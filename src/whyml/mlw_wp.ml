@@ -69,6 +69,8 @@ let pv_old = create_pvsymbol (id_fresh "'old") vtv_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 
+let t_at_old t = t_app fs_at [t; t_old] t.t_ty
+
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
 let t_absurd  = ps_app ls_absurd []
 
@@ -81,8 +83,7 @@ let vtv_of_vs vs =
 
 (* replace every occurrence of [old(t)] with [at(t,'old)] *)
 let rec remove_old f = match f.t_node with
-  | Tapp (ls,[t]) when ls_equal ls fs_old ->
-      t_app fs_at [remove_old t; t_old] f.t_ty
+  | Tapp (ls,[t]) when ls_equal ls fs_old -> t_at_old (remove_old t)
   | _ -> t_map remove_old f
 
 (* FIXME? Do we need this? *)
@@ -330,11 +331,17 @@ let wp_label e f =
   let lab = Ident.Slab.union e.e_label f.t_label in
   t_label ?loc lab f
 
-let expl_pre    = Ident.create_label "expl:precondition"
-let expl_post   = Ident.create_label "expl:normal postcondition"
-let expl_xpost  = Ident.create_label "expl:exceptional postcondition"
-let expl_assert = Ident.create_label "expl:assertion"
-let expl_check  = Ident.create_label "expl:check"
+let expl_pre       = Ident.create_label "expl:precondition"
+let expl_post      = Ident.create_label "expl:normal postcondition"
+let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
+let expl_assert    = Ident.create_label "expl:assertion"
+let expl_check     = Ident.create_label "expl:check"
+let expl_loop_init = Ident.create_label "expl:loop invariant init"
+let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
+let expl_loop_var  = Ident.create_label "expl:loop variant decreases"
+(* FIXME? couldn't we just reuse "loop invariant" explanations? *)
+let expl_for_init  = Ident.create_label "expl:for loop initialization"
+let expl_for_keep  = Ident.create_label "expl:for loop preservation"
 
 let wp_expl l f =
   let lab = Slab.add Split_goal.stop_split f.t_label in
@@ -398,7 +405,28 @@ type wp_env = {
   prog_known : Mlw_decl.known_map;
   pure_known : Decl.known_map;
   global_env : Env.env;
+  ls_int_le  : Term.lsymbol;
+  ls_int_lt  : Term.lsymbol;
 }
+
+let decrease ?loc env mk_old varl =
+  let rec decr pr = function
+    | [] -> t_false
+    | { v_term = t; v_rel = rel }::varl ->
+        let old_t = mk_old t in
+        let d = match rel with
+          | Some ls -> ps_app ls [t; old_t]
+          | None when ty_equal (t_type t) ty_int ->
+              t_and
+                (ps_app env.ls_int_le [t_int_const "0"; old_t])
+                (ps_app env.ls_int_lt [t; old_t])
+          | None -> Loc.errorm ?loc
+              "no default WF order for %a" Pretty.print_term t
+        in
+        let npr = t_and_simp pr (t_equ t old_t) in
+        t_or_simp (t_and_simp pr d) (decr npr varl)
+  in
+  if varl = [] then t_true else decr t_true varl
 
 (** Reconstruct pure values after writes *)
 
@@ -639,10 +667,19 @@ and wp_desc env e q xq = match e.e_node with
       let w = wp_abstract env eff c_q Mexn.empty q xq in
       let q = create_post (vs_result e1) w in
       wp_label e (wp_expr env e1 q xq)
+  | Eloop (inv, varl, e1) ->
+      (* TODO: what do we do about well-foundness? *)
+      let i = wp_expl expl_loop_keep inv in
+      let d = decrease ?loc:e.e_loc env t_at_old varl in
+      let q = create_unit_post (wp_and ~sym:true i d) in
+      let w = relativize (wp_expr env e1) q xq in
+      let regs = regs_of_writes e1.e_effect in
+      let w = quantify env regs (wp_implies inv w) in
+      let i = wp_expl expl_loop_init inv in
+      wp_label e (wp_and ~sym:true i w)
 
   (* TODO *)
   |Efor (_, _, _, _)-> t_true
-  |Eloop (_, _, _)-> t_true
 
 and wp_abstract env c_eff c_q c_xq q xq =
   let regs = regs_of_writes c_eff in
@@ -752,11 +789,14 @@ let add_wp_decl name f uc =
   let d = create_prop_decl Pgoal pr f in
   Theory.add_decl uc d
 
-let mk_env env km th = {
-  prog_known = km;
-  pure_known = Theory.get_known th;
-  global_env = env;
-}
+let mk_env env km th =
+  let th_int = Env.find_theory env ["int"] "Int" in
+  { prog_known = km;
+    pure_known = Theory.get_known th;
+    global_env = env;
+    ls_int_le  = Theory.ns_find_ls th_int.th_export ["infix <="];
+    ls_int_lt  = Theory.ns_find_ls th_int.th_export ["infix <"];
+  }
 
 let wp_let env km th ({ let_var = lv; let_expr = e } as ld) =
   spec_let ld;
