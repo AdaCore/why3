@@ -607,8 +607,8 @@ admit. (* needs lemmas on fresh_from *)
 admit.
 admit.
 (* case 4: v_1 bin_op e_2 *)
-simpl. 
 intros q h.
+
 admit. 
 
 (* case 5: v_1 bin_op v_2 *)

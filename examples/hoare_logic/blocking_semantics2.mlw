@@ -7,6 +7,8 @@ theory ImpExpr
 
 use import int.Int
 use import bool.Bool
+use export list.List
+use map.Map as IdMap
 
 (** types and values *)
 
@@ -20,12 +22,12 @@ type operator = Oplus | Ominus | Omult | Ole
 (* TODO: introduce two distinct
    types mident and ident *)
 (** ident for mutable variable*)
-type mident 
+type mident
 
 (** ident for imutable variable*)
-type ident 
+type ident
 
-constant result : ident 
+constant result : ident
 
 type term =
   | Tvalue value
@@ -41,11 +43,46 @@ type fmla =
   | Flet ident term fmla         (* let id = term in fmla *)
   | Fforall ident datatype fmla  (* forall id : ty, fmla *)
 
-use map.Map as IdMap
+(** Typing *)
+
+function type_value (v:value) : datatype =
+    match v with
+      | Vvoid  -> TYunit
+      | Vint int ->  TYint
+      | Vbool bool -> TYbool
+end
+
+inductive type_operator (op:operator) (ty1 ty2 ty: datatype) =
+      | Type_plus : type_operator Oplus TYint TYint TYint
+      | Type_minus : type_operator Ominus TYint TYint TYint
+      | Type_mult : type_operator Omult TYint TYint TYint
+      | Type_le : type_operator Ole TYint TYint TYbool
+
+type type_stack = list (ident, datatype)  (* map local immutable variables to their type *)
+function get_vartype (i:ident) (pi:type_stack) : datatype =
+  match pi with
+  | Nil -> TYunit
+  | Cons (x,ty) r -> if x=i then ty else get_vartype i r
+  end
+
+type type_env = IdMap.map mident datatype  (* map global mutable variables to their type *)
+function get_reftype (i:mident) (e:type_env) : datatype = IdMap.get e i
+
+inductive type_term type_env type_stack term datatype =
+  | Type_value : forall sigma: type_env, pi:type_stack, v:value. type_term sigma pi (Tvalue v) (type_value v)
+  | Type_var : forall sigma: type_env, pi:type_stack, v: ident, ty:datatype.
+        (get_vartype v pi = ty) -> type_term sigma pi (Tvar v) (ty)
+  | Type_deref : forall sigma: type_env, pi:type_stack, v: mident, ty:datatype.
+        (get_reftype v sigma = ty) -> type_term sigma pi (Tderef v) (ty)
+  | Type_bin : forall sigma: type_env, pi:type_stack, t1 t2 : term, op:operator, ty1 ty2 ty:datatype.
+        (type_term sigma pi t1 ty1) /\
+	(type_term sigma pi t2 ty2) /\
+	(type_operator op ty1 ty2 ty) -> type_term sigma pi (Tbin t1 op t2) ty
+
+(** Operational semantic *)
 type env = IdMap.map mident value  (* map global mutable variables to their value *)
 function get_env (i:mident) (e:env) : value = IdMap.get e i
 
-use export list.List
 type stack = list (ident, value)  (* map local immutable variables to their value *)
 function get_stack (i:ident) (pi:stack) : value =
   match pi with
@@ -91,22 +128,29 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   | Fand f1 f2 -> eval_fmla sigma pi f1 /\ eval_fmla sigma pi f2
   | Fnot f -> not (eval_fmla sigma pi f)
   | Fimplies f1 f2 -> eval_fmla sigma pi f1 -> eval_fmla sigma pi f2
-  | Flet x t f -> 
+  | Flet x t f ->
       eval_fmla sigma (Cons (x,eval_term sigma pi t) pi) f
-  | Fforall x TYint f -> 
+  | Fforall x TYint f ->
      forall n:int. eval_fmla sigma (Cons (x,Vint n) pi) f
   | Fforall x TYbool f ->
      forall b:bool. eval_fmla sigma (Cons (x,Vbool b) pi) f
-  | Fforall x TYunit f ->  eval_fmla sigma (Cons (x,Vvoid) pi) f 
+  | Fforall x TYunit f ->  eval_fmla sigma (Cons (x,Vvoid) pi) f
   end
 
 (** substitution of a reference [r] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is fresh *)
 
-function subst_term (e:term) (r:mident) (v:ident) : term =
+function msubst_term (e:term) (r:mident) (v:ident) : term =
   match e with
   | Tvalue _ | Tvar _ -> e
   | Tderef x -> if r = x then Tvar v else e
+  | Tbin e1 op e2 -> Tbin (msubst_term e1 r v) op (msubst_term e2 r v)
+  end
+
+function subst_term (e:term) (r:ident) (v:ident) : term =
+  match e with
+  | Tvalue _ | Tderef _ -> e
+  | Tvar x -> if r = x then Tvar v else e
   | Tbin e1 op e2 -> Tbin (subst_term e1 r v) op (subst_term e2 r v)
   end
 
@@ -119,11 +163,17 @@ predicate fresh_in_term (id:ident) (t:term) =
   | Tbin t1 _ t2 -> fresh_in_term id t1 /\ fresh_in_term id t2
   end
 
-lemma eval_subst_term:
+lemma eval_msubst_term:
   forall sigma:env, pi:stack, e:term, x:mident, v:ident.
     fresh_in_term v e ->
-    eval_term sigma pi (subst_term e x v) =
+    eval_term sigma pi (msubst_term e x v) =
     eval_term (IdMap.set sigma x (get_stack v pi)) pi e
+
+lemma eval_subst_term:
+  forall sigma:env, pi:stack, e:term, x:ident, v:ident.
+    fresh_in_term v e ->
+    eval_term sigma pi (subst_term e x v) =
+    eval_term sigma (Cons (x, (get_stack v pi)) pi) e
 
 lemma eval_term_change_free :
   forall t:term, sigma:env, pi:stack, id:ident, v:value.
@@ -140,7 +190,7 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
   | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
   end
 
-function subst (f:fmla) (x:mident) (v:ident) : fmla =
+function subst (f:fmla) (x:ident) (v:ident) : fmla =
   match f with
   | Fterm e -> Fterm (subst_term e x v)
   | Fand f1 f2 -> Fand (subst f1 x v) (subst f2 x v)
@@ -150,9 +200,19 @@ function subst (f:fmla) (x:mident) (v:ident) : fmla =
   | Fforall y ty f -> Fforall y ty (subst f x v)
   end
 
-(* lemma subst_fresh : *)
-(*   forall f:fmla, x:mident, v:mident. *)
-(*    fresh_in_fmla x f -> subst f x v = f *)
+function msubst (f:fmla) (x:mident) (v:ident) : fmla =
+  match f with
+  | Fterm e -> Fterm (msubst_term e x v)
+  | Fand f1 f2 -> Fand (msubst f1 x v) (msubst f2 x v)
+  | Fnot f -> Fnot (msubst f x v)
+  | Fimplies f1 f2 -> Fimplies (msubst f1 x v) (msubst f2 x v)
+  | Flet y t f -> Flet y (msubst_term t x v) (msubst f x v)
+  | Fforall y ty f -> Fforall y ty (msubst f x v)
+  end
+
+lemma subst_fresh :
+  forall f:fmla, x:ident, v:ident.
+   fresh_in_fmla x f -> subst f x v = f
 
 lemma let_subst:
     forall t:term, f:fmla, x id':ident, id :mident.
@@ -545,12 +605,12 @@ predicate expr_writes (e:expr) (w:Set.set mident) =
     | Ebin e1 op e2 ->
        let t1 = fresh_from q e in
        let t2 = fresh_from (Fand (Fterm (Tvar t1)) q) e in
-       (* let q' = Flet result (Tbin (Tvar t1) op (Tvar t2)) q in *)
-       (* let f = wp e2 (Flet t2 (Tvar result) q') in *)
-       (* wp e1 (Flet t1 (Tvar result) f) *)
-       let wp_op = subst q (Tvar result) (Tbin (Tvar t1) op (Tvar t2)) in
-       let wp2 = (subst (wp e2 wp_op) t2 (Tvar result)) in
-       (subst (wp e1 wp2) t1 (Tvar result))
+       let q' = Flet result (Tbin (Tvar t1) op (Tvar t2)) q in
+       let f = wp e2 (Flet t2 (Tvar result) q') in
+       wp e1 (Flet t1 (Tvar result) f)
+       (* let wp_op = subst q (Tvar result) (Tbin (Tvar t1) op (Tvar t2)) in *)
+       (* let wp2 = (subst (wp e2 wp_op) t2 (Tvar result)) in *)
+       (* (subst (wp e1 wp2) t1 (Tvar result)) *)
     | Eassign x e ->
         let id = fresh_from q e in
         let q' = Flet result (Tvalue Vvoid) q in
@@ -599,21 +659,25 @@ predicate expr_writes (e:expr) (w:Set.set mident) =
       eval_fmla sigma pi (wp e q) ->
       eval_fmla sigma' pi' (wp e' q)
 
-  predicate not_a_value (e:expr) =
+  predicate is_value (e:expr) =
     match e with
-    | Evalue _ -> false
-    | _ -> true
+    | Evalue _ -> true
+    | _ -> false
     end
 
   lemma decide_value:
-    forall e:expr. not_a_value e \/ exists v:value. e = Evalue v
+    forall e:expr. not (is_value e) \/ exists v:value. e = Evalue v
+
+  lemma bool_value:
+    forall e:expr. type_expr sigmat pit e TYbool -> is_value e -> 
+          (e = Tvalue True) \/ (e = Tvalue False).
 
   lemma progress:
-    forall e:expr, sigma:env, pi:stack, q:fmla.
-    eval_fmla sigma pi (wp e q) /\ not_a_value e ->
+    forall e:expr, sigma:env, pi:stack, sigmat: type_env, pit: type_stack, ty: datatype, q:fmla.
+      type_expr sigmat pit e ty -> type_fmla sigmat (Cons(result, ty) pit) q
+    eval_fmla sigma pi (wp e q) -> not_a_value e ->
     exists sigma':env, pi':stack, e':expr.
       one_step sigma pi e sigma' pi' e'
-
 
 (*
   let rec compute_writes (s:expr) : Set.set ident =
