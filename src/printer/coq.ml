@@ -33,6 +33,16 @@ let black_list =
   [ "at"; "cofix"; "exists2"; "fix"; "IF"; "left"; "mod"; "Prop";
     "return"; "right"; "Set"; "Type"; "using"; "where"; ]
 
+let char_to_alpha c =
+  match c with
+    | '\'' -> String.make 1 c
+    | _ -> Ident.char_to_alpha c
+
+let char_to_alnumus c =
+  match c with
+    | '\'' -> String.make 1 c
+    | _ -> Ident.char_to_alnumus c
+
 let fresh_printer () =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer black_list ~sanitizer:isanitize

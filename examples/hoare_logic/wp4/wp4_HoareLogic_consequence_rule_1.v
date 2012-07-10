@@ -278,35 +278,35 @@ Inductive one_step : (map refident value) -> (list (Z* value)%type) -> expr
   | one_step_deref : forall (sigma:(map refident value)) (pi:(list (Z*
       value)%type)) (r:refident), (one_step sigma pi (Ederef r) sigma pi
       (Evalue (get sigma r)))
-  | one_step_assign_ctxt : forall (sigma:(map refident value)) (sigmaqt:(map
-      refident value)) (pi:(list (Z* value)%type)) (piqt:(list (Z*
-      value)%type)) (x:refident) (e:expr) (eqt:expr), (one_step sigma pi e
-      sigmaqt piqt eqt) -> (one_step sigma pi (Eassign x e) sigmaqt piqt
-      (Eassign x eqt))
+  | one_step_assign_ctxt : forall (sigma:(map refident value)) (sigma':(map
+      refident value)) (pi:(list (Z* value)%type)) (pi':(list (Z*
+      value)%type)) (x:refident) (e:expr) (e':expr), (one_step sigma pi e
+      sigma' pi' e') -> (one_step sigma pi (Eassign x e) sigma' pi'
+      (Eassign x e'))
   | one_step_assign_value : forall (sigma:(map refident value)) (pi:(list (Z*
       value)%type)) (x:refident) (v:value), (one_step sigma pi (Eassign x
       (Evalue v)) (set sigma x v) pi (Evalue Vvoid))
-  | one_step_seq_ctxt : forall (sigma:(map refident value)) (sigmaqt:(map
-      refident value)) (pi:(list (Z* value)%type)) (piqt:(list (Z*
-      value)%type)) (e1:expr) (e1qt:expr) (e2:expr), (one_step sigma pi e1
-      sigmaqt piqt e1qt) -> (one_step sigma pi (Eseq e1 e2) sigmaqt piqt
-      (Eseq e1qt e2))
+  | one_step_seq_ctxt : forall (sigma:(map refident value)) (sigma':(map
+      refident value)) (pi:(list (Z* value)%type)) (pi':(list (Z*
+      value)%type)) (e1:expr) (e1':expr) (e2:expr), (one_step sigma pi e1
+      sigma' pi' e1') -> (one_step sigma pi (Eseq e1 e2) sigma' pi' (Eseq e1'
+      e2))
   | one_step_seq_value : forall (sigma:(map refident value)) (pi:(list (Z*
       value)%type)) (e:expr), (one_step sigma pi (Eseq (Evalue Vvoid) e)
       sigma pi e)
-  | one_step_let_ctxt : forall (sigma:(map refident value)) (sigmaqt:(map
-      refident value)) (pi:(list (Z* value)%type)) (piqt:(list (Z*
-      value)%type)) (id:Z) (e1:expr) (e1qt:expr) (e2:expr), (one_step sigma
-      pi e1 sigmaqt piqt e1qt) -> (one_step sigma pi (Elet id e1 e2) sigmaqt
-      piqt (Elet id e1qt e2))
+  | one_step_let_ctxt : forall (sigma:(map refident value)) (sigma':(map
+      refident value)) (pi:(list (Z* value)%type)) (pi':(list (Z*
+      value)%type)) (id:Z) (e1:expr) (e1':expr) (e2:expr), (one_step sigma pi
+      e1 sigma' pi' e1') -> (one_step sigma pi (Elet id e1 e2) sigma' pi'
+      (Elet id e1' e2))
   | one_step_let_value : forall (sigma:(map refident value)) (pi:(list (Z*
       value)%type)) (id:Z) (v:value) (e:expr), (one_step sigma pi (Elet id
       (Evalue v) e) sigma (Cons (id, v) pi) e)
-  | one_step_if_ctxt : forall (sigma:(map refident value)) (sigmaqt:(map
-      refident value)) (pi:(list (Z* value)%type)) (piqt:(list (Z*
-      value)%type)) (e1:expr) (e1qt:expr) (e2:expr) (e3:expr),
-      (one_step sigma pi e1 sigmaqt piqt e1qt) -> (one_step sigma pi (Eif e1
-      e2 e3) sigmaqt piqt (Eif e1qt e2 e3))
+  | one_step_if_ctxt : forall (sigma:(map refident value)) (sigma':(map
+      refident value)) (pi:(list (Z* value)%type)) (pi':(list (Z*
+      value)%type)) (e1:expr) (e1':expr) (e2:expr) (e3:expr), (one_step sigma
+      pi e1 sigma' pi' e1') -> (one_step sigma pi (Eif e1 e2 e3) sigma' pi'
+      (Eif e1' e2 e3))
   | one_step_if_true : forall (sigma:(map refident value)) (pi:(list (Z*
       value)%type)) (e1:expr) (e2:expr), (one_step sigma pi
       (Eif (Evalue (Vbool true)) e1 e2) sigma pi e1)
@@ -317,8 +317,8 @@ Inductive one_step : (map refident value) -> (list (Z* value)%type) -> expr
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Eassert f) sigma pi (Evalue Vvoid))
   | one_step_while : forall (sigma:(map refident value)) (pi:(list (Z*
-      value)%type)) (e:expr) (inv:fmla) (eqt:expr), (one_step sigma pi
-      (Ewhile e inv eqt) sigma pi (Eif e (Eseq eqt (Ewhile e inv eqt))
+      value)%type)) (e:expr) (inv:fmla) (e':expr), (one_step sigma pi
+      (Ewhile e inv e') sigma pi (Eif e (Eseq e' (Ewhile e inv e'))
       (Evalue Vvoid))).
 
 (* Why3 assumption *)
@@ -362,18 +362,24 @@ Definition valid_fmla(p:fmla): Prop := forall (sigma:(map refident value))
 (* Why3 assumption *)
 Definition valid_triple(p:fmla) (e:expr) (q:fmla): Prop := forall (sigma:(map
   refident value)) (pi:(list (Z* value)%type)), (eval_fmla sigma pi p) ->
-  forall (sigmaqt:(map refident value)) (piqt:(list (Z* value)%type))
-  (v:value) (n:Z), (many_steps sigma pi e sigmaqt piqt (Evalue v) n) ->
-  (eval_fmla sigmaqt (Cons ((-1%Z)%Z, v) piqt) q).
+  forall (sigma':(map refident value)) (pi':(list (Z* value)%type)) (v:value)
+  (n:Z), (many_steps sigma pi e sigma' pi' (Evalue v) n) -> (eval_fmla sigma'
+  (Cons ((-1%Z)%Z, v) pi') q).
 
 (* Why3 goal *)
-Theorem consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
-  (e:expr), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p e q) ->
-  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt e qqt))).
+Theorem consequence_rule : forall (p:fmla) (p':fmla) (q:fmla) (q':fmla)
+  (e:expr), (valid_fmla (Fimplies p' p)) -> ((valid_triple p e q) ->
+  ((valid_fmla (Fimplies q q')) -> (valid_triple p' e q'))).
 intros p p' q q' e h1 h2 h3.
 unfold valid_triple, valid_fmla in *.
 intros.
-
+simpl in h3.
+apply h3.
+eapply h2.
+simpl in h1.
+apply h1.
+apply H.
+apply H0.
 Qed.
 
 
