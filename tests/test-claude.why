@@ -123,6 +123,15 @@ theory TestFloat
 
 end
 
+theory TestIntros
+
+  use import int.Int
+
+  goal G : 
+    forall x y : int. x > 0 /\ y > 0 ->
+      (exists z t:int. x + t = y + z) -> x > y
+
+end
 
 
 theory TestRealize
