@@ -582,6 +582,7 @@ Theorem progress : forall (e:expr) (sigma:(map ident value)) (pi:(list
   (not_a_value e)) -> exists sigmaqt:(map ident value), exists piqt:(list
   (ident* value)%type), exists eqt:expr, (one_step sigma pi e sigmaqt piqt
   eqt).
+
 induction e.
 simpl; tauto.
 (* case 1: e = bin e1 op e2 *)
@@ -624,7 +625,6 @@ exists pi.
 exists (Evalue (eval_bin v o v2)).
 apply one_step_bin_value.
 
-
 (* case 2 : e = var *)
 intros sigma pi q (h1 & _).
 eexists.
@@ -661,24 +661,74 @@ eapply one_step_assign_value.
 (* case 5: e = e1; e2 *)
 destruct (decide_value e1).
 (* case 5.1: e1 not a value *)
-admit. (* TODO by Asma *)
-(* case 1.2: e1 is a value *)
-admit. (* TODO by Asma *)
+intros sigma pi q (h1 & _).
+generalize (IHe1 _ _ _ (conj h1 H)).
+intros (sigma' & pi' & e' & h).
+exists sigma'.
+exists pi'.
+exists (Eseq e' e2).
+eapply one_step_seq_ctxt; auto.
 
-(* case 6: e = let id = e1 in e2 *)
+(* case 5.2: e1 is a value *)
+elim H; clear H; intros v He_v.
+subst e1.
+intros sigma pi q (h2 & h3).
+eexists.
+exists pi.
+eexists.
+assert (h: v = Vvoid).
+(* problem : typage pour savoir que v est void *) 
+admit.
+subst v.
+eapply one_step_seq_value.
+
+(* case 6: e = let i = e1 in e2 *)
 destruct (decide_value e1).
 (* case 6.1: e1 not a value *)
-admit. (* TODO by Asma *)
+intros sigma pi q (h1 & _).
+generalize (IHe1 _ _ _(conj h1 H)).
+intros (sigma' & pi' & e' & h).
+exists sigma'.
+exists pi'.
+exists (Elet i e' e2).
+eapply one_step_let_ctxt; auto.
+
 (* case 6.2: e1 is a value *)
-admit. (* TODO by Asma *)
+elim H; clear H; intros v He_v.
+subst e1.
+intros sigma pi q (h2 & h3).
+eexists.
+eexists.
+eexists.
+eapply one_step_let_value.
 
 (* case 7: e = if e1 then e2 else e3 *)
 destruct (decide_value e1).
-(* case 6.1: e1 not a value *)
-admit. (* TODO by Asma *)
-(* case 6.2: e1 is a value *)
+(* case 7.1: e1 not a value *)
+intros sigma pi q (h1 & _).
+simpl in h1.
+generalize (IHe1 _ _ _ (conj h1 H)).
+intros (sigma' & pi' & e' & h).
+exists sigma'.
+exists pi'.
+exists (Eif e' e2 e3).
+eapply one_step_if_ctxt; auto.
+(* case 7.2: e1 is a value *)
+elim H; clear H; intros v He_v.
+subst e1.
+intros sigma pi q (h2 & h3).
+eexists sigma.
+exists pi.
+assert (h: v = Vbool true \/ v = Vbool false).
 (* problem : typage pour savoir que v est true ou false *)
 admit.
+destruct h.
+eexists.
+subst v.
+apply one_step_if_true.
+subst v.
+eexists.
+apply one_step_if_false.
 
 (* case 8 : e = assert f *)
 intros sigma pi q (h1 & _ ).
@@ -690,13 +740,13 @@ eexists.
 apply one_step_assert; auto.
 
 (* case 9: e = while cond inv body *)
-destruct (decide_value e1).
-(* case 6.1: e1 not a value *)
-admit. (* TODO by Asma *)
-(* case 6.2: e1 is a value *)
-(* problem : typage pour savoir que v est true ou false *)
-admit.
-
+intros sigma pi q (h1, h2).
+simpl in h1.
+destruct h1.
+eexists.
+eexists.
+eexists.
+eapply one_step_while; auto.
 
 Qed.
 
