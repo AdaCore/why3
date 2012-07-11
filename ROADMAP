@@ -62,7 +62,6 @@
 =========== Middle-term roadmap ==========================================
 
 * replayer
-** DONE option pour ne rejouer que si obsolete
 ** deplacer option -bench dans une commande de why3session
 
 * Sortie PVS
@@ -112,11 +111,6 @@
   (cf: en caml cela ne marche pas)
  Solution proposee: utiliser des types classes, en particulier Inhabited
 
-* new language constructs
-** NOT NEEDED ANYMORE sandbox
-** DONE abstract e { q }
-** contract e { q }
-
 * efficiency issues
  - understand problems when large number of goals (cf D Mentré examples)
  - also: BTS 13736
@@ -130,18 +124,13 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 * Documentation
  - (ANDREI) make the glossary available 
- - DONE (CLAUDE) revoir documentation du smoke detector
  - (CLAUDE) complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
-
-* DONE Ajouter un result de prouveur "outofmemory" analogue a "timeout"
 
 * Contre-exemples de Alt-Ergo
 
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
-
-
 
 
 * IDE
@@ -155,6 +144,67 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 * (JCF) reject global "val"s in typing environment for logic decls.
 
+
+==================== Roadmap for release 0.73 ========================
+
+== New Features to announce ==
+
+New features:
+  o [Why3ml] new construct "abstract e { q }"
+  o [Coq output] default tactic is now "intros ..." with a pattern
+    that matches the structure of the goal
+  o [why3replayer] option -obsolete-only
+  o co-inductive predicates (experimental ?)
+  o new option -e for "why3session latex" allows to specify when to
+    split tables in parts
+
+Bug fix:
+  o completed support for the "Out Of Memory" prover result
+  o [Coq output] quotes in identifiers remain quotes in Coq
+  o workaround for a bug about modulo operator in Alt-Ergo 0.94
+  o fixed a consistency issue with set.Fset theory
+
+
+== Final preparation ==
+
+* check that nightly bench is OK
+* put 0.73 in file Version
+* check headers
+* check the file CHANGES
+* manual in PDF: check that macro \todo is commented out
+    in ./macros.tex
+* do "make distrib"
+* test the distrib why3-0.73.tar.gz
+* make a last commit:
+ - add tag 0.73 to the git repository (do not forget to push it)
+* put on the web page
+ - why3-0.73.tar.gz
+ - standard library online, using why3doc (make stdlibdoc),
+   to http://why3.lri.fr/stdlib/
+ - API doc, produced using ocamldoc (make apidoc), to http://why3.lri.fr/api/
+    Note: check that URL of API doc is correct in doc/api.tex line 9.
+ - update the main HTML page (sources are in why3-papers/www)
+
+* produce the Why3 part of ProVal gallery ?
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+== TODOs ==
+
+* DONE Ajouter un result de prouveur "outofmemory" analogue a "timeout"
+
+* Why3ML new language constructs
+** NOT NEEDED ANYMORE sandbox
+** DONE abstract e { q }
+** DELAYED contract e { q }
+
+* replayer
+** DONE option pour ne rejouer que si obsolete
+
+* Documentation
+ - document co-inductive predicates ?
+ - DONE (CLAUDE) revoir documentation du smoke detector
 
 ==================== Roadmap for release 0.72 ========================
 
