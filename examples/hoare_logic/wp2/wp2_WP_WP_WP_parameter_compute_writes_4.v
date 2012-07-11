@@ -74,12 +74,12 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
+Parameter const: forall (a:Type) (b:Type), b -> (map a b).
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
@@ -183,7 +183,7 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   | (Fand f1 f2) => (Fand (subst f1 x v) (subst f2 x v))
   | (Fnot f1) => (Fnot (subst f1 x v))
   | (Fimplies f1 f2) => (Fimplies (subst f1 x v) (subst f2 x v))
-  | (Flet y t f1) => (Flet y t (subst f1 x v))
+  | (Flet y t f1) => (Flet y (subst_term t x v) (subst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (subst f1 x v))
   end.
 Unset Implicit Arguments.
@@ -219,9 +219,9 @@ Inductive one_step : (map Z value) -> (map Z value) -> stmt -> (map Z value)
       (e:term), (one_step sigma pi (Sassign x e) (set sigma x
       (eval_term sigma pi e)) pi Sskip)
   | one_step_seq : forall (sigma:(map Z value)) (pi:(map Z value))
-      (sigmaqt:(map Z value)) (piqt:(map Z value)) (i1:stmt) (i1qt:stmt)
-      (i2:stmt), (one_step sigma pi i1 sigmaqt piqt i1qt) -> (one_step sigma
-      pi (Sseq i1 i2) sigmaqt piqt (Sseq i1qt i2))
+      (sigma':(map Z value)) (pi':(map Z value)) (i1:stmt) (i1':stmt)
+      (i2:stmt), (one_step sigma pi i1 sigma' pi' i1') -> (one_step sigma pi
+      (Sseq i1 i2) sigma' pi' (Sseq i1' i2))
   | one_step_seq_skip : forall (sigma:(map Z value)) (pi:(map Z value))
       (i:stmt), (one_step sigma pi (Sseq Sskip i) sigma pi i)
   | one_step_if_true : forall (sigma:(map Z value)) (pi:(map Z value))
@@ -272,41 +272,9 @@ Definition valid_fmla(p:fmla): Prop := forall (sigma:(map Z value)) (pi:(map
 
 (* Why3 assumption *)
 Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (sigma:(map
-  Z value)) (pi:(map Z value)), (eval_fmla sigma pi p) ->
-  forall (sigmaqt:(map Z value)) (piqt:(map Z value)) (n:Z),
-  (many_steps sigma pi i sigmaqt piqt Sskip n) -> (eval_fmla sigmaqt piqt q).
-
-Axiom skip_rule : forall (q:fmla), (valid_triple q Sskip q).
-
-Axiom assign_rule : forall (q:fmla) (x:Z) (id:Z) (e:term), (fresh_in_fmla id
-  q) -> (valid_triple (Flet id e (subst q x id)) (Sassign x e) q).
-
-Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) -> (valid_triple p
-  (Sseq i1 i2) q).
-
-Axiom if_rule : forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple (Fand p (Fterm e)) i1 q) /\ (valid_triple (Fand p
-  (Fnot (Fterm e))) i2 q)) -> (valid_triple p (Sif e i1 i2) q).
-
-Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
-  (valid_triple p (Sassert f) p).
-
-Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
-  p) (Sassert f) p).
-
-Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
-  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
-  inv i) (Fand (Fnot (Fterm e)) inv)).
-
-Axiom while_rule_ext : forall (e:term) (inv:fmla) (invqt:fmla) (i:stmt),
-  (valid_fmla (Fimplies invqt inv)) -> ((valid_triple (Fand (Fterm e) invqt)
-  i invqt) -> (valid_triple invqt (Swhile e inv i) (Fand (Fnot (Fterm e))
-  invqt))).
-
-Axiom consequence_rule : forall (p:fmla) (pqt:fmla) (q:fmla) (qqt:fmla)
-  (i:stmt), (valid_fmla (Fimplies pqt p)) -> ((valid_triple p i q) ->
-  ((valid_fmla (Fimplies q qqt)) -> (valid_triple pqt i qqt))).
+  Z value)) (pi:(map Z value)), (eval_fmla sigma pi p) -> forall (sigma':(map
+  Z value)) (pi':(map Z value)) (n:Z), (many_steps sigma pi i sigma' pi'
+  Sskip n) -> (eval_fmla sigma' pi' q).
 
 Parameter set1 : forall (a:Type), Type.
 
@@ -376,6 +344,12 @@ Axiom diff_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
 Axiom subset_diff : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)),
   (subset (diff s1 s2) s1).
 
+Parameter choose: forall (a:Type), (set1 a) -> a.
+Implicit Arguments choose.
+
+Axiom choose_def : forall (a:Type), forall (s:(set1 a)), (~ (is_empty s)) ->
+  (mem (choose s) s).
+
 Parameter all: forall (a:Type), (set1 a).
 Set Contextual Implicit.
 Implicit Arguments all.
@@ -384,9 +358,9 @@ Unset Contextual Implicit.
 Axiom all_def : forall (a:Type), forall (x:a), (mem x (all :(set1 a))).
 
 (* Why3 assumption *)
-Definition assigns(sigma:(map Z value)) (a:(set1 Z)) (sigmaqt:(map Z
+Definition assigns(sigma:(map Z value)) (a:(set1 Z)) (sigma':(map Z
   value)): Prop := forall (i:Z), (~ (mem i a)) -> ((get sigma
-  i) = (get sigmaqt i)).
+  i) = (get sigma' i)).
 
 Axiom assigns_refl : forall (sigma:(map Z value)) (a:(set1 Z)),
   (assigns sigma a sigma).
@@ -395,13 +369,24 @@ Axiom assigns_trans : forall (sigma1:(map Z value)) (sigma2:(map Z value))
   (sigma3:(map Z value)) (a:(set1 Z)), ((assigns sigma1 a sigma2) /\
   (assigns sigma2 a sigma3)) -> (assigns sigma1 a sigma3).
 
-Axiom assigns_union_left : forall (sigma:(map Z value)) (sigmaqt:(map Z
-  value)) (s1:(set1 Z)) (s2:(set1 Z)), (assigns sigma s1 sigmaqt) ->
-  (assigns sigma (union s1 s2) sigmaqt).
+Axiom assigns_union_left : forall (sigma:(map Z value)) (sigma':(map Z
+  value)) (s1:(set1 Z)) (s2:(set1 Z)), (assigns sigma s1 sigma') ->
+  (assigns sigma (union s1 s2) sigma').
 
-Axiom assigns_union_right : forall (sigma:(map Z value)) (sigmaqt:(map Z
-  value)) (s1:(set1 Z)) (s2:(set1 Z)), (assigns sigma s2 sigmaqt) ->
-  (assigns sigma (union s1 s2) sigmaqt).
+Axiom assigns_union_right : forall (sigma:(map Z value)) (sigma':(map Z
+  value)) (s1:(set1 Z)) (s2:(set1 Z)), (assigns sigma s2 sigma') ->
+  (assigns sigma (union s1 s2) sigma').
+
+(* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint stmt_writes(i:stmt) (w:(set1 Z)) {struct i}: Prop :=
+  match i with
+  | (Sskip|(Sassert _)) => True
+  | (Sassign id _) => (mem id w)
+  | ((Sseq s1 s2)|(Sif _ s1 s2)) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
+  | (Swhile _ _ s) => (stmt_writes s w)
+  end.
+Unset Implicit Arguments.
 
 (* Why3 goal *)
 Theorem WP_parameter_compute_writes : forall (s:stmt),
@@ -411,22 +396,20 @@ Theorem WP_parameter_compute_writes : forall (s:stmt),
   | (Sseq s1 s2) => True
   | (Sif _ s1 s2) => True
   | (Swhile _ _ s1) => forall (result:(set1 Z)), (forall (sigma:(map Z
-      value)) (pi:(map Z value)) (sigmaqt:(map Z value)) (piqt:(map Z value))
-      (n:Z), (many_steps sigma pi s1 sigmaqt piqt Sskip n) -> (assigns sigma
-      result sigmaqt)) -> forall (sigma:(map Z value)) (pi:(map Z value))
-      (sigmaqt:(map Z value)) (piqt:(map Z value)) (n:Z), (many_steps sigma
-      pi s sigmaqt piqt Sskip n) -> (assigns sigma result sigmaqt)
+      value)) (pi:(map Z value)) (sigma':(map Z value)) (pi':(map Z value))
+      (n:Z), (many_steps sigma pi s1 sigma' pi' Sskip n) -> (assigns sigma
+      result sigma')) -> forall (sigma:(map Z value)) (pi:(map Z value))
+      (sigma':(map Z value)) (pi':(map Z value)) (n:Z), (many_steps sigma pi
+      s sigma' pi' Sskip n) -> (assigns sigma result sigma')
   | (Sassert _) => True
   end.
 destruct s; intuition.
-generalize sigma pi sigmaqt piqt H0.
+generalize sigma pi sigma' pi' H0.
 generalize (steps_non_neg _ _ _ _ _ _ _ H0).
-clear sigma pi sigmaqt piqt H0.
+clear sigma pi sigma' pi' H0.
 intro H_n_pos.
-apply Z_lt_induction with (P:= fun n => 
-  forall sigma pi sigmaqt piqt : map Z value,
-many_steps sigma pi (Swhile t f s) sigmaqt piqt Sskip n ->
-assigns sigma result sigmaqt); auto.
+pattern n.
+apply Z_lt_induction; auto.
 intros x Hind sigma pi sigma' qt' Hsteps.
 inversion Hsteps; subst; clear Hsteps.
 inversion H0; subst; clear H0.

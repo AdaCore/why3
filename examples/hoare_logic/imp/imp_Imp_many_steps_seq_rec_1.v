@@ -2,21 +2,30 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+
 Parameter ident : Type.
+
+Axiom ident_eq_dec : forall (i1:ident) (i2:ident), (i1 = i2) \/ ~ (i1 = i2).
 
 Parameter mk_ident: Z -> ident.
 
+Axiom mk_ident_inj : forall (i:Z) (j:Z), ((mk_ident i) = (mk_ident j)) ->
+  (i = j).
 
+(* Why3 assumption *)
 Inductive operator  :=
   | Oplus : operator 
   | Ominus : operator 
   | Omult : operator .
 
+(* Why3 assumption *)
 Inductive expr  :=
   | Econst : Z -> expr 
   | Evar : ident -> expr 
   | Ebin : expr -> operator -> expr -> expr .
 
+(* Why3 assumption *)
 Inductive stmt  :=
   | Sskip : stmt 
   | Sassign : ident -> expr -> stmt 
@@ -29,11 +38,9 @@ Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
 Parameter map : forall (a:Type) (b:Type), Type.
 
 Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-
 Implicit Arguments get.
 
 Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-
 Implicit Arguments set.
 
 Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
@@ -44,17 +51,18 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
-
+Parameter const: forall (a:Type) (b:Type), b -> (map a b).
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
+Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
+  ((get (const b1:(map a b)) a1) = b1).
 
+(* Why3 assumption *)
 Definition state  := (map ident Z).
 
+(* Why3 assumption *)
 Definition eval_bin(x:Z) (op:operator) (y:Z): Z :=
   match op with
   | Oplus => (x + y)%Z
@@ -62,6 +70,7 @@ Definition eval_bin(x:Z) (op:operator) (y:Z): Z :=
   | Omult => (x * y)%Z
   end.
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint eval_expr(s:(map ident Z)) (e:expr) {struct e}: Z :=
   match e with
@@ -71,13 +80,14 @@ Fixpoint eval_expr(s:(map ident Z)) (e:expr) {struct e}: Z :=
   end.
 Unset Implicit Arguments.
 
+(* Why3 assumption *)
 Inductive one_step : (map ident Z) -> stmt -> (map ident Z)
   -> stmt -> Prop :=
   | one_step_assign : forall (s:(map ident Z)) (x:ident) (e:expr),
       (one_step s (Sassign x e) (set s x (eval_expr s e)) Sskip)
-  | one_step_seq : forall (s:(map ident Z)) (sqt:(map ident Z)) (i1:stmt)
-      (i1qt:stmt) (i2:stmt), (one_step s i1 sqt i1qt) -> (one_step s (Sseq i1
-      i2) sqt (Sseq i1qt i2))
+  | one_step_seq : forall (s:(map ident Z)) (s':(map ident Z)) (i1:stmt)
+      (i1':stmt) (i2:stmt), (one_step s i1 s' i1') -> (one_step s (Sseq i1
+      i2) s' (Sseq i1' i2))
   | one_step_seq_skip : forall (s:(map ident Z)) (i:stmt), (one_step s
       (Sseq Sskip i) s i)
   | one_step_if_true : forall (s:(map ident Z)) (e:expr) (i1:stmt) (i2:stmt),
@@ -91,8 +101,9 @@ Inductive one_step : (map ident Z) -> stmt -> (map ident Z)
       ((eval_expr s e) = 0%Z) -> (one_step s (Swhile e i) s Sskip).
 
 Axiom progress : forall (s:(map ident Z)) (i:stmt), (~ (i = Sskip)) ->
-  exists sqt:(map ident Z), exists iqt:stmt, (one_step s i sqt iqt).
+  exists s':(map ident Z), exists i':stmt, (one_step s i s' i').
 
+(* Why3 assumption *)
 Inductive many_steps : (map ident Z) -> stmt -> (map ident Z)
   -> stmt -> Prop :=
   | many_steps_refl : forall (s:(map ident Z)) (i:stmt), (many_steps s i s i)
@@ -100,10 +111,9 @@ Inductive many_steps : (map ident Z) -> stmt -> (map ident Z)
       ident Z)) (i1:stmt) (i2:stmt) (i3:stmt), (one_step s1 i1 s2 i2) ->
       ((many_steps s2 i2 s3 i3) -> (many_steps s1 i1 s3 i3)).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem many_steps_seq_rec : forall (s1:(map ident Z)) (s3:(map ident Z))
   (i:stmt) (i3:stmt), (many_steps s1 i s3 i3) -> ((i3 = Sskip) ->
   forall (i1:stmt) (i2:stmt), (i = (Sseq i1 i2)) -> exists s2:(map ident Z),
@@ -121,7 +131,7 @@ intros H4 i5 i6 H56.
 subst.
 inversion Hstep; subst.
 (* case 1: one_step_seq (no skip) *)
-elim Hind with (i1:=i1qt) (i2:=i6); auto; clear Hind.
+elim Hind with (i1:=i1') (i2:=i6); auto; clear Hind.
 intros s6 (H1,H2).
 exists s6.
 split; auto.
@@ -130,6 +140,5 @@ eapply many_steps_trans; eauto.
 exists s4.
 split; [constructor | auto].
 Qed.
-(* DO NOT EDIT BELOW *)
 
 
