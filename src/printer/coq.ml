@@ -33,10 +33,12 @@ let black_list =
   [ "at"; "cofix"; "exists2"; "fix"; "IF"; "left"; "mod"; "Prop";
     "return"; "right"; "Set"; "Type"; "using"; "where"; ]
 
+(* wrong: ' not allowed as first character in Coq identifiers
 let char_to_alpha c =
   match c with
     | '\'' -> String.make 1 c
     | _ -> Ident.char_to_alpha c
+*)
 
 let char_to_alnumus c =
   match c with
@@ -530,7 +532,7 @@ let rec output_remaining fmt ?(in_other=false) script =
 let rec intros_hyp n fmt f =
   match f.t_node with
     | Tbinop(Tand,f1,f2) ->
-      fprintf fmt "@ (";
+      fprintf fmt "(";
       let m = intros_hyp n fmt f1 in
       fprintf fmt ",";
       let k = intros_hyp m fmt f2 in
@@ -538,7 +540,6 @@ let rec intros_hyp n fmt f =
       k
     | Tquant(Texists,fq) ->
       let vsl,_trl,f = t_open_quant fq in
-      fprintf fmt "@ ";
       let rec aux n vsl =
         match vsl with
           | [] -> intros_hyp n fmt f
@@ -552,7 +553,7 @@ let rec intros_hyp n fmt f =
       List.iter forget_var vsl;
       m
     | _ ->
-      fprintf fmt " h%d" n;
+      fprintf fmt "h%d" n;
       n+1
 
 let rec do_intros n fmt fmla =
@@ -569,6 +570,7 @@ let rec do_intros n fmt fmla =
       do_intros n fmt f;
       List.iter forget_var vsl
     | Tbinop(Timplies, f1, f2) ->
+      fprintf fmt "@ ";
       let m = intros_hyp n fmt f1 in
       do_intros m fmt f2
     | _ -> ()

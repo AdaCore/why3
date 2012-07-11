@@ -131,6 +131,10 @@ theory TestIntros
     forall x y : int. x > 0 /\ y > 0 ->
       (exists z t:int. x + t = y + z) -> x > y
 
+  goal G2 : 
+    forall x y : int. (x > 0 /\ y > 0) /\ (x < 10 /\ y < 10) ->
+      (exists x' y':int. x + x' = y + y') -> x > y
+
 end
 
 
