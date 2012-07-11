@@ -57,6 +57,10 @@ TODO
   * driver
     - maps: const
 
+  * MACRO
+
+  * AXIOM -> LEMMA
+
 *)
 
 open Format
@@ -481,65 +485,23 @@ let clean_line s =
   let n = String.length s in
   if n >= 2 && s.[0] = ' ' && s.[1] = ' ' then String.sub s 2 (n - 2) else s
 
-(***
-let copy_user_script begin_string end_string ch fmt =
-  fprintf fmt "%s@\n" begin_string;
-  try
-    while true do
-      let s = input_line ch in
-      let s = clean_line s in
-      fprintf fmt "%s@\n" s;
-      if s = end_string then raise Exit
-    done
-  with
-    | Exit -> fprintf fmt "@\n"
-    | End_of_file -> fprintf fmt "%s@\n@\n" end_string
-
-let proof_begin = "% YOU MAY EDIT THE PROOF BELOW"
-let proof_end = "% DO NOT EDIT BELOW"
-let context_begin = "% YOU MAY EDIT THE CONTEXT BELOW"
-let context_end = "% DO NOT EDIT BELOW"
-
-(* current kind of script in an old file *)
-type old_file_state = InContext | InProof | NoWhere
-
-let copy_proof s ch fmt =
-  copy_user_script proof_begin proof_end ch fmt;
-  s := NoWhere
-
-let copy_context s ch fmt =
-  copy_user_script context_begin context_end ch fmt;
-  s := NoWhere
-
-let lookup_context_or_proof old_state old_channel =
-  match !old_state with
-    | InProof | InContext -> ()
-    | NoWhere ->
-        let rec loop () =
-          let s = input_line old_channel in
-	  let s = clean_line s in
-          if s = proof_begin then old_state := InProof
-	  else if s = context_begin then old_state := InContext
-	  else loop ()
-        in
-        try loop ()
-        with End_of_file -> ()
-
-let read_old_script _ch =
-  []
- ****)
+type contents = string list
 
 type chunk =
-  | Edition of string * string (* name and contents *)
-  | Other of string            (* contents *)
+  | Edition of string * contents (* name contents *)
+  | Other of contents            (* contents *)
 
 let re_theory = Str.regexp "[^ :]+: THEORY"
 let re_begin = Str.regexp " BEGIN"
 let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
 
+(* Reads an old version of the file, as a list of chunks.
+   Each chunk is either identified as a Why3 symbol (Edition)
+   or as something else (Other).
+   Note: the very last chunk is purposely ignored, as it is "END th" *)
 let read_old_script ch =
   let chunks = ref [] in
-  let buffer = Buffer.create 1024 in
+  let contents = ref [] in
   let rec read_line () =
     let s = input_line ch in
     let s = clean_line s in
@@ -555,31 +517,43 @@ let read_old_script ch =
       let name = Str.matched_group 1 s in
       read ~name ()
     end else begin
-      if Buffer.length buffer > 0 then Buffer.add_string buffer "\n  ";
-      Buffer.add_string buffer s;
+      contents := s :: !contents;
       read ?name ()
     end
   and new_chunk ?name () =
-    let s = Buffer.contents buffer in
-    Buffer.clear buffer;
+    let s = List.rev !contents in
+    contents := [];
     match s, name with
-      | "", _ | _, Some "tuple0" -> ()
+      | ([] | [""]), _ | _, Some "tuple0" -> ()
       | _, None -> chunks := Other s :: !chunks
       | _, Some n -> chunks := Edition (n, s) :: !chunks
   in
   try read () with End_of_file -> List.rev !chunks
-  (* note: the very last chunk is purposely ignored, as it is "END th" *)
+
+(* DEBUG
+let read_old_script ch =
+  let cl = read_old_script ch in
+  let dump = function
+    | Edition (n, s) ->
+        eprintf "/edited %s = @[%a@]" n (print_list newline pp_print_string) s
+    | Other _s -> eprintf "/other"
+  in
+  List.iter dump cl; eprintf "@.";
+  cl
+*)
+
+let print_contents fmt c = print_list newline pp_print_string fmt c
 
 (* Output all the Other entries of the script that occur before the
    location of name. Modify the script by removing the name entry and all
-   these outputs. Return the user content. *)
+   these outputs. Return the user content, if any. *)
 let output_till_statement fmt script name =
   let print i =
     let rec aux acc = function
       | h :: l when h == i ->
-          let l = match l with Other "" :: l -> l | _ -> l in
+          let l = match l with Other [""] :: l -> l | _ -> l in
           script := List.rev_append acc l
-      | Other o :: l -> fprintf fmt "%s@\n@\n" o; aux acc l
+      | Other o :: l -> fprintf fmt "%a@\n@\n" print_contents o; aux acc l
       | h :: l -> aux (h :: acc) l
       | [] -> assert false
     in
@@ -592,26 +566,52 @@ let output_till_statement fmt script name =
   in
   find !script
 
-let comment_out s =
-  Str.global_replace (Str.regexp "\n") "\n  % " s
+let print_contents_in_comment fmt c =
+  let print fmt s =
+    if s = "" || s.[0] <> '%' then fprintf fmt "%% "; fprintf fmt "%s" s in
+  print_list newline print fmt c
 
 let output_remaining fmt cl =
-  let print = function
+  let print fmt = function
     | Edition (n, c) ->
-        fprintf fmt "%% Obsolete chunk %s@\n%% %s@\n" n (comment_out c)
+        fprintf fmt "%% Obsolete chunk %s@\n%a@\n" n print_contents_in_comment c
     | Other c ->
-        fprintf fmt "%% %s@\n" (comment_out c)
+        fprintf fmt "%a@\n" print_contents_in_comment c
   in
-  List.iter print cl
+  print_list newline print fmt cl
+
+(* Extracts and prints a definition from a user-edited chunk, if any;
+   otherwise, prints nothing *)
+let print_user_def fmt c =
+  let rec scan_string _stack i s =
+    let n = String.length s in
+    if i = n then None else match s.[i] with
+      | '=' -> Some (String.sub s i (n - i))
+      | _ -> scan_string _stack (i+1) s
+  in
+  let rec scan_chunck _stack = function
+    | [] -> ()
+    | s :: c ->
+        begin match scan_string _stack 0 s with
+          | Some s -> fprintf fmt " %s" s; print_contents fmt c
+          | None -> scan_chunck _stack c
+        end
+  in
+  scan_chunck [] c
+
+let realization fmt info = function
+  | Some (Edition (_, c)) when info.realization -> print_user_def fmt c
+  | _ -> ()
 
 let print_type_decl ~prev info fmt ts = ignore (prev);
   if not (is_ts_tuple ts) then begin
     print_name fmt ts.ts_name;
     match ts.ts_def with
     | None ->
-        fprintf fmt "@[<hov 2>%a%a: TYPE@]@\n@\n"
-          print_ts ts print_params_list ts.ts_args
-          (* (realization ~old ~def:true) info.realization *)
+        fprintf fmt "@[<hov 2>%a%a: TYPE"
+          print_ts ts print_params_list ts.ts_args;
+        realization fmt info prev;
+        fprintf fmt "@]@\n@\n"
     | Some ty ->
         fprintf fmt "@[<hov 2>%a%a: TYPE =@ %a@]@\n@\n"
           print_ts ts print_params_list ts.ts_args
@@ -643,21 +643,23 @@ let print_ls_type info fmt = function
   | None -> fprintf fmt "bool"
   | Some ty -> print_ty info fmt ty
 
+let create_argument ty = create_vsymbol (id_fresh "x") ty
+
+let print_arguments info fmt = function
+  | [] -> ()
+  | vl -> fprintf fmt "(%a)" (print_comma_list (print_vsty_nopar info)) vl
+
 let print_param_decl ~prev info fmt ls =
   ignore prev;
-  let _ty_vars_args, _ty_vars_value, all_ty_params = ls_ty_vars ls in
+  let _, _, all_ty_params = ls_ty_vars ls in
+  let vl = List.map create_argument ls.ls_args in
   print_name fmt ls.ls_name;
-  match ls.ls_args with
-    | [] ->
-        fprintf fmt "@[<hov 2>%a%a: %a@]@\n@\n"
-          print_ls ls print_params all_ty_params
-          (print_ls_type info) ls.ls_value
-    | _ ->
-        fprintf fmt "@[<hov 2>%a%a: [%a -> %a]@]@\n@\n"
-          print_ls ls print_params all_ty_params
-          (print_comma_list (print_ty info)) ls.ls_args
-          (print_ls_type info) ls.ls_value
-          (* (realization ~old ~def:true) info.realization *)
+  fprintf fmt "@[<hov 2>%a%a%a: %a"
+    print_ls ls print_params all_ty_params
+    (print_arguments info) vl (print_ls_type info) ls.ls_value;
+  realization fmt info prev;
+  List.iter forget_var vl;
+  fprintf fmt "@]@\n@\n"
 
 let print_param_decl ~prev info fmt ls =
   if not (Mid.mem ls.ls_name info.info_syn) then
@@ -665,13 +667,12 @@ let print_param_decl ~prev info fmt ls =
 
 let print_logic_decl ~prev info fmt (ls,ld) =
   ignore prev;
-  let _ty_vars_args, _ty_vars_value, all_ty_params = ls_ty_vars ls in
+  let _, _, all_ty_params = ls_ty_vars ls in
   let vl,e = open_ls_defn ld in
   print_name fmt ls.ls_name;
-  fprintf fmt "@[<hov 2>%a%a(%a): %a =@ %a@]@\n@\n"
+  fprintf fmt "@[<hov 2>%a%a%a: %a =@ %a@]@\n@\n"
     print_ls ls print_params all_ty_params
-    (print_comma_list (print_vsty_nopar info)) vl
-    (print_ls_type info) ls.ls_value
+    (print_arguments info) vl (print_ls_type info) ls.ls_value
     (print_expr info) e;
   List.iter forget_var vl
 
@@ -685,38 +686,26 @@ let print_recursive_decl info fmt (ls,ld) =
     | [i] -> i | _ -> assert false in
   let vl,e = open_ls_defn ld in
   print_name fmt ls.ls_name;
-  fprintf fmt "@[<hov 2>%a%a(%a): RECURSIVE %a =@ %a@\n"
-    print_ls ls print_params all_ty_params
-    (print_comma_list (print_vsty_nopar info)) vl
+  fprintf fmt "@[<hov 2>%a%a%a: RECURSIVE %a =@ %a@\n"
+    print_ls ls print_params all_ty_params (print_arguments info) vl
     (print_ls_type info) ls.ls_value
     (print_expr info) e;
-  fprintf fmt "MEASURE %a BY <<@\n@]"
+  fprintf fmt "MEASURE %a BY <<@\n@]@\n"
     print_vs (List.nth vl i);
-  List.iter forget_var vl
-
-let print_recursive_decl info fmt dl =
-  let d, dl = match dl with
-    | [d] -> d, []
-    | d :: dl -> d, dl (* PVS does not support mutual recursion *)
-    | [] -> assert false
-  in
-  fprintf fmt "@[<hov 2>";
-  print_recursive_decl info fmt d; forget_tvs ();
-  List.iter (print_recursive_decl info fmt) dl;
-  fprintf fmt "@]@\n"
+  List.iter forget_var vl;
+  forget_tvs ()
 
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[%% %a:@\n(%a)@]" print_pr pr (print_fmla info) f
 
 let print_ind_decl info fmt (ps,al) =
-  let _ty_vars_args, _ty_vars_value, all_ty_params = ls_ty_vars ps in
+  let _, _, all_ty_params = ls_ty_vars ps in
   let vl = List.map (create_vsymbol (id_fresh "z")) ps.ls_args in
   let tl = List.map t_var vl in
   let dj = Util.map_join_left (Eliminate_inductive.exi tl) t_or al in
   print_name fmt ps.ls_name;
-  fprintf fmt "@[<hov 2>%a%a(%a): INDUCTIVE bool =@ @[<hov>%a@]@]@\n"
-    print_ls ps print_params all_ty_params
-    (print_comma_list (print_vsty_nopar info)) vl
+  fprintf fmt "@[<hov 2>%a%a%a: INDUCTIVE bool =@ @[<hov>%a@]@]@\n"
+    print_ls ps print_params all_ty_params (print_arguments info) vl
     (print_fmla info) dj;
   fprintf fmt "@\n"
 
@@ -771,8 +760,10 @@ let print_decl ~old info fmt d =
       print_param_decl ~prev info fmt ls
   | Dlogic [s, _ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
       print_logic_decl ~prev info fmt ld
-  | Dlogic ll ->
-      print_recursive_decl info fmt ll
+  | Dlogic [d] ->
+      print_recursive_decl info fmt d
+  | Dlogic _ ->
+      assert false (* PVS does not support mutually recursive defns *)
   | Dind (Ind, il) ->
       print_list nothing (print_ind_decl info) fmt il
   | Dind (Coind, _) ->
@@ -806,14 +797,16 @@ let print_task env pr thpr realize ?old fmt task =
         Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
       | _ -> assert false
     ) Mid.empty task in
-  (* 2 cases: goal is clone T with [] or goal is a real goal *)
-  let realized_theories =
-    match task with
+  (* 2 cases: task is clone T with [] or task is a real goal *)
+  let thname, realized_theories = match task with
     | None -> assert false
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
-      Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
-      Mid.remove th.Theory.th_name realized_theories
-    | _ -> realized_theories in
+        Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
+        id_unique iprinter th.Theory.th_name,
+        Mid.remove th.Theory.th_name realized_theories
+    | _ ->
+        "goal", realized_theories
+  in
   let realized_theories' =
     Mid.map (fun (th,s) -> fprintf fmt "IMPORTING %a.%s@\n"
                print_path th.Theory.th_path s; th)
@@ -842,12 +835,12 @@ let print_task env pr thpr realize ?old fmt task =
     | None -> []
     | Some ch -> read_old_script ch)
   in
-  fprintf fmt "@[<hov 1>goal: THEORY@\n@[<hov 1>BEGIN@\n@\n";
+  fprintf fmt "@[<hov 1>%s: THEORY@\n@[<hov 1>BEGIN@\n@\n" thname;
   fprintf fmt "%% Why3 tuple0@\n";
   fprintf fmt "tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0@\n@\n";
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old;
-  fprintf fmt "@]@\nEND goal@\n@]"
+  fprintf fmt "@]@\nEND %s@\n@]" thname
 
 let print_task_full env pr thpr ?old fmt task =
   print_task env pr thpr false ?old fmt task
