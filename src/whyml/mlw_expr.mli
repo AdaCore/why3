@@ -27,26 +27,6 @@ open Term
 open Mlw_ty
 open Mlw_ty.T
 
-(** program variables *)
-
-(* pvsymbols represent function arguments and pattern variables *)
-
-type pvsymbol = private {
-  pv_vs  : vsymbol;
-  pv_vtv : vty_value;
-}
-
-module Mpv : Map.S with type key = pvsymbol
-module Spv : Mpv.Set
-module Hpv : Hashtbl.S with type key = pvsymbol
-module Wpv : Hashweak.S with type key = pvsymbol
-
-val pv_equal : pvsymbol -> pvsymbol -> bool
-
-val create_pvsymbol : preid -> vty_value -> pvsymbol
-
-val restore_pv : vsymbol -> pvsymbol
-
 (** program symbols *)
 
 (* psymbols represent lambda-abstractions. They are polymorphic and
@@ -59,16 +39,11 @@ type psymbol = private {
   ps_vars  : varset;
   (* this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
-     and region in ps_vty is generalized and can be instantiated. *)
+     and region in ps_vta is generalized and can be instantiated. *)
   ps_subst : ity_subst;
   (* this substitution instantiates every type variable and region
      in ps_vars to itself *)
 }
-
-module Mps : Map.S with type key = psymbol
-module Sps : Mps.Set
-module Hps : Hashtbl.S with type key = psymbol
-module Wps : Hashweak.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 
@@ -102,39 +77,17 @@ exception HiddenPLS of lsymbol
 
 (** specification *)
 
-type pre = term          (* precondition: pre_fmla *)
-type post = term         (* postcondition: eps result . post_fmla *)
-type xpost = post Mexn.t (* exceptional postconditions *)
-
-val create_post : vsymbol -> term -> post
-val open_post : post -> vsymbol * term
-
-type type_c = {
-  c_pre    : pre;
-  c_effect : effect;
-  c_result : type_v;
-  c_post   : post;
-  c_xpost  : xpost;
-}
-
-and type_v =
-  | SpecV of vty_value
-  | SpecA of pvsymbol list * type_c
-
-type let_var =
+type let_sym =
   | LetV of pvsymbol
   | LetA of psymbol
 
 type val_decl = private {
-  val_name : let_var;
-  val_spec : type_v;
-  val_vars : varset Mid.t;
+  val_sym  : let_sym;
+  val_vty  : vty;
+  val_vars : varmap;
 }
 
-val create_val : Ident.preid -> type_v -> val_decl
-
-exception DuplicateArg of pvsymbol
-exception UnboundException of xsymbol
+val create_val : Ident.preid -> vty -> val_decl
 
 (** patterns *)
 
@@ -175,24 +128,23 @@ type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
   e_effect : effect;
-  e_vars   : varset Mid.t;
+  e_vars   : varmap;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
-  e_tag    : Hashweak.tag;
 }
 
 and expr_node = private
   | Elogic  of term
   | Evalue  of pvsymbol
   | Earrow  of psymbol
-  | Eapp    of expr * pvsymbol
+  | Eapp    of expr * pvsymbol * spec
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
   | Eassign of expr * region * pvsymbol
   | Eghost  of expr
-  | Eany    of type_c
+  | Eany    of spec
   | Eloop   of invariant * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
@@ -202,14 +154,14 @@ and expr_node = private
   | Eabsurd
 
 and let_defn = private {
-  let_var  : let_var;
+  let_sym  : let_sym;
   let_expr : expr;
 }
 
 and rec_defn = private {
   rec_ps     : psymbol;
   rec_lambda : lambda;
-  rec_vars   : varset Mid.t;
+  rec_vars   : varmap;
 }
 
 and lambda = {
@@ -225,11 +177,6 @@ and variant = {
   v_term : term;           (* : tau *)
   v_rel  : lsymbol option; (* tau tau : prop *)
 }
-
-module Mexpr : Map.S with type key = expr
-module Sexpr : Mexpr.Set
-module Hexpr : Hashtbl.S with type key = expr
-module Wexpr : Hashweak.S with type key = expr
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
@@ -269,7 +216,7 @@ exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
-val e_any : type_c -> expr
+val e_any : spec -> vty -> expr
 
 val e_void : expr
 

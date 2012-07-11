@@ -27,39 +27,6 @@ open Term
 open Mlw_ty
 open Mlw_ty.T
 
-(** program variables *)
-
-type pvsymbol = {
-  pv_vs  : vsymbol;
-  pv_vtv : vty_value;
-}
-
-module PVsym = WeakStructMake (struct
-  type t = pvsymbol
-  let tag pv = pv.pv_vs.vs_name.id_tag
-end)
-
-module Spv = PVsym.S
-module Mpv = PVsym.M
-module Hpv = PVsym.H
-module Wpv = PVsym.W
-
-let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
-
-let create_pvsymbol id vtv = {
-  pv_vs   = create_vsymbol id (ty_of_ity vtv.vtv_ity);
-  pv_vtv  = vtv;
-}
-
-let create_pvsymbol, restore_pv =
-  let vs_to_pv = Wvs.create 17 in
-  (fun id vtv ->
-    let pv = create_pvsymbol id vtv in
-    Wvs.set vs_to_pv pv.pv_vs pv;
-    pv),
-  (fun vs -> try Wvs.find vs_to_pv vs with Not_found ->
-    Loc.error ?loc:vs.vs_name.id_loc (Decl.UnboundVar vs))
-
 (** program symbols *)
 
 type psymbol = {
@@ -69,29 +36,19 @@ type psymbol = {
   ps_subst : ity_subst;
 }
 
-module PSsym = WeakStructMake (struct
-  type t = psymbol
-  let tag ps = ps.ps_name.id_tag
-end)
-
-module Sps = PSsym.S
-module Mps = PSsym.M
-module Hps = PSsym.H
-module Wps = PSsym.W
-
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
-let create_psymbol_real ~poly id vta vars =
-  let frozen = if poly then vars else vars_union vars vta.vta_vars
-  in {
-    ps_name  = id_register id;
-    ps_vta   = vta_filter vars vta;
-    ps_vars  = frozen;
-    ps_subst = vars_freeze frozen; }
+let create_psymbol_real ~poly id vta varm =
+  let vars = if poly then vars_empty else vta.vta_vars in
+  let vars = vars_merge varm vars in
+  { ps_name  = id_register id;
+    ps_vta   = vta_filter varm vta;
+    ps_vars  = vars;
+    ps_subst = vars_freeze vars; }
 
 let create_psymbol_poly   = create_psymbol_real ~poly:true
 let create_psymbol_mono   = create_psymbol_real ~poly:false
-let create_psymbol id vta = create_psymbol_poly id vta vars_empty
+let create_psymbol id vta = create_psymbol_poly id vta Mid.empty
 
 (** program/logic symbols *)
 
@@ -133,30 +90,14 @@ exception HiddenPLS of lsymbol
 
 (** specification *)
 
-type pre = term          (* precondition: pre_fmla *)
-type post = term         (* postcondition: eps result . post_fmla *)
-type xpost = post Mexn.t (* exceptional postconditions *)
-
-type type_c = {
-  c_pre    : pre;
-  c_effect : effect;
-  c_result : type_v;
-  c_post   : post;
-  c_xpost  : xpost;
-}
-
-and type_v =
-  | SpecV of vty_value
-  | SpecA of pvsymbol list * type_c
-
-type let_var =
+type let_sym =
   | LetV of pvsymbol
   | LetA of psymbol
 
 type val_decl = {
-  val_name : let_var;
-  val_spec : type_v;
-  val_vars : varset Mid.t;
+  val_sym  : let_sym;
+  val_vty  : vty;
+  val_vars : varmap;
 }
 
 type variant = {
@@ -164,32 +105,12 @@ type variant = {
   v_rel  : lsymbol option; (* tau tau : prop *)
 }
 
-let create_post vs f = t_eps_close vs f
-
-let open_post f = match f.t_node with
-  | Teps bf -> t_open_bound bf
-  | _ -> Loc.errorm "invalid post-condition"
-
-let check_post f = match f.t_node with
-  | Teps _ -> ()
-  | _ -> Loc.errorm "invalid post-condition"
-
-let varmap_join = Mid.fold (fun _ -> vars_union)
-let varmap_union = Mid.set_union
-
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
 let add_vs_vars vs m = add_pv_vars (restore_pv vs) m
 
-let fmla_vars f vsset =
-  if f.t_ty <> None then Loc.error ?loc:f.t_loc (FmlaExpected f);
-  Mvs.set_union vsset f.t_vars
-
-let post_vars ity f vsset =
-  check_post f;
-  Ty.ty_equal_check (ty_of_ity ity) (t_type f);
-  Mvs.set_union vsset f.t_vars
-
-let xpost_vars = Mexn.fold (fun xs -> post_vars xs.xs_ity)
+let pre_vars f vsset = Mvs.set_union vsset f.t_vars
+let post_vars f vsset = Mvs.set_union vsset f.t_vars
+let xpost_vars = Mexn.fold (fun _ -> post_vars)
 
 let variant_vars varl vsset =
   let add_variant s { v_term = t; v_rel = ps } =
@@ -201,52 +122,32 @@ let variant_vars varl vsset =
     Mvs.set_union s t.t_vars in
   List.fold_left add_variant vsset varl
 
-exception UnboundException of xsymbol
-
-let spec_vars varm variant pre post xpost eff result =
-  let vsset = fmla_vars pre Mvs.empty in
-  let vsset = post_vars result post vsset in
-  let vsset = xpost_vars xpost vsset in
+let spec_varmap varm variant spec =
+  let vsset = pre_vars spec.c_pre Mvs.empty in
+  let vsset = post_vars spec.c_post vsset in
+  let vsset = xpost_vars spec.c_xpost vsset in
   let vsset = variant_vars variant vsset in
-  let badex = Sexn.union eff.eff_raises eff.eff_ghostx in
-  let badex = Mexn.set_diff badex xpost in
-  if not (Sexn.is_empty badex) then
-    raise (UnboundException (Sexn.choose badex));
   Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset varm
 
-exception DuplicateArg of pvsymbol
+let rec vta_varmap vta =
+  let varm = vty_varmap vta.vta_result in
+  let varm = spec_varmap varm [] vta.vta_spec in
+  let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
+  List.fold_left del_pv varm vta.vta_args
 
-let spec_arrow pvl effect vty =
-  let add pv s = Spv.add_new (DuplicateArg pv) pv s in
-  ignore (List.fold_right add pvl Spv.empty);
-  let arg,argl = match List.rev pvl with
-    | [] -> Loc.errorm "Empty argument list"
-    | arg::argl -> arg, argl in
-  let vta = vty_arrow arg.pv_vtv ~effect vty in
-  let add_arg vta pv = vty_arrow pv.pv_vtv (VTarrow vta) in
-  List.fold_left add_arg vta argl
-
-let rec check_c tyc =
-  let varm = check_v tyc.c_result in
-  let result = match tyc.c_result with
-    | SpecV v -> v.vtv_ity
-    | SpecA _ -> ity_unit in
-  spec_vars varm [] tyc.c_pre tyc.c_post tyc.c_xpost tyc.c_effect result
-
-and check_v = function
-  | SpecV _ -> Mid.empty
-  | SpecA (pvl,tyc) ->
-      let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
-      List.fold_left del_pv (check_c tyc) pvl
+and vty_varmap = function
+  | VTarrow a -> vta_varmap a
+  | VTvalue _ -> Mid.empty
 
 let eff_check vars result e =
   let check r =
     if not (reg_occurs r vars) then
-      Loc.errorm "every external effect must be covered in a post-condition"
+      Loc.errorm "every external effect must be mentioned in specification"
   in
   let reset r u = match result with
+    (* FIXME: we must reset non-written subregions of written regions *)
     | _ when u <> None -> Loc.errorm "abstract parameters cannot reset regions"
-    | SpecV v when reg_occurs r v.vtv_vars -> ()
+    | VTvalue v when reg_occurs r v.vtv_vars -> ()
     | _ -> check r
   in
   Sreg.iter check e.eff_reads;
@@ -255,28 +156,27 @@ let eff_check vars result e =
   Sreg.iter check e.eff_ghostw;
   Mreg.iter reset e.eff_resets
 
-let rec build_c vars tyc =
-  let vty = build_v vars tyc.c_result in
-  eff_check vars tyc.c_result tyc.c_effect;
-  vty
+let rec vta_check vars vta =
+  let add_arg vars pv = vars_union vars pv.pv_vtv.vtv_vars in
+  let vars = List.fold_left add_arg vars vta.vta_args in
+  eff_check vars vta.vta_result vta.vta_spec.c_effect;
+  vty_check vars vta.vta_result
 
-and build_v vars = function
-  | SpecV vtv ->
-      if vtv.vtv_mut <> None then
-        Loc.errorm "abstract parameters cannot produce mutable values";
-      VTvalue vtv
-  | SpecA (pvl,tyc) ->
-      let add_arg vars pv = vars_union vars pv.pv_vtv.vtv_vars in
-      let vty = build_c (List.fold_left add_arg vars pvl) tyc in
-      VTarrow (spec_arrow pvl tyc.c_effect vty)
+and vty_check vars = function
+  | VTarrow a -> vta_check vars a
+  | VTvalue v -> if v.vtv_mut <> None then
+      Loc.errorm "abstract parameters cannot produce mutable values"
 
-let create_val id tyv =
-  let varm = check_v tyv in
-  let vars = varmap_join varm vars_empty in
-  let name = match build_v vars tyv with
-    | VTarrow vta -> LetA (create_psymbol_poly id vta vars)
-    | VTvalue vtv -> LetV (create_pvsymbol id vtv) in
-  { val_name = name; val_spec = tyv; val_vars = varm }
+let create_val id vty = match vty with
+  | VTvalue v ->
+      let pv = create_pvsymbol id v in
+      vty_check vars_empty vty;
+      { val_sym = LetV pv; val_vty = vty; val_vars = Mid.empty }
+  | VTarrow a ->
+      let varm = vta_varmap a in
+      let ps = create_psymbol_poly id a varm in
+      vta_check ps.ps_vars a;
+      { val_sym = LetA ps; val_vty = vty; val_vars = varm }
 
 (** patterns *)
 
@@ -461,24 +361,23 @@ type expr = {
   e_node   : expr_node;
   e_vty    : vty;
   e_effect : effect;
-  e_vars   : varset Mid.t;
+  e_vars   : varmap;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
-  e_tag    : Hashweak.tag;
 }
 
 and expr_node =
   | Elogic  of term
   | Evalue  of pvsymbol
   | Earrow  of psymbol
-  | Eapp    of expr * pvsymbol
+  | Eapp    of expr * pvsymbol * spec
   | Elet    of let_defn * expr
   | Erec    of rec_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
   | Eassign of expr * region * pvsymbol
   | Eghost  of expr
-  | Eany    of type_c
+  | Eany    of spec
   | Eloop   of invariant * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
@@ -488,14 +387,14 @@ and expr_node =
   | Eabsurd
 
 and let_defn = {
-  let_var  : let_var;
+  let_sym  : let_sym;
   let_expr : expr;
 }
 
 and rec_defn = {
   rec_ps     : psymbol;
   rec_lambda : lambda;
-  rec_vars   : varset Mid.t;
+  rec_vars   : varmap;
 }
 
 and lambda = {
@@ -506,16 +405,6 @@ and lambda = {
   l_post    : post;
   l_xpost   : xpost;
 }
-
-module WSexpr = WeakStructMake (struct
-  type t = expr
-  let tag expr = expr.e_tag
-end)
-
-module Sexpr = WSexpr.S
-module Mexpr = WSexpr.M
-module Hexpr = WSexpr.H
-module Wexpr = WSexpr.W
 
 (* smart constructors *)
 
@@ -531,23 +420,16 @@ let e_label_copy { e_label = lab; e_loc = loc } e =
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
-let mk_expr node vty eff vars c = {
+let mk_expr node vty eff vars = {
   e_node   = node;
   e_vty    = vty;
   e_effect = if vty_ghost vty then eff_ghostify eff else eff;
   e_vars   = vars;
   e_label  = Slab.empty;
   e_loc    = None;
-  e_tag    = Hashweak.create_tag c;
 }
 
-let mk_expr =
-  let c = ref 0 in fun node vty eff vars ->
-    incr c; mk_expr node vty eff vars !c
-
-(* FIXME? e_label calls do not refresh the tag. This is safe
-   as long as we only use tags for "semantical things" such as
-   extended specification storage in WPs. *)
+let varmap_union = Mid.set_union
 
 let add_t_vars t m = Mvs.fold (fun vs _ m -> add_vs_vars vs m) t.t_vars m
 let add_e_vars e m = varmap_union e.e_vars m
@@ -577,10 +459,9 @@ let create_let_defn id e =
     | VTvalue vtv ->
         LetV (create_pvsymbol id (vtv_unmut vtv))
     | VTarrow vta ->
-        let vars = varmap_join e.e_vars vars_empty in
-        LetA (create_psymbol_mono id vta vars)
+        LetA (create_psymbol_mono id vta e.e_vars)
   in
-  { let_var = lv ; let_expr = e }
+  { let_sym = lv ; let_expr = e }
 
 exception StaleRegion of expr * region * ident
 
@@ -615,7 +496,7 @@ let check_postexpr e eff vars =
   check_ghost_write e eff;
   check_reset e vars
 
-let e_let ({ let_var = lv ; let_expr = d } as ld) e =
+let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
     | LetA ps -> ps.ps_name in
@@ -625,24 +506,23 @@ let e_let ({ let_var = lv ; let_expr = d } as ld) e =
   mk_expr (Elet (ld,e)) e.e_vty eff (add_e_vars d vars)
 
 let e_app_real e pv =
-  let eff,vty = vty_app_arrow (vta_of_expr e) pv.pv_vtv in
-  check_postexpr e eff (add_pv_vars pv Mid.empty);
-  let eff = eff_union e.e_effect eff in
-  mk_expr (Eapp (e,pv)) vty eff (add_pv_vars pv e.e_vars)
+  let spec,vty = vta_app (vta_of_expr e) pv in
+  check_postexpr e spec.c_effect (add_pv_vars pv Mid.empty);
+  let eff = eff_union e.e_effect spec.c_effect in
+  mk_expr (Eapp (e,pv,spec)) vty eff (add_pv_vars pv e.e_vars)
 
 let create_fun_defn id lam =
   let e = lam.l_expr in
-  let result = match e.e_vty with
-    | VTvalue v -> v.vtv_ity
-    | VTarrow _ -> ity_unit in
-  let varm = spec_vars e.e_vars lam.l_variant
-      lam.l_pre lam.l_post lam.l_xpost e.e_effect result in
+  let spec = {
+    c_pre    = lam.l_pre;
+    c_post   = lam.l_post;
+    c_xpost  = lam.l_xpost;
+    c_effect = e.e_effect; } in
+  let varm = spec_varmap e.e_vars lam.l_variant spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
-  let vars = varmap_join varm vars_empty in
-  let vta = spec_arrow lam.l_args e.e_effect e.e_vty in
-  (* construct rec_defn *)
-  { rec_ps     = create_psymbol_poly id vta vars;
+  let vta = vty_arrow lam.l_args ~spec e.e_vty in
+  { rec_ps     = create_psymbol_poly id vta varm;
     rec_lambda = lam;
     rec_vars   = varm; }
 
@@ -657,7 +537,7 @@ let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
   | _ ->
       let ld = create_let_defn (id_fresh "o") e in
-      let pv = match ld.let_var with
+      let pv = match ld.let_sym with
         | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
       e_let ld (fn pv)
@@ -807,10 +687,13 @@ let e_assign me e = on_value (e_assign_real me) e
 let e_ghost e =
   mk_expr (Eghost e) (vty_ghostify e.e_vty) e.e_effect e.e_vars
 
-let e_any tyc =
-  let varm = check_c tyc in
-  let vars = varmap_join varm vars_empty in
-  mk_expr (Eany tyc) (build_c vars tyc) tyc.c_effect varm
+let e_any spec vty =
+  let varm = spec_varmap (vty_varmap vty) [] spec in
+  let vars = vars_merge varm vars_empty in
+  spec_check spec vty;
+  eff_check vars vty spec.c_effect;
+  vty_check vars vty;
+  mk_expr (Eany spec) vty spec.c_effect varm
 
 let e_const t =
   let vtv = vty_value (ity_of_ty_opt t.t_ty) in
@@ -833,7 +716,7 @@ let on_fmla fn e = match e.e_node with
   | Evalue pv -> fn e (t_equ_simp (t_var pv.pv_vs) t_bool_true)
   | _ ->
       let ld = create_let_defn (id_fresh "o") e in
-      let pv = match ld.let_var with
+      let pv = match ld.let_sym with
         | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
       e_let ld (fn (e_value pv) (t_equ_simp (t_var pv.pv_vs) t_bool_true))
@@ -866,7 +749,7 @@ let e_lazy_or e1 e2 =
 let e_loop inv variant e =
   let vtv = vtv_of_expr e in
   ity_equal_check vtv.vtv_ity ity_unit;
-  let vsset = fmla_vars inv Mvs.empty in
+  let vsset = pre_vars inv Mvs.empty in
   let vsset = variant_vars variant vsset in
   let vars = Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset e.e_vars in
   check_postexpr e e.e_effect vars;
@@ -944,11 +827,14 @@ let e_try e0 bl =
   branch vtv0.vtv_ghost eff_empty Mid.empty bl
 
 let e_abstract e q xq =
-  let result = match e.e_vty with
-    | VTvalue v -> v.vtv_ity
-    | VTarrow _ -> ity_unit in
-  let vars = spec_vars e.e_vars [] t_true q xq e.e_effect result in
-  mk_expr (Eabstr (e,q,xq)) e.e_vty e.e_effect vars
+  let spec = {
+    c_pre    = t_true;
+    c_post   = q;
+    c_xpost  = xq;
+    c_effect = e.e_effect; } in
+  spec_check spec e.e_vty;
+  let varm = spec_varmap e.e_vars [] spec in
+  mk_expr (Eabstr (e,q,xq)) e.e_vty e.e_effect varm
 
 let e_assert ak f =
   let vars = add_t_vars f Mid.empty in
@@ -975,36 +861,37 @@ let eff_equal eff1 eff2 =
   Mreg.equal (Util.option_eq reg_equal) eff1.eff_resets eff2.eff_resets
 
 let vtv_equal vtv1 vtv2 =
-  ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
   vtv1.vtv_ghost = vtv2.vtv_ghost &&
+  ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
   option_eq reg_equal vtv1.vtv_mut vtv2.vtv_mut
 
-let rec vta_equal vta1 vta2 =
-  vtv_equal vta1.vta_arg vta2.vta_arg &&
-  eff_equal vta1.vta_effect vta2.vta_effect &&
-  vta1.vta_ghost = vta2.vta_ghost &&
-  match vta1.vta_result, vta2.vta_result with
-    | VTvalue vtv1, VTvalue vtv2 -> vtv_equal vtv1 vtv2
-    | VTarrow vta1, VTarrow vta2 -> vta_equal vta1 vta2
-    | _, _ -> false
+let rec vta_compat a1 a2 =
+  assert (List.for_all2 pv_equal a1.vta_args a2.vta_args);
+  a1.vta_ghost = a2.vta_ghost &&
+  (* no need to compare the rest of the spec, see below *)
+  eff_equal a1.vta_spec.c_effect a2.vta_spec.c_effect &&
+  match a1.vta_result, a2.vta_result with
+  | VTarrow a1, VTarrow a2 -> vta_compat a1 a2
+  | VTvalue v1, VTvalue v2 -> vtv_equal v1 v2
+  | _,_ -> assert false
 
 let ps_compat ps1 ps2 =
-  vta_equal ps1.ps_vta ps2.ps_vta &&
+  vta_compat ps1.ps_vta ps2.ps_vta &&
   vars_equal ps1.ps_vars ps2.ps_vars
 
 let rec expr_subst psm e = match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
       e_arrow (Mid.find ps.ps_name psm) (vta_of_expr e)
-  | Eapp (e,pv) ->
+  | Eapp (e,pv,_) ->
       e_app_real (expr_subst psm e) pv
-  | Elet ({ let_var = LetV pv ; let_expr = d }, e) ->
+  | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->
       let nd = expr_subst psm d in
       let vtv = match nd.e_vty with VTvalue vtv -> vtv | _ -> assert false in
       if not (vtv_equal vtv pv.pv_vtv) then Loc.errorm "vty_value mismatch";
-      e_let { let_var = LetV pv ; let_expr = nd } (expr_subst psm e)
-  | Elet ({ let_var = LetA ps ; let_expr = d }, e) ->
+      e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
+  | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
       let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in
-      let ns = match ld.let_var with LetA a -> a | LetV _ -> assert false in
+      let ns = match ld.let_sym with LetA a -> a | LetV _ -> assert false in
       e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
   | Erec (rdl,e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
@@ -1039,12 +926,33 @@ and create_rec_defn defl =
     let rd = create_fun_defn (id_clone ps.ps_name) lam in
     if ps_compat ps rd.rec_ps then m, { rd with rec_ps = ps }
     else Mid.add ps.ps_name rd.rec_ps m, rd in
-  let m, defl = Util.map_fold_left conv Mid.empty defl in
-  let subst { rec_ps = ps ; rec_lambda = lam } =
-    let lam = { lam with l_expr = expr_subst m lam.l_expr } in
-    Mid.find_def ps ps.ps_name m, lam in
-  if Mid.is_empty m then defl else
-  create_rec_defn (List.map subst defl)
+  let m, rdl = Util.map_fold_left conv Mid.empty defl in
+  if Mid.is_empty m then rdl else subst_rd m rdl
+
+and subst_rd psm rdl =
+  let subst { rec_ps = ps; rec_lambda = lam } =
+    Mid.find_def ps ps.ps_name psm,
+    { lam with l_expr = expr_subst psm lam.l_expr } in
+  create_rec_defn (List.map subst rdl)
+
+(* Before we start computing the fixpoint for effects, we must
+   get the pre/post/xpost right. Therefore we require every ps
+   participating in the recursion to have a first-order body,
+   so that its spec (except the effect) is known from the start.
+   Then we apply one round of substitution, to ensure that in
+   each pair (ps,lam), the two sides have vty of the same shape
+   and with the same final spec (except the effect). The result
+   is passed to create_rec_defn above which repeats substitution
+   until the effects are stabilized. TODO: prove correctness *)
+let create_rec_defn defl =
+  let conv m (ps,lam) = match lam.l_expr.e_vty with
+    | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
+        "The body of a recursive function must be a first-order value"
+    | VTvalue _ ->
+        let rd = create_fun_defn (id_clone ps.ps_name) lam in
+        Mid.add ps.ps_name rd.rec_ps m, rd in
+  let m, rdl = Util.map_fold_left conv Mid.empty defl in
+  subst_rd m rdl
 
 let create_fun_defn id lam =
   if lam.l_variant <> [] then
@@ -1065,67 +973,8 @@ let e_fold fn acc e = match e.e_node with
       let fnbr acc (_,_,e) = fn acc e in
       List.fold_left fnbr (fn acc e) bl
   | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
-  | Eapp (e,_) | Eassign (e,_,_) | Eghost e
+  | Eapp (e,_,_) | Eassign (e,_,_) | Eghost e
   | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
   | Eabstr (e,_,_) -> fn acc e
   | Elogic _ | Evalue _ | Earrow _
   | Eany _ | Eassert _ | Eabsurd -> acc
-
-(*
-  - A "proper type" of a vty [v] is [v] with empty specification
-    (effect/pre/post/xpost). Basically, it is formed from pv_ity's
-    of pvsymbols in the arguments and the result of [v].
-
-  - Given a vty [v], [vty_freevars v] and [vty_topregions v] return
-    the sets of type variables and regions, respectively, that occur
-    in the proper type of [v]. We will call them "proper" type vars
-    and regions of [v].
-
-  - The specification (effect/pre/post/xpost) of a vty [v] may contain
-    type vars and regions that do not occur in the proper type of [v].
-    We will call them "extra" type vars and regions of [v].
-
-  - An expression [e] provides the maps [e.e_tvs] and [e.e_regs] from
-    idents (vsymbols, pvsymbols, psymbols, ppsymbols) occurring in [e]
-    (including asserts, variant, pre- and post-conditions) to sets of
-    type vars and regions, respectively, that are "associated" to
-    those idents.
-
-  - Every type var in [vs.vs_ty] is associated to [vs].
-
-  - Every type var and region in [pv.pv_ity] is associated to [pv].
-
-  - A psymbol (monomorphic program symbol) [p] provides the sets [p.p_tvs]
-    and [p.p_regs] of its associated type vars and regions, respectively.
-    These are exactly the unions of the proper type vars and regions of
-    [p.p_vty] with the type vars and regions in the range of [e.e_tvs]
-    and [e.e_regs], where [e] is the defining expression of [p].
-
-  - A ppsymbol (polymorphic program symbol) [pp] provides the sets
-    [pp.pp_tvs] and [pp.pp_regs] of its associated type vars and regions.
-    Given a mutually recursive definition
-      let rec pp1 pv11 pv12 = expr1 { spec1 }
-      with    pp2 pv21 pv22 = expr2 { spec2 }
-    we compute the associated type vars of [pp1] as follows:
-      1. we combine [expr1.e_tvs] with the corresponding map of [spec1]
-      2. we remove from the resulting map the idents of [pv11] and [pv12]
-      3. we remove from the resulting map the idents of [pp1] and [pp2]
-      4. [pp1.pp_tvs] is the union of the range of the resulting map
-    Region sets are computed in the same way. (Don't forget to refresh
-    [expr1] and [expr2] if the sets of [pp1] and [pp2] have changed.)
-
-  - Every proper type var and region of [pp.pp_vty] that is not associated
-    to [pp] is generalized. Every extra type var and region of [pp.pp_vty]
-    must be associated to [pp] <*> and is not generalized. A substitution
-    given to [vty_full_inst] must instantiate every type var and region in
-    [pp.pp_tvs] and [pp.pp_regs] to itself.
-
-    In the specialized expression [e], the type vars and regions introduced
-    by the substitution will appear in the [e.e_vty], but not in the range
-    of [e.e_tvs] and [e.e_regs], as they are related to no ident.
-
-  - The invariant <*> above is not verified explicitly, but is maintained
-    by construction of ppsymbols. In particular, every extra type var and
-    region in [e.e_vty] appear in the range of [e.e_tvs] and [e.e_regs].
-*)
-

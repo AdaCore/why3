@@ -202,8 +202,9 @@ let unify d1 d2 = unify ~weak:false d1 d2
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let vty_of_dvty (argl,res) =
-  let add a v = VTarrow (vty_arrow (vty_value (ity_of_dity a)) v) in
-  List.fold_right add argl (VTvalue (vty_value (ity_of_dity res)))
+  let vtv = VTvalue (vty_value (ity_of_dity res)) in
+  let conv a = create_pvsymbol (id_fresh "x") (vty_value (ity_of_dity a)) in
+  if argl = [] then vtv else VTarrow (vty_arrow (List.map conv argl) vtv)
 
 type tvars = dity list
 
@@ -284,14 +285,14 @@ let specialize_xsymbol xs =
 
 let specialize_vtarrow vars vta =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
-  let conv vtv = dity_of_vtv htv hreg vars vtv in
+  let conv pv = dity_of_vtv htv hreg vars pv.pv_vtv in
   let rec specialize a =
-    let arg = conv a.vta_arg in
-    let argl,res = match a.vta_result with
-      | VTvalue v -> [], conv v
+    let argl = List.map conv a.vta_args in
+    let narg,res = match a.vta_result with
+      | VTvalue v -> [], dity_of_vtv htv hreg vars v
       | VTarrow a -> specialize a
     in
-    arg::argl, res
+    argl @ narg, res
   in
   specialize vta
 

@@ -33,6 +33,8 @@ module rec T : sig
     vars_reg : Mreg.Set.t;
   }
 
+  type varmap = varset Mid.t
+
   type itysymbol = private {
     its_pure : tysymbol;
     its_args : tvsymbol list;
@@ -171,6 +173,8 @@ val vars_empty : varset
 
 val vars_union : varset -> varset -> varset
 
+val vars_merge : varmap -> varset -> varset
+
 val vars_freeze : varset -> ity_subst
 
 val create_varset : Stv.t -> Sreg.t -> varset
@@ -191,7 +195,8 @@ val create_xsymbol : preid -> ity -> xsymbol
 module Mexn: Map.S with type key = xsymbol
 module Sexn: Mexn.Set
 
-(* effects *)
+(** effects *)
+
 type effect = private {
   eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
@@ -224,9 +229,24 @@ val eff_filter : varset -> effect -> effect
 
 val eff_is_empty : effect -> bool
 
-(** program types *)
+(** specification *)
 
-(* type of function arguments and values *)
+type pre = term          (* precondition: pre_fmla *)
+type post = term         (* postcondition: eps result . post_fmla *)
+type xpost = post Mexn.t (* exceptional postconditions *)
+
+val create_post : vsymbol -> term -> post
+val open_post : post -> vsymbol * term
+
+type spec = {
+  c_pre    : pre;
+  c_post   : post;
+  c_xpost  : xpost;
+  c_effect : effect;
+}
+
+(** program variables *)
+
 type vty_value = private {
   vtv_ity   : ity;
   vtv_ghost : bool;
@@ -234,45 +254,74 @@ type vty_value = private {
   vtv_vars  : varset;
 }
 
+val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
+
+val vtv_unmut : vty_value -> vty_value (* remove mutability *)
+
+type pvsymbol = private {
+  pv_vs  : vsymbol;
+  pv_vtv : vty_value;
+}
+
+module Mpv : Map.S with type key = pvsymbol
+module Spv : Mpv.Set
+module Hpv : Hashtbl.S with type key = pvsymbol
+module Wpv : Hashweak.S with type key = pvsymbol
+
+val pv_equal : pvsymbol -> pvsymbol -> bool
+
+val create_pvsymbol : preid -> vty_value -> pvsymbol
+
+val restore_pv : vsymbol -> pvsymbol
+  (* raises Decl.UnboundVar if the argument is not a pv_vs *)
+
+(** program types *)
+
 type vty =
   | VTvalue of vty_value
   | VTarrow of vty_arrow
 
 and vty_arrow = private {
-  vta_arg    : vty_value;
+  vta_args   : pvsymbol list;
   vta_result : vty;
-  vta_effect : effect;
+  vta_spec   : spec;
   vta_ghost  : bool;
   vta_vars   : varset;
   (* this varset covers every type variable and region in vta_arg
-     and vta_result, but not necessarily in vta_effect *)
+     and vta_result, but not necessarily in vta_spec *)
 }
 
-(* smart constructors *)
+exception UnboundException of xsymbol
 
-val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
-
-val vty_arrow : vty_value -> ?effect:effect -> ?ghost:bool -> vty -> vty_arrow
-
-val vty_app_arrow : vty_arrow -> vty_value -> effect * vty
-
-val vty_vars : varset -> vty -> varset
-
-val vty_ghost : vty -> bool
-val vty_ghostify : vty -> vty
-
-val vtv_unmut : vty_value -> vty_value
+(* every raised exception must have a postcondition in spec.c_xpost *)
+val vty_arrow : pvsymbol list -> ?spec:spec -> ?ghost:bool -> vty -> vty_arrow
 
 (* this only compares the types of arguments and results, and ignores
-   the effects. In other words, only the type variables and regions
+   the spec. In other words, only the type variables and regions
    in .vta_vars are matched. The caller should supply a "freezing"
    substitution that covers all external type variables and regions. *)
 val vta_vars_match : ity_subst -> vty_arrow -> vty_arrow -> ity_subst
 
 (* the substitution must cover not only vta_vars but also every
-   type variable and every region in vta_effect *)
+   type variable and every region in vta_spec *)
 val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
 
 (* remove from the given arrow every effect that is covered
-   neither by the arrow's vta_vars nor by the given varset *)
-val vta_filter : varset -> vty_arrow -> vty_arrow
+   neither by the arrow's vta_vars nor by the given varmap *)
+val vta_filter : varmap -> vty_arrow -> vty_arrow
+
+(* apply a function specification to a variable argument *)
+val vta_app : vty_arrow -> pvsymbol -> spec * vty
+
+(* test for ghostness and convert to ghost *)
+val vty_ghost : vty -> bool
+val vty_ghostify : vty -> vty
+
+(* verify that the spec corresponds to the result type *)
+val spec_check : spec -> vty -> unit
+
+(* convert arrows to the unit type *)
+val ity_of_vty : vty -> ity
+val ty_of_vty  : vty -> ty
+
+val vty_vars : vty -> varset

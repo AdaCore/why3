@@ -130,8 +130,9 @@ let print_vtv fmt vtv =
   fprintf fmt "%s%a" (if vtv.vtv_ghost then "?" else "") print_ity vtv.vtv_ity
 
 let rec print_vta fmt vta =
-  fprintf fmt "%a ->@ %a%a" print_vtv vta.vta_arg
-    print_effect vta.vta_effect print_vty vta.vta_result
+  let print_arg fmt pv = fprintf fmt "%a ->@ " print_vtv pv.pv_vtv in
+  fprintf fmt "%a%a%a" (print_list nothing print_arg) vta.vta_args
+    print_effect vta.vta_spec.c_effect print_vty vta.vta_result
 
 and print_vty fmt = function
   | VTarrow vta -> print_vta fmt vta
@@ -168,18 +169,20 @@ let forget_lv = function
   | LetA ps -> forget_ps ps
 
 let rec print_type_v fmt = function
-  | SpecV vtv -> print_vtv fmt vtv
-  | SpecA (pvl,tyc) ->
+  | VTvalue vtv -> print_vtv fmt vtv
+  | VTarrow vta ->
       let print_arg fmt pv = fprintf fmt "@[(%a)@] ->@ " print_pvty pv in
-      fprintf fmt "%a%a" (print_list nothing print_arg) pvl print_type_c tyc;
-      List.iter forget_pv pvl
+      fprintf fmt "%a%a"
+        (print_list nothing print_arg) vta.vta_args
+        (print_type_c vta.vta_spec) vta.vta_result;
+      List.iter forget_pv vta.vta_args
 
-and print_type_c fmt tyc =
+and print_type_c spec fmt vty =
   fprintf fmt "{ %a }@ %a%a@ { %a }"
-    print_term tyc.c_pre
-    print_effect tyc.c_effect
-    print_type_v tyc.c_result
-    print_post tyc.c_post
+    print_term spec.c_pre
+    print_effect spec.c_effect
+    print_type_v vty
+    print_post spec.c_post
     (* TODO: print_xpost *)
 
 let print_invariant fmt f =
@@ -262,14 +265,14 @@ and print_enode pri fmt e = match e.e_node with
       print_pv fmt v
   | Earrow a ->
       print_ps fmt a
-  | Eapp (e,v) ->
+  | Eapp (e,v,_) ->
       fprintf fmt "(%a@ %a)" (print_lexpr pri) e print_pv v
-  | Elet ({ let_var = LetV pv ; let_expr = e1 }, e2)
+  | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
     when pv.pv_vs.vs_name.id_string = "_" &&
          ity_equal pv.pv_vtv.vtv_ity ity_unit ->
       fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
         print_expr e1 print_expr e2;
-  | Elet ({ let_var = lv ; let_expr = e1 }, e2) ->
+  | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
       fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
@@ -309,8 +312,8 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "abstract %a@ { %a }" print_expr e print_post q
   | Eghost e ->
       fprintf fmt "ghost@ %a" print_expr e
-  | Eany tyc ->
-      fprintf fmt "any@ %a" print_type_c tyc
+  | Eany spec ->
+      fprintf fmt "any@ %a" (print_type_c spec) e.e_vty
 
 and print_branch fmt ({ ppat_pattern = p }, e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
@@ -388,12 +391,12 @@ let print_data_decl fst fmt (ts,csl) =
     (print_head fst) ts (print_list newline print_constr) csl;
   forget_tvs_regs ()
 
-let print_val_decl fmt { val_name = lv ; val_spec = tyv } =
-  fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v tyv;
+let print_val_decl fmt { val_sym = lv ; val_vty = vty } =
+  fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v vty;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
 
-let print_let_decl fmt { let_var = lv ; let_expr = e } =
+let print_let_decl fmt { let_sym = lv ; let_expr = e } =
   fprintf fmt "@[<hov 2>let %a =@ %a@]" print_lv lv print_expr e;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
@@ -438,6 +441,9 @@ let () = Exn_printer.register
       fprintf fmt "Region %a is used twice" print_reg r
   | Mlw_ty.UnboundRegion r ->
       fprintf fmt "Unbound region %a" print_reg r
+  | Mlw_ty.UnboundException xs ->
+      fprintf fmt "This function raises %a but does not \
+        specify a post-condition for it" print_xs xs
   | Mlw_ty.RegionMismatch (r1,r2) ->
       fprintf fmt "Region mismatch between %a and %a"
         print_regty r1 print_regty r2
@@ -467,10 +473,5 @@ let () = Exn_printer.register
       fprintf fmt "This expression is not a function and cannot be applied"
   | Mlw_expr.Immutable _e ->
       fprintf fmt "Mutable expression expected"
-  | Mlw_expr.UnboundException xs ->
-      fprintf fmt "This function raises %a but does not \
-        specify a post-condition for it" print_xs xs
-  | Mlw_expr.DuplicateArg pv ->
-      fprintf fmt "Argument %a is used twice" print_pv pv
   | _ -> raise exn
   end

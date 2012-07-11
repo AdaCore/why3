@@ -637,7 +637,7 @@ type lenv = {
   mod_uc   : module_uc;
   th_at    : Theory.theory_uc;
   th_old   : Theory.theory_uc;
-  let_vars : let_var Mstr.t;
+  let_vars : let_sym Mstr.t;
   log_vars : vsymbol Mstr.t;
   log_denv : Typing.denv;
 }
@@ -663,6 +663,9 @@ let create_post lenv x ty f =
   let f = remove_old f in
   count_term_tuples f;
   create_post res f
+
+let create_xpost lenv x xs f = create_post lenv x (ty_of_ity xs.xs_ity) f
+let create_post lenv x vty f = create_post lenv x (ty_of_vty vty) f
 
 let create_pre lenv f =
   let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
@@ -695,7 +698,7 @@ let binders lenv bl =
 
 let xpost lenv xq =
   let add_exn m (xs,f) =
-    let f = create_post lenv "result" (ty_of_ity xs.xs_ity) f in
+    let f = create_xpost lenv "result" xs f in
     Mexn.add_new (DuplicateException xs) xs f m in
   List.fold_left add_exn Mexn.empty xq
 
@@ -778,34 +781,31 @@ let eff_of_deff lenv deff =
   eff
 
 let rec type_c lenv gh vars dtyc =
-  let result = type_v lenv gh vars dtyc.dc_result in
-  let ty = match result with
-    | SpecV v -> ty_of_ity v.vtv_ity
-    | SpecA _ -> ty_unit in
+  let vty = type_v lenv gh vars dtyc.dc_result in
   let eff = eff_of_deff lenv dtyc.dc_effect in
   (* reset every new region in the result *)
-  let eff = match result with
-    | SpecV v ->
+  let eff = match vty with
+    | VTvalue v ->
         let rec add_reg r eff =
           if reg_occurs r vars then eff else eff_reset (add_ity r.reg_ity eff) r
         and add_ity ity eff = Sreg.fold add_reg ity.ity_vars.vars_reg eff in
         add_ity v.vtv_ity eff
-    | SpecA _ -> eff in
+    | VTarrow _ -> eff in
   { c_pre    = create_pre lenv dtyc.dc_pre;
     c_effect = eff;
-    c_result = result;
-    c_post   = create_post lenv "result" ty dtyc.dc_post;
-    c_xpost  = xpost lenv dtyc.dc_xpost; }
+    c_post   = create_post lenv "result" vty dtyc.dc_post;
+    c_xpost  = xpost lenv dtyc.dc_xpost }, vty
 
 and type_v lenv gh vars = function
   | DSpecV (ghost,v) ->
       let ghost = ghost || gh in
-      SpecV (vty_value ~ghost (ity_of_dity v))
+      VTvalue (vty_value ~ghost (ity_of_dity v))
   | DSpecA (bl,tyc) ->
       let lenv, pvl = binders lenv bl in
       let add_pv s pv = vars_union s pv.pv_vtv.vtv_vars in
       let vars = List.fold_left add_pv vars pvl in
-      SpecA (pvl, type_c lenv gh vars tyc)
+      let spec, vty = type_c lenv gh vars tyc in
+      VTarrow (vty_arrow pvl ~spec vty)
 
 (* expressions *)
 
@@ -855,7 +855,7 @@ and expr_desc lenv loc de = match de.de_desc with
         | _ -> ()
       end;
       let def1 = create_let_defn (Denv.create_user_id x) e1 in
-      let lenv = add_local x.id def1.let_var lenv in
+      let lenv = add_local x.id def1.let_sym lenv in
       let e2 = expr lenv de2 in
       e_let def1 e2
   | DEletrec (rdl, de1) ->
@@ -903,10 +903,7 @@ and expr_desc lenv loc de = match de.de_desc with
       e_case e1 (List.map branch bl)
   | DEabstract (de1, q, xq) ->
       let e1 = expr lenv de1 in
-      let ty = match e1.e_vty with
-        | VTvalue v -> ty_of_ity v.vtv_ity
-        | VTarrow _ -> ty_unit in
-      let q = create_post lenv "result" ty q in
+      let q = create_post lenv "result" e1.e_vty q in
       e_abstract e1 q (xpost lenv xq)
   | DEassert (ak, f) ->
       let ak = match ak with
@@ -933,10 +930,11 @@ and expr_desc lenv loc de = match de.de_desc with
       expr lenv { de1 with de_desc = DEtry (de2, bl) }
   | DEmark (x, de1) ->
       let ld = create_let_defn (Denv.create_user_id x) e_now in
-      let lenv = add_local x.id ld.let_var lenv in
+      let lenv = add_local x.id ld.let_sym lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->
-      e_any (type_c lenv false vars_empty dtyc)
+      let spec, result = type_c lenv false vars_empty dtyc in
+      e_any spec result
   | DEghost de1 ->
       e_ghostify true (expr lenv de1)
   | DEloop (var,inv,de1) ->
@@ -979,14 +977,11 @@ and expr_lam lenv gh (bl, var, p, de, q, xq) =
   let e = e_ghostify gh (expr lenv de) in
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
-  let ty = match e.e_vty with
-    | VTvalue vtv -> ty_of_ity vtv.vtv_ity
-    | VTarrow _ -> ty_unit in
   { l_args = pvl;
     l_variant = List.map (create_variant lenv) var;
     l_pre = create_pre lenv p;
     l_expr = e;
-    l_post = create_post lenv "result" ty q;
+    l_post = create_post lenv "result" e.e_vty q;
     l_xpost = xpost lenv xq; }
 
 (** Type declaration *)
@@ -1492,7 +1487,7 @@ let add_module lib path mm mt m =
         let tyv, _ = dtype_v (create_denv uc) tyv in
         let tyv = type_v (create_lenv uc) gh vars_empty tyv in
         let vd = create_val (Denv.create_user_id id) tyv in
-        begin match vd.val_name with
+        begin match vd.val_sym with
           | LetA { ps_vta = { vta_ghost = true }} when not gh ->
               errorm ~loc "%s must be a ghost function" id.id
           | LetV { pv_vtv = { vtv_ghost = true }} when not gh ->

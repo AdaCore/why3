@@ -178,7 +178,7 @@ let letvar_news = function
   | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
 
 let create_let_decl ld =
-  let news = letvar_news ld.let_var in
+  let news = letvar_news ld.let_sym in
 (*
   let syms = syms_varmap Sid.empty ld.let_expr.e_vars in
   let syms = syms_effect syms ld.let_expr.e_effect in
@@ -207,7 +207,7 @@ let create_rec_decl rdl =
   mk_decl (PDrec rdl) (*syms*) news
 
 let create_val_decl vd =
-  let news = letvar_news vd.val_name in
+  let news = letvar_news vd.val_sym in
 (*
   let syms = syms_type_v Sid.empty vd.val_spec in
   let syms = syms_varmap syms vd.val_vars in
