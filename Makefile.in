@@ -1268,13 +1268,13 @@ clean::
 
 tags:
 	find src -regex ".*\.ml[^#]*" | grep -v ".svn" | sort -r | xargs \
-	etags "--regex=/let[ \t]+\([^ \t]+\)/\1/" \
-	      "--regex=/let[ \t]+rec[ \t]+\([^ \t]+\)/\1/" \
-	      "--regex=/and[ \t]+\([^ \t]+\)/\1/" \
-	      "--regex=/type[ \t]+\([^ \t]+\)/\1/" \
-	      "--regex=/exception[ \t]+\([^ \t]+\)/\1/" \
-	      "--regex=/val[ \t]+\([^ \t]+\)/\1/" \
-	      "--regex=/module[ \t]+\([^ \t]+\)/\1/"
+	etags "--regex-ocaml=/let[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex-ocaml=/let[ \t]+rec[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex-ocaml=/and[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex-ocaml=/type[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex-ocaml=/exception[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex-ocaml=/val[ \t]+\([^ \t]+\)/\1/" \
+	      "--regex-ocaml=/module[ \t]+\([^ \t]+\)/\1/"
 
 otags:
 	find \( -name '*.ml' -or -name '*.mli' \) -print0 | xargs -0 otags

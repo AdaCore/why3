@@ -199,6 +199,6 @@ let () =
   try
     main ()
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "%a@." Exn_printer.exn_printer e;
+    eprintf "Error: %a@." Exn_printer.exn_printer e;
     exit 1
 
