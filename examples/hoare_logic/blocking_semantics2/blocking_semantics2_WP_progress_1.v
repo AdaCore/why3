@@ -756,14 +756,15 @@ intros h4; clear IHe1 IHe2.
 assert (h: type_fmla typ_sigma (Cons (result, ty1) typ_pi) q').
 eapply Type_let.
 constructor; auto.
-
-generalize (h4 h h3 H); clear h4.
+admit.
+admit.
+(*generalize (h4 h h3 H); clear h4.
 intro h4.
 destruct h4 as (sigma' & pi' & e' & h5 ).
 exists sigma'.
 exists pi'.
 exists (Ebin e' o e2).
-apply one_step_bin_ctxt1; auto.
+apply one_step_bin_ctxt1; auto.*)
 
 (* case 1.2: e1 is a value *)
 elim H; clear H; intros v He1_v.

@@ -24,12 +24,36 @@
   version="8.3pl4"/>
  <prover
   id="5"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="6"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="7"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="8"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="9"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="10"
   name="Z3"
   version="2.19"/>
  <prover
-  id="6"
+  id="11"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="12"
+  name="veriT"
+  version="dev"/>
  <file
   name="../blocking_semantics2.mlw"
   verified="false"
@@ -77,7 +101,7 @@
    <goal
     name="eval_msubst_term"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="270" loccnumb="6" loccnume="22"
+    loclnum="269" loccnumb="6" loccnume="22"
     sum="5414c32f6343d5437b3ee28b23b0ff2c"
     proved="false"
     expanded="false"
@@ -94,41 +118,41 @@
    <goal
     name="eval_subst_term"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="276" loccnumb="6" loccnume="21"
+    loclnum="275" loccnumb="6" loccnume="21"
     sum="059dc8e4613b9c79d7c5b0e19d707211"
     proved="false"
     expanded="false"
     shape="ainfix =aeval_termV0V1asubst_termV2V3V4aeval_termV0aConsaTuple2V3aget_stackV4V1V1V2Iafresh_in_termV4V2F">
     <proof
      prover="0"
-     timelimit="3"
+     timelimit="4"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="1.96"/>
+     <result status="unknown" time="1.90"/>
     </proof>
    </goal>
    <goal
     name="eval_term_change_free"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="282" loccnumb="6" loccnume="27"
+    loclnum="281" loccnumb="6" loccnume="27"
     sum="2c690fdc6b891ab883aa79fe49ded02b"
     proved="false"
     expanded="false"
     shape="ainfix =aeval_termV1aConsaTuple2V3V4V2V0aeval_termV1V2V0Iafresh_in_termV3V0F">
     <proof
      prover="0"
-     timelimit="3"
+     timelimit="4"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="1.59"/>
+     <result status="unknown" time="1.63"/>
     </proof>
    </goal>
    <goal
     name="subst_fresh"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="317" loccnumb="6" loccnume="17"
+    loclnum="316" loccnumb="6" loccnume="17"
     sum="de2ee05fc1df247bfe6c620e293e6c28"
     proved="false"
     expanded="false"
@@ -145,7 +169,7 @@
    <goal
     name="let_subst"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="321" loccnumb="6" loccnume="15"
+    loclnum="320" loccnumb="6" loccnume="15"
     sum="e4d4949f6f877465f3b8a21941bd7426"
     proved="true"
     expanded="false"
@@ -162,7 +186,7 @@
    <goal
     name="eval_subst"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="325" loccnumb="6" loccnume="16"
+    loclnum="324" loccnumb="6" loccnume="16"
     sum="a7b1d8ce5acdc89353da9675de46f6fd"
     proved="false"
     expanded="false"
@@ -179,7 +203,7 @@
    <goal
     name="eval_swap"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="331" loccnumb="6" loccnume="15"
+    loclnum="330" loccnumb="6" loccnume="15"
     sum="ec0518789eb206a98293b69a4c2ec593"
     proved="false"
     expanded="false"
@@ -190,13 +214,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="3.04"/>
     </proof>
    </goal>
    <goal
     name="eval_change_free"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="337" loccnumb="6" loccnume="22"
+    loclnum="336" loccnumb="6" loccnume="22"
     sum="704d3d772a23c77a2d24371c17d76684"
     proved="false"
     expanded="false"
@@ -213,7 +237,7 @@
    <goal
     name="let_equiv"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="347" loccnumb="6" loccnume="15"
+    loclnum="346" loccnumb="6" loccnume="15"
     sum="05cee05b588132c24dc4c0b5d3c3caaf"
     proved="false"
     expanded="false"
@@ -224,13 +248,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="3.03"/>
     </proof>
    </goal>
    <goal
     name="steps_non_neg"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="463" loccnumb="8" loccnume="21"
+    loclnum="462" loccnumb="8" loccnume="21"
     sum="eade67cadff33c28d6627e8e18f7a2f3"
     proved="false"
     expanded="false"
@@ -241,13 +265,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="3.03"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="467" loccnumb="8" loccnume="22"
+    loclnum="466" loccnumb="8" loccnume="22"
     sum="87b06c04ce30fe804803f351ae675078"
     proved="false"
     expanded="false"
@@ -258,13 +282,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="3.06"/>
     </proof>
    </goal>
    <goal
     name="many_steps_let"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="475" loccnumb="8" loccnume="22"
+    loclnum="474" loccnumb="8" loccnume="22"
     sum="57ebdc7cf9e77a27f6a37f1a48214fea"
     proved="false"
     expanded="false"
@@ -281,128 +305,208 @@
    <goal
     name="one_step_change_free"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="483" loccnumb="7" loccnume="27"
+    loclnum="482" loccnumb="7" loccnume="27"
     sum="3a17471a28bc3f2792281193af09bbda"
     proved="false"
     expanded="false"
     shape="aone_stepV2V4V0V3V5V1Iaone_stepV2aConsaTuple2V6V7V4V0V3V5V1Iafresh_in_exprV6V0F">
     <proof
      prover="0"
-     timelimit="3"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="2.23"/>
+     <result status="unknown" time="2.24"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="TestSemantics"
    locfile="blocking_semantics2/../blocking_semantics2.mlw"
-   loclnum="510" loccnumb="7" loccnume="20"
+   loclnum="509" loccnumb="7" loccnume="20"
    verified="false"
    expanded="false">
    <goal
     name="Test13"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="520" loccnumb="5" loccnume="11"
+    loclnum="519" loccnumb="5" loccnume="11"
     sum="aced46a66d8a3ea8db18355cf16fa74b"
-    proved="false"
+    proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTvalueaVintc13aVintc13">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
    </goal>
    <goal
     name="Test13expr"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="523" loccnumb="5" loccnume="15"
+    loclnum="522" loccnumb="5" loccnume="15"
     sum="ebc6798079f0af0397d65ce315e52d83"
-    proved="false"
+    proved="true"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEvalueaVintc13amy_sigmaamy_piaEvalueaVintc13c0">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
    </goal>
    <goal
     name="Test42"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="526" loccnumb="5" loccnume="11"
+    loclnum="525" loccnumb="5" loccnume="11"
     sum="44dfe77850d7ed6bbff7901274f5cc45"
-    proved="false"
+    proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTvaraxaVintc42">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
    </goal>
    <goal
     name="Test42expr"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="529" loccnumb="5" loccnume="15"
+    loclnum="528" loccnumb="5" loccnume="15"
     sum="ca95da50c98d443ef0631f590438dcde"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEvaraxamy_sigmaamy_piaEvalueaVintc42c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.01"/>
+    </proof>
    </goal>
    <goal
     name="Test0"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="532" loccnumb="5" loccnume="10"
+    loclnum="531" loccnumb="5" loccnume="10"
     sum="9d04f0e55886ac8006b517df8c7c813b"
-    proved="false"
+    proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTderefayaVintc0">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
    </goal>
    <goal
     name="Test0expr"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="535" loccnumb="5" loccnume="14"
+    loclnum="534" loccnumb="5" loccnume="14"
     sum="906662761f1ec924d98d61d18a2dd964"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEderefayamy_sigmaamy_piaEvalueaVintc0c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.01"/>
+    </proof>
    </goal>
    <goal
     name="Test55"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="538" loccnumb="5" loccnume="11"
+    loclnum="537" loccnumb="5" loccnume="11"
     sum="bf513883aa1624839d293cbb306ff87e"
     proved="false"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTbinaTvaraxaOplusaTvalueaVintc13aVintc55">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.00"/>
+    </proof>
    </goal>
    <goal
     name="Test55expr"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="541" loccnumb="5" loccnume="15"
+    loclnum="540" loccnumb="5" loccnume="15"
     sum="e1e23f5c48aca772aec8d59fb8139228"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEbinaEvaraxaOplusaEvalueaVintc13amy_sigmaamy_piaEvalueaVintc55c2">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.00"/>
+    </proof>
    </goal>
    <goal
     name="Ass42"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="544" loccnumb="5" loccnume="10"
+    loclnum="543" loccnumb="5" loccnume="10"
     sum="b47475700a7f319300278e9960332234"
-    proved="false"
+    proved="true"
     expanded="false"
     shape="ainfix =agetV0ayaVintc42Iaone_stepamy_sigmaamy_piaEassignayaEvalueaVintc42V0V1avoidF">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
+    </proof>
    </goal>
    <goal
     name="If42"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="549" loccnumb="5" loccnume="9"
+    loclnum="548" loccnumb="5" loccnume="9"
     sum="e3b24c7bf402d9c30cf367e1d1a80a3e"
     proved="false"
     expanded="false"
     shape="ainfix =agetV1ayaVintc13Iaone_stepV0V2V4V1V3avoidIaone_stepamy_sigmaamy_piaEifaEbinaEderefayaOleaEvalueaVintc10aEassignayaEvalueaVintc13aEassignayaEvalueaVintc42V0V2V4F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.01"/>
+    </proof>
    </goal>
   </theory>
   <theory
    name="HoareLogic"
    locfile="blocking_semantics2/../blocking_semantics2.mlw"
-   loclnum="563" loccnumb="7" loccnume="17"
+   loclnum="562" loccnumb="7" loccnume="17"
    verified="false"
    expanded="false">
    <goal
     name="consequence_rule"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="570" loccnumb="6" loccnume="22"
+    loclnum="569" loccnumb="6" loccnume="22"
     sum="8c8a5c2ec8d22245ca9896e253c65ce5"
     proved="false"
     expanded="false"
@@ -413,13 +517,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.00"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
     name="value_rule"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="577" loccnumb="6" loccnume="16"
+    loclnum="576" loccnumb="6" loccnume="16"
     sum="e71d54d24842fe23e2725e9a67b2f053"
     proved="false"
     expanded="false"
@@ -430,13 +534,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.00"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="581" loccnumb="6" loccnume="17"
+    loclnum="580" loccnumb="6" loccnume="17"
     sum="7f9551285da4af9dee8bf5af254ccd5e"
     proved="false"
     expanded="false"
@@ -447,13 +551,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.07"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
     name="seq_rule"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="586" loccnumb="6" loccnume="14"
+    loclnum="585" loccnumb="6" loccnume="14"
     sum="0347faf01446cd7792936a2b361ef633"
     proved="false"
     expanded="false"
@@ -464,13 +568,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.07"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
     name="let_rule"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="591" loccnumb="6" loccnume="14"
+    loclnum="590" loccnumb="6" loccnume="14"
     sum="d17f969ecc93eccc778be880880276ac"
     proved="false"
     expanded="false"
@@ -481,13 +585,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.04"/>
+     <result status="timeout" time="3.00"/>
     </proof>
    </goal>
    <goal
     name="assert_rule"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="605" loccnumb="6" loccnume="17"
+    loclnum="604" loccnumb="6" loccnume="17"
     sum="3954008a4c23d7ba5d96b3a8a7b3f078"
     proved="false"
     expanded="false"
@@ -498,13 +602,13 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.03"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
     name="assert_rule_ext"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="609" loccnumb="6" loccnume="21"
+    loclnum="608" loccnumb="6" loccnume="21"
     sum="6a09a23a3c569e658e7dccbfaa3a1034"
     proved="false"
     expanded="false"
@@ -515,14 +619,14 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.08"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="WP"
    locfile="blocking_semantics2/../blocking_semantics2.mlw"
-   loclnum="632" loccnumb="7" loccnume="9"
+   loclnum="631" loccnumb="7" loccnume="9"
    verified="false"
    expanded="true">
    <goal
@@ -607,7 +711,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.07"/>
+     <result status="timeout" time="3.11"/>
     </proof>
    </goal>
    <goal
@@ -624,7 +728,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.05"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
@@ -641,49 +745,32 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.05"/>
+     <result status="timeout" time="3.01"/>
     </proof>
    </goal>
    <goal
-    name="decide_value"
+    name="unique_type_expr"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="758" loccnumb="8" loccnume="20"
-    sum="c32c794c5ad37507535445c90fd6644e"
+    loclnum="758" loccnumb="8" loccnume="24"
+    sum="0b3e72d881397d52b7b4cb3762a45cdf"
     proved="false"
     expanded="false"
-    shape="ainfix =V0aEvalueV1EOais_valueV0NF">
+    shape="ainfix =V3V4Iatype_exprV1V2V0V4Iatype_exprV1V2V0V3F">
     <proof
-     prover="0"
+     prover="7"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.04"/>
+     <result status="timeout" time="3.03"/>
     </proof>
     <proof
-     prover="1"
+     prover="10"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="bool_value"
-    locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="761" loccnumb="8" loccnume="18"
-    sum="9398a3ef656ae793bc78226c404225c7"
-    proved="false"
-    expanded="true"
-    shape="ainfix =V0aEvalueaVboolaTrueOainfix =V0aEvalueaVboolaFalseIais_valueV0Iatype_exprV1V2V0aTYboolF">
-    <proof
-     prover="5"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.04"/>
+     <result status="timeout" time="3.02"/>
     </proof>
     <proof
      prover="2"
@@ -691,7 +778,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.09"/>
+     <result status="timeout" time="3.03"/>
     </proof>
     <proof
      prover="0"
@@ -707,13 +794,135 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="3.05"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="highfailure" time="0.00"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.09"/>
     </proof>
     <proof
      prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.08"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.09"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="highfailure" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+   </goal>
+   <goal
+    name="decide_value"
+    locfile="blocking_semantics2/../blocking_semantics2.mlw"
+    loclnum="763" loccnumb="8" loccnume="20"
+    sum="0ef5efdcbbc54ecd2d269c3674a0dddb"
+    proved="false"
+    expanded="true"
+    shape="ainfix =V0aEvalueV1EOais_valueV0NF">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.05"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="unknown" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="bool_value"
+    locfile="blocking_semantics2/../blocking_semantics2.mlw"
+    loclnum="766" loccnumb="8" loccnume="18"
+    sum="562326be7f50f6b5aab48b1db49554e2"
+    proved="false"
+    expanded="true"
+    shape="ainfix =V0aEvalueaVboolaTrueOainfix =V0aEvalueaVboolaFalseIais_valueV0Iatype_exprV1V2V0aTYboolF">
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="3.09"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="0"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="3.01"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="0"
+     obsolete="true"
      archived="false">
      <result status="timeout" time="3.01"/>
     </proof>
@@ -730,7 +939,7 @@
      prover="1"
      timelimit="3"
      memlimit="0"
-     obsolete="false"
+     obsolete="true"
      archived="false">
      <result status="timeout" time="2.99"/>
     </proof>
@@ -738,18 +947,18 @@
    <goal
     name="progress"
     locfile="blocking_semantics2/../blocking_semantics2.mlw"
-    loclnum="766" loccnumb="8" loccnume="16"
-    sum="9f9ea63b0720538037da57e6f0f81095"
+    loclnum="771" loccnumb="8" loccnume="16"
+    sum="a5fb27f2ebabd38dfe9cb96e5cc0d7e2"
     proved="false"
-    expanded="true"
+    expanded="false"
     shape="aone_stepV1V2V0V7V8V9EIais_valueV0NIaeval_fmlaV1V2awpV0V6Iatype_fmlaV3aConsaTuple2aresultV5V4V6Iatype_exprV3V4V0V5F">
     <proof
      prover="0"
      timelimit="3"
      memlimit="0"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="3.10"/>
     </proof>
     <proof
      prover="4"

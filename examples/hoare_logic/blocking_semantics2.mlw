@@ -216,7 +216,6 @@ function eval_bin (x:value) (op:operator) (y:value) : value =
   | _,_ -> Vvoid
   end
 
-
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
   | Tvalue v -> v
@@ -632,6 +631,7 @@ end
 theory WP
 
 use import ImpExpr
+use import bool.Bool
 
 use set.Set
 
@@ -755,13 +755,18 @@ predicate expr_writes (e:expr) (w:Set.set mident) =
     | _ -> false
     end
 
-  lemma decide_value:
+  lemma unique_type_expr : 
+  forall e:expr, sigmat: type_env, pit:type_stack, ty1 ty2:datatype.  
+    type_expr sigmat pit e ty1 ->
+    type_expr sigmat pit e ty2 -> ty1 = ty2
+
+  lemma decide_value :
     forall e:expr. not (is_value e) \/ exists v:value. e = Evalue v
 
   lemma bool_value:
     forall e:expr, sigmat: type_env, pit:type_stack.  
       type_expr sigmat pit e TYbool -> is_value e ->
-          (e = Evalue (Vbool Bool.False)) \/ (e = Evalue (Vbool Bool.True))
+          (e = Evalue (Vbool False)) \/ (e = Evalue (Vbool True))
 
   lemma progress:
     forall e:expr, sigma:env, pi:stack, sigmat: type_env, pit: type_stack, ty: datatype, q:fmla.
