@@ -525,8 +525,10 @@ let create_fun_defn id lam letrec recsyms =
     fun_lambda = lam; }
 
 let e_rec rdl e =
-  let add_varm m rd = varmap_union m rd.fun_ps.ps_varm in
-  let varm = List.fold_left add_varm e.e_varm rdl.rec_defn in
+  let add_rd m { fun_ps = ps } =
+    (* psymbols defined in rdl can't occur in ps.ps_varm *)
+    varmap_union (Mid.remove ps.ps_name m) ps.ps_varm in
+  let varm = List.fold_left add_rd e.e_varm rdl.rec_defn in
   mk_expr (Erec (rdl,e)) e.e_vty e.e_effect varm
 
 let on_value fn e = match e.e_node with

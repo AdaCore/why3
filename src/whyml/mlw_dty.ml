@@ -50,14 +50,16 @@ and rvar =
   | Rtvs  of tvsymbol * dity * region Lazy.t
   | Rval  of dreg
 
-let rec ity_of_dity = function
+let rec ity_of_dity ?(strict=true) = function
+  | Dvar { contents = Dtvs _ } when strict ->
+      Loc.errorm "undefined type variable"
   | Dvar { contents = Dtvs tv } -> ity_var tv
-  | Dvar { contents = Dval dty } -> ity_of_dity dty
+  | Dvar { contents = Dval dty } -> ity_of_dity ~strict dty
   | Duvar tv -> ity_var tv
   | Dits (its,dl,rl) ->
-      ity_app its (List.map ity_of_dity dl) (List.map reg_of_dreg rl)
+      ity_app its (List.map (ity_of_dity ~strict) dl) (List.map reg_of_dreg rl)
   | Dts (ts,dl) ->
-      ity_pur ts (List.map ity_of_dity dl)
+      ity_pur ts (List.map (ity_of_dity ~strict) dl)
 
 and reg_of_dreg = function
   | Rreg (r,_) -> r
@@ -193,15 +195,16 @@ and unify_reg r1 r2 =
     | _ -> raise Exit
 
 let unify ~weak d1 d2 =
-  try unify ~weak d1 d2
-  with Exit -> raise (TypeMismatch (ity_of_dity d1, ity_of_dity d2))
+  try unify ~weak d1 d2 with Exit -> raise (TypeMismatch
+    (ity_of_dity ~strict:false d1, ity_of_dity ~strict:false d2))
 
 let unify_weak d1 d2 = unify ~weak:true d1 d2
 let unify d1 d2 = unify ~weak:false d1 d2
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
-let vty_of_dvty (argl,res) =
+let vty_of_dvty ?(strict=true) (argl,res) =
+  let ity_of_dity dity = ity_of_dity ~strict dity in
   let vtv = VTvalue (vty_value (ity_of_dity res)) in
   let conv a = create_pvsymbol (id_fresh "x") (vty_value (ity_of_dity a)) in
   if argl = [] then vtv else VTarrow (vty_arrow (List.map conv argl) vtv)

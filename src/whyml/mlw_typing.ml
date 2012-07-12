@@ -109,6 +109,19 @@ let ht_tuple   = Hashtbl.create 3
 let ts_tuple n = Hashtbl.replace ht_tuple n (); ts_tuple n
 let fs_tuple n = Hashtbl.replace ht_tuple n (); fs_tuple n
 
+let rec check_at f0 =
+  let rec check f = match f.t_node with
+    | Term.Tapp (ls, _) when ls_equal ls fs_at ->
+        let d = Mvs.set_diff f.t_vars f0.t_vars in
+        if not (Mvs.is_empty d) then errorm ?loc:f.t_loc
+          "locally bound variable %a under `at'"
+          Pretty.print_vs (fst (Mvs.choose d))
+        else true
+    | _ ->
+        t_all check f
+  in
+  ignore (check f0)
+
 let count_term_tuples t =
   let syms_ts _ ts = match is_ts_tuple_id ts.ts_name with
     | Some n -> Hashtbl.replace ht_tuple n () | _ -> () in
@@ -662,6 +675,7 @@ let create_post lenv x ty f =
   let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
   let f = remove_old f in
   count_term_tuples f;
+  check_at f;
   create_post res f
 
 let create_xpost lenv x xs f = create_post lenv x (ty_of_ity xs.xs_ity) f
@@ -670,11 +684,13 @@ let create_post lenv x vty f = create_post lenv x (ty_of_vty vty) f
 let create_pre lenv f =
   let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
   count_term_tuples f;
+  check_at f;
   f
 
 let create_variant lenv (t,r) =
   let t = Typing.type_term lenv.th_at lenv.log_denv lenv.log_vars t in
   count_term_tuples t;
+  check_at t;
   t, r
 
 let add_local x lv lenv = match lv with
@@ -980,12 +996,19 @@ and expr_lam lenv gh (bl, var, p, de, q, xq) =
   let e = e_ghostify gh (expr lenv de) in
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
+  let xq =
+    let dummy_xpost xs () =
+      let v = create_vsymbol (id_fresh "dummy") (ty_of_ity xs.xs_ity) in
+      Mlw_ty.create_post v t_false in
+    let xq = xpost lenv xq in
+    let xs = Sexn.union e.e_effect.eff_raises e.e_effect.eff_ghostx in
+    Mexn.set_union xq (Mexn.mapi dummy_xpost (Mexn.set_diff xs xq)) in
   { l_args = pvl;
     l_variant = List.map (create_variant lenv) var;
     l_pre = create_pre lenv p;
     l_expr = e;
     l_post = create_post lenv "result" e.e_vty q;
-    l_xpost = xpost lenv xq; }
+    l_xpost = xq; }
 
 (** Type declaration *)
 

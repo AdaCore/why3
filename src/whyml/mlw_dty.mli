@@ -46,8 +46,8 @@ val ts_app: tysymbol -> dity list -> dity
 val unify: dity -> dity -> unit
 val unify_weak: dity -> dity -> unit (* don't unify regions *)
 
-val ity_of_dity: dity -> ity
-val vty_of_dvty: dvty -> vty
+val ity_of_dity: ?strict:bool -> dity -> ity
+val vty_of_dvty: ?strict:bool -> dvty -> vty
   (** use with care, only once unification is done *)
 
 val specialize_scheme: tvars -> dvty -> dvty

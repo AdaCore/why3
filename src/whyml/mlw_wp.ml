@@ -564,12 +564,10 @@ and wp_abstract env c_eff c_q c_xq q xq =
 and wp_lambda env lr l =
   let lab = fresh_mark () in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env = if lr = 0 then env else
+  let env = if lr = 0 || l.l_variant = [] then env else
     let lab = t_var lab in
-    let t_at_lab v = fs_app fs_at [t_var v; lab] v.vs_ty in
-    let add_arg v sbs = Mvs.add v (t_at_lab v) sbs in
-    let sbs = List.fold_right add_arg args Mvs.empty in
-    let tl = List.map (fun (t,_) -> t_subst sbs t) l.l_variant in
+    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
+    let tl = List.map t_at_lab l.l_variant in
     { env with letrec_var = Mint.add lr tl env.letrec_var }
   in
   let q = old_mark lab (wp_expl expl_post l.l_post) in
@@ -638,7 +636,7 @@ let rec unabsurd f = match f.t_node with
 
 let add_wp_decl name f uc =
   (* prepare a proposition symbol *)
-  let s = "WP_parameter_" ^ name.id_string in
+  let s = "WP_parameter " ^ name.id_string in
   let lab = Ident.create_label ("expl:parameter " ^ name.id_string) in
   let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
