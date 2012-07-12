@@ -57,10 +57,6 @@ TODO
   * driver
     - maps: const
 
-  * MACRO
-
-  * AXIOM -> LEMMA
-
 *)
 
 open Format
@@ -649,14 +645,22 @@ let print_arguments info fmt = function
   | [] -> ()
   | vl -> fprintf fmt "(%a)" (print_comma_list (print_vsty_nopar info)) vl
 
+let re_macro = Str.regexp "\\bMACRO\\b"
+let has_macro s =
+  try let _ = Str.search_forward re_macro s 0 in true with Not_found -> false
+let is_macro info fmt = function
+  | Some (Edition (_, c)) when info.realization && List.exists has_macro c ->
+      fprintf fmt "MACRO "
+  | _ -> ()
+
 let print_param_decl ~prev info fmt ls =
   ignore prev;
   let _, _, all_ty_params = ls_ty_vars ls in
   let vl = List.map create_argument ls.ls_args in
   print_name fmt ls.ls_name;
-  fprintf fmt "@[<hov 2>%a%a%a: %a"
-    print_ls ls print_params all_ty_params
-    (print_arguments info) vl (print_ls_type info) ls.ls_value;
+  fprintf fmt "@[<hov 2>%a%a%a: %a%a"
+    print_ls ls print_params all_ty_params (print_arguments info) vl
+    (is_macro info) prev (print_ls_type info) ls.ls_value;
   realization fmt info prev;
   List.iter forget_var vl;
   fprintf fmt "@]@\n@\n"
@@ -713,30 +717,27 @@ let print_ind_decl info fmt d =
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_ind_decl info fmt d; forget_tvs ())
 
-let print_pkind info fmt = function
-  | Paxiom when info.realization -> fprintf fmt "LEMMA"
-  | Paxiom -> fprintf fmt "AXIOM"
-  | Plemma -> fprintf fmt "LEMMA"
-  | Pgoal  -> fprintf fmt "THEOREM"
-  | Pskip  -> assert false (* impossible *)
+let re_lemma = Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
+let rec find_lemma = function
+  | [] -> "AXIOM"
+  | s :: sl ->
+      (try let _ = Str.search_forward re_lemma s 0 in Str.matched_group 1 s
+       with Not_found -> find_lemma sl)
+let axiom_or_lemma = function
+  | Some (Edition (_, c)) -> find_lemma c
+  | _ -> "AXIOM"
 
-let print_prop_decl info fmt (k,pr,f) =
+let print_prop_decl ~prev info fmt (k,pr,f) =
   let params = t_ty_freevars Stv.empty f in
-  let stt = match k with
-    | Paxiom when info.realization -> "LEMMA"
-    | Paxiom -> ""
+  let kind = match k with
+    | Paxiom when info.realization -> axiom_or_lemma prev
+    | Paxiom -> "AXIOM"
     | Plemma -> "LEMMA"
     | Pgoal -> "THEOREM"
     | Pskip -> assert false (* impossible *) in
   print_name fmt pr.pr_name;
-  if stt <> "" then
-    fprintf fmt "@[<hov 2>%a%a: %s %a@]@\n@\n"
-      print_pr pr print_params params stt
-      (print_fmla info) f
-  else
-    fprintf fmt "@[<hov 2>%a%a: %a %a@]@\n@\n"
-      print_pr pr print_params params (print_pkind info) k
-      (print_fmla info) f;
+  fprintf fmt "@[<hov 2>%a%a: %s %a@]@\n@\n"
+    print_pr pr print_params params kind (print_fmla info) f;
   forget_tvs ()
 
 let print_decl ~old info fmt d =
@@ -771,7 +772,7 @@ let print_decl ~old info fmt d =
   | Dprop (_, pr, _) when Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop pr ->
-      print_prop_decl info fmt pr
+      print_prop_decl ~prev info fmt pr
 
 let print_decls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@]" (print_list nothing (print_decl ~old info)) dl
@@ -804,8 +805,13 @@ let print_task env pr thpr realize ?old fmt task =
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
         id_unique iprinter th.Theory.th_name,
         Mid.remove th.Theory.th_name realized_theories
-    | _ ->
-        "goal", realized_theories
+    | Some { Task.task_decl = { Theory.td_node = td } } ->
+        let name = match td with
+          | Theory.Decl { Decl.d_node = Dprop (_, pr, _) } ->
+              pr.pr_name.id_string
+          | _ -> "goal"
+        in
+        name, realized_theories
   in
   let realized_theories' =
     Mid.map (fun (th,s) -> fprintf fmt "IMPORTING %a.%s@\n"

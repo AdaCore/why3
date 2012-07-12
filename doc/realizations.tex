@@ -13,37 +13,35 @@ Currently, realizations are supported for the proof assistants Coq and PVS.
 
 Generating the skeleton for a theory is done by passing to \why the
 \verb+--realize+ option, a driver suitable for realizations, the names of
-the theories to realize, and the target directory.
+the theories to realize, and a target directory.
 
 \begin{verbatim}
 why3 --realize -D path/to/drivers/prover-realize.drv
       -T env_path.theory_name -o path/to/target/dir/
 \end{verbatim}
-
 The name of the generated file is inferred from the theory name. If the
 target directory already contains a file with the same name, \why
-extracts all the parts that it assumes to be user-made and prints them in
+extracts all the parts that it assumes to be user-edited and merges them in
 the generated file.
 
 Note that \why does not track dependencies between realizations and
-theories, so a realization will become outdated if a theory is modified.
-It is up to the user to handle such dependencies, for instance by adding
-a Makefile rule.
+theories, so a realization will become outdated if the corresponding
+theory is modified.
+It is up to the user to handle such dependencies, for instance using a
+\texttt{Makefile}.
 
 \section{Using realizations inside proofs}
 
-If a theory has been realized, a \why printer for an interactive prover
-will no longer output assumptions from the theory but instead simply put
-a directive to load the realization. In order to indicate to the printer
-that a given theory is realized, one has to add a meta declaration to the
-corresponding theory section.
-
+If a theory has been realized, the \why printer for the corresponding prover
+will no longer output declarations for that theory but instead simply put
+a directive to load the realization. In order to tell the printer
+that a given theory is realized, one has to add a meta declaration in the
+corresponding theory section of the driver.
 \begin{verbatim}
 theory env_path.theory_name
   meta "realized" "env_path.theory_name", "optional_naming"
 end
 \end{verbatim}
-
 The first parameter is the theory name for \why, while the second
 parameter, if not empty, provides a name to be used inside generated
 scripts to point to the realization, in case the default name is not
@@ -91,7 +89,40 @@ comment.
 
 \subsection{PVS}
 
-TODO
+When a PVS file is regenerated, the old version is split into chunks,
+according to blank lines. Chunks corresponding to \why declarations
+are identified with a comment starting with \verb+% Why3+, \eg
+\begin{verbatim}
+  % Why3 f
+  f(x: int) : int
+\end{verbatim}
+Other chunks are considered to be user PVS declarations.
+Thus a comment such as \verb+% Why3 f+ must not be removed;
+otherwise, there will be two
+declarations for \texttt{f} in the next version of the file (one being
+regenerated and another one considered to be a user-edited chunk).
+
+The user is allowed to perform the following actions on a PVS
+realization:
+\begin{itemize}
+\item give a definition to an uninterpreted symbol (type, function, or
+  predicate symbol), by adding an equal sign (\texttt{=}) and a
+  right-hand side to the definition. When the declaration is
+  regenerated, the left-hand side is updated and the right-hand side
+  is reprinted as is. In particular, the names of a function or
+  predicate arguments should not be modified. In addition, the
+  \texttt{MACRO} keyword may be inserted and it will be kept in
+  further generations.
+
+\item turn an axiom into a lemma, that is to replace the PVS keyword
+  \texttt{AXIOM} with either \texttt{LEMMA} or \texttt{THEOREM}.
+
+\item insert anything between generated declarations, such as a lemma,
+  an extra definition for the purpose of a proof, etc.
+\end{itemize}
+\why makes some effort to merge the new declarations with the old ones
+and with the user chunks. If it happens that some chunks could not be
+merged, they are appended at the end of the file, in comments.
 
 \section{Shipping libraries of realizations}
 
