@@ -945,6 +945,19 @@ and subst_rd letrec psm rdl =
    until the effects are stabilized. TODO: prove correctness *)
 let create_rec_defn = let letrec = ref 0 in fun defl ->
   incr letrec;
+  if defl = [] then invalid_arg "Mlw_expr.create_rec_defn";
+  (* check that the all variants use the same order *)
+  let variant1 = (snd (List.hd defl)).l_variant in
+  let check_variant (_, { l_variant = vl }) =
+    let res = try List.for_all2 (fun (_,r1) (_,r2) ->
+        Util.option_eq ls_equal r1 r2) vl variant1
+      with Invalid_argument _ -> false in
+    if not res then Loc.errorm
+      "All functions in a recursive definition \
+        must use the same well-founded order for variant"
+  in
+  List.iter check_variant (List.tl defl);
+  (* create the first list of fun_defns *)
   let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
   let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) = match lam.l_expr.e_vty with

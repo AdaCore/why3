@@ -19,6 +19,7 @@
 (**************************************************************************)
 
 open Why3
+open Util
 open Ident
 open Ty
 open Term
@@ -86,7 +87,6 @@ let rec remove_old f = match f.t_node with
   | Tapp (ls,[t]) when ls_equal ls fs_old -> t_at_old (remove_old t)
   | _ -> t_map remove_old f
 
-(* FIXME? Do we need this? *)
 (* replace every occurrence of [at(t,'now)] with [t] *)
 let rec remove_at f = match f.t_node with
   | Tapp (ls, [t; { t_node = Tapp (fs,[]) }])
@@ -149,6 +149,7 @@ let expl_post      = Ident.create_label "expl:normal postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
+let expl_variant   = Ident.create_label "expl:variant decreases"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let expl_loop_var  = Ident.create_label "expl:loop variant decreases"
@@ -223,13 +224,13 @@ type wp_env = {
   ps_int_lt  : Term.lsymbol;
   ps_int_gt  : Term.lsymbol;
   fs_int_pl  : Term.lsymbol;
+  letrec_var : term list Mint.t;
 }
 
-let decrease ?loc env mk_old varl =
-  let rec decr pr = function
-    | [] -> t_false
-    | (t, rel)::varl ->
-        let old_t = mk_old t in
+let decrease ?loc env olds varl =
+  let rec decr pr olds varl = match olds, varl with
+    | [], [] -> t_false
+    | old_t::olds, (t, rel)::varl ->
         let d = match rel with
           | Some ls -> ps_app ls [t; old_t]
           | None when ty_equal (t_type t) ty_int ->
@@ -240,9 +241,10 @@ let decrease ?loc env mk_old varl =
               "no default WF order for %a" Pretty.print_term t
         in
         let npr = t_and_simp pr (t_equ t old_t) in
-        t_or_simp (t_and_simp pr d) (decr npr varl)
+        t_or_simp (t_and_simp pr d) (decr npr olds varl)
+    | _ -> assert false
   in
-  if varl = [] then t_true else decr t_true varl
+  if varl = [] then t_true else decr t_true olds varl
 
 (** Reconstruct pure values after writes *)
 
@@ -454,9 +456,14 @@ and wp_desc env e q xq = match e.e_node with
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
+      let d = if spec.c_letrec = 0 then t_true else
+        let olds = Mint.find_def [] spec.c_letrec env.letrec_var in
+        if olds = [] then t_true (* we are out of letrec *) else
+        let d = decrease ?loc:e.e_loc env olds spec.c_variant in
+        wp_expl expl_variant (t_label ?loc:e.e_loc d.t_label d) in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
-      let w = wp_and ~sym:false p w in (* FIXME? do we need pre? *)
+      let w = wp_and ~sym:false (wp_and ~sym:true d p) w in (* FIXME? ~sym? *)
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
   | Eabstr (e1, c_q, c_xq) ->
@@ -480,7 +487,8 @@ and wp_desc env e q xq = match e.e_node with
   | Eloop (inv, varl, e1) ->
       (* TODO: what do we do about well-foundness? *)
       let i = wp_expl expl_loop_keep inv in
-      let d = decrease ?loc:e.e_loc env t_at_old varl in
+      let olds = List.map (fun (t,_) -> t_at_old t) varl in
+      let d = decrease ?loc:e.e_loc env olds varl in
       let q = create_unit_post (wp_and ~sym:true i d) in
       let w = relativize (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
@@ -549,16 +557,26 @@ and wp_abstract env c_eff c_q c_xq q xq =
   in
   relativize proceed c_q c_xq
 
-and wp_lambda env l =
-  let q = wp_expl expl_post l.l_post in
-  let xq = Mexn.map (wp_expl expl_xpost) l.l_xpost in
-  let f = relativize (wp_expr env l.l_expr) q xq in
-  let f = wp_implies l.l_pre f in
+and wp_lambda env lr l =
+  let lab = fresh_mark () in
+  let args = List.map (fun pv -> pv.pv_vs) l.l_args in
+  let env = if lr = 0 then env else
+    let lab = t_var lab in
+    let t_at_lab v = fs_app fs_at [t_var v; lab] v.vs_ty in
+    let add_arg v sbs = Mvs.add v (t_at_lab v) sbs in
+    let sbs = List.fold_right add_arg args Mvs.empty in
+    let tl = List.map (fun (t,_) -> t_subst sbs t) l.l_variant in
+    { env with letrec_var = Mint.add lr tl env.letrec_var }
+  in
+  let q = old_mark lab (wp_expl expl_post l.l_post) in
+  let conv p = old_mark lab (wp_expl expl_xpost p) in
+  let f = wp_expr env l.l_expr q (Mexn.map conv l.l_xpost) in
+  let f = wp_implies l.l_pre (erase_mark lab f) in
   let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
-  wp_forall (List.map (fun pv -> pv.pv_vs) l.l_args) f
+  wp_forall args f
 
-and wp_rec_defn env rdl =
-  List.map (fun rd -> wp_lambda env rd.fun_lambda) rdl.rec_defn
+and wp_rec_defn env { rec_defn = rdl; rec_letrec = lr } =
+  List.map (fun rd -> wp_lambda env lr rd.fun_lambda) rdl
 
 (***
 let bool_to_prop env f =
@@ -617,12 +635,12 @@ let rec unabsurd f = match f.t_node with
 let add_wp_decl name f uc =
   (* prepare a proposition symbol *)
   let s = "WP_parameter_" ^ name.id_string in
-  let lab = Ident.create_label ("expl:" ^ name.id_string) in
+  let lab = Ident.create_label ("expl:parameter " ^ name.id_string) in
   let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
   (* prepare the VC formula *)
-  (* let f = remove_at f in (* FIXME: do we need this? *) *)
+  let f = remove_at f in
   (* let f = bool_to_prop uc f in *)
   let f = unabsurd f in
   (* get a known map with tuples added *)
@@ -643,6 +661,7 @@ let mk_env env km th =
     ps_int_lt  = Theory.ns_find_ls th_int.th_export ["infix <"];
     ps_int_gt  = Theory.ns_find_ls th_int.th_export ["infix >"];
     fs_int_pl  = Theory.ns_find_ls th_int.th_export ["infix +"];
+    letrec_var = Mint.empty;
   }
 
 let wp_let env km th { let_sym = lv; let_expr = e } =
