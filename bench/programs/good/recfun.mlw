@@ -40,7 +40,7 @@ module M
     { result = old !a + old !b }
 
   let test_f5 () =
-    { !x >= 0 } let f = f5 x in let b = ref 0 in f b { result = old !x }
+    { !x >= 0 } let b = ref 0 in let f = f5 x in f b { result = old !x }
 
   end
 

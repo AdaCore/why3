@@ -32,6 +32,7 @@ open Mlw_ty.T
 type psymbol = {
   ps_name  : ident;
   ps_vta   : vty_arrow;
+  ps_varm  : varmap;
   ps_vars  : varset;
   ps_subst : ity_subst;
 }
@@ -39,10 +40,11 @@ type psymbol = {
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
 let create_psymbol_real ~poly id vta varm =
-  let vars = if poly then vars_empty else vta.vta_vars in
+  let vars = if poly then vars_empty else vta_vars vta in
   let vars = vars_merge varm vars in
   { ps_name  = id_register id;
     ps_vta   = vta_filter varm vta;
+    ps_varm  = varm;
     ps_vars  = vars;
     ps_subst = vars_freeze vars; }
 
@@ -97,7 +99,6 @@ type let_sym =
 type val_decl = {
   val_sym  : let_sym;
   val_vty  : vty;
-  val_vars : varmap;
 }
 
 type variant = {
@@ -171,12 +172,12 @@ let create_val id vty = match vty with
   | VTvalue v ->
       let pv = create_pvsymbol id v in
       vty_check vars_empty vty;
-      { val_sym = LetV pv; val_vty = vty; val_vars = Mid.empty }
+      { val_sym = LetV pv; val_vty = vty }
   | VTarrow a ->
       let varm = vta_varmap a in
       let ps = create_psymbol_poly id a varm in
       vta_check ps.ps_vars a;
-      { val_sym = LetA ps; val_vty = vty; val_vars = varm }
+      { val_sym = LetA ps; val_vty = vty }
 
 (** patterns *)
 
@@ -394,7 +395,6 @@ and let_defn = {
 and rec_defn = {
   rec_ps     : psymbol;
   rec_lambda : lambda;
-  rec_vars   : varmap;
 }
 
 and lambda = {
@@ -450,7 +450,7 @@ let vta_of_expr e = match e.e_vty with
 
 let e_arrow ps vta =
   let sbs = vta_vars_match ps.ps_subst ps.ps_vta vta in
-  let vars = Mid.singleton ps.ps_name ps.ps_vars in
+  let vars = Mid.add ps.ps_name ps.ps_vars ps.ps_varm in
   let vta = vta_full_inst sbs ps.ps_vta in
   mk_expr (Earrow ps) (VTarrow vta) eff_empty vars
 
@@ -511,26 +511,27 @@ let e_app_real e pv =
   let eff = eff_union e.e_effect spec.c_effect in
   mk_expr (Eapp (e,pv,spec)) vty eff (add_pv_vars pv e.e_vars)
 
-let create_fun_defn id lam =
+let create_fun_defn id lam recsyms =
   let e = lam.l_expr in
   let spec = {
     c_pre    = lam.l_pre;
     c_post   = lam.l_post;
     c_xpost  = lam.l_xpost;
     c_effect = e.e_effect; } in
-  let varm = spec_varmap e.e_vars lam.l_variant spec in
+  let varm = Mid.set_diff e.e_vars recsyms in
+  let varm = spec_varmap varm lam.l_variant spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
   let vta = vty_arrow lam.l_args ~spec e.e_vty in
   { rec_ps     = create_psymbol_poly id vta varm;
-    rec_lambda = lam;
-    rec_vars   = varm; }
+    rec_lambda = lam; }
 
+(* FIXME: if the given rdl is not the result of create_rec_defn,
+   the varmap calculation below might be off. We should probably
+   make [rec_defn list] a private type. *)
 let e_rec rdl e =
-  let add_vars m rd = varmap_union m rd.rec_vars in
-  let remove_ps m rd = Mid.remove rd.rec_ps.ps_name m in
+  let add_vars m rd = varmap_union m rd.rec_ps.ps_varm in
   let vars = List.fold_left add_vars e.e_vars rdl in
-  let vars = List.fold_left remove_ps vars rdl in
   mk_expr (Erec (rdl,e)) e.e_vty e.e_effect vars
 
 let on_value fn e = match e.e_node with
@@ -847,10 +848,6 @@ let e_absurd ity =
 
 (* Compute the fixpoint on recursive definitions *)
 
-let vars_equal vs1 vs2 =
-  Stv.equal vs1.vars_tv vs2.vars_tv &&
-  Sreg.equal vs1.vars_reg vs2.vars_reg
-
 let eff_equal eff1 eff2 =
   Sreg.equal eff1.eff_reads  eff2.eff_reads  &&
   Sreg.equal eff1.eff_writes eff2.eff_writes &&
@@ -877,7 +874,7 @@ let rec vta_compat a1 a2 =
 
 let ps_compat ps1 ps2 =
   vta_compat ps1.ps_vta ps2.ps_vta &&
-  vars_equal ps1.ps_vars ps2.ps_vars
+  Mid.equal (fun _ _ -> true) ps1.ps_varm ps2.ps_varm
 
 let rec expr_subst psm e = match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
@@ -922,8 +919,10 @@ let rec expr_subst psm e = match e.e_node with
   | Elogic _ | Evalue _ | Earrow _ | Eany _ | Eabsurd | Eassert _ -> e
 
 and create_rec_defn defl =
+  let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
+  let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) =
-    let rd = create_fun_defn (id_clone ps.ps_name) lam in
+    let rd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
     if ps_compat ps rd.rec_ps then m, { rd with rec_ps = ps }
     else Mid.add ps.ps_name rd.rec_ps m, rd in
   let m, rdl = Util.map_fold_left conv Mid.empty defl in
@@ -945,11 +944,13 @@ and subst_rd psm rdl =
    is passed to create_rec_defn above which repeats substitution
    until the effects are stabilized. TODO: prove correctness *)
 let create_rec_defn defl =
+  let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
+  let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) = match lam.l_expr.e_vty with
     | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
         "The body of a recursive function must be a first-order value"
     | VTvalue _ ->
-        let rd = create_fun_defn (id_clone ps.ps_name) lam in
+        let rd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
         Mid.add ps.ps_name rd.rec_ps m, rd in
   let m, rdl = Util.map_fold_left conv Mid.empty defl in
   subst_rd m rdl
@@ -957,7 +958,7 @@ let create_rec_defn defl =
 let create_fun_defn id lam =
   if lam.l_variant <> [] then
     Loc.errorm "Variants are not allowed in a non-recursive definition";
-  create_fun_defn id lam
+  create_fun_defn id lam Sid.empty
 
 (* fold *)
 

@@ -36,6 +36,7 @@ open Mlw_ty.T
 type psymbol = private {
   ps_name  : ident;
   ps_vta   : vty_arrow;
+  ps_varm  : varmap;
   ps_vars  : varset;
   (* this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
@@ -84,7 +85,6 @@ type let_sym =
 type val_decl = private {
   val_sym  : let_sym;
   val_vty  : vty;
-  val_vars : varmap;
 }
 
 val create_val : Ident.preid -> vty -> val_decl
@@ -161,7 +161,6 @@ and let_defn = private {
 and rec_defn = private {
   rec_ps     : psymbol;
   rec_lambda : lambda;
-  rec_vars   : varmap;
 }
 
 and lambda = {

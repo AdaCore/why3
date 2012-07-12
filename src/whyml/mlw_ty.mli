@@ -286,9 +286,6 @@ and vty_arrow = private {
   vta_result : vty;
   vta_spec   : spec;
   vta_ghost  : bool;
-  vta_vars   : varset;
-  (* this varset covers every type variable and region in vta_arg
-     and vta_result, but not necessarily in vta_spec *)
 }
 
 exception UnboundException of xsymbol
@@ -297,17 +294,17 @@ exception UnboundException of xsymbol
 val vty_arrow : pvsymbol list -> ?spec:spec -> ?ghost:bool -> vty -> vty_arrow
 
 (* this only compares the types of arguments and results, and ignores
-   the spec. In other words, only the type variables and regions
-   in .vta_vars are matched. The caller should supply a "freezing"
+   the spec. In other words, only the type variables and regions in
+   [vta_vars vta] are matched. The caller should supply a "freezing"
    substitution that covers all external type variables and regions. *)
 val vta_vars_match : ity_subst -> vty_arrow -> vty_arrow -> ity_subst
 
-(* the substitution must cover not only vta_vars but also every
-   type variable and every region in vta_spec *)
+(* the substitution must cover not only [vta_vars vta] but
+   also every type variable and every region in vta_spec *)
 val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
 
 (* remove from the given arrow every effect that is covered
-   neither by the arrow's vta_vars nor by the given varmap *)
+   neither by the arrow's arguments nor by the given varmap *)
 val vta_filter : varmap -> vty_arrow -> vty_arrow
 
 (* apply a function specification to a variable argument *)
@@ -324,4 +321,7 @@ val spec_check : spec -> vty -> unit
 val ity_of_vty : vty -> ity
 val ty_of_vty  : vty -> ty
 
+(* collects the type variables and regions in arguments and values,
+   but ignores the spec *)
+val vta_vars : vty_arrow -> varset
 val vty_vars : vty -> varset

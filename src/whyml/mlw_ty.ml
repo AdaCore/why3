@@ -764,15 +764,15 @@ and vty_arrow = {
   vta_result : vty;
   vta_spec   : spec;
   vta_ghost  : bool;
-  vta_vars   : varset;
-  (* this varset covers every type variable and region in vta_arg
-     and vta_result, but may skip some type variables and regions
-     in vta_effect *)
 }
 
-let vty_vars = function
+let rec vta_vars vta =
+  let add_arg vars pv = vars_union vars pv.pv_vtv.vtv_vars in
+  List.fold_left add_arg (vty_vars vta.vta_result) vta.vta_args
+
+and vty_vars = function
   | VTvalue vtv -> vtv.vtv_vars
-  | VTarrow vta -> vta.vta_vars
+  | VTarrow vta -> vta_vars vta
 
 let vty_ghost = function
   | VTvalue vtv -> vtv.vtv_ghost
@@ -788,14 +788,12 @@ let ty_of_vty = function
 
 let spec_check spec vty = spec_check spec (ty_of_vty vty)
 
-let vty_arrow_unsafe argl ~spec ~ghost vty =
-  let add_arg vars { pv_vtv = vtv } = vars_union vars vtv.vtv_vars in
-  { vta_args   = argl;
-    vta_result = vty;
-    vta_spec   = spec;
-    vta_ghost  = ghost || vty_ghost vty;
-    vta_vars   = List.fold_left add_arg (vty_vars vty) argl;
-  }
+let vty_arrow_unsafe argl ~spec ~ghost vty = {
+  vta_args   = argl;
+  vta_result = vty;
+  vta_spec   = spec;
+  vta_ghost  = ghost || vty_ghost vty;
+}
 
 let vty_arrow argl ?spec ?(ghost=false) vty =
   (* we accept a mutable vty_value as a result to simplify Mlw_expr,

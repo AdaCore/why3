@@ -146,10 +146,10 @@ let print_psty fmt ps =
     fprintf fmt "[%a]@ " (print_list comma print_tv) (Stv.elements tvs) in
   let print_regs fmt regs = if not (Sreg.is_empty regs) then
     fprintf fmt "<%a>@ " (print_list comma print_regty) (Sreg.elements regs) in
-  let vars = ps.ps_vta.vta_vars in
+  let vars = vta_vars ps.ps_vta in
   fprintf fmt "@[%a :@ %a%a%a@]"
     print_ps ps
-    print_tvs (Stv.diff vars.vars_tv ps.ps_vars.vars_tv)
+    print_tvs (Mtv.set_diff vars.vars_tv ps.ps_subst.ity_subst_tv)
     print_regs (Mreg.set_diff vars.vars_reg ps.ps_subst.ity_subst_reg)
     print_vta ps.ps_vta
 
