@@ -128,7 +128,7 @@ type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
   e_effect : effect;
-  e_vars   : varmap;
+  e_varm   : varmap;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
