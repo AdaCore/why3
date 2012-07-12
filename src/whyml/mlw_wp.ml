@@ -202,6 +202,10 @@ let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
+let open_post q =
+  let v, f = open_post q in
+  v, t_label_copy q f
+
 let open_unit_post q =
   let v, q = open_post q in
   t_subst_single v t_void q
