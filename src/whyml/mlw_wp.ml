@@ -228,7 +228,7 @@ type wp_env = {
 let decrease ?loc env mk_old varl =
   let rec decr pr = function
     | [] -> t_false
-    | { v_term = t; v_rel = rel }::varl ->
+    | (t, rel)::varl ->
         let old_t = mk_old t in
         let d = match rel with
           | Some ls -> ps_app ls [t; old_t]
@@ -558,7 +558,7 @@ and wp_lambda env l =
   wp_forall (List.map (fun pv -> pv.pv_vs) l.l_args) f
 
 and wp_rec_defn env rdl =
-  List.map (fun rd -> wp_lambda env rd.rec_lambda) rdl
+  List.map (fun rd -> wp_lambda env rd.fun_lambda) rdl.rec_defn
 
 (***
 let bool_to_prop env f =
@@ -660,10 +660,10 @@ let wp_rec env km th rdl =
   let fl = wp_rec_defn env rdl in
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
-      d.rec_ps.ps_name.id_string Pretty.print_term f;
+      d.fun_ps.ps_name.id_string Pretty.print_term f;
     let f = wp_forall (Mvs.keys f.t_vars) f in
-    add_wp_decl d.rec_ps.ps_name f th
+    add_wp_decl d.fun_ps.ps_name f th
   in
-  List.fold_left2 add_one th rdl fl
+  List.fold_left2 add_one th rdl.rec_defn fl
 
 let wp_val _env _km th _vd = th

@@ -235,14 +235,18 @@ type pre = term          (* precondition: pre_fmla *)
 type post = term         (* postcondition: eps result . post_fmla *)
 type xpost = post Mexn.t (* exceptional postconditions *)
 
+type variant = term * lsymbol option (* tau * (tau -> tau -> prop) *)
+
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
 
 type spec = {
-  c_pre    : pre;
-  c_post   : post;
-  c_xpost  : xpost;
-  c_effect : effect;
+  c_pre     : pre;
+  c_post    : post;
+  c_xpost   : xpost;
+  c_effect  : effect;
+  c_variant : variant list;
+  c_letrec  : int;
 }
 
 (** program variables *)

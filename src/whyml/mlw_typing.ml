@@ -675,7 +675,7 @@ let create_pre lenv f =
 let create_variant lenv (t,r) =
   let t = Typing.type_term lenv.th_at lenv.log_denv lenv.log_vars t in
   count_term_tuples t;
-  { v_term = t; v_rel = r }
+  t, r
 
 let add_local x lv lenv = match lv with
   | LetA _ ->
@@ -791,10 +791,12 @@ let rec type_c lenv gh vars dtyc =
         and add_ity ity eff = Sreg.fold add_reg ity.ity_vars.vars_reg eff in
         add_ity v.vtv_ity eff
     | VTarrow _ -> eff in
-  { c_pre    = create_pre lenv dtyc.dc_pre;
-    c_effect = eff;
-    c_post   = create_post lenv "result" vty dtyc.dc_post;
-    c_xpost  = xpost lenv dtyc.dc_xpost }, vty
+  { c_pre     = create_pre lenv dtyc.dc_pre;
+    c_effect  = eff;
+    c_post    = create_post lenv "result" vty dtyc.dc_post;
+    c_xpost   = xpost lenv dtyc.dc_xpost;
+    c_variant = [];
+    c_letrec  = 0 }, vty
 
 and type_v lenv gh vars = function
   | DSpecV (ghost,v) ->
@@ -832,21 +834,21 @@ and expr_desc lenv loc de = match de.de_desc with
           end
       end
   | DElet (x, gh, { de_desc = DEfun lam }, de2) ->
-      let def = expr_fun lenv x gh lam in
-      let lenv = add_local x.id (LetA def.rec_ps) lenv in
+      let def, ps = expr_fun lenv x gh lam in
+      let lenv = add_local x.id (LetA ps) lenv in
       let e2 = expr lenv de2 in
-      e_rec [def] e2
+      e_rec def e2
   | DEfun lam ->
       let x = mk_id "fn" loc in
-      let def = expr_fun lenv x false lam in
-      let e2 = e_arrow def.rec_ps def.rec_ps.ps_vta in
-      e_rec [def] e2
+      let def, ps = expr_fun lenv x false lam in
+      let e2 = e_arrow ps ps.ps_vta in
+      e_rec def e2
   (* FIXME? (ghost "lab" fun x -> ...) loses the label "lab" *)
   | DEghost { de_desc = DEfun lam } ->
       let x = mk_id "fn" loc in
-      let def = expr_fun lenv x true lam in
-      let e2 = e_arrow def.rec_ps def.rec_ps.ps_vta in
-      e_rec [def] e2
+      let def, ps = expr_fun lenv x true lam in
+      let e2 = e_arrow ps ps.ps_vta in
+      e_rec def e2
   | DElet (x, gh, de1, de2) ->
       let e1 = e_ghostify gh (expr lenv de1) in
       begin match e1.e_vty with
@@ -860,8 +862,8 @@ and expr_desc lenv loc de = match de.de_desc with
       e_let def1 e2
   | DEletrec (rdl, de1) ->
       let rdl = expr_rec lenv rdl in
-      let add_rd { rec_ps = ps } = add_local ps.ps_name.id_string (LetA ps) in
-      let e1 = expr (List.fold_right add_rd rdl lenv) de1 in
+      let add_rd { fun_ps = ps } = add_local ps.ps_name.id_string (LetA ps) in
+      let e1 = expr (List.fold_right add_rd rdl.rec_defn lenv) de1 in
       e_rec rdl e1
   | DEapply (de1, del) ->
       let el = List.map (expr lenv) del in
@@ -970,7 +972,8 @@ and expr_rec lenv rdl =
 
 and expr_fun lenv x gh lam =
   let lam = expr_lam lenv gh lam in
-  create_fun_defn (Denv.create_user_id x) lam
+  let def = create_fun_defn (Denv.create_user_id x) lam in
+  def, (List.hd def.rec_defn).fun_ps
 
 and expr_lam lenv gh (bl, var, p, de, q, xq) =
   let lenv, pvl = binders lenv bl in
@@ -1460,8 +1463,8 @@ let add_module lib path mm mt m =
         let e = dexpr (create_denv uc) e in
         let pd = match e.de_desc with
           | DEfun lam ->
-              let def = expr_fun (create_lenv uc) id gh lam in
-              create_rec_decl [def]
+              let def, _ = expr_fun (create_lenv uc) id gh lam in
+              create_rec_decl def
           | _ ->
               let e = e_ghostify gh (expr (create_lenv uc) e) in
               if not gh && vty_ghost e.e_vty then

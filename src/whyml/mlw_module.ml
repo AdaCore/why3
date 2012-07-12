@@ -277,7 +277,7 @@ let add_let uc = function
   | LetV pv -> add_symbol add_ps pv.pv_vs.vs_name (PV pv) uc
   | LetA ps -> add_symbol add_ps ps.ps_name (PS ps) uc
 
-let add_rec uc { rec_ps = ps } =
+let add_rec uc { fun_ps = ps } =
   add_symbol add_ps ps.ps_name (PS ps) uc
 
 let add_exn uc xs =
@@ -314,7 +314,7 @@ let add_pdecl uc d =
   | PDval { val_sym = lv } | PDlet { let_sym = lv } ->
       add_let uc lv
   | PDrec rdl ->
-      List.fold_left add_rec uc rdl
+      List.fold_left add_rec uc rdl.rec_defn
   | PDexn xs ->
       add_exn uc xs
 

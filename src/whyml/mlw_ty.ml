@@ -633,6 +633,8 @@ type pre = term          (* precondition: pre_fmla *)
 type post = term         (* postcondition: eps result . post_fmla *)
 type xpost = post Mexn.t (* exceptional postconditions *)
 
+type variant = term * lsymbol option (* tau * (tau -> tau -> prop) *)
+
 let create_post vs f = t_eps_close vs f
 
 let open_post f = match f.t_node with
@@ -644,39 +646,48 @@ let check_post ty f = match f.t_node with
   | _ -> Loc.errorm "invalid post-condition"
 
 type spec = {
-  c_pre    : pre;
-  c_post   : post;
-  c_xpost  : xpost;
-  c_effect : effect;
+  c_pre     : pre;
+  c_post    : post;
+  c_xpost   : xpost;
+  c_effect  : effect;
+  c_variant : variant list;
+  c_letrec  : int;
 }
 
 let spec_empty ty = {
-  c_pre    = t_true;
-  c_post   = create_post (create_vsymbol (id_fresh "dummy") ty) t_true;
-  c_xpost  = Mexn.empty;
-  c_effect = eff_empty;
+  c_pre     = t_true;
+  c_post    = create_post (create_vsymbol (id_fresh "dummy") ty) t_true;
+  c_xpost   = Mexn.empty;
+  c_effect  = eff_empty;
+  c_variant = [];
+  c_letrec  = 0;
 }
 
 let spec_full_inst sbs tvm vsm c =
   let subst = t_ty_subst tvm vsm in {
-    c_pre    = subst c.c_pre;
-    c_post   = subst c.c_post;
-    c_xpost  = Mexn.map subst c.c_xpost;
-    c_effect = eff_full_inst sbs c.c_effect;
+    c_pre     = subst c.c_pre;
+    c_post    = subst c.c_post;
+    c_xpost   = Mexn.map subst c.c_xpost;
+    c_effect  = eff_full_inst sbs c.c_effect;
+    c_variant = List.map (fun (t,rel) -> subst t, rel) c.c_variant;
+    c_letrec  = c.c_letrec;
   }
 
 let spec_subst sbs c =
   let subst = t_subst sbs in {
-    c_pre    = subst c.c_pre;
-    c_post   = subst c.c_post;
-    c_xpost  = Mexn.map subst c.c_xpost;
-    c_effect = c.c_effect;
+    c_pre     = subst c.c_pre;
+    c_post    = subst c.c_post;
+    c_xpost   = Mexn.map subst c.c_xpost;
+    c_effect  = c.c_effect;
+    c_variant = List.map (fun (t,rel) -> subst t, rel) c.c_variant;
+    c_letrec  = c.c_letrec;
   }
 
 let spec_filter varm vars c =
-  let add _ f s = Mvs.set_union f.t_vars s in
-  let vss = add () c.c_pre c.c_post.t_vars in
-  let vss = Mexn.fold add c.c_xpost vss in
+  let add f s = Mvs.set_union f.t_vars s in
+  let vss = add c.c_pre c.c_post.t_vars in
+  let vss = Mexn.fold (fun _ -> add) c.c_xpost vss in
+  let vss = List.fold_right (fun (t,_) -> add t) c.c_variant vss in
   let check { vs_name = id } _ = if not (Mid.mem id varm) then
     Loc.errorm "Local variable %s escapes from its scope" id.id_string in
   Mvs.iter check vss;
@@ -689,6 +700,10 @@ let spec_check c ty =
     Loc.error ?loc:c.c_pre.t_loc (Term.FmlaExpected c.c_pre);
   check_post ty c.c_post;
   Mexn.iter (fun xs q -> check_post (ty_of_ity xs.xs_ity) q) c.c_xpost;
+  let check_variant (t,rel) = match rel with
+    | Some ps -> ignore (ps_app ps [t;t])
+    | None -> t_ty_check t (Some ty_int) in
+  List.iter check_variant c.c_variant;
   let sexn = Sexn.union c.c_effect.eff_raises c.c_effect.eff_ghostx in
   let sexn = Mexn.set_diff sexn c.c_xpost in
   if not (Sexn.is_empty sexn) then

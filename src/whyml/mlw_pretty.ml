@@ -192,7 +192,7 @@ let print_variant fmt varl =
   let print_rel fmt = function
     | Some ps -> fprintf fmt "@ [%a]" Pretty.print_ls ps
     | None -> () in
-  let print_var fmt { v_term = t; v_rel = ps } =
+  let print_var fmt (t, ps) =
     fprintf fmt " %a%a" Pretty.print_term t print_rel ps in
   fprintf fmt "variant@ {%a }@ " (print_list comma print_var) varl
 
@@ -276,10 +276,10 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
-  | Erec (rdl,e) ->
+  | Erec ({ rec_defn = rdl }, e) ->
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
         (print_list_next newline print_rec) rdl print_expr e;
-      let forget_rd rd = forget_ps rd.rec_ps in
+      let forget_rd rd = forget_ps rd.fun_ps in
       List.iter forget_rd rdl
   | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
@@ -323,7 +323,7 @@ and print_xbranch fmt (xs, pv, e) =
   fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" print_xs xs print_pv pv print_expr e;
   forget_pv pv
 
-and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
+and print_rec fst fmt { fun_ps = ps ; fun_lambda = lam } =
   let print_arg fmt pv = fprintf fmt "@[(%a)@]" print_pvty pv in
   fprintf fmt "@[<hov 2>%s (%a)@ %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
     (if fst then "let rec" else "with")
@@ -416,7 +416,7 @@ let print_pdecl fmt d = match d.pd_node with
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
   | PDval  vd -> print_val_decl fmt vd
   | PDlet  ld -> print_let_decl fmt ld
-  | PDrec rdl -> print_list_next newline print_rec_decl fmt rdl
+  | PDrec rdl -> print_list_next newline print_rec_decl fmt rdl.rec_defn
   | PDexn  xs -> print_exn_decl fmt xs
 
 let print_next_data_decl = print_data_decl false

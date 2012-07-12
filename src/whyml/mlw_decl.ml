@@ -44,7 +44,7 @@ and pdecl_node =
   | PDdata of data_decl list
   | PDval  of val_decl
   | PDlet  of let_defn
-  | PDrec  of rec_defn list
+  | PDrec  of rec_defn
   | PDexn  of xsymbol
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
@@ -187,9 +187,9 @@ let create_let_decl ld =
 *)
   mk_decl (PDlet ld) (*syms*) news
 
-let create_rec_decl rdl =
+let create_rec_decl ({ rec_defn = rdl } as d) =
   if rdl = [] then raise Decl.EmptyDecl;
-  let add_rd s { rec_ps = p } = check_vars p.ps_vars; news_id s p.ps_name in
+  let add_rd s { fun_ps = p } = check_vars p.ps_vars; news_id s p.ps_name in
   let news = List.fold_left add_rd Sid.empty rdl in
 (*
   let add_rd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
@@ -204,7 +204,7 @@ let create_rec_decl rdl =
     syms_expr syms l.l_expr in
   let syms = List.fold_left add_rd Sid.empty rdl in
 *)
-  mk_decl (PDrec rdl) (*syms*) news
+  mk_decl (PDrec d) (*syms*) news
 
 let create_val_decl vd =
   let news = letvar_news vd.val_sym in
