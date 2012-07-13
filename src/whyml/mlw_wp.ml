@@ -99,25 +99,23 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
 let erase_mark lab t = t_subst_single lab t_now t
 
-(* TODO: explain this *)
+(* TODO: explain this and rename the function *)
 let relativize fn q xq =
   let lab = fresh_mark () in
   let f = fn (old_mark lab q) (Mexn.map (old_mark lab) xq) in
   erase_mark lab f
 
-(* replace [at(t,now)] with [t] modulo variable renaming *)
+(* TODO: explain this and rename the function *)
 let rec drop_at now m t = match t.t_node with
   | Tvar vs when now ->
       begin try t_var (Mvs.find vs m) with Not_found -> t end
-  | Tapp (ls, _) when ls_equal ls fs_old ->
-      assert false
-  | Tapp (ls, [e; mark]) when ls_equal ls fs_at ->
-      begin match mark.t_node with
+  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
+  | Tapp (ls, [t; mark]) when ls_equal ls fs_at ->
+      let now = match mark.t_node with
         | Tvar vs when vs_equal vs vs_old -> assert false
-        | Tapp (ls,[]) when ls_equal ls fs_now -> drop_at true m e
-        (* no longer assume that unmarked variables are at 'now *)
-        | _ -> t_map (drop_at false m) t
-      end
+        | Tapp (ls,[]) when ls_equal ls fs_now -> true
+        | _ -> false in
+      t_map (drop_at now m) t
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
       (* do not open unless necessary *)
       let m = Mvs.set_inter m t.t_vars in
