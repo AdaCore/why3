@@ -110,7 +110,7 @@ let rec drop_at now m t = match t.t_node with
   | Tvar vs when now ->
       begin try t_var (Mvs.find vs m) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls fs_old -> assert false
-  | Tapp (ls, [t; mark]) when ls_equal ls fs_at ->
+  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
       let now = match mark.t_node with
         | Tvar vs when vs_equal vs vs_old -> assert false
         | Tapp (ls,[]) when ls_equal ls fs_now -> true
