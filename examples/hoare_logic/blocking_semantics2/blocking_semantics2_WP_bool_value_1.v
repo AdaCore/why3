@@ -725,11 +725,9 @@ Axiom decide_value : forall (e:expr), (~ (is_value e)) \/ exists v:value,
 Theorem bool_value : forall (v:value) (sigmat:(map mident datatype))
   (pit:(list (ident* datatype)%type)), (type_expr sigmat pit (Evalue v)
   TYbool) -> ((v = (Vbool false)) \/ (v = (Vbool true))).
-intros v sigmat pit h1.
-inversion h1; subst.
-generalize H3.
-case_eq v; simpl; intros; try congruence.
-case b; auto.
+inversion 1; subst.
+destruct v; simpl in *; try congruence.
+destruct b; auto.
 Qed.
 
 

@@ -896,16 +896,24 @@ eexists.
 eapply one_step_let_value.
 
 (* case 7: e = if e1 then e2 else e3 *)
+clear IHe2 IHe3.
 destruct (decide_value e1).
 (* case 7.1: e1 not a value *)
 intros sigma pi sigmat pit ty q h1 h2 h3 h4.
-(*generalize (IHe1 _ _ _ (conj h1 H)).
-intros (sigma' & pi' & e' & h).
+inversion h1; subst.
+simpl in h3.
+pose (q' := Fand (Fimplies (Fterm (Tvar result)) (wp e2 q))
+             (Fimplies (Fnot (Fterm (Tvar result))) (wp e3 q))).
+fold q' in h3.
+generalize (IHe1 sigma pi _ _ _ q' H5); clear IHe1.
+intros (h5, h6); auto.
+
+generalize (H0 h2 _ H).
 exists sigma'.
 exists pi'.
 exists (Eif e' e2 e3).
-eapply one_step_if_ctxt; auto.*)
-admit.
+eapply one_step_if_ctxt; auto.
+
 (* case 7.2: e1 is a value *)
 elim H; clear H; intros v He_v.
 subst.
@@ -915,12 +923,10 @@ exists pi.
 inversion h1; subst.
 assert (h: v = Vbool false \/ v = Vbool true).
 eapply bool_value with sigmat pit; auto.
-destruct h; subst.
+destruct h; subst; eexists.
 (* v = false *)
-eexists.
 apply one_step_if_false.
 (* v = true *)
-eexists.
 apply one_step_if_true.
 
 (* case 8 : e = assert f *)
