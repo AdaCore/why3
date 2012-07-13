@@ -100,6 +100,12 @@ AC_ARG_ENABLE(coq-libs,
     [  --enable-coq-libs       enable Coq realizations],,
     enable_coq_libs=yes)
 
+# PVS libraries
+
+AC_ARG_ENABLE(pvs-libs,
+    [  --enable-pvs-libs       enable PVS realizations],,
+    enable_pvs_libs=yes)
+
 # hypothesis selection
 
 AC_ARG_ENABLE(hypothesis-selection,
@@ -445,6 +451,43 @@ if test "$enable_coq_libs" = yes; then
    rm -f conftest.v conftest.vo conftest.err
 fi
 
+# PVS
+
+enable_pvs_fp_libs=no
+
+if test "$enable_pvs_libs" = no; then
+    enable_pvs_support=no
+    AC_MSG_WARN(PVS support disabled)
+    reason_pvs_support=" (disabled by user)"
+else
+    AC_CHECK_PROG(PVS,pvs,pvs,no)
+    if test "$PVS" = no ; then
+        enable_pvs_support=no
+        AC_MSG_WARN(Cannot find pvs.)
+        reason_pvs_support=" (pvs not found)"
+    else
+        PVSLIB=`$PVS -where`
+        AC_MSG_CHECKING(PVS version)
+        PVSVERSION=`$PVS -version | sed -n -e 's|.*Version* *\([[^ ]]*\)$|\1|p' `
+
+        case $PVSVERSION in
+          5.0)
+	        enable_pvs_support=yes
+                AC_MSG_RESULT($PVSVERSION)
+                ;;
+          *)
+                enable_pvs_support=no
+	        AC_MSG_WARN(You need PVS 5.0 or later; PVS discarded)
+                reason_pvs_support=" (need version 5.0 or later)"
+                ;;
+        esac
+    fi
+fi
+
+if test "$enable_pvs_support" = no; then
+   enable_pvs_libs=no
+fi
+
 # hypothesis_selection
 
 if test "$enable_hypothesis_selection" = yes; then
@@ -529,6 +572,11 @@ AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
 
+AC_SUBST(enable_pvs_libs)
+AC_SUBST(enable_pvs_fp_libs)
+AC_SUBST(PVS)
+AC_SUBST(PVSVERSION)
+
 AC_SUBST(enable_hypothesis_selection)
 
 AC_SUBST(enable_doc)
@@ -575,6 +623,15 @@ if test "$enable_coq_support" = "yes" ; then
    echo "    Realization support : $enable_coq_libs $reason_coq_libs"
    if test "$enable_coq_libs" = "yes" ; then
       echo "        FP arithmetic   : $enable_coq_fp_libs $reason_coq_fp_libs"
+   fi
+fi
+echo "PVS support             : $enable_pvs_support $reason_pvs_support"
+if test "$enable_pvs_support" = "yes" ; then
+   echo "    Version             : $PVSVERSION"
+   echo "    Lib                 : $PVSLIB"
+   echo "    Realization support : $enable_pvs_libs $reason_pvs_libs"
+   if test "$enable_pvs_libs" = "yes" ; then
+      echo "        FP arithmetic   : $enable_pvs_fp_libs $reason_pvs_fp_libs"
    fi
 fi
 echo "hypothesis selection    : $enable_hypothesis_selection"

@@ -43,19 +43,14 @@ QUESTIONS FOR THE PVS TEAM
 
         LET x2 = x1`1, x3 = x1`2 IN ...
 
-  * pattern-matching
-
-    - By mistake, I used _ as a catch-all in a CASES expressions
-      (as in ML and in Why3) and it made PVS go wild!
-
-  * I intend to use the script "proveit" to replay PVS proofs (when they exist).
-    What is the canonical way to check that all proofs have indeed been
-    successfully replayed? (exit code, grep on proveit's output, etc.)
+      better: LET (x2, x3) = x1 IN ...
 
 TODO
 ----
   * driver
     - maps: const
+
+  * use proveit (same path as PVS) to replay a proof
 
 *)
 
@@ -487,8 +482,8 @@ type chunk =
   | Edition of string * contents (* name contents *)
   | Other of contents            (* contents *)
 
-let re_theory = Str.regexp "[^ :]+: THEORY"
-let re_begin = Str.regexp " BEGIN"
+let re_ignored =
+  Str.regexp "\\([^ :]+: THEORY\\)\\|\\([^ :]+: LIBRARY\\)\\|IMPORTING\\| BEGIN"
 let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
 
 (* Reads an old version of the file, as a list of chunks.
@@ -501,8 +496,7 @@ let read_old_script ch =
   let rec read_line () =
     let s = input_line ch in
     let s = clean_line s in
-    if Str.string_match re_theory s 0 || Str.string_match re_begin s 0
-    then read_line () else s
+    if Str.string_match re_ignored s 0 then read_line () else s
   in
   let rec read ?name () =
     let s = read_line () in
@@ -604,7 +598,7 @@ let print_type_decl ~prev info fmt ts = ignore (prev);
     print_name fmt ts.ts_name;
     match ts.ts_def with
     | None ->
-        fprintf fmt "@[<hov 2>%a%a: TYPE"
+        fprintf fmt "@[<hov 2>%a%a: TYPE+"
           print_ts ts print_params_list ts.ts_args;
         realization fmt info prev;
         fprintf fmt "@]@\n@\n"
@@ -795,54 +789,69 @@ let print_task env pr thpr realize ?old fmt task =
         let f,id =
           let l = split_string_rev s1 '.' in List.rev (List.tl l),List.hd l in
         let th = Env.find_theory env f id in
-        Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
+        Mid.add th.Theory.th_name (th, (f, if s2 = "" then s1 else s2)) mid
       | _ -> assert false
     ) Mid.empty task in
-  (* 2 cases: task is clone T with [] or task is a real goal *)
-  let thname, realized_theories = match task with
+  (* two cases: task is clone T with [] or task is a real goal *)
+  let thname, thpath, realized_theories = match task with
     | None -> assert false
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
-        id_unique iprinter th.Theory.th_name,
-        Mid.remove th.Theory.th_name realized_theories
+        let id = th.Theory.th_name in
+        id.id_string, th.Theory.th_path, Mid.remove id realized_theories
     | Some { Task.task_decl = { Theory.td_node = td } } ->
         let name = match td with
           | Theory.Decl { Decl.d_node = Dprop (_, pr, _) } ->
               pr.pr_name.id_string
           | _ -> "goal"
         in
-        name, realized_theories
+        name, [], realized_theories
   in
-  let realized_theories' =
-    Mid.map (fun (th,s) -> fprintf fmt "IMPORTING %a.%s@\n"
-               print_path th.Theory.th_path s; th)
-      realized_theories in
+  (* make names as stable as possible by first printing all identifiers *)
+  let realized_theories' = Mid.map fst realized_theories in
   let realized_symbols = Task.used_symbols realized_theories' in
   let local_decls = Task.local_decls task realized_symbols in
-  (* associate a special printer to each symbol in a realized theory *)
   let symbol_printers =
     let printers =
       Mid.map (fun th ->
         let pr = fresh_printer () in
         Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
-        pr
-      ) realized_theories' in
+        pr)
+        realized_theories' in
     Mid.map (fun th ->
-      (snd (Mid.find th.Theory.th_name realized_theories), th,
-       Mid.find th.Theory.th_name printers)
-    ) realized_symbols in
+               let _, (_, s) = Mid.find th.Theory.th_name realized_theories in
+               (s, th, Mid.find th.Theory.th_name printers))
+      realized_symbols in
   let info = {
     info_syn = get_syntax_map task;
     symbol_printers = symbol_printers;
     realization = realize;
   }
   in
+  (* (\* build IMPORTING declarations *\) *)
+  (* let libraries = Hashtbl.create 17 in (\* path -> library name *\) *)
+  (* let importing = Hashtbl.create 17 in (\* library name -> theory name *\) *)
+  (* let add _ (th, (path, _)) = *)
+  (*   if not (Hashtbl.mem libraries path) then begin *)
+  (*     let libname = String.concat "_" ("why3" :: path) in *)
+  (*     Hashtbl.add libraries path libname *)
+  (*   end; *)
+  (*   let libname = Hashtbl.find libraries path in *)
+  (*   Hashtbl.add importing libname th.Theory.th_name.id_string *)
+  (* in *)
+  (* Mid.iter add realized_theories; *)
+  (* finally, read the old file, if any, and generate the new one *)
   let old = ref (match old with
     | None -> []
     | Some ch -> read_old_script ch)
   in
-  fprintf fmt "@[<hov 1>%s: THEORY@\n@[<hov 1>BEGIN@\n@\n" thname;
-  fprintf fmt "%% Why3 tuple0@\n";
+  fprintf fmt "@[<hov 1>%s: THEORY@\n@[<hov 1>BEGIN@\n" thname;
+  Mid.iter
+    (fun _ (th, (path, _)) ->
+       let lib = if path = thpath then "" else String.concat "." path ^ "@" in
+       fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
+    realized_theories;
+  fprintf fmt "@\n%% Why3 tuple0@\n";
   fprintf fmt "tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0@\n@\n";
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old;
