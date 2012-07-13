@@ -339,7 +339,7 @@ let quantify env regs f =
   (* quantify *)
   let update v t f = wp_let (Mvs.find v vv') t f in
   let f = Mvs.fold update vars (drop_at true vv' f) in
-  wp_forall (Mreg.values mreg) f
+  wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Weakest preconditions *)
 
@@ -491,6 +491,7 @@ and wp_desc env e q xq = match e.e_node with
       let i = wp_expl expl_loop_keep inv in
       let olds = List.map (fun (t,_) -> t_at_old t) varl in
       let d = decrease ?loc:e.e_loc env olds varl in
+      let d = wp_expl expl_loop_var d in
       let q = create_unit_post (wp_and ~sym:true i d) in
       let w = relativize (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
