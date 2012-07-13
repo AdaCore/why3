@@ -1690,7 +1690,11 @@ let merge_file ~keygen env ~allow_obsolete from_f to_f  =
     (fun to_th ->
       try
         let from_th =
-          Util.Mstr.find to_th.theory_name.Ident.id_string from_theories in
+          let name = to_th.theory_name.Ident.id_string in
+          try Util.Mstr.find name from_theories
+          (* TODO: remove this later when all sessions are updated *)
+          with Not_found -> Util.Mstr.find ("WP "^name) from_theories
+        in
         merge_theory ~keygen env ~allow_obsolete from_th to_th
       with
         | Not_found when allow_obsolete -> true
