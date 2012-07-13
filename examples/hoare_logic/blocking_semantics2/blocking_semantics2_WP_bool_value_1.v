@@ -696,13 +696,13 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   end.
 Unset Implicit Arguments.
 
-Axiom wp_implies : forall (p:fmla) (q:fmla), (forall (sigma:(map mident
+Axiom monotonicite : forall (p:fmla) (q:fmla), (forall (sigma:(map mident
   value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
   (eval_fmla sigma pi q)) -> forall (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (e:expr), (eval_fmla sigma pi (wp e p)) ->
   (eval_fmla sigma pi (wp e q)).
 
-Axiom wp_conj : forall (sigma:(map mident value)) (pi:(list (ident*
+Axiom distib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (e:expr) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp e (Fand p
   q))) <-> ((eval_fmla sigma pi (wp e p)) /\ (eval_fmla sigma pi (wp e q))).
 
@@ -718,33 +718,22 @@ Definition is_value(e:expr): Prop :=
   | _ => False
   end.
 
-Axiom unique_type_expr : forall (e:expr) (sigmat:(map mident datatype))
-  (pit:(list (ident* datatype)%type)) (ty1:datatype) (ty2:datatype),
-  (type_expr sigmat pit e ty1) -> ((type_expr sigmat pit e ty2) ->
-  (ty1 = ty2)).
-
 Axiom decide_value : forall (e:expr), (~ (is_value e)) \/ exists v:value,
   (e = (Evalue v)).
 
 (* Why3 goal *)
-Theorem bool_value : forall (e:expr) (sigmat:(map mident datatype))
-  (pit:(list (ident* datatype)%type)), (type_expr sigmat pit e TYbool) ->
-  ((is_value e) -> ((e = (Evalue (Vbool false))) \/
-  (e = (Evalue (Vbool true))))).
-intros e sigmat pit h1 h2.
-destruct (decide_value e).
-(* e is not a value *)
-tauto.
-(* e is not a value *)
-elim H; clear H h2; intros v H.
-subst e.
-assert (h : type_expr sigmat pit (Evalue v) (type_value v)).
-apply Type_evalue.
-assert (TYbool = (type_value v)).
-apply unique_type_expr with (Evalue v) sigmat pit; auto.
-assert (h3: v = (Vbool false) \/ v = (Vbool true)).
-admit.
-
+Theorem bool_value : forall (v:value) (sigmat:(map mident datatype))
+  (pit:(list (ident* datatype)%type)), (type_expr sigmat pit (Evalue v)
+  TYbool) -> ((v = (Vbool false)) \/ (v = (Vbool true))).
+intros e sigmat pit h1.
+case_eq e; intros v value_e h; try contradiction.
+clear h.
+subst.
+inversion h1; subst.
+generalize H3.
+clear H3.
+case_eq v; simpl; intros; try congruence.
+case b; auto.
 Qed.
 
 
