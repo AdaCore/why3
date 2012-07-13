@@ -74,7 +74,7 @@ let create_type_variable () =
   Dvar (ref (Dtvs (create_tvsymbol (id_fresh "a"))))
 
 let create_dreg ~user dity =
-  let id = id_fresh (if user then "urho" else "rho") in
+  let id = id_fresh "rho" in
   let tv = create_tvsymbol id in
   let reg = lazy (create_region id (ity_of_dity dity)) in
   if user then Rureg (tv,dity,reg) else Rvar (ref (Rtvs (tv,dity,reg)))

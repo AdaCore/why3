@@ -99,30 +99,11 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
 let erase_mark lab t = t_subst_single lab t_now t
 
-(* TODO: explain this and rename the function *)
-let relativize fn q xq =
+(* retreat to the point of the current postcondition's ['old] *)
+let backstep fn q xq =
   let lab = fresh_mark () in
   let f = fn (old_mark lab q) (Mexn.map (old_mark lab) xq) in
   erase_mark lab f
-
-(* TODO: explain this and rename the function *)
-let rec drop_at now m t = match t.t_node with
-  | Tvar vs when now ->
-      begin try t_var (Mvs.find vs m) with Not_found -> t end
-  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
-  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
-      let now = match mark.t_node with
-        | Tvar vs when vs_equal vs vs_old -> assert false
-        | Tapp (ls,[]) when ls_equal ls fs_now -> true
-        | _ -> false in
-      t_map (drop_at now m) t
-  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
-      (* do not open unless necessary *)
-      let m = Mvs.set_inter m t.t_vars in
-      if Mvs.is_empty m then t else
-      t_map (drop_at now m) t
-  | _ ->
-      t_map (drop_at now m) t
 
 (** WP utilities *)
 
@@ -296,6 +277,25 @@ let update_var env mreg vs =
   let vtv = vtv_of_vs vs in
   update Sts.empty vs vtv.vtv_ity vtv.vtv_mut
 
+(* substitute the updated values in the "contemporary" variables *)
+let rec subst_at_now now m t = match t.t_node with
+  | Tvar vs when now ->
+      begin try t_var (Mvs.find vs m) with Not_found -> t end
+  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
+  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
+      let now = match mark.t_node with
+        | Tvar vs when vs_equal vs vs_old -> assert false
+        | Tapp (ls,[]) when ls_equal ls fs_now -> true
+        | _ -> false in
+      t_map (subst_at_now now m) t
+  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+      (* do not open unless necessary *)
+      let m = Mvs.set_inter m t.t_vars in
+      if Mvs.is_empty m then t else
+      t_map (subst_at_now now m) t
+  | _ ->
+      t_map (subst_at_now now m) t
+
 (* quantify over all references in eff
    eff : effect
    f   : formula
@@ -338,15 +338,13 @@ let quantify env regs f =
   let vv' = Mvs.mapi new_var vars in
   (* quantify *)
   let update v t f = wp_let (Mvs.find v vv') t f in
-  let f = Mvs.fold update vars (drop_at true vv' f) in
+  let f = Mvs.fold update vars (subst_at_now true vv' f) in
   wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Weakest preconditions *)
 
 let rec wp_expr env e q xq =
-  (* FIXME? We only need to remove 'old from user-supplied posts.
-     Therefore it suffices to do it for Erec, Eany, and Eabstr. *)
-  let f = (* relativize ( *) wp_desc env e (* ) *) q xq in
+  let f = wp_desc env e q xq in
   if Debug.test_flag debug then begin
     Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
     Format.eprintf "@[<hov 2>q = %a@]@\n" Pretty.print_term q;
@@ -370,10 +368,6 @@ and wp_desc env e q xq = match e.e_node with
       let q = open_unit_post q in
       (* wp_label e *) q (* FIXME? *)
   | Elet ({ let_sym = lv; let_expr = e1 }, e2) ->
-      (* FIXME? Pgm_wp applies filter_post everywhere, but doesn't
-         it suffice to do it only on Etry? The same question about
-         saturate_post: why do we supply default exceptional posts
-         instead of requiring an explicit xpost for every "raises"? *)
       let w = wp_expr env e2 q xq in
       let q = match lv with
         | LetV v -> create_post v.pv_vs w
@@ -469,7 +463,7 @@ and wp_desc env e q xq = match e.e_node with
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
   | Eabstr (e1, c_q, c_xq) ->
-      let w1 = relativize (wp_expr env e1) c_q c_xq in
+      let w1 = backstep (wp_expr env e1) c_q c_xq in
       let w2 = wp_abstract env e1.e_effect c_q c_xq q xq in
       wp_and ~sym:true (wp_label e w1) w2
   | Eassign (e1, reg, pv) ->
@@ -493,7 +487,7 @@ and wp_desc env e q xq = match e.e_node with
       let d = decrease ?loc:e.e_loc env olds varl in
       let d = wp_expl expl_loop_var d in
       let q = create_unit_post (wp_and ~sym:true i d) in
-      let w = relativize (wp_expr env e1) q xq in
+      let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
       let w = quantify env regs (wp_implies inv w) in
       let i = wp_expl expl_loop_init inv in
@@ -558,7 +552,7 @@ and wp_abstract env c_eff c_q c_xq q xq =
     let mexn = Mexn.inter quantify_xpost c_xq xq in
     wp_ands ~sym:true (f :: Mexn.values mexn)
   in
-  relativize proceed c_q c_xq
+  backstep proceed c_q c_xq
 
 and wp_lambda env lr l =
   let lab = fresh_mark () in

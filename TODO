@@ -1,6 +1,16 @@
 WhyML
 -----
 
+  - currently every unhandled exception has postcondition "false".
+    Should it be "true"? Should we allow unhandled exceptions at all?
+
+  - currently we require every _global_ effect in a val/any to be
+    reflected in pre/postconditions (in order to keep the symbols).
+    We could produce dummy preconditions such as "r = r" for such
+    effects, but the requirement seems rather reasonable.
+
+  - should we produce the WPs for the modules loaded from loadpath?
+
   - should the API ensure that every psymbol resets the new regions?
     Should they be always reset at the last arrow? What if they are
     already reset at some earlier arrows, should we reset them again?
@@ -30,10 +40,6 @@ WhyML
     mutable fields in algebraic types. On the other hand, they
     require tedious checks pretty much everywhere in the code,
     and they cannot be translated to OCaml.
-
-  - get rid of %Exit, implement unit-typed "break" and "continue",
-    usable in all kinds of loops, including "for". Why the heck
-    aren't these in OCaml?
 
 syntaxe
 -------
