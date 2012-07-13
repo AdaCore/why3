@@ -696,13 +696,13 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   end.
 Unset Implicit Arguments.
 
-Axiom wp_implies : forall (p:fmla) (q:fmla), (forall (sigma:(map mident
+Axiom monotonicite : forall (p:fmla) (q:fmla), (forall (sigma:(map mident
   value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
   (eval_fmla sigma pi q)) -> forall (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (e:expr), (eval_fmla sigma pi (wp e p)) ->
   (eval_fmla sigma pi (wp e q)).
 
-Axiom wp_conj : forall (sigma:(map mident value)) (pi:(list (ident*
+Axiom distib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (e:expr) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp e (Fand p
   q))) <-> ((eval_fmla sigma pi (wp e p)) /\ (eval_fmla sigma pi (wp e q))).
 
@@ -720,6 +720,15 @@ Definition is_value(e:expr): Prop :=
 
 Axiom decide_value : forall (e:expr), (~ (is_value e)) \/ exists v:value,
   (e = (Evalue v)).
+
+Axiom bool_value : forall (e:expr) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)), (type_expr sigmat pit e TYbool) ->
+  ((is_value e) -> ((e = (Evalue (Vbool false))) \/
+  (e = (Evalue (Vbool true))))).
+
+Axiom unit_value : forall (e:expr) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)), (type_expr sigmat pit e TYunit) ->
+  ((is_value e) -> (e = (Evalue Vvoid))).
 
 (* Why3 goal *)
 Theorem progress : forall (e:expr) (sigma:(map mident value)) (pi:(list
@@ -814,16 +823,28 @@ apply one_step_deref.
 (* case 4.1: e' not a value *)
 destruct (decide_value e).
 intros sigma pi typ_sigma typ_pi type q h1 h2 h3 h4.
-generalize (IHe _ _ _ (conj h1 H)).
+inversion h1; subst.
+(*
+generalize (IHe sigma pi _ _ _ _ H6  h3 H).
+
+simpl in h3.
+pose (q' := (Flet (fresh_from q e) (Tvar result)
+             (Flet result (msubst_term (Tvalue Vvoid) m (fresh_from q e))
+                (msubst q m (fresh_from q e))))).
+fold q' in h3.
+
+intro; clear IHe.
+
 intros (sigma' & pi' & e' & h).
 exists sigma'.
 exists pi'.
 exists (Eassign i e').
-apply one_step_assign_ctxt; auto.
+apply one_step_assign_ctxt; auto.*)
+admit.
 (* case 4.2: e' is a value *)
 elim H; clear H; intros v He_v.
 subst e.
-intros sigma pi q (h2 & h3).
+intros sigma pi q h2 h3.
 eexists.
 exists pi.
 eexists.
@@ -832,26 +853,29 @@ eapply one_step_assign_value.
 (* case 5: e = e1; e2 *)
 destruct (decide_value e1).
 (* case 5.1: e1 not a value *)
-intros sigma pi q (h1 & _).
+(*intros sigma pi q (h1 & _).
 generalize (IHe1 _ _ _ (conj h1 H)).
 intros (sigma' & pi' & e' & h).
 exists sigma'.
 exists pi'.
 exists (Eseq e' e2).
-eapply one_step_seq_ctxt; auto.
-
+eapply one_step_seq_ctxt; auto.*)
+admit.
 (* case 5.2: e1 is a value *)
 elim H; clear H; intros v He_v.
 subst e1.
-intros sigma pi q (h2 & h3).
+clear IHe1 IHe2.
+intros sigma pi sigmat pit ty q h1 h2 h3 h4.
+inversion h1; subst.
+assert (h : Evalue v = Vvoid)
+
+
 eexists.
 exists pi.
 eexists.
-assert (h: v = Vvoid).
-(* problem : typage pour savoir que v est void *) 
-admit.
-subst v.
+
 eapply one_step_seq_value.
+
 
 (* case 6: e = let i = e1 in e2 *)
 destruct (decide_value e1).
