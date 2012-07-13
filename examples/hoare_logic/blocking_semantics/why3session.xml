@@ -1,33 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="blocking_semantics/why3session.xml">
+ name="examples/hoare_logic/blocking_semantics/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
   id="1"
-  name="Alt-Ergo"
-  version="0.95-dev"/>
- <prover
-  id="2"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="3"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="4"
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="5"
+  id="4"
   name="Z3"
   version="2.19"/>
  <prover
-  id="6"
+  id="5"
   name="Z3"
   version="3.2"/>
  <file
@@ -36,13 +32,13 @@
   expanded="true">
   <theory
    name="ImpExpr"
-   locfile="blocking_semantics/../blocking_semantics.mlw"
+   locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
    loclnum="6" loccnumb="7" loccnume="14"
    verified="false"
    expanded="false">
    <goal
     name="get_stack_eq"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="51" loccnumb="6" loccnume="18"
     sum="ba23f979a9acc92cbd0aa927e6a492e7"
     proved="true"
@@ -59,7 +55,7 @@
    </goal>
    <goal
     name="get_stack_neq"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="55" loccnumb="6" loccnume="19"
     sum="91809042d7f0e3672fb284ce69c7b63a"
     proved="true"
@@ -76,7 +72,7 @@
    </goal>
    <goal
     name="eval_subst_term"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="117" loccnumb="6" loccnume="21"
     sum="2fcafe55c0868db14100e9bd0350077a"
     proved="false"
@@ -93,7 +89,7 @@
    </goal>
    <goal
     name="eval_term_change_free"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="123" loccnumb="6" loccnume="27"
     sum="053c4358587b86d79bd6e10c760fc256"
     proved="false"
@@ -110,7 +106,7 @@
    </goal>
    <goal
     name="subst_fresh"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="148" loccnumb="6" loccnume="17"
     sum="dc909c4eedc136bd149e268ed82f2800"
     proved="false"
@@ -119,7 +115,7 @@
    </goal>
    <goal
     name="let_subst"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="152" loccnumb="6" loccnume="15"
     sum="75341198db12e1de873a8a62cb9ab945"
     proved="true"
@@ -136,7 +132,7 @@
    </goal>
    <goal
     name="eval_subst"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="156" loccnumb="6" loccnume="16"
     sum="518fe956a4a5bed1d2cf79e78f2f3218"
     proved="false"
@@ -153,7 +149,7 @@
    </goal>
    <goal
     name="eval_swap"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="162" loccnumb="6" loccnume="15"
     sum="0c6f04d96cf19c9559352c53aa2e442c"
     proved="false"
@@ -170,7 +166,7 @@
    </goal>
    <goal
     name="eval_change_free"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="168" loccnumb="6" loccnume="22"
     sum="a66e7b11a74776933b206a164b0a40ea"
     proved="false"
@@ -187,7 +183,7 @@
    </goal>
    <goal
     name="let_equiv"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="177" loccnumb="6" loccnume="15"
     sum="80318f792bd853c1b1a5e1e5e4dbf547"
     proved="false"
@@ -204,7 +200,7 @@
    </goal>
    <goal
     name="steps_non_neg"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="307" loccnumb="8" loccnume="21"
     sum="dc0a28ea13d0f5917cd6a59803232637"
     proved="false"
@@ -221,7 +217,7 @@
    </goal>
    <goal
     name="many_steps_seq"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="311" loccnumb="8" loccnume="22"
     sum="1c3f781ce8d67850c418f9caa7dd6fc9"
     proved="false"
@@ -238,7 +234,7 @@
    </goal>
    <goal
     name="many_steps_let"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="319" loccnumb="8" loccnume="22"
     sum="62edc3347ac0ffd5cb87dbca85565b20"
     proved="false"
@@ -255,7 +251,7 @@
    </goal>
    <goal
     name="one_step_change_free"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="327" loccnumb="7" loccnume="27"
     sum="b803db2b4215fb56c3ef30091b108324"
     proved="false"
@@ -265,13 +261,13 @@
   </theory>
   <theory
    name="TestSemantics"
-   locfile="blocking_semantics/../blocking_semantics.mlw"
+   locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
    loclnum="354" loccnumb="7" loccnume="20"
    verified="false"
    expanded="false">
    <goal
     name="Test13"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="362" loccnumb="5" loccnume="11"
     sum="5470eecd18c482465080854e9b23b7b7"
     proved="true"
@@ -288,7 +284,7 @@
    </goal>
    <goal
     name="Test13expr"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="365" loccnumb="5" loccnume="15"
     sum="ae7b49ba66863aa9e589cec426679317"
     proved="true"
@@ -305,7 +301,7 @@
    </goal>
    <goal
     name="Test42"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="368" loccnumb="5" loccnume="11"
     sum="d68c7df88e341b31ac064b4b383bbb9b"
     proved="true"
@@ -322,14 +318,14 @@
    </goal>
    <goal
     name="Test42expr"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="371" loccnumb="5" loccnume="15"
     sum="a9fc2cf4fc4cde61622c19948d63c9ba"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEvaraxamy_sigmaamy_piaEvalueaVintc42c1">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -337,7 +333,7 @@
      <result status="timeout" time="5.04"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -353,7 +349,7 @@
      <result status="unknown" time="4.56"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -361,7 +357,7 @@
      <result status="timeout" time="5.03"/>
     </proof>
     <proof
-     prover="6"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -371,7 +367,7 @@
    </goal>
    <goal
     name="Test0"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="374" loccnumb="5" loccnume="10"
     sum="b5aaeaab59a26ee76c24020f3656525f"
     proved="true"
@@ -388,14 +384,14 @@
    </goal>
    <goal
     name="Test0expr"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="377" loccnumb="5" loccnume="14"
     sum="11d3fc033b6a989ac73f6014c6e9e22c"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEderefaxamy_sigmaamy_piaEvalueaVintc0c1">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -403,7 +399,7 @@
      <result status="timeout" time="5.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -419,7 +415,7 @@
      <result status="unknown" time="4.56"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -427,7 +423,7 @@
      <result status="timeout" time="5.03"/>
     </proof>
     <proof
-     prover="6"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -437,14 +433,14 @@
    </goal>
    <goal
     name="Test55"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="380" loccnumb="5" loccnume="11"
     sum="15475684f514243fe041e90468182f07"
     proved="false"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTbinaTvaraxaOplusaTvalueaVintc13aVintc55">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -452,7 +448,7 @@
      <result status="timeout" time="5.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -468,7 +464,7 @@
      <result status="timeout" time="5.04"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -476,7 +472,7 @@
      <result status="timeout" time="5.03"/>
     </proof>
     <proof
-     prover="6"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -486,14 +482,14 @@
    </goal>
    <goal
     name="Test55expr"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="383" loccnumb="5" loccnume="15"
     sum="99e91d2c91df5e92337b88237413b180"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEbinaEvaraxaOplusaEvalueaVintc13amy_sigmaamy_piaEvalueaVintc55c2">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -501,7 +497,7 @@
      <result status="timeout" time="5.06"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -517,7 +513,7 @@
      <result status="timeout" time="5.04"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -525,7 +521,7 @@
      <result status="timeout" time="5.03"/>
     </proof>
     <proof
-     prover="6"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="true"
@@ -535,7 +531,7 @@
    </goal>
    <goal
     name="Ass42"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="386" loccnumb="5" loccnume="10"
     sum="db1d25439495f9ccb031facb3e930a58"
     proved="true"
@@ -552,7 +548,7 @@
    </goal>
    <goal
     name="If42"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="391" loccnumb="5" loccnume="9"
     sum="2d42fdcfd14985369a83947e4dda969b"
     proved="false"
@@ -570,13 +566,13 @@
   </theory>
   <theory
    name="HoareLogic"
-   locfile="blocking_semantics/../blocking_semantics.mlw"
+   locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
    loclnum="405" loccnumb="7" loccnume="17"
    verified="false"
    expanded="false">
    <goal
     name="consequence_rule"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="412" loccnumb="6" loccnume="22"
     sum="bc3818e5d5168b103a85bf7bab9e2808"
     proved="false"
@@ -593,7 +589,7 @@
    </goal>
    <goal
     name="value_rule"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="419" loccnumb="6" loccnume="16"
     sum="482d9785580ad1fe01d446da39d85151"
     proved="true"
@@ -610,7 +606,7 @@
    </goal>
    <goal
     name="assign_rule"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="423" loccnumb="6" loccnume="17"
     sum="65b35c83f9d3aa5384455ec7343da90f"
     proved="false"
@@ -627,7 +623,7 @@
    </goal>
    <goal
     name="seq_rule"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="428" loccnumb="6" loccnume="14"
     sum="261184d5d8045756e5e74ceb458a5a0c"
     proved="false"
@@ -644,7 +640,7 @@
    </goal>
    <goal
     name="let_rule"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="433" loccnumb="6" loccnume="14"
     sum="2a7044f47dcc32ba17422270e37490e5"
     proved="false"
@@ -661,7 +657,7 @@
    </goal>
    <goal
     name="assert_rule"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="447" loccnumb="6" loccnume="17"
     sum="b590c17fe8762e6f9768bf398bf7c266"
     proved="false"
@@ -678,7 +674,7 @@
    </goal>
    <goal
     name="assert_rule_ext"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="451" loccnumb="6" loccnume="21"
     sum="9b3011ef24753b7d67345b07f33a00e2"
     proved="false"
@@ -696,13 +692,13 @@
   </theory>
   <theory
    name="WP"
-   locfile="blocking_semantics/../blocking_semantics.mlw"
+   locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
    loclnum="474" loccnumb="7" loccnume="9"
    verified="false"
    expanded="true">
    <goal
     name="assigns_refl"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="487" loccnumb="6" loccnume="18"
     sum="72b15dac60cdba92f8ef1583adb713ea"
     proved="true"
@@ -719,7 +715,7 @@
    </goal>
    <goal
     name="assigns_trans"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="490" loccnumb="6" loccnume="19"
     sum="ed306518411caf9441faecfdee474b99"
     proved="true"
@@ -736,7 +732,7 @@
    </goal>
    <goal
     name="assigns_union_left"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="495" loccnumb="6" loccnume="24"
     sum="2d54a7cc084759c7825a7a1a1e87eb36"
     proved="true"
@@ -753,7 +749,7 @@
    </goal>
    <goal
     name="assigns_union_right"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="499" loccnumb="6" loccnume="25"
     sum="aa1889e101e9ccc1ad42aa2d02c00022"
     proved="true"
@@ -770,7 +766,7 @@
    </goal>
    <goal
     name="wp_subst"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="563" loccnumb="8" loccnume="16"
     sum="332ac227a145197f6bd46f146aa96d2d"
     proved="false"
@@ -779,7 +775,7 @@
    </goal>
    <goal
     name="wp_implies"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="568" loccnumb="8" loccnume="18"
     sum="bfcc2e44c5b5d93ca4e466a6f0282fb4"
     proved="false"
@@ -788,14 +784,14 @@
    </goal>
    <goal
     name="wp_conj"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="577" loccnumb="8" loccnume="15"
     sum="4667ed4a9c6a9562519071e071c49658"
     proved="false"
     expanded="false"
     shape="aeval_fmlaV0V1awpV2V4Aaeval_fmlaV0V1awpV2V3qaeval_fmlaV0V1awpV2aFandV3V4F">
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      edited="blocking_semantics_WP_wp_conj_1.v"
@@ -806,73 +802,25 @@
    </goal>
    <goal
     name="wp_reduction"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="584" loccnumb="8" loccnume="20"
     sum="d6e1b0dcab971053679571b187e6fc79"
-    proved="false"
-    expanded="true"
+    proved="true"
+    expanded="false"
     shape="aeval_fmlaV1V3awpV5V6Iaeval_fmlaV0V2awpV4V6FIaone_stepV0V2V4V1V3V5F">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="timeout" time="5.06"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="timeout" time="5.10"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="timeout" time="5.10"/>
-    </proof>
     <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="timeout" time="5.10"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="timeout" time="5.06"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
      edited="blocking_semantics_WP_wp_reduction_1.v"
-     obsolete="true"
-     archived="false"><undone/>
-     
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="true"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="4.98"/>
+     <result status="valid" time="0.73"/>
     </proof>
    </goal>
    <goal
     name="decide_value"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="597" loccnumb="8" loccnume="20"
     sum="3e267bc8fc7e9052d2c5a67aae0ed910"
     proved="true"
@@ -889,14 +837,14 @@
    </goal>
    <goal
     name="progress"
-    locfile="blocking_semantics/../blocking_semantics.mlw"
+    locfile="examples/hoare_logic/blocking_semantics/../blocking_semantics.mlw"
     loclnum="600" loccnumb="8" loccnume="16"
     sum="072d27a9e7a5198432dee86ea2dee213"
     proved="true"
     expanded="true"
     shape="aone_stepV1V2V0V4V5V6EIanot_a_valueV0Aaeval_fmlaV1V2awpV0V3F">
     <proof
-     prover="4"
+     prover="3"
      timelimit="3"
      memlimit="0"
      edited="blocking_semantics_WP_progress_1.v"

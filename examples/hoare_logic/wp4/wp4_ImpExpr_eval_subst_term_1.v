@@ -35,6 +35,9 @@ Definition ident  := Z.
 
 Parameter refident : Type.
 
+Axiom eq_refident_dec : forall (x:refident) (y:refident), (x = y) \/
+  ~ (x = y).
+
 (* Why3 assumption *)
 Inductive term  :=
   | Tvalue : value -> term 
@@ -199,13 +202,13 @@ rewrite (subst_term_def (Tvar z) x v'); auto.
 
 generalize (subst_term_def (Tderef r) x v').
 intros (h1,h2).
-case (Z_eq_dec x r).
+case (eq_refident_dec x r).
 intro; subst r; rewrite h1; simpl; auto.
 rewrite Select_eq; auto.
 intro; rewrite h2; simpl; auto.
 rewrite Select_neq; auto.
 
-rewrite (subst_term_def (Tbin e1 o e2) r v'); simpl; auto.
+rewrite (subst_term_def (Tbin e1 o e2) x v'); simpl; auto.
 elim H; intros.
 rewrite IHe1; auto.
 rewrite IHe2; auto.

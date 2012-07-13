@@ -18,7 +18,9 @@ type value = Vvoid | Vint int | Vbool bool
 type operator = Oplus | Ominus | Omult | Ole
 
 type ident = int
-type refident 
+type refident
+
+lemma eq_refident_dec : forall x y:refident. x=y \/ x <>y
 
 constant result : ident = (-1)
 
