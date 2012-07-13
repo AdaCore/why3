@@ -28,6 +28,7 @@ module PHprover = Whyconf.Hprover
 module C = Whyconf
 
 let debug = Debug.register_flag "session"
+let debug_pairing = Debug.register_flag "session_pairing"
 
 (** {2 Type definitions} *)
 
@@ -1376,21 +1377,19 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
     Hashtbl.remove old_goals_map g.goal_checksum
   in
   Array.iter
-    (fun (i,_,_goal_name,_,sum) ->
+    (fun (i,_,goal_name,_,sum) ->
        try
          let h = Hashtbl.find old_goals_map sum in
          (* an old goal has the same checksum *)
-         (*
-           eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
-           h.goal_name goal_name;
-         *)
+         Debug.dprintf debug_pairing
+           "Merge phase 1: old goal '%s' -> new goal '%s'@."
+           h.goal_name.Ident.id_string goal_name.Ident.id_string;
          shape_array.(i) <- h.goal_shape;
          associate_goals ~obsolete:false i h
        with Not_found ->
-         (*
-           eprintf "Merge phase 1: no old goal -> new goal '%s'@."
-           subgoal_name;
-         *)
+         Debug.dprintf debug_pairing
+           "Merge phase 1: no old goal -> new goal '%s'@."
+           goal_name.Ident.id_string;
          ())
     new_goals_array;
   (* Phase 2: we now build a list of all remaining new and old goals,
@@ -1426,17 +1425,17 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
     List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
       all_goals_without_pairing
   in
-(*
-  eprintf "[Merge] pairing the following shapes:@.";
-  List.iter
-    (fun (s,g) ->
-       match g with
-         | New_goal _ ->
-             eprintf "new: %s@." s
-         | Old_goal _ ->
-             eprintf "old: %s@." s)
-    sort_by_shape;
-*)
+  if Debug.test_flag debug_pairing then begin
+    Debug.dprintf debug_pairing "[Merge] pairing the following shapes:@.";
+    List.iter
+      (fun (s,g) ->
+         match g with
+           | New_goal _ ->
+               Debug.dprintf debug_pairing "new: %s@." s
+           | Old_goal _ ->
+               Debug.dprintf debug_pairing "old: %s@." s)
+      sort_by_shape;
+  end;
   let rec similarity_shape n s1 s2 =
     if String.length s1 <= n || String.length s2 <= n then n else
       if s1.[n] = s2.[n] then similarity_shape (n+1) s1 s2
@@ -1469,14 +1468,16 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
           end
   and try_associate si i sh h opt rem =
     let n = similarity_shape 0 si sh in
-    eprintf "[Merge] try_associate: claiming similarity %d for new \
-shape@\n%s@\nand old shape@\n%s@." n si sh;
+    Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
     if (match opt with
       | None ->
-          eprintf "[Merge] try_associate: no previous claim@.";
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            no previous claim@.";
           true
       | Some m ->
-          eprintf "[Merge] try_associate: previous claim was %d@." m;
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            previous claim was %d@." m;
           m < n)
     then
       (* try to associate i with h *)
@@ -1484,20 +1485,23 @@ shape@\n%s@\nand old shape@\n%s@." n si sh;
       if b then
         begin
           (* h or i was already paired in rem *)
-          eprintf "[Merge] try_associate: failed because claimed further@.";
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            failed because claimed further@.";
           false
         end
       else
         begin
-          eprintf "[Merge] try_associate: succeeded to associate new \
-goal@\n%s@\nwith old goal@\n%s@." si sh;
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            succeeded to associate new goal@\n%s@\nwith \
+            old goal@\n%s@." si sh;
           associate_goals ~obsolete:true i h;
           true
         end
     else
       (* no need to try to associate i with h *)
       begin
-        eprintf "[Merge] try_associate: no claim further attempted@.";
+        Debug.dprintf debug_pairing "[Merge] try_associate: \
+          no claim further attempted@.";
         let (_:bool) = match_shape None rem in
         false
       end
@@ -1538,16 +1542,12 @@ goal@\n%s@\nwith old goal@\n%s@." si sh;
           end
   and try_associate min si i sh h hd rem =
     let n = similarity_shape 0 si sh in
-(*
-    eprintf "[Merge] try_associate: claiming similarity %d for new \
-shape@\n%s@\nand old shape@\n%s@." n si sh;
-*)
+    Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
     if n < min then
       begin
-(*
-        eprintf "[Merge] try_associate: claiming dropped because similarity \
-lower than min = %d@." min;
-*)
+        Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+          dropped because similarity lower than min = %d@." min;
         let (b,rem2) = match_shape min rem in
         if b then
           (true, hd::rem2)
@@ -1557,17 +1557,14 @@ lower than min = %d@." min;
     else
       match match_shape n rem with
         | false, rem2 ->
-(*
-            eprintf "[Merge] try_associate: claiming dropped because head was \
-consumed by larger similarity@.";
-*)
+            Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+              dropped because head was consumed by larger similarity@.";
             match_shape min (hd::rem2)
         | true, [] -> assert false
         | true, _::rem2 ->
-(*
-            eprintf "[Merge] try_associate: claiming succeeded \
-(similarity %d) for new shape@\n%s@\nand old shape@\n%s@." n si sh;
-*)
+            Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+              succeeded (similarity %d) for new shape@\n%s@\nand \
+              old shape@\n%s@." n si sh;
             associate_goals ~obsolete:true i h;
             let (_,rem3) = match_shape min rem2 in
             (false, rem3)
@@ -1577,9 +1574,7 @@ consumed by larger similarity@.";
      Phase 3: we now associate remaining new goals to the remaining
      old goals in the same order as original
   *)
-(*
-  eprintf "[Merge] phase 3: associate remaining goals@.";
-*)
+  Debug.dprintf debug_pairing "[Merge] phase 3: associate remaining goals@.";
   let remaining_old_goals =
     Hashtbl.fold
       (fun _ g acc -> (g.goal_name,g)::acc)
