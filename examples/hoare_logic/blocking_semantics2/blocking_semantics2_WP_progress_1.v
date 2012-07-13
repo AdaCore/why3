@@ -721,14 +721,13 @@ Definition is_value(e:expr): Prop :=
 Axiom decide_value : forall (e:expr), (~ (is_value e)) \/ exists v:value,
   (e = (Evalue v)).
 
-Axiom bool_value : forall (e:expr) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)), (type_expr sigmat pit e TYbool) ->
-  ((is_value e) -> ((e = (Evalue (Vbool false))) \/
-  (e = (Evalue (Vbool true))))).
+Axiom bool_value : forall (v:value) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)), (type_expr sigmat pit (Evalue v) TYbool) ->
+  ((v = (Vbool false)) \/ (v = (Vbool true))).
 
-Axiom unit_value : forall (e:expr) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)), (type_expr sigmat pit e TYunit) ->
-  ((is_value e) -> (e = (Evalue Vvoid))).
+Axiom unit_value : forall (v:value) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)), (type_expr sigmat pit (Evalue v) TYunit) ->
+  (v = Vvoid).
 
 (* Why3 goal *)
 Theorem progress : forall (e:expr) (sigma:(map mident value)) (pi:(list
@@ -865,33 +864,32 @@ admit.
 elim H; clear H; intros v He_v.
 subst e1.
 clear IHe1 IHe2.
-intros sigma pi sigmat pit ty q h1 h2 h3 h4.
+intros sigma pi sigmat pit ty q h1 _ _ _.
 inversion h1; subst.
-assert (h : Evalue v = Vvoid)
-
-
+assert (v = Vvoid).
+apply unit_value with sigmat pit; auto.
+subst.
 eexists.
 exists pi.
 eexists.
-
 eapply one_step_seq_value.
-
 
 (* case 6: e = let i = e1 in e2 *)
 destruct (decide_value e1).
 (* case 6.1: e1 not a value *)
-intros sigma pi q (h1 & _).
-generalize (IHe1 _ _ _(conj h1 H)).
+intros sigma pi sigmat pit ty q h1 h2 h3 h4.
+(*generalize (IHe1 _ _ _(conj h1 H)).
 intros (sigma' & pi' & e' & h).
 exists sigma'.
 exists pi'.
 exists (Elet i e' e2).
-eapply one_step_let_ctxt; auto.
+eapply one_step_let_ctxt; auto.*)
+admit.
 
 (* case 6.2: e1 is a value *)
 elim H; clear H; intros v He_v.
 subst e1.
-intros sigma pi q (h2 & h3).
+intros sigma pi _ _ _ _ _ _ _ _.
 eexists.
 eexists.
 eexists.
@@ -900,42 +898,42 @@ eapply one_step_let_value.
 (* case 7: e = if e1 then e2 else e3 *)
 destruct (decide_value e1).
 (* case 7.1: e1 not a value *)
-intros sigma pi q (h1 & _).
-simpl in h1.
-generalize (IHe1 _ _ _ (conj h1 H)).
+intros sigma pi sigmat pit ty q h1 h2 h3 h4.
+(*generalize (IHe1 _ _ _ (conj h1 H)).
 intros (sigma' & pi' & e' & h).
 exists sigma'.
 exists pi'.
 exists (Eif e' e2 e3).
-eapply one_step_if_ctxt; auto.
+eapply one_step_if_ctxt; auto.*)
+admit.
 (* case 7.2: e1 is a value *)
 elim H; clear H; intros v He_v.
-subst e1.
-intros sigma pi q (h2 & h3).
+subst.
+intros sigma pi sigmat pit ty q h1 h2 h3 h4.
 eexists sigma.
 exists pi.
-assert (h: v = Vbool true \/ v = Vbool false).
-(* problem : typage pour savoir que v est true ou false *)
-admit.
-destruct h.
-eexists.
-subst v.
-apply one_step_if_true.
-subst v.
+inversion h1; subst.
+assert (h: v = Vbool false \/ v = Vbool true).
+eapply bool_value with sigmat pit; auto.
+destruct h; subst.
+(* v = false *)
 eexists.
 apply one_step_if_false.
+(* v = true *)
+eexists.
+apply one_step_if_true.
 
 (* case 8 : e = assert f *)
-intros sigma pi q (h1 & _ ).
-simpl in h1.
-destruct h1 as (h&_).
+intros sigma pi _ _  ty q _ _ h3 _.
+simpl in h3.
+destruct h3.
 eexists.
 eexists.
 eexists.
 apply one_step_assert; auto.
 
 (* case 9: e = while cond inv body *)
-intros sigma pi q (h1, h2).
+intros sigma pi sigmat pit ty q _ _ h1 _.
 simpl in h1.
 destruct h1.
 eexists.
