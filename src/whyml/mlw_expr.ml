@@ -509,6 +509,16 @@ let e_app_real e pv =
   let eff = eff_union e.e_effect spec.c_effect in
   mk_expr (Eapp (e,pv,spec)) vty eff (add_pv_vars pv e.e_varm)
 
+let rec e_app_flatten e pv = match e.e_node with
+  (* TODO/FIXME? here, we avoid capture in the first case,
+     but such an expression would break WP anyway. Though
+     it cannot come from a parsed WhyML program where the
+     typing ensures the uniqueness of pvsymbols, one can
+     construct it using the API directly. *)
+  | Elet ({ let_sym = LetV pv' }, _) when pv_equal pv pv' -> e_app_real e pv
+  | Elet (ld, e) -> e_let ld (e_app_flatten e pv)
+  | _ -> e_app_real e pv
+
 let create_fun_defn id lam letrec recsyms =
   let e = lam.l_expr in
   let spec = {
@@ -560,7 +570,7 @@ let on_value fn e = match e.e_node with
    will be rejected, since local_get_ref is instantiated to
    the region introduced (reset) by create_ref. Is it bad? *)
 
-let e_app = List.fold_left (fun e -> on_value (e_app_real e))
+let e_app = List.fold_left (fun e -> on_value (e_app_flatten e))
 
 let e_plapp pls el ity =
   if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);

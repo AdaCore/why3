@@ -907,15 +907,20 @@ and expr_desc lenv loc de = match de.de_desc with
       e_rec def e2
   | DElet (x, gh, de1, de2) ->
       let e1 = e_ghostify gh (expr lenv de1) in
+      let mk_expr e1 =
+        let def1 = create_let_defn (Denv.create_user_id x) e1 in
+        let lenv = add_local x.id def1.let_sym lenv in
+        let e2 = expr lenv de2 in
+        e_let def1 e2 in
+      let rec flatten e1 = match e1.e_node with
+        | Elet (ld,e1) -> e_let ld (flatten e1)
+        | _ -> mk_expr e1 in
       begin match e1.e_vty with
         | VTarrow { vta_ghost = true } when not gh ->
             errorm ~loc "%s must be a ghost function" x.id
-        | _ -> ()
+        | VTarrow _ -> flatten e1
+        | VTvalue _ -> mk_expr e1
       end;
-      let def1 = create_let_defn (Denv.create_user_id x) e1 in
-      let lenv = add_local x.id def1.let_sym lenv in
-      let e2 = expr lenv de2 in
-      e_let def1 e2
   | DEletrec (rdl, de1) ->
       let rdl = expr_rec lenv rdl in
       let add_rd { fun_ps = ps } = add_local ps.ps_name.id_string (LetA ps) in
