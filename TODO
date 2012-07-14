@@ -1,13 +1,9 @@
 WhyML
 -----
 
-  - currently every unhandled exception has postcondition "false".
-    Should it be "true"? Should we allow unhandled exceptions at all?
-
-  - currently we require every _global_ effect in a val/any to be
-    reflected in pre/postconditions (in order to keep the symbols).
-    We could produce dummy preconditions such as "r = r" for such
-    effects, but the requirement seems rather reasonable.
+  - currently every unhandled exception has postcondition "true".
+    "false" would be a poor choice, as it could introduce inconsistency
+    in the WPs of the caller. Should we allow unhandled exceptions at all?
 
   - should we produce the WPs for the modules loaded from loadpath?
 

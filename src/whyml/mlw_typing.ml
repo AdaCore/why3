@@ -718,6 +718,15 @@ let xpost lenv xq =
     Mexn.add_new (DuplicateException xs) xs f m in
   List.fold_left add_exn Mexn.empty xq
 
+(* add dummy postconditions for uncovered exceptions *)
+let complete_xpost lenv eff xq =
+  let xq = xpost lenv xq in
+  let dummy { xs_ity = ity } () =
+    let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
+    Mlw_ty.create_post v t_true in
+  let xs = Sexn.union eff.eff_raises eff.eff_ghostx in
+  Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xs xq))
+
 (* TODO: devise a good grammar for effect expressions *)
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
   | Ptree.PPvar (Ptree.Qident {id=x}) when Mstr.mem x lenv.let_vars ->
@@ -812,7 +821,7 @@ let rec type_c lenv gh svs vars dtyc =
     c_pre     = create_pre lenv dtyc.dc_pre;
     c_effect  = eff;
     c_post    = create_post lenv "result" vty dtyc.dc_post;
-    c_xpost   = xpost lenv dtyc.dc_xpost;
+    c_xpost   = complete_xpost lenv eff dtyc.dc_xpost;
     c_variant = [];
     c_letrec  = 0 } in
   (* we add an exception postcondition for %Exit that mentions
@@ -944,7 +953,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEabstract (de1, q, xq) ->
       let e1 = expr lenv de1 in
       let q = create_post lenv "result" e1.e_vty q in
-      e_abstract e1 q (xpost lenv xq)
+      e_abstract e1 q (complete_xpost lenv e1.e_effect xq)
   | DEassert (ak, f) ->
       let ak = match ak with
         | Ptree.Aassert -> Aassert
@@ -1018,19 +1027,12 @@ and expr_lam lenv gh (bl, var, p, de, q, xq) =
   let e = e_ghostify gh (expr lenv de) in
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
-  let xq =
-    let dummy_xpost xs () =
-      let v = create_vsymbol (id_fresh "dummy") (ty_of_ity xs.xs_ity) in
-      Mlw_ty.create_post v t_false in
-    let xq = xpost lenv xq in
-    let xs = Sexn.union e.e_effect.eff_raises e.e_effect.eff_ghostx in
-    Mexn.set_union xq (Mexn.mapi dummy_xpost (Mexn.set_diff xs xq)) in
   { l_args = pvl;
     l_variant = List.map (create_variant lenv) var;
     l_pre = create_pre lenv p;
     l_expr = e;
     l_post = create_post lenv "result" e.e_vty q;
-    l_xpost = xq; }
+    l_xpost = complete_xpost lenv e.e_effect xq }
 
 (** Type declaration *)
 
