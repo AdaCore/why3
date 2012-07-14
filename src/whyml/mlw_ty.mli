@@ -217,6 +217,7 @@ val eff_write : effect -> ?ghost:bool -> region -> effect
 val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
 
+val eff_refresh : effect -> region -> region -> effect
 val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect

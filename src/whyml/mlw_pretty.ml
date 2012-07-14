@@ -116,7 +116,7 @@ let print_effect fmt eff =
   let print_reset r = function
     | None -> print_reg "fresh" r
     | Some u ->
-        fprintf fmt "{reset %a@ under %a}@ " print_regty r print_regty u
+        fprintf fmt "{refresh %a@ under %a}@ " print_regty r print_regty u
   in
   Sreg.iter (print_reg "read") eff.eff_reads;
   Sreg.iter (print_reg "write") eff.eff_writes;

@@ -520,8 +520,13 @@ let eff_is_empty e =
   Sexn.is_empty e.eff_ghostx &&
   Mreg.is_empty e.eff_resets
 
-let join_reset _key v1 v2 =
-  Some (if option_eq reg_equal v1 v2 then v1 else None)
+let join_reset _key v1 v2 = match v1, v2 with
+  | Some r1, Some r2 ->
+      if reg_equal r1 r2 then Some v1 else
+      if reg_occurs r1 r2.reg_ity.ity_vars then Some v2 else
+      if reg_occurs r2 r1.reg_ity.ity_vars then Some v1 else
+      Some None
+  | _ -> Some None
 
 let eff_union x y = {
   eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
@@ -558,6 +563,12 @@ let eff_raise e ?(ghost=false) x = if ghost
 let eff_reset e r = { e with eff_resets = Mreg.add r None e.eff_resets }
 
 exception IllegalAlias of region
+
+let eff_refresh e r u =
+  if not (reg_occurs r u.reg_ity.ity_vars) then
+    invalid_arg "Mlw_ty.eff_refresh";
+  let reset = Mreg.singleton r (Some u) in
+  { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
 
 let eff_assign e ?(ghost=false) r ty =
   let e = eff_write e ~ghost r in

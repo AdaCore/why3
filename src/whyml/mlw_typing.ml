@@ -817,6 +817,15 @@ let rec type_c lenv gh svs vars dtyc =
         and add_ity ity eff = Sreg.fold add_reg ity.ity_vars.vars_reg eff in
         add_ity v.vtv_ity eff
     | VTarrow _ -> eff in
+  (* refresh every unmodified subregion of a modified region *)
+  let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
+  let check u eff =
+    let rec sub_reg r eff =
+      if Sreg.mem r writes then eff else sub_vars r (eff_refresh eff r u)
+    and sub_vars r eff = Sreg.fold sub_reg r.reg_ity.ity_vars.vars_reg eff in
+    sub_vars u eff in
+  let eff = Sreg.fold check writes eff in
+  (* create the spec *)
   let spec = {
     c_pre     = create_pre lenv dtyc.dc_pre;
     c_effect  = eff;
