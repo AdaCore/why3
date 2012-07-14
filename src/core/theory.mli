@@ -103,7 +103,7 @@ and tdecl_node = private
   | Clone of theory * symbol_map
   | Meta  of meta * meta_arg list
 
-and symbol_map = {
+and symbol_map = private {
   sm_ts : tysymbol Mts.t;
   sm_ls : lsymbol Mls.t;
   sm_pr : prsymbol Mpr.t;
