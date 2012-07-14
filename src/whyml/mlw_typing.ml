@@ -722,16 +722,16 @@ let xpost lenv xq =
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
   | Ptree.PPvar (Ptree.Qident {id=x}) when Mstr.mem x lenv.let_vars ->
       begin match Mstr.find x lenv.let_vars with
-        | LetV pv -> pv.pv_vtv
+        | LetV pv -> pv.pv_vs, pv.pv_vtv
         | LetA _ -> errorm ~loc "'%s' must be a first-order value" x
       end
   | Ptree.PPvar p ->
       begin match uc_find_ps lenv.mod_uc p with
-        | PV pv -> pv.pv_vtv
+        | PV pv -> pv.pv_vs, pv.pv_vtv
         | _ -> errorm ~loc:(qloc p) "'%a' must be a variable" print_qualid p
       end
   | Ptree.PPapp (p, [le]) ->
-      let vtv = get_eff_expr lenv le in
+      let vs, vtv = get_eff_expr lenv le in
       let quit () = errorm ~loc:le.pp_loc "This expression is not a record" in
       let pjm = match vtv.vtv_ity.ity_node with
         | Ityapp (its,_,_) ->
@@ -761,18 +761,18 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
       let sbs = unify_loc (ity_match ity_subst_empty) loc itya vtv.vtv_ity in
       let mut = Util.option_map (reg_full_inst sbs) vtvv.vtv_mut in
       let ghost = vtv.vtv_ghost || vtvv.vtv_ghost in
-      vty_value ~ghost ?mut (ity_full_inst sbs vtvv.vtv_ity)
+      vs, vty_value ~ghost ?mut (ity_full_inst sbs vtvv.vtv_ity)
   | Ptree.PPcast (e,_) | Ptree.PPnamed (_,e) ->
       get_eff_expr lenv e
   | _ ->
       errorm ~loc "unsupported effect expression"
 
-let get_eff_regs lenv fn eff ghost le =
-  let vtv = get_eff_expr lenv le in
+let get_eff_regs lenv fn (eff,svs) ghost le =
+  let vs, vtv = get_eff_expr lenv le in
   let ghost = ghost || vtv.vtv_ghost in
   match vtv.vtv_mut, vtv.vtv_ity.ity_node with
   | Some reg, _ ->
-      fn eff ?ghost:(Some ghost) reg
+      fn eff ?ghost:(Some ghost) reg, Svs.add vs svs
   | None, Ityapp (its,_,(_::_ as regl)) ->
       let add_arg regs vtv = match vtv.vtv_mut with
         | Some r when vtv.vtv_ghost -> Sreg.add r regs | _ -> regs in
@@ -783,22 +783,23 @@ let get_eff_regs lenv fn eff ghost le =
         let ghost = ghost || Sreg.mem reg0 ghost_regs in
         fn eff ?ghost:(Some ghost) reg
       in
-      List.fold_left2 add_reg eff its.its_regs regl
+      List.fold_left2 add_reg eff its.its_regs regl, Svs.add vs svs
   | _ ->
       errorm ~loc:le.pp_loc "mutable expression expected"
 
 let eff_of_deff lenv deff =
-  let add_read eff (gh,e) = get_eff_regs lenv eff_read eff gh e in
-  let eff = List.fold_left add_read eff_empty deff.deff_reads in
-  let add_write eff (gh,e) = get_eff_regs lenv eff_write eff gh e in
-  let eff = List.fold_left add_write eff deff.deff_writes in
+  let acc = eff_empty, Svs.empty in
+  let add_read acc (gh,e) = get_eff_regs lenv eff_read acc gh e in
+  let acc = List.fold_left add_read acc deff.deff_reads in
+  let add_write acc (gh,e) = get_eff_regs lenv eff_write acc gh e in
+  let eff, svs = List.fold_left add_write acc deff.deff_writes in
   let add_raise eff (gh,xs) = eff_raise eff ~ghost:gh xs in
   let eff = List.fold_left add_raise eff deff.deff_raises in
-  eff
+  eff, svs
 
-let rec type_c lenv gh vars dtyc =
-  let vty = type_v lenv gh vars dtyc.dc_result in
-  let eff = eff_of_deff lenv dtyc.dc_effect in
+let rec type_c lenv gh svs vars dtyc =
+  let vty = type_v lenv gh svs vars dtyc.dc_result in
+  let eff, esvs = eff_of_deff lenv dtyc.dc_effect in
   (* reset every new region in the result *)
   let eff = match vty with
     | VTvalue v ->
@@ -807,22 +808,43 @@ let rec type_c lenv gh vars dtyc =
         and add_ity ity eff = Sreg.fold add_reg ity.ity_vars.vars_reg eff in
         add_ity v.vtv_ity eff
     | VTarrow _ -> eff in
-  { c_pre     = create_pre lenv dtyc.dc_pre;
+  let spec = {
+    c_pre     = create_pre lenv dtyc.dc_pre;
     c_effect  = eff;
     c_post    = create_post lenv "result" vty dtyc.dc_post;
     c_xpost   = xpost lenv dtyc.dc_xpost;
     c_variant = [];
-    c_letrec  = 0 }, vty
+    c_letrec  = 0 } in
+  (* we add an exception postcondition for %Exit that mentions
+     every external variable in effect expressions which also
+     does not occur in pre/post/xpost. In this way, we keep
+     the variable in the specification in order to preserve
+     the effect in [Mlw_ty.spec_filter]. The exception %Exit
+     cannot be raised by an abstract parameter, so this xpost
+     will never appear in WP *)
+  let esvs = Svs.diff esvs svs in
+  let drop _ t s = Mvs.set_diff s t.t_vars in
+  let esvs = drop () spec.c_pre esvs in
+  let esvs = drop () spec.c_post esvs in
+  let esvs = Mexn.fold drop spec.c_xpost esvs in
+  let xpost = if Svs.is_empty esvs then spec.c_xpost else
+    let exn = Invalid_argument "Mlw_typing.type_c" in
+    let res = create_vsymbol (id_fresh "dummy") ty_unit in
+    let add vs f = let t = t_var vs in t_and_simp (t_equ t t) f in
+    let xq = Mlw_ty.create_post res (Svs.fold add esvs t_true) in
+    Mexn.add_new exn xs_exit xq spec.c_xpost in
+  { spec with c_xpost = xpost }, vty
 
-and type_v lenv gh vars = function
+and type_v lenv gh svs vars = function
   | DSpecV (ghost,v) ->
       let ghost = ghost || gh in
       VTvalue (vty_value ~ghost (ity_of_dity v))
   | DSpecA (bl,tyc) ->
       let lenv, pvl = binders lenv bl in
-      let add_pv s pv = vars_union s pv.pv_vtv.vtv_vars in
-      let vars = List.fold_left add_pv vars pvl in
-      let spec, vty = type_c lenv gh vars tyc in
+      let add_pv (vars,svs) pv =
+        vars_union vars pv.pv_vtv.vtv_vars, Svs.add pv.pv_vs svs in
+      let vars, svs = List.fold_left add_pv (vars,svs) pvl in
+      let spec, vty = type_c lenv gh svs vars tyc in
       VTarrow (vty_arrow pvl ~spec vty)
 
 (* expressions *)
@@ -951,7 +973,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let lenv = add_local x.id ld.let_sym lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->
-      let spec, result = type_c lenv false vars_empty dtyc in
+      let spec, result = type_c lenv false Svs.empty vars_empty dtyc in
       e_any spec result
   | DEghost de1 ->
       e_ghostify true (expr lenv de1)
@@ -1511,7 +1533,7 @@ let add_module lib path mm mt m =
         add_pdecl_with_tuples uc pd
     | Dparam (id, gh, tyv) ->
         let tyv, _ = dtype_v (create_denv uc) tyv in
-        let tyv = type_v (create_lenv uc) gh vars_empty tyv in
+        let tyv = type_v (create_lenv uc) gh Svs.empty vars_empty tyv in
         let vd = create_val (Denv.create_user_id id) tyv in
         begin match vd.val_sym with
           | LetA { ps_vta = { vta_ghost = true }} when not gh ->

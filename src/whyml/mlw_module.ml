@@ -327,9 +327,8 @@ let th_unit =
   let uc = Theory.add_ty_decl uc ts in
   close_theory uc
 
-let pd_exit =
-  let xs = create_xsymbol (id_fresh "%Exit") ity_unit in
-  create_exn_decl xs
+let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
+let pd_exit = create_exn_decl xs_exit
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
