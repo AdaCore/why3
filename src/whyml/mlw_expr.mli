@@ -65,16 +65,18 @@ type plsymbol = private {
   pl_value  : vty_value;
   pl_effect : effect;
   pl_hidden : bool;
+  pl_rdonly : bool;
 }
 
 val pl_equal : plsymbol -> plsymbol -> bool
 
-val create_plsymbol :
-  ?hidden:bool -> preid -> vty_value list -> vty_value -> plsymbol
+val create_plsymbol : ?hidden:bool -> ?rdonly:bool ->
+  preid -> vty_value list -> vty_value -> plsymbol
   (* FIXME? Effect calculation is hardwired to correspond to constructors
      and projections: mutable arguments are reset, mutable result is read. *)
 
 exception HiddenPLS of lsymbol
+exception RdOnlyPLS of lsymbol
 
 (** specification *)
 

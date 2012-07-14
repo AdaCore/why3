@@ -60,11 +60,12 @@ type plsymbol = {
   pl_value  : vty_value;
   pl_effect : effect;
   pl_hidden : bool;
+  pl_rdonly : bool;
 }
 
 let pl_equal : plsymbol -> plsymbol -> bool = (==)
 
-let create_plsymbol ?(hidden=false) id args value =
+let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
   let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
@@ -77,6 +78,7 @@ let create_plsymbol ?(hidden=false) id args value =
     pl_value  = value;
     pl_effect = effect;
     pl_hidden = hidden;
+    pl_rdonly = rdonly;
   }
 
 let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
@@ -86,9 +88,11 @@ let fake_pls = Wls.memoize 17 (fun ls ->
     pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
     pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
     pl_effect = eff_empty;
-    pl_hidden = false })
+    pl_hidden = false;
+    pl_rdonly = false; })
 
 exception HiddenPLS of lsymbol
+exception RdOnlyPLS of lsymbol
 
 (** specification *)
 
@@ -204,7 +208,8 @@ let ppat_plapp pls ppl vtv =
     if ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
       Loc.errorm "Ghost pattern in a non-ghost context";
     let effect = eff_union eff pp.ppat_effect in
-    match arg.vtv_mut, pp.ppat_vtv.vtv_mut with
+    let arg_mut = if pls.pl_rdonly then None else arg.vtv_mut in
+    match arg_mut, pp.ppat_vtv.vtv_mut with
     | _ when ppat_is_wild pp ->
         effect
     | Some r1, Some r2 ->
@@ -291,7 +296,8 @@ let make_ppattern pp vtv =
         let mtch arg pp =
           let ity = ity_full_inst sbs arg.vtv_ity in
           let ghost = vtv.vtv_ghost || arg.vtv_ghost in
-          let mut = Util.option_map (reg_full_inst sbs) arg.vtv_mut in
+          let arg_mut = if pls.pl_rdonly then None else arg.vtv_mut in
+          let mut = Util.option_map (reg_full_inst sbs) arg_mut in
           let pp = make (vty_value ~ghost ?mut ity) pp in
           if ppat_is_wild pp then pp.ppat_effect, pp else
           Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
@@ -562,13 +568,18 @@ let e_app = List.fold_left (fun e -> on_value (e_app_real e))
 
 let e_plapp pls el ity =
   if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
+  if pls.pl_rdonly then raise (RdOnlyPLS pls.pl_ls);
   let rec app tl varm ghost eff sbs vtvl argl =
     match vtvl, argl with
       | [],[] ->
           let vtv = pls.pl_value in
           let ghost = ghost || vtv.vtv_ghost in
           let sbs = ity_match sbs vtv.vtv_ity ity in
-          let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
+          let mut = match pls.pl_args with
+            (* if our sole argument is a private type, then we are immutable *)
+            | [{vtv_ity = {ity_node = Ityapp ({its_priv = true},_,_)}}] -> None
+            | _ -> vtv.vtv_mut in
+          let mut = Util.option_map (reg_full_inst sbs) mut in
           let vty = VTvalue (vty_value ~ghost ?mut ity) in
           let eff = eff_union eff (eff_full_inst sbs pls.pl_effect) in
           let t = match pls.pl_ls.ls_value with

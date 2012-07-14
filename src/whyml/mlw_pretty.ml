@@ -456,6 +456,8 @@ let () = Exn_printer.register
       fprintf fmt "The type of exception %s has mutable components" id.id_string
   | Mlw_ty.IllegalAlias _reg ->
       fprintf fmt "This application creates an illegal alias"
+  | Mlw_expr.RdOnlyPLS _ls ->
+      fprintf fmt "Cannot construct values of a private type"
   | Mlw_expr.HiddenPLS ls ->
       fprintf fmt "'%a' is a constructor/field of an abstract type \
       and cannot be used in a program" print_ls ls;

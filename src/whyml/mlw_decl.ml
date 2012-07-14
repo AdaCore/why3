@@ -143,9 +143,10 @@ let create_data_decl tdl =
     ignore (List.for_all check_arg vtvs);
     (* build the constructor ps *)
     let hidden = its.its_abst in
+    let rdonly = its.its_priv in
     let tvl = List.map ity_var its.its_args in
     let res = vty_value (ity_app its tvl its.its_regs) in
-    let pls = create_plsymbol ~hidden id vtvs res in
+    let pls = create_plsymbol ~hidden ~rdonly id vtvs res in
     news := Sid.add pls.pl_ls.ls_name !news;
     (* build the projections, if any *)
     let build_proj id vtv =
