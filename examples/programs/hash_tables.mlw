@@ -98,6 +98,11 @@ module HashTableImpl
     h.contents <- const None
     { valid h /\ forall k: 'a. get h k = None }
 
+  let idx (h: t 'a 'b) (k: 'a) =
+    { }
+    mod (abs (hash k)) (length h.data)
+    { result = idx h k }
+
   let add (h: t 'a 'b) (k: 'a) (v: 'b) =
     { valid h }
     let i = idx h k in

@@ -77,6 +77,11 @@ module Iterator
 
   predicate hasNext (i: iterator) = i.it <> Done
 
+  let hasNext (i: iterator) =
+    { }
+    i.it <> Done
+    { result = True <-> hasNext i }
+
   let next (i: iterator) =
     { hasNext i }
     match i.it with
@@ -154,7 +159,7 @@ module ITree
     bst_mem x t.tree
     { result=True <-> mem x t.tree }
 
-  let add (t: itree) (x: elt) = 
+  let add (t: itree) (x: elt) =
     { inv t }
     try t.tree <- bst_add x t.tree; True
     with Already -> False
