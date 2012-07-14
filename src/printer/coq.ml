@@ -734,6 +734,7 @@ let print_ind_decl info s fmt d =
     (print_ind_decl info s fmt d; forget_tvs ())
 
 let print_prop_decl ~prev info fmt (k,pr,f) =
+  ignore prev;
   let params = t_ty_freevars Stv.empty f in
   let stt = match k with
     | Paxiom when info.realization -> "Lemma"

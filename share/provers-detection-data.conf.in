@@ -328,13 +328,13 @@ exec = "pvs"
 version_switch = "-version"
 version_regexp = "PVS Version \\([^ \n]+\\)"
 version_ok = "5.0"
-command = "'@LOCALBIN@why3-cpulimit' 0 %m -s proveit %f"
+command = "'@LOCALBIN@why3-cpulimit' 0 %m -s @LOCALBIN@why3-check-pvs %l %f"
 driver = "drivers/pvs.drv"
 editor = "pvs"
 
 [editor pvs]
 name = "PVS"
-command = "PVS_LIBRARY_PATH=%l/pvs pvs %f"
+command = "@LOCALBIN@why3-call-pvs %l %f"
 
 [editor coqide]
 name = "CoqIDE"

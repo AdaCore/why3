@@ -1,7 +1,7 @@
 
-valid 0
-unknown "Error: \\(.*\\)$" "\\1"
-fail "Syntax error: \\(.*\\)$" "\\1"
+unknown "unfinished" "\"\\0\""
+unknown "untried" "\"\\0\""
+valid "succeeded"
 time "why3cpulimit time : %s s"
 
 (*transformation "inline_trivial"*)

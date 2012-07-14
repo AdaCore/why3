@@ -9,11 +9,11 @@ Abs: THEORY
   abs(x:int): int = IF (x >= 0) THEN x ELSE (-x) ENDIF
   
   % Why3 abs_le
-  abs_le: AXIOM FORALL (x:int, y:int): (abs(x) <= y) <=> (((-y) <= x) AND
+  abs_le: LEMMA FORALL (x:int, y:int): (abs(x) <= y) <=> (((-y) <= x) AND
     (x <= y))
   
   % Why3 abs_pos
-  abs_pos: AXIOM FORALL (x:int): (abs(x) >= 0)
+  abs_pos: LEMMA FORALL (x:int): (abs(x) >= 0)
   
   
  END Abs

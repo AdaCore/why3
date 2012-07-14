@@ -13,57 +13,57 @@ ComputerDivision: THEORY
   mod(x:int, x1:int): int
   
   % Why3 div_mod
-  div_mod: AXIOM FORALL (x:int, y:int): (NOT (y = 0)) => (x = ((y * div(x,
+  div_mod: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) => (x = ((y * div(x,
     y)) + mod(x, y)))
   
   % Why3 div_bound
-  div_bound: AXIOM FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
+  div_bound: LEMMA FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
     ((0 <= div(x, y)) AND (div(x, y) <= x))
   
   % Why3 mod_bound
-  mod_bound: AXIOM FORALL (x:int, y:int): (NOT (y = 0)) =>
+  mod_bound: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) =>
     (((-abs(y)) <  mod(x, y)) AND (mod(x, y) <  abs(y)))
   
   % Why3 div_sign_pos
-  div_sign_pos: AXIOM FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
+  div_sign_pos: LEMMA FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
     (div(x, y) >= 0)
   
   % Why3 div_sign_neg
-  div_sign_neg: AXIOM FORALL (x:int, y:int): ((x <= 0) AND (y >  0)) =>
+  div_sign_neg: LEMMA FORALL (x:int, y:int): ((x <= 0) AND (y >  0)) =>
     (div(x, y) <= 0)
   
   % Why3 mod_sign_pos
-  mod_sign_pos: AXIOM FORALL (x:int, y:int): ((x >= 0) AND NOT (y = 0)) =>
+  mod_sign_pos: LEMMA FORALL (x:int, y:int): ((x >= 0) AND NOT (y = 0)) =>
     (mod(x, y) >= 0)
   
   % Why3 mod_sign_neg
-  mod_sign_neg: AXIOM FORALL (x:int, y:int): ((x <= 0) AND NOT (y = 0)) =>
+  mod_sign_neg: LEMMA FORALL (x:int, y:int): ((x <= 0) AND NOT (y = 0)) =>
     (mod(x, y) <= 0)
   
   % Why3 rounds_toward_zero
-  rounds_toward_zero: AXIOM FORALL (x:int, y:int): (NOT (y = 0)) =>
+  rounds_toward_zero: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) =>
     (abs((div(x, y) * y)) <= abs(x))
   
   % Why3 div_1
-  div_1: AXIOM FORALL (x:int): (div(x, 1) = x)
+  div_1: LEMMA FORALL (x:int): (div(x, 1) = x)
   
   % Why3 mod_1
-  mod_1: AXIOM FORALL (x:int): (mod(x, 1) = 0)
+  mod_1: LEMMA FORALL (x:int): (mod(x, 1) = 0)
   
   % Why3 div_inf
-  div_inf: AXIOM FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (div(x,
+  div_inf: LEMMA FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (div(x,
     y) = 0)
   
   % Why3 mod_inf
-  mod_inf: AXIOM FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (mod(x,
+  mod_inf: LEMMA FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (mod(x,
     y) = x)
   
   % Why3 div_mult
-  div_mult: AXIOM FORALL (x:int, y:int, z:int): ((x >  0) AND ((y >= 0) AND
+  div_mult: LEMMA FORALL (x:int, y:int, z:int): ((x >  0) AND ((y >= 0) AND
     (z >= 0))) => (div(((x * y) + z), x) = (y + div(z, x)))
   
   % Why3 mod_mult
-  mod_mult: AXIOM FORALL (x:int, y:int, z:int): ((x >  0) AND ((y >= 0) AND
+  mod_mult: LEMMA FORALL (x:int, y:int, z:int): ((x >  0) AND ((y >= 0) AND
     (z >= 0))) => (mod(((x * y) + z), x) = mod(z, x))
   
   

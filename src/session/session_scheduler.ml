@@ -905,7 +905,7 @@ let edit_proof eS sched ~default_editor a =
               with Not_found -> default_editor
           in
           let file = update_edit_external_proof eS a in
-          dprintf debug "[Editing] goal %a with command %s %s@."
+          dprintf debug "[Editing] goal %a with command '%s' on file %s@."
             (fun fmt a -> pp_print_string fmt
               (Task.task_goal (goal_task a.proof_parent))
               . Decl.pr_name.Ident.id_string)

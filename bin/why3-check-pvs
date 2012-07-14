@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export PVS_LIBRARY_PATH=$1/pvs
+cd `dirname $2`
+exec proveit -q `basename $2`
+
+
+

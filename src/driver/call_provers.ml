@@ -153,7 +153,10 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     try Str.global_substitute cmd_regexp replace s
     with e -> if cleanup then Sys.remove fin; raise e
   in
-  let argarray = Array.of_list (List.map subst arglist) in
+  let arglist = List.map subst arglist in
+  Debug.dprintf debug "@[<hov 2>Call_provers: command is: %a@]@."
+    (Pp.print_list Pp.space pp_print_string) arglist;
+  let argarray = Array.of_list arglist in
 
   fun () ->
     let fd_in = Unix.openfile fin [Unix.O_RDONLY] 0 in

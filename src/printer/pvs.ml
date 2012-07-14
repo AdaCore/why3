@@ -724,7 +724,7 @@ let axiom_or_lemma = function
 let print_prop_decl ~prev info fmt (k,pr,f) =
   let params = t_ty_freevars Stv.empty f in
   let kind = match k with
-    | Paxiom when info.realization -> axiom_or_lemma prev
+    | Paxiom when info.realization -> "LEMMA" (* axiom_or_lemma prev *)
     | Paxiom -> "AXIOM"
     | Plemma -> "LEMMA"
     | Pgoal -> "THEOREM"

@@ -970,13 +970,13 @@ clean::
 
 ifeq (@enable_pvs_libs@,yes)
 
-PVSLIBS_INT_FILES = Abs ComputerDivision EuclideanDivision Int MinMax
+PVSLIBS_INT_FILES = Int Abs MinMax ComputerDivision EuclideanDivision
 PVSLIBS_INT = $(addprefix lib/pvs/int/, $(PVSLIBS_INT_FILES))
 
-PVSLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square RealInfix
+PVSLIBS_REAL_FILES = Abs FromInt MinMax Real # ExpLog Square RealInfix
 PVSLIBS_REAL = $(addprefix lib/pvs/real/, $(PVSLIBS_REAL_FILES))
 
-PVSLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime
+PVSLIBS_NUMBER_FILES = # Divisibility Gcd Parity Prime
 PVSLIBS_NUMBER = $(addprefix lib/pvs/number/, $(PVSLIBS_NUMBER_FILES))
 
 ifeq (@enable_pvs_fp_libs@,yes)

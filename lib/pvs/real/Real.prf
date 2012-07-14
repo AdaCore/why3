@@ -1,0 +1,250 @@
+(Real
+ (unit_def 0
+  (unit_def-1 nil 3551212104 ("" (grind) nil nil)
+   ((zero const-decl "real" Real nil)) shostak))
+ (assoc 0
+        (assoc-1 nil 3551212333 ("" (grind) nil nil)
+         ((real_plus_real_is_real application-judgement "real" reals
+           nil))
+         shostak))
+ (inv_def 0
+  (inv_def-1 nil 3551212368 ("" (default-strategy))
+   ((minus_real_is_real application-judgement "real" reals nil)
+    (zero const-decl "real" Real nil))
+   shostak))
+ (comm 0 (comm-1 nil 3551212368 ("" (default-strategy)) nil shostak))
+ (assoc1 0
+  (assoc1-1 nil 3551212368 ("" (default-strategy))
+   ((real_times_real_is_real application-judgement "real" reals nil))
+   shostak))
+ (mul_distr 0
+  (mul_distr-1 nil 3551212368 ("" (default-strategy))
+   ((real_times_real_is_real application-judgement "real" reals nil))
+   shostak))
+ (comm1 0 (comm1-1 nil 3551212368 ("" (default-strategy)) nil shostak))
+ (unitary 0
+  (unitary-1 nil 3551212368 ("" (default-strategy))
+   ((one const-decl "real" Real nil)) shostak))
+ (nontrivialring 0
+  (nontrivialring-1 nil 3551212368 ("" (default-strategy))
+   ((one const-decl "real" Real nil) (zero const-decl "real" Real nil))
+   shostak))
+ (inverse 0
+  (inverse-1 nil 3551212368 ("" (default-strategy))
+   ((one const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (zero const-decl "real" Real nil)
+    (nzreal_div_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (add_div 0
+  (add_div-1 nil 3551212368 ("" (default-strategy))
+   ((infix_sl const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (zero const-decl "real" Real nil))
+   shostak))
+ (sub_div 0
+  (sub_div-1 nil 3551212368 ("" (default-strategy))
+   ((infix_sl const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (infix_mn const-decl "real" Real nil)
+    (zero const-decl "real" Real nil)
+    (nzreal_div_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (minus_real_is_real application-judgement "real" reals nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (neg_div 0
+  (neg_div-1 nil 3551212369 ("" (default-strategy))
+   ((infix_sl const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (zero const-decl "real" Real nil)
+    (nzreal_div_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (minus_real_is_real application-judgement "real" reals nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (assoc_mul_div 0
+  (assoc_mul_div-1 nil 3551212369 ("" (default-strategy))
+   ((infix_sl const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (zero const-decl "real" Real nil)
+    (nzreal_div_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (assoc_div_mul 0
+  (assoc_div_mul-1 nil 3551212369 ("" (default-strategy))
+   ((infix_sl const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (zero const-decl "real" Real nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (nzreal_div_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (nzreal_times_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (assoc_div_div 0
+  (assoc_div_div-1 nil 3551212370 ("" (default-strategy))
+   ((infix_sl const-decl "real" Real nil)
+    (/= const-decl "boolean" notequal nil)
+    (zero const-decl "real" Real nil)
+    (nzreal_div_nzreal_is_nzreal application-judgement "nzreal"
+     real_types nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (refl 0
+  (refl-1 nil 3551212370 ("" (default-strategy))
+   ((infix_lseq const-decl "bool" Real nil)) shostak))
+ (trans 0
+  (trans-1 nil 3551212370 ("" (default-strategy))
+   ((infix_lseq const-decl "bool" Real nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (antisymm 0
+  (antisymm-1 nil 3551212370 ("" (default-strategy))
+   ((infix_lseq const-decl "bool" Real nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (total 0
+  (total-1 nil 3551212370 ("" (default-strategy))
+   ((infix_lseq const-decl "bool" Real nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (zerolessone 0
+  (zerolessone-1 nil 3551212370 ("" (default-strategy))
+   ((real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (infix_lseq const-decl "bool" Real nil)
+    (one const-decl "real" Real nil) (zero const-decl "real" Real nil))
+   shostak))
+ (compatorderadd 0
+  (compatorderadd-1 nil 3551212370 ("" (default-strategy))
+   ((infix_lseq const-decl "bool" Real nil)
+    (real_plus_real_is_real application-judgement "real" reals nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (compatordermult 0
+  (compatordermult-1 nil 3551212370
+   ("" (default-strategy)
+    (("" (auto-rewrite-theory "real_props") (("" (grind) nil nil))
+      nil))
+    nil)
+   ((real_le_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (real_ge_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (real_gt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (both_sides_times_pos_lt1 formula-decl nil real_props nil)
+    (infix_lseq const-decl "bool" Real nil)
+    (zero const-decl "real" Real nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (real_times_real_is_real application-judgement "real" reals nil))
+   shostak)))
+
