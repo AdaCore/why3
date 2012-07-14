@@ -134,21 +134,17 @@ and vty_varmap = function
   | VTvalue _ -> Mid.empty
 
 let eff_check vars result e =
-  let check r =
-    if not (reg_occurs r vars) then
-      Loc.errorm "every external effect must be mentioned in specification"
-  in
-  let reset r u = match result with
-    (* FIXME: we must reset non-written subregions of written regions *)
-    | _ when u <> None -> Loc.errorm "abstract parameters cannot reset regions"
-    | VTvalue v when reg_occurs r v.vtv_vars -> ()
-    | _ -> check r
-  in
+  let check vars r = if not (reg_occurs r vars) then
+    Loc.errorm "every external effect must be mentioned in specification" in
+  let reset vars r u = check vars r; Util.option_iter (check vars) u in
+  let check = check vars in
   Sreg.iter check e.eff_reads;
   Sreg.iter check e.eff_writes;
   Sreg.iter check e.eff_ghostr;
   Sreg.iter check e.eff_ghostw;
-  Mreg.iter reset e.eff_resets
+  if not (Mreg.is_empty e.eff_resets) then
+    let reset = reset (vars_union vars (vty_vars result)) in
+    Mreg.iter reset e.eff_resets
 
 let rec vta_check vars vta =
   let add_arg vars pv = vars_union vars pv.pv_vtv.vtv_vars in

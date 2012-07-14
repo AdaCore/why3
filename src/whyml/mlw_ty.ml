@@ -881,12 +881,13 @@ let rec vta_filter varm vars vta =
   (* reads and writes must come from the context,
      resets may affect the regions in the result *)
   let spec = spec_filter varm vars vta.vta_spec in
-  let vars = vars_union vars (vty_vars vty) in
   let rst = vta.vta_spec.c_effect.eff_resets in
-  let rst = { eff_empty with eff_resets = rst } in
-  let rst = (eff_filter vars rst).eff_resets in
-  let eff = { spec.c_effect with eff_resets = rst } in
-  let spec = { spec with c_effect = eff } in
+  let spec = if Mreg.is_empty rst then spec else
+    let vars = vars_union vars (vty_vars vty) in
+    let rst = { eff_empty with eff_resets = rst } in
+    let rst = (eff_filter vars rst).eff_resets in
+    let eff = { spec.c_effect with eff_resets = rst } in
+    { spec with c_effect = eff } in
   vty_arrow_unsafe vta.vta_args ~ghost:vta.vta_ghost ~spec vty
 
 let vta_filter varm vta =
