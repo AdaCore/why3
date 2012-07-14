@@ -330,11 +330,20 @@ let th_unit =
 let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
 let pd_exit = create_exn_decl xs_exit
 
+let mod_exit = {
+  mod_theory = close_theory (create_theory (id_fresh "Exit"));
+  mod_decls  = [pd_exit];
+  mod_export = add_ps true xs_exit.xs_name.id_string (XS xs_exit) empty_ns;
+  mod_known  = Mid.singleton xs_exit.xs_name pd_exit;
+  mod_local  = Sid.singleton xs_exit.xs_name;
+  mod_used   = Sid.empty;
+}
+
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m th_unit in
-  let m = add_pdecl m pd_exit in
+  let m = use_export m mod_exit in
   m
 
 (** Clone *)
