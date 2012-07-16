@@ -42,7 +42,7 @@ type pdecl = {
 and pdecl_node =
   | PDtype of itysymbol
   | PDdata of data_decl list
-  | PDval  of val_decl
+  | PDval  of let_sym
   | PDlet  of let_defn
   | PDrec  of rec_defn
   | PDexn  of xsymbol
@@ -175,11 +175,21 @@ let check_vars vars =
     raise (UnboundTypeVar (Stv.choose vars.vars_tv))
 
 let letvar_news = function
-  | LetV pv -> check_vars pv.pv_vtv.vtv_vars; Sid.singleton pv.pv_vs.vs_name
+  | LetV pv -> check_vars pv.pv_vars; Sid.singleton pv.pv_vs.vs_name
   | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
 
+let rec new_regs old_vars news vars =
+  let add_reg r s =
+    let s = if reg_occurs r old_vars then s else Sid.add r.reg_name s in
+    new_regs old_vars s r.reg_ity.ity_vars in
+  Sreg.fold add_reg vars.vars_reg news
+
 let create_let_decl ld =
+  let vars = vars_merge ld.let_expr.e_varm vars_empty in
   let news = letvar_news ld.let_sym in
+  let news = match ld.let_sym with
+    | LetA ps -> new_regs vars news ps.ps_vars
+    | LetV pv -> new_regs vars news pv.pv_vars in
 (*
   let syms = syms_varmap Sid.empty ld.let_expr.e_vars in
   let syms = syms_effect syms ld.let_expr.e_effect in
@@ -189,7 +199,6 @@ let create_let_decl ld =
   mk_decl (PDlet ld) (*syms*) news
 
 let create_rec_decl ({ rec_defn = rdl } as d) =
-  if rdl = [] then raise Decl.EmptyDecl;
   let add_rd s { fun_ps = p } = check_vars p.ps_vars; news_id s p.ps_name in
   let news = List.fold_left add_rd Sid.empty rdl in
 (*
@@ -207,13 +216,18 @@ let create_rec_decl ({ rec_defn = rdl } as d) =
 *)
   mk_decl (PDrec d) (*syms*) news
 
-let create_val_decl vd =
-  let news = letvar_news vd.val_sym in
+let create_val_decl lv =
+  let news = letvar_news lv in
+  let news = match lv with
+    | LetV { pv_vtv = { vtv_mut = Some _ }} ->
+        Loc.errorm "abstract parameters cannot be mutable"
+    | LetV pv -> new_regs vars_empty news pv.pv_vars
+    | LetA _ -> news in
 (*
   let syms = syms_type_v Sid.empty vd.val_spec in
   let syms = syms_varmap syms vd.val_vars in
 *)
-  mk_decl (PDval vd) (*syms*) news
+  mk_decl (PDval lv) (*syms*) news
 
 let create_exn_decl xs =
   let news = Sid.singleton xs.xs_name in

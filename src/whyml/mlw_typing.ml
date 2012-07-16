@@ -860,7 +860,7 @@ and type_v lenv gh svs vars = function
   | DSpecA (bl,tyc) ->
       let lenv, pvl = binders lenv bl in
       let add_pv (vars,svs) pv =
-        vars_union vars pv.pv_vtv.vtv_vars, Svs.add pv.pv_vs svs in
+        vars_union vars pv.pv_vars, Svs.add pv.pv_vs svs in
       let vars, svs = List.fold_left add_pv (vars,svs) pvl in
       let spec, vty = type_c lenv gh svs vars tyc in
       VTarrow (vty_arrow pvl ~spec vty)
@@ -1550,15 +1550,17 @@ let add_module lib path mm mt m =
     | Dparam (id, gh, tyv) ->
         let tyv, _ = dtype_v (create_denv uc) tyv in
         let tyv = type_v (create_lenv uc) gh Svs.empty vars_empty tyv in
-        let vd = create_val (Denv.create_user_id id) tyv in
-        begin match vd.val_sym with
-          | LetA { ps_vta = { vta_ghost = true }} when not gh ->
-              errorm ~loc "%s must be a ghost function" id.id
-          | LetV { pv_vtv = { vtv_ghost = true }} when not gh ->
-              errorm ~loc "%s must be a ghost variable" id.id
-          | _ -> ()
-        end;
-        let pd = create_val_decl vd in
+        let lv = match tyv with
+          | VTvalue v ->
+              if v.vtv_ghost && not gh then
+                errorm ~loc "%s must be a ghost variable" id.id;
+              LetV (create_pvsymbol (Denv.create_user_id id) v)
+          | VTarrow a ->
+              if a.vta_ghost && not gh then
+                errorm ~loc "%s must be a ghost function" id.id;
+              LetA (create_psymbol (Denv.create_user_id id) a)
+        in
+        let pd = create_val_decl lv in
         add_pdecl_with_tuples uc pd
     (* TODO: this is made obsolete by Duseclone, remove later *)
     | Duse (qid, use_imp_exp, use_as) ->

@@ -256,7 +256,6 @@ type vty_value = private {
   vtv_ity   : ity;
   vtv_ghost : bool;
   vtv_mut   : region option;
-  vtv_vars  : varset;
 }
 
 val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
@@ -264,8 +263,9 @@ val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
 val vtv_unmut : vty_value -> vty_value (* remove mutability *)
 
 type pvsymbol = private {
-  pv_vs  : vsymbol;
-  pv_vtv : vty_value;
+  pv_vs   : vsymbol;
+  pv_vtv  : vty_value;
+  pv_vars : varset;
 }
 
 module Mpv : Map.S with type key = pvsymbol

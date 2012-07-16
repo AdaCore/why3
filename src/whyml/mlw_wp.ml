@@ -550,6 +550,7 @@ and wp_abstract env c_eff c_q c_xq q xq =
     let xq = Mexn.set_inter xq exns in
     let c_xq = Mexn.set_inter c_xq exns in
     let mexn = Mexn.inter quantify_xpost c_xq xq in
+    (* FIXME? This wp_ands is asymmetric in Pgm_wp *)
     wp_ands ~sym:true (f :: Mexn.values mexn)
   in
   backstep proceed c_q c_xq
@@ -680,4 +681,4 @@ let wp_rec env km th rdl =
   in
   List.fold_left2 add_one th rdl.rec_defn fl
 
-let wp_val _env _km th _vd = th
+let wp_val _env _km th _lv = th

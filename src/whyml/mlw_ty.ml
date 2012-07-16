@@ -726,31 +726,26 @@ type vty_value = {
   vtv_ity   : ity;
   vtv_ghost : bool;
   vtv_mut   : region option;
-  vtv_vars  : varset;
 }
 
 let vty_value ?(ghost=false) ?mut ity =
-  let vars = ity.ity_vars in
-  let vars = match mut with
-    | Some r ->
-        ity_equal_check ity r.reg_ity;
-        { vars with vars_reg = Sreg.add r vars.vars_reg }
-    | None ->
-        vars
-  in {
-    vtv_ity   = ity;
+  Util.option_iter (fun r -> ity_equal_check ity r.reg_ity) mut;
+  { vtv_ity   = ity;
     vtv_ghost = ghost;
-    vtv_mut   = mut;
-    vtv_vars  = vars;
-  }
+    vtv_mut   = mut }
+
+let vtv_vars {vtv_ity = {ity_vars = vars}; vtv_mut = mut} = match mut with
+  | Some r -> { vars with vars_reg = Sreg.add r vars.vars_reg }
+  | None   -> vars
 
 let vtv_unmut vtv =
   if vtv.vtv_mut = None then vtv else
     vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity
 
 type pvsymbol = {
-  pv_vs  : vsymbol;
-  pv_vtv : vty_value;
+  pv_vs   : vsymbol;
+  pv_vtv  : vty_value;
+  pv_vars : varset;
 }
 
 module PVsym = WeakStructMake (struct
@@ -768,6 +763,7 @@ let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
 let create_pvsymbol id vtv = {
   pv_vs   = create_vsymbol id (ty_of_ity vtv.vtv_ity);
   pv_vtv  = vtv;
+  pv_vars = vtv_vars vtv;
 }
 
 let create_pvsymbol, restore_pv =
@@ -793,11 +789,11 @@ and vty_arrow = {
 }
 
 let rec vta_vars vta =
-  let add_arg vars pv = vars_union vars pv.pv_vtv.vtv_vars in
+  let add_arg vars pv = vars_union vars pv.pv_vars in
   List.fold_left add_arg (vty_vars vta.vta_result) vta.vta_args
 
 and vty_vars = function
-  | VTvalue vtv -> vtv.vtv_vars
+  | VTvalue vtv -> vtv_vars vtv
   | VTarrow vta -> vta_vars vta
 
 let vty_ghost = function
@@ -822,18 +818,19 @@ let vty_arrow_unsafe argl ~spec ~ghost vty = {
 }
 
 let vty_arrow argl ?spec ?(ghost=false) vty =
-  (* we accept a mutable vty_value as a result to simplify Mlw_expr,
-     but drop it in the signature: only projections return mutables *)
-  let vty = match vty with
-    | VTvalue v -> VTvalue (vtv_unmut v)
-    | VTarrow _ -> vty in
-  (* the arguments must be all distinct and at least one must be given *)
-  if argl = [] then invalid_arg "Mlw.vty_arrow";
+  let exn = Invalid_argument "Mlw.vty_arrow" in
+  (* the arguments must be all distinct *)
+  if argl = [] then raise exn;
   let add_arg pvs pv =
     (* mutable arguments are rejected outright *)
-    if pv.pv_vtv.vtv_mut <> None then invalid_arg "Mlw.vty_arrow";
-    Spv.add_new (Invalid_argument "Mlw.vty_arrow") pv pvs in
+    if pv.pv_vtv.vtv_mut <> None then raise exn;
+    Spv.add_new exn pv pvs in
   ignore (List.fold_left add_arg Spv.empty argl);
+  (* only projections may return mutable values *)
+  begin match vty with
+    | VTvalue { vtv_mut = Some _ } -> raise exn
+    | _ -> ()
+  end;
   let spec = match spec with
     | Some spec -> spec_check spec vty; spec
     | None -> spec_empty (ty_of_vty vty) in
@@ -882,8 +879,8 @@ let vta_full_inst sbs vta =
 (* remove from the given arrow every effect that is covered
    neither by the arrow's vta_vars nor by the given varmap *)
 let rec vta_filter varm vars vta =
-  let add_m pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m in
-  let add_s pv s = vars_union pv.pv_vtv.vtv_vars s in
+  let add_m pv m = Mid.add pv.pv_vs.vs_name pv.pv_vars m in
+  let add_s pv s = vars_union pv.pv_vars s in
   let varm = List.fold_right add_m vta.vta_args varm in
   let vars = List.fold_right add_s vta.vta_args vars in
   let vty = match vta.vta_result with

@@ -78,19 +78,6 @@ val create_plsymbol : ?hidden:bool -> ?rdonly:bool ->
 exception HiddenPLS of lsymbol
 exception RdOnlyPLS of lsymbol
 
-(** specification *)
-
-type let_sym =
-  | LetV of pvsymbol
-  | LetA of psymbol
-
-type val_decl = private {
-  val_sym  : let_sym;
-  val_vty  : vty;
-}
-
-val create_val : Ident.preid -> vty -> val_decl
-
 (** patterns *)
 
 type ppattern = private {
@@ -125,6 +112,10 @@ type for_direction = To | DownTo
 type for_bounds = pvsymbol * for_direction * pvsymbol
 
 type invariant = term
+
+type let_sym =
+  | LetV of pvsymbol
+  | LetA of psymbol
 
 type expr = private {
   e_node   : expr_node;

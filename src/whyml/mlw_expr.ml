@@ -48,9 +48,8 @@ let create_psymbol_real ~poly id vta varm =
     ps_vars  = vars;
     ps_subst = vars_freeze vars; }
 
-let create_psymbol_poly   = create_psymbol_real ~poly:true
-let create_psymbol_mono   = create_psymbol_real ~poly:false
-let create_psymbol id vta = create_psymbol_poly id vta Mid.empty
+let create_psymbol_poly = create_psymbol_real ~poly:true
+let create_psymbol_mono = create_psymbol_real ~poly:false
 
 (** program/logic symbols *)
 
@@ -96,16 +95,7 @@ exception RdOnlyPLS of lsymbol
 
 (** specification *)
 
-type let_sym =
-  | LetV of pvsymbol
-  | LetA of psymbol
-
-type val_decl = {
-  val_sym  : let_sym;
-  val_vty  : vty;
-}
-
-let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vtv.vtv_vars m
+let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vars m
 let add_vs_vars vs m = add_pv_vars (restore_pv vs) m
 
 let pre_vars f vsset = Mvs.set_union vsset f.t_vars
@@ -124,14 +114,12 @@ let spec_varmap varm spec =
   Mvs.fold (fun vs _ m -> add_vs_vars vs m) vsset varm
 
 let rec vta_varmap vta =
-  let varm = vty_varmap vta.vta_result in
+  let varm = match vta.vta_result with
+    | VTarrow a -> vta_varmap a
+    | VTvalue _ -> Mid.empty in
   let varm = spec_varmap varm vta.vta_spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   List.fold_left del_pv varm vta.vta_args
-
-and vty_varmap = function
-  | VTarrow a -> vta_varmap a
-  | VTvalue _ -> Mid.empty
 
 let eff_check vars result e =
   let check vars r = if not (reg_occurs r vars) then
@@ -147,28 +135,19 @@ let eff_check vars result e =
     Mreg.iter reset e.eff_resets
 
 let rec vta_check vars vta =
-  let add_arg vars pv = vars_union vars pv.pv_vtv.vtv_vars in
+  let add_arg vars pv = vars_union vars pv.pv_vars in
   let vars = List.fold_left add_arg vars vta.vta_args in
   if vta.vta_spec.c_variant <> [] || vta.vta_spec.c_letrec <> 0 then
     Loc.errorm "variants are not allowed in a parameter declaration";
   eff_check vars vta.vta_result vta.vta_spec.c_effect;
-  vty_check vars vta.vta_result
-
-and vty_check vars = function
+  match vta.vta_result with
   | VTarrow a -> vta_check vars a
-  | VTvalue v -> if v.vtv_mut <> None then
-      Loc.errorm "abstract parameters cannot produce mutable values"
+  | VTvalue _ -> ()
 
-let create_val id vty = match vty with
-  | VTvalue v ->
-      let pv = create_pvsymbol id v in
-      vty_check vars_empty vty;
-      { val_sym = LetV pv; val_vty = vty }
-  | VTarrow a ->
-      let varm = vta_varmap a in
-      let ps = create_psymbol_poly id a varm in
-      vta_check ps.ps_vars a;
-      { val_sym = LetA ps; val_vty = vty }
+let create_psymbol id vta =
+  let ps = create_psymbol_poly id vta (vta_varmap vta) in
+  vta_check ps.ps_vars vta;
+  ps
 
 (** patterns *)
 
@@ -351,6 +330,10 @@ type for_bounds = pvsymbol * for_direction * pvsymbol
 
 type invariant = term
 
+type let_sym =
+  | LetV of pvsymbol
+  | LetA of psymbol
+
 type expr = {
   e_node   : expr_node;
   e_vty    : vty;
@@ -532,7 +515,10 @@ let create_fun_defn id lam letrec recsyms =
   let varm = Mid.set_diff varm recsyms in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
-  let vta = vty_arrow lam.l_args ~spec e.e_vty in
+  let vty = match e.e_vty with
+    | VTvalue ({ vtv_mut = Some _ } as vtv) -> VTvalue (vtv_unmut vtv)
+    | vty -> vty in
+  let vta = vty_arrow lam.l_args ~spec vty in
   { fun_ps     = create_psymbol_poly id vta varm;
     fun_lambda = lam; }
 
@@ -702,14 +688,12 @@ let e_assign me e = on_value (e_assign_real me) e
 let e_ghost e =
   mk_expr (Eghost e) (vty_ghostify e.e_vty) e.e_effect e.e_varm
 
+let pv_dummy = create_pvsymbol (id_fresh "dummy") (vty_value ity_unit)
+
 let e_any spec vty =
-  let varm = spec_varmap (vty_varmap vty) spec in
-  let vars = vars_merge varm vars_empty in
-  spec_check spec vty;
-  if spec.c_variant <> [] || spec.c_letrec <> 0 then
-    Loc.errorm "variants are not allowed in a parameter declaration";
-  eff_check vars vty spec.c_effect;
-  vty_check vars vty;
+  let vta = vty_arrow [pv_dummy] ~spec vty in
+  let varm = vta_varmap vta in
+  vta_check (vars_merge varm vars_empty) vta;
   mk_expr (Eany spec) vty spec.c_effect varm
 
 let e_const t =

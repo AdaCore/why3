@@ -391,7 +391,9 @@ let print_data_decl fst fmt (ts,csl) =
     (print_head fst) ts (print_list newline print_constr) csl;
   forget_tvs_regs ()
 
-let print_val_decl fmt { val_sym = lv ; val_vty = vty } =
+let print_val_decl fmt lv =
+  let vty = match lv with
+    | LetV pv -> VTvalue pv.pv_vtv | LetA ps -> VTarrow ps.ps_vta in
   fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v vty;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
