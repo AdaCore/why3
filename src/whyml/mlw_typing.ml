@@ -388,13 +388,8 @@ and dtype_v denv = function
       let tyc,(argl,res) = dtype_c denv tyc in
       DSpecA (bl,tyc), (tyl @ argl,res)
 
-let dvariant uc = function
-  | Some (le, Some q) -> [le, Some (find_variant_ls uc q)]
-  | Some (le, None) -> [le, None]
-  | None -> []
-(* TODO: accept a list of variants in the surface language
+let dvariant uc var =
   List.map (fun (le,q) -> le, Util.option_map (find_variant_ls uc) q) var
-*)
 
 (* expressions *)
 
@@ -454,7 +449,7 @@ and de_desc denv loc = function
       DEletrec (rdl, e1), e1.de_type
   | Ptree.Efun (bl, tr) ->
       let denv, bl, tyl = dbinders denv bl in
-      let lam, (argl, res) = dlambda denv bl None tr in
+      let lam, (argl, res) = dlambda denv bl [] tr in
       DEfun lam, (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in

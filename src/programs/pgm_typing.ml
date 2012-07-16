@@ -342,9 +342,14 @@ let dvariant env (l, p) =
   in
   l, option_map relation p
 
+let dvariants env = function
+  | [] -> None
+  | [v] -> Some (dvariant env v)
+  | _ -> errorm "multiple variants are not supported"
+
 let dloop_annotation env a =
   { dloop_invariant = a.Ptree.loop_invariant;
-    dloop_variant   = option_map (dvariant env) a.Ptree.loop_variant; }
+    dloop_variant   = dvariants env a.Ptree.loop_variant; }
 
 (***
 let is_ps_ghost e = match e.dexpr_desc with
@@ -741,7 +746,7 @@ and dletrec ~ghost ~userloc env dl =
   (* then type-check all of them and unify *)
   let type_one ((id, tyres), bl, v, t) =
     let env, bl = map_fold_left dubinder env bl in
-    let v = option_map (dvariant env) v in
+    let v = dvariants env v in
     let (_,e,_) as t = dtriple ~ghost ~userloc env t in
     let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in

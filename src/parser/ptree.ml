@@ -181,7 +181,7 @@ type variant = lexpr * qualid option
 
 type loop_annotation = {
   loop_invariant : lexpr option;
-  loop_variant   : variant option;
+  loop_variant   : variant list;
 }
 
 type for_direction = To | Downto
@@ -248,7 +248,7 @@ and expr_desc =
   | Eabstract of expr * post
   | Enamed of label * expr
 
-and letrec = loc * ident * ghost * binder list * variant option * triple
+and letrec = loc * ident * ghost * binder list * variant list * triple
 
 and triple = pre * expr * post
 

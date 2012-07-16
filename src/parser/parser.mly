@@ -1437,9 +1437,18 @@ effect:
 ;
 
 opt_variant:
-| /* epsilon */                   { None }
-| VARIANT annotation              { Some ($2, None) }
-| VARIANT annotation WITH lqualid { Some ($2, Some $4) }
+| /* epsilon */         { [] }
+| VARIANT list1_variant { $2 }
+;
+
+list1_variant:
+| variant                     { [$1] }
+| variant COMMA list1_variant { $1::$3 }
+;
+
+variant:
+| annotation              { $1, None }
+| annotation WITH lqualid { $1, Some $3 }
 ;
 
 opt_cast:
