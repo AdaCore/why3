@@ -111,6 +111,8 @@ fi
 echo "" >> $REPORT
 echo "-------------- Full current state --------------" >> $REPORT
 echo "" >> $REPORT
+tail -1 $OUT >> $REPORT
+echo "" >> $REPORT
 cat $OUT >> $REPORT
 
 # final notification after the replay
