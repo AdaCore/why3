@@ -210,24 +210,49 @@ type wp_env = {
   letrec_var : term list Mint.t;
 }
 
+let decrease_alg ?loc env old_t t =
+  let oty = t_type old_t in
+  let nty = t_type t in
+  let quit () =
+    Loc.errorm ?loc "no default order for %a" Pretty.print_term t in
+  let ts = match oty with { ty_node = Tyapp (ts,_) } -> ts | _ -> quit () in
+  let csl = Decl.find_constructors env.pure_known ts in
+  if csl = [] then quit ();
+  let sbs = ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) oty in
+  let add_arg acc fty =
+    let fty = ty_inst sbs fty in
+    if ty_equal fty nty then
+      let vs = create_vsymbol (id_fresh "f") nty in
+      t_or_simp acc (t_equ (t_var vs) t), pat_var vs
+    else acc, pat_wild fty in
+  let add_cs (cs,_) =
+    let f, pl = Util.map_fold_left add_arg t_false cs.ls_args in
+    t_close_branch (pat_app cs pl oty) f in
+  t_case old_t (List.map add_cs csl)
+
+let decrease_rel ?loc env old_t t = function
+  | Some ls -> ps_app ls [t; old_t]
+  | None when ty_equal (t_type t) ty_int ->
+      t_and
+        (ps_app env.ps_int_le [t_int_const "0"; old_t])
+        (ps_app env.ps_int_lt [t; old_t])
+  | None -> decrease_alg ?loc env old_t t
+
 let decrease ?loc env olds varl =
   let rec decr pr olds varl = match olds, varl with
-    | [], [] -> t_false
-    | old_t::olds, (t, rel)::varl ->
-        let d = match rel with
-          | Some ls -> ps_app ls [t; old_t]
-          | None when ty_equal (t_type t) ty_int ->
-              t_and
-                (ps_app env.ps_int_le [t_int_const "0"; old_t])
-                (ps_app env.ps_int_lt [t; old_t])
-          | None -> Loc.errorm ?loc
-              "no default WF order for %a" Pretty.print_term t
-        in
-        let npr = t_and_simp pr (t_equ t old_t) in
-        t_or_simp (t_and_simp pr d) (decr npr olds varl)
+    | [], [] -> (* empty variant *)
+        t_true
+    | [old_t], [t, rel] ->
+        t_and_simp pr (decrease_rel ?loc env old_t t rel)
+    | old_t::_, (t,_)::_ when not (oty_equal old_t.t_ty t.t_ty) ->
+        Loc.errorm ?loc "cannot use lexicographic ordering"
+    | old_t::olds, (t,rel)::varl ->
+        let dt = t_and_simp pr (decrease_rel ?loc env old_t t rel) in
+        let pr = t_and_simp pr (t_equ old_t t) in
+        t_or_simp dt (decr pr olds varl)
     | _ -> assert false
   in
-  if varl = [] then t_true else decr t_true olds varl
+  decr t_true olds varl
 
 (** Reconstruct pure values after writes *)
 

@@ -713,7 +713,7 @@ let spec_check c ty =
   Mexn.iter (fun xs q -> check_post (ty_of_ity xs.xs_ity) q) c.c_xpost;
   let check_variant (t,rel) = match rel with
     | Some ps -> ignore (ps_app ps [t;t])
-    | None -> t_ty_check t (Some ty_int) in
+    | None -> ignore (t_type t) in
   List.iter check_variant c.c_variant;
   let sexn = Sexn.union c.c_effect.eff_raises c.c_effect.eff_ghostx in
   let sexn = Mexn.set_diff sexn c.c_xpost in

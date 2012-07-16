@@ -181,8 +181,9 @@ let letvar_news = function
 let new_regs old_vars news vars =
   let rec add_reg r acc = add_regs r.reg_ity.ity_vars.vars_reg acc
   and add_regs regs acc = Sreg.fold add_reg regs (Sreg.union regs acc) in
+  let old_regs = add_regs old_vars.vars_reg Sreg.empty in
   let regs = add_regs vars.vars_reg Sreg.empty in
-  let regs = Sreg.filter (fun r -> not (reg_occurs r old_vars)) regs in
+  let regs = Sreg.diff regs old_regs in
   Sreg.fold (fun r acc -> Sid.add r.reg_name acc) regs news
 
 let create_let_decl ld =
