@@ -178,11 +178,12 @@ let letvar_news = function
   | LetV pv -> check_vars pv.pv_vars; Sid.singleton pv.pv_vs.vs_name
   | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
 
-let rec new_regs old_vars news vars =
-  let add_reg r s =
-    let s = if reg_occurs r old_vars then s else Sid.add r.reg_name s in
-    new_regs old_vars s r.reg_ity.ity_vars in
-  Sreg.fold add_reg vars.vars_reg news
+let new_regs old_vars news vars =
+  let rec add_reg r acc = add_regs r.reg_ity.ity_vars.vars_reg acc
+  and add_regs regs acc = Sreg.fold add_reg regs (Sreg.union regs acc) in
+  let regs = add_regs vars.vars_reg Sreg.empty in
+  let regs = Sreg.filter (fun r -> not (reg_occurs r old_vars)) regs in
+  Sreg.fold (fun r acc -> Sid.add r.reg_name acc) regs news
 
 let create_let_decl ld =
   let vars = vars_merge ld.let_expr.e_varm vars_empty in
