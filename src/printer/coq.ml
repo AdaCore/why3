@@ -575,18 +575,29 @@ let rec do_intros n fmt fmla =
       do_intros m fmt f2
     | _ -> ()
 
-let intros fmt fmla =
-  match fmla.t_node with
+let intros_params fmt params =
+  Stv.iter
+    (fun tv ->
+      let n = id_unique iprinter tv.tv_name in
+      fprintf fmt "@ %s" n)
+    params
+
+let intros fmt params fmla =
+  let need_intros =
+    not (Stv.is_empty params) ||
+      match fmla.t_node with
     | Tlet _
     | Tquant(Tforall,_)
-    | Tbinop(Timplies, _, _) ->
-      fprintf fmt "@[intros%a.@]@\n" (do_intros 1) fmla
-    | _ -> ()
+    | Tbinop(Timplies, _, _) -> true
+    | _ -> false
+  in
+  if need_intros then
+    fprintf fmt "@[intros%a%a.@]@\n" intros_params params (do_intros 1) fmla
 
 let print_empty_proof fmt def =
   match def with
-    | Some fmla ->
-      intros fmt fmla;
+    | Some (params,fmla) ->
+      intros fmt params fmla;
       fprintf fmt "@\n";
       fprintf fmt "Qed.@\n"
     | None ->
@@ -741,12 +752,13 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Paxiom -> ""
     | Plemma -> "Lemma"
     | Pgoal -> "Theorem"
-    | Pskip -> assert false (* impossible *) in
+    | Pskip -> assert false (* impossible *) 
+  in
   if stt <> "" then
     fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
       stt print_pr pr print_params params
       (print_fmla info) f
-      (print_previous_proof (Some f)) prev
+      (print_previous_proof (Some (params,f))) prev
   else
     fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
       print_pr pr print_params params
