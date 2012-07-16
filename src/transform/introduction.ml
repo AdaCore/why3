@@ -25,6 +25,7 @@
 *)
 
 open Ident
+open Ty
 open Term
 open Decl
 open Task
@@ -57,6 +58,14 @@ let rec intros pr f = match f.t_node with
       let d = create_logic_decl [make_ls_defn ls [] t] in
       d :: intros pr f
   | _ -> [create_prop_decl Pgoal pr f]
+
+let intros pr f =
+  let tvs = t_ty_freevars Stv.empty f in
+  let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] None in
+  let tvm = Mtv.mapi mk_ts tvs in
+  let decls = Mtv.map create_ty_decl tvm in
+  let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
+  Mtv.values decls @ intros pr (t_ty_subst subst Mvs.empty f)
 
 let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
 
