@@ -6,24 +6,26 @@ Require Import ZOdiv.
 Require int.Int.
 Require int.Abs.
 Require int.ComputerDivision.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
 Parameter qtmark : Type.
 
 Parameter at1: forall (a:Type), a -> qtmark -> a.
-
 Implicit Arguments at1.
 
 Parameter old: forall (a:Type), a -> a.
-
 Implicit Arguments old.
 
+(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false
   | (_, _) => true
   end.
 
+(* Why3 assumption *)
 Inductive option (a:Type) :=
   | None : option a
   | Some : a -> option a.
@@ -35,11 +37,9 @@ Implicit Arguments Some.
 Parameter map : forall (a:Type) (b:Type), Type.
 
 Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-
 Implicit Arguments get.
 
 Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-
 Implicit Arguments set.
 
 Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
@@ -50,15 +50,15 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
-
+Parameter const: forall (a:Type) (b:Type), b -> (map a b).
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
+(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
@@ -67,6 +67,7 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
@@ -75,66 +76,74 @@ Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   end.
 Unset Implicit Arguments.
 
+(* Why3 assumption *)
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
 Implicit Arguments mk_array.
 
-Definition elts (a:Type)(u:(array a)): (map Z a) :=
-  match u with
-  | (mk_array _ elts1) => elts1
+(* Why3 assumption *)
+Definition elts (a:Type)(v:(array a)): (map Z a) :=
+  match v with
+  | (mk_array x x1) => x1
   end.
 Implicit Arguments elts.
 
-Definition length (a:Type)(u:(array a)): Z :=
-  match u with
-  | (mk_array length1 _) => length1
+(* Why3 assumption *)
+Definition length (a:Type)(v:(array a)): Z :=
+  match v with
+  | (mk_array x x1) => x
   end.
 Implicit Arguments length.
 
+(* Why3 assumption *)
 Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
 Implicit Arguments get1.
 
+(* Why3 assumption *)
 Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
-  match a1 with
-  | (mk_array xcl0 _) => (mk_array xcl0 (set (elts a1) i v))
-  end.
+  (mk_array (length a1) (set (elts a1) i v)).
 Implicit Arguments set1.
 
+(* Why3 assumption *)
 Inductive t (a:Type)
   (b:Type) :=
   | mk_t : (map a (option b)) -> (array (list (a* b)%type)) -> t a b.
 Implicit Arguments mk_t.
 
-Definition contents (a:Type) (b:Type)(u:(t a b)): (map a (option b)) :=
-  match u with
-  | (mk_t contents1 _) => contents1
-  end.
-Implicit Arguments contents.
-
-Definition data (a:Type) (b:Type)(u:(t a b)): (array (list (a* b)%type)) :=
-  match u with
-  | (mk_t _ data1) => data1
+(* Why3 assumption *)
+Definition data (a:Type) (b:Type)(v:(t a b)): (array (list (a* b)%type)) :=
+  match v with
+  | (mk_t x x1) => x1
   end.
 Implicit Arguments data.
 
+(* Why3 assumption *)
+Definition contents (a:Type) (b:Type)(v:(t a b)): (map a (option b)) :=
+  match v with
+  | (mk_t x x1) => x
+  end.
+Implicit Arguments contents.
+
+(* Why3 assumption *)
 Definition get2 (a:Type) (b:Type)(h:(t a b)) (k:a): (option b) :=
   (get (contents h) k).
 Implicit Arguments get2.
 
 Parameter hash: forall (a:Type), a -> Z.
-
 Implicit Arguments hash.
 
+(* Why3 assumption *)
 Definition idx (a:Type) (b:Type)(h:(t a b)) (k:a): Z :=
   (ZOmod (Zabs (hash k)) (length (data h))).
 Implicit Arguments idx.
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint occurs_first (a:Type) (b:Type)(k:a) (v:b) (l:(list (a*
   b)%type)) {struct l}: Prop :=
   match l with
   | Nil => False
-  | (Cons (kqt, vqt) r) => ((k = kqt) /\ (v = vqt)) \/ ((~ (k = kqt)) /\
+  | (Cons (k', v') r) => ((k = k') /\ (v = v')) \/ ((~ (k = k')) /\
       (occurs_first k v r))
   end.
 Unset Implicit Arguments.
@@ -146,43 +155,39 @@ Axiom cons_occurs_first : forall (a:Type) (b:Type), forall (k1:a) (v1:b)
   (l:(list (a* b)%type)), (occurs_first k1 v1 l) -> forall (k:a) (v:b),
   (~ (k = k1)) -> (occurs_first k1 v1 (Cons (k, v) l)).
 
+(* Why3 assumption *)
 Definition valid (a:Type) (b:Type)(h:(t a b)): Prop :=
-  (0%Z <  (length (data h)))%Z /\ ((forall (k:a) (v:b), ((get2 h
+  (0%Z < (length (data h)))%Z /\ ((forall (k:a) (v:b), ((get2 h
   k) = (Some v)) <-> (occurs_first k v (get1 (data h) (idx h k)))) /\
   forall (k:a) (v:b), forall (i:Z), ((0%Z <= i)%Z /\
-  (i <  (length (data h)))%Z) -> ((mem (k, v) (get1 (data h) i)) ->
+  (i < (length (data h)))%Z) -> ((mem (k, v) (get1 (data h) i)) ->
   (i = (idx h k)))).
 Implicit Arguments valid.
 
 Axiom idx_bounds : forall (a:Type) (b:Type), forall (h:(t a b)), (valid h) ->
-  forall (k:a), (0%Z <= (idx h k))%Z /\ ((idx h k) <  (length (data h)))%Z.
+  forall (k:a), (0%Z <= (idx h k))%Z /\ ((idx h k) < (length (data h)))%Z.
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 Require Import Classical.
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem WP_parameter_add : forall (a:Type) (b:Type), forall (h:Z),
   forall (k:a), forall (v:b), forall (rho:(map Z (list (a* b)%type))),
-  forall (rho1:(map a (option b))), ((0%Z <  (length (data (mk_t rho1
+  forall (rho1:(map a (option b))), ((0%Z < (length (data (mk_t rho1
   (mk_array h rho)))))%Z /\ ((forall (k1:a) (v1:b), ((get2 (mk_t rho1
   (mk_array h rho)) k1) = (Some v1)) <-> (occurs_first k1 v1
   (get1 (data (mk_t rho1 (mk_array h rho))) (idx (mk_t rho1 (mk_array h rho))
   k1)))) /\ forall (k1:a) (v1:b), forall (i:Z), ((0%Z <= i)%Z /\
-  (i <  (length (data (mk_t rho1 (mk_array h rho)))))%Z) -> ((mem (k1, v1)
+  (i < (length (data (mk_t rho1 (mk_array h rho)))))%Z) -> ((mem (k1, v1)
   (get1 (data (mk_t rho1 (mk_array h rho))) i)) -> (i = (idx (mk_t rho1
-  (mk_array h rho)) k1))))) -> ((((0%Z <  (ZOmod (Zabs (hash k)) h))%Z \/
-  (0%Z = (ZOmod (Zabs (hash k)) h))) /\
-  ((ZOmod (Zabs (hash k)) h) <  h)%Z) ->
-  ((((0%Z <  (ZOmod (Zabs (hash k)) h))%Z \/
-  (0%Z = (ZOmod (Zabs (hash k)) h))) /\
-  ((ZOmod (Zabs (hash k)) h) <  h)%Z) -> forall (x:(map Z (list (a*
-  b)%type))), (x = (set rho (ZOmod (Zabs (hash k)) h) (Cons (k, v) (get rho
-  (ZOmod (Zabs (hash k)) h))))) -> forall (rho2:(map a (option b))),
-  (rho2 = (set rho1 k (Some v))) -> forall (k1:a) (v1:b), forall (i:Z),
-  ((0%Z <= i)%Z /\ (i <  (length (data (mk_t rho2 (mk_array h x)))))%Z) ->
-  ((mem (k1, v1) (get1 (data (mk_t rho2 (mk_array h x))) i)) ->
-  (i = (idx (mk_t rho2 (mk_array h x)) k1))))).
-(* YOU MAY EDIT THE PROOF BELOW *)
+  (mk_array h rho)) k1))))) -> let result := (ZOmod (Zabs (hash k)) h) in
+  ((((0%Z < result)%Z \/ (0%Z = result)) /\ (result < h)%Z) ->
+  ((((0%Z < result)%Z \/ (0%Z = result)) /\ (result < h)%Z) -> forall (x:(map
+  Z (list (a* b)%type))), (x = (set rho result (Cons (k, v) (get rho
+  result)))) -> forall (rho2:(map a (option b))), (rho2 = (set rho1 k
+  (Some v))) -> forall (k1:a) (v1:b), forall (i:Z), ((0%Z <= i)%Z /\
+  (i < (length (data (mk_t rho2 (mk_array h x)))))%Z) -> ((mem (k1, v1)
+  (get1 (data (mk_t rho2 (mk_array h x))) i)) -> (i = (idx (mk_t rho2
+  (mk_array h x)) k1))))).
 intros.
 set (ik := (Zabs (hash k) mod h)).
 simpl in H4.
@@ -220,6 +225,5 @@ clear H2.
 simpl in H7.
 apply (H7 k1 v1 i); auto.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 
