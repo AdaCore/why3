@@ -101,6 +101,7 @@ and 'a theory =
 and 'a file =
     { mutable file_key : 'a;
       file_name : string;
+      file_format : string option;
       file_parent : 'a session;
       mutable file_theories: 'a theory list;
       (** Not mutated after the creation *)
@@ -408,8 +409,8 @@ let save_theory provers fmt t =
   fprintf fmt "@]@\n</theory>"
 
 let save_file provers fmt _ f =
-  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ verified=\"%b\"@ expanded=\"%b\">"
-    save_string f.file_name f.file_verified f.file_expanded;
+  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
+    save_string f.file_name (opt "format") f.file_format f.file_verified f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
@@ -675,18 +676,19 @@ let raw_add_theory ~(keygen:'a keygen) mfile thname exp =
   let mth = { theory_name = thname;
               theory_key = key;
               theory_parent = mfile;
-              theory_goals = [] ;
+              theory_goals = [];
               theory_verified = false;
               theory_expanded = exp;
             }
   in
   mth
 
-let raw_add_file ~(keygen:'a keygen) session f exp =
+let raw_add_file ~(keygen:'a keygen) session f fmt exp =
   let key = keygen () in
   let mfile = { file_name = f;
                 file_key = key;
-                file_theories = [] ;
+                file_format = fmt;
+                file_theories = [];
                 file_verified = false;
                 file_expanded = exp;
                 file_parent  = session;
@@ -887,8 +889,9 @@ let load_file session old_provers f =
   match f.Xml.name with
     | "file" ->
         let fn = string_attribute "name" f in
+        let fmt = load_option "format" f in
         let exp = bool_attribute "expanded" f true in
-        let mf = raw_add_file ~keygen session fn exp in
+        let mf = raw_add_file ~keygen session fn fmt exp in
         mf.file_theories <-
           List.rev
           (List.fold_left
@@ -983,8 +986,8 @@ let raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
       let name,expl,task = x_goal goal in
       raw_add_task ~keygen:x_keygen parent name expl task false in
     g::acc in
-  let add_file session f_name file =
-    let rfile = raw_add_file ~keygen:x_keygen session f_name false in
+  let add_file session f_name fmt file =
+    let rfile = raw_add_file ~keygen:x_keygen session f_name fmt false in
     let add_theory acc thname theory =
       let rtheory = raw_add_theory ~keygen:x_keygen rfile thname false in
       let parent = Parent_theory rtheory in
@@ -1016,19 +1019,21 @@ module AddFile(X : sig
     'a -> file -> 'a
 
 end) = (struct
-  let add_file session  fn f =
+  let add_file session fn ?format f =
     let file = raw_add_file ~x_keygen:X.keygen ~x_goal:X.goal
-    ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session fn f in
+    ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session
+    fn format f in
     check_file_verified notify file;
     file
 end : sig
-  val add_file : X.key session -> string -> X.file -> X.key file
+  val add_file :
+    X.key session -> string -> ?format:string -> X.file -> X.key file
 end)
 
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
-let read_file env fn =
-  let theories = Env.read_file env fn in
+let read_file env ?format fn =
+  let theories = Env.read_file env ?format fn in
   let theories =
     Util.Mstr.fold
       (fun name th acc ->
@@ -1049,19 +1054,19 @@ let goal_expl_task task =
   let info = get_explanation gid task in
   gid, info, task
 
-let add_file ~keygen env filename =
+let add_file ~keygen env ?format filename =
   let x_keygen = keygen in
   let x_goal = goal_expl_task in
   let x_fold_theory f acc th =
     let tasks = List.rev (Task.split_theory th None None) in
     List.fold_left f acc tasks in
   let x_fold_file f acc (env,fname) =
-    let theories = read_file env fname in
+    let theories = read_file env ?format fname in
     List.fold_left (fun acc (_,thname,th) -> f acc thname th) acc theories in
   dprintf debug "[Load] file '%s'@\n" filename;
   let file = Filename.concat env.session.session_dir filename in
   let add_file = raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
-  let file = add_file env.session filename (env.env,file) in
+  let file = add_file env.session filename format (env.env,file) in
   check_file_verified notify file;
   file
 
@@ -1706,7 +1711,8 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
                     } in
   let obsolete = PHstr.fold (fun _ old_file acc ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-    let new_file = add_file ~keygen new_env_session old_file.file_name in
+    let new_file = add_file ~keygen new_env_session
+      ?format:old_file.file_format old_file.file_name in
     merge_file ~keygen env ~allow_obsolete old_file new_file
     || acc)
     old_session.session_files false in

@@ -816,7 +816,7 @@ let () =
         else
           try
             Debug.dprintf debug "[Info] adding file %s in database@." fn;
-            ignore (M.add_file (env_session()) fn)
+            ignore (M.add_file (env_session()) ?format:!opt_parser fn)
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;

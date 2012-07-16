@@ -109,7 +109,8 @@ module Make(O: OBSERVER) : sig
      Same as {!Session.update_session} except initialization is done.
     *)
 
-  val add_file : O.key env_session -> string -> O.key Session.file
+  val add_file :
+    O.key env_session -> ?format:string -> string -> O.key Session.file
     (** [add_file es f] adds the file with filename [f] in the proof
         session, the file name must be given relatively to the session
         dir given to [open_session]

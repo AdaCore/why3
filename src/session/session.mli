@@ -118,6 +118,7 @@ and 'a theory = private
 and 'a file = private
     { mutable file_key : 'a;
       file_name : string;
+      file_format : string option;
       file_parent : 'a session;
       mutable file_theories: 'a theory list;
       (** Not mutated after the creation *)
@@ -185,7 +186,7 @@ val load_prover : 'a env_session -> Whyconf.prover -> loaded_prover option
 (** load a prover *)
 
 val unload_provers : 'a env_session -> unit
-(** forces unloading of all provers, 
+(** forces unloading of all provers,
     to force reading again the configuration *)
 
 (** {2 Update session} *)
@@ -365,6 +366,7 @@ val remove_transformation : ?notify:'key notify -> 'key transf -> unit
 val add_file :
   keygen:'key keygen ->
   'key env_session ->
+  ?format:string ->
   string ->
   'key file
 (** Add a real file by its filename. The filename must be relative to
@@ -448,7 +450,8 @@ module AddFile(X : sig
     'a -> file -> 'a
 
 end) : sig
-  val add_file : X.key session -> string -> X.file -> X.key file
+  val add_file :
+    X.key session -> string -> ?format:string -> X.file -> X.key file
 end
 
 
