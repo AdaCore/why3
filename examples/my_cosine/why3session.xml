@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/jc/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="my_cosine/why3session.xml">
+ name="examples/my_cosine/why3session.xml">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,35 +16,35 @@
   version="0.16.0"/>
  <file
   name="../my_cosine.why"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="CosineSingle"
-   locfile="my_cosine/../my_cosine.why"
+   locfile="examples/my_cosine/../my_cosine.why"
    loclnum="1" loccnumb="7" loccnume="19"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="MethodError"
-    locfile="my_cosine/../my_cosine.why"
+    locfile="examples/my_cosine/../my_cosine.why"
     loclnum="13" loccnumb="6" loccnume="17"
     sum="5654505132d0df95fb8d98d86e9154f0"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="ainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix &lt;=aabsV0c0x1.p-5F">
     <proof
      prover="1"
-     timelimit="13"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      edited="my_cosine_CosineSingle_MethodError_1.v"
-     obsolete="true"
-     archived="false"><undone/>
-     
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.55"/>
     </proof>
    </goal>
    <goal
     name="TotalErrorFullyExpanded"
-    locfile="my_cosine/../my_cosine.why"
+    locfile="examples/my_cosine/../my_cosine.why"
     loclnum="20" loccnumb="6" loccnume="29"
     sum="b272d2bbaa334f583a44d792f1e66da2"
     proved="true"
@@ -61,7 +61,7 @@
    </goal>
    <goal
     name="TotalErrorExpanded"
-    locfile="my_cosine/../my_cosine.why"
+    locfile="examples/my_cosine/../my_cosine.why"
     loclnum="31" loccnumb="6" loccnume="24"
     sum="e8eb30517031d5f9aa29e249a13fcaaf"
     proved="true"
@@ -78,7 +78,7 @@
    </goal>
    <goal
     name="TotalError"
-    locfile="my_cosine/../my_cosine.why"
+    locfile="examples/my_cosine/../my_cosine.why"
     loclnum="51" loccnumb="6" loccnume="16"
     sum="0457c10047c2e650ca89f0b4f6c924e4"
     proved="true"
