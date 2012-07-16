@@ -94,7 +94,7 @@ module Opt = struct
           if stop then Format.fprintf fmt "%s *" p
           else Format.pp_print_string fmt p in
         Format.printf "@[<hov 2>Known debug flags \
-(* mark flags which change the behavior) :@\n%a@]@."
+(`*' marks the flags that change Why3 behavior):@\n%a@]@."
           (Pp.print_list Pp.newline print)
           (List.sort Pervasives.compare list);
       end;

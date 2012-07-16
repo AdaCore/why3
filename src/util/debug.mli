@@ -22,14 +22,12 @@ type flag
 (* Flag used for debugging only part of Why3 *)
 
 val register_flag : string -> flag
-(** Register a new flag. If someone try to register two times the same
-    flag the same one is used *)
+(** Register a new flag. It is allowed to register twice the same flag *)
 
 val register_stop_flag : string -> flag
-(** Register a new stop flag. If someone try to register two times the same
-    flag the same one is used.
-    A stop flag should be used when a flag change the behavior of the program.
-    It is not setted by debug-all *)
+(** Register a new stop flag. It is allowed to register twice the same flag.
+    A stop flag should be used when a flag changes the behavior of Why3.
+    Such flags are not set by --debug-all. *)
 
 val lookup_flag : string -> flag
 val list_flags : unit -> (string * flag * bool) list
@@ -69,8 +67,7 @@ module Opt : sig
 
   val option_list : unit -> bool
   (** Print the list of debug flag if requested (in this case return [true]).
-      You should run this function after the plugins have been started.
-  *)
+      You should run this function after the plugins have been loaded. *)
 
   val desc_debug_all : spec
   (** Option for setting all the debug flags except the stopping one *)

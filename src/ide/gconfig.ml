@@ -24,6 +24,8 @@ open Util
 open Rc
 open Whyconf
 
+let debug = Debug.register_flag "ide_info"
+let () = Debug.set_flag debug
 
 (* config file *)
 
@@ -138,7 +140,7 @@ let load_ide section =
     ide_error_color =
       get_string section ~default:default_ide.ide_error_color
         "error_color";
-    ide_iconset = 
+    ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
     ide_default_editor =
@@ -239,6 +241,7 @@ let load_config config original_config =
 
   *)
 
+(*
 let debug_save_config n c =
   let coq = { prover_name = "Coq" ; prover_version = "8.3pl3";
               prover_altern = "" } in
@@ -246,9 +249,10 @@ let debug_save_config n c =
   let time = Whyconf.timelimit (Whyconf.get_main c) in
   Format.eprintf "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
     n time p.editor
+*)
 
 let save_config t =
-  eprintf "[Info] saving IDE config file@.";
+  Debug.dprintf debug "[Info] saving IDE config file@.";
   (* taking original config, without the extra_config *)
   let config = t.original_config in
   (* copy possibly modified settings to original config *)
@@ -298,9 +302,9 @@ let config,read_config =
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
   (fun conf_file extra_files ->
-    eprintf "[Info] reading IDE config file...@?";
+    (*Debug.dprintf debug "[Info] reading config file...@?";*)
     let c = read_config conf_file extra_files in
-    eprintf " done.@.";
+    (*Debug.dprintf debug " done.@.";*)
     config := Some c)
 
 let save_config () = save_config (config ())
@@ -349,7 +353,7 @@ let why_icon = ref !image_default
 
 let image ?size f =
   let main = get_main () in
-  let n = 
+  let n =
     Filename.concat (datadir main)
       (Filename.concat "images" (f^".png"))
   in
@@ -466,11 +470,11 @@ let resize_images size =
   ()
 
 let init () =
-  eprintf "[Info] reading icons...@?";
+  Debug.dprintf debug "[Info] reading icons...@?";
   load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
-  eprintf " done.@."
+  Debug.dprintf debug " done.@."
 
 let show_legend_window () =
   let dialog = GWindow.dialog ~title:"Why3: legend of icons" () in
@@ -837,7 +841,7 @@ let editors_page c (notebook:GPack.notebook) =
                   try Meditor.find s map
                   with Not_found -> assert false
             in
-	    (* Format.eprintf "prover %a : selected editor '%s'@." *)
+	    (* Debug.dprintf debug "prover %a : selected editor '%s'@." *)
             (*   print_prover p data; *)
             let provers = Whyconf.get_provers c.config in
             c.config <-
@@ -905,7 +909,7 @@ let run_auto_detection gconfig =
   ()
 *)
 
-(* let () = eprintf "[Info] end of configuration initialization@." *)
+(*let () = Debug.dprintf debug "[Info] end of configuration initialization@."*)
 
 let uninstalled_prover c eS unknown =
   try
@@ -1079,9 +1083,6 @@ let replace_prover c to_be_removed to_be_copied =
   dialog#destroy ();
   res
 *)
-
-let read_config conf_file extra_files =
-  read_config conf_file extra_files; init ()
 
 (*
 Local Variables:

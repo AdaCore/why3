@@ -21,20 +21,14 @@
 
 open Format
 
-let () =
-  eprintf "[Info] Init the GTK interface...@?";
-  ignore (GtkMain.Main.init ());
-  eprintf " done.@."
-
-
 open Why3
 open Whyconf
 open Gconfig
 open Util
-open Debug
 module C = Whyconf
 
-let debug = register_flag "gui"
+let debug = Debug.register_flag "ide_info"
+let () = Debug.set_flag debug
 
 (************************)
 (* parsing command line *)
@@ -42,9 +36,11 @@ let debug = register_flag "gui"
 
 let includes = ref []
 let file = ref None
+let opt_parser = ref None
 let opt_version = ref false
 let opt_config = ref None
 let opt_extra = ref []
+let opt_list_formats = ref false
 
 let spec = Arg.align [
   ("-L",
@@ -62,6 +58,12 @@ let spec = Arg.align [
       " same as -C";
   "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
       "<file> Read additional configuration from <file>";
+  "-F", Arg.String (fun s -> opt_parser := Some s),
+      "<format> Select input format (default: \"why\")";
+  "--format", Arg.String (fun s -> opt_parser := Some s),
+      " same as -F";
+  "--list-formats", Arg.Set opt_list_formats,
+      " List known input formats";
 (*
   ("-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -98,12 +100,36 @@ let () =
 
 let () = Gconfig.read_config !opt_config !opt_extra
 
+let () = C.load_plugins (get_main ())
+
+let () =
+  Debug.Opt.set_flags_selected ();
+  if Debug.Opt.option_list () then exit 0
+
+let () =
+  if !opt_list_formats then begin
+    let print1 fmt s = fprintf fmt "%S" s in
+    let print fmt (p, l) =
+      fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
+    in
+    printf "@[<hov 2>Known input formats:@\n%a@]@."
+      (Pp.print_list Pp.newline print)
+      (List.sort Pervasives.compare (Env.list_formats ()));
+    exit 0;
+  end
+
 let fname = match !file with
   | None ->
       Arg.usage spec usage_str;
       exit 1
   | Some f ->
       f
+
+let () =
+  Debug.dprintf debug "[Info] Init the GTK interface...@?";
+  ignore (GtkMain.Main.init ());
+  Debug.dprintf debug " done.@.";
+  Gconfig.init ()
 
 let (why_lang, any_lang) =
   let main = get_main () in
@@ -116,7 +142,7 @@ let (why_lang, any_lang) =
   let why_lang =
     match languages_manager#language "why" with
     | None ->
-        Format.eprintf "language file for 'why' not found in directory %s@."
+        eprintf "language file for 'why' not found in directory %s@."
           load_path;
         exit 1
     | Some _ as l -> l in
@@ -149,14 +175,6 @@ let gconfig =
     Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
 *)
   c
-
-let () =
-  C.load_plugins (get_main ())
-
-let () =
-  Debug.Opt.set_flags_selected ();
-  if Debug.Opt.option_list () then exit 0
-
 
 (***************)
 (* Main window *)
@@ -356,7 +374,7 @@ let () =
   view_time_column#set_visible true
 
 let goals_model,goals_view =
-  eprintf "[Info] Creating tree model...@?";
+  Debug.dprintf debug "[Info] Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrollview#add () in
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
@@ -364,7 +382,7 @@ let goals_model,goals_view =
   ignore (view#append_column view_name_column);
   ignore (view#append_column view_status_column);
   ignore (view#append_column view_time_column);
-  eprintf " done@.";
+  Debug.dprintf debug " done@.";
   model,view
 
 
@@ -699,17 +717,19 @@ let project_dir, file_to_read =
     begin
       if Sys.is_directory fname then
         begin
-          eprintf "[Info] found directory '%s' for the project@." fname;
+          Debug.dprintf debug
+            "[Info] found directory '%s' for the project@." fname;
           fname, None
         end
       else
         begin
-          eprintf "[Info] found regular file '%s'@." fname;
+          Debug.dprintf debug "[Info] found regular file '%s'@." fname;
           let d =
             try Filename.chop_extension fname
             with Invalid_argument _ -> fname
           in
-          eprintf "[Info] using '%s' as directory for the project@." d;
+          Debug.dprintf debug
+            "[Info] using '%s' as directory for the project@." d;
           d, Some (Filename.concat Filename.parent_dir_name
                      (Filename.basename fname))
         end
@@ -720,8 +740,8 @@ let project_dir, file_to_read =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      eprintf "[Info] '%s' does not exists. Creating directory of that name \
- for the project@." project_dir;
+      Debug.dprintf debug "[Info] '%s' does not exists. \
+        Creating directory of that name for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
 
@@ -762,7 +782,7 @@ let () =
 
 let sched =
   try
-    eprintf "[Info] Opening session...@\n@[<v 2>  ";
+    Debug.dprintf debug "@[<hov 2>[Info] Opening session...@\n";
     let session =
       if Sys.file_exists project_dir then S.read_session project_dir
       else S.create_session project_dir in
@@ -773,7 +793,7 @@ let sched =
     let sched = M.init (Whyconf.running_provers_max
                           (Whyconf.get_main gconfig.config))
     in
-    dprintf debug "@]@\n[Info] Opening session: done@.";
+    Debug.dprintf debug "@]@\n[Info] Opening session: done@.";
     session_needs_saving := false;
     current_env_session := Some env;
     sched
@@ -781,7 +801,6 @@ let sched =
     eprintf "@[Error while opening session:@ %a@.@]"
       Exn_printer.exn_printer e;
     exit 1
-
 
 
 (**********************************)
@@ -793,17 +812,15 @@ let () =
     | None -> ()
     | Some fn ->
         if S.PHstr.mem (env_session()).S.session.S.session_files fn then
-          dprintf debug "[Info] file %s already in database@." fn
+          Debug.dprintf debug "[Info] file %s already in database@." fn
         else
           try
-            dprintf debug "[Info] adding file %s in database@." fn;
+            Debug.dprintf debug "[Info] adding file %s in database@." fn;
             ignore (M.add_file (env_session()) fn)
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
             exit 1
-
-
 
 
 (*****************************************************)
@@ -908,7 +925,7 @@ let select_file () =
           | None -> ()
           | Some f ->
               let f = Sysutil.relativize_filename project_dir f in
-              eprintf "Adding file '%s'@." f;
+              Debug.dprintf debug "Adding file '%s'@." f;
               try
                 ignore (M.add_file (env_session()) f)
               with e ->
@@ -956,7 +973,7 @@ let (_ : GMenu.image_menu_item) =
 (*
       Mprover.iter
         (fun p pi ->
-          Format.eprintf "editor for %a : %s@." Whyconf.print_prover p
+          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
             pi.editor)
         (Whyconf.get_provers gconfig.config);
 *)
@@ -966,7 +983,7 @@ let (_ : GMenu.image_menu_item) =
 
 let add_refresh_provers f _msg =
 (*
-  eprintf "[Info] recording '%s' for refresh provers@." msg;
+  Debug.dprintf debug "[Info] recording '%s' for refresh provers@." msg;
 *)
   let rp = !refresh_provers in
   refresh_provers := (fun () -> rp (); f ())
@@ -980,7 +997,7 @@ let (_ : GMenu.image_menu_item) =
 
 let save_session () =
   if !session_needs_saving then begin
-    eprintf "[Info] saving session@.";
+    Debug.dprintf debug "[Info] saving session@.";
     S.save_session gconfig.config (env_session()).S.session;
     session_needs_saving := false;
   end
@@ -1529,7 +1546,7 @@ let edit_selected_row r =
         let c = e.Session.whyconf in
         let p = Mprover.find coq (get_provers c) in
         let time = Whyconf.timelimit (Whyconf.get_main c) in
-        Format.eprintf
+        Debug.dprintf debug
           "[debug] save_config %d: timelimit=%d ; editor for Coq=%s@."
           0 time p.editor;
 *)

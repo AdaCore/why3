@@ -48,6 +48,8 @@ type t =
 val read_config : string option -> string list -> unit
 (** None use the default config *)
 
+val init : unit -> unit
+
 val save_config : unit -> unit
 
 val config : unit -> t
