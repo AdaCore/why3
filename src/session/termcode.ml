@@ -22,6 +22,8 @@ open Ty
 open Term
 
 
+let current_shape_version = 2
+
 (* similarity code of terms, or of "shapes"
 
 example:
@@ -93,8 +95,8 @@ let rec pat_shape ~(push:string->'a->'a) c m (acc:'a) p : 'a =
     | Por (p, q) ->
         pat_shape ~push c m (push tag_or (pat_shape ~push c m acc q)) p
 
-let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
-  let fn = t_shape ~push c m in
+let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
+  let fn = t_shape ~version ~push c m in
   match t.t_node with
     | Tconst c -> const_shape ~push (push tag_const acc) c
     | Tvar v ->
@@ -108,34 +110,30 @@ let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
           (push (s.ls_name.Ident.id_string) (push tag_app acc))
           l
     | Tif (f,t1,t2) -> fn (fn (fn (push tag_if acc) f) t1) t2
-    | Tlet (t1,b) ->
-        let u,t2 = t_open_bound b in
-        let m = vs_rename_alpha c m u in
-        t_shape ~push c m (fn (push tag_let acc) t1) t2
     | Tcase (t1,bl) ->
         let br_shape acc b =
           let p,t2 = t_open_branch b in
           let acc = pat_shape ~push c m acc p in
           let m = pat_rename_alpha c m p in
-          t_shape ~push c m acc t2
+          t_shape ~version ~push c m acc t2
         in
         List.fold_left br_shape (fn (push tag_case acc) t1) bl
     | Teps b ->
         let u,f = t_open_bound b in
         let m = vs_rename_alpha c m u in
-        t_shape ~push c m (push tag_eps acc) f
+        t_shape ~version ~push c m (push tag_eps acc) f
     | Tquant (q,b) ->
         let vl,triggers,f1 = t_open_quant b in
         let m = vl_rename_alpha c m vl in
         let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
         (* argument first, intentionally, to give more weight on A in
            forall x,A *)
-        let acc = push hq (t_shape ~push c m acc f1) in
+        let acc = push hq (t_shape ~version ~push c m acc f1) in
         List.fold_right
           (fun trigger acc ->
              List.fold_right
                (fun t acc ->
-                  t_shape ~push c m acc t)
+                  t_shape ~version ~push c m acc t)
                trigger acc)
           triggers acc
     | Tbinop (o,f,g) ->
@@ -147,16 +145,29 @@ let rec t_shape ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         in
         fn (push tag (fn acc g)) f
           (* g first, intentionally, to give more weight on B in A->B *)
+    | Tlet (t1,b) ->
+        let u,t2 = t_open_bound b in
+        let m = vs_rename_alpha c m u in
+        begin
+          match version with
+            | 1 ->
+              t_shape ~version ~push c m (fn (push tag_let acc) t1) t2
+            | 2 ->
+              (* t2 first, intentionally *)
+              fn (push tag_let (t_shape ~version ~push c m acc t2)) t1
+            | _ -> assert false
+        end
     | Tnot f -> push tag_not (fn acc f)
     | Ttrue -> push tag_true acc
     | Tfalse -> push tag_false acc
 
-let t_shape_buf t =
+let t_shape_buf ?(version=current_shape_version) t =
   let b = Buffer.create 17 in
   let push t () = Buffer.add_string b t in
-  let () = t_shape ~push (ref (-1)) Mvs.empty () t in
+  let () = t_shape ~version ~push (ref (-1)) Mvs.empty () t in
   Buffer.contents b
 
+(*
 let t_shape_list t =
   let push t l = t::l in
   List.rev (t_shape ~push (ref (-1)) Mvs.empty [] t)
@@ -164,26 +175,27 @@ let t_shape_list t =
 let pr_shape_list fmt t =
   List.iter (fun s -> Format.fprintf fmt "%s" s) (t_shape_list t)
 
+*)
 
 (* shape of a task *)
 
 let param_decl_shape ~(push:string->'a->'a) (acc:'a) ls : 'a =
   push (ls.ls_name.Ident.id_string) acc
 
-let logic_decl_shape ~(push:string->'a->'a) (acc:'a) (ls,def) : 'a =
+let logic_decl_shape ~version ~(push:string->'a->'a) (acc:'a) (ls,def) : 'a =
   let acc = push (ls.ls_name.Ident.id_string) acc in
   let vl,t = Decl.open_ls_defn def in
   let c = ref (-1) in
   let m = vl_rename_alpha c Mvs.empty vl in
-  t_shape ~push c m acc t
+  t_shape ~version ~push c m acc t
 
-let logic_ind_decl_shape ~(push:string->'a->'a) (acc:'a) (ls,cl) : 'a =
+let logic_ind_decl_shape ~version ~(push:string->'a->'a) (acc:'a) (ls,cl) : 'a =
   let acc = push (ls.ls_name.Ident.id_string) acc in
   List.fold_right
-    (fun (_,t) acc -> t_shape ~push (ref (-1)) Mvs.empty acc t)
+    (fun (_,t) acc -> t_shape ~version ~push (ref (-1)) Mvs.empty acc t)
     cl acc
 
-let propdecl_shape ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
+let propdecl_shape ~version ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
   let tag = match k with
     | Decl.Plemma -> tag_Plemma
     | Decl.Paxiom -> tag_Paxiom
@@ -192,9 +204,9 @@ let propdecl_shape ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
   in
   let acc = push tag acc in
   let acc = push n.Decl.pr_name.Ident.id_string acc in
-  t_shape ~push (ref(-1)) Mvs.empty acc t
+  t_shape ~version ~push (ref(-1)) Mvs.empty acc t
 
-let decl_shape ~(push:string->'a->'a) (acc:'a) d : 'a =
+let decl_shape ~version ~(push:string->'a->'a) (acc:'a) d : 'a =
   match d.Decl.d_node with
     | Decl.Dtype _ts ->
         push tag_Dtype acc
@@ -206,37 +218,38 @@ let decl_shape ~(push:string->'a->'a) (acc:'a) d : 'a =
         param_decl_shape ~push (push tag_Dparam acc) ls
     | Decl.Dlogic ldl ->
         List.fold_right
-          (fun d acc -> logic_decl_shape ~push acc d)
+          (fun d acc -> logic_decl_shape ~version ~push acc d)
           ldl (push tag_Dlogic acc)
     | Decl.Dind (_, idl) ->
         List.fold_right
-          (fun d acc -> logic_ind_decl_shape ~push acc d)
+          (fun d acc -> logic_ind_decl_shape ~version ~push acc d)
           idl (push tag_Dind acc)
     | Decl.Dprop pdecl ->
-        propdecl_shape ~push (push tag_Dprop acc) pdecl
+        propdecl_shape ~version ~push (push tag_Dprop acc) pdecl
 
-let tdecl_shape ~(push:string->'a->'a) (acc:'a) t : 'a =
+let tdecl_shape ~version ~(push:string->'a->'a) (acc:'a) t : 'a =
   match t.Theory.td_node with
-    | Theory.Decl d -> decl_shape ~push (push tag_tDecl acc) d
+    | Theory.Decl d -> decl_shape ~version ~push (push tag_tDecl acc) d
     | Theory.Meta _ -> push tag_tMeta acc
     | Theory.Clone _ -> push tag_tClone acc
     | Theory.Use _ -> push tag_tUse acc
 
-let rec task_shape ~(push:string->'a->'a) (acc:'a) t : 'a =
+let rec task_shape ~version ~(push:string->'a->'a) (acc:'a) t : 'a =
   match t with
     | None -> acc
     | Some t ->
-        task_shape ~push (tdecl_shape ~push acc t.Task.task_decl)
+        task_shape ~version ~push (tdecl_shape ~version ~push acc t.Task.task_decl)
           t.Task.task_prev
+
 
 (* checksum of a task
    it is the MD5 digest of the shape
 *)
 
-let task_checksum t =
+let task_checksum ?(version=current_shape_version) t =
   let b = Buffer.create 257 in
   let push t () = Buffer.add_string b t in
-  let () = task_shape ~push () t in
+  let () = task_shape ~version ~push () t in
   let shape = Buffer.contents b in
   Digest.to_hex (Digest.string shape)
 

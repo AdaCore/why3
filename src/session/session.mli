@@ -69,8 +69,8 @@ type 'a goal = private
       goal_name : Ident.ident; (** The ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
-      goal_checksum : string;  (** checksum of the task *)
-      goal_shape : string;     (** shape are produced by the module Termcode *)
+      mutable goal_checksum : string;  (** checksum of the task *)
+      mutable goal_shape : string;     (** shape are produced by the module Termcode *)
       mutable goal_verified : bool;
       goal_task: task_option;
       mutable goal_expanded : bool;
@@ -128,6 +128,7 @@ and 'a file = private
 
 and 'a session = private
     { session_files : 'a file PHstr.t;
+      mutable session_shape_version : int;
       session_dir   : string;
     }
 
@@ -138,7 +139,7 @@ val print_attempt_status : Format.formatter -> proof_attempt_status -> unit
 
 val print_external_proof : Format.formatter -> 'key proof_attempt -> unit
 
-val create_session : string -> 'key session
+val create_session : ?shape_version:int -> string -> 'key session
 (** create a new_session in the given directory. The directory is
     created if it doesn't exists yet. Don't change the current
     directory of the program if you give a relative path *)

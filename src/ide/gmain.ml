@@ -785,8 +785,11 @@ let sched =
   try
     Debug.dprintf debug "@[<hov 2>[Info] Opening session...@\n";
     let session =
-      if Sys.file_exists project_dir then S.read_session project_dir
-      else S.create_session project_dir in
+      if Sys.file_exists project_dir then
+        S.read_session project_dir
+      else
+        S.create_session project_dir
+    in
     let env,(_:bool) =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config

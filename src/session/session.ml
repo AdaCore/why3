@@ -53,8 +53,8 @@ type 'a goal =
       goal_name : Ident.ident;
       goal_expl : string option;
       goal_parent : 'a goal_parent;
-      goal_checksum : string;
-      goal_shape : string;
+      mutable goal_checksum : string;
+      mutable goal_shape : string;
       mutable goal_verified : bool;
       goal_task: task_option;
       mutable goal_expanded : bool;
@@ -111,6 +111,7 @@ and 'a file =
 
 and 'a session =
     { session_files : 'a file PHstr.t;
+      mutable session_shape_version : int;
       session_dir   : string; (** Absolute path *)
     }
 
@@ -254,7 +255,17 @@ let print_session fmt s = PTree.print fmt (PTreeT.Session s)
 
 (** 2 Create a session *)
 
-let create_session project_dir =
+let empty_session ?shape_version dir =
+  let shape_version = match shape_version with
+    | Some v -> v
+    | None -> Termcode.current_shape_version
+  in
+  { session_files = PHstr.create 3;
+    session_shape_version = shape_version;
+    session_dir   = dir;
+  }
+
+let create_session ?shape_version project_dir =
   if not (Sys.file_exists project_dir) then
     begin
       dprintf debug
@@ -262,9 +273,7 @@ let create_session project_dir =
  for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end;
-  { session_files = PHstr.create 3;
-    session_dir   = project_dir;
-  }
+  empty_session ?shape_version project_dir
 
 
 let load_env_session ?(includes=[]) session conf_path_opt =
@@ -428,7 +437,8 @@ let save fname config session =
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
     save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
-  fprintf fmt "@[<v 1><why3session@ name=\"%a\">" save_string fname;
+  fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
+    save_string fname session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
@@ -629,14 +639,19 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
   in
   goal
 
+(* a global variable indicating the shape version to use. It is set
+   when reading the attribute shape_version of an XML file
+*)
+let current_shape_version = ref 0
+
 let raw_add_task ~(keygen:'a keygen) parent name expl t exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = keygen ~parent:parent_key () in
-  let sum = Termcode.task_checksum t in
-  let shape = Termcode.t_shape_buf (Task.task_goal_fmla t) in
+  let sum = Termcode.task_checksum ~version:!current_shape_version t in
+  let shape = Termcode.t_shape_buf ~version:!current_shape_version (Task.task_goal_fmla t) in
   let goal = { goal_name = name;
                goal_expl = expl;
                goal_parent = parent;
@@ -916,12 +931,15 @@ let old_provers = ref Util.Mstr.empty
 let get_old_provers () = !old_provers
 
 let load_session session xml =
-  let cont = xml.Xml.content in
-  match cont.Xml.name with
+  match xml.Xml.name with
     | "why3session" ->
+      let shape_version = int_attribute "shape_version" xml 1 in
+      session.session_shape_version <- shape_version;
+      dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
-        old_provers :=
-          List.fold_left (load_file session) Util.Mstr.empty cont.Xml.elements
+      old_provers :=
+        List.fold_left (load_file session) Util.Mstr.empty xml.Xml.elements;
+      dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 
@@ -931,13 +949,13 @@ let read_session dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
     raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
-  let session = {session_files = PHstr.create 3; session_dir = dir} in
+  let session = empty_session dir in
   (** If the xml is present we read it, otherwise we consider it empty *)
   if Sys.file_exists xml_filename then begin
     try
       let xml = Xml.from_file xml_filename in
       try
-        load_session session xml;
+        load_session session xml.Xml.content;
       with Sys_error msg ->
         failwith ("Open session: sys error " ^ msg)
     with
@@ -1342,7 +1360,9 @@ let array_map_list f l =
          | [] -> assert false
          | x::rem -> r := rem; f i x)
 
-let associate_subgoals gname (old_goals : 'a goal list) new_goals =
+let associate_subgoals gname (old_goals : 'a goal list) 
+    new_goals =
+  dprintf debug "[Info] associate_subgoals, shape_version = %d@\n" !current_shape_version;
   (*
      we make a map of old goals indexed by their checksums
   *)
@@ -1359,7 +1379,7 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
          let id = (Task.task_goal g).Decl.pr_name in
          let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (i+1)) in
          let goal_name = Ident.id_register (Ident.id_derive goal_name id) in
-         let sum = Termcode.task_checksum g in
+         let sum = Termcode.task_checksum ~version:!current_shape_version g in
          (i,id,goal_name,g,sum))
       new_goals
   in
@@ -1419,7 +1439,8 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
            | Some _ -> acc
            | None ->
                let shape =
-                 Termcode.t_shape_buf (Task.task_goal_fmla g)
+                 Termcode.t_shape_buf ~version:!current_shape_version
+                   (Task.task_goal_fmla g)
                in
                shape_array.(i) <- shape;
                (shape,New_goal i)::acc)
@@ -1639,8 +1660,9 @@ and merge_trans ~keygen env to_goal _ from_transf =
     from_transf_name to_goal_name.Ident.id_string;
   let subgoals =
     Trans.apply_transform from_transf.transf_name env (goal_task to_goal) in
-  let goals = associate_subgoals
-    to_goal_name from_transf.transf_goals subgoals in
+  let goals =
+    associate_subgoals to_goal_name from_transf.transf_goals subgoals
+  in
   let goal (gid,name,t,_,_,_,_) = name, get_explanation gid t, t in
   let transf = add_transformation ~keygen ~goal
     from_transf_name to_goal goals in
@@ -1681,12 +1703,14 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
     ) to_th.theory_goals
 
 let merge_file ~keygen env ~allow_obsolete from_f to_f  =
+  dprintf debug "[Info] merge_file, shape_version = %d@." !current_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
     Util.Mstr.empty from_f.file_theories
   in
-  Util.list_or
+  let b = 
+    Util.list_or
     (fun to_th ->
       try
         let from_th =
@@ -1701,21 +1725,60 @@ let merge_file ~keygen env ~allow_obsolete from_f to_f  =
         | Not_found -> raise OutdatedSession
     )
     to_f.file_theories
+  in
+  dprintf debug "[Info] merge_file, done@\n";
+  b
+
+
+
+let rec recompute_all_shapes_goal g =
+  let t = goal_task g in
+  g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t);
+  g.goal_checksum <- Termcode.task_checksum t;
+  PHstr.iter recompute_all_shapes_transf g.goal_transformations
+
+and recompute_all_shapes_transf _ tr =
+  List.iter recompute_all_shapes_goal tr.transf_goals
+
+let recompute_all_shapes_theory t =
+  List. iter recompute_all_shapes_goal t.theory_goals
+
+let recompute_all_shapes_file _ f =
+  List.iter recompute_all_shapes_theory f.file_theories
+
+let recompute_all_shapes session =
+  PHstr.iter recompute_all_shapes_file session.session_files;
+  session.session_shape_version <- Termcode.current_shape_version
 
 let update_session ~keygen ~allow_obsolete old_session env whyconf =
-  let new_session = create_session old_session.session_dir in
-  let new_env_session = { session = new_session;
-                      env = env;
-                      whyconf = whyconf;
-                      loaded_provers = PHprover.create 5;
-                    } in
+  current_shape_version := old_session.session_shape_version;
+  dprintf debug "[Info] update_session: shape_version = %d@\n" !current_shape_version;
+  let new_session =
+    create_session ~shape_version:!current_shape_version old_session.session_dir
+  in
+  let new_env_session =
+    { session = new_session;
+      env = env;
+      whyconf = whyconf;
+      loaded_provers = PHprover.create 5;
+    }
+  in
   let obsolete = PHstr.fold (fun _ old_file acc ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;
     let new_file = add_file ~keygen new_env_session
-      ?format:old_file.file_format old_file.file_name in
+      ?format:old_file.file_format old_file.file_name
+    in
     merge_file ~keygen env ~allow_obsolete old_file new_file
     || acc)
-    old_session.session_files false in
+    old_session.session_files false 
+  in
+  dprintf debug "[Info] update_session: done@\n";
+  if !current_shape_version <> Termcode.current_shape_version then
+    begin
+      current_shape_version := Termcode.current_shape_version;
+      dprintf debug "[Info] update_session: recompute shapes@\n";
+      recompute_all_shapes new_session;
+    end;
   new_env_session, obsolete
 
 let get_project_dir fname =

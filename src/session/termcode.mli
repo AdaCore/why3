@@ -18,6 +18,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val current_shape_version : int
+
 (*
 val t_dist : term -> term -> float
   (** returns an heuristic distance between the two given terms. The
@@ -36,7 +38,7 @@ val t_dist : term -> term -> float
 *)
 
 
-val t_shape_buf : Term.term -> string
+val t_shape_buf : ?version:int -> Term.term -> string
   (** returns a shape of the given term *)
 
 (*
@@ -46,4 +48,4 @@ val t_shape_list : Term.term -> string list
 val pr_shape_list : Format.formatter -> Term.term -> unit
 *)
 
-val task_checksum : Task.task -> string
+val task_checksum : ?version:int -> Task.task -> string
