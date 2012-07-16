@@ -561,7 +561,8 @@ let update_task_view a =
         let trans =
           Trans.lookup_transform intro_transformation (env_session()).S.env
         in
-        display_task (Trans.apply trans (S.goal_task g))
+        display_task (try Trans.apply trans (S.goal_task g) with
+          e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
       else
         display_task (S.goal_task g)
     | S.Theory _th ->
