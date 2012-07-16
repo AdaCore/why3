@@ -380,15 +380,10 @@ Axiom let_subst : forall (t:term) (f:fmla) (x:ident) (id':ident) (id:mident),
   ((msubst (Flet x t f) id id') = (Flet x (msubst_term t id id') (msubst f id
   id'))).
 
-Axiom eval_msubst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
+Axiom eval_subst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v f) ->
   ((eval_fmla sigma pi (msubst f x v)) <-> (eval_fmla (set sigma x
   (get_stack v pi)) pi f)).
-
-Axiom eval_subst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:ident) (v:ident), (fresh_in_fmla v f) ->
-  ((eval_fmla sigma pi (subst f x v)) <-> (eval_fmla sigma (Cons (x,
-  (get_stack v pi)) pi) f)).
 
 Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
@@ -405,17 +400,8 @@ Definition valid_fmla(p:fmla): Prop := forall (sigma:(map mident value))
 
 Axiom let_equiv : forall (id:ident) (id':ident) (t:term) (f:fmla),
   forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (fresh_in_fmla id' f) -> ((eval_fmla sigma pi (Flet id' t (subst f id
-  id'))) -> (eval_fmla sigma pi (Flet id t f))).
-
-Axiom let_equiv2 : forall (id:ident) (id':ident) (t:term) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (fresh_in_fmla id' f) -> ((eval_fmla sigma pi (Flet id' t (subst f id
-  id'))) -> (eval_fmla sigma pi (Flet id t f))).
-
-Axiom let_implies : forall (id:ident) (t:term) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (Flet id t p) (Flet id
-  t q))).
+  (eval_fmla sigma pi (Flet id' t (subst f id id'))) -> (eval_fmla sigma pi
+  (Flet id t f)).
 
 (* Why3 assumption *)
 Set Implicit Arguments.
@@ -686,6 +672,7 @@ Axiom fresh_from_expr : forall (e:expr) (f:fmla),
 
 Parameter abstract_effects: expr -> fmla -> fmla.
 
+Lemma L
 (* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
@@ -710,254 +697,15 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   end.
 Unset Implicit Arguments.
 
-Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (e:expr) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp e (Fand p
-  q))) <-> ((eval_fmla sigma pi (wp e p)) /\ (eval_fmla sigma pi (wp e q))).
-
-Axiom monotonicity : forall (e:expr) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp e p) (wp e q))).
-
-Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (e:expr) (e':expr), (one_step sigma pi e sigma' pi' e') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp e q)) -> (eval_fmla sigma' pi' (wp e' q)).
-
-(* Why3 assumption *)
-Definition is_value(e:expr): Prop :=
-  match e with
-  | (Evalue _) => True
-  | _ => False
-  end.
-
-Axiom decide_value : forall (e:expr), (~ (is_value e)) \/ exists v:value,
-  (e = (Evalue v)).
-
-Axiom bool_value : forall (v:value) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)), (type_expr sigmat pit (Evalue v) TYbool) ->
-  ((v = (Vbool false)) \/ (v = (Vbool true))).
-
-Axiom unit_value : forall (v:value) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)), (type_expr sigmat pit (Evalue v) TYunit) ->
-  (v = Vvoid).
-
 (* Why3 goal *)
-Theorem progress : forall (e:expr) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-  datatype)%type)) (ty:datatype) (q:fmla), (type_expr sigmat pit e ty) ->
-  ((type_fmla sigmat (Cons (result, ty) pit) q) -> ((eval_fmla sigma pi (wp e
-  q)) -> ((~ (is_value e)) -> exists sigma':(map mident value),
-  exists pi':(list (ident* value)%type), exists e':expr, (one_step sigma pi e
-  sigma' pi' e')))).
-induction e.
-simpl; tauto.
-(* case 1: e = bin e1 op e2 *)
-(* case 1.1: e1 not a value *)
-destruct (decide_value e1).
-intros sigma pi typ_sigma typ_pi ty q h1 h2 h3 _.
-inversion h1; subst; clear h1.
-simpl in h3.
-pose (q' := (Flet (fresh_from q (Ebin e1 o e2)) (Tvar result)
-             (wp e2
-                (Flet
-                   (fresh_from
-                      (Fand (Fterm (Tvar (fresh_from q (Ebin e1 o e2)))) q)
-                      (Ebin e1 o e2)) (Tvar result)
-                   (Flet result
-                      (Tbin (Tvar (fresh_from q (Ebin e1 o e2))) o
-                         (Tvar
-                            (fresh_from
-                               (Fand
-                                  (Fterm (Tvar (fresh_from q (Ebin e1 o e2))))
-                                  q) (Ebin e1 o e2)))) q))))).
-fold q' in h3.
-generalize (IHe1 sigma pi _ _ _ q' H5).
-intros h4; clear IHe1 IHe2.
-assert (h: type_fmla typ_sigma (Cons (result, ty1) typ_pi) q').
-eapply Type_let.
-constructor; auto.
-admit.
-admit.
-(*generalize (h4 h h3 H); clear h4.
-intro h4.
-destruct h4 as (sigma' & pi' & e' & h5 ).
-exists sigma'.
-exists pi'.
-exists (Ebin e' o e2).
-apply one_step_bin_ctxt1; auto.*)
+Theorem monotonicite : forall (p:fmla) (q:fmla), (forall (sigma:(map mident
+  value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
+  (eval_fmla sigma pi q)) -> forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (e:expr), (eval_fmla sigma pi (wp e p)) ->
+  (eval_fmla sigma pi (wp e q)).
+intros p q h1 sigma pi e h2.
 
-(* case 1.2: e1 is a value *)
-elim H; clear H; intros v He1_v.
-subst e1.
-(* case 1.2.1: e2 not a value *)
-destruct (decide_value e2).
-intros sigma pi typ_sigma typ_pi type q h1 h2 h3 _.
-(*generalize (IHe2 _ _ _ (conj h1 H)).
-intros (sigma' & pi' & e' & h).
-exists sigma'.
-eexists.
-exists (Ebin (Evalue v) o e').
-apply one_step_bin_ctxt2.
-assert (Hfresh : fresh_in_expr 
-   (fresh_from q (Ebin (Evalue v) o e2)) e2).
-  assert (Hf : fresh_in_expr 
-   (fresh_from q (Ebin (Evalue v) o e2)) (Ebin (Evalue v) o e2)).
-  apply fresh_from_expr.
-  simpl in Hf; tauto.
-generalize (one_step_change_free _ _ _ _ _ _ _ _ Hfresh h).
-apply one_step_change_free.*)
-admit. (* typage *)
-(* case 1.2.2: e2 is a value *)
-elim H; clear H; intros v2 He2_v.
-subst e2.
-intros sigma pi typ_sigma typ_pi type q h1 h2 h3 h4.
-exists sigma.
-exists pi.
-exists (Evalue (eval_bin v o v2)).
-apply one_step_bin_value.
-
-(* case 2 : e = var *)
-intros sigma pi typ_sigma typ_pi type q h1 h2 h3 h4.
-eexists.
-eexists.
-eexists.
-apply one_step_var.
-
-(* case 3 : e = deref *)
-intros sigma pi typ_sigma typ_pi type q h1 h2 h3 h4.
-eexists.
-eexists.
-eexists.
-apply one_step_deref.
-
-(* case 4 : e = assign x e' *)
-(* case 4.1: e' not a value *)
-destruct (decide_value e).
-intros sigma pi typ_sigma typ_pi type q h1 h2 h3 h4.
-inversion h1; subst.
-(*
-generalize (IHe sigma pi _ _ _ _ H6  h3 H).
-
-simpl in h3.
-pose (q' := (Flet (fresh_from q e) (Tvar result)
-             (Flet result (msubst_term (Tvalue Vvoid) m (fresh_from q e))
-                (msubst q m (fresh_from q e))))).
-fold q' in h3.
-
-intro; clear IHe.
-
-intros (sigma' & pi' & e' & h).
-exists sigma'.
-exists pi'.
-exists (Eassign i e').
-apply one_step_assign_ctxt; auto.*)
-admit.
-(* case 4.2: e' is a value *)
-elim H; clear H; intros v He_v.
-subst e.
-intros sigma pi q h2 h3.
-eexists.
-exists pi.
-eexists.
-eapply one_step_assign_value.
-
-(* case 5: e = e1; e2 *)
-destruct (decide_value e1).
-(* case 5.1: e1 not a value *)
-(*intros sigma pi q (h1 & _).
-generalize (IHe1 _ _ _ (conj h1 H)).
-intros (sigma' & pi' & e' & h).
-exists sigma'.
-exists pi'.
-exists (Eseq e' e2).
-eapply one_step_seq_ctxt; auto.*)
-admit.
-(* case 5.2: e1 is a value *)
-elim H; clear H; intros v He_v.
-subst e1.
-clear IHe1 IHe2.
-intros sigma pi sigmat pit ty q h1 _ _ _.
-inversion h1; subst.
-assert (v = Vvoid).
-apply unit_value with sigmat pit; auto.
-subst.
-eexists.
-exists pi.
-eexists.
-eapply one_step_seq_value.
-
-(* case 6: e = let i = e1 in e2 *)
-destruct (decide_value e1).
-(* case 6.1: e1 not a value *)
-intros sigma pi sigmat pit ty q h1 h2 h3 h4.
-(*generalize (IHe1 _ _ _(conj h1 H)).
-intros (sigma' & pi' & e' & h).
-exists sigma'.
-exists pi'.
-exists (Elet i e' e2).
-eapply one_step_let_ctxt; auto.*)
-admit.
-
-(* case 6.2: e1 is a value *)
-elim H; clear H; intros v He_v.
-subst e1.
-intros sigma pi _ _ _ _ _ _ _ _.
-eexists.
-eexists.
-eexists.
-eapply one_step_let_value.
-
-(* case 7: e = if e1 then e2 else e3 *)
-destruct (decide_value e1).
-(* case 7.1: e1 not a value *)
-clear IHe2 IHe3.
-intros sigma pi sigmat pit ty q h1 h2 h3 h4.
-inversion h1; subst.
-simpl in h3.
-pose (q' := Fand (Fimplies (Fterm (Tvar result)) (wp e2 q))
-             (Fimplies (Fnot (Fterm (Tvar result))) (wp e3 q))).
-fold q' in h3.
-generalize (IHe1 sigma pi _ _ _ q' H5); clear IHe1.
-intros (h5, h6); auto.
-(*
-generalize (H0 h2 _ H).
-exists sigma'.
-exists pi'.
-exists (Eif e' e2 e3).
-eapply one_step_if_ctxt; auto.*)
-admit.
-admit.
-(* case 7.2: e1 is a value *)
-elim H; clear H; intros v He_v.
-subst.
-intros sigma pi sigmat pit ty q h1 h2 h3 h4.
-eexists sigma.
-exists pi.
-inversion h1; subst.
-assert (h: v = Vbool false \/ v = Vbool true).
-eapply bool_value with sigmat pit; auto.
-destruct h; subst; eexists.
-(* v = false *)
-apply one_step_if_false.
-(* v = true *)
-apply one_step_if_true.
-
-(* case 8 : e = assert f *)
-intros sigma pi _ _  ty q _ _ h3 _.
-simpl in h3.
-destruct h3.
-eexists.
-eexists.
-eexists.
-apply one_step_assert; auto.
-
-(* case 9: e = while cond inv body *)
-intros sigma pi sigmat pit ty q _ _ h1 _.
-simpl in h1.
-destruct h1.
-eexists.
-eexists.
-eexists.
-eapply one_step_while; auto.
+elim e.
 
 Qed.
 
