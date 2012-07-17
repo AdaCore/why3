@@ -173,13 +173,6 @@ Definition neg_post(x:floating_point.SingleFormat.single)
   ((model res) = (-(model x))%R)).
 
 (* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
-(* Why3 assumption *)
 Definition lt(x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single): Prop := ((value x) < (value y))%R.
 
@@ -188,8 +181,3 @@ Definition gt(x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single): Prop := ((value y) < (value x))%R.
 
 
-(* (* Unused content named single
-exact (t 24 128).
-Defined.
- *)
-*)
