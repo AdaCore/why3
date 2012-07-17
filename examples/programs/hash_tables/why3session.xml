@@ -1,58 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
- name="programs/hash_tables/why3session.xml" shape_version="2">
+ name="examples/programs/hash_tables/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
   version="0.94"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.2"/>
+  name="Alt-Ergo"
+  version="0.95-dev"/>
  <prover
   id="2"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="4"
+  id="5"
   name="Z3"
   version="2.19"/>
  <prover
-  id="5"
+  id="6"
   name="Z3"
   version="3.2"/>
  <file
   name="../hash_tables.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="WP HashTable"
-   locfile="programs/hash_tables/../hash_tables.mlw"
+   locfile="examples/programs/hash_tables/../hash_tables.mlw"
    loclnum="10" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="WP HashTableImpl"
-   locfile="programs/hash_tables/../hash_tables.mlw"
+   locfile="examples/programs/hash_tables/../hash_tables.mlw"
    loclnum="41" loccnumb="7" loccnume="20"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="mem_occurs_first"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="68" loccnumb="8" loccnume="24"
     sum="8877339accd60b88826efe1680824c5c"
     proved="true"
     expanded="false"
     shape="amemaTuple2V0V1V2Iaoccurs_firstV0V1V2F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="0"
      edited="hash_tables_WP_HashTableImpl_mem_occurs_first_2.v"
@@ -63,32 +67,48 @@
    </goal>
    <goal
     name="cons_occurs_first"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="72" loccnumb="8" loccnume="25"
     sum="bfb8b9d44f3164146df0c2c4eba8e82f"
     proved="true"
     expanded="false"
     shape="aoccurs_firstV0V1aConsaTuple2V3V4V2Iainfix =V3V0NFIaoccurs_firstV0V1V2F">
     <proof
-     prover="4"
-     timelimit="20"
-     memlimit="0"
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="20"
-     memlimit="0"
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="0"
-     timelimit="20"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -96,16 +116,56 @@
    </goal>
    <goal
     name="idx_bounds"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="86" loccnumb="8" loccnume="18"
     sum="f0226fa4275508a5bae7ec9efa6be522"
     proved="true"
     expanded="false"
     shape="ainfix &lt;aidxV0V1alengthadataV0Aainfix &lt;=c0aidxV0V1FIavalidV0F">
     <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
      prover="0"
-     timelimit="15"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.08"/>
@@ -113,7 +173,7 @@
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="89" loccnumb="6" loccnume="12"
     expl="parameter create"
     sum="67d699e15ed7eef115e6366f61d9befa"
@@ -123,9 +183,17 @@
     <label
      name="expl:parameter create"/>
     <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
@@ -133,7 +201,7 @@
    </goal>
    <goal
     name="WP_parameter clear"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="95" loccnumb="6" loccnume="11"
     expl="parameter clear"
     sum="b8293fb0af655ea500be6393fa0ee3ea"
@@ -148,7 +216,7 @@
      expanded="false">
      <goal
       name="WP_parameter clear.1"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="95" loccnumb="6" loccnume="11"
       expl="precondition"
       sum="42c9d0f28eb79dff81c195e1079a3b26"
@@ -158,17 +226,57 @@
       <label
        name="expl:parameter clear"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
       </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter clear.2"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="95" loccnumb="6" loccnume="11"
       expl="normal postcondition"
       sum="b087f3b923ce9751f663295c85a7188e"
@@ -183,7 +291,7 @@
        expanded="false">
        <goal
         name="WP_parameter clear.2.1"
-        locfile="programs/hash_tables/../hash_tables.mlw"
+        locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="95" loccnumb="6" loccnume="11"
         expl="normal postcondition"
         sum="f69455c4bc9132de4fa8a638f80b2f66"
@@ -198,7 +306,7 @@
          expanded="false">
          <goal
           name="WP_parameter clear.2.1.1"
-          locfile="programs/hash_tables/../hash_tables.mlw"
+          locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
           sum="34039b3d034762636d45b6fbd30527a0"
@@ -208,9 +316,49 @@
           <label
            name="expl:parameter clear"/>
           <proof
+           prover="5"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
            prover="0"
-           timelimit="10"
-           memlimit="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+          <proof
+           prover="3"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
+           prover="6"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
+           prover="1"
+           timelimit="5"
+           memlimit="1000"
            obsolete="false"
            archived="false">
            <result status="valid" time="0.01"/>
@@ -218,7 +366,7 @@
          </goal>
          <goal
           name="WP_parameter clear.2.1.2"
-          locfile="programs/hash_tables/../hash_tables.mlw"
+          locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
           sum="a2c3cf6d9093166bb3242a7760d2278b"
@@ -228,17 +376,57 @@
           <label
            name="expl:parameter clear"/>
           <proof
-           prover="1"
-           timelimit="10"
-           memlimit="0"
+           prover="5"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="2.51"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="5"
+           memlimit="1000"
            obsolete="false"
            archived="false">
            <result status="valid" time="0.04"/>
           </proof>
+          <proof
+           prover="3"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+          <proof
+           prover="6"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
+           prover="1"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="2.52"/>
+          </proof>
          </goal>
          <goal
           name="WP_parameter clear.2.1.3"
-          locfile="programs/hash_tables/../hash_tables.mlw"
+          locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
           sum="ff5fe42741dac92977c300c17c5570c3"
@@ -248,17 +436,57 @@
           <label
            name="expl:parameter clear"/>
           <proof
-           prover="0"
-           timelimit="10"
-           memlimit="0"
+           prover="5"
+           timelimit="5"
+           memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.69"/>
+           <result status="valid" time="0.04"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.09"/>
+          </proof>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.70"/>
+          </proof>
+          <proof
+           prover="3"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.10"/>
+          </proof>
+          <proof
+           prover="6"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+          <proof
+           prover="1"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.65"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter clear.2.1.4"
-          locfile="programs/hash_tables/../hash_tables.mlw"
+          locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
           sum="93e243e2597e4bce81ee2f672cb9f19d"
@@ -268,17 +496,57 @@
           <label
            name="expl:parameter clear"/>
           <proof
+           prover="5"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.06"/>
+          </proof>
+          <proof
            prover="0"
-           timelimit="10"
-           memlimit="0"
+           timelimit="5"
+           memlimit="1000"
            obsolete="false"
            archived="false">
            <result status="valid" time="0.78"/>
           </proof>
+          <proof
+           prover="3"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.08"/>
+          </proof>
+          <proof
+           prover="6"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+          <proof
+           prover="1"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.75"/>
+          </proof>
          </goal>
          <goal
           name="WP_parameter clear.2.1.5"
-          locfile="programs/hash_tables/../hash_tables.mlw"
+          locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
           sum="41b2cd35b813d67000310faae971e1a6"
@@ -288,12 +556,52 @@
           <label
            name="expl:parameter clear"/>
           <proof
-           prover="0"
-           timelimit="10"
-           memlimit="0"
+           prover="5"
+           timelimit="5"
+           memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.00"/>
+           <result status="valid" time="0.03"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
+          </proof>
+          <proof
+           prover="3"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
+           prover="6"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+          <proof
+           prover="1"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.01"/>
           </proof>
          </goal>
         </transf>
@@ -304,7 +612,7 @@
    </goal>
    <goal
     name="WP_parameter idx"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="101" loccnumb="6" loccnume="9"
     expl="normal postcondition"
     sum="a36201ace30447a7225f7b79c70f6fc1"
@@ -314,8 +622,48 @@
     <label
      name="expl:parameter idx"/>
     <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="0"
-     timelimit="15"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -324,7 +672,7 @@
    </goal>
    <goal
     name="WP_parameter add"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="106" loccnumb="6" loccnume="9"
     expl="parameter add"
     sum="3f7915905c0c96f6613c794f552cdf66"
@@ -339,7 +687,7 @@
      expanded="false">
      <goal
       name="WP_parameter add.1"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="106" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="4b8c12ff443b7152c7b5b7a816549c41"
@@ -349,17 +697,57 @@
       <label
        name="expl:parameter add"/>
       <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
        prover="0"
-       timelimit="15"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.12"/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter add.2"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="106" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="4b032453f3958787947d6997fd9045b8"
@@ -369,8 +757,48 @@
       <label
        name="expl:parameter add"/>
       <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
        prover="0"
-       timelimit="15"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -379,7 +807,7 @@
      </goal>
      <goal
       name="WP_parameter add.3"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="106" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="e25b0fcf24f2a4af183b3d7c91a6f992"
@@ -394,7 +822,7 @@
        expanded="false">
        <goal
         name="WP_parameter add.3.1"
-        locfile="programs/hash_tables/../hash_tables.mlw"
+        locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="106" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="3e6ffd6f17e079ed5794bc4b05853480"
@@ -409,7 +837,7 @@
          expanded="false">
          <goal
           name="WP_parameter add.3.1.1"
-          locfile="programs/hash_tables/../hash_tables.mlw"
+          locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="106" loccnumb="6" loccnume="9"
           expl="parameter add"
           sum="7e8c6c1eeb99504bdaf7030d87e39907"
@@ -424,7 +852,7 @@
            expanded="false">
            <goal
             name="WP_parameter add.3.1.1.1"
-            locfile="programs/hash_tables/../hash_tables.mlw"
+            locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
             sum="2b97e2cba4ed6d1424601027e5086d04"
@@ -434,8 +862,48 @@
             <label
              name="expl:parameter add"/>
             <proof
+             prover="5"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.02"/>
+            </proof>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.02"/>
+            </proof>
+            <proof
              prover="0"
-             timelimit="15"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.00"/>
+            </proof>
+            <proof
+             prover="3"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.02"/>
+            </proof>
+            <proof
+             prover="6"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.02"/>
+            </proof>
+            <proof
+             prover="1"
+             timelimit="5"
              memlimit="1000"
              obsolete="false"
              archived="false">
@@ -444,7 +912,7 @@
            </goal>
            <goal
             name="WP_parameter add.3.1.1.2"
-            locfile="programs/hash_tables/../hash_tables.mlw"
+            locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
             sum="d6c5ef232b3c30f9afcec4eb68d25eda"
@@ -455,6 +923,14 @@
              name="expl:parameter add"/>
             <proof
              prover="3"
+             timelimit="10"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="4.52"/>
+            </proof>
+            <proof
+             prover="4"
              timelimit="15"
              memlimit="1000"
              edited="hash_tables_WP_HashTableImpl_WP_parameter_add_1.v"
@@ -465,7 +941,7 @@
            </goal>
            <goal
             name="WP_parameter add.3.1.1.3"
-            locfile="programs/hash_tables/../hash_tables.mlw"
+            locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
             sum="8d1e502b5408dd2edb7f1e69270bab59"
@@ -475,49 +951,17 @@
             <label
              name="expl:parameter add"/>
             <proof
-             prover="4"
-             timelimit="15"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="15.04"/>
-            </proof>
-            <proof
-             prover="1"
-             timelimit="15"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.84"/>
-            </proof>
-            <proof
-             prover="0"
-             timelimit="15"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="15.04"/>
-            </proof>
-            <proof
              prover="2"
-             timelimit="15"
+             timelimit="5"
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="timeout" time="15.04"/>
-            </proof>
-            <proof
-             prover="5"
-             timelimit="15"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="15.05"/>
+             <result status="valid" time="0.82"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter add.3.1.1.4"
-            locfile="programs/hash_tables/../hash_tables.mlw"
+            locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
             sum="4287ad23dce5baf80b88da6c21aa76b3"
@@ -527,7 +971,7 @@
             <label
              name="expl:parameter add"/>
             <proof
-             prover="3"
+             prover="4"
              timelimit="15"
              memlimit="1000"
              edited="hash_tables_WP_HashTableImpl_WP_parameter_add_2.v"
@@ -542,7 +986,7 @@
        </goal>
        <goal
         name="WP_parameter add.3.2"
-        locfile="programs/hash_tables/../hash_tables.mlw"
+        locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="106" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="8c8cf393765af8615f9785b5a934894c"
@@ -552,8 +996,48 @@
         <label
          name="expl:parameter add"/>
         <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
          prover="0"
-         timelimit="15"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
@@ -562,7 +1046,7 @@
        </goal>
        <goal
         name="WP_parameter add.3.3"
-        locfile="programs/hash_tables/../hash_tables.mlw"
+        locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="106" loccnumb="6" loccnume="9"
         expl="parameter add"
         sum="73f9f022c2e3a67fb545dca0d7836071"
@@ -572,8 +1056,48 @@
         <label
          name="expl:parameter add"/>
         <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
          prover="0"
-         timelimit="15"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
@@ -586,7 +1110,7 @@
    </goal>
    <goal
     name="WP_parameter lookup"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="116" loccnumb="10" loccnume="16"
     expl="parameter lookup"
     sum="8929a99c2fa2c5e14aa708cc8a040b83"
@@ -596,9 +1120,17 @@
     <label
      name="expl:parameter lookup"/>
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
@@ -606,7 +1138,7 @@
    </goal>
    <goal
     name="WP_parameter find"
-    locfile="programs/hash_tables/../hash_tables.mlw"
+    locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="125" loccnumb="6" loccnume="10"
     expl="parameter find"
     sum="9d9dd856ae1818bade6ab7eefd628ce4"
@@ -621,7 +1153,7 @@
      expanded="false">
      <goal
       name="WP_parameter find.1"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="125" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="acec8c308b397bb0b68ca464b77408a7"
@@ -631,17 +1163,57 @@
       <label
        name="expl:parameter find"/>
       <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
        prover="0"
-       timelimit="15"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.12"/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter find.2"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="125" loccnumb="6" loccnume="10"
       expl="normal postcondition"
       sum="0e23bb393105a7a158b4217c92f6db97"
@@ -651,24 +1223,16 @@
       <label
        name="expl:parameter find"/>
       <proof
-       prover="0"
-       timelimit="15"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.60"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="15"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="15.14"/>
-      </proof>
-      <proof
        prover="5"
-       timelimit="15"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -677,7 +1241,7 @@
      </goal>
      <goal
       name="WP_parameter find.3"
-      locfile="programs/hash_tables/../hash_tables.mlw"
+      locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="125" loccnumb="6" loccnume="10"
       expl="exceptional postcondition"
       sum="b4d169b0edc20648a9db45bfcdc0eb09"
@@ -687,7 +1251,7 @@
       <label
        name="expl:parameter find"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="15"
        memlimit="1000"
        edited="hash_tables_WP_HashTableImpl_WP_parameter_find_1.v"

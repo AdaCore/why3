@@ -132,7 +132,6 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
 
-
 * IDE
 ** todo: run detection immediately at start up if conf file absent or
     outdated. should become doable with the new Session module
@@ -157,6 +156,10 @@ New features:
   o co-inductive predicates
   o new option -e for "why3session latex" allows to specify when to
     split tables in parts
+  o [Sessions] a small change in the format. This hopefully improves
+    the association of old goals and new goals when the input is
+    modified.  For compatibility, Why3 is still able to read session
+    files in the old format.
 
 Bug fix:
   o completed support for the "Out Of Memory" prover result
@@ -203,7 +206,7 @@ Bug fix:
 ** DONE option pour ne rejouer que si obsolete
 
 * Documentation
- - document co-inductive predicates ?
+ - DELAYED document co-inductive predicates
  - DONE (CLAUDE) revoir documentation du smoke detector
 
 ==================== Roadmap for release 0.72 ========================
