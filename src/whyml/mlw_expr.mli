@@ -27,29 +27,6 @@ open Term
 open Mlw_ty
 open Mlw_ty.T
 
-(** program symbols *)
-
-(* psymbols represent lambda-abstractions. They are polymorphic and
-   can be type-instantiated in some type variables and regions of
-   their type signature. *)
-
-type psymbol = private {
-  ps_name  : ident;
-  ps_vta   : vty_arrow;
-  ps_varm  : varmap;
-  ps_vars  : varset;
-  (* this varset covers the type variables and regions of the defining
-     lambda that cannot be instantiated. Every other type variable
-     and region in ps_vta is generalized and can be instantiated. *)
-  ps_subst : ity_subst;
-  (* this substitution instantiates every type variable and region
-     in ps_vars to itself *)
-}
-
-val ps_equal : psymbol -> psymbol -> bool
-
-val create_psymbol : preid -> vty_arrow -> psymbol
-
 (** program/logic symbols *)
 
 (* plymbols represent algebraic type constructors and projections.
@@ -102,6 +79,29 @@ type pre_ppattern =
   | PPas   of pre_ppattern * preid
 
 val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
+
+(** program symbols *)
+
+(* psymbols represent lambda-abstractions. They are polymorphic and
+   can be type-instantiated in some type variables and regions of
+   their type signature. *)
+
+type psymbol = private {
+  ps_name  : ident;
+  ps_vta   : vty_arrow;
+  ps_varm  : varmap;
+  ps_vars  : varset;
+  (* this varset covers the type variables and regions of the defining
+     lambda that cannot be instantiated. Every other type variable
+     and region in ps_vta is generalized and can be instantiated. *)
+  ps_subst : ity_subst;
+  (* this substitution instantiates every type variable and region
+     in ps_vars to itself *)
+}
+
+val ps_equal : psymbol -> psymbol -> bool
+
+val create_psymbol : preid -> vty_arrow -> psymbol
 
 (** program expressions *)
 
@@ -208,7 +208,6 @@ exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
-val e_any : spec -> vty -> expr
 
 val e_void : expr
 
@@ -228,6 +227,7 @@ val e_loop : invariant -> variant list -> expr -> expr
 val e_for :
   pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
+val e_any : spec -> vty -> expr
 val e_abstract : expr -> post -> xpost -> expr
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
