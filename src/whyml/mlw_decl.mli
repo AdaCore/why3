@@ -66,6 +66,10 @@ val create_rec_decl : rec_defn -> pdecl
 
 val create_exn_decl : xsymbol -> pdecl
 
+(** {2 Cloning} *)
+
+val clone_data_decl : Mlw_expr.symbol_map -> pdecl -> pdecl
+
 (** {2 Known identifiers} *)
 
 type known_map = pdecl Mid.t

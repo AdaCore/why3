@@ -353,21 +353,31 @@ let clone_export uc m inst =
   let sm = match Theory.get_rev_decls nth with
     | { td_node = Clone (_,sm) } :: _ -> sm
     | _ -> assert false in
-  let itsm = its_clone sm in
+  let psm = pl_clone sm in
+  let conv_its its = Mits.find_def its its psm.sm_its in
+  let conv_ts ts = Mts.find_def ts ts sm.Theory.sm_ts in
+  let psh = Hid.create 3 in
+  let find_ps def id = try Hid.find psh id with Not_found -> def in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
-    muc_local = Sid.union uc.muc_local d.pd_news }
-  in
+    muc_local = Sid.union uc.muc_local d.pd_news } in
   let add_pd uc pd = match pd.pd_node with
     | PDtype its ->
-        let its = Mits.find its itsm in
-        add_pdecl uc (create_ty_decl its)
-    | PDdata _dl -> assert false (* TODO *)
+        add_pdecl uc (create_ty_decl (conv_its its))
+    | PDdata _ ->
+        add_pdecl uc (clone_data_decl psm pd)
+    | PDexn xs ->
+        let rec conv_ity ity = match ity.ity_node with
+          | Ityapp (s,tl,[]) -> ity_app (conv_its s) (List.map conv_ity tl) []
+          | Itypur (s,tl) -> ity_pur (conv_ts s) (List.map conv_ity tl)
+          | Ityapp _ | Ityvar _ -> assert false (* can't happen *) in
+        let nxs = create_xsymbol (id_clone xs.xs_name) (conv_ity xs.xs_ity) in
+        Hid.add psh xs.xs_name (XS nxs);
+        add_pdecl uc (create_exn_decl nxs)
     | PDval _lv -> assert false (* TODO *)
     | PDlet _ld -> assert false (* TODO *)
     | PDrec _rd -> assert false (* TODO *)
-    | PDexn _xs -> assert false (* TODO *)
   in
   let uc = { uc with
     muc_known = merge_known uc.muc_known (Mid.set_diff m.mod_known m.mod_local);
@@ -380,19 +390,16 @@ let clone_export uc m inst =
     | LS ls -> not (Mls.mem ls inst.inst_ls)
     | _ -> true in
   let f_ts = function
-    | TS ts -> TS (Mts.find_def ts ts sm.sm_ts)
-    | PT pt -> PT (Mits.find_def pt pt itsm)
-  in
-  let f_ps = function
-    | LS ls -> LS (Mls.find_def ls ls sm.sm_ls)
+    | TS ts -> TS (Mts.find_def ts ts sm.Theory.sm_ts)
+    | PT pt -> PT (Mits.find_def pt pt psm.sm_its) in
+  let f_ps ps = match ps with
+    | LS ls -> LS (Mls.find_def ls ls sm.Theory.sm_ls)
     | PV _ as x -> x (* TODO *)
     | PS _ as x -> x (* TODO *)
-    | PL _ as x -> x (* TODO *)
-    | XS _ as x -> x (* TODO *)
-  in
+    | PL pl -> PL (Mls.find_def pl pl.pl_ls psm.sm_pls)
+    | XS xs -> find_ps ps xs.xs_name in
   let rec f_ns ns = {
     ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
     ns_ps = Mstr.map f_ps (Mstr.filter g_ps ns.ns_ps);
-    ns_ns = Mstr.map f_ns ns.ns_ns; }
-  in
+    ns_ns = Mstr.map f_ns ns.ns_ns; } in
   add_to_module uc nth (f_ns m.mod_export)

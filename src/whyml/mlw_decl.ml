@@ -115,7 +115,7 @@ let syms_expr s _e = s (* TODO *)
 
 let create_ty_decl its =
 (*   let syms = Util.option_fold syms_ity Sid.empty its.its_def in *)
-  let news = news_id Sid.empty its.its_pure.ts_name in
+  let news = Sid.singleton its.its_pure.ts_name in
   mk_decl (PDtype its) (*syms*) news
 
 type pre_constructor = preid * (pvsymbol * bool) list
@@ -124,8 +124,7 @@ type pre_data_decl = itysymbol * pre_constructor list
 
 let create_data_decl tdl =
 (*   let syms = ref Sid.empty in *)
-  let add s (its,_) = news_id s its.its_pure.ts_name in
-  let news = ref (List.fold_left add Sid.empty tdl) in
+  let news = ref Sid.empty in
   let projections = Hid.create 17 in (* id -> plsymbol *)
   let build_constructor its (id,al) =
     (* check well-formedness *)
@@ -147,12 +146,12 @@ let create_data_decl tdl =
     let tvl = List.map ity_var its.its_args in
     let res = vty_value (ity_app its tvl its.its_regs) in
     let pls = create_plsymbol ~hidden ~rdonly id vtvs res in
-    news := Sid.add pls.pl_ls.ls_name !news;
+    news := news_id !news pls.pl_ls.ls_name;
     (* build the projections, if any *)
     let build_proj id vtv =
       try Hid.find projections id with Not_found ->
       let pls = create_plsymbol ~hidden (id_clone id) [res] vtv in
-      news := Sid.add pls.pl_ls.ls_name !news;
+      news := news_id !news pls.pl_ls.ls_name;
       Hid.add projections id pls;
       pls
     in
@@ -165,6 +164,7 @@ let create_data_decl tdl =
   in
   let build_type (its,cl) =
     Hid.clear projections;
+    news := news_id !news its.its_pure.ts_name;
     its, List.map (build_constructor its) cl
   in
   let tdl = List.map build_type tdl in
@@ -184,7 +184,7 @@ let new_regs old_vars news vars =
   let old_regs = add_regs old_vars.vars_reg Sreg.empty in
   let regs = add_regs vars.vars_reg Sreg.empty in
   let regs = Sreg.diff regs old_regs in
-  Sreg.fold (fun r acc -> Sid.add r.reg_name acc) regs news
+  Sreg.fold (fun r s -> news_id s r.reg_name) regs news
 
 let create_let_decl ld =
   let vars = vars_merge ld.let_expr.e_varm vars_empty in
@@ -201,7 +201,8 @@ let create_let_decl ld =
   mk_decl (PDlet ld) (*syms*) news
 
 let create_rec_decl ({ rec_defn = rdl } as d) =
-  let add_rd s { fun_ps = p } = check_vars p.ps_vars; news_id s p.ps_name in
+  let add_rd s { fun_ps = p } =
+    check_vars p.ps_vars; news_id s p.ps_name in
   let news = List.fold_left add_rd Sid.empty rdl in
 (*
   let add_rd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
@@ -237,6 +238,25 @@ let create_exn_decl xs =
   let syms = syms_ity Sid.empty xs.xs_ity in
 *)
   mk_decl (PDexn xs) (*syms*) news
+
+(** {2 Cloning} *)
+
+let clone_data_decl sm pd = match pd.pd_node with
+  | PDdata tdl ->
+      let news = ref Sid.empty in
+      let add_pl pl =
+        let pl = Mls.find pl.pl_ls sm.sm_pls in
+        news := news_id !news pl.pl_ls.ls_name;
+        pl in
+      let add_cs (cs,pjl) =
+        add_pl cs, List.map (Util.option_map add_pl) pjl in
+      let add_td (its,csl) =
+        let its = Mits.find its sm.sm_its in
+        news := news_id !news its.its_pure.ts_name;
+        its, List.map add_cs csl in
+      let tdl = List.map add_td tdl in
+      mk_decl (PDdata tdl) (*!syms*) !news
+  | _ -> invalid_arg "Mlw_decl.clone_data_decl"
 
 (** {2 Known identifiers} *)
 

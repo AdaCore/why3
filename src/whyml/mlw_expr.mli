@@ -55,6 +55,16 @@ val create_plsymbol : ?hidden:bool -> ?rdonly:bool ->
 exception HiddenPLS of lsymbol
 exception RdOnlyPLS of lsymbol
 
+(** cloning *)
+
+type symbol_map = private {
+  sm_pure : Theory.symbol_map;
+  sm_its  : itysymbol Mits.t;
+  sm_pls  : plsymbol Mls.t;
+}
+
+val pl_clone : Theory.symbol_map -> symbol_map
+
 (** patterns *)
 
 type ppattern = private {

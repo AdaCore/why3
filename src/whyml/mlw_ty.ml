@@ -514,7 +514,8 @@ let its_clone sm =
     with Not_found -> ()
   in
   Mts.iter add_ts sm.Theory.sm_ts;
-  Hits.fold Mits.add itsh Mits.empty
+  Hits.fold Mits.add itsh Mits.empty,
+  Hreg.fold Mreg.add regh Mreg.empty
 
 (** computation types (with effects) *)
 

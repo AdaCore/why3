@@ -40,6 +40,21 @@ type plsymbol = {
 
 let pl_equal : plsymbol -> plsymbol -> bool = (==)
 
+let create_plsymbol_unsafe, restore_pl =
+  let ls_to_pls = Wls.create 17 in
+  (fun ls args value effect ~hidden ~rdonly ->
+    let pl = {
+      pl_ls     = ls;
+      pl_args   = args;
+      pl_value  = value;
+      pl_effect = effect;
+      pl_hidden = hidden;
+      pl_rdonly = rdonly;
+    } in
+    Wls.set ls_to_pls ls pl;
+    pl),
+  Wls.find ls_to_pls
+
 let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
   let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
   let pure_args = List.map ty_of_vtv args in
@@ -47,14 +62,8 @@ let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
   let eff_read e r = eff_read e ~ghost:value.vtv_ghost r in
   let effect = Util.option_fold eff_read eff_empty value.vtv_mut in
   let arg_reset acc a = Util.option_fold eff_reset acc a.vtv_mut in
-  let effect = List.fold_left arg_reset effect args in {
-    pl_ls     = ls;
-    pl_args   = args;
-    pl_value  = value;
-    pl_effect = effect;
-    pl_hidden = hidden;
-    pl_rdonly = rdonly;
-  }
+  let effect = List.fold_left arg_reset effect args in
+  create_plsymbol_unsafe ls args value effect ~hidden ~rdonly
 
 let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
 
@@ -68,6 +77,69 @@ let fake_pls = Wls.memoize 17 (fun ls ->
 
 exception HiddenPLS of lsymbol
 exception RdOnlyPLS of lsymbol
+
+(** cloning *)
+
+type symbol_map = {
+  sm_pure : Theory.symbol_map;
+  sm_its  : itysymbol Mits.t;
+  sm_pls  : plsymbol Mls.t;
+}
+
+let pl_clone sm =
+  let itsm, regm = its_clone sm in
+  let conv_reg r = Mreg.find r regm in
+  let conv_its its = Mits.find_def its its itsm in
+  let conv_ts ts = Mts.find_def ts ts sm.Theory.sm_ts in
+  let rec conv_ity ity = match ity.ity_node with
+    | Ityapp (its,tl,rl) ->
+        let tl = List.map conv_ity tl in
+        let rl = List.map conv_reg rl in
+        ity_app (conv_its its) tl rl
+    | Itypur (ts,tl) ->
+        let tl = List.map conv_ity tl in
+        ity_pur (conv_ts ts) tl
+    | Ityvar _ -> ity
+  in
+  let conv_vtv v =
+    let ghost = v.vtv_ghost in
+    let mut, ity = match v.vtv_mut with
+      | Some r -> let r = conv_reg r in Some r, r.reg_ity
+      | None   -> None, conv_ity v.vtv_ity in
+    vty_value ~ghost ?mut ity
+  in
+  let conv_eff eff =
+    let e = eff_empty in
+    assert (Sexn.is_empty eff.eff_raises);
+    assert (Sexn.is_empty eff.eff_ghostx);
+    let conv fn r e = fn e (conv_reg r) in
+    let e = Sreg.fold (conv (eff_read  ~ghost:false)) eff.eff_reads  e in
+    let e = Sreg.fold (conv (eff_write ~ghost:false)) eff.eff_writes e in
+    let e = Sreg.fold (conv (eff_read  ~ghost:true))  eff.eff_ghostr e in
+    let e = Sreg.fold (conv (eff_write ~ghost:true))  eff.eff_ghostw e in
+    let conv r u e = match u with
+      | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
+      | None   -> eff_reset e (conv_reg r) in
+    Mreg.fold conv eff.eff_resets e
+  in
+  let add_pl opls nls acc =
+    let npls = try restore_pl nls with Not_found ->
+      let args = List.map conv_vtv opls.pl_args in
+      let value = conv_vtv opls.pl_value in
+      let effect = conv_eff opls.pl_effect in
+      let hidden = opls.pl_hidden in
+      let rdonly = opls.pl_rdonly in
+      create_plsymbol_unsafe nls args value effect ~hidden ~rdonly
+    in
+    Mls.add opls.pl_ls npls acc
+  in
+  let add_ls ols nls acc =
+    try add_pl (restore_pl ols) nls acc with Not_found -> acc
+  in
+  let plsm = Mls.fold add_ls sm.Theory.sm_ls Mls.empty in
+  { sm_pure = sm;
+    sm_its  = itsm;
+    sm_pls  = plsm; }
 
 (** patterns *)
 

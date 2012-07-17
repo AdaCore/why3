@@ -127,7 +127,7 @@ val ity_s_fold :
 val ity_s_all : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 
-val its_clone : Theory.symbol_map -> itysymbol Mits.t
+val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
 (* traversal functions on type variables and regions *)
 
