@@ -348,5 +348,51 @@ let create_module env ?(path=[]) n =
 
 (** Clone *)
 
-let clone_export _uc _m _inst =
-  assert false (*TODO*)
+let clone_export uc m inst =
+  let nth = Theory.clone_export uc.muc_theory m.mod_theory inst in
+  let sm = match Theory.get_rev_decls nth with
+    | { td_node = Clone (_,sm) } :: _ -> sm
+    | _ -> assert false in
+  let itsm = its_clone sm in
+  let add_pdecl uc d = { uc with
+    muc_decls = d :: uc.muc_decls;
+    muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
+    muc_local = Sid.union uc.muc_local d.pd_news }
+  in
+  let add_pd uc pd = match pd.pd_node with
+    | PDtype its ->
+        let its = Mits.find its itsm in
+        add_pdecl uc (create_ty_decl its)
+    | PDdata _dl -> assert false (* TODO *)
+    | PDval _lv -> assert false (* TODO *)
+    | PDlet _ld -> assert false (* TODO *)
+    | PDrec _rd -> assert false (* TODO *)
+    | PDexn _xs -> assert false (* TODO *)
+  in
+  let uc = { uc with
+    muc_known = merge_known uc.muc_known (Mid.set_diff m.mod_known m.mod_local);
+    muc_used = Sid.union uc.muc_used m.mod_used } in
+  let uc = List.fold_left add_pd uc m.mod_decls in
+  let g_ts _ = function
+    | TS ts -> not (Mts.mem ts inst.inst_ts)
+    | _ -> true in
+  let g_ps _ = function
+    | LS ls -> not (Mls.mem ls inst.inst_ls)
+    | _ -> true in
+  let f_ts = function
+    | TS ts -> TS (Mts.find_def ts ts sm.sm_ts)
+    | PT pt -> PT (Mits.find_def pt pt itsm)
+  in
+  let f_ps = function
+    | LS ls -> LS (Mls.find_def ls ls sm.sm_ls)
+    | PV _ as x -> x (* TODO *)
+    | PS _ as x -> x (* TODO *)
+    | PL _ as x -> x (* TODO *)
+    | XS _ as x -> x (* TODO *)
+  in
+  let rec f_ns ns = {
+    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
+    ns_ps = Mstr.map f_ps (Mstr.filter g_ps ns.ns_ps);
+    ns_ns = Mstr.map f_ns ns.ns_ns; }
+  in
+  add_to_module uc nth (f_ns m.mod_export)

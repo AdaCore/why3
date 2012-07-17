@@ -214,15 +214,15 @@ let mk_ity n = {
 }
 
 let ity_var n = Hsity.hashcons (mk_ity (Ityvar n))
-let ity_pur s tl = Hsity.hashcons (mk_ity (Itypur (s,tl)))
-let ity_app s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
+let ity_pur_unsafe s tl = Hsity.hashcons (mk_ity (Itypur (s,tl)))
+let ity_app_unsafe s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
 
 (* generic traversal functions *)
 
 let ity_map fn ity = match ity.ity_node with
   | Ityvar _ -> ity
-  | Itypur (f,tl) -> ity_pur f (List.map fn tl)
-  | Ityapp (f,tl,rl) -> ity_app f (List.map fn tl) rl
+  | Itypur (f,tl) -> ity_pur_unsafe f (List.map fn tl)
+  | Ityapp (f,tl,rl) -> ity_app_unsafe f (List.map fn tl) rl
 
 let ity_fold fn acc ity = match ity.ity_node with
   | Ityvar _ -> acc
@@ -256,9 +256,9 @@ let rec ity_v_map fnv fnr ity = match ity.ity_node with
   | Ityvar v ->
       fnv v
   | Itypur (f,tl) ->
-      ity_pur f (List.map (ity_v_map fnv fnr) tl)
+      ity_pur_unsafe f (List.map (ity_v_map fnv fnr) tl)
   | Ityapp (f,tl,rl) ->
-      ity_app f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
+      ity_app_unsafe f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
 
 let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
   | Ityvar v ->
@@ -365,18 +365,18 @@ let rec ty_of_ity ity = match ity.ity_node with
 
 let rec ity_of_ty ty = match ty.ty_node with
   | Tyvar v -> ity_var v
-  | Tyapp (s,tl) -> ity_pur s (List.map ity_of_ty tl)
+  | Tyapp (s,tl) -> ity_pur_unsafe s (List.map ity_of_ty tl)
 
 let rec ity_inst_fresh mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
       let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
-      mr, ity_pur s tl
+      mr, ity_pur_unsafe s tl
   | Ityapp (s,tl,rl) ->
       let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
       let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
-      mr, ity_app s tl rl
+      mr, ity_app_unsafe s tl rl
 
 and reg_refresh mv mr r = match Mreg.find_opt r mr with
   | Some r ->
@@ -398,7 +398,7 @@ let ity_app_fresh s tl =
   (* every top region in def is guaranteed to be in mr *)
   match s.its_def with
   | Some ity -> ity_subst_unsafe mv mr ity
-  | None -> ity_app s tl rl
+  | None -> ity_app_unsafe s tl rl
 
 let ity_app s tl rl =
   (* type variable map *)
@@ -414,7 +414,7 @@ let ity_app s tl rl =
   (* every type var and top region in def are in its_args and its_regs *)
   match s.its_def with
   | Some ity -> ity_full_inst sub ity
-  | None -> ity_app s tl rl
+  | None -> ity_app_unsafe s tl rl
 
 let ity_pur s tl = match s.ts_def with
   | Some ty ->
@@ -424,7 +424,22 @@ let ity_pur s tl = match s.ts_def with
           raise (Ty.BadTypeArity (s, List.length s.ts_args, List.length tl)) in
       ity_subst_unsafe m Mreg.empty (ity_of_ty ty)
   | None ->
-      ity_pur s tl
+      ity_pur_unsafe s tl
+
+let create_itysymbol_unsafe, restore_its =
+  let ts_to_its = Wts.create 17 in
+  (fun ts ~abst ~priv regs def ->
+    let its = {
+      its_pure  = ts;
+      its_args  = ts.ts_args;
+      its_regs  = regs;
+      its_def   = def;
+      its_abst  = abst;
+      its_priv  = priv;
+    } in
+    Wts.set ts_to_its ts its;
+    its),
+  Wts.find ts_to_its
 
 let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
   let puredef = option_map ty_of_ity def in
@@ -443,12 +458,7 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
   (* if a type is an alias then it cannot be abstract or private *)
   if abst && def <> None then Loc.errorm "A type alias cannot be abstract";
   if priv && def <> None then Loc.errorm "A type alias cannot be private";
-  { its_pure  = purets;
-    its_args  = args;
-    its_regs  = regs;
-    its_def   = def;
-    its_abst  = abst;
-    its_priv  = priv }
+  create_itysymbol_unsafe purets ~abst ~priv regs def
 
 let ts_unit = ts_tuple 0
 let ty_unit = ty_tuple []
@@ -461,6 +471,50 @@ let vars_freeze s =
   let sbs = Stv.fold (fun v -> Mtv.add v (ity_var v)) s.vars_tv Mtv.empty in
   let sbs = { ity_subst_tv = sbs ; ity_subst_reg = Mreg.empty } in
   Sreg.fold (fun r s -> reg_match s r r) s.vars_reg sbs
+
+(** cloning *)
+
+let its_clone sm =
+  let itsh = Hits.create 3 in
+  let regh = Hreg.create 3 in
+  let rec add_ts oits nts =
+    let nits = try restore_its nts with Not_found ->
+      let abst = oits.its_abst in
+      let priv = oits.its_priv in
+      let regs = List.map conv_reg oits.its_regs in
+      let def = Util.option_map conv_ity oits.its_def in
+      create_itysymbol_unsafe nts ~abst ~priv regs def
+    in
+    Hits.replace itsh oits nits;
+    nits
+  and conv_reg r =
+    try Hreg.find regh r with Not_found ->
+      let ity = conv_ity r.reg_ity in
+      let nr = create_region (id_clone r.reg_name) ity in
+      Hreg.replace regh r nr;
+      nr
+  and conv_ity ity = match ity.ity_node with
+    | Ityapp (its,tl,rl) ->
+        let tl = List.map conv_ity tl in
+        let rl = List.map conv_reg rl in
+        ity_app_unsafe (conv_its its) tl rl
+    | Itypur (ts,tl) ->
+        let tl = List.map conv_ity tl in
+        ity_pur_unsafe (conv_ts ts) tl
+    | Ityvar _ -> ity
+  and conv_its its =
+    try Hits.find itsh its with Not_found ->
+      try add_ts its (Mts.find its.its_pure sm.Theory.sm_ts)
+      with Not_found -> its
+  and conv_ts ts =
+    Mts.find_def ts ts sm.Theory.sm_ts
+  in
+  let add_ts ots nts =
+    try ignore (add_ts (restore_its ots) nts)
+    with Not_found -> ()
+  in
+  Mts.iter add_ts sm.Theory.sm_ts;
+  Hits.fold Mits.add itsh Mits.empty
 
 (** computation types (with effects) *)
 
