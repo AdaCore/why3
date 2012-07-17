@@ -1773,12 +1773,15 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
     old_session.session_files false 
   in
   dprintf debug "[Info] update_session: done@\n";
-  if !current_shape_version <> Termcode.current_shape_version then
-    begin
-      current_shape_version := Termcode.current_shape_version;
-      dprintf debug "[Info] update_session: recompute shapes@\n";
-      recompute_all_shapes new_session;
-    end;
+  let obsolete =
+    if !current_shape_version <> Termcode.current_shape_version then
+      begin
+        current_shape_version := Termcode.current_shape_version;
+        dprintf debug "[Info] update_session: recompute shapes@\n";
+        recompute_all_shapes new_session;
+        true
+      end
+    else obsolete in
   new_env_session, obsolete
 
 let get_project_dir fname =
