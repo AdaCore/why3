@@ -17,15 +17,12 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
-
 open Ident
 open Ty
 open Term
 open Decl
 open Theory
 open Task
-
-let debug = Debug.register_flag "induction"
 
 
 (*********************************************************)
@@ -35,6 +32,119 @@ let debug = Debug.register_flag "induction"
 (**********************************************************************)
 type tyscheme = (pattern * Svs.t) list
 
+
+(*A induction scheme variable*)
+type vlex =
+    {vs: vsymbol;       (*variable*)
+     lq: vsymbol list;  (*left immediate neutral quantifiers *)
+     rq: vsymbol list;  (*generalized neutral and induction quantifiers *)
+     ts: tyscheme       (*type scheme following its definition*)
+    }
+
+
+module VsList =
+struct
+ 
+  type t = vsymbol list
+  let hash = Hashcons.combine_list vs_hash 3
+  let equal = Util.list_all2 vs_equal
+  let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs1) (vs_hash vs2)
+  let compare t1 t2 = 
+    let rec aux t1 t2 = match t1,t2 with
+      | [],[] -> 0
+      | v1 :: q1, v2 :: q2 ->
+	if vs_equal v1 v2 
+	then aux q1 q2 
+	else cmp_vs v1 v2
+      | _ -> assert false;
+    in
+    if List.length t1 < List.length t2 then -1
+    else if List.length t1 > List.length t2 then 1
+    else aux t1 t2
+end
+
+module Mvsl = Stdlib.Map.Make(VsList)
+module Svsl = Mvsl.Set    
+
+
+
+
+
+(*Set of vsymbol list, where each list is some recursive function
+  decreasing arguments instanciated with terms of function call if 
+  if all of them are variables in function call 
+  
+  First are compared lists length, otherwise comparison is made on 
+  lexicographic order of vsymbols.  
+*)  
+
+
+
+
+
+
+(**************************** PRINTING ***************************************)
+let debug = Debug.register_flag "induction"
+let debug_verbose = Debug.register_flag "induction-verbose"
+
+let print_ty_skm skm =
+  List.iter
+    (fun (p,svs) ->
+      Format.printf "@[| %a : @]" Pretty.print_pat p;
+      Svs.iter (Format.printf "%a " Pretty.print_vs) svs;
+      Format.printf "@.")
+    skm;
+  Pretty.forget_all ()
+
+let print_vset vset =
+  let aux vl =
+    Format.printf "[ ";
+    List.iter (Format.printf "%a " Pretty.print_vs) vl;
+    Format.printf "] " 
+  in
+  Format.printf "************** t_candidates_lex *****************\n";
+  Format.printf "Candidates found : %d @." (Svsl.cardinal vset);
+  Format.printf "Candidates : [ ";
+  Svsl.iter (fun vl -> aux vl) vset;
+  Format.printf "]\n@.";
+  Pretty.forget_all ()
+    
+let print_heuristic_lex vl =
+  let _,ivm = List.fold_left (fun (i,m) v -> 
+    (i+1, Mvs.add v i m)) (0,Mvs.empty) vl in
+  Format.printf "**************** heuristic_lex ******************\n";
+  Format.printf "Induction variables (in lexicographic order of the leftmost";
+  Format.printf "recursive function call): [ ";
+  List.iter (Format.printf "%a " Pretty.print_vs) vl;
+  Format.printf "]@.";
+  Format.printf "Lex. order map : [ ";
+  Mvs.iter (fun v i -> Format.printf "%a -> %d; " Pretty.print_vs v i) ivm;
+  Format.printf "]\n@.";
+  Pretty.forget_all ()
+
+let print_lex lexl =
+  let rec aux = function
+    | [] -> ()
+    | v :: tl ->
+      Format.printf "\n%a : [ " Pretty.print_vs v.vs;
+      List.iter (Format.printf "%a " Pretty.print_vs) v.lq;
+      Format.printf "] [ ";
+      List.iter (Format.printf "%a " Pretty.print_vs) v.rq;
+      Format.printf "]@.";
+      Format.printf "--- Type scheme --- \n";
+      print_ty_skm v.ts;
+      Format.printf "------------------- \n";
+      aux tl
+  in
+  Format.printf "******************* qsplit_lex ******************\n";
+  Format.printf "Induction variables (in the initial order): ";
+  List.iter (fun v -> Format.printf "%a " Pretty.print_vs v.vs ) lexl;
+  Format.printf "@.(Variable) (Introduced) (Generalized)\n";
+  aux lexl;
+  Pretty.forget_all ()
+
+
+(**********************************************************************)
 let tyscheme_inst f (km : Decl.known_map) x tx  =
   let inst_branch = (fun (p, vset) ->
     t_close_branch p ( Svs.fold (fun v tacc ->
@@ -98,10 +208,7 @@ let t_candidates filter km qvs t =
 let heuristic_svs vset = Svs.choose vset
 
 
-
-
 (**********************************************************************)
-
 let filter_tydef v = not (ty_equal v.vs_ty ty_int)
 
 (* Decl.known_map -> Term.vsymbol -> Term.term -> tyscheme *)
@@ -154,101 +261,27 @@ let induction_ty km t0 =
       end;
     [tcase]
 
-(**********************************************************************)
+(*****************************************************************************)
+(******************** INDUCTION BASED ON TYPE DEFINITIONS ********************)
+(************************* WITH LEXICOGRAPHIC ORDER **************************)
+(*****************************************************************************)
 
-type vlex =
-    {vs: vsymbol;
-     lq: vsymbol list;
-     rq: vsymbol list;
-     ts: tyscheme}
-
-module type VSL = sig
-    type t = vsymbol list
-    val compare : t -> t -> int
-end
-
-module Vsl : VSL = struct
-    type t = vsymbol list
-
-    let compare t1 t2 =
-      let compare_vs _v1 _v2 = 1 in
-      let rec aux t1 t2 = match t1,t2 with
-	| [],[] -> 0
-	| h1 :: q1, h2 :: q2 ->
-	  if vs_equal h1 h2 then aux q1 q2 else compare_vs h1 h2
-	| _ -> assert false;
-      in
-      let c = List.length t1 - List.length t2 in
-      if c = 0 then aux t1 t2
-      else let c = c / (abs c) in assert (c = 1 || c = -1); c
-end
-
-
-module Svls  = Set.Make(Vsl)
-
-
-
-
-let print_ty_skm skm =
-  List.iter
-    (fun (p,svs) ->
-      Format.printf "@[| %a : @]" Pretty.print_pat p;
-      Svs.iter (Format.printf "%a " Pretty.print_vs) svs;
-      Format.printf "@.")
-    skm
-
-let print_vset vset =
-  let aux vl =
-    Format.printf "[ ";
-    List.iter (Format.printf "%a " Pretty.print_vs) vl;
-    Format.printf "] " in
-  Format.printf "************** t_candidates_lex *****************\n";
-  Format.printf "Candidates found : %d @." (Svls.cardinal vset);
-  Format.printf "Candidates : [ ";
-  Svls.iter (fun vl -> aux vl) vset;
-  Format.printf "]\n@."
-
-
-
-let print_heuristic_lex vl ivm =
-  Format.printf "**************** heuristic_lex ******************\n";
-  Format.printf "Induction variables (following some called recursive ";
-  Format.printf "function lexicographic order): [ ";
-  List.iter (Format.printf "%a " Pretty.print_vs) vl;
-  Format.printf "]@.";
-  Format.printf "Lex. order map : [ ";
-  Mvs.iter (fun v i -> Format.printf "%a -> %d; " Pretty.print_vs v i) ivm;
-  Format.printf "]\n@."
-
-let print_lex lexl =
-  let rec aux = function
-    | [] -> ()
-    | v :: tl ->
-      Format.printf "\n%a : [ " Pretty.print_vs v.vs;
-      List.iter (Format.printf "%a " Pretty.print_vs) v.lq;
-      Format.printf "] [ ";
-      List.iter (Format.printf "%a " Pretty.print_vs) v.rq;
-      Format.printf "]@.";
-      Format.printf "--- Type scheme --- \n";
-      print_ty_skm v.ts;
-      Format.printf "------------------- \n";
-aux tl
-  in
-  Format.printf "******************* qsplit_lex ******************\n";
-  Format.printf "Induction variables (in the initial order): ";
-  List.iter (fun v -> Format.printf "%a " Pretty.print_vs v.vs ) lexl;
-  Format.printf "@.Instanciated (left) and generalized (right) ";
-  Format.printf "variables (in initial order) of each induction variable: \n";
-  aux lexl
-
-
-
-(* Decl.known_map -> Term.Svs.t -> Term.term -> Svls.t *)
+(* This function collects lists of variables corresponding to
+  some recursive functions call parameters into the body of formula.
+  Each list respects the lexicographic order of the corresponding 
+  recusrive function in which decrease its formal arguments.
+  
+  Note that one list contain the biggest lexicographic order prefix where all
+  actual parameters are variables. For example, if function f(x,a,y,b,z) 
+  decreases on [a;b], but is called with some not-variable term T for argument
+  b, then the resulting list will be [a]. *)
 let t_candidates_lex km qvs t =
-  let int_candidates tl acc = List.fold_left
-    (fun acc t -> match t.t_node with
-      | Tvar x when Svs.mem x qvs && ty_equal x.vs_ty ty_int -> Svls.add [x] acc
-      | _ -> acc) acc tl in
+  let int_candidates _tl acc = acc 
+  (* List.fold_left (fun acc t -> match t.t_node with
+     | Tvar x when Svs.mem x qvs && ty_equal x.vs_ty ty_int -> 
+     Svls.add [x] acc
+     | _ -> acc) acc tl *)
+  in 
   let rec_candidates il tl acc =
     let rec aux il vl = match il with
       | i :: iq ->
@@ -261,15 +294,12 @@ let t_candidates_lex km qvs t =
 	  | _ -> vl
 	end
       | [] -> vl
-    in
-    (*Format.printf "[";
-    List.iter (fun i ->
-      Format.printf "[%d : %a]" i Pretty.print_term (List.nth tl i)) il;
-    Format.printf "]@.";*)
-    Svls.add (List.rev (aux il [])) acc
+    in 
+    Svsl.add (List.rev (aux il [])) acc
   in
   let defn_candidates (ls,tl) acc = match (find_logic_definition km ls) with
-    | Some defn -> rec_candidates (ls_defn_decrease defn) tl (int_candidates tl acc)
+    | Some defn -> 
+      rec_candidates (ls_defn_decrease defn) tl (int_candidates tl acc)
     | None -> acc
   in
   let rec t_candidates acc t =
@@ -278,12 +308,26 @@ let t_candidates_lex km qvs t =
       | _ ->  acc
     in t_fold t_candidates acc t
   in
-  t_candidates Svls.empty t
+  t_candidates Svsl.empty t
+    
+    
+exception No_candidates_found
 
 
+(*Chooses some candidate list of the biggest size ; 
+  raises an exception, if the candidate set is empty 
+  or contains only an empty list, *)
+let heuristic_lex vset =
+  try 
+    let vl = Svsl.max_elt vset in
+    if vl = []
+    then raise No_candidates_found
+    else vl
+  with Not_found -> raise No_candidates_found
+    
 
-(* Decl.known_map -> Term.vsymbol -> tyscheme *)
-let vs_tyscheme km x _t =
+(*Generates induction scheme according to variable type's definition *)
+let vs_tyscheme km x =
   let ts,ty = match x.vs_ty.ty_node with
     | Tyapp _ when ty_equal x.vs_ty ty_int -> assert false
     | Tyvar _ ->   assert false
@@ -311,20 +355,13 @@ let vs_tyscheme km x _t =
   let cl = find_constructors km ts in
   ((List.map tyscheme_constructor cl) : tyscheme)
 
-
-(*
-ivs : ind. var. set
-ivm : ind. var. (vsymbol, int "lex pos") map
-qvl : quant. var. list
-lql : left quant. var. list
-lvl : left var. list
-acc : vlex list
-*)
-let qsplit km ivs ivm qvl t0 =
-  let rec aux ivs qvl lql lvl acc = match qvl with
-    | [] -> List.rev acc, t_forall_close lql [] t0
+(* Preprocesses selected induction candidate list for 
+   induction scheme instanciation.  *)
+let qsplit km vl qvl  = 
+  let rec aux (ivs,ivm) qvl lql lvl acc = match qvl with
+    | [] -> List.rev acc, lql
     | q :: tl ->
-      if Svs.mem q ivs (*if q is candidate*)
+      if Svs.mem q ivs 
       then
 	let qi = Mvs.find q ivm in
 	let rleft = List.filter (fun v -> (Mvs.find v ivm) > qi) lvl in
@@ -335,40 +372,55 @@ let qsplit km ivs ivm qvl t0 =
 	  vs = q;
 	  lq = List.rev lql;
 	  rq = (List.rev rleft) @ rright;
-	  ts =  vs_tyscheme km q t0} in
-	aux ivs tl [] (q :: lvl) (v :: acc)
+	  ts =  vs_tyscheme km q} in
+	aux ((Svs.remove q ivs),ivm) tl [] (q :: lvl) (v :: acc)
       else
-	aux ivs tl (q :: lql) lvl acc
-  in aux ivs qvl [] [] []
+	if Svs.is_empty ivs 
+	then List.rev acc, qvl 
+	else aux (ivs,ivm) tl (q :: lql) lvl acc
+  in 
+  let _, ivs, ivm = List.fold_left (fun (i,s,m) v -> 
+    (i+1, Svs.add v s, Mvs.add v i m)) (0,Svs.empty,Mvs.empty) vl in
+  aux (ivs,ivm) qvl [] [] []
 
-exception No_candidates_found
 
-let heuristic_lex vset =
-  let vl = Svls.max_elt vset in
-  if vl = []
-  then raise No_candidates_found
-  else let _, ivs, ivm = List.fold_left (fun (i,s,m) v ->
-    let v =
-      (*if Svs.mem v s
-      then (create_vsymbol (Ident.id_clone v.vs_name) v.vs_ty)
-      else *) v
-    in (i+1, Svs.add v s, Mvs.add v i m)) (0,Svs.empty,Mvs.empty) vl
-       in vl, ivs, ivm
+let make_induction_lex lexl rql t = 
+  let make_h v vset timp = 
+    Svs.fold (fun x timp -> 
+      let t = t_subst_single v.vs (t_var x) t in
+      let t = t_forall_close v.rq [] t in
+      Term.t_implies t timp) vset timp  
+  in
+  let rec aux lexl timp = match lexl with
+    | [] -> timp
+    | v :: vl -> 
+      let tbl = List.map (fun (pat, vset) -> 
+	let timp = (make_h v vset timp) in 
+	t_close_branch pat (aux vl timp)) v.ts in
+      let t = t_case (t_var v.vs) tbl in
+      let t = t_forall_close (v.lq @ [v.vs]) [] t in t
+  in aux lexl (t_forall_close rql [] t)
 
 let induction_ty_lex km t0 =
   let qvs, qvl, t = decompose_forall t0 in
   let vset = t_candidates_lex km qvs t in
   try
-    let vl,ivs,ivm = heuristic_lex vset in
-    let lexl, _t = qsplit km ivs ivm qvl t in
-    let tcase = t0 (* make_induction lexl t *) in
-    if Debug.test_flag debug then
+    let vl = heuristic_lex vset in
+    let lexl, rightmost_qvl = qsplit km vl qvl in
+    let tcase = make_induction_lex lexl rightmost_qvl t in
+
+    if Debug.test_flag debug_verbose then
       begin
 	print_vset vset;
-	print_heuristic_lex vl ivm;
-	print_lex lexl (*
+	print_heuristic_lex vl;
+	print_lex lexl; 
 	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
-	Format.printf "New Task: %a \n@." Pretty.print_term tcase *)
+	Format.printf "New Task: %a \n@." Pretty.print_term tcase 
+      end;
+    if Debug.test_flag debug then
+      begin
+	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
+	Format.printf "New Task: %a \n@." Pretty.print_term tcase 
       end;
     [tcase]
   with No_candidates_found -> Format.printf "No candidates found\n"; [t0]
@@ -939,11 +991,67 @@ let induction = function
 let () = Trans.register_transform_l "induction" (Trans.store induction)
 *)
 
-
+  (*Format.printf "[";
+    List.iter (fun i ->
+      Format.printf "[%d : %a]" i Pretty.print_term (List.nth tl i)) il;
+    Format.printf "]@.";*)
 
 (*********************************************************)
 (******* Induction tactic on function definition *********)
 (*********************************************************)
+
+
+
+(*
+module Vsl = struct
+  type t = Svs.elt list
+  let compare t1 t2 =
+    let rec aux t1 t2 = match t1,t2 with
+      | [],[] -> 0
+      | h1 :: q1, h2 :: q2 ->
+	if vs_equal h1 h2 
+	then aux q1 q2 
+	else Pervasives.compare (vs_hash h1) (vs_hash h2)
+      | _ -> assert false;
+    in
+    if List.length t1 < List.length t2 then -1
+    else if List.length t1 > List.length t2 then 1
+    else aux t1 t2
+end
+
+module Svsl = Set.Make(Vsl) *)
+
+
+
+
+
+(*
+module VsList =
+struct
+ 
+  type t = Svs.elt list
+  let hash = Hashcons.combine_list vs_hash 3
+  let equal = list_all2 vs_equal
+  let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs1) (vs_hash vs2)
+  let compare t1 t2 = 
+    let rec aux t1 t2 = match t1,t2 with
+      | [],[] -> 0
+      | v1 :: q1, v2 :: q2 ->
+	if vs_equal v1 v2 
+	then aux q1 q2 
+	else cmp_vs v1 v2
+      | _ -> assert false;
+    in
+    if List.length t1 < List.length t2 then -1
+    else if List.length t1 > List.length t2 then 1
+    else aux t1 t2
+end
+
+module Mvls = Util.StructMake(VsList)
+*)
+
+
+
 
 (*
 Local Variables:
