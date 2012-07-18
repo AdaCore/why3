@@ -397,15 +397,12 @@ let clone_export uc m inst =
       | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
       | None   -> eff_reset e (conv_reg r) in
     Mreg.fold conv eff.eff_resets e in
-  let conv_ty ty = ty_s_map conv_ts ty in
-  let conv_vs mv vs _ = Mvs.find_def vs vs mv in
-  let conv_mvs mv t = Mvs.mapi (conv_vs mv) t.t_vars in
-  let conv_term mv t = t_gen_map conv_ty conv_ls (conv_mvs mv t) t in
-  let add_xq mv xs t = Mexn.add (conv_xs xs) (conv_term mv t) in
+  let conv_term mv t = t_gen_map (ty_s_map conv_ts) conv_ls mv t in
+  let addx mv xs t q = Mexn.add (conv_xs xs) (conv_term mv t) q in
   let conv_spec mv c = {
     c_pre     = conv_term mv c.c_pre;
     c_post    = conv_term mv c.c_post;
-    c_xpost   = Mexn.fold (add_xq mv) c.c_xpost Mexn.empty;
+    c_xpost   = Mexn.fold (addx mv) c.c_xpost Mexn.empty;
     c_effect  = conv_eff c.c_effect;
     c_variant = [];
     c_letrec  = 0; } in
@@ -454,12 +451,31 @@ let clone_export uc m inst =
          brings in some external symbol S and fixes some region
          in the psymbol's type, but S does not occur in the spec,
          then the cloned psymbol will be overgeneralized.
-         Two fixes are possible:
+         Three fixes are possible:
            1. Prohibit global regions in psymbol type signatures.
               This is what previous implementation of WhyML did.
            2. Let Mlw_expr.create_psymbol take an additional varmap
               as an argument and add those variables to ps.ps_varm.
-              Can this be abused in any way? *)
+              Can this be abused in any way?
+           3. Require that (vta_varmap ps.ps_vta) fixes exactly
+              the same regions as ps.ps_varm. At the moment, we
+              only have inclusion, since ps.ps_varm is guaranteed
+              to be a superset of (vta_varmap ps.ps_vta). If this
+              requirement is satisfied, we can always set ps_varm
+              to be the varmap of ps_vta. But what about resets?
+              Consider:
+                  let r <rho> = ref 0 in
+                  let f x = ... r <- x ... in
+                  { reset rho }
+                  f 5
+              The reference r appears in f.ps_varm, and thus the
+              last expression (f 5) would be rejected as freshness
+              violation. This is correct, otherwise the effect of
+              (f 5) could modify the values of unrelated variables.
+              This is correct even if r does not occur in f.ps_vta,
+              and therefore we cannot forget about r in f.ps_varm.
+              We could require that r appears in the spec of f, as
+              we do for abstract parameters, but is this reasonable? *)
         let conv_rd uc { fun_ps = ps } =
           let vta = conv_vta !mvs ps.ps_vta in
           let nps = create_psymbol (id_clone ps.ps_name) vta in
