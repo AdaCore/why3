@@ -28,9 +28,7 @@ let file = ref None
 let opt_version = ref false
 let opt_stats = ref true
 let opt_force = ref false
-(*
-let opt_convert_unknown_provers = ref false
-*)
+let opt_obsolete_only = ref false
 let opt_bench = ref false
 
 (** {2 Smoke detector} *)
@@ -72,6 +70,9 @@ let spec = Arg.align [
   ("-force",
    Arg.Set opt_force,
    " enforce saving the session after replay") ;
+  ("-obsolete-only",
+   Arg.Set opt_obsolete_only,
+   " replay only if session is obsolete") ;
   ("-smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
@@ -436,6 +437,12 @@ let () =
       M.update_session ~allow_obsolete:true session env config
     in
     eprintf " done.@.";
+    if !opt_obsolete_only && not found_obs then
+      begin
+        eprintf "Session is not obsolete, hence no replayed@.";
+        printf "@.";
+        exit 0
+      end;
     if !opt_bench then run_as_bench env_session;
     let () = transform_smoke env_session in
     let sched =

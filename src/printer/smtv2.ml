@@ -157,7 +157,7 @@ let rec print_term info fmt t = match t.t_node with
         end end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
-      fprintf fmt "@[(let (%a %a)@ %a)@]" print_var v
+      fprintf fmt "@[(let ((%a %a))@ %a)@]" print_var v
         (print_term info) t1 (print_term info) t2;
       forget_var v
   | Tif (f1,t1,t2) ->

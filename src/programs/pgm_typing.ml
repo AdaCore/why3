@@ -86,7 +86,7 @@ type denv = {
 let create_denv uc =
   { uc = uc;
     locals = Mstr.empty;
-    denv = Typing.create_denv (); }
+    denv = Typing.denv_empty; }
 
 let loc_of_id id = Util.of_option id.Ident.id_loc
 
@@ -103,7 +103,8 @@ let rec create_regions ~user n =
     []
   else
     let tv = create_tvsymbol (id_fresh "rho") in
-    tyvar (create_ty_decl_var ~user tv) :: create_regions ~user (n - 1)
+    let r = if user then tyuvar tv else tyvar (create_ty_decl_var tv) in
+    r :: create_regions ~user (n - 1)
 
 (* region variables are collected in the following list of lists
    so that we can check after typing that two region variables in the same
@@ -120,16 +121,19 @@ let push_region_var tv vloc = match !region_vars with
 
 let check_region_vars () =
   let values = Htv.create 17 in
-  let check tv (v, loc) = match view_dty (tyvar v) with
+  let check_tv tv tv' loc =
+    try
+      let tv'' = Htv.find values tv' in
+      if not (tv_equal tv tv'') then
+        errorm ~loc "this application would create an alias";
+    with Not_found ->
+      Htv.add values tv' tv
+  in
+  let check tv (v, loc) = match view_dty v with
     | Tyvar v'  ->
-        let tv' = tvsymbol_of_type_var v' in
-        begin try
-          let tv'' = Htv.find values tv' in
-          if not (tv_equal tv tv'') then
-            errorm ~loc "this application would create an alias";
-        with Not_found ->
-          Htv.add values tv' tv
-        end
+        check_tv tv (tvsymbol_of_type_var v') loc
+    | Tyuvar tv' ->
+        check_tv tv tv' loc
     | Tyapp _ ->
         assert false
   in
@@ -146,13 +150,13 @@ let rec specialize_ty ?(policy=Region_var) ~loc htv ty = match ty.ty_node with
       let n = (get_mtsymbol ts).mt_regions in
       let mk_region ty = match ty.ty_node with
         | Ty.Tyvar _ when policy = Region_ret ->
-            tyvar (Typing.create_user_type_var "fresh")
+            tyuvar (create_tvsymbol (id_fresh "fresh"))
         | Ty.Tyvar tv when policy = Region_var ->
             let v = Denv.find_type_var ~loc htv tv in
-            push_region_var tv (v, loc);
+            push_region_var tv (tyvar v, loc);
             tyvar v
         | Ty.Tyvar tv (* policy = Region_glob *) ->
-            tyvar (create_ty_decl_var ~user:true tv)
+            tyuvar tv
         | Ty.Tyapp _ ->
             assert false
       in
@@ -172,8 +176,7 @@ let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
       in
       Sreg.iter
         (fun r ->
-           let v = create_ty_decl_var ~user:true r.R.r_tv in
-           push_region_var r.R.r_tv (v, loc))
+           push_region_var r.R.r_tv (tyuvar r.R.r_tv, loc))
         globals;
       dcurrying
         (List.map (fun pv -> specialize_type_v ~loc htv pv.pv_tv) bl)
@@ -205,7 +208,7 @@ let specialize_exception loc x uc =
 
 let create_type_var loc =
   let tv = Ty.create_tvsymbol (id_user "a" loc) in
-  tyvar (create_ty_decl_var ~loc ~user:false tv)
+  tyvar (create_ty_decl_var ~loc tv)
 
 let add_pure_var id ty denv = match view_dty ty with
   | Tyapp (ts, _) when Ty.ts_equal ts ts_arrow -> denv
@@ -245,12 +248,17 @@ let dexception uc qid =
       print_dty ty;
   r
 
+let no_ghost gh =
+  if gh then errorm "ghost types are not supported in this version of WhyML"
+
+let eff_no_ghost l = List.map (fun (gh,x) -> no_ghost gh; x) l
+
 let dueffect env e =
-  { du_reads  = e.Ptree.pe_reads;
-    du_writes = e.Ptree.pe_writes;
+  { du_reads  = eff_no_ghost e.Ptree.pe_reads;
+    du_writes = eff_no_ghost e.Ptree.pe_writes;
     du_raises =
       List.map (fun id -> let ls,_,_ = dexception env.uc id in ls)
-        e.Ptree.pe_raises; }
+        (eff_no_ghost e.Ptree.pe_raises); }
 
 let dpost uc (q, ql) =
   let dexn (id, l) = let s, _, _ = dexception uc id in s, l in
@@ -272,7 +280,7 @@ let rec dpurify_utype_v = function
 (* user indicates whether region type variables can be instantiated *)
 let rec dtype ~user env = function
   | PPTtyvar {id=x} ->
-      tyvar (Typing.find_user_type_var x env.denv)
+      Typing.create_user_type_var x
   | PPTtyapp (p, x) ->
       let loc = Typing.qloc x in
       let ts = Typing.specialize_tysymbol loc x (impure_uc env.uc) in
@@ -306,7 +314,8 @@ and dutype_c env c =
     duc_post        = dpost env.uc c.Ptree.pc_post;
   }
 
-and dubinder env ({id=x; id_loc=loc} as id, v) =
+and dubinder env ({id=x; id_loc=loc} as id, gh, v) =
+  no_ghost gh;
   let ty = match v with
     | Some v -> dtype ~user:true env v
     | None -> create_type_var loc
@@ -333,9 +342,14 @@ let dvariant env (l, p) =
   in
   l, option_map relation p
 
+let dvariants env = function
+  | [] -> None
+  | [v] -> Some (dvariant env v)
+  | _ -> errorm "multiple variants are not supported"
+
 let dloop_annotation env a =
   { dloop_invariant = a.Ptree.loop_invariant;
-    dloop_variant   = option_map (dvariant env) a.Ptree.loop_variant; }
+    dloop_variant   = dvariants env a.Ptree.loop_variant; }
 
 (***
 let is_ps_ghost e = match e.dexpr_desc with
@@ -477,7 +491,8 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
-  | Ptree.Elet (x, e1, e2) ->
+  | Ptree.Elet (x, gh, e1, e2) ->
+      no_ghost gh;
       let e1 = dexpr ~ghost ~userloc env e1 in
       let ty1 = e1.dexpr_type in
       let env = add_local env x.id ty1 in
@@ -713,12 +728,16 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let e1 = dexpr ~ghost ~userloc env e1 in
       let q = dpost env.uc q in
       DEabstract(e1, q), e1.dexpr_type
+  | Ptree.Eghost _ ->
+      no_ghost true;
+      assert false
   | Ptree.Enamed _ ->
       assert false
 
 and dletrec ~ghost ~userloc env dl =
   (* add all functions into environment *)
-  let add_one env (id, bl, var, t) =
+  let add_one env (_loc, id, gh, bl, var, t) =
+    no_ghost gh;
     let ty = create_type_var id.id_loc in
     let env = add_local_top env id.id ty in
     env, ((id, ty), bl, var, t)
@@ -727,7 +746,7 @@ and dletrec ~ghost ~userloc env dl =
   (* then type-check all of them and unify *)
   let type_one ((id, tyres), bl, v, t) =
     let env, bl = map_fold_left dubinder env bl in
-    let v = option_map (dvariant env) v in
+    let v = dvariants env v in
     let (_,e,_) as t = dtriple ~ghost ~userloc env t in
     let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
@@ -811,18 +830,18 @@ let create_ivsymbol id ty =
   in
   { i_impure = vs; i_effect = vse; i_pure = vsp }
 
-let rec dty_of_ty denv ty = match ty.ty_node with
+let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyvar v ->
-      Denv.tyvar (Typing.find_user_type_var v.tv_name.id_string denv)
+      Typing.create_user_type_var v.tv_name.id_string
   | Ty.Tyapp (ts, tyl) ->
-      Denv.tyapp ts (List.map (dty_of_ty denv) tyl)
+      Denv.tyapp ts (List.map dty_of_ty tyl)
 
 let iadd_local env x ty =
   let v = create_ivsymbol x ty in
   let s = v.i_impure.vs_name.id_string in
   let env = { env with
     i_denv =
-      (let dty = dty_of_ty env.i_denv v.i_pure.vs_ty in
+      (let dty = dty_of_ty v.i_pure.vs_ty in
        add_pure_var s dty env.i_denv);
     i_impures = Mstr.add s v env.i_impures;
     i_effects = Mstr.add s v.i_effect env.i_effects;
@@ -1568,7 +1587,7 @@ let rec is_pure_expr e =
   | Elocal _ | Elogic _ -> true
   | Eif (e1, e2, e3) -> is_pure_expr e1 && is_pure_expr e2 && is_pure_expr e3
   | Elet (_, e1, e2) -> is_pure_expr e1 && is_pure_expr e2
-  | Eabstract (e1, _) 
+  | Eabstract (e1, _)
   | Emark (_, e1) -> is_pure_expr e1
   | Eany c -> E.no_side_effect c.c_effect
   | Eassert _ | Etry _ | Efor _ | Eraise _ | Ematch _
@@ -1963,8 +1982,7 @@ let create_ienv denv = {
 }
 
 let type_type uc ty =
-  let denv = create_denv uc in
-  let dty = Typing.dty (impure_uc uc) denv.denv ty in
+  let dty = Typing.dty (impure_uc uc) ty in
   Denv.ty_of_dty dty
 
 let add_pure_decl uc ?loc ls =
@@ -2303,8 +2321,9 @@ let find_module penv lmod q id = match q with
 
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
-let rec decl ~wp env ltm lmod uc = function
-  | Ptree.Dlet (id, e) ->
+let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
+  | Ptree.Dlet (id, gh, e) ->
+      no_ghost gh;
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
       let e = iexpr (create_ienv denv) e in
@@ -2343,7 +2362,8 @@ let rec decl ~wp env ltm lmod uc = function
       let d = Dletrec dl in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
-  | Ptree.Dparam (id, tyv) ->
+  | Ptree.Dparam (id, gh, tyv) ->
+      no_ghost gh;
       let loc = id.id_loc in
       let denv = create_denv uc in
       let tyv = dutype_v denv tyv in
@@ -2395,7 +2415,7 @@ let rec decl ~wp env ltm lmod uc = function
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
       end
-  | Ptree.Dnamespace (loc, id, import, dl) ->
+  | Ptree.Dnamespace (id, import, dl) ->
       let uc = open_namespace uc in
       let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
       begin try close_namespace uc import id
@@ -2407,7 +2427,7 @@ let rec decl ~wp env ltm lmod uc = function
   | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
       Pgm_module.add_pure_pdecl d uc
   | Ptree.Duseclone d ->
-      Pgm_module.add_use_clone env ltm d uc
+      Pgm_module.add_use_clone env ltm loc d uc
 
 (*
 Local Variables:

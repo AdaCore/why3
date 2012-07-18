@@ -105,7 +105,6 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
      && List.for_all2 ty_equal tyl ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) tyl tyr)
 
-let d_ts_base = create_ty_decl ts_base
 let d_ts_deco = create_ty_decl ts_deco
 
 let mono_init =

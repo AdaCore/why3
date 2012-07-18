@@ -105,28 +105,24 @@ let unify_raise ~loc ty1 ty2 =
     environment + local variables.
     It is only local to this module and created with [create_denv] below. *)
 
-type denv = {
-  utyvars : (string, type_var) Hashtbl.t; (* user type variables *)
-  dvars   : dty Mstr.t;    (* local variables, to be bound later *)
-}
+let create_user_tv =
+  let hs = Hashtbl.create 17 in
+  fun s -> try Hashtbl.find hs s with Not_found ->
+  let tv = create_tvsymbol (id_fresh s) in
+  Hashtbl.add hs s tv;
+  tv
 
-let create_denv () = {
-  utyvars = Hashtbl.create 17;
-  dvars = Mstr.empty;
-}
-
+(* TODO: shouldn't we localize this ident? *)
 let create_user_type_var x =
-  (* TODO: shouldn't we localize this ident? *)
-  let v = create_tvsymbol (id_fresh x) in
-  create_ty_decl_var ~user:true v
+  tyuvar (create_user_tv x)
 
-let find_user_type_var x env =
-  try
-    Hashtbl.find env.utyvars x
-  with Not_found ->
-    let v = create_user_type_var x in
-    Hashtbl.add env.utyvars x v;
-    v
+type denv = {
+  dvars : dty Mstr.t;    (* local variables, to be bound later *)
+  gvars : qualid -> vsymbol option; (* global variables, for programs *)
+}
+
+let denv_empty = { dvars = Mstr.empty; gvars = Util.const None }
+let denv_empty_with_globals gv = { dvars = Mstr.empty; gvars = gv }
 
 let mem_var x denv = Mstr.mem x denv.dvars
 let find_var x denv = Mstr.find x denv.dvars
@@ -159,17 +155,17 @@ let add_logic_decl uc dl = add_decl_with_tuples uc (create_logic_decl dl)
 let add_ind_decl uc s dl = add_decl_with_tuples uc (create_ind_decl s dl)
 let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
 
-let rec dty uc env = function
+let rec dty uc = function
   | PPTtyvar {id=x} ->
-      tyvar (find_user_type_var x env)
+      create_user_type_var x
   | PPTtyapp (p, x) ->
       let loc = qloc x in
       let ts = specialize_tysymbol loc x uc in
-      let tyl = List.map (dty uc env) p in
+      let tyl = List.map (dty uc) p in
       Loc.try2 loc tyapp ts tyl
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
-      tyapp ts (List.map (dty uc env) tyl)
+      tyapp ts (List.map (dty uc) tyl)
 
 let find_ns get_id find p ns =
   let loc = qloc p in
@@ -336,7 +332,7 @@ let check_pat_linearity p =
 
 let fresh_type_var loc =
   let tv = create_tvsymbol (id_user "a" loc) in
-  tyvar (create_ty_decl_var ~loc ~user:false tv)
+  tyvar (create_ty_decl_var ~loc tv)
 
 let rec dpat uc env pat =
   let env, n, ty = dpat_node pat.pat_loc uc env pat.pat_desc in
@@ -348,7 +344,7 @@ and dpat_node loc uc env = function
       env, Pwild, ty
   | PPpvar x ->
       let ty = fresh_type_var loc in
-      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       env, Pvar x, ty
   | PPpapp (x, pl) ->
       let s, tyl, ty = specialize_fsymbol x uc in
@@ -380,7 +376,7 @@ and dpat_node loc uc env = function
       env, Papp (s, pl), ty
   | PPpas (p, x) ->
       let env, p = dpat uc env p in
-      let env = { env with dvars = Mstr.add x.id p.dp_ty env.dvars } in
+      let env = add_var x.id p.dp_ty env in
       env, Pas (p,x), p.dp_ty
   | PPpor (p, q) ->
       let env, p = dpat uc env p in
@@ -419,7 +415,8 @@ let check_quant_linearity uqu =
 
 let check_highord uc env x tl = match x with
   | Qident { id = x } when Mstr.mem x env.dvars -> true
-  | _ -> List.length tl > List.length ((find_lsymbol x uc).ls_args)
+  | _ -> env.gvars x <> None ||
+      List.length tl > List.length ((find_lsymbol x uc).ls_args)
 
 let apply_highord loc x tl = match List.rev tl with
   | a::[] -> [{pp_loc = loc; pp_desc = PPvar x}; a]
@@ -444,6 +441,11 @@ and dterm_node ~localize loc uc env = function
       (* local variable *)
       let ty = Mstr.find x env.dvars in
       Tvar x, ty
+  | PPvar x when env.gvars x <> None ->
+      let vs = Util.of_option (env.gvars x) in
+      assert (ty_closed vs.vs_ty);
+      let ty = specialize_ty ~loc (Htv.create 0) vs.vs_ty in
+      Tgvar vs, ty
   | PPvar x ->
       (* 0-arity symbol (constant) *)
       let s, tyl, ty = specialize_fsymbol x uc in
@@ -477,7 +479,7 @@ and dterm_node ~localize loc uc env = function
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
-      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       let e2 = dterm ~localize uc env e2 in
       Tlet (e1, x, e2), e2.dt_ty
   | PPmatch (e1, bl) ->
@@ -503,7 +505,7 @@ and dterm_node ~localize loc uc env = function
   | PPcast (e1, ty) ->
       let loc = e1.pp_loc in
       let e1 = dterm ~localize uc env e1 in
-      let ty = dty uc env ty in
+      let ty = dty uc ty in
       unify_raise ~loc e1.dt_ty ty;
       e1.dt_node, ty
   | PPif (e1, e2, e3) ->
@@ -513,19 +515,19 @@ and dterm_node ~localize loc uc env = function
       unify_raise ~loc e3.dt_ty e2.dt_ty;
       Tif (dfmla ~localize uc env e1, e2, e3), e2.dt_ty
   | PPeps (x, ty, e1) ->
-      let ty = dty uc env ty in
-      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
+      let ty = dty uc ty in
+      let env = add_var x.id ty env in
       let e1 = dfmla ~localize uc env e1 in
       Teps (x, ty, e1), ty
   | PPquant ((PPlambda|PPfunc|PPpred) as q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
-        let ty = dty uc env ty in
+        let ty = dty uc ty in
         let id = match idl with
           | Some id -> id
           | None -> assert false
         in
-        { env with dvars = Mstr.add id.id ty env.dvars }, (id,ty)
+        add_var id.id ty env, (id,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
@@ -639,12 +641,12 @@ and dfmla_node ~localize loc uc env = function
   | PPquant (q, uqu, trl, a) ->
       check_quant_linearity uqu;
       let uquant env (idl,ty) =
-        let ty = dty uc env ty in
+        let ty = dty uc ty in
         let id = match idl with
           | Some id -> id
           | None -> assert false
         in
-        { env with dvars = Mstr.add id.id ty env.dvars }, (id,ty)
+        add_var id.id ty env, (id,ty)
       in
       let env, uqu = map_fold_left uquant env uqu in
       let trigger e =
@@ -683,7 +685,7 @@ and dfmla_node ~localize loc uc env = function
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
       let ty = e1.dt_ty in
-      let env = { env with dvars = Mstr.add x.id ty env.dvars } in
+      let env = add_var x.id ty env in
       let e2 = dfmla ~localize uc env e2 in
       Flet (e1, x, e2)
   | PPmatch (e1, bl) ->
@@ -808,7 +810,7 @@ let add_types dl th =
       let vl = List.map (fun id ->
         if Hashtbl.mem vars id.id then
           error ~loc:id.id_loc (DuplicateTypeVar id.id);
-        let i = create_tvsymbol (create_user_id id) in
+        let i = create_user_tv id.id in
         Hashtbl.add vars id.id i;
         i) d.td_params
       in
@@ -855,18 +857,11 @@ let add_types dl th =
   in
   let csymbols = Hashtbl.create 17 in
   let decl d (abstr,algeb,alias) =
-    let ts, denv' = match Hashtbl.find tysymbols d.td_ident.id with
+    let ts = match Hashtbl.find tysymbols d.td_ident.id with
       | None ->
           assert false
       | Some ts ->
-          let denv' = create_denv () in
-          let vars = denv'.utyvars in
-          List.iter
-            (fun v ->
-               Hashtbl.add vars v.tv_name.id_string
-                  (create_ty_decl_var ~user:true v))
-            ts.ts_args;
-          ts, denv'
+          ts
     in
     match d.td_def with
       | TDabstract -> ts::abstr, algeb, alias
@@ -874,7 +869,7 @@ let add_types dl th =
       | TDalgebraic cl ->
           let ht = Hashtbl.create 17 in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
-          let param (_,t) = ty_of_dty (dty th' denv' t) in
+          let param (_,t) = ty_of_dty (dty th' t) in
           let projection (id,_) fty = match id with
             | None -> None
             | Some id ->
@@ -947,9 +942,9 @@ let add_logics dl th =
   let create_symbol th d =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
-    let denv = create_denv () in
+    let denv = denv_empty in
     Hashtbl.add denvs id denv;
-    let type_ty (_,t) = ty_of_dty (dty th denv t) in
+    let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.ld_params in
     let add d = match d.ld_type with
       | None -> (* predicate *)
@@ -971,9 +966,7 @@ let add_logics dl th =
     check_quant_linearity d.ld_params;
     let dadd_var denv (x, ty) = match x with
       | None -> denv
-      | Some id ->
-          let ty = dty th' denv ty in
-          { denv with dvars = Mstr.add id.id ty denv.dvars }
+      | Some id -> add_var id.id (dty th' ty) denv
     in
     let denv = Hashtbl.find denvs id in
     let denv = List.fold_left dadd_var denv d.ld_params in
@@ -1005,7 +998,7 @@ let add_logics dl th =
           | None -> fs :: abst, defn
           | Some t ->
               let loc = t.pp_loc in
-              let ty = dty th' denv ty in
+              let ty = dty th' ty in
               let t = dterm th' denv t in
               unify_raise ~loc t.dt_ty ty;
               let vl = match fs.ls_value with
@@ -1031,19 +1024,19 @@ let type_fmla uc denv env f =
 
 let add_prop k loc s f th =
   let pr = create_prsymbol (create_user_id s) in
-  let f = type_fmla th (create_denv ()) Mstr.empty f in
+  let f = type_fmla th denv_empty Mstr.empty f in
   Loc.try4 loc add_prop_decl th k pr f
 
 let loc_of_id id = of_option id.Ident.id_loc
 
 let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
-  let denv = create_denv () in
+  let denv = denv_empty in
   let psymbols = Hashtbl.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
-    let type_ty (_,t) = ty_of_dty (dty th denv t) in
+    let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
     Hashtbl.add psymbols id ps;
@@ -1172,7 +1165,7 @@ let type_inst th t s =
   in
   List.fold_left add_inst empty_inst s
 
-let add_use_clone env lenv th (loc, use, subst) =
+let add_use_clone env lenv th loc (use, subst) =
   if Debug.test_flag debug_parse_only then th else
   let use_or_clone th =
     let q, id = split_qualid use.use_theory in

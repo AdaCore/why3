@@ -1,0 +1,32 @@
+MinMax: THEORY
+ BEGIN
+  IMPORTING Real
+  
+  % Why3 tuple0
+  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
+  
+  % Why3 min
+  min(x:real, x1:real): MACRO real = min(x,x1)
+  
+  % Why3 max
+  max(x:real, x1:real): MACRO real = max(x,x1)
+  
+  % Why3 max_is_ge
+  max_is_ge: LEMMA FORALL (x:real, y:real): (max(x, y) >= x) AND (max(x,
+    y) >= y)
+  
+  % Why3 max_is_some
+  max_is_some: LEMMA FORALL (x:real, y:real): (max(x, y) = x) OR (max(x,
+    y) = y)
+  
+  % Why3 min_is_le
+  min_is_le: LEMMA FORALL (x:real, y:real): (min(x, y) <= x) AND (min(x,
+    y) <= y)
+  
+  % Why3 min_is_some
+  min_is_some: LEMMA FORALL (x:real, y:real): (min(x, y) = x) OR (min(x,
+    y) = y)
+  
+  
+ END MinMax
+ 

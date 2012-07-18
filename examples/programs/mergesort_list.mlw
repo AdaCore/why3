@@ -9,7 +9,7 @@ module M
   use import list.Append
   use import list.Permut
 
-  let split l0 =
+  let split (l0 : list 'a) =
     {  length l0 >= 2 }
     let rec split_aux (l1 : list 'a) l2 l variant { length l } =
       { length l2 = length l1 \/ length l2 = length l1 + 1 }

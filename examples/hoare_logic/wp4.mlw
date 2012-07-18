@@ -18,13 +18,16 @@ type value = Vvoid | Vint int | Vbool bool
 type operator = Oplus | Ominus | Omult | Ole
 
 type ident = int
+type refident
+
+lemma eq_refident_dec : forall x y:refident. x=y \/ x <>y
 
 constant result : ident = (-1)
 
 type term =
   | Tvalue value
   | Tvar ident
-  | Tderef ident
+  | Tderef refident
   | Tbin term operator term
 
 type fmla =
@@ -36,7 +39,7 @@ type fmla =
   | Fforall ident datatype fmla
 
 use map.Map as IdMap
-type env = IdMap.map ident value
+type env = IdMap.map refident value
 
 use export list.List
 type stack = list (ident, value)
@@ -55,13 +58,21 @@ function eval_bin (x:value) (op:operator) (y:value) : value =
   | _,_ -> Vbool False
   end
 
-function get_env (i:ident) (e:env) : value = IdMap.get e i
+function get_env (i:refident) (e:env) : value = IdMap.get e i
 
 function get_stack (i:ident) (pi:stack) : value =
   match pi with
   | Nil -> Vvoid
   | Cons (x,v) r -> if x=i then v else get_stack i r
   end
+
+lemma get_stack_eq:
+  forall x:ident, v:value, r:stack.
+    get_stack x (Cons (x,v) r) = v
+
+lemma get_stack_neq:
+  forall x i:ident, v:value, r:stack.
+    x <> i -> get_stack i (Cons (x,v) r) = get_stack i r 
 
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
@@ -88,13 +99,19 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   end
 
 (** substitution of a reference [r] by a logic variable [v]
-   warning: proper behavior only guaranted if [v] is fresh *)
-
-function subst_term (e:term) (r:ident) (v:ident) : term =
+   warning: proper behavior only guaranteed if [v] is fresh *)
+function subst_term (e:term) (r:refident) (v:ident) : term =
   match e with
   | Tvalue _ | Tvar _ -> e
   | Tderef x -> if r=x then Tvar v else e
   | Tbin e1 op e2 -> Tbin (subst_term e1 r v) op (subst_term e2 r v)
+  end
+
+function vsubst_term (e:term) (v:ident) (t:term) : term =
+  match e with
+  | Tvalue _ | Tderef _ -> e
+  | Tvar x -> if v=x then t else e
+  | Tbin e1 op e2 -> Tbin (vsubst_term e1 v t) op (vsubst_term e2 v t)
   end
 
 predicate fresh_in_term (id:ident) (t:term) =
@@ -106,10 +123,15 @@ predicate fresh_in_term (id:ident) (t:term) =
   end
 
 lemma eval_subst_term:
-  forall sigma:env, pi:stack, e:term, x:ident, v:ident.
+  forall sigma:env, pi:stack, e:term, x:refident, v:ident.
     fresh_in_term v e ->
     eval_term sigma pi (subst_term e x v) =
     eval_term (IdMap.set sigma x (get_stack v pi)) pi e
+
+lemma eval_vsubst_term:
+  forall sigma:env, pi:stack, e:term, v:ident, va:value.
+    eval_term sigma pi (vsubst_term e v (Tvalue va)) =
+    eval_term sigma (Cons (v, va) pi) e
 
 lemma eval_term_change_free :
   forall t:term, sigma:env, pi:stack, id:ident, v:value.
@@ -126,7 +148,7 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
   | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
   end
 
-function subst (f:fmla) (x:ident) (v:ident) : fmla =
+function subst (f:fmla) (x:refident) (v:ident) : fmla =
   match f with
   | Fterm e -> Fterm (subst_term e x v)
   | Fand f1 f2 -> Fand (subst f1 x v) (subst f2 x v)
@@ -137,11 +159,27 @@ function subst (f:fmla) (x:ident) (v:ident) : fmla =
   end
 
 
+function vsubst (f:fmla) (v:ident) (t:term) : fmla =
+  match f with
+  | Fterm e -> Fterm (vsubst_term e v t)
+  | Fand f1 f2 -> Fand (vsubst f1 v t) (vsubst f2 v t)
+  | Fnot f -> Fnot (vsubst f v t)
+  | Fimplies f1 f2 -> Fimplies (vsubst f1 v t) (vsubst f2 v t)
+  | Flet y t1 f -> Flet y (vsubst_term t1 v t) (vsubst f v t)
+  | Fforall y ty f -> Fforall y ty (vsubst f v t)
+  end
+
+
 lemma eval_subst:
-  forall f:fmla, sigma:env, pi:stack, x:ident, v:ident.
+  forall f:fmla, sigma:env, pi:stack, x:refident, v:ident.
     fresh_in_fmla v f ->
     (eval_fmla sigma pi (subst f x v) <->
      eval_fmla (IdMap.set sigma x (get_stack v pi)) pi f)
+
+lemma eval_vsubst:
+  forall f:fmla, sigma:env, pi:stack, v:ident, va:value.
+    eval_fmla sigma pi (vsubst f v (Tvalue va)) <->
+    eval_fmla sigma (Cons (v, va) pi) f
 
 lemma eval_swap:
   forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
@@ -160,8 +198,8 @@ type expr =
   | Evalue value
   | Ebin expr operator expr
   | Evar ident
-  | Ederef ident
-  | Eassign ident expr
+  | Ederef refident
+  | Eassign refident expr
   | Eseq expr expr
   | Elet ident expr expr
   | Eif expr expr expr
@@ -179,14 +217,22 @@ lemma check_skip:
 
 inductive one_step env stack expr env stack expr =
 
+  | one_step_var:
+      forall sigma:env, pi:stack, v:ident.
+        one_step sigma pi (Evar v) sigma pi (Evalue (get_stack v pi))
+
+  | one_step_deref:
+      forall sigma:env, pi:stack, r:refident.
+        one_step sigma pi (Ederef r) sigma pi (Evalue (IdMap.get sigma r))
+
   | one_step_assign_ctxt:
-      forall sigma sigma':env, pi pi':stack, x:ident, e e':expr.
+      forall sigma sigma':env, pi pi':stack, x:refident, e e':expr.
         one_step sigma pi e sigma' pi' e' ->
         one_step sigma pi (Eassign x e)
                  sigma' pi' (Eassign x e')
 
   | one_step_assign_value:
-      forall sigma:env, pi:stack, x:ident, v:value, e:term.
+      forall sigma:env, pi:stack, x:refident, v:value, e:term.
         one_step sigma pi (Eassign x (Evalue v))
                  (IdMap.set sigma x v) pi void
 
@@ -228,7 +274,7 @@ inductive one_step env stack expr env stack expr =
 
   | one_step_while:
       forall sigma:env, pi:stack, e:expr, inv:fmla, e':expr.
-        one_step sigma pi (Ewhile e inv e') sigma pi 
+        one_step sigma pi (Ewhile e inv e') sigma pi
         (Eif e (Eseq e' (Ewhile e inv e')) void)
 
 (***
@@ -299,6 +345,7 @@ theory TestSemantics
 
 use import ImpExpr
 
+constant my_x : refident
 function my_sigma : env = IdMap.const (Vint 0)
 function my_pi : stack = Cons (0, Vint 42) Nil
 
@@ -315,10 +362,10 @@ goal Test42expr :
   many_steps my_sigma my_pi (Evar 0) my_sigma my_pi (Evalue (Vint 42)) 1
 
 goal Test0 :
-  eval_term my_sigma my_pi (Tderef 0) = Vint 0
+  eval_term my_sigma my_pi (Tderef my_x) = Vint 0
 
 goal Test0expr :
-  many_steps my_sigma my_pi (Ederef 0) my_sigma my_pi (Evalue (Vint 0)) 1
+  many_steps my_sigma my_pi (Ederef my_x) my_sigma my_pi (Evalue (Vint 0)) 1
 
 goal Test55 :
   eval_term my_sigma my_pi (Tbin (Tvar 0) Oplus (Tvalue (Vint 13))) = Vint 55
@@ -327,21 +374,19 @@ goal Test55expr :
   many_steps my_sigma my_pi (Ebin (Evar 0) Oplus (Evalue (Vint 13))) my_sigma my_pi (Evalue (Vint 55)) 3
 
 goal Ass42 :
-  let x = 0 in
   forall sigma':env, pi':stack.
-    one_step my_sigma my_pi (Eassign x (Evalue (Vint 42))) sigma' pi' void ->
-      IdMap.get sigma' x = Vint 42
+    one_step my_sigma my_pi (Eassign my_x (Evalue (Vint 42))) sigma' pi' void ->
+      IdMap.get sigma' my_x = Vint 42
 
 goal If42 :
-    let x = 0 in
     forall sigma1 sigma2:env, pi1 pi2:stack, e:expr.
       one_step my_sigma my_pi
-        (Eif (Ebin (Ederef x) Ole (Evalue (Vint 10)))
-             (Eassign x (Evalue (Vint 13)))
-             (Eassign x (Evalue (Vint 42))))
+        (Eif (Ebin (Ederef my_x) Ole (Evalue (Vint 10)))
+             (Eassign my_x (Evalue (Vint 13)))
+             (Eassign my_x (Evalue (Vint 42))))
         sigma1 pi1 e ->
       one_step sigma1 pi1 e sigma2 pi2 void ->
-        IdMap.get sigma2 x = Vint 13
+        IdMap.get sigma2 my_x = Vint 13
 
 end
 
@@ -362,11 +407,11 @@ lemma consequence_rule:
   valid_triple p' e q'
 
 lemma value_rule:
-  forall q:fmla, v:value. fresh_in_fmla result q ->
-  valid_triple q (Evalue v) q
+  forall q:fmla, v:value. 
+  valid_triple (vsubst q result (Tvalue v)) (Evalue v) q
 
 lemma assign_rule:
-  forall p q:fmla, x:ident, e:expr.
+  forall p q:fmla, x:refident, e:expr.
   valid_triple p e (subst q x result) ->
   valid_triple p (Eassign x e) q
 
@@ -507,7 +552,7 @@ predicate expr_writes (i:expr) (w:Set.set ident) =
           (abstract_effects i
             (Fand
                 (Fimplies (Fand (Fterm e) inv) (wp i inv))
-                (Fimplies (Fand (Fnot (Fterm e)) inv) q))) 
+                (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
 
     end
     { valid_triple result i q }

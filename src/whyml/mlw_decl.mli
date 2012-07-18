@@ -36,7 +36,6 @@ type data_decl = itysymbol * constructor list
 
 type pdecl = private {
   pd_node : pdecl_node;
-  pd_syms : Sid.t;         (* idents used in declaration *)
   pd_news : Sid.t;         (* idents introduced in declaration *)
   pd_tag  : int;           (* unique tag *)
 }
@@ -44,8 +43,9 @@ type pdecl = private {
 and pdecl_node = private
   | PDtype of itysymbol
   | PDdata of data_decl list
+  | PDval  of let_sym
   | PDlet  of let_defn
-  | PDrec  of rec_defn list
+  | PDrec  of rec_defn
   | PDexn  of xsymbol
 
 (** {2 Declaration constructors} *)
@@ -58,11 +58,17 @@ val create_data_decl : pre_data_decl list -> pdecl
 
 val create_ty_decl : itysymbol -> pdecl
 
+val create_val_decl : let_sym -> pdecl
+
 val create_let_decl : let_defn -> pdecl
 
-val create_rec_decl : rec_defn list -> pdecl
+val create_rec_decl : rec_defn -> pdecl
 
 val create_exn_decl : xsymbol -> pdecl
+
+(** {2 Cloning} *)
+
+val clone_data_decl : Mlw_expr.symbol_map -> pdecl -> pdecl
 
 (** {2 Known identifiers} *)
 

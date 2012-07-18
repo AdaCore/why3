@@ -34,6 +34,7 @@ type vsymbol = private {
 module Mvs : Map.S with type key = vsymbol
 module Svs : Mvs.Set
 module Hvs : Hashtbl.S with type key = vsymbol
+module Wvs : Hashweak.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
 val vs_hash : vsymbol -> int
@@ -404,6 +405,9 @@ val t_freevars    : int Mvs.t -> term -> int Mvs.t
 val t_ty_freevars : Stv.t -> term -> Stv.t
 
 (** Map/fold over types and logical symbols in terms and patterns *)
+
+val t_gen_map :
+  (ty -> ty) -> (lsymbol -> lsymbol) -> vsymbol Mvs.t -> term -> term
 
 val t_s_map : (ty -> ty) -> (lsymbol -> lsymbol) -> term -> term
 val t_s_fold : ('a -> ty -> 'a) -> ('a -> lsymbol -> 'a) -> 'a -> term -> 'a

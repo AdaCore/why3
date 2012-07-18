@@ -29,88 +29,70 @@ open Mlw_module
 open Mlw_dty
 
 type loc = Loc.position
-
 type ident = Ptree.ident
-
-type constant = Term.constant
-
-type assertion_kind = Ptree.assertion_kind
-
-type lazy_op = Ptree.lazy_op
-
-type for_direction = Ptree.for_direction
-
-(*****************************************************************************)
-(* phase 1: introduction of destructive types *)
-
-(* user type_v *)
 
 type ghost = bool
 type dpre = Ptree.pre
-type dpost_fmla = Ptree.lexpr
-type dexn_post_fmla = Ptree.lexpr
-type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list
-
-type deffect = {
-  deff_reads  : Ptree.lexpr list;
-  deff_writes : Ptree.lexpr list;
-  deff_raises : xsymbol list;
-}
-
+type dpost = Ptree.pre
+type dxpost = (xsymbol * dpost) list
 type dbinder = ident * ghost * dity
 
-(**
-type dutype_v =
-  | DUTpure  of Denv.dty
-  | DUTarrow of dbinder list * dutype_c
+type deffect = {
+  deff_reads  : (ghost * Ptree.lexpr) list;
+  deff_writes : (ghost * Ptree.lexpr) list;
+  deff_raises : (ghost * xsymbol) list;
+}
 
-and dutype_c =
-  { duc_result_type : dutype_v;
-    duc_effect      : deffect;
-    duc_pre         : Ptree.lexpr;
-    duc_post        : Ptree.lexpr * (Term.lsymbol * Ptree.lexpr) list; }
-**)
+type dtype_v =
+  | DSpecV of ghost * dity
+  | DSpecA of dbinder list * dtype_c
+
+and dtype_c = {
+  dc_result : dtype_v;
+  dc_effect : deffect;
+  dc_pre    : dpre;
+  dc_post   : dpost;
+  dc_xpost  : dxpost;
+}
 
 type dvariant = Ptree.lexpr * Term.lsymbol option
 
-type dloop_annotation = {
-  dloop_invariant : Ptree.lexpr option;
-  dloop_variant   : dvariant list;
-}
+type dinvariant = Ptree.lexpr option
 
 type dexpr = {
-  dexpr_desc : dexpr_desc;
-  dexpr_type : dity;
-  dexpr_lab  : Ident.label list;
-  dexpr_loc  : loc;
+  de_desc : dexpr_desc;
+  de_type : dvty;
+  de_lab  : Ident.Slab.t;
+  de_loc  : loc;
 }
 
 and dexpr_desc =
-  | DEconstant of constant
+  | DEconstant of Term.constant
   | DElocal of string
   | DEglobal_pv of pvsymbol
   | DEglobal_ps of psymbol
   | DEglobal_pl of plsymbol
   | DEglobal_ls of Term.lsymbol
   | DEapply of dexpr * dexpr list
-  | DEfun of dbinder list * dtriple
-  | DElet of ident * dexpr * dexpr
+  | DEfun of dlambda
+  | DElet of ident * ghost * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
   | DEassign of dexpr * dexpr
-  | DEsequence of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEloop of dloop_annotation * dexpr
-  | DElazy of lazy_op * dexpr * dexpr
+  | DEloop of dvariant list * dinvariant * dexpr
+  | DElazy of Ptree.lazy_op * dexpr * dexpr
   | DEnot of dexpr
   | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
-  | DEraise of xsymbol * dexpr option
-  | DEtry of dexpr * (xsymbol * string option * dexpr) list
-  | DEfor of ident * dexpr * for_direction * dexpr * Ptree.lexpr option * dexpr
-  | DEassert of assertion_kind * Ptree.lexpr
-  | DEmark of string * dexpr
-  (* | DEany of dutype_c *)
+  | DEraise of xsymbol * dexpr
+  | DEtry of dexpr * (xsymbol * ident * dexpr) list
+  | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
+  | DEassert of Ptree.assertion_kind * Ptree.lexpr
+  | DEabstract of dexpr * dpost * dxpost
+  | DEmark of ident * dexpr
+  | DEghost of dexpr
+  | DEany of dtype_c
 
-and drecfun = ident * dity * dbinder list * dvariant list * dtriple
+and drecfun = loc * ident * ghost * dvty * dlambda
 
-and dtriple = dpre * dexpr * dpost
+and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost

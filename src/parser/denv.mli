@@ -28,15 +28,17 @@ open Theory
 type type_var
 
 val find_type_var : loc:Ptree.loc -> type_var Htv.t -> tvsymbol -> type_var
-val create_ty_decl_var : ?loc:Ptree.loc -> user:bool -> tvsymbol -> type_var
+val create_ty_decl_var : ?loc:Ptree.loc -> tvsymbol -> type_var
 
 type dty
 
 val tyvar : type_var -> dty
+val tyuvar: tvsymbol -> dty
 val tyapp : tysymbol -> dty list -> dty
 
 type dty_view =
   | Tyvar of type_var
+  | Tyuvar of tvsymbol
   | Tyapp of tysymbol * dty list
 
 val view_dty : dty -> dty_view
@@ -66,6 +68,7 @@ type dterm = { dt_node : dterm_node; dt_ty : dty }
 
 and dterm_node =
   | Tvar of string
+  | Tgvar of vsymbol
   | Tconst of constant
   | Tapp of lsymbol * dterm list
   | Tif of dfmla * dterm * dterm

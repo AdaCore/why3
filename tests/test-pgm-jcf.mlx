@@ -1,4 +1,14 @@
 
+module TestWP
+  use import int.Int
+  let h x =
+    let rec f (x:int) = {} g x {}
+       with g (x:int) = {} f x {}
+    in
+    f x
+end
+
+(***
 theory T
   type t = int
 end
@@ -16,28 +26,54 @@ module N
   use import M
   goal G1: f 41 = 42
 
-  type unit = ()
-
   type tree 'a = Node 'a (forest 'a) | Leaf
   with forest 'a = Cons (tree 'a) (forest 'a) | Nil
 
-  type ref 'b = {| (* ghost *) mutable contents : 'b |}
+  type ref 'b = {| ghost mutable contents : 'b |}
 
   type myrec 'a = {| f1 : int ; ghost f2 : tree 'a |}
 
   exception Exit (tree int)
 
-  let myfun r =
-    let rec on_tree t = match t with
+  type dref 'a = {| mutable dcontents : ref 'a |}
+
+  let create_dref i = {| dcontents = {| contents = i |} |}
+
+  let ghost foo (x : ref int) (y : ref int) =
+    x.contents <- 1;
+    y.contents <- 2
+
+  val gr : ref int
+
+  val add :
+      x:int -> y: ref int ->
+            {} unit writes gr { gr.contents = (old gr.contents) + 4 }
+
+
+  let ghost test () =
+    foo gr {| contents = 4 |}
+
+  let ghost myfun r = { r = r }
+  'L:
+    let rec ghost on_tree t = { true } match t with
       | Node {| contents = v |} f -> v + on_forest f
-      | Leaf -> 0
-    end with on_forest f = match f with
-      | Cons t f -> on_tree t + on_forest f
+      | Leaf -> raise (Exit Leaf)
+    end { at r 'L = t }
+    with ghost on_forest f = match f with
+      | Cons t f -> let ee = Leaf in on_tree t + on_forest f + on_tree ee
       | Nil -> 1
     end
     in
-    on_tree r
+    let dr = create_dref 0 in
+    let or = dr.dcontents in
+    let nr = {| contents = 1 |} in
+    for i = 3 to 10 do let j = i + 5 in () done;
+    dr.dcontents <- nr;
+    assert { r = r };
+    try on_tree r with Exit -> 0 end
+    { old result = 0 }
 end
+***)
 
 (*
 Local Variables:

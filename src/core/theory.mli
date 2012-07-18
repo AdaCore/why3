@@ -28,7 +28,7 @@ open Ty
 open Term
 open Decl
 
-type namespace = private {
+type namespace = {
   ns_ts : tysymbol Mstr.t;   (* type symbols *)
   ns_ls : lsymbol Mstr.t;    (* logic symbols *)
   ns_pr : prsymbol Mstr.t;   (* propositions *)
@@ -103,7 +103,7 @@ and tdecl_node = private
   | Clone of theory * symbol_map
   | Meta  of meta * meta_arg list
 
-and symbol_map = {
+and symbol_map = private {
   sm_ts : tysymbol Mts.t;
   sm_ls : lsymbol Mls.t;
   sm_pr : prsymbol Mpr.t;
@@ -129,6 +129,8 @@ val close_namespace : theory_uc -> bool -> string option -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 val get_known : theory_uc -> known_map
+
+val get_rev_decls : theory_uc -> tdecl list
 
 (** Declaration constructors *)
 

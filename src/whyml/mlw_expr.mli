@@ -19,47 +19,13 @@
 (**************************************************************************)
 
 open Why3
+open Stdlib
 open Util
 open Ident
 open Ty
 open Term
 open Mlw_ty
 open Mlw_ty.T
-
-(** program variables *)
-
-(* pvsymbols represent function arguments and pattern variables *)
-
-type pvsymbol = private {
-  pv_vs  : vsymbol;
-  pv_vtv : vty_value;
-}
-
-val pv_equal : pvsymbol -> pvsymbol -> bool
-
-val create_pvsymbol : preid -> vty_value -> pvsymbol
-
-(** program symbols *)
-
-(* psymbols represent lambda-abstractions. They are polymorphic and
-   can be type-instantiated in some type variables and regions of
-   their type signature. *)
-
-type psymbol = private {
-  ps_name  : ident;
-  ps_vta   : vty_arrow;
-  ps_vars  : varset;
-  (* this varset covers the type variables and regions of the defining
-     lambda that cannot be instantiated. Every other type variable
-     and region in ps_vty is generalized and can be instantiated. *)
-  ps_subst : ity_subst;
-  (* this substitution instantiates every type variable and region
-     in ps_vars to itself *)
-}
-
-val ps_equal : psymbol -> psymbol -> bool
-
-val create_psymbol : preid -> vty_arrow -> varset -> psymbol
 
 (** program/logic symbols *)
 
@@ -75,13 +41,29 @@ type plsymbol = private {
   pl_args   : vty_value list;
   pl_value  : vty_value;
   pl_effect : effect;
+  pl_hidden : bool;
+  pl_rdonly : bool;
 }
 
 val pl_equal : plsymbol -> plsymbol -> bool
 
-val create_plsymbol : preid -> vty_value list -> vty_value -> plsymbol
+val create_plsymbol : ?hidden:bool -> ?rdonly:bool ->
+  preid -> vty_value list -> vty_value -> plsymbol
   (* FIXME? Effect calculation is hardwired to correspond to constructors
      and projections: mutable arguments are reset, mutable result is read. *)
+
+exception HiddenPLS of lsymbol
+exception RdOnlyPLS of lsymbol
+
+(** cloning *)
+
+type symbol_map = private {
+  sm_pure : Theory.symbol_map;
+  sm_its  : itysymbol Mits.t;
+  sm_pls  : plsymbol Mls.t;
+}
+
+val pl_clone : Theory.symbol_map -> symbol_map
 
 (** patterns *)
 
@@ -108,20 +90,48 @@ type pre_ppattern =
 
 val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
+(** program symbols *)
+
+(* psymbols represent lambda-abstractions. They are polymorphic and
+   can be type-instantiated in some type variables and regions of
+   their type signature. *)
+
+type psymbol = private {
+  ps_name  : ident;
+  ps_vta   : vty_arrow;
+  ps_varm  : varmap;
+  ps_vars  : varset;
+  (* this varset covers the type variables and regions of the defining
+     lambda that cannot be instantiated. Every other type variable
+     and region in ps_vta is generalized and can be instantiated. *)
+  ps_subst : ity_subst;
+  (* this substitution instantiates every type variable and region
+     in ps_vars to itself *)
+}
+
+val ps_equal : psymbol -> psymbol -> bool
+
+val create_psymbol : preid -> vty_arrow -> psymbol
+
 (** program expressions *)
 
-type pre = term          (* precondition *)
-type post                (* postcondition: a formula with a bound variable *)
-type xpost = post Mexn.t (* exceptional postconditions *)
+type assertion_kind = Aassert | Aassume | Acheck
 
-val create_post : vsymbol -> term -> post
-val open_post : post -> vsymbol * term
+type for_direction = To | DownTo
+
+type for_bounds = pvsymbol * for_direction * pvsymbol
+
+type invariant = term
+
+type let_sym =
+  | LetV of pvsymbol
+  | LetA of psymbol
 
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
   e_effect : effect;
-  e_vars   : varset Mid.t;
+  e_varm   : varmap;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
@@ -130,28 +140,35 @@ and expr_node = private
   | Elogic  of term
   | Evalue  of pvsymbol
   | Earrow  of psymbol
-  | Eapp    of expr * pvsymbol
+  | Eapp    of expr * pvsymbol * spec
   | Elet    of let_defn * expr
-  | Erec    of rec_defn list * expr
-  | Eif     of pvsymbol * expr * expr
-  | Ecase   of pvsymbol * (ppattern * expr) list
-  | Eassign of pvsymbol * region * pvsymbol (* mutable pv <- expr *)
+  | Erec    of rec_defn * expr
+  | Eif     of expr * expr * expr
+  | Ecase   of expr * (ppattern * expr) list
+  | Eassign of expr * region * pvsymbol
   | Eghost  of expr
-  | Eany    of any_effect
+  | Eany    of spec
+  | Eloop   of invariant * variant list * expr
+  | Efor    of pvsymbol * for_bounds * invariant * expr
+  | Eraise  of xsymbol * expr
+  | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Eabstr  of expr * post * xpost
+  | Eassert of assertion_kind * term
+  | Eabsurd
 
 and let_defn = private {
-  let_var  : let_var;
+  let_sym  : let_sym;
   let_expr : expr;
 }
 
-and let_var =
-  | LetV of pvsymbol
-  | LetA of psymbol
-
 and rec_defn = private {
-  rec_ps     : psymbol;
-  rec_lambda : lambda;
-  rec_vars   : varset Mid.t;
+  rec_defn   : fun_defn list;
+  rec_letrec : int;
+}
+
+and fun_defn = private {
+  fun_ps     : psymbol;
+  fun_lambda : lambda;
 }
 
 and lambda = {
@@ -163,33 +180,18 @@ and lambda = {
   l_xpost   : xpost;
 }
 
-and variant = {
-  v_term : term;           (* : tau *)
-  v_rel  : lsymbol option; (* tau tau : prop *)
-}
-
-(* TODO? Every top region in the type of Eany is reset.
-   This is enough for our current purposes, but we might
-   need to be more flexible later. *)
-and any_effect = {
-  aeff_reads  : expr list; (* for a ghost read, use a ghost expression *)
-  aeff_writes : expr list; (* for a ghost write, use a ghost expression *)
-  aeff_raises : (bool * xsymbol) list; (* ghost raise * exception symbol *)
-}
-
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-
-val e_inst : psymbol -> ity_subst -> expr
-val e_cast : psymbol -> vty -> expr
+val e_arrow : psymbol -> vty_arrow -> expr
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
 
 val vtv_of_expr : expr -> vty_value
+val vta_of_expr : expr -> vty_arrow
 
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
@@ -201,13 +203,13 @@ val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
 val create_fun_defn : preid -> lambda -> rec_defn
-val create_rec_defn : (psymbol * lambda) list -> rec_defn list
+val create_rec_defn : (psymbol * lambda) list -> rec_defn
 
-exception StaleRegion of region * ident
+exception StaleRegion of expr * region * ident
 (* freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr
-val e_rec : rec_defn list -> expr -> expr
+val e_rec : rec_defn -> expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
 val e_case : expr -> (ppattern * expr) list -> expr
@@ -216,7 +218,8 @@ exception Immutable of expr
 
 val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
-val e_any : any_effect -> ity -> expr
+
+val e_void : expr
 
 val e_const : constant -> expr
 val e_int_const : string -> expr
@@ -226,6 +229,19 @@ val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr
 
-(* TODO: when should we check for escaping identifiers (regions?)
-   in pre/post/xpost/effects? Here or in WP? *)
+val e_raise : xsymbol -> expr -> ity -> expr
+val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
 
+val e_loop : invariant -> variant list -> expr -> expr
+
+val e_for :
+  pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
+
+val e_any : spec -> vty -> expr
+val e_abstract : expr -> post -> xpost -> expr
+val e_assert : assertion_kind -> term -> expr
+val e_absurd : ity -> expr
+
+(** expression traversal *)
+
+val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a

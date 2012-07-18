@@ -41,10 +41,9 @@ module Stack
   val is_empty:
     s: t 'a -> {} bool reads s { result=True <-> s.elts = Nil }
 
-  (***
-  val length: s: t 'a -> {} int reads s { result = length s.elts }
-  *)
   function length (s: t 'a) : int = L.length s.elts
+
+  val length: s: t 'a -> {} int reads s { result = L.length s.elts }
 
 end
 

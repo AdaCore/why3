@@ -319,8 +319,8 @@ let update_session ~allow_obsolete old_session env whyconf  =
   init_session env_session.session;
   res
 
-let add_file env_session f =
-  let mfile = add_file ~keygen:O.create env_session f in
+let add_file env_session ?format f =
+  let mfile = add_file ~keygen:O.create env_session ?format f in
   let any_file = (File mfile) in
   init_any any_file;
   O.notify any_file;
@@ -905,7 +905,7 @@ let edit_proof eS sched ~default_editor a =
               with Not_found -> default_editor
           in
           let file = update_edit_external_proof eS a in
-          dprintf debug "[Editing] goal %a with command %s %s@."
+          dprintf debug "[Editing] goal %a with command '%s' on file %s@."
             (fun fmt a -> pp_print_string fmt
               (Task.task_goal (goal_task a.proof_parent))
               . Decl.pr_name.Ident.id_string)

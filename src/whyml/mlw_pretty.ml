@@ -31,7 +31,6 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
-open Mlw_module
 
 let debug_print_labels = Debug.register_flag "print_labels"
 let debug_print_locs = Debug.register_flag "print_locs"
@@ -82,9 +81,6 @@ let print_ps fmt ps =
 
 let forget_ps ps = forget_id iprinter ps.ps_name
 
-(* theory names always start with an upper case letter *)
-let print_mod fmt m = print_th fmt m.mod_theory
-
 let print_its fmt ts = print_ts fmt ts.its_pure
 
 (** Types *)
@@ -106,7 +102,7 @@ let rec print_ity_node inn fmt ity = match ity.ity_node with
 
 and print_regty fmt reg =
   if Debug.test_flag debug_print_reg_types then print_reg fmt reg else
-  fprintf fmt "%a:@,%a" print_reg reg (print_ity_node false) reg.reg_ity
+  fprintf fmt "@[%a:@,%a@]" print_reg reg (print_ity_node false) reg.reg_ity
 
 let print_ity = print_ity_node false
 
@@ -120,7 +116,7 @@ let print_effect fmt eff =
   let print_reset r = function
     | None -> print_reg "fresh" r
     | Some u ->
-        fprintf fmt "{reset %a@ under %a}@ " print_regty r print_regty u
+        fprintf fmt "{refresh %a@ under %a}@ " print_regty r print_regty u
   in
   Sreg.iter (print_reg "read") eff.eff_reads;
   Sreg.iter (print_reg "write") eff.eff_writes;
@@ -134,14 +130,15 @@ let print_vtv fmt vtv =
   fprintf fmt "%s%a" (if vtv.vtv_ghost then "?" else "") print_ity vtv.vtv_ity
 
 let rec print_vta fmt vta =
-  fprintf fmt "%a@ ->@ %a%a" print_vtv vta.vta_arg
-    print_effect vta.vta_effect print_vty vta.vta_result
+  let print_arg fmt pv = fprintf fmt "%a ->@ " print_vtv pv.pv_vtv in
+  fprintf fmt "%a%a%a" (print_list nothing print_arg) vta.vta_args
+    print_effect vta.vta_spec.c_effect print_vty vta.vta_result
 
 and print_vty fmt = function
   | VTarrow vta -> print_vta fmt vta
   | VTvalue vtv -> print_vtv fmt vtv
 
-let print_pvty fmt pv = fprintf fmt "%a%a:@,%a"
+let print_pvty fmt pv = fprintf fmt "@[%a%a:@,%a@]"
   print_pv pv print_reg_opt pv.pv_vtv.vtv_mut print_vtv pv.pv_vtv
 
 let print_psty fmt ps =
@@ -149,16 +146,72 @@ let print_psty fmt ps =
     fprintf fmt "[%a]@ " (print_list comma print_tv) (Stv.elements tvs) in
   let print_regs fmt regs = if not (Sreg.is_empty regs) then
     fprintf fmt "<%a>@ " (print_list comma print_regty) (Sreg.elements regs) in
-  let vars = ps.ps_vta.vta_vars in
-  fprintf fmt "%a :@ %a%a%a"
+  let vars = vta_vars ps.ps_vta in
+  fprintf fmt "@[%a :@ %a%a%a@]"
     print_ps ps
-    print_tvs (Stv.diff vars.vars_tv ps.ps_vars.vars_tv)
+    print_tvs (Mtv.set_diff vars.vars_tv ps.ps_subst.ity_subst_tv)
     print_regs (Mreg.set_diff vars.vars_reg ps.ps_subst.ity_subst_reg)
     print_vta ps.ps_vta
 
-let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
+(* specification *)
+
+let print_post fmt post =
+  let vs,f = open_post post in
+  fprintf fmt "@[%a ->@ %a@]" print_vs vs print_term f;
+  Pretty.forget_var vs
+
+let print_lv fmt = function
+  | LetV pv -> print_pvty fmt pv
+  | LetA ps -> print_psty fmt ps
+
+let forget_lv = function
+  | LetV pv -> forget_pv pv
+  | LetA ps -> forget_ps ps
+
+let rec print_type_v fmt = function
+  | VTvalue vtv -> print_vtv fmt vtv
+  | VTarrow vta ->
+      let print_arg fmt pv = fprintf fmt "@[(%a)@] ->@ " print_pvty pv in
+      fprintf fmt "%a%a"
+        (print_list nothing print_arg) vta.vta_args
+        (print_type_c vta.vta_spec) vta.vta_result;
+      List.iter forget_pv vta.vta_args
+
+and print_type_c spec fmt vty =
+  fprintf fmt "{ %a }@ %a%a@ { %a }"
+    print_term spec.c_pre
+    print_effect spec.c_effect
+    print_type_v vty
+    print_post spec.c_post
+    (* TODO: print_xpost *)
+
+let print_invariant fmt f =
+  fprintf fmt "invariant@ { %a }@ " Pretty.print_term f
+
+let print_variant fmt varl =
+  let print_rel fmt = function
+    | Some ps -> fprintf fmt "@ [%a]" Pretty.print_ls ps
+    | None -> () in
+  let print_var fmt (t, ps) =
+    fprintf fmt " %a%a" Pretty.print_term t print_rel ps in
+  fprintf fmt "variant@ {%a }@ " (print_list comma print_var) varl
+
+let print_invariant fmt f = match f.t_node with
+  | Ttrue -> ()
+  | _ -> print_invariant fmt f
+
+let print_variant fmt = function
+  | [] -> ()
+  | varl -> print_variant fmt varl
 
 (* expressions *)
+
+let print_ppat fmt ppat = print_pat fmt ppat.ppat_pattern
+
+let print_ak fmt = function
+  | Aassert -> fprintf fmt "assert"
+  | Aassume -> fprintf fmt "assume"
+  | Acheck  -> fprintf fmt "check"
 
 let print_list_next sep print fmt = function
   | [] -> ()
@@ -212,51 +265,75 @@ and print_enode pri fmt e = match e.e_node with
       print_pv fmt v
   | Earrow a ->
       print_ps fmt a
-  | Eapp (e,v) ->
+  | Eapp (e,v,_) ->
       fprintf fmt "(%a@ %a)" (print_lexpr pri) e print_pv v
-  | Elet ({ let_var = lv ; let_expr = e1 }, e2) ->
-      let print_lv fmt = function
-        | LetV pv -> print_pvty fmt pv
-        | LetA ps -> print_psty fmt ps in
-      let forget_lv = function
-        | LetV pv -> forget_pv pv
-        | LetA ps -> forget_ps ps in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
+  | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
+    when pv.pv_vs.vs_name.id_string = "_" &&
+         ity_equal pv.pv_vtv.vtv_ity ity_unit ->
+      fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
+        print_expr e1 print_expr e2;
+  | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
+      fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
-  | Erec (rdl,e) ->
-      fprintf fmt (protect_on (pri > 0) "%a@ in@ %a")
-        (print_list_next newline print_rec) rdl print_expr e;
-      let forget_rd rd = forget_ps rd.rec_ps in
+  | Erec ({ rec_defn = rdl; rec_letrec = lr }, e) ->
+      fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
+        (print_list_next newline (print_rec lr)) rdl print_expr e;
+      let forget_rd rd = forget_ps rd.fun_ps in
       List.iter forget_rd rdl
-  | Eif (v,e1,e2) ->
+  | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
-        print_pv v print_expr e1 print_expr e2
-  | Eassign (pv1,r,pv2) ->
+        print_expr e0 print_expr e1 print_expr e2
+  | Eassign (e,r,pv) ->
       fprintf fmt (protect_on (pri > 0) "%a <%a> <- %a")
-        print_pv pv1 print_regty r print_pv pv2
-  | Ecase (pv,bl) ->
+        print_expr e print_regty r print_pv pv
+  | Ecase (e0,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
-        print_pv pv (print_list newline print_branch) bl
-  | _ ->
-      fprintf fmt "<expr TODO>"
+        print_expr e0 (print_list newline print_branch) bl
+  | Eloop (inv,var,e) ->
+      fprintf fmt "loop@ %a%a@\n@[<hov>%a@]@\nend"
+        print_invariant inv print_variant var print_expr e
+  | Efor (pv,(pvfrom,dir,pvto),inv,e) ->
+      fprintf fmt "@[<hov 2>for@ %a =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
+        print_pv pv print_pv pvfrom
+        (if dir = To then "to" else "downto") print_pv pvto
+        print_invariant inv print_expr e
+  | Eraise (xs,e) ->
+      fprintf fmt "raise (%a %a)" print_xs xs print_expr e
+  | Etry (e,bl) ->
+      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
+        print_expr e (print_list newline print_xbranch) bl
+  | Eabsurd ->
+      fprintf fmt "absurd"
+  | Eassert (ak,f) ->
+      fprintf fmt "%a { %a }" print_ak ak print_term f
+  | Eabstr (e,q,_xq) ->
+    (* TODO: print_xpost *)
+      fprintf fmt "abstract %a@ { %a }" print_expr e print_post q
+  | Eghost e ->
+      fprintf fmt "ghost@ %a" print_expr e
+  | Eany spec ->
+      fprintf fmt "any@ %a" (print_type_c spec) e.e_vty
 
 and print_branch fmt ({ ppat_pattern = p }, e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
   Svs.iter forget_var p.pat_vars
 
-and print_rec fst fmt { rec_ps = ps ; rec_lambda = lam } =
-  let print_post fmt post =
-    let vs,f = open_post post in
-    fprintf fmt "%a ->@ %a" print_vs vs print_term f in
-  let print_arg fmt pv = fprintf fmt "(%a)" print_pvty pv in
-  fprintf fmt "@[<hov 2>%s (%a) %a =@ { %a }@ %a@ { %a }@]"
-    (if fst then "let rec" else "with")
+and print_xbranch fmt (xs, pv, e) =
+  fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" print_xs xs print_pv pv print_expr e;
+  forget_pv pv
+
+and print_rec lr fst fmt { fun_ps = ps ; fun_lambda = lam } =
+  let print_arg fmt pv = fprintf fmt "@[(%a)@]" print_pvty pv in
+  fprintf fmt "@[<hov 2>%s (%a)@ %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
+    (if fst then if lr > 0 then "let rec" else "let" else "with")
     print_psty ps
     (print_list space print_arg) lam.l_args
     print_term lam.l_pre
+    print_variant lam.l_variant
     print_expr lam.l_expr
     print_post lam.l_post
+    (* TODO: print_xpost *)
 
 (*
 and print_tl fmt tl =
@@ -310,20 +387,24 @@ let print_ty_decl fmt ts =
   print_ty_decl fmt ts; forget_tvs_regs ()
 
 let print_data_decl fst fmt (ts,csl) =
-  fprintf fmt "@[<hov 2>%a =@\n@[<hov>%a@]@]"
+  fprintf fmt "@[<hov 2>%a =@ %a@]"
     (print_head fst) ts (print_list newline print_constr) csl;
   forget_tvs_regs ()
 
-let print_let_decl fmt { let_var = lv ; let_expr = e } =
-  let print_lv fmt = function
-    | LetV pv -> print_pvty fmt pv
-    | LetA ps -> print_psty fmt ps in
-  fprintf fmt "@[<hov 2>let %a = @[%a@]@]" print_lv lv print_expr e;
+let print_val_decl fmt lv =
+  let vty = match lv with
+    | LetV pv -> VTvalue pv.pv_vtv | LetA ps -> VTarrow ps.ps_vta in
+  fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v vty;
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
 
-let print_rec_decl fst fmt rd =
-  print_rec fst fmt rd;
+let print_let_decl fmt { let_sym = lv ; let_expr = e } =
+  fprintf fmt "@[<hov 2>let %a =@ %a@]" print_lv lv print_expr e;
+  (* FIXME: don't forget global regions *)
+  forget_tvs_regs ()
+
+let print_rec_decl lr fst fmt rd =
+  print_rec lr fst fmt rd;
   forget_tvs_regs ()
 
 let print_exn_decl fmt xs =
@@ -335,42 +416,61 @@ let print_exn_decl fmt xs =
 let print_pdecl fmt d = match d.pd_node with
   | PDtype ts -> print_ty_decl fmt ts
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
+  | PDval  vd -> print_val_decl fmt vd
   | PDlet  ld -> print_let_decl fmt ld
-  | PDrec rdl -> print_list_next newline print_rec_decl fmt rdl
+  | PDrec { rec_defn = rdl; rec_letrec = lr } ->
+      print_list_next newline (print_rec_decl lr) fmt rdl
   | PDexn  xs -> print_exn_decl fmt xs
-
-let print_next_data_decl = print_data_decl false
-let print_data_decl      = print_data_decl true
-
-let print_next_rec_decl  = print_rec_decl false
-let print_rec_decl       = print_rec_decl true
-
-let print_module fmt m =
-  fprintf fmt "@[<hov 2>module %a%a@\n%a@]@\nend@."
-    print_mod m print_ident_labels m.mod_theory.th_name
-    (print_list newline2 print_pdecl) m.mod_decls
 
 (* Print exceptions *)
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
-  | BadItyArity (ts, ts_arg, app_arg) ->
+  | Mlw_ty.BadItyArity (ts, ts_arg, app_arg) ->
       fprintf fmt "Bad type arity: type symbol %a must be applied \
                    to %i arguments, but is applied to %i"
         print_its ts ts_arg app_arg
-  | BadRegArity (ts, ts_arg, app_arg) ->
+  | Mlw_ty.BadRegArity (ts, ts_arg, app_arg) ->
       fprintf fmt "Bad region arity: type symbol %a must be applied \
                    to %i regions, but is applied to %i"
         print_its ts ts_arg app_arg
-  | DuplicateRegion r ->
+  | Mlw_ty.DuplicateRegion r ->
       fprintf fmt "Region %a is used twice" print_reg r
-  | UnboundRegion r ->
+  | Mlw_ty.UnboundRegion r ->
       fprintf fmt "Unbound region %a" print_reg r
-  | RegionMismatch (r1,r2) ->
+  | Mlw_ty.UnboundException xs ->
+      fprintf fmt "This function raises %a but does not \
+        specify a post-condition for it" print_xs xs
+  | Mlw_ty.RegionMismatch (r1,r2) ->
       fprintf fmt "Region mismatch between %a and %a"
         print_regty r1 print_regty r2
   | Mlw_ty.TypeMismatch (t1,t2) ->
       fprintf fmt "Type mismatch between %a and %a"
         print_ity t1 print_ity t2
+  | Mlw_ty.PolymorphicException (id,_ity) ->
+      fprintf fmt "Exception %s has a polymorphic type" id.id_string
+  | Mlw_ty.MutableException (id,_ity) ->
+      fprintf fmt "The type of exception %s has mutable components" id.id_string
+  | Mlw_ty.IllegalAlias _reg ->
+      fprintf fmt "This application creates an illegal alias"
+  | Mlw_expr.RdOnlyPLS _ls ->
+      fprintf fmt "Cannot construct values of a private type"
+  | Mlw_expr.HiddenPLS ls ->
+      fprintf fmt "'%a' is a constructor/field of an abstract type \
+      and cannot be used in a program" print_ls ls;
+  | Mlw_expr.GhostWrite (_e, _reg) ->
+      fprintf fmt "This expression stores a ghost value in a non-ghost location"
+  | Mlw_expr.GhostRaise (_e, xs) ->
+      fprintf fmt "This expression raises a ghost exception %a \
+        catched by a non-ghost code" print_xs xs
+  | Mlw_expr.StaleRegion (_e, _reg, id) ->
+      fprintf fmt "This expression prohibits further \
+        usage of variable %s" id.id_string
+  | Mlw_expr.ValueExpected _e ->
+      fprintf fmt "This expression is not a first-order value"
+  | Mlw_expr.ArrowExpected _e ->
+      fprintf fmt "This expression is not a function and cannot be applied"
+  | Mlw_expr.Immutable _e ->
+      fprintf fmt "Mutable expression expected"
   | _ -> raise exn
   end

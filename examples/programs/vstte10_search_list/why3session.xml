@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/vstte10_search_list/why3session.xml">
+ name="programs/vstte10_search_list/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -28,13 +28,13 @@
   expanded="true">
   <theory
    name="WP SearchingALinkedList"
-   locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+   locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
    loclnum="9" loccnumb="7" loccnume="27"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter search"
-    locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+    locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
     loclnum="22" loccnumb="10" loccnume="16"
     expl="parameter search"
     sum="7915e05cf96e8315d1b80013ef644fb0"
@@ -49,7 +49,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.42"/>
+     <result status="valid" time="0.38"/>
     </proof>
     <proof
      prover="0"
@@ -57,12 +57,12 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.07"/>
+     <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter search_list"
-    locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+    locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
     loclnum="32" loccnumb="6" loccnume="17"
     expl="normal postcondition"
     sum="476380c83527238939be4f8061178ce7"
@@ -98,7 +98,7 @@
    </goal>
    <goal
     name="WP_parameter head"
-    locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+    locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
     loclnum="45" loccnumb="6" loccnume="10"
     expl="parameter head"
     sum="f554c84f4c24de88b1574f28c77d9ef6"
@@ -129,12 +129,12 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter tail"
-    locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+    locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
     loclnum="50" loccnumb="6" loccnume="10"
     expl="parameter tail"
     sum="457fb9cf8017ca23267cb14d1807d03a"
@@ -170,7 +170,7 @@
    </goal>
    <goal
     name="WP_parameter search_loop"
-    locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+    locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
     loclnum="55" loccnumb="6" loccnume="17"
     expl="parameter search_loop"
     sum="497215e920b38b468ad110d4c7da58e4"
@@ -185,7 +185,7 @@
      expanded="true">
      <goal
       name="WP_parameter search_loop.1"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="loop invariant init"
       sum="4cbb4cb5d18f4aa88baa68cf083f2c49"
@@ -216,12 +216,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.2"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="precondition"
       sum="459d968590711ac25f97a8a3d410deea"
@@ -257,7 +257,7 @@
      </goal>
      <goal
       name="WP_parameter search_loop.3"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="precondition"
       sum="5e3a7c1c534b1a0f1c0fc81bd695acd7"
@@ -272,7 +272,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -288,12 +288,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.4"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="loop invariant preservation"
       sum="587fa54cdd99accad25488ce30d41a22"
@@ -308,13 +308,49 @@
        expanded="true">
        <goal
         name="WP_parameter search_loop.4.1"
-        locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+        locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
         loclnum="55" loccnumb="6" loccnume="17"
         expl="parameter search_loop"
         sum="a1accabe66ed4da1bb4371d86496b315"
         proved="true"
         expanded="true"
         shape="ainfix &lt;=c0V4Iainfix =V6V5FICV1aNilfaConswVainfix =V5V7FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NICV1aNilfaConsVwainfix =V3V8FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix &lt;=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FFF">
+        <label
+         name="expl:parameter search_loop"/>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="20"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_loop.4.2"
+        locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
+        loclnum="55" loccnumb="6" loccnume="17"
+        expl="parameter search_loop"
+        sum="958d4134b2cfdd0ffa1304395449767c"
+        proved="true"
+        expanded="true"
+        shape="ainfix =ainfix +V4alengthV6alengthV0Iainfix =V6V5FICV1aNilfaConswVainfix =V5V7FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NICV1aNilfaConsVwainfix =V3V8FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix &lt;=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FFF">
         <label
          name="expl:parameter search_loop"/>
         <proof
@@ -339,48 +375,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter search_loop.4.2"
-        locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
-        loclnum="55" loccnumb="6" loccnume="17"
-        expl="parameter search_loop"
-        sum="958d4134b2cfdd0ffa1304395449767c"
-        proved="true"
-        expanded="true"
-        shape="ainfix =ainfix +V4alengthV6alengthV0Iainfix =V6V5FICV1aNilfaConswVainfix =V5V7FIainfix =V1aNilNIainfix =V4ainfix +V2c1FIainfix =V3c0NICV1aNilfaConsVwainfix =V3V8FIainfix =V1aNilNIainfix =V1aNilNIainfix =anthV9V0aSomec0NIainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix &lt;=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FFF">
-        <label
-         name="expl:parameter search_loop"/>
-        <proof
-         prover="4"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-        <proof
-         prover="0"
-         timelimit="20"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter search_loop.4.3"
-        locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+        locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
         loclnum="55" loccnumb="6" loccnume="17"
         expl="parameter search_loop"
         sum="86a8284cccede7ebbfcf40b49a418525"
@@ -396,12 +396,12 @@
          edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.58"/>
+         <result status="valid" time="0.55"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter search_loop.4.4"
-        locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+        locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
         loclnum="55" loccnumb="6" loccnume="17"
         expl="parameter search_loop"
         sum="8e5cee14cb67249b4ec5cfa80f52d9a2"
@@ -417,14 +417,14 @@
          edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.63"/>
+         <result status="valid" time="0.68"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter search_loop.5"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="loop variant decreases"
       sum="4af88c34176e2d251a24feac7bcf7b84"
@@ -447,7 +447,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="2"
@@ -460,7 +460,7 @@
      </goal>
      <goal
       name="WP_parameter search_loop.6"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="normal postcondition"
       sum="9fbd9f67e9b76f1d53bba4ff5d615db2"
@@ -476,12 +476,12 @@
        edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.61"/>
+       <result status="valid" time="0.57"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_loop.7"
-      locfile="examples/programs/vstte10_search_list/../vstte10_search_list.mlw"
+      locfile="programs/vstte10_search_list/../vstte10_search_list.mlw"
       loclnum="55" loccnumb="6" loccnume="17"
       expl="normal postcondition"
       sum="f4a9c4aabb68e7081952f45ffc8e6ffb"

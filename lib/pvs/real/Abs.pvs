@@ -1,0 +1,30 @@
+Abs: THEORY
+ BEGIN
+  IMPORTING Real
+  
+  % Why3 tuple0
+  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
+  
+  % Why3 abs
+  abs(x:real): real = IF (x >= 0) THEN x ELSE (-x) ENDIF
+  
+  % Why3 abs_le
+  abs_le: LEMMA FORALL (x:real, y:real): (abs(x) <= y) <=> (((-y) <= x) AND
+    (x <= y))
+  
+  % Why3 abs_pos
+  abs_pos: LEMMA FORALL (x:real): (abs(x) >= 0)
+  
+  % Why3 abs_sum
+  abs_sum: LEMMA FORALL (x:real, y:real): (abs((x + y)) <= (abs(x) + abs(y)))
+  
+  % Why3 abs_prod
+  abs_prod: LEMMA FORALL (x:real, y:real): (abs((x * y)) = (abs(x) * abs(y)))
+  
+  % Why3 triangular_inequality
+  triangular_inequality: LEMMA FORALL (x:real, y:real, z:real):
+    (abs((x - z)) <= (abs((x - y)) + abs((y - z))))
+  
+  
+ END Abs
+ 

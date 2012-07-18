@@ -1,0 +1,154 @@
+(Int
+ (unit_def 0
+  (unit_def-1 nil 3551114638 ("" (grind) nil nil)
+   ((zero const-decl "int" Int nil)) shostak))
+ (assoc 0
+        (assoc-1 nil 3551114663 ("" (grind) nil nil)
+         ((int_plus_int_is_int application-judgement "int" integers
+           nil))
+         shostak))
+ (inv_def 0
+  (inv_def-1 nil 3551114670 ("" (grind) nil nil)
+   ((zero const-decl "int" Int nil)
+    (minus_int_is_int application-judgement "int" integers nil))
+   shostak))
+ (comm 0 (comm-1 nil 3551114676 ("" (grind) nil nil) nil shostak))
+ (assoc1 0
+  (assoc1-1 nil 3551114692 ("" (grind) nil nil)
+   ((mult_divides1 application-judgement "(divides(n))" divides nil)
+    (mult_divides2 application-judgement "(divides(m))" divides nil))
+   shostak))
+ (mul_distr 0
+  (mul_distr-1 nil 3551114708 ("" (grind) nil nil)
+   ((mult_divides1 application-judgement "(divides(n))" divides nil)
+    (mult_divides2 application-judgement "(divides(m))" divides nil))
+   shostak))
+ (comm1 0 (comm1-1 nil 3551114723 ("" (grind) nil nil) nil shostak))
+ (unitary 0
+  (unitary-1 nil 3551114731 ("" (grind) nil nil)
+   ((one const-decl "int" Int nil)) shostak))
+ (nontrivialring 0
+  (nontrivialring-1 nil 3551114740 ("" (grind) nil nil)
+   ((zero const-decl "int" Int nil) (one const-decl "int" Int nil))
+   shostak))
+ (refl 0
+  (refl-1 nil 3551114750 ("" (grind) nil nil)
+   ((infix_lseq const-decl "bool" Int nil)) shostak))
+ (trans 0
+  (trans-1 nil 3551114763 ("" (grind) nil nil)
+   ((boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (infix_lseq const-decl "bool" Int nil))
+   shostak))
+ (antisymm 0
+  (antisymm-1 nil 3551114771 ("" (grind) nil nil)
+   ((boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (infix_lseq const-decl "bool" Int nil))
+   shostak))
+ (total 0
+  (total-1 nil 3551114779 ("" (grind) nil nil)
+   ((boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (infix_lseq const-decl "bool" Int nil))
+   shostak))
+ (zerolessone 0
+  (zerolessone-1 nil 3551114789 ("" (grind) nil nil)
+   ((zero const-decl "int" Int nil) (one const-decl "int" Int nil)
+    (infix_lseq const-decl "bool" Int nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil))
+   shostak))
+ (compatorderadd 0
+  (compatorderadd-1 nil 3551114796 ("" (grind) nil nil)
+   ((boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (int_plus_int_is_int application-judgement "int" integers nil)
+    (infix_lseq const-decl "bool" Int nil))
+   shostak))
+ (compatordermult 0
+  (compatordermult-1 nil 3551114806
+   ("" (grind)
+    (("" (auto-rewrite-theory "real_props") (("" (assert) nil nil))
+      nil))
+    nil)
+   ((real_le_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (real_ge_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (real_gt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (both_sides_times_pos_lt1 formula-decl nil real_props nil)
+    (mult_divides2 application-judgement "(divides(m))" divides nil)
+    (mult_divides1 application-judgement "(divides(n))" divides nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (zero const-decl "int" Int nil)
+    (infix_lseq const-decl "bool" Int nil))
+   shostak)))
+

@@ -152,7 +152,34 @@ version_old = "0.12.2"
 version_old = "0.12.1"
 version_old = "0.12.0"
 version_old = "0.11.2"
-command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa016dev]
+name = "Gappa+dev"
+exec = "gappa-0.16.0+dev"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.16.0"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa015]
+name = "Gappa"
+exec = "gappa-0.15.1"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.15.1"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa014]
+name = "Gappa"
+exec = "gappa-0.14.1"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.14.1"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
 driver = "drivers/gappa.drv"
 
 [ATP simplify]
@@ -295,18 +322,19 @@ command = "'@LOCALBIN@why3-cpulimit' 0 %m -s %e -I %l/coq-tactic -R %l/coq Why3 
 driver = "drivers/coq.drv"
 editor = "coqide"
 
-# [ITP pvs]
-# name = "PVS"
-# exec = "pvs"
-# version_switch = "-version"
-# version_regexp = "PVS Version \\([^ \n]+\\)"
-# version_ok = "5.0"
-# command = "'@LOCALBIN@why3-cpulimit' 0 %m -s proveit %f"
-# driver = "drivers/pvs.drv"
-# editor = "pvs"
+[ITP pvs]
+name = "PVS"
+exec = "pvs"
+version_switch = "-version"
+version_regexp = "PVS Version \\([^ \n]+\\)"
+version_ok = "5.0"
+command = "'@LOCALBIN@why3-cpulimit' 0 %m -s @LOCALBIN@why3-check-pvs %l %f"
+driver = "drivers/pvs.drv"
+editor = "pvs"
 
-# [editor pvs]
-# command = "pvs %f"
+[editor pvs]
+name = "PVS"
+command = "@LOCALBIN@why3-call-pvs %l %f"
 
 [editor coqide]
 name = "CoqIDE"

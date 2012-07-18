@@ -82,7 +82,7 @@ back   +-+-+-+-------------------+
 
   (* assignment *)
 
-  use import map.MapInjection
+  use map.MapInjection as MI
 
   lemma permutation :
     forall a: sparse_array 'a. sa_inv a ->
@@ -109,24 +109,24 @@ module Harness
   use import module SparseArray
 
   type elt
-  constant def : elt
+  constant default : elt
 
   constant c1 : elt
   constant c2 : elt
 
   let harness () =
-    let a = create 10 def in
-    let b = create 20 def in
-    let get_a_5 = get a 5 in assert { get_a_5 = def };
-    let get_b_7 = get b 7 in assert { get_b_7 = def };
+    let a = create 10 default in
+    let b = create 20 default in
+    let get_a_5 = get a 5 in assert { get_a_5 = default };
+    let get_b_7 = get b 7 in assert { get_b_7 = default };
     set a 5 c1;
     set b 7 c2;
     let get_a_5 = get a 5 in assert { get_a_5 = c1 };
     let get_b_7 = get b 7 in assert { get_b_7 = c2 };
-    let get_a_7 = get a 7 in assert { get_a_7 = def };
-    let get_b_5 = get b 5 in assert { get_b_5 = def };
-    let get_a_0 = get a 0 in assert { get_a_0 = def };
-    let get_b_0 = get b 0 in assert { get_b_0 = def };
+    let get_a_7 = get a 7 in assert { get_a_7 = default };
+    let get_b_5 = get b 5 in assert { get_b_5 = default };
+    let get_a_0 = get a 0 in assert { get_a_0 = default };
+    let get_b_0 = get b 0 in assert { get_b_0 = default };
     ()
 
 end

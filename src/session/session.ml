@@ -28,6 +28,7 @@ module PHprover = Whyconf.Hprover
 module C = Whyconf
 
 let debug = Debug.register_flag "session"
+let debug_pairing = Debug.register_flag "session_pairing"
 
 (** {2 Type definitions} *)
 
@@ -52,8 +53,8 @@ type 'a goal =
       goal_name : Ident.ident;
       goal_expl : string option;
       goal_parent : 'a goal_parent;
-      goal_checksum : string;
-      goal_shape : string;
+      mutable goal_checksum : string;
+      mutable goal_shape : string;
       mutable goal_verified : bool;
       goal_task: task_option;
       mutable goal_expanded : bool;
@@ -100,6 +101,7 @@ and 'a theory =
 and 'a file =
     { mutable file_key : 'a;
       file_name : string;
+      file_format : string option;
       file_parent : 'a session;
       mutable file_theories: 'a theory list;
       (** Not mutated after the creation *)
@@ -109,6 +111,7 @@ and 'a file =
 
 and 'a session =
     { session_files : 'a file PHstr.t;
+      mutable session_shape_version : int;
       session_dir   : string; (** Absolute path *)
     }
 
@@ -252,7 +255,17 @@ let print_session fmt s = PTree.print fmt (PTreeT.Session s)
 
 (** 2 Create a session *)
 
-let create_session project_dir =
+let empty_session ?shape_version dir =
+  let shape_version = match shape_version with
+    | Some v -> v
+    | None -> Termcode.current_shape_version
+  in
+  { session_files = PHstr.create 3;
+    session_shape_version = shape_version;
+    session_dir   = dir;
+  }
+
+let create_session ?shape_version project_dir =
   if not (Sys.file_exists project_dir) then
     begin
       dprintf debug
@@ -260,9 +273,7 @@ let create_session project_dir =
  for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end;
-  { session_files = PHstr.create 3;
-    session_dir   = project_dir;
-  }
+  empty_session ?shape_version project_dir
 
 
 let load_env_session ?(includes=[]) session conf_path_opt =
@@ -407,8 +418,8 @@ let save_theory provers fmt t =
   fprintf fmt "@]@\n</theory>"
 
 let save_file provers fmt _ f =
-  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ verified=\"%b\"@ expanded=\"%b\">"
-    save_string f.file_name f.file_verified f.file_expanded;
+  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
+    save_string f.file_name (opt "format") f.file_format f.file_verified f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
@@ -426,7 +437,8 @@ let save fname config session =
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
     save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
-  fprintf fmt "@[<v 1><why3session@ name=\"%a\">" save_string fname;
+  fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
+    save_string fname session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
@@ -627,14 +639,19 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
   in
   goal
 
+(* a global variable indicating the shape version to use. It is set
+   when reading the attribute shape_version of an XML file
+*)
+let current_shape_version = ref 0
+
 let raw_add_task ~(keygen:'a keygen) parent name expl t exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = keygen ~parent:parent_key () in
-  let sum = Termcode.task_checksum t in
-  let shape = Termcode.t_shape_buf (Task.task_goal_fmla t) in
+  let sum = Termcode.task_checksum ~version:!current_shape_version t in
+  let shape = Termcode.t_shape_buf ~version:!current_shape_version (Task.task_goal_fmla t) in
   let goal = { goal_name = name;
                goal_expl = expl;
                goal_parent = parent;
@@ -674,18 +691,19 @@ let raw_add_theory ~(keygen:'a keygen) mfile thname exp =
   let mth = { theory_name = thname;
               theory_key = key;
               theory_parent = mfile;
-              theory_goals = [] ;
+              theory_goals = [];
               theory_verified = false;
               theory_expanded = exp;
             }
   in
   mth
 
-let raw_add_file ~(keygen:'a keygen) session f exp =
+let raw_add_file ~(keygen:'a keygen) session f fmt exp =
   let key = keygen () in
   let mfile = { file_name = f;
                 file_key = key;
-                file_theories = [] ;
+                file_format = fmt;
+                file_theories = [];
                 file_verified = false;
                 file_expanded = exp;
                 file_parent  = session;
@@ -886,8 +904,9 @@ let load_file session old_provers f =
   match f.Xml.name with
     | "file" ->
         let fn = string_attribute "name" f in
+        let fmt = load_option "format" f in
         let exp = bool_attribute "expanded" f true in
-        let mf = raw_add_file ~keygen session fn exp in
+        let mf = raw_add_file ~keygen session fn fmt exp in
         mf.file_theories <-
           List.rev
           (List.fold_left
@@ -912,12 +931,15 @@ let old_provers = ref Util.Mstr.empty
 let get_old_provers () = !old_provers
 
 let load_session session xml =
-  let cont = xml.Xml.content in
-  match cont.Xml.name with
+  match xml.Xml.name with
     | "why3session" ->
+      let shape_version = int_attribute "shape_version" xml 1 in
+      session.session_shape_version <- shape_version;
+      dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
-        old_provers :=
-          List.fold_left (load_file session) Util.Mstr.empty cont.Xml.elements
+      old_provers :=
+        List.fold_left (load_file session) Util.Mstr.empty xml.Xml.elements;
+      dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 
@@ -927,13 +949,13 @@ let read_session dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
     raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
-  let session = {session_files = PHstr.create 3; session_dir = dir} in
+  let session = empty_session dir in
   (** If the xml is present we read it, otherwise we consider it empty *)
   if Sys.file_exists xml_filename then begin
     try
       let xml = Xml.from_file xml_filename in
       try
-        load_session session xml;
+        load_session session xml.Xml.content;
       with Sys_error msg ->
         failwith ("Open session: sys error " ^ msg)
     with
@@ -982,8 +1004,8 @@ let raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
       let name,expl,task = x_goal goal in
       raw_add_task ~keygen:x_keygen parent name expl task false in
     g::acc in
-  let add_file session f_name file =
-    let rfile = raw_add_file ~keygen:x_keygen session f_name false in
+  let add_file session f_name fmt file =
+    let rfile = raw_add_file ~keygen:x_keygen session f_name fmt false in
     let add_theory acc thname theory =
       let rtheory = raw_add_theory ~keygen:x_keygen rfile thname false in
       let parent = Parent_theory rtheory in
@@ -1015,19 +1037,21 @@ module AddFile(X : sig
     'a -> file -> 'a
 
 end) = (struct
-  let add_file session  fn f =
+  let add_file session fn ?format f =
     let file = raw_add_file ~x_keygen:X.keygen ~x_goal:X.goal
-    ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session fn f in
+    ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session
+    fn format f in
     check_file_verified notify file;
     file
 end : sig
-  val add_file : X.key session -> string -> X.file -> X.key file
+  val add_file :
+    X.key session -> string -> ?format:string -> X.file -> X.key file
 end)
 
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
-let read_file env fn =
-  let theories = Env.read_file env fn in
+let read_file env ?format fn =
+  let theories = Env.read_file env ?format fn in
   let theories =
     Util.Mstr.fold
       (fun name th acc ->
@@ -1048,19 +1072,19 @@ let goal_expl_task task =
   let info = get_explanation gid task in
   gid, info, task
 
-let add_file ~keygen env filename =
+let add_file ~keygen env ?format filename =
   let x_keygen = keygen in
   let x_goal = goal_expl_task in
   let x_fold_theory f acc th =
     let tasks = List.rev (Task.split_theory th None None) in
     List.fold_left f acc tasks in
   let x_fold_file f acc (env,fname) =
-    let theories = read_file env fname in
+    let theories = read_file env ?format fname in
     List.fold_left (fun acc (_,thname,th) -> f acc thname th) acc theories in
   dprintf debug "[Load] file '%s'@\n" filename;
   let file = Filename.concat env.session.session_dir filename in
   let add_file = raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
-  let file = add_file env.session filename (env.env,file) in
+  let file = add_file env.session filename format (env.env,file) in
   check_file_verified notify file;
   file
 
@@ -1336,7 +1360,9 @@ let array_map_list f l =
          | [] -> assert false
          | x::rem -> r := rem; f i x)
 
-let associate_subgoals gname (old_goals : 'a goal list) new_goals =
+let associate_subgoals gname (old_goals : 'a goal list) 
+    new_goals =
+  dprintf debug "[Info] associate_subgoals, shape_version = %d@\n" !current_shape_version;
   (*
      we make a map of old goals indexed by their checksums
   *)
@@ -1353,7 +1379,7 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
          let id = (Task.task_goal g).Decl.pr_name in
          let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (i+1)) in
          let goal_name = Ident.id_register (Ident.id_derive goal_name id) in
-         let sum = Termcode.task_checksum g in
+         let sum = Termcode.task_checksum ~version:!current_shape_version g in
          (i,id,goal_name,g,sum))
       new_goals
   in
@@ -1376,21 +1402,19 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
     Hashtbl.remove old_goals_map g.goal_checksum
   in
   Array.iter
-    (fun (i,_,_goal_name,_,sum) ->
+    (fun (i,_,goal_name,_,sum) ->
        try
          let h = Hashtbl.find old_goals_map sum in
          (* an old goal has the same checksum *)
-         (*
-           eprintf "Merge phase 1: old goal '%s' -> new goal '%s'@."
-           h.goal_name goal_name;
-         *)
+         Debug.dprintf debug_pairing
+           "Merge phase 1: old goal '%s' -> new goal '%s'@."
+           h.goal_name.Ident.id_string goal_name.Ident.id_string;
          shape_array.(i) <- h.goal_shape;
          associate_goals ~obsolete:false i h
        with Not_found ->
-         (*
-           eprintf "Merge phase 1: no old goal -> new goal '%s'@."
-           subgoal_name;
-         *)
+         Debug.dprintf debug_pairing
+           "Merge phase 1: no old goal -> new goal '%s'@."
+           goal_name.Ident.id_string;
          ())
     new_goals_array;
   (* Phase 2: we now build a list of all remaining new and old goals,
@@ -1415,7 +1439,8 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
            | Some _ -> acc
            | None ->
                let shape =
-                 Termcode.t_shape_buf (Task.task_goal_fmla g)
+                 Termcode.t_shape_buf ~version:!current_shape_version
+                   (Task.task_goal_fmla g)
                in
                shape_array.(i) <- shape;
                (shape,New_goal i)::acc)
@@ -1426,17 +1451,17 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
     List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
       all_goals_without_pairing
   in
-(*
-  eprintf "[Merge] pairing the following shapes:@.";
-  List.iter
-    (fun (s,g) ->
-       match g with
-         | New_goal _ ->
-             eprintf "new: %s@." s
-         | Old_goal _ ->
-             eprintf "old: %s@." s)
-    sort_by_shape;
-*)
+  if Debug.test_flag debug_pairing then begin
+    Debug.dprintf debug_pairing "[Merge] pairing the following shapes:@.";
+    List.iter
+      (fun (s,g) ->
+         match g with
+           | New_goal _ ->
+               Debug.dprintf debug_pairing "new: %s@." s
+           | Old_goal _ ->
+               Debug.dprintf debug_pairing "old: %s@." s)
+      sort_by_shape;
+  end;
   let rec similarity_shape n s1 s2 =
     if String.length s1 <= n || String.length s2 <= n then n else
       if s1.[n] = s2.[n] then similarity_shape (n+1) s1 s2
@@ -1469,14 +1494,16 @@ let associate_subgoals gname (old_goals : 'a goal list) new_goals =
           end
   and try_associate si i sh h opt rem =
     let n = similarity_shape 0 si sh in
-    eprintf "[Merge] try_associate: claiming similarity %d for new \
-shape@\n%s@\nand old shape@\n%s@." n si sh;
+    Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
     if (match opt with
       | None ->
-          eprintf "[Merge] try_associate: no previous claim@.";
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            no previous claim@.";
           true
       | Some m ->
-          eprintf "[Merge] try_associate: previous claim was %d@." m;
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            previous claim was %d@." m;
           m < n)
     then
       (* try to associate i with h *)
@@ -1484,20 +1511,23 @@ shape@\n%s@\nand old shape@\n%s@." n si sh;
       if b then
         begin
           (* h or i was already paired in rem *)
-          eprintf "[Merge] try_associate: failed because claimed further@.";
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            failed because claimed further@.";
           false
         end
       else
         begin
-          eprintf "[Merge] try_associate: succeeded to associate new \
-goal@\n%s@\nwith old goal@\n%s@." si sh;
+          Debug.dprintf debug_pairing "[Merge] try_associate: \
+            succeeded to associate new goal@\n%s@\nwith \
+            old goal@\n%s@." si sh;
           associate_goals ~obsolete:true i h;
           true
         end
     else
       (* no need to try to associate i with h *)
       begin
-        eprintf "[Merge] try_associate: no claim further attempted@.";
+        Debug.dprintf debug_pairing "[Merge] try_associate: \
+          no claim further attempted@.";
         let (_:bool) = match_shape None rem in
         false
       end
@@ -1538,16 +1568,12 @@ goal@\n%s@\nwith old goal@\n%s@." si sh;
           end
   and try_associate min si i sh h hd rem =
     let n = similarity_shape 0 si sh in
-(*
-    eprintf "[Merge] try_associate: claiming similarity %d for new \
-shape@\n%s@\nand old shape@\n%s@." n si sh;
-*)
+    Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
     if n < min then
       begin
-(*
-        eprintf "[Merge] try_associate: claiming dropped because similarity \
-lower than min = %d@." min;
-*)
+        Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+          dropped because similarity lower than min = %d@." min;
         let (b,rem2) = match_shape min rem in
         if b then
           (true, hd::rem2)
@@ -1557,17 +1583,14 @@ lower than min = %d@." min;
     else
       match match_shape n rem with
         | false, rem2 ->
-(*
-            eprintf "[Merge] try_associate: claiming dropped because head was \
-consumed by larger similarity@.";
-*)
+            Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+              dropped because head was consumed by larger similarity@.";
             match_shape min (hd::rem2)
         | true, [] -> assert false
         | true, _::rem2 ->
-(*
-            eprintf "[Merge] try_associate: claiming succeeded \
-(similarity %d) for new shape@\n%s@\nand old shape@\n%s@." n si sh;
-*)
+            Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
+              succeeded (similarity %d) for new shape@\n%s@\nand \
+              old shape@\n%s@." n si sh;
             associate_goals ~obsolete:true i h;
             let (_,rem3) = match_shape min rem2 in
             (false, rem3)
@@ -1577,9 +1600,7 @@ consumed by larger similarity@.";
      Phase 3: we now associate remaining new goals to the remaining
      old goals in the same order as original
   *)
-(*
-  eprintf "[Merge] phase 3: associate remaining goals@.";
-*)
+  Debug.dprintf debug_pairing "[Merge] phase 3: associate remaining goals@.";
   let remaining_old_goals =
     Hashtbl.fold
       (fun _ g acc -> (g.goal_name,g)::acc)
@@ -1639,8 +1660,9 @@ and merge_trans ~keygen env to_goal _ from_transf =
     from_transf_name to_goal_name.Ident.id_string;
   let subgoals =
     Trans.apply_transform from_transf.transf_name env (goal_task to_goal) in
-  let goals = associate_subgoals
-    to_goal_name from_transf.transf_goals subgoals in
+  let goals =
+    associate_subgoals to_goal_name from_transf.transf_goals subgoals
+  in
   let goal (gid,name,t,_,_,_,_) = name, get_explanation gid t, t in
   let transf = add_transformation ~keygen ~goal
     from_transf_name to_goal goals in
@@ -1681,36 +1703,85 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
     ) to_th.theory_goals
 
 let merge_file ~keygen env ~allow_obsolete from_f to_f  =
+  dprintf debug "[Info] merge_file, shape_version = %d@." !current_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
     Util.Mstr.empty from_f.file_theories
   in
-  Util.list_or
+  let b = 
+    Util.list_or
     (fun to_th ->
       try
         let from_th =
-          Util.Mstr.find to_th.theory_name.Ident.id_string from_theories in
+          let name = to_th.theory_name.Ident.id_string in
+          try Util.Mstr.find name from_theories
+          (* TODO: remove this later when all sessions are updated *)
+          with Not_found -> Util.Mstr.find ("WP "^name) from_theories
+        in
         merge_theory ~keygen env ~allow_obsolete from_th to_th
       with
         | Not_found when allow_obsolete -> true
         | Not_found -> raise OutdatedSession
     )
     to_f.file_theories
+  in
+  dprintf debug "[Info] merge_file, done@\n";
+  b
+
+
+
+let rec recompute_all_shapes_goal g =
+  let t = goal_task g in
+  g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t);
+  g.goal_checksum <- Termcode.task_checksum t;
+  PHstr.iter recompute_all_shapes_transf g.goal_transformations
+
+and recompute_all_shapes_transf _ tr =
+  List.iter recompute_all_shapes_goal tr.transf_goals
+
+let recompute_all_shapes_theory t =
+  List. iter recompute_all_shapes_goal t.theory_goals
+
+let recompute_all_shapes_file _ f =
+  List.iter recompute_all_shapes_theory f.file_theories
+
+let recompute_all_shapes session =
+  PHstr.iter recompute_all_shapes_file session.session_files;
+  session.session_shape_version <- Termcode.current_shape_version
 
 let update_session ~keygen ~allow_obsolete old_session env whyconf =
-  let new_session = create_session old_session.session_dir in
-  let new_env_session = { session = new_session;
-                      env = env;
-                      whyconf = whyconf;
-                      loaded_provers = PHprover.create 5;
-                    } in
+  current_shape_version := old_session.session_shape_version;
+  dprintf debug "[Info] update_session: shape_version = %d@\n" !current_shape_version;
+  let new_session =
+    create_session ~shape_version:!current_shape_version old_session.session_dir
+  in
+  let new_env_session =
+    { session = new_session;
+      env = env;
+      whyconf = whyconf;
+      loaded_provers = PHprover.create 5;
+    }
+  in
   let obsolete = PHstr.fold (fun _ old_file acc ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-    let new_file = add_file ~keygen new_env_session old_file.file_name in
+    let new_file = add_file ~keygen new_env_session
+      ?format:old_file.file_format old_file.file_name
+    in
     merge_file ~keygen env ~allow_obsolete old_file new_file
     || acc)
-    old_session.session_files false in
+    old_session.session_files false 
+  in
+  dprintf debug "[Info] update_session: done@\n";
+  let obsolete =
+    if !current_shape_version <> Termcode.current_shape_version then
+      begin
+        current_shape_version := Termcode.current_shape_version;
+        dprintf debug "[Info] update_session: recompute shapes@\n";
+        recompute_all_shapes new_session;
+        true
+      end
+    else obsolete in
   new_env_session, obsolete
 
 let get_project_dir fname =

@@ -3,24 +3,26 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
 Parameter qtmark : Type.
 
 Parameter at1: forall (a:Type), a -> qtmark -> a.
-
 Implicit Arguments at1.
 
 Parameter old: forall (a:Type), a -> a.
-
 Implicit Arguments old.
 
+(* Why3 assumption *)
 Definition implb(x:bool) (y:bool): bool := match (x,
   y) with
   | (true, false) => false
   | (_, _) => true
   end.
 
+(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
@@ -29,20 +31,7 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
-Set Implicit Arguments.
-Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-Unset Implicit Arguments.
-
-Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
-  (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
   a) :=
@@ -59,9 +48,25 @@ Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
 Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
   (Nil :(list a))) = l).
 
+(* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
+  match l with
+  | Nil => 0%Z
+  | (Cons _ r) => (1%Z + (length r))%Z
+  end.
+Unset Implicit Arguments.
+
+Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
+  (0%Z <= (length l))%Z.
+
+Axiom Length_nil : forall (a:Type), forall (l:(list a)),
+  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
+
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
@@ -76,10 +81,12 @@ Axiom mem_append : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
 Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
   exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
 
+(* Why3 assumption *)
 Inductive tree  :=
   | Leaf : tree 
   | Node : tree -> tree -> tree .
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint depths(d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
@@ -98,46 +105,58 @@ Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
   (s2:(list Z)), ((infix_plpl (depths d t1) s1) = (infix_plpl (depths d t2)
   s2)) -> ((t1 = t2) /\ (s1 = s2)).
 
+Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list
+  Z)), ((infix_plpl (depths d1 t) s1) = (infix_plpl (depths d2 t) s2)) ->
+  (d1 = d2).
+
+Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
+  t) = (depths d2 t)) -> (d1 = d2).
+
+Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list
+  Z)), ((infix_plpl (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
+
+Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
+  t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
+
+(* Why3 assumption *)
 Definition lex(x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
   match x1 with
   | (s1, d1) =>
       match x2 with
-      | (s2, d2) => ((length s1) <  (length s2))%Z \/
+      | (s2, d2) => ((length s1) < (length s2))%Z \/
           (((length s1) = (length s2)) /\ match (s1,
           s2) with
-          | ((Cons h1 _), (Cons h2 _)) => ((d2 <  d1)%Z /\ (d1 <= h1)%Z) /\
+          | ((Cons h1 _), (Cons h2 _)) => ((d2 < d1)%Z /\ (d1 <= h1)%Z) /\
               (h1 = h2)
           | _ => False
           end)
       end
   end.
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 
-(* DO NOT EDIT BELOW *)
 
+(* Why3 goal *)
 Theorem WP_parameter_build_rec : forall (d:Z), forall (s:(list Z)),
   match s with
   | Nil => True
-  | (Cons h t) => (~ (h <  d)%Z) -> ((~ (h = d)) -> ((lex (s, (d + 1%Z)%Z) (
-      s, d)) -> ((forall (result:tree) (result1:(list Z)),
+  | (Cons h t) => (~ (h < d)%Z) -> ((~ (h = d)) -> ((lex (s, (d + 1%Z)%Z) (s,
+      d)) -> ((forall (result:tree) (result1:(list Z)),
       (s = (infix_plpl (depths (d + 1%Z)%Z result) result1)) -> ((lex (
       result1, (d + 1%Z)%Z) (s, d)) /\ ((forall (result2:tree) (result3:(list
       Z)), (result1 = (infix_plpl (depths (d + 1%Z)%Z result2) result3)) ->
       (s = (infix_plpl (depths d (Node result result2)) result3))) /\
-      ((forall (t1:tree) (sqt:(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z
-      t1) sqt) = result1)) -> forall (t1:tree) (sqt:(list Z)),
-      ~ ((infix_plpl (depths d t1) sqt) = s))))) -> ((forall (t1:tree)
-      (sqt:(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z t1) sqt) = s)) ->
-      forall (t1:tree) (sqt:(list Z)), ~ ((infix_plpl (depths d t1)
-      sqt) = s)))))
+      ((forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z
+      t1) s') = result1)) -> forall (t1:tree) (s':(list Z)),
+      ~ ((infix_plpl (depths d t1) s') = s))))) -> ((forall (t1:tree)
+      (s':(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z t1) s') = s)) ->
+      forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths d t1)
+      s') = s)))))
   end.
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 destruct s; intuition.
 rename z into h. rename s into t.
 clear H1.
-rename sqt into st1.
 destruct t1 as [_|t1 t2].
 (* t1 = Leaf *)
 simpl in H4.
@@ -149,6 +168,5 @@ clear H2.
 rewrite <- Append_assoc in H4.
 apply (H3 _ _ H4).
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

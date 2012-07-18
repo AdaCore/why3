@@ -18,4 +18,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val protect_enumeration : Task.task Trans.trans
+open Why3
+open Theory
+open Mlw_ty
+open Mlw_ty.T
+open Mlw_decl
+open Mlw_expr
+
+(** WP-only builtins *)
+
+val ts_mark : Ty.tysymbol
+val ty_mark : Ty.ty
+
+val fs_at  : Term.lsymbol
+val fs_old : Term.lsymbol
+
+val th_mark_at  : Theory.theory
+val th_mark_old : Theory.theory
+
+val e_now : expr
+
+val remove_old : Term.term -> Term.term
+
+(** Weakest preconditions *)
+
+val wp_val: Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
+val wp_let: Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
+val wp_rec: Env.env -> known_map -> theory_uc -> rec_defn -> theory_uc

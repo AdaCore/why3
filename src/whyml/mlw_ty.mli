@@ -33,10 +33,12 @@ module rec T : sig
     vars_reg : Mreg.Set.t;
   }
 
+  type varmap = varset Mid.t
+
   type itysymbol = private {
     its_pure : tysymbol;
     its_args : tvsymbol list;
-    its_regs : region   list;
+    its_regs : region list;
     its_def  : ity option;
     its_abst : bool;
     its_priv : bool;
@@ -86,6 +88,8 @@ val ity_hash : ity -> int
 val reg_equal : region -> region -> bool
 val reg_hash : region -> int
 
+val reg_occurs : region -> varset -> bool
+
 exception BadItyArity of itysymbol * int * int
 exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
@@ -123,6 +127,8 @@ val ity_s_fold :
 val ity_s_all : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 
+val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
+
 (* traversal functions on type variables and regions *)
 
 val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
@@ -135,6 +141,9 @@ val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
 
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
+
+val ts_unit : tysymbol
+val ty_unit : ty
 
 val ity_int : ity
 val ity_bool : ity
@@ -166,9 +175,9 @@ val vars_empty : varset
 
 val vars_union : varset -> varset -> varset
 
-val vars_freeze : varset -> ity_subst
+val vars_merge : varmap -> varset -> varset
 
-val vs_vars : varset -> vsymbol -> varset
+val vars_freeze : varset -> ity_subst
 
 val create_varset : Stv.t -> Sreg.t -> varset
 
@@ -180,12 +189,16 @@ type xsymbol = private {
 
 val xs_equal : xsymbol -> xsymbol -> bool
 
+exception PolymorphicException of ident * ity
+exception MutableException of ident * ity
+
 val create_xsymbol : preid -> ity -> xsymbol
 
 module Mexn: Map.S with type key = xsymbol
 module Sexn: Mexn.Set
 
-(* effects *)
+(** effects *)
+
 type effect = private {
   eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
@@ -206,9 +219,12 @@ val eff_write : effect -> ?ghost:bool -> region -> effect
 val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
 
+val eff_refresh : effect -> region -> region -> effect
 val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
+
+exception IllegalAlias of region
 
 val eff_full_inst : ity_subst -> effect -> effect
 
@@ -216,103 +232,103 @@ val eff_filter : varset -> effect -> effect
 
 val eff_is_empty : effect -> bool
 
-(** program types *)
+(** specification *)
 
-(* type of function arguments and values *)
+type pre = term          (* precondition: pre_fmla *)
+type post = term         (* postcondition: eps result . post_fmla *)
+type xpost = post Mexn.t (* exceptional postconditions *)
+
+type variant = term * lsymbol option (* tau * (tau -> tau -> prop) *)
+
+val create_post : vsymbol -> term -> post
+val open_post : post -> vsymbol * term
+
+type spec = {
+  c_pre     : pre;
+  c_post    : post;
+  c_xpost   : xpost;
+  c_effect  : effect;
+  c_variant : variant list;
+  c_letrec  : int;
+}
+
+(** program variables *)
+
 type vty_value = private {
   vtv_ity   : ity;
   vtv_ghost : bool;
   vtv_mut   : region option;
-  vtv_vars  : varset;
 }
+
+val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
+
+val vtv_unmut : vty_value -> vty_value (* remove mutability *)
+
+type pvsymbol = private {
+  pv_vs   : vsymbol;
+  pv_vtv  : vty_value;
+  pv_vars : varset;
+}
+
+module Mpv : Map.S with type key = pvsymbol
+module Spv : Mpv.Set
+module Hpv : Hashtbl.S with type key = pvsymbol
+module Wpv : Hashweak.S with type key = pvsymbol
+
+val pv_equal : pvsymbol -> pvsymbol -> bool
+
+val create_pvsymbol : preid -> vty_value -> pvsymbol
+
+val restore_pv : vsymbol -> pvsymbol
+  (* raises Decl.UnboundVar if the argument is not a pv_vs *)
+
+(** program types *)
 
 type vty =
   | VTvalue of vty_value
   | VTarrow of vty_arrow
 
 and vty_arrow = private {
-  vta_arg    : vty_value;
+  vta_args   : pvsymbol list;
   vta_result : vty;
-  vta_effect : effect;
+  vta_spec   : spec;
   vta_ghost  : bool;
-  vta_vars   : varset;
-  (* this varset covers every type variable and region in vta_arg
-     and vta_result, but may skip some type variables and regions
-     in vta_effect *)
 }
 
-(* smart constructors *)
+exception UnboundException of xsymbol
 
-val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
+(* every raised exception must have a postcondition in spec.c_xpost *)
+val vty_arrow : pvsymbol list -> ?spec:spec -> ?ghost:bool -> vty -> vty_arrow
 
-val vty_arrow : vty_value -> ?effect:effect -> ?ghost:bool -> vty -> vty_arrow
+(* this only compares the types of arguments and results, and ignores
+   the spec. In other words, only the type variables and regions in
+   [vta_vars vta] are matched. The caller should supply a "freezing"
+   substitution that covers all external type variables and regions. *)
+val vta_vars_match : ity_subst -> vty_arrow -> vty_arrow -> ity_subst
 
-val vty_app_arrow : vty_arrow -> vty_value -> effect * vty
-
-val vty_vars : varset -> vty -> varset
-
-val vty_ghost : vty -> bool
-val vty_ghostify : vty -> vty
-
-(* the substitution must cover not only vta.vta_tvs and vta.vta_regs
-   but also every type variable and every region in vta_effect *)
+(* the substitution must cover not only [vta_vars vta] but
+   also every type variable and every region in vta_spec *)
 val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
 
 (* remove from the given arrow every effect that is covered
-   neither by the arrow's vta_vars nor by the given varset *)
-val vta_filter : varset -> vty_arrow -> vty_arrow
+   neither by the arrow's arguments nor by the given varmap *)
+val vta_filter : varmap -> vty_arrow -> vty_arrow
 
-(** THE FOLLOWING CODE MIGHT BE USEFUL LATER FOR WPgen *)
-(*
-(* program variables *)
-type pvsymbol = private {
-  pv_vs      : vsymbol;
-  pv_ity     : ity;
-  pv_ghost   : bool;
-  pv_mutable : region option;
-  pv_tvs     : Stv.t;
-  pv_regs    : Sreg.t;
-}
+(* apply a function specification to a variable argument *)
+val vta_app : vty_arrow -> pvsymbol -> spec * vty
 
-val create_pvsymbol : preid -> ?mut:region -> ?ghost:bool -> ity -> pvsymbol
+(* test for ghostness and convert to ghost *)
+val vty_ghost : vty -> bool
+val vty_ghostify : vty -> vty
 
-val pv_equal : pvsymbol -> pvsymbol -> bool
+(* verify that the spec corresponds to the result type *)
+val spec_check : spec -> vty -> unit
 
-(* value types *)
+(* convert arrows to the unit type *)
+val ity_of_vty : vty -> ity
+val ty_of_vty  : vty -> ty
 
-type pre   = term (* precondition *)
-type post  = term (* postcondition *)
-type xpost = (vsymbol * post) Mexn.t (* exceptional postconditions *)
-
-type vty_arrow  (* pvsymbol -> vty_comp *)
-
-type vty = private
-  | VTvalue of pvsymbol
-  | VTarrow of vty_arrow
-
-type vty_comp = private {
-  c_vty   : vty;
-  c_eff   : effect;
-  c_pre   : pre;
-  c_post  : post;
-  c_xpost : xpost;
-}
-
-(* smart constructors *)
-val vty_value : pvsymbol -> vty
-
-val vty_arrow : pvsymbol ->
-  ?pre:term -> ?post:term -> ?xpost:xpost -> ?effect:effect -> vty -> vty
-
-val vty_app_arrow : vty_arrow -> pvsymbol -> vty_comp
-
-val open_vty_arrow : vty_arrow -> pvsymbol * vty
-
-val vty_freevars : Stv.t -> vty -> Stv.t (* only args and values count... *)
-val vty_topregions : Sreg.t -> vty -> Sreg.t (* ...not eff/pre/post/xpost *)
-
-(* the substitution must cover not only the vty_freevars and
-   vty_topregions of vty, but also every type variable and
-   every region in effects and pre/post/xpost formulas *)
-val vty_full_inst : ity_subst -> vty -> vty
-*)
+(* collects the type variables and regions in arguments and values,
+   but ignores the spec *)
+val vta_vars : vty_arrow -> varset
+val vty_vars : vty -> varset

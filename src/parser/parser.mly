@@ -60,9 +60,9 @@ module Incremental = struct
   let new_decl d =
     ref_set uc_ref (Typing.add_decl (ref_get uc_ref) d)
 
-  let new_use_clone d =
+  let new_use_clone loc d =
     let env = ref_get env_ref in let lenv = ref_get lenv_ref in
-    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) d)
+    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) loc d)
 
 end
 
@@ -167,6 +167,13 @@ end
 
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
 
+  let effect_union e1 e2 =
+    let { pe_reads = r1; pe_writes = w1; pe_raises = x1 } = e1 in
+    let { pe_reads = r2; pe_writes = w2; pe_raises = x2 } = e2 in
+    { pe_reads = r1 @ r2; pe_writes = w1 @ w2; pe_raises = x1 @ x2 }
+
+  let effect_exprs ghost l = List.map (fun x -> (ghost, x)) l
+
   let type_c p ty ef q =
     { pc_result_type = ty;
       pc_effect      = ef;
@@ -245,7 +252,7 @@ end
 %nonassoc IN
 %right SEMICOLON
 %nonassoc prec_no_else
-%nonassoc DOT ELSE
+%nonassoc DOT ELSE GHOST
 %nonassoc prec_named
 %nonassoc COLON
 
@@ -306,9 +313,9 @@ new_decl:
 | decl
    { Incremental.new_decl $1 }
 | use_clone
-   { Incremental.new_use_clone $1 }
+   { Incremental.new_use_clone (floc ()) $1 }
 | namespace_head namespace_import namespace_name list0_decl END
-   { Incremental.close_namespace (floc_i 3) $2 $3 }
+   { Incremental.close_namespace (floc_ij 1 3) $2 $3 }
 ;
 
 namespace_head:
@@ -357,9 +364,9 @@ inductive:
 
 use_clone:
 | USE use
-    { (floc (), $2, None) }
+    { ($2, None) }
 | CLONE use clone_subst
-    { (floc (), $2, Some $3) }
+    { ($2, Some $3) }
 ;
 
 use:
@@ -428,6 +435,7 @@ list1_type_decl:
 type_decl:
 | lident labels type_args typedefn
   { let model, vis, def = $4 in
+    let vis = if model then Abstract else vis in
     { td_loc = floc (); td_ident = add_lab $1 $2;
       td_params = $3; td_model = model; td_vis = vis; td_def = def } }
 ;
@@ -1027,11 +1035,11 @@ list1_full_decl:
 
 full_decl:
 | decl
-   { Dlogic $1 }
+   { floc (), Dlogic $1 }
 | use_clone
-   { Duseclone $1 }
+   { floc (), Duseclone $1 }
 | NAMESPACE namespace_import namespace_name list0_full_decl END
-   { Dnamespace (floc_i 3, $3, $2, $4) }
+   { floc_ij 1 3, Dnamespace ($3, $2, $4) }
 ;
 
 list0_program_decl:
@@ -1049,31 +1057,35 @@ list1_program_decl:
 ;
 
 program_decl:
+| program_decl_one
+    { floc (), $1 }
+| NAMESPACE namespace_import namespace_name list0_program_decl END
+    { floc_ij 1 3, Dnamespace ($3, $2, $4) }
+;
+
+program_decl_one:
 | decl
     { Dlogic $1 }
 | use_clone
     { Duseclone $1 }
-| LET lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
-    { Dlet (add_lab $2 $3, mk_expr_i 7 (Efun ($4, cast_body $5 $7))) }
-| LET lident_rich_pgm labels EQUAL qualid
-    { Dlet (add_lab $2 $3, mk_expr_i 5 (Eident $5)) }
-| LET lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
-    { Dlet (add_lab $2 $3, mk_expr_i 8 (Efun ($6, $8))) }
+| LET ghost lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
+    { Dlet (add_lab $3 $4, $2, mk_expr_i 8 (Efun ($5, cast_body $6 $8))) }
+| LET ghost lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
+    { Dlet (add_lab $3 $4, $2, mk_expr_i 9 (Efun ($7, $9))) }
+| LET ghost lident_rich_pgm labels EQUAL qualid
+    { Dlet (add_lab $3 $4, $2, mk_expr_i 5 (Eident $6)) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
-| VAL lident_rich_pgm labels COLON type_v
-    { Dparam (add_lab $2 $3, $5) }
-| VAL lident_rich_pgm labels list1_type_v_param COLON type_c
-    { let tv = Tarrow ($4, $6) in
-      Dparam (add_lab $2 $3, tv) }
+| VAL ghost lident_rich_pgm labels COLON type_v
+    { Dparam (add_lab $3 $4, $2, $6) }
+| VAL ghost lident_rich_pgm labels list1_type_v_param COLON type_c
+    { Dparam (add_lab $3 $4, $2, Tarrow ($5, $7)) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, Some $4) }
 | USE use_module
     { $2 }
-| NAMESPACE namespace_import namespace_name list0_program_decl END
-    { Dnamespace (floc_i 3, $3, $2, $4) }
 ;
 
 lident_rich_pgm:
@@ -1101,8 +1113,9 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| lident_rich_pgm labels list1_type_v_binder opt_cast opt_variant EQUAL triple
-   { add_lab $1 $2, $3, $5, cast_body $4 $7 }
+| ghost lident_rich_pgm labels list1_type_v_binder
+     opt_cast opt_variant EQUAL triple
+   { floc (), add_lab $2 $3, $1, $4, $6, cast_body $5 $8 }
 ;
 
 expr:
@@ -1154,10 +1167,16 @@ expr:
    { mk_expr (Elazy (LazyOr, $1, $3)) }
 | LET pattern EQUAL expr IN expr
    { match $2.pat_desc with
-       | PPpvar id -> mk_expr (Elet (id, $4, $6))
-       | _ -> mk_expr (Ematch ($4, [$2, $6])) }
+     | PPpvar id -> mk_expr (Elet (id, false, $4, $6))
+     | _ -> mk_expr (Ematch ($4, [$2, $6])) }
+| LET GHOST pattern EQUAL expr IN expr
+   { match $3.pat_desc with
+     | PPpvar id -> mk_expr (Elet (id, true, $5, $7))
+     | _ -> Loc.errorm ~loc:(floc_i 3) "`ghost' cannot come before a pattern" }
 | LET lident labels list1_type_v_binder EQUAL triple IN expr
-   { mk_expr (Elet (add_lab $2 $3, mk_expr_i 6 (Efun ($4, $6)), $8)) }
+   { mk_expr (Elet (add_lab $2 $3, false, mk_expr_i 6 (Efun ($4, $6)), $8)) }
+| LET GHOST lident labels list1_type_v_binder EQUAL triple IN expr
+   { mk_expr (Elet (add_lab $3 $4, true, mk_expr_i 7 (Efun ($5, $7)), $9)) }
 | LET REC list1_recfun_sep_and IN expr
    { mk_expr (Eletrec ($3, $5)) }
 | FUN list1_type_v_binder ARROW triple
@@ -1192,6 +1211,8 @@ expr:
    { mk_expr (Etry ($2, $5)) }
 | ANY simple_type_c
    { mk_expr (Eany $2) }
+| GHOST expr
+   { mk_expr (Eghost $2) }
 | ABSTRACT expr post
    { mk_expr (Eabstract($2, $3)) }
 | label expr %prec prec_named
@@ -1311,17 +1332,17 @@ list1_type_v_param:
 ;
 
 type_v_binder:
-| lident labels
-   { [add_lab $1 $2, None] }
+| ghost lident labels
+   { [add_lab $2 $3, $1, None] }
 | type_v_param
    { $1 }
 ;
 
 type_v_param:
 | LEFTPAR RIGHTPAR
-   { [id_anonymous (), Some (ty_unit ())] }
-| LEFTPAR lidents_lab COLON primitive_type RIGHTPAR
-   { List.map (fun i -> (i, Some $4)) $2 }
+   { [id_anonymous (), false, Some (ty_unit ())] }
+| LEFTPAR ghost lidents_lab COLON primitive_type RIGHTPAR
+   { List.map (fun i -> (i, $2, Some $5)) $3 }
 ;
 
 lidents_lab:
@@ -1337,9 +1358,13 @@ type_v:
 
 arrow_type_v:
 | primitive_type ARROW type_c
-   { Tarrow ([id_anonymous (), Some $1], $3) }
+   { Tarrow ([id_anonymous (), false, Some $1], $3) }
+| GHOST primitive_type ARROW type_c
+   { Tarrow ([id_anonymous (), true, Some $2], $4) }
 | lident labels COLON primitive_type ARROW type_c
-   { Tarrow ([add_lab $1 $2, Some $4], $6) }
+   { Tarrow ([add_lab $1 $2, false, Some $4], $6) }
+| GHOST lident labels COLON primitive_type ARROW type_c
+   { Tarrow ([add_lab $2 $3, true, Some $5], $7) }
    /* TODO: we could alllow lidents instead, e.g. x y : int -> ... */
    /*{ Tarrow (List.map (fun x -> x, Some $3) $1, $5) }*/
 ;
@@ -1394,29 +1419,38 @@ post_exn:
 ;
 
 effects:
-| opt_reads opt_writes opt_raises
-    { { pe_reads = $1; pe_writes = $2; pe_raises = $3 } }
+| /* epsilon */   { empty_effect }
+| effect effects  { effect_union $1 $2 }
 ;
 
-opt_reads:
-| /* epsilon */         { [] }
-| READS list1_lexpr_arg { $2 }
-;
-
-opt_writes:
-| /* epsilon */          { [] }
-| WRITES list1_lexpr_arg { $2 }
-;
-
-opt_raises:
-| /* epsilon */        { [] }
-| RAISES list1_uqualid { $2 }
+effect:
+| READS list1_lexpr_arg
+    { { pe_reads = effect_exprs false $2; pe_writes = []; pe_raises = [] } }
+| WRITES list1_lexpr_arg
+    { { pe_writes = effect_exprs false $2; pe_reads = []; pe_raises = [] } }
+| RAISES list1_uqualid
+    { { pe_raises = effect_exprs false $2; pe_writes = []; pe_reads = [] } }
+| GHOST READS list1_lexpr_arg
+    { { pe_reads = effect_exprs true $3; pe_writes = []; pe_raises = [] } }
+| GHOST WRITES list1_lexpr_arg
+    { { pe_writes = effect_exprs true $3; pe_reads = []; pe_raises = [] } }
+| GHOST RAISES list1_uqualid
+    { { pe_raises = effect_exprs true $3; pe_writes = []; pe_reads = [] } }
 ;
 
 opt_variant:
-| /* epsilon */                   { None }
-| VARIANT annotation              { Some ($2, None) }
-| VARIANT annotation WITH lqualid { Some ($2, Some $4) }
+| /* epsilon */         { [] }
+| VARIANT list1_variant { $2 }
+;
+
+list1_variant:
+| variant                     { [$1] }
+| variant COMMA list1_variant { $1::$3 }
+;
+
+variant:
+| annotation              { $1, None }
+| annotation WITH lqualid { $1, Some $3 }
 ;
 
 opt_cast:
@@ -1427,6 +1461,11 @@ opt_cast:
 list1_uqualid:
 | uqualid               { [$1] }
 | uqualid list1_uqualid { $1 :: $2 }
+;
+
+ghost:
+| /* epsilon */ { false }
+| GHOST         { true }
 ;
 
 /*

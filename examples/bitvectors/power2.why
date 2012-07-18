@@ -89,6 +89,11 @@ theory Pow2int
   lemma Div_pow2: forall x i:int. -pow2 i <= x < -pow2 (i-1) ->
   		 div x (pow2 (i-1)) = -2
 
+(*
+  lemma Mod_pow2: forall x i:int. mod (x + pow2 i) 2 = mod x 2
+*)
+  lemma Mod_pow2_gen: forall x i k :int. 0 <= k < i -> mod (div (x + pow2 i) (pow2 k)) 2 = mod (div x (pow2 k)) 2
+
 end
 
 

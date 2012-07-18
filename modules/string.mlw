@@ -7,24 +7,30 @@ module Char
 
   use import int.Int
 
-  type char model int
+  type char model {| code : int |}
 
-  val chr : x:int -> { 0 <= x <= 255 } char { result = x }
+  val chr : x:int -> { 0 <= x <= 255 } char { result = {| code = x |} }
 
-  val code : c:char -> {} int { result = c /\ 0 <= c <= 255 }
+  val code : c:char -> {} int { result = c.code /\ 0 <= c.code <= 255 }
 
-  function uppercase int : int
-  function lowercase int : int
+  function uppercase char : char
+  function lowercase char : char
 
   axiom uppercase_alpha:
-    forall c:int. 97 <= c <= 122 -> uppercase c = c - 32
+    forall c:int. 97 <= c <= 122 ->
+      uppercase {| code = c |} = {| code = c - 32 |}
+
   axiom uppercase_other:
-    forall c:int. 0 <= c < 97 \/ 122 < c <= 127 -> uppercase c = c
+    forall c:int. 0 <= c < 97 \/ 122 < c <= 127 ->
+      uppercase {| code = c |} = {| code = c |}
 
   axiom lowercase_alpha:
-    forall c:int. 65 <= c <= 90 -> lowercase c = c + 32
+    forall c:int. 65 <= c <= 90 ->
+      lowercase {| code = c |} = {| code = c + 32 |}
+
   axiom lowercase_other:
-    forall c:int. 0 <= c < 65 \/ 90 < c <= 127 -> lowercase c = c
+    forall c:int. 0 <= c < 65 \/ 90 < c <= 127 ->
+      lowercase {| code = c |} = {| code = c |}
 
   val uppercase : c:char -> {} char { result = uppercase c }
   val lowercase : c:char -> {} char { result = lowercase c }

@@ -27,56 +27,852 @@ open Task
 
 let debug = Debug.register_flag "induction"
 
-let print_candidates vs =
-  Svs.iter (fun x -> Format.eprintf "Candidate %a@." Pretty.print_vs x) vs
 
-(******* Searching for variable candidates to induction tactic  *******)
-let decompose_forall t =
-  let rec aux qvl_acc t = match t.t_node with
-  | Tquant (Tforall, q) ->
-      let qvl, _, t = t_open_quant q in
-      aux (qvl_acc @ qvl) t
-  | _ -> qvl_acc, t
-  in let qvl, t = aux [] t
-     in (List.fold_right Svs.add qvl Svs.empty), qvl, t
+(*********************************************************)
+(*******      Data type induction principle      *********)
+(*********************************************************)
 
-let defn_candidate vs_acc km ls tl qvs =
-  let arg_candidate  = function
-    | Tvar x when Svs.mem x qvs -> Svs.add x vs_acc
-    | _ -> vs_acc
-  in match (find_logic_definition km ls) with
-    | Some defn ->
-      begin match ls_defn_decrease defn with
-	| [i] -> arg_candidate (List.nth tl i).t_node
-	| _ -> vs_acc
-      end
-    | None -> vs_acc
+(**********************************************************************)
+type tyscheme = (pattern * Svs.t) list
 
-let t_candidates km qvs t =
-   let rec t_candidate vs_acc t =
-     let vs_acc = match t.t_node with
-       | Tapp (ls, tl) -> defn_candidate vs_acc km ls tl qvs
-       | _ -> vs_acc
-     in t_fold t_candidate vs_acc t
-   in t_candidate Svs.empty t
+let tyscheme_inst f (km : Decl.known_map) x tx  =
+  let inst_branch = (fun (p, vset) ->
+    t_close_branch p ( Svs.fold (fun v tacc ->
+      (Term.t_implies (t_subst_single x (t_var v) tx) tacc )) vset tx))
+  in
+  t_case (t_var x) (List.map inst_branch ((f km x tx) : tyscheme))
 
-
-let heuristic = Svs.choose (* IMPROVE ME *)
-
-
-(******* Tranforming the goal into corresponding induction scheme  *******)
 
 let split_quantifiers x qvl =
   let rec aux left = function
     | hd :: tl when vs_equal x hd -> List.rev left, tl
     | hd :: tl -> aux (hd :: left) tl
     | [] -> assert false
+  in aux [] qvl
+
+
+let decompose_forall t =
+  let rec aux qvl_acc t = match t.t_node with
+    | Tquant (Tforall, qt) ->
+      let qvl, _, t = t_open_quant qt in aux (qvl_acc @ qvl) t
+    | _ -> qvl_acc, t
   in
-  aux [] qvl
+  let qvl, t = aux [] t in (List.fold_right Svs.add qvl Svs.empty), qvl, t
+
+
+let t_candidates filter km qvs t =
+  let int_candidate = (fun acc t ->
+    match t.t_node with
+      | Tvar x when Svs.mem x qvs && ty_equal x.vs_ty ty_int ->
+	Svs.add x acc
+      | _ -> acc)
+  in
+  let arg_candidate = (fun acc t ->
+    match t.t_node with
+      | Tvar x when Svs.mem x qvs ->
+	begin match x.vs_ty.ty_node with
+	  | Tyvar _ -> acc
+	  | Tyapp _ -> Svs.add x acc
+	end
+      | _ -> acc)
+  in
+  let defn_candidate = (fun vs_acc ls tl ->
+    match (find_logic_definition km ls) with
+      | Some defn ->
+	let vs_acc = List.fold_left int_candidate vs_acc tl in
+	begin match ls_defn_decrease defn with
+	  | [i] -> arg_candidate vs_acc (List.nth tl i)
+	  | h :: _ ->
+	    arg_candidate vs_acc (List.nth tl h)
+	  | _ ->  vs_acc
+	end
+      | None -> vs_acc)
+  in
+  let rec t_candidate vs_acc t =
+    let vs_acc = match t.t_node with
+      | Tapp (ls, tl) -> defn_candidate vs_acc ls tl
+      | _ ->  vs_acc
+    in t_fold t_candidate vs_acc t
+  in Svs.filter filter (t_candidate Svs.empty t)
+
+let heuristic_svs vset = Svs.choose vset
+
+
+
+
+(**********************************************************************)
+
+let filter_tydef v = not (ty_equal v.vs_ty ty_int)
+
+(* Decl.known_map -> Term.vsymbol -> Term.term -> tyscheme *)
+let tyscheme_vsty km x (_t : Term.term) =
+  let ts,ty = match x.vs_ty.ty_node with
+    | Tyapp _ when ty_equal x.vs_ty ty_int -> assert false
+    | Tyvar _ ->   assert false
+    | Tyapp (ts, _) -> ts, ty_app ts (List.map ty_var ts.ts_args)
+  in
+  let sigma = ty_match Mtv.empty ty x.vs_ty in
+  let ty_str ty =
+    let s = match ty.ty_node with
+      | Tyapp (ts, _) -> ts.ts_name.id_string
+      | Tyvar tv -> tv.tv_name.id_string
+    in if s = "" then "x" else String.make 1 s.[0]
+  in
+  let ty_vs ty =
+    let ty = ty_inst sigma ty in
+    Term.create_vsymbol (Ident.id_fresh (ty_str ty)) ty
+  in
+  let tyscheme_constructor (ls, _) =
+    let vlst = List.map ty_vs ls.ls_args in
+    let plst = List.map pat_var vlst in
+    let vset = List.fold_left
+      (fun s v ->
+	if ty_equal x.vs_ty v.vs_ty then Svs.add v s else s)
+      Svs.empty vlst
+    in pat_app ls plst x.vs_ty, vset
+  in
+  let cl = find_constructors km ts in
+  ((List.map tyscheme_constructor cl) : tyscheme)
+
+
+let induction_ty km t0 =
+  let qvs, qvl, t = decompose_forall t0 in
+  let vset = t_candidates filter_tydef km qvs t in
+  if Svs.is_empty vset then (Format.printf "No candidates found"; [t0])
+  else
+    let x  =  heuristic_svs vset in
+    let qvl1, qvl2 = split_quantifiers x qvl in
+    let t = t_forall_close qvl2 [] t in
+    let tcase = tyscheme_inst tyscheme_vsty km x t in
+    let tcase = t_forall_close [x] [] tcase in
+    let tcase = t_forall_close qvl1 [] tcase in
+    if Debug.test_flag debug then
+      begin
+
+	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
+	Format.printf "New Task: %a \n@." Pretty.print_term tcase
+      end;
+    [tcase]
+
+(**********************************************************************)
+
+type vlex =
+    {vs: vsymbol;
+     lq: vsymbol list;
+     rq: vsymbol list;
+     ts: tyscheme}
+
+module type VSL = sig
+    type t = vsymbol list
+    val compare : t -> t -> int
+end
+
+module Vsl : VSL = struct
+    type t = vsymbol list
+
+    let compare t1 t2 =
+      let compare_vs _v1 _v2 = 1 in
+      let rec aux t1 t2 = match t1,t2 with
+	| [],[] -> 0
+	| h1 :: q1, h2 :: q2 ->
+	  if vs_equal h1 h2 then aux q1 q2 else compare_vs h1 h2
+	| _ -> assert false;
+      in
+      let c = List.length t1 - List.length t2 in
+      if c = 0 then aux t1 t2
+      else let c = c / (abs c) in assert (c = 1 || c = -1); c
+end
+
+
+module Svls  = Set.Make(Vsl)
+
+
+
+
+let print_ty_skm skm =
+  List.iter
+    (fun (p,svs) ->
+      Format.printf "@[| %a : @]" Pretty.print_pat p;
+      Svs.iter (Format.printf "%a " Pretty.print_vs) svs;
+      Format.printf "@.")
+    skm
+
+let print_vset vset =
+  let aux vl =
+    Format.printf "[ ";
+    List.iter (Format.printf "%a " Pretty.print_vs) vl;
+    Format.printf "] " in
+  Format.printf "************** t_candidates_lex *****************\n";
+  Format.printf "Candidates found : %d @." (Svls.cardinal vset);
+  Format.printf "Candidates : [ ";
+  Svls.iter (fun vl -> aux vl) vset;
+  Format.printf "]\n@."
+
+
+
+let print_heuristic_lex vl ivm =
+  Format.printf "**************** heuristic_lex ******************\n";
+  Format.printf "Induction variables (following some called recursive ";
+  Format.printf "function lexicographic order): [ ";
+  List.iter (Format.printf "%a " Pretty.print_vs) vl;
+  Format.printf "]@.";
+  Format.printf "Lex. order map : [ ";
+  Mvs.iter (fun v i -> Format.printf "%a -> %d; " Pretty.print_vs v i) ivm;
+  Format.printf "]\n@."
+
+let print_lex lexl =
+  let rec aux = function
+    | [] -> ()
+    | v :: tl ->
+      Format.printf "\n%a : [ " Pretty.print_vs v.vs;
+      List.iter (Format.printf "%a " Pretty.print_vs) v.lq;
+      Format.printf "] [ ";
+      List.iter (Format.printf "%a " Pretty.print_vs) v.rq;
+      Format.printf "]@.";
+      Format.printf "--- Type scheme --- \n";
+      print_ty_skm v.ts;
+      Format.printf "------------------- \n";
+aux tl
+  in
+  Format.printf "******************* qsplit_lex ******************\n";
+  Format.printf "Induction variables (in the initial order): ";
+  List.iter (fun v -> Format.printf "%a " Pretty.print_vs v.vs ) lexl;
+  Format.printf "@.Instanciated (left) and generalized (right) ";
+  Format.printf "variables (in initial order) of each induction variable: \n";
+  aux lexl
+
+
+
+(* Decl.known_map -> Term.Svs.t -> Term.term -> Svls.t *)
+let t_candidates_lex km qvs t =
+  let int_candidates tl acc = List.fold_left
+    (fun acc t -> match t.t_node with
+      | Tvar x when Svs.mem x qvs && ty_equal x.vs_ty ty_int -> Svls.add [x] acc
+      | _ -> acc) acc tl in
+  let rec_candidates il tl acc =
+    let rec aux il vl = match il with
+      | i :: iq ->
+	begin match (List.nth tl i).t_node with
+	  | Tvar x when Svs.mem x qvs ->
+	    begin match x.vs_ty.ty_node with
+	      | Tyvar _ -> vl
+	      | Tyapp _ -> aux iq (x :: vl)
+	    end
+	  | _ -> vl
+	end
+      | [] -> vl
+    in
+    (*Format.printf "[";
+    List.iter (fun i ->
+      Format.printf "[%d : %a]" i Pretty.print_term (List.nth tl i)) il;
+    Format.printf "]@.";*)
+    Svls.add (List.rev (aux il [])) acc
+  in
+  let defn_candidates (ls,tl) acc = match (find_logic_definition km ls) with
+    | Some defn -> rec_candidates (ls_defn_decrease defn) tl (int_candidates tl acc)
+    | None -> acc
+  in
+  let rec t_candidates acc t =
+    let acc = match t.t_node with
+      | Tapp (ls, tl) -> defn_candidates (ls, tl) acc
+      | _ ->  acc
+    in t_fold t_candidates acc t
+  in
+  t_candidates Svls.empty t
+
+
+
+(* Decl.known_map -> Term.vsymbol -> tyscheme *)
+let vs_tyscheme km x _t =
+  let ts,ty = match x.vs_ty.ty_node with
+    | Tyapp _ when ty_equal x.vs_ty ty_int -> assert false
+    | Tyvar _ ->   assert false
+    | Tyapp (ts, _) -> ts, ty_app ts (List.map ty_var ts.ts_args)
+  in
+  let sigma = ty_match Mtv.empty ty x.vs_ty in
+  let ty_str ty =
+    let s = match ty.ty_node with
+      | Tyapp (ts, _) -> ts.ts_name.id_string
+      | Tyvar tv -> tv.tv_name.id_string
+    in if s = "" then "x" else String.make 1 s.[0]
+  in
+  let ty_vs ty =
+    let ty = ty_inst sigma ty in
+    Term.create_vsymbol (Ident.id_fresh (ty_str ty)) ty
+  in
+  let tyscheme_constructor (ls, _) =
+    let vlst = List.map ty_vs ls.ls_args in
+    let plst = List.map pat_var vlst in
+    let vset = List.fold_left
+      (fun s v -> if ty_equal x.vs_ty v.vs_ty then Svs.add v s else s)
+      Svs.empty vlst
+    in pat_app ls plst x.vs_ty, vset
+  in
+  let cl = find_constructors km ts in
+  ((List.map tyscheme_constructor cl) : tyscheme)
+
+
+(*
+ivs : ind. var. set
+ivm : ind. var. (vsymbol, int "lex pos") map
+qvl : quant. var. list
+lql : left quant. var. list
+lvl : left var. list
+acc : vlex list
+*)
+let qsplit km ivs ivm qvl t0 =
+  let rec aux ivs qvl lql lvl acc = match qvl with
+    | [] -> List.rev acc, t_forall_close lql [] t0
+    | q :: tl ->
+      if Svs.mem q ivs (*if q is candidate*)
+      then
+	let qi = Mvs.find q ivm in
+	let rleft = List.filter (fun v -> (Mvs.find v ivm) > qi) lvl in
+	let rright = List.filter
+	  (fun v -> if (Mvs.mem v ivm) then (Mvs.find v ivm) > qi else true) tl
+	in
+	let v = {
+	  vs = q;
+	  lq = List.rev lql;
+	  rq = (List.rev rleft) @ rright;
+	  ts =  vs_tyscheme km q t0} in
+	aux ivs tl [] (q :: lvl) (v :: acc)
+      else
+	aux ivs tl (q :: lql) lvl acc
+  in aux ivs qvl [] [] []
+
+exception No_candidates_found
+
+let heuristic_lex vset =
+  let vl = Svls.max_elt vset in
+  if vl = []
+  then raise No_candidates_found
+  else let _, ivs, ivm = List.fold_left (fun (i,s,m) v ->
+    let v =
+      (*if Svs.mem v s
+      then (create_vsymbol (Ident.id_clone v.vs_name) v.vs_ty)
+      else *) v
+    in (i+1, Svs.add v s, Mvs.add v i m)) (0,Svs.empty,Mvs.empty) vl
+       in vl, ivs, ivm
+
+let induction_ty_lex km t0 =
+  let qvs, qvl, t = decompose_forall t0 in
+  let vset = t_candidates_lex km qvs t in
+  try
+    let vl,ivs,ivm = heuristic_lex vset in
+    let lexl, _t = qsplit km ivs ivm qvl t in
+    let tcase = t0 (* make_induction lexl t *) in
+    if Debug.test_flag debug then
+      begin
+	print_vset vset;
+	print_heuristic_lex vl ivm;
+	print_lex lexl (*
+	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
+	Format.printf "New Task: %a \n@." Pretty.print_term tcase *)
+      end;
+    [tcase]
+  with No_candidates_found -> Format.printf "No candidates found\n"; [t0]
+
+
+(**********************************************************************)
+let t_defn_candidates km vs t =
+  let defn_collect = (fun acc ls tl ->
+    match (find_logic_definition km ls) with
+      | Some defn ->
+        begin match ls_defn_decrease defn with
+          | [i] ->
+	    begin match (List.nth tl i).t_node with
+	      | Tvar x when vs_equal x vs -> Mls.add ls (i, defn) acc
+	      | _ -> acc
+	    end
+	  | _  -> acc
+        end
+      | None -> acc)
+  in
+  let rec t_collect = (fun acc t ->
+    let acc = match t.t_node with
+      | Tapp (ls, tl) -> defn_collect acc ls tl
+      | _ -> acc
+    in t_fold t_collect acc t)
+  in t_collect (Mls.empty) t
+
+
+type htree = | Snode of (vsymbol * pattern * htree) list
+	     | Sleaf of Svs.t
+
+let empty = Sleaf Svs.empty
+
+
+let defn_htree _km fls x i t =
+  let rec t_htree acc t =
+    match t.t_node with
+      | Tcase ({t_node = (Tvar y)}, bl) when ty_equal x.vs_ty y.vs_ty ->
+	case_htree acc y bl
+      | Tapp (ls, tl) when ls_equal ls fls ->
+	begin
+	  match (List.nth tl i).t_node with
+	    | Tvar y -> push acc (Sleaf (Svs.add y Svs.empty))
+	    | _ -> assert false
+	end
+
+      | Tapp (_, tl) -> app_htree acc tl
+      | _ -> acc
+
+  and app_htree acc tl =
+    List.fold_left (fun acc t -> t_htree acc t ) acc tl
+
+  and case_htree acc y bl =
+    let ptl = List.map (fun b ->
+      let (p,t) = t_open_branch b in (p, t)) bl in
+    let sml = List.map (fun (p,t) -> (y, p, t_htree empty t)) ptl in
+    push acc (Snode sml)
+
+  and push acc sm = match acc with
+    | Snode l -> Snode (List.map (fun (x,p,s) -> (x,p, push s sm)) l)
+    | Sleaf svs0 -> match sm with
+	| Snode sml ->
+	  Snode ((List.map (fun (x,p,s) ->
+	    (x,p, push (Sleaf svs0) s)))  sml)
+	| Sleaf svs1 -> Sleaf (Svs.union svs0 svs1)
+  in
+  t_htree (Sleaf Svs.empty) t
+
+
+let htree_tyscheme _ht = ([] : tyscheme)
+
+(* Decl.known_map -> Term.vsymbol -> Term.term -> tyscheme *)
+let tyscheme_fdef_one km x t =
+  let (ls, (i, _defn)) = Mls.choose (t_defn_candidates km x t) in
+  let ht = defn_htree km ls x i t in
+  htree_tyscheme ht
+
+let induction_fun km t0 =
+  let qvs, qvl, t = decompose_forall t0 in
+  let vset = t_candidates (fun _ -> true) km qvs t in
+  if Svs.is_empty vset
+  then [t0]
+  else
+    let x  =  heuristic_svs vset in
+    let qvl1, qvl2 = split_quantifiers x qvl in
+    let t = t_forall_close qvl2 [] t in
+    let t = tyscheme_inst tyscheme_fdef_one km x t in
+    let t = t_forall_close [x] [] t in
+    let t = t_forall_close qvl1 [] t in
+    if Debug.test_flag debug then
+      (Format.printf "Old Task: %a \n@." Pretty.print_term t0;
+       Format.printf "New Task: %a \n@." Pretty.print_term t);
+    [t]
+
+
+
+
+(**********************************************************************)
+let filter_int v = ty_equal v.vs_ty ty_int
+
+let int_strong_induction (le_int,lt_int) x t =
+
+  let k = Term.create_vsymbol (Ident.id_clone x.vs_name) ty_int in
+  (* 0 <= k < x *)
+  let ineq = t_and (ps_app le_int [t_int_const "0"; t_var k])
+    (ps_app lt_int [t_var k; t_var x]) in
+  (* forall k. 0 <= k < x -> P[x <- k] *)
+  let ih =
+    t_forall_close [k] [] (t_implies ineq (t_subst_single x (t_var k) t)) in
+  t_forall_close [x] [] (t_implies ih t)
+
+let induction_int km (le_int,lt_int) t0 =
+  let qvs, qvl, t = decompose_forall t0 in
+  let vset = t_candidates filter_int km qvs t in
+  if Svs.is_empty vset
+  then [t0]
+  else begin
+    let x = heuristic_svs vset in
+    let qvl1, qvl2 = split_quantifiers x qvl in
+    let t = t_forall_close qvl2 [] t in
+    let t = int_strong_induction (le_int,lt_int) x t in
+    let t = t_forall_close qvl1 [] t in
+    if Debug.test_flag debug then
+    (Format.printf "Old Task: %a \n@." Pretty.print_term t0;
+     Format.printf "New Task: %a \n@." Pretty.print_term t);
+    [t]
+  end
+
+
+
+(********************************************************************)
+
+let induction_ty = function
+  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+	   task_prev = prev;
+	   task_known = km } ->
+    List.map (add_prop_decl prev Pgoal pr) (induction_ty km f)
+  | _ -> assert false
+
+
+let induction_ty_lex = function
+  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+	   task_prev = prev;
+	   task_known = km } ->
+    List.map (add_prop_decl prev Pgoal pr) (induction_ty_lex km f)
+  | _ -> assert false
+
+
+
+let induction_fun = function
+  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+	   task_prev = prev;
+	   task_known = km } ->
+    List.map (add_prop_decl prev Pgoal pr) (induction_fun km f)
+  | _ -> assert false
+
+
+
+let induction_int th_int = function
+  | Some
+      { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+	task_prev = prev; task_known = km } as t ->
+    begin
+      try
+	let le_int = ns_find_ls th_int.th_export ["infix <="] in
+	let lt_int = ns_find_ls th_int.th_export ["infix <"] in
+	if not (Mid.mem le_int.ls_name km) then raise Exit;
+	List.map (add_prop_decl prev Pgoal pr)
+	  (induction_int km (le_int, lt_int) f)
+      with Exit -> [t] end
+  | _ -> assert false
+
+
+
+
+
+let () =
+  Trans.register_transform_l "induction_ty" (Trans.store induction_ty)
+
+let () =
+  Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
+
+
+let () =
+  Trans.register_transform_l "induction_ty_fdef" (Trans.store induction_fun)
+
+let () =
+  Trans.register_env_transform_l "induction_int"
+    (fun env ->
+      let th_int = Env.find_theory env ["int"] "Int" in
+      Trans.store (induction_int th_int))
+
+(**********************************************************************)
+(*TODO
+
+1° km x t -> htree (optimized)
+2° htree -> tyscheme
+
+3° defn list -> htree
+4° predicate induction
+4° benchmark
+4° labels à la
+  {induction j}
+  {induction false}
+  {induction_int}
+  {induction @1} {induction @2}
+  {induction @1 generalize}
+5° common tactic
+6° mutual recursion
+7° lexicographic orders
+8° termination criterium
+9° warnings
+10° indentation
+
+let time = Unix.localtime (Unix.time ()) in
+	Format.printf "Last version : %d:%d %d.%d\n"
+	  time.Unix.tm_hour time.Unix.tm_min
+	  time.Unix.tm_mon time.Unix.tm_mday;
+
+
+*)
+
+
+
+
+(******************* ATTIC  **********************)
+(*
+let t_iter_scheme km t =
+
+  let ty_cl ts =
+    List.map (fun (ls, _) -> ls ) (find_constructors km ts) in
+
+  let rec t_patc (acc,n) t =
+    match t.t_node with
+      | Tapp (ls, tl)      -> t_tapp (acc,n) (ls,tl)
+      | Tif (c, t1, t2)    -> t_tif (acc,n)  (c, t1,t2)
+      | Tlet (t, tb)       -> t_tlet (acc,n) (t,tb)
+      | Tcase (t, tbl)     -> t_tcase (acc,n) (t, tbl)
+      | Tvar _ | Tconst _  -> acc, n
+      | Ttrue | Tfalse | Tnot _ | Tbinop (_, _, _) | Tquant (_,_) -> acc, n
+      | Teps _ -> acc,n
+
+  and t_tcase (acc,n) (t0, bl) = match t0.t_node with
+    | (Tvar x)  ->
+      begin
+        match x.vs_ty.ty_node with
+          | Tyapp (_, _) ->
+            let tpl = List.map
+	      (fun b -> let (p,t) = t_open_branch b in (p, t)) bl in
+            let sub_ctl =
+              List.fold_left (fun acc (_, t) ->
+                let ctl,_ = (t_patc ([],(n+1)) t) in ctl @ acc) [] tpl in
+            let tpl =
+              List.map (fun b -> let (p,t) = t_open_branch b in [p], t) bl
+            in
+            let patc = Pattern.CompileTerm.compile ty_cl [t0] tpl in
+            let acc = ((patc, n) :: sub_ctl) @ acc in
+            acc,n
+          | _ -> assert false
+      end
+    | _ ->
+      let tl = List.map (fun b -> let (_,t) = t_open_branch b in t) bl in
+      List.fold_left (fun (acc,n) t -> t_patc (acc,n) t) (acc,n) tl
+
+  and t_tapp (acc,n) (_ls,tl) =
+    List.fold_left (fun (acc,n) t -> t_patc (acc,n) t) (acc,n) tl
+
+  and t_tif (acc,n) (_c,t1,t2) =
+    let acc, n = (t_patc (acc,n) t1) in t_patc (acc,n) t2
+
+  and t_tlet (acc,n) (_t,_tb) = acc,n  in
+
+
+  let acc, _ = t_patc ([],0) t in
+  List.iter (fun (pc, n ) ->
+    Format.printf "%d: %a \n @." n Pretty.print_term pc  )
+    (List.rev acc)
+
+
+
+let t_iter_compile_first km t =
+  let ty_cl ts =
+    List.map (fun (ls, _) -> ls ) (find_constructors km ts) in
+
+  let rec t_patc t =
+    match t.t_node with
+      | Tapp (_ls, _tl)      -> t (* fs_app ls (List.map t_patc tl) *)
+      | Tif (c, t1, t2)    ->  Term.t_if c (t_patc t1) (t_patc t2)
+      | Tlet (t, _tb)       -> t (*
+	let vs,tb,f = t_open_bound_cb tb in
+	t_let t (f vs (t_patc tb)) *)
+      | Tcase (t, bl)   ->
+	let tpl =
+          List.map (fun b -> let (p,t) = t_open_branch b in [p], t) bl
+        in
+	let ct = Pattern.CompileTerm.compile ty_cl [t] tpl in
+	begin
+	  match ct.t_node with
+	    | Tcase (t, bl) ->
+	      let bl =
+		List.map (fun b ->
+		  let (p,t) = t_open_branch b in
+		  t_close_branch p (t_patc t)) bl
+	      in
+	      Term.t_case t bl
+	    | _ -> ct
+	end
+
+      | _ -> t
+  in
+  Format.printf "%a \n @." Pretty.print_term (t_patc t)
+
+
+t_tcase (acc,n) (t, tbl)
+      | _ -> t
+
+  and t_tcase (acc,n) (t0, bl) = match t0.t_node with
+    | (Tvar x)  ->
+      begin
+        match x.vs_ty.ty_node with
+          | Tyapp (_, _) ->
+	    let tpl =
+              List.map (fun b -> let (p,t) = t_open_branch b in [p], t) bl
+            in
+	    let patc = Pattern.CompileTerm.compile ty_cl [t0] tpl in
+
+
+	    let tpl = List.map
+	      (fun b -> let (p,t) = t_open_branch b in (p, t)) bl in
+            let sub_ctl =
+              List.fold_left (fun acc (_, t) ->
+                let ctl,_ = (t_patc ([],(n+1)) t) in ctl @ acc) [] tpl in
+            let tpl =
+              List.map (fun b -> let (p,t) = t_open_branch b in [p], t) bl
+            in
+            let patc = Pattern.CompileTerm.compile ty_cl [t0] tpl in
+            let acc = ((patc, n) :: sub_ctl) @ acc in
+            acc,n
+          | _ -> assert false
+      end
+    | _ ->
+      let tl = List.map (fun b -> let (_,t) = t_open_branch b in t) bl in
+      List.fold_left (fun (acc,n) t -> t_patc (acc,n) t) (acc,n) tl
+
+  and t_tapp (acc,n) (_ls,tl) =
+    List.fold_left (fun (acc,n) t -> t_patc (acc,n) t) (acc,n) tl
+
+  and t_tif (acc,n) (_c,t1,t2) =
+    let acc, n = (t_patc (acc,n) t1) in t_patc (acc,n) t2
+
+  and t_tlet (acc,n) (_t,_tb) = acc,n  in
+
+
+  let acc, _ = t_patc ([],0) t in
+  List.iter (fun (pc, n ) ->
+    Format.printf "%d: %a \n @." n Pretty.print_term pc  )
+    (List.rev acc)
+
+	 *)
+
+
+
+
+
+
+
+(*
+let functional_induction km t0 =
+  let qvs, _qvl, t = decompose_forall t0 in
+  let vmap = t_collect_data km qvs t in
+  let x, lmap =  Mvs.choose vmap in
+  let (ls, (i, defn)) = Mls.choose lmap in
+  let (_,t) = open_ls_defn defn in
+  Format.printf "%a@." print_scheme (make_scheme km ls x i t);
+  [t0]
+
+  let _ = Mls.iter (fun _ls (_i,defn) ->
+    let (_,t) = open_ls_defn defn in t_iter_compile_first km t) lmap in
+
+  if (Mvs.is_empty vmap)
+  then
+    [t0]
+  else
+    [t0]
+*)
+
+
+(*
+
+let functional_induction  = function
+  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+           task_prev = prev;
+           task_known = km } ->
+    List.map (add_prop_decl prev Pgoal pr) (functional_induction km f)
+  | _ -> assert false
+
+
+let () = Trans.register_transform_l
+  "induction_on_function_definition"
+  (Trans.store functional_induction)
+  *)
+
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.."
+End:
+*)
+
+(*
+
+
+let rec print_scheme fmt = function
+  | Snode l ->
+      Format.fprintf fmt "Snode@[<hov 2>[";
+      List.iter (fun (x,p,s) ->
+	Format.printf "@[(%a,@ %a,@ %a)@];@ "
+	  Pretty.print_vs x Pretty.print_pat p print_scheme s)
+	l;
+      Format.fprintf fmt "@]]"
+    | Sleaf s ->
+      if Svs.cardinal s = 0 then
+	Format.fprintf fmt "Sleaf .. "
+      else
+	( Format.fprintf fmt "Sleaf ";
+	  Svs.iter (fun x -> Format.printf "%a " Pretty.print_vs x) s )
+
+
+
+let t_collect_data km qvs t =
+
+  let defn_collect_data acc ls tl =
+
+    let arg_collect_data i defn = function
+      | Tvar x when Svs.mem x qvs ->
+        let lmap =
+          try
+            Mvs.find x acc
+          with Not_found ->
+            Mls.empty
+        in Mvs.add x (Mls.add ls (i,defn) lmap) acc
+      | _ -> acc
+    in
+
+    match (find_logic_definition km ls) with
+      | Some defn ->
+        begin match ls_defn_decrease defn with
+          | [i] -> arg_collect_data i defn (List.nth tl i).t_node
+          | _  -> acc
+        end
+      | None -> acc
+  in
+
+  let rec t_collect acc t =
+    let acc = match t.t_node with
+      | Tapp (ls, tl) -> defn_collect_data acc ls tl
+      | _ -> acc
+    in t_fold t_collect acc t
+
+  in t_collect (Mvs.empty) t
+*)
+
+
+
+(*
+
+type ind_info =
+    {tact : string ;
+     cands : Term.Svs.t;
+     ind_v : Term.vsymbol;
+     ind_ty : ty;
+     itsk : Term.term;
+     pred : Term.term;
+     sg : Term.term;
+     }
+
+let show_info i =
+   Format.printf "\nInduction tactic: %s  @." i.tact;
+   Format.printf "Initial task: %a @.Candidates: " Pretty.print_term i.itsk;
+   Svs.iter (fun x -> Format.printf "%a @." Pretty.print_vs x) i.cands;
+   Format.printf "Induction on variable:   %a @." Pretty.print_vsty i.ind_v;
+   Format.printf "Induction on type:   %a @." Pretty.print_ty i.ind_ty;
+   Format.printf "Induction predicate:   %a @." Pretty.print_term i.pred;
+   Format.printf "Induction sub-task: %a \n@." Pretty.print_term i.sg
+
+let print_ty_skm skm =
+  List.iter
+    (fun (p,svs) ->
+      Format.printf "@[ %a : @]" Pretty.print_pat p;
+      Svs.iter (Format.printf "%a " Pretty.print_vs) svs;
+      Format.printf "@.")
+    skm
+
+
+
 
 let indv_ty x = match x.vs_ty.ty_node with
   | Tyapp (ts, _) -> ts, ty_app ts (List.map ty_var ts.ts_args)
   | Tyvar _ -> assert false
+
+let heuristic vss =
+  let x = Svs.choose vss in
+  let ts, ty = indv_ty x in
+  x, ts, ty
 
 let name_from_type ty =
   let s = match ty.ty_node with
@@ -85,24 +881,15 @@ let name_from_type ty =
   in
   if s = "" then "x" else String.make 1 s.[0]
 
+
+
+
 let make_induction vs km qvl t =
-  let x = heuristic vs in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let init_t = t_forall_close qvl [] t in
-  if Debug.test_flag debug then
-    Format.printf "Initial task: %a @ \n" Pretty.print_term init_t;
-  let p = t_forall_close qvl2 [] t in
-  if Debug.test_flag debug then
-    Format.printf "Induction predicate:@  %a @ \n" Pretty.print_term p;
-  let ts,ty = indv_ty x in
-  if Debug.test_flag debug then begin
-    Format.printf "induction on tysymbol:  %a @ \n" Pretty.print_ts ts;
-    Format.printf "induction on type:  %a @ \n" Pretty.print_ty ty
-  end;
+  let x, ts, ty  = heuristic vs in
+
   let sigma = ty_match Mtv.empty ty x.vs_ty in
-  if Debug.test_flag debug then
-    Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
-      Pretty.print_tv x Pretty.print_ty tx ) sigma;
+  let qvl1, qvl2 = split_quantifiers x qvl in
+  let p = t_forall_close qvl2 [] t in
   let make_case (ls, _) =
     let create_var ty =
       let ty = ty_inst sigma ty in
@@ -110,7 +897,6 @@ let make_induction vs km qvl t =
       Term.create_vsymbol id ty
     in
     let ind_vl = List.map create_var ls.ls_args in
-    (* MAKE IT REALLY FRESH *)
     let ind_tl = List.map t_var ind_vl in
     let goal = t_subst_single x (t_app ls ind_tl (Some x.vs_ty)) p in
     let goal = List.fold_left
@@ -120,22 +906,28 @@ let make_induction vs km qvl t =
 	else goal) goal ind_vl
     in
     let goal = t_forall_close (qvl1 @ ind_vl) [] goal in
-    if Debug.test_flag debug then
-      Format.printf "Induction sub-task: %a @ \n" Pretty.print_term goal;
-    goal
+     if Debug.test_flag debug then
+       begin
+	 let data = {
+	   tact = ""; cands = vs; ind_v = x;
+	   ind_ty = ty;
+	   itsk = t_forall_close qvl [] t ;
+	   pred = p; sg = goal}
+	 in  show_info data
+       end; goal
   in
   let cl = find_constructors km ts in
   List.map make_case cl
 
 
-
-
-(*******                  Applying induction tactic                *******)
 let induction km t0 =
-  let qvs, qvl, t = decompose_forall t0 in
+  let qvs, _qvl, t = decompose_forall t0 in
   let vs = t_candidates km qvs t in
-  if Debug.test_flag debug then print_candidates vs;
-  if Svs.is_empty vs then [t0] else make_induction vs km qvl t
+  if Svs.is_empty vs then [t0] else
+    let x, _ts, _ty  = heuristic vs in
+    let () = print_ty_skm (tyscheme_genvt km x t) in
+    [t0]
+    (* make_induction vs km qvl t  *)
 
 let induction = function
   | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
@@ -145,158 +937,16 @@ let induction = function
   | _ -> assert false
 
 let () = Trans.register_transform_l "induction" (Trans.store induction)
+*)
 
 
 
-
-
-
-
-
-(*************************************************************************)
-
-(*List.iter (fun (cs, _) ->
-    print_int (List.length cs.ls_args); print_string "\n";
-    Format.printf "Constructor:  %a \n  with args:" Pretty.print_cs cs;
-    List.iter (fun ty ->
-      Format.printf " %a " Pretty.print_ty ty) cs.ls_args) cl;
-
-      print_string "\n";*)
-(*
-
-List.iter (fun vs ->
-      if ty_equal vs.vs_ty x.vs_ty
-      then
-	begin
-	  Format.printf "new_var = %a \n" Pretty.print_vsty vs
-	end
-      else ()) ind_vl;
-
-List.iter (fun ty ->
-      Format.printf "inst_ty = %a \n" Pretty.print_ty ty) tyl;
-    let f = init_t in f
-     assert false (* TODO: instancier p sur le constructeur ls *) in
-    t_forall_close qvl1 [] f *)
-
+(*********************************************************)
+(******* Induction tactic on function definition *********)
+(*********************************************************)
 
 (*
-
-let make_induction vs km qvl t =
-  (* here I print the initial term *)
-  let init_t = t_forall_close qvl [] t in
-  Format.printf "Initial task: %a @ \n" Pretty.print_term init_t;
-
-  (* here I print the transformed term *)
-  let x = heuristic vs in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let p = t_forall_close qvl2 [] t in
-  let ts,ty = indv_ty x in
-  let sigma = ty_match Mtv.empty ty x.vs_ty in
-
-  Format.printf "Induction predicate:@  %a @ \n" Pretty.print_term p;
-  Format.printf "induction on type_symbol:  %a @ \n" Pretty.print_ts ts;
-  Format.printf "induction on type:  %a @ \n" Pretty.print_ty ty;
-  Mtv.iter (fun x tx -> Format.printf "(%a : %a) @ \n"
-    Pretty.print_tv x Pretty.print_ty tx ) sigma;
-
-  let make_case (ls, _) =
-    let _ = if ls = ls then () else () in
-    let f = assert false (* TODO: instancier p sur le constructeur ls *) in
-    t_forall_close qvl1 [] f
-  in
-  (* here I return the new term (TODO) *)
-  let cl = find_constructors km ts in
-
-  List.iter (fun (cs,_) -> Format.printf "%a @ \n" Pretty.print_cs cs) cl;
-  List.map make_case cl
-
-
-
-let make_indb = t_subst_single
-
-let t_candidates km qvs t =
-  let rec t_candidates_aux vs_acc t =
-    let vs_acc = match t.t_node with
-      | Tapp (ls, tl) -> begin match find_logic_definition km ls with
-	  | Some defn -> begin match ls_defn_decrease defn with
-	      | [i] -> begin match (List.nth tl i).t_node with
-		  | Tvar x when Svs.mem x qvs -> Svs.add x vs_acc
-		  | _ -> vs_acc
-	      end
-	      | _ -> vs_acc
-	  end
-	  | None -> vs_acc
-      end
-      | _ -> vs_acc
-    in
-    t_fold t_candidates_aux vs_acc t
-  in t_candidates_aux Svs.empty t
-
-
-(* Term.Svs.t -> Term.term -> Term.Svs.t *)
-let induction km f0 =
-  let qvs, qvl, f = decompose_forall [] f0 in
-  let rec candidate vs f =
-    let vs = match f.t_node with
-      | Tapp (ls, tl) -> begin match find_logic_definition km ls with
-	  | Some defn -> begin match ls_defn_decrease defn with
-	      | [i] -> begin match (List.nth tl i).t_node with
-		  | Tvar x when Svs.mem x qvs -> Svs.add x vs
-		  | _ -> vs (*here rec call *)
-	      end
-	      | _ -> vs
-	  end
-	  | None -> vs
-      end
-      | _ -> vs
-    in
-    t_fold candidate vs f
-  in
-  let candidates =
-    candidate Svs.empty f in print_vs candidates;
-  if Svs.is_empty candidates
-  then [f0]
-  else make_induction km qvl f candidates
-
-let make_induction_bk vs _km qvl t =
-  let _x = heuristic vs in
-  [t_forall_close qvl [] t]
-
-
-Format.printf "induction on type %a @ " Pretty.print_ts ts;
-
-let make_induction vs km qvl t =
-
-  (* here I print the initial term *)
-  let init_t = t_forall_close qvl [] t in
-  Format.printf "Initial task: %a @ " Pretty.print_term init_t;
-
-  (* here I print the transformed term *)
-  let x = heuristic vs in
-  let qvl1, qvl2 = split_quantifiers x qvl in
-  let p = t_forall_close qvl2 [] t in
-  Format.printf "Induction predicate:@ %a @ " Pretty.print_term p;
-
-  let ts = match x.vs_ty.ty_node with
-    | Tyapp (ts, _) -> ts
-    | Tyvar _ -> assert false
-  in
-  Format.printf "induction on type %a @ " Pretty.print_ts ts;
-
-  let sigma =
-    let ty = ty_app ts (List.map ty_var ts.ts_args) in
-    ty_match Mtv.empty ty x.vs_ty
-  in
-
-
-  let make_case (ls, _) =
-    let f = assert false (* TODO: instancier p sur ls constructeur ls *) in
-    t_forall_close qvl1 [] f
-  in
-  (* here I return the new term (TODO) *)
-  List.map make_case (find_constructors km ts)
-
-
-
-
+Local Variables:
+compile-command: "unset LANG; make -C ../.. bin/why3.byte"
+End:
 *)

@@ -1,10 +1,10 @@
 
-valid 0
-unknown "Error: \\(.*\\)$" "\\1"
-fail "Syntax error: \\(.*\\)$" "\\1"
+unknown "unfinished" "\"\\0\""
+unknown "untried" "\"\\0\""
+valid "succeeded"
 time "why3cpulimit time : %s s"
 
-transformation "inline_trivial"
+(*transformation "inline_trivial"*)
 transformation "eliminate_builtin"
 
 (* PVS does not support mutual recursion *)
@@ -71,10 +71,10 @@ theory int.Int
   syntax function zero "0"
   syntax function one  "1"
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (-_) "(-%1)"
+  syntax function ( + ) "(%1 + %2)"
+  syntax function ( - ) "(%1 - %2)"
+  syntax function ( * ) "(%1 * %2)"
+  syntax function (-_)  "(-%1)"
 
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 <  %2)"
@@ -157,12 +157,12 @@ theory real.Real
   syntax function zero "0"
   syntax function one  "1"
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (-_) "(-%1)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (/)  "(%1 / %2)"
-  syntax function inv  "(1 / %1)"
+  syntax function ( + ) "(%1 + %2)"
+  syntax function ( - ) "(%1 - %2)"
+  syntax function (-_)  "(-%1)"
+  syntax function ( * ) "(%1 * %2)"
+  syntax function ( / ) "(%1 / %2)"
+  syntax function inv   "(1 / %1)"
 
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 <  %2)"
@@ -262,3 +262,7 @@ theory real.Trigonometry
   syntax function tan "TAN(%1)"
 
 end
+
+(* this file has an extension .aux rather than .gen
+   since it should not be distributed *)
+import "pvs-realizations.aux"

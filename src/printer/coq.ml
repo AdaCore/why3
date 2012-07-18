@@ -33,6 +33,18 @@ let black_list =
   [ "at"; "cofix"; "exists2"; "fix"; "IF"; "left"; "mod"; "Prop";
     "return"; "right"; "Set"; "Type"; "using"; "where"; ]
 
+(* wrong: ' not allowed as first character in Coq identifiers
+let char_to_alpha c =
+  match c with
+    | '\'' -> String.make 1 c
+    | _ -> Ident.char_to_alpha c
+*)
+
+let char_to_alnumus c =
+  match c with
+    | '\'' -> String.make 1 c
+    | _ -> Ident.char_to_alnumus c
+
 let fresh_printer () =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer black_list ~sanitizer:isanitize
@@ -517,10 +529,80 @@ let rec output_remaining fmt ?(in_other=false) script =
   | [] ->
     if in_other then fprintf fmt "*)@\n"
 
+let rec intros_hyp n fmt f =
+  match f.t_node with
+    | Tbinop(Tand,f1,f2) ->
+      fprintf fmt "(";
+      let m = intros_hyp n fmt f1 in
+      fprintf fmt ",";
+      let k = intros_hyp m fmt f2 in
+      fprintf fmt ")";
+      k
+    | Tquant(Texists,fq) ->
+      let vsl,_trl,f = t_open_quant fq in
+      let rec aux n vsl =
+        match vsl with
+          | [] -> intros_hyp n fmt f
+          | v::l ->
+            fprintf fmt "(%a," print_vs v;
+            let m = aux n l in
+            fprintf fmt ")";
+            m
+      in
+      let m = aux n vsl in
+      List.iter forget_var vsl;
+      m
+    | _ ->
+      fprintf fmt "h%d" n;
+      n+1
+
+let rec do_intros n fmt fmla =
+  match fmla.t_node with
+    | Tlet(_,fb) ->
+      let vs,f = t_open_bound fb in
+      fprintf fmt "@ %a" print_vs vs;
+      do_intros n fmt f;
+      forget_var vs
+    | Tquant(Tforall,fq) ->
+      let vsl,_trl,f = t_open_quant fq in
+      List.iter
+        (fun v -> fprintf fmt "@ %a" print_vs v) vsl;
+      do_intros n fmt f;
+      List.iter forget_var vsl
+    | Tbinop(Timplies, f1, f2) ->
+      fprintf fmt "@ ";
+      let m = intros_hyp n fmt f1 in
+      do_intros m fmt f2
+    | _ -> ()
+
+let intros_params fmt params =
+  Stv.iter
+    (fun tv ->
+      let n = id_unique iprinter tv.tv_name in
+      fprintf fmt "@ %s" n)
+    params
+
+let intros fmt params fmla =
+  let need_intros =
+    not (Stv.is_empty params) ||
+      match fmla.t_node with
+    | Tlet _
+    | Tquant(Tforall,_)
+    | Tbinop(Timplies, _, _) -> true
+    | _ -> false
+  in
+  if need_intros then
+    fprintf fmt "@[intros%a%a.@]@\n" intros_params params (do_intros 1) fmla
+
 let print_empty_proof fmt def =
-  if not def then fprintf fmt "intuition.@\n";
-  fprintf fmt "@\n";
-  fprintf fmt "%s.@\n" (if def then "Defined" else "Qed")
+  match def with
+    | Some (params,fmla) ->
+      intros fmt params fmla;
+      fprintf fmt "@\n";
+      fprintf fmt "Qed.@\n"
+    | None ->
+      fprintf fmt "@\n";
+      fprintf fmt "Defined.@\n"
 
 let print_previous_proof def fmt previous =
   match previous with
@@ -543,7 +625,7 @@ let print_type_decl ~prev info fmt ts =
         | _ ->
           fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a : %aType.@]@\n%a@\n"
             print_ts ts print_params_list ts.ts_args
-            (print_previous_proof true) prev
+            (print_previous_proof None) prev
       else
         fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
           print_ts ts print_params_list ts.ts_args
@@ -590,7 +672,7 @@ let print_param_decl ~prev info fmt ls =
           print_ls ls print_params all_ty_params
           (print_arrow_list (print_ty info)) ls.ls_args
           (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-          (print_previous_proof true) prev
+          (print_previous_proof None) prev
     else
       fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n"
         print_ls ls print_params all_ty_params
@@ -663,18 +745,20 @@ let print_ind_decl info s fmt d =
     (print_ind_decl info s fmt d; forget_tvs ())
 
 let print_prop_decl ~prev info fmt (k,pr,f) =
+  ignore prev;
   let params = t_ty_freevars Stv.empty f in
   let stt = match k with
     | Paxiom when info.realization -> "Lemma"
     | Paxiom -> ""
     | Plemma -> "Lemma"
     | Pgoal -> "Theorem"
-    | Pskip -> assert false (* impossible *) in
+    | Pskip -> assert false (* impossible *) 
+  in
   if stt <> "" then
     fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
       stt print_pr pr print_params params
       (print_fmla info) f
-      (print_previous_proof false) prev
+      (print_previous_proof (Some (params,f))) prev
   else
     fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
       print_pr pr print_params params

@@ -7,7 +7,7 @@ printer "smtv2"
 filename "%f-%t-%g.smt"
 
 valid "^unsat"
-unknown "^\\(unknown\\|sat\\|Fail\\)" "Unknown"
+unknown "^\\(unknown\\|sat\\|Fail\\)" ""
 outofmemory "(error \"out of memory\")\\|Cannot allocate memory"
 time "why3cpulimit time : %s s"
 
@@ -123,6 +123,7 @@ theory bool.Bool
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
+   syntax function implb "(=> %1 %2)"
 end
 
 theory int.EuclideanDivision

@@ -2,13 +2,19 @@
 
 config=src/config.ml
 
-libdir="$LIBDIR/why3"
-datadir="$DATADIR/why3"
+libdir="\"$LIBDIR/why3\""
+datadir="\"$DATADIR/why3\""
 localdir="None"
 
-if [ "@enable_local@" = "yes" ]; then
-    libdir="@LOCALDIR@/lib"
-    datadir="@LOCALDIR@/share"
+if [ "@enable_relocation@" = "yes" ]; then
+    libdir='Filename.concat (Filename.concat (Filename.dirname
+        (Filename.dirname Sys.executable_name)) "lib") "why3"'
+    datadir='Filename.concat (Filename.concat (Filename.dirname
+        (Filename.dirname Sys.executable_name)) "share") "why3"'
+    localdir="None"
+elif [ "@enable_local@" = "yes" ]; then
+    libdir="\"@LOCALDIR@/lib\""
+    datadir="\"@LOCALDIR@/share\""
     localdir="Some \"@LOCALDIR@\""
 fi
 
@@ -16,7 +22,7 @@ echo "
 let version   = \"@VERSION@\"
 let builddate = \"@BUILDDATE@\"
 
-let libdir    = \"$libdir\"
-let datadir   = \"$datadir\"
+let libdir    = $libdir
+let datadir   = $datadir
 let localdir  = $localdir
 " > $config

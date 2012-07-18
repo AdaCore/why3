@@ -34,7 +34,6 @@ Record t : Set := mk_fp {
   model : R
 }.
 
-
 Record t_strict: Set := mk_fp_strict {
   datum :> t;
   finite : is_finite prec emax (binary datum) = true
@@ -105,31 +104,34 @@ Qed.
 Definition r_to_fp_aux (m:mode) (r r1 r2:R) :=
   mk_fp (r_to_fp (rnd_of_mode m) r) r1 r2.
 
+(* Why3 goal *)
+Definition round: floating_point.Rounding.mode -> R -> R.
+exact (fun m => round radix2 fexp (round_mode (rnd_of_mode m))).
+Defined.
 
-Definition round: floating_point.Rounding.mode -> R -> R :=
-   (fun m => round radix2 fexp (round_mode (rnd_of_mode m))).
+(* Why3 goal *)
+Definition round_logic: floating_point.Rounding.mode -> R -> t.
+exact (fun m r => r_to_fp_aux m r r r).
+Defined.
 
-Definition round_logic: floating_point.Rounding.mode -> R -> t :=
-   fun m r => r_to_fp_aux m r r r.
-
-
+(* Why3 assumption *)
 Definition round_error(x:t): R := (Rabs ((value x) - (exact x))%R).
 
+(* Why3 assumption *)
 Definition total_error(x:t): R := (Rabs ((value x) - (model x))%R).
 
-Definition max: R := F2R (Float radix2 (Zpower 2 prec -1) (emax-prec)).
+(* Why3 goal *)
+Definition max: R.
+exact (F2R (Float radix2 (Zpower 2 prec - 1) (emax - prec))).
+Defined.
 
-
+(* Why3 assumption *)
 Definition no_overflow(m:floating_point.Rounding.mode) (x:R): Prop :=
   ((Rabs (round m x)) <= max)%R.
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Bounded_real_no_overflow : forall (m:floating_point.Rounding.mode)
   (x:R), ((Rabs x) <= max)%R -> (no_overflow m x).
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros m x Hx.
 apply Rabs_le.
@@ -180,57 +182,35 @@ apply round_le_generic...
 apply H0.
 Qed.
 
-(* DO NOT EDIT BELOW *)
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_monotonic : forall (m:floating_point.Rounding.mode) (x:R) (y:R),
   (x <= y)%R -> ((round m x) <= (round m y))%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros m x y Hxy.
 apply round_le with (3 := Hxy)...
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_idempotent : forall (m1:floating_point.Rounding.mode)
   (m2:floating_point.Rounding.mode) (x:R), ((round m1 (round m2
   x)) = (round m2 x)).
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros m1 m2 x.
 apply round_generic...
 apply generic_format_round...
 Qed.
 
-(* DO NOT EDIT BELOW *)
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_value : forall (m:floating_point.Rounding.mode) (x:t), ((round m
   (value x)) = (value x)).
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros m x.
 apply round_generic...
 apply generic_format_B2R.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Bounded_value : forall (x:t), ((Rabs (value x)) <= max)%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros x.
 replace max with (pred radix2 fexp (bpow radix2 emax)).
@@ -258,19 +238,16 @@ apply Zlt_le_weak.
 exact Hprec'.
 clear; generalize Hprec' Hemax' ; omega.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-Definition max_representable_integer: Z := Zpower 2 prec.
+(* Why3 goal *)
+Definition max_representable_integer: Z.
+exact (Zpower 2 prec).
+Defined.
 
-
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Exact_rounding_for_integers : forall (m:floating_point.Rounding.mode)
   (i:Z), (((-max_representable_integer)%Z <= i)%Z /\
   (i <= max_representable_integer)%Z) -> ((round m (IZR i)) = (IZR i)).
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
@@ -296,53 +273,35 @@ omega.
 apply Zlt_le_weak.
 apply Hprec'.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_down_le : forall (x:R), ((round floating_point.Rounding.Down
   x) <= x)%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros x.
 apply round_DN_pt...
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_up_ge : forall (x:R), (x <= (round floating_point.Rounding.Up
   x))%R.
-(* YOU MAY EDIT THE PROOF BELOW *)
 Proof with auto with typeclass_instances.
 intros x.
 apply round_UP_pt...
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_down_neg : forall (x:R), ((round floating_point.Rounding.Down
   (-x)%R) = (-(round floating_point.Rounding.Up x))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
+Proof.
 intros x.
 apply round_opp.
 Qed.
-(* DO NOT EDIT BELOW *)
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
-
-(* DO NOT EDIT BELOW *)
-
+(* Why3 goal *)
 Lemma Round_up_neg : forall (x:R), ((round floating_point.Rounding.Up
   (-x)%R) = (-(round floating_point.Rounding.Down x))%R).
-(* YOU MAY EDIT THE PROOF BELOW *)
+Proof.
 intros x.
 pattern x at 2 ; rewrite <- Ropp_involutive.
 rewrite Round_down_neg.
@@ -350,4 +309,3 @@ now rewrite Ropp_involutive.
 Qed.
 
 End GenFloat.
-(* DO NOT EDIT BELOW *)

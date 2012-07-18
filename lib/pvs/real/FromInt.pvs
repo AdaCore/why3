@@ -1,0 +1,35 @@
+FromInt: THEORY
+ BEGIN
+  IMPORTING int@Int
+  IMPORTING Real
+  
+  % Why3 tuple0
+  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
+  
+  % Why3 from_int
+  from_int(x:int): MACRO real = x
+  
+  % Why3 zero
+  zero: LEMMA (from_int(0) = 0)
+  
+  % Why3 one
+  one: LEMMA (from_int(1) = 1)
+  
+  % Why3 add
+  add: LEMMA FORALL (x:int, y:int):
+    (from_int((x + y)) = (from_int(x) + from_int(y)))
+  
+  % Why3 sub
+  sub: LEMMA FORALL (x:int, y:int):
+    (from_int((x - y)) = (from_int(x) - from_int(y)))
+  
+  % Why3 mul
+  mul: LEMMA FORALL (x:int, y:int):
+    (from_int((x * y)) = (from_int(x) * from_int(y)))
+  
+  % Why3 neg
+  neg: LEMMA FORALL (x:int): (from_int((-x)) = (-from_int(x)))
+  
+  
+ END FromInt
+ 

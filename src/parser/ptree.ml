@@ -162,7 +162,7 @@ type metarg =
   | PMAstr of string
   | PMAint of int
 
-type use_clone = loc * use * clone_subst list option
+type use_clone = use * clone_subst list option
 
 type decl =
   | TypeDecl of type_decl list
@@ -181,32 +181,35 @@ type variant = lexpr * qualid option
 
 type loop_annotation = {
   loop_invariant : lexpr option;
-  loop_variant   : variant option;
+  loop_variant   : variant list;
 }
 
 type for_direction = To | Downto
 
+type ghost = bool
+
 type effect = {
-  pe_reads  : lexpr list;
-  pe_writes : lexpr list;
-  pe_raises : qualid list;
+  pe_reads  : (ghost * lexpr) list;
+  pe_writes : (ghost * lexpr) list;
+  pe_raises : (ghost * qualid) list;
 }
 
 type pre = lexpr
 
 type post = lexpr * (qualid * lexpr) list
 
-type binder = ident * pty option
+type binder = ident * ghost * pty option
 
 type type_v =
   | Tpure of pty
   | Tarrow of binder list * type_c
 
-and type_c =
-  { pc_result_type : type_v;
-    pc_effect      : effect;
-    pc_pre         : pre;
-    pc_post        : post; }
+and type_c = {
+  pc_result_type : type_v;
+  pc_effect      : effect;
+  pc_pre         : pre;
+  pc_post        : post;
+}
 
 type expr = {
   expr_desc : expr_desc;
@@ -219,8 +222,8 @@ and expr_desc =
   | Eident of qualid
   | Eapply of expr * expr
   | Efun of binder list * triple
-  | Elet of ident * expr * expr
-  | Eletrec of (ident * binder list * variant option * triple) list * expr
+  | Elet of ident * ghost * expr * expr
+  | Eletrec of letrec list * expr
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -241,32 +244,33 @@ and expr_desc =
   | Emark of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
+  | Eghost of expr
   | Eabstract of expr * post
   | Enamed of label * expr
 
-  (* TODO: ghost *)
+and letrec = loc * ident * ghost * binder list * variant list * triple
 
 and triple = pre * expr * post
 
 type program_decl =
-  | Dlet    of ident * expr
-  | Dletrec of (ident * binder list * variant option * triple) list
+  | Dlet    of ident * ghost * expr
+  | Dletrec of letrec list
   | Dlogic  of decl
   | Duseclone of use_clone
-  | Dparam  of ident * type_v
+  | Dparam  of ident * ghost * type_v
   | Dexn    of ident * pty option
   (* modules *)
   | Duse    of qualid * bool option * (*as:*) string option
-  | Dnamespace of loc * string option * (* import: *) bool * program_decl list
+  | Dnamespace of string option * (*import:*) bool * (loc * program_decl) list
 
 type theory = {
-  pth_name   : ident;
-  pth_decl   : program_decl list;
+  pth_name : ident;
+  pth_decl : (loc * program_decl) list;
 }
 
 type module_ = {
-  mod_name   : ident;
-  mod_decl   : program_decl list;
+  mod_name : ident;
+  mod_decl : (loc * program_decl) list;
 }
 
 type theory_module =

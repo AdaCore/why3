@@ -6,7 +6,8 @@ printer "yices"
 filename "%f-%t-%g.ycs"
 
 valid "\\bunsat\\b"
-unknown "\\bunknown\\b\\|\\bsat\\b\\|feature not supported: non linear problem" "Unknown"
+unknown "\\bunknown\\b\\|\\bsat\\b" ""
+unknown "feature not supported: non linear problem" "non linear arith"
 time "why3cpulimit time : %s s"
 
 (* À discuter *)

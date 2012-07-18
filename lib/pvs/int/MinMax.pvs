@@ -1,0 +1,50 @@
+MinMax: THEORY
+ BEGIN
+  IMPORTING Int
+  
+  % Why3 tuple0
+  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
+  
+  % Why3 min
+  min(x:int, x1:int): MACRO int = min(x, x1)
+  
+  % Why3 max
+  max(x:int, x1:int): MACRO int = max(x, x1)
+  
+  % Why3 max_is_ge
+  max_is_ge: LEMMA FORALL (x:int, y:int): (max(x, y) >= x) AND (max(x,
+    y) >= y)
+  
+  % Why3 max_is_some
+  max_is_some: LEMMA FORALL (x:int, y:int): (max(x, y) = x) OR (max(x,
+    y) = y)
+  
+  % Why3 min_is_le
+  min_is_le: LEMMA FORALL (x:int, y:int): (x >= min(x, y)) AND (y >= min(x,
+    y))
+  
+  % Why3 min_is_some
+  min_is_some: LEMMA FORALL (x:int, y:int): (min(x, y) = x) OR (min(x,
+    y) = y)
+  
+  % Why3 max_x
+  max_x: LEMMA FORALL (x:int, y:int): (x >= y) => (max(x, y) = x)
+  
+  % Why3 max_y
+  max_y: LEMMA FORALL (x:int, y:int): (y >= x) => (max(x, y) = y)
+  
+  % Why3 min_x
+  min_x: LEMMA FORALL (x:int, y:int): (y >= x) => (min(x, y) = x)
+  
+  % Why3 min_y
+  min_y: LEMMA FORALL (x:int, y:int): (x >= y) => (min(x, y) = y)
+  
+  % Why3 max_sym
+  max_sym: LEMMA FORALL (x:int, y:int): (x >= y) => (max(x, y) = max(y, x))
+  
+  % Why3 min_sym
+  min_sym: LEMMA FORALL (x:int, y:int): (x >= y) => (min(x, y) = min(y, x))
+  
+  
+ END MinMax
+ 

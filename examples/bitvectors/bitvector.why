@@ -345,9 +345,8 @@ theory BitVector
   lemma nth_from_int2c_0:
      forall i:int. size > i >= 0 -> nth (from_int2c 0) i = False
 
-
   lemma nth_from_int2c_plus_pow2:
-      forall x k i:int. 0 <= k < i ->
+      forall x k i:int. 0 <= k < i /\ k < size-1 ->
         nth (from_int2c (x+pow2 i)) k = nth (from_int2c x) k
 
 end

@@ -23,11 +23,14 @@ val compile_match : Task.task Trans.trans
 val meta_proj : Theory.meta (* [MTlsymbol; MTlsymbol; MTint; MTprsymbol] *)
 (* projection symbol, constructor symbol, position, defining axiom *)
 
-(* a type constructor tagged "enumeration" generates a finite type
-   if and only if all of its non-phantom arguments are finite types *)
+(* a type constructor generates an infinite type if either it is tagged by
+   meta_infinite or one of its "material" arguments is an infinite type *)
 
-val meta_enum : Theory.meta (* [MTtysymbol] *)
-val meta_phantom : Theory.meta (* [MTtysymbol; MTint] *)
+val meta_infinite : Theory.meta (* [MTtysymbol] *)
+val meta_material : Theory.meta (* [MTtysymbol; MTint] *)
 
-(* tests whether a type is finite given [meta_enum] and [meta_phantom] *)
-val is_finite_ty : Ty.Sts.t -> Theory.meta_arg list list -> (Ty.ty -> bool)
+(* extracts the material type arguments from [meta_material] *)
+val get_material_args : Theory.meta_arg list list -> bool list Ty.Mts.t
+
+(* tests if a type is infinite given [meta_infinite] and [meta_material] *)
+val is_infinite_ty : Ty.Sts.t -> bool list Ty.Mts.t -> (Ty.ty -> bool)

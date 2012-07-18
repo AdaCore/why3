@@ -33,7 +33,8 @@ val debug_type_only : Debug.flag
 val add_decl : theory_uc -> Ptree.decl -> theory_uc
 
 val add_use_clone :
-  unit Env.library -> theory Mstr.t -> theory_uc -> Ptree.use_clone -> theory_uc
+  unit Env.library -> theory Mstr.t -> theory_uc ->
+    Loc.position -> Ptree.use_clone -> theory_uc
 
 val close_namespace :
   Loc.position -> bool -> string option -> theory_uc -> theory_uc
@@ -56,12 +57,13 @@ val specialize_psymbol :
 val specialize_tysymbol :
   Loc.position -> Ptree.qualid -> theory_uc -> Ty.tysymbol
 
+val create_user_tv: string -> tvsymbol
+val create_user_type_var : string -> Denv.dty
+
 type denv
 
-val create_denv : unit -> denv
-
-val create_user_type_var : string -> Denv.type_var
-val find_user_type_var : string -> denv -> Denv.type_var
+val denv_empty : denv
+val denv_empty_with_globals : (Ptree.qualid -> vsymbol option) -> denv
 
 val mem_var : string -> denv -> bool
 val find_var : string -> denv -> Denv.dty
@@ -70,7 +72,7 @@ val add_var : string -> Denv.dty -> denv -> denv
 val type_term : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
 val type_fmla : theory_uc -> denv -> vsymbol Mstr.t -> Ptree.lexpr -> term
 
-val dty : theory_uc -> denv -> Ptree.pty -> Denv.dty
+val dty : theory_uc -> Ptree.pty -> Denv.dty
 val dterm : ?localize:(Ptree.loc option option) ->
   theory_uc -> denv -> Ptree.lexpr -> Denv.dterm
 val dfmla : ?localize:(Ptree.loc option option) ->
