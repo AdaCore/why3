@@ -8,15 +8,15 @@ theory Bool
   use export Bool (* built-in theory of Booleans *)
 
   function andb (x y : bool) : bool =
-    match x, y with
-    | True, True -> True
-    | _   , _    -> False
+    match x with
+    | True -> y
+    | False -> False
     end
 
   function orb (x y : bool) : bool =
-    match x, y with
-    | False, False -> False
-    | _    , _     -> True
+    match x with
+    | False -> y
+    | True -> True
     end
 
   function xorb (x y : bool) : bool =
