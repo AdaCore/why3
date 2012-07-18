@@ -112,11 +112,12 @@ let pl_clone sm =
     let e = eff_empty in
     assert (Sexn.is_empty eff.eff_raises);
     assert (Sexn.is_empty eff.eff_ghostx);
-    let conv fn r e = fn e (conv_reg r) in
-    let e = Sreg.fold (conv (eff_read  ~ghost:false)) eff.eff_reads  e in
-    let e = Sreg.fold (conv (eff_write ~ghost:false)) eff.eff_writes e in
-    let e = Sreg.fold (conv (eff_read  ~ghost:true))  eff.eff_ghostr e in
-    let e = Sreg.fold (conv (eff_write ~ghost:true))  eff.eff_ghostw e in
+    let conv ghost r e = eff_read ~ghost e (conv_reg r) in
+    let e = Sreg.fold (conv false) eff.eff_reads  e in
+    let e = Sreg.fold (conv true)  eff.eff_ghostr e in
+    let conv ghost r e = eff_write ~ghost e (conv_reg r) in
+    let e = Sreg.fold (conv false) eff.eff_writes e in
+    let e = Sreg.fold (conv true)  eff.eff_ghostw e in
     let conv r u e = match u with
       | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
       | None   -> eff_reset e (conv_reg r) in

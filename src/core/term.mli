@@ -406,6 +406,9 @@ val t_ty_freevars : Stv.t -> term -> Stv.t
 
 (** Map/fold over types and logical symbols in terms and patterns *)
 
+val t_gen_map :
+  (ty -> ty) -> (lsymbol -> lsymbol) -> vsymbol Mvs.t -> term -> term
+
 val t_s_map : (ty -> ty) -> (lsymbol -> lsymbol) -> term -> term
 val t_s_fold : ('a -> ty -> 'a) -> ('a -> lsymbol -> 'a) -> 'a -> term -> 'a
 

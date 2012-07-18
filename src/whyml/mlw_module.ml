@@ -356,8 +356,69 @@ let clone_export uc m inst =
   let psm = pl_clone sm in
   let conv_its its = Mits.find_def its its psm.sm_its in
   let conv_ts ts = Mts.find_def ts ts sm.Theory.sm_ts in
+  let conv_ls ls = Mls.find_def ls ls sm.Theory.sm_ls in
+  let extras = Mid.set_diff m.mod_known m.mod_local in
+  let regh = Hreg.create 5 in
+  let rec conv_ity ity = match ity.ity_node with
+    | Ityapp (s,tl,rl) ->
+        ity_app (conv_its s) (List.map conv_ity tl) (List.map conv_reg rl)
+    | Itypur (s,tl) -> ity_pur (conv_ts s) (List.map conv_ity tl)
+    | Ityvar _ -> ity
+  and conv_reg r =
+    if Mid.mem r.reg_name extras then r else
+    try Hreg.find regh r with Not_found ->
+    let nr = create_region (id_clone r.reg_name) (conv_ity r.reg_ity) in
+    Hreg.replace regh r nr;
+    nr in
+  let conv_vtv v =
+    let ghost = v.vtv_ghost in
+    let mut, ity = match v.vtv_mut with
+      | Some r -> let r = conv_reg r in Some r, r.reg_ity
+      | None   -> None, conv_ity v.vtv_ity in
+    vty_value ~ghost ?mut ity in
+  let conv_pv pv =
+    create_pvsymbol (id_clone pv.pv_vs.vs_name) (conv_vtv pv.pv_vtv) in
   let psh = Hid.create 3 in
   let find_ps def id = try Hid.find psh id with Not_found -> def in
+  let conv_xs xs = try match Hid.find psh xs.xs_name with
+    | XS xs -> xs | _ -> assert false with Not_found -> xs in
+  let conv_eff eff =
+    let e = eff_empty in
+    let conv ghost r e = eff_read ~ghost e (conv_reg r) in
+    let e = Sreg.fold (conv false) eff.eff_reads  e in
+    let e = Sreg.fold (conv true)  eff.eff_ghostr e in
+    let conv ghost r e = eff_write ~ghost e (conv_reg r) in
+    let e = Sreg.fold (conv false) eff.eff_writes e in
+    let e = Sreg.fold (conv true)  eff.eff_ghostw e in
+    let conv ghost xs e = eff_raise ~ghost e (conv_xs xs) in
+    let e = Sexn.fold (conv false) eff.eff_raises e in
+    let e = Sexn.fold (conv true)  eff.eff_ghostx e in
+    let conv r u e = match u with
+      | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
+      | None   -> eff_reset e (conv_reg r) in
+    Mreg.fold conv eff.eff_resets e in
+  let conv_ty ty = ty_s_map conv_ts ty in
+  let conv_vs mv vs _ = Mvs.find_def vs vs mv in
+  let conv_mvs mv t = Mvs.mapi (conv_vs mv) t.t_vars in
+  let conv_term mv t = t_gen_map conv_ty conv_ls (conv_mvs mv t) t in
+  let add_xq mv xs t = Mexn.add (conv_xs xs) (conv_term mv t) in
+  let conv_spec mv c = {
+    c_pre     = conv_term mv c.c_pre;
+    c_post    = conv_term mv c.c_post;
+    c_xpost   = Mexn.fold (add_xq mv) c.c_xpost Mexn.empty;
+    c_effect  = conv_eff c.c_effect;
+    c_variant = [];
+    c_letrec  = 0; } in
+  let rec conv_vta mv a =
+    let args = List.map conv_pv a.vta_args in
+    let add mv pv npv = Mvs.add pv.pv_vs npv.pv_vs mv in
+    let mv = List.fold_left2 add mv a.vta_args args in
+    let spec = conv_spec mv a.vta_spec in
+    let vty = match a.vta_result with
+      | VTarrow a -> VTarrow (conv_vta mv a)
+      | VTvalue v -> VTvalue (conv_vtv v) in
+    vty_arrow args ~spec ~ghost:a.vta_ghost vty in
+  let mvs = ref Mvs.empty in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
@@ -368,19 +429,46 @@ let clone_export uc m inst =
     | PDdata _ ->
         add_pdecl uc (clone_data_decl psm pd)
     | PDexn xs ->
-        let rec conv_ity ity = match ity.ity_node with
-          | Ityapp (s,tl,[]) -> ity_app (conv_its s) (List.map conv_ity tl) []
-          | Itypur (s,tl) -> ity_pur (conv_ts s) (List.map conv_ity tl)
-          | Ityapp _ | Ityvar _ -> assert false (* can't happen *) in
-        let nxs = create_xsymbol (id_clone xs.xs_name) (conv_ity xs.xs_ity) in
+        let ity = conv_ity xs.xs_ity in
+        let nxs = create_xsymbol (id_clone xs.xs_name) ity in
         Hid.add psh xs.xs_name (XS nxs);
         add_pdecl uc (create_exn_decl nxs)
-    | PDval _lv -> assert false (* TODO *)
-    | PDlet _ld -> assert false (* TODO *)
-    | PDrec _rd -> assert false (* TODO *)
+    | PDlet _ ->
+        Loc.errorm "Cannot clone top-level computations"
+        (* TODO? Should we clone the defining expression and
+           let it participate in the top-level module WP?
+           If not, what do we do about its effects? *)
+    | PDval (LetV pv) ->
+        let npv = conv_pv pv in
+        Hid.add psh pv.pv_vs.vs_name (PV npv);
+        mvs := Mvs.add pv.pv_vs npv.pv_vs !mvs;
+        add_pdecl uc (create_val_decl (LetV npv))
+    | PDval (LetA ps) ->
+        let vta = conv_vta !mvs ps.ps_vta in
+        let nps = create_psymbol (id_clone ps.ps_name) vta in
+        Hid.add psh ps.ps_name (PS nps);
+        add_pdecl uc (create_val_decl (LetA nps))
+    | PDrec { rec_defn = rdl } ->
+      (* FIXME: the resulting psymbols are as polymorphic as
+         their ps_vta allow them to be. If the definition body
+         brings in some external symbol S and fixes some region
+         in the psymbol's type, but S does not occur in the spec,
+         then the cloned psymbol will be overgeneralized.
+         Two fixes are possible:
+           1. Prohibit global regions in psymbol type signatures.
+              This is what previous implementation of WhyML did.
+           2. Let Mlw_expr.create_psymbol take an additional varmap
+              as an argument and add those variables to ps.ps_varm.
+              Can this be abused in any way? *)
+        let conv_rd uc { fun_ps = ps } =
+          let vta = conv_vta !mvs ps.ps_vta in
+          let nps = create_psymbol (id_clone ps.ps_name) vta in
+          Hid.add psh ps.ps_name (PS nps);
+          add_pdecl uc (create_val_decl (LetA nps)) in
+        List.fold_left conv_rd uc rdl
   in
   let uc = { uc with
-    muc_known = merge_known uc.muc_known (Mid.set_diff m.mod_known m.mod_local);
+    muc_known = merge_known uc.muc_known extras;
     muc_used = Sid.union uc.muc_used m.mod_used } in
   let uc = List.fold_left add_pd uc m.mod_decls in
   let g_ts _ = function
@@ -392,12 +480,12 @@ let clone_export uc m inst =
   let f_ts = function
     | TS ts -> TS (Mts.find_def ts ts sm.Theory.sm_ts)
     | PT pt -> PT (Mits.find_def pt pt psm.sm_its) in
-  let f_ps ps = match ps with
+  let f_ps prs = match prs with
     | LS ls -> LS (Mls.find_def ls ls sm.Theory.sm_ls)
-    | PV _ as x -> x (* TODO *)
-    | PS _ as x -> x (* TODO *)
     | PL pl -> PL (Mls.find_def pl pl.pl_ls psm.sm_pls)
-    | XS xs -> find_ps ps xs.xs_name in
+    | PV pv -> find_ps prs pv.pv_vs.vs_name
+    | PS ps -> find_ps prs ps.ps_name
+    | XS xs -> find_ps prs xs.xs_name in
   let rec f_ns ns = {
     ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
     ns_ps = Mstr.map f_ps (Mstr.filter g_ps ns.ns_ps);
