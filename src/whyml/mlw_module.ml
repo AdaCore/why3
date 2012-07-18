@@ -446,39 +446,32 @@ let clone_export uc m inst =
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec { rec_defn = rdl } ->
-      (* FIXME: the resulting psymbols are as polymorphic as
-         their ps_vta allow them to be. If the definition body
-         brings in some external symbol S and fixes some region
-         in the psymbol's type, but S does not occur in the spec,
-         then the cloned psymbol will be overgeneralized.
-         Three fixes are possible:
-           1. Prohibit global regions in psymbol type signatures.
-              This is what previous implementation of WhyML did.
-           2. Let Mlw_expr.create_psymbol take an additional varmap
-              as an argument and add those variables to ps.ps_varm.
-              Can this be abused in any way?
-           3. Require that (vta_varmap ps.ps_vta) fixes exactly
-              the same regions as ps.ps_varm. At the moment, we
-              only have inclusion, since ps.ps_varm is guaranteed
-              to be a superset of (vta_varmap ps.ps_vta). If this
-              requirement is satisfied, we can always set ps_varm
-              to be the varmap of ps_vta. But what about resets?
-              Consider:
-                  let r <rho> = ref 0 in
-                  let f x = ... r <- x ... in
-                  { reset rho }
-                  f 5
-              The reference r appears in f.ps_varm, and thus the
-              last expression (f 5) would be rejected as freshness
-              violation. This is correct, otherwise the effect of
-              (f 5) could modify the values of unrelated variables.
-              This is correct even if r does not occur in f.ps_vta,
-              and therefore we cannot forget about r in f.ps_varm.
-              We could require that r appears in the spec of f, as
-              we do for abstract parameters, but is this reasonable? *)
+        let add_id id _ (pvs,pss) =
+          try match Hid.find psh id with
+            | PV pv -> Spv.add pv pvs, pss
+            | PS ps -> pvs, Sps.add ps pss
+            | _ -> assert false
+          with Not_found ->
+            let exn = Invalid_argument "Mlw_module.clone_export" in
+            begin match (Mid.find_exn exn id extras).pd_node with
+              | PDval (LetV pv) | PDlet { let_sym = LetV pv } ->
+                  Spv.add pv pvs, pss
+              | PDval (LetA ps) | PDlet { let_sym = LetA ps } ->
+                  pvs, Sps.add ps pss
+              | PDrec { rec_defn = rdl } ->
+                  let rec down = function
+                    | { fun_ps = ps }::_ when id_equal ps.ps_name id -> ps
+                    | _::rdl -> down rdl
+                    | [] -> assert false in
+                  pvs, Sps.add (down rdl) pss
+              | PDtype _ | PDdata _ | PDexn _ -> assert false
+            end in
         let conv_rd uc { fun_ps = ps } =
+          let id = id_clone ps.ps_name in
           let vta = conv_vta !mvs ps.ps_vta in
-          let nps = create_psymbol (id_clone ps.ps_name) vta in
+          (* we must retrieve all pvsymbols and psymbols in ps.ps_varm *)
+          let pvs,pss = Mid.fold add_id ps.ps_varm (Spv.empty,Sps.empty) in
+          let nps = create_psymbol_extra id vta pvs pss in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
         List.fold_left conv_rd uc rdl

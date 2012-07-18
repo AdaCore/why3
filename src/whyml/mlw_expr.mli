@@ -109,9 +109,16 @@ type psymbol = private {
      in ps_vars to itself *)
 }
 
+module Mps : Map.S with type key = psymbol
+module Sps : Mps.Set
+module Hps : Hashtbl.S with type key = psymbol
+module Wps : Hashweak.S with type key = psymbol
+
 val ps_equal : psymbol -> psymbol -> bool
 
 val create_psymbol : preid -> vty_arrow -> psymbol
+
+val create_psymbol_extra : preid -> vty_arrow -> Spv.t -> Sps.t -> psymbol
 
 (** program expressions *)
 

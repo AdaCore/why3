@@ -323,6 +323,16 @@ type psymbol = {
   ps_subst : ity_subst;
 }
 
+module Psym = WeakStructMake (struct
+  type t = psymbol
+  let tag ps = ps.ps_name.id_tag
+end)
+
+module Sps = Psym.S
+module Mps = Psym.M
+module Hps = Psym.H
+module Wps = Psym.W
+
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
 let create_psymbol_real ~poly id vta varm =
@@ -339,9 +349,14 @@ let create_psymbol_mono = create_psymbol_real ~poly:false
 
 (** specification *)
 
+let varmap_union = Mid.set_union
+
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vars m
 let add_vs_vars vs _ m = add_pv_vars (restore_pv vs) m
 let add_t_vars vss m = Mvs.fold add_vs_vars vss m
+
+let add_ps_vars ps m =
+  Mid.add ps.ps_name ps.ps_vars (varmap_union ps.ps_varm m)
 
 let pre_vars f vsset = Mvs.set_union vsset f.t_vars
 let post_vars f vsset = Mvs.set_union vsset f.t_vars
@@ -391,6 +406,14 @@ let rec vta_check vars vta =
 
 let create_psymbol id vta =
   let ps = create_psymbol_poly id vta (vta_varmap vta) in
+  vta_check ps.ps_vars vta;
+  ps
+
+let create_psymbol_extra id vta pvs pss =
+  let varm = vta_varmap vta in
+  let varm = Spv.fold add_pv_vars pvs varm in
+  let varm = Sps.fold add_ps_vars pss varm in
+  let ps = create_psymbol_poly id vta varm in
   vta_check ps.ps_vars vta;
   ps
 
@@ -483,7 +506,6 @@ let vta_of_expr e = match e.e_vty with
   | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
   | VTarrow vta -> vta
 
-let varmap_union = Mid.set_union
 let add_e_vars e m = varmap_union e.e_varm m
 
 (* check admissibility of consecutive events *)
@@ -541,8 +563,8 @@ let e_value pv =
   mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty varm
 
 let e_arrow ps vta =
+  let varm = add_ps_vars ps Mid.empty in
   let sbs = vta_vars_match ps.ps_subst ps.ps_vta vta in
-  let varm = Mid.add ps.ps_name ps.ps_vars ps.ps_varm in
   let vta = vta_full_inst sbs ps.ps_vta in
   mk_expr (Earrow ps) (VTarrow vta) eff_empty varm
 
