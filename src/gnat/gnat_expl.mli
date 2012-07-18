@@ -6,6 +6,7 @@ type reason =
    | VC_Index_Check
    | VC_Overflow_Check
    | VC_Range_Check
+   | VC_Discriminant_Check
    | VC_Precondition
    | VC_Postcondition
    | VC_Loop_Invariant
