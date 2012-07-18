@@ -239,7 +239,7 @@ let print_data_decl info fmt = function
   | _, _ -> unsupported
       "alt-ergo : algebraic datatype are not supported"
 
-let print_data_decl info fmt ((ts, csl) as p) =
+let print_data_decl info fmt ((ts, _csl) as p) =
   if Mid.mem ts.ts_name info.info_syn then () else
   print_data_decl info fmt p
 
