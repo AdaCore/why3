@@ -625,15 +625,15 @@ if test "$enable_coq_support" = "yes" ; then
       echo "        FP arithmetic   : $enable_coq_fp_libs $reason_coq_fp_libs"
    fi
 fi
-echo "PVS support             : $enable_pvs_support $reason_pvs_support"
-if test "$enable_pvs_support" = "yes" ; then
-   echo "    Version             : $PVSVERSION"
-   echo "    Lib                 : $PVSLIB"
-   echo "    Realization support : $enable_pvs_libs $reason_pvs_libs"
-   if test "$enable_pvs_libs" = "yes" ; then
-      echo "        FP arithmetic   : $enable_pvs_fp_libs $reason_pvs_fp_libs"
-   fi
-fi
+dnl echo "PVS support             : $enable_pvs_support $reason_pvs_support"
+dnl if test "$enable_pvs_support" = "yes" ; then
+dnl    echo "    Version             : $PVSVERSION"
+dnl    echo "    Lib                 : $PVSLIB"
+dnl    echo "    Realization support : $enable_pvs_libs $reason_pvs_libs"
+dnl    if test "$enable_pvs_libs" = "yes" ; then
+dnl       echo "        FP arithmetic   : $enable_pvs_fp_libs $reason_pvs_fp_libs"
+dnl    fi
+dnl fi
 echo "hypothesis selection    : $enable_hypothesis_selection"
 echo "debugging symbols       : $enable_debug"
 echo "profiling               : $enable_profiling"
