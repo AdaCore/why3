@@ -171,6 +171,7 @@ New features:
     the association of old goals and new goals when the input is
     modified.  For compatibility, Why3 is still able to read session
     files in the old format.
+  o [Provers] support for Z3 4.0
 
 Bug fix:
   o completed support for the "Out Of Memory" prover result
@@ -193,10 +194,17 @@ Bug fix:
  - add tag 0.73 to the git repository (do not forget to push it)
 * put on the web page
  - why3-0.73.tar.gz
- - standard library online, using why3doc (make stdlibdoc),
-   to http://why3.lri.fr/stdlib/
- - API doc, produced using ocamldoc (make apidoc), to http://why3.lri.fr/api/
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   (make stdlibdoc ;
+    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.73;
+    ln -s /users/www-perso/projets/why3/stdlib-0.73 \
+            /users/www-perso/projets/why3/stdlib)
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     Note: check that URL of API doc is correct in doc/api.tex line 9.
+     (make apidoc ;
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.73;
+    ln -s /users/www-perso/projets/why3/api-0.73 \
+            /users/www-perso/projets/why3/api    )
  - update the main HTML page (sources are in why3-papers/www)
 
 * produce the Why3 part of ProVal gallery ?
