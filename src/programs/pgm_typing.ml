@@ -2060,10 +2060,10 @@ let add_logic_ps ?(nofail=false) uc x =
     (* can fail if x is a constructor of a model type (record or algebraic) *)
     assert nofail
 
-let add_types uc dl =
+let add_types loc uc dl =
   (* 1. type check the pure def, to have all sanity checks performed *)
   let dlp = List.map make_immutable_type dl in
-  let uc = Pgm_module.add_pure_pdecl (TypeDecl dlp) uc in
+  let uc = Pgm_module.add_pure_pdecl loc (TypeDecl dlp) uc in
   (* 2. compute number of regions for each type *)
   let def = List.fold_left
     (fun def d -> Mstr.add d.td_ident.id d def) Mstr.empty dl
@@ -2182,9 +2182,9 @@ let add_types uc dl =
       td_params = params; td_model = false; td_vis = Public; td_def = def }
   in
   let dli = List.map (add_regions ~effect:false) dl in
-  let uc = Pgm_module.add_impure_pdecl (Ptree.TypeDecl dli) uc in
+  let uc = Pgm_module.add_impure_pdecl loc (Ptree.TypeDecl dli) uc in
   let dle = List.map (add_regions ~effect:true) dl in
-  let uc = Pgm_module.add_effect_pdecl (Ptree.TypeDecl dle) uc in
+  let uc = Pgm_module.add_effect_pdecl loc (Ptree.TypeDecl dle) uc in
   (* 4. add mtsymbols in module *)
   let add_mt d =
     let x = d.td_ident.id in
@@ -2256,8 +2256,8 @@ let add_types uc dl =
   List.iter (fun d -> visit d.td_ident.id) dl;
   uc
 
-let add_logics uc d =
-  let uc = Pgm_module.add_pure_pdecl d uc in
+let add_logics loc uc d =
+  let uc = Pgm_module.add_pure_pdecl loc d uc in
   let region =
     let c = ref (-1) in
     fun loc ->
@@ -2286,8 +2286,8 @@ let add_logics uc d =
   in
   let add uc d0 =
     let d = LogicDecl [add_regions d0] in
-    let uc = Pgm_module.add_impure_pdecl d uc in
-    let uc = Pgm_module.add_effect_pdecl d uc in
+    let uc = Pgm_module.add_impure_pdecl loc d uc in
+    let uc = Pgm_module.add_effect_pdecl loc d uc in
     add_logic_ps uc d0.ld_ident.id;
     uc
   in
@@ -2308,10 +2308,17 @@ let find_module penv lmod q id = match q with
       (* module in file f *)
       Mstr.find id (fst (Env.read_lib_file penv q))
 
+type program_decl =
+  | PDdecl of Ptree.decl
+  | PDpdecl of Ptree.pdecl
+  | PDuseclone of Ptree.use_clone
+  | PDuse of Ptree.use
+  | PDnamespace of string option * bool * (Ptree.loc * program_decl) list
+
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
 let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
-  | Ptree.Dlet (id, gh, e) ->
+  | PDpdecl (Ptree.Dlet (id, gh, e)) ->
       no_ghost gh;
       let denv = create_denv uc in
       let e = dexpr ~ghost:false ~userloc:None denv e in
@@ -2328,7 +2335,7 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
       let d = Dlet (ls, e) in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
-  | Ptree.Dletrec dl ->
+  | PDpdecl (Ptree.Dletrec dl) ->
       let denv = create_denv uc in
       let _, dl = dletrec ~ghost:false ~userloc:None denv dl in
       let _, dl = iletrec (create_ienv denv) dl in
@@ -2351,7 +2358,7 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
       let d = Dletrec dl in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc
-  | Ptree.Dparam (id, gh, tyv) ->
+  | PDpdecl (Ptree.Dparam (id, gh, tyv)) ->
       no_ghost gh;
       let loc = id.id_loc in
       let denv = create_denv uc in
@@ -2380,11 +2387,11 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
             ps, uc
       in
       add_decl (Dparam ps) uc (* TODO: is it really needed? *)
-  | Ptree.Dexn (id, ty) ->
+  | PDpdecl (Ptree.Dexn (id, ty)) ->
       let ty = option_map (type_type uc) ty in
       add_exception id.id_loc id.id ty uc
   (* modules *)
-  | Ptree.Duse (qid, imp_exp, use_as) ->
+  | PDuse { use_theory = qid; use_imp_exp = imp_exp; use_as = use_as } ->
       let loc = Typing.qloc qid in
       let q, id = Typing.split_qualid qid in
       let m =
@@ -2404,18 +2411,18 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
       end
-  | Ptree.Dnamespace (id, import, dl) ->
+  | PDnamespace (id, import, dl) ->
       let uc = open_namespace uc in
       let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
       begin try close_namespace uc import id
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
-  | Ptree.Dlogic (TypeDecl d) ->
-      add_types uc d
-  | Ptree.Dlogic (LogicDecl _ | IndDecl _ as d) ->
-      add_logics uc d
-  | Ptree.Dlogic (PropDecl _ | Meta _ as d) ->
-      Pgm_module.add_pure_pdecl d uc
-  | Ptree.Duseclone d ->
+  | PDdecl (Ptree.TypeDecl d) ->
+      add_types loc uc d
+  | PDdecl (Ptree.LogicDecl _ | Ptree.IndDecl _ as d) ->
+      add_logics loc uc d
+  | PDdecl (Ptree.PropDecl _ | Ptree.Meta _ as d) ->
+      Pgm_module.add_pure_pdecl loc d uc
+  | PDuseclone d ->
       Pgm_module.add_use_clone env ltm loc d uc
 
 (*

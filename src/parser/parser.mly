@@ -20,50 +20,19 @@
 
 %{
 module Incremental = struct
-  let env_ref  = ref []
-  let lenv_ref = ref []
-  let uc_ref   = ref []
-  let path_ref = ref []
-
-  let ref_get  ref = List.hd !ref
-  let ref_tail ref = List.tl !ref
-  let ref_drop ref = ref := ref_tail ref
-  let ref_pop  ref = let v = ref_get ref in ref_drop ref; v
-
-  let ref_push ref v = ref := v :: !ref
-  let ref_set  ref v = ref := v :: ref_tail ref
-
-  let open_logic_file env path =
-    ref_push env_ref env;
-    ref_push path_ref path;
-    ref_push lenv_ref Util.Mstr.empty
-
-  let close_logic_file () =
-    ref_drop path_ref;
-    ref_drop env_ref;
-    ref_pop lenv_ref
-
-  let open_theory id =
-    let path = ref_get path_ref in
-    ref_push uc_ref (Theory.create_theory ~path (Denv.create_user_id id))
-
-  let close_theory loc =
-    let uc = ref_pop uc_ref in
-    ref_set lenv_ref (Typing.close_theory loc (ref_get lenv_ref) uc)
-
-  let open_namespace () =
-    ref_set uc_ref (Theory.open_namespace (ref_get uc_ref))
-
-  let close_namespace loc import name =
-    ref_set uc_ref (Typing.close_namespace loc import name (ref_get uc_ref))
-
-  let new_decl d =
-    ref_set uc_ref (Typing.add_decl (ref_get uc_ref) d)
-
-  let new_use_clone loc d =
-    let env = ref_get env_ref in let lenv = ref_get lenv_ref in
-    ref_set uc_ref (Typing.add_use_clone env lenv (ref_get uc_ref) loc d)
-
+  let stack = Stack.create ()
+  let open_file inc = Stack.push inc stack
+  let close_file () = ignore (Stack.pop stack)
+  let open_theory id = (Stack.top stack).Ptree.open_theory id
+  let close_theory () = (Stack.top stack).Ptree.close_theory ()
+  let open_module id = (Stack.top stack).Ptree.open_module id
+  let close_module () = (Stack.top stack).Ptree.close_module ()
+  let open_namespace () = (Stack.top stack).Ptree.open_namespace ()
+  let close_namespace l b n = (Stack.top stack).Ptree.close_namespace l b n
+  let new_decl loc d = (Stack.top stack).Ptree.new_decl loc d
+  let new_pdecl loc d = (Stack.top stack).Ptree.new_pdecl loc d
+  let use_clone loc use = (Stack.top stack).Ptree.use_clone loc use
+  let use_module loc use = (Stack.top stack).Ptree.use_module loc use
 end
 
   open Ptree
@@ -273,20 +242,20 @@ end
 
 /* Entry points */
 
-%type <unit Env.library -> string list -> unit> pre_logic_file
-%start pre_logic_file
-%type <Theory.theory Util.Mstr.t> logic_file
+%type <Ptree.incremental -> unit> open_file
+%start open_file
+%type <unit> logic_file
 %start logic_file
-%type <Ptree.program_file> program_file
+%type <unit> program_file
 %start program_file
 %%
 
-pre_logic_file:
-| /* epsilon */  { Incremental.open_logic_file }
+open_file:
+| /* epsilon */  { Incremental.open_file }
 ;
 
 logic_file:
-| list0_theory EOF  { Incremental.close_logic_file () }
+| list0_theory EOF  { Incremental.close_file () }
 ;
 
 /* File, theory, namespace */
@@ -301,7 +270,7 @@ theory_head:
 ;
 
 theory:
-| theory_head list0_decl END  { Incremental.close_theory (floc_i 1) }
+| theory_head list0_decl END  { Incremental.close_theory () }
 ;
 
 list0_decl:
@@ -311,9 +280,9 @@ list0_decl:
 
 new_decl:
 | decl
-   { Incremental.new_decl $1 }
+   { Incremental.new_decl (floc ()) $1 }
 | use_clone
-   { Incremental.new_use_clone (floc ()) $1 }
+   { Incremental.use_clone (floc ()) $1 }
 | namespace_head namespace_import namespace_name list0_decl END
    { Incremental.close_namespace (floc_ij 1 3) $2 $3 }
 ;
@@ -346,13 +315,13 @@ decl:
 | inductive list1_inductive_decl
     { IndDecl ($1, $2) }
 | AXIOM ident labels COLON lexpr
-    { PropDecl (floc (), Kaxiom, add_lab $2 $3, $5) }
+    { PropDecl (Kaxiom, add_lab $2 $3, $5) }
 | LEMMA ident labels COLON lexpr
-    { PropDecl (floc (), Klemma, add_lab $2 $3, $5) }
+    { PropDecl (Klemma, add_lab $2 $3, $5) }
 | GOAL ident labels COLON lexpr
-    { PropDecl (floc (), Kgoal, add_lab $2 $3, $5) }
+    { PropDecl (Kgoal, add_lab $2 $3, $5) }
 | META sident list1_meta_arg_sep_comma
-    { Meta (floc (), $2, $3) }
+    { Meta ($2, $3) }
 ;
 
 inductive:
@@ -995,79 +964,46 @@ bar_:
 /****************************************************************************/
 
 program_file:
-| list0_theory_or_module_ EOF { $1 }
+| list0_theory_or_module EOF { Incremental.close_file () }
 ;
 
-list0_theory_or_module_:
-| /* epsilon */
-   { [] }
-| list1_theory_or_module_
-   { $1 }
+list0_theory_or_module:
+| /* epsilon */                   { () }
+| theory list0_theory_or_module   { () }
+| module_ list0_theory_or_module  { () }
 ;
 
-list1_theory_or_module_:
-| theory_or_module_
-   { [$1] }
-| theory_or_module_ list1_theory_or_module_
-   { $1 :: $2 }
+module_head:
+| MODULE uident labels  { Incremental.open_module (add_lab $2 $3) }
 ;
 
-theory_or_module_:
-| THEORY uident labels list0_full_decl END
-   { Ptheory { pth_name = add_lab $2 $3; pth_decl = $4; } }
-| MODULE uident labels list0_program_decl END
-   { Pmodule { mod_name = add_lab $2 $3; mod_decl = $4; } }
+module_:
+| module_head list0_pdecl END  { Incremental.close_module () }
 ;
 
-list0_full_decl:
-| /* epsilon */
-   { [] }
-| list1_full_decl
-   { $1 }
+list0_pdecl:
+| /* epsilon */         { () }
+| new_decl  list0_pdecl { () }
+| new_pdecl list0_pdecl { () }
 ;
 
-list1_full_decl:
-| full_decl
-   { [$1] }
-| full_decl list1_full_decl
-   { $1 :: $2 }
+new_pdecl:
+| pdecl
+    { Incremental.new_pdecl (floc ()) $1 }
+| USE use_module
+    { Incremental.use_module (floc ()) $2 }
 ;
 
-full_decl:
-| decl
-   { floc (), Dlogic $1 }
-| use_clone
-   { floc (), Duseclone $1 }
-| NAMESPACE namespace_import namespace_name list0_full_decl END
-   { floc_ij 1 3, Dnamespace ($3, $2, $4) }
+use_module:
+| imp_exp MODULE tqualid
+    { { use_theory = $3; use_as = Some (qualid_last $3); use_imp_exp = $1 } }
+| imp_exp MODULE tqualid AS uident
+    { { use_theory = $3; use_as = Some $5.id; use_imp_exp = $1 } }
+| imp_exp MODULE tqualid AS UNDERSCORE
+    { { use_theory = $3; use_as = None; use_imp_exp = $1 } }
 ;
 
-list0_program_decl:
-| /* epsilon */
-   { [] }
-| list1_program_decl
-   { $1 }
-;
-
-list1_program_decl:
-| program_decl
-   { [$1] }
-| program_decl list1_program_decl
-   { $1 :: $2 }
-;
-
-program_decl:
-| program_decl_one
-    { floc (), $1 }
-| NAMESPACE namespace_import namespace_name list0_program_decl END
-    { floc_ij 1 3, Dnamespace ($3, $2, $4) }
-;
-
-program_decl_one:
-| decl
-    { Dlogic $1 }
-| use_clone
-    { Duseclone $1 }
+pdecl:
 | LET ghost lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $3 $4, $2, mk_expr_i 8 (Efun ($5, cast_body $6 $8))) }
 | LET ghost lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
@@ -1082,8 +1018,6 @@ program_decl_one:
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, Some $4) }
-| USE use_module
-    { $2 }
 ;
 
 lident_rich_pgm:
@@ -1096,13 +1030,6 @@ lident_rich_pgm:
 opt_semicolon:
 | /* epsilon */ {}
 | SEMICOLON     {}
-;
-
-use_module:
-| imp_exp MODULE tqualid
-    { Duse ($3, $1, Some (qualid_last $3)) }
-| imp_exp MODULE tqualid AS uident
-    { Duse ($3, $1, Some $5.id) }
 ;
 
 list1_recfun_sep_and:

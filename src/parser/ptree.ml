@@ -168,8 +168,8 @@ type decl =
   | TypeDecl of type_decl list
   | LogicDecl of logic_decl list
   | IndDecl of Decl.ind_sign * ind_decl list
-  | PropDecl of loc * prop_kind * ident * lexpr
-  | Meta of loc * ident * metarg list
+  | PropDecl of prop_kind * ident * lexpr
+  | Meta of ident * metarg list
 
 (* program files *)
 
@@ -252,30 +252,24 @@ and letrec = loc * ident * ghost * binder list * variant list * triple
 
 and triple = pre * expr * post
 
-type program_decl =
-  | Dlet    of ident * ghost * expr
+type pdecl =
+  | Dlet of ident * ghost * expr
   | Dletrec of letrec list
-  | Dlogic  of decl
-  | Duseclone of use_clone
-  | Dparam  of ident * ghost * type_v
-  | Dexn    of ident * pty option
-  (* modules *)
-  | Duse    of qualid * bool option * (*as:*) string option
-  | Dnamespace of string option * (*import:*) bool * (loc * program_decl) list
+  | Dparam of ident * ghost * type_v
+  | Dexn of ident * pty option
 
-type theory = {
-  pth_name : ident;
-  pth_decl : (loc * program_decl) list;
+(* incremental parsing *)
+
+type incremental = {
+  open_theory     : ident -> unit;
+  close_theory    : unit -> unit;
+  open_module     : ident -> unit;
+  close_module    : unit -> unit;
+  open_namespace  : unit -> unit;
+  close_namespace : loc -> bool (*import:*) -> string option -> unit;
+  new_decl        : loc -> decl -> unit;
+  new_pdecl       : loc -> pdecl -> unit;
+  use_clone       : loc -> use_clone -> unit;
+  (* TODO: remove this once the new whyml becomes default *)
+  use_module      : loc -> use -> unit;
 }
-
-type module_ = {
-  mod_name : ident;
-  mod_decl : (loc * program_decl) list;
-}
-
-type theory_module =
-  | Ptheory of theory
-  | Pmodule of module_
-
-type program_file = theory_module list
-

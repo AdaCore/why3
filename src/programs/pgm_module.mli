@@ -75,9 +75,9 @@ val add_impure_decl : Decl.decl -> uc -> uc
 val add_effect_decl : Decl.decl -> uc -> uc
 val add_pure_decl : Decl.decl -> uc -> uc
 
-val add_impure_pdecl : Ptree.decl -> uc -> uc
-val add_effect_pdecl : Ptree.decl -> uc -> uc
-val add_pure_pdecl : Ptree.decl -> uc -> uc
+val add_impure_pdecl : Loc.position -> Ptree.decl -> uc -> uc
+val add_effect_pdecl : Loc.position -> Ptree.decl -> uc -> uc
+val add_pure_pdecl   : Loc.position -> Ptree.decl -> uc -> uc
 
 val add_use_clone :
   t Mstr.t Env.library -> Theory.theory Mstr.t ->

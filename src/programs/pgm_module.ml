@@ -272,14 +272,14 @@ let create_module ?(path=[]) id =
   let uc = empty_module path id in
   use_export_theory uc th_prelude
 
-let add_impure_pdecl d uc =
-  { uc with uc_impure = Typing.add_decl uc.uc_impure d }
+let add_impure_pdecl loc d uc =
+  { uc with uc_impure = Typing.add_decl loc uc.uc_impure d }
 
-let add_effect_pdecl d uc =
-  { uc with uc_effect = Typing.add_decl uc.uc_effect d; }
+let add_effect_pdecl loc d uc =
+  { uc with uc_effect = Typing.add_decl loc uc.uc_effect d; }
 
-let add_pure_pdecl d uc =
-  { uc with uc_pure = Typing.add_decl uc.uc_pure d; }
+let add_pure_pdecl loc d uc =
+  { uc with uc_pure = Typing.add_decl loc uc.uc_pure d; }
 
 let add_use_clone env ltm loc d uc =
   let env = Lexer.library_of_env (Env.env_of_library env) in

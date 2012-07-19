@@ -1423,162 +1423,204 @@ let find_module loc lib mm mt path s = match path with
   | _ :: _ -> (* module/theory in file path *)
       find_module loc lib path s
 
-(** Main loop *)
+(** Top level *)
 
-let add_theory lib path mt m =
-  let { id = id; id_loc = loc } = m.pth_name in
-  if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
-  let uc = create_theory ~path (Denv.create_user_id m.pth_name) in
-  let rec add_pure_decl uc (loc,decl) = Loc.try3 loc real_add uc loc decl
-  and real_add uc loc decl = match decl with
-    | Dlogic d ->
-        Typing.add_decl uc d
-    | Duseclone (use, inst) ->
-        let path, s = Typing.split_qualid use.use_theory in
-        let th = find_theory loc lib mt path s in
-        (* open namespace, if any *)
-        let uc =
-          if use.use_imp_exp <> None then Theory.open_namespace uc else uc in
-        (* use or clone *)
-        let uc = match inst with
-          | None -> Theory.use_export uc th
-          | Some inst ->
-              let inst = Typing.type_inst uc th inst in
-              Theory.clone_export uc th inst
-        in
-        (* close namespace, if any *)
-        begin match use.use_imp_exp with
-          | None -> uc
-          | Some imp -> Theory.close_namespace uc imp use.use_as
-        end
-    | Dnamespace (name, import, dl) ->
-        let uc = Theory.open_namespace uc in
-        let uc = List.fold_left add_pure_decl uc dl in
-        Theory.close_namespace uc import name
-    | Dlet _ | Dletrec _ | Dparam _ | Dexn _ | Duse _ ->
-        assert false
+let add_decl loc uc decl =
+  let th0 = Mlw_module.get_theory uc in
+  let dl0 = Theory.get_rev_decls th0 in
+  let seen td = match dl0 with
+    | td0 :: _ -> td_equal td td0
+    | [] -> false in
+  (* we extract the added declarations and readd it to uc *)
+  let rec add_td uc = function
+    | [] -> uc
+    | td :: _ when seen td -> uc
+    | { td_node = Theory.Decl d } :: dl ->
+        Mlw_module.add_decl (add_td uc dl) d
+    | { td_node = Theory.Meta (m,al) } :: dl ->
+        Mlw_module.add_meta (add_td uc dl) m al
+    | { td_node = Theory.Use th } :: dl ->
+        Mlw_module.use_export_theory (add_td uc dl) th
+    | { td_node = Theory.Clone _ } :: _ -> assert false
   in
-  let uc = List.fold_left add_pure_decl uc m.pth_decl in
-  let th = close_theory uc in
-  Mstr.add id th mt
+  add_td uc (Theory.get_rev_decls (Typing.add_decl loc th0 decl))
 
-let add_module lib path mm mt m =
-  let { id = id; id_loc = loc } = m.mod_name in
-  if Mstr.mem id mm then Loc.errorm ~loc "clash with previous module %s" id;
-  if Mstr.mem id mt then Loc.errorm ~loc "clash with previous theory %s" id;
-  let env = Env.env_of_library lib in
-  let uc = create_module env ~path (Denv.create_user_id m.mod_name) in
-  let rec add_prog_decl uc (loc,decl) = Loc.try3 loc real_add uc loc decl
-  and real_add uc loc decl = match decl with
-    | Dlogic (TypeDecl tdl) ->
-        add_types uc tdl
-    | Dlogic d ->
-        let th0 = get_theory uc in
-        let dl0 = get_rev_decls th0 in
-        let seen td = match dl0 with
-          | td0 :: _ -> td_equal td td0
-          | [] -> false in
-        (* we extract the added declarations and readd it to uc *)
-        let rec add_td uc = function
-          | [] -> uc
-          | td :: _ when seen td -> uc
-          | { td_node = Theory.Decl d } :: dl ->
-              add_decl (add_td uc dl) d
-          | { td_node = Theory.Meta (m,al) } :: dl ->
-              add_meta (add_td uc dl) m al
-          | { td_node = Theory.Use th } :: dl ->
-              use_export_theory (add_td uc dl) th
-          | { td_node = Theory.Clone _ } :: _ -> assert false in
-        add_td uc (get_rev_decls (Typing.add_decl th0 d))
-    | Duseclone (use, inst) ->
-        let path, s = Typing.split_qualid use.use_theory in
-        let mth = find_module loc lib mm mt path s in
-        (* open namespace, if any *)
-        let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
-        (* use or clone *)
-        let uc = match mth, inst with
-          | Theory th, None -> use_export_theory uc th
-          | Theory th, Some inst ->
-              let inst = Typing.type_inst (get_theory uc) th inst in
-              clone_export_theory uc th inst
-          | Module m, None -> use_export uc m
-          | Module m, Some inst ->
-              let inst = Typing.type_inst (get_theory uc) m.mod_theory inst in
-              clone_export uc m inst
-        in
-        (* close namespace, if any *)
-        begin match use.use_imp_exp with
-          | None -> uc
-          | Some imp -> close_namespace uc imp use.use_as
-        end
-    | Dnamespace (name, import, dl) ->
-        let uc = open_namespace uc in
-        let uc = List.fold_left add_prog_decl uc dl in
-        close_namespace uc import name
-    | Dlet (id, gh, e) ->
-        let e = dexpr (create_denv uc) e in
-        let pd = match e.de_desc with
-          | DEfun lam ->
-              let def, _ = expr_fun (create_lenv uc) id gh lam in
-              create_rec_decl def
-          | _ ->
-              let e = e_ghostify gh (expr (create_lenv uc) e) in
-              if not gh && vty_ghost e.e_vty then
-                errorm ~loc "%s must be a ghost variable" id.id;
-              let def = create_let_defn (Denv.create_user_id id) e in
-              create_let_decl def
-        in
-        add_pdecl_with_tuples uc pd
-    | Dletrec rdl ->
-        let rdl = dletrec (create_denv uc) rdl in
-        let rdl = expr_rec (create_lenv uc) rdl in
-        let pd = create_rec_decl rdl in
-        add_pdecl_with_tuples uc pd
-    | Dexn (id, pty) ->
-        let ity = match pty with
-          | Some pty ->
-              ity_of_dity (dity_of_pty ~user:false (create_denv uc) pty)
-          | None -> ity_unit in
-        let xs = create_xsymbol (Denv.create_user_id id) ity in
-        let pd = create_exn_decl xs in
-        add_pdecl_with_tuples uc pd
-    | Dparam (id, gh, tyv) ->
-        let tyv, _ = dtype_v (create_denv uc) tyv in
-        let tyv = type_v (create_lenv uc) gh Svs.empty vars_empty tyv in
-        let lv = match tyv with
-          | VTvalue v ->
-              if v.vtv_ghost && not gh then
-                errorm ~loc "%s must be a ghost variable" id.id;
-              LetV (create_pvsymbol (Denv.create_user_id id) v)
-          | VTarrow a ->
-              if a.vta_ghost && not gh then
-                errorm ~loc "%s must be a ghost function" id.id;
-              LetA (create_psymbol (Denv.create_user_id id) a)
-        in
-        let pd = create_val_decl lv in
-        add_pdecl_with_tuples uc pd
-    (* TODO: this is made obsolete by Duseclone, remove later *)
-    | Duse (qid, use_imp_exp, use_as) ->
-        let path, s = Typing.split_qualid qid in
-        let mth = find_module loc lib mm mt path s in
-        (* open namespace, if any *)
-        let uc = if use_imp_exp <> None then open_namespace uc else uc in
-        (* use or clone *)
-        let uc = match mth with
-          | Theory _ -> errorm ~loc "Module not found: %a" print_qualid qid
-          | Module m -> use_export uc m
-        in
-        (* close namespace, if any *)
-        begin match use_imp_exp with
-          | None -> uc
-          | Some imp -> close_namespace uc imp use_as
-        end
-  in
-  let uc = List.fold_left add_prog_decl uc m.mod_decl in
+let add_decl loc uc = function
+  | TypeDecl tdl -> add_types uc tdl
+  | decl -> add_decl loc uc decl
+
+let add_decl loc uc d =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  Loc.try3 loc add_decl loc uc d
+
+let add_pdecl loc uc = function
+  | Dlet (id, gh, e) ->
+      let e = dexpr (create_denv uc) e in
+      let pd = match e.de_desc with
+        | DEfun lam ->
+            let def, _ = expr_fun (create_lenv uc) id gh lam in
+            create_rec_decl def
+        | _ ->
+            let e = e_ghostify gh (expr (create_lenv uc) e) in
+            if not gh && vty_ghost e.e_vty then
+              errorm ~loc "%s must be a ghost variable" id.id;
+            let def = create_let_defn (Denv.create_user_id id) e in
+            create_let_decl def in
+      add_pdecl_with_tuples uc pd
+  | Dletrec rdl ->
+      let rdl = dletrec (create_denv uc) rdl in
+      let rdl = expr_rec (create_lenv uc) rdl in
+      let pd = create_rec_decl rdl in
+      add_pdecl_with_tuples uc pd
+  | Dexn (id, pty) ->
+      let ity = match pty with
+        | Some pty ->
+            ity_of_dity (dity_of_pty ~user:false (create_denv uc) pty)
+        | None -> ity_unit in
+      let xs = create_xsymbol (Denv.create_user_id id) ity in
+      let pd = create_exn_decl xs in
+      add_pdecl_with_tuples uc pd
+  | Dparam (id, gh, tyv) ->
+      let tyv, _ = dtype_v (create_denv uc) tyv in
+      let tyv = type_v (create_lenv uc) gh Svs.empty vars_empty tyv in
+      let lv = match tyv with
+        | VTvalue v ->
+            if v.vtv_ghost && not gh then
+              errorm ~loc "%s must be a ghost variable" id.id;
+            LetV (create_pvsymbol (Denv.create_user_id id) v)
+        | VTarrow a ->
+            if a.vta_ghost && not gh then
+              errorm ~loc "%s must be a ghost function" id.id;
+            LetA (create_psymbol (Denv.create_user_id id) a) in
+      let pd = create_val_decl lv in
+      add_pdecl_with_tuples uc pd
+
+let add_pdecl loc uc d =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  Loc.try3 loc add_pdecl loc uc d
+
+let use_clone_pure lib mth uc loc (use,inst) =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  let path, s = Typing.split_qualid use.use_theory in
+  let th = find_theory loc lib mth path s in
+  (* open namespace, if any *)
+  let uc = if use.use_imp_exp <> None then Theory.open_namespace uc else uc in
+  (* use or clone *)
+  let uc = match inst with
+    | None -> Theory.use_export uc th
+    | Some inst -> Theory.clone_export uc th (Typing.type_inst uc th inst) in
+  (* close namespace, if any *)
+  match use.use_imp_exp with
+    | None -> uc
+    | Some imp -> Theory.close_namespace uc imp use.use_as
+
+let use_clone_pure lib mth uc loc use =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  Loc.try3 loc (use_clone_pure lib mth) uc loc use
+
+let use_clone lib mmd mth uc loc (use,inst) =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  let path, s = Typing.split_qualid use.use_theory in
+  let mth = find_module loc lib mmd mth path s in
+  (* open namespace, if any *)
+  let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+  (* use or clone *)
+  let uc = match mth, inst with
+    | Module m, None -> use_export uc m
+    | Theory th, None -> use_export_theory uc th
+    | Module m, Some inst ->
+        clone_export uc m (Typing.type_inst (get_theory uc) m.mod_theory inst)
+    | Theory th, Some inst ->
+        clone_export_theory uc th (Typing.type_inst (get_theory uc) th inst) in
+  (* close namespace, if any *)
+  match use.use_imp_exp with
+    | None -> uc
+    | Some imp -> close_namespace uc imp use.use_as
+
+let use_clone lib mmd mth uc loc use =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  Loc.try3 loc (use_clone lib mmd mth) uc loc use
+
+let use_module lib mmd mth uc loc use =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  let path, s = Typing.split_qualid use.use_theory in
+  let mth = find_module loc lib mmd mth path s in
+  (* open namespace, if any *)
+  let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+  (* use or clone *)
+  let uc = match mth with
+    | Theory _ ->
+        errorm ~loc "Module not found: %a" print_qualid (use.use_theory)
+    | Module m -> use_export uc m in
+  (* close namespace, if any *)
+  match use.use_imp_exp with
+    | None -> uc
+    | Some imp -> close_namespace uc imp use.use_as
+
+let use_module lib mmd mth uc loc use =
+  if Debug.test_flag Typing.debug_parse_only then uc else
+  Loc.try3 loc (use_module lib mmd mth) uc loc use
+
+let close_theory (mmd,mth) uc =
+  if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
+  let th = Theory.close_theory uc in
+  let id = th.th_name.id_string in
+  let loc = th.th_name.Ident.id_loc in
+  if Mstr.mem id mmd then Loc.errorm ?loc "clash with previous module %s" id;
+  if Mstr.mem id mth then Loc.errorm ?loc "clash with previous theory %s" id;
+  mmd, Mstr.add id th mth
+
+let close_module (mmd,mth) uc =
+  if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
   let m = close_module uc in
-  Mstr.add id m mm, Mstr.add id m.mod_theory mt
+  let id = m.mod_theory.th_name.id_string in
+  let loc = m.mod_theory.th_name.Ident.id_loc in
+  if Mstr.mem id mmd then Loc.errorm ?loc "clash with previous module %s" id;
+  if Mstr.mem id mth then Loc.errorm ?loc "clash with previous theory %s" id;
+  Mstr.add id m mmd, Mstr.add id m.mod_theory mth
 
-let add_theory_module lib path (mm, mt) = function
-  | Ptheory th -> mm, add_theory lib path mt th
-  | Pmodule m -> add_module lib path mm mt m
-
+let open_file, close_file =
+  let inm  = Stack.create () in
+  let tuc  = Stack.create () in
+  let muc  = Stack.create () in
+  let lenv = Stack.create () in
+  let open_file lib path =
+    let env = Env.env_of_library lib in
+    Stack.push (Mstr.empty,Mstr.empty) lenv;
+    let open_theory id = Stack.push false inm;
+      Stack.push (Theory.create_theory ~path (Denv.create_user_id id)) tuc in
+    let open_module id = Stack.push true inm;
+      Stack.push (create_module env ~path (Denv.create_user_id id)) muc in
+    let close_theory () = ignore (Stack.pop inm);
+      Stack.push (close_theory (Stack.pop lenv) (Stack.pop tuc)) lenv in
+    let close_module () = ignore (Stack.pop inm);
+      Stack.push (close_module (Stack.pop lenv) (Stack.pop muc)) lenv in
+    let open_namespace () = if Stack.top inm
+      then Stack.push (Mlw_module.open_namespace (Stack.pop muc)) muc
+      else Stack.push (Theory.open_namespace (Stack.pop tuc)) tuc in
+    let close_namespace imp name = if Stack.top inm
+      then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp name) muc
+      else Stack.push (Theory.close_namespace (Stack.pop tuc) imp name) tuc in
+    let new_decl loc d = if Stack.top inm
+      then Stack.push (add_decl loc (Stack.pop muc) d) muc
+      else Stack.push (Typing.add_decl loc (Stack.pop tuc) d) tuc in
+    let new_pdecl loc d =
+      Stack.push (add_pdecl loc (Stack.pop muc) d) muc in
+    let use_clone loc use = let (mmd,mth) = Stack.top lenv in if Stack.top inm
+      then Stack.push (use_clone lib mmd mth (Stack.pop muc) loc use) muc
+      else Stack.push (use_clone_pure lib mth (Stack.pop tuc) loc use) tuc in
+    let use_module loc use = let (mmd,mth) = Stack.top lenv in
+      Stack.push (use_module lib mmd mth (Stack.pop muc) loc use) muc in
+    { open_theory = open_theory;
+      close_theory = close_theory;
+      open_module = open_module;
+      close_module = close_module;
+      open_namespace = open_namespace;
+      close_namespace = (fun loc -> Loc.try2 loc close_namespace);
+      new_decl = new_decl;
+      new_pdecl = new_pdecl;
+      use_clone = use_clone;
+      use_module = use_module; }
+  in
+  let close_file () = Stack.pop lenv in
+  open_file, close_file

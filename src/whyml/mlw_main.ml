@@ -23,24 +23,20 @@ open Util
 open Mlw_module
 open Mlw_typing
 
-let debug = Debug.register_flag "whyml_print_modules"
+let debug = Debug.register_flag "print_modules"
 
 let read_channel env path file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
-  let ml = Lexer.parse_program_file lb in
-  if Debug.test_flag Typing.debug_parse_only then
-    Mstr.empty, Mstr.empty
-  else
-    let mm, tm =
-      List.fold_left (add_theory_module env path) (Mstr.empty, Mstr.empty) ml
-    in
-    if Debug.test_flag debug then Mstr.iter (fun _ m ->
-      Format.fprintf Format.err_formatter
-        "@[<hov 2>module %a@\n%a@]@\nend@." Pretty.print_th m.mod_theory
-        (Pp.print_list Pp.newline2 Mlw_pretty.print_pdecl) m.mod_decls;
-      Format.pp_print_newline Format.err_formatter ()) mm;
-    mm, tm
+  let inc = Mlw_typing.open_file env path in
+  Lexer.parse_program_file inc lb;
+  let mm, tm = Mlw_typing.close_file () in
+  if Debug.test_flag debug then Mstr.iter (fun _ m ->
+    Format.fprintf Format.err_formatter
+      "@[<hov 2>module %a@\n%a@]@\nend@." Pretty.print_th m.mod_theory
+      (Pp.print_list Pp.newline2 Mlw_pretty.print_pdecl) m.mod_decls;
+    Format.pp_print_newline Format.err_formatter ()) mm;
+  mm, tm
 
 (* TODO: remove this function once whyml becomes the default *)
 let read_channel =
