@@ -482,8 +482,7 @@ type chunk =
   | Edition of string * contents (* name contents *)
   | Other of contents            (* contents *)
 
-let re_ignored =
-  Str.regexp "\\([^ :]+: THEORY\\)\\|\\([^ :]+: LIBRARY\\)\\|IMPORTING\\| BEGIN"
+let re_blank = Str.regexp "[ ]*$"
 let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
 
 (* Reads an old version of the file, as a list of chunks.
@@ -495,9 +494,13 @@ let read_old_script ch =
   let contents = ref [] in
   let rec read_line () =
     let s = input_line ch in
-    let s = clean_line s in
-    if Str.string_match re_ignored s 0 then read_line () else s
+    clean_line s
   in
+  (* skip first lines, until we find a blank line *)
+  begin try while true do
+    let s = read_line () in if Str.string_match re_blank s 0 then raise Exit
+  done with End_of_file | Exit -> () end;
+  (* then read chunks *)
   let rec read ?name () =
     let s = read_line () in
     if s = "" then begin
@@ -852,7 +855,8 @@ let print_task env pr thpr realize ?old fmt task =
        let lib = if path = thpath then "" else String.concat "." path ^ "@" in
        fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
     realized_theories;
-  fprintf fmt "@\n%% Why3 tuple0@\n";
+  fprintf fmt "@\n%% do not edit above this line@\n@\n";
+  fprintf fmt "%% Why3 tuple0@\n";
   fprintf fmt "tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0@\n@\n";
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old;

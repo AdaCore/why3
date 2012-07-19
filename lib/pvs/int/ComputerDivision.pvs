@@ -3,14 +3,24 @@ ComputerDivision: THEORY
   IMPORTING Int
   IMPORTING Abs
   
+  % do not edit above this line
+  
   % Why3 tuple0
   tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
   
+  IMPORTING ints@div, ints@rem
+  
+  div_total(x: int): int
+  
   % Why3 div
-  div(x:int, x1:int): int
+  div(x:int,
+    x1:int): MACRO int =  IF x1 /= 0 THEN div(x, x1) ELSE div_total(x) ENDIF
+  
+  mod_total(x: int): int
   
   % Why3 mod
-  mod(x:int, x1:int): int
+  mod(x:int,
+    x1:int): MACRO int =  IF x1 /= 0 THEN rem(x, x1) ELSE mod_total(x) ENDIF
   
   % Why3 div_mod
   div_mod: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) => (x = ((y * div(x,

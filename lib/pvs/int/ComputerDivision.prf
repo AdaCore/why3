@@ -1,0 +1,65 @@
+(ComputerDivision
+ (div_mod 0
+  (div_mod-1 nil 3551625251 ("" (grind) nil nil)
+   ((boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (/= const-decl "boolean" notequal nil)
+    (sgn const-decl "int" real_defs nil)
+    (abs const-decl "{n: nonneg_real | n >= m AND n >= -m}" real_defs
+         nil)
+    (div const-decl "integer" div "ints/")
+    (rem const-decl "{k | abs(k) < abs(j)}" rem "ints/")
+    (int_abs_is_nonneg application-judgement "{j: nonneg_int | j >= i}"
+     real_defs nil)
+    (minus_int_is_int application-judgement "int" integers nil)
+    (minus_odd_is_odd application-judgement "odd_int" integers nil)
+    (mult_divides1 application-judgement "(divides(n))" divides nil)
+    (mult_divides2 application-judgement "(divides(m))" divides nil))
+   shostak))
+ (div_bound 0
+  (div_bound-1 nil 3551625260
+   ("" (grind) (("1" (postpone) nil nil) ("2" (postpone) nil nil)) nil)
+   nil shostak))
+ (mod_bound 0
+  (mod_bound-1 nil 3551625904 ("" (default-strategy)) nil shostak))
+ (div_sign_pos 0
+  (div_sign_pos-1 nil 3551625906 ("" (default-strategy)) nil shostak))
+ (div_sign_neg 0
+  (div_sign_neg-1 nil 3551625906 ("" (default-strategy)) nil shostak))
+ (mod_sign_pos 0
+  (mod_sign_pos-1 nil 3551625906 ("" (default-strategy)) nil shostak))
+ (mod_sign_neg 0
+  (mod_sign_neg-1 nil 3551625907 ("" (default-strategy)) nil shostak))
+ (rounds_toward_zero 0
+  (rounds_toward_zero-1 nil 3551625313
+   ("" (grind)
+    (("1" (postpone) nil nil) ("2" (postpone) nil nil)
+     ("3" (postpone) nil nil) ("4" (postpone) nil nil)
+     ("5" (postpone) nil nil) ("6" (postpone) nil nil)
+     ("7" (postpone) nil nil) ("8" (postpone) nil nil))
+    nil)
+   nil shostak))
+ (div_1 0 (div_1-1 nil 3551625908 ("" (default-strategy)) nil shostak))
+ (mod_1 0 (mod_1-1 nil 3551625908 ("" (default-strategy)) nil shostak))
+ (div_inf 0
+  (div_inf-1 nil 3551625909 ("" (default-strategy)) nil shostak))
+ (mod_inf 0
+  (mod_inf-1 nil 3551625909 ("" (default-strategy)) nil shostak))
+ (div_mult 0
+  (div_mult-1 nil 3551625910 ("" (default-strategy)) nil shostak))
+ (mod_mult 0
+  (mod_mult-1 nil 3551625910 ("" (default-strategy)) nil shostak)))
+

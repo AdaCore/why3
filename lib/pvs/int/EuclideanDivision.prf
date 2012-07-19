@@ -1,0 +1,112 @@
+(EuclideanDivision
+ (div_mod 0
+  (div_mod-1 nil 3551625869 ("" (default-strategy))
+   ((mult_divides2 application-judgement "(divides(m))" divides nil)
+    (mult_divides1 application-judgement "(divides(n))" divides nil)
+    (minus_odd_is_odd application-judgement "odd_int" integers nil)
+    (mod const-decl "{k | abs(k) < abs(j)}" tmod "ints/")
+    (tdiv const-decl "integer" tdiv "ints/")
+    (/= const-decl "boolean" notequal nil)
+    (int_plus_int_is_int application-judgement "int" integers nil)
+    (rat_div_nzrat_is_rat application-judgement "rat" rationals nil)
+    (int_minus_int_is_int application-judgement "int" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (div_bound 0
+  (div_bound-1 nil 3551625870 ("" (default-strategy)) nil shostak))
+ (mod_bound 0
+  (mod_bound-1 nil 3551625870
+   ("" (default-strategy)
+    (("1" (postpone) nil nil) ("2" (postpone) nil nil)
+     ("3" (postpone) nil nil))
+    nil)
+   nil shostak))
+ (mod_1 0
+  (mod_1-1 nil 3551625870 ("" (default-strategy))
+   ((minus_odd_is_odd application-judgement "odd_int" integers nil)
+    (mod const-decl "{k | abs(k) < abs(j)}" tmod "ints/")
+    (tdiv const-decl "integer" tdiv "ints/")
+    (rat_div_nzrat_is_rat application-judgement "rat" rationals nil)
+    (int_minus_int_is_int application-judgement "int" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (div_1 0
+  (div_1-1 nil 3551625870 ("" (default-strategy))
+   ((tdiv const-decl "integer" tdiv "ints/")
+    (rat_div_nzrat_is_rat application-judgement "rat" rationals nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (div_inf 0
+  (div_inf-1 nil 3551625870 ("" (default-strategy)) nil shostak))
+ (div_inf_neg 0
+  (div_inf_neg-1 nil 3551625870 ("" (default-strategy)) nil shostak))
+ (mod_0 0
+  (mod_0-1 nil 3551625871 ("" (default-strategy))
+   ((mod const-decl "{k | abs(k) < abs(j)}" tmod "ints/")
+    (tdiv const-decl "integer" tdiv "ints/")
+    (/= const-decl "boolean" notequal nil)
+    (mult_divides2 application-judgement "(divides(m))" divides nil)
+    (mult_divides1 application-judgement "(divides(n))" divides nil)
+    (minus_odd_is_odd application-judgement "odd_int" integers nil)
+    (rat_div_nzrat_is_rat application-judgement "rat" rationals nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (div_1_left 0
+  (div_1_left-1 nil 3551625871 ("" (default-strategy)) nil shostak))
+ (div_minus1_left 0
+  (div_minus1_left-1 nil 3551625871 ("" (default-strategy)) nil
+   shostak))
+ (mod_1_left 0
+  (mod_1_left-1 nil 3551625871 ("" (default-strategy)) nil shostak))
+ (mod_minus1_left 0
+  (mod_minus1_left-1 nil 3551625871 ("" (default-strategy)) nil
+   shostak)))
+
