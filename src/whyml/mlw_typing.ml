@@ -908,6 +908,8 @@ and expr_desc lenv loc de = match de.de_desc with
         let e2 = expr lenv de2 in
         e_let def1 e2 in
       let rec flatten e1 = match e1.e_node with
+        | Elet (ld,_) (* can't let a non-ghost expr from a ghost one *)
+          when gh && not (vty_ghost ld.let_expr.e_vty) -> mk_expr e1
         | Elet (ld,e1) -> e_let ld (flatten e1)
         | _ -> mk_expr e1 in
       begin match e1.e_vty with
