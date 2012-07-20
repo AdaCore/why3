@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
  name="programs/fib_memo/why3session.xml" shape_version="2">
  <prover
@@ -15,7 +15,7 @@
   verified="true"
   expanded="false">
   <theory
-   name="WP M"
+   name="M"
    locfile="programs/fib_memo/../fib_memo.mlw"
    loclnum="3" loccnumb="7" loccnume="8"
    verified="true"
@@ -25,10 +25,10 @@
     locfile="programs/fib_memo/../fib_memo.mlw"
     loclnum="37" loccnumb="10" loccnume="14"
     expl="parameter fibo"
-    sum="5b7f6f3f66e3c94d7c3170a4d844909b"
+    sum="6917f8a3e4f877d06aa2bc878ddb1a9f"
     proved="true"
     expanded="true"
-    shape="iainfix &lt;=V0c1ainvV1Aainfix =c1afibV0ainvV4Aainfix =ainfix +V3V5afibV0IainvV4Aainfix =V5afibainfix -V0c2FFAainvV2Aainfix &lt;=c0ainfix -V0c2IainvV2Aainfix =V3afibainfix -V0c1FFAainvV1Aainfix &lt;=c0ainfix -V0c1IainvV1Aainfix &lt;=c0V0FF">
+    shape="iainfix &lt;=V0c1ainvV1Aainfix =c1afibV0ainvV3Aainfix =ainfix +afibainfix -V0c1afibainfix -V0c2afibV0IainvV3FAainvV2Aainfix &lt;=c0ainfix -V0c1IainvV2FAainvV1Aainfix &lt;=c0ainfix -V0c2IainvV1Aainfix &lt;=c0V0FF">
     <label
      name="expl:parameter fibo"/>
     <proof
@@ -45,10 +45,10 @@
     locfile="programs/fib_memo/../fib_memo.mlw"
     loclnum="45" loccnumb="7" loccnume="16"
     expl="parameter memo_fibo"
-    sum="bb4266e68ad74ac3282dc34cf6734596"
+    sum="6f1f6f6117ede52a0fb495e98364b6d3"
     proved="true"
     expanded="true"
-    shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFAainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix &lt;=c0V0FF">
+    shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2LafibV0FAainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix &lt;=c0V0FF">
     <label
      name="expl:parameter memo_fibo"/>
     <transf
@@ -60,7 +60,7 @@
       locfile="programs/fib_memo/../fib_memo.mlw"
       loclnum="45" loccnumb="7" loccnume="16"
       expl="normal postcondition"
-      sum="240d2b4c7283831d3c793764f6a77582"
+      sum="840e824c9b178fed91a3c46af17a04b7"
       proved="true"
       expanded="true"
       shape="ainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix &lt;=c0V0FF">
@@ -72,7 +72,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -80,10 +80,10 @@
       locfile="programs/fib_memo/../fib_memo.mlw"
       loclnum="45" loccnumb="7" loccnume="16"
       expl="precondition"
-      sum="9f34894fa7dbcdc986bad7c5b16696b1"
+      sum="75e64739c64b2bffa08707dace5303a7"
       proved="true"
       expanded="true"
-      shape="ainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix &lt;=c0V0FF">
+      shape="ainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix &lt;=c0V0FF">
       <label
        name="expl:parameter memo_fibo"/>
       <proof
@@ -100,10 +100,10 @@
       locfile="programs/fib_memo/../fib_memo.mlw"
       loclnum="45" loccnumb="7" loccnume="16"
       expl="normal postcondition"
-      sum="b8b9438239163be4917bf4a5eb0bec5e"
+      sum="a848abcce9e4a32cb2c53aac338287fb"
       proved="true"
       expanded="true"
-      shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2Aainfix =V3afibV0FFIainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix &lt;=c0V0FF">
+      shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2LafibV0FIainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix &lt;=c0V0FF">
       <label
        name="expl:parameter memo_fibo"/>
       <proof
@@ -112,7 +112,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
