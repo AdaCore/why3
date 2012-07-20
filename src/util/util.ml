@@ -228,8 +228,11 @@ let padd_string c s i =
   then String.sub s 0 i
   else s
 
-(** usefule function on char *)
+(** useful function on char *)
 let is_uppercase c = 'A' <= c && c <= 'Z'
+
+let concat_non_empty sep l =
+  String.concat sep (List.filter (fun s -> s <> "") l)
 
 (* Set and Map on ints and strings *)
 
