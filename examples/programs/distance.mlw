@@ -64,10 +64,10 @@ module Distance
           f i <= !j < i /\ !count + d[!j] <= i-1 /\
           (forall k: int. !j < k < i -> d[!j] < d[k]) }
         variant { !j }
-        ghost incr count;
+        incr count;
         j := g[!j]
       done;
-      ghost d[i] <- 1 + d[!j];
+      d[i] <- 1 + d[!j];
       g[i] <- !j
     done;
     assert { !count < n }; (* O(n) is thus ensured *)
