@@ -227,13 +227,13 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ~filename drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
   let regexps = drv.drv_regexps in
   let timeregexps = drv.drv_timeregexps in
   let exitcodes = drv.drv_exitcodes in
   Call_provers.call_on_buffer
     ~command ?timelimit ?memlimit ~regexps ~timeregexps
-    ~exitcodes ~filename buffer
+    ~exitcodes ~filename ?inplace buffer
 
 (** print'n'prove *)
 
@@ -300,25 +300,31 @@ let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
   print_task ?old drv fmt task
 
-let prove_task_prepared ~command ?timelimit ?memlimit ?old drv task =
+let prove_task_prepared
+  ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  print_task_prepared ?old drv fmt task; pp_print_flush fmt ();
-  let filename =
-    let pr = Task.task_goal task in
-    let fn = match pr.pr_name.id_loc with
-      | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
-      | None -> "" in
-    let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
-    get_filename drv fn "T" pr.pr_name.id_string
+  let old_channel = option_map open_in old in
+  print_task_prepared ?old:old_channel drv fmt task; pp_print_flush fmt ();
+  option_iter close_in old_channel;
+  let filename = match old, inplace with
+    | Some fn, Some true -> fn
+    | _ ->
+        let pr = Task.task_goal task in
+        let fn = match pr.pr_name.id_loc with
+          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | None -> "" in
+        let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
+        get_filename drv fn "T" pr.pr_name.id_string
   in
-  let res = call_on_buffer ~command ?timelimit ?memlimit ~filename drv buf in
+  let res =
+    call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ?timelimit ?memlimit ?old drv task =
+let prove_task ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let task = prepare_task drv task in
-  prove_task_prepared ~command ?timelimit ?memlimit ?old drv task
+  prove_task_prepared ~command ?timelimit ?memlimit ?old ?inplace drv task
 
 (* exception report *)
 

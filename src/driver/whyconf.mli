@@ -109,6 +109,7 @@ type config_prover = {
   id      : string; (* unique name for command line *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  in_place: bool;     (* verification should be performed in-place *)
   editor  : string;   (* Dedicated editor *)
   interactive : bool; (* Interactive theorem prover *)
   extra_options : string list;

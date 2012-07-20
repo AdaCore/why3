@@ -128,9 +128,11 @@ type post_prover_call = unit -> prover_result
 type prover_call = Unix.wait_flag list -> post_prover_call
 type pre_prover_call = unit -> prover_call
 
+let save f = f ^ ".save"
+
 let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
                  ~regexps ~timeregexps ~exitcodes
-                 ?(cleanup=false) fin =
+                 ?(cleanup=false) ?(inplace=false) fin =
 
   let arglist = Cmdline.cmdline_split command in
   let command = List.hd arglist in
@@ -150,8 +152,12 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
   in
   let subst s =
-    try Str.global_substitute cmd_regexp replace s
-    with e -> if cleanup then Sys.remove fin; raise e
+    try
+      Str.global_substitute cmd_regexp replace s
+    with e ->
+      if cleanup then Sys.remove fin;
+      if inplace then Sys.rename (save fin) fin;
+      raise e
   in
   let arglist = List.map subst arglist in
   Debug.dprintf debug "@[<hov 2>Call_provers: command is: %a@]@."
@@ -179,6 +185,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
       fun () ->
         if Debug.nottest_flag debug then begin
           if cleanup then Sys.remove fin;
+          if inplace then Sys.rename (save fin) fin;
           Sys.remove fout
         end;
         let ans = match ret with
@@ -205,12 +212,18 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
           pr_time   = time }
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
-                   ~regexps ~timeregexps ~exitcodes ~filename buffer =
+                   ~regexps ~timeregexps ~exitcodes ~filename
+                   ?(inplace=false) buffer =
 
-  let fin,cin = Filename.open_temp_file "why_" ("_" ^ filename) in
+  let fin,cin =
+    if inplace then begin
+      Sys.rename filename (save filename);
+      filename, open_out filename
+    end else
+      Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~timelimit ~memlimit
-               ~regexps ~timeregexps ~exitcodes ~cleanup:true fin
+               ~regexps ~timeregexps ~exitcodes ~cleanup:true ~inplace fin
 
 let query_call call = try Some (call [Unix.WNOHANG]) with Exit -> None
 

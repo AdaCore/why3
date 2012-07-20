@@ -85,6 +85,7 @@ val call_on_file :
   timeregexps : timeregexp list ->
   exitcodes   : (int * prover_answer) list ->
   ?cleanup    : bool ->
+  ?inplace    : bool ->
   string -> pre_prover_call
 
 val call_on_buffer :
@@ -95,6 +96,7 @@ val call_on_buffer :
   timeregexps : timeregexp list ->
   exitcodes   : (int * prover_answer) list ->
   filename    : string ->
+  ?inplace    : bool ->
   Buffer.t -> pre_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
 

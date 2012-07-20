@@ -113,6 +113,7 @@ type config_prover = {
   id      : string;
   command : string;
   driver  : string;
+  in_place: bool;
   editor  : string;
   interactive : bool;
   extra_options : string list;
@@ -236,6 +237,7 @@ let set_prover _ prover (ids,family) =
   let section = set_string ~default:"" section "alternative" prover.prover.prover_altern in
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
+  let section = set_bool section "in_place" prover.in_place in
   (Sstr.add prover.id ids,(prover.id,section)::family)
 
 let set_provers rc provers =
@@ -298,6 +300,7 @@ let load_prover dirname provers (id,section) =
       prover  = prover;
       command = get_string section "command";
       driver  = absolute_filename dirname (get_string section "driver");
+      in_place = get_bool ~default:false section "in_place";
       editor  = get_string ~default:"" section "editor";
       interactive = get_bool ~default:false section "interactive";
       extra_options = [];

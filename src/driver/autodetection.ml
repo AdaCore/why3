@@ -42,6 +42,7 @@ type prover_autodetection_data =
       prover_command : string;
       prover_driver : string;
       prover_editor : string;
+      prover_in_place : bool;
     }
 
 let prover_keys =
@@ -49,7 +50,7 @@ let prover_keys =
   List.fold_left add Sstr.empty
     ["name";"exec";"version_switch";"version_regexp";
      "version_ok";"version_old";"version_bad";"command";
-     "editor";"driver"]
+     "editor";"driver";"in_place"]
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
@@ -65,6 +66,7 @@ let load_prover kind (id,section) =
     prover_command = get_string section "command";
     prover_driver = get_string section "driver";
     prover_editor = get_string section ~default:"" "editor";
+    prover_in_place = get_bool section ~default:false "in_place";
   }
 
 let editor_keys =
@@ -187,6 +189,7 @@ let detect_exec main data com =
               command = c;
               driver  = Filename.concat (datadir main) data.prover_driver;
               editor = data.prover_editor;
+              in_place = data.prover_in_place;
               interactive = (match data.kind with ITP -> true | ATP -> false);
               extra_options = [];
               extra_drivers = [] }

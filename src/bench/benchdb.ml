@@ -80,7 +80,7 @@ let rec goal whyconf env path dbgoal wgoal =
       let old = if edited_as = "" then None else
           begin
             eprintf "Info: proving using edited file %s@." edited_as;
-            (Some (open_in edited_as))
+            (Some edited_as)
           end
       in
       let call_prover : Call_provers.pre_prover_call =

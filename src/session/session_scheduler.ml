@@ -93,7 +93,7 @@ let running a = match a.proof_state with
 (*************************)
 
 type action =
-  | Action_proof_attempt of int * int * in_channel option * string *
+  | Action_proof_attempt of int * int * string option * bool * string *
       Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
 
@@ -218,14 +218,14 @@ let idle_handler t =
   try
     begin
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(timelimit,memlimit,old,command,driver,
+        | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
             callback (Undone Scheduled);
             begin
               try
                 let pre_call =
                   Driver.prove_task
-                    ?old ~command ~timelimit ~memlimit driver goal
+                    ?old ~inplace ~command ~timelimit ~memlimit driver goal
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
@@ -264,7 +264,7 @@ let cancel_scheduled_proofs t =
   try
     while true do
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(_timelimit,_memlimit,_old,_command,
+        | Action_proof_attempt(_timelimit,_memlimit,_old,_inplace,_command,
                                _driver,callback,_goal) ->
             callback (Undone Interrupted)
         | Action_delayed _ as a->
@@ -282,13 +282,13 @@ let cancel_scheduled_proofs t =
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
-let schedule_proof_attempt ~timelimit ~memlimit ?old
+let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
     ~command ~driver ~callback t goal =
     dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
       (fun fmt g -> Format.pp_print_string fmt
        (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   Queue.push
-    (Action_proof_attempt(timelimit,memlimit,old,command,driver,
+    (Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                         callback,goal))
     t.actions_queue;
   run_idle_handler t
@@ -475,20 +475,21 @@ let run_external_proof eS eT ?callback a =
               | Some f ->
                 if Sys.file_exists f then begin
                   dprintf debug "Info: proving using edited file %s@." f;
-                  (Some (open_in f))
+                  (Some f)
                 end
                 else begin
                   dprintf debug "Warning: the file %s is not found@." f;
                   None
                 end
           in
+          let inplace = npc.prover_config.Whyconf.in_place in
           let command =
             String.concat " " (npc.prover_config.Whyconf.command ::
                                  npc.prover_config.Whyconf.extra_options) in
           (* eprintf "scheduling it...@."; *)
           schedule_proof_attempt
             ~timelimit ~memlimit
-            ?old ~command
+            ?old ~inplace ~command
             ~driver:npc.prover_driver
             ~callback
             eT
@@ -677,11 +678,12 @@ let check_external_proof eS eT todo a =
                   if Sys.file_exists f then
                     begin
                     (* Format.eprintf "Info: proving using edited file %s@." f; *)
-                      (Some (open_in f))
+                      (Some f)
                     end
                   else
                     raise (NoFile f)
             in
+            let inplace = npc.prover_config.Whyconf.in_place in
             let timelimit = adapt_timelimit a in
             let memlimit = a.proof_memlimit in
             let callback result =
@@ -710,7 +712,7 @@ let check_external_proof eS eT todo a =
                                    npc.prover_config.Whyconf.extra_options) in
             schedule_proof_attempt eT
               ~timelimit ~memlimit
-              ?old ~command
+              ?old ~inplace ~command
               ~driver:npc.prover_driver
               ~callback
               (goal_task g)
