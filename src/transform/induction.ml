@@ -30,6 +30,7 @@ open Task
 (*********************************************************)
 
 (**********************************************************************)
+(*Algebraic datatype induction scheme *)
 type tyscheme = (pattern * Svs.t) list
 
 
@@ -41,14 +42,26 @@ type vlex =
      ts: tyscheme       (*type scheme following its definition*)
     }
 
-
+(*Definitions for Svsl : "Set of variable symbol list". 
+  Each list corresponds to the largest prefix of some recursive function
+  decreasing argument list, where arguments are instanciated 
+  with call actual parameters and recognized as possibles induction candidates
+  if they are variables themselves. 
+  
+  Note, that first are compared lists length, otherwise comparison is made on 
+  lexicographic order of vsymbols. Empty list corresponds to non-recurisve 
+  functions calls  
+  
+  This definitions and methods using them are without use if some induction tags
+  are provided in the goal by user.
+*)  
 module VsList =
 struct
  
   type t = vsymbol list
   let hash = Hashcons.combine_list vs_hash 3
   let equal = Util.list_all2 vs_equal
-  let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs1) (vs_hash vs2)
+  let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs2) (vs_hash vs1)
   let compare t1 t2 = 
     let rec aux t1 t2 = match t1,t2 with
       | [],[] -> 0
@@ -56,7 +69,7 @@ struct
 	if vs_equal v1 v2 
 	then aux q1 q2 
 	else cmp_vs v1 v2
-      | _ -> assert false;
+      | _ -> assert false; 
     in
     if List.length t1 < List.length t2 then -1
     else if List.length t1 > List.length t2 then 1
@@ -65,23 +78,6 @@ end
 
 module Mvsl = Stdlib.Map.Make(VsList)
 module Svsl = Mvsl.Set    
-
-
-
-
-
-(*Set of vsymbol list, where each list is some recursive function
-  decreasing arguments instanciated with terms of function call if 
-  if all of them are variables in function call 
-  
-  First are compared lists length, otherwise comparison is made on 
-  lexicographic order of vsymbols.  
-*)  
-
-
-
-
-
 
 (**************************** PRINTING ***************************************)
 let debug = Debug.register_flag "induction"
@@ -207,8 +203,6 @@ let t_candidates filter km qvs t =
 
 let heuristic_svs vset = Svs.choose vset
 
-
-(**********************************************************************)
 let filter_tydef v = not (ty_equal v.vs_ty ty_int)
 
 (* Decl.known_map -> Term.vsymbol -> Term.term -> tyscheme *)
@@ -266,22 +260,37 @@ let induction_ty km t0 =
 (************************* WITH LEXICOGRAPHIC ORDER **************************)
 (*****************************************************************************)
 
+
+
+let qvl_labeled qvl = 
+  List.filter (fun v -> 
+    let slab = Slab.filter (fun v -> 
+      v.lab_string = "induction") v.vs_name.id_label in not (Slab.is_empty slab))
+    qvl
+
+
 (* This function collects lists of variables corresponding to
-  some recursive functions call parameters into the body of formula.
-  Each list respects the lexicographic order of the corresponding 
-  recusrive function in which decrease its formal arguments.
-  
-  Note that one list contain the biggest lexicographic order prefix where all
-  actual parameters are variables. For example, if function f(x,a,y,b,z) 
-  decreases on [a;b], but is called with some not-variable term T for argument
-  b, then the resulting list will be [a]. *)
-let t_candidates_lex km qvs t =
-  let int_candidates _tl acc = acc 
-  (* List.fold_left (fun acc t -> match t.t_node with
+   some recursive functions call parameters into the body of formula, 
+   if no user made induction tag is provided. 
+   
+   If some user tags are provided, this function will return the corresponding 
+   list of variables will be returned according to the order of tags 
+   (from left to right).  
+   
+   Otherwise, each list respects the lexicographic order of the corresponding 
+   recusrive function in which decrease its formal arguments.
+   
+   Note that one list contain the biggest lexicographic order prefix where all
+   actual parameters are variables. For example, if function f(x,a,y,b,z) 
+   decreases on [a;b], but is called with some not-variable term T for argument
+   b, then the resulting list will be [a]. 
+*)
+let t_candidates_lex km qvs labeledvl t =
+  (* let int_candidates _tl acc = acc 
+   List.fold_left (fun acc t -> match t.t_node with
      | Tvar x when Svs.mem x qvs && ty_equal x.vs_ty ty_int -> 
      Svls.add [x] acc
-     | _ -> acc) acc tl *)
-  in 
+     | _ -> acc) acc tl *) 
   let rec_candidates il tl acc =
     let rec aux il vl = match il with
       | i :: iq ->
@@ -299,7 +308,8 @@ let t_candidates_lex km qvs t =
   in
   let defn_candidates (ls,tl) acc = match (find_logic_definition km ls) with
     | Some defn -> 
-      rec_candidates (ls_defn_decrease defn) tl (int_candidates tl acc)
+      let acc = acc (*int_candidates tl acc*) in
+      rec_candidates (ls_defn_decrease defn) tl acc
     | None -> acc
   in
   let rec t_candidates acc t =
@@ -308,14 +318,15 @@ let t_candidates_lex km qvs t =
       | _ ->  acc
     in t_fold t_candidates acc t
   in
-  t_candidates Svsl.empty t
+  if labeledvl <> [] 
+  then Svsl.add labeledvl Svsl.empty 
+  else t_candidates Svsl.empty t
     
     
 exception No_candidates_found
 
-
-(*Chooses some candidate list of the biggest size ; 
-  raises an exception, if the candidate set is empty 
+(*Chooses leftmost (in the formula ) candidate list from the subset of lists 
+  of the biggest size ; raises an exception, if the candidate set is empty 
   or contains only an empty list, *)
 let heuristic_lex vset =
   try 
@@ -326,7 +337,8 @@ let heuristic_lex vset =
   with Not_found -> raise No_candidates_found
     
 
-(*Generates induction scheme according to variable type's definition *)
+(*Generates induction scheme for one variable of some algebraic datatype 
+  according to datatype's definition *)
 let vs_tyscheme km x =
   let ts,ty = match x.vs_ty.ty_node with
     | Tyapp _ when ty_equal x.vs_ty ty_int -> assert false
@@ -356,7 +368,8 @@ let vs_tyscheme km x =
   ((List.map tyscheme_constructor cl) : tyscheme)
 
 (* Preprocesses selected induction candidate list for 
-   induction scheme instanciation.  *)
+   induction scheme instanciation.  
+*)
 let qsplit km vl qvl  = 
   let rec aux (ivs,ivm) qvl lql lvl acc = match qvl with
     | [] -> List.rev acc, lql
@@ -403,12 +416,13 @@ let make_induction_lex lexl rql t =
 
 let induction_ty_lex km t0 =
   let qvs, qvl, t = decompose_forall t0 in
-  let vset = t_candidates_lex km qvs t in
+  let lblvl = qvl_labeled qvl in
+  let vset = t_candidates_lex km qvs lblvl t in
   try
     let vl = heuristic_lex vset in
     let lexl, rightmost_qvl = qsplit km vl qvl in
     let tcase = make_induction_lex lexl rightmost_qvl t in
-
+    
     if Debug.test_flag debug_verbose then
       begin
 	print_vset vset;
