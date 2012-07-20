@@ -12,21 +12,25 @@
   version="2.2"/>
  <prover
   id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="2.19"/>
  <file
   name="../gcd.mlw"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="EuclideanAlgorithm"
    locfile="examples/programs/gcd/../gcd.mlw"
    loclnum="4" loccnumb="7" loccnume="25"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter gcd"
@@ -34,14 +38,14 @@
     loclnum="10" loccnumb="10" loccnume="13"
     expl="parameter gcd"
     sum="e7fb9f71ca8d13171325c792ae210df1"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Aainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
      name="expl:parameter gcd"/>
     <transf
      name="split_goal"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter gcd.1"
@@ -55,7 +59,7 @@
       <label
        name="expl:parameter gcd"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -85,11 +89,27 @@
       loclnum="10" loccnumb="10" loccnume="13"
       expl="variant decreases"
       sum="bc3a27e8c6c197ade6b87e38ae3d4e11"
-      proved="false"
-      expanded="false"
+      proved="true"
+      expanded="true"
       shape="ainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:parameter gcd"/>
+      <proof
+       prover="0"
+       timelimit="300"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.19"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="300"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter gcd.3"
@@ -103,7 +123,7 @@
       <label
        name="expl:parameter gcd"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -139,7 +159,7 @@
       <label
        name="expl:parameter gcd"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="10"
        memlimit="0"
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"

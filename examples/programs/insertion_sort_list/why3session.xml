@@ -10,15 +10,19 @@
   id="1"
   name="CVC3"
   version="2.2"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
  <file
   name="../insertion_sort_list.mlw"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="M"
    locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
    loclnum="4" loccnumb="7" loccnume="8"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter insert"
@@ -26,14 +30,14 @@
     loclnum="11" loccnumb="10" loccnume="16"
     expl="parameter insert"
     sum="d02d16309dfde41102e8d45efca5d33a"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVViainfix &lt;=V0V2apermutaConsV0V1aConsV0V1AasortedaConsV0V1apermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FAasortedV3Aainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1IasortedV1F">
     <label
      name="expl:parameter insert"/>
     <transf
      name="split_goal"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter insert.1"
@@ -81,11 +85,27 @@
       loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
       sum="15c6091d425cf0844b57e066a6569536"
-      proved="false"
-      expanded="false"
+      proved="true"
+      expanded="true"
       shape="CV1aNiltaConsVVainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1Iainfix &lt;=V0V2NIasortedV1F">
       <label
        name="expl:parameter insert"/>
+      <proof
+       prover="0"
+       timelimit="300"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="300"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter insert.4"

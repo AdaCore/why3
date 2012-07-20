@@ -32,8 +32,8 @@
   version="2.19"/>
  <file
   name="../fibonacci.mlw"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="Fibonacci"
    locfile="examples/programs/fibonacci/../fibonacci.mlw"
@@ -173,7 +173,7 @@
    name="FibonacciLogarithmic"
    locfile="examples/programs/fibonacci/../fibonacci.mlw"
    loclnum="68" loccnumb="7" loccnume="27"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter logfib"
@@ -181,14 +181,14 @@
     loclnum="82" loccnumb="10" loccnume="16"
     expl="parameter logfib"
     sum="3966dacbc1855018004e996b874f27fa"
-    proved="false"
-    expanded="false"
+    proved="true"
+    expanded="true"
     shape="iainfix =V0c0ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1iainfix =amodV0c2c0ainfix =apoweramk tc1c1c1c0V0amk tainfix +V3V4V4V4V3Lainfix *V2ainfix +V1ainfix +V1V2Lainfix +ainfix *V1V1ainfix *V2V2ainfix =apoweramk tc1c1c1c0V0amk tainfix +V5V6V6V6V5Lainfix +ainfix *ainfix +V1V2ainfix +V1V2ainfix *V2V2Lainfix *V2ainfix +V1ainfix +V1V2Iainfix =apoweramk tc1c1c1c0adivV0c2amk tainfix +V1V2V2V2V1FAainfix &gt;=adivV0c2c0Aainfix &lt;adivV0c2V0Aainfix &lt;=c0V0Iainfix &gt;=V0c0F">
     <label
      name="expl:parameter logfib"/>
     <transf
      name="split_goal"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter logfib.1"
@@ -197,7 +197,7 @@
       expl="normal postcondition"
       sum="adf3fda094b1f16d576b23cf13147c8d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1Iainfix =V0c0Iainfix &gt;=V0c0F">
       <label
        name="expl:parameter logfib"/>
@@ -240,11 +240,19 @@
       loclnum="82" loccnumb="10" loccnume="16"
       expl="variant decreases"
       sum="4464035e38e634573f8cf479606f0013"
-      proved="false"
-      expanded="false"
+      proved="true"
+      expanded="true"
       shape="ainfix &lt;adivV0c2V0Aainfix &lt;=c0V0Iainfix =V0c0NIainfix &gt;=V0c0F">
       <label
        name="expl:parameter logfib"/>
+      <proof
+       prover="0"
+       timelimit="300"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter logfib.3"
@@ -253,7 +261,7 @@
       expl="precondition"
       sum="914eb29f581e4f81f1dc88e3cd6a2125"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &gt;=adivV0c2c0Iainfix =V0c0NIainfix &gt;=V0c0F">
       <label
        name="expl:parameter logfib"/>
