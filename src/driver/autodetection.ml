@@ -44,6 +44,8 @@ the version is old (version_old).
 The field command can be missing in a block, in that case the block
 defines a version known to be buggy: no prover config is generated.
 
+The regexp must start with ^.
+
 *)
 
 open Format
@@ -66,9 +68,9 @@ type prover_autodetection_data =
       execs : string list;
       version_switch : string;
       version_regexp : string;
-      versions_ok : string list;
-      versions_old : string list;
-      versions_bad : string list;
+      versions_ok : Str.regexp list;
+      versions_old : Str.regexp list;
+      versions_bad : Str.regexp list;
       (** If none it's a fake prover (very bad version) *)
       prover_command : string option;
       prover_driver : string;
@@ -86,6 +88,8 @@ let prover_keys =
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
+  let reg_map = List.rev_map
+    (fun s -> if s.[0] = '^' then Str.regexp s else Str.regexp_string s) in
   { kind = kind;
     prover_id = id;
     prover_name = get_string section "name";
@@ -93,9 +97,9 @@ let load_prover kind (id,section) =
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
     version_regexp = get_string section ~default:"" "version_regexp";
-    versions_ok = get_stringl section ~default:[] "version_ok";
-    versions_old = get_stringl section ~default:[] "version_old";
-    versions_bad = get_stringl section ~default:[] "version_bad";
+    versions_ok = reg_map $ get_stringl section ~default:[] "version_ok";
+    versions_old = reg_map $ get_stringl section ~default:[] "version_old";
+    versions_bad = reg_map $ get_stringl section ~default:[] "version_bad";
     prover_command = get_stringo section "command";
     prover_driver = get_string section "driver";
     prover_editor = get_string section ~default:"" "editor";
@@ -151,13 +155,14 @@ let read_editors main =
     | Not_found ->
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
-let make_command exec com =
+let make_command =
   let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace s = match Str.matched_group 1 s with
-    | "e" -> exec
-    | c -> "%"^c
-  in
-  Str.global_substitute cmd_regexp replace com
+  fun exec com ->
+    let replace s = match Str.matched_group 1 s with
+      | "e" -> exec
+      | c -> "%"^c
+    in
+    Str.global_substitute cmd_regexp replace com
 
 let sanitize_exec =
   let first c = match c with
@@ -213,7 +218,9 @@ let ask_prover_version env exec_name version_switch =
     Hashtbl.replace env.prover_output (exec_name,version_switch) res;
     res
 
-let check_version (version : string) schema = schema = version
+let check_version version schema =
+  Str.string_match schema version 0
+  && Str.match_end () = String.length version
 
 let known_version env exec_name =
   Hashtbl.replace env.prover_unknown_version exec_name None
