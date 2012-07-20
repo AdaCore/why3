@@ -159,17 +159,17 @@ let uc_find_ps uc p =
 
 (** Typing type expressions *)
 
-let rec dity_of_pty ~user denv = function
+let rec dity_of_pty denv = function
   | Ptree.PPTtyvar id ->
       create_user_type_variable id
   | Ptree.PPTtyapp (pl, p) ->
-      let dl = List.map (dity_of_pty ~user denv) pl in
+      let dl = List.map (dity_of_pty denv) pl in
       begin match uc_find_ts denv.uc p with
-        | PT ts -> its_app ~user ts dl
+        | PT ts -> its_app ts dl
         | TS ts -> ts_app ts dl
       end
   | Ptree.PPTtuple pl ->
-      let dl = List.map (dity_of_pty ~user denv) pl in
+      let dl = List.map (dity_of_pty denv) pl in
       ts_app (ts_tuple (List.length pl)) dl
 
 (** Typing program expressions *)
@@ -357,7 +357,7 @@ let dbinders denv bl =
     if Hashtbl.mem hv id.id then raise (DuplicateProgVar id.id);
     Hashtbl.add hv id.id ();
     let dity = match pty with
-      | Some pty -> dity_of_pty ~user:true denv pty
+      | Some pty -> dity_of_pty denv pty
       | None -> create_type_variable () in
     add_var id dity denv, (id,gh,dity)::bl, dity::tyl
   in
@@ -381,7 +381,7 @@ let rec dtype_c denv tyc =
 
 and dtype_v denv = function
   | Tpure pty ->
-      let dity = dity_of_pty ~user:true denv pty in
+      let dity = dity_of_pty denv pty in
       DSpecV (false,dity), ([],dity)
   | Tarrow (bl,tyc) ->
       let denv,bl,tyl = dbinders denv bl in
@@ -453,7 +453,7 @@ and de_desc denv loc = function
       DEfun lam, (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in
-      expected_type e1 (dity_of_pty ~user:false denv pty);
+      expected_type e1 (dity_of_pty denv pty);
       e1.de_desc, e1.de_type
   | Ptree.Enamed _ ->
       assert false
@@ -1475,7 +1475,7 @@ let add_pdecl loc uc = function
   | Dexn (id, pty) ->
       let ity = match pty with
         | Some pty ->
-            ity_of_dity (dity_of_pty ~user:false (create_denv uc) pty)
+            ity_of_dity (dity_of_pty (create_denv uc) pty)
         | None -> ity_unit in
       let xs = create_xsymbol (Denv.create_user_id id) ity in
       let pd = create_exn_decl xs in
