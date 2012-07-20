@@ -42,12 +42,12 @@ module Distance
     path d i /\ forall d': int. path d' i -> d <= d'
 
   (* function [g] is built into local array [g]
-     and (ghost) array [d] holds the distance *)
+     and ghost array [d] holds the distance *)
   let distance () =
     let g = make n 0 in
     g[0] <- -1; (* sentinel *)
-    let d = make n 0 in
-    let count = ref 0 in (* ghost *)
+    let ghost d = make n 0 in
+    let ghost count = ref 0 in
     for i = 1 to n-1 do
       invariant {
         d[0] = 0 /\ g[0] = -1 /\ !count + d[i-1] <= i-1 /\
@@ -64,10 +64,10 @@ module Distance
           f i <= !j < i /\ !count + d[!j] <= i-1 /\
           (forall k: int. !j < k < i -> d[!j] < d[k]) }
         variant { !j }
-        j := g[!j];
-        incr count
+        ghost incr count;
+        j := g[!j]
       done;
-      d[i] <- 1 + d[!j];
+      ghost d[i] <- 1 + d[!j];
       g[i] <- !j
     done;
     assert { !count < n }; (* O(n) is thus ensured *)
