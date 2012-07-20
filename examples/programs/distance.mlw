@@ -6,8 +6,8 @@
    The following problem was suggested to me by Ernie Cohen (Microsoft Research)
 
    We are given an integer N>0 and a function f such that 0 <= f(i) < i
-   for all i in 0..N-1. We define a reachability as follows:
-   each integer i in 0..N-1 can be reached from any integer in f(i)..i-1
+   for all i in 1..N-1. We define a reachability as follows:
+   each integer i in 1..N-1 can be reached from any integer in f(i)..i-1
    in one step.
 
    The problem is then to compute the distance from 0 to N-1 in O(N).
@@ -30,7 +30,7 @@ module Distance
   axiom n_nonneg: 0 < n
 
   function f int: int
-  axiom f_prop: forall k: int. 0 <= k < n -> 0 <= f k < k
+  axiom f_prop: forall k: int. 0 < k < n -> 0 <= f k < k
 
   (* path from 0 to i of distance d *)
   inductive path int int =
@@ -41,22 +41,26 @@ module Distance
   predicate distance (d i: int) =
     path d i /\ forall d': int. path d' i -> d <= d'
 
-  (* function [g] is built in an array and then returned *)
+  (* function [g] is built into local array [g]
+     and (ghost) array [d] holds the distance *)
   let distance () =
-    { }
     let g = make n 0 in
     g[0] <- -1; (* sentinel *)
     let d = make n 0 in
-    d[0] <- 0;  (* redundant *)
     let count = ref 0 in (* ghost *)
     for i = 1 to n-1 do
-      invariant { g[0] = -1 /\
-        (forall k: int. 0 < k < i -> f k <= g[k] < k) /\
-        (forall k: int. 0 < k < i -> d[k] = d[g[k]] + 1) (* /\
-        (forall k: int. 0 <= k < i -> path d[k] k) *) }
+      invariant {
+        d[0] = 0 /\ g[0] = -1 /\ !count + d[i-1] <= i-1 /\
+        (forall k: int. 0 < k < i ->
+           g[g[k]] < f k <= g[k] < k /\
+           0 <= d[k] = d[g[k]] + 1 /\
+           forall k': int. g[k] < k' < k -> d[g[k]] < d[k']) /\
+        (forall k: int. 0 <= k < i -> path d[k] k) }
       let j = ref (i-1) in
       while g[!j] >= f i do
-        invariant { f i <= !j < i }
+        invariant {
+          f i <= !j < i /\ !count + d[!j] <= i-1 /\
+          (forall k: int. !j < k < i -> d[!j] < d[k]) }
         variant { !j }
         j := g[!j];
         incr count
@@ -64,8 +68,7 @@ module Distance
       d[i] <- 1 + d[!j];
       g[i] <- !j
     done;
-    g
-    { forall k: int. 0 < k < n -> f k <= result[k] < k }
+    assert { !count < n } (* O(n) is thus ensured *)
 
 end
 
