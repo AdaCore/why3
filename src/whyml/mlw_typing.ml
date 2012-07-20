@@ -904,8 +904,19 @@ and expr_desc lenv loc de = match de.de_desc with
       let e1 = e_ghostify gh (expr lenv de1) in
       let mk_expr e1 =
         let def1 = create_let_defn (Denv.create_user_id x) e1 in
+        let name = match def1.let_sym with
+          | LetA ps -> ps.ps_name | LetV pv -> pv.pv_vs.vs_name in
         let lenv = add_local x.id def1.let_sym lenv in
         let e2 = expr lenv de2 in
+        let ghost_unit = match e2.e_vty with
+          | VTvalue { vtv_ghost = true; vtv_mut = None; vtv_ity = ity } ->
+              ity_equal ity ity_unit
+          | _ -> false in
+        let e2 =
+          if ghost_unit (* e2 is immutable ghost unit *)
+             && not (vty_ghost e1.e_vty) (* and e1 is non-ghost *)
+             && not (Mid.mem name e2.e_varm) (* and x doesn't occur in e2 *)
+          then e_let (create_let_defn (id_fresh "gh") e2) e_void else e2 in
         e_let def1 e2 in
       let rec flatten e1 = match e1.e_node with
         | Elet (ld,_) (* can't let a non-ghost expr from a ghost one *)
