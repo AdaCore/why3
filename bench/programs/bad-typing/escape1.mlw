@@ -6,6 +6,6 @@ module M
 
   let test () =
     let x = ref 0 in
-    fun y -> x := y; !x
+    fun y -> { } x := y; !x { result = !x }
 
 end

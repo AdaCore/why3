@@ -655,11 +655,11 @@ $(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide
 byte: bin/why3replayer.byte
 opt:  bin/why3replayer.opt
 
-bin/why3replayer.opt: src/why3.cmxa $(PGMCMX) $(REPLAYERCMX)
+bin/why3replayer.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(REPLAYERCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3replayer.byte: src/why3.cma $(PGMCMO) $(REPLAYERCMO)
+bin/why3replayer.byte: src/why3.cma $(PGMCMO) $(MLWCMO) $(REPLAYERCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -705,11 +705,11 @@ $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 byte: bin/why3session.byte
 opt:  bin/why3session.opt
 
-bin/why3session.opt: src/why3.cmxa $(PGMCMX) $(SESSIONCMX)
+bin/why3session.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(SESSIONCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3session.byte: src/why3.cma $(PGMCMO) $(SESSIONCMO)
+bin/why3session.byte: src/why3.cma $(PGMCMO) $(MLWCMO) $(SESSIONCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -760,11 +760,11 @@ opt:  bin/why3bench.opt
 bin/why3bench.opt bin/why3bench.byte: INCLUDES += -thread -I +threads -I @SQLITE3LIB@
 bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads sqlite3
 
-bin/why3bench.opt: src/why3.cmxa $(PGMCMX) $(BENCHCMX)
+bin/why3bench.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(BENCHCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3bench.byte: src/why3.cma  $(PGMCMO) $(BENCHCMO)
+bin/why3bench.byte: src/why3.cma  $(PGMCMO) $(MLWCMO) $(BENCHCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -1074,11 +1074,11 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 byte: bin/why3doc.byte
 opt:  bin/why3doc.opt
 
-bin/why3doc.opt: src/why3.cmxa $(PGMCMX) $(WHY3DOCCMX)
+bin/why3doc.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(WHY3DOCCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3doc.byte: src/why3.cma $(PGMCMO) $(WHY3DOCCMO)
+bin/why3doc.byte: src/why3.cma $(PGMCMO) $(MLWCMO) $(WHY3DOCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 

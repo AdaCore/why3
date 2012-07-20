@@ -150,7 +150,20 @@ let read_channel env path file c =
   let tm, mm = retrieve env path file c in
   mm, tm
 
-let library_of_env = Env.register_format "whyml" ["mlw"] read_channel
+let read_channel =
+  let one_time_hack = ref true in
+  fun env path file c ->
+    let env =
+      if !one_time_hack then begin
+        one_time_hack := false;
+        let genv = Env.env_of_library env in
+        Env.register_format "whyml-old-library" ["mlw"] read_channel genv
+      end
+      else env
+    in
+    read_channel env path file c
+
+let library_of_env = Env.register_format "whyml-old" [] read_channel
 
 (*
 Local Variables:

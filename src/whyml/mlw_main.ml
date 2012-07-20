@@ -38,18 +38,4 @@ let read_channel env path file c =
     Format.pp_print_newline Format.err_formatter ()) mm;
   mm, tm
 
-(* TODO: remove this function once whyml becomes the default *)
-let read_channel =
-  let one_time_hack = ref true in
-  fun env path file c ->
-    let env =
-      if !one_time_hack then begin
-        one_time_hack := false;
-        let genv = Env.env_of_library env in
-        Env.register_format "whyml-library" ["mlw"] read_channel genv
-      end
-      else env
-    in
-    read_channel env path file c
-
-let library_of_env = Env.register_format "whyml-exp" ["mlx"] read_channel
+let library_of_env = Env.register_format "whyml" ["mlw"] read_channel
