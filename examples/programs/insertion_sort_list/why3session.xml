@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/insertion_sort_list/why3session.xml" shape_version="2">
+ name="examples/programs/insertion_sort_list/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,38 +12,38 @@
   version="2.2"/>
  <file
   name="../insertion_sort_list.mlw"
-  verified="true"
+  verified="false"
   expanded="false">
   <theory
-   name="WP M"
-   locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+   name="M"
+   locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
    loclnum="4" loccnumb="7" loccnume="8"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="WP_parameter insert"
-    locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+    locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
     loclnum="11" loccnumb="10" loccnume="16"
     expl="parameter insert"
-    sum="ca0323e40daa26a0fa17b639a4cff00a"
-    proved="true"
+    sum="d02d16309dfde41102e8d45efca5d33a"
+    proved="false"
     expanded="true"
-    shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVViainfix &lt;=V0V2apermutaConsV0V1aConsV0V1AasortedaConsV0V1apermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FAasortedV3Aainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1IasortedV1FF">
+    shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVViainfix &lt;=V0V2apermutaConsV0V1aConsV0V1AasortedaConsV0V1apermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FAasortedV3Aainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1IasortedV1F">
     <label
      name="expl:parameter insert"/>
     <transf
      name="split_goal"
-     proved="true"
+     proved="false"
      expanded="true">
      <goal
       name="WP_parameter insert.1"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="38005d337be08b140a7b5d82c72e6f35"
+      sum="d4379e4bec4a471b0e8deb7e5d889a6b"
       proved="true"
       expanded="true"
-      shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVVtIasortedV1FF">
+      shape="CV1aNilapermutaConsV0V1aConsV0aNilAasortedaConsV0aNilaConsVVtIasortedV1F">
       <label
        name="expl:parameter insert"/>
       <proof
@@ -57,13 +57,13 @@
      </goal>
      <goal
       name="WP_parameter insert.2"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="0ee0ad5c2e8d8d59c32a7a879b2fbc23"
+      sum="9472c764992bdf0174f72a419389874d"
       proved="true"
       expanded="true"
-      shape="CV1aNiltaConsVVapermutaConsV0V1aConsV0V1AasortedaConsV0V1Iainfix &lt;=V0V2IasortedV1FF">
+      shape="CV1aNiltaConsVVapermutaConsV0V1aConsV0V1AasortedaConsV0V1Iainfix &lt;=V0V2IasortedV1F">
       <label
        name="expl:parameter insert"/>
       <proof
@@ -77,13 +77,25 @@
      </goal>
      <goal
       name="WP_parameter insert.3"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="dfdfc06f2aa258367daeef9ca74040b2"
+      sum="15c6091d425cf0844b57e066a6569536"
+      proved="false"
+      expanded="false"
+      shape="CV1aNiltaConsVVainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1Iainfix &lt;=V0V2NIasortedV1F">
+      <label
+       name="expl:parameter insert"/>
+     </goal>
+     <goal
+      name="WP_parameter insert.4"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
+      loclnum="11" loccnumb="10" loccnume="16"
+      expl="parameter insert"
+      sum="f9075386b1643cab6e0fecf2303cc714"
       proved="true"
       expanded="true"
-      shape="CV1aNiltaConsVVasortedV3Aainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1Iainfix &lt;=V0V2NIasortedV1FF">
+      shape="CV1aNiltaConsVVasortedV3Iainfix &lt;=V0V2NIasortedV1F">
       <label
        name="expl:parameter insert"/>
       <proof
@@ -96,14 +108,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter insert.4"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      name="WP_parameter insert.5"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="11" loccnumb="10" loccnume="16"
       expl="parameter insert"
-      sum="43e13374a9a2f29fa2c515974862a959"
+      sum="2154d1686baa049c9ccb88b3af850cd8"
       proved="true"
       expanded="true"
-      shape="CV1aNiltaConsVVapermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FIasortedV3Aainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1Iainfix &lt;=V0V2NIasortedV1FF">
+      shape="CV1aNiltaConsVVapermutaConsV0V1aConsV2V4AasortedaConsV2V4IapermutaConsV0V3V4AasortedV4FIasortedV3Aainfix &lt;alengthV3alengthV1Aainfix &lt;=c0alengthV1Iainfix &lt;=V0V2NIasortedV1F">
       <label
        name="expl:parameter insert"/>
       <proof
@@ -112,17 +124,17 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.17"/>
+       <result status="valid" time="0.18"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter insertion_sort"
-    locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+    locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
     loclnum="19" loccnumb="10" loccnume="24"
     expl="parameter insertion_sort"
-    sum="0d5d9890ba337448a13d035783965f88"
+    sum="22ed71db92dbc4618db7845d6aac3812"
     proved="true"
     expanded="true"
     shape="CV0aNilapermutV0aNilAasortedaNilaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FAasortedV3IapermutV2V3AasortedV3FAainfix &lt;alengthV2alengthV0Aainfix &lt;=c0alengthV0F">
@@ -134,10 +146,10 @@
      expanded="true">
      <goal
       name="WP_parameter insertion_sort.1"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="8aa655fef178dec13a6e96a9b3bd2e51"
+      sum="df104cbddc54bbb030e753b8dd86d46b"
       proved="true"
       expanded="true"
       shape="CV0aNilapermutV0aNilAasortedaNilaConsVVtF">
@@ -154,10 +166,10 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.2"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="3d514e9c004769c4b006d94ff5e15cb3"
+      sum="f4887cda77b61fefa69587f3e50f23e5"
       proved="true"
       expanded="true"
       shape="CV0aNiltaConsVVainfix &lt;alengthV2alengthV0Aainfix &lt;=c0alengthV0F">
@@ -182,10 +194,10 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.3"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="3f733378850718854b2b833a019a1324"
+      sum="96712606a0d58e7a01fea0234a37a63c"
       proved="true"
       expanded="true"
       shape="CV0aNiltaConsVVasortedV3IapermutV2V3AasortedV3FIainfix &lt;alengthV2alengthV0Aainfix &lt;=c0alengthV0F">
@@ -210,10 +222,10 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.4"
-      locfile="programs/insertion_sort_list/../insertion_sort_list.mlw"
+      locfile="examples/programs/insertion_sort_list/../insertion_sort_list.mlw"
       loclnum="19" loccnumb="10" loccnume="24"
       expl="parameter insertion_sort"
-      sum="5aedf878a9220b2de75913b4d5e2e160"
+      sum="d0d9c60848c97ef8dddbab8d264e0491"
       proved="true"
       expanded="true"
       shape="CV0aNiltaConsVVapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FIainfix &lt;alengthV2alengthV0Aainfix &lt;=c0alengthV0F">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/max_matrix/why3session.xml" shape_version="2">
+ name="examples/programs/max_matrix/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -20,11 +20,11 @@
   version="3.2"/>
  <file
   name="../max_matrix.mlw"
-  verified="true"
+  verified="false"
   expanded="false">
   <theory
    name="Bitset"
-   locfile="programs/max_matrix/../max_matrix.mlw"
+   locfile="examples/programs/max_matrix/../max_matrix.mlw"
    loclnum="22" loccnumb="7" loccnume="13"
    verified="true"
    expanded="false">
@@ -32,23 +32,23 @@
     name="sets of small integers"/>
   </theory>
   <theory
-   name="WP HashTable"
-   locfile="programs/max_matrix/../max_matrix.mlw"
+   name="HashTable"
+   locfile="examples/programs/max_matrix/../max_matrix.mlw"
    loclnum="65" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
   </theory>
   <theory
-   name="WP MaxMatrixMemo"
-   locfile="programs/max_matrix/../max_matrix.mlw"
+   name="MaxMatrixMemo"
+   locfile="examples/programs/max_matrix/../max_matrix.mlw"
    loclnum="95" loccnumb="7" loccnume="20"
-   verified="true"
+   verified="false"
    expanded="false">
    <goal
     name="sum_ind"
-    locfile="programs/max_matrix/../max_matrix.mlw"
+    locfile="examples/programs/max_matrix/../max_matrix.mlw"
     loclnum="121" loccnumb="8" loccnume="15"
-    sum="5d6c204fcaa961b165968930d5675da0"
+    sum="27df450085491689d7ba29acebf3385c"
     proved="true"
     expanded="false"
     shape="ainfix =asumamixfix [&lt;-]V2V0V1V0anainfix +amixfix []amixfix []amV0V1asumV2ainfix +V0c1anFFIainfix &lt;V0anF">
@@ -58,33 +58,33 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.97"/>
+     <result status="valid" time="5.03"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter maximum"
-    locfile="programs/max_matrix/../max_matrix.mlw"
+    locfile="examples/programs/max_matrix/../max_matrix.mlw"
     loclnum="152" loccnumb="10" loccnume="17"
     expl="parameter maximum"
-    sum="7ea3385604517656b647310ca51f7cc0"
-    proved="true"
+    sum="6f291efb991ffbc7d64551530b91dc51"
+    proved="false"
     expanded="false"
-    shape="iainfix =V0anainvV3AapostaTuple2V0V1aTuple2c0aconstc0ainvV7AapostaTuple2V0V1aTuple2V5V4Aainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7AiamemV12V1iainfix &gt;ainfix +amixfix []amixfix []amV0V12V15V5ainfix &gt;=V17asumV19V0anIainfix &lt;amixfix []V19V0ainfix +V12c1Iamemamixfix []V19V0V1Iamemamixfix []V19V20V1Iainfix &lt;V20anAainfix &lt;=V0V20FIasolutionV19V0FAainfix =V17asumV18V0anAamemamixfix []V18V21V1Iainfix &lt;V21anAainfix &lt;=V0V21FAasolutionV18V0Aainfix &lt;=c0V17OamemV22V1NIainfix &lt;V22ainfix +V12c1Aainfix &lt;=c0V22FAainfix =V17aprefix -c1AainvV14Iainfix =V18amixfix [&lt;-]V16V0V12FIainfix =V17ainfix +amixfix []amixfix []amV0V12V15Fainfix &gt;=V5asumV23V0anIainfix &lt;amixfix []V23V0ainfix +V12c1Iamemamixfix []V23V0V1Iamemamixfix []V23V24V1Iainfix &lt;V24anAainfix &lt;=V0V24FIasolutionV23V0FAainfix =V5asumV4V0anAamemamixfix []V4V25V1Iainfix &lt;V25anAainfix &lt;=V0V25FAasolutionV4V0Aainfix &lt;=c0V5OamemV26V1NIainfix &lt;V26ainfix +V12c1Aainfix &lt;=c0V26FAainfix =V5aprefix -c1AainvV14IainvV14AapostaTuple2ainfix +V0c1aremoveV12V1aTuple2V15V16FLamk tV13FAainvV7AapreaTuple2ainfix +V0c1aremoveV12V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0ainfix &gt;=V5asumV27V0anIainfix &lt;amixfix []V27V0ainfix +V12c1Iamemamixfix []V27V0V1Iamemamixfix []V27V28V1Iainfix &lt;V28anAainfix &lt;=V0V28FIasolutionV27V0FAainfix =V5asumV4V0anAamemamixfix []V4V29V1Iainfix &lt;V29anAainfix &lt;=V0V29FAasolutionV4V0Aainfix &lt;=c0V5OamemV30V1NIainfix &lt;V30ainfix +V12c1Aainfix &lt;=c0V30FAainfix =V5aprefix -c1AainvV7Iainfix &gt;=V5asumV31V0anIainfix &lt;amixfix []V31V0V12Iamemamixfix []V31V0V1Iamemamixfix []V31V32V1Iainfix &lt;V32anAainfix &lt;=V0V32FIasolutionV31V0FAainfix =V5asumV4V0anAamemamixfix []V4V33V1Iainfix &lt;V33anAainfix &lt;=V0V33FAasolutionV4V0Aainfix &lt;=c0V5OamemV34V1NIainfix &lt;V34V12Aainfix &lt;=c0V34FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V12ainfix -anc1Aainfix &lt;=c0V12FLamk tV6FFFAainfix &gt;=aprefix -c1asumV35V0anIainfix &lt;amixfix []V35V0c0Iamemamixfix []V35V0V1Iamemamixfix []V35V36V1Iainfix &lt;V36anAainfix &lt;=V0V36FIasolutionV35V0FAainfix =aprefix -c1asumaconstc0V0anAamemamixfix []aconstc0V37V1Iainfix &lt;V37anAainfix &lt;=V0V37FAasolutionaconstc0V0Aainfix &lt;=c0aprefix -c1OamemV38V1NIainfix &lt;V38c0Aainfix &lt;=c0V38FAainfix =aprefix -c1aprefix -c1AainvV3Iainfix &lt;=c0ainfix -anc1AainvV3AapostaTuple2V0V1aTuple2aprefix -c1aconstc0Aainfix &lt;=c0aprefix -c1Iainfix &gt;c0ainfix -anc1IainvV3AapreaTuple2V0V1Lamk tV2FFF">
+    shape="iainfix =V0anainvV3AapostaTuple2V0V1aTuple2c0aconstc0ainvV7AapostaTuple2V0V1aTuple2V5V4Aainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7AiamemV12V1iainfix &gt;ainfix +amixfix []amixfix []amV0V12V15V5ainfix &gt;=V17asumV19V0anIainfix &lt;amixfix []V19V0ainfix +V12c1Iamemamixfix []V19V0V1Iamemamixfix []V19V20V1Iainfix &lt;V20anAainfix &lt;=V0V20FIasolutionV19V0FAainfix =V17asumV18V0anAamemamixfix []V18V21V1Iainfix &lt;V21anAainfix &lt;=V0V21FAasolutionV18V0Aainfix &lt;=c0V17OamemV22V1NIainfix &lt;V22ainfix +V12c1Aainfix &lt;=c0V22FAainfix =V17aprefix -c1AainvV14Iainfix =V18amixfix [&lt;-]V16V0V12FIainfix =V17ainfix +amixfix []amixfix []amV0V12V15Fainfix &gt;=V5asumV23V0anIainfix &lt;amixfix []V23V0ainfix +V12c1Iamemamixfix []V23V0V1Iamemamixfix []V23V24V1Iainfix &lt;V24anAainfix &lt;=V0V24FIasolutionV23V0FAainfix =V5asumV4V0anAamemamixfix []V4V25V1Iainfix &lt;V25anAainfix &lt;=V0V25FAasolutionV4V0Aainfix &lt;=c0V5OamemV26V1NIainfix &lt;V26ainfix +V12c1Aainfix &lt;=c0V26FAainfix =V5aprefix -c1AainvV14IainvV14AapostaTuple2ainfix +V0c1aremoveV12V1aTuple2V15V16FLamk tV13FAainvV7AapreaTuple2ainfix +V0c1aremoveV12V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0ainfix &gt;=V5asumV27V0anIainfix &lt;amixfix []V27V0ainfix +V12c1Iamemamixfix []V27V0V1Iamemamixfix []V27V28V1Iainfix &lt;V28anAainfix &lt;=V0V28FIasolutionV27V0FAainfix =V5asumV4V0anAamemamixfix []V4V29V1Iainfix &lt;V29anAainfix &lt;=V0V29FAasolutionV4V0Aainfix &lt;=c0V5OamemV30V1NIainfix &lt;V30ainfix +V12c1Aainfix &lt;=c0V30FAainfix =V5aprefix -c1AainvV7Iainfix &gt;=V5asumV31V0anIainfix &lt;amixfix []V31V0V12Iamemamixfix []V31V0V1Iamemamixfix []V31V32V1Iainfix &lt;V32anAainfix &lt;=V0V32FIasolutionV31V0FAainfix =V5asumV4V0anAamemamixfix []V4V33V1Iainfix &lt;V33anAainfix &lt;=V0V33FAasolutionV4V0Aainfix &lt;=c0V5OamemV34V1NIainfix &lt;V34V12Aainfix &lt;=c0V34FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V12ainfix -anc1Aainfix &lt;=c0V12FLamk tV6FAainfix &gt;=aprefix -c1asumV35V0anIainfix &lt;amixfix []V35V0c0Iamemamixfix []V35V0V1Iamemamixfix []V35V36V1Iainfix &lt;V36anAainfix &lt;=V0V36FIasolutionV35V0FAainfix =aprefix -c1asumaconstc0V0anAamemamixfix []aconstc0V37V1Iainfix &lt;V37anAainfix &lt;=V0V37FAasolutionaconstc0V0Aainfix &lt;=c0aprefix -c1OamemV38V1NIainfix &lt;V38c0Aainfix &lt;=c0V38FAainfix =aprefix -c1aprefix -c1AainvV3Iainfix &lt;=c0ainfix -anc1AainvV3AapostaTuple2V0V1aTuple2aprefix -c1aconstc0Aainfix &lt;=c0aprefix -c1Iainfix &gt;c0ainfix -anc1IainvV3AapreaTuple2V0V1Lamk tV2FF">
     <label
      name="expl:parameter maximum"/>
     <transf
      name="split_goal"
-     proved="true"
+     proved="false"
      expanded="true">
      <goal
       name="WP_parameter maximum.1"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="normal postcondition"
-      sum="d7b08eba374cf706e8ee53a0e1d59bd2"
+      sum="99fd70c63500048b2987fd901bffe29c"
       proved="true"
       expanded="false"
-      shape="ainvV3AapostaTuple2V0V1aTuple2c0aconstc0Iainfix =V0anIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainvV3AapostaTuple2V0V1aTuple2c0aconstc0Iainfix =V0anIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <proof
@@ -98,13 +98,13 @@
      </goal>
      <goal
       name="WP_parameter maximum.2"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="assertion"
-      sum="b5cfa9a0060b36974c0df41040ae5d66"
+      sum="105ceef7dc4ccdfe1de4debc488f1e5b"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=c0aprefix -c1Iainfix &gt;c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainfix &lt;=c0aprefix -c1Iainfix &gt;c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <transf
@@ -113,13 +113,13 @@
        expanded="true">
        <goal
         name="WP_parameter maximum.2.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="assertion"
-        sum="6d36d3442abfcfc0b2215df876021567"
+        sum="78fb4b8fcc22747a9c026ce8810967aa"
         proved="true"
         expanded="false"
-        shape="ainfix =c0aprefix -c1Oainfix &lt;c0aprefix -c1Iainfix &lt;ainfix -anc1c0Iainfix =V0anNIapostV4V5Iainfix =amixfix []V3V4aSomeV5FACaTuple2V0V1aTuple2VVainfix &lt;V8anAainfix &lt;=c0V8IamemV8V7FAainfix =acardinalV7ainfix -anV6Aainfix &lt;=V6anAainfix &lt;=c0V6Lamk tV2FFF">
+        shape="ainfix =c0aprefix -c1Oainfix &lt;c0aprefix -c1Iainfix &lt;ainfix -anc1c0Iainfix =V0anNIapostV4V5Iainfix =amixfix []V3V4aSomeV5FACaTuple2V0V1aTuple2VVainfix &lt;V8anAainfix &lt;=c0V8IamemV8V7FAainfix =acardinalV7ainfix -anV6Aainfix &lt;=V6anAainfix &lt;=c0V6Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <proof
@@ -135,13 +135,13 @@
      </goal>
      <goal
       name="WP_parameter maximum.3"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="normal postcondition"
-      sum="d4f2c11ae4f003d6eff0d8f4b6d488bb"
+      sum="54d3bba682c96456df81275cbf8ab5b2"
       proved="true"
       expanded="false"
-      shape="ainvV3AapostaTuple2V0V1aTuple2aprefix -c1aconstc0Iainfix &lt;=c0aprefix -c1Iainfix &gt;c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainvV3AapostaTuple2V0V1aTuple2aprefix -c1aconstc0Iainfix &lt;=c0aprefix -c1Iainfix &gt;c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <proof
@@ -155,13 +155,13 @@
      </goal>
      <goal
       name="WP_parameter maximum.4"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="for loop initialization"
-      sum="99b5c5f2c3004086c9fc08f3de6c2665"
+      sum="1652f8f45efc80bd6695c7cc98c19385"
       proved="true"
       expanded="false"
-      shape="ainfix &gt;=aprefix -c1asumV4V0anIainfix &lt;amixfix []V4V0c0Iamemamixfix []V4V0V1Iamemamixfix []V4V5V1Iainfix &lt;V5anAainfix &lt;=V0V5FIasolutionV4V0FAainfix =aprefix -c1asumaconstc0V0anAamemamixfix []aconstc0V6V1Iainfix &lt;V6anAainfix &lt;=V0V6FAasolutionaconstc0V0Aainfix &lt;=c0aprefix -c1OamemV7V1NIainfix &lt;V7c0Aainfix &lt;=c0V7FAainfix =aprefix -c1aprefix -c1AainvV3Iainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainfix &gt;=aprefix -c1asumV4V0anIainfix &lt;amixfix []V4V0c0Iamemamixfix []V4V0V1Iamemamixfix []V4V5V1Iainfix &lt;V5anAainfix &lt;=V0V5FIasolutionV4V0FAainfix =aprefix -c1asumaconstc0V0anAamemamixfix []aconstc0V6V1Iainfix &lt;V6anAainfix &lt;=V0V6FAasolutionaconstc0V0Aainfix &lt;=c0aprefix -c1OamemV7V1NIainfix &lt;V7c0Aainfix &lt;=c0V7FAainfix =aprefix -c1aprefix -c1AainvV3Iainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <proof
@@ -175,28 +175,40 @@
      </goal>
      <goal
       name="WP_parameter maximum.5"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="for loop preservation"
-      sum="ddffcc31f7d3256fdefd1b9c610581ad"
-      proved="true"
+      sum="48e6b0f7f4c6689bbe2d698d21b16fe6"
+      proved="false"
       expanded="false"
-      shape="iamemV8V1iainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5ainfix &gt;=V13asumV15V0anIainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix &lt;=V0V16FIasolutionV15V0FAainfix =V13asumV14V0anAamemamixfix []V14V17V1Iainfix &lt;V17anAainfix &lt;=V0V17FAasolutionV14V0Aainfix &lt;=c0V13OamemV18V1NIainfix &lt;V18ainfix +V8c1Aainfix &lt;=c0V18FAainfix =V13aprefix -c1AainvV10Iainfix =V14amixfix [&lt;-]V12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11Fainfix &gt;=V5asumV19V0anIainfix &lt;amixfix []V19V0ainfix +V8c1Iamemamixfix []V19V0V1Iamemamixfix []V19V20V1Iainfix &lt;V20anAainfix &lt;=V0V20FIasolutionV19V0FAainfix =V5asumV4V0anAamemamixfix []V4V21V1Iainfix &lt;V21anAainfix &lt;=V0V21FAasolutionV4V0Aainfix &lt;=c0V5OamemV22V1NIainfix &lt;V22ainfix +V8c1Aainfix &lt;=c0V22FAainfix =V5aprefix -c1AainvV10IainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FAainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0ainfix &gt;=V5asumV23V0anIainfix &lt;amixfix []V23V0ainfix +V8c1Iamemamixfix []V23V0V1Iamemamixfix []V23V24V1Iainfix &lt;V24anAainfix &lt;=V0V24FIasolutionV23V0FAainfix =V5asumV4V0anAamemamixfix []V4V25V1Iainfix &lt;V25anAainfix &lt;=V0V25FAasolutionV4V0Aainfix &lt;=c0V5OamemV26V1NIainfix &lt;V26ainfix +V8c1Aainfix &lt;=c0V26FAainfix =V5aprefix -c1AainvV7Iainfix &gt;=V5asumV27V0anIainfix &lt;amixfix []V27V0V8Iamemamixfix []V27V0V1Iamemamixfix []V27V28V1Iainfix &lt;V28anAainfix &lt;=V0V28FIasolutionV27V0FAainfix =V5asumV4V0anAamemamixfix []V4V29V1Iainfix &lt;V29anAainfix &lt;=V0V29FAasolutionV4V0Aainfix &lt;=c0V5OamemV30V1NIainfix &lt;V30V8Aainfix &lt;=c0V30FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="iamemV8V1iainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5ainfix &gt;=V13asumV15V0anIainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix &lt;=V0V16FIasolutionV15V0FAainfix =V13asumV14V0anAamemamixfix []V14V17V1Iainfix &lt;V17anAainfix &lt;=V0V17FAasolutionV14V0Aainfix &lt;=c0V13OamemV18V1NIainfix &lt;V18ainfix +V8c1Aainfix &lt;=c0V18FAainfix =V13aprefix -c1AainvV10Iainfix =V14amixfix [&lt;-]V12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11Fainfix &gt;=V5asumV19V0anIainfix &lt;amixfix []V19V0ainfix +V8c1Iamemamixfix []V19V0V1Iamemamixfix []V19V20V1Iainfix &lt;V20anAainfix &lt;=V0V20FIasolutionV19V0FAainfix =V5asumV4V0anAamemamixfix []V4V21V1Iainfix &lt;V21anAainfix &lt;=V0V21FAasolutionV4V0Aainfix &lt;=c0V5OamemV22V1NIainfix &lt;V22ainfix +V8c1Aainfix &lt;=c0V22FAainfix =V5aprefix -c1AainvV10IainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FAainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0ainfix &gt;=V5asumV23V0anIainfix &lt;amixfix []V23V0ainfix +V8c1Iamemamixfix []V23V0V1Iamemamixfix []V23V24V1Iainfix &lt;V24anAainfix &lt;=V0V24FIasolutionV23V0FAainfix =V5asumV4V0anAamemamixfix []V4V25V1Iainfix &lt;V25anAainfix &lt;=V0V25FAasolutionV4V0Aainfix &lt;=c0V5OamemV26V1NIainfix &lt;V26ainfix +V8c1Aainfix &lt;=c0V26FAainfix =V5aprefix -c1AainvV7Iainfix &gt;=V5asumV27V0anIainfix &lt;amixfix []V27V0V8Iamemamixfix []V27V0V1Iamemamixfix []V27V28V1Iainfix &lt;V28anAainfix &lt;=V0V28FIasolutionV27V0FAainfix =V5asumV4V0anAamemamixfix []V4V29V1Iainfix &lt;V29anAainfix &lt;=V0V29FAasolutionV4V0Aainfix &lt;=c0V5OamemV30V1NIainfix &lt;V30V8Aainfix &lt;=c0V30FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <transf
        name="split_goal"
-       proved="true"
+       proved="false"
        expanded="true">
        <goal
         name="WP_parameter maximum.5.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="d562ea2627abe7dd1667c4ebccbf7a04"
+        sum="70d31e4bc1d8558b6cb629d4379310e5"
+        proved="false"
+        expanded="false"
+        shape="ainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
+        <label
+         name="expl:parameter maximum"/>
+       </goal>
+       <goal
+        name="WP_parameter maximum.5.2"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
+        loclnum="152" loccnumb="10" loccnume="17"
+        expl="for loop preservation"
+        sum="553e401928b646ba2da03655e2009181"
         proved="true"
         expanded="false"
-        shape="ainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainvV7AapreaTuple2ainfix +V0c1aremoveV8V1IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <transf
@@ -204,54 +216,14 @@
          proved="true"
          expanded="true">
          <goal
-          name="WP_parameter maximum.5.1.1"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          name="WP_parameter maximum.5.2.1"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="152" loccnumb="10" loccnume="17"
           expl="for loop preservation"
-          sum="a4b5b97fc49eee5bf9c25c2b2065e261"
+          sum="7e1e1a646d04a9a9adec9345ce13a190"
           proved="true"
           expanded="false"
-          shape="ainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
-          <label
-           name="expl:parameter maximum"/>
-          <proof
-           prover="0"
-           timelimit="10"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.01"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter maximum.5.1.2"
-          locfile="programs/max_matrix/../max_matrix.mlw"
-          loclnum="152" loccnumb="10" loccnume="17"
-          expl="for loop preservation"
-          sum="2b5ddd69d3aa038cd89de187745f0532"
-          proved="true"
-          expanded="false"
-          shape="ainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
-          <label
-           name="expl:parameter maximum"/>
-          <proof
-           prover="0"
-           timelimit="10"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.01"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter maximum.5.1.3"
-          locfile="programs/max_matrix/../max_matrix.mlw"
-          loclnum="152" loccnumb="10" loccnume="17"
-          expl="for loop preservation"
-          sum="13170b85d788eaf751767d0ed5e4d9ca"
-          proved="true"
-          expanded="false"
-          shape="apreaTuple2ainfix +V0c1aremoveV8V1IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+          shape="apreaTuple2ainfix +V0c1aremoveV8V1IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
           <label
            name="expl:parameter maximum"/>
           <proof
@@ -260,18 +232,18 @@
            memlimit="0"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.03"/>
+           <result status="valid" time="0.02"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter maximum.5.1.4"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          name="WP_parameter maximum.5.2.2"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="152" loccnumb="10" loccnume="17"
           expl="for loop preservation"
-          sum="89ad3e14e41e2a5b054eba9b99bd0176"
+          sum="bbb5509aae134f6d45ba351a19ad4083"
           proved="true"
           expanded="false"
-          shape="ainvV7IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+          shape="ainvV7IamemV8V1Iainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
           <label
            name="expl:parameter maximum"/>
           <proof
@@ -280,20 +252,20 @@
            memlimit="0"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.01"/>
+           <result status="valid" time="0.00"/>
           </proof>
          </goal>
         </transf>
        </goal>
        <goal
-        name="WP_parameter maximum.5.2"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter maximum.5.3"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="7a2b08bca71184f8ec6c81ecc0126592"
+        sum="c1094b83296af45e6c24121eaef62889"
         proved="true"
         expanded="false"
-        shape="ainvV10Iainfix =V14amixfix [&lt;-]V12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5IainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV15V0anIainfix &lt;amixfix []V15V0V8Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix &lt;=V0V16FIasolutionV15V0FAainfix =V5asumV4V0anAamemamixfix []V4V17V1Iainfix &lt;V17anAainfix &lt;=V0V17FAasolutionV4V0Aainfix &lt;=c0V5OamemV18V1NIainfix &lt;V18V8Aainfix &lt;=c0V18FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainvV10Iainfix =V14amixfix [&lt;-]V12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5IainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV15V0anIainfix &lt;amixfix []V15V0V8Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix &lt;=V0V16FIasolutionV15V0FAainfix =V5asumV4V0anAamemamixfix []V4V17V1Iainfix &lt;V17anAainfix &lt;=V0V17FAasolutionV4V0Aainfix &lt;=c0V5OamemV18V1NIainfix &lt;V18V8Aainfix &lt;=c0V18FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <proof
@@ -306,14 +278,14 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter maximum.5.3"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter maximum.5.4"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="e27d12d607a183a6fab968d1f2e2cfa2"
+        sum="3b89376aca4c12e3f93efd11ff523587"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=V13asumV15V0anIainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix &lt;=V0V16FIasolutionV15V0FAainfix =V13asumV14V0anAamemamixfix []V14V17V1Iainfix &lt;V17anAainfix &lt;=V0V17FAasolutionV14V0Aainfix &lt;=c0V13OamemV18V1NIainfix &lt;V18ainfix +V8c1Aainfix &lt;=c0V18FAainfix =V13aprefix -c1Iainfix =V14amixfix [&lt;-]V12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5IainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV19V0anIainfix &lt;amixfix []V19V0V8Iamemamixfix []V19V0V1Iamemamixfix []V19V20V1Iainfix &lt;V20anAainfix &lt;=V0V20FIasolutionV19V0FAainfix =V5asumV4V0anAamemamixfix []V4V21V1Iainfix &lt;V21anAainfix &lt;=V0V21FAasolutionV4V0Aainfix &lt;=c0V5OamemV22V1NIainfix &lt;V22V8Aainfix &lt;=c0V22FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainfix &gt;=V13asumV15V0anIainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix &lt;=V0V16FIasolutionV15V0FAainfix =V13asumV14V0anAamemamixfix []V14V17V1Iainfix &lt;V17anAainfix &lt;=V0V17FAasolutionV14V0Aainfix &lt;=c0V13OamemV18V1NIainfix &lt;V18ainfix +V8c1Aainfix &lt;=c0V18FAainfix =V13aprefix -c1Iainfix =V14amixfix [&lt;-]V12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5IainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV19V0anIainfix &lt;amixfix []V19V0V8Iamemamixfix []V19V0V1Iamemamixfix []V19V20V1Iainfix &lt;V20anAainfix &lt;=V0V20FIasolutionV19V0FAainfix =V5asumV4V0anAamemamixfix []V4V21V1Iainfix &lt;V21anAainfix &lt;=V0V21FAasolutionV4V0Aainfix &lt;=c0V5OamemV22V1NIainfix &lt;V22V8Aainfix &lt;=c0V22FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <transf
@@ -321,14 +293,14 @@
          proved="true"
          expanded="true">
          <goal
-          name="WP_parameter maximum.5.3.1"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          name="WP_parameter maximum.5.4.1"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="152" loccnumb="10" loccnume="17"
           expl="for loop preservation"
-          sum="d9bfc6ebd7f8d180d0c7916f7f0550c1"
+          sum="e9dfcc46659ce02ddd74dcd8f6575806"
           proved="true"
           expanded="false"
-          shape="ainfix &lt;=asumV15V0anV13Iainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix =V0V16Oainfix &lt;V0V16FIainfix =amixfix []V15V17amixfix []V15V18NIainfix &lt;V18anAainfix &lt;V17V18Aainfix &lt;=V0V17FAainfix &lt;amixfix []V15V19anAainfix &lt;=c0amixfix []V15V19Iainfix &lt;V19anAainfix &lt;=V0V19FFAainfix =V13asumV14V0anAamemamixfix []V14V20V1Iainfix &lt;V20anAainfix =V0V20Oainfix &lt;V0V20FAainfix =amixfix []V14V21amixfix []V14V22NIainfix &lt;V22anAainfix &lt;V21V22Aainfix &lt;=V0V21FAainfix &lt;amixfix []V14V23anAainfix &lt;=c0amixfix []V14V23Iainfix &lt;V23anAainfix &lt;=V0V23FAainfix =c0V13Oainfix &lt;c0V13OamemV24V1NIainfix &lt;V24ainfix +V8c1Aainfix =c0V24Oainfix &lt;c0V24FAainfix =V13aprefix -c1Iainfix =V14asetV12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &lt;V5ainfix +amixfix []amixfix []amV0V8V11IapostV25V26Iainfix =amixfix []V10V25aSomeV26FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVCaTuple2V11V12aTuple2VVainfix &gt;=V29asumV31V27anIamemamixfix []V31V32V28Iainfix &lt;V32anAainfix &lt;=V27V32FIasolutionV31V27FAainfix =V29asumV30V27anAamemamixfix []V30V33V28Iainfix &lt;V33anAainfix &lt;=V27V33FAasolutionV30V27Aainfix &lt;=c0V29FLamk tV9FIapostV34V35Iainfix =amixfix []V7V34aSomeV35FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVainfix &lt;V38anAainfix &lt;=c0V38IamemV38V37FAainfix =acardinalV37ainfix -anV36Aainfix &lt;=V36anAainfix &lt;=c0V36Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix =c0ainfix -ainfix *c2anainfix *c2V0Oainfix &lt;c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &lt;=asumV39V0anV5Iainfix &lt;amixfix []V39V0V8Iamemamixfix []V39V0V1Iamemamixfix []V39V40V1Iainfix &lt;V40anAainfix =V0V40Oainfix &lt;V0V40FIainfix =amixfix []V39V41amixfix []V39V42NIainfix &lt;V42anAainfix &lt;V41V42Aainfix &lt;=V0V41FAainfix &lt;amixfix []V39V43anAainfix &lt;=c0amixfix []V39V43Iainfix &lt;V43anAainfix &lt;=V0V43FFAainfix =V5asumV4V0anAamemamixfix []V4V44V1Iainfix &lt;V44anAainfix =V0V44Oainfix &lt;V0V44FAainfix =amixfix []V4V45amixfix []V4V46NIainfix &lt;V46anAainfix &lt;V45V46Aainfix &lt;=V0V45FAainfix &lt;amixfix []V4V47anAainfix &lt;=c0amixfix []V4V47Iainfix &lt;V47anAainfix &lt;=V0V47FAainfix =c0V5Oainfix &lt;c0V5OamemV48V1NIainfix &lt;V48V8Aainfix =c0V48Oainfix &lt;c0V48FAainfix =V5aprefix -c1AapostV49V50Iainfix =amixfix []V7V49aSomeV50FIainfix =V8ainfix -anc1Oainfix &lt;V8ainfix -anc1Aainfix =c0V8Oainfix &lt;c0V8FLamk tV6FFFIainfix =c0ainfix -anc1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNIapostV51V52Iainfix =amixfix []V3V51aSomeV52FACaTuple2V0V1aTuple2VVainfix &lt;V55anAainfix &lt;=c0V55IamemV55V54FAainfix =acardinalV54ainfix -anV53Aainfix &lt;=V53anAainfix &lt;=c0V53Lamk tV2FFF">
+          shape="ainfix &lt;=asumV15V0anV13Iainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix =V0V16Oainfix &lt;V0V16FIainfix =amixfix []V15V17amixfix []V15V18NIainfix &lt;V18anAainfix &lt;V17V18Aainfix &lt;=V0V17FAainfix &lt;amixfix []V15V19anAainfix &lt;=c0amixfix []V15V19Iainfix &lt;V19anAainfix &lt;=V0V19FFAainfix =V13asumV14V0anAamemamixfix []V14V20V1Iainfix &lt;V20anAainfix =V0V20Oainfix &lt;V0V20FAainfix =amixfix []V14V21amixfix []V14V22NIainfix &lt;V22anAainfix &lt;V21V22Aainfix &lt;=V0V21FAainfix &lt;amixfix []V14V23anAainfix &lt;=c0amixfix []V14V23Iainfix &lt;V23anAainfix &lt;=V0V23FAainfix =c0V13Oainfix &lt;c0V13OamemV24V1NIainfix &lt;V24ainfix +V8c1Aainfix =c0V24Oainfix &lt;c0V24FAainfix =V13aprefix -c1Iainfix =V14asetV12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &lt;V5ainfix +amixfix []amixfix []amV0V8V11IapostV25V26Iainfix =amixfix []V10V25aSomeV26FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVCaTuple2V11V12aTuple2VVainfix &gt;=V29asumV31V27anIamemamixfix []V31V32V28Iainfix &lt;V32anAainfix &lt;=V27V32FIasolutionV31V27FAainfix =V29asumV30V27anAamemamixfix []V30V33V28Iainfix &lt;V33anAainfix &lt;=V27V33FAasolutionV30V27Aainfix &lt;=c0V29FLamk tV9FIapostV34V35Iainfix =amixfix []V7V34aSomeV35FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVainfix &lt;V38anAainfix &lt;=c0V38IamemV38V37FAainfix =acardinalV37ainfix -anV36Aainfix &lt;=V36anAainfix &lt;=c0V36Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix =c0ainfix -ainfix *c2anainfix *c2V0Oainfix &lt;c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &lt;=asumV39V0anV5Iainfix &lt;amixfix []V39V0V8Iamemamixfix []V39V0V1Iamemamixfix []V39V40V1Iainfix &lt;V40anAainfix =V0V40Oainfix &lt;V0V40FIainfix =amixfix []V39V41amixfix []V39V42NIainfix &lt;V42anAainfix &lt;V41V42Aainfix &lt;=V0V41FAainfix &lt;amixfix []V39V43anAainfix &lt;=c0amixfix []V39V43Iainfix &lt;V43anAainfix &lt;=V0V43FFAainfix =V5asumV4V0anAamemamixfix []V4V44V1Iainfix &lt;V44anAainfix =V0V44Oainfix &lt;V0V44FAainfix =amixfix []V4V45amixfix []V4V46NIainfix &lt;V46anAainfix &lt;V45V46Aainfix &lt;=V0V45FAainfix &lt;amixfix []V4V47anAainfix &lt;=c0amixfix []V4V47Iainfix &lt;V47anAainfix &lt;=V0V47FAainfix =c0V5Oainfix &lt;c0V5OamemV48V1NIainfix &lt;V48V8Aainfix =c0V48Oainfix &lt;c0V48FAainfix =V5aprefix -c1AapostV49V50Iainfix =amixfix []V7V49aSomeV50FIainfix =V8ainfix -anc1Oainfix &lt;V8ainfix -anc1Aainfix =c0V8Oainfix &lt;c0V8FLamk tV6FIainfix =c0ainfix -anc1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNIapostV51V52Iainfix =amixfix []V3V51aSomeV52FACaTuple2V0V1aTuple2VVainfix &lt;V55anAainfix &lt;=c0V55IamemV55V54FAainfix =acardinalV54ainfix -anV53Aainfix &lt;=V53anAainfix &lt;=c0V53Lamk tV2FF">
           <label
            name="expl:parameter maximum"/>
           <transf
@@ -336,23 +308,23 @@
            proved="true"
            expanded="true">
            <goal
-            name="WP_parameter maximum.5.3.1.1"
-            locfile="programs/max_matrix/../max_matrix.mlw"
+            name="WP_parameter maximum.5.4.1.1"
+            locfile="examples/programs/max_matrix/../max_matrix.mlw"
             loclnum="152" loccnumb="10" loccnume="17"
             expl="for loop preservation"
-            sum="bf7a34f38cb2c629c0aa0716742b0a34"
+            sum="21cf171a0339a55ce1871f1e5f552385"
             proved="true"
             expanded="false"
-            shape="ainfix =asumV15V0anV13Oainfix &lt;asumV15V0anV13Iainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix =V0V16Oainfix &lt;V0V16FIainfix =agetV15V17agetV15V18NIainfix &lt;V18anAainfix &lt;V17V18Aainfix =V0V17Oainfix &lt;V0V17FAainfix &lt;amixfix []V15V19anAainfix =c0amixfix []V15V19Oainfix &lt;c0amixfix []V15V19Iainfix &lt;V19anAainfix =V0V19Oainfix &lt;V0V19FFAainfix =V13asumV14V0anAamemamixfix []V14V20V1Iainfix &lt;V20anAainfix =V0V20Oainfix &lt;V0V20FAainfix =agetV14V21agetV14V22NIainfix &lt;V22anAainfix &lt;V21V22Aainfix =V0V21Oainfix &lt;V0V21FAainfix &lt;amixfix []V14V23anAainfix =c0amixfix []V14V23Oainfix &lt;c0amixfix []V14V23Iainfix &lt;V23anAainfix =V0V23Oainfix &lt;V0V23FAainfix =c0V13Oainfix &lt;c0V13OamemV24V1NIainfix &lt;V24ainfix +V8c1Aainfix =c0V24Oainfix &lt;c0V24FAainfix =V13aprefix -c1Iainfix =V14asetV12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &lt;V5ainfix +amixfix []amixfix []amV0V8V11ICV25aTuple2VVCV26aTuple2VVainfix &gt;=V29asumV31V27anIamemamixfix []V31V32V28Iainfix &lt;V32anAainfix &lt;=V27V32FIasolutionV31V27FAainfix =V29asumV30V27anAamemamixfix []V30V33V28Iainfix &lt;V33anAainfix &lt;=V27V33FAasolutionV30V27Aainfix &lt;=c0V29Iainfix =agetacontentsV10V25aSomeV26FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVCaTuple2V11V12aTuple2VVainfix &lt;=asumV38V34anV36Iamemamixfix []V38V39V35Iainfix &lt;V39anAainfix =V34V39Oainfix &lt;V34V39FIainfix =amixfix []V38V40amixfix []V38V41NIainfix &lt;V41anAainfix &lt;V40V41Aainfix &lt;=V34V40FAainfix &lt;amixfix []V38V42anAainfix &lt;=c0amixfix []V38V42Iainfix &lt;V42anAainfix &lt;=V34V42FFAainfix =V36asumV37V34anAamemamixfix []V37V43V35Iainfix &lt;V43anAainfix =V34V43Oainfix &lt;V34V43FAainfix =amixfix []V37V44amixfix []V37V45NIainfix &lt;V45anAainfix &lt;V44V45Aainfix &lt;=V34V44FAainfix &lt;amixfix []V37V46anAainfix &lt;=c0amixfix []V37V46Iainfix &lt;V46anAainfix &lt;=V34V46FAainfix =c0V36Oainfix &lt;c0V36FLamk tV9FICV47aTuple2VVCV48aTuple2VVainfix &gt;=V51asumV53V49anIamemamixfix []V53V54V50Iainfix &lt;V54anAainfix &lt;=V49V54FIasolutionV53V49FAainfix =V51asumV52V49anAamemamixfix []V52V55V50Iainfix &lt;V55anAainfix &lt;=V49V55FAasolutionV52V49Aainfix &lt;=c0V51Iainfix =agetacontentsV7V47aSomeV48FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVainfix &lt;V58anAainfix =c0V58Oainfix &lt;c0V58IamemV58V57FAainfix =acardinalV57ainfix +anaprefix -V56Aainfix =V56anOainfix &lt;V56anAainfix =c0V56Oainfix &lt;c0V56Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix =c0ainfix +ainfix *c2anaprefix -ainfix *c2V0Oainfix &lt;c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix =asumV59V0anV5Oainfix &lt;asumV59V0anV5Iainfix &lt;amixfix []V59V0V8Iamemamixfix []V59V0V1Iamemamixfix []V59V60V1Iainfix &lt;V60anAainfix =V0V60Oainfix &lt;V0V60FIainfix =agetV59V61agetV59V62NIainfix &lt;V62anAainfix &lt;V61V62Aainfix =V0V61Oainfix &lt;V0V61FAainfix &lt;amixfix []V59V63anAainfix =c0amixfix []V59V63Oainfix &lt;c0amixfix []V59V63Iainfix &lt;V63anAainfix =V0V63Oainfix &lt;V0V63FFAainfix =V5asumV4V0anAamemamixfix []V4V64V1Iainfix &lt;V64anAainfix =V0V64Oainfix &lt;V0V64FAainfix =agetV4V65agetV4V66NIainfix &lt;V66anAainfix &lt;V65V66Aainfix =V0V65Oainfix &lt;V0V65FAainfix &lt;amixfix []V4V67anAainfix =c0amixfix []V4V67Oainfix &lt;c0amixfix []V4V67Iainfix &lt;V67anAainfix =V0V67Oainfix &lt;V0V67FAainfix =c0V5Oainfix &lt;c0V5OamemV68V1NIainfix &lt;V68V8Aainfix =c0V68Oainfix &lt;c0V68FAainfix =V5aprefix -c1ACV69aTuple2VVCV70aTuple2VVainfix &gt;=V73asumV75V71anIamemamixfix []V75V76V72Iainfix &lt;V76anAainfix &lt;=V71V76FIasolutionV75V71FAainfix =V73asumV74V71anAamemamixfix []V74V77V72Iainfix &lt;V77anAainfix &lt;=V71V77FAasolutionV74V71Aainfix &lt;=c0V73Iainfix =agetacontentsV7V69aSomeV70FIainfix =V8ainfix +anaprefix -c1Oainfix &lt;V8ainfix -anc1Aainfix =c0V8Oainfix &lt;c0V8FLamk tV6FFFIainfix =c0ainfix +anaprefix -c1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNICV78aTuple2VVCV79aTuple2VVainfix &gt;=V82asumV84V80anIamemamixfix []V84V85V81Iainfix &lt;V85anAainfix &lt;=V80V85FIasolutionV84V80FAainfix =V82asumV83V80anAamemamixfix []V83V86V81Iainfix &lt;V86anAainfix &lt;=V80V86FAasolutionV83V80Aainfix &lt;=c0V82Iainfix =agetacontentsV3V78aSomeV79FACaTuple2V0V1aTuple2VVainfix &lt;V89anAainfix =c0V89Oainfix &lt;c0V89IamemV89V88FAainfix =acardinalV88ainfix +anaprefix -V87Aainfix =V87anOainfix &lt;V87anAainfix =c0V87Oainfix &lt;c0V87Lamk tV2FFF">
+            shape="ainfix =asumV15V0anV13Oainfix &lt;asumV15V0anV13Iainfix &lt;amixfix []V15V0ainfix +V8c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix =V0V16Oainfix &lt;V0V16FIainfix =agetV15V17agetV15V18NIainfix &lt;V18anAainfix &lt;V17V18Aainfix =V0V17Oainfix &lt;V0V17FAainfix &lt;amixfix []V15V19anAainfix =c0amixfix []V15V19Oainfix &lt;c0amixfix []V15V19Iainfix &lt;V19anAainfix =V0V19Oainfix &lt;V0V19FFAainfix =V13asumV14V0anAamemamixfix []V14V20V1Iainfix &lt;V20anAainfix =V0V20Oainfix &lt;V0V20FAainfix =agetV14V21agetV14V22NIainfix &lt;V22anAainfix &lt;V21V22Aainfix =V0V21Oainfix &lt;V0V21FAainfix &lt;amixfix []V14V23anAainfix =c0amixfix []V14V23Oainfix &lt;c0amixfix []V14V23Iainfix &lt;V23anAainfix =V0V23Oainfix &lt;V0V23FAainfix =c0V13Oainfix &lt;c0V13OamemV24V1NIainfix &lt;V24ainfix +V8c1Aainfix =c0V24Oainfix &lt;c0V24FAainfix =V13aprefix -c1Iainfix =V14asetV12V0V8FIainfix =V13ainfix +amixfix []amixfix []amV0V8V11FIainfix &lt;V5ainfix +amixfix []amixfix []amV0V8V11ICV25aTuple2VVCV26aTuple2VVainfix &gt;=V29asumV31V27anIamemamixfix []V31V32V28Iainfix &lt;V32anAainfix &lt;=V27V32FIasolutionV31V27FAainfix =V29asumV30V27anAamemamixfix []V30V33V28Iainfix &lt;V33anAainfix &lt;=V27V33FAasolutionV30V27Aainfix &lt;=c0V29Iainfix =agetacontentsV10V25aSomeV26FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVCaTuple2V11V12aTuple2VVainfix &lt;=asumV38V34anV36Iamemamixfix []V38V39V35Iainfix &lt;V39anAainfix =V34V39Oainfix &lt;V34V39FIainfix =amixfix []V38V40amixfix []V38V41NIainfix &lt;V41anAainfix &lt;V40V41Aainfix &lt;=V34V40FAainfix &lt;amixfix []V38V42anAainfix &lt;=c0amixfix []V38V42Iainfix &lt;V42anAainfix &lt;=V34V42FFAainfix =V36asumV37V34anAamemamixfix []V37V43V35Iainfix &lt;V43anAainfix =V34V43Oainfix &lt;V34V43FAainfix =amixfix []V37V44amixfix []V37V45NIainfix &lt;V45anAainfix &lt;V44V45Aainfix &lt;=V34V44FAainfix &lt;amixfix []V37V46anAainfix &lt;=c0amixfix []V37V46Iainfix &lt;V46anAainfix &lt;=V34V46FAainfix =c0V36Oainfix &lt;c0V36FLamk tV9FICV47aTuple2VVCV48aTuple2VVainfix &gt;=V51asumV53V49anIamemamixfix []V53V54V50Iainfix &lt;V54anAainfix &lt;=V49V54FIasolutionV53V49FAainfix =V51asumV52V49anAamemamixfix []V52V55V50Iainfix &lt;V55anAainfix &lt;=V49V55FAasolutionV52V49Aainfix &lt;=c0V51Iainfix =agetacontentsV7V47aSomeV48FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVainfix &lt;V58anAainfix =c0V58Oainfix &lt;c0V58IamemV58V57FAainfix =acardinalV57ainfix +anaprefix -V56Aainfix =V56anOainfix &lt;V56anAainfix =c0V56Oainfix &lt;c0V56Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix =c0ainfix +ainfix *c2anaprefix -ainfix *c2V0Oainfix &lt;c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix =asumV59V0anV5Oainfix &lt;asumV59V0anV5Iainfix &lt;amixfix []V59V0V8Iamemamixfix []V59V0V1Iamemamixfix []V59V60V1Iainfix &lt;V60anAainfix =V0V60Oainfix &lt;V0V60FIainfix =agetV59V61agetV59V62NIainfix &lt;V62anAainfix &lt;V61V62Aainfix =V0V61Oainfix &lt;V0V61FAainfix &lt;amixfix []V59V63anAainfix =c0amixfix []V59V63Oainfix &lt;c0amixfix []V59V63Iainfix &lt;V63anAainfix =V0V63Oainfix &lt;V0V63FFAainfix =V5asumV4V0anAamemamixfix []V4V64V1Iainfix &lt;V64anAainfix =V0V64Oainfix &lt;V0V64FAainfix =agetV4V65agetV4V66NIainfix &lt;V66anAainfix &lt;V65V66Aainfix =V0V65Oainfix &lt;V0V65FAainfix &lt;amixfix []V4V67anAainfix =c0amixfix []V4V67Oainfix &lt;c0amixfix []V4V67Iainfix &lt;V67anAainfix =V0V67Oainfix &lt;V0V67FAainfix =c0V5Oainfix &lt;c0V5OamemV68V1NIainfix &lt;V68V8Aainfix =c0V68Oainfix &lt;c0V68FAainfix =V5aprefix -c1ACV69aTuple2VVCV70aTuple2VVainfix &gt;=V73asumV75V71anIamemamixfix []V75V76V72Iainfix &lt;V76anAainfix &lt;=V71V76FIasolutionV75V71FAainfix =V73asumV74V71anAamemamixfix []V74V77V72Iainfix &lt;V77anAainfix &lt;=V71V77FAasolutionV74V71Aainfix &lt;=c0V73Iainfix =agetacontentsV7V69aSomeV70FIainfix =V8ainfix +anaprefix -c1Oainfix &lt;V8ainfix -anc1Aainfix =c0V8Oainfix &lt;c0V8FLamk tV6FIainfix =c0ainfix +anaprefix -c1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNICV78aTuple2VVCV79aTuple2VVainfix &gt;=V82asumV84V80anIamemamixfix []V84V85V81Iainfix &lt;V85anAainfix &lt;=V80V85FIasolutionV84V80FAainfix =V82asumV83V80anAamemamixfix []V83V86V81Iainfix &lt;V86anAainfix &lt;=V80V86FAasolutionV83V80Aainfix &lt;=c0V82Iainfix =agetacontentsV3V78aSomeV79FACaTuple2V0V1aTuple2VVainfix &lt;V89anAainfix =c0V89Oainfix &lt;c0V89IamemV89V88FAainfix =acardinalV88ainfix +anaprefix -V87Aainfix =V87anOainfix &lt;V87anAainfix =c0V87Oainfix &lt;c0V87Lamk tV2FF">
             <label
              name="expl:parameter maximum"/>
             <proof
              prover="3"
-             timelimit="30"
+             timelimit="58"
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="28.74"/>
+             <result status="valid" time="39.99"/>
             </proof>
            </goal>
           </transf>
@@ -360,14 +332,14 @@
         </transf>
        </goal>
        <goal
-        name="WP_parameter maximum.5.4"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter maximum.5.5"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="110b3fff5ce60325f1bf42f846bc2cad"
+        sum="6f224a1ffae7ac49e161b37e28e12a44"
         proved="true"
         expanded="false"
-        shape="ainvV10Iainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5NIainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV13V0anIainfix &lt;amixfix []V13V0V8Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix &lt;=V0V14FIasolutionV13V0FAainfix =V5asumV4V0anAamemamixfix []V4V15V1Iainfix &lt;V15anAainfix &lt;=V0V15FAasolutionV4V0Aainfix &lt;=c0V5OamemV16V1NIainfix &lt;V16V8Aainfix &lt;=c0V16FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainvV10Iainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5NIainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV13V0anIainfix &lt;amixfix []V13V0V8Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix &lt;=V0V14FIasolutionV13V0FAainfix =V5asumV4V0anAamemamixfix []V4V15V1Iainfix &lt;V15anAainfix &lt;=V0V15FAasolutionV4V0Aainfix &lt;=c0V5OamemV16V1NIainfix &lt;V16V8Aainfix &lt;=c0V16FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <proof
@@ -376,18 +348,18 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
-        name="WP_parameter maximum.5.5"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter maximum.5.6"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="d63a91aa2d8747aad732934a52c0e4ab"
+        sum="3513ae8ebd42f0b1271d12c3ab925cba"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=V5asumV13V0anIainfix &lt;amixfix []V13V0ainfix +V8c1Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix &lt;=V0V14FIasolutionV13V0FAainfix =V5asumV4V0anAamemamixfix []V4V15V1Iainfix &lt;V15anAainfix &lt;=V0V15FAasolutionV4V0Aainfix &lt;=c0V5OamemV16V1NIainfix &lt;V16ainfix +V8c1Aainfix &lt;=c0V16FAainfix =V5aprefix -c1Iainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5NIainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV17V0anIainfix &lt;amixfix []V17V0V8Iamemamixfix []V17V0V1Iamemamixfix []V17V18V1Iainfix &lt;V18anAainfix &lt;=V0V18FIasolutionV17V0FAainfix =V5asumV4V0anAamemamixfix []V4V19V1Iainfix &lt;V19anAainfix &lt;=V0V19FAasolutionV4V0Aainfix &lt;=c0V5OamemV20V1NIainfix &lt;V20V8Aainfix &lt;=c0V20FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainfix &gt;=V5asumV13V0anIainfix &lt;amixfix []V13V0ainfix +V8c1Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix &lt;=V0V14FIasolutionV13V0FAainfix =V5asumV4V0anAamemamixfix []V4V15V1Iainfix &lt;V15anAainfix &lt;=V0V15FAasolutionV4V0Aainfix &lt;=c0V5OamemV16V1NIainfix &lt;V16ainfix +V8c1Aainfix &lt;=c0V16FAainfix =V5aprefix -c1Iainfix &gt;ainfix +amixfix []amixfix []amV0V8V11V5NIainvV10AapostaTuple2ainfix +V0c1aremoveV8V1aTuple2V11V12FLamk tV9FIainvV7AapreaTuple2ainfix +V0c1aremoveV8V1Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix &lt;=c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &gt;=V5asumV17V0anIainfix &lt;amixfix []V17V0V8Iamemamixfix []V17V0V1Iamemamixfix []V17V18V1Iainfix &lt;V18anAainfix &lt;=V0V18FIasolutionV17V0FAainfix =V5asumV4V0anAamemamixfix []V4V19V1Iainfix &lt;V19anAainfix &lt;=V0V19FAasolutionV4V0Aainfix &lt;=c0V5OamemV20V1NIainfix &lt;V20V8Aainfix &lt;=c0V20FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <transf
@@ -395,14 +367,14 @@
          proved="true"
          expanded="true">
          <goal
-          name="WP_parameter maximum.5.5.1"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          name="WP_parameter maximum.5.6.1"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="152" loccnumb="10" loccnume="17"
           expl="for loop preservation"
-          sum="bf6d239f61a57f1da4866aa4141658d6"
+          sum="84d042947fa6e4e71b4f514a22d97953"
           proved="true"
           expanded="false"
-          shape="ainfix &lt;=asumV13V0anV5Iainfix &lt;amixfix []V13V0ainfix +V8c1Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix =V0V14Oainfix &lt;V0V14FIainfix =amixfix []V13V15amixfix []V13V16NIainfix &lt;V16anAainfix &lt;V15V16Aainfix &lt;=V0V15FAainfix &lt;amixfix []V13V17anAainfix &lt;=c0amixfix []V13V17Iainfix &lt;V17anAainfix &lt;=V0V17FFAainfix =V5asumV4V0anAamemamixfix []V4V18V1Iainfix &lt;V18anAainfix =V0V18Oainfix &lt;V0V18FAainfix =amixfix []V4V19amixfix []V4V20NIainfix &lt;V20anAainfix &lt;V19V20Aainfix &lt;=V0V19FAainfix &lt;amixfix []V4V21anAainfix &lt;=c0amixfix []V4V21Iainfix &lt;V21anAainfix &lt;=V0V21FAainfix =c0V5Oainfix &lt;c0V5OamemV22V1NIainfix &lt;V22ainfix +V8c1Aainfix =c0V22Oainfix &lt;c0V22FAainfix =V5aprefix -c1Iainfix &lt;V5ainfix +amixfix []amixfix []amV0V8V11NIapostV23V24Iainfix =amixfix []V10V23aSomeV24FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVCaTuple2V11V12aTuple2VVainfix &gt;=V27asumV29V25anIamemamixfix []V29V30V26Iainfix &lt;V30anAainfix &lt;=V25V30FIasolutionV29V25FAainfix =V27asumV28V25anAamemamixfix []V28V31V26Iainfix &lt;V31anAainfix &lt;=V25V31FAasolutionV28V25Aainfix &lt;=c0V27FLamk tV9FIapostV32V33Iainfix =amixfix []V7V32aSomeV33FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVainfix &lt;V36anAainfix &lt;=c0V36IamemV36V35FAainfix =acardinalV35ainfix -anV34Aainfix &lt;=V34anAainfix &lt;=c0V34Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix =c0ainfix -ainfix *c2anainfix *c2V0Oainfix &lt;c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &lt;=asumV37V0anV5Iainfix &lt;amixfix []V37V0V8Iamemamixfix []V37V0V1Iamemamixfix []V37V38V1Iainfix &lt;V38anAainfix =V0V38Oainfix &lt;V0V38FIainfix =amixfix []V37V39amixfix []V37V40NIainfix &lt;V40anAainfix &lt;V39V40Aainfix &lt;=V0V39FAainfix &lt;amixfix []V37V41anAainfix &lt;=c0amixfix []V37V41Iainfix &lt;V41anAainfix &lt;=V0V41FFAainfix =V5asumV4V0anAamemamixfix []V4V42V1Iainfix &lt;V42anAainfix =V0V42Oainfix &lt;V0V42FAainfix =amixfix []V4V43amixfix []V4V44NIainfix &lt;V44anAainfix &lt;V43V44Aainfix &lt;=V0V43FAainfix &lt;amixfix []V4V45anAainfix &lt;=c0amixfix []V4V45Iainfix &lt;V45anAainfix &lt;=V0V45FAainfix =c0V5Oainfix &lt;c0V5OamemV46V1NIainfix &lt;V46V8Aainfix =c0V46Oainfix &lt;c0V46FAainfix =V5aprefix -c1AapostV47V48Iainfix =amixfix []V7V47aSomeV48FIainfix =V8ainfix -anc1Oainfix &lt;V8ainfix -anc1Aainfix =c0V8Oainfix &lt;c0V8FLamk tV6FFFIainfix =c0ainfix -anc1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNIapostV49V50Iainfix =amixfix []V3V49aSomeV50FACaTuple2V0V1aTuple2VVainfix &lt;V53anAainfix &lt;=c0V53IamemV53V52FAainfix =acardinalV52ainfix -anV51Aainfix &lt;=V51anAainfix &lt;=c0V51Lamk tV2FFF">
+          shape="ainfix &lt;=asumV13V0anV5Iainfix &lt;amixfix []V13V0ainfix +V8c1Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix =V0V14Oainfix &lt;V0V14FIainfix =amixfix []V13V15amixfix []V13V16NIainfix &lt;V16anAainfix &lt;V15V16Aainfix &lt;=V0V15FAainfix &lt;amixfix []V13V17anAainfix &lt;=c0amixfix []V13V17Iainfix &lt;V17anAainfix &lt;=V0V17FFAainfix =V5asumV4V0anAamemamixfix []V4V18V1Iainfix &lt;V18anAainfix =V0V18Oainfix &lt;V0V18FAainfix =amixfix []V4V19amixfix []V4V20NIainfix &lt;V20anAainfix &lt;V19V20Aainfix &lt;=V0V19FAainfix &lt;amixfix []V4V21anAainfix &lt;=c0amixfix []V4V21Iainfix &lt;V21anAainfix &lt;=V0V21FAainfix =c0V5Oainfix &lt;c0V5OamemV22V1NIainfix &lt;V22ainfix +V8c1Aainfix =c0V22Oainfix &lt;c0V22FAainfix =V5aprefix -c1Iainfix &lt;V5ainfix +amixfix []amixfix []amV0V8V11NIapostV23V24Iainfix =amixfix []V10V23aSomeV24FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVCaTuple2V11V12aTuple2VVainfix &gt;=V27asumV29V25anIamemamixfix []V29V30V26Iainfix &lt;V30anAainfix &lt;=V25V30FIasolutionV29V25FAainfix =V27asumV28V25anAamemamixfix []V28V31V26Iainfix &lt;V31anAainfix &lt;=V25V31FAasolutionV28V25Aainfix &lt;=c0V27FLamk tV9FIapostV32V33Iainfix =amixfix []V7V32aSomeV33FACaTuple2ainfix +V0c1aremoveV8V1aTuple2VVainfix &lt;V36anAainfix &lt;=c0V36IamemV36V35FAainfix =acardinalV35ainfix -anV34Aainfix &lt;=V34anAainfix &lt;=c0V34Aainfix &lt;ainfix +ainfix -ainfix *c2anainfix *c2ainfix +V0c1c1ainfix -ainfix *c2anainfix *c2V0Aainfix =c0ainfix -ainfix *c2anainfix *c2V0Oainfix &lt;c0ainfix -ainfix *c2anainfix *c2V0IamemV8V1Iainfix &lt;=asumV37V0anV5Iainfix &lt;amixfix []V37V0V8Iamemamixfix []V37V0V1Iamemamixfix []V37V38V1Iainfix &lt;V38anAainfix =V0V38Oainfix &lt;V0V38FIainfix =amixfix []V37V39amixfix []V37V40NIainfix &lt;V40anAainfix &lt;V39V40Aainfix &lt;=V0V39FAainfix &lt;amixfix []V37V41anAainfix &lt;=c0amixfix []V37V41Iainfix &lt;V41anAainfix &lt;=V0V41FFAainfix =V5asumV4V0anAamemamixfix []V4V42V1Iainfix &lt;V42anAainfix =V0V42Oainfix &lt;V0V42FAainfix =amixfix []V4V43amixfix []V4V44NIainfix &lt;V44anAainfix &lt;V43V44Aainfix &lt;=V0V43FAainfix &lt;amixfix []V4V45anAainfix &lt;=c0amixfix []V4V45Iainfix &lt;V45anAainfix &lt;=V0V45FAainfix =c0V5Oainfix &lt;c0V5OamemV46V1NIainfix &lt;V46V8Aainfix =c0V46Oainfix &lt;c0V46FAainfix =V5aprefix -c1AapostV47V48Iainfix =amixfix []V7V47aSomeV48FIainfix =V8ainfix -anc1Oainfix &lt;V8ainfix -anc1Aainfix =c0V8Oainfix &lt;c0V8FLamk tV6FIainfix =c0ainfix -anc1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNIapostV49V50Iainfix =amixfix []V3V49aSomeV50FACaTuple2V0V1aTuple2VVainfix &lt;V53anAainfix &lt;=c0V53IamemV53V52FAainfix =acardinalV52ainfix -anV51Aainfix &lt;=V51anAainfix &lt;=c0V51Lamk tV2FF">
           <label
            name="expl:parameter maximum"/>
           <proof
@@ -417,14 +389,14 @@
         </transf>
        </goal>
        <goal
-        name="WP_parameter maximum.5.6"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter maximum.5.7"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="cc08fc5a044935240d3b55bd88dee678"
+        sum="604caa3f082b0b4d2802ca3002792879"
         proved="true"
         expanded="false"
-        shape="ainvV7IamemV8V1NIainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainvV7IamemV8V1NIainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0V8Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <proof
@@ -437,14 +409,14 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter maximum.5.7"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter maximum.5.8"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="for loop preservation"
-        sum="2961cdfe2e59700c14633e0f0b623c58"
+        sum="e7b6a0c0d1b00a476cb299887d8a2267"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0ainfix +V8c1Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12ainfix +V8c1Aainfix &lt;=c0V12FAainfix =V5aprefix -c1IamemV8V1NIainfix &gt;=V5asumV13V0anIainfix &lt;amixfix []V13V0V8Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix &lt;=V0V14FIasolutionV13V0FAainfix =V5asumV4V0anAamemamixfix []V4V15V1Iainfix &lt;V15anAainfix &lt;=V0V15FAasolutionV4V0Aainfix &lt;=c0V5OamemV16V1NIainfix &lt;V16V8Aainfix &lt;=c0V16FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainfix &gt;=V5asumV9V0anIainfix &lt;amixfix []V9V0ainfix +V8c1Iamemamixfix []V9V0V1Iamemamixfix []V9V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FIasolutionV9V0FAainfix =V5asumV4V0anAamemamixfix []V4V11V1Iainfix &lt;V11anAainfix &lt;=V0V11FAasolutionV4V0Aainfix &lt;=c0V5OamemV12V1NIainfix &lt;V12ainfix +V8c1Aainfix &lt;=c0V12FAainfix =V5aprefix -c1IamemV8V1NIainfix &gt;=V5asumV13V0anIainfix &lt;amixfix []V13V0V8Iamemamixfix []V13V0V1Iamemamixfix []V13V14V1Iainfix &lt;V14anAainfix &lt;=V0V14FIasolutionV13V0FAainfix =V5asumV4V0anAamemamixfix []V4V15V1Iainfix &lt;V15anAainfix &lt;=V0V15FAasolutionV4V0Aainfix &lt;=c0V5OamemV16V1NIainfix &lt;V16V8Aainfix &lt;=c0V16FAainfix =V5aprefix -c1AainvV7Iainfix &lt;=V8ainfix -anc1Aainfix &lt;=c0V8FLamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <proof
@@ -460,13 +432,13 @@
      </goal>
      <goal
       name="WP_parameter maximum.6"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="assertion"
-      sum="153f1aaf22806508718109f55f8882c6"
+      sum="b4f153aff2664f331e723a9a95dcf6ef"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <transf
@@ -475,13 +447,13 @@
        expanded="true">
        <goal
         name="WP_parameter maximum.6.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="assertion"
-        sum="153f1aaf22806508718109f55f8882c6"
+        sum="b4f153aff2664f331e723a9a95dcf6ef"
         proved="true"
         expanded="false"
-        shape="ainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <proof
@@ -490,20 +462,20 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter maximum.7"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="152" loccnumb="10" loccnume="17"
       expl="normal postcondition"
-      sum="4591b18072f879e42f0b26c74dd4d3c4"
+      sum="f8a4410ad2d405808b01c97f6caff655"
       proved="true"
       expanded="false"
-      shape="ainvV7AapostaTuple2V0V1aTuple2V5V4Iainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainvV7AapostaTuple2V0V1aTuple2V5V4Iainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter maximum"/>
       <transf
@@ -512,13 +484,13 @@
        expanded="true">
        <goal
         name="WP_parameter maximum.7.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="parameter maximum"
-        sum="ab99eb2798c2dd0f28689c753e7f6d51"
+        sum="b759447b48ec64bb5c5d342ae1020234"
         proved="true"
         expanded="false"
-        shape="apostaTuple2V0V1aTuple2V5V4Iainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="apostaTuple2V0V1aTuple2V5V4Iainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
         <transf
@@ -527,13 +499,13 @@
          expanded="true">
          <goal
           name="WP_parameter maximum.7.1.1"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="152" loccnumb="10" loccnume="17"
           expl="parameter maximum"
-          sum="347256f3714c7651a54e57bdbeba2a06"
+          sum="7e717a484eff272ddd942591205a016b"
           proved="true"
           expanded="false"
-          shape="CaTuple2V0V1aTuple2VVCaTuple2V5V4aTuple2VVainfix &gt;=V10asumV12V8anIamemamixfix []V12V13V9Iainfix &lt;V13anAainfix &lt;=V8V13FIasolutionV12V8FAainfix =V10asumV11V8anAamemamixfix []V11V14V9Iainfix &lt;V14anAainfix &lt;=V8V14FAasolutionV11V8Aainfix &lt;=c0V10Iainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;=asumV15V0anV5Iainfix &lt;amixfix []V15V0ainfix +ainfix -anc1c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix =V0V16Oainfix &lt;V0V16FIainfix =amixfix []V15V17amixfix []V15V18NIainfix &lt;V18anAainfix &lt;V17V18Aainfix &lt;=V0V17FAainfix &lt;amixfix []V15V19anAainfix &lt;=c0amixfix []V15V19Iainfix &lt;V19anAainfix &lt;=V0V19FFAainfix =V5asumV4V0anAamemamixfix []V4V20V1Iainfix &lt;V20anAainfix =V0V20Oainfix &lt;V0V20FAainfix =amixfix []V4V21amixfix []V4V22NIainfix &lt;V22anAainfix &lt;V21V22Aainfix &lt;=V0V21FAainfix &lt;amixfix []V4V23anAainfix &lt;=c0amixfix []V4V23Iainfix &lt;V23anAainfix &lt;=V0V23FAainfix =c0V5Oainfix &lt;c0V5OamemV24V1NIainfix &lt;V24ainfix +ainfix -anc1c1Aainfix =c0V24Oainfix &lt;c0V24FAainfix =V5aprefix -c1AapostV25V26Iainfix =amixfix []V7V25aSomeV26FLamk tV6FFFIainfix =c0ainfix -anc1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNIapostV27V28Iainfix =amixfix []V3V27aSomeV28FACaTuple2V0V1aTuple2VVainfix &lt;V31anAainfix &lt;=c0V31IamemV31V30FAainfix =acardinalV30ainfix -anV29Aainfix &lt;=V29anAainfix &lt;=c0V29Lamk tV2FFF">
+          shape="CaTuple2V0V1aTuple2VVCaTuple2V5V4aTuple2VVainfix &gt;=V10asumV12V8anIamemamixfix []V12V13V9Iainfix &lt;V13anAainfix &lt;=V8V13FIasolutionV12V8FAainfix =V10asumV11V8anAamemamixfix []V11V14V9Iainfix &lt;V14anAainfix &lt;=V8V14FAasolutionV11V8Aainfix &lt;=c0V10Iainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;=asumV15V0anV5Iainfix &lt;amixfix []V15V0ainfix +ainfix -anc1c1Iamemamixfix []V15V0V1Iamemamixfix []V15V16V1Iainfix &lt;V16anAainfix =V0V16Oainfix &lt;V0V16FIainfix =amixfix []V15V17amixfix []V15V18NIainfix &lt;V18anAainfix &lt;V17V18Aainfix &lt;=V0V17FAainfix &lt;amixfix []V15V19anAainfix &lt;=c0amixfix []V15V19Iainfix &lt;V19anAainfix &lt;=V0V19FFAainfix =V5asumV4V0anAamemamixfix []V4V20V1Iainfix &lt;V20anAainfix =V0V20Oainfix &lt;V0V20FAainfix =amixfix []V4V21amixfix []V4V22NIainfix &lt;V22anAainfix &lt;V21V22Aainfix &lt;=V0V21FAainfix &lt;amixfix []V4V23anAainfix &lt;=c0amixfix []V4V23Iainfix &lt;V23anAainfix &lt;=V0V23FAainfix =c0V5Oainfix &lt;c0V5OamemV24V1NIainfix &lt;V24ainfix +ainfix -anc1c1Aainfix =c0V24Oainfix &lt;c0V24FAainfix =V5aprefix -c1AapostV25V26Iainfix =amixfix []V7V25aSomeV26FLamk tV6FIainfix =c0ainfix -anc1Oainfix &lt;c0ainfix -anc1Iainfix =V0anNIapostV27V28Iainfix =amixfix []V3V27aSomeV28FACaTuple2V0V1aTuple2VVainfix &lt;V31anAainfix &lt;=c0V31IamemV31V30FAainfix =acardinalV30ainfix -anV29Aainfix &lt;=V29anAainfix &lt;=c0V29Lamk tV2FF">
           <label
            name="expl:parameter maximum"/>
           <proof
@@ -542,76 +514,22 @@
            memlimit="0"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.13"/>
+           <result status="valid" time="0.12"/>
           </proof>
          </goal>
         </transf>
        </goal>
        <goal
         name="WP_parameter maximum.7.2"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="152" loccnumb="10" loccnume="17"
         expl="parameter maximum"
-        sum="b916c1203f039d02eeab882872fc17ac"
+        sum="e5d220bc71fb6d6c55c30fb9f09cf1b5"
         proved="true"
         expanded="false"
-        shape="ainvV7Iainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FFFIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="ainvV7Iainfix &lt;=c0V5Iainfix &gt;=V5asumV8V0anIainfix &lt;amixfix []V8V0ainfix +ainfix -anc1c1Iamemamixfix []V8V0V1Iamemamixfix []V8V9V1Iainfix &lt;V9anAainfix &lt;=V0V9FIasolutionV8V0FAainfix =V5asumV4V0anAamemamixfix []V4V10V1Iainfix &lt;V10anAainfix &lt;=V0V10FAasolutionV4V0Aainfix &lt;=c0V5OamemV11V1NIainfix &lt;V11ainfix +ainfix -anc1c1Aainfix &lt;=c0V11FAainfix =V5aprefix -c1AainvV7Lamk tV6FIainfix &lt;=c0ainfix -anc1Iainfix =V0anNIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter maximum"/>
-        <proof
-         prover="0"
-         timelimit="30"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter memo"
-    locfile="programs/max_matrix/../max_matrix.mlw"
-    loclnum="181" loccnumb="7" loccnume="11"
-    expl="parameter memo"
-    sum="bac74497902c2d23be0d1354b3f2fdc7"
-    proved="true"
-    expanded="false"
-    shape="ainvamk tV8AapostaTuple2V0V1V7Iainfix =agetV8V11agetV4V11Iainfix =V1V10Aainfix =V0V9NLaTuple2V9V10FAainfix =agetV8aTuple2V0V1aSomeV7FIainvamk tV4AapostaTuple2V0V1V7LaTuple2V5V6FFAainvV3AapreaTuple2V0V1Aainfix &lt;ainfix -ainfix *c2anainfix *c2V0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Iainfix =agetV2aTuple2V0V1aNoneAainvV3AapostaTuple2V0V1V14Iainfix =agetV2aTuple2V0V1aSomeV14LaTuple2V12V13FIainvV3AapreaTuple2V0V1Lamk tV2FFF">
-    <label
-     name="expl:parameter memo"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter memo.1"
-      locfile="programs/max_matrix/../max_matrix.mlw"
-      loclnum="181" loccnumb="7" loccnume="11"
-      expl="normal postcondition"
-      sum="cc1e23c03f2cccba247cef7325fdb39f"
-      proved="true"
-      expanded="false"
-      shape="ainvV3AapostaTuple2V0V1V6Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FFF">
-      <label
-       name="expl:parameter memo"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter memo.1.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
-        loclnum="181" loccnumb="7" loccnume="11"
-        expl="parameter memo"
-        sum="7283df0db7dede1f7da9435867cf26d8"
-        proved="true"
-        expanded="false"
-        shape="apostaTuple2V0V1V6Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FFF">
-        <label
-         name="expl:parameter memo"/>
         <proof
          prover="0"
          timelimit="30"
@@ -621,15 +539,69 @@
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter memo"
+    locfile="examples/programs/max_matrix/../max_matrix.mlw"
+    loclnum="181" loccnumb="7" loccnume="11"
+    expl="parameter memo"
+    sum="ba0d3834fd6bffdb249727df8bb4ea78"
+    proved="false"
+    expanded="false"
+    shape="ainvamk tV8AapostaTuple2V0V1V7Iainfix =agetV8V11agetV4V11Iainfix =V1V10Aainfix =V0V9NLaTuple2V9V10FAainfix =agetV8aTuple2V0V1aSomeV7FIainvamk tV4AapostaTuple2V0V1V7LaTuple2V5V6FFAainvV3AapreaTuple2V0V1Aainfix &lt;ainfix -ainfix *c2anainfix *c2V0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Iainfix =agetV2aTuple2V0V1aNoneAainvV3AapostaTuple2V0V1V14Iainfix =agetV2aTuple2V0V1aSomeV14LaTuple2V12V13FIainvV3AapreaTuple2V0V1Lamk tV2FF">
+    <label
+     name="expl:parameter memo"/>
+    <transf
+     name="split_goal"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter memo.1"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
+      loclnum="181" loccnumb="7" loccnume="11"
+      expl="normal postcondition"
+      sum="2ba85d42aca5edfe28b6dec4aa821b11"
+      proved="true"
+      expanded="false"
+      shape="ainvV3AapostaTuple2V0V1V6Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FF">
+      <label
+       name="expl:parameter memo"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
        <goal
-        name="WP_parameter memo.1.2"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        name="WP_parameter memo.1.1"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="181" loccnumb="7" loccnume="11"
         expl="parameter memo"
-        sum="bf8f0f88e55fe5106eff0824e7f609d3"
+        sum="e2d0df222173e67d8b3f89148fe1de92"
         proved="true"
         expanded="false"
-        shape="ainvV3Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+        shape="apostaTuple2V0V1V6Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FF">
+        <label
+         name="expl:parameter memo"/>
+        <proof
+         prover="0"
+         timelimit="30"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter memo.1.2"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
+        loclnum="181" loccnumb="7" loccnume="11"
+        expl="parameter memo"
+        sum="659aba9fbc4058aae761ec1a8a86711f"
+        proved="true"
+        expanded="false"
+        shape="ainvV3Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FF">
         <label
          name="expl:parameter memo"/>
         <proof
@@ -645,33 +617,25 @@
      </goal>
      <goal
       name="WP_parameter memo.2"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="181" loccnumb="7" loccnume="11"
-      expl="precondition"
-      sum="6a3f462993e8c69eb2572ed4314ed618"
-      proved="true"
+      expl="variant decreases"
+      sum="643019f1a36986fae2edf1f8c08f88e8"
+      proved="false"
       expanded="false"
-      shape="ainvV3AapreaTuple2V0V1Aainfix &lt;ainfix -ainfix *c2anainfix *c2V0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Iainfix =agetV2aTuple2V0V1aNoneIainvV3AapostaTuple2V0V1V6Iainfix =agetV2aTuple2V0V1aSomeV6LaTuple2V4V5FIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainfix &lt;ainfix -ainfix *c2anainfix *c2V0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Iainfix =agetV2aTuple2V0V1aNoneIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter memo"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter memo.3"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="181" loccnumb="7" loccnume="11"
-      expl="normal postcondition"
-      sum="803c120a728f0e8d5eb41b741c815e69"
+      expl="precondition"
+      sum="c3d7005e4e0e2fb8f0f5222daf0c5199"
       proved="true"
       expanded="false"
-      shape="ainvamk tV8AapostaTuple2V0V1V7Iainfix =agetV8V11agetV4V11Iainfix =V1V10Aainfix =V0V9NLaTuple2V9V10FAainfix =agetV8aTuple2V0V1aSomeV7FIainvamk tV4AapostaTuple2V0V1V7LaTuple2V5V6FFIainvV3AapreaTuple2V0V1Aainfix &lt;ainfix -ainfix *c2anainfix *c2V0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Iainfix =agetV2aTuple2V0V1aNoneIainvV3AapostaTuple2V0V1V14Iainfix =agetV2aTuple2V0V1aSomeV14LaTuple2V12V13FIainvV3AapreaTuple2V0V1Lamk tV2FFF">
+      shape="ainvV3AapreaTuple2V0V1Iainfix =agetV2aTuple2V0V1aNoneIainvV3AapreaTuple2V0V1Lamk tV2FF">
       <label
        name="expl:parameter memo"/>
       <proof
@@ -680,17 +644,37 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter memo.4"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
+      loclnum="181" loccnumb="7" loccnume="11"
+      expl="normal postcondition"
+      sum="88e8bc8377605185ca45d641ace0f2ba"
+      proved="true"
+      expanded="false"
+      shape="ainvamk tV8AapostaTuple2V0V1V7Iainfix =agetV8V11agetV4V11Iainfix =V1V10Aainfix =V0V9NLaTuple2V9V10FAainfix =agetV8aTuple2V0V1aSomeV7FIainvamk tV4AapostaTuple2V0V1V7LaTuple2V5V6FFIainvV3AapreaTuple2V0V1Aainfix &lt;ainfix -ainfix *c2anainfix *c2V0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix -ainfix *c2anainfix *c2V0c1Iainfix =agetV2aTuple2V0V1aNoneIainvV3AapreaTuple2V0V1Lamk tV2FF">
+      <label
+       name="expl:parameter memo"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter maxmat"
-    locfile="programs/max_matrix/../max_matrix.mlw"
+    locfile="examples/programs/max_matrix/../max_matrix.mlw"
     loclnum="187" loccnumb="6" loccnume="12"
     expl="parameter maxmat"
-    sum="8f21cc5eb683c4f5e992e33be97ff9b7"
+    sum="c2af48b8cec07c50b50b945303c4110b"
     proved="true"
     expanded="false"
     shape="ainfix &gt;=V3asumV5c0anIapermutationV5FAainfix =V3asumV6c0anAapermutationV6EIainvamk tV2AapostaTuple2c0abelowanaTuple2V3V4FFAainvV1AapreaTuple2c0abelowanAainvV1Iainfix =agetV0aTuple2V7V8aNoneFLamk tV0F">
@@ -702,10 +686,10 @@
      expanded="true">
      <goal
       name="WP_parameter maxmat.1"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="187" loccnumb="6" loccnume="12"
       expl="assertion"
-      sum="0b4f588ce077e9db513b2322df31e67b"
+      sum="b79a618c769dc113bb2f917458be31bd"
       proved="true"
       expanded="false"
       shape="ainvV1Iainfix =agetV0aTuple2V2V3aNoneFLamk tV0F">
@@ -717,10 +701,10 @@
        expanded="true">
        <goal
         name="WP_parameter maxmat.1.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="187" loccnumb="6" loccnume="12"
         expl="assertion"
-        sum="2666a5135f80497e526a7a8077e006f0"
+        sum="7dd9af3cdd39dc9cbf76a0e80b2d8718"
         proved="true"
         expanded="false"
         shape="apostV2V3Iainfix =amixfix []V1V2aSomeV3FIainfix =agetV0aTuple2V4V5aNoneFLamk tV0F">
@@ -739,10 +723,10 @@
      </goal>
      <goal
       name="WP_parameter maxmat.2"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="187" loccnumb="6" loccnume="12"
       expl="precondition"
-      sum="a58a7b2364b8ea9f02e18ec91e8038cb"
+      sum="322489014243e3d527d9c31f25a99419"
       proved="true"
       expanded="false"
       shape="ainvV1AapreaTuple2c0abelowanIainvV1Iainfix =agetV0aTuple2V2V3aNoneFLamk tV0F">
@@ -754,10 +738,10 @@
        expanded="true">
        <goal
         name="WP_parameter maxmat.2.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="187" loccnumb="6" loccnume="12"
         expl="precondition"
-        sum="94bf15097e2f3a5f76ca106d61b531c4"
+        sum="908640c16af7b2705bd9222aacd5b310"
         proved="true"
         expanded="false"
         shape="apostV2V3Iainfix =amixfix []V1V2aSomeV3FACaTuple2c0abelowanaTuple2VVainfix &lt;V6anAainfix &lt;=c0V6IamemV6V5FAainfix =acardinalV5ainfix -anV4Aainfix &lt;=V4anAainfix &lt;=c0V4IapostV7V8Iainfix =amixfix []V1V7aSomeV8FIainfix =agetV0aTuple2V9V10aNoneFLamk tV0F">
@@ -769,10 +753,10 @@
          expanded="true">
          <goal
           name="WP_parameter maxmat.2.1.1"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="22daa52d9166aa363e5d118ef21ea21e"
+          sum="8a0b7850159c3dd915c954a5fc797454"
           proved="true"
           expanded="false"
           shape="CaTuple2c0abelowanaTuple2VVainfix &lt;=c0V2IapostV4V5Iainfix =amixfix []V1V4aSomeV5FIainfix =agetV0aTuple2V6V7aNoneFLamk tV0F">
@@ -789,10 +773,10 @@
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.2"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="c1619f516c2f637b2985a1ececf61778"
+          sum="d3084bd2731358bfcc70b34837112c03"
           proved="true"
           expanded="false"
           shape="CaTuple2c0abelowanaTuple2VVainfix &lt;=V2anIapostV4V5Iainfix =amixfix []V1V4aSomeV5FIainfix =agetV0aTuple2V6V7aNoneFLamk tV0F">
@@ -809,10 +793,10 @@
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.3"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="b3015881f43f7a58ea12174f9efbe825"
+          sum="2b4e33b92882731fd44ae1f93521be1f"
           proved="true"
           expanded="false"
           shape="CaTuple2c0abelowanaTuple2VVainfix =acardinalV3ainfix -anV2IapostV4V5Iainfix =amixfix []V1V4aSomeV5FIainfix =agetV0aTuple2V6V7aNoneFLamk tV0F">
@@ -829,10 +813,10 @@
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.4"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="a09b5b42880540430de0d4b829baa14a"
+          sum="c5924d2ea73ad5f900cb228c58b9d0d9"
           proved="true"
           expanded="false"
           shape="CaTuple2c0abelowanaTuple2VVainfix &lt;=c0V4IamemV4V3FIapostV5V6Iainfix =amixfix []V1V5aSomeV6FIainfix =agetV0aTuple2V7V8aNoneFLamk tV0F">
@@ -849,10 +833,10 @@
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.5"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="9002f6153b4f2bac3d584a17e5e7da0b"
+          sum="ef1342390a0e82af07a2b89c53cf7309"
           proved="true"
           expanded="false"
           shape="CaTuple2c0abelowanaTuple2VVainfix &lt;V4anIamemV4V3FIapostV5V6Iainfix =amixfix []V1V5aSomeV6FIainfix =agetV0aTuple2V7V8aNoneFLamk tV0F">
@@ -869,10 +853,10 @@
          </goal>
          <goal
           name="WP_parameter maxmat.2.1.6"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="f9dd278867edea006e4c8414a463bf13"
+          sum="ea043e9d6dbb3b2625b625b0d2d1d1f7"
           proved="true"
           expanded="false"
           shape="apostV2V3Iainfix =amixfix []V1V2aSomeV3FIapostV4V5Iainfix =amixfix []V1V4aSomeV5FIainfix =agetV0aTuple2V6V7aNoneFLamk tV0F">
@@ -893,10 +877,10 @@
      </goal>
      <goal
       name="WP_parameter maxmat.3"
-      locfile="programs/max_matrix/../max_matrix.mlw"
+      locfile="examples/programs/max_matrix/../max_matrix.mlw"
       loclnum="187" loccnumb="6" loccnume="12"
       expl="normal postcondition"
-      sum="37ce2d9686509489542247356262ac87"
+      sum="067b01b4135b8eeae0d0c91a7d6946de"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V3asumV5c0anIapermutationV5FAainfix =V3asumV6c0anAapermutationV6EIainvamk tV2AapostaTuple2c0abelowanaTuple2V3V4FFIainvV1AapreaTuple2c0abelowanIainvV1Iainfix =agetV0aTuple2V7V8aNoneFLamk tV0F">
@@ -908,10 +892,10 @@
        expanded="true">
        <goal
         name="WP_parameter maxmat.3.1"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="187" loccnumb="6" loccnume="12"
         expl="parameter maxmat"
-        sum="16748248b75776cb5ac43d85f85f6db0"
+        sum="0c10596a02eea6bf4c73d015f61dc2a4"
         proved="true"
         expanded="false"
         shape="ainfix =V3asumV5c0anAapermutationV5EIainvamk tV2AapostaTuple2c0abelowanaTuple2V3V4FFIainvV1AapreaTuple2c0abelowanIainvV1Iainfix =agetV0aTuple2V6V7aNoneFLamk tV0F">
@@ -923,15 +907,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter maxmat.3.2"
-        locfile="programs/max_matrix/../max_matrix.mlw"
+        locfile="examples/programs/max_matrix/../max_matrix.mlw"
         loclnum="187" loccnumb="6" loccnume="12"
         expl="parameter maxmat"
-        sum="78ad9dfee74382f4ff2bd1503b172234"
+        sum="24a34f934d14652f00c1eef93bf40d5d"
         proved="true"
         expanded="false"
         shape="ainfix &gt;=V3asumV5c0anIapermutationV5FIainvamk tV2AapostaTuple2c0abelowanaTuple2V3V4FFIainvV1AapreaTuple2c0abelowanIainvV1Iainfix =agetV0aTuple2V6V7aNoneFLamk tV0F">
@@ -943,10 +927,10 @@
          expanded="true">
          <goal
           name="WP_parameter maxmat.3.2.1"
-          locfile="programs/max_matrix/../max_matrix.mlw"
+          locfile="examples/programs/max_matrix/../max_matrix.mlw"
           loclnum="187" loccnumb="6" loccnume="12"
           expl="parameter maxmat"
-          sum="6c19d261a42c8a2e0190232d2d915e7c"
+          sum="6a0d6d4147b6bbdce05b6697285f9406"
           proved="true"
           expanded="false"
           shape="ainfix &lt;=asumV5c0anV3IasolutionV5c0FIapostV6V7Iainfix =amixfix []amk tV2V6aSomeV7FACaTuple2c0abelowanaTuple2VVCaTuple2V3V4aTuple2VVainfix &gt;=V10asumV12V8anIamemamixfix []V12V13V9Iainfix &lt;V13anAainfix &lt;=V8V13FIasolutionV12V8FAainfix =V10asumV11V8anAamemamixfix []V11V14V9Iainfix &lt;V14anAainfix &lt;=V8V14FAasolutionV11V8Aainfix &lt;=c0V10FFIapostV15V16Iainfix =amixfix []V1V15aSomeV16FACaTuple2c0abelowanaTuple2VVainfix &lt;V19anAainfix &lt;=c0V19IamemV19V18FAainfix =acardinalV18ainfix -anV17Aainfix &lt;=V17anAainfix &lt;=c0V17IapostV20V21Iainfix =amixfix []V1V20aSomeV21FIainfix =agetV0aTuple2V22V23aNoneFLamk tV0F">
@@ -958,7 +942,7 @@
            memlimit="0"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.10"/>
+           <result status="valid" time="0.11"/>
           </proof>
          </goal>
         </transf>
