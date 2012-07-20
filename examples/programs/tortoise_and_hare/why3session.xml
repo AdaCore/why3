@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/tortoise_and_hare/why3session.xml" shape_version="2">
+ name="examples/programs/tortoise_and_hare/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,18 +13,18 @@
  <file
   name="../tortoise_and_hare.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
-   name="WP TortoiseAndHare"
-   locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+   name="TortoiseAndHare"
+   locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
    loclnum="6" loccnumb="7" loccnume="22"
    verified="true"
    expanded="true">
    <goal
     name="cycle_induction"
-    locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+    locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
     loclnum="44" loccnumb="8" loccnume="23"
-    sum="452a8413964eb81ab0dd2a136f7d6690"
+    sum="26f9de9564d1bb07b002bb002ef9dfda"
     proved="true"
     expanded="true"
     shape="ainfix =axainfix +V0ainfix *alambdaV1axV0Iainfix &lt;=c0V1FIainfix &lt;=amuV0F">
@@ -40,13 +40,13 @@
    </goal>
    <goal
     name="WP_parameter tortoise_hare"
-    locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+    locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
     loclnum="69" loccnumb="6" loccnume="19"
     expl="parameter tortoise_hare"
-    sum="16f7edd37f38a1c209b35a5e4b32c87d"
+    sum="f6e711f767941fe8712513361a9b06a2"
     proved="true"
     expanded="true"
-    shape="arelV2V1Aainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFFAainfix =axV9axainfix *c2V9NIainfix &lt;V9V8Aainfix &lt;=c1V9FAainfix =afafax0axainfix *c2V8Aainfix =afax0axV8Aainfix &lt;=V8ainfix +amualambdaAainfix &lt;=c1V8E">
+    shape="arelV2V1Aainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFAainfix =axV9axainfix *c2V9NIainfix &lt;V9V8Aainfix &lt;=c1V9FAainfix =afafax0axainfix *c2V8Aainfix =afax0axV8Aainfix &lt;=V8ainfix +amualambdaAainfix &lt;=c1V8E">
     <label
      name="expl:parameter tortoise_hare"/>
     <transf
@@ -55,10 +55,10 @@
      expanded="true">
      <goal
       name="WP_parameter tortoise_hare.1"
-      locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+      locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
       loclnum="69" loccnumb="6" loccnume="19"
       expl="loop invariant init"
-      sum="a05bf306355f8fffd0c6425be0bb069d"
+      sum="7d4a0fb4e80f013aa6b5b70ecfae851c"
       proved="true"
       expanded="true"
       shape="ainfix =axV1axainfix *c2V1NIainfix &lt;V1V0Aainfix &lt;=c1V1FAainfix =afafax0axainfix *c2V0Aainfix =afax0axV0Aainfix &lt;=V0ainfix +amualambdaAainfix &lt;=c1V0E">
@@ -75,13 +75,13 @@
      </goal>
      <goal
       name="WP_parameter tortoise_hare.2"
-      locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+      locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
       loclnum="69" loccnumb="6" loccnume="19"
       expl="loop invariant preservation"
-      sum="aa2260468248411cb12e5efe6ed602c8"
+      sum="368217ec1f899430b268e7c8879549e4"
       proved="true"
       expanded="true"
-      shape="ainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFF">
+      shape="ainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EF">
       <label
        name="expl:parameter tortoise_hare"/>
       <proof
@@ -96,13 +96,13 @@
      </goal>
      <goal
       name="WP_parameter tortoise_hare.3"
-      locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+      locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
       loclnum="69" loccnumb="6" loccnume="19"
       expl="loop variant decreases"
-      sum="462a82eff865c2d65f2f8639aed56fae"
+      sum="6fc99c899aa75de561ee867284a405e6"
       proved="true"
       expanded="true"
-      shape="arelV2V1Iainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFF">
+      shape="arelV2V1Iainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V0axainfix *c2V4Aainfix =V1axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EF">
       <label
        name="expl:parameter tortoise_hare"/>
       <proof
@@ -112,7 +112,7 @@
        edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.64"/>
+       <result status="valid" time="0.60"/>
       </proof>
      </goal>
     </transf>

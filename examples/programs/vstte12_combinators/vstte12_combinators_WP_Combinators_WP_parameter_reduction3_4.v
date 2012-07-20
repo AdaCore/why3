@@ -7,21 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive term  :=
   | S : term 
@@ -96,12 +81,12 @@ Axiom red_star_left : forall (t1:term) (t2:term) (t:term), (relTR t1 t2) ->
 Axiom red_star_right : forall (v:term) (t1:term) (t2:term), (is_value v) ->
   ((relTR t1 t2) -> (relTR (App v t1) (App v t2))).
 
-Axiom reducible_or_value : forall (t:term), (exists tqt:term, (infix_mnmngt t
-  tqt)) \/ (is_value t).
+Axiom reducible_or_value : forall (t:term), (exists t':term, (infix_mnmngt t
+  t')) \/ (is_value t).
 
 (* Why3 assumption *)
-Definition irreducible(t:term): Prop := forall (tqt:term), ~ (infix_mnmngt t
-  tqt).
+Definition irreducible(t:term): Prop := forall (t':term), ~ (infix_mnmngt t
+  t').
 
 Axiom irreducible_is_value : forall (t:term), (irreducible t) <->
   (is_value t).
@@ -138,7 +123,7 @@ Axiom ks1 : ((ks 1%Z) = (App K K)).
 Axiom only_K_ks : forall (n:Z), (0%Z <= n)%Z -> (only_K (ks n)).
 
 Axiom ks_inversion : forall (n:Z), (0%Z <= n)%Z -> ((n = 0%Z) \/
-  ((0%Z <  n)%Z /\ ((ks n) = (App (ks (n - 1%Z)%Z) K)))).
+  ((0%Z < n)%Z /\ ((ks n) = (App (ks (n - 1%Z)%Z) K)))).
 
 Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
   (((ks n1) = (ks n2)) -> (n1 = n2))).
@@ -159,12 +144,12 @@ Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,
       (0%Z <= n)%Z -> (((t1 = (ks (2%Z * n)%Z)) -> (result = K)) /\
       ((t1 = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> (result = (App K K))))) ->
       match result with
-      | K => (exists n:Z, (0%Z <= n)%Z /\ (t2 = (ks n))) ->
-          forall (result1:term), ((is_value result1) /\ forall (n:Z),
-          (0%Z <= n)%Z -> (((t2 = (ks (2%Z * n)%Z)) -> (result1 = K)) /\
-          ((t2 = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> (result1 = (App K K))))) ->
+      | K => (exists n:Z, (0%Z <= n)%Z /\ (t2 = (ks n))) -> forall (o:term),
+          ((is_value o) /\ forall (n:Z), (0%Z <= n)%Z ->
+          (((t2 = (ks (2%Z * n)%Z)) -> (o = K)) /\
+          ((t2 = (ks ((2%Z * n)%Z + 1%Z)%Z)) -> (o = (App K K))))) ->
           forall (n:Z), (0%Z <= n)%Z -> ((t = (ks ((2%Z * n)%Z + 1%Z)%Z)) ->
-          ((App K result1) = (App K K)))
+          (o = K))
       | S => True
       | (App K v1) => True
       | (App S v1) => True
@@ -180,7 +165,7 @@ intros (_, ht1).
 intros (n2, (h5,h6)).
 assert (n2 = 0)%Z.
   destruct (ks_inversion n h1); ae.
-destruct result1; auto.
+destruct o; auto.
 intros (_, ht2).
 destruct (div2 n2).
 ae.

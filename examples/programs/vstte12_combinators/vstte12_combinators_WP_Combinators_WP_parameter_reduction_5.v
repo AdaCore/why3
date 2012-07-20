@@ -6,21 +6,6 @@ Require Import Rbase.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive term  :=
   | S : term 
@@ -74,6 +59,12 @@ Inductive infix_mnmngt : term -> term -> Prop :=
       (infix_mnmngt (subst c (App (App (App S v1) v2) v3)) (subst c
       (App (App v1 v3) (App v2 v3)))))).
 
+Axiom red_left : forall (t1:term) (t2:term) (t:term), (infix_mnmngt t1 t2) ->
+  (infix_mnmngt (App t1 t) (App t2 t)).
+
+Axiom red_right : forall (v:term) (t1:term) (t2:term), (is_value v) ->
+  ((infix_mnmngt t1 t2) -> (infix_mnmngt (App v t1) (App v t2))).
+
 (* Why3 assumption *)
 Inductive relTR : term -> term -> Prop :=
   | BaseTransRefl : forall (x:term), (relTR x x)
@@ -101,10 +92,9 @@ Theorem WP_parameter_reduction : forall (t:term),
       | S => True
       | (App K v1) => True
       | (App S v1) => True
-      | (App (App S v1) v2) => forall (result1:term), ((relTR t2 result1) /\
-          (is_value result1)) -> forall (result2:term), ((relTR (App (App v1
-          result1) (App v2 result1)) result2) /\ (is_value result2)) ->
-          (relTR t result2)
+      | (App (App S v1) v2) => forall (v3:term), ((relTR t2 v3) /\
+          (is_value v3)) -> forall (result1:term), ((relTR (App (App v1 v3)
+          (App v2 v3)) result1) /\ (is_value result1)) -> (relTR t result1)
       | _ => True
       end
   end.
@@ -115,9 +105,9 @@ destruct result1; intuition.
 destruct result1_1; intuition.
 apply relTR_transitive with (App (App (App S result1_2) result2) t2); auto.
 apply red_star_left; auto.
-apply relTR_transitive with (App (App (App S result1_2) result2) result1); auto.
+apply relTR_transitive with (App (App (App S result1_2) result2) v3); auto.
 apply red_star_right; auto.
-apply relTR_transitive with (App (App result1_2 result1) (App result2 result1)); auto.
+apply relTR_transitive with (App (App result1_2 v3) (App result2 v3)); auto.
 eapply StepTransRefl.
 apply BaseTransRefl.
 apply (red_S Hole); auto.

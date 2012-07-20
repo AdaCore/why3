@@ -7,21 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
@@ -134,23 +119,14 @@ Definition lex(x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
   end.
 
 
-
 (* Why3 goal *)
-Theorem WP_parameter_build_rec : forall (d:Z), forall (s:(list Z)),
+Theorem WP_parameter_build_rec : forall (d:Z) (s:(list Z)),
   match s with
   | Nil => True
   | (Cons h t) => (~ (h < d)%Z) -> ((~ (h = d)) -> ((lex (s, (d + 1%Z)%Z) (s,
-      d)) -> ((forall (result:tree) (result1:(list Z)),
-      (s = (infix_plpl (depths (d + 1%Z)%Z result) result1)) -> ((lex (
-      result1, (d + 1%Z)%Z) (s, d)) /\ ((forall (result2:tree) (result3:(list
-      Z)), (result1 = (infix_plpl (depths (d + 1%Z)%Z result2) result3)) ->
-      (s = (infix_plpl (depths d (Node result result2)) result3))) /\
-      ((forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z
-      t1) s') = result1)) -> forall (t1:tree) (s':(list Z)),
-      ~ ((infix_plpl (depths d t1) s') = s))))) -> ((forall (t1:tree)
-      (s':(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z t1) s') = s)) ->
-      forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths d t1)
-      s') = s)))))
+      d)) -> ((forall (t1:tree) (s':(list Z)),
+      ~ ((infix_plpl (depths (d + 1%Z)%Z t1) s') = s)) -> forall (t1:tree)
+      (s':(list Z)), ~ ((infix_plpl (depths d t1) s') = s))))
   end.
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
@@ -159,14 +135,13 @@ rename z into h. rename s into t.
 clear H1.
 destruct t1 as [_|t1 t2].
 (* t1 = Leaf *)
-simpl in H4.
-injection H4.
+simpl in H3.
+injection H3.
 omega.
 (* t1 = Node t1 t2 *)
-simpl in H4.
-clear H2.
-rewrite <- Append_assoc in H4.
-apply (H3 _ _ H4).
+simpl in H3.
+rewrite <- Append_assoc in H3.
+apply (H2 _ _ H3).
 Qed.
 
 

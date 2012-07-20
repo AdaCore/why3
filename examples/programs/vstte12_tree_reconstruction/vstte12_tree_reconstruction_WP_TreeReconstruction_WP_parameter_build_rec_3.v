@@ -7,21 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
@@ -134,20 +119,17 @@ Definition lex(x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
   end.
 
 
-
 (* Why3 goal *)
-Theorem WP_parameter_build_rec : forall (d:Z), forall (s:(list Z)),
+Theorem WP_parameter_build_rec : forall (d:Z) (s:(list Z)),
   match s with
   | Nil => True
   | (Cons h t) => (~ (h < d)%Z) -> ((~ (h = d)) -> ((lex (s, (d + 1%Z)%Z) (s,
       d)) -> forall (result:tree) (result1:(list Z)),
       (s = (infix_plpl (depths (d + 1%Z)%Z result) result1)) -> ((lex (
-      result1, (d + 1%Z)%Z) (s, d)) -> ((forall (result2:tree) (result3:(list
-      Z)), (result1 = (infix_plpl (depths (d + 1%Z)%Z result2) result3)) ->
-      (s = (infix_plpl (depths d (Node result result2)) result3))) ->
-      ((forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z
-      t1) s') = result1)) -> forall (t1:tree) (s':(list Z)),
-      ~ ((infix_plpl (depths d t1) s') = s))))))
+      result1, (d + 1%Z)%Z) (s, d)) -> ((forall (t1:tree) (s':(list Z)),
+      ~ ((infix_plpl (depths (d + 1%Z)%Z t1) s') = result1)) ->
+      forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths d t1)
+      s') = s)))))
   end.
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
@@ -158,18 +140,17 @@ rename result into l. rename result1 into sl.
 clear H3.
 destruct t1 as [_|t1 t2].
 (* t1 = Leaf *)
-simpl in H6.
-injection H6.
+simpl in H5.
+injection H5.
 omega.
 (* t1 = Node t1 t2 *)
-simpl in H6.
-rewrite <- Append_assoc in H6.
-rewrite H2 in H6.
-generalize (depths_unique _ _ _ _ _ H6).
+simpl in H5.
+rewrite <- Append_assoc in H5.
+rewrite H2 in H5.
+generalize (depths_unique _ _ _ _ _ H5).
 intuition.
 subst t1.
-apply (H5 t2 s'); intuition.
-
+apply (H4 t2 s'); intuition.
 Qed.
 
 

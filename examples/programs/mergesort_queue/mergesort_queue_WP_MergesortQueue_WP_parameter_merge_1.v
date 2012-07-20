@@ -3,24 +3,11 @@
 Require Import ZArith.
 Require Import Rbase.
 Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-
-Implicit Arguments old.
-
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
+(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
@@ -29,6 +16,7 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
   match l with
@@ -41,8 +29,9 @@ Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
   (0%Z <= (length l))%Z.
 
 Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
+  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
   a) :=
@@ -57,11 +46,12 @@ Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
   l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
 
 Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
-  (Nil:(list a))) = l).
+  (Nil :(list a))) = l).
 
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
@@ -77,7 +67,6 @@ Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
   exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
 
 Parameter num_occ: forall (a:Type), a -> (list a) -> Z.
-
 Implicit Arguments num_occ.
 
 Axiom num_occ_def : forall (a:Type), forall (x:a) (l:(list a)),
@@ -88,12 +77,13 @@ Axiom num_occ_def : forall (a:Type), forall (x:a) (l:(list a)),
   end.
 
 Axiom Mem_Num_Occ : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) <->
-  (0%Z <  (num_occ x l))%Z.
+  (0%Z < (num_occ x l))%Z.
 
 Axiom Append_Num_Occ : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list
   a)), ((num_occ x (infix_plpl l1 l2)) = ((num_occ x l1) + (num_occ x
   l2))%Z).
 
+(* Why3 assumption *)
 Definition permut (a:Type)(l1:(list a)) (l2:(list a)): Prop := forall (x:a),
   ((num_occ x l1) = (num_occ x l2)).
 Implicit Arguments permut.
@@ -133,13 +123,15 @@ Axiom Permut_mem : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
 Axiom Permut_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   (permut l1 l2) -> ((length l1) = (length l2)).
 
+(* Why3 assumption *)
 Inductive t (a:Type) :=
   | mk_t : (list a) -> t a.
 Implicit Arguments mk_t.
 
-Definition elts (a:Type)(u:(t a)): (list a) :=
-  match u with
-  | (mk_t elts1) => elts1
+(* Why3 assumption *)
+Definition elts (a:Type)(v:(t a)): (list a) :=
+  match v with
+  | (mk_t x) => x
   end.
 Implicit Arguments elts.
 
@@ -147,52 +139,49 @@ Parameter elt : Type.
 
 Parameter le: elt -> elt -> Prop.
 
-
 Axiom total_preorder1 : forall (x:elt) (y:elt), (le x y) \/ (le y x).
 
 Axiom total_preorder2 : forall (x:elt) (y:elt) (z:elt), (le x y) -> ((le y
   z) -> (le x z)).
 
+(* Why3 assumption *)
 Inductive sorted : (list elt) -> Prop :=
-  | Sorted_Nil : (sorted (Nil:(list elt)))
-  | Sorted_One : forall (x:elt), (sorted (Cons x (Nil:(list elt))))
+  | Sorted_Nil : (sorted (Nil :(list elt)))
+  | Sorted_One : forall (x:elt), (sorted (Cons x (Nil :(list elt))))
   | Sorted_Two : forall (x:elt) (y:elt) (l:(list elt)), (le x y) ->
       ((sorted (Cons y l)) -> (sorted (Cons x (Cons y l)))).
 
 Axiom sorted_mem : forall (x:elt) (l:(list elt)), ((forall (y:elt), (mem y
   l) -> (le x y)) /\ (sorted l)) <-> (sorted (Cons x l)).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
 
-(* DO NOT EDIT BELOW *)
 
-Theorem WP_parameter_merge : forall (q:(list elt)), forall (q2:(list elt)),
-  forall (q1:(list elt)), (q = (Nil:(list elt))) -> forall (q3:(list elt)),
-  forall (q21:(list elt)), forall (q11:(list elt)),
-  (permut (infix_plpl (infix_plpl q3 q11) q21) (infix_plpl q1 q2)) ->
-  ((0%Z <  (length q11))%Z -> ((~ ((length q11) = 0%Z)) ->
-  ((~ ((length q21) = 0%Z)) -> forall (result:elt),
+(* Why3 goal *)
+Theorem WP_parameter_merge : forall (q:(list elt)) (q2:(list elt)) (q1:(list
+  elt)), (q = (Nil :(list elt))) -> forall (q3:(list elt)) (q21:(list elt))
+  (q11:(list elt)), (permut (infix_plpl (infix_plpl q3 q11) q21)
+  (infix_plpl q1 q2)) -> ((0%Z < (length q11))%Z ->
+  ((~ ((length q11) = 0%Z)) -> ((~ ((length q21) = 0%Z)) -> forall (x1:elt),
   match q11 with
   | Nil => False
-  | (Cons x _) => (result = x)
-  end -> forall (result1:elt),
+  | (Cons x _) => (x1 = x)
+  end -> forall (x2:elt),
   match q21 with
   | Nil => False
-  | (Cons x _) => (result1 = x)
-  end -> ((~ (le result result1)) -> forall (q22:(list elt)),
-  forall (result2:elt),
+  | (Cons x _) => (x2 = x)
+  end -> ((~ (le x1 x2)) -> forall (q22:(list elt)), forall (o:elt),
   match q21 with
   | Nil => False
-  | (Cons x t1) => (result2 = x) /\ (q22 = t1)
-  end -> forall (q4:(list elt)), (q4 = (infix_plpl q3 (Cons result2
-  (Nil:(list elt))))) -> (permut (infix_plpl (infix_plpl q4 q11) q22)
-  (infix_plpl q1 q2)))))).
+  | (Cons x t1) => (o = x) /\ (q22 = t1)
+  end -> forall (q4:(list elt)), (q4 = (infix_plpl q3 (Cons o (Nil :(list
+  elt))))) -> (permut (infix_plpl (infix_plpl q4 q11) q22) (infix_plpl q1
+  q2)))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 destruct q21.
 elim H7.
 intuition; subst.
-clear H1 H2 H3 H4 result H6.
+clear H1 H2 H3 H4 H6.
 apply Permut_trans with (infix_plpl (infix_plpl q3 q11) (Cons e q21)); auto.
 repeat rewrite <- Append_assoc.
 eapply Permut_append; auto.
@@ -200,6 +189,5 @@ apply Permut_refl.
 simpl.
 apply Permut_cons_append.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

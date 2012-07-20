@@ -7,21 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive term  :=
   | S : term 
@@ -96,12 +81,12 @@ Axiom red_star_left : forall (t1:term) (t2:term) (t:term), (relTR t1 t2) ->
 Axiom red_star_right : forall (v:term) (t1:term) (t2:term), (is_value v) ->
   ((relTR t1 t2) -> (relTR (App v t1) (App v t2))).
 
-Axiom reducible_or_value : forall (t:term), (exists tqt:term, (infix_mnmngt t
-  tqt)) \/ (is_value t).
+Axiom reducible_or_value : forall (t:term), (exists t':term, (infix_mnmngt t
+  t')) \/ (is_value t).
 
 (* Why3 assumption *)
-Definition irreducible(t:term): Prop := forall (tqt:term), ~ (infix_mnmngt t
-  tqt).
+Definition irreducible(t:term): Prop := forall (t':term), ~ (infix_mnmngt t
+  t').
 
 Axiom irreducible_is_value : forall (t:term), (irreducible t) <->
   (is_value t).
@@ -131,7 +116,7 @@ Theorem WP_parameter_reduction2 : forall (t:term), (only_K t) ->
   match t with
   | S => True
   | K => True
-  | (App t1 t2) => (((0%Z <= (size t))%Z /\ ((size t1) <  (size t))%Z) /\
+  | (App t1 t2) => (((0%Z <= (size t))%Z /\ ((size t1) < (size t))%Z) /\
       (only_K t1)) -> forall (result:term), ((only_K result) /\
       (is_value result)) ->
       match result with
@@ -140,9 +125,9 @@ Theorem WP_parameter_reduction2 : forall (t:term), (only_K t) ->
       | (App K v1) => True
       | (App S v1) => True
       | (App (App S v1) v2) => (((0%Z <= (size t))%Z /\
-          ((size t2) <  (size t))%Z) /\ (only_K t2)) ->
-          forall (result1:term), ((only_K result1) /\ (is_value result1)) ->
-          (only_K (App (App v1 result1) (App v2 result1)))
+          ((size t2) < (size t))%Z) /\ (only_K t2)) -> forall (v3:term),
+          ((only_K v3) /\ (is_value v3)) -> (only_K (App (App v1 v3) (App v2
+          v3)))
       | _ => True
       end
   end.

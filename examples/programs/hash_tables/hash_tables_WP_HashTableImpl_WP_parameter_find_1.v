@@ -10,21 +10,6 @@ Require int.ComputerDivision.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive option (a:Type) :=
   | None : option a
@@ -168,24 +153,23 @@ Axiom idx_bounds : forall (a:Type) (b:Type), forall (h:(t a b)), (valid h) ->
   forall (k:a), (0%Z <= (idx h k))%Z /\ ((idx h k) < (length (data h)))%Z.
 
 (* Why3 goal *)
-Theorem WP_parameter_find : forall (a:Type) (b:Type), forall (h:Z),
-  forall (k:a), forall (rho:(map Z (list (a* b)%type))), forall (rho1:(map a
-  (option b))), (valid (mk_t rho1 (mk_array h rho))) -> let result :=
-  (ZOmod (Zabs (hash k)) h) in (((0%Z <= result)%Z /\ (result < h)%Z) ->
-  let result1 := (get rho result) in ((forall (result2:b), (occurs_first k
-  result2 result1) -> ((get rho1 k) = (Some result2))) -> ((forall (v:b),
-  ~ (mem (k, v) result1)) -> ((get rho1 k) = (None :(option b)))))).
-intros a b h k rho.
+Theorem WP_parameter_find : forall (a:Type) (b:Type), forall (h:(map a
+  (option b))) (h1:Z) (k:a), forall (rho:(map Z (list (a* b)%type))),
+  (valid (mk_t h (mk_array h1 rho))) -> let i :=
+  (ZOmod (Zabs (hash k)) h1) in (((0%Z <= i)%Z /\ (i < h1)%Z) ->
+  ((forall (v:b), ~ (mem (k, v) (get rho i))) -> ((get h k) = (None :(option
+  b))))).
+intros a b h h1 k rho.
 unfold valid.
-pose (i := (Zabs (hash k) mod h)).
+pose (i := (Zabs (hash k) mod h1)).
 unfold get1; simpl.
 intuition.
 generalize (H0 k); clear H0.
-generalize (H6 k); clear H6.
+generalize (H5 k); clear H5.
 unfold get2; simpl; intuition.
-destruct (get rho1 k); auto.
-elim (H2 b0); clear H2.
-generalize (H4 b0); clear H4.
+destruct (get h k); auto.
+elim (H1 b0); clear H1.
+generalize (H3 b0); clear H3.
 intuition.
 apply mem_occurs_first; auto.
 Qed.
