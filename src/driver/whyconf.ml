@@ -433,7 +433,7 @@ let merge_config config filename =
         let key,c = Mprover.choose (Mprover.filter (fun _ p -> p.id = id) provers) in
         let opt = (get_stringl ~default:[] section "option") @ c.extra_options in
         let drv = (List.map (absolute_filename dirname)
-          (get_stringl ~default:[] section "driver")) @ c.extra_options in
+          (get_stringl ~default:[] section "driver")) @ c.extra_drivers in
         Mprover.add key { c with extra_options = opt ; extra_drivers = drv } provers
       with
         Not_found -> load_prover dirname provers (id, section)
