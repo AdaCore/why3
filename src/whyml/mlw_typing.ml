@@ -137,7 +137,7 @@ let flush_tuples uc =
   Hashtbl.clear ht_tuple;
   uc
 
-let add_pdecl_with_tuples uc pd = add_pdecl (flush_tuples uc) pd
+let add_pdecl_with_tuples ~wp uc pd = add_pdecl ~wp (flush_tuples uc) pd
 let add_decl_with_tuples uc d = add_decl (flush_tuples uc) d
 
 (** Namespace lookup *)
@@ -1061,7 +1061,7 @@ let look_for_loc tdl s =
   in
   List.fold_left look None tdl
 
-let add_types uc tdl =
+let add_types ~wp uc tdl =
   let add m d =
     let id = d.td_ident.id in
     Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d m in
@@ -1329,7 +1329,7 @@ let add_types uc tdl =
   in
   let add_type_decl uc ts =
     if is_impure_type ts then
-      add_pdecl_with_tuples uc (create_ty_decl ts)
+      add_pdecl_with_tuples ~wp uc (create_ty_decl ts)
     else
       add_decl_with_tuples uc (Decl.create_ty_decl ts.its_pure)
   in
@@ -1337,7 +1337,7 @@ let add_types uc tdl =
     let uc = List.fold_left add_type_decl uc abstr in
     let uc = if algeb = [] then uc else
       if List.exists is_impure_data algeb then
-        add_pdecl_with_tuples uc (create_data_decl algeb)
+        add_pdecl_with_tuples ~wp uc (create_data_decl algeb)
       else
         let d = List.map mk_pure_decl algeb in
         add_decl_with_tuples uc (Decl.create_data_decl d)
@@ -1445,15 +1445,15 @@ let add_decl loc uc decl =
   in
   add_td uc (Theory.get_rev_decls (Typing.add_decl loc th0 decl))
 
-let add_decl loc uc = function
-  | TypeDecl tdl -> add_types uc tdl
+let add_decl ~wp loc uc = function
+  | TypeDecl tdl -> add_types ~wp uc tdl
   | decl -> add_decl loc uc decl
 
-let add_decl loc uc d =
+let add_decl ~wp loc uc d =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc add_decl loc uc d
+  Loc.try3 loc (add_decl ~wp) loc uc d
 
-let add_pdecl loc uc = function
+let add_pdecl ~wp loc uc = function
   | Dlet (id, gh, e) ->
       let e = dexpr (create_denv uc) e in
       let pd = match e.de_desc with
@@ -1466,12 +1466,12 @@ let add_pdecl loc uc = function
               errorm ~loc "%s must be a ghost variable" id.id;
             let def = create_let_defn (Denv.create_user_id id) e in
             create_let_decl def in
-      add_pdecl_with_tuples uc pd
+      add_pdecl_with_tuples ~wp uc pd
   | Dletrec rdl ->
       let rdl = dletrec (create_denv uc) rdl in
       let rdl = expr_rec (create_lenv uc) rdl in
       let pd = create_rec_decl rdl in
-      add_pdecl_with_tuples uc pd
+      add_pdecl_with_tuples ~wp uc pd
   | Dexn (id, pty) ->
       let ity = match pty with
         | Some pty ->
@@ -1479,7 +1479,7 @@ let add_pdecl loc uc = function
         | None -> ity_unit in
       let xs = create_xsymbol (Denv.create_user_id id) ity in
       let pd = create_exn_decl xs in
-      add_pdecl_with_tuples uc pd
+      add_pdecl_with_tuples ~wp uc pd
   | Dparam (id, gh, tyv) ->
       let tyv, _ = dtype_v (create_denv uc) tyv in
       let tyv = type_v (create_lenv uc) gh Svs.empty vars_empty tyv in
@@ -1493,11 +1493,11 @@ let add_pdecl loc uc = function
               errorm ~loc "%s must be a ghost function" id.id;
             LetA (create_psymbol (Denv.create_user_id id) a) in
       let pd = create_val_decl lv in
-      add_pdecl_with_tuples uc pd
+      add_pdecl_with_tuples ~wp uc pd
 
-let add_pdecl loc uc d =
+let add_pdecl ~wp loc uc d =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc add_pdecl loc uc d
+  Loc.try3 loc (add_pdecl ~wp) loc uc d
 
 let use_clone_pure lib mth uc loc (use,inst) =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1586,6 +1586,7 @@ let open_file, close_file =
   let lenv = Stack.create () in
   let open_file lib path =
     let env = Env.env_of_library lib in
+    let wp = path = [] && Debug.nottest_flag Typing.debug_type_only in
     Stack.push (Mstr.empty,Mstr.empty) lenv;
     let open_theory id = Stack.push false inm;
       Stack.push (Theory.create_theory ~path (Denv.create_user_id id)) tuc in
@@ -1602,10 +1603,10 @@ let open_file, close_file =
       then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp name) muc
       else Stack.push (Theory.close_namespace (Stack.pop tuc) imp name) tuc in
     let new_decl loc d = if Stack.top inm
-      then Stack.push (add_decl loc (Stack.pop muc) d) muc
+      then Stack.push (add_decl ~wp loc (Stack.pop muc) d) muc
       else Stack.push (Typing.add_decl loc (Stack.pop tuc) d) tuc in
     let new_pdecl loc d =
-      Stack.push (add_pdecl loc (Stack.pop muc) d) muc in
+      Stack.push (add_pdecl ~wp loc (Stack.pop muc) d) muc in
     let use_clone loc use = let (mmd,mth) = Stack.top lenv in if Stack.top inm
       then Stack.push (use_clone lib mmd mth (Stack.pop muc) loc use) muc
       else Stack.push (use_clone_pure lib mth (Stack.pop tuc) loc use) tuc in

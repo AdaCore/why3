@@ -90,7 +90,7 @@ val add_meta : module_uc -> meta -> meta_arg list -> module_uc
 
 (** Program decls *)
 
-val add_pdecl : module_uc -> pdecl -> module_uc
+val add_pdecl : wp:bool -> module_uc -> pdecl -> module_uc
 
 (** Builtin symbols *)
 

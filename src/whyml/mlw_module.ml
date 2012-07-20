@@ -289,14 +289,14 @@ let pdecl_vc env km th d = match d.pd_node with
   | PDlet ld -> Mlw_wp.wp_let env km th ld
   | PDrec rdl -> Mlw_wp.wp_rec env km th rdl
 
-let add_pdecl uc d =
+let add_pdecl ~wp uc d =
   let uc = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news }
   in
   let uc =
-    if Debug.test_flag Typing.debug_type_only then uc else
+    if not wp then uc else
     let th = pdecl_vc uc.muc_env uc.muc_known uc.muc_theory d in
     { uc with muc_theory = th }
   in
