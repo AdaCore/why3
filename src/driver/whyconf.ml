@@ -62,10 +62,9 @@ type prover =
     }
 
 let print_prover fmt p =
-  Format.fprintf fmt "%s (%s)" p.prover_name p.prover_version
-  (* Format.fprintf fmt "%s (%s%s%s)" *)
-  (*   p.prover_name p.prover_version *)
-  (*   (if p.prover_altern = "" then "" else " ") p.prover_altern *)
+  Format.fprintf fmt "%s (%s%s%s)"
+    p.prover_name p.prover_version
+    (if p.prover_altern = "" then "" else " ") p.prover_altern
 
 module Prover = struct
   type t = prover
@@ -74,20 +73,20 @@ module Prover = struct
     let c = String.compare s1.prover_name s2.prover_name in
     if c <> 0 then c else
     let c = String.compare s1.prover_version s2.prover_version in
-    (* if c <> 0 then c else *)
-    (* let c = String.compare s1.prover_altern s2.prover_altern in *)
+    if c <> 0 then c else
+    let c = String.compare s1.prover_altern s2.prover_altern in
     c
 
   let equal s1 s2 =
     s1 == s2 ||
       (s1.prover_name = s2.prover_name &&
-       s1.prover_version = s2.prover_version(*  && *)
-       (* s1.prover_altern = s2.prover_altern *))
+       s1.prover_version = s2.prover_version &&
+       s1.prover_altern = s2.prover_altern )
 
   let hash s1 =
       2 * Hashtbl.hash s1.prover_name +
-      3 * Hashtbl.hash s1.prover_version (* + *)
-      (* 5 * Hashtbl.hash s1.prover_altern *)
+      3 * Hashtbl.hash s1.prover_version +
+      5 * Hashtbl.hash s1.prover_altern
 end
 
 module Mprover = Map.Make(Prover)
