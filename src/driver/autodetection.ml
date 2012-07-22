@@ -88,8 +88,7 @@ let prover_keys =
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
-  let reg_map = List.rev_map
-    (fun s -> if s.[0] = '^' then Str.regexp s else Str.regexp_string s) in
+  let reg_map = List.rev_map why3_regexp_of_string in
   { kind = kind;
     prover_id = id;
     prover_name = get_string section "name";
@@ -218,9 +217,7 @@ let ask_prover_version env exec_name version_switch =
     Hashtbl.replace env.prover_output (exec_name,version_switch) res;
     res
 
-let check_version version schema =
-  Str.string_match schema version 0
-  && Str.match_end () = String.length version
+let check_version version schema = Str.string_match schema version 0
 
 let known_version env exec_name =
   Hashtbl.replace env.prover_unknown_version exec_name None
@@ -256,19 +253,7 @@ let add_prover_with_uniq_id prover provers =
   (** find an unique prover triplet *)
   let prover_id = find_prover_altern provers prover.Wc.prover in
   let prover = {prover with Wc.prover = prover_id} in
-  (** find an unique id *)
-  let test id _ p = p.Wc.id = id in
-  if not (Mprover.exists (test prover.Wc.id) provers)
-  then Mprover.add prover.Wc.prover prover provers
-  else
-    let rec aux i =
-      let prover_id = sprintf "%s_%i" prover.Wc.id i in
-      if not (Mprover.exists (test prover_id) provers)
-      then Mprover.add prover.Wc.prover
-        {prover with id = prover_id}  provers
-      else aux (i+1) in
-    aux 2
-
+  Mprover.add prover_id prover provers
 
 let detect_exec env main data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
@@ -319,7 +304,6 @@ let detect_exec env main data acc exec_name =
                   prover_altern       = data.prover_altern} in
     let prover_config =
       {prover  = prover;
-       id      = data.prover_id;
        command = c;
        driver  = Filename.concat (datadir main) data.prover_driver;
        editor  = data.prover_editor;
@@ -412,11 +396,7 @@ let add_prover_binary config id path =
           Wc.prover_altern =
             Util.concat_non_empty " " [p.prover.Wc.prover_altern;alt] } in
         find_prover_altern provers prover_id in
-    let p_new = {p with prover = prover_id} in
-    let alt = sanitizer char_to_alnumus char_to_alnumus
-      (get_suffix p.prover.Wc.prover_altern
-         prover_id.Wc.prover_altern) in
-    let p_new = { p_new with id = p.id ^ "-" ^ alt } in
-    add_prover_with_uniq_id p_new provers in
+    let p = {p with prover = prover_id} in
+    add_prover_with_uniq_id p provers in
   let provers = Mprover.fold fold detected provers in
   set_provers config provers

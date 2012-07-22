@@ -95,25 +95,24 @@ let read_update_session ~allow_obsolete env config fname =
 
 (** filter *)
 type filter_prover =
-  | Prover of Whyconf.prover
-  | ProverId of string
+| Prover of Whyconf.prover
+| FilterProver of Whyconf.filter_prover
 
 let filter_prover = Stack.create ()
 
 let read_opt_prover s =
-  let sl = Util.split_string_rev s ',' in
-  (* reverse order *)
-  let prover =
-    match sl with
-      | [altern;version;name] ->
-        Prover {C.prover_name = name; prover_version = version;
-                prover_altern = altern}
-      | [version;name] ->
-        Prover {C.prover_name = name; prover_version = version;
-                prover_altern = ""}
-      | [id] -> ProverId id
-      | _ -> raise (Arg.Bad "--filter-prover [name,version[,alternative]|id]")
-  in prover
+  try
+    let l = Util.split_string_rev s ',' in
+    match l with
+    | [altern;version;name] when List.for_all (fun s -> s.[0] <> '^') l ->
+      Prover {Whyconf.prover_name = name;
+              prover_version = version;
+              prover_altern = altern}
+    | _ -> FilterProver (Whyconf.parse_filter_prover s)
+  with Whyconf.ParseFilterProver _ ->
+    raise (Arg.Bad
+             "--filter-prover name[,version[,alternative]|,,alternative] \
+                regexp must start with ^")
 
 
 let add_filter_prover s = Stack.push (read_opt_prover s) filter_prover
@@ -155,20 +154,28 @@ type filters =
       verified_goal : filter_three;
     }
 
+let provers_of_filter_prover whyconf = function
+  | Prover p        -> C.Sprover.singleton p
+  | FilterProver fp ->
+    C.Mprover.map (Util.const ()) (C.filter_provers whyconf fp)
+
 let prover_of_filter_prover whyconf = function
-  | Prover p -> p
-  | ProverId id -> (C.prover_by_id whyconf id).C.prover
+  | Prover p        -> p
+  | FilterProver fp ->
+    (C.filter_one_prover whyconf fp).C.prover
+
 
 let read_filter_spec whyconf : filters * bool =
   let should_exit = ref false in
   let s = ref C.Sprover.empty in
   let iter p =
     try
-      s := C.Sprover.add (prover_of_filter_prover whyconf p) !s
-    with C.ProverNotFound (_,id) ->
+      s := C.Sprover.union (provers_of_filter_prover whyconf p) !s
+    with C.ProverNotFound (_,fp) ->
       Format.eprintf
-        "The prover %s is not found in the configuration file %s@."
-        id (Whyconf.get_conf_file whyconf);
+        "The prover %a is not found in the configuration file %s@."
+        Whyconf.print_filter_prover fp
+        (Whyconf.get_conf_file whyconf);
       should_exit := true in
   Stack.iter iter filter_prover;
   {provers = !s;

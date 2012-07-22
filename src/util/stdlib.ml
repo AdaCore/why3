@@ -52,6 +52,7 @@ module type S =
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
 
     (** Added into why stdlib version *)
+    val is_num_elt : int -> 'a t -> bool
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
@@ -115,6 +116,7 @@ module type S =
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
+      val is_num_elt : int -> t -> bool
     end
 
     module Set : Set
@@ -610,6 +612,11 @@ module Make(Ord: OrderedType) = struct
       | Some _ -> raise e
       | None -> Some v) x m
 
+    let is_num_elt n m =
+      try
+        fold (fun _ _ n -> if n < 0 then raise Exit else n-1) m n = 0
+      with Exit -> false
+
     module type Set =
     sig
       type elt = key
@@ -645,6 +652,7 @@ module Make(Ord: OrderedType) = struct
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
+      val is_num_elt : int -> t -> bool
     end
 
     module Set =
@@ -688,6 +696,7 @@ module Make(Ord: OrderedType) = struct
         let fold2 f = fold2_union (fun k _ _ acc -> f k acc)
         let translate = translate
         let add_new e x s = add_new e x () s
+        let is_num_elt n m = is_num_elt n m
       end
 
 end

@@ -56,7 +56,8 @@ let rec goal whyconf env path dbgoal wgoal =
       let prover_name = Db.prover_name prover_id in
       let driver, extra, command =
         try
-          let p = Whyconf.prover_by_id whyconf prover_name in
+          let p = Whyconf.filter_one_prover whyconf
+            (Whyconf.parse_filter_prover prover_name) in
           p.Whyconf.driver, p.Whyconf.extra_drivers,
           String.concat " " (p.Whyconf.command :: p.Whyconf.extra_options)
         with
