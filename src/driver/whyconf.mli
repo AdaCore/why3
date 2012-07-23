@@ -129,6 +129,12 @@ val set_provers : config -> config_prover Mprover.t -> config
 val is_prover_known : config -> prover -> bool
 (** test if a prover is detected *)
 
+val get_prover_shortcuts : config -> prover Mstr.t
+(** return the prover shortcuts *)
+
+val set_prover_shortcuts : config -> prover Mstr.t -> config
+(** set the prover shortcuts *)
+
 type config_editor = {
   editor_name : string;
   editor_command : string;
@@ -173,12 +179,9 @@ val set_policies : config -> prover_upgrade_policy Mprover.t -> config
 type filter_prover
 
 val mk_filter_prover :
-  ?version:string -> ?altern:string -> name:string -> filter_prover
+  ?version:string -> ?altern:string -> (* name *) string -> filter_prover
 
 val print_filter_prover :
-  Format.formatter -> filter_prover -> unit
-
-val print_filter_prover_no_regexp :
   Format.formatter -> filter_prover -> unit
 
 val parse_filter_prover : string -> filter_prover

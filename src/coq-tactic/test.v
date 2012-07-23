@@ -3,7 +3,7 @@ Require Export ZArith.
 Open Scope Z_scope.
 Require Export List.
 
-Ltac ae := why3 "Alt-Ergo".
+Ltac ae := why3 "alt-ergo".
 
 Section S0.
   Variable a:Set->Set.

@@ -126,12 +126,45 @@ let load rc =
   let tps = List.fold_left (cons (load_prover ITP)) atps itps in
   tps
 
+let load_prover_shortcut acc (_, section) =
+  let name = get_string section "name" in
+  let version = get_stringo section "version" in
+  let altern = get_stringo section "alternative" in
+  let shortcuts = get_stringl section "shortcut" in
+  let fp = mk_filter_prover ?version ?altern name in
+  List.fold_left (fun acc shortcut ->
+    (fp,shortcut)::acc
+  ) acc shortcuts
+
+type env =
+  {
+    (** memoization of (exec_name,version_switch)
+        -> Some output | None doesn't exists *)
+    prover_output : ((string * string),string option) Hashtbl.t;
+    (** existing executable table:
+        exec_name -> | Some prover_config unknown version (neither good or bad)
+                     | None               there is a good version *)
+    prover_unknown_version : (string, config_prover option) Hashtbl.t;
+    (** string -> prover *)
+    prover_shortcuts : (string, prover) Hashtbl.t;
+    mutable possible_prover_shortcuts : (filter_prover * string) list;
+  }
+
+let create_env shortcuts =
+{ prover_output = Hashtbl.create 10;
+  prover_unknown_version = Hashtbl.create 10;
+  prover_shortcuts = Hashtbl.create 5;
+  possible_prover_shortcuts = shortcuts;
+ }
+
 let read_auto_detection_data main =
   let filename = Filename.concat (Whyconf.datadir main)
     "provers-detection-data.conf" in
   try
     let rc = Rc.from_file filename in
-    List.rev (load rc)
+    let shortcuts =
+      List.fold_left load_prover_shortcut [] (get_family rc "shortcut") in
+    List.rev (load rc), create_env shortcuts
   with
     | Failure "lexing" ->
         Loc.errorm "Syntax error in provers-detection-data.conf@."
@@ -173,21 +206,6 @@ let sanitize_exec =
     | _ -> char_to_alnumus c
   in
   sanitizer first rest
-
-type env =
-  {
-    (** memoization of (exec_name,version_switch)
-        -> Some output | None doesn't exists *)
-    prover_output : ((string * string),string option) Hashtbl.t;
-    (** existing executable table:
-        exec_name -> | Some prover_config unknown version (neither good or bad)
-                     | None               there is a good version *)
-    prover_unknown_version : (string, config_prover option) Hashtbl.t;
-  }
-
-let create_env () =
-{ prover_output = Hashtbl.create 10;
-  prover_unknown_version = Hashtbl.create 10 }
 
 let ask_prover_version exec_name version_switch =
   let out = Filename.temp_file "out" "" in
@@ -255,6 +273,19 @@ let add_prover_with_uniq_id prover provers =
   let prover = {prover with Wc.prover = prover_id} in
   Mprover.add prover_id prover provers
 
+let add_prover_shortcuts env prover =
+  let rec aux = function
+    | [] -> []
+    | (fp,s)::l when filter_prover fp prover ->
+      Hashtbl.replace env.prover_shortcuts s prover;
+      aux l
+    | a::l -> a::(aux l) in
+  env.possible_prover_shortcuts <- aux env.possible_prover_shortcuts
+
+let add_id_prover_shortcut env id prover =
+  if not (Hashtbl.mem env.prover_shortcuts id) then
+    Hashtbl.replace env.prover_shortcuts id prover
+
 let detect_exec env main data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
   match s with
@@ -318,6 +349,8 @@ let detect_exec env main data acc exec_name =
         (def_option (if old then " (it is an old version)." else ", Ok.")
            data.message);
       known_version env exec_name;
+      add_prover_shortcuts env prover;
+      add_id_prover_shortcut env data.prover_id prover;
       add_prover_with_uniq_id prover_config acc
     end
     else (unknown_version env exec_name prover_config; acc)
@@ -338,23 +371,32 @@ let detect_unknown env detected =
       add_prover_with_uniq_id prover_config acc)
     env.prover_unknown_version detected
 
+let convert_shortcuts env =
+  Hashtbl.fold (fun s p acc ->
+    Mstr.add s p acc
+  ) env.prover_shortcuts Mstr.empty
+
 let run_auto_detection config =
   let main = get_main config in
-  let l = read_auto_detection_data main in
-  let env = create_env () in
-  let detect = List.fold_left (detect_prover env main) Mprover.empty l in
-  let length_detected = Mprover.cardinal detect in
-  let detect = detect_unknown env detect in
-  let length_unsupported_version = Mprover.cardinal detect - length_detected in
+  let l,env = read_auto_detection_data main in
+  let detected = List.fold_left (detect_prover env main) Mprover.empty l in
+  let length_detected = Mprover.cardinal detected in
+  let detected = detect_unknown env detected in
+  let length_unsupported_version =
+    Mprover.cardinal detected - length_detected in
   eprintf
     "%d provers detected and %d provers detected with unsupported version@."
     length_detected length_unsupported_version;
-  set_provers (set_editors config (read_editors main)) detect
+  let shortcuts = convert_shortcuts env in
+  let config = set_editors config (read_editors main) in
+  let config = set_prover_shortcuts config shortcuts in
+  let config = set_provers config detected in
+  config
 
 let list_prover_ids () =
   let config = default_config "/dev/null" in
   let main = get_main config in
-  let l = read_auto_detection_data main in
+  let l,_ = read_auto_detection_data main in
   let s = List.fold_left (fun s p -> Sstr.add p.prover_id s) Sstr.empty l in
   Sstr.elements s
 
@@ -374,12 +416,20 @@ let get_altern id path =
   let alt = Filename.basename path in
   get_suffix id alt
 
+let add_existing_shortcuts env shortcuts =
+  let aux shortcut prover =
+    Hashtbl.replace env.prover_shortcuts shortcut prover;
+    env.possible_prover_shortcuts <-
+    List.filter (fun (_,s) -> s = shortcut) env.possible_prover_shortcuts
+  in
+  Mstr.iter aux shortcuts
+
 let add_prover_binary config id path =
   let main = get_main config in
-  let l = read_auto_detection_data main in
+  let l,env = read_auto_detection_data main in
+  add_existing_shortcuts env (get_prover_shortcuts config);
   let l = List.filter (fun p -> p.prover_id = id) l in
   if l = [] then Loc.errorm "Unknown prover id: %s" id;
-  let env = create_env () in
   let detected = List.fold_left
     (fun acc data -> detect_exec env main data acc path) Mprover.empty l in
   let detected = detect_unknown env detected in
@@ -399,4 +449,7 @@ let add_prover_binary config id path =
     let p = {p with prover = prover_id} in
     add_prover_with_uniq_id p provers in
   let provers = Mprover.fold fold detected provers in
-  set_provers config provers
+  let shortcuts = convert_shortcuts env in
+  let config = set_prover_shortcuts config shortcuts in
+  let config = set_provers config provers in
+  config

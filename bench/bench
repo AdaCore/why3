@@ -87,10 +87,10 @@ bad_programs () {
 valid_goals () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if $pgml -L modules -t 10 -P Alt-Ergo $f | grep -q -v Valid; then
+	if $pgml -L modules -t 10 -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
 	    echo "$pgml -P alt-ergo $f"
-	    $pgml -L modules -t 10 -P Alt-Ergo $f
+	    $pgml -L modules -t 10 -P alt-ergo $f
 	    exit 1
        else 
 	    echo "ok"

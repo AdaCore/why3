@@ -1108,7 +1108,7 @@ let tr_top_decl = function
   | _, Lib.FrozenState _ -> ()
 
 let pr_fp fp =
-  pr_str (Pp.string_of_wnl Whyconf.print_filter_prover_no_regexp fp)
+  pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)
 
 let why3tac ?(timelimit=timelimit) s gl =
   (* print_dep Format.err_formatter; *)

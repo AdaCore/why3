@@ -201,6 +201,7 @@ type config = {
   config    : Rc.t;
   main      : main;
   provers   : config_prover Mprover.t;
+  prover_shortcuts : prover Mstr.t;
   editors   : config_editor Meditor.t;
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
 }
@@ -249,6 +250,19 @@ let set_prover _ prover family =
 let set_provers rc provers =
   let family = Mprover.fold set_prover provers [] in
   set_family rc "prover" family
+
+let set_prover_shortcut shortcut prover family =
+  let section = empty_section in
+  let section = set_string section "name" prover.prover_name in
+  let section = set_string section "version" prover.prover_version in
+  let section =
+    set_string ~default:"" section "alternative" prover.prover_altern in
+  let section = set_string section "shortcut" shortcut in
+  ("definition", section)::family
+
+let set_prover_shortcuts rc shortcuts =
+  let family = Mstr.fold set_prover_shortcut shortcuts [] in
+  set_family rc "shortcut" family
 
 let set_editor id editor (ids, family) =
   if Sstr.mem id ids then raise NonUniqueId;
@@ -311,6 +325,20 @@ let load_prover dirname provers (_,section) =
       extra_options = [];
       extra_drivers = [];
     } provers
+
+let load_shortcut acc (_,section) =
+  let name = get_string section "name" in
+  let version = get_string section "version" in
+  let altern = get_string ~default:"" section "alternative" in
+  let shortcuts = get_stringl section "shortcut" in
+  let prover = { prover_name = name;
+                 prover_version = version;
+                 prover_altern= altern} in
+  List.fold_left (fun acc shortcut ->
+    if shortcut.[0] = '^' then
+      invalid_arg "prover shortcut can't start with a ^";
+    Mstr.add shortcut prover acc
+  ) acc shortcuts
 
 let load_editor editors (id, section) =
   Meditor.add id
@@ -384,6 +412,8 @@ let get_config (filename,rc) =
   in
   let provers = get_family rc "prover" in
   let provers = List.fold_left (load_prover dirname) Mprover.empty provers in
+  let shortcuts = get_family rc "shortcut" in
+  let shortcuts = List.fold_left load_shortcut Mstr.empty shortcuts in
   let editors = get_family rc "editor" in
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
@@ -392,6 +422,7 @@ let get_config (filename,rc) =
     config    = rc;
     main      = main;
     provers   = provers;
+    prover_shortcuts = shortcuts;
     editors   = editors;
     provers_upgrade_policy = policy;
   }
@@ -414,31 +445,31 @@ let read_config conf_file =
     raise (ConfigFailure (fst filenamerc, Buffer.contents b))
 
 (** filter prover *)
+type regexp_desc = { reg : Str.regexp; desc : string}
+
+let mk_regexp s = { reg = why3_regexp_of_string s; desc = s}
+
 type filter_prover =
-  { filter_name    : Str.regexp; filter_desc_name    : string;
-    filter_version : Str.regexp; filter_desc_version : string;
-    filter_altern  : Str.regexp; filter_desc_altern  : string;
+  { filter_name    : regexp_desc;
+    filter_version : regexp_desc option;
+    filter_altern  : regexp_desc option;
   }
 
-let mk_filter_prover ?(version="^") ?(altern="^") ~name =
-  let reg = why3_regexp_of_string in
-  { filter_name    = reg name    ; filter_desc_name    = name;
-    filter_version = reg version ; filter_desc_version = version;
-    filter_altern  = reg altern  ; filter_desc_altern  = altern}
+let mk_filter_prover ?version ?altern name =
+  begin match version with
+  | Some "" -> invalid_arg "mk_filter_prover: version can't be an empty string"
+  | _ -> () end;
+  { filter_name    = mk_regexp name;
+    filter_version = option_map mk_regexp version;
+    filter_altern  = option_map mk_regexp altern;
+  }
 
 let print_filter_prover fmt fp =
-  fprintf fmt "%s,%s,%s"
-    fp.filter_desc_name fp.filter_desc_version fp.filter_desc_altern
-
-let print_filter_prover_no_regexp fmt fp =
-  let all s = s = "^" in
-  fprintf fmt "%s%s%s"
-    fp.filter_desc_name
-    (if all fp.filter_desc_version then
-        (if all fp.filter_desc_altern then "" else ",")
-     else "," ^ fp.filter_desc_version)
-    (if all fp.filter_desc_altern then ""
-     else ("," ^ fp.filter_desc_altern))
+  match fp.filter_version, fp.filter_altern with
+  | None  , None -> fprintf fmt "%s" fp.filter_name.desc
+  | Some v, None -> fprintf fmt "%s,%s" fp.filter_name.desc v.desc
+  | None  , Some a -> fprintf fmt "%s,,%s" fp.filter_name.desc a.desc
+  | Some v, Some a -> fprintf fmt "%s,%s,%s" fp.filter_name.desc v.desc a.desc
 
 exception ProverNotFound  of config * filter_prover
 exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t
@@ -446,46 +477,42 @@ exception ParseFilterProver of string
 
 let parse_filter_prover s =
   let sl = Util.split_string_rev s ',' in
-  let match_all = Str.regexp "" in
-  let reg = why3_regexp_of_string in
   (* reverse order *)
   match sl with
-  | [name] ->
-    {filter_name    = reg name    ; filter_desc_name    = name;
-     filter_version = match_all   ; filter_desc_version = "^";
-     filter_altern  = match_all  ; filter_desc_altern   = "^"}
-  | [version;name] ->
-    {filter_name    = reg name    ; filter_desc_name    = name;
-     filter_version = reg version ; filter_desc_version = version;
-     filter_altern  = match_all   ; filter_desc_altern  = "^"}
-  | [altern;"";name] ->
-    {filter_name    = reg name    ; filter_desc_name    = name;
-     filter_version = match_all   ; filter_desc_version = "^";
-     filter_altern  = reg altern  ; filter_desc_altern  = altern}
-  | [altern;version;name] ->
-    {filter_name    = reg name    ; filter_desc_name    = name;
-     filter_version = reg version ; filter_desc_version = version;
-     filter_altern  = reg altern  ; filter_desc_altern  = altern}
+  | [name] -> mk_filter_prover name
+  | [version;name] -> mk_filter_prover ~version name
+  | [altern;"";name] -> mk_filter_prover ~altern name
+  | [altern;version;name] -> mk_filter_prover ~version ~altern name
   | _ -> raise (ParseFilterProver s)
 
 let filter_prover fp p =
-  let check schema s = Str.string_match schema s 0 in
-  check fp.filter_name p.prover_name
-  && check fp.filter_version p.prover_version
-  && check fp.filter_altern p.prover_altern
+  let check s schema = Str.string_match schema.reg s 0 in
+  check p.prover_name fp.filter_name
+  && option_apply true (check p.prover_version) fp.filter_version
+  && option_apply true (check p.prover_altern) fp.filter_altern
 
 let filter_provers whyconf fp =
-  Mprover.filter (fun p _ -> filter_prover fp p) whyconf.provers
+  try
+    if fp.filter_version = None && fp.filter_altern = None then
+      let prover = (Mstr.find fp.filter_name.desc whyconf.prover_shortcuts) in
+      try
+        let prover_config = Mprover.find prover whyconf.provers in
+        Mprover.singleton prover prover_config
+      with Not_found ->
+        (** shortcut send to nothing *)
+        Mprover.empty
+    else raise Not_found
+  with Not_found ->
+    Mprover.filter (fun p _ -> filter_prover fp p) whyconf.provers
 
-let filter_one_prover config fp =
-  let provers = Mprover.filter (fun k _ -> filter_prover fp k)
-    config.provers in
+let filter_one_prover whyconf fp =
+  let provers = filter_provers whyconf fp in
   if Mprover.is_num_elt 1 provers then
     snd (Mprover.choose provers)
   else if Mprover.is_empty provers then
-    raise $ ProverNotFound (config,fp)
+    raise $ ProverNotFound (whyconf,fp)
   else
-    raise $ ProverAmbiguity (config,fp,provers)
+    raise $ ProverAmbiguity (whyconf,fp,provers)
 
 (** merge config *)
 
@@ -504,13 +531,9 @@ let merge_config config filename =
   (** modify provers *)
   let create_filter_prover section =
     let name = get_string section "name" in
-    let version = get_string ~default:"^" section "version" in
-    let altern = get_string ~default:"^" section "alternative" in
-    { filter_name = why3_regexp_of_string name;
-      filter_version = why3_regexp_of_string version;
-      filter_altern = why3_regexp_of_string altern;
-      filter_desc_name = ""; filter_desc_version = ""; filter_desc_altern = "";
-    } in
+    let version = get_stringo section "version" in
+    let altern = get_stringo section "alternative" in
+    mk_filter_prover ?version ?altern name in
   let prover_modifiers = get_family rc "prover_modifiers" in
   let prover_modifiers =
     List.map (fun (_,sec) -> create_filter_prover sec, sec) prover_modifiers in
@@ -551,6 +574,7 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_prover_shortcuts config = config.prover_shortcuts
 let get_policies config = config.provers_upgrade_policy
 let get_prover_upgrade_policy config p =
   Mprover.find p config.provers_upgrade_policy
@@ -565,6 +589,12 @@ let set_provers config provers =
   {config with
     config = set_provers config.config provers;
     provers = provers;
+  }
+
+let set_prover_shortcuts config shortcuts =
+  {config with
+    config = set_prover_shortcuts config.config shortcuts;
+    prover_shortcuts = shortcuts;
   }
 
 let set_editors config editors =
@@ -626,10 +656,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | NonUniqueId ->
     Format.fprintf fmt "InternalError : two provers share the same id"
   | ProverNotFound (config,fp) ->
-    fprintf fmt "No prover in %s corresponds to %a@."
+    fprintf fmt "No prover in %s corresponds to \"%a\"@."
       (get_conf_file config) print_filter_prover fp
   | ProverAmbiguity (config,fp,provers ) ->
-    fprintf fmt "More than one prover in %s correspond to %a: %a@."
+    fprintf fmt "More than one prover@ in %s@ correspond@ to \"%a\":@ %a@."
       (get_conf_file config) print_filter_prover fp
       (Pp.print_iter2 Mprover.iter Pp.space Pp.nothing print_prover Pp.nothing)
       provers
