@@ -286,6 +286,7 @@ exec = "pvs"
 version_switch = "-version"
 version_regexp = "PVS Version \\([^ \n]+\\)"
 version_ok = "5.0"
+version_old = "^[0-4]\..*"
 command = "'@LOCALBIN@why3-cpulimit' 0 %m -s @LOCALBIN@why3-check-pvs %l %f"
 driver = "drivers/pvs.drv"
 in_place = true

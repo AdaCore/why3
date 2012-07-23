@@ -35,10 +35,11 @@ open Stdlib
   - 10 require %f in editor lines
   - 11 change prover identifiers in provers-detection-data.conf
   - 12 split editors out of provers
+  - 13 add shortcuts
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 12
+let magicnumber = 13
 
 exception WrongMagicNumber
 

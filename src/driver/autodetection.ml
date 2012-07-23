@@ -89,7 +89,7 @@ let prover_keys =
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
   let reg_map = List.rev_map why3_regexp_of_string in
-  { kind = kind;
+  let prover = { kind = kind;
     prover_id = id;
     prover_name = get_string section "name";
     prover_altern = get_string section ~default:"" "altern";
@@ -100,11 +100,15 @@ let load_prover kind (id,section) =
     versions_old = reg_map $ get_stringl section ~default:[] "version_old";
     versions_bad = reg_map $ get_stringl section ~default:[] "version_bad";
     prover_command = get_stringo section "command";
-    prover_driver = get_string section "driver";
+    prover_driver = get_string section ~default:""  "driver";
     prover_editor = get_string section ~default:"" "editor";
     prover_in_place = get_bool section ~default:false "in_place";
     message = get_stringo section "message";
-  }
+  } in
+  if prover.prover_command != None && prover.prover_driver = "" then
+    invalid_arg
+      (sprintf "In section prover %s command specified without driver" id);
+  prover
 
 let editor_keys =
   let add acc k = Sstr.add k acc in
@@ -346,7 +350,9 @@ let detect_exec env main data acc exec_name =
     if good || old then begin
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
-        (def_option (if old then " (it is an old version)." else ", Ok.")
+        (def_option (if old then
+            " (it is an old version that is less tested than \
+             the current one)." else ", Ok.")
            data.message);
       known_version env exec_name;
       add_prover_shortcuts env prover;
