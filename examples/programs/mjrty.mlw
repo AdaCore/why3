@@ -12,12 +12,12 @@
 
    http://www.cs.utexas.edu/users/boyer/mjrty.ps.Z
 
-   Changes from the article above:
+   Changes w.r.t. the article above:
    - arrays are 0-based
    - we assume the input array to have at least one element
    - we use 2x <= y instead of x <= floor(y/2), which is equivalent
-   - we do not consider arithmetic overflows (easy, but requires an
-     the extra hypothesis than length a <= max_int)
+   - we do not consider arithmetic overflows (easy, but requires the
+     extra hypothesis length a <= max_int)
 *)
 
 module Mjrty
@@ -30,16 +30,12 @@ module Mjrty
   exception Found
 
   type candidate
-  type votes = array candidate
 
-  type param = (M.map int candidate, candidate)
-  predicate pr (p: param) (i: int) = let (m, v) = p in M.([]) m i = v
-  clone import int.NumOfParam with type param = param, predicate pr = pr
+  predicate pr (c: candidate) (i: int) (ai: candidate) = ai = c
+  clone import array.NumOfParam
+    with type elt = candidate, type param = candidate, predicate pr = pr
 
-  function numof (a: votes) (c: candidate) (l u: int) : int =
-    num_of (a.elts, c) l u
-
-  let mjrty (a: votes) =
+  let mjrty (a: array candidate) =
     { 1 <= length a }
     let n = length a in
     let cand = ref a[0] in
