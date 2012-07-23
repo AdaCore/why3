@@ -41,8 +41,8 @@ module Mjrty
     let cand = ref a[0] in
     let k = ref 0 in
     for i = 0 to n-1 do (* could start at 1 with k initialized to 1 *)
-      invariant { 0 <= !k <= i /\
-        numof a !cand 0 i >= !k /\
+      invariant {
+        0 <= !k <= numof a !cand 0 i /\
         2 * (numof a !cand 0 i - !k) <= i - !k /\
         forall c: candidate. c <> !cand -> 2 * numof a c 0 i <= i - !k
       }
