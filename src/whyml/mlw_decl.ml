@@ -131,15 +131,15 @@ let create_data_decl tdl =
     let vtvs = List.map (fun (pv,_) -> pv.pv_vtv) al in
     let tvs = List.fold_right Stv.add its.its_args Stv.empty in
     let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
-    let check_tv tv =
-      if not (Stv.mem tv tvs) then raise (UnboundTypeVar tv); true in
-    let check_reg r =
-      if not (Sreg.mem r regs) then raise (UnboundRegion r); true in
+    let check_vars { vars_tv = atvs; vars_reg = aregs } =
+      if not (Stv.subset atvs tvs) then
+        raise (UnboundTypeVar (Stv.choose (Stv.diff atvs tvs)));
+      if not (Sreg.subset aregs regs) then
+        raise (UnboundRegion (Sreg.choose (Sreg.diff aregs regs))) in
     let check_arg vtv = match vtv.vtv_mut with
-      | None -> ity_v_all check_tv check_reg vtv.vtv_ity
-      | Some r -> check_reg r
-    in
-    ignore (List.for_all check_arg vtvs);
+      | Some r -> if not (Sreg.mem r regs) then raise (UnboundRegion r)
+      | None -> check_vars vtv.vtv_ity.ity_vars in
+    List.iter check_arg vtvs;
     (* build the constructor ps *)
     let hidden = its.its_abst in
     let rdonly = its.its_priv in
@@ -179,10 +179,9 @@ let letvar_news = function
   | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
 
 let new_regs old_vars news vars =
-  let rec add_reg r acc = add_regs r.reg_ity.ity_vars.vars_reg acc
-  and add_regs regs acc = Sreg.fold add_reg regs (Sreg.union regs acc) in
-  let old_regs = add_regs old_vars.vars_reg Sreg.empty in
-  let regs = add_regs vars.vars_reg Sreg.empty in
+  let on_reg r acc = Sreg.union r.reg_ity.ity_vars.vars_reg acc in
+  let old_regs = reg_fold on_reg old_vars old_vars.vars_reg in
+  let regs = reg_fold on_reg vars vars.vars_reg in
   let regs = Sreg.diff regs old_regs in
   Sreg.fold (fun r s -> news_id s r.reg_name) regs news
 

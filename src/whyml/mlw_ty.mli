@@ -88,8 +88,6 @@ val ity_hash : ity -> int
 val reg_equal : region -> region -> bool
 val reg_hash : region -> int
 
-val reg_occurs : region -> varset -> bool
-
 exception BadItyArity of itysymbol * int * int
 exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
@@ -133,16 +131,21 @@ val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
 val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
 
-val ity_v_fold :
-  ('a -> tvsymbol -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
-
-val ity_v_all : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
-val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
-
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
 
-val ts_unit : tysymbol
+(* these functions attend the sub-regions *)
+
+val reg_fold : (region -> 'a -> 'a) -> varset -> 'a -> 'a
+val reg_any  : (region -> bool) -> varset -> bool
+val reg_all  : (region -> bool) -> varset -> bool
+val reg_iter : (region -> unit) -> varset -> unit
+
+val reg_occurs : region -> varset -> bool
+
+(* built-in types *)
+
+val ts_unit : tysymbol (* the same as [Ty.ts_tuple 0] *)
 val ty_unit : ty
 
 val ity_int : ity

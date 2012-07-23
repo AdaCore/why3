@@ -137,10 +137,6 @@ let create_varset tvs regs = {
   vars_reg = regs;
 }
 
-let rec reg_occurs r vars =
-  let check r r' = reg_equal r r' || reg_occurs r r'.reg_ity.ity_vars in
-  Sreg.exists (check r) vars.vars_reg
-
 (* value type symbols *)
 
 module Itsym = WeakStructMake (struct
@@ -260,25 +256,29 @@ let rec ity_v_map fnv fnr ity = match ity.ity_node with
   | Ityapp (f,tl,rl) ->
       ity_app_unsafe f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
 
-let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
-  | Ityvar v ->
-      fnv acc v
-  | Itypur (_,tl) ->
-      List.fold_left (ity_v_fold fnv fnr) acc tl
-  | Ityapp (_,tl,rl) ->
-      List.fold_left (ity_v_fold fnv fnr) (List.fold_left fnr acc rl) tl
-
-let ity_v_all prv prr ity =
-  try ity_v_fold (all_fn prv) (all_fn prr) true ity with FoldSkip -> false
-
-let ity_v_any prv prr ity =
-  try ity_v_fold (any_fn prv) (any_fn prr) false ity with FoldSkip -> true
-
 let ity_subst_unsafe mv mr ity =
   ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
 let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
+
+let rec reg_fold fn vars acc =
+  let on_reg r acc = reg_fold fn r.reg_ity.ity_vars (fn r acc) in
+  Sreg.fold on_reg vars.vars_reg acc
+
+let rec reg_all fn vars =
+  let on_reg r = fn r && reg_all fn r.reg_ity.ity_vars in
+  Sreg.for_all on_reg vars.vars_reg
+
+let rec reg_any fn vars =
+  let on_reg r = fn r || reg_any fn r.reg_ity.ity_vars in
+  Sreg.exists on_reg vars.vars_reg
+
+let rec reg_iter fn vars =
+  let rec on_reg r = fn r; reg_iter fn r.reg_ity.ity_vars in
+  Sreg.iter on_reg vars.vars_reg
+
+let reg_occurs r vars = reg_any (reg_equal r) vars
 
 (* smart constructors *)
 
@@ -450,11 +450,13 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in
   (* all type variables in [regs] must be in [args] *)
-  let check tv = Stv.mem tv sargs || raise (UnboundTypeVar tv) in
-  List.iter (fun r -> ignore (ity_v_all check Util.ttrue r.reg_ity)) regs;
+  let check dtvs = if not (Stv.subset dtvs sargs) then
+    raise (UnboundTypeVar (Stv.choose (Stv.diff dtvs sargs))) in
+  List.iter (fun r -> check r.reg_ity.ity_vars.vars_tv) regs;
   (* all regions in [def] must be in [regs] *)
-  let check r = Sreg.mem r sregs || raise (UnboundRegion r) in
-  ignore (option_map (ity_v_all Util.ttrue check) def);
+  let check dregs = if not (Sreg.subset dregs sregs) then
+    raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs))) in
+  Util.option_iter (fun d -> check d.ity_vars.vars_reg) def;
   (* if a type is an alias then it cannot be abstract or private *)
   if abst && def <> None then Loc.errorm "A type alias cannot be abstract";
   if priv && def <> None then Loc.errorm "A type alias cannot be private";
@@ -951,6 +953,13 @@ let rec vta_filter varm vars vta =
     let rst = (eff_filter vars rst).eff_resets in
     let eff = { spec.c_effect with eff_resets = rst } in
     { spec with c_effect = eff } in
+  (* we must also reset every fresh region in the value *)
+  let spec = match vta.vta_result with
+    | VTvalue v ->
+        let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
+        let eff = reg_fold on_reg v.vtv_ity.ity_vars spec.c_effect in
+        { spec with c_effect = eff }
+    | VTarrow _ -> spec in
   vty_arrow_unsafe vta.vta_args ~ghost:vta.vta_ghost ~spec vty
 
 let vta_filter varm vta =

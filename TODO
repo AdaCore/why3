@@ -5,12 +5,6 @@ WhyML
     "false" would be a poor choice, as it could introduce inconsistency
     in the WPs of the caller. Should we allow unhandled exceptions at all?
 
-  - should we produce the WPs for the modules loaded from loadpath?
-
-  - should the API ensure that every psymbol resets the new regions?
-    Should they be always reset at the last arrow? What if they are
-    already reset at some earlier arrows, should we reset them again?
-
   - current WP does not respect the lexical scope. In the program
 
       let r = create 0 in

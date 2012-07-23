@@ -807,18 +807,14 @@ let rec type_c lenv gh svs vars dtyc =
   (* reset every new region in the result *)
   let eff = match vty with
     | VTvalue v ->
-        let rec add_reg r eff =
-          if reg_occurs r vars then eff else eff_reset (add_ity r.reg_ity eff) r
-        and add_ity ity eff = Sreg.fold add_reg ity.ity_vars.vars_reg eff in
-        add_ity v.vtv_ity eff
+        let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
+        reg_fold on_reg v.vtv_ity.ity_vars eff
     | VTarrow _ -> eff in
   (* refresh every unmodified subregion of a modified region *)
   let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
   let check u eff =
-    let rec sub_reg r eff =
-      if Sreg.mem r writes then eff else sub_vars r (eff_refresh eff r u)
-    and sub_vars r eff = Sreg.fold sub_reg r.reg_ity.ity_vars.vars_reg eff in
-    sub_vars u eff in
+    let on_reg r e = if Sreg.mem r writes then e else eff_refresh e r u in
+    reg_fold on_reg u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
   (* create the spec *)
   let spec = {
@@ -1148,7 +1144,7 @@ let add_types ~wp uc tdl =
       let d = Mstr.find x def in
       let add_tv acc id =
         let e = Loc.Located (id.id_loc, DuplicateTypeVar id.id) in
-        let tv = create_tvsymbol (Denv.create_user_id id) in
+        let tv = Typing.create_user_tv id.id in
         Mstr.add_new e id.id tv acc in
       let vars = List.fold_left add_tv Mstr.empty d.td_params in
       let vl = List.map (fun id -> Mstr.find id.id vars) d.td_params in

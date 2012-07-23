@@ -394,6 +394,13 @@ let eff_check vars result e =
     let reset = reset (vars_union vars (vty_vars result)) in
     Mreg.iter reset e.eff_resets
 
+let vtv_check vars eff vtv =
+  let on_reg r =
+    if not (reg_occurs r vars) &&
+      (try Mreg.find r eff.eff_resets <> None with Not_found -> true)
+    then Loc.errorm "every fresh region in the result must be reset" in
+  reg_iter on_reg vtv.vtv_ity.ity_vars
+
 let rec vta_check vars vta =
   let add_arg vars pv = vars_union vars pv.pv_vars in
   let vars = List.fold_left add_arg vars vta.vta_args in
@@ -402,7 +409,7 @@ let rec vta_check vars vta =
   eff_check vars vta.vta_result vta.vta_spec.c_effect;
   match vta.vta_result with
   | VTarrow a -> vta_check vars a
-  | VTvalue _ -> ()
+  | VTvalue v -> vtv_check vars vta.vta_spec.c_effect v
 
 let create_psymbol id vta =
   let ps = create_psymbol_poly id vta (vta_varmap vta) in
@@ -524,7 +531,7 @@ let check_reset e varm =
       let rec check_reg reg =
         reg_equal r reg || match u with
           | Some u when reg_equal u reg -> false
-          | _ -> ity_v_any Util.ffalse check_reg reg.reg_ity
+          | _ -> Sreg.exists check_reg reg.reg_ity.ity_vars.vars_reg
       in
       if Sreg.exists check_reg s.vars_reg then
         Loc.error ?loc:e.e_loc (StaleRegion (e,r,id))
