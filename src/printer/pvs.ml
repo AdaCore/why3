@@ -84,7 +84,7 @@ let black_list =
     (* PVS prelude *)
     "boolean"; "bool";
     "pred"; "setof"; "exists1";
-    "list"; "member"; "append"; "reverse";
+    "list"; "length"; "member"; "nth"; "append"; "reverse";
     "domain"; "range"; "graph"; "preserves"; "inverts"; "transpose";
     "restrict"; "extend"; "identity"; "eq";
     "epsilon";
@@ -107,11 +107,10 @@ let black_list =
     "mod"; "divides"; "rem"; "ndiv";
     "upfrom"; "above";
     "even";
-    (* introduced by Why3 *)
-    "tuple0"; ]
+    ]
 
 let fresh_printer () =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  let isanitize = sanitizer char_to_lalpha char_to_lalnumus in
   create_ident_printer black_list ~sanitizer:isanitize
 
 let iprinter =
@@ -176,12 +175,14 @@ let print_path = print_list (constant_string ".") string
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_id_real info fmt id =
-        try let path,th,ipr = Mid.find id info.symbol_printers in
-        fprintf fmt "%s.%s.%s"
-          path
-          th.Theory.th_name.id_string
-          (id_unique ipr id)
-        with Not_found -> print_id fmt id
+  try
+    let path, th, ipr = Mid.find id info.symbol_printers in
+    let th = th.Theory.th_name.id_string in
+    let id = id_unique ipr id in
+    if path = "" then fprintf fmt "%s.%s" th id
+    else fprintf fmt "%s@@%s.%s" path th id
+  with Not_found ->
+    print_id fmt id
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
@@ -193,7 +194,7 @@ let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin match tl with
-        | []  -> fprintf fmt "tuple0"
+        | []  -> fprintf fmt "[]"
         | [ty] -> print_ty info fmt ty
         | _   -> fprintf fmt "[%a]" (print_list comma (print_ty info)) tl
       end
@@ -338,7 +339,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_vsty_nopar info) v (print_opl_fmla info) f;
       forget_var v
   | Tapp (fs, []) when is_fs_tuple fs ->
-      fprintf fmt "Tuple0"
+      fprintf fmt "()"
   | Tapp (fs, pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs, tl) ->
@@ -541,7 +542,7 @@ let read_old_script ch =
     let s = List.rev !contents in
     contents := [];
     match s, name with
-      | ([] | [""]), _ | _, Some "tuple0" -> ()
+      | ([] | [""]), _ -> ()
       | _, None -> chunks := Other s :: !chunks
       | _, Some n -> chunks := Edition (n, s) :: !chunks
   in
@@ -724,10 +725,7 @@ let print_recursive_decl info fmt (ls,ld) =
   List.iter forget_var vl
 
 let print_recursive_decl info fmt d =
-  eprintf "print_recursive_decl: %a@." print_id (fst d).ls_name;
-  Mid.iter (fun id _ -> eprintf "  syn %a@." print_id id) info.info_syn;
   if not (Mid.mem (fst d).ls_name info.info_syn) then begin
-    eprintf "DO IT@.";
     print_recursive_decl info fmt d;
     forget_tvs ()
   end
@@ -831,7 +829,8 @@ let print_task env pr thpr realize ?old fmt task =
         let f,id =
           let l = split_string_rev s1 '.' in List.rev (List.tl l),List.hd l in
         let th = Env.find_theory env f id in
-        Mid.add th.Theory.th_name (th, (f, if s2 = "" then s1 else s2)) mid
+        Mid.add th.Theory.th_name
+          (th, (f, if s2 = "" then String.concat "." f else s2)) mid
       | _ -> assert false
     ) Mid.empty task in
   (* two cases: task is clone T with [] or task is a real goal *)
@@ -861,7 +860,8 @@ let print_task env pr thpr realize ?old fmt task =
         pr)
         realized_theories' in
     Mid.map (fun th ->
-               let _, (_, s) = Mid.find th.Theory.th_name realized_theories in
+               let _, (p, s) = Mid.find th.Theory.th_name realized_theories in
+               let s = if p = thpath then "" else s in
                (s, th, Mid.find th.Theory.th_name printers))
       realized_symbols in
   let info = {
@@ -894,8 +894,6 @@ let print_task env pr thpr realize ?old fmt task =
        fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
     realized_theories;
   fprintf fmt "%% do not edit above this line@\n@\n";
-  fprintf fmt "%% Why3 tuple0@\n";
-  fprintf fmt "tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0@\n@\n";
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old;
   fprintf fmt "@]@\nEND %s@\n@]" thname

@@ -122,8 +122,10 @@ theory real.Real
   syntax function ( - ) "(%1 - %2)"
   syntax function (-_)  "(-%1)"
   syntax function ( * ) "(%1 * %2)"
+(*
   syntax function ( / ) "(%1 / %2)"
   syntax function inv   "(1 / %1)"
+*)
 
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 <  %2)"
@@ -169,7 +171,7 @@ theory real.RealInfix
   syntax function (-.)  "(%1 - %2)"
   syntax function (-._) "(-%1)"
   syntax function ( *.) "(%1 * %2)"
-  syntax function (/.)  "(%1 / %2)"
+  (* syntax function (/.)  "(%1 / %2)" *)
 
   syntax predicate (<=.) "(%1 <= %2)"
   syntax predicate (<.)  "(%1 <  %2)"

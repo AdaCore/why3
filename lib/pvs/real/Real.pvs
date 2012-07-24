@@ -2,9 +2,6 @@ Real: THEORY
  BEGIN
   % do not edit above this line
   
-  % Why3 tuple0
-  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
-  
   % Why3 zero
   zero: real = 0
   
@@ -125,7 +122,6 @@ Real: THEORY
   % Why3 compatordermult
   compatordermult: LEMMA FORALL (x:real, y:real, z:real): infix_lseq(x, y) =>
     (infix_lseq(zero, z) => infix_lseq(infix_as(x, z), infix_as(y, z)))
-  
   
  END Real
  

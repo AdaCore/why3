@@ -4,9 +4,6 @@ EuclideanDivision: THEORY
   IMPORTING Abs
   % do not edit above this line
   
-  % Why3 tuple0
-  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
-  
   IMPORTING ints@tdiv, ints@tmod
   
   div_total(x: int): int
@@ -15,26 +12,25 @@ EuclideanDivision: THEORY
   div(x:int,
     x1:int): MACRO int =  IF x1 /= 0 THEN tdiv(x, x1) ELSE div_total(x) ENDIF
   
-  mod_total(x: int): int
+  % Why3 mod1
+  mod1(x:int, x1:int): int
   
-  % Why3 mod
-  mod(x:int,
-    x1:int): MACRO int =  IF x1 /= 0 THEN mod(x, x1) ELSE mod_total(x) ENDIF    
+  mod_total(x: int): int
   
   % Why3 div_mod
   div_mod: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) => (x = ((y * div(x,
-    y)) + mod(x, y)))
+    y)) + mod1(x, y)))
   
   % Why3 div_bound
   div_bound: LEMMA FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
     ((0 <= div(x, y)) AND (div(x, y) <= x))
   
   % Why3 mod_bound
-  mod_bound: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) => ((0 <= mod(x,
-    y)) AND (mod(x, y) <  abs(y)))
+  mod_bound: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) => ((0 <= mod1(x,
+    y)) AND (mod1(x, y) <  abs(y)))
   
   % Why3 mod_1
-  mod_1: LEMMA FORALL (x:int): (mod(x, 1) = 0)
+  mod_1: LEMMA FORALL (x:int): (mod1(x, 1) = 0)
   
   % Why3 div_1
   div_1: LEMMA FORALL (x:int): (div(x, 1) = x)
@@ -48,7 +44,7 @@ EuclideanDivision: THEORY
     (div((-x), y) = (-1))
   
   % Why3 mod_0
-  mod_0: LEMMA FORALL (y:int): (NOT (y = 0)) => (mod(0, y) = 0)
+  mod_0: LEMMA FORALL (y:int): (NOT (y = 0)) => (mod1(0, y) = 0)
   
   % Why3 div_1_left
   div_1_left: LEMMA FORALL (y:int): (y >  1) => (div(1, y) = 0)
@@ -57,11 +53,11 @@ EuclideanDivision: THEORY
   div_minus1_left: LEMMA FORALL (y:int): (y >  1) => (div((-1), y) = (-1))
   
   % Why3 mod_1_left
-  mod_1_left: LEMMA FORALL (y:int): (y >  1) => (mod(1, y) = 1)
+  mod_1_left: LEMMA FORALL (y:int): (y >  1) => (mod1(1, y) = 1)
   
   % Why3 mod_minus1_left
-  mod_minus1_left: LEMMA FORALL (y:int): (y >  1) => (mod((-1), y) = (y - 1))
-  
+  mod_minus1_left: LEMMA FORALL (y:int): (y >  1) => (mod1((-1),
+    y) = (y - 1))
   
  END EuclideanDivision
  

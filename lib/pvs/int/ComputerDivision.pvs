@@ -4,9 +4,6 @@ ComputerDivision: THEORY
   IMPORTING Abs
   % do not edit above this line
   
-  % Why3 tuple0
-  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
-  
   IMPORTING ints@div, ints@rem
   
   div_total(x: int): int
@@ -15,15 +12,14 @@ ComputerDivision: THEORY
   div(x:int,
     x1:int): MACRO int =  IF x1 /= 0 THEN div(x, x1) ELSE div_total(x) ENDIF
   
-  mod_total(x: int): int
+  % Why3 mod1
+  mod1(x:int, x1:int): int
   
-  % Why3 mod
-  mod(x:int,
-    x1:int): MACRO int =  IF x1 /= 0 THEN rem(x, x1) ELSE mod_total(x) ENDIF
+  mod_total(x: int): int
   
   % Why3 div_mod
   div_mod: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) => (x = ((y * div(x,
-    y)) + mod(x, y)))
+    y)) + mod1(x, y)))
   
   % Why3 div_bound
   div_bound: LEMMA FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
@@ -31,7 +27,7 @@ ComputerDivision: THEORY
   
   % Why3 mod_bound
   mod_bound: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) =>
-    (((-abs(y)) <  mod(x, y)) AND (mod(x, y) <  abs(y)))
+    (((-abs(y)) <  mod1(x, y)) AND (mod1(x, y) <  abs(y)))
   
   % Why3 div_sign_pos
   div_sign_pos: LEMMA FORALL (x:int, y:int): ((x >= 0) AND (y >  0)) =>
@@ -43,11 +39,11 @@ ComputerDivision: THEORY
   
   % Why3 mod_sign_pos
   mod_sign_pos: LEMMA FORALL (x:int, y:int): ((x >= 0) AND NOT (y = 0)) =>
-    (mod(x, y) >= 0)
+    (mod1(x, y) >= 0)
   
   % Why3 mod_sign_neg
   mod_sign_neg: LEMMA FORALL (x:int, y:int): ((x <= 0) AND NOT (y = 0)) =>
-    (mod(x, y) <= 0)
+    (mod1(x, y) <= 0)
   
   % Why3 rounds_toward_zero
   rounds_toward_zero: LEMMA FORALL (x:int, y:int): (NOT (y = 0)) =>
@@ -57,14 +53,14 @@ ComputerDivision: THEORY
   div_1: LEMMA FORALL (x:int): (div(x, 1) = x)
   
   % Why3 mod_1
-  mod_1: LEMMA FORALL (x:int): (mod(x, 1) = 0)
+  mod_1: LEMMA FORALL (x:int): (mod1(x, 1) = 0)
   
   % Why3 div_inf
   div_inf: LEMMA FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (div(x,
     y) = 0)
   
   % Why3 mod_inf
-  mod_inf: LEMMA FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (mod(x,
+  mod_inf: LEMMA FORALL (x:int, y:int): ((0 <= x) AND (x <  y)) => (mod1(x,
     y) = x)
   
   % Why3 div_mult
@@ -73,8 +69,7 @@ ComputerDivision: THEORY
   
   % Why3 mod_mult
   mod_mult: LEMMA FORALL (x:int, y:int, z:int): ((x >  0) AND ((y >= 0) AND
-    (z >= 0))) => (mod(((x * y) + z), x) = mod(z, x))
-  
+    (z >= 0))) => (mod1(((x * y) + z), x) = mod1(z, x))
   
  END ComputerDivision
  

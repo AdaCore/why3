@@ -977,13 +977,13 @@ PVSLIBS_REAL_FILES = Abs FromInt MinMax Real # ExpLog Square RealInfix
 PVSLIBS_REAL = $(addprefix lib/pvs/real/, $(PVSLIBS_REAL_FILES))
 
 PVSLIBS_LIST_FILES =
-  # List Length
+  # Nth
 PVSLIBS_LIST = $(addprefix lib/pvs/int/, $(PVSLIBS_LIST_FILES))
 
 PVSLIBS_NUMBER_FILES = # Divisibility Gcd Parity Prime
 PVSLIBS_NUMBER = $(addprefix lib/pvs/number/, $(PVSLIBS_NUMBER_FILES))
 
-ifeq (@enable_pvs_fp_libs@,yes)
+ifeq (@enable_pvs_nasa_libs@,yes)
 PVSLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 PVSLIBS_FP_ALL_FILES = GenFloat $(PVSLIBS_FP_FILES)
 PVSLIBS_FP = $(addprefix lib/pvs/floating_point/, $(PVSLIBS_FP_ALL_FILES))
@@ -1016,7 +1016,7 @@ install_no_local::
 	cp $(PVSLIBS_LIST) $(LIBDIR)/why3/pvs/list/
 	mkdir -p $(LIBDIR)/why3/pvs/number
 	cp $(PVSLIBS_NUMBER) $(LIBDIR)/why3/pvs/number/
-ifeq (@enable_pvs_fp_libs@,yes)
+ifeq (@enable_pvs_nasa_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/pvs/floating_point/
 	cp $(PVSLIBS_FP) $(LIBDIR)/why3/pvs/
 endif
