@@ -7,17 +7,16 @@ let apply_append fn acc l =
   List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
 
 let rec split acc f =
-   match f.t_node with
-   | Ttrue ->
-         acc
-   | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _)
-   | Tbinop (Tor, _, _) ->
-         f :: acc
-   | Tbinop (Tand, f1, f2) ->
-         split (split acc f2) f1
-   | Tbinop (Timplies, f1, f2) ->
-         let fn f2 = t_label_copy f (t_implies f1 f2) in
-         apply_append fn acc (split [] f2)
+  match f.t_node with
+  | Ttrue ->
+      acc
+  | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
+      f :: acc
+  | Tbinop (Tand, f1, f2) ->
+      split (split acc f2) f1
+  | Tbinop (Timplies, f1, f2) ->
+      let fn f2 = t_label_copy f (t_implies f1 f2) in
+      apply_append fn acc (split [] f2)
   | Tbinop (Tiff,f1,f2) ->
       let f12 = t_label_copy f (t_implies f1 f2) in
       let f21 = t_label_copy f (t_implies f2 f1) in
@@ -36,7 +35,7 @@ let rec split acc f =
       let vsl,trl,f1,close = t_open_quant_cb fq in
       let fn f1 = t_label_copy f (t_forall (close vsl trl f1)) in
       apply_append fn acc (split [] f1)
-   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and split_case forig c acc tl bl =
   let bl = List.rev_map t_open_branch_cb bl in
@@ -58,5 +57,3 @@ let split_conj = Trans.goal_l split_goal
 
 let split_conj_name = "split_conj"
 let () = Trans.register_transform_l split_conj_name split_conj
-
-
