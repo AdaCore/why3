@@ -434,7 +434,7 @@ end
 
 let is_full_split_goal goal =
    Session.PHstr.mem goal.Session.goal_transformations
-      Gnat_config.full_split_name
+      Gnat_split_conj.split_conj_name
 
 let rec handle_vc_result goal result detailed =
    (* This function is called when the prover has returned from a VC.
@@ -466,7 +466,7 @@ let rec handle_vc_result goal result detailed =
          if is_full_split_goal goal then raise Exit;
          let transf =
            Session.add_registered_transformation
-              ~keygen env_session Gnat_config.full_split_name goal in
+              ~keygen env_session Gnat_split_conj.split_conj_name goal in
          let new_goals = transf.Session.transf_goals in
          if List.length new_goals <= 1 then begin
             Session.remove_transformation transf;

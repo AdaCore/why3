@@ -168,7 +168,6 @@ let debug = !opt_debug
 let force = !opt_force
 let noproof = !opt_noproof
 let split_name = "split_goal"
-let full_split_name = "full_split_goal"
 let limit_line = !opt_limit_line
 let limit_subp = !opt_limit_subp
 let ide_progress_bar = !opt_ide_progress_bar
