@@ -124,7 +124,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | e -> raise e)
 
 type section = rc_value list Mstr.t
-type family  = (string * section) list
+type family = (string * section) list
+type simple_family = section list
+
 type ofamily  = (string option * section) list
 type t = ofamily Mstr.t
 
@@ -137,10 +139,10 @@ let make_t tl =
     Mstr.add key (value::l) acc in
   let add_section t (args,sectionl) =
     let sname,arg = match args with
-      | []    -> assert false
-      | [sname]    -> sname,None
+      | [] -> assert false
+      | [sname] -> sname,None
       | [sname;arg] -> sname,Some arg
-      | sname::_     -> raise (ExtraParameters sname) in
+      | sname::_ -> raise (ExtraParameters sname) in
     let m = List.fold_left add_key empty_section sectionl in
     let m = Mstr.map List.rev m in
     let l = Mstr.find_def [] sname t in
@@ -165,6 +167,15 @@ let get_family t sname =
     List.map get l
   with Not_found -> []
 
+let get_simple_family t sname =
+  try
+    let l = Mstr.find sname t in
+    let get (arg,section) =
+      (match arg with Some _ -> raise (ExtraParameters sname) | None ->
+        section) in
+    List.map get l
+  with Not_found -> []
+
 
 let set_section t sname section =
   Mstr.add sname [None,section] t
@@ -172,6 +183,11 @@ let set_section t sname section =
 let set_family t sname sections =
   if sections = [] then Mstr.remove sname t else
     let set (arg,section) = (Some arg,section) in
+    Mstr.add sname (List.map set sections) t
+
+let set_simple_family t sname sections =
+  if sections = [] then Mstr.remove sname t else
+    let set section = (None,section) in
     Mstr.add sname (List.map set sections) t
 
 let get_value read section key =
@@ -351,7 +367,7 @@ and string_val key = parse
       { Buffer.add_char buf c;
         string_val key lexbuf }
   | '\\' (['\\' '"' 'n' 'r' 't'] as c)
-      { Buffer.add_char buf 
+      { Buffer.add_char buf
           (match c with 'n' -> '\n' | 'r' -> '\r' | 't' -> '\t' | _ -> c);
         string_val key lexbuf }
   | '\\' '\n'
@@ -395,8 +411,8 @@ let to_formatter fmt t =
   let print_kv k fmt v = fprintf fmt "%s = %a" k print_rc_value v in
   let print_kvl fmt k vl = Pp.print_list Pp.newline (print_kv k) fmt vl in
   let print_section sname fmt (h,l) =
-    fprintf fmt "[%s %a]@\n%a"
-      sname (Pp.print_option Pp.string) h
+    fprintf fmt "[%s%a]@\n%a"
+      sname (Pp.print_option (fun fmt -> fprintf fmt " %s")) h
       (Pp.print_iter22 Mstr.iter Pp.newline print_kvl) l in
   let print_sectionl fmt sname l =
     Pp.print_list Pp.newline2 (print_section sname) fmt l in

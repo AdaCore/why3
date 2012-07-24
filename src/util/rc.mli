@@ -65,7 +65,8 @@ exception BoolExpected of string * rc_value
 
 type t (** Rc parsed file *)
 type section (** section in rc file *)
-type family  = (string * section) list (** A family in rc files *)
+type family = (string * section) list (** A family in rc files *)
+type simple_family = section list (** A family w/o arguments in rc files*)
 
 val empty : t (** An empty Rc *)
 val empty_section : section (** An empty section *)
@@ -77,23 +78,35 @@ val get_section : t -> string -> section option
     @raise ExtraParameters if [name] is a family in [rc] instead of a section
 *)
 
-val get_family  : t -> string -> family
-(** [get_family rc name] return all the sections of the family [name]
-    in [rc]
-    @raise MissingParameters if [name] correspond also too a section in [rc]
- *)
+val get_family : t -> string -> family
+(** [get_family rc name] return all the sections of the family [name] in [rc]
+    @raise MissingParameters if [name] also corresponds to a section in [rc]
+*)
+
+val get_simple_family : t -> string -> simple_family
+(** [get_simple_family rc name] return all the sections of the simple
+    family [name] in [rc]
+    @raise ExtraParameters if [name] also corresponds to family in [rc]
+*)
 
 val set_section : t -> string -> section -> t
-(** [set_section rc name section] add a section [section] with name [name] in
-    [rc]. Remove former section [name] if present in [rc] *)
+(** [set_section rc name section] add a section [section] with name [name]
+    in [rc]. Remove former section [name] if present in [rc]
+*)
 
-val set_family  : t -> string -> family  -> t
+val set_family : t -> string -> family -> t
 (** [set_family rc name family] add all the section in [family] using
-    the associated [string] as argument of the family [name] in the rc
-    file [rc]. Remove all the former sections of family [name] if
-    present in [rc] *)
+    the associated [string] as argument of the family [name] in [rc].
+    Remove all the former sections of family [name] if present in [rc].
+*)
 
-val get_int  : ?default:int      -> section -> string -> int
+val set_simple_family : t -> string -> simple_family -> t
+(** [set_simple_family rc name family] add all the section in [family]
+    using the associated [string] as argument of the family [name] in [rc].
+    Remove all the former sections of family [name] if present in [rc].
+*)
+
+val get_int : ?default:int -> section -> string -> int
 (** [get_int ~default section key] one key to one value
 
     @raise Bad_value_type if the value associated to [key] is not of type
@@ -117,7 +130,7 @@ val get_intl : ?default:int list -> section -> string -> int list
     associated to [key]
 *)
 
-val set_int :?default:int -> section -> string -> int -> section
+val set_int : ?default:int -> section -> string -> int -> section
 (** [set_int ?default section key value] add the association [key] to [value]
     in the section if value is not default.
     Remove all former associations with this [key]
@@ -129,10 +142,10 @@ val set_intl : ?default:int list -> section -> string -> int list -> section
     Remove all former associations with this [key]
 *)
 
-val get_bool  : ?default:bool       -> section -> string -> bool
+val get_bool : ?default:bool -> section -> string -> bool
 (** Same as {!get_int} but on bool *)
 
-val get_booll  : ?default:bool list -> section -> string -> bool list
+val get_booll : ?default:bool list -> section -> string -> bool list
 (** Same as {!get_intl} but on bool *)
 
 val get_boolo : section -> string -> bool option
@@ -144,10 +157,10 @@ val set_booll : ?default:bool list -> section -> string -> bool list -> section
 (** Same as {!set_intl} but on bool *)
 
 
-val get_string  : ?default:string       -> section -> string -> string
+val get_string : ?default:string -> section -> string -> string
 (** Same as {!get_int} but on string *)
 
-val get_stringl  : ?default:string list -> section -> string -> string list
+val get_stringl : ?default:string list -> section -> string -> string list
 (** Same as {!get_intl} but on string *)
 
 val get_stringo : section -> string -> string option
