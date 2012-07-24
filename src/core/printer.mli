@@ -70,7 +70,7 @@ val syntax_arguments : string -> 'a pp -> 'a list pp
      the list l using the template templ and the printer print_arg *)
 
 val syntax_arguments_typed :
-  string -> term pp -> ty pp -> term option -> term list pp
+  string -> term pp -> ty pp -> term -> term list pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
      the list l using the template templ and the printer print_arg *)
 

@@ -82,6 +82,30 @@ let black_list =
     "closure"; "exists"; "law"; "subtypes";
     "cond"; "exporting"; "lemma"; "subtype"; "of";
     (* PVS prelude *)
+    "boolean"; "bool";
+    "pred"; "setof"; "exists1";
+    "list"; "member"; "append"; "reverse";
+    "domain"; "range"; "graph"; "preserves"; "inverts"; "transpose";
+    "restrict"; "extend"; "identity"; "eq";
+    "epsilon";
+    "set"; "member"; "emptyset"; "nonempty_set"; "fullset";
+    "union"; "intersection"; "complement"; "difference";
+    "symmetric_difference"; "every"; "some"; "singleton"; "add"; "remove";
+    "choose"; "the"; "singleton_elt"; "rest"; "setofsets"; "powerset";
+    "rinverse"; "rcomplement"; "runion"; "rintersection"; "image";
+    "preimage"; "postcondition"; "converse";
+    "number"; "number_field"; "numfield"; "nonzero_number"; "nznum";
+    "real"; "nonzero_real"; "nzreal";
+    "nonneg_real"; "nonpos_real"; "posreal"; "negreal"; "nnreal"; "npreal";
+    "rational"; "rat"; "nonzero_rational"; "nzrat";
+    "nonneg_rat"; "nonpos_rat"; "posrat"; "negrat"; "nnrat"; "nprat";
+    "integer"; "int"; "nonzero_integer"; "nzint";
+    "nonneg_int"; "nonpos_int"; "posint"; "negint"; "nnint"; "npint";
+    "subrange"; "even_int"; "odd_int";
+    "naturalnumber"; "nat"; "upto"; "below"; "succ"; "pred";
+    "min"; "max"; "sgn"; "abs";
+    "mod"; "divides"; "rem"; "ndiv";
+    "upfrom"; "above";
     "even";
     (* introduced by Why3 *)
     "tuple0"; ]
@@ -320,7 +344,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
-          syntax_arguments s (print_term info) fmt tl
+          syntax_arguments_typed s (print_term info) (print_ty info) t fmt tl
       | _ ->
           let no_cast = unambig_fs fs in
           begin match tl with
@@ -663,8 +687,10 @@ let print_param_decl ~prev info fmt ls =
   fprintf fmt "@]@\n@\n"
 
 let print_param_decl ~prev info fmt ls =
-  if not (Mid.mem ls.ls_name info.info_syn) then
-    (print_param_decl ~prev info fmt ls; forget_tvs ())
+  if not (Mid.mem ls.ls_name info.info_syn) then begin
+    print_param_decl ~prev info fmt ls;
+    forget_tvs ()
+  end
 
 let print_logic_decl ~prev info fmt (ls,ld) =
   ignore prev;
@@ -678,8 +704,10 @@ let print_logic_decl ~prev info fmt (ls,ld) =
   List.iter forget_var vl
 
 let print_logic_decl ~prev info fmt d =
-  if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_logic_decl ~prev info fmt d; forget_tvs ())
+  if not (Mid.mem (fst d).ls_name info.info_syn) then begin
+    print_logic_decl ~prev info fmt d;
+    forget_tvs ()
+  end
 
 let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
@@ -693,8 +721,16 @@ let print_recursive_decl info fmt (ls,ld) =
     (print_expr info) e;
   fprintf fmt "MEASURE %a BY <<@\n@]@\n"
     print_vs (List.nth vl i);
-  List.iter forget_var vl;
-  forget_tvs ()
+  List.iter forget_var vl
+
+let print_recursive_decl info fmt d =
+  eprintf "print_recursive_decl: %a@." print_id (fst d).ls_name;
+  Mid.iter (fun id _ -> eprintf "  syn %a@." print_id id) info.info_syn;
+  if not (Mid.mem (fst d).ls_name info.info_syn) then begin
+    eprintf "DO IT@.";
+    print_recursive_decl info fmt d;
+    forget_tvs ()
+  end
 
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[%% %a:@\n(%a)@]" print_pr pr (print_fmla info) f
@@ -711,8 +747,10 @@ let print_ind_decl info fmt (ps,al) =
   fprintf fmt "@\n"
 
 let print_ind_decl info fmt d =
-  if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_ind_decl info fmt d; forget_tvs ())
+  if not (Mid.mem (fst d).ls_name info.info_syn) then begin
+    print_ind_decl info fmt d;
+    forget_tvs ()
+  end
 
 let re_lemma = Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
 let rec find_lemma = function
@@ -762,7 +800,7 @@ let print_decl ~old info fmt d =
   | Dlogic [d] ->
       print_recursive_decl info fmt d
   | Dlogic _ ->
-      assert false (* PVS does not support mutually recursive defns *)
+      unsupportedDecl d "PVS does not support mutually recursive definitions"
   | Dind (Ind, il) ->
       print_list nothing (print_ind_decl info) fmt il
   | Dind (Coind, _) ->
@@ -855,7 +893,7 @@ let print_task env pr thpr realize ?old fmt task =
        let lib = if path = thpath then "" else String.concat "." path ^ "@" in
        fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
     realized_theories;
-  fprintf fmt "@\n%% do not edit above this line@\n@\n";
+  fprintf fmt "%% do not edit above this line@\n@\n";
   fprintf fmt "%% Why3 tuple0@\n";
   fprintf fmt "tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0@\n@\n";
   print_decls ~old info fmt local_decls;

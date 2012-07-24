@@ -34,18 +34,16 @@ theory map.Map
   syntax type  map "[%1 -> %2]"
 
   syntax function get "%1(%2)"
-  syntax function set "(%1 WITH [(%2) |-> %3])"
+  syntax function ([]) "%1(%2)"
+
+  syntax function set    "(%1 WITH [(%2) |-> %3])"
+  syntax function ([<-]) "(%1 WITH [(%2) |-> %3])"
 
   remove prop Select_eq
   remove prop Select_neq
 
-  (* %t0 is "map a b"
-     %t1 is the type of const's argument, that is "b"
-     but we need type "a" instead, i.e. the first type argument
-
-  syntax function const "(LAMBDA (x:%t1): %1)"
+  syntax function const "(LAMBDA (x:%v0): %1)"
   remove prop Const
-  *)
 end
 
 theory Bool
@@ -64,7 +62,6 @@ theory bool.Bool
   syntax function implb "(%1 => %2)"
 
 end
-
 
 theory int.Int
 
@@ -115,42 +112,6 @@ theory int.MinMax
 
 end
 
-theory int.EuclideanDivision
-
-  syntax function div "ndiv(%1, %2)"
-  syntax function mod "mod(%1, %2)"
-
-  remove prop Div_mod
-  remove prop Div_bound
-  remove prop Mod_bound
-  remove prop Mod_1
-  remove prop Div_1
-
-end
-
-(***
-theory int.ComputerDivision
-
-  syntax function div "(ZOdiv %1 %2)"
-  syntax function mod "(ZOmod %1 %2)"
-
-  remove prop Div_mod
-  remove prop Div_bound
-  remove prop Mod_bound
-  remove prop Div_sign_pos
-  remove prop Div_sign_neg
-  remove prop Mod_sign_pos
-  remove prop Mod_sign_neg
-  remove prop Rounds_toward_zero
-  remove prop Div_1
-  remove prop Mod_1
-  remove prop Div_inf
-  remove prop Mod_inf
-  remove prop Div_mult
-  remove prop Mod_mult
-
-end
-***)
 
 theory real.Real
 
@@ -190,6 +151,16 @@ theory real.Real
   remove prop assoc_div_mul
   remove prop assoc_div_div
 
+end
+
+theory real.MinMax
+  syntax function min "min(%1, %2)"
+  syntax function max "max(%1, %2)"
+
+  remove prop Max_is_ge
+  remove prop Max_is_some
+  remove prop Min_is_le
+  remove prop Min_is_some
 end
 
 theory real.RealInfix
@@ -261,6 +232,130 @@ theory real.Trigonometry
 
   syntax function tan "TAN(%1)"
 
+end
+
+theory option.Option
+  syntax type option "lift[%1]"
+
+  syntax function None "bottom"
+  syntax function Some "up(%1)"
+end
+
+theory list.List
+
+  syntax type list "list[%1]"
+
+  syntax function Nil  "null"
+  syntax function Cons "cons(%1, %2)"
+
+end
+
+theory list.Length
+  syntax function length "length(%1)"
+  remove prop Length_nonnegative
+  remove prop Length_nil
+end
+
+theory list.Mem
+  syntax predicate mem "member(%1, %2)"
+end
+
+theory list.Nth
+  syntax function nth
+    "IF 0 <= %1 AND %1 < length(%2) THEN up(nth(%2, %1)) ELSE bottom ENDIF"
+end
+
+theory list.Append
+  syntax function (++) "append(%1, %2)"
+
+  remove prop Append_assoc
+  remove prop Append_l_nil
+  remove prop Append_length
+end
+
+theory list.Reverse
+  syntax function reverse "reverse(%1)"
+end
+
+theory set.Set
+  syntax type set "set[%1]"
+
+  syntax predicate mem "member(%1, %2)"
+  remove prop      extensionality
+
+  syntax predicate subset "subset?(%1, %2)"
+  remove prop      subset_trans
+
+  syntax function  empty    "(emptyset :: %t0)"
+  syntax predicate is_empty "empty?(%1)"
+  remove prop      empty_def1
+
+  syntax function add "add(%1, %2)"
+  remove prop     add_def1
+  syntax function singleton "singleton(%1)"
+
+  syntax function remove "remove(%1, %2)"
+  remove prop     remove_def1
+  remove prop     subset_remove
+
+  syntax function union "union(%1, %2)"
+  remove prop     union_def1
+
+  syntax function inter "intersection(%1, %2)"
+  remove prop     inter_def1
+
+  syntax function diff "difference(%1, %2)"
+  remove prop     diff_def1
+  remove prop     subset_diff
+
+  (* TODO: choose *)
+
+  syntax function all "fullset"
+  remove prop     all_def
+end
+
+theory set.Fset
+  syntax type set "finite_set[%1]"
+
+  syntax predicate mem "member(%1, %2)"
+  remove prop      extensionality
+
+  syntax predicate subset "subset?(%1, %2)"
+  remove prop      subset_trans
+
+  syntax function  empty    "(emptyset :: %t0)"
+  syntax predicate is_empty "empty?(%1)"
+  remove prop      empty_def1
+
+  syntax function add "add(%1, %2)"
+  remove prop     add_def1
+  syntax function singleton "singleton(%1)"
+
+  syntax function remove "remove(%1, %2)"
+  remove prop     remove_def1
+  remove prop     subset_remove
+
+  syntax function union "union(%1, %2)"
+  remove prop     union_def1
+
+  syntax function inter "intersection(%1, %2)"
+  remove prop     inter_def1
+
+  syntax function diff "difference(%1, %2)"
+  remove prop     diff_def1
+  remove prop     subset_diff
+
+  (* TODO: choose *)
+
+  syntax function cardinal "Card(%1)"
+  remove prop     cardinal_nonneg
+  remove prop     cardinal_empty
+  remove prop     cardinal_add
+  remove prop     cardinal_remove
+  remove prop     cardinal_subset
+  remove prop     cardinal1
+
+  (* TODO: nth *)
 end
 
 (* this file has an extension .aux rather than .gen
