@@ -1,32 +1,11 @@
 
-theory Power
+(* fast exponentiation *)
+
+module FastExponentiation
 
   use import int.Int
-
-  function power int int : int
-
-  axiom Power_0 : forall x : int. power x 0 = 1
-
-  axiom Power_s : forall x n : int. 0 < n -> power x n = x * power x (n-1)
-
-  lemma Power_1 : forall x : int. power x 1 = x
-
-  lemma Power_sum : forall x n m : int. 0 <= n -> 0 <= m ->
-    power x (n + m) = power x n * power x m
-
-  lemma Power_mult : forall x n m : int. 0 <= n -> 0 <= m ->
-    power x (n * m) = power (power x n) m
-
-  lemma Power_mult2 : forall x y n : int. 0 <= n ->
-    power (x * y) n = power x n * power y n
-
-end
-
-module M
-
-  use import int.Int
+  use import int.Power
   use import int.ComputerDivision
-  use import Power
 
   (* recursive implementation *)
 

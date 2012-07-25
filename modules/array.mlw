@@ -217,6 +217,7 @@ module NumOfParam
   predicate pr_ (p: param_) (i: int) = let (a, p) = p in pr p i a[i]
   clone import int.NumOfParam with type param = param_, predicate pr = pr_
 
+  (* the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
   function numof (a: array elt) (p: param) (l u: int) : int = num_of (a, p) l u
 end
 
