@@ -25,11 +25,6 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
-theory Tuple0
-  syntax type     tuple0 "tuple0"
-  syntax function Tuple0 "Tuple0"
-end
-
 theory map.Map
   syntax type  map "[%1 -> %2]"
 
@@ -202,6 +197,17 @@ theory real.FromInt
 
 end
 
+theory real.PowerReal
+
+  syntax function pow "(%1 ^ %2)"
+
+  remove prop Pow_x_zero
+  remove prop Pow_x_one
+  remove prop Pow_one_y
+
+end
+
+(***
 theory real.Square
 
   syntax function sqrt "SQRT(%1)"
@@ -215,16 +221,6 @@ theory real.ExpLog
 
 end
 
-theory real.PowerReal
-
-  syntax function pow "(%1 ^ %2)"
-
-  remove prop Pow_x_zero
-  remove prop Pow_x_one
-  remove prop Pow_one_y
-
-end
-
 theory real.Trigonometry
 
   syntax function cos "COS(%1)"
@@ -235,6 +231,7 @@ theory real.Trigonometry
   syntax function tan "TAN(%1)"
 
 end
+***)
 
 theory option.Option
   syntax type option "lift[%1]"
@@ -260,6 +257,7 @@ end
 
 theory list.Mem
   syntax predicate mem "member(%1, %2)"
+  
 end
 
 theory list.Nth
@@ -273,6 +271,9 @@ theory list.Append
   remove prop Append_assoc
   remove prop Append_l_nil
   remove prop Append_length
+  (* FIXME? the following are not part of PVS prelude *)
+  remove prop mem_append
+  remove prop mem_decomp
 end
 
 theory list.Reverse

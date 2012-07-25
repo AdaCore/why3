@@ -1,0 +1,44 @@
+ExpLog: THEORY
+ BEGIN
+  IMPORTING Real
+  % do not edit above this line
+  
+  IMPORTING lnexp@ln_exp
+  
+  % Why3 exp
+  exp(x:real): MACRO real = exp(x)
+  
+  % Why3 exp_zero
+  exp_zero: LEMMA (exp(0) = 1)
+  
+  % Why3 exp_sum
+  exp_sum: LEMMA FORALL (x:real, y:real): (exp((x + y)) = (exp(x) * exp(y)))
+  
+  % Why3 e
+  e: real = exp(1)
+  
+  % Why3 log
+  log(x:real): MACRO real = IF x > 0 THEN ln(x) ELSE log_total(x) ENDIF
+  
+  % Why3 log_one
+  log_one: LEMMA (log(1) = 0)
+  
+  % Why3 log_mul
+  log_mul: LEMMA FORALL (x:real, y:real): ((x >  0) AND (y >  0)) =>
+    (log((x * y)) = (log(x) + log(y)))
+  
+  % Why3 log_exp
+  log_exp: LEMMA FORALL (x:real): (log(exp(x)) = x)
+  
+  % Why3 exp_log
+  exp_log: LEMMA FORALL (x:real): (x >  0) => (exp(log(x)) = x)
+  
+  % Why3 log2
+  log2(x:real): real = Real.infix_sl(log(x), log(2))
+  
+  % Why3 log10
+  log10(x:real): real = Real.infix_sl(log(x), log(10))
+  
+  
+ END ExpLog
+ 

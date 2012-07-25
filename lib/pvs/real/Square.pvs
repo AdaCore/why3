@@ -1,0 +1,35 @@
+Square: THEORY
+ BEGIN
+  IMPORTING Real
+  % do not edit above this line
+  
+  IMPORTING reals@sqrt
+  
+  % Why3 sqr
+  sqr(x:real): real = (x * x)
+  
+  sqrt_total(x:real): real
+  
+  % Why3 sqrt
+  sqrt(x:real): MACRO real = IF x >= 0 THEN sqrt(x) ELSE sqrt_total(x) ENDIF
+  
+  % Why3 sqrt_positive
+  sqrt_positive: LEMMA FORALL (x:real): (x >= 0) => (sqrt(x) >= 0)
+  
+  % Why3 sqrt_square
+  sqrt_square: LEMMA FORALL (x:real): (x >= 0) => (sqr(sqrt(x)) = x)
+  
+  % Why3 square_sqrt
+  square_sqrt: LEMMA FORALL (x:real): (x >= 0) => (sqrt((x * x)) = x)
+  
+  % Why3 sqrt_mul
+  sqrt_mul: LEMMA FORALL (x:real, y:real): ((x >= 0) AND (y >= 0)) =>
+    (sqrt((x * y)) = (sqrt(x) * sqrt(y)))
+  
+  % Why3 sqrt_le
+  sqrt_le: LEMMA FORALL (x:real, y:real): ((0 <= x) AND (x <= y)) =>
+    (sqrt(x) <= sqrt(y))
+  
+  
+ END Square
+ 

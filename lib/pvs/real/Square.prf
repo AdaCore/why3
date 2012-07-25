@@ -1,0 +1,51 @@
+(Square
+ (sqrt_positive 0
+  (sqrt_positive-1 nil 3552163066 ("" (default-strategy))
+   ((real_ge_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (sqrt_square 0
+  (sqrt_square-1 nil 3552163066 ("" (default-strategy))
+   ((sqr const-decl "real" Square nil)
+    (real_ge_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (nnreal_times_nnreal_is_nnreal application-judgement "nnreal"
+     real_types nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (square_sqrt 0
+  (square_sqrt-1 nil 3552163066 ("" (default-strategy))
+   ((real_ge_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (real_times_real_is_real application-judgement "real" reals nil)
+    (sqrt_square formula-decl nil sqrt "reals/")
+    (real nonempty-type-from-decl nil reals nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number nonempty-type-decl nil numbers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (boolean nonempty-type-decl nil booleans nil))
+   shostak))
+ (sqrt_mul 0
+  (sqrt_mul-1 nil 3552163067
+   ("" (default-strategy) (("" (postpone) nil nil)) nil) nil shostak))
+ (sqrt_le 0
+  (sqrt_le-1 nil 3552163067 ("" (default-strategy)) nil shostak)))
+
