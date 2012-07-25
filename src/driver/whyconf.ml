@@ -36,10 +36,11 @@ open Stdlib
   - 11 change prover identifiers in provers-detection-data.conf
   - 12 split editors out of provers
   - 13 add shortcuts
+  - 14 use simple_family for prover and shortcut section
 
 If a configuration doesn't contain the actual magic number we don't use it.*)
 
-let magicnumber = 13
+let magicnumber = 14
 
 exception WrongMagicNumber
 
@@ -247,11 +248,11 @@ let set_prover _ (prover,shortcuts) family =
   let section = set_bool section "interactive" prover.interactive in
   let section = set_bool section "in_place" prover.in_place in
   let section = set_stringl section "shortcut" shortcuts in
-  ("config", section)::family
+  section::family
 
 let set_provers rc provers =
   let family = Mprover.fold set_prover provers [] in
-  set_family rc "prover" family
+  set_simple_family rc "prover" family
 
 let set_prover_shortcut prover shortcuts family =
   let section = empty_section in
@@ -260,11 +261,11 @@ let set_prover_shortcut prover shortcuts family =
   let section =
     set_string ~default:"" section "alternative" prover.prover_altern in
   let section = set_stringl section "shortcut" shortcuts in
-  ("definition", section)::family
+  section::family
 
 let set_prover_shortcuts rc shortcuts =
   let family = Mprover.fold set_prover_shortcut shortcuts [] in
-  set_family rc "shortcut" family
+  set_simple_family rc "shortcut" family
 
 let set_provers_shortcuts rc shortcuts provers =
   (** inverse the shortcut map *)
@@ -340,7 +341,7 @@ let add_prover_shortcuts acc prover shortcuts =
   ) acc shortcuts
 
 
-let load_prover dirname (provers,shortcuts) (_,section) =
+let load_prover dirname (provers,shortcuts) section =
   let name = get_string section "name" in
   let version = get_string ~default:"" section "version" in
   let altern = get_string ~default:"" section "alternative" in
@@ -364,7 +365,7 @@ let load_prover dirname (provers,shortcuts) (_,section) =
   let shortcuts = add_prover_shortcuts shortcuts prover lshort in
   provers,shortcuts
 
-let load_shortcut acc (_,section) =
+let load_shortcut acc section =
   let name = get_string section "name" in
   let version = get_string section "version" in
   let altern = get_string ~default:"" section "alternative" in
@@ -444,10 +445,10 @@ let get_config (filename,rc) =
       | None      -> raise (ConfigFailure (filename, "no main section"))
       | Some main -> rc, load_main dirname main
   in
-  let provers = get_family rc "prover" in
+  let provers = get_simple_family rc "prover" in
   let provers,shortcuts = List.fold_left (load_prover dirname)
     (Mprover.empty,Mstr.empty) provers in
-  let fam_shortcuts = get_family rc "shortcut" in
+  let fam_shortcuts = get_simple_family rc "shortcut" in
   let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
   let editors = get_family rc "editor" in
   let editors = List.fold_left load_editor Meditor.empty editors in
@@ -588,7 +589,7 @@ let merge_config config filename =
     ) config.provers prover_modifiers in
   let provers,shortcuts =
     List.fold_left (load_prover dirname)
-      (provers,config.prover_shortcuts) (get_family rc "prover") in
+      (provers,config.prover_shortcuts) (get_simple_family rc "prover") in
   (** modify editors *)
   let editor_modifiers = get_family rc "editor_modifiers" in
   let editors = List.fold_left
