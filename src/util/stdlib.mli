@@ -286,6 +286,27 @@ module type S =
         to the ordering [Ord.compare] of the keys, where [Ord] is the argument
         given to {!Map.Make}. *)
 
+    (** enumeration: zipper style *)
+    type 'a enumeration
+
+    val val_enum : 'a enumeration -> (key * 'a) option
+    (** get the current key value pair of the enumeration, return None
+        if the enumeration reach the end *)
+
+    val start_enum : 'a t -> 'a enumeration
+    (** start the enumeration of the given map *)
+
+    val next_enum : 'a enumeration -> 'a enumeration
+    (** get the next step of the enumeration *)
+
+    val start_ge_enum : key -> 'a t -> 'a enumeration
+    (** start the enumeration of the given map at the first key which
+        is greater or equal than the given one *)
+
+    val next_ge_enum : key -> 'a enumeration -> 'a enumeration
+    (** get the next (or same) step of the enumeration which key is
+        greater or equal to the given key *)
+
     module type Set =
     sig
       type elt = key

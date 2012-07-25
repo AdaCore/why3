@@ -33,6 +33,7 @@ type config
     {!Whyconf.get_provers}, {!Whyconf.set_provers} *)
 
 exception ConfigFailure of string (* filename *) * string
+exception DuplicateShortcut of string
 
 val read_config : string option -> config
 (** [read_config conf_file] :
@@ -122,7 +123,8 @@ val get_provers : config  -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
-val set_provers : config -> config_prover Mprover.t -> config
+val set_provers : config ->
+  ?shortcuts:Mprover.key Util.Mstr.t -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
     one given *)
 

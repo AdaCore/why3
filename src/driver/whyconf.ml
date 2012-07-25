@@ -235,7 +235,7 @@ let set_main rc main =
 
 exception NonUniqueId
 
-let set_prover _ prover family =
+let set_prover _ (prover,shortcuts) family =
   let section = empty_section in
   let section = set_string section "name" prover.prover.prover_name in
   let section = set_string section "command" prover.command in
@@ -246,24 +246,48 @@ let set_prover _ prover family =
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
   let section = set_bool section "in_place" prover.in_place in
+  let section = set_stringl section "shortcut" shortcuts in
   ("config", section)::family
 
 let set_provers rc provers =
   let family = Mprover.fold set_prover provers [] in
   set_family rc "prover" family
 
-let set_prover_shortcut shortcut prover family =
+let set_prover_shortcut prover shortcuts family =
   let section = empty_section in
   let section = set_string section "name" prover.prover_name in
   let section = set_string section "version" prover.prover_version in
   let section =
     set_string ~default:"" section "alternative" prover.prover_altern in
-  let section = set_string section "shortcut" shortcut in
+  let section = set_stringl section "shortcut" shortcuts in
   ("definition", section)::family
 
 let set_prover_shortcuts rc shortcuts =
-  let family = Mstr.fold set_prover_shortcut shortcuts [] in
+  let family = Mprover.fold set_prover_shortcut shortcuts [] in
   set_family rc "shortcut" family
+
+let set_provers_shortcuts rc shortcuts provers =
+  (** inverse the shortcut map *)
+  let shortcuts = Mstr.fold (fun shortcut prover acc ->
+    Mprover.change (function
+    | None -> Some [shortcut]
+    | Some l -> Some (shortcut::l)) prover acc) shortcuts Mprover.empty in
+  (** the shortcut to unknown prover *)
+  let shortcuts_prover_unknown = Mprover.set_diff shortcuts provers in
+  let rc = set_prover_shortcuts rc shortcuts_prover_unknown in
+  (** merge the known *)
+  let _,shortcuts_provers_known =
+    Mprover.mapi_fold (fun k v acc ->
+      let acc = Mprover.next_ge_enum k acc in
+      match Mprover.val_enum acc with
+      | None -> acc,(v,[])
+      | Some (ks,vs) ->
+        let c = Prover.compare k ks in
+        if c = 0 then acc,(v,vs)
+        else (* c < 0 *) acc,(v,[])
+    ) provers (Mprover.start_enum shortcuts) in
+  let rc = set_provers rc shortcuts_provers_known in
+  rc
 
 let set_editor id editor (ids, family) =
   if Sstr.mem id ids then raise NonUniqueId;
@@ -306,7 +330,17 @@ let set_policies rc policy =
 
 let absolute_filename = Sysutil.absolutize_filename
 
-let load_prover dirname provers (_,section) =
+exception DuplicateShortcut of string
+
+let add_prover_shortcuts acc prover shortcuts =
+  List.fold_left (fun acc shortcut ->
+    if shortcut.[0] = '^' then
+      invalid_arg "prover shortcut can't start with a ^";
+    Mstr.add_new (DuplicateShortcut shortcut) shortcut prover acc
+  ) acc shortcuts
+
+
+let load_prover dirname (provers,shortcuts) (_,section) =
   let name = get_string section "name" in
   let version = get_string ~default:"" section "version" in
   let altern = get_string ~default:"" section "alternative" in
@@ -316,7 +350,7 @@ let load_prover dirname provers (_,section) =
       prover_altern = altern;
     }
   in
-  Mprover.add prover
+  let provers = Mprover.add prover
     { prover  = prover;
       command = get_string section "command";
       driver  = absolute_filename dirname (get_string section "driver");
@@ -325,7 +359,10 @@ let load_prover dirname provers (_,section) =
       interactive = get_bool ~default:false section "interactive";
       extra_options = [];
       extra_drivers = [];
-    } provers
+    } provers in
+  let lshort = get_stringl section ~default:[] "shortcut" in
+  let shortcuts = add_prover_shortcuts shortcuts prover lshort in
+  provers,shortcuts
 
 let load_shortcut acc (_,section) =
   let name = get_string section "name" in
@@ -335,11 +372,7 @@ let load_shortcut acc (_,section) =
   let prover = { prover_name = name;
                  prover_version = version;
                  prover_altern= altern} in
-  List.fold_left (fun acc shortcut ->
-    if shortcut.[0] = '^' then
-      invalid_arg "prover shortcut can't start with a ^";
-    Mstr.add shortcut prover acc
-  ) acc shortcuts
+  add_prover_shortcuts acc prover shortcuts
 
 let load_editor editors (id, section) =
   Meditor.add id
@@ -412,9 +445,10 @@ let get_config (filename,rc) =
       | Some main -> rc, load_main dirname main
   in
   let provers = get_family rc "prover" in
-  let provers = List.fold_left (load_prover dirname) Mprover.empty provers in
-  let shortcuts = get_family rc "shortcut" in
-  let shortcuts = List.fold_left load_shortcut Mstr.empty shortcuts in
+  let provers,shortcuts = List.fold_left (load_prover dirname)
+    (Mprover.empty,Mstr.empty) provers in
+  let fam_shortcuts = get_family rc "shortcut" in
+  let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
   let editors = get_family rc "editor" in
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
@@ -552,8 +586,9 @@ let merge_config config filename =
             extra_drivers = drv @ c.extra_drivers })
         provers
     ) config.provers prover_modifiers in
-  let provers =
-    List.fold_left (load_prover dirname) provers (get_family rc "prover") in
+  let provers,shortcuts =
+    List.fold_left (load_prover dirname)
+      (provers,config.prover_shortcuts) (get_family rc "prover") in
   (** modify editors *)
   let editor_modifiers = get_family rc "editor_modifiers" in
   let editors = List.fold_left
@@ -566,7 +601,8 @@ let merge_config config filename =
     ) config.editors editor_modifiers in
   (** add editors *)
   let editors = List.fold_left load_editor editors (get_family rc "editor") in
-  { config with main = main; provers = provers; editors = editors }
+  { config with main = main; provers = provers;
+    prover_shortcuts = shortcuts; editors = editors }
 
 let save_config config =
   let filename = config.conf_file in
@@ -586,15 +622,17 @@ let set_main config main =
     main = main;
   }
 
-let set_provers config provers =
+let set_provers config ?shortcuts provers =
+  let shortcuts = def_option config.prover_shortcuts shortcuts in
   {config with
-    config = set_provers config.config provers;
+    config = set_provers_shortcuts config.config shortcuts provers;
     provers = provers;
+    prover_shortcuts = shortcuts;
   }
 
 let set_prover_shortcuts config shortcuts =
   {config with
-    config = set_prover_shortcuts config.config shortcuts;
+    config = set_provers_shortcuts config.config shortcuts config.provers;
     prover_shortcuts = shortcuts;
   }
 
@@ -668,4 +706,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
     fprintf fmt
       "Syntax error prover identification '%s' : \
        name[,version[,alternative]|,,alternative]" s
+  | DuplicateShortcut s ->
+    fprintf fmt
+      "Shortcut %s appears two times in the configuration file" s
   | _ -> raise e)

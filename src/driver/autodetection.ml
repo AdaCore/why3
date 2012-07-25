@@ -456,6 +456,5 @@ let add_prover_binary config id path =
     add_prover_with_uniq_id p provers in
   let provers = Mprover.fold fold detected provers in
   let shortcuts = convert_shortcuts env in
-  let config = set_prover_shortcuts config shortcuts in
-  let config = set_provers config provers in
+  let config = set_provers config ~shortcuts provers in
   config
