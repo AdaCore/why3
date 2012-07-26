@@ -30,7 +30,7 @@ open Mlw_expr
 
 type constructor = plsymbol * plsymbol option list
 
-type data_decl = itysymbol * constructor list
+type data_decl = itysymbol * constructor list * post
 
 type pdecl = {
   pd_node : pdecl_node;
@@ -122,6 +122,11 @@ type pre_constructor = preid * (pvsymbol * bool) list
 
 type pre_data_decl = itysymbol * pre_constructor list
 
+let null_invariant { its_pure = ts } =
+  let ty = ty_app ts (List.map ty_var ts.ts_args) in
+  let vs = create_vsymbol (id_fresh "dummy") ty in
+  create_post vs t_true
+
 let create_data_decl tdl =
 (*   let syms = ref Sid.empty in *)
   let news = ref Sid.empty in
@@ -165,10 +170,29 @@ let create_data_decl tdl =
   let build_type (its,cl) =
     Hid.clear projections;
     news := news_id !news its.its_pure.ts_name;
-    its, List.map (build_constructor its) cl
+    its, List.map (build_constructor its) cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
   mk_decl (PDdata tdl) (*!syms*) !news
+
+let add_invariant pd its p =
+  if not its.its_inv then invalid_arg "Mlw_decl.add_invariant";
+  Mvs.iter (fun vs _ -> raise (Decl.UnboundVar vs)) p.t_vars;
+  let rec add = function
+    | (s, cls, inv) :: tdl when its_equal s its ->
+        check_post (t_type inv) p;
+        let v, q = open_post inv in
+        let u, p = open_post p in
+        let q = t_and_simp (t_subst_single v (t_var u) q) p in
+        let inv = create_post u q in
+        (s, cls, inv) :: tdl
+    | td :: tdl ->
+        td :: add tdl
+    | [] -> raise Not_found
+  in
+  match pd.pd_node with
+    | PDdata tdl -> mk_decl (PDdata (add tdl)) (*pd.pd_syms*) pd.pd_news
+    | _ -> invalid_arg "Mlw_decl.add_invariant"
 
 let check_vars vars =
   if not (Stv.is_empty vars.vars_tv) then
@@ -249,10 +273,13 @@ let clone_data_decl sm pd = match pd.pd_node with
         pl in
       let add_cs (cs,pjl) =
         add_pl cs, List.map (Util.option_map add_pl) pjl in
-      let add_td (its,csl) =
+      let add_td (its,csl,inv) =
+        let conv_ts ts = Mts.find_def ts ts sm.sm_pure.Theory.sm_ts in
+        let conv_ls ls = Mls.find_def ls ls sm.sm_pure.Theory.sm_ls in
+        let inv = Term.t_s_map (Ty.ty_s_map conv_ts) conv_ls inv in
         let its = Mits.find its sm.sm_its in
         news := news_id !news its.its_pure.ts_name;
-        its, List.map add_cs csl in
+        its, List.map add_cs csl, inv in
       let tdl = List.map add_td tdl in
       mk_decl (PDdata tdl) (*!syms*) !news
   | _ -> invalid_arg "Mlw_decl.clone_data_decl"
@@ -289,8 +316,19 @@ let known_add_decl _lkn0 kn0 decl =
 
 (* TODO: known_add_decl must check pattern matches for exhaustiveness *)
 
+let rec find_td its1 = function
+  | (its2,csl,inv) :: _ when its_equal its1 its2 -> csl,inv
+  | _ :: tdl -> find_td its1 tdl
+  | [] -> raise Not_found
+
 let find_constructors kn its =
   match (Mid.find its.its_pure.ts_name kn).pd_node with
   | PDtype _ -> []
-  | PDdata dl -> List.assq its dl
+  | PDdata tdl -> fst (find_td its tdl)
+  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
+
+let find_invariant kn its =
+  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  | PDtype _ -> null_invariant its
+  | PDdata tdl -> snd (find_td its tdl)
   | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false

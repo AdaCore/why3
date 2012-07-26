@@ -30,7 +30,7 @@ open Mlw_expr
 
 type constructor = plsymbol * plsymbol option list
 
-type data_decl = itysymbol * constructor list
+type data_decl = itysymbol * constructor list * post
 
 (** {2 Declaration type} *)
 
@@ -66,6 +66,12 @@ val create_rec_decl : rec_defn -> pdecl
 
 val create_exn_decl : xsymbol -> pdecl
 
+(** {2 Type invariants} *)
+
+val null_invariant : itysymbol -> post
+
+val add_invariant : pdecl -> itysymbol -> post -> pdecl
+
 (** {2 Cloning} *)
 
 val clone_data_decl : Mlw_expr.symbol_map -> pdecl -> pdecl
@@ -79,3 +85,4 @@ val known_add_decl : Decl.known_map -> known_map -> pdecl -> known_map
 val merge_known : known_map -> known_map -> known_map
 
 val find_constructors : known_map -> itysymbol -> constructor list
+val find_invariant : known_map -> itysymbol -> post

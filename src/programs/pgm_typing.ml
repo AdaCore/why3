@@ -2039,6 +2039,10 @@ let check_type_vars ~loc vars ty =
   check ty
 
 let make_immutable_type td =
+  if td.td_vis = Private then errorm ~loc:td.td_loc
+    "private types are not supported in this version of WhyML";
+  if td.td_inv <> None then errorm ~loc:td.td_loc
+    "type invariants are not supported in this version of WhyML";
   let td = { td with td_model = false; td_vis = Public } in
   let make_immutable_field f = { f with f_mutable = false; f_ghost = false } in
   match td.td_def with

@@ -403,10 +403,11 @@ list1_type_decl:
 
 type_decl:
 | lident labels type_args typedefn
-  { let model, vis, def = $4 in
+  { let model, vis, def, inv = $4 in
     let vis = if model then Abstract else vis in
     { td_loc = floc (); td_ident = add_lab $1 $2;
-      td_params = $3; td_model = model; td_vis = vis; td_def = def } }
+      td_params = $3; td_model = model;
+      td_vis = vis; td_def = def; td_inv = inv } }
 ;
 
 type_args:
@@ -415,14 +416,18 @@ type_args:
 ;
 
 typedefn:
-| /* epsilon */                         { false, Public, TDabstract }
-| equal_model visibility typecases      { $1,    $2,     TDalgebraic $3 }
-| equal_model visibility BAR typecases  { $1,    $2,     TDalgebraic $4 }
-| equal_model visibility record_type    { $1,    $2,     TDrecord $3 }
+| /* epsilon */
+    { false, Public, TDabstract, None }
+| equal_model visibility typecases invariant
+    { $1, $2, TDalgebraic $3, $4 }
+| equal_model visibility BAR typecases invariant
+    { $1, $2, TDalgebraic $4, $5 }
+| equal_model visibility record_type invariant
+    { $1, $2, TDrecord $3, $4 }
 /* abstract/private is not allowed for alias type */
 | equal_model visibility primitive_type
     { if $2 <> Public then Loc.error ~loc:(floc_i 2) Parsing.Parse_error;
-      $1, Public, TDalias $3 }
+      $1, Public, TDalias $3, None }
 ;
 
 visibility:
@@ -1122,7 +1127,7 @@ expr:
                      mk_expr (Eif ($2, $5,
                                    mk_expr (Eraise (exit_exn (), None)))))),
            [exit_exn (), None, mk_expr (Etuple [])])) }
-| FOR lident EQUAL expr for_direction expr DO loop_invariant expr DONE
+| FOR lident EQUAL expr for_direction expr DO invariant expr DONE
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD
    { mk_expr Eabsurd }
@@ -1238,10 +1243,10 @@ for_direction:
 ;
 
 loop_annotation:
-| loop_invariant opt_variant { { loop_invariant = $1; loop_variant = $2 } }
+| invariant opt_variant { { loop_invariant = $1; loop_variant = $2 } }
 ;
 
-loop_invariant:
+invariant:
 | INVARIANT annotation { Some $2 }
 | /* epsilon */        { None    }
 ;

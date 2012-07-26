@@ -127,6 +127,8 @@ type type_def =
 
 type visibility = Public | Private | Abstract
 
+type invariant = lexpr option
+
 type type_decl = {
   td_loc    : loc;
   td_ident  : ident;
@@ -134,6 +136,7 @@ type type_decl = {
   td_model  : bool;
   td_vis    : visibility;
   td_def    : type_def;
+  td_inv    : invariant;
 }
 
 type logic_decl = {
@@ -180,7 +183,7 @@ type lazy_op = LazyAnd | LazyOr
 type variant = lexpr * qualid option
 
 type loop_annotation = {
-  loop_invariant : lexpr option;
+  loop_invariant : invariant;
   loop_variant   : variant list;
 }
 
@@ -238,7 +241,7 @@ and expr_desc =
   | Eabsurd
   | Eraise of qualid * expr option
   | Etry of expr * (qualid * ident option * expr) list
-  | Efor of ident * expr * for_direction * expr * lexpr option * expr
+  | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
   | Emark of ident * expr

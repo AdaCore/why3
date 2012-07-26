@@ -41,6 +41,7 @@ module rec T : sig
     its_args : tvsymbol list;
     its_regs : region list;
     its_def  : ity option;
+    its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
   }
@@ -75,6 +76,7 @@ end = struct
     its_args : tvsymbol list;
     its_regs : region   list;
     its_def  : ity option;
+    its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
   }
@@ -262,6 +264,10 @@ let ity_subst_unsafe mv mr ity =
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
 let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
 
+let rec ity_inv ity = match ity.ity_node with
+  | Ityapp (its,_,_) -> its.its_inv || ity_any ity_inv ity
+  | _ -> ity_any ity_inv ity
+
 let rec reg_fold fn vars acc =
   let on_reg r acc = reg_fold fn r.reg_ity.ity_vars (fn r acc) in
   Sreg.fold on_reg vars.vars_reg acc
@@ -306,12 +312,6 @@ let ity_subst_empty = {
   ity_subst_tv  = Mtv.empty;
   ity_subst_reg = Mreg.empty;
 }
-
-let ity_subst_union s1 s2 =
-  let check_ity _ ity1 ity2 = ity_equal_check ity1 ity2; Some ity1 in
-  let check_reg _ r1 r2 = reg_equal_check r1 r2; Some r1 in
-  { ity_subst_tv  = Mtv.union  check_ity s1.ity_subst_tv  s2.ity_subst_tv;
-    ity_subst_reg = Mreg.union check_reg s1.ity_subst_reg s2.ity_subst_reg }
 
 let tv_inst s v = Mtv.find_def (ity_var v) v s.ity_subst_tv
 let reg_inst s r = Mreg.find_def r r s.ity_subst_reg
@@ -428,12 +428,13 @@ let ity_pur s tl = match s.ts_def with
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ts ~abst ~priv regs def ->
+  (fun ts ~abst ~priv ~inv regs def ->
     let its = {
       its_pure  = ts;
       its_args  = ts.ts_args;
       its_regs  = regs;
       its_def   = def;
+      its_inv   = inv;
       its_abst  = abst;
       its_priv  = priv;
     } in
@@ -441,7 +442,8 @@ let create_itysymbol_unsafe, restore_its =
     its),
   Wts.find ts_to_its
 
-let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
+let create_itysymbol
+      name ?(abst=false) ?(priv=false) ?(inv=false) args regs def =
   let puredef = option_map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
@@ -458,9 +460,10 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
     raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs))) in
   Util.option_iter (fun d -> check d.ity_vars.vars_reg) def;
   (* if a type is an alias then it cannot be abstract or private *)
-  if abst && def <> None then Loc.errorm "A type alias cannot be abstract";
-  if priv && def <> None then Loc.errorm "A type alias cannot be private";
-  create_itysymbol_unsafe purets ~abst ~priv regs def
+  if abst && def <> None then Loc.errorm "Type aliases cannot be abstract";
+  if priv && def <> None then Loc.errorm "Type aliases cannot be private";
+  if inv  && def <> None then Loc.errorm "Type aliases cannot have invariants";
+  create_itysymbol_unsafe purets ~abst ~priv ~inv regs def
 
 let ts_unit = ts_tuple 0
 let ty_unit = ty_tuple []
@@ -483,9 +486,10 @@ let its_clone sm =
     let nits = try restore_its nts with Not_found ->
       let abst = oits.its_abst in
       let priv = oits.its_priv in
+      let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
       let def = Util.option_map conv_ity oits.its_def in
-      create_itysymbol_unsafe nts ~abst ~priv regs def
+      create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
     in
     Hits.replace itsh oits nits;
     nits

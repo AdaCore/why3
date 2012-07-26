@@ -40,6 +40,7 @@ module rec T : sig
     its_args : tvsymbol list;
     its_regs : region list;
     its_def  : ity option;
+    its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
   }
@@ -95,8 +96,9 @@ exception UnboundRegion of region
 
 val create_region : preid -> ity -> region
 
-val create_itysymbol : preid -> ?abst:bool -> ?priv:bool ->
-  tvsymbol list -> region list -> ity option -> itysymbol
+val create_itysymbol :
+  preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
+    tvsymbol list -> region list -> ity option -> itysymbol
 
 val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
@@ -133,6 +135,7 @@ val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
 
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
+val ity_inv : ity -> bool
 
 (* these functions attend the sub-regions *)
 
@@ -167,8 +170,6 @@ val ity_match : ity_subst -> ity -> ity -> ity_subst
 val reg_match : ity_subst -> region -> region -> ity_subst
 
 val ity_equal_check : ity -> ity -> unit
-
-val ity_subst_union : ity_subst -> ity_subst -> ity_subst
 
 val ity_full_inst : ity_subst -> ity -> ity
 
@@ -245,6 +246,7 @@ type variant = term * lsymbol option (* tau * (tau -> tau -> prop) *)
 
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
+val check_post : ty -> post -> unit
 
 type spec = {
   c_pre     : pre;

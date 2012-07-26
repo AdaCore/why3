@@ -266,7 +266,7 @@ let add_meta uc m al =
 let add_type uc its =
   add_symbol add_ts its.its_pure.ts_name (PT its) uc
 
-let add_data uc (its,csl) =
+let add_data uc (its,csl,_) =
   let add_pl uc pl = add_symbol add_ps pl.pl_ls.ls_name (PL pl) uc in
   let add_pj uc pj = Util.option_fold add_pl uc pj in
   let add_cs uc (cs,pjl) = List.fold_left add_pj (add_pl uc cs) pjl in
@@ -309,7 +309,7 @@ let add_pdecl ~wp uc d =
       let projection = option_map (fun pls -> pls.pl_ls) in
       let constructor (pls,pjl) = pls.pl_ls, List.map projection pjl in
       let defn cl = List.map constructor cl in
-      let dl = List.map (fun (its,cl) -> its.its_pure, defn cl) dl in
+      let dl = List.map (fun (its,cl,_) -> its.its_pure, defn cl) dl in
       add_to_theory Theory.add_data_decl uc dl
   | PDval lv | PDlet { let_sym = lv } ->
       add_let uc lv
@@ -317,6 +317,21 @@ let add_pdecl ~wp uc d =
       List.fold_left add_rec uc rdl.rec_defn
   | PDexn xs ->
       add_exn uc xs
+
+(* we can safely add a new type invariant as long as
+   the type was introduced in the last program decl,
+   and no let, rec or val could see it *)
+let add_invariant uc its p =
+  let rec add = function
+    | { pd_node = PDtype _ } as d :: dl ->
+        let nd, dl = add dl in nd, d :: dl
+    | d :: dl ->
+        let d = Mlw_decl.add_invariant d its p in d, d :: dl
+    | [] -> invalid_arg "Mlw_module.add_invariant" in
+  let decl, decls = add uc.muc_decls in
+  let kn = Mid.map (const decl) decl.pd_news in
+  let kn = Mid.set_union kn uc.muc_known in
+  { uc with muc_decls = decls; muc_known = kn }
 
 (* create module *)
 

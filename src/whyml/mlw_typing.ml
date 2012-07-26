@@ -1097,7 +1097,7 @@ let add_types ~wp uc tdl =
         Mstr.add x true seen in
   ignore (Mstr.fold cyc_visit def Mstr.empty);
 
-  (* detect mutable types *)
+  (* detect mutable types and invariants *)
 
   let mutables = Hashtbl.create 5 in
   let rec mut_visit x =
@@ -1107,7 +1107,7 @@ let add_types ~wp uc tdl =
         | Qident { id = x } when Mstr.mem x def -> mut_visit x
         | q ->
             begin match uc_find_ts uc q with
-              | PT its -> its.its_regs <> []
+              | PT its -> its.its_regs <> [] || its.its_inv
               | TS _ -> false
             end
       in
@@ -1116,7 +1116,10 @@ let add_types ~wp uc tdl =
         | PPTtyapp (tyl,q) -> ts_mut q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hashtbl.replace mutables x false;
-      let mut = match (Mstr.find x def).td_def with
+      let mut =
+        let td = Mstr.find x def in
+        td.td_inv <> None ||
+        match td.td_def with
         | TDabstract -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
@@ -1138,8 +1141,10 @@ let add_types ~wp uc tdl =
     try match Hashtbl.find tysymbols x with
       | Some ts -> ts
       | None ->
-          let loc = (Mstr.find x def).td_loc in
-          errorm ~loc "Mutable type in a recursive type definition"
+          let td = Mstr.find x def in let loc = td.td_loc in
+          if td.td_inv <> None
+          then errorm ~loc "Recursive types cannot have invariants"
+          else errorm ~loc "Recursive types cannot have mutable components"
     with Not_found ->
       let d = Mstr.find x def in
       let add_tv acc id =
@@ -1174,19 +1179,20 @@ let add_types ~wp uc tdl =
         | TDalias ty ->
             let def = parse ty in
             let rl = Sreg.elements def.ity_vars.vars_reg in
-            create_itysymbol id ~abst ~priv vl rl (Some def)
+            create_itysymbol id ~abst ~priv ~inv:false vl rl (Some def)
         | TDalgebraic csl when Hashtbl.find mutables x ->
             let projs = Hashtbl.create 5 in
             (* to check projections' types we must fix the tyvars *)
             let add s v = let t = ity_var v in ity_match s t t in
             let sbs = List.fold_left add ity_subst_empty vl in
-            let mk_proj s (id,pty) =
+            let mk_proj (regs,inv) (id,pty) =
               let ity = parse pty in
               let vtv = vty_value ity in
+              let inv = inv || ity_inv ity in
               match id with
                 | None ->
                     let pv = create_pvsymbol (id_fresh "pj") vtv in
-                    Sreg.union s ity.ity_vars.vars_reg, (pv, false)
+                    (Sreg.union regs ity.ity_vars.vars_reg, inv), (pv, false)
                 | Some id ->
                     try
                       let pv = Hashtbl.find projs id.id in
@@ -1194,39 +1200,42 @@ let add_types ~wp uc tdl =
                       (* TODO: once we have ghost/mutable fields in algebraics,
                          don't forget to check here that they coincide, too *)
                       ignore (Loc.try3 id.id_loc ity_match sbs ty ity);
-                      s, (pv, true)
+                      (regs, inv), (pv, true)
                     with Not_found ->
                       let pv = create_pvsymbol (Denv.create_user_id id) vtv in
                       Hashtbl.replace projs id.id pv;
-                      Sreg.union s ity.ity_vars.vars_reg, (pv, true)
+                      (Sreg.union regs ity.ity_vars.vars_reg, inv), (pv, true)
             in
             let mk_constr s (_loc,cid,pjl) =
               let s,pjl = Util.map_fold_left mk_proj s pjl in
               s, (Denv.create_user_id cid, pjl)
             in
-            let s,def = Util.map_fold_left mk_constr Sreg.empty csl in
+            let init = (Sreg.empty, d.td_inv <> None) in
+            let (regs,inv),def = Util.map_fold_left mk_constr init csl in
             Hashtbl.replace predefs x def;
-            create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
+            create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None
         | TDrecord fl when Hashtbl.find mutables x ->
-            let mk_field s f =
+            let mk_field (regs,inv) f =
               let ghost = f.f_ghost in
               let ity = parse f.f_pty in
+              let inv = inv || ity_inv ity in
               let fid = Denv.create_user_id f.f_ident in
-              let s,mut = if f.f_mutable then
+              let regs,mut = if f.f_mutable then
                 let r = create_region fid ity in
-                Sreg.add r s, Some r
+                Sreg.add r regs, Some r
               else
-                Sreg.union s ity.ity_vars.vars_reg, None
+                Sreg.union regs ity.ity_vars.vars_reg, None
               in
               let vtv = vty_value ?mut ~ghost ity in
-              s, (create_pvsymbol fid vtv, true)
+              (regs, inv), (create_pvsymbol fid vtv, true)
             in
-            let s,pjl = Util.map_fold_left mk_field Sreg.empty fl in
+            let init = (Sreg.empty, d.td_inv <> None) in
+            let (regs,inv),pjl = Util.map_fold_left mk_field init fl in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
             Hashtbl.replace predefs x [Denv.create_user_id cid, pjl];
-            create_itysymbol id ~abst ~priv vl (Sreg.elements s) None
+            create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None
         | TDalgebraic _ | TDrecord _ | TDabstract ->
-            create_itysymbol id ~abst ~priv vl [] None
+            create_itysymbol id ~abst ~priv ~inv:false vl [] None
       in
       Hashtbl.add tysymbols x (Some ts);
       ts
@@ -1307,7 +1316,7 @@ let add_types ~wp uc tdl =
   let check its = Mid.mem its.its_pure.ts_name kn in
   let check ity = ity_s_any check Util.ffalse ity in
   let is_impure_type ts =
-    ts.its_abst || ts.its_priv || ts.its_regs <> [] ||
+    ts.its_abst || ts.its_priv || ts.its_inv || ts.its_regs <> [] ||
     option_apply false check ts.its_def
   in
   let check (pv,_) =
@@ -1342,6 +1351,31 @@ let add_types ~wp uc tdl =
     else
       add_decl_with_tuples uc (Decl.create_ty_decl ts.its_pure)
   in
+  let add_invariant uc d = match d.td_inv with
+    | None -> uc
+    | Some f ->
+        let ts = Util.of_option (Hashtbl.find tysymbols d.td_ident.id) in
+        let ty = ty_app ts.its_pure (List.map ty_var ts.its_pure.ts_args) in
+        let x = "result" in
+        let f = match d.td_def with
+          | TDrecord fl ->
+              let loc = f.pp_loc in
+              let field { f_loc = loc; f_ident = id } =
+                Qident id, { pat_loc = loc; pat_desc = PPpvar id } in
+              let pat = PPprec (List.map field fl) in
+              let pat = { pat_loc = loc; pat_desc = pat } in
+              let id = { id = x; id_lab = []; id_loc = loc } in
+              let id = { pp_loc = loc; pp_desc = Ptree.PPvar (Qident id) } in
+              { pp_loc = loc; pp_desc = Ptree.PPmatch (id, [pat, f]) }
+          | TDabstract | TDalias _ | TDalgebraic _ -> f
+        in
+        let res = create_vsymbol (id_fresh x) ty in
+        let log_vars = Mstr.singleton x res in
+        let log_denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
+        let f = Typing.type_fmla (get_theory uc) log_denv log_vars f in
+        let uc = (count_term_tuples f; flush_tuples uc) in
+        Mlw_module.add_invariant uc ts (Mlw_ty.create_post res f)
+  in
   try
     let uc = List.fold_left add_type_decl uc abstr in
     let uc = if algeb = [] then uc else
@@ -1352,6 +1386,7 @@ let add_types ~wp uc tdl =
         add_decl_with_tuples uc (Decl.create_data_decl d)
     in
     let uc = List.fold_left add_type_decl uc alias in
+    let uc = List.fold_left add_invariant uc tdl in
     uc
   with
     | ClashSymbol s ->
