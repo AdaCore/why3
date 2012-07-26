@@ -91,6 +91,16 @@ version_old = "^1\.0\.1\.*$"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e"
 driver = "drivers/yices.drv"
 
+[ATP yices2]
+name = "Yices2"
+exec = "yices"
+exec = "yices-2.0.4"
+version_switch = "--version"
+version_regexp = "[Yices ]*\\([^ \n]+\\)\."
+version_ok = "^2\.0\.4"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e"
+driver = "drivers/yices.drv"
+
 [ATP eprover]
 name = "Eprover"
 exec = "eprover"

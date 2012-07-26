@@ -31,6 +31,9 @@ theory BuiltIn
   syntax predicate (=)  "(= %1 %2)"
 
   meta "encoding : kept" type int
+
+  (* could we do this? *)
+  (* meta "eliminate_algebraic" "keep_enums" *)
 end
 
 theory int.Int
