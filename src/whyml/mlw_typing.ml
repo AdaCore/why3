@@ -661,13 +661,18 @@ let create_lenv uc = {
 
 (* invariant handling *)
 
-let env_invariant lenv svs =
+let env_invariant lenv eff svs =
   let kn = get_known lenv.mod_uc in
   let lkn = Theory.get_known (get_theory lenv.mod_uc) in
-  let add_vs vs inv =
+  let regs = Sreg.union eff.eff_writes eff.eff_ghostw in
+  let add_vs vs (pinv,qinv) =
     let ity = (restore_pv vs).pv_vtv.vtv_ity in
-    t_and_simp inv (Mlw_wp.full_invariant lkn kn vs ity) in
-  Svs.fold add_vs svs t_true
+    let written r = reg_occurs r ity.ity_vars in
+    let inv = Mlw_wp.full_invariant lkn kn vs ity in
+    t_and_simp pinv inv,
+    if Sreg.exists written regs then t_and_simp qinv inv else qinv
+  in
+  Svs.fold add_vs svs (t_true,t_true)
 
 let post_invariant lenv inv ity q =
   let vs, q = open_post q in
@@ -678,10 +683,10 @@ let post_invariant lenv inv ity q =
   Mlw_ty.create_post vs q
 
 let spec_invariant lenv svs ity spec =
-  let inv = env_invariant lenv svs in
-  let post_inv = post_invariant lenv inv in
+  let pinv,qinv = env_invariant lenv spec.c_effect svs in
+  let post_inv = post_invariant lenv qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
-  { spec with c_pre   = t_and_simp spec.c_pre inv;
+  { spec with c_pre   = t_and_simp spec.c_pre pinv;
               c_post  = post_inv ity spec.c_post;
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
