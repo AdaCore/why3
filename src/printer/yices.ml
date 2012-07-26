@@ -68,7 +68,7 @@ type info = {
 }
 
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "yices : you must encode the polymorphism"
+  | Tyvar _ -> unsupported "yices: you must encode polymorphism"
   | Tyapp (ts, []) -> begin match query_syntax info.info_syn ts.ts_name with
       | Some s -> syntax_arguments s (print_type info) fmt []
       | None -> fprintf fmt "%a" print_ident ts.ts_name
@@ -85,7 +85,7 @@ let rec print_type info fmt ty = match ty.ty_node with
 (*   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl *)
 
 let rec iter_complex_type info fmt () ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "cvc3 : you must encode the polymorphism"
+  | Tyvar _ -> unsupported "yices: you must encode polymorphism"
   | Tyapp (_, []) -> ()
   | Tyapp (ts, l) ->
     begin match query_syntax info.info_syn ts.ts_name with
@@ -151,7 +151,7 @@ let rec print_term info fmt t = match t.t_node with
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) t fmt tl
-      | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
+      | None -> begin match tl with
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
           | _ -> fprintf fmt "@,(%a %a)"
               print_ident ls.ls_name (print_list space (print_term info)) tl
@@ -165,9 +165,9 @@ let rec print_term info fmt t = match t.t_node with
       fprintf fmt "@[(if %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
   | Tcase _ -> unsupportedTerm t
-      "yices : you must eliminate match"
+      "yices: you must eliminate match"
   | Teps _ -> unsupportedTerm t
-      "yices : you must eliminate epsilon"
+      "yices: you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = match f.t_node with
@@ -224,7 +224,7 @@ and print_fmla info fmt f = match f.t_node with
         (print_term info) t1 (print_fmla info) f2;
       forget_var v
   | Tcase _ -> unsupportedTerm f
-      "yices : you must eliminate match"
+      "yices: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
@@ -247,6 +247,19 @@ let print_type_decl info fmt ts =
   (fprintf fmt "(define-type %a)" print_ident ts.ts_name; true)
   else false
 
+let print_data_decl _info fmt = function
+  | ts, csl (* monomorphic enumeration *)
+    when ts.ts_args = [] && List.for_all (fun (_,l) -> l = []) csl ->
+      let print_cs fmt (ls,_) = print_ident fmt ls.ls_name in
+      fprintf fmt "@[<hov 2>(define-type %a@ (scalar %a))@]@\n@\n"
+        print_ident ts.ts_name (print_list space print_cs) csl
+  | _, _ ->
+      unsupported "yices: algebraic types are not supported"
+
+let print_data_decl info fmt (ts, _ as d) =
+  if Mid.mem ts.ts_name info.info_syn then false
+  else begin print_data_decl info fmt d; true end
+
 let print_param_decl info fmt ls =
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
   Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
@@ -268,14 +281,14 @@ let print_param_decl info fmt ls =
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
-  | Ddata _ -> unsupportedDecl d
-      "yices : algebraic type are not supported"
+  | Ddata dl ->
+      print_list_opt nothing (print_data_decl info) fmt dl
   | Dparam ls ->
       print_param_decl info fmt ls
   | Dlogic _ -> unsupportedDecl d
-      "yices : function and predicate definitions are not supported"
+      "yices: function and predicate definitions are not supported"
   | Dind _ -> unsupportedDecl d
-      "yices : inductive definition are not supported"
+      "yices: inductive definitions are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
   | Dprop (Paxiom, pr, f) ->
     find_complex_type info fmt f;
