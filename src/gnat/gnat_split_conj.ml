@@ -1,5 +1,4 @@
 open Why3
-open Ident
 open Term
 open Decl
 
