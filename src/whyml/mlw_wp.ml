@@ -80,7 +80,7 @@ let to_term t = if t.t_ty = None then mk_t_if t else t
 
 (* any vs in post/xpost is either a pvsymbol or a fresh mark *)
 let vtv_of_vs vs =
-  try (restore_pv vs).pv_vtv with UnboundVar _ -> vtv_mark
+  try (restore_pv vs).pv_vtv with Not_found -> vtv_mark
 
 (* replace every occurrence of [old(t)] with [at(t,'old)] *)
 let rec remove_old f = match f.t_node with
@@ -128,6 +128,7 @@ let expl_post      = Ident.create_label "expl:normal postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
+let expl_inv       = Ident.create_label "expl:type invariant"
 let expl_variant   = Ident.create_label "expl:variant decreases"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
@@ -256,11 +257,11 @@ let decrease ?loc env olds varl =
 
 (** Reconstruct pure values after writes *)
 
-let find_constructors env sts ity = match ity.ity_node with
+let find_constructors lkn kn sts ity = match ity.ity_node with
   | Itypur (ts,_) ->
       let base = ity_pur ts (List.map ity_var ts.ts_args) in
       let sbs = ity_match ity_subst_empty base ity in
-      let csl = Decl.find_constructors env.pure_known ts in
+      let csl = Decl.find_constructors lkn ts in
       if csl = [] || Sts.mem ts sts then Loc.errorm
         "Cannot update values of type %a" Mlw_pretty.print_ity base;
       let subst ty = ity_full_inst sbs (ity_of_ty ty), None in
@@ -269,7 +270,7 @@ let find_constructors env sts ity = match ity.ity_node with
   | Ityapp (its,_,_) ->
       let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
       let sbs = ity_match ity_subst_empty base ity in
-      let csl = Mlw_decl.find_constructors env.prog_known its in
+      let csl = Mlw_decl.find_constructors kn its in
       if csl = [] || Sts.mem its.its_pure sts then Loc.errorm
         "Cannot update values of type %a" Mlw_pretty.print_ity base;
       let subst vtv =
@@ -279,6 +280,17 @@ let find_constructors env sts ity = match ity.ity_node with
       Sts.add its.its_pure sts, List.map cnstr csl
   | Ityvar _ -> assert false
 
+let analyze_var fn_down fn_join lkn kn sts vs ity =
+  let sts, csl = find_constructors lkn kn sts ity in
+  let branch (cs,ityl) =
+    let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
+    let vars = List.map mk_var ityl in
+    let mk_arg vs (ity, mut) = fn_down sts vs ity mut in
+    let t = fn_join cs (List.map2 mk_arg vars ityl) vs.vs_ty in
+    let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
+    t_close_branch pat t in
+  t_case (t_var vs) (List.map branch csl)
+
 let update_var env mreg vs =
   let rec update sts vs ity mut =
     (* are we a mutable variable? *)
@@ -286,18 +298,8 @@ let update_var env mreg vs =
     let vs = Util.option_apply vs get_vs mut in
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
-    if ity_pure ity || not (Mreg.exists check_reg mreg) then
-      t_var vs
-    else
-      let sts, csl = find_constructors env sts ity in
-      let branch (cs,ityl) =
-        let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
-        let vars = List.map mk_var ityl in
-        let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
-        let mk_arg vs (ity, mut) = update sts vs ity mut in
-        let t = fs_app cs (List.map2 mk_arg vars ityl) vs.vs_ty in
-        t_close_branch pat t in
-      t_case (t_var vs) (List.map branch csl)
+    if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
+    else analyze_var update fs_app env.pure_known env.prog_known sts vs ity
   in
   let vtv = vtv_of_vs vs in
   update Sts.empty vs vtv.vtv_ity vtv.vtv_mut
@@ -365,6 +367,44 @@ let quantify env regs f =
   let update v t f = wp_let (Mvs.find v vv') t f in
   let f = Mvs.fold update vars (subst_at_now true vv' f) in
   wp_forall (List.rev (Mreg.values mreg)) f
+
+(* invariants *)
+
+let get_invariant kn v =
+  let ts = match v.vs_ty.ty_node with
+    | Tyapp (ts,_) -> ts
+    | _ -> assert false in
+  let rec find_td = function
+    | (its,_,inv) :: _ when ts_equal ts its.its_pure -> inv
+    | _ :: tdl -> find_td tdl
+    | [] -> assert false in
+  let pd = Mid.find ts.ts_name kn in
+  let inv = match pd.Mlw_decl.pd_node with
+    | Mlw_decl.PDdata tdl -> find_td tdl
+    | _ -> assert false in
+  let sbs = Ty.ty_match Mtv.empty (t_type inv) v.vs_ty in
+  let u, p = open_post (t_ty_subst sbs Mvs.empty inv) in
+  wp_expl expl_inv (t_subst_single u (t_var v) p)
+
+let ps_inv = Term.create_psymbol (id_fresh "inv")
+  [ty_var (create_tvsymbol (id_fresh "a"))]
+
+let full_invariant lkn kn vs ity =
+  let rec update sts vs ity _ =
+    if not (ity_inv ity) then t_true else
+    (* what is our current invariant? *)
+    let f = match ity.ity_node with
+      | Ityapp (its,_,_) when its.its_inv ->
+          get_invariant kn vs
+        (* ps_app ps_inv [t_var vs] *)
+      | _ -> t_true in
+    (* what are our sub-invariants? *)
+    let join _ fl _ = wp_ands ~sym:true fl in
+    let g = analyze_var update join lkn kn sts vs ity in
+    (* put everything together *)
+    wp_and ~sym:true f g
+  in
+  update Sts.empty vs ity None
 
 (** Weakest preconditions *)
 

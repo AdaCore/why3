@@ -285,7 +285,10 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 val create_pvsymbol : preid -> vty_value -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
-  (* raises Decl.UnboundVar if the argument is not a pv_vs *)
+  (* raises Not_found if the argument is not a pv_vs *)
+
+val restore_pv_by_id : ident -> pvsymbol
+  (* raises Not_found if the argument is not a pv_vs.vs_name *)
 
 (** program types *)
 

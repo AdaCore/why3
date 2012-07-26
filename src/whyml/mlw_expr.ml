@@ -366,12 +366,16 @@ let variant_vars varl vsset =
   let add_variant s (t,_) = Mvs.set_union s t.t_vars in
   List.fold_left add_variant vsset varl
 
-let spec_varmap varm spec =
+let spec_vsset spec =
   let vsset = pre_vars spec.c_pre Mvs.empty in
   let vsset = post_vars spec.c_post vsset in
   let vsset = xpost_vars spec.c_xpost vsset in
   let vsset = variant_vars spec.c_variant vsset in
-  add_t_vars vsset varm
+  vsset
+
+let spec_varmap varm spec = add_t_vars (spec_vsset spec) varm
+
+let spec_vsset spec = Mvs.map (const ()) (spec_vsset spec)
 
 let rec vta_varmap vta =
   let varm = match vta.vta_result with

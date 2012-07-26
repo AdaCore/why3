@@ -49,6 +49,7 @@ type ident = private {
 module Mid : Map.S with type key = ident
 module Sid : Mid.Set
 module Hid : Hashtbl.S with type key = ident
+module Wid : Hashweak.S with type key = ident
 
 val id_equal : ident -> ident -> bool
 

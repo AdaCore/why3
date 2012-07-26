@@ -659,6 +659,79 @@ let create_lenv uc = {
   log_denv = Typing.denv_empty_with_globals (find_global_vs uc);
 }
 
+(* invariant handling *)
+
+let env_invariant lenv svs =
+  let kn = get_known lenv.mod_uc in
+  let lkn = Theory.get_known (get_theory lenv.mod_uc) in
+  let add_vs vs inv =
+    let ity = (restore_pv vs).pv_vtv.vtv_ity in
+    t_and_simp inv (Mlw_wp.full_invariant lkn kn vs ity) in
+  Svs.fold add_vs svs t_true
+
+let post_invariant lenv inv ity q =
+  let vs, q = open_post q in
+  let kn = get_known lenv.mod_uc in
+  let lkn = Theory.get_known (get_theory lenv.mod_uc) in
+  let res_inv = Mlw_wp.full_invariant lkn kn vs ity in
+  let q = t_and_asym_simp q (t_and_simp res_inv inv) in
+  Mlw_ty.create_post vs q
+
+let spec_invariant lenv svs ity spec =
+  let inv = env_invariant lenv svs in
+  let post_inv = post_invariant lenv inv in
+  let xpost_inv xs q = post_inv xs.xs_ity q in
+  { spec with c_pre   = t_and_simp spec.c_pre inv;
+              c_post  = post_inv ity spec.c_post;
+              c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
+
+let ity_or_unit = function
+  | VTvalue v -> v.vtv_ity
+  | VTarrow _ -> ity_unit
+
+let expr_vsset svs e =
+  let add_id id _ s =
+    try Svs.add (restore_pv_by_id id).pv_vs s
+    with Not_found -> s in
+  Mid.fold add_id e.e_varm svs
+
+let abst_invariant lenv e q xq =
+  let spec = {
+    c_pre     = t_true;
+    c_effect  = eff_empty;
+    c_post    = q;
+    c_xpost   = xq;
+    c_variant = [];
+    c_letrec  = 0 } in
+  let ity = ity_or_unit e.e_vty in
+  let svs = expr_vsset (spec_vsset spec) e in
+  let spec = spec_invariant lenv svs ity spec in
+  spec.c_post, spec.c_xpost
+
+let spec_of_lambda lam = {
+  c_pre     = lam.l_pre;
+  c_effect  = lam.l_expr.e_effect;
+  c_post    = lam.l_post;
+  c_xpost   = lam.l_xpost;
+  c_variant = lam.l_variant;
+  c_letrec  = 0 }
+
+let lambda_invariant lenv svs lam =
+  let spec = spec_of_lambda lam in
+  let add_pv s pv = Svs.add pv.pv_vs s in
+  let svs = List.fold_left add_pv svs lam.l_args in
+  let ity = ity_or_unit lam.l_expr.e_vty in
+  let spec = spec_invariant lenv svs ity spec in
+  { lam with  l_pre   = spec.c_pre;
+              l_post  = spec.c_post;
+              l_xpost = spec.c_xpost }
+
+let lambda_vsset lam =
+  let del_pv svs pv = Svs.remove pv.pv_vs svs in
+  let svs = spec_vsset (spec_of_lambda lam) in
+  let svs = expr_vsset svs lam.l_expr in
+  List.fold_left del_pv svs lam.l_args
+
 let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
   | Ty.Tyvar v -> Denv.tyuvar v
@@ -842,7 +915,11 @@ let rec type_c lenv gh svs vars dtyc =
     let add vs f = let t = t_var vs in t_and_simp (t_equ t t) f in
     let xq = Mlw_ty.create_post res (Svs.fold add esvs t_true) in
     Mexn.add_new exn xs_exit xq spec.c_xpost in
-  { spec with c_xpost = xpost }, vty
+  let spec = { spec with c_xpost = xpost } in
+  (* add the invariants *)
+  let ity = ity_or_unit vty in
+  let svs = Svs.union svs (spec_vsset spec) in
+  spec_invariant lenv svs ity spec, vty
 
 and type_v lenv gh svs vars = function
   | DSpecV (ghost,v) ->
@@ -971,7 +1048,9 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEabstract (de1, q, xq) ->
       let e1 = expr lenv de1 in
       let q = create_post lenv "result" e1.e_vty q in
-      e_abstract e1 q (complete_xpost lenv e1.e_effect xq)
+      let xq = complete_xpost lenv e1.e_effect xq in
+      let q, xq = abst_invariant lenv e1 q xq in
+      e_abstract e1 q xq
   | DEassert (ak, f) ->
       let ak = match ak with
         | Ptree.Aassert -> Aassert
@@ -1033,10 +1112,15 @@ and expr_rec lenv rdl =
     add_local id.id (LetA ps) lenv, (ps, gh, lam) in
   let lenv, rdl = Util.map_fold_left step1 lenv rdl in
   let step2 (ps, gh, lam) = ps, expr_lam lenv gh lam in
-  create_rec_defn (List.map step2 rdl)
+  let rdl = List.map step2 rdl in
+  let add_rd_vsset s (_, lam) = Svs.union s (lambda_vsset lam) in
+  let svs = List.fold_left add_rd_vsset Svs.empty rdl in
+  let step3 (ps, lam) = ps, lambda_invariant lenv svs lam in
+  create_rec_defn (List.map step3 rdl)
 
 and expr_fun lenv x gh lam =
   let lam = expr_lam lenv gh lam in
+  let lam = lambda_invariant lenv (lambda_vsset lam) lam in
   let def = create_fun_defn (Denv.create_user_id x) lam in
   def, (List.hd def.rec_defn).fun_ps
 

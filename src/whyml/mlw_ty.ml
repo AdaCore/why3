@@ -827,14 +827,14 @@ let create_pvsymbol id vtv = {
   pv_vars = vtv_vars vtv;
 }
 
-let create_pvsymbol, restore_pv =
-  let vs_to_pv = Wvs.create 17 in
+let create_pvsymbol, restore_pv, restore_pv_by_id =
+  let id_to_pv = Wid.create 17 in
   (fun id vtv ->
     let pv = create_pvsymbol id vtv in
-    Wvs.set vs_to_pv pv.pv_vs pv;
+    Wid.set id_to_pv pv.pv_vs.vs_name pv;
     pv),
-  (fun vs -> try Wvs.find vs_to_pv vs with Not_found ->
-    Loc.error ?loc:vs.vs_name.id_loc (Decl.UnboundVar vs))
+  (fun vs -> Wid.find id_to_pv vs.vs_name),
+  (fun id -> Wid.find id_to_pv id)
 
 (** program types *)
 
