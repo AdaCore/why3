@@ -469,21 +469,15 @@ else
         PVSVERSION=`$PVS -version | sed -n -e 's|.*Version* *\([[^ ]]*\)$|\1|p' `
 
         case $PVSVERSION in
-          6.0)
-	        enable_pvs_support=yes
+          2.*|3.*|4.*|5.*)
                 AC_MSG_RESULT($PVSVERSION)
-                ;;
-          5.0)
-	        enable_pvs_support=yes
-                AC_MSG_RESULT($PVSVERSION)
-                enable_pvs_libs=no
-                AC_MSG_WARN(No PVS realizations)
-                reason_pvs_libs="(requires version 6.0 or higher)"
+                enable_pvs_support=no
+	        AC_MSG_WARN(You need PVS 6.0 or higher; PVS discarded)
+                reason_pvs_support=" (need version 6.0 or higher)"
                 ;;
           *)
-                enable_pvs_support=no
-	        AC_MSG_WARN(You need PVS 5.0 or higher; PVS discarded)
-                reason_pvs_support=" (need version 5.0 or higher)"
+	        enable_pvs_support=yes
+                AC_MSG_RESULT($PVSVERSION)
                 ;;
         esac
     fi
