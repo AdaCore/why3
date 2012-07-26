@@ -97,7 +97,7 @@ Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
 Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list
   Z)), ((infix_plpl (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
 
-Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
+Require Import Why3. Ltac z := why3 "z3" timelimit 5.
 
 (* Why3 goal *)
 Theorem depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z),

@@ -134,12 +134,12 @@ generalize (h10 k h). intros h10k.
 assert (case: (j < get g1 k \/ j = get g1 k \/ j > get g1 k)%Z) by omega.
 destruct case.
 (* j < g[k] *)
-why3 "z3-3" timelimit 5.
+why3 "z3" timelimit 5.
 destruct H5.
 (* j = g[k] *)
 ae.
 (* j > g[k] *)
-why3 "z3-3" timelimit 3.
+why3 "z3" timelimit 3.
 (* k = 0 *)
 ae.
 Qed.

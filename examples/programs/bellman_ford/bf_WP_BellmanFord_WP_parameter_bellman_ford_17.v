@@ -438,7 +438,7 @@ Axiom key_lemma_2 : forall (m:(map vertex t)), (inv1 m (cardinal vertices)
   forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
-Ltac Z3 := why3 "z3-3".
+Ltac Z3 := why3 "z3".
 Ltac ae := why3 "alt-ergo".
 
 (* Why3 goal *)
@@ -498,7 +498,7 @@ destruct (get m1 v) as [] _eqn; auto.
 intros l hpath hlength.
 destruct (path_right_inversion s v l hpath) as [(h1,h2) | (y, (l', (h1, (h2, h3))))].
 (* Nil *)
-subst. simpl. why3 "cvc3-2.4".
+subst. simpl. why3 "cvc3".
 (* Cons *)
 rewrite h3; rewrite path_weight_right_extension.
 generalize (H6 v H7); clear H6.

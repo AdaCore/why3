@@ -435,7 +435,7 @@ Definition inv2(m:(map vertex t)) (via:(set1 (vertex* vertex)%type)): Prop :=
 
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 30.
-Ltac Z3 := why3 "z3-3" timelimit 10.
+Ltac Z3 := why3 "z3" timelimit 10.
 
 Lemma length_nonneg: forall a, forall l: list a, (length l >= 0)%Z.
 induction l; ae.

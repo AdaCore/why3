@@ -170,7 +170,7 @@ Inductive g : (list (Z* tree)%type) -> Prop :=
   | Gtwo : forall (d:Z) (t:tree) (l:(list (Z* tree)%type)), (greedy d t l) ->
       ((g l) -> (g (Cons (d, t) l))).
 
-Require Import Why3. Ltac z := why3 "z3-3".
+Require Import Why3. Ltac z := why3 "z3".
 
 (* Why3 goal *)
 Theorem g_tail : forall (l:(list (Z* tree)%type)) (d:Z) (t:tree),

@@ -7,21 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
@@ -119,7 +104,7 @@ Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
   t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
 
 (* Why3 assumption *)
-Definition lt_nat(x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x <  y)%Z.
+Definition lt_nat(x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x < y)%Z.
 
 (* Why3 assumption *)
 Inductive lex : (Z* Z)%type -> (Z* Z)%type -> Prop :=
@@ -162,15 +147,6 @@ Axiom forest_depths_append : forall (f1:(list (Z* tree)%type)) (f2:(list (Z*
 
 (* Why3 assumption *)
 Set Implicit Arguments.
-Fixpoint only_leaf(l:(list (Z* tree)%type)) {struct l}: Prop :=
-  match l with
-  | Nil => True
-  | (Cons (_, t) r) => (t = Leaf) /\ (only_leaf r)
-  end.
-Unset Implicit Arguments.
-
-(* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint greedy(d:Z) (d1:Z) (t1:tree) {struct t1}: Prop := (~ (d = d1)) /\
   match t1 with
   | Leaf => True
@@ -190,7 +166,7 @@ Inductive g : (list (Z* tree)%type) -> Prop :=
 Axiom g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
   tree)%type)), (g (infix_plpl l1 l2)) -> (g l1).
 
-Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
+Require Import Why3. Ltac z := why3 "z3" timelimit 5.
 Ltac ae := why3 "alt-ergo".
 
 Lemma depths_length: forall t d, (length (depths d t) >= 1)%Z.
@@ -208,7 +184,7 @@ Qed.
 Lemma g_tail : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
   tree)%type)), (g (infix_plpl l1 l2)) -> (g l2).
 induction l1; simpl; auto.
-z.
+ae.
 Qed.
 
 Theorem key_lemma : forall t l d d1 t1 s, (d < d1)%Z ->
@@ -241,7 +217,7 @@ assert (case: (d2 < d1 \/ d1 < d2)%Z) by omega. destruct case as [case|case].
 assert (L0: (forall t2 d1 d2, greedy d1 d2 t2 -> d2 < d1 ->
    match depths d2 t2 with Cons x _ => x < d1 | Nil  => False end)%Z).
   induction t0.
-  z.
+  ae.
   simpl.
   clear IHt0_2.
   intros d0 d3 (diseq, gr) lt.
@@ -343,7 +319,7 @@ generalize eq; clear eq.
 replace (depths d t) with (infix_plpl (depths d t) Nil) by z.
 apply key_lemma; auto.
 simpl in H.
-z.
+ae.
 Qed.
 
 

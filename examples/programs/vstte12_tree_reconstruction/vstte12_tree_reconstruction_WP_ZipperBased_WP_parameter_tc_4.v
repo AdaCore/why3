@@ -180,7 +180,7 @@ Axiom main_lemma : forall (l:(list (Z* tree)%type)) (d1:Z) (d2:Z) (t1:tree)
   (t2:tree), (~ (d1 = d2)) -> ((g (reverse (Cons (d1, t1) l))) ->
   (g (reverse (Cons (d2, t2) (Cons (d1, t1) l))))).
 
-Require Import Why3. Ltac z := why3 "z3-3".
+Require Import Why3. Ltac z := why3 "z3".
 
 (* Why3 goal *)
 Theorem WP_parameter_tc : forall (left1:(list (Z* tree)%type)),
