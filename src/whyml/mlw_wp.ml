@@ -388,21 +388,34 @@ let empty_state kn = {
 let next_point state =
   let res = !(state.next) in incr state.next; res
 
-let get_ts = function
-  | Some { ty_node = Tyapp (ts,_) } -> ts
-  | _ -> assert false
-
-let make_value state csl =
+let make_value state ty =
   let get_p _ = next_point state in
   let new_cs cs = List.map get_p cs.ls_args in
   let add_cs m (cs,_) = Mls.add cs (new_cs cs) m in
+  let csl = match ty.ty_node with
+    | Tyapp (ts,_) -> Decl.find_constructors state.kn ts
+    | _ -> assert false in
   List.fold_left add_cs Mls.empty csl
 
-let match_point state csl p =
+let match_point state ty p =
   try Hashtbl.find state.memory p with Not_found ->
-  let value = make_value state csl in
+  let value = make_value state ty in
   Hashtbl.replace state.memory p value;
   value
+
+let rec open_pattern state names value p pat = match pat.pat_node with
+  | Pwild -> names
+  | Pvar vs -> Mvs.add vs p names
+  | Papp (cs,patl) ->
+      let add_pat names p pat =
+        let value = match_point state pat.pat_ty p in
+        open_pattern state names value p pat in
+      List.fold_left2 add_pat names (Mls.find cs value) patl
+  | Por _ ->
+      let add_vs vs s = Mvs.add vs (next_point state) s in
+      Svs.fold add_vs pat.pat_vars names
+  | Pas (pat,vs) ->
+      open_pattern state (Mvs.add vs p names) value p pat
 
 let rec point_of_term state names t = match t.t_node with
   | Tvar vs ->
@@ -418,28 +431,58 @@ let rec point_of_term state names t = match t.t_node with
         | _ -> next_point state
       end
   | Tlet (t1, bt) ->
-      let p = point_of_term state names t1 in
+      let p1 = point_of_term state names t1 in
       let v, t2 = t_open_bound bt in
-      let names = Mvs.add v p names in
+      let names = Mvs.add v p1 names in
       point_of_term state names t2
-  (* | Tcase _ when Slab.mem update_lab t.t_label -> *)
-  | Tcase (_t1,[_b]) -> assert false (* TODO *)
-  | Tconst _ | Tif _ | Tcase _ | Teps _ -> next_point state
+  | Tcase (t1,[br]) ->
+      let pat, t2 = t_open_branch br in
+      let p1 = point_of_term state names t1 in
+      let value = match_point state pat.pat_ty p1 in
+      let names = open_pattern state names value p1 pat in
+      point_of_term state names t2
+  | Tcase (t1,bl) ->
+      (* we treat here the case of a value update: the value
+         of each branch must be a distinct constructor *)
+      let p = next_point state in
+      let ty = of_option t.t_ty in
+      let p1 = point_of_term state names t1 in
+      let value = match_point state (of_option t1.t_ty) p1 in
+      let branch acc br =
+        let pat, t2 = t_open_branch br in
+        let ls = match t2.t_node with
+          | Tapp (ls,_) -> ls | _ -> raise Exit in
+        let names = open_pattern state names value p1 pat in
+        let p2 = point_of_term state names t2 in
+        let v2 = match_point state ty p2 in
+        Mls.add_new Exit ls (Mls.find_exn Exit ls v2) acc
+      in
+      begin try
+        let value = List.fold_left branch Mls.empty bl in
+        let value = Mls.set_union value (make_value state ty) in
+        Hashtbl.replace state.memory p value
+      with Exit -> () end;
+      p
+  | Tconst _ | Tif _ | Teps _ -> next_point state
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> assert false
 
 and point_of_constructor state names ls tl =
-  let csl = Decl.find_constructors state.kn (get_ts ls.ls_value) in
-  let pl = List.map (point_of_term state names) tl in
-  let value = Mls.add ls pl (make_value state csl) in
   let p = next_point state in
+  let pl = List.map (point_of_term state names) tl in
+  let value = make_value state (of_option ls.ls_value) in
+  let value = Mls.add ls pl value in
   Hashtbl.replace state.memory p value;
   p
 
 and point_of_projection state names ls t1 =
-  match Decl.find_constructors state.kn (get_ts t1.t_ty) with
-    | [cs,pjl] as csl ->
+  let ty = of_option t1.t_ty in
+  let csl = match ty.ty_node with
+    | Tyapp (ts,_) -> Decl.find_constructors state.kn ts
+    | _ -> assert false in
+  match csl with
+    | [cs,pjl] ->
         let p1 = point_of_term state names t1 in
-        let value = match_point state csl p1 in
+        let value = match_point state ty p1 in
         let rec find_p pjl pl = match pjl, pl with
           | Some pj::_, p::_ when ls_equal ls pj -> p
           | _::pjl, _::pl -> find_p pjl pl
