@@ -418,8 +418,10 @@ let save_theory provers fmt t =
   fprintf fmt "@]@\n</theory>"
 
 let save_file provers fmt _ f =
-  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
-    save_string f.file_name (opt "format") f.file_format f.file_verified f.file_expanded;
+  fprintf fmt
+    "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
+    save_string f.file_name (opt "format")
+    f.file_format f.file_verified f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
@@ -427,7 +429,8 @@ let save_prover fmt p (provers,id) =
   fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ \
 name=\"%a\"@ version=\"%a\"%a/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
-    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\"" save_string s)
+    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
+        save_string s)
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
@@ -436,7 +439,8 @@ let save fname config session =
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
-    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
+    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config))
+                   "why3session.dtd");
   fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
     save_string fname session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
@@ -651,7 +655,8 @@ let raw_add_task ~(keygen:'a keygen) parent name expl t exp =
   in
   let key = keygen ~parent:parent_key () in
   let sum = Termcode.task_checksum ~version:!current_shape_version t in
-  let shape = Termcode.t_shape_buf ~version:!current_shape_version (Task.task_goal_fmla t) in
+  let shape = Termcode.t_shape_buf ~version:!current_shape_version
+    (Task.task_goal_fmla t) in
   let goal = { goal_name = name;
                goal_expl = expl;
                goal_parent = parent;
@@ -1166,7 +1171,8 @@ let load_prover eS prover =
     let r = match r with
       | None -> None
       | Some pr ->
-        let dr = Driver.load_driver eS.env pr.Whyconf.driver pr.Whyconf.extra_drivers in
+        let dr = Driver.load_driver eS.env
+          pr.Whyconf.driver pr.Whyconf.extra_drivers in
         Some { prover_config = pr;
                prover_driver = dr}
     in
@@ -1362,7 +1368,8 @@ let array_map_list f l =
 
 let associate_subgoals gname (old_goals : 'a goal list) 
     new_goals =
-  dprintf debug "[Info] associate_subgoals, shape_version = %d@\n" !current_shape_version;
+  dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+    !current_shape_version;
   (*
      we make a map of old goals indexed by their checksums
   *)
@@ -1703,7 +1710,8 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
     ) to_th.theory_goals
 
 let merge_file ~keygen env ~allow_obsolete from_f to_f  =
-  dprintf debug "[Info] merge_file, shape_version = %d@." !current_shape_version;
+  dprintf debug "[Info] merge_file, shape_version = %d@."
+    !current_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
@@ -1752,7 +1760,8 @@ let recompute_all_shapes session =
 
 let update_session ~keygen ~allow_obsolete old_session env whyconf =
   current_shape_version := old_session.session_shape_version;
-  dprintf debug "[Info] update_session: shape_version = %d@\n" !current_shape_version;
+  dprintf debug "[Info] update_session: shape_version = %d@\n"
+    !current_shape_version;
   let new_session =
     create_session ~shape_version:!current_shape_version old_session.session_dir
   in
