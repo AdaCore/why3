@@ -368,6 +368,85 @@ let quantify env regs f =
   let f = Mvs.fold update vars (subst_at_now true vv' f) in
   wp_forall (List.rev (Mreg.values mreg)) f
 
+(* value tracking *)
+
+type point = int
+type value = point list Mls.t (* constructor -> field list *)
+type state = {
+  kn     : Decl.known_map;
+  memory : (point, value) Hashtbl.t;
+  next   : point ref;
+}
+type names = point Mvs.t
+
+let empty_state kn = {
+  kn     = kn;
+  memory = Hashtbl.create 5;
+  next   = ref 0;
+}
+
+let next_point state =
+  let res = !(state.next) in incr state.next; res
+
+let get_ts = function
+  | Some { ty_node = Tyapp (ts,_) } -> ts
+  | _ -> assert false
+
+let make_value state csl =
+  let get_p _ = next_point state in
+  let new_cs cs = List.map get_p cs.ls_args in
+  let add_cs m (cs,_) = Mls.add cs (new_cs cs) m in
+  List.fold_left add_cs Mls.empty csl
+
+let match_point state csl p =
+  try Hashtbl.find state.memory p with Not_found ->
+  let value = make_value state csl in
+  Hashtbl.replace state.memory p value;
+  value
+
+let rec point_of_term state names t = match t.t_node with
+  | Tvar vs ->
+      Mvs.find vs names
+  | Tapp (ls, tl) ->
+      begin match Mid.find ls.ls_name state.kn with
+        | { Decl.d_node = Decl.Ddata tdl } ->
+            let is_cs (cs,_) = ls_equal ls cs in
+            let is_cs (_,csl) = List.exists is_cs csl in
+            if List.exists is_cs tdl
+            then point_of_constructor state names ls tl
+            else point_of_projection state names ls (List.hd tl)
+        | _ -> next_point state
+      end
+  | Tlet (t1, bt) ->
+      let p = point_of_term state names t1 in
+      let v, t2 = t_open_bound bt in
+      let names = Mvs.add v p names in
+      point_of_term state names t2
+  (* | Tcase _ when Slab.mem update_lab t.t_label -> *)
+  | Tcase (_t1,[_b]) -> assert false (* TODO *)
+  | Tconst _ | Tif _ | Tcase _ | Teps _ -> next_point state
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> assert false
+
+and point_of_constructor state names ls tl =
+  let csl = Decl.find_constructors state.kn (get_ts ls.ls_value) in
+  let pl = List.map (point_of_term state names) tl in
+  let value = Mls.add ls pl (make_value state csl) in
+  let p = next_point state in
+  Hashtbl.replace state.memory p value;
+  p
+
+and point_of_projection state names ls t1 =
+  match Decl.find_constructors state.kn (get_ts t1.t_ty) with
+    | [cs,pjl] as csl ->
+        let p1 = point_of_term state names t1 in
+        let value = match_point state csl p1 in
+        let rec find_p pjl pl = match pjl, pl with
+          | Some pj::_, p::_ when ls_equal ls pj -> p
+          | _::pjl, _::pl -> find_p pjl pl
+          | _ -> assert false in
+        find_p pjl (Mls.find cs value)
+    | _ -> next_point state (* more than one, can't choose *)
+
 (* invariants *)
 
 let get_invariant kn v =
