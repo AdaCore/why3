@@ -25,7 +25,7 @@ module Algo65
     a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
     { 0 <= m < n < length a }
     unit writes a i j
-    { m <= !j < !i <= n /\ permut_sub (old a) a m n /\
+    { m <= !j < !i <= n /\ permut_sub (old a) a m (n+1) /\
       exists x:int.
         (forall r:int. m <= r <= !j -> a[r] <= x) /\
         (forall r:int. !j < r < !i -> a[r] = x) /\
@@ -40,13 +40,13 @@ module Algo65
       let j = ref 0 in
 'L1:
       partition a m n i j;
-      assert { permut_sub (at a 'L1) a m n };
+      assert { permut_sub (at a 'L1) a m (n+1) };
 'L2:
       if k <= !j then find a m !j k;
-      assert { permut_sub (at a 'L2) a m n };
+      assert { permut_sub (at a 'L2) a m (n+1) };
       if !i <= k then find a !i n k
     end
-    { permut_sub (old a) a m n /\
+    { permut_sub (old a) a m (n+1) /\
       (forall r:int. m <= r <= k -> a[r] <= a[k]) /\
       (forall r:int. k <= r <= n -> a[k] <= a[r]) }
 
