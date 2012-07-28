@@ -1,6 +1,24 @@
 WhyML
 -----
 
+  - introduce logic predicates for program type invariants:
+      predicate <type_name>_invariant (result : <type_name>) = ...
+    Should this be just the top invariant, as written by the user,
+    or should we also include the invariants for the fields?
+
+  - allow to specify type invariants below a type definition,
+    provided there are no program declarations in between.
+    This allows us to define auxiliary logical functions and
+    predicates that depend on the (pure) type and can be used in
+    the invariant. However, the parser must know from the start
+    that the type has an invariant, what's the best syntax?
+
+  - type invariants are now assumed/asserted at the function call
+    boundaries. We can add a binary flag to Ityapp to allow open
+    types in function signatures (must be careful with reg_match!).
+    The type cast can then play the role of the "close" instruction.
+    Do we need it? What's the good syntax for open types?
+
   - currently every unhandled exception has postcondition "true".
     "false" would be a poor choice, as it could introduce inconsistency
     in the WPs of the caller. Should we allow unhandled exceptions at all?
