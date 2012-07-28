@@ -1,3 +1,24 @@
+docs
+----
+
+  - rename the languages to "Why" and "WhyML". "Why3ML" is a horrible name.
+
+generic
+-------
+
+  - let modules register new command-line options. This would deprecate
+    the "stop flags" in Debug, and serve, for instance, for --type-only,
+    --parse-only, ocaml code extraction, printing of modules, etc.
+
+  - introduce a dedicated buffer-backed formatter for warnings.
+    The contents of the buffer would be shown on stdout or in a window
+    at selected points of program execution. Demote non-critical errors
+    (e.g. unnamed type variables) to warnings.
+
+  - should we create a common [exception Why.Error of exn] to facilitate
+    integration of the library? This would require a special [raise] call:
+        why_raise e = raise (Why.Error e)
+
 WhyML
 -----
 
@@ -45,8 +66,8 @@ WhyML
     require tedious checks pretty much everywhere in the code,
     and they cannot be translated to OCaml.
 
-syntaxe
--------
+syntax
+------
 
   - open
 
@@ -58,52 +79,32 @@ syntaxe
 
        match ... with 0 :: r -> ... | ...
 
-
-sémantique
-----------
-
-  - env should not contain theories under the null path.
-    The current implementation of Typing.find_theory is potentially broken.
+semantics
+---------
 
   - should split_goal provide a "right-hand side only split"?
 
   - produce reparsable tasks in Why3 format: how to preserve information about
     the origins of symbols to be able to use drivers after reparsing?
 
-  - weak memoization in transformations has a disadvantage: if a task or a decl
-    is not changed by a transformation, it will stay in the hash table forever,
-    since the key is the value. Should we use generation numbers in arguments
-    and results of transformations?
-     François -- I don't get that point the weak Hashtbl that we use
-   are designed to work on this case, even with the identity function.
-   What we should do is a way to remove the task from a session when
-   they are not needed anymore.
-
-  - uses : pour l'instant, l'ordre des théories dans le fichier est important
-    i.e. les théories mentionnées par uses doivent être définies précédemment
-
   - open (et échouer si "open A" et "open B" avec A et B déclarant un symbole
     de même nom)
 
-error reporting
----------------
-
-  - should we create a common [exception Why.Error of exn] to facilitate
-    integration of the library? This would require a special [raise] call:
-        why_raise e = raise (Why.Error e)
-
 session
 -------
+
   - save the output of the prover
+
   - escape the string in the xml
+
   - the filenames in the location inside a session should be relative
-   to the session_dir.
+    to the session_dir.
 
 tools
 -----
 
   - the tools should verify that the provers have the same version
-   than reported in the configuration
+    than reported in the configuration
+        Andrei: isn't this done?
+
   - Maybe : make something generic for the dialog box with memory.
-  - autodetection can be modified now that only name/version/altern
-   are taken into account in session.
