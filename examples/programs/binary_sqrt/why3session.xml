@@ -8,10 +8,6 @@
   version="2.4.1"/>
  <prover
   id="1"
-  name="Yices"
-  version="1.0.35"/>
- <prover
-  id="2"
   name="Z3"
   version="4.0"/>
  <file
@@ -21,13 +17,13 @@
   <theory
    name="BinarySqrt"
    locfile="binary_sqrt/../binary_sqrt.mlw"
-   loclnum="4" loccnumb="7" loccnume="17"
+   loclnum="7" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter sqrt"
     locfile="binary_sqrt/../binary_sqrt.mlw"
-    loclnum="8" loccnumb="10" loccnume="14"
+    loclnum="11" loccnumb="10" loccnume="14"
     expl="parameter sqrt"
     sum="6fb9f45bceebd36003977dac619e981d"
     proved="true"
@@ -42,7 +38,7 @@
      <goal
       name="WP_parameter sqrt.1"
       locfile="binary_sqrt/../binary_sqrt.mlw"
-      loclnum="8" loccnumb="10" loccnume="14"
+      loclnum="11" loccnumb="10" loccnume="14"
       expl="normal postcondition"
       sum="f120da5e3e759683aae641129f7f30ec"
       proved="true"
@@ -51,7 +47,7 @@
       <label
        name="expl:parameter sqrt"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -62,7 +58,7 @@
      <goal
       name="WP_parameter sqrt.2"
       locfile="binary_sqrt/../binary_sqrt.mlw"
-      loclnum="8" loccnumb="10" loccnume="14"
+      loclnum="11" loccnumb="10" loccnume="14"
       expl="precondition"
       sum="c46ce2bb4db8e77b0cb247d89dec7ffc"
       proved="true"
@@ -78,19 +74,11 @@
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter sqrt.3"
       locfile="binary_sqrt/../binary_sqrt.mlw"
-      loclnum="8" loccnumb="10" loccnume="14"
+      loclnum="11" loccnumb="10" loccnume="14"
       expl="normal postcondition"
       sum="c6dfcc729813c8e563786251490e58e3"
       proved="true"
