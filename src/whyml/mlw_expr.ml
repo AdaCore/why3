@@ -375,7 +375,9 @@ let spec_vsset spec =
 
 let spec_varmap varm spec = add_t_vars (spec_vsset spec) varm
 
-let spec_vsset spec = Mvs.map (const ()) (spec_vsset spec)
+let spec_pvset pvs spec =
+  let add_vs vs _ s = Spv.add (restore_pv vs) s in
+  Mvs.fold add_vs (spec_vsset spec) pvs
 
 let rec vta_varmap vta =
   let varm = match vta.vta_result with
@@ -518,6 +520,25 @@ let vta_of_expr e = match e.e_vty with
   | VTarrow vta -> vta
 
 let add_e_vars e m = varmap_union e.e_varm m
+
+let e_pvset pvs e =
+  let add_id id _ s =
+    try Spv.add (restore_pv_by_id id) s
+    with Not_found -> s in
+  Mid.fold add_id e.e_varm pvs
+
+let spec_of_lambda lam letrec = {
+  c_pre     = lam.l_pre;
+  c_effect  = lam.l_expr.e_effect;
+  c_post    = lam.l_post;
+  c_xpost   = lam.l_xpost;
+  c_variant = lam.l_variant;
+  c_letrec  = letrec; }
+
+let l_pvset pvs lam =
+  let pvs = e_pvset pvs lam.l_expr in
+  let pvs = spec_pvset pvs (spec_of_lambda lam 0) in
+  List.fold_right Spv.remove lam.l_args pvs
 
 (* check admissibility of consecutive events *)
 
@@ -955,19 +976,12 @@ let e_absurd ity =
 (* simple functional definitions *)
 
 let create_fun_defn id lam letrec recsyms =
-  let e = lam.l_expr in
-  let spec = {
-    c_pre     = lam.l_pre;
-    c_post    = lam.l_post;
-    c_xpost   = lam.l_xpost;
-    c_effect  = e.e_effect;
-    c_variant = lam.l_variant;
-    c_letrec  = letrec; } in
-  let varm = spec_varmap e.e_varm spec in
+  let spec = spec_of_lambda lam letrec in
+  let varm = spec_varmap lam.l_expr.e_varm spec in
   let varm = Mid.set_diff varm recsyms in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
-  let vty = match e.e_vty with
+  let vty = match lam.l_expr.e_vty with
     | VTvalue ({ vtv_mut = Some _ } as vtv) -> VTvalue (vtv_unmut vtv)
     | vty -> vty in
   let vta = vty_arrow lam.l_args ~spec vty in

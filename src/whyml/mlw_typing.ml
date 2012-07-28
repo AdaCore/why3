@@ -661,18 +661,18 @@ let create_lenv uc = {
 
 (* invariant handling *)
 
-let env_invariant lenv eff svs =
+let env_invariant lenv eff pvs =
   let kn = get_known lenv.mod_uc in
   let lkn = Theory.get_known (get_theory lenv.mod_uc) in
   let regs = Sreg.union eff.eff_writes eff.eff_ghostw in
-  let add_vs vs (pinv,qinv) =
-    let ity = (restore_pv vs).pv_vtv.vtv_ity in
+  let add_pv pv (pinv,qinv) =
+    let ity = pv.pv_vtv.vtv_ity in
     let written r = reg_occurs r ity.ity_vars in
-    let inv = Mlw_wp.full_invariant lkn kn vs ity in
+    let inv = Mlw_wp.full_invariant lkn kn pv.pv_vs ity in
     t_and_simp pinv inv,
     if Sreg.exists written regs then t_and_simp qinv inv else qinv
   in
-  Svs.fold add_vs svs (t_true,t_true)
+  Spv.fold add_pv pvs (t_true,t_true)
 
 let post_invariant lenv inv ity q =
   let vs, q = open_post q in
@@ -682,60 +682,35 @@ let post_invariant lenv inv ity q =
   let q = t_and_asym_simp q (t_and_simp res_inv inv) in
   Mlw_ty.create_post vs q
 
-let spec_invariant lenv svs ity spec =
-  let pinv,qinv = env_invariant lenv spec.c_effect svs in
+let ity_or_unit = function
+  | VTvalue v -> v.vtv_ity
+  | VTarrow _ -> ity_unit
+
+let spec_invariant lenv pvs vty spec =
+  let ity = ity_or_unit vty in
+  let pvs = spec_pvset pvs spec in
+  let pinv,qinv = env_invariant lenv spec.c_effect pvs in
   let post_inv = post_invariant lenv qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { spec with c_pre   = t_and_simp spec.c_pre pinv;
               c_post  = post_inv ity spec.c_post;
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
-let ity_or_unit = function
-  | VTvalue v -> v.vtv_ity
-  | VTarrow _ -> ity_unit
-
-let expr_vsset svs e =
-  let add_id id _ s =
-    try Svs.add (restore_pv_by_id id).pv_vs s
-    with Not_found -> s in
-  Mid.fold add_id e.e_varm svs
-
 let abst_invariant lenv e q xq =
-  let spec = {
-    c_pre     = t_true;
-    c_effect  = eff_empty;
-    c_post    = q;
-    c_xpost   = xq;
-    c_variant = [];
-    c_letrec  = 0 } in
   let ity = ity_or_unit e.e_vty in
-  let svs = expr_vsset (spec_vsset spec) e in
-  let spec = spec_invariant lenv svs ity spec in
-  spec.c_post, spec.c_xpost
+  let post_inv = post_invariant lenv t_true in
+  let xpost_inv xs q = post_inv xs.xs_ity q in
+  post_inv ity q, Mexn.mapi xpost_inv xq
 
-let spec_of_lambda lam = {
-  c_pre     = lam.l_pre;
-  c_effect  = lam.l_expr.e_effect;
-  c_post    = lam.l_post;
-  c_xpost   = lam.l_xpost;
-  c_variant = lam.l_variant;
-  c_letrec  = 0 }
-
-let lambda_invariant lenv svs lam =
-  let spec = spec_of_lambda lam in
-  let add_pv s pv = Svs.add pv.pv_vs s in
-  let svs = List.fold_left add_pv svs lam.l_args in
+let lambda_invariant lenv pvs lam =
   let ity = ity_or_unit lam.l_expr.e_vty in
-  let spec = spec_invariant lenv svs ity spec in
-  { lam with  l_pre   = spec.c_pre;
-              l_post  = spec.c_post;
-              l_xpost = spec.c_xpost }
-
-let lambda_vsset lam =
-  let del_pv svs pv = Svs.remove pv.pv_vs svs in
-  let svs = spec_vsset (spec_of_lambda lam) in
-  let svs = expr_vsset svs lam.l_expr in
-  List.fold_left del_pv svs lam.l_args
+  let pvs = List.fold_right Spv.add lam.l_args pvs in
+  let pinv,qinv = env_invariant lenv lam.l_expr.e_effect pvs in
+  let post_inv = post_invariant lenv qinv in
+  let xpost_inv xs q = post_inv xs.xs_ity q in
+  { lam with  l_pre   = t_and_simp lam.l_pre pinv;
+              l_post  = post_inv ity lam.l_post;
+              l_xpost = Mexn.mapi xpost_inv lam.l_xpost }
 
 let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
@@ -879,8 +854,8 @@ let eff_of_deff lenv deff =
   let eff = List.fold_left add_raise eff deff.deff_raises in
   eff, svs
 
-let rec type_c lenv gh svs vars dtyc =
-  let vty = type_v lenv gh svs vars dtyc.dc_result in
+let rec type_c lenv gh pvs vars dtyc =
+  let vty = type_v lenv gh pvs vars dtyc.dc_result in
   let eff, esvs = eff_of_deff lenv dtyc.dc_effect in
   (* reset every new region in the result *)
   let eff = match vty with
@@ -909,7 +884,8 @@ let rec type_c lenv gh svs vars dtyc =
      the effect in [Mlw_ty.spec_filter]. The exception %Exit
      cannot be raised by an abstract parameter, so this xpost
      will never appear in WP *)
-  let esvs = Svs.diff esvs svs in
+  let del_pv pv s = Svs.remove pv.pv_vs s in
+  let esvs = Spv.fold del_pv pvs esvs in
   let drop _ t s = Mvs.set_diff s t.t_vars in
   let esvs = drop () spec.c_pre esvs in
   let esvs = drop () spec.c_post esvs in
@@ -922,20 +898,18 @@ let rec type_c lenv gh svs vars dtyc =
     Mexn.add_new exn xs_exit xq spec.c_xpost in
   let spec = { spec with c_xpost = xpost } in
   (* add the invariants *)
-  let ity = ity_or_unit vty in
-  let svs = Svs.union svs (spec_vsset spec) in
-  spec_invariant lenv svs ity spec, vty
+  spec_invariant lenv pvs vty spec, vty
 
-and type_v lenv gh svs vars = function
+and type_v lenv gh pvs vars = function
   | DSpecV (ghost,v) ->
       let ghost = ghost || gh in
       VTvalue (vty_value ~ghost (ity_of_dity v))
   | DSpecA (bl,tyc) ->
       let lenv, pvl = binders lenv bl in
-      let add_pv (vars,svs) pv =
-        vars_union vars pv.pv_vars, Svs.add pv.pv_vs svs in
-      let vars, svs = List.fold_left add_pv (vars,svs) pvl in
-      let spec, vty = type_c lenv gh svs vars tyc in
+      let add_pv pv s = vars_union pv.pv_vars s in
+      let vars = List.fold_right add_pv pvl vars in
+      let pvs = List.fold_right Spv.add pvl pvs in
+      let spec, vty = type_c lenv gh pvs vars tyc in
       VTarrow (vty_arrow pvl ~spec vty)
 
 (* expressions *)
@@ -1084,7 +1058,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let lenv = add_local x.id ld.let_sym lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->
-      let spec, result = type_c lenv false Svs.empty vars_empty dtyc in
+      let spec, result = type_c lenv false Spv.empty vars_empty dtyc in
       e_any spec result
   | DEghost de1 ->
       e_ghostify true (expr lenv de1)
@@ -1118,14 +1092,15 @@ and expr_rec lenv rdl =
   let lenv, rdl = Util.map_fold_left step1 lenv rdl in
   let step2 (ps, gh, lam) = ps, expr_lam lenv gh lam in
   let rdl = List.map step2 rdl in
-  let add_rd_vsset s (_, lam) = Svs.union s (lambda_vsset lam) in
-  let svs = List.fold_left add_rd_vsset Svs.empty rdl in
-  let step3 (ps, lam) = ps, lambda_invariant lenv svs lam in
+  let rd_pvset pvs (_, lam) = l_pvset pvs lam in
+  let pvs = List.fold_left rd_pvset Spv.empty rdl in
+  let step3 (ps, lam) = ps, lambda_invariant lenv pvs lam in
   create_rec_defn (List.map step3 rdl)
 
 and expr_fun lenv x gh lam =
   let lam = expr_lam lenv gh lam in
-  let lam = lambda_invariant lenv (lambda_vsset lam) lam in
+  let pvs = l_pvset Spv.empty lam in
+  let lam = lambda_invariant lenv pvs lam in
   let def = create_fun_defn (Denv.create_user_id x) lam in
   def, (List.hd def.rec_defn).fun_ps
 
@@ -1615,7 +1590,7 @@ let add_pdecl ~wp loc uc = function
       add_pdecl_with_tuples ~wp uc pd
   | Dparam (id, gh, tyv) ->
       let tyv, _ = dtype_v (create_denv uc) tyv in
-      let tyv = type_v (create_lenv uc) gh Svs.empty vars_empty tyv in
+      let tyv = type_v (create_lenv uc) gh Spv.empty vars_empty tyv in
       let lv = match tyv with
         | VTvalue v ->
             if v.vtv_ghost && not gh then
