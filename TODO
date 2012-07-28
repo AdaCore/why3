@@ -19,6 +19,9 @@ generic
     integration of the library? This would require a special [raise] call:
         why_raise e = raise (Why.Error e)
 
+  - the drivers cannot deal with theories defined in the .mlw files.
+    Otherwise why3 would report an error. Is it acceptable?
+
 WhyML
 -----
 
@@ -39,6 +42,15 @@ WhyML
     types in function signatures (must be careful with reg_match!).
     The type cast can then play the role of the "close" instruction.
     Do we need it? What's the good syntax for open types?
+
+  - we check the context type invariants around Eany, but not around
+    Eabstr, which is rather strange. Should Eabstr have preconditions?
+    If not, why should it post-ensure the invariants that didn't
+    necessarily hold before its execution? Probably, we shouldn't
+    add the context invariants to the outer spec of Eany.
+
+  - and what about return/raise invariants, should Eany and Eabstr
+    ensure them? (at the moment, they do)
 
   - currently every unhandled exception has postcondition "true".
     "false" would be a poor choice, as it could introduce inconsistency
