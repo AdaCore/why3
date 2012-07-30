@@ -109,8 +109,7 @@ let print_heuristic_lex vl =
   let _,ivm = List.fold_left (fun (i,m) v -> 
     (i+1, Mvs.add v i m)) (0,Mvs.empty) vl in
   Format.printf "**************** heuristic_lex ******************\n";
-  Format.printf "Induction variables (in lexicographic order of the leftmost";
-  Format.printf "recursive function call): [ ";
+  Format.printf "Induction variables (in lexicographic order): [ ";
   List.iter (Format.printf "%a " Pretty.print_vs) vl;
   Format.printf "]@.";
   Format.printf "Lex. order map : [ ";
@@ -239,7 +238,7 @@ let tyscheme_vsty km x (_t : Term.term) =
 let induction_ty km t0 =
   let qvs, qvl, t = decompose_forall t0 in
   let vset = t_candidates filter_tydef km qvs t in
-  if Svs.is_empty vset then (Format.printf "No candidates found"; [t0])
+  if Svs.is_empty vset then [t0]
   else
     let x  =  heuristic_svs vset in
     let qvl1, qvl2 = split_quantifiers x qvl in
@@ -260,13 +259,11 @@ let induction_ty km t0 =
 (************************* WITH LEXICOGRAPHIC ORDER **************************)
 (*****************************************************************************)
 
-
-
 let qvl_labeled qvl = 
   List.filter (fun v -> 
     let slab = Slab.filter (fun v -> 
-      v.lab_string = "induction") v.vs_name.id_label in not (Slab.is_empty slab))
-    qvl
+      v.lab_string = "induction") v.vs_name.id_label 
+    in not (Slab.is_empty slab)) qvl
 
 
 (* This function collects lists of variables corresponding to
@@ -304,6 +301,10 @@ let t_candidates_lex km qvs labeledvl t =
 	end
       | [] -> vl
     in 
+    (*Format.printf "[";
+    List.iter (fun i ->
+      Format.printf "[%d : %a]" i Pretty.print_term (List.nth tl i)) il;
+    Format.printf "]@.";*)
     Svsl.add (List.rev (aux il [])) acc
   in
   let defn_candidates (ls,tl) acc = match (find_logic_definition km ls) with
@@ -325,7 +326,7 @@ let t_candidates_lex km qvs labeledvl t =
     
 exception No_candidates_found
 
-(*Chooses leftmost (in the formula ) candidate list from the subset of lists 
+(*Chooses leftmost (in the formula's quantifiers list ) candidate list from the subset of lists 
   of the biggest size ; raises an exception, if the candidate set is empty 
   or contains only an empty list, *)
 let heuristic_lex vset =
@@ -439,42 +440,51 @@ let induction_ty_lex km t0 =
     [tcase]
   with No_candidates_found -> Format.printf "No candidates found\n"; [t0]
 
-
-(**********************************************************************)
-let t_defn_candidates km vs t =
-  let defn_collect = (fun acc ls tl ->
-    match (find_logic_definition km ls) with
-      | Some defn ->
-        begin match ls_defn_decrease defn with
-          | [i] ->
-	    begin match (List.nth tl i).t_node with
-	      | Tvar x when vs_equal x vs -> Mls.add ls (i, defn) acc
-	      | _ -> acc
-	    end
-	  | _  -> acc
-        end
-      | None -> acc)
-  in
-  let rec t_collect = (fun acc t ->
-    let acc = match t.t_node with
-      | Tapp (ls, tl) -> defn_collect acc ls tl
-      | _ -> acc
-    in t_fold t_collect acc t)
-  in t_collect (Mls.empty) t
-
+(*****************************************************************************)
+(******************** INDUCTION BASED ON FUNCTION DEFINITION *****************)
+(************************* WITH LEXICOGRAPHIC ORDER **************************)
+(*****************************************************************************)
 
 type htree = | Snode of (vsymbol * pattern * htree) list
-	     | Sleaf of Svs.t
+	     | Sleaf of Svs.t (*here (int, vsymbol) set*)
 
 let empty = Sleaf Svs.empty
 
 
-let defn_htree _km fls x i t =
+let defn_candidates_lex km qvs t = 
+  let rec are_vars il tl = match il with
+    | i :: iq ->
+      begin match (List.nth tl i).t_node with
+	| Tvar x when Svs.mem x qvs ->
+	  begin match x.vs_ty.ty_node with
+	    | Tyvar _ -> are_vars iq tl
+	    | Tyapp _ -> false 
+	  end
+	| _ -> false
+      end
+    | [] -> true
+  in
+  let defn_candidates (ls,tl) acc = match (find_logic_definition km ls) with
+    | Some defn -> 
+      let il = ls_defn_decrease defn in
+      if (are_vars il tl) then Mls.add ls (il, defn) acc else acc
+    | None -> acc
+  in
+  let rec t_candidates acc t =
+    let acc = match t.t_node with
+      | Tapp (ls, tl) -> defn_candidates (ls, tl) acc
+      | _ ->  acc
+    in t_fold t_candidates acc t
+  in
+  t_candidates Mls.empty t
+
+
+let defn_htree fname x i t =
   let rec t_htree acc t =
     match t.t_node with
       | Tcase ({t_node = (Tvar y)}, bl) when ty_equal x.vs_ty y.vs_ty ->
 	case_htree acc y bl
-      | Tapp (ls, tl) when ls_equal ls fls ->
+      | Tapp (ls, tl) when ls_equal ls fname ->
 	begin
 	  match (List.nth tl i).t_node with
 	    | Tvar y -> push acc (Sleaf (Svs.add y Svs.empty))
@@ -503,7 +513,7 @@ let defn_htree _km fls x i t =
   in
   t_htree (Sleaf Svs.empty) t
 
-
+(*
 let htree_tyscheme _ht = ([] : tyscheme)
 
 (* Decl.known_map -> Term.vsymbol -> Term.term -> tyscheme *)
@@ -529,7 +539,7 @@ let induction_fun km t0 =
        Format.printf "New Task: %a \n@." Pretty.print_term t);
     [t]
 
-
+    *)
 
 
 (**********************************************************************)
@@ -583,14 +593,14 @@ let induction_ty_lex = function
   | _ -> assert false
 
 
-
+(*
 let induction_fun = function
   | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
 	   task_prev = prev;
 	   task_known = km } ->
     List.map (add_prop_decl prev Pgoal pr) (induction_fun km f)
   | _ -> assert false
-
+*)
 
 
 let induction_int th_int = function
@@ -617,9 +627,10 @@ let () =
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
 
-
+(*
 let () =
   Trans.register_transform_l "induction_ty_fdef" (Trans.store induction_fun)
+*)
 
 let () =
   Trans.register_env_transform_l "induction_int"
