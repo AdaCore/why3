@@ -21,6 +21,17 @@
 open Ty
 open Term
 
+type checksum = string
+let print_checksum = Format.pp_print_string
+let string_of_checksum x = x
+let checksum_of_string x = x
+
+type shape    = string
+let print_shape = Format.pp_print_string
+let string_of_shape x = x
+let shape_of_string x = x
+
+let debug = Debug.register_flag "session_pairing"
 
 let current_shape_version = 2
 
@@ -238,7 +249,7 @@ let rec task_shape ~version ~(push:string->'a->'a) (acc:'a) t : 'a =
   match t with
     | None -> acc
     | Some t ->
-        task_shape ~version ~push (tdecl_shape ~version ~push acc t.Task.task_decl)
+     task_shape ~version ~push (tdecl_shape ~version ~push acc t.Task.task_decl)
           t.Task.task_prev
 
 
@@ -255,3 +266,349 @@ let task_checksum ?(version=current_shape_version) t =
 
 
 
+(*************************)
+(**       Pairing       **)
+
+(** needed accessor *)
+module type S = sig
+  type t
+  val checksum : t -> string
+  val shape    : t -> string
+  val name       : t -> Ident.ident
+end
+
+
+module type Sold = sig
+  type t
+  val checksum : t -> string
+  val shape    : t -> string
+  val id       : t -> Ident.ident
+(* .goal_name *)
+end
+
+module type Snew = sig
+  type t
+  val checksum : t -> string
+  val shape    : t -> string
+  (* Termcode.t_shape_buf ~version:!current_shape_version *)
+  (*   (Task.task_goal_fmla g) *)
+
+  val name     : t -> string (** for debugging *)
+(* let id = (Task.task_goal g).Decl.pr_name in *)
+(* let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (i+1)) in *)
+(* let goal_name = Ident.id_register (Ident.id_derive goal_name id) in *)
+
+  val id      : t -> Ident.ident
+(* let id = (Task.task_goal g).Decl.pr_name in *)
+
+(* let id = (Task.task_goal g).Decl.pr_name in *)
+(* let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (i+1)) in *)
+(* let goal_name = Ident.id_register (Ident.id_derive goal_name id) in *)
+
+
+end
+
+
+(*************************************************************)
+(* pairing of new and old subgoals of a given transformation *)
+(*************************************************************)
+
+(* we have an ordered list of new subgoals
+
+           subgoals = [g1; g2; g3; ...]
+
+   and a list of old subgoals
+
+          old_subgoals = [h1 ; h2 ; ... ]
+
+   we build a map from each new subgoal g to tuples
+       (id,subgoal_name,subtask,sum,old_subgoal,obsolete)
+
+   where
+     id = name of the goal of g
+     subgoal_name = name of parent goal with "dot n" added
+     subtask = the corresponding task
+     sum = the checksum of that task
+     old_subgoal = ref to an optional old subgoal which is paired with g
+     obsolete = true when paired to an old goal with different checksum
+
+*)
+
+module AssoMake (Old : S) (New : S) = struct
+
+type 'a any_goal =
+  | New_goal of int
+  | Old_goal of Old.t
+
+let array_map_list f l =
+  let r = ref l in
+  Array.init (List.length l)
+    (fun i ->
+       match !r with
+         | [] -> assert false
+         | x::rem -> r := rem; f i x)
+
+let associate (old_goals : Old.t list) new_goals =
+  (*
+     we make a map of old goals indexed by their checksums
+  *)
+  let old_goals_map = Hashtbl.create 7 in
+  List.iter
+    (fun g -> Hashtbl.add old_goals_map (Old.checksum g) g)
+    old_goals;
+  (*
+     we make an array of new goals with their numbers and checksums
+  *)
+  let new_goals_array =
+    array_map_list
+      (fun i g -> i,g)
+      new_goals
+  in
+  let pairing_array =
+    Array.make (Array.length new_goals_array) None
+  in
+  let obsolete_array =
+    Array.make (Array.length new_goals_array) false
+  in
+  (*
+     Phase 1: we first associate each new goal for which there is an
+     old goal with the same checksum.
+  *)
+  let associate_goals ~obsolete i g =
+    pairing_array.(i) <- Some g;
+    obsolete_array.(i) <- obsolete;
+    Hashtbl.remove old_goals_map (Old.checksum g)
+  in
+  Array.iter
+    (fun (i,g) ->
+       try
+         let h = Hashtbl.find old_goals_map (New.checksum g) in
+         (* an old goal has the same checksum *)
+         Debug.dprintf debug
+           "Merge phase 1: old goal '%s' -> new goal '%s'@."
+           (Old.name h).Ident.id_string (New.name g).Ident.id_string;
+         associate_goals ~obsolete:false i h
+       with Not_found ->
+         Debug.dprintf debug
+           "Merge phase 1: no old goal -> new goal '%s'@."
+           (New.name g).Ident.id_string;
+         ())
+    new_goals_array;
+  (* Phase 2: we now build a list of all remaining new and old goals,
+     ordered by shapes, then by name *)
+  let old_goals_without_pairing =
+    Hashtbl.fold
+      (fun _ g acc ->
+         let s = (Old.shape g) in
+         if s = "" then
+           (* We don't try to associate old goals without shapes:
+              they will be paired in order in next phase *)
+           acc
+         else
+           (s,Old_goal g)::acc)
+      old_goals_map
+      []
+  in
+  let all_goals_without_pairing =
+    Array.fold_left
+      (fun acc (i,g) ->
+         match pairing_array.(i) with
+           | Some _ -> acc
+           | None ->
+               let shape = New.shape g
+                 (* Termcode.t_shape_buf ~version:!current_shape_version *)
+                 (*   (Task.task_goal_fmla g) *)
+               in
+               (* shape_array.(i) <- shape; *)
+               (shape,New_goal i)::acc)
+      old_goals_without_pairing
+      new_goals_array
+  in
+  let sort_by_shape =
+    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
+      all_goals_without_pairing
+  in
+  if Debug.test_flag debug then begin
+    Debug.dprintf debug "[Merge] pairing the following shapes:@.";
+    List.iter
+      (fun (s,g) ->
+         match g with
+           | New_goal _ ->
+               Debug.dprintf debug "new: %s@." s
+           | Old_goal _ ->
+               Debug.dprintf debug "old: %s@." s)
+      sort_by_shape;
+  end;
+  let rec similarity_shape n s1 s2 =
+    if String.length s1 <= n || String.length s2 <= n then n else
+      if s1.[n] = s2.[n] then similarity_shape (n+1) s1 s2
+      else n
+  in
+(*  let rec match_shape (opt:int option) goals : bool =
+    (* when [opt] is [Some n] then it means [goals] starts with a goal g
+       which is already claimed to be associated by the former goal h.
+       We return a boolean which is true when that first goal g was also
+       claimed by the next goal, with a proximity measure larger than n,
+       meaning that the former goal h cannot associate with g
+    *)
+    match goals with
+      | [] -> false
+      | (si,New_goal i)::rem ->
+          begin match rem with
+            | [] -> false
+            | (_,New_goal _)::_ ->
+                let (_:bool) = match_shape None rem in false
+            | (sh,Old_goal h)::_ ->
+                try_associate si i sh h opt rem
+          end
+      | (sh,Old_goal h)::rem ->
+          begin match rem with
+            | [] -> false
+            | (_,Old_goal _)::_ ->
+                let (_:bool) = match_shape None rem in false
+            | (si,New_goal i)::_ ->
+                try_associate si i sh h opt rem
+          end
+  and try_associate si i sh h opt rem =
+    let n = similarity_shape 0 si sh in
+    Debug.dprintf debug "[Merge] try_associate: claiming \
+      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+    if (match opt with
+      | None ->
+          Debug.dprintf debug "[Merge] try_associate: \
+            no previous claim@.";
+          true
+      | Some m ->
+          Debug.dprintf debug "[Merge] try_associate: \
+            previous claim was %d@." m;
+          m < n)
+    then
+      (* try to associate i with h *)
+      let b = match_shape (Some n) rem in
+      if b then
+        begin
+          (* h or i was already paired in rem *)
+          Debug.dprintf debug "[Merge] try_associate: \
+            failed because claimed further@.";
+          false
+        end
+      else
+        begin
+          Debug.dprintf debug "[Merge] try_associate: \
+            succeeded to associate new goal@\n%s@\nwith \
+            old goal@\n%s@." si sh;
+          associate_goals ~obsolete:true i h;
+          true
+        end
+    else
+      (* no need to try to associate i with h *)
+      begin
+        Debug.dprintf debug "[Merge] try_associate: \
+          no claim further attempted@.";
+        let (_:bool) = match_shape None rem in
+        false
+      end
+  in
+  let (_:bool) = match_shape None sort_by_shape in
+*)
+  let rec match_shape (min:int) goals : bool * (string * 'a any_goal) list =
+    (* try to associate in [goals] each pair of old and new goal whose
+       similarity is at least [min]. Returns a pair [(b,rem)] where
+       [rem] is the sublist of [goals] made of goals which have not
+       been paired, and [b] is a boolean telling that the head of
+       [rem] is the same has the head of [goals] *)
+    match goals with
+      | [] -> (true, goals)
+      | ((si,New_goal i) as hd)::rem ->
+          begin match rem with
+            | [] -> (true, goals)
+            | (_,New_goal _)::_ ->
+                let (b,rem2) = match_shape min rem in
+                if b then
+                  (true, hd::rem2)
+                else
+                  match_shape min (hd::rem2)
+            | (sh,Old_goal h)::_ ->
+                try_associate min si i sh h hd rem
+          end
+      | ((sh,Old_goal h) as hd)::rem ->
+          begin match rem with
+            | [] -> (true, goals)
+            | (_,Old_goal _)::_ ->
+                let (b,rem2) = match_shape min rem in
+                if b then
+                  (true, hd::rem2)
+                else
+                  match_shape min (hd::rem2)
+            | (si,New_goal i)::_ ->
+                try_associate min si i sh h hd rem
+          end
+            (** si : shape of i
+                i  : id of the new goal
+                sh : shape of h
+                h  : an old goal
+                hd : the head
+                rem : the tail of the list *)
+  and try_associate min si i sh h hd rem =
+    let n = similarity_shape 0 si sh in
+    Debug.dprintf debug "[Merge] try_associate: claiming \
+      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
+    if n < min then
+      begin
+        Debug.dprintf debug "[Merge] try_associate: claiming \
+          dropped because similarity lower than min = %d@." min;
+        let (b,rem2) = match_shape min rem in
+        if b then
+          (true, hd::rem2)
+        else
+          match_shape min (hd::rem2)
+      end
+    else
+      match match_shape n rem with
+        | false, rem2 ->
+            Debug.dprintf debug "[Merge] try_associate: claiming \
+              dropped because head was consumed by larger similarity@.";
+            match_shape min (hd::rem2)
+        | true, [] -> assert false
+        | true, _::rem2 ->
+            Debug.dprintf debug "[Merge] try_associate: claiming \
+              succeeded (similarity %d) for new shape@\n%s@\nand \
+              old shape@\n%s@." n si sh;
+            associate_goals ~obsolete:true i h;
+            let (_,rem3) = match_shape min rem2 in
+            (false, rem3)
+  in
+  let (_b,_rem) = match_shape 0 sort_by_shape in
+  (*
+     Phase 3: we now associate remaining new goals to the remaining
+     old goals in the same order as original
+  *)
+  Debug.dprintf debug "[Merge] phase 3: associate remaining goals@.";
+  let remaining_old_goals =
+    Hashtbl.fold
+      (fun _ g acc -> (Old.name g,g)::acc)
+      old_goals_map
+      []
+  in
+  let remaining_old_goals =
+    ref (List.sort (fun (s1,_) (s2,_) ->
+      String.compare s1.Ident.id_string s2.Ident.id_string)
+           remaining_old_goals)
+  in
+  Array.iteri
+    (fun i opt ->
+       match opt with
+         | Some _ -> ()
+         | None ->
+             match !remaining_old_goals with
+               | [] -> ()
+               | (_,h) :: rem ->
+                   remaining_old_goals := rem;
+                   associate_goals ~obsolete:true i h)
+    pairing_array;
+
+  Array.fold_right
+    (fun (i,g) res -> (g, pairing_array.(i), obsolete_array.(i))::res)
+    new_goals_array []
+
+end

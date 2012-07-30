@@ -69,8 +69,8 @@ type 'a goal = private
       goal_name : Ident.ident; (** The ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
-      mutable goal_checksum : string;  (** checksum of the task *)
-      mutable goal_shape : string;     (** shape are produced by the module Termcode *)
+      mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
+      mutable goal_shape : Termcode.shape;  (** shape of the task *)
       mutable goal_verified : bool;
       goal_task: task_option;
       mutable goal_expanded : bool;
