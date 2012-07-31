@@ -623,7 +623,8 @@ let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
 let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
   | _ ->
-      let ld = create_let_defn (id_fresh "o") e in
+      let id = id_fresh ?loc:e.e_loc "o" in
+      let ld = create_let_defn id e in
       let pv = match ld.let_sym with
         | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
@@ -827,7 +828,8 @@ let on_fmla fn e = match e.e_node with
   | Elogic t -> fn e (t_equ_simp t t_bool_true)
   | Evalue pv -> fn e (t_equ_simp (t_var pv.pv_vs) t_bool_true)
   | _ ->
-      let ld = create_let_defn (id_fresh "o") e in
+      let id = id_fresh ?loc:e.e_loc "o" in
+      let ld = create_let_defn id e in
       let pv = match ld.let_sym with
         | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in

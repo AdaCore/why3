@@ -267,7 +267,7 @@ let mk_let ~loc ~uloc e (desc,dvty) =
   if test_var e then desc, dvty else
   let loc = def_option loc uloc in
   let e1 = mk_dexpr desc dvty loc Slab.empty in
-  DElet (mk_id "q" loc, false, e, e1), dvty
+  DElet (mk_id "q" e.de_loc, false, e, e1), dvty
 
 (* patterns *)
 

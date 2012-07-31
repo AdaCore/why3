@@ -631,16 +631,25 @@ and wp_desc env e q xq = match e.e_node with
   | Earrow _ ->
       let q = open_unit_post q in
       (* wp_label e *) q (* FIXME? *)
-  | Elet ({ let_sym = lv; let_expr = e1 }, e2) ->
+  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2)
+    when Util.option_eq Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc ->
+    (* we push the label down, past the implicitly inserted "let" *)
+      let w = wp_expr env (e_label_copy e e2) q xq in
+      let q = create_post v.pv_vs w in
+      wp_expr env e1 q xq
+  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
       let w = wp_expr env e2 q xq in
-      let q = match lv with
-        | LetV v -> create_post v.pv_vs w
-        | LetA _ -> create_unit_post w in
+      let q = create_post v.pv_vs w in
       wp_label e (wp_expr env e1 q xq)
-  | Erec (rdl, e) ->
+  | Elet ({ let_sym = LetA _; let_expr = e1 }, e2) ->
+      let w = wp_expr env e2 q xq in
+      let q = create_unit_post w in
+      wp_label e (wp_expr env e1 q xq)
+  | Erec (rdl, e1) ->
       let fr = wp_rec_defn env rdl in
-      let fe = wp_expr env e q xq in
-      wp_and ~sym:true (wp_ands ~sym:true fr) fe
+      let fe = wp_expr env e1 q xq in
+      let fr = wp_ands ~sym:true fr in
+      wp_label e (wp_and ~sym:true fr fe)
   | Eif (e1, e2, e3) ->
       let res = vs_result e1 in
       let test = t_equ (t_var res) t_bool_true in
