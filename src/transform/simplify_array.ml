@@ -22,15 +22,15 @@ open Term
 open Theory
 open Env
 
-let prelude = ["array"]
-let array = "Array"
-let store = ["store"]
-let select = ["select"]
+let prelude = ["map"]
+let array = "Map"
+let store = ["set"]
+let select = ["get"]
 
 let make_rt_rf env =
   let array  =
     try
-      find_theory env prelude array
+      read_theory ~format:"why" env prelude array
     with TheoryNotFound (_,s) ->
       Format.eprintf "The theory %s is unknown" s;
       exit 1 in
