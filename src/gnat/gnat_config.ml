@@ -147,18 +147,6 @@ let prover_driver : Driver.driver =
        Exn_printer.exn_printer e;
     Gnat_util.abort_with_message ""
 
-let gnat_driver : Driver.driver =
-  try
-    Driver.load_driver env
-      (Filename.concat
-         (Filename.concat Relocatable.datadir "drivers")
-         "gnat_vc.drv") []
-  with e ->
-    Format.eprintf "Failed to load driver for gnat: %a"
-       Exn_printer.exn_printer e;
-    Gnat_util.abort_with_message ""
-
-
 (* freeze values *)
 
 let timeout = !opt_timeout
