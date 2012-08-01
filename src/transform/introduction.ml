@@ -68,7 +68,8 @@ let intros pr f =
   Mtv.values decls @ intros pr (t_ty_subst subst Mvs.empty f)
 
 let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
-
+  ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
+         goal@ into@ constant@ symbol@ and@ axioms."
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. byte"

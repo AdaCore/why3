@@ -18,6 +18,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Format
 open Util
 open Ident
 open Ty
@@ -27,6 +28,8 @@ open Theory
 open Task
 
 let debug = Debug.register_flag "transform"
+  ~desc:"About@ which@ transformations@ are@ applied@ and@ with@ which@ \
+         arguments, ie metas."
 
 (** Task transformation *)
 
@@ -255,33 +258,85 @@ let named s f (x : task) =
   if Debug.test_flag Debug.stack_trace then f x
   else try f x with e -> raise (TransFailure (s,e))
 
-let transforms   : (string, env -> task trans) Hashtbl.t = Hashtbl.create 17
-let transforms_l : (string, env -> task tlist) Hashtbl.t = Hashtbl.create 17
+type desc_labels = (label * Pp.formatted) list
+type desc_metas  = (meta  * Pp.formatted) list
 
-let register_transform s p =
+type reg_desc =
+ {
+   reg_desc_labels : desc_labels;
+   reg_desc_metas  : desc_metas;
+   reg_desc        : Pp.formatted;
+ }
+
+let print_reg_desc fmt r =
+  let print_meta fmt (m,f) =
+    fprintf fmt "@[%s@\n  @[%a%a@]@]"
+      m.meta_name Pp.formatted m.meta_desc Pp.formatted f in
+  let print_label fmt (l,f) =
+    fprintf fmt "@[%s@\n  @[%a@]@]"
+      l.lab_string Pp.formatted f in
+  fprintf fmt "@[@[%a@]%a%a@]"
+    Pp.formatted r.reg_desc
+    (Pp.print_list_delim
+       ~start:(Pp.constant_formatted "@\nlabels:@\n  @[")
+       ~stop:(Pp.constant_formatted "@]")
+       ~sep:Pp.newline
+       print_label) r.reg_desc_labels
+    (Pp.print_list_delim
+       ~start:(Pp.constant_formatted "@\nmetas:@\n  @[")
+       ~stop:(Pp.constant_formatted "@]")
+       ~sep:Pp.newline
+       print_meta) r.reg_desc_metas
+
+let print_trans_desc fmt (x,r) =
+  fprintf fmt "@[%s@\n  @[%a@]@]" x print_reg_desc r
+
+type 'a reg_trans = (env -> 'a trans) * reg_desc
+
+let mk_reg_trans ?(desc_labels=[]) ?(desc_metas=[]) ~desc f =
+  f, { reg_desc_labels = desc_labels;
+       reg_desc_metas  = desc_metas;
+       reg_desc        = desc}
+
+
+let transforms   : (string, task reg_trans) Hashtbl.t = Hashtbl.create 17
+let transforms_l : (string, task list reg_trans) Hashtbl.t = Hashtbl.create 17
+
+let register_transform ?desc_labels ?desc_metas ~desc s p =
   if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s (fun _ -> named s p)
+  Hashtbl.replace transforms s
+    (mk_reg_trans ?desc_labels ?desc_metas ~desc (fun _ -> named s p))
 
-let register_transform_l s p =
+let register_transform_l ?desc_labels ?desc_metas ~desc s p =
   if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s (fun _ -> named s p)
+  Hashtbl.replace transforms_l s
+    (mk_reg_trans ?desc_labels ?desc_metas ~desc (fun _ -> named s p))
 
-let register_env_transform s p =
+let register_env_transform ?desc_labels ?desc_metas ~desc s p =
   if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s (Wenv.memoize 3 (fun e -> named s (p e)))
+  Hashtbl.replace transforms s
+    (mk_reg_trans ?desc_labels ?desc_metas ~desc
+       (Wenv.memoize 3 (fun e -> named s (p e))))
 
-let register_env_transform_l s p =
+let register_env_transform_l ?desc_labels ?desc_metas ~desc s p =
   if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s (Wenv.memoize 3 (fun e -> named s (p e)))
+  Hashtbl.replace transforms_l s
+    (mk_reg_trans ?desc_labels ?desc_metas ~desc
+       (Wenv.memoize 3 (fun e -> named s (p e))))
 
 let lookup_transform s =
-  try Hashtbl.find transforms s with Not_found -> raise (UnknownTrans s)
+  try fst (Hashtbl.find transforms s)
+  with Not_found -> raise (UnknownTrans s)
 
 let lookup_transform_l s =
-  try Hashtbl.find transforms_l s with Not_found -> raise (UnknownTrans s)
+  try fst (Hashtbl.find transforms_l s)
+  with Not_found -> raise (UnknownTrans s)
 
-let list_transforms ()   = Hashtbl.fold (fun k _ acc -> k::acc) transforms []
-let list_transforms_l () = Hashtbl.fold (fun k _ acc -> k::acc) transforms_l []
+let list_transforms ()   = Hashtbl.fold (fun k r acc ->
+  (k,snd r)::acc) transforms []
+
+let list_transforms_l ()   = Hashtbl.fold
+  (fun k r acc -> (k,snd r)::acc) transforms_l []
 
 (** fast transform *)
 type gentrans =

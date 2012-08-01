@@ -66,6 +66,7 @@ let lift kind =
 let lift_epsilon kind = Trans.fold (lift kind) None
 
 let meta_epsilon = Theory.register_meta_excl "lift_epsilon" [MTstring]
+  ~desc:"TODO"
 
 let lift_epsilon = Trans.on_meta_excl meta_epsilon
   (fun alo ->
@@ -77,3 +78,4 @@ let lift_epsilon = Trans.on_meta_excl meta_epsilon
     lift_epsilon kind)
 
 let () = Trans.register_transform "lift_epsilon" lift_epsilon
+  ~desc:"TODO"

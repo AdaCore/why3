@@ -234,3 +234,4 @@ let () = register_printer "smtv1"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)
+  ~desc:"Printer@ for@ the@ smtlib@ version@ 1@ format."

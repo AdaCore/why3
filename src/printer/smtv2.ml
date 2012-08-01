@@ -327,6 +327,7 @@ let () = register_printer "smtv2"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task_old pr thpr fmt task)
+  ~desc:"Printer for the smtlib version 2 format."
 
 let print_decls =
   let add_ls sm acc = function
@@ -352,3 +353,4 @@ let print_task _env pr thpr ?old:_ fmt task =
     (List.rev (Trans.apply print_decls task))
 
 let () = register_printer "smtv2new" print_task
+  ~desc:"New (TODO: in which sense?) printer for the smtlib version 2 format."

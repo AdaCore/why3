@@ -235,4 +235,6 @@ let print_task fof _env pr thpr ?old:_ fmt task =
     (print_list nothing (print_decl info)) (Task.task_decls task)
 
 let () = register_printer "tptp-tff" (print_task false)
+  ~desc:"Printer for the TPTP-TFF format."
 let () = register_printer "tptp-fof" (print_task true)
+  ~desc:"Printer for the TPTP-FOF format."

@@ -30,9 +30,10 @@ module B = Bench
 module C = Call_provers
 
 let debug = Debug.register_flag "main"
+  ~desc:"About initialization of the bench"
 
 let usage_msg = sprintf
-  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]...
+  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]...\
   [-P <prover> ]..."
   (Filename.basename Sys.argv.(0))
 
@@ -219,52 +220,51 @@ let () =
 
   (** listings*)
 
+  let sort_pair (x,_) (y,_) = String.compare x y in
   let opt_list = ref false in
-  if !opt_version then begin
-    opt_list := true;
-    printf "%s@." version_msg
-  end;
   if !opt_list_transforms then begin
     opt_list := true;
     printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Trans.list_transforms ()));
+      (Pp.print_list Pp.newline Trans.print_trans_desc)
+      (List.sort sort_pair (Trans.list_transforms ()));
     printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Trans.list_transforms_l ()))
+      (Pp.print_list Pp.newline Trans.print_trans_desc)
+      (List.sort sort_pair (Trans.list_transforms_l ()))
   end;
   if !opt_list_printers then begin
     opt_list := true;
     printf "@[<hov 2>Known printers:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Printer.list_printers ()))
+      (Pp.print_list Pp.newline Printer.print_printer_desc)
+      (List.sort sort_pair (Printer.list_printers ()))
   end;
   if !opt_list_formats then begin
     opt_list := true;
     let print1 fmt s = fprintf fmt "%S" s in
-    let print fmt (p, l) =
-      fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
+    let print fmt (p, l, f) =
+      fprintf fmt "@[%s [%a]@\n  @[%a@]@]"
+        p (Pp.print_list Pp.comma print1) l
+        Pp.formatted f
     in
-    printf "@[<hov 2>Known input formats:@\n%a@]@."
+    printf "@[Known input formats:@\n  @[%a@]@]@."
       (Pp.print_list Pp.newline print)
       (List.sort Pervasives.compare (Env.list_formats ()))
   end;
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt prover pc = fprintf fmt "%a (%a)@\n"
-      print_prover_parsable_format pc.prover print_prover prover in
-    let print fmt m = Mprover.iter (print fmt) m in
+    let print = Pp.print_iter2 Mprover.iter Pp.newline Pp.nothing
+      print_prover Pp.nothing in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
   if !opt_list_metas then begin
     opt_list := true;
-    let print fmt m = fprintf fmt "@[%s %s%a@]"
+    let print fmt m = fprintf fmt "@[<h 2>%s %s%a@\n@[<hov>%a@]@]"
       (let s = m.meta_name in
         if String.contains s ' ' then "\"" ^ s ^ "\"" else s)
-      (if m.meta_excl then "* " else "")
+      (if m.meta_excl then "(flag) " else "")
       (Pp.print_list Pp.space Pretty.print_meta_arg_type) m.meta_type
+      Pp.formatted m.meta_desc
     in
     let cmp m1 m2 = Pervasives.compare m1.meta_name m2.meta_name in
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
@@ -311,7 +311,7 @@ let () =
     && (not !opt_redo)
   then
     begin
-      eprintf "At least one bench is required or one prover and one file or
+      eprintf "At least one bench is required or one prover and one file or\n\
       the verification of a database .@.";
       Arg.usage option_list usage_msg;
       exit 1

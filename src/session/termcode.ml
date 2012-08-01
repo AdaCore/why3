@@ -32,6 +32,9 @@ let string_of_shape x = x
 let shape_of_string x = x
 
 let debug = Debug.register_flag "session_pairing"
+  ~desc:"About@ the@ way@ old@ goals@ recorded@ in@ sessions@ are@ paired@ \
+         with@ new@ goals@ obtained@ after@ modifications@ of@ the@ source@ \
+         file."
 
 let current_shape_version = 2
 

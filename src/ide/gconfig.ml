@@ -25,6 +25,7 @@ open Rc
 open Whyconf
 
 let debug = Debug.register_flag "ide_info"
+  ~desc:"About why3ide."
 let () = Debug.set_flag debug
 
 (* config file *)

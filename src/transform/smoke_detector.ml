@@ -49,9 +49,17 @@ let rec neg f = match f.t_node with
 
 let deep = create neg
 
-let () = List.iter (fun (name,trans) -> Trans.register_transform name trans)
-  ["smoke_detector_top",top;
-   "smoke_detector_deep",deep]
+let () = Trans.register_transform "smoke_detector_top" top
+  ~desc:"Transformation@ that@ doesn't@ keep@ satisfiability.@ Add@ a@ \
+         negation@ at@ the@ top@ of@ the@ goal@ in@ order@ to@ (try)@ to@ \
+         detect@ inconsistencies@ in@ the@ premises."
+
+let () = Trans.register_transform "smoke_detector_deep" deep
+  ~desc:"Transformation@ that@ doesn't@ keep@ satisfiability.@ Add@ a@ \
+         negation@ under@ all@ the@ universal@ quantifications@ and@ \
+         hypothesis@ of@ the@ goal@ in@ order@ to@ (try)@ to@ \
+         detect@ inconsistencies@ in@ the@ premises."
+
 
 (*
 Local Variables:

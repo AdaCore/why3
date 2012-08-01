@@ -169,6 +169,7 @@ let forget_all printer =
 (** Sanitizers *)
 
 let unsanitizable = Debug.register_flag "unsanitizable"
+  ~desc:"About@ the@ sanitazing@ during@ the@ pretty-printing."
 
 let char_to_alpha c = match c with
   | 'a'..'z' | 'A'..'Z' -> String.make 1 c

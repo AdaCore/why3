@@ -50,3 +50,6 @@ let make_rt_rf env =
 let t env = let rt,rf = make_rt_rf env in Trans.rewriteTF rt rf None
 
 let () = Trans.register_env_transform "simplify_array" t
+  ~desc:"Rewrite@ using@ the@ axiom@ Select_eq@ of@ theory@ map.Map@ \
+         whenever@ possible@ using@ syntaxic@ equality@ modulo@ alpha@ \
+         equivalence."

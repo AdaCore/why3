@@ -78,6 +78,10 @@ val print_iter22:
      print k v sep () print k v sep () ...
 *)
 
+(** formatted: string which is formatted "@ " allow to cut the line if
+    too long *)
+type formatted = (unit, unit, unit, unit, unit, unit) format6
+val empty_formatted : formatted
 
 val space : formatter -> unit -> unit
 val alt : formatter -> unit -> unit
@@ -104,6 +108,8 @@ val rchevron : formatter -> unit -> unit
 val nothing : formatter -> 'a -> unit
 val string : formatter -> string -> unit
 val constant_string : string -> formatter -> unit -> unit
+val formatted : formatter -> formatted -> unit
+val constant_formatted : formatted -> formatter -> unit -> unit
 val print0 : formatter -> unit -> unit
 val hov : int -> formatter -> ('a -> unit) -> 'a -> unit
 val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
@@ -139,3 +145,5 @@ module Ansi :
 sig
   val set_column : Format.formatter -> int -> unit
 end
+
+type formatter = Format.formatter

@@ -26,26 +26,33 @@ type flag = bool ref
 
 let flag_table = Hashtbl.create 17
 
-let gen_register_flag s stop =
+let fst3 (flag,_,_) = flag
+let snd3 (_,stop,_) = stop
+let thd3 (_,_,desc) = desc
+
+let gen_register_flag (desc : Pp.formatted) s stop =
   try
-    fst (Hashtbl.find flag_table s)
+    fst3 (Hashtbl.find flag_table s)
   with Not_found ->
     let flag = ref false in
-    Hashtbl.replace flag_table s (flag,stop);
+    Hashtbl.replace flag_table s (flag,stop,desc);
     flag
 
-let register_flag s = gen_register_flag s false
+let register_flag ~desc s = gen_register_flag desc s false
 
-let register_stop_flag s = gen_register_flag s true
+let register_stop_flag ~desc s = gen_register_flag desc s true
 
 let lookup_flag s =
-  try fst (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
+  try fst3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
-let list_flags () = Hashtbl.fold (fun s (v,_) acc -> (s,v,!v)::acc)
+let list_flags () = Hashtbl.fold (fun s (v,_,desc) acc -> (s,v,!v,desc)::acc)
   flag_table []
 
 let is_stop_flag s =
-  try snd (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
+  try snd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
+
+let flag_desc s =
+  try thd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
 let test_flag s = !s
 let nottest_flag s = not !s
@@ -59,7 +66,12 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let stack_trace = register_flag "stack_trace"
+  ~desc:"Don't@ catch@ the@ exception@ in@ order@ to@ get@ the stack trace."
+
 let timestamp = register_flag "timestamp"
+  ~desc:"Add@ a time stamp@ in seconds@ before@ all@ the debug@ \
+         messages \"<...>\"."
+
 let time_start = Unix.gettimeofday ()
 
 let set_debug_formatter = (:=) formatter
@@ -88,11 +100,13 @@ module Opt = struct
     let list () =
       if !opt_list_flags then begin
         let list =
-          Hashtbl.fold (fun s (_,stop) acc -> (s,stop)::acc)
+          Hashtbl.fold (fun s (_,stop,desc) acc -> (s,stop,desc)::acc)
             flag_table [] in
-        let print fmt (p,stop) =
-          if stop then Format.fprintf fmt "%s *" p
-          else Format.pp_print_string fmt p in
+        let print fmt (p,stop,desc) =
+          Format.fprintf fmt "@[%s%s@\n  @[%a@]@]"
+            p (if stop then "*" else "")
+            Pp.formatted desc
+        in
         Format.printf "@[<hov 2>Known debug flags \
 (`*' marks the flags that change Why3 behavior):@\n%a@]@."
           (Pp.print_list Pp.newline print)
@@ -124,7 +138,7 @@ module Opt = struct
   let set_flags_selected () =
     if !opt_debug_all then
       List.iter
-        (fun (s,f,_) -> if not (is_stop_flag s) then set_flag f)
+        (fun (s,f,_,_) -> if not (is_stop_flag s) then set_flag f)
         (list_flags ());
     Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
       opt_list_flags

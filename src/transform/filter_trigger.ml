@@ -45,7 +45,7 @@ let remove_triggers =
     Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "remove_triggers" remove_triggers
-
+  ~desc:"Remove@ all@ the@ triggers@ from@ quantifiers."
 
 let keep_no_predicate e = e.t_ty <> None
 
@@ -55,7 +55,7 @@ let filter_trigger_no_predicate =
 
 let () = Trans.register_transform "filter_trigger_no_predicate"
   filter_trigger_no_predicate
-
+  ~desc:"Keep@ only@ triggers@ which@ patterns@ are@ terms."
 
 let keep_no_fmla = function
   | { t_ty = Some _ } -> true
@@ -67,6 +67,8 @@ let filter_trigger =
     Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "filter_trigger" filter_trigger
+  ~desc:"Same@ as@ filter_trigger_no_predicate@ but@ keep@ also@ pattern@ \
+         that@ are@ a@ predicate@ application@ (except@ equality)."
 
 
 let keep_no_builtin rem_ls = function
@@ -82,3 +84,5 @@ let filter_trigger_builtin =
 
 let () = Trans.register_transform "filter_trigger_builtin"
   filter_trigger_builtin
+  ~desc:"Same@ as@ filter_trigger_no_predicate@ but@ keep@ also@ pattern@ \
+         that@ are@ a@ predicate@ application@ not@ builtin."

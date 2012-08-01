@@ -35,6 +35,7 @@ open Pgm_types.T
 open Pgm_module
 
 let debug = Debug.register_flag "program_typing"
+  ~desc:"About the way program are typed."
 let is_debug () = Debug.test_flag debug
 
 let error = Loc.error

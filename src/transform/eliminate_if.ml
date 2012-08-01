@@ -114,7 +114,13 @@ let eliminate_if_fmla = Trans.rewriteTF elim_t (elim_f true) None
 let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 
 let () =
-  Trans.register_transform "eliminate_if_term" eliminate_if_term;
-  Trans.register_transform "eliminate_if_fmla" eliminate_if_fmla;
+  Trans.register_transform "eliminate_if_term" eliminate_if_term
+  ~desc:"Replaces@ terms@ of@ the@ form@ [if formula then t2 else t3]@ by@ \
+         lifting@ them@ at@ the@ level@ of@ formulas.@ This@ may@ introduce@ \
+         [if then else]@ in@ formulas.";
+  Trans.register_transform "eliminate_if_fmla" eliminate_if_fmla
+    ~desc:"Replaces@ formulas@ of@ the@ form@ [if f1 then f2\
+           else f3]@ by@ an@ equivalent@ formula@ using@ implications@ and@ \
+           other@ connectives.";
   Trans.register_transform "eliminate_if" eliminate_if
-
+    ~desc:"Apply@ both@ eliminate_if_term/fmla."

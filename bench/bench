@@ -98,6 +98,18 @@ valid_goals () {
     done
 }
 
+list_stuff () {
+    echo -n "$1 "
+    if $pgml $1 > /dev/null 2>&1; then
+        echo "ok"
+    else
+        echo "$pgm $1 FAIL"
+        $pgm $1
+        exit 1
+    fi
+}
+
+
 echo "=== Checking drivers ==="
 drivers drivers
 echo ""
@@ -154,3 +166,11 @@ echo "=== Checking valid goals ==="
 valid_goals bench/valid
 echo ""
 
+echo "=== Checking --list-* ==="
+list_stuff --list-transforms
+list_stuff --list-printers
+list_stuff --list-provers
+list_stuff --list-formats
+list_stuff --list-metas
+list_stuff --list-debug-flags
+echo ""

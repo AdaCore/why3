@@ -131,3 +131,9 @@ let read_channel env path filename cin =
   (), Mstr.singleton "EqLin" (close_theory th_uc)
 
 let library_of_env = Env.register_format "EquLin" ["equlin"] read_channel
+  ~desc:"@[Generate rendomly linear arithmetic problems:@\n  \
+  @[The first line give the seed to use. Each other lines corresond to one goal@\n  \
+    @[- @[the first number give the number of variables@]@\n\
+      - @[the second the number of equation@]@\n\
+      - @[the third the absolute maximun of the constants used@]\
+@]"

@@ -78,7 +78,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let debug_parse_only = Debug.register_stop_flag "parse_only"
+  ~desc:"Stop@ after@ the@ parsing."
 let debug_type_only  = Debug.register_stop_flag "type_only"
+  ~desc:"Stop@ after@ the@ typing."
 
 (** Environments *)
 

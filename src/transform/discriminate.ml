@@ -27,12 +27,47 @@ open Theory
 open Task
 
 let meta_inst   = register_meta "encoding : inst"   [MTty]
+  ~desc:"Specify@ which@ type@ should@ instantiate@ symbol@ marked@ by@ \
+         'encoding : lskept'."
 let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
+  ~desc:"Specify@ which@ function@ symbols@ should@ be@ kept.@ If@ the@ \
+         function@ is@ polymorphic,@ the@ monorphisations@ which@ signatures@ \
+         contain@ only@ types@ @ marked@ with@ 'encoding : inst'@ are@ kept."
 let meta_lsinst = register_meta "encoding : lsinst" [MTlsymbol;MTlsymbol]
+  ~desc:"Specify@ which@ instantiations@ of@ symbols@ should@ be@ kept.@ \
+         The first@ symbol@ specifies@ the@ symbol,@ the@ signature@ of@ the@ \
+         second@ specifies@ the@ instantiation@ to@ keep."
 
 let meta_select_inst   = register_meta_excl "select_inst"   [MTstring]
+  ~desc:"@[Specify@ how@ to@ automatically@ mark@ type@ by@ \
+'encoding : inst':@]@\n  \
+@[\
+  - none:@[ don't@ mark@ automatically@]@\n\
+  - goal:@[ mark@ all@ the@ closed@ type@ that@ appear@ has@ argument@ \
+            in@ the@ goal@]@\n\
+  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
+@]"
+
 let meta_select_lskept = register_meta_excl "select_lskept" [MTstring]
+  ~desc:"@[Specify@ how@ to@ automatically@ mark@ symbol@ by@ \
+'encoding : lskept':@]@\n  \
+@[\
+  - none:@[ don't@ mark@ automatically@]@\n\
+  - goal:@[ mark@ all@ the@ symbols@ acceptable@ that@ appear@ in@ the@ \
+            goal.@ The signature@ of an@ acceptable@ symbol@ contain@ at@ \
+            least@ one@ type@ that@ is@ not@ a@ type@ variable@ neither@]@\n\
+  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
+@]"
+
 let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
+  ~desc:"@[Specify@ how@ to@ automatically@ mark@ symbol@ by@ \
+'encoding : lskept':@]@\n  \
+@[\
+  - none:@[ don't@ mark@ automatically@]@\n\
+  - goal:@[ mark@ all@ the@ instantiation of symbols@ that@ appear@ in@ \
+             the@ goal@]@\n\
+  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
+@]"
 
 module OHTy = OrderedHash(struct
   type t = ty
@@ -198,7 +233,6 @@ let ft_select_lskept =
 
 let ft_select_lsinst =
   ((Hashtbl.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
-
 let metas_from_env env =
   let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
   let fold_ls _ insts s = Mtyl.fold fold_inst insts s in
@@ -270,5 +304,16 @@ let discriminate env = Trans.seq [
   lsymbol_distinction;
 ]
 
+let empty_formatted : Pp.formatted = ""
+
 let () = Trans.register_env_transform "discriminate" discriminate
+  ~desc_metas:[meta_select_inst  , empty_formatted;
+               meta_select_lskept, empty_formatted;
+               meta_select_lsinst, empty_formatted;
+               meta_inst         , empty_formatted;
+               meta_lskept       , empty_formatted;
+               meta_lsinst       , empty_formatted]
+  ~desc:"Discriminate@ polymorphic@ function@ and@ predicate@ symbols.@ \
+         Allow@ to@ keep@ some@ instantiations@ from@ being@ touched@ by@ \
+         following@ polymorphism@ encodings."
 

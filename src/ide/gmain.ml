@@ -27,8 +27,7 @@ open Gconfig
 open Util
 module C = Whyconf
 
-let debug = Debug.register_flag "ide_info"
-let () = Debug.set_flag debug
+let debug = Debug.lookup_flag "ide_info"
 
 (************************)
 (* parsing command line *)
@@ -109,13 +108,14 @@ let () =
 let () =
   if !opt_list_formats then begin
     let print1 fmt s = fprintf fmt "%S" s in
-    let print fmt (p, l) =
-      fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
+    let print fmt (p, l, f) =
+      fprintf fmt "@[%s [%a]@\n  @[%a@]@]"
+        p (Pp.print_list Pp.comma print1) l
+        Pp.formatted f
     in
-    printf "@[<hov 2>Known input formats:@\n%a@]@."
+    printf "@[Known input formats:@\n  @[%a@]@]@."
       (Pp.print_list Pp.newline print)
-      (List.sort Pervasives.compare (Env.list_formats ()));
-    exit 0;
+      (List.sort Pervasives.compare (Env.list_formats ()))
   end
 
 let fname = match !file with
@@ -1652,7 +1652,7 @@ let confirm_remove_row r =
         info_window
           ~callback:(fun () -> M.remove_transformation tr)
           `QUESTION
-          "Do you really want to remove the selected transformation
+          "Do you really want to remove the selected transformation\n\
 and all its subgoals?"
 
 let remove_proof r =

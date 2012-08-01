@@ -55,7 +55,7 @@
   let parse_error s = raise (Parse_error s)
   open Debug
   let debug = register_flag "xml"
-
+    ~desc:"About the xml parsing."
 }
 
 let space = [' ' '\t' '\r' '\n']

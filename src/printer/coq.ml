@@ -857,7 +857,11 @@ let print_task_real env pr thpr ?old fmt task =
   print_task env pr thpr true  ?old fmt task
 
 let () = register_printer "coq" print_task_full
+  ~desc:"Printer@ for@ the@ Coq@ proof@ assistant@ \
+         (without@ realization@ capabilities)."
 let () = register_printer "coq-realize" print_task_real
+  ~desc:"Printer@ for@ the@ Coq@ proof@ assistant@ \
+         (with@ realization@ capabilities)."
 
 (* specific printer for realization of theories *)
 (* OBSOLETE

@@ -78,6 +78,10 @@ let print_iter22 iter sep print fmt l =
 let print_pair_delim start sep stop pr1 pr2 fmt (a,b) =
   fprintf fmt "%a%a%a%a%a" start () pr1 a sep () pr2 b stop ()
 
+
+type formatted = (unit, unit, unit, unit, unit, unit) format6
+let empty_formatted : formatted = ""
+
 let dot fmt () = fprintf fmt ".@ "
 let comma fmt () = fprintf fmt ",@ "
 let star fmt () = fprintf fmt "*@ "
@@ -103,6 +107,8 @@ let rchevron fmt () = fprintf fmt ">"
 let nothing _fmt _ = ()
 let string fmt s = fprintf fmt "%s" s
 let constant_string s fmt () = string fmt s
+let formatted fmt x = Format.fprintf fmt "%( %)" x
+let constant_formatted f fmt () = formatted fmt f
 let print0 fmt () = pp_print_string fmt "\000"
 let add_flush sep fmt x = sep fmt x; pp_print_flush fmt ()
 
@@ -189,3 +195,5 @@ module Ansi =
 
     let set_column fmt n = fprintf fmt "\027[%iG" n
 end
+
+type formatter = Format.formatter

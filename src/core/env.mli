@@ -70,7 +70,7 @@ val read_file : ?format:fformat -> env -> filename -> theory Mstr.t
 
 val read_theory : format:fformat -> env -> pathname -> string -> theory
 (** [read_theory ~format env path th] returns the theory [path.th]
-    from the library. The parameter [format] speicifies the format
+    from the library. The parameter [format] specifies the format
     of the library file to look for.
 
     @raise UnknownFormat [format] if the format is not registered
@@ -100,6 +100,7 @@ type 'a read_format =
     (e.g. file name) to be used in error messages. *)
 
 val register_format :
+  desc:Pp.formatted ->
   fformat -> extension list -> 'a read_format -> (env -> 'a library)
 (** [register_format fname exts read] registers a new format [fname]
     for files with extensions from the string list [exts] (without
@@ -112,7 +113,7 @@ val register_format :
 val env_of_library : 'a library -> env
 (** [env_of_library lib] returns the environment of [lib] *)
 
-val list_formats : unit -> (fformat * extension list) list
+val list_formats : unit -> (fformat * extension list * Pp.formatted) list
 (** [list_formats ()] returns the list of registered formats *)
 
 val read_lib_file : 'a library -> pathname -> 'a * theory Mstr.t

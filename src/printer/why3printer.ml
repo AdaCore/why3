@@ -411,5 +411,7 @@ let print_task _env pr thpr ?old:_ fmt task =
       (List.rev (Trans.apply print_tdecls task))
 
 let () = register_printer "why3old" print_task_old
+  ~desc:"TODO"
 let () = register_printer "why3" print_task
-
+  ~desc:"Printer@ for@ the@ logical@ format@ of@ why3.@ There@ is@ currently@ \
+         a@ lose@ of@ informations@ between@ the@ parser@ and@ the@ printer."

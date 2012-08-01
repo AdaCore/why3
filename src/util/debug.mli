@@ -18,23 +18,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type flag
-(* Flag used for debugging only part of Why3 *)
 
-val register_flag : string -> flag
+type flag
+
+(** Flags used for debugging only part of Why3 *)
+
+val register_flag : desc:Pp.formatted -> string -> flag
 (** Register a new flag. It is allowed to register twice the same flag *)
 
-val register_stop_flag : string -> flag
+val register_stop_flag : desc:Pp.formatted -> string -> flag
 (** Register a new stop flag. It is allowed to register twice the same flag.
-    A stop flag should be used when a flag changes the behavior of Why3.
+    A stop flag should be used when the flag changes the behavior of Why3.
     Such flags are not set by --debug-all. *)
 
 val lookup_flag : string -> flag
-val list_flags : unit -> (string * flag * bool) list
+val list_flags : unit -> (string * flag * bool * Pp.formatted) list
 (** List the known flags *)
 
 val is_stop_flag : string -> bool
 (** test if the flag is a stop flag *)
+
+val flag_desc : string -> Pp.formatted
+(** get the description of the flag *)
 
 (** Modify the state of a flag *)
 val set_flag : flag -> unit

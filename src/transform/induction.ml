@@ -17,6 +17,7 @@
 (*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
 (*                                                                        *)
 (**************************************************************************)
+
 open Ident
 open Ty
 open Term
@@ -81,7 +82,11 @@ module Svsl = Mvsl.Set
 
 (**************************** PRINTING ***************************************)
 let debug = Debug.register_flag "induction"
+  ~desc:"About@ the@ transformation@ of@ the@ goal@ using@ induction."
+
 let debug_verbose = Debug.register_flag "induction-verbose"
+  ~desc:"Same@ as@ induction, but@ print@ also@ the@ variables, the@ \
+         heuristics@ and@ the lexicographic@ order@ used."
 
 let print_ty_skm skm =
   List.iter
@@ -258,6 +263,9 @@ let induction_ty km t0 =
 (******************** INDUCTION BASED ON TYPE DEFINITIONS ********************)
 (************************* WITH LEXICOGRAPHIC ORDER **************************)
 (*****************************************************************************)
+
+(** TODO use this label in the following function *)
+let label_induction = create_label "induction"
 
 let qvl_labeled qvl = 
   List.filter (fun v -> 
@@ -619,17 +627,23 @@ let induction_int th_int = function
 
 
 
+let desc_labels = [label_induction,
+                   ("Make the induction on the labeled variables." :
+                       Pp.formatted)]
 
 
 let () =
   Trans.register_transform_l "induction_ty" (Trans.store induction_ty)
+    ~desc_labels ~desc:"TODO: induction on type"
 
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
+    ~desc_labels ~desc:"TODO: induction on type with lexicographic order"
 
 (*
 let () =
   Trans.register_transform_l "induction_ty_fdef" (Trans.store induction_fun)
+    ~desc_labels ~desc:"TODO: induction on type using function definition"
 *)
 
 let () =
@@ -637,6 +651,7 @@ let () =
     (fun env ->
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int th_int))
+    ~desc_labels ~desc:"TODO: induction on integers"
 
 (**********************************************************************)
 (*TODO

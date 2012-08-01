@@ -34,6 +34,7 @@ open Pgm_types.T
 open Pgm_module
 
 let debug = Debug.register_flag "program_wp"
+  ~desc:"About the way weakest precondition is computed."
 
 (* mutable fields *)
 

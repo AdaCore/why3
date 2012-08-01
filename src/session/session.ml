@@ -29,6 +29,7 @@ module C = Whyconf
 module Tc = Termcode
 
 let debug = Debug.register_flag "session"
+  ~desc:"About the why3 session creation, reading and writing."
 
 (** {2 Type definitions} *)
 

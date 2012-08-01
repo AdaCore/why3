@@ -28,8 +28,12 @@ open Decl
 open Theory
 open Task
 
+(* TODO: Is it not an example of register_stop_flag? *)
 let debug_print_labels = Debug.register_flag "print_labels"
+  ~desc:"Control if ident labels are printed."
+
 let debug_print_locs = Debug.register_flag "print_locs"
+  ~desc:"Control if ident location are printed."
 
 let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";

@@ -123,6 +123,7 @@ let rec grep out l = match l with
 
 
 let debug = Debug.register_flag "call_prover"
+  ~desc:"About@ external@ prover@ calls@ and@ results."
 
 type post_prover_call = unit -> prover_result
 type prover_call = Unix.wait_flag list -> post_prover_call

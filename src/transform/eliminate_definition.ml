@@ -45,6 +45,13 @@ let eliminate_builtin =
   Trans.decl (elim rem_ls rem_pr) None))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
+  ~desc_metas:[Printer.meta_syntax_logic,
+               ("@ Remove@ their@ definitions@ since@ they@ are@ considered@ \
+                 builtin."
+                   : Pp.formatted);
+               Printer.meta_remove_prop, Pp.empty_formatted]
+  ~desc:"Eliminate@ facts@ which@ are@ builtin@ in@ the@ prover:@ symbol@ \
+         definitions@ or@ axiomatics."
 
 (** Eliminate definitions of functions and predicates *)
 
@@ -114,15 +121,25 @@ let eliminate_mutual_recursion = Trans.decl elim_mutual None
 
 let () =
   Trans.register_transform "eliminate_definition_func"
-    eliminate_definition_func;
+    eliminate_definition_func
+    ~desc:"Transform@ function@ definition@ into@ axioms.";
   Trans.register_transform "eliminate_definition_pred"
-    eliminate_definition_pred;
+    eliminate_definition_pred
+    ~desc:"Transform@ predicate@ definition@ into@ axioms.";
   Trans.register_transform "eliminate_definition"
-    eliminate_definition;
+    eliminate_definition
+    ~desc:"Same@ as@ eliminate_definition_func/_pred@ at@ the@ same@ time.";
   Trans.register_transform "eliminate_recursion"
-    eliminate_recursion;
+    eliminate_recursion
+    ~desc:"Same@ as@ eliminate_definition@ ,but@ only@ for@ recursive@ \
+           definition";
   Trans.register_transform "eliminate_non_struct_recursion"
-    eliminate_non_struct_recursion;
+    eliminate_non_struct_recursion
+    ~desc:"Same@ as@ eliminate_recursion@ ,but@ only@ for@ non@ structural@ \
+           recursive@ definition";
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
+    ~desc:"Same@ as@ eliminate_recursion@ ,but@ only@ for@ mutual@ \
+           recursive@ definition (at@ least@ two@ functions@ or@ \
+           predicates@ defined@ at@ the@ same@ time)";
 

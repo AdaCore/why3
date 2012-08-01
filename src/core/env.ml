@@ -64,7 +64,7 @@ let lookup_format name =
   with Not_found -> raise (UnknownFormat name)
 
 let list_formats () =
-  let add n (_,_,l) acc = (n,l)::acc in
+  let add n (_,_,l,desc) acc = (n,l,desc)::acc in
   Hashtbl.fold add read_format_table []
 
 let get_extension file =
@@ -82,7 +82,7 @@ let read_channel ?format env file ic =
   let name = match format with
     | Some name -> name
     | None -> get_format file in
-  let rc,_,_ = lookup_format name in
+  let rc,_,_,_ = lookup_format name in
   rc env file ic
 
 let read_file ?format env file =
@@ -94,7 +94,7 @@ let read_file ?format env file =
   with e -> close_in ic; raise e
 
 let read_theory ~format env path th =
-  let _,rl,_ = lookup_format format in
+  let _,rl,_,_ = lookup_format format in
   rl env path th
 
 let find_theory = read_theory ~format:"why"
@@ -180,17 +180,17 @@ let read_lib_theory lib path th =
   try Mstr.find th mth with Not_found ->
   raise (TheoryNotFound (path,th))
 
-let register_format name exts read =
+let register_format ~(desc:Pp.formatted) name exts read =
   if Hashtbl.mem read_format_table name then raise (KnownFormat name);
   let getlib = Wenv.memoize 5 (mk_library read exts) in
   let rc env file ic = snd (read (getlib env) [] file ic) in
   let rl env path th = read_lib_theory (getlib env) path th in
-  Hashtbl.add read_format_table name (rc,rl,exts);
+  Hashtbl.add read_format_table name (rc,rl,exts,desc);
   List.iter (fun s -> Hashtbl.replace extensions_table s name) exts;
   getlib
 
 let locate_lib_file env format path =
-  let _,_,exts = lookup_format format in
+  let _,_,exts,_ = lookup_format format in
   locate_lib_file env path exts
 
 (* Exception reporting *)
