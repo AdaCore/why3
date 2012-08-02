@@ -519,6 +519,10 @@ let vta_of_expr e = match e.e_vty with
   | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
   | VTarrow vta -> vta
 
+let pv_effect pv = match pv.pv_vtv.vtv_mut with
+  | Some r -> eff_read ~ghost:pv.pv_vtv.vtv_ghost eff_empty r
+  | None -> eff_empty
+
 let add_e_vars e m = varmap_union e.e_varm m
 
 let e_pvset pvs e =
@@ -592,7 +596,7 @@ let mk_expr node vty eff varm = {
 
 let e_value pv =
   let varm = add_pv_vars pv Mid.empty in
-  mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty varm
+  mk_expr (Evalue pv) (VTvalue pv.pv_vtv) (pv_effect pv) varm
 
 let e_arrow ps vta =
   let varm = add_ps_vars ps Mid.empty in
@@ -636,6 +640,7 @@ let e_app_real e pv =
   let spec,vty = vta_app (vta_of_expr e) pv in
   check_postexpr e spec.c_effect (add_pv_vars pv Mid.empty);
   let eff = eff_union e.e_effect spec.c_effect in
+  let eff = eff_union eff (pv_effect pv) in
   mk_expr (Eapp (e,pv,spec)) vty eff (add_pv_vars pv e.e_varm)
 
 let rec e_app_flatten e pv = match e.e_node with
@@ -703,6 +708,7 @@ let e_plapp pls el ity =
       | vtv::vtvl, e::argl ->
           let apply_to_pv pv =
             let t = t_var pv.pv_vs in
+            let eff = eff_union eff (pv_effect pv) in
             let ghost = ghost || (pv.pv_vtv.vtv_ghost && not vtv.vtv_ghost) in
             let sbs = ity_match sbs vtv.vtv_ity pv.pv_vtv.vtv_ity in
             app (t::tl) (add_pv_vars pv varm) ghost eff sbs vtvl argl
@@ -783,7 +789,8 @@ let e_assign_real e0 pv =
   let varm = add_pv_vars pv Mid.empty in
   check_postexpr e0 eff varm;
   let varm = add_e_vars e0 varm in
-  let eff = eff_union e0.e_effect eff in
+  let eff = eff_union eff e0.e_effect in
+  let eff = eff_union eff (pv_effect pv) in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
   let e = mk_expr (Eassign (e0,r,pv)) vty eff varm in
   (* FIXME? Ok, this is awkward. We prohibit assignments
