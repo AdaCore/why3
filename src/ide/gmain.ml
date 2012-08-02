@@ -1247,6 +1247,14 @@ let split_selected_goals () =
 let inline_selected_goals () =
   apply_trans_on_selection inline_transformation
 
+let escape_text = Glib.Markup.escape_text
+let sanitize_markup x =
+  let remove = function
+    | '_' -> "__"
+    | c -> String.make 1 c in
+  Ident.sanitizer remove remove (escape_text x)
+
+
 let () =
   let add_separator () =
     ignore(tools_factory#add_separator
@@ -1261,12 +1269,37 @@ let () =
              ~label:"Inline in selection"
              ~callback:inline_selected_goals
              () : GMenu.image_menu_item) in
+  let add_submenu_transform nonsplitting () =
+    let non_splitting = tools_factory#add_submenu
+      (if nonsplitting
+       then "non-splitting transformations"
+       else "splitting transformations") in
+    let non_splitting = new GMenu.factory non_splitting ~accel_group in
+    let iter ((name,_) as desc) =
+      let callback () = apply_trans_on_selection name in
+      let ii = non_splitting#add_image_item
+        ~label:(sanitize_markup name) ~callback () in
+      ii#misc#set_tooltip_text
+        (Pp.string_of Trans.print_trans_desc desc) in
+    let trans =
+      if nonsplitting
+      then Trans.list_transforms ()
+      else Trans.list_transforms_l () in
+    let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
+    List.iter iter trans in
+
   add_refresh_provers add_separator "add separator in tools menu";
   add_refresh_provers add_item_split "add split in tools menu";
   add_refresh_provers add_item_inline  "add inline in tools menu";
+  add_refresh_provers (add_submenu_transform true)
+    "add non splitting transformations in tools menu";
+  add_refresh_provers (add_submenu_transform false)
+    "add splitting transformations in tools menu";
   add_separator ();
   add_item_split ();
-  add_item_inline ()
+  add_item_inline ();
+  add_submenu_transform true ();
+  add_submenu_transform false ()
 
 
 let () =
