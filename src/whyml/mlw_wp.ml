@@ -179,6 +179,8 @@ let wp_forall_post v p f =
     | Some t, p -> wp_let v t (wp_implies p f)
     | _ -> wp_forall [v] (wp_implies p f)
 
+(* regs_of_reads, and therefore regs_of_effect, only take into account
+   reads in program expressions and ignore the variables in specification *)
 let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
@@ -828,8 +830,10 @@ and wp_abstract env c_eff c_q c_xq q xq =
   in
   backstep proceed c_q c_xq
 
-and wp_lambda env lr l =
+and wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () in
+  let regs = ps.ps_subst.ity_subst_reg in
+  let regs = Mreg.map (fun _ -> ()) regs in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env = if lr = 0 || l.l_variant = [] then env else
     let lab = t_var lab in
@@ -841,11 +845,10 @@ and wp_lambda env lr l =
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv l.l_xpost) in
   let f = wp_implies l.l_pre (erase_mark lab f) in
-  let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
-  wp_forall args f
+  wp_forall args (quantify env regs f)
 
 and wp_rec_defn env { rec_defn = rdl; rec_letrec = lr } =
-  List.map (fun rd -> wp_lambda env lr rd.fun_lambda) rdl
+  List.map (wp_fun_defn env lr) rdl
 
 (***
 let bool_to_prop env f =
