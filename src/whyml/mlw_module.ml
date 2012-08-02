@@ -343,22 +343,29 @@ let th_unit =
   close_theory uc
 
 let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
-let pd_exit = create_exn_decl xs_exit
 
-let mod_exit = {
-  mod_theory = close_theory (create_theory (id_fresh "Exit"));
-  mod_decls  = [pd_exit];
-  mod_export = add_ps true xs_exit.xs_name.id_string (XS xs_exit) empty_ns;
-  mod_known  = Mid.singleton xs_exit.xs_name pd_exit;
-  mod_local  = Sid.singleton xs_exit.xs_name;
-  mod_used   = Sid.empty;
-}
+let mod_prelude env =
+  let pd_exit = create_exn_decl xs_exit in
+  let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
+  let uc = empty_module env (id_fresh "Prelude") [] in
+  let uc = add_pdecl ~wp:false uc pd_old in
+  let uc = add_pdecl ~wp:false uc pd_exit in
+  close_module uc
+
+let mod_prelude =
+  let one_time = ref None in
+  fun env -> match !one_time with
+    | Some m -> m
+    | None ->
+        let m = mod_prelude env in
+        one_time := Some m;
+        m
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m th_unit in
-  let m = use_export m mod_exit in
+  let m = use_export m (mod_prelude env) in
   m
 
 (** Clone *)
