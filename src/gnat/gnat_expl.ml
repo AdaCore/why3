@@ -169,13 +169,19 @@ let rec extract_msg t =
    | _ ->
          read_labels t.t_label
 
+let print_simple_proven fmt p =
+   match p.loc with
+   | [] -> assert false (* the sloc of a VC is never empty *)
+   | primary :: _ ->
+         Format.fprintf fmt "%a: info: %a proved"
+         simple_print_loc primary print_reason p.reason
+
 let print_expl proven task fmt p =
    match p.loc with
    | [] -> assert false (* the sloc of a VC is never empty *)
    | primary :: secondaries ->
          if proven then begin
-            Format.fprintf fmt "%a: info: %a proved"
-            simple_print_loc primary print_reason p.reason
+            print_simple_proven fmt p
          end else begin
             let g = Task.task_goal_fmla task in
             let info = extract_msg g in

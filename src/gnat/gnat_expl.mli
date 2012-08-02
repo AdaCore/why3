@@ -18,6 +18,7 @@ type expl
 
 val reason_from_string : string -> reason
 
+val print_simple_proven : Format.formatter -> expl -> unit
 val print_expl : bool -> Task.task -> Format.formatter -> expl -> unit
 
 val print_skipped : Format.formatter -> expl -> unit

@@ -520,7 +520,7 @@ $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 byte: bin/gnatwhy3.byte
 opt:  bin/gnatwhy3.opt
 
-bin/gnatwhy3.opt: src/why3.cmxa $(PGMCMX) $(GNATCMX)
+bin/gnatwhy3.opt: src/why3.cmxa $(PGMCMX) $(MLWCMX) $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 
