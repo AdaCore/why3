@@ -30,7 +30,7 @@ val debug_type_only : Debug.flag
 
 (** incremental parsing *)
 
-val add_decl : theory_uc -> Ptree.decl -> theory_uc
+val add_decl : Loc.position -> theory_uc -> Ptree.decl -> theory_uc
 
 val add_use_clone :
   unit Env.library -> theory Mstr.t -> theory_uc ->
@@ -39,7 +39,11 @@ val add_use_clone :
 val close_namespace :
   Loc.position -> bool -> string option -> theory_uc -> theory_uc
 
-val close_theory : Loc.position -> theory Mstr.t -> theory_uc -> theory Mstr.t
+val close_theory : theory Mstr.t -> theory_uc -> theory Mstr.t
+
+val open_file : unit Env.library -> Env.pathname -> Ptree.incremental
+
+val close_file : unit -> theory Mstr.t
 
 (******************************************************************************)
 (** The following is exported for program typing (src/programs/pgm_typing.ml) *)

@@ -256,7 +256,7 @@ Theorem long_path_decomposition_pigeon1 : forall (l:(list vertex))
 
 Require Why3.
 Ltac ae := why3 "alt-ergo".
-Ltac cvc := why3 "cvc3-2.4".
+Ltac cvc := why3 "cvc3".
 
 intros l v H0.
 induction H0.

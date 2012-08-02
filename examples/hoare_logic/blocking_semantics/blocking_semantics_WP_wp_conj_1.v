@@ -480,7 +480,7 @@ Unset Implicit Arguments.
 Require Why3.
 Ltac ae := why3 "alt-ergo" timelimit 2.
 Ltac ae10 := why3 "alt-ergo" timelimit 10.
-Ltac cvc10 := why3 "cvc3-2.4" timelimit 10.
+Ltac cvc10 := why3 "cvc3" timelimit 10.
 
 (* Why3 goal *)
 Theorem wp_conj : forall (sigma:(map Z value)) (pi:(list (Z* value)%type))

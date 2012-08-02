@@ -3,60 +3,35 @@
 Require Import ZArith.
 Require Import Rbase.
 Require Import ZOdiv.
+Require int.Int.
+Require int.Abs.
+Require int.ComputerDivision.
+Require int.Power.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter mark : Type.
-
-Parameter at1: forall (a:Type), a -> mark -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-
-Implicit Arguments old.
-
-Axiom Abs_le : forall (x:Z) (y:Z), ((Zabs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\
-  (x <= y)%Z).
-
-Parameter power: Z -> Z -> Z.
-
-
-Axiom Power_0 : forall (x:Z), ((power x 0%Z) = 1%Z).
-
-Axiom Power_s : forall (x:Z) (n:Z), (0%Z <  n)%Z -> ((power x
-  n) = (x * (power x (n - 1%Z)%Z))%Z).
-
-Axiom Power_1 : forall (x:Z), ((power x 1%Z) = x).
-
-Axiom Power_sum : forall (x:Z) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
-  ((power x (n + m)%Z) = ((power x n) * (power x m))%Z)).
-
-Axiom Power_mult : forall (x:Z) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
-  ((power x (n * m)%Z) = (power (power x n) m))).
-
-Axiom Power_mult2 : forall (x:Z) (y:Z) (n:Z), (0%Z <= n)%Z ->
-  ((power (x * y)%Z n) = ((power x n) * (power y n))%Z).
-
+(* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Implicit Arguments mk_ref.
 
-Definition contents (a:Type)(u:(ref a)): a :=
-  match u with
-  | mk_ref contents1 => contents1
+(* Why3 assumption *)
+Definition contents (a:Type)(v:(ref a)): a :=
+  match v with
+  | (mk_ref x) => x
   end.
 Implicit Arguments contents.
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
+Import Power.
 
-(* DO NOT EDIT BELOW *)
-
-Theorem WP_parameter_fast_exp_imperative : forall (x:Z), forall (n:Z),
-  (0%Z <= n)%Z -> forall (e:Z), forall (p:Z), forall (r:Z), ((0%Z <= e)%Z /\
-  ((r * (power p e))%Z = (power x n))) -> ((0%Z <  e)%Z ->
+(* Why3 goal *)
+Theorem WP_parameter_fast_exp_imperative : forall (x:Z) (n:Z),
+  (0%Z <= n)%Z -> forall (e:Z) (p:Z) (r:Z), ((0%Z <= e)%Z /\
+  ((r * (int.Power.power p e))%Z = (int.Power.power x n))) -> ((0%Z < e)%Z ->
   ((~ ((ZOmod e 2%Z) = 1%Z)) -> forall (p1:Z), (p1 = (p * p)%Z) ->
-  forall (e1:Z), (e1 = (ZOdiv e 2%Z)) -> ((r * (power p1 e1))%Z = (power x
-  n)))).
+  forall (e1:Z), (e1 = (ZOdiv e 2%Z)) -> ((r * (int.Power.power p1
+  e1))%Z = (int.Power.power x n)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros x n Hn e0 p0 r0 (He0,Hind).
 intros He0' Hmod p1 Hp e1 He.
@@ -72,6 +47,5 @@ rewrite Power_mult2; auto with zarith.
 rewrite h at 3.
 rewrite Power_sum; omega.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

@@ -89,7 +89,7 @@ let iter_group expr iter_fun text =
   iter 0 false
 
 let regexp_arg_pos = Str.regexp "%\\([0-9]+\\)"
-let regexp_arg_pos_typed = Str.regexp "%\\([t]?[0-9]+\\)"
+let regexp_arg_pos_typed = Str.regexp "%\\([tv]?[0-9]+\\)"
 
 exception BadSyntaxIndex of int
 exception BadSyntaxArity of int * int
@@ -102,19 +102,26 @@ let check_syntax s len =
   in
   iter_group regexp_arg_pos arg s
 
-let check_syntax_typed s len ret =
+let check_syntax_typed ls s =
+  let len = List.length ls.ls_args in
+  let ret = ls.ls_value <> None in
+  let nfv = Stv.cardinal (ls_ty_freevars ls) in
   let arg s =
     let grp = (Str.matched_group 1 s) in
-    if grp.[0] = 't'
-    then
+    if grp.[0] = 't' then begin
       let grp = String.sub grp 1 (String.length grp - 1) in
       let i = int_of_string grp in
       if i < 0 || (not ret && i = 0) then raise (BadSyntaxIndex i);
-      if i > len then raise (BadSyntaxArity (len,i));
-    else
+      if i > len then raise (BadSyntaxArity (len,i))
+    end else if grp.[0] = 'v' then begin
+      let grp = String.sub grp 1 (String.length grp - 1) in
+      let i = int_of_string grp in
+      if i < 0 || i >= nfv then raise (BadSyntaxIndex i)
+    end else begin
       let i = int_of_string grp in
       if i <= 0 then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i));
+    end
   in
   iter_group regexp_arg_pos_typed arg s
 
@@ -125,17 +132,33 @@ let syntax_arguments s print fmt l =
     print fmt args.(i-1) in
   global_substitute_fmt regexp_arg_pos repl_fun s fmt
 
+(* return the type arguments of a symbol application, sorted according
+   to their (formal) names *)
+let get_type_arguments t = match t.t_node with
+  | Tapp (ls, tl) ->
+      let m = oty_match Mtv.empty ls.ls_value t.t_ty in
+      let m = List.fold_left2
+        (fun m ty t -> oty_match m (Some ty) t.t_ty) m ls.ls_args tl in
+      let name tv = Util.Mstr.add tv.tv_name.id_string in
+      let m = Mtv.fold name m Util.Mstr.empty in
+      Array.of_list (Util.Mstr.values m)
+  | _ ->
+      [||]
+
 let syntax_arguments_typed s print_arg print_type t fmt l =
   let args = Array.of_list l in
   let repl_fun s fmt =
     let grp = (Str.matched_group 1 s) in
-    if grp.[0] = 't'
-    then
+    if grp.[0] = 't' then
       let grp = String.sub grp 1 (String.length grp - 1) in
       let i = int_of_string grp in
       if i = 0
-      then print_type fmt (t_type (Util.of_option t))
+      then print_type fmt (t_type t)
       else print_type fmt (t_type args.(i-1))
+    else if grp.[0] = 'v' then
+      let grp = String.sub grp 1 (String.length grp - 1) in
+      let m = get_type_arguments t in
+      print_type fmt m.(int_of_string grp)
     else
       let i = int_of_string grp in
       print_arg fmt args.(i-1) in
@@ -179,7 +202,7 @@ let syntax_type ts s =
   create_meta meta_syntax_type [MAts ts; MAstr s]
 
 let syntax_logic ls s =
-  check_syntax_typed s (List.length ls.ls_args) (ls.ls_value <> None);
+  check_syntax_typed ls s;
   create_meta meta_syntax_logic [MAls ls; MAstr s]
 
 let remove_prop pr =

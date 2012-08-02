@@ -316,10 +316,13 @@ and string = parse
       | e -> raise (Loc.Located (loc lb, e))
 
   let parse_logic_file env path lb =
-    pre_logic_file token (Lexing.from_string "") env path;
-    with_location (logic_file token) lb
+    open_file token (Lexing.from_string "") (Typing.open_file env path);
+    with_location (logic_file token) lb;
+    Typing.close_file ()
 
-  let parse_program_file = with_location (program_file token)
+  let parse_program_file inc lb =
+    open_file token (Lexing.from_string "") inc;
+    with_location (program_file token) lb
 
   let token_counter lb =
     let rec loop in_annot a p =

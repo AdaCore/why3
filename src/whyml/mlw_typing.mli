@@ -26,9 +26,8 @@ open Ptree
 open Mlw_module
 
 type mlw_contents = modul Mstr.t
-type mlw_library = mlw_contents library
+type mlw_library = mlw_contents Env.library
 type mlw_file = mlw_contents * Theory.theory Mstr.t
 
-val add_theory_module:
-  mlw_library -> pathname -> mlw_file -> theory_module -> mlw_file
-
+val open_file : mlw_library -> Env.pathname -> Ptree.incremental
+val close_file : unit -> mlw_file

@@ -265,9 +265,8 @@ let () = try
     opt_list := true;
     let config = read_config !opt_config in
     let config = List.fold_left merge_config config !opt_extra in
-    let print fmt prover pc = fprintf fmt "%s (%a)@\n"
-      pc.id print_prover prover in
-    let print fmt m = Mprover.iter (print fmt) m in
+    let print = Pp.print_iter2 Mprover.iter Pp.newline Pp.nothing
+      print_prover Pp.nothing in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
   end;
@@ -328,9 +327,11 @@ let () = try
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
   | Some s ->
-      let prover = Whyconf.prover_by_id config s in
-      opt_command := Some (String.concat " " (prover.command :: prover.extra_options));
-      opt_driver := Some (prover.driver, prover.extra_drivers)
+    let filter_prover = Whyconf.parse_filter_prover s in
+    let prover = Whyconf.filter_one_prover config filter_prover in
+    opt_command :=
+      Some (String.concat " " (prover.command :: prover.extra_options));
+    opt_driver := Some (prover.driver, prover.extra_drivers)
   | None ->
       ()
   end;
@@ -547,7 +548,8 @@ let do_input env drv = function
 let () =
   try
     let env = Env.create_env !opt_loadpath in
-    let drv = Util.option_map (fun (f,ef) -> load_driver env f ef) !opt_driver in
+    let drv =
+      Util.option_map (fun (f,ef) -> load_driver env f ef) !opt_driver in
     Queue.iter (do_input env drv) opt_queue;
     if !opt_token_count then
       Format.printf "Total: %d annot/%d programs, ratio = %.3f@."

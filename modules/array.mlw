@@ -198,6 +198,29 @@ module ArraySum
 
 end
 
+(** {2 Number of array elements satisfying a given predicate}
+
+This module is parametrized by a predicate [pr]. It is supposed to be
+cloned with needed instances for [pr]. It is also parametrized by a
+type [param] to be used as an additional parameter to [pr].
+
+*)
+
+module NumOfParam
+  use import Array
+
+  type elt
+  type param
+  predicate pr (p: param) (i: int) (e: elt)
+
+  type param_ = (array elt, param)
+  predicate pr_ (p: param_) (i: int) = let (a, p) = p in pr p i a[i]
+  clone import int.NumOfParam with type param = param_, predicate pr = pr_
+
+  (* the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
+  function numof (a: array elt) (p: param) (l u: int) : int = num_of (a, p) l u
+end
+
 module TestArray
 
   use import int.Int

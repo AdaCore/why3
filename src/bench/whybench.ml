@@ -252,8 +252,8 @@ let () =
   if !opt_list_provers then begin
     opt_list := true;
     let config = read_config !opt_config in
-    let print fmt prover pc = fprintf fmt "%s (%a)@\n"
-      pc.id print_prover prover in
+    let print fmt prover pc = fprintf fmt "%a (%a)@\n"
+      print_prover_parsable_format pc.prover print_prover prover in
     let print fmt m = Mprover.iter (print fmt) m in
     let provers = get_provers config in
     printf "@[<hov 2>Known provers:@\n%a@]@." print provers
@@ -343,7 +343,7 @@ let () =
 
 
   let map_prover s =
-    let prover = prover_by_id config s in
+    let prover = filter_one_prover config (parse_filter_prover s) in
     { B.tval   = {B.tool_name = "cmdline"; prover_name = s; tool_db = None};
       ttrans   = [Trans.identity,None];
       tdriver  = load_driver env prover.driver prover.extra_drivers;

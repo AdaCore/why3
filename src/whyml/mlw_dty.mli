@@ -40,7 +40,7 @@ val add_dvty: tvars -> dvty -> tvars
 
 val create_type_variable: unit -> dity
 val create_user_type_variable: Ptree.ident -> dity
-val its_app: user:bool -> itysymbol -> dity list -> dity
+val its_app: itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
 
 val unify: dity -> dity -> unit

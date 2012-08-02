@@ -146,7 +146,7 @@ let rec print_term info fmt t = match t.t_node with
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
-        (print_type info) (Some t) fmt tl
+        (print_type info) t fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
           | _ -> fprintf fmt "@,%a(%a)"
@@ -171,7 +171,7 @@ and print_fmla info fmt f = match f.t_node with
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
-        (print_type info) None fmt tl
+        (print_type info) f fmt tl
       | None -> begin match tl with
           | [] -> fprintf fmt "%a" print_ident ls.ls_name
           | _ -> fprintf fmt "(%a(%a))"

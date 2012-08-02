@@ -417,7 +417,7 @@ intros (h4, h5).
 destruct (get m u) as [] _eqn. 2: intuition.
 destruct (get m v) as [] _eqn.
 intros hlt. apply key_lemma_1 with v z0.
-why3 "z3-3".
+why3 "z3".
 assert (hu: exists lu: list vertex, path s lu u /\ path_weight lu u = z) by ae.
 destruct hu as (lu, (hu1, hu2)).
 exists (infix_plpl lu (Cons u Nil)); ae.

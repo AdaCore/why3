@@ -40,6 +40,9 @@ val e_now : expr
 
 val remove_old : Term.term -> Term.term
 
+val full_invariant :
+  Decl.known_map -> Mlw_decl.known_map -> Term.vsymbol -> ity -> Term.term
+
 (** Weakest preconditions *)
 
 val wp_val: Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc

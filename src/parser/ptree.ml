@@ -127,6 +127,8 @@ type type_def =
 
 type visibility = Public | Private | Abstract
 
+type invariant = lexpr option
+
 type type_decl = {
   td_loc    : loc;
   td_ident  : ident;
@@ -134,6 +136,7 @@ type type_decl = {
   td_model  : bool;
   td_vis    : visibility;
   td_def    : type_def;
+  td_inv    : invariant;
 }
 
 type logic_decl = {
@@ -168,8 +171,8 @@ type decl =
   | TypeDecl of type_decl list
   | LogicDecl of logic_decl list
   | IndDecl of Decl.ind_sign * ind_decl list
-  | PropDecl of loc * prop_kind * ident * lexpr
-  | Meta of loc * ident * metarg list
+  | PropDecl of prop_kind * ident * lexpr
+  | Meta of ident * metarg list
 
 (* program files *)
 
@@ -180,7 +183,7 @@ type lazy_op = LazyAnd | LazyOr
 type variant = lexpr * qualid option
 
 type loop_annotation = {
-  loop_invariant : lexpr option;
+  loop_invariant : invariant;
   loop_variant   : variant list;
 }
 
@@ -238,7 +241,7 @@ and expr_desc =
   | Eabsurd
   | Eraise of qualid * expr option
   | Etry of expr * (qualid * ident option * expr) list
-  | Efor of ident * expr * for_direction * expr * lexpr option * expr
+  | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
   | Emark of ident * expr
@@ -252,30 +255,24 @@ and letrec = loc * ident * ghost * binder list * variant list * triple
 
 and triple = pre * expr * post
 
-type program_decl =
-  | Dlet    of ident * ghost * expr
+type pdecl =
+  | Dlet of ident * ghost * expr
   | Dletrec of letrec list
-  | Dlogic  of decl
-  | Duseclone of use_clone
-  | Dparam  of ident * ghost * type_v
-  | Dexn    of ident * pty option
-  (* modules *)
-  | Duse    of qualid * bool option * (*as:*) string option
-  | Dnamespace of string option * (*import:*) bool * (loc * program_decl) list
+  | Dparam of ident * ghost * type_v
+  | Dexn of ident * pty option
 
-type theory = {
-  pth_name : ident;
-  pth_decl : (loc * program_decl) list;
+(* incremental parsing *)
+
+type incremental = {
+  open_theory     : ident -> unit;
+  close_theory    : unit -> unit;
+  open_module     : ident -> unit;
+  close_module    : unit -> unit;
+  open_namespace  : unit -> unit;
+  close_namespace : loc -> bool (*import:*) -> string option -> unit;
+  new_decl        : loc -> decl -> unit;
+  new_pdecl       : loc -> pdecl -> unit;
+  use_clone       : loc -> use_clone -> unit;
+  (* TODO: remove this once the new whyml becomes default *)
+  use_module      : loc -> use -> unit;
 }
-
-type module_ = {
-  mod_name : ident;
-  mod_decl : (loc * program_decl) list;
-}
-
-type theory_module =
-  | Ptheory of theory
-  | Pmodule of module_
-
-type program_file = theory_module list
-

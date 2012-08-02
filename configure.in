@@ -453,8 +453,6 @@ fi
 
 # PVS
 
-enable_pvs_fp_libs=no
-
 if test "$enable_pvs_libs" = no; then
     enable_pvs_support=no
     AC_MSG_WARN(PVS support disabled)
@@ -471,14 +469,15 @@ else
         PVSVERSION=`$PVS -version | sed -n -e 's|.*Version* *\([[^ ]]*\)$|\1|p' `
 
         case $PVSVERSION in
-          5.0)
-	        enable_pvs_support=yes
+          2.*|3.*|4.*|5.*)
                 AC_MSG_RESULT($PVSVERSION)
+                enable_pvs_support=no
+	        AC_MSG_WARN(You need PVS 6.0 or higher; PVS discarded)
+                reason_pvs_support=" (need version 6.0 or higher)"
                 ;;
           *)
-                enable_pvs_support=no
-	        AC_MSG_WARN(You need PVS 5.0 or later; PVS discarded)
-                reason_pvs_support=" (need version 5.0 or later)"
+	        enable_pvs_support=yes
+                AC_MSG_RESULT($PVSVERSION)
                 ;;
         esac
     fi
@@ -486,6 +485,19 @@ fi
 
 if test "$enable_pvs_support" = no; then
    enable_pvs_libs=no
+fi
+
+if test "$enable_pvs_libs" = yes; then
+   AC_MSG_CHECKING([for NASA libraries])
+   enable_pvs_nasa_libs=no
+   reason_pvs_nasa_libs="(not in PVS_LIBRARY_PATH)"
+   for dir in ${PVS_LIBRARY_PATH//:/ }; do
+       if test -f $dir/nasalib-version; then
+          enable_pvs_nasa_libs=yes
+          reason_pvs_nasa_libs=""
+       fi
+   done
+   AC_MSG_RESULT($enable_pvs_nasa_libs)
 fi
 
 # hypothesis_selection
@@ -573,7 +585,7 @@ AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
 
 AC_SUBST(enable_pvs_libs)
-AC_SUBST(enable_pvs_fp_libs)
+AC_SUBST(enable_pvs_nasa_libs)
 AC_SUBST(PVS)
 AC_SUBST(PVSVERSION)
 
@@ -631,7 +643,7 @@ if test "$enable_pvs_support" = "yes" ; then
    echo "    Lib                 : $PVSLIB"
    echo "    Realization support : $enable_pvs_libs $reason_pvs_libs"
    if test "$enable_pvs_libs" = "yes" ; then
-      echo "        FP arithmetic   : $enable_pvs_fp_libs $reason_pvs_fp_libs"
+      echo "        NASA libraries  : $enable_pvs_nasa_libs $reason_pvs_nasa_libs"
    fi
 fi
 echo "hypothesis selection    : $enable_hypothesis_selection"

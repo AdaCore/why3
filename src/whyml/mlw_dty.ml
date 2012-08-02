@@ -43,7 +43,6 @@ and dvar =
 
 and dreg =
   | Rreg  of region * dity
-  | Rureg of tvsymbol * dity * region Lazy.t
   | Rvar  of rvar ref
 
 and rvar =
@@ -63,7 +62,6 @@ let rec ity_of_dity ?(strict=true) = function
 
 and reg_of_dreg = function
   | Rreg (r,_) -> r
-  | Rureg (_,_,r)
   | Rvar { contents = Rtvs (_,_,r) } -> Lazy.force r
   | Rvar { contents = Rval dreg } -> reg_of_dreg dreg
 
@@ -73,36 +71,36 @@ let create_user_type_variable x =
 let create_type_variable () =
   Dvar (ref (Dtvs (create_tvsymbol (id_fresh "a"))))
 
-let create_dreg ~user dity =
+let create_dreg dity =
   let id = id_fresh "rho" in
   let tv = create_tvsymbol id in
   let reg = lazy (create_region id (ity_of_dity dity)) in
-  if user then Rureg (tv,dity,reg) else Rvar (ref (Rtvs (tv,dity,reg)))
+  Rvar (ref (Rtvs (tv,dity,reg)))
 
 let ts_app_real ts dl = Dts (ts, dl)
 
 let its_app_real its dl rl = Dits (its, dl, rl)
 
-let rec ity_inst_fresh ~user mv mr ity = match ity.ity_node with
+let rec ity_inst_fresh mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh ~user mv) mr tl in
+      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
       mr, ts_app_real s tl
   | Ityapp (s,tl,rl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh ~user mv) mr tl in
-      let mr,rl = Util.map_fold_left (reg_refresh ~user mv) mr rl in
+      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
       mr, its_app_real s tl rl
 
-and reg_refresh ~user mv mr r = match Mreg.find_opt r mr with
+and reg_refresh mv mr r = match Mreg.find_opt r mr with
   | Some r ->
       mr, r
   | None ->
-      let mr,ity = ity_inst_fresh ~user mv mr r.reg_ity in
-      let reg = create_dreg ~user ity in
+      let mr,ity = ity_inst_fresh mv mr r.reg_ity in
+      let reg = create_dreg ity in
       Mreg.add r reg mr, reg
 
-let its_app ~user s tl =
+let its_app s tl =
   let add m v t = Mtv.add v t m in
   let mv = try List.fold_left2 add Mtv.empty s.its_args tl
     with Invalid_argument _ ->
@@ -110,10 +108,10 @@ let its_app ~user s tl =
   in
   match s.its_def with
   | Some ity ->
-      snd (ity_inst_fresh ~user mv Mreg.empty ity)
+      snd (ity_inst_fresh mv Mreg.empty ity)
   | None ->
       let _, rl =
-        Util.map_fold_left (reg_refresh ~user mv) Mreg.empty s.its_regs in
+        Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
       its_app_real s tl rl
 
 let ts_app ts dl = match ts.ts_def with
@@ -122,7 +120,7 @@ let ts_app ts dl = match ts.ts_def with
       let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
         with Invalid_argument _ ->
           raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
-      snd (ity_inst_fresh ~user:true mv Mreg.empty (ity_of_ty ty))
+      snd (ity_inst_fresh mv Mreg.empty (ity_of_ty ty))
   | None ->
       ts_app_real ts dl
 
@@ -140,7 +138,7 @@ let rec occur_check_reg tv = function
   | Dits (_,dl,rl) ->
       let rec check = function
         | Rvar { contents = Rval dreg } -> check dreg
-        | Rvar { contents = Rtvs (tv',dity,_) } | Rureg (tv',dity,_) ->
+        | Rvar { contents = Rtvs (tv',dity,_) } ->
             if tv_equal tv tv' then raise Exit;
             occur_check_reg tv dity
         | Rreg _ -> ()
@@ -175,7 +173,7 @@ and unify_reg r1 r2 =
   let rec dity_of_reg = function
     | Rvar { contents = Rval r } -> dity_of_reg r
     | Rvar { contents = Rtvs (_,dity,_) }
-    | Rureg (_,dity,_) | Rreg (_,dity) -> dity
+    | Rreg (_,dity) -> dity
   in
   match r1,r2 with
     | Rvar { contents = Rval r1 }, r2
@@ -190,7 +188,6 @@ and unify_reg r1 r2 =
         occur_check_reg tv dity;
         unify ~weak:false rd dity;
         r := Rval d
-    | Rureg (tv1,_,_), Rureg (tv2,_,_) when tv_equal tv1 tv2 -> ()
     | Rreg (reg1,_), Rreg (reg2,_) when reg_equal reg1 reg2 -> ()
     | _ -> raise Exit
 
@@ -237,16 +234,15 @@ let specialize_scheme tvs (argl,res) =
         its_app_real its (List.map specialize dl) (List.map spec_reg rl)
     | Dts (ts, dl) ->
         ts_app_real ts (List.map specialize dl)
-  and spec_reg = function
+  and spec_reg r = match r with
     | Rvar { contents = Rval r } -> spec_reg r
-    | Rvar { contents = Rtvs (tv,dity,_) }
-    | Rureg (tv,dity,_) as r ->
+    | Rvar { contents = Rtvs (tv,dity,_) } ->
         if reg_in_tvars tv tvs then r else
         begin try Htv.find hreg tv with Not_found ->
-          let v = create_dreg ~user:false (specialize dity) in
+          let v = create_dreg (specialize dity) in
           Htv.add hreg tv v; v
         end
-    | Rreg _ as r -> r
+    | Rreg _ -> r
   in
   List.map specialize argl, specialize res
 
@@ -270,7 +266,7 @@ and dreg_of_reg htv hreg vars r =
   try Hreg.find hreg r with Not_found ->
   let dity = dity_of_ity htv hreg vars r.reg_ity in
   let dreg = if reg_occurs r vars then Rreg (r,dity)
-    else create_dreg ~user:false dity in
+    else create_dreg dity in
   Hreg.add hreg r dreg;
   dreg
 

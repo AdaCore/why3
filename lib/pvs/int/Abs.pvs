@@ -1,19 +1,17 @@
 Abs: THEORY
  BEGIN
   IMPORTING Int
+  % do not edit above this line
   
-  % Why3 tuple0
-  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
-  
-  % Why3 abs
-  abs(x:int): int = IF (x >= 0) THEN x ELSE (-x) ENDIF
+  % Why3 abs1
+  abs1(x:int): int = IF (x >= 0) THEN x ELSE (-x) ENDIF
   
   % Why3 abs_le
-  abs_le: LEMMA FORALL (x:int, y:int): (abs(x) <= y) <=> (((-y) <= x) AND
+  abs_le: LEMMA FORALL (x:int, y:int): (abs1(x) <= y) <=> (((-y) <= x) AND
     (x <= y))
   
   % Why3 abs_pos
-  abs_pos: LEMMA FORALL (x:int): (abs(x) >= 0)
+  abs_pos: LEMMA FORALL (x:int): (abs1(x) >= 0)
   
   
  END Abs

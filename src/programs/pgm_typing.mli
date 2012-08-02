@@ -22,8 +22,15 @@ open Why3
 
 val debug : Debug.flag
 
+type program_decl =
+  | PDdecl of Ptree.decl
+  | PDpdecl of Ptree.pdecl
+  | PDuseclone of Ptree.use_clone
+  | PDuse of Ptree.use
+  | PDnamespace of string option * bool * (Ptree.loc * program_decl) list
+
 val decl :
   wp:bool -> Pgm_module.t Util.Mstr.t Env.library ->
   Theory.theory Util.Mstr.t ->
   Pgm_module.t Util.Mstr.t ->
-  Pgm_module.uc -> (Ptree.loc * Ptree.program_decl) -> Pgm_module.uc
+  Pgm_module.uc -> (Ptree.loc * program_decl) -> Pgm_module.uc

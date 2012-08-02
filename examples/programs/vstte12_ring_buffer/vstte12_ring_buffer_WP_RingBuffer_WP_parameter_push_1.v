@@ -7,21 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
@@ -97,12 +82,12 @@ Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
+Parameter const: forall (a:Type) (b:Type), b -> (map a b).
 Set Contextual Implicit.
 Implicit Arguments const.
 Unset Contextual Implicit.
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
@@ -165,7 +150,7 @@ Implicit Arguments size.
 
 (* Why3 assumption *)
 Definition buffer_invariant (a:Type)(b:(buffer a)): Prop :=
-  ((0%Z <= (first b))%Z /\ ((first b) <  (size b))%Z) /\
+  ((0%Z <= (first b))%Z /\ ((first b) < (size b))%Z) /\
   ((0%Z <= (len b))%Z /\ ((len b) <= (size b))%Z).
 Implicit Arguments buffer_invariant.
 
@@ -177,25 +162,25 @@ Axiom sequence_def_1 : forall (a:Type), forall (b:(buffer a)),
   a)))).
 
 Axiom sequence_def_2 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
-  ((((first b) + 1%Z)%Z <  (size b))%Z ->
-  ((sequence b) = (Cons (get1 (data b) (first b))
-  (sequence (mk_buffer ((first b) + 1%Z)%Z ((len b) - 1%Z)%Z (data b))))))).
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
+  ((((first b) + 1%Z)%Z < (size b))%Z -> ((sequence b) = (Cons (get1 (data b)
+  (first b)) (sequence (mk_buffer ((first b) + 1%Z)%Z ((len b) - 1%Z)%Z
+  (data b))))))).
 
 Axiom sequence_def_3 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
   ((((first b) + 1%Z)%Z = (size b)) -> ((sequence b) = (Cons (get1 (data b)
   (first b)) (sequence (mk_buffer 0%Z ((len b) - 1%Z)%Z (data b))))))).
 
 Axiom sequence_ind_1 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
-  (((((first b) + (len b))%Z - 1%Z)%Z <  (size b))%Z ->
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
+  (((((first b) + (len b))%Z - 1%Z)%Z < (size b))%Z ->
   ((sequence b) = (infix_plpl (sequence (mk_buffer (first b)
   ((len b) - 1%Z)%Z (data b))) (Cons (get1 (data b)
   (((first b) + (len b))%Z - 1%Z)%Z) (Nil :(list a))))))).
 
 Axiom sequence_ind_2 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
   (((size b) <= (((first b) + (len b))%Z - 1%Z)%Z)%Z ->
   ((sequence b) = (infix_plpl (sequence (mk_buffer (first b)
   ((len b) - 1%Z)%Z (data b))) (Cons (get1 (data b)
@@ -205,28 +190,26 @@ Axiom sequence_invariance : forall (a:Type), forall (b1:(buffer a))
   (b2:(buffer a)), (buffer_invariant b1) -> ((buffer_invariant b2) ->
   (((first b1) = (first b2)) -> (((len b1) = (len b2)) ->
   (((size b1) = (size b2)) -> ((forall (i:Z), (((first b1) <= i)%Z /\
-  (i <  ((first b1) + (len b1))%Z)%Z) -> ((i <  (size b1))%Z ->
+  (i < ((first b1) + (len b1))%Z)%Z) -> ((i < (size b1))%Z ->
   ((get1 (data b1) i) = (get1 (data b2) i)))) -> ((forall (i:Z),
-  ((0%Z <= i)%Z /\ (i <  (((first b1) + (len b1))%Z - (size b1))%Z)%Z) ->
+  ((0%Z <= i)%Z /\ (i < (((first b1) + (len b1))%Z - (size b1))%Z)%Z) ->
   ((get1 (data b1) i) = (get1 (data b2) i))) ->
   ((sequence b1) = (sequence b2)))))))).
 
 
-
 (* Why3 goal *)
-Theorem WP_parameter_push : forall (a:Type), forall (b:Z), forall (x:a),
-  forall (rho:(map Z a)), forall (rho1:Z), forall (rho2:Z), let b1 :=
-  (mk_buffer rho2 rho1 (mk_array b rho)) in (((rho1 <  b)%Z /\
-  (buffer_invariant b1)) -> (((((b <= (rho2 + rho1)%Z)%Z /\
-  (0%Z <= ((rho2 + rho1)%Z - b)%Z)%Z) \/ ((~ (b <= (rho2 + rho1)%Z)%Z) /\
-  (0%Z <= (rho2 + rho1)%Z)%Z)) /\ (((b <= (rho2 + rho1)%Z)%Z /\
-  (((rho2 + rho1)%Z - b)%Z <  b)%Z) \/ ((~ (b <= (rho2 + rho1)%Z)%Z) /\
-  ((rho2 + rho1)%Z <  b)%Z))) -> forall (x1:(map Z a)),
-  (((b <= (rho2 + rho1)%Z)%Z /\ (x1 = (set rho ((rho2 + rho1)%Z - b)%Z
-  x))) \/ ((~ (b <= (rho2 + rho1)%Z)%Z) /\ (x1 = (set rho (rho2 + rho1)%Z
-  x)))) -> forall (rho3:Z), (rho3 = (rho1 + 1%Z)%Z) ->
-  ((sequence (mk_buffer rho2 rho3 (mk_array b
-  x1))) = (infix_plpl (sequence b1) (Cons x (Nil :(list a))))))).
+Theorem WP_parameter_push : forall (a:Type), forall (b:Z) (x:a),
+  forall (rho:(map Z a)) (rho1:Z) (rho2:Z), let b1 := (mk_buffer rho2 rho1
+  (mk_array b rho)) in (((rho1 < b)%Z /\ (buffer_invariant b1)) ->
+  (((((b <= (rho2 + rho1)%Z)%Z /\ (0%Z <= ((rho2 + rho1)%Z - b)%Z)%Z) \/
+  ((~ (b <= (rho2 + rho1)%Z)%Z) /\ (0%Z <= (rho2 + rho1)%Z)%Z)) /\
+  (((b <= (rho2 + rho1)%Z)%Z /\ (((rho2 + rho1)%Z - b)%Z < b)%Z) \/
+  ((~ (b <= (rho2 + rho1)%Z)%Z) /\ ((rho2 + rho1)%Z < b)%Z))) ->
+  forall (o:(map Z a)), (((b <= (rho2 + rho1)%Z)%Z /\ (o = (set rho
+  ((rho2 + rho1)%Z - b)%Z x))) \/ ((~ (b <= (rho2 + rho1)%Z)%Z) /\
+  (o = (set rho (rho2 + rho1)%Z x)))) -> forall (rho3:Z),
+  (rho3 = (rho1 + 1%Z)%Z) -> ((sequence (mk_buffer rho2 rho3 (mk_array b
+  o))) = (infix_plpl (sequence b1) (Cons x (Nil :(list a))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 rename a into t.
@@ -235,7 +218,7 @@ rename b into b_size.
 intuition.
 (* 1 *)
 (*clear H H1 H5.*)
-subst x1 rho3.
+subst o rho3.
 red in H2. simpl in H2. unfold size in H2. simpl in H2.
 rewrite sequence_ind_2. simpl.
 apply f_equal2.
@@ -259,7 +242,7 @@ omega.
 (*discriminate H10.*)
 (* 3 *)
 (*clear H H3 H0.*)
-subst rho3 x1.
+subst rho3 o.
 red in H2. simpl in H2. unfold size in H2. simpl in H2.
 rewrite sequence_ind_1. simpl.
 apply f_equal2.

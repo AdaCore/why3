@@ -1,0 +1,91 @@
+Trigonometry: THEORY
+ BEGIN
+  IMPORTING Real
+  IMPORTING Abs
+  IMPORTING Square
+  % do not edit above this line
+  
+  IMPORTING trig@trig_basic
+  
+  % Why3 cos
+  cos(x:real): MACRO real = cos(x)
+  
+  % Why3 sin
+  sin(x:real): MACRO real = sin(x)
+  
+  % Why3 pythagorean_identity
+  pythagorean_identity: LEMMA FORALL (x:real):
+    ((Square.sqr(cos(x)) + Square.sqr(sin(x))) = 1)
+  
+  % Why3 cos_le_one
+  cos_le_one: LEMMA FORALL (x:real): (abs(cos(x)) <= 1)
+  
+  % Why3 sin_le_one
+  sin_le_one: LEMMA FORALL (x:real): (abs(sin(x)) <= 1)
+  
+  % Why3 cos_0
+  cos_0: LEMMA (cos(0) = 1)
+  
+  % Why3 sin_0
+  sin_0: LEMMA (sin(0) = 0)
+  
+  % Why3 pi
+  pi: MACRO real = pi
+  
+  % Why3 pi_interval
+  pi_interval: LEMMA ((314159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196 / 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000) <  pi) AND
+    (pi <  (314159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038197 / 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000))
+  
+  % Why3 cos_pi
+  cos_pi: LEMMA (cos(pi) = (-1))
+  
+  % Why3 sin_pi
+  sin_pi: LEMMA (sin(pi) = 0)
+  
+  % Why3 cos_pi2
+  cos_pi2: LEMMA (cos(((05 / 10) * pi)) = 0)
+  
+  % Why3 sin_pi2
+  sin_pi2: LEMMA (sin(((05 / 10) * pi)) = 1)
+  
+  % Why3 cos_plus_pi
+  cos_plus_pi: LEMMA FORALL (x:real): (cos((x + pi)) = (-cos(x)))
+  
+  % Why3 sin_plus_pi
+  sin_plus_pi: LEMMA FORALL (x:real): (sin((x + pi)) = (-sin(x)))
+  
+  % Why3 cos_plus_pi2
+  cos_plus_pi2: LEMMA FORALL (x:real):
+    (cos((x + ((05 / 10) * pi))) = (-sin(x)))
+  
+  % Why3 sin_plus_pi2
+  sin_plus_pi2: LEMMA FORALL (x:real): (sin((x + ((05 / 10) * pi))) = cos(x))
+  
+  % Why3 cos_neg
+  cos_neg: LEMMA FORALL (x:real): (cos((-x)) = cos(x))
+  
+  % Why3 sin_neg
+  sin_neg: LEMMA FORALL (x:real): (sin((-x)) = (-sin(x)))
+  
+  % Why3 cos_sum
+  cos_sum: LEMMA FORALL (x:real, y:real):
+    (cos((x + y)) = ((cos(x) * cos(y)) - (sin(x) * sin(y))))
+  
+  % Why3 sin_sum
+  sin_sum: LEMMA FORALL (x:real, y:real):
+    (sin((x + y)) = ((sin(x) * cos(y)) + (cos(x) * sin(y))))
+  
+  % Why3 tan
+  tan(x:real): real = Real.infix_sl(sin(x), cos(x))
+  
+  IMPORTING trig@atan
+  
+  % Why3 atan
+  atan(x:real): real = atan(x)
+  
+  % Why3 tan_atan
+  tan_atan: LEMMA FORALL (x:real): (tan(atan(x)) = x)
+  
+  
+ END Trigonometry
+ 

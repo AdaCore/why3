@@ -56,7 +56,8 @@ let rec goal whyconf env path dbgoal wgoal =
       let prover_name = Db.prover_name prover_id in
       let driver, extra, command =
         try
-          let p = Whyconf.prover_by_id whyconf prover_name in
+          let p = Whyconf.filter_one_prover whyconf
+            (Whyconf.parse_filter_prover prover_name) in
           p.Whyconf.driver, p.Whyconf.extra_drivers,
           String.concat " " (p.Whyconf.command :: p.Whyconf.extra_options)
         with
@@ -80,7 +81,7 @@ let rec goal whyconf env path dbgoal wgoal =
       let old = if edited_as = "" then None else
           begin
             eprintf "Info: proving using edited file %s@." edited_as;
-            (Some (open_in edited_as))
+            (Some edited_as)
           end
       in
       let call_prover : Call_provers.pre_prover_call =

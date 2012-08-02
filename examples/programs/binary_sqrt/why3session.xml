@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/jc/why3/share/why3session.dtd">
+<why3session
+ name="binary_sqrt/why3session.xml" shape_version="2">
+ <prover
+  id="0"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="1"
+  name="Z3"
+  version="4.0"/>
+ <file
+  name="../binary_sqrt.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="BinarySqrt"
+   locfile="binary_sqrt/../binary_sqrt.mlw"
+   loclnum="7" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter sqrt"
+    locfile="binary_sqrt/../binary_sqrt.mlw"
+    loclnum="11" loccnumb="10" loccnume="14"
+    expl="parameter sqrt"
+    sum="6fb9f45bceebd36003977dac619e981d"
+    proved="true"
+    expanded="true"
+    shape="iainfix &lt;c1.V1Aainfix &lt;V0V1ainfix &lt;V0ainfix *ainfix +c0.V1ainfix +c0.V1Aainfix &lt;=ainfix *c0.c0.V0ainfix &lt;V0ainfix *ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1Aainfix &lt;=ainfix *iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V0Iainfix &lt;V0ainfix *ainfix +V2ainfix *c2.V1ainfix +V2ainfix *c2.V1Aainfix &lt;=ainfix *V2V2V0FAainfix &lt;c0.ainfix *c2.V1Aainfix &lt;=c0.V0Iainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
+    <label
+     name="expl:parameter sqrt"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter sqrt.1"
+      locfile="binary_sqrt/../binary_sqrt.mlw"
+      loclnum="11" loccnumb="10" loccnume="14"
+      expl="normal postcondition"
+      sum="f120da5e3e759683aae641129f7f30ec"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V0ainfix *ainfix +c0.V1ainfix +c0.V1Aainfix &lt;=ainfix *c0.c0.V0Iainfix &lt;c1.V1Aainfix &lt;V0V1Iainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
+      <label
+       name="expl:parameter sqrt"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sqrt.2"
+      locfile="binary_sqrt/../binary_sqrt.mlw"
+      loclnum="11" loccnumb="10" loccnume="14"
+      expl="precondition"
+      sum="c46ce2bb4db8e77b0cb247d89dec7ffc"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;c0.ainfix *c2.V1Aainfix &lt;=c0.V0Iainfix &lt;c1.V1Aainfix &lt;V0V1NIainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
+      <label
+       name="expl:parameter sqrt"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sqrt.3"
+      locfile="binary_sqrt/../binary_sqrt.mlw"
+      loclnum="11" loccnumb="10" loccnume="14"
+      expl="normal postcondition"
+      sum="c6dfcc729813c8e563786251490e58e3"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V0ainfix *ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1Aainfix &lt;=ainfix *iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V0Iainfix &lt;V0ainfix *ainfix +V2ainfix *c2.V1ainfix +V2ainfix *c2.V1Aainfix &lt;=ainfix *V2V2V0FIainfix &lt;c0.ainfix *c2.V1Aainfix &lt;=c0.V0Iainfix &lt;c1.V1Aainfix &lt;V0V1NIainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
+      <label
+       name="expl:parameter sqrt"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

@@ -10,21 +10,6 @@ Require int.ComputerDivision.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive option (a:Type) :=
   | None : option a
@@ -170,23 +155,22 @@ Axiom idx_bounds : forall (a:Type) (b:Type), forall (h:(t a b)), (valid h) ->
 Require Import Classical.
 
 (* Why3 goal *)
-Theorem WP_parameter_add : forall (a:Type) (b:Type), forall (h:Z),
-  forall (k:a), forall (v:b), forall (rho:(map Z (list (a* b)%type))),
-  forall (rho1:(map a (option b))), ((0%Z < (length (data (mk_t rho1
-  (mk_array h rho)))))%Z /\ ((forall (k1:a) (v1:b), ((get2 (mk_t rho1
-  (mk_array h rho)) k1) = (Some v1)) <-> (occurs_first k1 v1
-  (get1 (data (mk_t rho1 (mk_array h rho))) (idx (mk_t rho1 (mk_array h rho))
-  k1)))) /\ forall (k1:a) (v1:b), forall (i:Z), ((0%Z <= i)%Z /\
-  (i < (length (data (mk_t rho1 (mk_array h rho)))))%Z) -> ((mem (k1, v1)
-  (get1 (data (mk_t rho1 (mk_array h rho))) i)) -> (i = (idx (mk_t rho1
-  (mk_array h rho)) k1))))) -> let result := (ZOmod (Zabs (hash k)) h) in
-  ((((0%Z < result)%Z \/ (0%Z = result)) /\ (result < h)%Z) ->
-  ((((0%Z < result)%Z \/ (0%Z = result)) /\ (result < h)%Z) -> forall (x:(map
-  Z (list (a* b)%type))), (x = (set rho result (Cons (k, v) (get rho
-  result)))) -> forall (rho2:(map a (option b))), (rho2 = (set rho1 k
-  (Some v))) -> forall (k1:a) (v1:b), ((get2 (mk_t rho2 (mk_array h x))
-  k1) = (Some v1)) -> (occurs_first k1 v1 (get1 (data (mk_t rho2 (mk_array h
-  x))) (idx (mk_t rho2 (mk_array h x)) k1))))).
+Theorem WP_parameter_add : forall (a:Type) (b:Type), forall (h:Z) (k:a)
+  (v:b), forall (rho:(map Z (list (a* b)%type))) (rho1:(map a (option b))),
+  ((0%Z < (length (data (mk_t rho1 (mk_array h rho)))))%Z /\ ((forall (k1:a)
+  (v1:b), ((get2 (mk_t rho1 (mk_array h rho)) k1) = (Some v1)) <->
+  (occurs_first k1 v1 (get1 (data (mk_t rho1 (mk_array h rho)))
+  (idx (mk_t rho1 (mk_array h rho)) k1)))) /\ forall (k1:a) (v1:b),
+  forall (i:Z), ((0%Z <= i)%Z /\ (i < (length (data (mk_t rho1 (mk_array h
+  rho)))))%Z) -> ((mem (k1, v1) (get1 (data (mk_t rho1 (mk_array h rho)))
+  i)) -> (i = (idx (mk_t rho1 (mk_array h rho)) k1))))) -> let i :=
+  (ZOmod (Zabs (hash k)) h) in ((((0%Z < i)%Z \/ (0%Z = i)) /\ (i < h)%Z) ->
+  ((((0%Z < i)%Z \/ (0%Z = i)) /\ (i < h)%Z) -> forall (o:(map Z (list (a*
+  b)%type))), (o = (set rho i (Cons (k, v) (get rho i)))) ->
+  forall (rho2:(map a (option b))), (rho2 = (set rho1 k (Some v))) ->
+  forall (k1:a) (v1:b), ((get2 (mk_t rho2 (mk_array h o)) k1) = (Some v1)) ->
+  (occurs_first k1 v1 (get1 (data (mk_t rho2 (mk_array h o))) (idx (mk_t rho2
+  (mk_array h o)) k1))))).
 unfold get1; simpl; intros.
 assert (case: (k1=k \/ k1<>k)) by apply classic; destruct case.
 (* k1 = k *)
@@ -196,7 +180,7 @@ unfold get2 in H4; simpl in H4.
 rewrite Select_eq in H4; auto.
 injection H4; intro; subst v1; clear H4.
 unfold idx; simpl.
-subst x; rewrite Select_eq.
+subst o; rewrite Select_eq.
 red; intuition.
 auto.
 (* k1 <> k *)
@@ -204,7 +188,7 @@ subst rho2.
 unfold idx; simpl.
 unfold get2 in H4; simpl in H4.
 rewrite Select_neq in H4; auto.
-subst x.
+subst o.
 set (i := (Zabs (hash k) mod h)).
 set (i1 := (Zabs (hash k1) mod h)).
 assert (case: (i1=i \/ i1<>i)) by omega; destruct case.
@@ -233,3 +217,5 @@ apply H7.
 unfold get2; simpl.
 auto.
 Qed.
+
+

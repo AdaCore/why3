@@ -52,6 +52,7 @@ module type S =
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
 
     (** Added into why stdlib version *)
+    val is_num_elt : int -> 'a t -> bool
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
@@ -79,6 +80,12 @@ module type S =
     val add_new : exn -> key -> 'a -> 'a t -> 'a t
     val keys: 'a t -> key list
     val values: 'a t -> 'a list
+    type 'a enumeration
+    val val_enum : 'a enumeration -> (key * 'a) option
+    val start_enum : 'a t -> 'a enumeration
+    val next_enum : 'a enumeration -> 'a enumeration
+    val start_ge_enum : key -> 'a t -> 'a enumeration
+    val next_ge_enum : key -> 'a enumeration -> 'a enumeration
 
     module type Set =
     sig
@@ -115,6 +122,7 @@ module type S =
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
+      val is_num_elt : int -> t -> bool
     end
 
     module Set : Set
@@ -610,6 +618,42 @@ module Make(Ord: OrderedType) = struct
       | Some _ -> raise e
       | None -> Some v) x m
 
+    let is_num_elt n m =
+      try
+        fold (fun _ _ n -> if n < 0 then raise Exit else n-1) m n = 0
+      with Exit -> false
+
+    let start_enum s = cons_enum s End
+
+    let val_enum = function
+      | End -> None
+      | More (v,d,_,_) -> Some (v,d)
+
+    let next_enum = function
+      | End -> End
+      | More(_,_,r,e) -> cons_enum r e
+
+    let rec cons_ge_enum k m e =
+      match m with
+        Empty -> e
+      | Node(l, v, d, r, _) ->
+        let c = Ord.compare k v in
+        if c = 0 then More(v,d,r,e)
+        else if c < 0 then cons_ge_enum k l (More(v, d, r, e))
+        else (* c > 0 *) cons_ge_enum k r e
+
+    let start_ge_enum k m = cons_ge_enum k m End
+
+    let rec next_ge_enum k r0 = function
+      | End -> start_ge_enum k r0
+      | More(v,_,r,e) as e0 ->
+        let c = Ord.compare k v in
+        if c = 0 then e0
+        else if c < 0 then cons_ge_enum k r0 e0
+        else (*  c > 0  *) next_ge_enum k r  e
+
+    let next_ge_enum k e = next_ge_enum k Empty e
+
     module type Set =
     sig
       type elt = key
@@ -645,6 +689,7 @@ module Make(Ord: OrderedType) = struct
       val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
+      val is_num_elt : int -> t -> bool
     end
 
     module Set =
@@ -688,6 +733,7 @@ module Make(Ord: OrderedType) = struct
         let fold2 f = fold2_union (fun k _ _ acc -> f k acc)
         let translate = translate
         let add_new e x s = add_new e x () s
+        let is_num_elt n m = is_num_elt n m
       end
 
 end

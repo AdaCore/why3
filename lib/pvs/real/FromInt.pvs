@@ -2,9 +2,7 @@ FromInt: THEORY
  BEGIN
   IMPORTING int@Int
   IMPORTING Real
-  
-  % Why3 tuple0
-  tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0
+  % do not edit above this line
   
   % Why3 from_int
   from_int(x:int): MACRO real = x
@@ -15,8 +13,8 @@ FromInt: THEORY
   % Why3 one
   one: LEMMA (from_int(1) = 1)
   
-  % Why3 add
-  add: LEMMA FORALL (x:int, y:int):
+  % Why3 add1
+  add1: LEMMA FORALL (x:int, y:int):
     (from_int((x + y)) = (from_int(x) + from_int(y)))
   
   % Why3 sub

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/tortoise_and_hare/why3session.xml" shape_version="2">
+ name="examples/programs/tortoise_and_hare/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,18 +13,18 @@
  <file
   name="../tortoise_and_hare.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
-   name="WP TortoiseAndHare"
-   locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+   name="TortoiseAndHare"
+   locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
    loclnum="6" loccnumb="7" loccnume="22"
    verified="true"
    expanded="true">
    <goal
     name="cycle_induction"
-    locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+    locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
     loclnum="44" loccnumb="8" loccnume="23"
-    sum="559119bc9414f5839b7b6311bb112e7a"
+    sum="26f9de9564d1bb07b002bb002ef9dfda"
     proved="true"
     expanded="true"
     shape="ainfix =axainfix +V0ainfix *alambdaV1axV0Iainfix &lt;=c0V1FIainfix &lt;=amuV0F">
@@ -35,18 +35,18 @@
      edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.47"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter tortoise_hare"
-    locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+    locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
     loclnum="69" loccnumb="6" loccnume="19"
     expl="parameter tortoise_hare"
-    sum="01706a68c156765694938f84e60db430"
+    sum="f6e711f767941fe8712513361a9b06a2"
     proved="true"
     expanded="true"
-    shape="arelV2V1Aainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFFAainfix =axV9axainfix *c2V9NIainfix &lt;V9V8Aainfix &lt;=c1V9FAainfix =afafax0axainfix *c2V8Aainfix =afax0axV8Aainfix &lt;=V8ainfix +amualambdaAainfix &lt;=c1V8E">
+    shape="arelV2V1Aainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFAainfix =axV9axainfix *c2V9NIainfix &lt;V9V8Aainfix &lt;=c1V9FAainfix =afafax0axainfix *c2V8Aainfix =afax0axV8Aainfix &lt;=V8ainfix +amualambdaAainfix &lt;=c1V8E">
     <label
      name="expl:parameter tortoise_hare"/>
     <transf
@@ -55,10 +55,10 @@
      expanded="true">
      <goal
       name="WP_parameter tortoise_hare.1"
-      locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+      locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
       loclnum="69" loccnumb="6" loccnume="19"
       expl="loop invariant init"
-      sum="70e116e2321c0b9c28e2551ed7868ac7"
+      sum="7d4a0fb4e80f013aa6b5b70ecfae851c"
       proved="true"
       expanded="true"
       shape="ainfix =axV1axainfix *c2V1NIainfix &lt;V1V0Aainfix &lt;=c1V1FAainfix =afafax0axainfix *c2V0Aainfix =afax0axV0Aainfix &lt;=V0ainfix +amualambdaAainfix &lt;=c1V0E">
@@ -75,13 +75,13 @@
      </goal>
      <goal
       name="WP_parameter tortoise_hare.2"
-      locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+      locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
       loclnum="69" loccnumb="6" loccnume="19"
       expl="loop invariant preservation"
-      sum="35d0c8f2fd593e302913e0b738e2b152"
+      sum="368217ec1f899430b268e7c8879549e4"
       proved="true"
       expanded="true"
-      shape="ainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFF">
+      shape="ainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EF">
       <label
        name="expl:parameter tortoise_hare"/>
       <proof
@@ -91,18 +91,18 @@
        edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.71"/>
+       <result status="valid" time="0.70"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tortoise_hare.3"
-      locfile="programs/tortoise_and_hare/../tortoise_and_hare.mlw"
+      locfile="examples/programs/tortoise_and_hare/../tortoise_and_hare.mlw"
       loclnum="69" loccnumb="6" loccnume="19"
       expl="loop variant decreases"
-      sum="51db4cbed22b4e8d25095db51c5764d6"
+      sum="6fc99c899aa75de561ee867284a405e6"
       proved="true"
       expanded="true"
-      shape="arelV2V1Iainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V3axainfix *c2V4Aainfix =V2axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EIainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV7axainfix *c2V7NIainfix &lt;V7V6Aainfix &lt;=c1V7FAainfix =V0axainfix *c2V6Aainfix =V1axV6Aainfix &lt;=V6ainfix +amualambdaAainfix &lt;=c1V6EFF">
+      shape="arelV2V1Iainfix =V3afafV0FIainfix =V2afV1FIainfix =V1V0NIainfix =axV5axainfix *c2V5NIainfix &lt;V5V4Aainfix &lt;=c1V5FAainfix =V0axainfix *c2V4Aainfix =V1axV4Aainfix &lt;=V4ainfix +amualambdaAainfix &lt;=c1V4EF">
       <label
        name="expl:parameter tortoise_hare"/>
       <proof
@@ -112,7 +112,7 @@
        edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.62"/>
+       <result status="valid" time="0.60"/>
       </proof>
      </goal>
     </transf>

@@ -64,28 +64,12 @@
 * replayer
 ** deplacer option -bench dans une commande de why3session
 
-* Sortie PVS
-** avec mecanisme de realization
-
-* Yices 2 ? interesserait Cesar
-
 * Projets interessant Cesar ?
 ** Preuve de prog flottants avec Frama-C+WP+Why3+PVS
 ** Generation d'annotations
 ** porter multirounding a jessie->Why3. Completer le mode full et faire passer
    interval_arith.c. Completer la galerie
 ** preuve sur l'assembleur
-
-* PRIORITAIRE, JCF et ANDREI, clone de module
- - demarche: ecrire une API avec smart constructors garantissant
-   le bon typage, et clone sera en premier lieu un de ces constructors
- - cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
-   containeurs pour Adacore et Claire
- - NON PRIORITAIRE ?
-  + regions : strong update
-  + ghost code
-  + logic symbols used in programs
-
 
 * extraction vers Caml
  - PRIORITAIRE, JCF, ANDREI
@@ -104,13 +88,6 @@
 * Coq tactic
 ** ajout de bases de hint
 
-* PRIORITAIRE Coq output
- - corriger l'incoherence, comprendre si on veut vraiment accepter
-
-  function x : 'a
-  (cf: en caml cela ne marche pas)
- Solution proposee: utiliser des types classes, en particulier Inhabited
-
 * efficiency issues
  - understand problems when large number of goals (cf D Mentré examples)
  - also: BTS 13736
@@ -121,16 +98,6 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
   intentionel que l'on veuille prouver false. Un tel cas pourrait etre
   traité de facon speciale par le smoke detector avec option "deep",
   pour eviter une fausse alarme.
-
-* Documentation
- - (ANDREI) make the glossary available 
- - (CLAUDE) complete api.tex: explain how to build theories, apply
-   transformations, write new functions on terms (A)
-
-* Contre-exemples de Alt-Ergo
-
-* detect editors
-*** check if coqide and also emacs/proof-general is installed
 
 * IDE
 ** todo: run detection immediately at start up if conf file absent or
@@ -143,9 +110,50 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 * (JCF) reject global "val"s in typing environment for logic decls.
 
+==================== Roadmap for release 0.74 ========================
+
+scheduled on Sep 2012
+
+* Sortie PVS
+** avec mecanisme de realization
+
+* Yices 2 ? interesserait Cesar
+
 * mettre au propre les loc des fichiers de sessions, en particulier
   les noms de fichiers doivent etre relatifs au fichier de session
   lui-meme. Utiliser Sysutil.relativize_filename a bon escient.
+
+* Contre-exemples de Alt-Ergo
+
+* detect editors
+*** check if coqide and also emacs/proof-general is installed
+
+* Documentation
+ - (ANDREI) make the glossary available 
+ - (CLAUDE) complete api.tex: explain how to build theories, apply
+   transformations, write new functions on terms (A)
+
+* PRIORITAIRE Coq output
+ - corriger l'incoherence, comprendre si on veut vraiment accepter
+
+  function x : 'a
+  (cf: en caml cela ne marche pas)
+ Solution proposee: utiliser des types classes, en particulier Inhabited
+
+* PRIORITAIRE, JCF et ANDREI, clone de module
+ - demarche: ecrire une API avec smart constructors garantissant
+   le bon typage, et clone sera en premier lieu un de ces constructors
+ - cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
+   containeurs pour Adacore et Claire
+ - NON PRIORITAIRE ?
+  + regions : strong update
+  + ghost code
+  + logic symbols used in programs
+
+
+
+
+
 
 ==================== Roadmap for release 0.73 ========================
 
@@ -163,6 +171,7 @@ New features:
     the association of old goals and new goals when the input is
     modified.  For compatibility, Why3 is still able to read session
     files in the old format.
+  o [Provers] support for Z3 4.0
 
 Bug fix:
   o completed support for the "Out Of Memory" prover result
@@ -185,10 +194,17 @@ Bug fix:
  - add tag 0.73 to the git repository (do not forget to push it)
 * put on the web page
  - why3-0.73.tar.gz
- - standard library online, using why3doc (make stdlibdoc),
-   to http://why3.lri.fr/stdlib/
- - API doc, produced using ocamldoc (make apidoc), to http://why3.lri.fr/api/
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   (make stdlibdoc ;
+    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.73;
+    ln -s /users/www-perso/projets/why3/stdlib-0.73 \
+            /users/www-perso/projets/why3/stdlib)
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     Note: check that URL of API doc is correct in doc/api.tex line 9.
+     (make apidoc ;
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.73;
+    ln -s /users/www-perso/projets/why3/api-0.73 \
+            /users/www-perso/projets/why3/api    )
  - update the main HTML page (sources are in why3-papers/www)
 
 * produce the Why3 part of ProVal gallery ?

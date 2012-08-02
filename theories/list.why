@@ -55,6 +55,23 @@ theory Nth
 
 end
 
+theory NthLength
+
+  use export Nth
+  use export Length
+  use import int.Int
+
+  lemma nth_none_1:
+     forall l: list 'a, i: int. i < 0 -> nth i l  = None
+
+  lemma nth_none_2:
+     forall l: list 'a, i: int. i >= length l -> nth i l  = None
+
+  lemma nth_none_3:
+     forall l: list 'a, i: int. nth i l = None -> i < 0 \/ i >= length l
+
+end
+
 (** {2 Head and tail} *)
 
 theory HdTl
@@ -123,6 +140,22 @@ theory Append
   lemma mem_decomp:
     forall x: 'a, l: list 'a.
     mem x l -> exists l1 l2: list 'a. l = l1 ++ Cons x l2
+
+end
+
+theory NthLengthAppend
+
+  use export NthLength
+  use export Append
+  use import int.Int
+
+  lemma nth_append_1:
+    forall l1 l2: list 'a, i: int.
+    i < length l1 -> nth i (l1 ++ l2) = nth i l1
+
+  lemma nth_append_2:
+    forall l1 l2: list 'a, i: int.
+    length l1 <= i -> nth i (l1 ++ l2) = nth (i - length l1) l2
 
 end
 

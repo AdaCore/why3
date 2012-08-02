@@ -194,7 +194,7 @@ Axiom right_nil : forall (l:(list (Z* tree)%type)), (2%Z <= (length l))%Z ->
   ((g l) -> forall (t:tree), ~ ((forest_depths (reverse l)) = (depths 0%Z
   t))).
 
-Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
+Require Import Why3. Ltac z := why3 "z3" timelimit 5.
 
 (*
 Lemma key_lemma:

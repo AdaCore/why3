@@ -61,12 +61,11 @@ val read_update_session :
   Why3.Whyconf.config -> string -> unit Why3.Session.env_session * bool
 
 (** {2 Spec for filtering } *)
-type filter_prover =
-  | Prover of Whyconf.prover
-  | ProverId of string
+type filter_prover
 
 val read_opt_prover : string -> filter_prover
-val prover_of_filter_prover : config -> filter_prover -> prover
+val prover_of_filter_prover : config -> filter_prover -> Why3.Whyconf.prover
+val provers_of_filter_prover : config -> filter_prover -> Why3.Whyconf.Sprover.t
 
 type filters
 

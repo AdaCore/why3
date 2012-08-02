@@ -386,9 +386,12 @@ let print_ty_decl fmt ts = match ts.its_def with
 let print_ty_decl fmt ts =
   print_ty_decl fmt ts; forget_tvs_regs ()
 
-let print_data_decl fst fmt (ts,csl) =
-  fprintf fmt "@[<hov 2>%a =@ %a@]"
-    (print_head fst) ts (print_list newline print_constr) csl;
+let print_data_decl fst fmt (ts,csl,inv) =
+  let print_inv fmt inv = if ts.its_inv then
+    fprintf fmt "@ invariant { %a }" print_post inv else () in
+  fprintf fmt "@[<hov 2>%a =@ %a%a@]"
+    (print_head fst) ts (print_list newline print_constr) csl
+    print_inv inv;
   forget_tvs_regs ()
 
 let print_val_decl fmt lv =

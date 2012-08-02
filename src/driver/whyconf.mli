@@ -33,6 +33,7 @@ type config
     {!Whyconf.get_provers}, {!Whyconf.set_provers} *)
 
 exception ConfigFailure of string (* filename *) * string
+exception DuplicateShortcut of string
 
 val read_config : string option -> config
 (** [read_config conf_file] :
@@ -45,7 +46,8 @@ val read_config : string option -> config
     the built-in default_config with default configuration filename *)
 
 val merge_config : config -> string -> config
-(** [merge_config config filename] merge the content of [filename] into [config] *)
+(** [merge_config config filename] merge the content of [filename]
+    into [config]( *)
 
 val save_config : config -> unit
 (** [save_config config] save the configuration *)
@@ -96,6 +98,8 @@ type prover =
     (** record of necessary data for a given external prover *)
 
 val print_prover : Format.formatter -> prover -> unit
+val print_prover_parsable_format : Format.formatter -> prover -> unit
+
 (** Printer for prover *)
 module Prover   : Util.OrderedHash with type t = prover
 module Mprover  : Stdlib.Map.S with type key = prover
@@ -106,9 +110,9 @@ module Hprover  : Hashtbl.S with type key = prover
 
 type config_prover = {
   prover : prover;  (* unique name for session *)
-  id      : string; (* unique name for command line *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
+  in_place: bool;     (* verification should be performed in-place *)
   editor  : string;   (* Dedicated editor *)
   interactive : bool; (* Interactive theorem prover *)
   extra_options : string list;
@@ -119,18 +123,19 @@ val get_provers : config  -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
-val set_provers : config -> config_prover Mprover.t -> config
+val set_provers : config ->
+  ?shortcuts:Mprover.key Util.Mstr.t -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
     one given *)
 
 val is_prover_known : config -> prover -> bool
 (** test if a prover is detected *)
 
-exception ProverNotFound of config * string
+val get_prover_shortcuts : config -> prover Mstr.t
+(** return the prover shortcuts *)
 
-val prover_by_id : config -> string -> config_prover
-(** return the configuration of the prover if found, otherwise return
-    ProverNotFound *)
+val set_prover_shortcuts : config -> prover Mstr.t -> config
+(** set the prover shortcuts *)
 
 type config_editor = {
   editor_name : string;
@@ -171,6 +176,41 @@ val get_prover_upgrade_policy : config -> prover -> prover_upgrade_policy
 val get_policies : config -> prover_upgrade_policy Mprover.t
 
 val set_policies : config -> prover_upgrade_policy Mprover.t -> config
+
+(** filter prover *)
+type filter_prover
+
+val mk_filter_prover :
+  ?version:string -> ?altern:string -> (* name *) string -> filter_prover
+
+val print_filter_prover :
+  Format.formatter -> filter_prover -> unit
+
+val parse_filter_prover : string -> filter_prover
+(** parse the string representing a filter_prover:
+    - "name,version,altern"
+    - "name,version" -> "name,version,^.*"
+    - "name,,altern" -> "name,^.*,altern"
+    - "name" -> "name,^.*,^.*"
+
+    regexp must start with ^. Partial match will be used.
+*)
+
+val filter_prover : filter_prover -> prover -> bool
+(** test if the prover match the filter prover *)
+
+val filter_provers : config -> filter_prover -> config_prover Mprover.t
+(** test if the prover match the filter prover *)
+
+exception ProverNotFound  of config * filter_prover
+exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t
+exception ParseFilterProver of string
+
+val filter_one_prover : config -> filter_prover -> config_prover
+(** find the uniq prover that verify the filter. If it doesn't exists
+    raise ProverNotFound or raise ProverAmbiguity *)
+
+val why3_regexp_of_string : string -> Str.regexp
 
 (** {2 For accesing other parts of the configuration } *)
 

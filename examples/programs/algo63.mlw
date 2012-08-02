@@ -15,15 +15,58 @@ Pages: 321 - 322
 module Algo63
 
   use import int.Int
-  use import module ref.Ref
+  use import module ref.Refint
   use import module array.Array
   use import module array.ArrayPermut
 
-  val partition :
-    a : array int -> m:int -> n:int -> i:ref int -> j:ref int ->
-    { m < n }
-    unit writes a i j
-    { m <= !j /\ !j < !i /\ !i <= n /\ permut_sub (old a) a m n /\
+  (* we pass m and n (as ghost arguments) to ensure [permut_sub];
+     this will help solvers in the proof of partition *)
+  let exchange (a: array int) (ghost m n: int) (i j: int) =
+    { 0 <= m <= i <= n < length a /\ m <= j <= n }
+    let v = a[i] in
+    a[i] <- a[j];
+    a[j] <- v
+    { exchange (old a) a i j /\ permut_sub (old a) a m (n+1) }
+
+  val random (m n: int) : {} int { m <= result <= n }
+
+  let partition (a: array int) (m n: int) (i j: ref int) =
+    { 0 <= m < n < length a }
+'Init:
+    let f = random m n in
+    let x = a[f] in
+    i := m;
+    j := n;
+    let rec up_down () variant { 1 + !j - !i } =
+      { m <= !j <= n /\ m <= !i <= n /\ permut_sub (at a 'Init) a m (n+1) /\
+        (forall r:int. m <= r < !i -> a[r] <= x) /\
+        (forall r:int. !j < r <= n -> a[r] >= x) /\ a[f] = x }
+      while !i < n && a[!i] <= x do
+        invariant { m <= !i <= n /\ forall r: int. m <= r < !i -> a[r] <= x }
+        variant { n - !i }
+        incr i
+      done;
+      while m < !j && a[!j] >= x do
+        invariant { m <= !j <= n /\ forall r: int. !j < r <= n -> a[r] >= x }
+        variant { !j }
+        decr j
+      done;
+      if !i < !j then begin
+        exchange a m n !i !j;
+        incr i;
+        decr j;
+        up_down ()
+      end
+      { m <= !j <= !i <= n /\ permut_sub (at a 'Init) a m (n+1) /\
+        (!i = n \/ a[!i] > x) /\ (!j = m \/ a[!j] < x) /\ a[f] = x /\
+        (forall r:int. m <= r < !i -> a[r] <= x) /\
+        (forall r:int. !j < r <= n -> a[r] >= x) }
+    in
+    up_down ();
+    assert { !j < !i \/ !j = !i = m \/ !j = !i = n };
+    if !i < f then begin exchange a m n !i f; incr i end
+    else if f < !j then begin exchange a m n f !j; decr j end
+    { m <= !j /\ !j < !i /\ !i <= n /\ permut_sub (old a) a m (n+1) /\
       exists x:int.
         (forall r:int. m <= r <= !j -> a[r] <= x) /\
         (forall r:int. !j < r < !i -> a[r] = x) /\

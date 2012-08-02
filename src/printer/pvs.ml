@@ -82,16 +82,43 @@ let black_list =
     "closure"; "exists"; "law"; "subtypes";
     "cond"; "exporting"; "lemma"; "subtype"; "of";
     (* PVS prelude *)
+    "boolean"; "bool";
+    "pred"; "setof"; "exists1";
+    "list"; "length"; "member"; "nth"; "append"; "reverse";
+    "domain"; "range"; "graph"; "preserves"; "inverts"; "transpose";
+    "restrict"; "extend"; "identity"; "eq";
+    "epsilon";
+    "set"; "member"; "emptyset"; "nonempty_set"; "fullset";
+    "union"; "intersection"; "complement"; "difference";
+    "symmetric_difference"; "every"; "some"; "singleton"; "add"; "remove";
+    "choose"; "the"; "singleton_elt"; "rest"; "setofsets"; "powerset";
+    "rinverse"; "rcomplement"; "runion"; "rintersection"; "image";
+    "preimage"; "postcondition"; "converse";
+    "number"; "number_field"; "numfield"; "nonzero_number"; "nznum";
+    "real"; "nonzero_real"; "nzreal";
+    "nonneg_real"; "nonpos_real"; "posreal"; "negreal"; "nnreal"; "npreal";
+    "rational"; "rat"; "nonzero_rational"; "nzrat";
+    "nonneg_rat"; "nonpos_rat"; "posrat"; "negrat"; "nnrat"; "nprat";
+    "integer"; "int"; "nonzero_integer"; "nzint";
+    "nonneg_int"; "nonpos_int"; "posint"; "negint"; "nnint"; "npint";
+    "subrange"; "even_int"; "odd_int";
+    "naturalnumber"; "nat"; "upto"; "below"; "succ"; "pred";
+    "min"; "max"; "sgn"; "abs";
+    "mod"; "divides"; "rem"; "ndiv";
+    "upfrom"; "above";
     "even";
-    (* introduced by Why3 *)
-    "tuple0"; ]
+    ]
 
 let fresh_printer () =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  let isanitize = sanitizer char_to_lalpha char_to_lalnumus in
   create_ident_printer black_list ~sanitizer:isanitize
 
 let iprinter =
   let isanitize = sanitizer char_to_lalpha char_to_lalnumus in
+  create_ident_printer black_list ~sanitizer:isanitize
+
+let thprinter =
+  let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer black_list ~sanitizer:isanitize
 
 let forget_all () = forget_all iprinter
@@ -139,6 +166,9 @@ let print_pr fmt pr =
 let print_name fmt id =
   fprintf fmt "%% Why3 %s@\n" (id_unique iprinter id)
 
+let print_th_name fmt id =
+  fprintf fmt "%s" (id_unique thprinter id)
+
 (* info *)
 
 type info = {
@@ -152,12 +182,14 @@ let print_path = print_list (constant_string ".") string
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_id_real info fmt id =
-        try let path,th,ipr = Mid.find id info.symbol_printers in
-        fprintf fmt "%s.%s.%s"
-          path
-          th.Theory.th_name.id_string
-          (id_unique ipr id)
-        with Not_found -> print_id fmt id
+  try
+    let path, th, ipr = Mid.find id info.symbol_printers in
+    let th = id_unique thprinter th.Theory.th_name in
+    let id = id_unique ipr id in
+    if path = "" then fprintf fmt "%s.%s" th id
+    else fprintf fmt "%s@@%s.%s" path th id
+  with Not_found ->
+    print_id fmt id
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
@@ -169,7 +201,7 @@ let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin match tl with
-        | []  -> fprintf fmt "tuple0"
+        | []  -> fprintf fmt "[]"
         | [ty] -> print_ty info fmt ty
         | _   -> fprintf fmt "[%a]" (print_list comma (print_ty info)) tl
       end
@@ -314,13 +346,13 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_vsty_nopar info) v (print_opl_fmla info) f;
       forget_var v
   | Tapp (fs, []) when is_fs_tuple fs ->
-      fprintf fmt "Tuple0"
+      fprintf fmt "()"
   | Tapp (fs, pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
-          syntax_arguments s (print_term info) fmt tl
+          syntax_arguments_typed s (print_term info) (print_ty info) t fmt tl
       | _ ->
           let no_cast = unambig_fs fs in
           begin match tl with
@@ -482,8 +514,7 @@ type chunk =
   | Edition of string * contents (* name contents *)
   | Other of contents            (* contents *)
 
-let re_ignored =
-  Str.regexp "\\([^ :]+: THEORY\\)\\|\\([^ :]+: LIBRARY\\)\\|IMPORTING\\| BEGIN"
+let re_blank = Str.regexp "[ ]*$"
 let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
 
 (* Reads an old version of the file, as a list of chunks.
@@ -495,9 +526,13 @@ let read_old_script ch =
   let contents = ref [] in
   let rec read_line () =
     let s = input_line ch in
-    let s = clean_line s in
-    if Str.string_match re_ignored s 0 then read_line () else s
+    clean_line s
   in
+  (* skip first lines, until we find a blank line *)
+  begin try while true do
+    let s = read_line () in if Str.string_match re_blank s 0 then raise Exit
+  done with End_of_file | Exit -> () end;
+  (* then read chunks *)
   let rec read ?name () =
     let s = read_line () in
     if s = "" then begin
@@ -514,7 +549,7 @@ let read_old_script ch =
     let s = List.rev !contents in
     contents := [];
     match s, name with
-      | ([] | [""]), _ | _, Some "tuple0" -> ()
+      | ([] | [""]), _ -> ()
       | _, None -> chunks := Other s :: !chunks
       | _, Some n -> chunks := Edition (n, s) :: !chunks
   in
@@ -660,8 +695,10 @@ let print_param_decl ~prev info fmt ls =
   fprintf fmt "@]@\n@\n"
 
 let print_param_decl ~prev info fmt ls =
-  if not (Mid.mem ls.ls_name info.info_syn) then
-    (print_param_decl ~prev info fmt ls; forget_tvs ())
+  if not (Mid.mem ls.ls_name info.info_syn) then begin
+    print_param_decl ~prev info fmt ls;
+    forget_tvs ()
+  end
 
 let print_logic_decl ~prev info fmt (ls,ld) =
   ignore prev;
@@ -675,8 +712,10 @@ let print_logic_decl ~prev info fmt (ls,ld) =
   List.iter forget_var vl
 
 let print_logic_decl ~prev info fmt d =
-  if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_logic_decl ~prev info fmt d; forget_tvs ())
+  if not (Mid.mem (fst d).ls_name info.info_syn) then begin
+    print_logic_decl ~prev info fmt d;
+    forget_tvs ()
+  end
 
 let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
@@ -690,8 +729,13 @@ let print_recursive_decl info fmt (ls,ld) =
     (print_expr info) e;
   fprintf fmt "MEASURE %a BY <<@\n@]@\n"
     print_vs (List.nth vl i);
-  List.iter forget_var vl;
-  forget_tvs ()
+  List.iter forget_var vl
+
+let print_recursive_decl info fmt d =
+  if not (Mid.mem (fst d).ls_name info.info_syn) then begin
+    print_recursive_decl info fmt d;
+    forget_tvs ()
+  end
 
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[%% %a:@\n(%a)@]" print_pr pr (print_fmla info) f
@@ -708,8 +752,10 @@ let print_ind_decl info fmt (ps,al) =
   fprintf fmt "@\n"
 
 let print_ind_decl info fmt d =
-  if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_ind_decl info fmt d; forget_tvs ())
+  if not (Mid.mem (fst d).ls_name info.info_syn) then begin
+    print_ind_decl info fmt d;
+    forget_tvs ()
+  end
 
 let re_lemma = Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
 let rec find_lemma = function
@@ -759,7 +805,7 @@ let print_decl ~old info fmt d =
   | Dlogic [d] ->
       print_recursive_decl info fmt d
   | Dlogic _ ->
-      assert false (* PVS does not support mutually recursive defns *)
+      unsupportedDecl d "PVS does not support mutually recursive definitions"
   | Dind (Ind, il) ->
       print_list nothing (print_ind_decl info) fmt il
   | Dind (Coind, _) ->
@@ -790,7 +836,8 @@ let print_task env pr thpr realize ?old fmt task =
         let f,id =
           let l = split_string_rev s1 '.' in List.rev (List.tl l),List.hd l in
         let th = Env.find_theory env f id in
-        Mid.add th.Theory.th_name (th, (f, if s2 = "" then s1 else s2)) mid
+        Mid.add th.Theory.th_name
+          (th, (f, if s2 = "" then String.concat "." f else s2)) mid
       | _ -> assert false
     ) Mid.empty task in
   (* two cases: task is clone T with [] or task is a real goal *)
@@ -799,11 +846,12 @@ let print_task env pr thpr realize ?old fmt task =
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
         let id = th.Theory.th_name in
-        id.id_string, th.Theory.th_path, Mid.remove id realized_theories
+        id_unique thprinter id,
+        th.Theory.th_path, Mid.remove id realized_theories
     | Some { Task.task_decl = { Theory.td_node = td } } ->
         let name = match td with
           | Theory.Decl { Decl.d_node = Dprop (_, pr, _) } ->
-              pr.pr_name.id_string
+              id_unique thprinter pr.pr_name
           | _ -> "goal"
         in
         name, [], realized_theories
@@ -820,7 +868,8 @@ let print_task env pr thpr realize ?old fmt task =
         pr)
         realized_theories' in
     Mid.map (fun th ->
-               let _, (_, s) = Mid.find th.Theory.th_name realized_theories in
+               let _, (p, s) = Mid.find th.Theory.th_name realized_theories in
+               let s = if p = thpath then "" else s in
                (s, th, Mid.find th.Theory.th_name printers))
       realized_symbols in
   let info = {
@@ -850,10 +899,9 @@ let print_task env pr thpr realize ?old fmt task =
   Mid.iter
     (fun _ (th, (path, _)) ->
        let lib = if path = thpath then "" else String.concat "." path ^ "@" in
-       fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
+       fprintf fmt "IMPORTING %s%a@\n" lib print_th_name th.Theory.th_name)
     realized_theories;
-  fprintf fmt "@\n%% Why3 tuple0@\n";
-  fprintf fmt "tuple0: DATATYPE BEGIN Tuple0: Tuple0? END tuple0@\n@\n";
+  fprintf fmt "%% do not edit above this line@\n@\n";
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old;
   fprintf fmt "@]@\nEND %s@\n@]" thname

@@ -159,6 +159,8 @@ val starts_with : string -> string -> bool
 val padd_string : char -> string -> int -> string
 (** extract or padd the given string in order to have the given length *)
 
+val concat_non_empty : string -> string list -> string
+
 (* useful function on char *)
 val is_uppercase : char -> bool
 

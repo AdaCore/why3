@@ -76,12 +76,15 @@ let main : Whyconf.main = Whyconf.get_main config
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
-(* the [prover alt-ergo] section of the config file *)
+(* One prover named Alt-Ergo in the config file *)
 let alt_ergo : Whyconf.config_prover =
   try
-    Whyconf.prover_by_id config "alt-ergo"
+    let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+    (** all the prover that have the name "Alt-Ergo" *)
+    let provers = Whyconf.filter_provers config fp in
+    snd (Whyconf.Mprover.choose provers)
   with Whyconf.ProverNotFound _ ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
+    eprintf "Prover Alt-Ergo not installed or not configured@.";
     exit 0
 
 (*

@@ -15,7 +15,7 @@ let f () =
 let k () =
   {}
   begin
-    b := 0; (* b := 1 for the right-to-left evaluation *)
+    b := 1; (* b := 0 for the left-to-right evaluation *)
     b1 := (1 - (f ())) + (f ());
     b2 := (f ()) * (1 - (f ()))
   end

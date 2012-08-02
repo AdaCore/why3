@@ -1,0 +1,33 @@
+PowerInt: THEORY
+ BEGIN
+  IMPORTING int@Int
+  IMPORTING Real
+  % do not edit above this line
+  
+  power_total(x: int) : real
+
+  % Why3 power
+  power(x:real, x1:int): MACRO real =
+    IF x = 0 AND x1 < 0 THEN power_total(x1) ELSE x^x1 ENDIF
+  
+  % Why3 power_0
+  power_0: LEMMA FORALL (x:real): (power(x, 0) = 1)
+  
+  % Why3 power_s
+  power_s: LEMMA FORALL (x:real, n:int): (n >= 0) => (power(x,
+    (n + 1)) = (x * power(x, n)))
+  
+  % Why3 power_1
+  power_1: LEMMA FORALL (x:real): (power(x, 1) = x)
+  
+  % Why3 power_sum
+  power_sum: LEMMA FORALL (x:real, n:int, m:int): ((n >= 0) AND (m >= 0)) =>
+    (power(x, (n + m)) = (power(x, n) * power(x, m)))
+  
+  % Why3 power_mult
+  power_mult: LEMMA FORALL (x:real, n:int, m:int): (0 <= n) => ((0 <= m) =>
+    (power(x, (n * m)) = power(power(x, n), m)))
+  
+  
+ END PowerInt
+ 

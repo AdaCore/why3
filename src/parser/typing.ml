@@ -913,7 +913,9 @@ let prepare_typedef td =
   if td.td_model then
     errorm ~loc:td.td_loc "model types are not allowed in the logic";
   if td.td_vis <> Public then
-    errorm ~loc:td.td_loc "a logic type cannot be abstract or private";
+    errorm ~loc:td.td_loc "logic types cannot be abstract or private";
+  if td.td_inv <> None then
+    errorm ~loc:td.td_loc "logic types cannot have invariants";
   match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->
       td
@@ -1103,16 +1105,16 @@ let rec clone_ns loc sl ns2 ns1 s =
   in
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
 
-let add_decl th = function
+let add_decl loc th = function
   | TypeDecl dl ->
       add_types dl th
   | LogicDecl dl ->
       add_logics dl th
   | IndDecl (s, dl) ->
       add_inductives s dl th
-  | PropDecl (loc, k, s, f) ->
+  | PropDecl (k, s, f) ->
       add_prop (prop_kind k) loc s f th
-  | Meta (loc, id, al) ->
+  | Meta (id, al) ->
       let convert = function
         | PMAts q  -> MAts (find_tysymbol q th)
         | PMAfs q  -> MAls (find_fsymbol q th)
@@ -1124,8 +1126,9 @@ let add_decl th = function
       let add s = add_meta th (lookup_meta s) (List.map convert al) in
       Loc.try1 loc add id.id
 
-let add_decl th d =
-  if Debug.test_flag debug_parse_only then th else add_decl th d
+let add_decl loc th d =
+  if Debug.test_flag debug_parse_only then th else
+  Loc.try3 loc add_decl loc th d
 
 let type_inst th t s =
   let add_inst s = function
@@ -1187,15 +1190,50 @@ let add_use_clone env lenv th loc (use, subst) =
   in
   Loc.try1 loc use_or_clone th
 
-let close_theory loc lenv th =
+let close_theory lenv th =
   if Debug.test_flag debug_parse_only then lenv else
   let th = close_theory th in
   let id = th.th_name.id_string in
-  if Mstr.mem id lenv then error ~loc (ClashTheory id);
+  let loc = th.th_name.Ident.id_loc in
+  if Mstr.mem id lenv then error ?loc (ClashTheory id);
   Mstr.add id th lenv
 
 let close_namespace loc import id th =
   Loc.try3 loc close_namespace th import id
+
+(* incremental parsing *)
+
+let open_file, close_file =
+  let lenv = Stack.create () in
+  let uc   = Stack.create () in
+  let open_file env path =
+    Stack.push Mstr.empty lenv;
+    let open_theory id =
+      Stack.push (Theory.create_theory ~path (Denv.create_user_id id)) uc in
+    let close_theory () =
+      Stack.push (close_theory (Stack.pop lenv) (Stack.pop uc)) lenv in
+    let open_namespace () =
+      Stack.push (Theory.open_namespace (Stack.pop uc)) uc in
+    let close_namespace loc imp name =
+      Stack.push (close_namespace loc imp name (Stack.pop uc)) uc in
+    let new_decl loc d =
+      Stack.push (add_decl loc (Stack.pop uc) d) uc in
+    let use_clone loc use =
+      let lenv = Stack.top lenv in
+      Stack.push (add_use_clone env lenv (Stack.pop uc) loc use) uc in
+    { open_theory = open_theory;
+      close_theory = close_theory;
+      open_namespace = open_namespace;
+      close_namespace = close_namespace;
+      new_decl = new_decl;
+      use_clone = use_clone;
+      open_module = (fun _ -> assert false);
+      close_module = (fun _ -> assert false);
+      new_pdecl = (fun _ -> assert false);
+      use_module = (fun _ _ -> assert false); }
+  in
+  let close_file () = Stack.pop lenv in
+  open_file, close_file
 
 (*
 Local Variables:

@@ -63,7 +63,17 @@ let get_prover s =
   try
     Hashtbl.find provers s
   with Not_found ->
-    let cp = Whyconf.prover_by_id config s in
+    let filter_prover = Whyconf.parse_filter_prover s in
+    let cp = try Whyconf.filter_one_prover config filter_prover
+      with Whyconf.ProverAmbiguity (wc,fp,provers) ->
+        let provers = Mprover.filter (fun _ p -> not p.interactive) provers in
+        if Mprover.is_num_elt 1 provers then
+          snd (Mprover.choose provers)
+        else if Mprover.is_empty provers then
+          raise (Whyconf.ProverNotFound (wc,fp))
+        else
+          raise (Whyconf.ProverAmbiguity (wc,fp,provers))
+    in
     let drv = Driver.load_driver env cp.driver cp.extra_drivers in
     Hashtbl.add provers s (cp, drv);
     cp, drv
@@ -1097,6 +1107,9 @@ let tr_top_decl = function
   | _, Lib.ClosedSection _
   | _, Lib.FrozenState _ -> ()
 
+let pr_fp fp =
+  pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)
+
 let why3tac ?(timelimit=timelimit) s gl =
   (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
@@ -1126,14 +1139,31 @@ let why3tac ?(timelimit=timelimit) s gl =
     | NotFO ->
         if debug then Printexc.print_backtrace stderr; flush stderr;
         error "Not a first order goal"
-    | Whyconf.ProverNotFound (_, s) ->
+    | Whyconf.ProverNotFound (_, fp) ->
         let pl =
-          Mprover.fold (fun _ p l -> if not p.interactive then p.id :: l else l)
+          Mprover.fold (fun prover p l -> if not p.interactive
+            then (Pp.string_of_wnl Whyconf.print_prover prover) :: l
+            else l)
           (get_provers config) [] in
-        let msg = pr_str "No such prover `" ++ pr_str s ++ pr_str "'." ++
+        let msg = pr_str "No such prover `"
+          ++ pr_fp fp
+          ++ pr_str "'." ++
           pr_spc () ++ pr_str "Available provers are:" ++ pr_fnl () ++
           prlist (fun s -> pr_str s ++ pr_fnl ()) (List.rev pl) in
         errorlabstrm "Whyconf.ProverNotFound" msg
+    | Whyconf.ProverAmbiguity (_, fp,provers) ->
+        let pl = Mprover.keys provers in
+        let pl = List.map (Pp.string_of_wnl Whyconf.print_prover) pl in
+        let msg = pr_str "More than one prover corresponding to `" ++
+          pr_fp fp ++ pr_str "'." ++
+          pr_spc () ++ pr_str "Corresponding provers are:" ++ pr_fnl () ++
+          prlist (fun s -> pr_str s ++ pr_fnl ()) (List.rev pl) in
+        errorlabstrm "Whyconf.ProverAmbiguity" msg
+    | Whyconf.ParseFilterProver s ->
+      let msg = pr_str "Syntax error prover identification '" ++
+        pr_str s ++ pr_str "' :  name[,version[,alternative]|,,alternative]" in
+      errorlabstrm "Whyconf.ParseFilterProver" msg
+
     | e ->
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;

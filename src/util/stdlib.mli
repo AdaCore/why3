@@ -179,6 +179,9 @@ module type S =
 
     (** {3} Added into why stdlib version *)
 
+    val is_num_elt : int -> 'a t -> bool
+    (** check if the map has the given number of elements *)
+
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     (** [change f x m] returns a map containing the same bindings as
         [m], except the binding of [x] in [m] is changed from [y] to
@@ -186,7 +189,9 @@ module type S =
         binding of [x] becomes [f None].
 
         [change f x m] corresponds to a more efficient way to do
-        [add x (try f (Some (find x m)) with Not_found -> f None) m] *)
+        [match (try f (Some (find x m)) with Not_found -> f None) with
+          | None -> m
+          | Some v -> add x v] *)
 
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     (** [union f m1 m2] computes a map whose keys is a subset of keys
@@ -280,6 +285,27 @@ module type S =
         The returned list is sorted in increasing order with respect
         to the ordering [Ord.compare] of the keys, where [Ord] is the argument
         given to {!Map.Make}. *)
+
+    (** enumeration: zipper style *)
+    type 'a enumeration
+
+    val val_enum : 'a enumeration -> (key * 'a) option
+    (** get the current key value pair of the enumeration, return None
+        if the enumeration reach the end *)
+
+    val start_enum : 'a t -> 'a enumeration
+    (** start the enumeration of the given map *)
+
+    val next_enum : 'a enumeration -> 'a enumeration
+    (** get the next step of the enumeration *)
+
+    val start_ge_enum : key -> 'a t -> 'a enumeration
+    (** start the enumeration of the given map at the first key which
+        is greater or equal than the given one *)
+
+    val next_ge_enum : key -> 'a enumeration -> 'a enumeration
+    (** get the next (or same) step of the enumeration which key is
+        greater or equal to the given key *)
 
     module type Set =
     sig
@@ -409,6 +435,10 @@ module type S =
       val add_new : exn -> elt -> t -> t
       (** [add_new e x s] adds [x] to [s] if [s] does not contain [x],
           and raises [e] otherwise. *)
+
+      val is_num_elt : int -> t -> bool
+      (** check if the map has the given number of elements *)
+
     end
 
     module Set : Set

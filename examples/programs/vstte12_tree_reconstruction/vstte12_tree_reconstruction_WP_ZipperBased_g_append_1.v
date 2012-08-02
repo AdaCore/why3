@@ -187,7 +187,7 @@ Inductive g : (list (Z* tree)%type) -> Prop :=
       tree)%type)), (greedy d1 d2 t2) -> ((g (Cons (d1, t1) l)) -> (g (Cons (
       d2, t2) (Cons (d1, t1) l)))).
 
-Require Import Why3. Ltac z := why3 "z3-3" timelimit 5.
+Require Import Why3. Ltac z := why3 "z3" timelimit 5.
 
 (* Why3 goal *)
 Theorem g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*

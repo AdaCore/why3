@@ -1,0 +1,119 @@
+Double: THEORY
+ BEGIN
+  IMPORTING int@Int
+  IMPORTING real@Real
+  IMPORTING real@Abs
+  IMPORTING real@FromInt
+  IMPORTING Rounding
+  IMPORTING DoubleFormat
+  % do not edit above this line
+  
+  % Why3 round
+  round(x:Rounding.mode, x1:real): real
+  
+  % Why3 round_logic
+  round_logic(x:Rounding.mode, x1:real): DoubleFormat.double
+  
+  % Why3 value
+  value(x:DoubleFormat.double): real
+  
+  % Why3 exact
+  exact(x:DoubleFormat.double): real
+  
+  % Why3 model
+  model(x:DoubleFormat.double): real
+  
+  % Why3 round_error
+  round_error(x:DoubleFormat.double): real = abs((value(x) - exact(x)))
+  
+  % Why3 total_error
+  total_error(x:DoubleFormat.double): real = abs((value(x) - model(x)))
+  
+  % Why3 no_overflow
+  no_overflow(m:Rounding.mode, x:real): bool = (abs(round(m,
+    x)) <= DoubleFormat.max_double)
+  
+  % Why3 bounded_real_no_overflow
+  bounded_real_no_overflow: LEMMA FORALL (m:Rounding.mode, x:real):
+    (abs(x) <= DoubleFormat.max_double) => no_overflow(m, x)
+  
+  % Why3 round_monotonic
+  round_monotonic: LEMMA FORALL (m:Rounding.mode, x:real, y:real):
+    (x <= y) => (round(m, x) <= round(m, y))
+  
+  % Why3 round_idempotent
+  round_idempotent: LEMMA FORALL (m1:Rounding.mode, m2:Rounding.mode,
+    x:real): (round(m1, round(m2, x)) = round(m2, x))
+  
+  % Why3 round_value
+  round_value: LEMMA FORALL (m:Rounding.mode, x:DoubleFormat.double):
+    (round(m, value(x)) = value(x))
+  
+  % Why3 bounded_value
+  bounded_value: LEMMA FORALL (x:DoubleFormat.double):
+    (abs(value(x)) <= DoubleFormat.max_double)
+  
+  % Why3 exact_rounding_for_integers
+  exact_rounding_for_integers: LEMMA FORALL (m:Rounding.mode, i:int):
+    (((-DoubleFormat.max_int) <= i) AND (i <= DoubleFormat.max_int)) =>
+    (round(m, (i :: real)) = (i :: real))
+  
+  % Why3 round_down_le
+  round_down_le: LEMMA FORALL (x:real): (round(Rounding.down, x) <= x)
+  
+  % Why3 round_up_ge
+  round_up_ge: LEMMA FORALL (x:real): (round(Rounding.up, x) >= x)
+  
+  % Why3 round_down_neg
+  round_down_neg: LEMMA FORALL (x:real): (round(Rounding.down,
+    (-x)) = (-round(Rounding.up, x)))
+  
+  % Why3 round_up_neg
+  round_up_neg: LEMMA FORALL (x:real): (round(Rounding.up,
+    (-x)) = (-round(Rounding.down, x)))
+  
+  % Why3 of_real_post
+  of_real_post(m:Rounding.mode, x:real, res:DoubleFormat.double): bool =
+    (value(res) = round(m, x)) AND ((exact(res) = x) AND (model(res) = x))
+  
+  % Why3 add_post
+  add_post(m:Rounding.mode, x:DoubleFormat.double, y:DoubleFormat.double,
+    res:DoubleFormat.double): bool = (value(res) = round(m,
+    (value(x) + value(y)))) AND ((exact(res) = (exact(x) + exact(y))) AND
+    (model(res) = (model(x) + model(y))))
+  
+  % Why3 sub_post
+  sub_post(m:Rounding.mode, x:DoubleFormat.double, y:DoubleFormat.double,
+    res:DoubleFormat.double): bool = (value(res) = round(m,
+    (value(x) - value(y)))) AND ((exact(res) = (exact(x) - exact(y))) AND
+    (model(res) = (model(x) - model(y))))
+  
+  % Why3 mul_post
+  mul_post(m:Rounding.mode, x:DoubleFormat.double, y:DoubleFormat.double,
+    res:DoubleFormat.double): bool = (value(res) = round(m,
+    (value(x) * value(y)))) AND ((exact(res) = (exact(x) * exact(y))) AND
+    (model(res) = (model(x) * model(y))))
+  
+  % Why3 div_post
+  div_post(m:Rounding.mode, x:DoubleFormat.double, y:DoubleFormat.double,
+    res:DoubleFormat.double): bool = (value(res) = round(m,
+    real@Real.infix_sl(value(x), value(y)))) AND
+    ((exact(res) = real@Real.infix_sl(exact(x), exact(y))) AND
+    (model(res) = real@Real.infix_sl(model(x), model(y))))
+  
+  % Why3 neg_post
+  neg_post(x:DoubleFormat.double, res:DoubleFormat.double): bool =
+    (value(res) = (-value(x))) AND ((exact(res) = (-exact(x))) AND
+    (model(res) = (-model(x))))
+  
+  % Why3 lt
+  lt(x:DoubleFormat.double, y:DoubleFormat.double): bool =
+    (value(x) <  value(y))
+  
+  % Why3 gt
+  gt(x:DoubleFormat.double, y:DoubleFormat.double): bool =
+    (value(x) >  value(y))
+  
+  
+ END Double
+ 

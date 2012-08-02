@@ -41,6 +41,7 @@ module rec T : sig
     its_args : tvsymbol list;
     its_regs : region list;
     its_def  : ity option;
+    its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
   }
@@ -75,6 +76,7 @@ end = struct
     its_args : tvsymbol list;
     its_regs : region   list;
     its_def  : ity option;
+    its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
   }
@@ -136,10 +138,6 @@ let create_varset tvs regs = {
   vars_tv = Sreg.fold (fun r -> Stv.union r.reg_ity.ity_vars.vars_tv) regs tvs;
   vars_reg = regs;
 }
-
-let rec reg_occurs r vars =
-  let check r r' = reg_equal r r' || reg_occurs r r'.reg_ity.ity_vars in
-  Sreg.exists (check r) vars.vars_reg
 
 (* value type symbols *)
 
@@ -260,25 +258,33 @@ let rec ity_v_map fnv fnr ity = match ity.ity_node with
   | Ityapp (f,tl,rl) ->
       ity_app_unsafe f (List.map (ity_v_map fnv fnr) tl) (List.map fnr rl)
 
-let rec ity_v_fold fnv fnr acc ity = match ity.ity_node with
-  | Ityvar v ->
-      fnv acc v
-  | Itypur (_,tl) ->
-      List.fold_left (ity_v_fold fnv fnr) acc tl
-  | Ityapp (_,tl,rl) ->
-      List.fold_left (ity_v_fold fnv fnr) (List.fold_left fnr acc rl) tl
-
-let ity_v_all prv prr ity =
-  try ity_v_fold (all_fn prv) (all_fn prr) true ity with FoldSkip -> false
-
-let ity_v_any prv prr ity =
-  try ity_v_fold (any_fn prv) (any_fn prr) false ity with FoldSkip -> true
-
 let ity_subst_unsafe mv mr ity =
   ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
 let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
+
+let rec ity_inv ity = match ity.ity_node with
+  | Ityapp (its,_,_) -> its.its_inv || ity_any ity_inv ity
+  | _ -> ity_any ity_inv ity
+
+let rec reg_fold fn vars acc =
+  let on_reg r acc = reg_fold fn r.reg_ity.ity_vars (fn r acc) in
+  Sreg.fold on_reg vars.vars_reg acc
+
+let rec reg_all fn vars =
+  let on_reg r = fn r && reg_all fn r.reg_ity.ity_vars in
+  Sreg.for_all on_reg vars.vars_reg
+
+let rec reg_any fn vars =
+  let on_reg r = fn r || reg_any fn r.reg_ity.ity_vars in
+  Sreg.exists on_reg vars.vars_reg
+
+let rec reg_iter fn vars =
+  let rec on_reg r = fn r; reg_iter fn r.reg_ity.ity_vars in
+  Sreg.iter on_reg vars.vars_reg
+
+let reg_occurs r vars = reg_any (reg_equal r) vars
 
 (* smart constructors *)
 
@@ -306,12 +312,6 @@ let ity_subst_empty = {
   ity_subst_tv  = Mtv.empty;
   ity_subst_reg = Mreg.empty;
 }
-
-let ity_subst_union s1 s2 =
-  let check_ity _ ity1 ity2 = ity_equal_check ity1 ity2; Some ity1 in
-  let check_reg _ r1 r2 = reg_equal_check r1 r2; Some r1 in
-  { ity_subst_tv  = Mtv.union  check_ity s1.ity_subst_tv  s2.ity_subst_tv;
-    ity_subst_reg = Mreg.union check_reg s1.ity_subst_reg s2.ity_subst_reg }
 
 let tv_inst s v = Mtv.find_def (ity_var v) v s.ity_subst_tv
 let reg_inst s r = Mreg.find_def r r s.ity_subst_reg
@@ -428,12 +428,13 @@ let ity_pur s tl = match s.ts_def with
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ts ~abst ~priv regs def ->
+  (fun ts ~abst ~priv ~inv regs def ->
     let its = {
       its_pure  = ts;
       its_args  = ts.ts_args;
       its_regs  = regs;
       its_def   = def;
+      its_inv   = inv;
       its_abst  = abst;
       its_priv  = priv;
     } in
@@ -441,7 +442,8 @@ let create_itysymbol_unsafe, restore_its =
     its),
   Wts.find ts_to_its
 
-let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
+let create_itysymbol
+      name ?(abst=false) ?(priv=false) ?(inv=false) args regs def =
   let puredef = option_map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
@@ -450,15 +452,18 @@ let create_itysymbol name ?(abst=false) ?(priv=false) args regs def =
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in
   (* all type variables in [regs] must be in [args] *)
-  let check tv = Stv.mem tv sargs || raise (UnboundTypeVar tv) in
-  List.iter (fun r -> ignore (ity_v_all check Util.ttrue r.reg_ity)) regs;
+  let check dtvs = if not (Stv.subset dtvs sargs) then
+    raise (UnboundTypeVar (Stv.choose (Stv.diff dtvs sargs))) in
+  List.iter (fun r -> check r.reg_ity.ity_vars.vars_tv) regs;
   (* all regions in [def] must be in [regs] *)
-  let check r = Sreg.mem r sregs || raise (UnboundRegion r) in
-  ignore (option_map (ity_v_all Util.ttrue check) def);
+  let check dregs = if not (Sreg.subset dregs sregs) then
+    raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs))) in
+  Util.option_iter (fun d -> check d.ity_vars.vars_reg) def;
   (* if a type is an alias then it cannot be abstract or private *)
-  if abst && def <> None then Loc.errorm "A type alias cannot be abstract";
-  if priv && def <> None then Loc.errorm "A type alias cannot be private";
-  create_itysymbol_unsafe purets ~abst ~priv regs def
+  if abst && def <> None then Loc.errorm "Type aliases cannot be abstract";
+  if priv && def <> None then Loc.errorm "Type aliases cannot be private";
+  if inv  && def <> None then Loc.errorm "Type aliases cannot have invariants";
+  create_itysymbol_unsafe purets ~abst ~priv ~inv regs def
 
 let ts_unit = ts_tuple 0
 let ty_unit = ty_tuple []
@@ -481,9 +486,10 @@ let its_clone sm =
     let nits = try restore_its nts with Not_found ->
       let abst = oits.its_abst in
       let priv = oits.its_priv in
+      let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
       let def = Util.option_map conv_ity oits.its_def in
-      create_itysymbol_unsafe nts ~abst ~priv regs def
+      create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
     in
     Hits.replace itsh oits nits;
     nits
@@ -657,7 +663,7 @@ let eff_full_inst s e =
   let wr = Sreg.union e.eff_writes wr in
   let wr = Sreg.union e.eff_ghostw wr in
   (* read-only regions in e *)
-  let ro = Sreg.diff (Sreg.union e.eff_reads e.eff_ghostr) wr in
+  let ro = Sreg.diff (Mreg.map (Util.const ()) s) wr in
   (* all modified or reset regions are instantiated into distinct regions *)
   let add_affected r acc =
     let r = Mreg.find r s in Sreg.add_new (IllegalAlias r) r acc in
@@ -821,14 +827,14 @@ let create_pvsymbol id vtv = {
   pv_vars = vtv_vars vtv;
 }
 
-let create_pvsymbol, restore_pv =
-  let vs_to_pv = Wvs.create 17 in
+let create_pvsymbol, restore_pv, restore_pv_by_id =
+  let id_to_pv = Wid.create 17 in
   (fun id vtv ->
     let pv = create_pvsymbol id vtv in
-    Wvs.set vs_to_pv pv.pv_vs pv;
+    Wid.set id_to_pv pv.pv_vs.vs_name pv;
     pv),
-  (fun vs -> try Wvs.find vs_to_pv vs with Not_found ->
-    Loc.error ?loc:vs.vs_name.id_loc (Decl.UnboundVar vs))
+  (fun vs -> Wid.find id_to_pv vs.vs_name),
+  (fun id -> Wid.find id_to_pv id)
 
 (** program types *)
 
@@ -951,6 +957,13 @@ let rec vta_filter varm vars vta =
     let rst = (eff_filter vars rst).eff_resets in
     let eff = { spec.c_effect with eff_resets = rst } in
     { spec with c_effect = eff } in
+  (* we must also reset every fresh region in the value *)
+  let spec = match vta.vta_result with
+    | VTvalue v ->
+        let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
+        let eff = reg_fold on_reg v.vtv_ity.ity_vars spec.c_effect in
+        { spec with c_effect = eff }
+    | VTarrow _ -> spec in
   vty_arrow_unsafe vta.vta_args ~ghost:vta.vta_ghost ~spec vty
 
 let vta_filter varm vta =

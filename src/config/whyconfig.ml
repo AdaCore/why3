@@ -70,7 +70,7 @@ let option_list = Arg.align [
     (let id = ref "" in
      [Arg.Set_string id;
       Arg.String (fun name -> Queue.add (!id, name) prover_bins)]),
-  "<id> <file> Add a new prover executable";
+  "<id><file> Add a new prover executable";
   "--list-prover-ids", Arg.Set opt_list_prover_ids,
   " List known prover families";
   "--install-plugin", Arg.String add_plugin,

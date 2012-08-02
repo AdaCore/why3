@@ -323,6 +323,16 @@ type psymbol = {
   ps_subst : ity_subst;
 }
 
+module Psym = WeakStructMake (struct
+  type t = psymbol
+  let tag ps = ps.ps_name.id_tag
+end)
+
+module Sps = Psym.S
+module Mps = Psym.M
+module Hps = Psym.H
+module Wps = Psym.W
+
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
 let create_psymbol_real ~poly id vta varm =
@@ -339,9 +349,14 @@ let create_psymbol_mono = create_psymbol_real ~poly:false
 
 (** specification *)
 
+let varmap_union = Mid.set_union
+
 let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_vars m
 let add_vs_vars vs _ m = add_pv_vars (restore_pv vs) m
 let add_t_vars vss m = Mvs.fold add_vs_vars vss m
+
+let add_ps_vars ps m =
+  Mid.add ps.ps_name ps.ps_vars (varmap_union ps.ps_varm m)
 
 let pre_vars f vsset = Mvs.set_union vsset f.t_vars
 let post_vars f vsset = Mvs.set_union vsset f.t_vars
@@ -351,12 +366,18 @@ let variant_vars varl vsset =
   let add_variant s (t,_) = Mvs.set_union s t.t_vars in
   List.fold_left add_variant vsset varl
 
-let spec_varmap varm spec =
+let spec_vsset spec =
   let vsset = pre_vars spec.c_pre Mvs.empty in
   let vsset = post_vars spec.c_post vsset in
   let vsset = xpost_vars spec.c_xpost vsset in
   let vsset = variant_vars spec.c_variant vsset in
-  add_t_vars vsset varm
+  vsset
+
+let spec_varmap varm spec = add_t_vars (spec_vsset spec) varm
+
+let spec_pvset pvs spec =
+  let add_vs vs _ s = Spv.add (restore_pv vs) s in
+  Mvs.fold add_vs (spec_vsset spec) pvs
 
 let rec vta_varmap vta =
   let varm = match vta.vta_result with
@@ -379,6 +400,13 @@ let eff_check vars result e =
     let reset = reset (vars_union vars (vty_vars result)) in
     Mreg.iter reset e.eff_resets
 
+let vtv_check vars eff vtv =
+  let on_reg r =
+    if not (reg_occurs r vars) &&
+      (try Mreg.find r eff.eff_resets <> None with Not_found -> true)
+    then Loc.errorm "every fresh region in the result must be reset" in
+  reg_iter on_reg vtv.vtv_ity.ity_vars
+
 let rec vta_check vars vta =
   let add_arg vars pv = vars_union vars pv.pv_vars in
   let vars = List.fold_left add_arg vars vta.vta_args in
@@ -387,10 +415,18 @@ let rec vta_check vars vta =
   eff_check vars vta.vta_result vta.vta_spec.c_effect;
   match vta.vta_result with
   | VTarrow a -> vta_check vars a
-  | VTvalue _ -> ()
+  | VTvalue v -> vtv_check vars vta.vta_spec.c_effect v
 
 let create_psymbol id vta =
   let ps = create_psymbol_poly id vta (vta_varmap vta) in
+  vta_check ps.ps_vars vta;
+  ps
+
+let create_psymbol_extra id vta pvs pss =
+  let varm = vta_varmap vta in
+  let varm = Spv.fold add_pv_vars pvs varm in
+  let varm = Sps.fold add_ps_vars pss varm in
+  let ps = create_psymbol_poly id vta varm in
   vta_check ps.ps_vars vta;
   ps
 
@@ -483,8 +519,30 @@ let vta_of_expr e = match e.e_vty with
   | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
   | VTarrow vta -> vta
 
-let varmap_union = Mid.set_union
+let pv_effect pv = match pv.pv_vtv.vtv_mut with
+  | Some r -> eff_read ~ghost:pv.pv_vtv.vtv_ghost eff_empty r
+  | None -> eff_empty
+
 let add_e_vars e m = varmap_union e.e_varm m
+
+let e_pvset pvs e =
+  let add_id id _ s =
+    try Spv.add (restore_pv_by_id id) s
+    with Not_found -> s in
+  Mid.fold add_id e.e_varm pvs
+
+let spec_of_lambda lam letrec = {
+  c_pre     = lam.l_pre;
+  c_effect  = lam.l_expr.e_effect;
+  c_post    = lam.l_post;
+  c_xpost   = lam.l_xpost;
+  c_variant = lam.l_variant;
+  c_letrec  = letrec; }
+
+let l_pvset pvs lam =
+  let pvs = e_pvset pvs lam.l_expr in
+  let pvs = spec_pvset pvs (spec_of_lambda lam 0) in
+  List.fold_right Spv.remove lam.l_args pvs
 
 (* check admissibility of consecutive events *)
 
@@ -502,7 +560,7 @@ let check_reset e varm =
       let rec check_reg reg =
         reg_equal r reg || match u with
           | Some u when reg_equal u reg -> false
-          | _ -> ity_v_any Util.ffalse check_reg reg.reg_ity
+          | _ -> Sreg.exists check_reg reg.reg_ity.ity_vars.vars_reg
       in
       if Sreg.exists check_reg s.vars_reg then
         Loc.error ?loc:e.e_loc (StaleRegion (e,r,id))
@@ -538,11 +596,11 @@ let mk_expr node vty eff varm = {
 
 let e_value pv =
   let varm = add_pv_vars pv Mid.empty in
-  mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty varm
+  mk_expr (Evalue pv) (VTvalue pv.pv_vtv) (pv_effect pv) varm
 
 let e_arrow ps vta =
+  let varm = add_ps_vars ps Mid.empty in
   let sbs = vta_vars_match ps.ps_subst ps.ps_vta vta in
-  let varm = Mid.add ps.ps_name ps.ps_vars ps.ps_varm in
   let vta = vta_full_inst sbs ps.ps_vta in
   mk_expr (Earrow ps) (VTarrow vta) eff_empty varm
 
@@ -569,7 +627,8 @@ let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
 let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
   | _ ->
-      let ld = create_let_defn (id_fresh "o") e in
+      let id = id_fresh ?loc:e.e_loc "o" in
+      let ld = create_let_defn id e in
       let pv = match ld.let_sym with
         | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
@@ -581,6 +640,7 @@ let e_app_real e pv =
   let spec,vty = vta_app (vta_of_expr e) pv in
   check_postexpr e spec.c_effect (add_pv_vars pv Mid.empty);
   let eff = eff_union e.e_effect spec.c_effect in
+  let eff = eff_union eff (pv_effect pv) in
   mk_expr (Eapp (e,pv,spec)) vty eff (add_pv_vars pv e.e_varm)
 
 let rec e_app_flatten e pv = match e.e_node with
@@ -648,6 +708,7 @@ let e_plapp pls el ity =
       | vtv::vtvl, e::argl ->
           let apply_to_pv pv =
             let t = t_var pv.pv_vs in
+            let eff = eff_union eff (pv_effect pv) in
             let ghost = ghost || (pv.pv_vtv.vtv_ghost && not vtv.vtv_ghost) in
             let sbs = ity_match sbs vtv.vtv_ity pv.pv_vtv.vtv_ity in
             app (t::tl) (add_pv_vars pv varm) ghost eff sbs vtvl argl
@@ -728,7 +789,8 @@ let e_assign_real e0 pv =
   let varm = add_pv_vars pv Mid.empty in
   check_postexpr e0 eff varm;
   let varm = add_e_vars e0 varm in
-  let eff = eff_union e0.e_effect eff in
+  let eff = eff_union eff e0.e_effect in
+  let eff = eff_union eff (pv_effect pv) in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
   let e = mk_expr (Eassign (e0,r,pv)) vty eff varm in
   (* FIXME? Ok, this is awkward. We prohibit assignments
@@ -773,7 +835,8 @@ let on_fmla fn e = match e.e_node with
   | Elogic t -> fn e (t_equ_simp t t_bool_true)
   | Evalue pv -> fn e (t_equ_simp (t_var pv.pv_vs) t_bool_true)
   | _ ->
-      let ld = create_let_defn (id_fresh "o") e in
+      let id = id_fresh ?loc:e.e_loc "o" in
+      let ld = create_let_defn id e in
       let pv = match ld.let_sym with
         | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
         | LetV pv -> pv in
@@ -922,19 +985,12 @@ let e_absurd ity =
 (* simple functional definitions *)
 
 let create_fun_defn id lam letrec recsyms =
-  let e = lam.l_expr in
-  let spec = {
-    c_pre     = lam.l_pre;
-    c_post    = lam.l_post;
-    c_xpost   = lam.l_xpost;
-    c_effect  = e.e_effect;
-    c_variant = lam.l_variant;
-    c_letrec  = letrec; } in
-  let varm = spec_varmap e.e_varm spec in
+  let spec = spec_of_lambda lam letrec in
+  let varm = spec_varmap lam.l_expr.e_varm spec in
   let varm = Mid.set_diff varm recsyms in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
-  let vty = match e.e_vty with
+  let vty = match lam.l_expr.e_vty with
     | VTvalue ({ vtv_mut = Some _ } as vtv) -> VTvalue (vtv_unmut vtv)
     | vty -> vty in
   let vta = vty_arrow lam.l_args ~spec vty in

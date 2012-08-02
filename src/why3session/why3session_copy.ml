@@ -179,12 +179,7 @@ let read_to_prover config =
   match !opt_to_prover with
     | None -> None
     | Some fpr ->
-      try Some (prover_of_filter_prover config fpr)
-      with ProverNotFound (_,id) ->
-        eprintf
-          "The prover %s is not found in the configuration file %s@."
-          id (get_conf_file config);
-          exit 1
+      Some (prover_of_filter_prover config fpr)
 
 
 let run ~action () =

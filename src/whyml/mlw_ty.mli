@@ -40,6 +40,7 @@ module rec T : sig
     its_args : tvsymbol list;
     its_regs : region list;
     its_def  : ity option;
+    its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
   }
@@ -88,8 +89,6 @@ val ity_hash : ity -> int
 val reg_equal : region -> region -> bool
 val reg_hash : region -> int
 
-val reg_occurs : region -> varset -> bool
-
 exception BadItyArity of itysymbol * int * int
 exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
@@ -97,8 +96,9 @@ exception UnboundRegion of region
 
 val create_region : preid -> ity -> region
 
-val create_itysymbol : preid -> ?abst:bool -> ?priv:bool ->
-  tvsymbol list -> region list -> ity option -> itysymbol
+val create_itysymbol :
+  preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
+    tvsymbol list -> region list -> ity option -> itysymbol
 
 val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
@@ -133,16 +133,22 @@ val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
 val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
 
-val ity_v_fold :
-  ('a -> tvsymbol -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
-
-val ity_v_all : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
-val ity_v_any : (tvsymbol -> bool) -> (region -> bool) -> ity -> bool
-
 val ity_closed : ity -> bool
 val ity_pure : ity -> bool
+val ity_inv : ity -> bool
 
-val ts_unit : tysymbol
+(* these functions attend the sub-regions *)
+
+val reg_fold : (region -> 'a -> 'a) -> varset -> 'a -> 'a
+val reg_any  : (region -> bool) -> varset -> bool
+val reg_all  : (region -> bool) -> varset -> bool
+val reg_iter : (region -> unit) -> varset -> unit
+
+val reg_occurs : region -> varset -> bool
+
+(* built-in types *)
+
+val ts_unit : tysymbol (* the same as [Ty.ts_tuple 0] *)
 val ty_unit : ty
 
 val ity_int : ity
@@ -164,8 +170,6 @@ val ity_match : ity_subst -> ity -> ity -> ity_subst
 val reg_match : ity_subst -> region -> region -> ity_subst
 
 val ity_equal_check : ity -> ity -> unit
-
-val ity_subst_union : ity_subst -> ity_subst -> ity_subst
 
 val ity_full_inst : ity_subst -> ity -> ity
 
@@ -242,6 +246,7 @@ type variant = term * lsymbol option (* tau * (tau -> tau -> prop) *)
 
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
+val check_post : ty -> post -> unit
 
 type spec = {
   c_pre     : pre;
@@ -280,7 +285,10 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 val create_pvsymbol : preid -> vty_value -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
-  (* raises Decl.UnboundVar if the argument is not a pv_vs *)
+  (* raises Not_found if the argument is not a pv_vs *)
+
+val restore_pv_by_id : ident -> pvsymbol
+  (* raises Not_found if the argument is not a pv_vs.vs_name *)
 
 (** program types *)
 

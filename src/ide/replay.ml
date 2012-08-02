@@ -225,21 +225,7 @@ end
 
 module M = Session_scheduler.Make(O)
 
-let print_result fmt
-    { Call_provers.pr_answer=ans;
-      Call_provers.pr_output=out;
-      Call_provers.pr_time=t } =
-  fprintf fmt "%a (%.1fs)" Call_provers.print_prover_answer ans t;
-(*
-  fprintf fmt "%a" Call_provers.print_prover_answer ans;
-*)
-  match ans with
-    | Call_provers.HighFailure ->
-      fprintf fmt "@\nProver output:@\n%s@." out
-    | _ -> ()
-      (*
-        fprintf fmt "[limit=%s@\nProver output:@\n%s@." out
-      *)
+let print_result = Call_provers.print_prover_result
 
 let main_loop = O.main_loop
 

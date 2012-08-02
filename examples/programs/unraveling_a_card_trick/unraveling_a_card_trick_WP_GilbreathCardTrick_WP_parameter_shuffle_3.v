@@ -2,24 +2,12 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-
-Implicit Arguments old.
-
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
+(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
@@ -28,6 +16,22 @@ Implicit Arguments Nil.
 Unset Contextual Implicit.
 Implicit Arguments Cons.
 
+(* Why3 assumption *)
+Set Implicit Arguments.
+Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
+  match l with
+  | Nil => 0%Z
+  | (Cons _ r) => (1%Z + (length r))%Z
+  end.
+Unset Implicit Arguments.
+
+Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
+  (0%Z <= (length l))%Z.
+
+Axiom Length_nil : forall (a:Type), forall (l:(list a)),
+  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
+
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
   a) :=
@@ -42,25 +46,12 @@ Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
   l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
 
 Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
-  (Nil:(list a))) = l).
-
-Set Implicit Arguments.
-Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-Unset Implicit Arguments.
-
-Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
-  (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
+  (Nil :(list a))) = l).
 
 Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
@@ -75,11 +66,12 @@ Axiom mem_append : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
 Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
   exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
 
+(* Why3 assumption *)
 Set Implicit Arguments.
 Fixpoint reverse (a:Type)(l:(list a)) {struct l}: (list a) :=
   match l with
-  | Nil => (Nil:(list a))
-  | (Cons x r) => (infix_plpl (reverse r) (Cons x (Nil:(list a))))
+  | Nil => (Nil :(list a))
+  | (Cons x r) => (infix_plpl (reverse r) (Cons x (Nil :(list a))))
   end.
 Unset Implicit Arguments.
 
@@ -93,80 +85,117 @@ Axiom reverse_reverse : forall (a:Type), forall (l:(list a)),
 Axiom Reverse_length : forall (a:Type), forall (l:(list a)),
   ((length (reverse l)) = (length l)).
 
-Inductive t (a:Type) :=
-  | mk_t : (list a) -> t a.
-Implicit Arguments mk_t.
+(* Why3 assumption *)
+Inductive option (a:Type) :=
+  | None : option a
+  | Some : a -> option a.
+Set Contextual Implicit.
+Implicit Arguments None.
+Unset Contextual Implicit.
+Implicit Arguments Some.
 
-Definition elts (a:Type)(u:(t a)): (list a) :=
-  match u with
-  | (mk_t elts1) => elts1
+Parameter nth: forall (a:Type), Z -> (list a) -> (option a).
+Implicit Arguments nth.
+
+Axiom nth_def : forall (a:Type), forall (n:Z) (l:(list a)),
+  match l with
+  | Nil => ((nth n l) = (None :(option a)))
+  | (Cons x r) => ((n = 0%Z) -> ((nth n l) = (Some x))) /\ ((~ (n = 0%Z)) ->
+      ((nth n l) = (nth (n - 1%Z)%Z r)))
   end.
-Implicit Arguments elts.
-
-Definition length1 (a:Type)(s:(t a)): Z := (length (elts s)).
-Implicit Arguments length1.
 
 Parameter m: Z.
 
-
-Axiom m_positive : (0%Z <  m)%Z.
+Axiom m_positive : (0%Z < m)%Z.
 
 Parameter n: Z.
 
-
 Axiom n_nonnegative : (0%Z <= n)%Z.
 
+(* Why3 assumption *)
 Inductive shuffle{a:Type}  : (list a) -> (list a) -> (list a) -> Prop :=
-  | Shuffle_nil_left : forall (l:(list a)), (shuffle l (Nil:(list a)) l)
-  | Shuffle_nil_right : forall (l:(list a)), (shuffle (Nil:(list a)) l l)
+  | Shuffle_nil_left : forall (l:(list a)), (shuffle l (Nil :(list a)) l)
+  | Shuffle_nil_right : forall (l:(list a)), (shuffle (Nil :(list a)) l l)
   | Shuffle_cons_left : forall (x:a) (a1:(list a)) (b:(list a)) (c:(list a)),
       (shuffle a1 b c) -> (shuffle (Cons x a1) b (Cons x c))
   | Shuffle_cons_right : forall (x:a) (a1:(list a)) (b:(list a)) (c:(list
       a)), (shuffle a1 b c) -> (shuffle a1 (Cons x b) (Cons x c)).
 Implicit Arguments shuffle.
 
-Axiom shuffle_nil_nil_nil : forall (a:Type), (shuffle (Nil:(list a))
-  (Nil:(list a)) (Nil:(list a))).
+Axiom shuffle_nil_nil_nil : forall (a:Type), (shuffle (Nil :(list a))
+  (Nil :(list a)) (Nil :(list a))).
+
+Axiom shuffle_sym : forall (a:Type), forall (a1:(list a)) (b:(list a))
+  (c:(list a)), (shuffle a1 b c) -> (shuffle b a1 c).
 
 Axiom shuffle_length : forall (a:Type), forall (a1:(list a)) (b:(list a))
   (c:(list a)), (shuffle a1 b c) ->
   (((length a1) + (length b))%Z = (length c)).
 
-(* YOU MAY EDIT THE CONTEXT BELOW *)
+(* Why3 assumption *)
+Definition suit_ordered(l:(list Z)): Prop := forall (i:Z) (j:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < m)%Z) ->
+  ((nth ((i * m)%Z + j)%Z l) = (Some j))).
 
-(* DO NOT EDIT BELOW *)
+(* Why3 assumption *)
+Definition suit_sorted(l:(list Z)): Prop := (forall (i:Z) (v:Z), ((nth i
+  l) = (Some v)) -> ((0%Z <= v)%Z /\ (v < m)%Z)) /\ forall (i:Z) (j1:Z)
+  (j2:Z), ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j1)%Z /\ (j1 < m)%Z) ->
+  (((0%Z <= j2)%Z /\ (j2 < m)%Z) -> ~ ((nth ((i * m)%Z + j1)%Z
+  l) = (nth ((i * m)%Z + j2)%Z l)))).
 
-Theorem WP_parameter_shuffle : forall (b:(list Z)), forall (a:(list Z)),
-  forall (result:(list Z)), (result = (Nil:(list Z))) -> forall (c:(list Z)),
-  forall (b1:(list Z)), forall (a1:(list Z)), (exists aqt:(list Z),
-  (exists bqt:(list Z), ((reverse a) = (infix_plpl (reverse a1) aqt)) /\
-  (((reverse b) = (infix_plpl (reverse b1) bqt)) /\ (shuffle aqt bqt c)))) ->
-  forall (result1:bool), ((result1 = true) <-> (a1 = (Nil:(list Z)))) ->
-  ((~ (result1 = true)) -> forall (result2:bool), ((result2 = true) <->
-  (a1 = (Nil:(list Z)))) -> ((~ (result2 = true)) -> forall (result3:bool),
-  ((result3 = true) <-> (b1 = (Nil:(list Z)))) -> forall (result4:bool),
-  (~ ((result3 = true) \/ (result4 = true))) -> forall (b2:(list Z)),
-  forall (result5:Z),
+Axiom gilbreath_card_trick : forall (a:(list Z)), ((length a) = (n * m)%Z) ->
+  ((suit_ordered a) -> forall (c:(list Z)) (d:(list Z)), (a = (infix_plpl c
+  d)) -> forall (b:(list Z)), (shuffle c (reverse d) b) -> (suit_sorted b)).
+
+(* Why3 assumption *)
+Inductive t (a:Type) :=
+  | mk_t : (list a) -> t a.
+Implicit Arguments mk_t.
+
+(* Why3 assumption *)
+Definition elts (a:Type)(v:(t a)): (list a) :=
+  match v with
+  | (mk_t x) => x
+  end.
+Implicit Arguments elts.
+
+(* Why3 assumption *)
+Definition length1 (a:Type)(s:(t a)): Z := (length (elts s)).
+Implicit Arguments length1.
+
+
+
+(* Why3 goal *)
+Theorem WP_parameter_shuffle : forall (b:(list Z)) (a:(list Z)),
+  forall (c:(list Z)), (c = (Nil :(list Z))) -> forall (c1:(list Z))
+  (b1:(list Z)) (a1:(list Z)), (exists a':(list Z), (exists b':(list Z),
+  ((reverse a) = (infix_plpl (reverse a1) a')) /\
+  (((reverse b) = (infix_plpl (reverse b1) b')) /\ (shuffle a' b' c1)))) ->
+  forall (result:bool), ((result = true) <-> (a1 = (Nil :(list Z)))) ->
+  ((~ (result = true)) -> forall (o:bool), ((o = true) <-> (a1 = (Nil :(list
+  Z)))) -> ((~ (o = true)) -> forall (o1:bool), forall (o2:bool),
+  ((o2 = true) <-> (b1 = (Nil :(list Z)))) -> ((~ ((o2 = true) \/
+  (o1 = true))) -> forall (b2:(list Z)), forall (o3:Z),
   match b1 with
   | Nil => False
-  | (Cons x t1) => (result5 = x) /\ (b2 = t1)
-  end -> forall (c1:(list Z)), (c1 = (Cons result5 c)) -> exists aqt:(list
-  Z), exists bqt:(list Z), ((reverse a) = (infix_plpl (reverse a1) aqt)) /\
-  (((reverse b) = (infix_plpl (reverse b2) bqt)) /\ (shuffle aqt bqt c1)))).
+  | (Cons x t1) => (o3 = x) /\ (b2 = t1)
+  end -> forall (c2:(list Z)), (c2 = (Cons o3 c1)) -> exists a':(list Z),
+  exists b':(list Z), ((reverse a) = (infix_plpl (reverse a1) a')) /\
+  (((reverse b) = (infix_plpl (reverse b2) b')) /\ (shuffle a' b' c2))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros.
 clear H6.
 intuition.
 destruct H0 as (a', (b', (h1, (h2, h3)))).
 subst.
-exists a'; exists (Cons result5 b').
+exists a'; exists (Cons o3 b').
 destruct b1.
 inversion H7.
-intuition (subst; clear H2 H4 H6 H9 H1 H3 H11 H10 result2 result1 result3 result4).
+intuition (subst; clear H2 H4 H6 H9 H1 H3 H11 H10 result o o1 o2).
 rewrite h2.
 rewrite reverse_append. auto.
 apply Shuffle_cons_right; auto.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

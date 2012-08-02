@@ -31,15 +31,15 @@ module Spec
   (* we introduce two predicates:
      - [numeq a v l u] is the number of values in a[l..u[ equal to v
      - [numlt a v l u] is the number of values in a[l..u[ less than v *)
-  type param = (M.map int int, int)
+  type param = (array int, int)
 
-  predicate eq (p: param) (i: int) = let (a,v) = p in M.get a i = v
+  predicate eq (p: param) (i: int) = let (a,v) = p in a[i] = v
   clone int.NumOfParam as Neq with type param = param, predicate pr = eq
-  function numeq (a: array int) (v i j : int) : int = Neq.num_of (a.elts, v) i j
+  function numeq (a: array int) (v i j : int) : int = Neq.num_of (a, v) i j
 
-  predicate lt (p: param) (i: int) = let (a,v) = p in M.get a i < v
+  predicate lt (p: param) (i: int) = let (a,v) = p in a[i] < v
   clone int.NumOfParam as Nlt with type param = param, predicate pr = lt
-  function numlt (a: array int) (v i j : int) : int = Nlt.num_of (a.elts, v) i j
+  function numlt (a: array int) (v i j : int) : int = Nlt.num_of (a, v) i j
 
   (* an ovious lemma relates numeq and numlt *)
   lemma eqlt:

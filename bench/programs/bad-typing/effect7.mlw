@@ -1,8 +1,16 @@
+module Bad
 
-module M
+  use import int.Int
+  use import ref.Ref
 
-  type t = {| mutable a : int; mutable b : int |}
+  let f (x y : ref int) : unit =
+  { !x = !y }
+    x := !x + 1
+  { !x = !y + 1 }
 
-  val f : x:t -> {} unit writes x {}
+  let g () : unit =
+    let r = ref 0 in
+    f r r;
+    absurd
 
 end

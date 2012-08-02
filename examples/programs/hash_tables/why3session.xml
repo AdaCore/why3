@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
  name="examples/programs/hash_tables/why3session.xml" shape_version="2">
  <prover
@@ -35,14 +35,14 @@
   verified="true"
   expanded="true">
   <theory
-   name="WP HashTable"
+   name="HashTable"
    locfile="examples/programs/hash_tables/../hash_tables.mlw"
    loclnum="10" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
   </theory>
   <theory
-   name="WP HashTableImpl"
+   name="HashTableImpl"
    locfile="examples/programs/hash_tables/../hash_tables.mlw"
    loclnum="41" loccnumb="7" loccnume="20"
    verified="true"
@@ -51,9 +51,9 @@
     name="mem_occurs_first"
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="68" loccnumb="8" loccnume="24"
-    sum="8877339accd60b88826efe1680824c5c"
+    sum="9ca57dcc31f50a84637e7ac8ed4eebd6"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="amemaTuple2V0V1V2Iaoccurs_firstV0V1V2F">
     <proof
      prover="4"
@@ -62,16 +62,16 @@
      edited="hash_tables_WP_HashTableImpl_mem_occurs_first_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.58"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
    <goal
     name="cons_occurs_first"
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="72" loccnumb="8" loccnume="25"
-    sum="bfb8b9d44f3164146df0c2c4eba8e82f"
+    sum="11c2a98e60741f3eb574fa15759e54a6"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="aoccurs_firstV0V1aConsaTuple2V3V4V2Iainfix =V3V0NFIaoccurs_firstV0V1V2F">
     <proof
      prover="5"
@@ -118,9 +118,9 @@
     name="idx_bounds"
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="86" loccnumb="8" loccnume="18"
-    sum="f0226fa4275508a5bae7ec9efa6be522"
+    sum="5c672c5ea8b793da194d0312a97b1c09"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;aidxV0V1alengthadataV0Aainfix &lt;=c0aidxV0V1FIavalidV0F">
     <proof
      prover="5"
@@ -176,9 +176,9 @@
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="89" loccnumb="6" loccnume="12"
     expl="parameter create"
-    sum="67d699e15ed7eef115e6366f61d9befa"
+    sum="74df1111abfaf4e4a1642f625fa51729"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =agetaconstaNoneV1aNoneFAavalidamk taconstaNoneamk arrayV0aconstaNilAainfix &gt;=V0c0Iainfix &lt;c0V0F">
     <label
      name="expl:parameter create"/>
@@ -204,25 +204,25 @@
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="95" loccnumb="6" loccnume="11"
     expl="parameter clear"
-    sum="b8293fb0af655ea500be6393fa0ee3ea"
+    sum="cc00021a710b90acd5594c2793ab5427"
     proved="true"
-    expanded="false"
-    shape="ainfix =agetV4V5aNoneFAavalidamk tV4amk arrayV0V3Iainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix &lt;=c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +c0V0V7Oainfix &lt;V7c0Aainfix &lt;=c0V7FFAainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FFF">
+    expanded="true"
+    shape="ainfix =agetV4V5aNoneFAavalidamk tV4amk arrayV0V3Iainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix &lt;=c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +c0V0V7Oainfix &lt;V7c0Aainfix &lt;=c0V7FFAainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FF">
     <label
      name="expl:parameter clear"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter clear.1"
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="95" loccnumb="6" loccnume="11"
       expl="precondition"
-      sum="42c9d0f28eb79dff81c195e1079a3b26"
+      sum="10d5b8d3e6f005a86b7831c20acb694d"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FFF">
+      expanded="true"
+      shape="ainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FF">
       <label
        name="expl:parameter clear"/>
       <proof
@@ -247,7 +247,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="3"
@@ -279,40 +279,40 @@
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="95" loccnumb="6" loccnume="11"
       expl="normal postcondition"
-      sum="b087f3b923ce9751f663295c85a7188e"
+      sum="5c7b5f97b0aed0882d7992b850eb2410"
       proved="true"
-      expanded="false"
-      shape="ainfix =agetV4V5aNoneFAavalidamk tV4amk arrayV0V3Iainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix &lt;=c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +c0V0V7Oainfix &lt;V7c0Aainfix &lt;=c0V7FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FFF">
+      expanded="true"
+      shape="ainfix =agetV4V5aNoneFAavalidamk tV4amk arrayV0V3Iainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix &lt;=c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +c0V0V7Oainfix &lt;V7c0Aainfix &lt;=c0V7FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FF">
       <label
        name="expl:parameter clear"/>
       <transf
        name="inline_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter clear.2.1"
         locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="95" loccnumb="6" loccnume="11"
         expl="normal postcondition"
-        sum="f69455c4bc9132de4fa8a638f80b2f66"
+        sum="fd42950be990fb265a95bb3319f5e4c6"
         proved="true"
-        expanded="false"
-        shape="ainfix =agetV4V5aNoneFAainfix =V8aidxamk tV4amk arrayV0V3V6IamemaTuple2V6V7amixfix []adataamk tV4amk arrayV0V3V8Iainfix &lt;V8alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V8FFAaoccurs_firstV9V10amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V9qainfix =agetamk tV4amk arrayV0V3V9aSomeV10FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0Iainfix =V4aconstaNoneFIainfix =agetV3V11aNilIainfix &lt;V11ainfix +c0V0Aainfix =c0V11Oainfix &lt;c0V11FAainfix =agetV3V12agetV1V12Iainfix &lt;V12V0Aainfix =ainfix +c0V0V12Oainfix &lt;ainfix +c0V0V12Oainfix &lt;V12c0Aainfix =c0V12Oainfix &lt;c0V12FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V15aidxamk tV2amk arrayV0V1V13IamemaTuple2V13V14amixfix []adataamk tV2amk arrayV0V1V15Iainfix &lt;V15alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V15FFAaoccurs_firstV16V17amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V16qainfix =agetamk tV2amk arrayV0V1V16aSomeV17FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FFF">
+        expanded="true"
+        shape="ainfix =agetV4V5aNoneFAainfix =V8aidxamk tV4amk arrayV0V3V6IamemaTuple2V6V7amixfix []adataamk tV4amk arrayV0V3V8Iainfix &lt;V8alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V8FFAaoccurs_firstV9V10amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V9qainfix =agetamk tV4amk arrayV0V3V9aSomeV10FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0Iainfix =V4aconstaNoneFIainfix =agetV3V11aNilIainfix &lt;V11ainfix +c0V0Aainfix =c0V11Oainfix &lt;c0V11FAainfix =agetV3V12agetV1V12Iainfix &lt;V12V0Aainfix =ainfix +c0V0V12Oainfix &lt;ainfix +c0V0V12Oainfix &lt;V12c0Aainfix =c0V12Oainfix &lt;c0V12FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V15aidxamk tV2amk arrayV0V1V13IamemaTuple2V13V14amixfix []adataamk tV2amk arrayV0V1V15Iainfix &lt;V15alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V15FFAaoccurs_firstV16V17amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V16qainfix =agetamk tV2amk arrayV0V1V16aSomeV17FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
         <label
          name="expl:parameter clear"/>
         <transf
          name="split_goal"
          proved="true"
-         expanded="false">
+         expanded="true">
          <goal
           name="WP_parameter clear.2.1.1"
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
-          sum="34039b3d034762636d45b6fbd30527a0"
+          sum="b85dba0d1323e230e952f602db7a5b28"
           proved="true"
-          expanded="false"
-          shape="ainfix &gt;alengthadataamk tV4amk arrayV0V3c0Iainfix =V4aconstaNoneFIainfix =agetV3V5aNilIainfix &lt;V5ainfix +c0V0Aainfix =c0V5Oainfix &lt;c0V5FAainfix =agetV3V6agetV1V6Iainfix &lt;V6V0Aainfix =ainfix +c0V0V6Oainfix &lt;ainfix +c0V0V6Oainfix &lt;V6c0Aainfix =c0V6Oainfix &lt;c0V6FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V9aidxamk tV2amk arrayV0V1V7IamemaTuple2V7V8amixfix []adataamk tV2amk arrayV0V1V9Iainfix &lt;V9alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V9FFAaoccurs_firstV10V11amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V10qainfix =agetamk tV2amk arrayV0V1V10aSomeV11FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FFF">
+          expanded="true"
+          shape="ainfix &gt;alengthadataamk tV4amk arrayV0V3c0Iainfix =V4aconstaNoneFIainfix =agetV3V5aNilIainfix &lt;V5ainfix +c0V0Aainfix =c0V5Oainfix &lt;c0V5FAainfix =agetV3V6agetV1V6Iainfix &lt;V6V0Aainfix =ainfix +c0V0V6Oainfix &lt;ainfix +c0V0V6Oainfix &lt;V6c0Aainfix =c0V6Oainfix &lt;c0V6FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V9aidxamk tV2amk arrayV0V1V7IamemaTuple2V7V8amixfix []adataamk tV2amk arrayV0V1V9Iainfix &lt;V9alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V9FFAaoccurs_firstV10V11amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V10qainfix =agetamk tV2amk arrayV0V1V10aSomeV11FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
           <label
            name="expl:parameter clear"/>
           <proof
@@ -321,7 +321,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.03"/>
+           <result status="valid" time="0.02"/>
           </proof>
           <proof
            prover="2"
@@ -369,10 +369,10 @@
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
-          sum="a2c3cf6d9093166bb3242a7760d2278b"
+          sum="5d30e3aed0ebe96566cd64b093fb247b"
           proved="true"
-          expanded="false"
-          shape="aoccurs_firstV5V6amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V5Iainfix =agetamk tV4amk arrayV0V3V5aSomeV6FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix =ainfix +c0V0V8Oainfix &lt;ainfix +c0V0V8Oainfix &lt;V8c0Aainfix =c0V8Oainfix &lt;c0V8FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V11aidxamk tV2amk arrayV0V1V9IamemaTuple2V9V10amixfix []adataamk tV2amk arrayV0V1V11Iainfix &lt;V11alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V11FFAaoccurs_firstV12V13amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V12qainfix =agetamk tV2amk arrayV0V1V12aSomeV13FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FFF">
+          expanded="true"
+          shape="aoccurs_firstV5V6amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V5Iainfix =agetamk tV4amk arrayV0V3V5aSomeV6FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix =ainfix +c0V0V8Oainfix &lt;ainfix +c0V0V8Oainfix &lt;V8c0Aainfix =c0V8Oainfix &lt;c0V8FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V11aidxamk tV2amk arrayV0V1V9IamemaTuple2V9V10amixfix []adataamk tV2amk arrayV0V1V11Iainfix &lt;V11alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V11FFAaoccurs_firstV12V13amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V12qainfix =agetamk tV2amk arrayV0V1V12aSomeV13FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
           <label
            name="expl:parameter clear"/>
           <proof
@@ -385,11 +385,11 @@
           </proof>
           <proof
            prover="0"
-           timelimit="5"
+           timelimit="6"
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="2.51"/>
+           <result status="valid" time="2.64"/>
           </proof>
           <proof
            prover="2"
@@ -413,15 +413,15 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.02"/>
+           <result status="valid" time="0.03"/>
           </proof>
           <proof
            prover="1"
-           timelimit="5"
+           timelimit="6"
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="2.52"/>
+           <result status="valid" time="2.47"/>
           </proof>
          </goal>
          <goal
@@ -429,10 +429,10 @@
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
-          sum="ff5fe42741dac92977c300c17c5570c3"
+          sum="48b4001878e979d8cacea0e00bf53003"
           proved="true"
-          expanded="false"
-          shape="ainfix =agetamk tV4amk arrayV0V3V5aSomeV6Iaoccurs_firstV5V6amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V5FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix =ainfix +c0V0V8Oainfix &lt;ainfix +c0V0V8Oainfix &lt;V8c0Aainfix =c0V8Oainfix &lt;c0V8FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V11aidxamk tV2amk arrayV0V1V9IamemaTuple2V9V10amixfix []adataamk tV2amk arrayV0V1V11Iainfix &lt;V11alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V11FFAaoccurs_firstV12V13amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V12qainfix =agetamk tV2amk arrayV0V1V12aSomeV13FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FFF">
+          expanded="true"
+          shape="ainfix =agetamk tV4amk arrayV0V3V5aSomeV6Iaoccurs_firstV5V6amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V5FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix =ainfix +c0V0V8Oainfix &lt;ainfix +c0V0V8Oainfix &lt;V8c0Aainfix =c0V8Oainfix &lt;c0V8FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V11aidxamk tV2amk arrayV0V1V9IamemaTuple2V9V10amixfix []adataamk tV2amk arrayV0V1V11Iainfix &lt;V11alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V11FFAaoccurs_firstV12V13amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V12qainfix =agetamk tV2amk arrayV0V1V12aSomeV13FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
           <label
            name="expl:parameter clear"/>
           <proof
@@ -449,7 +449,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.09"/>
+           <result status="valid" time="0.10"/>
           </proof>
           <proof
            prover="0"
@@ -457,7 +457,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.70"/>
+           <result status="valid" time="0.71"/>
           </proof>
           <proof
            prover="3"
@@ -465,7 +465,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.10"/>
+           <result status="valid" time="0.11"/>
           </proof>
           <proof
            prover="6"
@@ -473,7 +473,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.04"/>
+           <result status="valid" time="0.03"/>
           </proof>
           <proof
            prover="1"
@@ -481,7 +481,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.65"/>
+           <result status="valid" time="0.67"/>
           </proof>
          </goal>
          <goal
@@ -489,10 +489,10 @@
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
-          sum="93e243e2597e4bce81ee2f672cb9f19d"
+          sum="ef3d583144a6b53063269b280d3118f8"
           proved="true"
-          expanded="false"
-          shape="ainfix =V7aidxamk tV4amk arrayV0V3V5IamemaTuple2V5V6amixfix []adataamk tV4amk arrayV0V3V7Iainfix &lt;V7alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V7FFIainfix =V4aconstaNoneFIainfix =agetV3V8aNilIainfix &lt;V8ainfix +c0V0Aainfix =c0V8Oainfix &lt;c0V8FAainfix =agetV3V9agetV1V9Iainfix &lt;V9V0Aainfix =ainfix +c0V0V9Oainfix &lt;ainfix +c0V0V9Oainfix &lt;V9c0Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V12aidxamk tV2amk arrayV0V1V10IamemaTuple2V10V11amixfix []adataamk tV2amk arrayV0V1V12Iainfix &lt;V12alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V13qainfix =agetamk tV2amk arrayV0V1V13aSomeV14FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FFF">
+          expanded="true"
+          shape="ainfix =V7aidxamk tV4amk arrayV0V3V5IamemaTuple2V5V6amixfix []adataamk tV4amk arrayV0V3V7Iainfix &lt;V7alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V7FFIainfix =V4aconstaNoneFIainfix =agetV3V8aNilIainfix &lt;V8ainfix +c0V0Aainfix =c0V8Oainfix &lt;c0V8FAainfix =agetV3V9agetV1V9Iainfix &lt;V9V0Aainfix =ainfix +c0V0V9Oainfix &lt;ainfix +c0V0V9Oainfix &lt;V9c0Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V12aidxamk tV2amk arrayV0V1V10IamemaTuple2V10V11amixfix []adataamk tV2amk arrayV0V1V12Iainfix &lt;V12alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V13qainfix =agetamk tV2amk arrayV0V1V13aSomeV14FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
           <label
            name="expl:parameter clear"/>
           <proof
@@ -501,7 +501,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.04"/>
+           <result status="valid" time="0.03"/>
           </proof>
           <proof
            prover="2"
@@ -517,7 +517,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.78"/>
+           <result status="valid" time="0.77"/>
           </proof>
           <proof
            prover="3"
@@ -533,7 +533,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.03"/>
+           <result status="valid" time="0.04"/>
           </proof>
           <proof
            prover="1"
@@ -541,7 +541,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.75"/>
+           <result status="valid" time="0.76"/>
           </proof>
          </goal>
          <goal
@@ -549,10 +549,10 @@
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="95" loccnumb="6" loccnume="11"
           expl="parameter clear"
-          sum="41b2cd35b813d67000310faae971e1a6"
+          sum="379a3c59b531e6f505591bfd9c5a4fd7"
           proved="true"
-          expanded="false"
-          shape="ainfix =agetV4V5aNoneFIainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix =c0V6Oainfix &lt;c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix =ainfix +c0V0V7Oainfix &lt;ainfix +c0V0V7Oainfix &lt;V7c0Aainfix =c0V7Oainfix &lt;c0V7FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V10aidxamk tV2amk arrayV0V1V8IamemaTuple2V8V9amixfix []adataamk tV2amk arrayV0V1V10Iainfix &lt;V10alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V11qainfix =agetamk tV2amk arrayV0V1V11aSomeV12FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FFF">
+          expanded="true"
+          shape="ainfix =agetV4V5aNoneFIainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix =c0V6Oainfix &lt;c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix =ainfix +c0V0V7Oainfix &lt;ainfix +c0V0V7Oainfix &lt;V7c0Aainfix =c0V7Oainfix &lt;c0V7FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V10aidxamk tV2amk arrayV0V1V8IamemaTuple2V8V9amixfix []adataamk tV2amk arrayV0V1V10Iainfix &lt;V10alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V11qainfix =agetamk tV2amk arrayV0V1V11aSomeV12FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
           <label
            name="expl:parameter clear"/>
           <proof
@@ -615,10 +615,10 @@
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="101" loccnumb="6" loccnume="9"
     expl="normal postcondition"
-    sum="a36201ace30447a7225f7b79c70f6fc1"
+    sum="7699e4be73d7fe90e820d8934811cacc"
     proved="true"
-    expanded="false"
-    shape="ainfix =amodaabsahashV1V0amodaabsahashV1V0FF">
+    expanded="true"
+    shape="ainfix =amodaabsahashV1V0amodaabsahashV1V0F">
     <label
      name="expl:parameter idx"/>
     <proof
@@ -635,7 +635,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="0"
@@ -643,7 +643,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -675,25 +675,25 @@
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="106" loccnumb="6" loccnume="9"
     expl="parameter add"
-    sum="3f7915905c0c96f6613c794f552cdf66"
+    sum="66fa70e36ae48a56b748cd06aa94d8a7"
     proved="true"
-    expanded="false"
-    shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+    expanded="true"
+    shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
     <label
      name="expl:parameter add"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter add.1"
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="106" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="4b8c12ff443b7152c7b5b7a816549c41"
+      sum="3ab5ea212c99d85e8c45531e92faee9c"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+      expanded="true"
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
       <label
        name="expl:parameter add"/>
       <proof
@@ -710,7 +710,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="0"
@@ -718,7 +718,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.11"/>
       </proof>
       <proof
        prover="3"
@@ -750,10 +750,10 @@
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="106" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="4b032453f3958787947d6997fd9045b8"
+      sum="201c2a1444fe9ee50fec22ec0ca21289"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+      expanded="true"
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
       <label
        name="expl:parameter add"/>
       <proof
@@ -778,7 +778,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="3"
@@ -810,55 +810,55 @@
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="106" loccnumb="6" loccnume="9"
       expl="normal postcondition"
-      sum="e25b0fcf24f2a4af183b3d7c91a6f992"
+      sum="cf2b5f862674fc0e9c00c6dc38ebb7ed"
       proved="true"
-      expanded="false"
-      shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+      expanded="true"
+      shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
       <label
        name="expl:parameter add"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter add.3.1"
         locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="106" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="3e6ffd6f17e079ed5794bc4b05853480"
+        sum="dda7a6b86f451435e9c1c05ab1e1cfcb"
         proved="true"
-        expanded="false"
-        shape="avalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+        expanded="true"
+        shape="avalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
         <label
          name="expl:parameter add"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="false">
+         expanded="true">
          <goal
           name="WP_parameter add.3.1.1"
           locfile="examples/programs/hash_tables/../hash_tables.mlw"
           loclnum="106" loccnumb="6" loccnume="9"
           expl="parameter add"
-          sum="7e8c6c1eeb99504bdaf7030d87e39907"
+          sum="a717d1d4ca84caba3d1a1ce8425ee559"
           proved="true"
-          expanded="false"
-          shape="ainfix =V10aidxamk tV7amk arrayV0V6V8IamemaTuple2V8V9amixfix []adataamk tV7amk arrayV0V6V10Iainfix &lt;V10alengthadataamk tV7amk arrayV0V6Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V11qainfix =agetamk tV7amk arrayV0V6V11aSomeV12FAainfix &gt;alengthadataamk tV7amk arrayV0V6c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V15aidxamk tV4amk arrayV0V3V13IamemaTuple2V13V14amixfix []adataamk tV4amk arrayV0V3V15Iainfix &lt;V15alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V15FFAaoccurs_firstV16V17amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V16qainfix =agetamk tV4amk arrayV0V3V16aSomeV17FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FFFFF">
+          expanded="true"
+          shape="ainfix =V10aidxamk tV7amk arrayV0V6V8IamemaTuple2V8V9amixfix []adataamk tV7amk arrayV0V6V10Iainfix &lt;V10alengthadataamk tV7amk arrayV0V6Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V11qainfix =agetamk tV7amk arrayV0V6V11aSomeV12FAainfix &gt;alengthadataamk tV7amk arrayV0V6c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V15aidxamk tV4amk arrayV0V3V13IamemaTuple2V13V14amixfix []adataamk tV4amk arrayV0V3V15Iainfix &lt;V15alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V15FFAaoccurs_firstV16V17amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V16qainfix =agetamk tV4amk arrayV0V3V16aSomeV17FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
           <label
            name="expl:parameter add"/>
           <transf
            name="split_goal"
            proved="true"
-           expanded="false">
+           expanded="true">
            <goal
             name="WP_parameter add.3.1.1.1"
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
-            sum="2b97e2cba4ed6d1424601027e5086d04"
+            sum="68ced7e33e77f0a081a863d95e2f6d0b"
             proved="true"
-            expanded="false"
-            shape="ainfix &gt;alengthadataamk tV7amk arrayV0V6c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V10aidxamk tV4amk arrayV0V3V8IamemaTuple2V8V9amixfix []adataamk tV4amk arrayV0V3V10Iainfix &lt;V10alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V11qainfix =agetamk tV4amk arrayV0V3V11aSomeV12FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FFFFF">
+            expanded="true"
+            shape="ainfix &gt;alengthadataamk tV7amk arrayV0V6c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V10aidxamk tV4amk arrayV0V3V8IamemaTuple2V8V9amixfix []adataamk tV4amk arrayV0V3V10Iainfix &lt;V10alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V11qainfix =agetamk tV4amk arrayV0V3V11aSomeV12FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
             <label
              name="expl:parameter add"/>
             <proof
@@ -867,7 +867,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.02"/>
+             <result status="valid" time="0.03"/>
             </proof>
             <proof
              prover="2"
@@ -883,7 +883,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.00"/>
+             <result status="valid" time="0.01"/>
             </proof>
             <proof
              prover="3"
@@ -915,10 +915,10 @@
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
-            sum="d6c5ef232b3c30f9afcec4eb68d25eda"
+            sum="6917dbb72fb22f05b63394daf9df0557"
             proved="true"
-            expanded="false"
-            shape="aoccurs_firstV8V9amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V8Iainfix =agetamk tV7amk arrayV0V6V8aSomeV9FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V12aidxamk tV4amk arrayV0V3V10IamemaTuple2V10V11amixfix []adataamk tV4amk arrayV0V3V12Iainfix &lt;V12alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V13qainfix =agetamk tV4amk arrayV0V3V13aSomeV14FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FFFFF">
+            expanded="true"
+            shape="aoccurs_firstV8V9amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V8Iainfix =agetamk tV7amk arrayV0V6V8aSomeV9FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V12aidxamk tV4amk arrayV0V3V10IamemaTuple2V10V11amixfix []adataamk tV4amk arrayV0V3V12Iainfix &lt;V12alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V13qainfix =agetamk tV4amk arrayV0V3V13aSomeV14FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
             <label
              name="expl:parameter add"/>
             <proof
@@ -927,7 +927,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="4.52"/>
+             <result status="valid" time="4.41"/>
             </proof>
             <proof
              prover="4"
@@ -936,7 +936,7 @@
              edited="hash_tables_WP_HashTableImpl_WP_parameter_add_1.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.69"/>
+             <result status="valid" time="0.71"/>
             </proof>
            </goal>
            <goal
@@ -944,10 +944,10 @@
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
-            sum="8d1e502b5408dd2edb7f1e69270bab59"
+            sum="2490e1ea7a20aee85cf24a27951f7f5a"
             proved="true"
-            expanded="false"
-            shape="ainfix =agetamk tV7amk arrayV0V6V8aSomeV9Iaoccurs_firstV8V9amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V8FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V12aidxamk tV4amk arrayV0V3V10IamemaTuple2V10V11amixfix []adataamk tV4amk arrayV0V3V12Iainfix &lt;V12alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V13qainfix =agetamk tV4amk arrayV0V3V13aSomeV14FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FFFFF">
+            expanded="true"
+            shape="ainfix =agetamk tV7amk arrayV0V6V8aSomeV9Iaoccurs_firstV8V9amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V8FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V12aidxamk tV4amk arrayV0V3V10IamemaTuple2V10V11amixfix []adataamk tV4amk arrayV0V3V12Iainfix &lt;V12alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V13qainfix =agetamk tV4amk arrayV0V3V13aSomeV14FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
             <label
              name="expl:parameter add"/>
             <proof
@@ -956,7 +956,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.82"/>
+             <result status="valid" time="0.84"/>
             </proof>
            </goal>
            <goal
@@ -964,10 +964,10 @@
             locfile="examples/programs/hash_tables/../hash_tables.mlw"
             loclnum="106" loccnumb="6" loccnume="9"
             expl="parameter add"
-            sum="4287ad23dce5baf80b88da6c21aa76b3"
+            sum="ccf8247228932d15920fd49fcce45c22"
             proved="true"
-            expanded="false"
-            shape="ainfix =V10aidxamk tV7amk arrayV0V6V8IamemaTuple2V8V9amixfix []adataamk tV7amk arrayV0V6V10Iainfix &lt;V10alengthadataamk tV7amk arrayV0V6Aainfix &lt;=c0V10FFIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V13aidxamk tV4amk arrayV0V3V11IamemaTuple2V11V12amixfix []adataamk tV4amk arrayV0V3V13Iainfix &lt;V13alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V13FFAaoccurs_firstV14V15amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V14qainfix =agetamk tV4amk arrayV0V3V14aSomeV15FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FFFFF">
+            expanded="true"
+            shape="ainfix =V10aidxamk tV7amk arrayV0V6V8IamemaTuple2V8V9amixfix []adataamk tV7amk arrayV0V6V10Iainfix &lt;V10alengthadataamk tV7amk arrayV0V6Aainfix &lt;=c0V10FFIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V13aidxamk tV4amk arrayV0V3V11IamemaTuple2V11V12amixfix []adataamk tV4amk arrayV0V3V13Iainfix &lt;V13alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V13FFAaoccurs_firstV14V15amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V14qainfix =agetamk tV4amk arrayV0V3V14aSomeV15FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
             <label
              name="expl:parameter add"/>
             <proof
@@ -977,7 +977,7 @@
              edited="hash_tables_WP_HashTableImpl_WP_parameter_add_2.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.69"/>
+             <result status="valid" time="0.66"/>
             </proof>
            </goal>
           </transf>
@@ -989,10 +989,10 @@
         locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="106" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="8c8cf393765af8615f9785b5a934894c"
+        sum="04b5f797cfcf17a7f42900a19a98c3b6"
         proved="true"
-        expanded="false"
-        shape="ainfix =agetV7V1aSomeV2Iavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+        expanded="true"
+        shape="ainfix =agetV7V1aSomeV2Iavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
         <label
          name="expl:parameter add"/>
         <proof
@@ -1049,10 +1049,10 @@
         locfile="examples/programs/hash_tables/../hash_tables.mlw"
         loclnum="106" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="73f9f022c2e3a67fb545dca0d7836071"
+        sum="11bae55fc21a8ecb2be7781735bd8bbb"
         proved="true"
-        expanded="false"
-        shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFIavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FFFFF">
+        expanded="true"
+        shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFIavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
         <label
          name="expl:parameter add"/>
         <proof
@@ -1101,7 +1101,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
@@ -1113,10 +1113,10 @@
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="116" loccnumb="10" loccnume="16"
     expl="parameter lookup"
-    sum="8929a99c2fa2c5e14aa708cc8a040b83"
+    sum="d08c9a44763936bbdbb4e060f1de51fe"
     proved="true"
-    expanded="false"
-    shape="CV1aNilamemaTuple2V0V2V1NFaConsaTuple2VVViainfix =V0V3aoccurs_firstV0V4V1amemaTuple2V0V6V1NFIamemaTuple2V0V7V5NFAaoccurs_firstV0V8V1Iaoccurs_firstV0V8V5FFF">
+    expanded="true"
+    shape="CV1aNilamemaTuple2V0V2V1NFaConsaTuple2VVViainfix =V0V3aoccurs_firstV0V4V1amemaTuple2V0V6V1NFIamemaTuple2V0V7V5NFAaoccurs_firstV0V8V1Iaoccurs_firstV0V8V5FF">
     <label
      name="expl:parameter lookup"/>
     <proof
@@ -1141,25 +1141,25 @@
     locfile="examples/programs/hash_tables/../hash_tables.mlw"
     loclnum="125" loccnumb="6" loccnume="10"
     expl="parameter find"
-    sum="9d9dd856ae1818bade6ab7eefd628ce4"
+    sum="068563a36bb44b1f1e58cfd4c453ffa8"
     proved="true"
-    expanded="false"
-    shape="ainfix =agetV3V1aNoneIamemaTuple2V1V6V5NFAainfix =agetV3V1aSomeV7Iaoccurs_firstV1V7V5FLagetV2V4Aainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
+    expanded="true"
+    shape="ainfix =agetV0V2aNoneIamemaTuple2V2V6V5NFAainfix =agetV0V2aSomeV7Iaoccurs_firstV2V7V5FLagetV3V4Aainfix &lt;V4V1Aainfix &lt;=c0V4LamodaabsahashV2V1Iavalidamk tV0amk arrayV1V3FF">
     <label
      name="expl:parameter find"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter find.1"
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="125" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="acec8c308b397bb0b68ca464b77408a7"
+      sum="930f1ff3ceb1282b4695e6fdd49381cf"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
+      expanded="true"
+      shape="ainfix &lt;V4V1Aainfix &lt;=c0V4LamodaabsahashV2V1Iavalidamk tV0amk arrayV1V3FF">
       <label
        name="expl:parameter find"/>
       <proof
@@ -1192,7 +1192,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="6"
@@ -1208,7 +1208,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal
@@ -1216,10 +1216,10 @@
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="125" loccnumb="6" loccnume="10"
       expl="normal postcondition"
-      sum="0e23bb393105a7a158b4217c92f6db97"
+      sum="43b0111c7a03c329b24e065a9eea995d"
       proved="true"
-      expanded="false"
-      shape="ainfix =agetV3V1aSomeV6Iaoccurs_firstV1V6V5FLagetV2V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
+      expanded="true"
+      shape="ainfix =agetV0V2aSomeV6Iaoccurs_firstV2V6V5FLagetV3V4Iainfix &lt;V4V1Aainfix &lt;=c0V4LamodaabsahashV2V1Iavalidamk tV0amk arrayV1V3FF">
       <label
        name="expl:parameter find"/>
       <proof
@@ -1228,7 +1228,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="6"
@@ -1236,7 +1236,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
@@ -1244,10 +1244,10 @@
       locfile="examples/programs/hash_tables/../hash_tables.mlw"
       loclnum="125" loccnumb="6" loccnume="10"
       expl="exceptional postcondition"
-      sum="b4d169b0edc20648a9db45bfcdc0eb09"
+      sum="f96de5bfec04b5daab1ec4785183abd9"
       proved="true"
-      expanded="false"
-      shape="ainfix =agetV3V1aNoneIamemaTuple2V1V6V5NFIainfix =agetV3V1aSomeV7Iaoccurs_firstV1V7V5FLagetV2V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FFFF">
+      expanded="true"
+      shape="ainfix =agetV0V2aNoneIamemaTuple2V2V6V5NFLagetV3V4Iainfix &lt;V4V1Aainfix &lt;=c0V4LamodaabsahashV2V1Iavalidamk tV0amk arrayV1V3FF">
       <label
        name="expl:parameter find"/>
       <proof
@@ -1257,7 +1257,7 @@
        edited="hash_tables_WP_HashTableImpl_WP_parameter_find_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.59"/>
+       <result status="valid" time="0.54"/>
       </proof>
      </goal>
     </transf>

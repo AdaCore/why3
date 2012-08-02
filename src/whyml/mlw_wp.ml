@@ -30,6 +30,8 @@ open Mlw_ty.T
 open Mlw_expr
 
 let debug = Debug.register_flag "whyml_wp"
+let no_track = Debug.register_flag "wp_no_track"
+let no_eval = Debug.register_flag "wp_no_eval"
 
 (** Marks *)
 
@@ -80,7 +82,7 @@ let to_term t = if t.t_ty = None then mk_t_if t else t
 
 (* any vs in post/xpost is either a pvsymbol or a fresh mark *)
 let vtv_of_vs vs =
-  try (restore_pv vs).pv_vtv with UnboundVar _ -> vtv_mark
+  try (restore_pv vs).pv_vtv with Not_found -> vtv_mark
 
 (* replace every occurrence of [old(t)] with [at(t,'old)] *)
 let rec remove_old f = match f.t_node with
@@ -128,6 +130,7 @@ let expl_post      = Ident.create_label "expl:normal postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
+let expl_inv       = Ident.create_label "expl:type invariant"
 let expl_variant   = Ident.create_label "expl:variant decreases"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
@@ -176,6 +179,8 @@ let wp_forall_post v p f =
     | Some t, p -> wp_let v t (wp_implies p f)
     | _ -> wp_forall [v] (wp_implies p f)
 
+(* regs_of_reads, and therefore regs_of_effect, only take into account
+   reads in program expressions and ignore the variables in specification *)
 let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
@@ -256,11 +261,11 @@ let decrease ?loc env olds varl =
 
 (** Reconstruct pure values after writes *)
 
-let find_constructors env sts ity = match ity.ity_node with
+let find_constructors lkm km sts ity = match ity.ity_node with
   | Itypur (ts,_) ->
       let base = ity_pur ts (List.map ity_var ts.ts_args) in
       let sbs = ity_match ity_subst_empty base ity in
-      let csl = Decl.find_constructors env.pure_known ts in
+      let csl = Decl.find_constructors lkm ts in
       if csl = [] || Sts.mem ts sts then Loc.errorm
         "Cannot update values of type %a" Mlw_pretty.print_ity base;
       let subst ty = ity_full_inst sbs (ity_of_ty ty), None in
@@ -269,7 +274,7 @@ let find_constructors env sts ity = match ity.ity_node with
   | Ityapp (its,_,_) ->
       let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
       let sbs = ity_match ity_subst_empty base ity in
-      let csl = Mlw_decl.find_constructors env.prog_known its in
+      let csl = Mlw_decl.find_constructors km its in
       if csl = [] || Sts.mem its.its_pure sts then Loc.errorm
         "Cannot update values of type %a" Mlw_pretty.print_ity base;
       let subst vtv =
@@ -279,6 +284,17 @@ let find_constructors env sts ity = match ity.ity_node with
       Sts.add its.its_pure sts, List.map cnstr csl
   | Ityvar _ -> assert false
 
+let analyze_var fn_down fn_join lkm km sts vs ity =
+  let sts, csl = find_constructors lkm km sts ity in
+  let branch (cs,ityl) =
+    let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
+    let vars = List.map mk_var ityl in
+    let mk_arg vs (ity, mut) = fn_down sts vs ity mut in
+    let t = fn_join cs (List.map2 mk_arg vars ityl) vs.vs_ty in
+    let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
+    t_close_branch pat t in
+  t_case (t_var vs) (List.map branch csl)
+
 let update_var env mreg vs =
   let rec update sts vs ity mut =
     (* are we a mutable variable? *)
@@ -286,18 +302,8 @@ let update_var env mreg vs =
     let vs = Util.option_apply vs get_vs mut in
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
-    if ity_pure ity || not (Mreg.exists check_reg mreg) then
-      t_var vs
-    else
-      let sts, csl = find_constructors env sts ity in
-      let branch (cs,ityl) =
-        let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
-        let vars = List.map mk_var ityl in
-        let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
-        let mk_arg vs (ity, mut) = update sts vs ity mut in
-        let t = fs_app cs (List.map2 mk_arg vars ityl) vs.vs_ty in
-        t_close_branch pat t in
-      t_case (t_var vs) (List.map branch csl)
+    if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
+    else analyze_var update fs_app env.pure_known env.prog_known sts vs ity
   in
   let vtv = vtv_of_vs vs in
   update Sts.empty vs vtv.vtv_ity vtv.vtv_mut
@@ -366,6 +372,241 @@ let quantify env regs f =
   let f = Mvs.fold update vars (subst_at_now true vv' f) in
   wp_forall (List.rev (Mreg.values mreg)) f
 
+(** Invariants *)
+
+let get_invariant km t =
+  let ty = t_type t in
+  let ts = match ty.ty_node with
+    | Tyapp (ts,_) -> ts
+    | _ -> assert false in
+  let rec find_td = function
+    | (its,_,inv) :: _ when ts_equal ts its.its_pure -> inv
+    | _ :: tdl -> find_td tdl
+    | [] -> assert false in
+  let pd = Mid.find ts.ts_name km in
+  let inv = match pd.Mlw_decl.pd_node with
+    | Mlw_decl.PDdata tdl -> find_td tdl
+    | _ -> assert false in
+  let sbs = Ty.ty_match Mtv.empty (t_type inv) ty in
+  let u, p = open_post (t_ty_subst sbs Mvs.empty inv) in
+  wp_expl expl_inv (t_subst_single u t p)
+
+let ps_inv = Term.create_psymbol (id_fresh "inv")
+  [ty_var (create_tvsymbol (id_fresh "a"))]
+
+let full_invariant lkm km vs ity =
+  let rec update sts vs ity _ =
+    if not (ity_inv ity) then t_true else
+    (* what is our current invariant? *)
+    let f = match ity.ity_node with
+      | Ityapp (its,_,_) when its.its_inv ->
+          if Debug.test_flag no_track
+          then get_invariant km (t_var vs)
+          else ps_app ps_inv [t_var vs]
+      | _ -> t_true in
+    (* what are our sub-invariants? *)
+    let join _ fl _ = wp_ands ~sym:true fl in
+    let g = analyze_var update join lkm km sts vs ity in
+    (* put everything together *)
+    wp_and ~sym:true f g
+  in
+  update Sts.empty vs ity None
+
+(** Value tracking *)
+
+type point = int
+type value = point list Mls.t (* constructor -> field list *)
+
+type state = {
+  st_km   : Mlw_decl.known_map;
+  st_lkm  : Decl.known_map;
+  st_mem  : (point, value) Hashtbl.t;
+  st_next : point ref;
+}
+
+type names = point Mvs.t  (* variable -> point *)
+type condition = lsymbol Mint.t (* point -> constructor *)
+type lesson = condition list Mint.t (* point -> conditions for invariant *)
+
+let empty_state lkm km = {
+  st_km   = km;
+  st_lkm  = lkm;
+  st_mem  = Hashtbl.create 5;
+  st_next = ref 0;
+}
+
+let next_point state =
+  let res = !(state.st_next) in incr state.st_next; res
+
+let make_value state ty =
+  let get_p _ = next_point state in
+  let new_cs cs = List.map get_p cs.ls_args in
+  let add_cs m (cs,_) = Mls.add cs (new_cs cs) m in
+  let csl = match ty.ty_node with
+    | Tyapp (ts,_) -> Decl.find_constructors state.st_lkm ts
+    | _ -> [] in
+  List.fold_left add_cs Mls.empty csl
+
+let match_point state ty p =
+  try Hashtbl.find state.st_mem p with Not_found ->
+  let value = make_value state ty in
+  if not (Mls.is_empty value) then
+    Hashtbl.replace state.st_mem p value;
+  value
+
+let rec open_pattern state names value p pat = match pat.pat_node with
+  | Pwild -> names
+  | Pvar vs -> Mvs.add vs p names
+  | Papp (cs,patl) ->
+      let add_pat names p pat =
+        let value = match_point state pat.pat_ty p in
+        open_pattern state names value p pat in
+      List.fold_left2 add_pat names (Mls.find cs value) patl
+  | Por _ ->
+      let add_vs vs s = Mvs.add vs (next_point state) s in
+      Svs.fold add_vs pat.pat_vars names
+  | Pas (pat,vs) ->
+      open_pattern state (Mvs.add vs p names) value p pat
+
+let rec point_of_term state names t = match t.t_node with
+  | Tvar vs ->
+      Mvs.find vs names
+  | Tapp (ls, tl) ->
+      begin match Mid.find ls.ls_name state.st_lkm with
+        | { Decl.d_node = Decl.Ddata tdl } ->
+            let is_cs (cs,_) = ls_equal ls cs in
+            let is_cs (_,csl) = List.exists is_cs csl in
+            if List.exists is_cs tdl
+            then point_of_constructor state names ls tl
+            else point_of_projection state names ls (List.hd tl)
+        | _ -> next_point state
+      end
+  | Tlet (t1, bt) ->
+      let p1 = point_of_term state names t1 in
+      let v, t2 = t_open_bound bt in
+      let names = Mvs.add v p1 names in
+      point_of_term state names t2
+  | Tcase (t1,[br]) ->
+      let pat, t2 = t_open_branch br in
+      let p1 = point_of_term state names t1 in
+      let value = match_point state pat.pat_ty p1 in
+      let names = open_pattern state names value p1 pat in
+      point_of_term state names t2
+  | Tcase (t1,bl) ->
+      (* we treat here the case of a value update: the value
+         of each branch must be a distinct constructor *)
+      let p = next_point state in
+      let ty = of_option t.t_ty in
+      let p1 = point_of_term state names t1 in
+      let value = match_point state (of_option t1.t_ty) p1 in
+      let branch acc br =
+        let pat, t2 = t_open_branch br in
+        let ls = match t2.t_node with
+          | Tapp (ls,_) -> ls | _ -> raise Exit in
+        let names = open_pattern state names value p1 pat in
+        let p2 = point_of_term state names t2 in
+        let v2 = match_point state ty p2 in
+        Mls.add_new Exit ls (Mls.find_exn Exit ls v2) acc
+      in
+      begin try
+        let value = List.fold_left branch Mls.empty bl in
+        let value = Mls.set_union value (make_value state ty) in
+        Hashtbl.replace state.st_mem p value
+      with Exit -> () end;
+      p
+  | Tconst _ | Tif _ | Teps _ -> next_point state
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> assert false
+
+and point_of_constructor state names ls tl =
+  let p = next_point state in
+  let pl = List.map (point_of_term state names) tl in
+  let value = make_value state (of_option ls.ls_value) in
+  let value = Mls.add ls pl value in
+  Hashtbl.replace state.st_mem p value;
+  p
+
+and point_of_projection state names ls t1 =
+  let ty = of_option t1.t_ty in
+  let csl = match ty.ty_node with
+    | Tyapp (ts,_) -> Decl.find_constructors state.st_lkm ts
+    | _ -> assert false in
+  match csl with
+    | [cs,pjl] ->
+        let p1 = point_of_term state names t1 in
+        let value = match_point state ty p1 in
+        let rec find_p pjl pl = match pjl, pl with
+          | Some pj::_, p::_ when ls_equal ls pj -> p
+          | _::pjl, _::pl -> find_p pjl pl
+          | _ -> assert false in
+        find_p pjl (Mls.find cs value)
+    | _ -> next_point state (* more than one, can't choose *)
+
+let rec track_values state names lesson cond f = match f.t_node with
+  | Tapp (ls, [t1]) when ls_equal ls ps_inv ->
+      let p1 = point_of_term state names t1 in
+      let condl = Mint.find_def [] p1 lesson in
+      let contains c1 c2 = Mint.submap (fun _ -> ls_equal) c2 c1 in
+      if List.exists (contains cond) condl then
+        lesson, t_true
+      else
+        let good c = not (contains c cond) in
+        let condl = List.filter good condl in
+        let l = Mint.add p1 (cond::condl) lesson in
+        l, get_invariant state.st_km t1
+  | Tbinop (Timplies, f1, f2) ->
+      let l, f1 = track_values state names lesson cond f1 in
+      let _, f2 = track_values state names l cond f2 in
+      lesson, t_label_copy f (t_implies_simp f1 f2)
+  | Tbinop (Tand, f1, f2) ->
+      let l, f1 = track_values state names lesson cond f1 in
+      let l, f2 = track_values state names l cond f2 in
+      l, t_label_copy f (t_and_simp f1 f2)
+  | Tif (fc, f1, f2) ->
+      let _, f1 = track_values state names lesson cond f1 in
+      let _, f2 = track_values state names lesson cond f2 in
+      lesson, t_label_copy f (t_if_simp fc f1 f2)
+  | Tcase (t1, bl) ->
+      let p1 = point_of_term state names t1 in
+      let value = match_point state (of_option t1.t_ty) p1 in
+      let is_pat_var = function
+        | { pat_node = Pvar _ } -> true | _ -> false in
+      let branch l br =
+        let pat, f1, cb = t_open_branch_cb br in
+        let learn, cond = match bl, pat.pat_node with
+          | [_], _ -> true, cond (* one branch, can learn *)
+          | _, Papp (cs, pl) when List.for_all is_pat_var pl ->
+              (try true, Mint.add_new Exit p1 cs cond (* can learn *)
+              with Exit -> false, cond) (* contradiction, cannot learn *)
+          | _, _ -> false, cond (* complex pattern, will not learn *)
+        in
+        let names = open_pattern state names value p1 pat in
+        let m, f1 = track_values state names lesson cond f1 in
+        let l = if learn then m else l in
+        l, cb pat f1
+      in
+      let l, bl = Util.map_fold_left branch lesson bl in
+      l, t_label_copy f (t_case t1 bl)
+  | Tlet (t1, bf) ->
+      let p1 = point_of_term state names t1 in
+      let v, f1, cb = t_open_bound_cb bf in
+      let names = Mvs.add v p1 names in
+      let l, f1 = track_values state names lesson cond f1 in
+      l, t_label_copy f (t_let_simp t1 (cb v f1))
+  | Tquant (Tforall, qf) ->
+      let vl, trl, f1, cb = t_open_quant_cb qf in
+      let add_vs s vs = Mvs.add vs (next_point state) s in
+      let names = List.fold_left add_vs names vl in
+      let l, f1 = track_values state names lesson cond f1 in
+      l, t_label_copy f (t_forall_simp (cb vl trl f1))
+  | Tbinop ((Tor|Tiff),_,_) | Tquant (Texists,_)
+  | Tapp _ | Tnot _ | Ttrue | Tfalse -> lesson, f
+  | Tvar _ | Tconst _ | Teps _ -> assert false
+
+let track_values lkm km f =
+  let state = empty_state lkm km in
+  let _, f = track_values state Mvs.empty Mint.empty Mint.empty f in
+  f
+
 (** Weakest preconditions *)
 
 let rec wp_expr env e q xq =
@@ -392,16 +633,25 @@ and wp_desc env e q xq = match e.e_node with
   | Earrow _ ->
       let q = open_unit_post q in
       (* wp_label e *) q (* FIXME? *)
-  | Elet ({ let_sym = lv; let_expr = e1 }, e2) ->
+  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2)
+    when Util.option_eq Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc ->
+    (* we push the label down, past the implicitly inserted "let" *)
+      let w = wp_expr env (e_label_copy e e2) q xq in
+      let q = create_post v.pv_vs w in
+      wp_expr env e1 q xq
+  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
       let w = wp_expr env e2 q xq in
-      let q = match lv with
-        | LetV v -> create_post v.pv_vs w
-        | LetA _ -> create_unit_post w in
+      let q = create_post v.pv_vs w in
       wp_label e (wp_expr env e1 q xq)
-  | Erec (rdl, e) ->
+  | Elet ({ let_sym = LetA _; let_expr = e1 }, e2) ->
+      let w = wp_expr env e2 q xq in
+      let q = create_unit_post w in
+      wp_label e (wp_expr env e1 q xq)
+  | Erec (rdl, e1) ->
       let fr = wp_rec_defn env rdl in
-      let fe = wp_expr env e q xq in
-      wp_and ~sym:true (wp_ands ~sym:true fr) fe
+      let fe = wp_expr env e1 q xq in
+      let fr = wp_ands ~sym:true fr in
+      wp_label e (wp_and ~sym:true fr fe)
   | Eif (e1, e2, e3) ->
       let res = vs_result e1 in
       let test = t_equ (t_var res) t_bool_true in
@@ -580,8 +830,10 @@ and wp_abstract env c_eff c_q c_xq q xq =
   in
   backstep proceed c_q c_xq
 
-and wp_lambda env lr l =
+and wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () in
+  let regs = ps.ps_subst.ity_subst_reg in
+  let regs = Mreg.map (fun _ -> ()) regs in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env = if lr = 0 || l.l_variant = [] then env else
     let lab = t_var lab in
@@ -593,11 +845,10 @@ and wp_lambda env lr l =
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv l.l_xpost) in
   let f = wp_implies l.l_pre (erase_mark lab f) in
-  let f = quantify env (regs_of_effect l.l_expr.e_effect) f in
-  wp_forall args f
+  wp_forall args (quantify env regs f)
 
 and wp_rec_defn env { rec_defn = rdl; rec_letrec = lr } =
-  List.map (fun rd -> wp_lambda env lr rd.fun_lambda) rdl
+  List.map (wp_fun_defn env lr) rdl
 
 (***
 let bool_to_prop env f =
@@ -653,7 +904,7 @@ let rec unabsurd f = match f.t_node with
   | _ ->
       t_map unabsurd f
 
-let add_wp_decl name f uc =
+let add_wp_decl km name f uc =
   (* prepare a proposition symbol *)
   let s = "WP_parameter " ^ name.id_string in
   let lab = Ident.create_label ("expl:parameter " ^ name.id_string) in
@@ -665,9 +916,12 @@ let add_wp_decl name f uc =
   (* let f = bool_to_prop uc f in *)
   let f = unabsurd f in
   (* get a known map with tuples added *)
-  let km = Theory.get_known uc in
+  let lkm = Theory.get_known uc in
+  (* remove redundant invariants *)
+  let f = if Debug.test_flag no_track then f else track_values lkm km f in
   (* simplify f *)
-  let f = Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear km f in
+  let f = if Debug.test_flag no_eval then f else
+    Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkm f in
   (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in
   Theory.add_decl uc d
@@ -693,7 +947,7 @@ let wp_let env km th { let_sym = lv; let_expr = e } =
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
     | LetA ps -> ps.ps_name in
-  add_wp_decl id f th
+  add_wp_decl km id f th
 
 let wp_rec env km th rdl =
   let env = mk_env env km th in
@@ -702,7 +956,7 @@ let wp_rec env km th rdl =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
     let f = wp_forall (Mvs.keys f.t_vars) f in
-    add_wp_decl d.fun_ps.ps_name f th
+    add_wp_decl km d.fun_ps.ps_name f th
   in
   List.fold_left2 add_one th rdl.rec_defn fl
 
