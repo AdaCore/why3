@@ -663,7 +663,7 @@ let eff_full_inst s e =
   let wr = Sreg.union e.eff_writes wr in
   let wr = Sreg.union e.eff_ghostw wr in
   (* read-only regions in e *)
-  let ro = Sreg.diff (Sreg.union e.eff_reads e.eff_ghostr) wr in
+  let ro = Sreg.diff (Mreg.map (Util.const ()) s) wr in
   (* all modified or reset regions are instantiated into distinct regions *)
   let add_affected r acc =
     let r = Mreg.find r s in Sreg.add_new (IllegalAlias r) r acc in
