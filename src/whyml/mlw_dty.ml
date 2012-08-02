@@ -49,21 +49,24 @@ and rvar =
   | Rtvs  of tvsymbol * dity * region Lazy.t
   | Rval  of dreg
 
-let rec ity_of_dity ?(strict=true) = function
-  | Dvar { contents = Dtvs _ } when strict ->
-      Loc.errorm "undefined type variable"
-  | Dvar { contents = Dtvs tv } -> ity_var tv
-  | Dvar { contents = Dval dty } -> ity_of_dity ~strict dty
-  | Duvar tv -> ity_var tv
-  | Dits (its,dl,rl) ->
-      ity_app its (List.map (ity_of_dity ~strict) dl) (List.map reg_of_dreg rl)
-  | Dts (ts,dl) ->
-      ity_pur ts (List.map (ity_of_dity ~strict) dl)
-
-and reg_of_dreg = function
-  | Rreg (r,_) -> r
-  | Rvar { contents = Rtvs (_,_,r) } -> Lazy.force r
-  | Rvar { contents = Rval dreg } -> reg_of_dreg dreg
+let ity_of_dity ?(strict=true) dity =
+  let rec get_ity = function
+    | Dvar { contents = Dtvs _ } when strict ->
+        Loc.errorm "undefined type variable"
+    | Dvar { contents = Dtvs tv } -> ity_var tv
+    | Dvar { contents = Dval dty } -> get_ity dty
+    | Duvar tv -> ity_var tv
+    | Dits (its,dl,rl) ->
+        ity_app its (List.map get_ity dl) (List.map get_reg rl)
+    | Dts (ts,dl) -> ity_pur ts (List.map get_ity dl)
+  and get_reg = function
+    | Rreg (r,_) -> r
+    | Rvar { contents = Rtvs (_,dity,_) } when not strict ->
+        create_region (id_fresh "rho") (get_ity dity)
+    | Rvar { contents = Rtvs (_,_,r) } -> Lazy.force r
+    | Rvar { contents = Rval dreg } -> get_reg dreg
+  in
+  get_ity dity
 
 let create_user_type_variable x =
   Duvar (Typing.create_user_tv x.id)
