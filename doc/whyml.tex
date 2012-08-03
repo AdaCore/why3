@@ -1,4 +1,4 @@
-\chapter{The Why3ML Programming Language}
+\chapter{The WhyML Programming Language}
 \label{chap:whyml}
 
 This chapter describes the \whyml programming language.
@@ -32,15 +32,14 @@ They also provide extra features:
 \end{itemize}
 %
 Programs are contained in files with suffix \verb|.mlw|.
-They are handled by the tool \texttt{why3ml}, which has a command line
-similar to \texttt{why3}. For instance
+They are handled by \texttt{why3}. For instance
 \begin{verbatim}
-  % why3ml myfile.mlw
+  % why3 myfile.mlw
 \end{verbatim}
 will display the verification conditions extracted from modules in
 file \texttt{myfile.mlw}, as a set of corresponding theories, and
 \begin{verbatim}
-  % why3ml -P alt-ergo myfile.mlw
+  % why3 -P alt-ergo myfile.mlw
 \end{verbatim}
 will run the SMT solver Alt-Ergo on these verification conditions.
 Program files are also handled by the GUI tool \texttt{why3ide}.
@@ -178,7 +177,7 @@ end
   \label{fig:MaxAndSum}
 \end{figure}
 We can now proceed to its verification.
-Running \texttt{why3ml}, or better \texttt{why3ide}, on file
+Running \texttt{why3}, or better \texttt{why3ide}, on file
 \verb|max_sum.mlw| will show a single verification condition with name
 \verb|WP_parameter_max_sum|.
 Discharging this verification condition with an automated theorem
