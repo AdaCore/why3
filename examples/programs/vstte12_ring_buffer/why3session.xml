@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="examples/programs/vstte12_ring_buffer/why3session.xml" shape_version="2">
+ name="programs/vstte12_ring_buffer/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +24,13 @@
   expanded="true">
   <theory
    name="RingBuffer"
-   locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+   locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
    loclnum="8" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="sequence_ind_1"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="51" loccnumb="8" loccnume="22"
     sum="c8b5f1b8457d4ba3e003531de1b8fdd7"
     proved="true"
@@ -43,12 +43,12 @@
      edited="vstte12_ring_buffer_WP_RingBuffer_sequence_ind_1_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.98"/>
+     <result status="valid" time="0.93"/>
     </proof>
    </goal>
    <goal
     name="sequence_ind_2"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="57" loccnumb="8" loccnume="22"
     sum="aac13f525443fc68b413b73bfc232ca6"
     proved="true"
@@ -61,12 +61,12 @@
      edited="vstte12_ring_buffer_WP_RingBuffer_sequence_ind_2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.89"/>
+     <result status="valid" time="0.83"/>
     </proof>
    </goal>
    <goal
     name="sequence_invariance"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="63" loccnumb="8" loccnume="27"
     sum="c81fb3ede7e05c10c695e52ca643a9b1"
     proved="true"
@@ -79,18 +79,18 @@
      edited="vstte12_ring_buffer_WP_RingBuffer_sequence_invariance_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.26"/>
+     <result status="valid" time="1.20"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="74" loccnumb="6" loccnume="12"
     expl="parameter create"
-    sum="d6e55b8f9f96d31b463233e3a62435e8"
+    sum="d6bb69288e7829cde5b409c9a885b326"
     proved="true"
     expanded="true"
-    shape="ainfix =asequenceamk bufferc0c0V2aNilAabuffer_invariantamk bufferc0c0V2Lamk arrayV0aconstV1Aainfix &gt;=V0c0Iainfix &gt;V0c0F">
+    shape="ainfix =asequenceamk bufferc0c0V2aNilAainfix =V0V0Aabuffer_invariantamk bufferc0c0V2Lamk arrayV0aconstV1Aainfix &gt;=V0c0Iainfix &gt;V0c0F">
     <label
      name="expl:parameter create"/>
     <proof
@@ -104,13 +104,13 @@
    </goal>
    <goal
     name="WP_parameter length"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="79" loccnumb="6" loccnume="12"
     expl="normal postcondition"
-    sum="670bbb56f03c91e0945efc4d4a42dc91"
+    sum="10662225ecc4acfcd16a8d5edc456221"
     proved="true"
     expanded="true"
-    shape="ainfix =V3V3Iabuffer_invariantamk bufferV0V3amk arrayV1V2FF">
+    shape="ainfix =V2V2Iabuffer_invariantamk bufferV3V2amk arrayV0V1FF">
     <label
      name="expl:parameter length"/>
     <proof
@@ -119,18 +119,18 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter clear"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="84" loccnumb="6" loccnume="11"
     expl="normal postcondition"
-    sum="58b1cc26a788990fe79d80977fd712e0"
+    sum="b27d1b2bfb1cce0d7f8001db4c5ca717"
     proved="true"
     expanded="true"
-    shape="ainfix =asequenceV5aNilAainfix =V4c0Aabuffer_invariantV5Iainfix =V4c0Lamk bufferV0V4amk arrayV1V2FIabuffer_invariantamk bufferV0V3amk arrayV1V2FF">
+    shape="ainfix =asequenceV5aNilAainfix =V4c0Aabuffer_invariantV5Iainfix =V4c0Lamk bufferV3V4amk arrayV0V1FIabuffer_invariantamk bufferV3V2amk arrayV0V1FF">
     <label
      name="expl:parameter clear"/>
     <proof
@@ -139,12 +139,12 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter push"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="89" loccnumb="6" loccnume="10"
     expl="parameter push"
     sum="9e7fbbd29725a1ad2a764beef5b7cc35"
@@ -159,7 +159,7 @@
      expanded="true">
      <goal
       name="WP_parameter push.1"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="89" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="1944f0e3bc28536322271445b452f310"
@@ -179,7 +179,7 @@
      </goal>
      <goal
       name="WP_parameter push.2"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="89" loccnumb="6" loccnume="10"
       expl="normal postcondition"
       sum="c5d52c24a25eb769153d5fb3ac85f4da"
@@ -194,7 +194,7 @@
        expanded="true">
        <goal
         name="WP_parameter push.2.1"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="89" loccnumb="6" loccnume="10"
         expl="parameter push"
         sum="31ce0a68708d7b42d8ec317f74a271c4"
@@ -214,7 +214,7 @@
        </goal>
        <goal
         name="WP_parameter push.2.2"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="89" loccnumb="6" loccnume="10"
         expl="parameter push"
         sum="493a2685411bf0a90492a17ddb50f53a"
@@ -229,12 +229,12 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter push.2.3"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="89" loccnumb="6" loccnume="10"
         expl="parameter push"
         sum="171237dcc44399dedb03a386c8352f63"
@@ -250,7 +250,7 @@
          edited="vstte12_ring_buffer_WP_RingBuffer_WP_parameter_push_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.82"/>
+         <result status="valid" time="0.81"/>
         </proof>
        </goal>
       </transf>
@@ -259,13 +259,13 @@
    </goal>
    <goal
     name="WP_parameter head"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="98" loccnumb="6" loccnume="10"
     expl="parameter head"
-    sum="c9dc0b25cd131abc7b92bdf243ebddee"
+    sum="055bb47e5d4423a31bc2d7ce0a86cc69"
     proved="true"
     expanded="true"
-    shape="CasequenceV4aNilfaConsVwainfix =agetV2V3V5Aainfix &lt;V3V1Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V0c0Lamk bufferV3V0amk arrayV1V2FF">
+    shape="CasequenceV4aNilfaConsVwainfix =agetV1V3V5Aainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
     <label
      name="expl:parameter head"/>
     <transf
@@ -274,13 +274,13 @@
      expanded="true">
      <goal
       name="WP_parameter head.1"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="98" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="d4c2024fd8a0353fe5058fc7d31bc5fd"
+      sum="42141da183ff8284953d5f19b37a033b"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;V3V1Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V0c0Lamk bufferV3V0amk arrayV1V2FF">
+      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
       <label
        name="expl:parameter head"/>
       <proof
@@ -289,18 +289,18 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter head.2"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="98" loccnumb="6" loccnume="10"
       expl="normal postcondition"
-      sum="63090e725659df379168fb6ef0d6e38c"
+      sum="ec820eeee1d56a2ef25fc847043427f6"
       proved="true"
       expanded="true"
-      shape="CasequenceV4aNilfaConsVwainfix =agetV2V3V5Iainfix &lt;V3V1Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V0c0Lamk bufferV3V0amk arrayV1V2FF">
+      shape="CasequenceV4aNilfaConsVwainfix =agetV1V3V5Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
       <label
        name="expl:parameter head"/>
       <proof
@@ -309,14 +309,14 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter pop"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="103" loccnumb="6" loccnume="9"
     expl="parameter pop"
     sum="34f03c90fe626c13f4e82615259a6ac8"
@@ -331,7 +331,7 @@
      expanded="true">
      <goal
       name="WP_parameter pop.1"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="103" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="562f8bf3ab70041da8cb82c0f671836b"
@@ -351,7 +351,7 @@
      </goal>
      <goal
       name="WP_parameter pop.2"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="103" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="ec236ff23c45b792ce48a0fc92f0ebfa"
@@ -366,7 +366,7 @@
        expanded="true">
        <goal
         name="WP_parameter pop.2.1"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="603102f9770f7dd36331bb3d262f9a58"
@@ -386,7 +386,7 @@
        </goal>
        <goal
         name="WP_parameter pop.2.2"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="f6955fc810e9efec8a88e6cd1f790114"
@@ -406,7 +406,7 @@
        </goal>
        <goal
         name="WP_parameter pop.2.3"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="462ea5f4fe7f9e4daa12047b3ee588e5"
@@ -426,7 +426,7 @@
        </goal>
        <goal
         name="WP_parameter pop.2.4"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="dda8049512688dc017a96f2c39175863"
@@ -446,7 +446,7 @@
        </goal>
        <goal
         name="WP_parameter pop.2.5"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="180406dbd877789273b32307a32e22aa"
@@ -468,7 +468,7 @@
      </goal>
      <goal
       name="WP_parameter pop.3"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="103" loccnumb="6" loccnume="9"
       expl="normal postcondition"
       sum="bc735f393f636f27f520f408c57228d2"
@@ -483,7 +483,7 @@
        expanded="true">
        <goal
         name="WP_parameter pop.3.1"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="1973ef3305d41b886ad8586f1f877d00"
@@ -503,7 +503,7 @@
        </goal>
        <goal
         name="WP_parameter pop.3.2"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="b74ec960d63a04079cfe065ea0dcbe6a"
@@ -523,7 +523,7 @@
        </goal>
        <goal
         name="WP_parameter pop.3.3"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="9ffe0e5437e7ca7029b56ad3b80cd9f4"
@@ -543,7 +543,7 @@
        </goal>
        <goal
         name="WP_parameter pop.3.4"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="9032ecbd737b48b900bc158c9db5e723"
@@ -563,7 +563,7 @@
        </goal>
        <goal
         name="WP_parameter pop.3.5"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
         sum="07bf0e74e5c6fdaeb45b1812f5f79273"
@@ -578,7 +578,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
       </transf>
@@ -588,13 +588,13 @@
   </theory>
   <theory
    name="Harness"
-   locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+   locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
    loclnum="117" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter harness"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="122" loccnumb="6" loccnume="13"
     expl="parameter harness"
     sum="3a8e7844a054511edc614bd3cde0cc6d"
@@ -609,7 +609,7 @@
      expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="ab1b41e01e3967d08dc184449f46d8e3"
@@ -629,7 +629,7 @@
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="670cf6f1f9e86238567f6484590be24f"
@@ -649,7 +649,7 @@
      </goal>
      <goal
       name="WP_parameter harness.3"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="6aeb0973fbd6979f2e9c032579b5b8f7"
@@ -669,7 +669,7 @@
      </goal>
      <goal
       name="WP_parameter harness.4"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="c648d155018196762a10bd754a8598b0"
@@ -684,12 +684,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.5"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="e67abcb6f63b205b948a9e62323232d1"
@@ -704,12 +704,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.6"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="6e49a2ff98a68a4e9c523124f7a9ee81"
@@ -724,12 +724,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="4.79"/>
+       <result status="valid" time="3.45"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.7"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="e2b480d994c8707822b968bb3353037a"
@@ -749,7 +749,7 @@
      </goal>
      <goal
       name="WP_parameter harness.8"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="05bb37e1aa7b42e240ddfa2118d01072"
@@ -765,12 +765,12 @@
        edited="vstte12_ring_buffer_WP_Harness_WP_parameter_harness_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.65"/>
+       <result status="valid" time="0.64"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.9"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="8b931dde5aca67ad4c5f811e3a598402"
@@ -793,12 +793,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.10"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="f57776e926e8f64721da14b2a4e54cdf"
@@ -813,14 +813,14 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter harness2"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="132" loccnumb="6" loccnume="14"
     expl="parameter harness2"
     sum="2b0aa08a02d01bc0894abc1d4ae348b8"
@@ -835,7 +835,7 @@
      expanded="true">
      <goal
       name="WP_parameter harness2.1"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="d88a3ea11b8257179552d4f568508dd6"
@@ -855,7 +855,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.2"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="610d3d3c40617dcac88d85ae144c4fed"
@@ -870,7 +870,7 @@
        expanded="true">
        <goal
         name="WP_parameter harness2.2.1"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="132" loccnumb="6" loccnume="14"
         expl="parameter harness2"
         sum="20e91cbdcc8e0a145c06a279c8c9e58e"
@@ -890,7 +890,7 @@
        </goal>
        <goal
         name="WP_parameter harness2.2.2"
-        locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="132" loccnumb="6" loccnume="14"
         expl="parameter harness2"
         sum="dc009b0d6ba3e7f5ea028bb6211b2af5"
@@ -905,14 +905,14 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter harness2.3"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="7af6cc558e7866c9ac332dedbf906b08"
@@ -932,7 +932,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.4"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="c0d63dbcbebbae1b751ef0965c759ecf"
@@ -952,7 +952,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.5"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="0547df2a893582768ca06e75751291a7"
@@ -967,12 +967,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.13"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness2.6"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="a374c0fa6eb95461d073fcfed29b4fc1"
@@ -992,7 +992,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.7"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="5df11d3311bf0fa7162fbac472d5f704"
@@ -1007,12 +1007,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness2.8"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="229766c6ddf5dd926416668386344a33"
@@ -1027,12 +1027,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness2.9"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="8d45b77d749eb33c8296b87c5baa2a62"
@@ -1052,7 +1052,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.10"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="ab37c50ff09e1dea160341706bd156e2"
@@ -1072,7 +1072,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.11"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="74222210a347894c5b553a526fe71ba0"
@@ -1092,7 +1092,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.12"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="150223c37bc41fcf337c88694ee1466c"
@@ -1107,12 +1107,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness2.13"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="d3c4411484902bc4ed3129c34d84cace"
@@ -1132,7 +1132,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.14"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="3848b986327e3cc89e9428e2ceda3cc5"
@@ -1147,12 +1147,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.15"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness2.15"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="eea5c398c5311748c6f0e122cc9c4021"
@@ -1167,12 +1167,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.13"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness2.16"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="fa8d7932c6fe127a25713d78aeef1b83"
@@ -1192,7 +1192,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.17"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="0fa8930decbaa32e3c637067684a94f1"
@@ -1212,7 +1212,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.18"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="3a45139ee94d35a40865a76fb596bb88"
@@ -1232,7 +1232,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.19"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
       sum="3e4452aec41e307295415e157aea8cc1"
@@ -1252,7 +1252,7 @@
      </goal>
      <goal
       name="WP_parameter harness2.20"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
       sum="8bfada42766b729051045d9a96326f69"
@@ -1267,14 +1267,14 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.20"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter test"
-    locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+    locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="153" loccnumb="6" loccnume="10"
     expl="parameter test"
     sum="7f53321b8db1e8b686b7aef6d48179f2"
@@ -1289,7 +1289,7 @@
      expanded="true">
      <goal
       name="WP_parameter test.1"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="3b712990d644c909da4f9074798d9929"
@@ -1309,7 +1309,7 @@
      </goal>
      <goal
       name="WP_parameter test.2"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="bcb43b28882ba360921c57d398f4ae56"
@@ -1329,7 +1329,7 @@
      </goal>
      <goal
       name="WP_parameter test.3"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="c6fc2865ba687879a23b7cfd53a2ecfe"
@@ -1349,7 +1349,7 @@
      </goal>
      <goal
       name="WP_parameter test.4"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="2001876a3e3dab2063058d00b44ce44b"
@@ -1364,12 +1364,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.40"/>
+       <result status="valid" time="1.34"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test.5"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="94c7530c94e4678dc55bfe643035c49d"
@@ -1389,7 +1389,7 @@
      </goal>
      <goal
       name="WP_parameter test.6"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="29298c70d9ed8b90da5156a932dfa587"
@@ -1404,12 +1404,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test.7"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="c886b2c0b845aab37c429b02540db128"
@@ -1429,7 +1429,7 @@
      </goal>
      <goal
       name="WP_parameter test.8"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="4e39711142e66ec40bb4cd5e30cf79d8"
@@ -1449,7 +1449,7 @@
      </goal>
      <goal
       name="WP_parameter test.9"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="2ef5f8aedc1884ec581c467744fc063f"
@@ -1464,12 +1464,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.48"/>
+       <result status="valid" time="0.46"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test.10"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="160eff4305fe03a8599eb10b307ba562"
@@ -1489,7 +1489,7 @@
      </goal>
      <goal
       name="WP_parameter test.11"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="e5b1369750ba995116154af24a91e8e0"
@@ -1504,12 +1504,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test.12"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="46efaacb2a56353356c1711b7a403ca7"
@@ -1524,7 +1524,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -1532,12 +1532,12 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter test.13"
-      locfile="examples/programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+      locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="b3915687e8afcec2c15f3229a6d88712"
