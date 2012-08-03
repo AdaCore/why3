@@ -546,7 +546,7 @@ let l_pvset pvs lam =
 
 (* check admissibility of consecutive events *)
 
-exception StaleRegion of expr * region * ident
+exception StaleRegion of expr * ident
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
@@ -555,19 +555,10 @@ let check_reset e varm =
      as the result of the resetting expression. Otherwise, this is
      a freshness violation: some symbol defined earlier carries that
      region into the later code. *)
-  let check_reset r u = (* does r occur in varm? *)
-    let check_id id s = (* does r occur among the regions of id? *)
-      let rec check_reg reg =
-        reg_equal r reg || match u with
-          | Some u when reg_equal u reg -> false
-          | _ -> Sreg.exists check_reg reg.reg_ity.ity_vars.vars_reg
-      in
-      if Sreg.exists check_reg s.vars_reg then
-        Loc.error ?loc:e.e_loc (StaleRegion (e,r,id))
-    in
+  let check_id id vars = if eff_stale_region e.e_effect vars then
+    Loc.error ?loc:e.e_loc (StaleRegion (e,id)) in
+  if not (Mreg.is_empty e.e_effect.eff_resets) then
     Mid.iter check_id varm
-  in
-  Mreg.iter check_reset e.e_effect.eff_resets
 
 let check_ghost_write e eff =
   (* If we make a ghost write, then the modified region cannot

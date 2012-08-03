@@ -699,6 +699,15 @@ let eff_filter vars e =
     eff_resets = Mreg.mapi_filter reset e.eff_resets;
   }
 
+let eff_stale_region eff vars =
+  let check_reset r u =
+    let rec check_reg reg =
+      reg_equal r reg || match u with
+        | Some u when reg_equal u reg -> false
+        | _ -> Sreg.exists check_reg reg.reg_ity.ity_vars.vars_reg in
+    Sreg.exists check_reg vars.vars_reg in
+  Mreg.exists check_reset eff.eff_resets
+
 (** specification *)
 
 type pre = term          (* precondition: pre_fmla *)

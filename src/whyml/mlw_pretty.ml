@@ -466,7 +466,7 @@ let () = Exn_printer.register
   | Mlw_expr.GhostRaise (_e, xs) ->
       fprintf fmt "This expression raises a ghost exception %a \
         catched by a non-ghost code" print_xs xs
-  | Mlw_expr.StaleRegion (_e, _reg, id) ->
+  | Mlw_expr.StaleRegion (_e, id) ->
       fprintf fmt "This expression prohibits further \
         usage of variable %s" id.id_string
   | Mlw_expr.ValueExpected _e ->

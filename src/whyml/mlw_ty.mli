@@ -228,6 +228,8 @@ val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
 val eff_remove_raise : effect -> xsymbol -> effect
 
+val eff_stale_region : effect -> varset -> bool
+
 exception IllegalAlias of region
 
 val eff_full_inst : ity_subst -> effect -> effect

@@ -78,6 +78,19 @@ WhyML
     require tedious checks pretty much everywhere in the code,
     and they cannot be translated to OCaml.
 
+  - the following function is verifiable:
+
+      type dref 'a = {| mutable dcontents : ref 'a |}
+
+      let fn (dr : dref int) (r : ref int) =
+      { !r = 0 } dr.dcontents <- r; dr.dcontents := 1 { !r = 0 }
+
+    Strictly speaking, this is benign, since r is reset by the
+    first assignement, and the corresponding reference cannot be
+    used anymore during the program execution. However, it would
+    be nice to forbid the use of reset regions in post-conditions,
+    unless they are put under "old".
+
 syntax
 ------
 

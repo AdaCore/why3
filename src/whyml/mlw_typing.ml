@@ -669,8 +669,10 @@ let env_invariant lenv eff pvs =
     let ity = pv.pv_vtv.vtv_ity in
     let written r = reg_occurs r ity.ity_vars in
     let inv = Mlw_wp.full_invariant lkn kn pv.pv_vs ity in
-    t_and_simp pinv inv,
-    if Sreg.exists written regs then t_and_simp qinv inv else qinv
+    let qinv = (* we reprove invariants for modified non-reset variables *)
+      if Sreg.exists written regs && not (eff_stale_region eff ity.ity_vars)
+      then t_and_simp qinv inv else qinv in
+    t_and_simp pinv inv, qinv
   in
   Spv.fold add_pv pvs (t_true,t_true)
 
