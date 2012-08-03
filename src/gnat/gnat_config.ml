@@ -5,7 +5,7 @@ type report_mode = Fail | Verbose | Detailed
 let gnatprove_why3conf_file = "why3.conf"
 
 let opt_verbose = ref false
-let opt_timeout = ref 10
+let opt_timeout = ref 1
 let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
