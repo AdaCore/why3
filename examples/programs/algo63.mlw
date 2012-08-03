@@ -30,11 +30,12 @@ module Algo63
 
   val random (m n: int) : {} int { m <= result <= n }
 
-  let partition (a: array int) (m n: int) (i j: ref int) =
+  let partition_ (a: array int) (m n: int) (i j: ref int) (ghost ghx: ref int) =
     { 0 <= m < n < length a }
 'Init:
     let f = random m n in
     let x = a[f] in
+    ghx := x;
     i := m;
     j := n;
     let rec up_down () variant { 1 + !j - !i } =
@@ -67,7 +68,15 @@ module Algo63
     if !i < f then begin exchange a m n !i f; incr i end
     else if f < !j then begin exchange a m n f !j; decr j end
     { m <= !j /\ !j < !i /\ !i <= n /\ permut_sub (old a) a m (n+1) /\
-      exists x:int.
+      (forall r:int. m <= r <= !j -> a[r] <= !ghx) /\
+      (forall r:int. !j < r < !i -> a[r] = !ghx) /\
+      (forall r:int. !i <= r <= n -> a[r] >= !ghx) }
+
+  let partition (a: array int) (m n: int) (i j: ref int) =
+    { 0 <= m < n < length a }
+    partition_ a m n i j (ref 0)
+    { m <= !j /\ !j < !i /\ !i <= n /\ permut_sub (old a) a m (n+1) /\
+      exists x: int.
         (forall r:int. m <= r <= !j -> a[r] <= x) /\
         (forall r:int. !j < r < !i -> a[r] = x) /\
         (forall r:int. !i <= r <= n -> a[r] >= x) }
@@ -76,6 +85,6 @@ end
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/algo63.gui"
+compile-command: "why3ide algo63.mlw"
 End:
 *)
