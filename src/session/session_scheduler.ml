@@ -819,7 +819,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
           Ident.id_derive (goal_name ^ "." ^ (string_of_int (!i))) gid in
         let gid = Ident.id_register gid in
         gid,expl,task)
-      tr g subgoals in
+      eS tr g subgoals in
     init_any (Transf ntr);
     Some ntr
   else None

@@ -645,19 +645,14 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
   in
   goal
 
-(* a global variable indicating the shape version to use. It is set
-   when reading the attribute shape_version of an XML file
-*)
-let current_shape_version = ref 0
-
-let raw_add_task ~(keygen:'a keygen) parent name expl t exp =
+let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = keygen ~parent:parent_key () in
-  let sum = Termcode.task_checksum ~version:!current_shape_version t in
-  let shape = Termcode.t_shape_buf ~version:!current_shape_version
+  let sum = Termcode.task_checksum ~version t in
+  let shape = Termcode.t_shape_buf ~version
     (Task.task_goal_fmla t) in
   let goal = { goal_name = name;
                goal_expl = expl;
@@ -1005,11 +1000,11 @@ let set_file_expanded f b =
 
 
 (** raw add_file *)
-let raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
+let raw_add_file ~version ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
   let add_goal parent acc goal =
     let g =
       let name,expl,task = x_goal goal in
-      raw_add_task ~keygen:x_keygen parent name expl task false in
+      raw_add_task ~version ~keygen:x_keygen parent name expl task false in
     g::acc in
   let add_file session f_name fmt file =
     let rfile = raw_add_file ~keygen:x_keygen session f_name fmt false in
@@ -1046,6 +1041,7 @@ module AddFile(X : sig
 end) = (struct
   let add_file session fn ?format f =
     let file = raw_add_file ~x_keygen:X.keygen ~x_goal:X.goal
+      ~version:Termcode.current_shape_version
     ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session
     fn format f in
     check_file_verified notify file;
@@ -1090,7 +1086,8 @@ let add_file ~keygen env ?format filename =
     List.fold_left (fun acc (_,thname,th) -> f acc thname th) acc theories in
   dprintf debug "[Load] file '%s'@\n" filename;
   let file = Filename.concat env.session.session_dir filename in
-  let add_file = raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
+  let add_file = raw_add_file ~version:env.session.session_shape_version
+    ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
   let file = add_file env.session filename format (env.env,file) in
   check_file_verified notify file;
   file
@@ -1115,7 +1112,8 @@ end) = (struct
   let add_goal parent acc goal =
     let name,expl,task = X.goal goal in
     let g =
-      raw_add_task ~keygen:X.keygen parent
+      raw_add_task ~version:Termcode.current_shape_version
+        ~keygen:X.keygen parent
         name expl task false in
     (** no verified since that can't be empty (no proof no transf) and true *)
     g::acc
@@ -1133,12 +1131,13 @@ end : sig
   val add_transformation : X.key goal -> string -> X.transf -> X.key transf
 end)
 
-let add_transformation ~keygen ~goal transfn g goals =
+let add_transformation ~keygen ~goal env_session transfn g goals =
   let rtransf = raw_add_transformation ~keygen g transfn true in
   let parent = Parent_transf rtransf in
   let add_goal acc g =
     let name,expl,task = goal g in
-    let g = raw_add_task ~keygen parent name expl task  false in
+    let g = raw_add_task ~version:env_session.session.session_shape_version
+      ~keygen parent name expl task  false in
     g::acc in
   let goals = List.fold_left add_goal [] goals in
   rtransf.transf_goals <- List.rev goals;
@@ -1168,7 +1167,7 @@ let add_registered_transformation ~keygen env_session tr_name g =
     let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
     goal_name, expl, task
   in
-  add_transformation ~keygen ~goal tr_name g subgoals
+  add_transformation ~keygen ~goal env_session tr_name g subgoals
 
 (*****************************************************)
 (**                    Prover Loaded                **)
@@ -1411,10 +1410,11 @@ and merge_trans ~keygen env to_goal _ from_transf =
   dprintf debug "[Reload] transformation %s for goal %s @\n"
     from_transf_name to_goal_name.Ident.id_string;
   let to_transf =
-    add_registered_transformation ~keygen env from_transf_name to_goal in
+    add_registered_transformation
+      ~keygen env from_transf_name to_goal in
   let associated =
     dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
-      !current_shape_version;
+      env.session.session_shape_version;
     AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
   | (to_goal, Some from_goal, obsolete) ->
@@ -1453,7 +1453,7 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
 
 let merge_file ~keygen env ~allow_obsolete from_f to_f  =
   dprintf debug "[Info] merge_file, shape_version = %d@."
-    !current_shape_version;
+    env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
@@ -1497,15 +1497,15 @@ let recompute_all_shapes_file _ f =
   List.iter recompute_all_shapes_theory f.file_theories
 
 let recompute_all_shapes session =
-  PHstr.iter recompute_all_shapes_file session.session_files;
-  session.session_shape_version <- Termcode.current_shape_version
+  session.session_shape_version <- Termcode.current_shape_version;
+  PHstr.iter recompute_all_shapes_file session.session_files
 
 let update_session ~keygen ~allow_obsolete old_session env whyconf =
-  current_shape_version := old_session.session_shape_version;
   dprintf debug "[Info] update_session: shape_version = %d@\n"
-    !current_shape_version;
+    old_session.session_shape_version;
   let new_session =
-    create_session ~shape_version:!current_shape_version old_session.session_dir
+    create_session ~shape_version:old_session.session_shape_version
+      old_session.session_dir
   in
   let new_env_session =
     { session = new_session;
@@ -1516,7 +1516,8 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
   in
   let obsolete = PHstr.fold (fun _ old_file acc ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-    let new_file = add_file ~keygen new_env_session
+    let new_file = add_file
+      ~keygen new_env_session
       ?format:old_file.file_format old_file.file_name
     in
     merge_file ~keygen new_env_session ~allow_obsolete old_file new_file
@@ -1525,14 +1526,15 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
   in
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
-    if !current_shape_version <> Termcode.current_shape_version then
+    if old_session.session_shape_version <> Termcode.current_shape_version then
       begin
-        current_shape_version := Termcode.current_shape_version;
         dprintf debug "[Info] update_session: recompute shapes@\n";
         recompute_all_shapes new_session;
         true
       end
     else obsolete in
+  assert (new_env_session.session.session_shape_version
+          = Termcode.current_shape_version);
   new_env_session, obsolete
 
 let get_project_dir fname =

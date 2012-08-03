@@ -344,6 +344,7 @@ val copy_external_proof :
 val add_transformation :
   keygen:'key keygen ->
   goal:('goal -> Ident.ident * expl * Task.task) ->
+  'key env_session ->
   string ->
   'key goal ->
   'goal list ->
