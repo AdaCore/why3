@@ -190,36 +190,27 @@ Implicit Arguments first.
 Definition size (a:Type)(b:(buffer a)): Z := (length1 (data b)).
 Implicit Arguments size.
 
-(* Why3 assumption *)
-Definition buffer_invariant (a:Type)(b:(buffer a)): Prop :=
-  ((0%Z <= (first b))%Z /\ ((first b) < (size b))%Z) /\
-  (((0%Z <= (len b))%Z /\ ((len b) <= (size b))%Z) /\
-  (((len b) = (length (sequence b))) /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i < (len b))%Z) -> (((((first b) + i)%Z < (size b))%Z -> ((nth i
-  (sequence b)) = (Some (get1 (data b) ((first b) + i)%Z)))) /\
-  ((0%Z <= (((first b) + i)%Z - (size b))%Z)%Z -> ((nth i
-  (sequence b)) = (Some (get1 (data b)
-  (((first b) + i)%Z - (size b))%Z))))))).
-Implicit Arguments buffer_invariant.
-
 Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
 Theorem WP_parameter_pop : forall (a:Type), forall (b:Z), forall (rho:(list
   a)) (rho1:(map Z a)) (rho2:Z) (rho3:Z), ((0%Z < rho2)%Z /\
-  (buffer_invariant (mk_buffer rho3 rho2 (mk_array b rho1) rho))) ->
+  (((0%Z <= rho3)%Z /\ (rho3 < b)%Z) /\ (((0%Z <= rho2)%Z /\
+  (rho2 <= b)%Z) /\ ((rho2 = (length rho)) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i < rho2)%Z) -> ((((rho3 + i)%Z < b)%Z -> ((nth i rho) = (Some (get rho1
+  (rho3 + i)%Z)))) /\ ((0%Z <= ((rho3 + i)%Z - b)%Z)%Z -> ((nth i
+  rho) = (Some (get rho1 ((rho3 + i)%Z - b)%Z))))))))) ->
   match rho with
   | Nil => True
   | (Cons _ s) => forall (rho4:(list a)), (rho4 = s) -> (((0%Z <= rho3)%Z /\
       (rho3 < b)%Z) -> forall (rho5:Z), (rho5 = (rho2 - 1%Z)%Z) ->
-      forall (rho6:Z), (rho6 = (rho3 + 1%Z)%Z) -> ((rho6 = b) ->
-      forall (rho7:Z), (rho7 = 0%Z) ->
+      forall (rho6:Z), (rho6 = (rho3 + 1%Z)%Z) -> ((~ (rho6 = b)) ->
       match rho with
       | Nil => True
       | (Cons x l) => ((get rho1 rho3) = x)
       end))
   end.
-unfold buffer_invariant. unfold get1; simpl.
+unfold get1; simpl.
 intros a b rho rho1 rho2 rho3 (h1,h2).
 destruct rho; auto.
 intros; subst.
