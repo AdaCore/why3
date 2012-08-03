@@ -837,8 +837,9 @@ and wp_abstract env c_eff c_q c_xq q xq =
 
 and wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () in
-  let regs = ps.ps_subst.ity_subst_reg in
-  let regs = Mreg.map (fun _ -> ()) regs in
+  let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
+  let subst = List.fold_left add_arg ps.ps_subst l.l_args in
+  let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env = if lr = 0 || l.l_variant = [] then env else
     let lab = t_var lab in
