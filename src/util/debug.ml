@@ -102,7 +102,7 @@ module Opt = struct
             flag_table [] in
         let print fmt (p,info,desc) =
           Format.fprintf fmt "@[%s%s@\n  @[%a@]@]"
-            p (if info then "*" else "")
+            p (if info then " *" else "")
             Pp.formatted desc
         in
         Format.printf "@[<hov 2>Known debug flags \
