@@ -33,8 +33,8 @@ open Pgm_types
 open Pgm_types.T
 open Pgm_module
 
-let debug = Debug.register_flag "program_wp"
-  ~desc:"About the way weakest precondition is computed."
+let debug = Debug.register_flag "whyml_wp"
+  ~desc:"Print@ details@ of@ verification@ condition@ generation."
 
 (* mutable fields *)
 

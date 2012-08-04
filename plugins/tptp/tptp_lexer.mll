@@ -256,7 +256,7 @@ and comment_line = parse
     (), Tptp_typing.typecheck env path ast
 
   let library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
-    ~desc:"TFF1 TPTP format."
+    ~desc:"TPTP format (CNF FOF FOFX TFF)"
 }
 
 (*

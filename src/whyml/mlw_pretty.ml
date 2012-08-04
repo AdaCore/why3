@@ -33,11 +33,11 @@ open Mlw_expr
 open Mlw_decl
 
 let debug_print_labels = Debug.register_flag "print_labels"
-  ~desc:"print labels during pretty-printing"
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 let debug_print_locs = Debug.register_flag "print_locs"
-  ~desc:"print locations during pretty-printing"
+  ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 let debug_print_reg_types = Debug.register_flag "print_reg_types"
-  ~desc:"TODO"
+  ~desc:"Print@ types@ of@ regions@ (mutable@ fields)."
 
 let iprinter =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in

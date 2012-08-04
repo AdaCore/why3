@@ -28,9 +28,9 @@ open Pgm_types.T
 open Pgm_ttree
 
 let debug_print_labels = Debug.register_flag "print_labels"
-  ~desc:"Specify to pretty-print the labels in why3ml format."
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 let debug_print_locs = Debug.register_flag "print_locs"
-  ~desc:"Specify to pretty-print the localization in why3ml format."
+  ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
 (* pretty-printing (for debugging) *)
 

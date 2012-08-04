@@ -30,13 +30,13 @@ open Mlw_ty.T
 open Mlw_expr
 
 let debug = Debug.register_flag "whyml_wp"
-  ~desc:"TODO:What is the difference with program_wp?"
+  ~desc:"Print@ details@ of@ verification@ conditions@ generation."
 
-(** Seems to modify the behavior, should use register_stop_flag *)
-let no_track = Debug.register_flag "wp_no_track"
-  ~desc:"TODO"
-let no_eval = Debug.register_flag "wp_no_eval"
-  ~desc:"TODO"
+let no_track = Debug.register_stop_flag "wp_no_track"
+  ~desc:"Do@ not@ remove@ redundant@ type@ invariant@ conditions@ from@ VCs."
+
+let no_eval = Debug.register_stop_flag "wp_no_eval"
+  ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
 (** Marks *)
 

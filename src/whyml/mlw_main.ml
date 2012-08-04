@@ -24,7 +24,7 @@ open Mlw_module
 open Mlw_typing
 
 let debug = Debug.register_flag "print_modules"
-  ~desc:"Print modules after typing."
+  ~desc:"Print@ program@ modules@ after@ typechecking."
 
 let read_channel env path file c =
   let lb = Lexing.from_channel c in
@@ -43,4 +43,4 @@ let read_channel env path file c =
   mm, tm
 
 let library_of_env = Env.register_format "whyml" ["mlw"] read_channel
-  ~desc:"Why3 programs format"
+  ~desc:"WhyML programming language"

@@ -29,10 +29,8 @@ open Typing
 open Ptree
 open Pgm_module
 
-(** TODO: Why is it defined here, it seems to modify the comportement:
-    it calls Pgm_ocaml.extract_module. A stop flag? *)
-let debug_extraction = Debug.register_flag "extraction"
-  ~desc:"TODO"
+let debug_extraction = Debug.register_stop_flag "extraction"
+  ~desc:"for internal use"
 
 exception ClashModule of string
 
@@ -161,14 +159,14 @@ let read_channel =
         one_time_hack := false;
         let genv = Env.env_of_library env in
         Env.register_format "whyml-old-library" ["mlw"] read_channel genv
-          ~desc:"TODO: old version?"
+          ~desc:"for internal use"
       end
       else env
     in
     read_channel env path file c
 
 let library_of_env = Env.register_format "whyml-old" [] read_channel
-  ~desc:"TODO: older version? not really used?"
+  ~desc:"WhyML@ programming@ language@ (obsolete@ implementation)"
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"
