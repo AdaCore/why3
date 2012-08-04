@@ -33,7 +33,7 @@ open Pgm_types
 open Pgm_types.T
 open Pgm_module
 
-let debug = Debug.register_flag "whyml_wp"
+let debug = Debug.register_info_flag "whyml_wp"
   ~desc:"Print@ details@ of@ verification@ condition@ generation."
 
 (* mutable fields *)

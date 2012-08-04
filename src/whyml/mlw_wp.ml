@@ -29,13 +29,13 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
-let debug = Debug.register_flag "whyml_wp"
+let debug = Debug.register_info_flag "whyml_wp"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
 
-let no_track = Debug.register_stop_flag "wp_no_track"
+let no_track = Debug.register_flag "wp_no_track"
   ~desc:"Do@ not@ remove@ redundant@ type@ invariant@ conditions@ from@ VCs."
 
-let no_eval = Debug.register_stop_flag "wp_no_eval"
+let no_eval = Debug.register_flag "wp_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
 (** Marks *)

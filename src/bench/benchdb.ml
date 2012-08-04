@@ -28,7 +28,7 @@ module BenchUtil = Bench.BenchUtil
 let load_driver = Env.Wenv.memoize 2 (fun env ->
   memo_string 10 (Driver.load_driver env))
 
-let debug = Debug.register_flag "benchdb"
+let debug = Debug.register_info_flag "benchdb"
   ~desc:"About the communication from the database"
 
 type path =

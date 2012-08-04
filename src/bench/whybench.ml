@@ -29,7 +29,7 @@ open Trans
 module B = Bench
 module C = Call_provers
 
-let debug = Debug.register_flag "main"
+let debug = Debug.register_info_flag "main"
   ~desc:"About initialization of the bench"
 
 let usage_msg = sprintf

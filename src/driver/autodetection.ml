@@ -55,7 +55,7 @@ open Whyconf
 module Wc = Whyconf
 open Rc
 
-let debug = Debug.register_flag "autodetect"
+let debug = Debug.register_info_flag "autodetect"
   ~desc:"About@ the@ autodetection@ of@ external@ provers."
 
 (* auto-detection of provers *)

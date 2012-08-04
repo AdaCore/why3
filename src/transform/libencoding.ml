@@ -25,7 +25,7 @@ open Term
 open Decl
 open Theory
 
-let debug = Debug.register_flag "encoding"
+let debug = Debug.register_info_flag "encoding"
   ~desc:"About the encoding of polymorphism."
 
 (* meta to tag the protected types *)

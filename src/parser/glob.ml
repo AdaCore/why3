@@ -20,7 +20,7 @@
 
 open Ident
 
-let flag = Debug.register_flag "glob"
+let flag = Debug.register_info_flag "glob"
   ~desc:"TODO, used in parsing?"
 
 let () = Debug.unset_flag flag (* make sure it is unset by default *)

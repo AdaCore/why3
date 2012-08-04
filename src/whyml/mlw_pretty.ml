@@ -32,11 +32,11 @@ open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 
-let debug_print_labels = Debug.register_flag "print_labels"
+let debug_print_labels = Debug.register_info_flag "print_labels"
   ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
-let debug_print_locs = Debug.register_flag "print_locs"
+let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
-let debug_print_reg_types = Debug.register_flag "print_reg_types"
+let debug_print_reg_types = Debug.register_info_flag "print_reg_types"
   ~desc:"Print@ types@ of@ regions@ (mutable@ fields)."
 
 let iprinter =

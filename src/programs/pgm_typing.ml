@@ -34,7 +34,7 @@ open Pgm_types
 open Pgm_types.T
 open Pgm_module
 
-let debug = Debug.register_flag "whyml_typing"
+let debug = Debug.register_info_flag "whyml_typing"
   ~desc:"Print@ details@ of@ program@ typechecking."
 let is_debug () = Debug.test_flag debug
 

@@ -122,7 +122,7 @@ let rec grep out l = match l with
       with Not_found -> grep out l end
 
 
-let debug = Debug.register_flag "call_prover"
+let debug = Debug.register_info_flag "call_prover"
   ~desc:"About@ external@ prover@ calls@ and@ results."
 
 type post_prover_call = unit -> prover_result

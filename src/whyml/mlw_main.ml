@@ -23,7 +23,7 @@ open Util
 open Mlw_module
 open Mlw_typing
 
-let debug = Debug.register_flag "print_modules"
+let debug = Debug.register_info_flag "print_modules"
   ~desc:"Print@ program@ modules@ after@ typechecking."
 
 let read_channel env path file c =

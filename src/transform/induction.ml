@@ -81,10 +81,10 @@ module Mvsl = Stdlib.Map.Make(VsList)
 module Svsl = Mvsl.Set    
 
 (**************************** PRINTING ***************************************)
-let debug = Debug.register_flag "induction"
+let debug = Debug.register_info_flag "induction"
   ~desc:"About@ the@ transformation@ of@ the@ goal@ using@ induction."
 
-let debug_verbose = Debug.register_flag "induction-verbose"
+let debug_verbose = Debug.register_info_flag "induction-verbose"
   ~desc:"Same@ as@ induction, but@ print@ also@ the@ variables, the@ \
          heuristics@ and@ the lexicographic@ order@ used."
 

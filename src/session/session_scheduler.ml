@@ -22,7 +22,7 @@ open Format
 open Session
 open Debug
 
-let debug = register_flag "scheduler"
+let debug = register_info_flag "scheduler"
   ~desc:"About@ the@ session@ scheduler@ which@ schedules@ the@ application@ \
           of@ transformtions@ or@ the@ call@ of@ provers."
 
