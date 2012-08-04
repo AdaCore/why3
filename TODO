@@ -43,16 +43,13 @@ WhyML
     The type cast can then play the role of the "close" instruction.
     Do we need it? What's the good syntax for open types?
 
-  - we check the context type invariants around Eany, but not around
-    Eabstr, which is rather strange. Should Eabstr have preconditions?
-    If not, why should it post-ensure the invariants that didn't
-    necessarily hold before its execution? Probably, we shouldn't
-    add the context invariants to the outer spec of Eany.
+  - we check the context type invariants around Eany and after Eabstr.
+    It might be strange that Eabstr post-ensures the invariants that
+    didn't necessarily hold before its execution. Also, what about
+    return/raise invariants, should Eany and Eabstr enforce them?
+    (at the moment, they do)
 
-  - and what about return/raise invariants, should Eany and Eabstr
-    ensure them? (at the moment, they do)
-
-  - currently every unhandled exception has postcondition "true".
+  - currently every unhandled exception has the postcondition "true".
     "false" would be a poor choice, as it could introduce inconsistency
     in the WPs of the caller. Should we allow unhandled exceptions at all?
 
@@ -77,19 +74,6 @@ WhyML
     mutable fields in algebraic types. On the other hand, they
     require tedious checks pretty much everywhere in the code,
     and they cannot be translated to OCaml.
-
-  - the following function is verifiable:
-
-      type dref 'a = {| mutable dcontents : ref 'a |}
-
-      let fn (dr : dref int) (r : ref int) =
-      { !r = 0 } dr.dcontents <- r; dr.dcontents := 1 { !r = 0 }
-
-    Strictly speaking, this is benign, since r is reset by the
-    first assignement, and the corresponding reference cannot be
-    used anymore during the program execution. However, it would
-    be nice to forbid the use of reset regions in post-conditions,
-    unless they are put under "old".
 
 syntax
 ------

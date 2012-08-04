@@ -1,0 +1,14 @@
+module Bad
+
+  use import int.Int
+  use import ref.Ref
+
+  type dref 'a = {| mutable dcontents : ref 'a |}
+
+  let one (x : dref 'a) (y : ref 'a) =
+  { }
+    x.dcontents <- y;
+    y
+  { !(x.dcontents) = !(old y) }
+
+end

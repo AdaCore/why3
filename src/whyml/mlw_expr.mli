@@ -191,6 +191,7 @@ and lambda = {
 
 val e_pvset : Spv.t -> expr -> Spv.t
 val l_pvset : Spv.t -> lambda -> Spv.t
+val abstr_pvset : Spv.t -> expr -> post -> xpost -> Spv.t
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr

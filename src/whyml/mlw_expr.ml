@@ -544,6 +544,18 @@ let l_pvset pvs lam =
   let pvs = spec_pvset pvs (spec_of_lambda lam 0) in
   List.fold_right Spv.remove lam.l_args pvs
 
+let spec_of_abstract e q xq = {
+  c_pre     = t_true;
+  c_post    = q;
+  c_xpost   = xq;
+  c_effect  = e.e_effect;
+  c_variant = [];
+  c_letrec  = 0; }
+
+let abstr_pvset pvs e q xq =
+  let pvs = e_pvset pvs e in
+  spec_pvset pvs (spec_of_abstract e q xq)
+
 (* check admissibility of consecutive events *)
 
 exception StaleRegion of expr * ident
@@ -953,13 +965,7 @@ let e_any spec vty =
   mk_expr (Eany spec) vty spec.c_effect varm
 
 let e_abstract e q xq =
-  let spec = {
-    c_pre     = t_true;
-    c_post    = q;
-    c_xpost   = xq;
-    c_effect  = e.e_effect;
-    c_variant = [];
-    c_letrec  = 0 } in
+  let spec = spec_of_abstract e q xq in
   spec_check spec e.e_vty;
   let varm = spec_varmap e.e_varm spec in
   mk_expr (Eabstr (e,q,xq)) e.e_vty e.e_effect varm
