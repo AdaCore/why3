@@ -62,8 +62,8 @@ type meta = private {
   meta_name : string;
   meta_type : meta_arg_type list;
   meta_excl : bool;
+  meta_desc : Pp.formatted;
   meta_tag  : int;
-  mutable meta_desc : Pp.formatted;
 }
 
 val print_meta_desc : Pp.formatter -> meta -> unit
@@ -75,16 +75,16 @@ module Hmeta : Hashtbl.S with type key = meta
 val meta_equal : meta -> meta -> bool
 val meta_hash : meta -> int
 
-val register_meta      :
+val register_meta :
   desc:Pp.formatted -> string -> meta_arg_type list -> meta
+
 val register_meta_excl :
   desc:Pp.formatted -> string -> meta_arg_type list -> meta
-(** Register exclusive meta, each new setting remove the previous one.
-Useful for transformation or printer parameters *)
+(** With exclusive metas, each new meta cancels the previous one.
+    Useful for transformation or printer parameters *)
 
 val lookup_meta : string -> meta
 val list_metas  : unit -> meta list
-val set_meta_desc : Pp.formatted -> meta -> unit
 
 (** Theory *)
 

@@ -102,8 +102,8 @@ type meta = {
   meta_name : string;
   meta_type : meta_arg_type list;
   meta_excl : bool;
+  meta_desc : Pp.formatted;
   meta_tag  : int;
-  mutable meta_desc : Pp.formatted;
 }
 
 let print_meta_desc fmt m =
@@ -133,8 +133,8 @@ let mk_meta =
     meta_name = s;
     meta_type = al;
     meta_excl = excl;
-    meta_tag  = (incr c; !c);
     meta_desc = desc;
+    meta_tag  = (incr c; !c);
   }
 
 let register_meta ~desc s al excl =
@@ -155,8 +155,6 @@ let lookup_meta s =
   with Not_found -> raise (UnknownMeta s)
 
 let list_metas () = Hashtbl.fold (fun _ v acc -> v::acc) meta_table []
-
-let set_meta_desc f m = m.meta_desc <- f
 
 (** Theory *)
 
