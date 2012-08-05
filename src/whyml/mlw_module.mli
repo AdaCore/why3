@@ -74,8 +74,14 @@ val close_namespace : module_uc -> bool -> module_uc
 
 val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace
-val get_prefix : module_uc -> string list
 val get_known : module_uc -> known_map
+
+val restore_path : ident -> string list * string * string list
+(* [restore_path id] returns the triple (library path, module,
+   qualified symbol name) if the ident was ever introduced in
+   a module declaration. If the ident was declared in several
+   different modules, the first association is retained.
+   Raises Not_found if the ident was never declared in a module. *)
 
 (** Use and clone *)
 

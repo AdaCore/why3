@@ -296,9 +296,7 @@ let close_theory uc = match uc.uc_export with
   | _ -> raise CloseTheory
 
 let get_namespace uc = List.hd uc.uc_import
-let get_prefix uc = List.rev uc.uc_prefix
 let get_known uc = uc.uc_known
-
 let get_rev_decls uc = uc.uc_decls
 
 let open_namespace uc s = match uc.uc_import with
@@ -353,7 +351,19 @@ let add_tdecl uc td = match td.td_node with
 
 (** Declarations *)
 
+let store_path, restore_path =
+  let id_to_path = Wid.create 17 in
+  let store_path uc path id =
+    (* this symbol already belongs to some theory *)
+    if Wid.mem id_to_path id then () else
+    let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
+    Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix)
+  in
+  let restore_path id = Wid.find id_to_path id in
+  store_path, restore_path
+
 let add_symbol add id v uc =
+  store_path uc [] id;
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = add false id.id_string v i0 :: sti;
@@ -648,17 +658,23 @@ let clone_export uc th inst =
   let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
   let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
 
-  let f_ts ts = Mts.find_def ts ts cl.ts_table in
-  let f_ls ls = Mls.find_def ls ls cl.ls_table in
-  let f_pr pr = Mpr.find_def pr pr cl.pr_table in
+  let f_ts p ts =
+    try let ts = Mts.find ts cl.ts_table in store_path uc p ts.ts_name; ts
+    with Not_found -> ts in
+  let f_ls p ls =
+    try let ls = Mls.find ls cl.ls_table in store_path uc p ls.ls_name; ls
+    with Not_found -> ls in
+  let f_pr p pr =
+    try let pr = Mpr.find pr cl.pr_table in store_path uc p pr.pr_name; pr
+    with Not_found -> pr in
 
-  let rec f_ns ns = {
-    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
-    ns_ls = Mstr.map f_ls (Mstr.filter g_ls ns.ns_ls);
-    ns_pr = Mstr.map f_pr ns.ns_pr;
-    ns_ns = Mstr.map f_ns ns.ns_ns; } in
+  let rec f_ns p ns = {
+    ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.ns_ts);
+    ns_ls = Mstr.map (f_ls p) (Mstr.filter g_ls ns.ns_ls);
+    ns_pr = Mstr.map (f_pr p) ns.ns_pr;
+    ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.ns_ns; } in
 
-  let ns = f_ns th.th_export in
+  let ns = f_ns [] th.th_export in
 
   match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste -> { uc with

@@ -133,10 +133,15 @@ val open_namespace  : theory_uc -> string -> theory_uc
 val close_namespace : theory_uc -> bool (* import *) -> theory_uc
 
 val get_namespace : theory_uc -> namespace
-val get_prefix : theory_uc -> string list
 val get_known : theory_uc -> known_map
-
 val get_rev_decls : theory_uc -> tdecl list
+
+val restore_path : ident -> string list * string * string list
+(* [restore_path id] returns the triple (library path, theory,
+   qualified symbol name) if the ident was ever introduced in
+   a theory declaration. If the ident was declared in several
+   different theories, the first association is retained.
+   Raises Not_found if the ident was never declared in a theory. *)
 
 (** Declaration constructors *)
 
