@@ -40,6 +40,20 @@ theory Mem
 
 end
 
+theory Elements
+
+  use import List
+  use Mem
+  use set.Fset as FSet
+
+  function elements (list 'a) : FSet.set 'a
+
+  axiom elements_mem:
+    forall l:list 'a, x:'a.
+      Mem.mem x l <-> FSet.mem x (elements l)
+
+end
+
 (** {2 Nth element of a list} *)
 
 theory Nth
@@ -340,6 +354,7 @@ theory Induction
     forall l:list elt. p l
 
 end
+
 
 (** {2 Maps as lists of pairs} *)
 

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/cmarche/recherche/why3/share/why3session.dtd">
+<why3session
+ name="alphaBeta/why3session.xml" shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Coq"
+  version="8.3pl3"/>
+ <prover
+  id="2"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../alphaBeta.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="TwoPlayerGame"
+   locfile="alphaBeta/../alphaBeta.mlw"
+   loclnum="2" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+   <goal
+    name="Test"
+    locfile="alphaBeta/../alphaBeta.mlw"
+    loclnum="73" loccnumb="7" loccnume="11"
+    sum="67b40aee2368f16ea7d0587212ff4945"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=aprefix -aposition_valueado_moveV0V1aminmaxV0c1IamemV1V2Lalegal_movesV0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="1000"
+     edited="alphaBeta_TwoPlayerGame_Test_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.83"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="AlphaBeta"
+   locfile="alphaBeta/../alphaBeta.mlw"
+   loclnum="87" loccnumb="7" loccnume="16"
+   verified="false"
+   expanded="true">
+   <goal
+    name="WP_parameter move_value_alpha_beta"
+    locfile="alphaBeta/../alphaBeta.mlw"
+    loclnum="95" loccnumb="10" loccnume="31"
+    expl="normal postcondition"
+    sum="1166f011b7545b1ba75685a11ad22581"
+    proved="true"
+    expanded="true"
+    shape="t">
+    <label
+     name="expl:parameter move_value_alpha_beta"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter negabeta"
+    locfile="alphaBeta/../alphaBeta.mlw"
+    loclnum="104" loccnumb="7" loccnume="15"
+    expl="parameter negabeta"
+    sum="9e6b9bade21340c597985f94c1f3ee3f"
+    proved="false"
+    expanded="true"
+    shape="Calegal_movesV1aNilainfix =aposition_valueV1aminmaxV1ainfix +ainfix -V2V3c1aConsVViainfix &gt;=V6V0ainfix =V6aminmaxV1ainfix +ainfix -V2V3c1ainfix =V7aminmaxV1ainfix +ainfix -V2V3c1FFF">
+    <label
+     name="expl:parameter negabeta"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter negabeta_rec"
+    locfile="alphaBeta/../alphaBeta.mlw"
+    loclnum="118" loccnumb="7" loccnume="19"
+    expl="parameter negabeta_rec"
+    sum="3b961de9787633290d315ec737d261ef"
+    proved="true"
+    expanded="true"
+    shape="CV0aNiltaConsVVtF">
+    <label
+     name="expl:parameter negabeta_rec"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter alpha_beta"
+    locfile="alphaBeta/../alphaBeta.mlw"
+    loclnum="132" loccnumb="4" loccnume="14"
+    expl="normal postcondition"
+    sum="8ba0807b7798457a268d25f5c06f46d0"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aminmaxV0ainfix +ainfix -V1c1c1aminmaxV0V1F">
+    <label
+     name="expl:parameter alpha_beta"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
