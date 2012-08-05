@@ -129,11 +129,11 @@ type theory_uc  (* a theory under construction *)
 val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
 
-val open_namespace  : theory_uc -> theory_uc
-val close_namespace : theory_uc -> bool -> string -> theory_uc
-  (* the Boolean indicates [import]; the string indicates [as T] *)
+val open_namespace  : theory_uc -> string -> theory_uc
+val close_namespace : theory_uc -> bool (* import *) -> theory_uc
 
 val get_namespace : theory_uc -> namespace
+val get_prefix : theory_uc -> string list
 val get_known : theory_uc -> known_map
 
 val get_rev_decls : theory_uc -> tdecl list

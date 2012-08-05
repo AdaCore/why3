@@ -261,6 +261,7 @@ type theory_uc = {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
+  uc_prefix : string list;
   uc_import : namespace list;
   uc_export : namespace list;
   uc_known  : known_map;
@@ -275,6 +276,7 @@ let empty_theory n p = {
   uc_name   = id_register n;
   uc_path   = p;
   uc_decls  = [];
+  uc_prefix = [];
   uc_import = [empty_ns];
   uc_export = [empty_ns];
   uc_known  = Mid.empty;
@@ -294,25 +296,27 @@ let close_theory uc = match uc.uc_export with
   | _ -> raise CloseTheory
 
 let get_namespace uc = List.hd uc.uc_import
+let get_prefix uc = List.rev uc.uc_prefix
 let get_known uc = uc.uc_known
 
 let get_rev_decls uc = uc.uc_decls
 
-let open_namespace uc = match uc.uc_import with
+let open_namespace uc s = match uc.uc_import with
   | ns :: _ -> { uc with
+      uc_prefix =        s :: uc.uc_prefix;
       uc_import =       ns :: uc.uc_import;
       uc_export = empty_ns :: uc.uc_export; }
   | [] -> assert false
 
-let close_namespace uc import s =
-  match uc.uc_import, uc.uc_export with
-  | _ :: i1 :: sti, e0 :: e1 :: ste ->
+let close_namespace uc import =
+  match uc.uc_prefix, uc.uc_import, uc.uc_export with
+  | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
-      { uc with uc_import = i1 :: sti; uc_export = e1 :: ste; }
-  | [_], [_] -> raise NoOpenedNamespace
+      { uc with uc_prefix = prf; uc_import = i1::sti; uc_export = e1::ste; }
+  | [], [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
 (* Base constructors *)
@@ -843,4 +847,3 @@ let () = Exn_printer.register
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | _ -> raise exn
   end
-

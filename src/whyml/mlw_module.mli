@@ -69,11 +69,12 @@ type module_uc (* a module under construction *)
 val create_module : Env.env -> ?path:string list -> preid -> module_uc
 val close_module  : module_uc -> modul
 
-val open_namespace  : module_uc -> module_uc
-val close_namespace : module_uc -> bool -> string -> module_uc
+val open_namespace  : module_uc -> string -> module_uc
+val close_namespace : module_uc -> bool -> module_uc
 
 val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace
+val get_prefix : module_uc -> string list
 val get_known : module_uc -> known_map
 
 (** Use and clone *)

@@ -27,8 +27,8 @@ module Incremental = struct
   let close_theory () = (Stack.top stack).Ptree.close_theory ()
   let open_module id = (Stack.top stack).Ptree.open_module id
   let close_module () = (Stack.top stack).Ptree.close_module ()
-  let open_namespace () = (Stack.top stack).Ptree.open_namespace ()
-  let close_namespace l b n = (Stack.top stack).Ptree.close_namespace l b n
+  let open_namespace n = (Stack.top stack).Ptree.open_namespace n
+  let close_namespace l b = (Stack.top stack).Ptree.close_namespace l b
   let new_decl loc d = (Stack.top stack).Ptree.new_decl loc d
   let new_pdecl loc d = (Stack.top stack).Ptree.new_pdecl loc d
   let use_clone loc use = (Stack.top stack).Ptree.use_clone loc use
@@ -283,12 +283,13 @@ new_decl:
    { Incremental.new_decl (floc ()) $1 }
 | use_clone
    { Incremental.use_clone (floc ()) $1 }
-| namespace_head namespace_import uident list0_decl END
-   { Incremental.close_namespace (floc_ij 1 3) $2 $3.id }
+| namespace_head list0_decl END
+   { Incremental.close_namespace (floc_i 1) $1 }
 ;
 
 namespace_head:
-| NAMESPACE  { Incremental.open_namespace () }
+| NAMESPACE namespace_import uident
+   { Incremental.open_namespace $3.id; $2 }
 ;
 
 namespace_import:

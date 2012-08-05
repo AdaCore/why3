@@ -267,8 +267,8 @@ type incremental = {
   close_theory    : unit -> unit;
   open_module     : ident -> unit;
   close_module    : unit -> unit;
-  open_namespace  : unit -> unit;
-  close_namespace : loc -> bool (*import:*) -> string -> unit;
+  open_namespace  : string -> unit;
+  close_namespace : loc -> bool (*import:*) -> unit;
   new_decl        : loc -> decl -> unit;
   new_pdecl       : loc -> pdecl -> unit;
   use_clone       : loc -> use_clone -> unit;

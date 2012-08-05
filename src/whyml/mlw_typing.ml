@@ -1642,7 +1642,8 @@ let use_clone_pure lib mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
   let th = find_theory loc lib mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp <> None then Theory.open_namespace uc else uc in
+  let uc = if use.use_imp_exp = None then uc
+  else Theory.open_namespace uc use.use_as in
   (* use or clone *)
   let uc = match inst with
     | None -> Theory.use_export uc th
@@ -1650,7 +1651,7 @@ let use_clone_pure lib mth uc loc (use,inst) =
   (* close namespace, if any *)
   match use.use_imp_exp with
     | None -> uc
-    | Some imp -> Theory.close_namespace uc imp use.use_as
+    | Some imp -> Theory.close_namespace uc imp
 
 let use_clone_pure lib mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1661,7 +1662,8 @@ let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+  let uc = if use.use_imp_exp = None then uc
+  else open_namespace uc use.use_as in
   (* use or clone *)
   let uc = match mth, inst with
     | Module m, None -> use_export uc m
@@ -1673,7 +1675,7 @@ let use_clone lib mmd mth uc loc (use,inst) =
   (* close namespace, if any *)
   match use.use_imp_exp with
     | None -> uc
-    | Some imp -> close_namespace uc imp use.use_as
+    | Some imp -> close_namespace uc imp
 
 let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1684,7 +1686,8 @@ let use_module lib mmd mth uc loc use =
   let path, s = Typing.split_qualid use.use_theory in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+  let uc = if use.use_imp_exp = None then uc
+  else open_namespace uc use.use_as in
   (* use or clone *)
   let uc = match mth with
     | Theory _ ->
@@ -1693,7 +1696,7 @@ let use_module lib mmd mth uc loc use =
   (* close namespace, if any *)
   match use.use_imp_exp with
     | None -> uc
-    | Some imp -> close_namespace uc imp use.use_as
+    | Some imp -> close_namespace uc imp
 
 let use_module lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1734,12 +1737,12 @@ let open_file, close_file =
       Stack.push (close_theory (Stack.pop lenv) (Stack.pop tuc)) lenv in
     let close_module () = ignore (Stack.pop inm);
       Stack.push (close_module (Stack.pop lenv) (Stack.pop muc)) lenv in
-    let open_namespace () = if Stack.top inm
-      then Stack.push (Mlw_module.open_namespace (Stack.pop muc)) muc
-      else Stack.push (Theory.open_namespace (Stack.pop tuc)) tuc in
-    let close_namespace imp name = if Stack.top inm
-      then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp name) muc
-      else Stack.push (Theory.close_namespace (Stack.pop tuc) imp name) tuc in
+    let open_namespace name = if Stack.top inm
+      then Stack.push (Mlw_module.open_namespace (Stack.pop muc) name) muc
+      else Stack.push (Theory.open_namespace (Stack.pop tuc) name) tuc in
+    let close_namespace imp = if Stack.top inm
+      then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp) muc
+      else Stack.push (Theory.close_namespace (Stack.pop tuc) imp) tuc in
     let new_decl loc d = if Stack.top inm
       then Stack.push (add_decl ~wp loc (Stack.pop muc) d) muc
       else Stack.push (Typing.add_decl loc (Stack.pop tuc) d) tuc in
@@ -1755,7 +1758,7 @@ let open_file, close_file =
       open_module = open_module;
       close_module = close_module;
       open_namespace = open_namespace;
-      close_namespace = (fun loc -> Loc.try2 loc close_namespace);
+      close_namespace = (fun loc -> Loc.try1 loc close_namespace);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
       use_clone = use_clone;

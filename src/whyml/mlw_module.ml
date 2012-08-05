@@ -135,6 +135,7 @@ type modul = {
 type module_uc = {
   muc_theory : theory_uc;
   muc_decls  : pdecl list;
+  muc_prefix : string list;
   muc_import : namespace list;
   muc_export : namespace list;
   muc_known  : known_map;
@@ -146,6 +147,7 @@ type module_uc = {
 let empty_module env n p = {
   muc_theory = create_theory ~path:p n;
   muc_decls  = [];
+  muc_prefix = [];
   muc_import = [empty_ns];
   muc_export = [empty_ns];
   muc_known  = Mid.empty;
@@ -165,25 +167,28 @@ let close_module uc =
 
 let get_theory uc = uc.muc_theory
 let get_namespace uc = List.hd uc.muc_import
+let get_prefix uc = List.rev uc.muc_prefix
 let get_known uc = uc.muc_known
 
-let open_namespace uc = match uc.muc_import with
+let open_namespace uc s = match uc.muc_import with
   | ns :: _ -> { uc with
-      muc_theory = Theory.open_namespace uc.muc_theory;
+      muc_theory = Theory.open_namespace uc.muc_theory s;
+      muc_prefix =        s :: uc.muc_prefix;
       muc_import =       ns :: uc.muc_import;
       muc_export = empty_ns :: uc.muc_export; }
   | [] -> assert false
 
-let close_namespace uc import s =
-  let th = Theory.close_namespace uc.muc_theory import s in (* catches errors *)
-  match uc.muc_import, uc.muc_export with
-  | _ :: i1 :: sti, e0 :: e1 :: ste ->
+let close_namespace uc import =
+  let th = Theory.close_namespace uc.muc_theory import in (* catches errors *)
+  match uc.muc_prefix, uc.muc_import, uc.muc_export with
+  | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
       { uc with
 	  muc_theory = th;
+          muc_prefix = prf;
 	  muc_import = i1 :: sti;
 	  muc_export = e1 :: ste; }
   | _ ->
