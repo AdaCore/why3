@@ -37,7 +37,7 @@ val add_use_clone :
     Loc.position -> Ptree.use_clone -> theory_uc
 
 val close_namespace :
-  Loc.position -> bool -> string option -> theory_uc -> theory_uc
+  Loc.position -> bool -> string -> theory_uc -> theory_uc
 
 val close_theory : theory Mstr.t -> theory_uc -> theory Mstr.t
 

@@ -27,7 +27,7 @@ type program_decl =
   | PDpdecl of Ptree.pdecl
   | PDuseclone of Ptree.use_clone
   | PDuse of Ptree.use
-  | PDnamespace of string option * bool * (Ptree.loc * program_decl) list
+  | PDnamespace of string * bool * (Ptree.loc * program_decl) list
 
 val decl :
   wp:bool -> Pgm_module.t Util.Mstr.t Env.library ->

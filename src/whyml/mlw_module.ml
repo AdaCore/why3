@@ -180,8 +180,8 @@ let close_namespace uc import s =
   | _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
-      let i1 = match s with Some s -> add_ns false s e0 i1 | _ -> i1 in
-      let e1 = match s with Some s -> add_ns true  s e0 e1 | _ -> e1 in
+      let i1 = add_ns false s e0 i1 in
+      let e1 = add_ns true  s e0 e1 in
       { uc with
 	  muc_theory = th;
 	  muc_import = i1 :: sti;

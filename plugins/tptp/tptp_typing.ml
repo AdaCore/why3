@@ -580,7 +580,7 @@ let flush_impl ~strict env uc impl =
     | Suse th ->
         let uc = open_namespace uc in
         let uc = use_export uc th in
-        close_namespace uc false None
+        close_namespace uc false th.th_name.id_string
     | _ -> uc
   in
   let update s e (env,uc) = match e with

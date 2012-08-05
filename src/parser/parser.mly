@@ -283,8 +283,8 @@ new_decl:
    { Incremental.new_decl (floc ()) $1 }
 | use_clone
    { Incremental.use_clone (floc ()) $1 }
-| namespace_head namespace_import namespace_name list0_decl END
-   { Incremental.close_namespace (floc_ij 1 3) $2 $3 }
+| namespace_head namespace_import uident list0_decl END
+   { Incremental.close_namespace (floc_ij 1 3) $2 $3.id }
 ;
 
 namespace_head:
@@ -294,11 +294,6 @@ namespace_head:
 namespace_import:
 | /* epsilon */  { false }
 | IMPORT         { true }
-;
-
-namespace_name:
-| uident      { Some $1.id }
-| UNDERSCORE  { None }
 ;
 
 /* Declaration */
@@ -340,11 +335,9 @@ use_clone:
 
 use:
 | imp_exp tqualid
-    { { use_theory = $2; use_as = Some (qualid_last $2); use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = qualid_last $2; use_imp_exp = $1 } }
 | imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = Some $4.id; use_imp_exp = $1 } }
-| imp_exp tqualid AS UNDERSCORE
-    { { use_theory = $2; use_as = None; use_imp_exp = $1 } }
+    { { use_theory = $2; use_as = $4.id; use_imp_exp = $1 } }
 ;
 
 imp_exp:
@@ -1001,11 +994,9 @@ new_pdecl:
 
 use_module:
 | imp_exp MODULE tqualid
-    { { use_theory = $3; use_as = Some (qualid_last $3); use_imp_exp = $1 } }
+    { { use_theory = $3; use_as = qualid_last $3; use_imp_exp = $1 } }
 | imp_exp MODULE tqualid AS uident
-    { { use_theory = $3; use_as = Some $5.id; use_imp_exp = $1 } }
-| imp_exp MODULE tqualid AS UNDERSCORE
-    { { use_theory = $3; use_as = None; use_imp_exp = $1 } }
+    { { use_theory = $3; use_as = $5.id; use_imp_exp = $1 } }
 ;
 
 pdecl:

@@ -2318,7 +2318,7 @@ type program_decl =
   | PDpdecl of Ptree.pdecl
   | PDuseclone of Ptree.use_clone
   | PDuse of Ptree.use
-  | PDnamespace of string option * bool * (Ptree.loc * program_decl) list
+  | PDnamespace of string * bool * (Ptree.loc * program_decl) list
 
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)

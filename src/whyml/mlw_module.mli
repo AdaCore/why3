@@ -70,7 +70,7 @@ val create_module : Env.env -> ?path:string list -> preid -> module_uc
 val close_module  : module_uc -> modul
 
 val open_namespace  : module_uc -> module_uc
-val close_namespace : module_uc -> bool -> string option -> module_uc
+val close_namespace : module_uc -> bool -> string -> module_uc
 
 val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace

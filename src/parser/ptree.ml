@@ -97,8 +97,7 @@ type plogic_type =
 
 type use = {
   use_theory  : qualid;
-  use_as      : string option;
-    (* None = as _, Some id = as id *)
+  use_as      : string;
   use_imp_exp : bool option;
     (* None = export, Some false = default, Some true = import *)
 }
@@ -269,7 +268,7 @@ type incremental = {
   open_module     : ident -> unit;
   close_module    : unit -> unit;
   open_namespace  : unit -> unit;
-  close_namespace : loc -> bool (*import:*) -> string option -> unit;
+  close_namespace : loc -> bool (*import:*) -> string -> unit;
   new_decl        : loc -> decl -> unit;
   new_pdecl       : loc -> pdecl -> unit;
   use_clone       : loc -> use_clone -> unit;
