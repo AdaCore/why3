@@ -49,7 +49,6 @@ val print_pat : formatter -> pattern -> unit      (* pattern *)
 val print_term : formatter -> term -> unit        (* term *)
 
 val print_label : formatter -> label -> unit
-val print_labels : formatter -> Slab.t -> unit
 val print_loc : formatter -> Loc.position -> unit
 val print_pkind : formatter -> prop_kind -> unit
 val print_meta_arg : formatter -> meta_arg -> unit

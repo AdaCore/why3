@@ -59,7 +59,7 @@ let get_mutable_field ts i =
 
 let wp_label e f =
   let loc = if f.t_loc = None then Some e.expr_loc else f.t_loc in
-  let lab = Ident.Slab.fold Ident.Slab.add e.expr_lab f.t_label in
+  let lab = List.fold_right Ident.Slab.add e.expr_lab f.t_label in
   t_label ?loc lab f
 
 let wp_and ?(sym=false) f1 f2 =
