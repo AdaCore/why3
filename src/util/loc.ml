@@ -124,5 +124,3 @@ let () = Exn_printer.register
     | _ ->
         raise exn)
 
-
-let get_file (f,_,_,_) = f

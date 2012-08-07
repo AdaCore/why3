@@ -49,7 +49,6 @@ val gen_report_position : formatter -> position -> unit
 
 val report_position : formatter -> position -> unit
 
-val get_file : position -> string
 (* located exceptions *)
 
 exception Located of position * exn
