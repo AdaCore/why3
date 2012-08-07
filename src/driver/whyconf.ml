@@ -50,8 +50,8 @@ let why3_regexp_of_string s = (** define a regexp in why3 *)
 (* lib and shared dirs *)
 
 let default_loadpath =
-  [ Filename.concat Relocatable.datadir "theories";
-    Filename.concat Relocatable.datadir "modules"; ]
+  [ Filename.concat Config.datadir "theories";
+    Filename.concat Config.datadir "modules"; ]
 
 let default_conf_file =
   match Config.localdir with
@@ -210,8 +210,8 @@ type config = {
 
 let default_main =
   {
-    libdir = Relocatable.libdir;
-    datadir = Relocatable.datadir;
+    libdir = Config.libdir;
+    datadir = Config.datadir;
     loadpath = default_loadpath;
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)

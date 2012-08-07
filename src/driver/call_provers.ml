@@ -148,8 +148,8 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
        to prepare the command line in a separate function? *)
-    | "l" -> Relocatable.libdir
-    | "d" -> Relocatable.datadir
+    | "l" -> Config.libdir
+    | "d" -> Config.datadir
     | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
   in
   let subst s =
