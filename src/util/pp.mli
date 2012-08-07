@@ -84,7 +84,6 @@ type formatted = (unit, unit, unit, unit, unit, unit) format6
 val empty_formatted : formatted
 
 val space : formatter -> unit -> unit
-val simple_space : formatter -> unit -> unit
 val alt : formatter -> unit -> unit
 val alt2 : formatter -> unit -> unit
 val newline : formatter -> unit -> unit
