@@ -217,17 +217,6 @@ let ends_with s suf =
   let suflen = String.length suf in
   slen >= suflen && aux s suf suflen (slen - suflen) 0
 
-let starts_with s start =
-   let start_len = String.length start in
-   if start_len > String.length s then false
-   else
-      try
-         for i = 0 to start_len - 1 do
-            if s.[i] <> start.[i] then raise Exit
-         done;
-         true
-      with Exit -> false
-
 let padd_string c s i =
   let sl = String.length s in
   if sl < i then
@@ -242,26 +231,8 @@ let padd_string c s i =
 (** useful function on char *)
 let is_uppercase c = 'A' <= c && c <= 'Z'
 
-let colon = ':'
-
-let colon_split s =
-   let acc : string list ref = ref [] in
-   let last_index = ref (String.length s) in
-   let cur_index = ref (String.length s - 1) in
-   try
-      while true do
-         cur_index := String.rindex_from s (!cur_index - 1) colon;
-         acc :=
-            String.sub s (!cur_index + 1) (!last_index - !cur_index - 1):: !acc;
-         last_index := !cur_index;
-      done;
-      !acc
-   with Invalid_argument _ | Not_found ->
-      String.sub s 0 (!last_index) :: !acc
-
 let concat_non_empty sep l =
   String.concat sep (List.filter (fun s -> s <> "") l)
-
 
 (* Set and Map on ints and strings *)
 

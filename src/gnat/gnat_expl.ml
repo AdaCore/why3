@@ -100,8 +100,8 @@ let read_labels s =
    Ident.Slab.iter
      (fun x ->
         let s = x.Ident.lab_string in
-        if Util.starts_with s "GP_" then
-           match Util.colon_split s with
+        if Gnat_util.starts_with s "GP_" then
+           match Gnat_util.colon_split s with
            | ["GP_Reason"; reason] ->
                  b.expl_reason <- Some (reason_from_string reason)
            | ["GP_Pretty_Ada"; msg] ->
@@ -130,7 +130,7 @@ let read_labels s =
      if b.expl_reason = Some VC_Loop_Invariant then begin
         Ident.Slab.iter (fun x ->
            let s = x.Ident.lab_string in
-           if Util.starts_with s "expl:" then
+           if Gnat_util.starts_with s "expl:" then
               if s = "expl:loop invariant init" then
                  b.expl_reason <- Some VC_Loop_Invariant_Init
               else
