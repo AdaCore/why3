@@ -544,9 +544,21 @@ let l_pvset pvs lam =
   let pvs = spec_pvset pvs (spec_of_lambda lam 0) in
   List.fold_right Spv.remove lam.l_args pvs
 
+let spec_of_abstract e q xq = {
+  c_pre     = t_true;
+  c_post    = q;
+  c_xpost   = xq;
+  c_effect  = e.e_effect;
+  c_variant = [];
+  c_letrec  = 0; }
+
+let abstr_pvset pvs e q xq =
+  let pvs = e_pvset pvs e in
+  spec_pvset pvs (spec_of_abstract e q xq)
+
 (* check admissibility of consecutive events *)
 
-exception StaleRegion of expr * region * ident
+exception StaleRegion of expr * ident
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
 
@@ -555,19 +567,10 @@ let check_reset e varm =
      as the result of the resetting expression. Otherwise, this is
      a freshness violation: some symbol defined earlier carries that
      region into the later code. *)
-  let check_reset r u = (* does r occur in varm? *)
-    let check_id id s = (* does r occur among the regions of id? *)
-      let rec check_reg reg =
-        reg_equal r reg || match u with
-          | Some u when reg_equal u reg -> false
-          | _ -> Sreg.exists check_reg reg.reg_ity.ity_vars.vars_reg
-      in
-      if Sreg.exists check_reg s.vars_reg then
-        Loc.error ?loc:e.e_loc (StaleRegion (e,r,id))
-    in
+  let check_id id vars = if eff_stale_region e.e_effect vars then
+    Loc.error ?loc:e.e_loc (StaleRegion (e,id)) in
+  if not (Mreg.is_empty e.e_effect.eff_resets) then
     Mid.iter check_id varm
-  in
-  Mreg.iter check_reset e.e_effect.eff_resets
 
 let check_ghost_write e eff =
   (* If we make a ghost write, then the modified region cannot
@@ -962,13 +965,7 @@ let e_any spec vty =
   mk_expr (Eany spec) vty spec.c_effect varm
 
 let e_abstract e q xq =
-  let spec = {
-    c_pre     = t_true;
-    c_post    = q;
-    c_xpost   = xq;
-    c_effect  = e.e_effect;
-    c_variant = [];
-    c_letrec  = 0 } in
+  let spec = spec_of_abstract e q xq in
   spec_check spec e.e_vty;
   let varm = spec_varmap e.e_varm spec in
   mk_expr (Eabstr (e,q,xq)) e.e_vty e.e_effect varm

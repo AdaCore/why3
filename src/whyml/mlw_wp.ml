@@ -29,9 +29,14 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
-let debug = Debug.register_flag "whyml_wp"
+let debug = Debug.register_info_flag "whyml_wp"
+  ~desc:"Print@ details@ of@ verification@ conditions@ generation."
+
 let no_track = Debug.register_flag "wp_no_track"
+  ~desc:"Do@ not@ remove@ redundant@ type@ invariant@ conditions@ from@ VCs."
+
 let no_eval = Debug.register_flag "wp_no_eval"
+  ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
 (** Marks *)
 
@@ -62,13 +67,13 @@ let th_mark_old =
   let uc = add_param_decl uc fs_old in
   close_theory uc
 
-let fs_now = create_lsymbol (id_fresh "'now") [] (Some ty_mark)
+let fs_now = create_lsymbol (id_fresh "%now") [] (Some ty_mark)
 let t_now = fs_app fs_now [] ty_mark
 let e_now = e_lapp fs_now [] (ity_pur ts_mark [])
 
 (* [vs_old] appears in the postconditions given to the core API,
    which expects every vsymbol to be a pure part of a pvsymbol *)
-let pv_old = create_pvsymbol (id_fresh "'old") vtv_mark
+let pv_old = create_pvsymbol (id_fresh "%old") vtv_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 
@@ -832,8 +837,9 @@ and wp_abstract env c_eff c_q c_xq q xq =
 
 and wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () in
-  let regs = ps.ps_subst.ity_subst_reg in
-  let regs = Mreg.map (fun _ -> ()) regs in
+  let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
+  let subst = List.fold_left add_arg ps.ps_subst l.l_args in
+  let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env = if lr = 0 || l.l_variant = [] then env else
     let lab = t_var lab in

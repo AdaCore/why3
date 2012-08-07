@@ -19,6 +19,17 @@ module RingBuffer
             data : array 'a;
     ghost mutable sequence: list 'a;
   |}
+  invariant {
+    let size = Array.length data in
+    0 <= first <  size /\
+    0 <= len   <= size /\
+    len = L.length sequence /\
+    forall i: int. 0 <= i < len ->
+      (first + i < size ->
+         nth i sequence = Some data[first + i]) /\
+      (0 <= first + i - size ->
+         nth i sequence = Some data[first + i - size])
+  }
 
   (* total capacity of the buffer *)
   function size (b: buffer 'a) : int = Array.length b.data
@@ -26,51 +37,41 @@ module RingBuffer
   (* length = number of elements *)
   function length (b: buffer 'a) : int = b.len
 
-  predicate buffer_invariant (b: buffer 'a) =
-    0 <= b.first <  size b /\
-    0 <= b.len   <= size b /\
-    b.len = L.length b.sequence /\
-    forall i: int. 0 <= i < b.len ->
-      (b.first + i < size b ->
-         nth i b.sequence = Some b.data[b.first + i]) /\
-      (0 <= b.first + i - size b ->
-         nth i b.sequence = Some b.data[b.first + i - size b])
-
   (* code *)
 
   let create (n: int) (dummy: 'a) =
     { n > 0 }
     {| first = 0; len = 0; data = make n dummy; sequence = Nil |}
-    { buffer_invariant result /\ size result = n /\ result.sequence = Nil }
+    { size result = n /\ result.sequence = Nil }
 
   let length (b: buffer 'a) =
-    { buffer_invariant b }
+    { }
     b.len
     { result = length b }
 
   let clear (b: buffer 'a) =
-    { buffer_invariant b }
+    { }
     ghost b.sequence <- Nil;
     b.len <- 0
-    { buffer_invariant b /\ length b = 0 /\ b.sequence = Nil }
+    { length b = 0 /\ b.sequence = Nil }
 
   let push (b: buffer 'a) (x: 'a) =
-    { length b < size b /\ buffer_invariant b }
+    { length b < size b }
     ghost b.sequence <- b.sequence ++ Cons x Nil;
     let i = b.first + b.len in
     let n = Array.length b.data in
     b.data[if i >= n then i - n else i] <- x;
     b.len <- b.len + 1
-    { buffer_invariant b /\ length b = (old (length b)) + 1 /\
+    { length b = (old (length b)) + 1 /\
       b.sequence = (old b.sequence) ++ Cons x Nil }
 
   let head (b: buffer 'a) =
-    { length b > 0 /\ buffer_invariant b }
+    { length b > 0 }
     b.data[b.first]
     { match b.sequence with Nil -> false | Cons x _ -> result = x end }
 
   let pop (b: buffer 'a) =
-    { length b > 0 /\ buffer_invariant b }
+    { length b > 0 }
     ghost match b.sequence with Nil -> absurd | Cons _ s -> b.sequence <- s end;
     let r = b.data[b.first] in
     b.len <- b.len - 1;
@@ -78,7 +79,7 @@ module RingBuffer
     b.first <- b.first + 1;
     if b.first = n then b.first <- 0;
     r
-    { buffer_invariant b /\ length b = (old (length b)) - 1 /\
+    { length b = (old (length b)) - 1 /\
       match old b.sequence with
       | Nil -> false
       | Cons x l -> result = x /\ b.sequence = l end }

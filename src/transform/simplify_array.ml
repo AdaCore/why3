@@ -22,15 +22,15 @@ open Term
 open Theory
 open Env
 
-let prelude = ["array"]
-let array = "Array"
-let store = ["store"]
-let select = ["select"]
+let prelude = ["map"]
+let array = "Map"
+let store = ["set"]
+let select = ["get"]
 
 let make_rt_rf env =
   let array  =
     try
-      find_theory env prelude array
+      read_theory ~format:"why" env prelude array
     with TheoryNotFound (_,s) ->
       Format.eprintf "The theory %s is unknown" s;
       exit 1 in
@@ -50,3 +50,6 @@ let make_rt_rf env =
 let t env = let rt,rf = make_rt_rf env in Trans.rewriteTF rt rf None
 
 let () = Trans.register_env_transform "simplify_array" t
+  ~desc:"Rewrite@ using@ the@ axiom@ Select_eq@ of@ theory@ map.Map@ \
+         whenever@ possible@ using@ syntaxic@ equality@ modulo@ alpha@ \
+         equivalence."

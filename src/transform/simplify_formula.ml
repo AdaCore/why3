@@ -41,9 +41,12 @@ let simplify_formula_and_task = Trans.decl_l decl_l None
 
 let () = Trans.register_transform
   "simplify_formula" simplify_formula
+  ~desc:"Simplify@ the@ formulas@ using@ propositional@ simplifications."
 
 let () = Trans.register_transform_l
   "simplify_formula_and_task" simplify_formula_and_task
+  ~desc:"Same as simplify_formula, but also@ \
+         removes@ axioms@ and@ goals@ that@ become@ trivial."
 
 (** remove_trivial_quantification
     Original version in the alt-ergo prover by Sylvain Conchon *)
@@ -132,6 +135,10 @@ let simplify_trivial_quantification =
 
 let () = Trans.register_transform
   "simplify_trivial_quantification" simplify_trivial_quantification
+  ~desc:"@[Simplify@ trivial@ quantifications:@]@\n  \
+@[\
+ - @[transform \\exists x. x == y /\\ F@ into F[y/x],@]@\n\
+ - @[transform \\forall x. x <> y \\/ F@ into F[y/x].@]@]"
 
 let simplify_trivial_quantification_in_goal =
   Trans.goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
@@ -139,6 +146,7 @@ let simplify_trivial_quantification_in_goal =
 let () = Trans.register_transform
   "simplify_trivial_quantification_in_goal"
    simplify_trivial_quantification_in_goal
+  ~desc:"Same@ as@ simplify_trivial_quantification, but@ only@ in@ goals."
 
 (** linearize all the subformulas with the given connector (conj/disj);
     the returned array also contains the sign of each subformula *)

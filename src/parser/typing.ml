@@ -77,8 +77,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
   | _ -> raise e)
 
-let debug_parse_only = Debug.register_stop_flag "parse_only"
-let debug_type_only  = Debug.register_stop_flag "type_only"
+let debug_parse_only = Debug.register_flag "parse_only"
+  ~desc:"Stop@ after@ the@ parsing."
+let debug_type_only  = Debug.register_flag "type_only"
+  ~desc:"Stop@ after@ the@ typing."
 
 (** Environments *)
 
@@ -1182,9 +1184,9 @@ let add_use_clone env lenv th loc (use, subst) =
   let use_or_clone th = match use.use_imp_exp with
     | Some imp ->
         (* use T = namespace T use_export T end *)
-        let th = open_namespace th in
+        let th = open_namespace th use.use_as in
         let th = use_or_clone th in
-        close_namespace th imp use.use_as
+        close_namespace th imp
     | None ->
         use_or_clone th
   in
@@ -1198,8 +1200,8 @@ let close_theory lenv th =
   if Mstr.mem id lenv then error ?loc (ClashTheory id);
   Mstr.add id th lenv
 
-let close_namespace loc import id th =
-  Loc.try3 loc close_namespace th import id
+let close_namespace loc import th =
+  Loc.try2 loc close_namespace th import
 
 (* incremental parsing *)
 
@@ -1212,10 +1214,10 @@ let open_file, close_file =
       Stack.push (Theory.create_theory ~path (Denv.create_user_id id)) uc in
     let close_theory () =
       Stack.push (close_theory (Stack.pop lenv) (Stack.pop uc)) lenv in
-    let open_namespace () =
-      Stack.push (Theory.open_namespace (Stack.pop uc)) uc in
-    let close_namespace loc imp name =
-      Stack.push (close_namespace loc imp name (Stack.pop uc)) uc in
+    let open_namespace name =
+      Stack.push (Theory.open_namespace (Stack.pop uc) name) uc in
+    let close_namespace loc imp =
+      Stack.push (close_namespace loc imp (Stack.pop uc)) uc in
     let new_decl loc d =
       Stack.push (add_decl loc (Stack.pop uc) d) uc in
     let use_clone loc use =

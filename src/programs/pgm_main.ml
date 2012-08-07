@@ -30,6 +30,7 @@ open Ptree
 open Pgm_module
 
 let debug_extraction = Debug.register_flag "extraction"
+  ~desc:"for internal use"
 
 exception ClashModule of string
 
@@ -48,8 +49,8 @@ type module_ast = {
 }
 
 type theory_module_ast =
-  | Ptheory of theory_ast
-  | Pmodule of module_ast
+| Ptheory of theory_ast
+| Pmodule of module_ast
 
 let add_theory env path lenv m =
   let id = m.pth_name in
@@ -57,13 +58,13 @@ let add_theory env path lenv m =
   let th = Theory.create_theory ~path (Denv.create_user_id id) in
   let rec add_decl th (loc,dcl) = match dcl with
     | Pgm_typing.PDdecl d ->
-        Typing.add_decl loc th d
+      Typing.add_decl loc th d
     | Pgm_typing.PDuseclone d ->
-        Typing.add_use_clone env lenv th loc d
+      Typing.add_use_clone env lenv th loc d
     | Pgm_typing.PDnamespace (name, import, dl) ->
-        let th = Theory.open_namespace th in
-        let th = List.fold_left add_decl th dl in
-        Typing.close_namespace loc import name th
+      let th = Theory.open_namespace th name in
+      let th = List.fold_left add_decl th dl in
+      Typing.close_namespace loc import th
     | Pgm_typing.PDpdecl _ | Pgm_typing.PDuse _ -> assert false
   in
   let th = List.fold_left add_decl th m.pth_decl in
@@ -93,6 +94,7 @@ open Pgm_typing
 let open_file, close_file =
   let ids  = Stack.create () in
   let muc  = Stack.create () in
+  let prf  = Stack.create () in
   let lenv = Stack.create () in
   let open_file () =
     Stack.push [] lenv;
@@ -106,8 +108,10 @@ let open_file, close_file =
       let mast = { mod_name = Stack.pop ids;
                    mod_decl = List.rev (Stack.pop muc) } in
       Stack.push (Pmodule mast :: Stack.pop lenv) lenv in
-    let open_namespace () = Stack.push [] muc in
-    let close_namespace loc imp name =
+    let open_namespace s =
+      Stack.push s prf; Stack.push [] muc in
+    let close_namespace loc imp =
+      let name = Stack.pop prf in
       let decl = List.rev (Stack.pop muc) in
       Stack.push ((loc, PDnamespace (name,imp,decl)) :: Stack.pop muc) muc in
     let new_decl loc d =
@@ -158,13 +162,14 @@ let read_channel =
         one_time_hack := false;
         let genv = Env.env_of_library env in
         Env.register_format "whyml-old-library" ["mlw"] read_channel genv
+          ~desc:"for internal use"
       end
       else env
     in
     read_channel env path file c
 
 let library_of_env = Env.register_format "whyml-old" [] read_channel
-
+  ~desc:"WhyML@ programming@ language@ (obsolete@ implementation)"
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. testl"

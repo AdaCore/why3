@@ -191,6 +191,7 @@ and lambda = {
 
 val e_pvset : Spv.t -> expr -> Spv.t
 val l_pvset : Spv.t -> lambda -> Spv.t
+val abstr_pvset : Spv.t -> expr -> post -> xpost -> Spv.t
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
@@ -217,7 +218,7 @@ val create_let_defn : preid -> expr -> let_defn
 val create_fun_defn : preid -> lambda -> rec_defn
 val create_rec_defn : (psymbol * lambda) list -> rec_defn
 
-exception StaleRegion of expr * region * ident
+exception StaleRegion of expr * ident
 (* freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr

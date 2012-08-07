@@ -298,7 +298,17 @@ let merge_known kn1 kn2 =
   in
   Mid.union check_known kn1 kn2
 
-let known_add_decl _lkn0 kn0 decl =
+let pd_vars pd = match pd.pd_node with
+  | PDval (LetV _) -> Sid.empty
+  | PDval (LetA ps) -> Mid.map (fun _ -> ()) ps.ps_varm
+  | PDlet ld -> Mid.map (fun _ -> ()) ld.let_expr.e_varm
+  | PDrec rd ->
+      let add_rd s fd = Mid.set_union s fd.fun_ps.ps_varm in
+      let varm = List.fold_left add_rd Mid.empty rd.rec_defn in
+      Mid.map (fun _ -> ()) varm
+  | PDtype _ | PDdata _ | PDexn _ -> Sid.empty
+
+let known_add_decl lkn0 kn0 decl =
   let kn = Mid.map (const decl) decl.pd_news in
   let check id decl0 _ =
     if pd_equal decl0 decl
@@ -306,13 +316,10 @@ let known_add_decl _lkn0 kn0 decl =
     else raise (RedeclaredIdent id)
   in
   let kn = Mid.union check kn0 kn in
-(*
-  let unk = Mid.set_diff decl.pd_syms kn in
+  let unk = Mid.set_diff (pd_vars decl) kn in
   let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
-*)
-  kn
 
 (* TODO: known_add_decl must check pattern matches for exhaustiveness *)
 

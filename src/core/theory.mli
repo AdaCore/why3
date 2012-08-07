@@ -62,8 +62,11 @@ type meta = private {
   meta_name : string;
   meta_type : meta_arg_type list;
   meta_excl : bool;
+  meta_desc : Pp.formatted;
   meta_tag  : int;
 }
+
+val print_meta_desc : Pp.formatter -> meta -> unit
 
 module Mmeta : Map.S with type key = meta
 module Smeta : Mmeta.Set
@@ -72,10 +75,13 @@ module Hmeta : Hashtbl.S with type key = meta
 val meta_equal : meta -> meta -> bool
 val meta_hash : meta -> int
 
-val register_meta      : string -> meta_arg_type list -> meta
-val register_meta_excl : string -> meta_arg_type list -> meta
-(** Register exclusive meta, each new setting remove the previous one.
-Useful for transformation or printer parameters *)
+val register_meta :
+  desc:Pp.formatted -> string -> meta_arg_type list -> meta
+
+val register_meta_excl :
+  desc:Pp.formatted -> string -> meta_arg_type list -> meta
+(** With exclusive metas, each new meta cancels the previous one.
+    Useful for transformation or printer parameters *)
 
 val lookup_meta : string -> meta
 val list_metas  : unit -> meta list
@@ -123,14 +129,19 @@ type theory_uc  (* a theory under construction *)
 val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
 
-val open_namespace  : theory_uc -> theory_uc
-val close_namespace : theory_uc -> bool -> string option -> theory_uc
-  (* the Boolean indicates [import]; the string option indicates [as T] *)
+val open_namespace  : theory_uc -> string -> theory_uc
+val close_namespace : theory_uc -> bool (* import *) -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 val get_known : theory_uc -> known_map
-
 val get_rev_decls : theory_uc -> tdecl list
+
+val restore_path : ident -> string list * string * string list
+(* [restore_path id] returns the triple (library path, theory,
+   qualified symbol name) if the ident was ever introduced in
+   a theory declaration. If the ident was declared in several
+   different theories, the first association is retained.
+   Raises Not_found if the ident was never declared in a theory. *)
 
 (** Declaration constructors *)
 

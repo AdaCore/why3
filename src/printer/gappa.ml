@@ -40,7 +40,9 @@ let syntactic_transform transf =
 
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
-    (syntactic_transform Abstraction.abstraction);
+    (syntactic_transform Abstraction.abstraction)
+    ~desc_metas:[meta_syntax_logic,Pp.empty_formatted]
+    ~desc:"Abstract@ application@ of@ non-built-in@ symbols@ with@ constants.";
   Trans.register_transform "simplify_unknown_lsymbols"
     (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
       [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
@@ -54,6 +56,9 @@ let () =
           | Tapp(ls,_) -> not (check_ls ls)
           | _ -> true) f)
       ])))
+    ~desc_metas:[meta_syntax_logic,("" : Pp.formatted)]
+    ~desc:"In the goal substitute equality on application of unknown symbols.";
+
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
 
@@ -98,7 +103,13 @@ let real_minus = ref ps_equ
 (** lsymbol, ""/"not ", op, rev_op *)
 let arith_meta = register_meta "gappa arith"
   [MTlsymbol;MTstring;MTstring;MTstring]
-
+  ~desc:"Specifies how to pretty-print symbols into gappa format:@\n  \
+@[\
+ @[<hov 2>- first argument: which symbol@]@\n\
+ @[<hov 2>- second argument: which prefix around the term@]@\n\
+ @[<hov 2>- third argument: which operator to pretty-print@]@\n\
+ @[<hov 2>- fourth argument: which is the inverse operator to pretty-print@]\
+@]"
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in
@@ -428,7 +439,8 @@ let print_task env pr thpr ?old:_ fmt task =
 *)
 
 let () = register_printer "gappa" print_task
-
+  ~desc:"Printer@ for@ the@ Gappa@ theorem@ prover@ specialized@ in@ \
+         floating@ point@ reasoning."
 
 (*
 Local Variables:

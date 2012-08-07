@@ -36,22 +36,33 @@ type 'a pp = formatter -> 'a -> unit
 
 type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
 
-let printers : (string, printer) Hashtbl.t = Hashtbl.create 17
+type reg_printer =
+  { reg_desc    : formatted;
+    reg_printer : printer;
+  }
+
+let printers : (string, reg_printer) Hashtbl.t = Hashtbl.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
-let register_printer s p =
+let register_printer ~desc s p =
   if Hashtbl.mem printers s then raise (KnownPrinter s);
-  Hashtbl.replace printers s p
+  Hashtbl.replace printers s {reg_desc = desc; reg_printer = p}
 
 let lookup_printer s =
-  try Hashtbl.find printers s
+  try (Hashtbl.find printers s).reg_printer
   with Not_found -> raise (UnknownPrinter s)
 
-let list_printers ()  = Hashtbl.fold (fun k _ acc -> k::acc) printers []
+let list_printers ()  = Hashtbl.fold (fun k p acc ->
+  (k,p.reg_desc)::acc) printers []
 
-let () = register_printer "(null)" (fun _ _ _ ?old:_ _ _ -> ())
+let print_printer_desc fmt (s,f) =
+  fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]"
+    s Pp.formatted f
+
+let () = register_printer ~desc:"Print nothing" "(null)"
+  (fun _ _ _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
 
@@ -193,9 +204,20 @@ exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
 
 let meta_syntax_type  = register_meta "syntax_type" [MTtysymbol; MTstring]
+  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ the@ type@ symbols.@ \
+         Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax type'@ rule."
+
 let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring]
+  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ the@ logic@ symbols.@ \
+         Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax function'@ \
+         rule."
+
 let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
+  ~desc:"Specify@ the@ logical@ propositions@ to@ remove.@ \
+         Can@ be@ specified@ in@ the@ driver@ with@ the@ remove@ prop@ rule."
+
 let meta_realized     = register_meta "realized" [MTstring; MTstring]
+  ~desc:"TODO??"
 
 let syntax_type ts s =
   check_syntax s (List.length ts.ts_args);

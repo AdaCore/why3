@@ -40,7 +40,7 @@ type undone_proof =
                       has never been scheduled*)
     | Running (** external proof attempt is in progress *)
     | Unedited (** unedited but editable *)
-    | JustEdited (** edited by not run yet *)
+    | JustEdited (** edited but not run yet *)
 
 (** State of a proof *)
 type proof_attempt_status =
@@ -69,8 +69,8 @@ type 'a goal = private
       goal_name : Ident.ident; (** The ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
-      mutable goal_checksum : string;  (** checksum of the task *)
-      mutable goal_shape : string;     (** shape are produced by the module Termcode *)
+      mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
+      mutable goal_shape : Termcode.shape;  (** shape of the task *)
       mutable goal_verified : bool;
       goal_task: task_option;
       mutable goal_expanded : bool;
@@ -344,6 +344,7 @@ val copy_external_proof :
 val add_transformation :
   keygen:'key keygen ->
   goal:('goal -> Ident.ident * expl * Task.task) ->
+  'key env_session ->
   string ->
   'key goal ->
   'goal list ->

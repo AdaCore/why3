@@ -28,8 +28,10 @@ open Decl
 open Theory
 open Task
 
-let debug_print_labels = Debug.register_flag "print_labels"
-let debug_print_locs = Debug.register_flag "print_locs"
+let debug_print_labels = Debug.register_info_flag "print_labels"
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+let debug_print_locs = Debug.register_info_flag "print_locs"
+  ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
 let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";

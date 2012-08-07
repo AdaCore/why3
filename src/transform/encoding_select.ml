@@ -93,7 +93,7 @@ end
 (** {2 select Lsinst} *)
 
 module Lsinst = struct
-
+(** TODO : only closed instantiation? without variables? *)
   let add_lsinst mls ls tyl tyv =
     if good_for_inst ls then Lsmap.add ls tyl tyv mls else mls
 

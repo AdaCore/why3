@@ -26,9 +26,10 @@ module Mprover = Whyconf.Mprover
 module Sprover = Whyconf.Sprover
 module PHprover = Whyconf.Hprover
 module C = Whyconf
+module Tc = Termcode
 
-let debug = Debug.register_flag "session"
-let debug_pairing = Debug.register_flag "session_pairing"
+let debug = Debug.register_info_flag "session"
+  ~desc:"About the why3 session creation, reading and writing."
 
 (** {2 Type definitions} *)
 
@@ -49,30 +50,30 @@ type proof_attempt_status =
 type task_option = Task.task option
 
 type 'a goal =
-    { mutable goal_key  : 'a;
-      goal_name : Ident.ident;
-      goal_expl : string option;
-      goal_parent : 'a goal_parent;
-      mutable goal_checksum : string;
-      mutable goal_shape : string;
-      mutable goal_verified : bool;
-      goal_task: task_option;
-      mutable goal_expanded : bool;
-      goal_external_proofs : 'a proof_attempt PHprover.t;
-      goal_transformations : 'a transf PHstr.t;
-    }
+  { mutable goal_key  : 'a;
+    goal_name : Ident.ident;
+    goal_expl : string option;
+    goal_parent : 'a goal_parent;
+    mutable goal_checksum : Tc.checksum;
+    mutable goal_shape : Tc.shape;
+    mutable goal_verified : bool;
+    goal_task: task_option;
+    mutable goal_expanded : bool;
+    goal_external_proofs : 'a proof_attempt PHprover.t;
+    goal_transformations : 'a transf PHstr.t;
+  }
 
 and 'a proof_attempt =
-    { proof_key : 'a;
-      mutable proof_prover : Whyconf.prover;
-      proof_parent : 'a goal;
-      mutable proof_state : proof_attempt_status;
-      mutable proof_timelimit : int;
-      mutable proof_memlimit : int;
-      mutable proof_obsolete : bool;
-      mutable proof_archived : bool;
-      mutable proof_edited_as : string option;
-    }
+  { proof_key : 'a;
+    mutable proof_prover : Whyconf.prover;
+    proof_parent : 'a goal;
+    mutable proof_state : proof_attempt_status;
+    mutable proof_timelimit : int;
+    mutable proof_memlimit : int;
+    mutable proof_obsolete : bool;
+    mutable proof_archived : bool;
+    mutable proof_edited_as : string option;
+  }
 
 and 'a goal_parent =
   | Parent_theory of 'a theory
@@ -389,14 +390,15 @@ let save_label fmt s =
   fprintf fmt "@\n@[<v 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
 
 let rec save_goal provers fmt g =
-  assert (g.goal_shape <> "");
+  assert (Tc.string_of_shape g.goal_shape <> "");
   fprintf fmt
     "@\n@[<v 1><goal@ %a@ %asum=\"%a\"@ proved=\"%b\"@ \
 expanded=\"%b\"@ shape=\"%a\">"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
-    save_string g.goal_checksum g.goal_verified  g.goal_expanded
-    save_string g.goal_shape;
+    save_string (Tc.string_of_checksum g.goal_checksum)
+    g.goal_verified  g.goal_expanded
+    save_string (Tc.string_of_shape g.goal_shape);
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
   PHstr.iter (save_trans provers fmt) g.goal_transformations;
@@ -418,8 +420,10 @@ let save_theory provers fmt t =
   fprintf fmt "@]@\n</theory>"
 
 let save_file provers fmt _ f =
-  fprintf fmt "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
-    save_string f.file_name (opt "format") f.file_format f.file_verified f.file_expanded;
+  fprintf fmt
+    "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
+    save_string f.file_name (opt "format")
+    f.file_format f.file_verified f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
@@ -427,7 +431,8 @@ let save_prover fmt p (provers,id) =
   fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ \
 name=\"%a\"@ version=\"%a\"%a/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
-    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\"" save_string s)
+    (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
+        save_string s)
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
@@ -436,7 +441,8 @@ let save fname config session =
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
-    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config)) "why3session.dtd");
+    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config))
+                   "why3session.dtd");
   fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
     save_string fname session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
@@ -639,19 +645,15 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
   in
   goal
 
-(* a global variable indicating the shape version to use. It is set
-   when reading the attribute shape_version of an XML file
-*)
-let current_shape_version = ref 0
-
-let raw_add_task ~(keygen:'a keygen) parent name expl t exp =
+let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
   in
   let key = keygen ~parent:parent_key () in
-  let sum = Termcode.task_checksum ~version:!current_shape_version t in
-  let shape = Termcode.t_shape_buf ~version:!current_shape_version (Task.task_goal_fmla t) in
+  let sum = Termcode.task_checksum ~version t in
+  let shape = Termcode.t_shape_buf ~version
+    (Task.task_goal_fmla t) in
   let goal = { goal_name = name;
                goal_expl = expl;
                goal_parent = parent;
@@ -814,8 +816,8 @@ let rec load_goal ~old_provers parent acc g =
     | "goal" ->
         let gname = load_ident g in
         let expl = load_option "expl" g in
-        let sum = string_attribute_def "sum" g "" in
-        let shape = string_attribute_def "shape" g "" in
+        let sum = Tc.checksum_of_string (string_attribute_def "sum" g "") in
+        let shape = Tc.shape_of_string (string_attribute_def "shape" g "") in
         let exp = bool_attribute "expanded" g true in
         let mg = raw_add_no_task ~keygen parent gname expl sum shape exp in
         List.iter (load_proof_or_transf ~old_provers mg) g.Xml.elements;
@@ -998,11 +1000,11 @@ let set_file_expanded f b =
 
 
 (** raw add_file *)
-let raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
+let raw_add_file ~version ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
   let add_goal parent acc goal =
     let g =
       let name,expl,task = x_goal goal in
-      raw_add_task ~keygen:x_keygen parent name expl task false in
+      raw_add_task ~version ~keygen:x_keygen parent name expl task false in
     g::acc in
   let add_file session f_name fmt file =
     let rfile = raw_add_file ~keygen:x_keygen session f_name fmt false in
@@ -1039,6 +1041,7 @@ module AddFile(X : sig
 end) = (struct
   let add_file session fn ?format f =
     let file = raw_add_file ~x_keygen:X.keygen ~x_goal:X.goal
+      ~version:Termcode.current_shape_version
     ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session
     fn format f in
     check_file_verified notify file;
@@ -1083,7 +1086,8 @@ let add_file ~keygen env ?format filename =
     List.fold_left (fun acc (_,thname,th) -> f acc thname th) acc theories in
   dprintf debug "[Load] file '%s'@\n" filename;
   let file = Filename.concat env.session.session_dir filename in
-  let add_file = raw_add_file ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
+  let add_file = raw_add_file ~version:env.session.session_shape_version
+    ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
   let file = add_file env.session filename format (env.env,file) in
   check_file_verified notify file;
   file
@@ -1108,7 +1112,8 @@ end) = (struct
   let add_goal parent acc goal =
     let name,expl,task = X.goal goal in
     let g =
-      raw_add_task ~keygen:X.keygen parent
+      raw_add_task ~version:Termcode.current_shape_version
+        ~keygen:X.keygen parent
         name expl task false in
     (** no verified since that can't be empty (no proof no transf) and true *)
     g::acc
@@ -1126,12 +1131,13 @@ end : sig
   val add_transformation : X.key goal -> string -> X.transf -> X.key transf
 end)
 
-let add_transformation ~keygen ~goal transfn g goals =
+let add_transformation ~keygen ~goal env_session transfn g goals =
   let rtransf = raw_add_transformation ~keygen g transfn true in
   let parent = Parent_transf rtransf in
   let add_goal acc g =
     let name,expl,task = goal g in
-    let g = raw_add_task ~keygen parent name expl task  false in
+    let g = raw_add_task ~version:env_session.session.session_shape_version
+      ~keygen parent name expl task  false in
     g::acc in
   let goals = List.fold_left add_goal [] goals in
   rtransf.transf_goals <- List.rev goals;
@@ -1150,8 +1156,18 @@ let remove_transformation ?(notify=notify) t =
 (***************************)
 let add_registered_transformation ~keygen env_session tr_name g =
   let task = goal_task g in
+  let gname = g.goal_name in
   let subgoals = Trans.apply_transform tr_name env_session.env task in
-  add_transformation ~keygen ~goal:goal_expl_task tr_name g subgoals
+  let i = ref 1 in
+  let goal task =
+    let gid = (Task.task_goal task).Decl.pr_name in
+    let expl = get_explanation gid task in
+    let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (!i)) in
+    incr i;
+    let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
+    goal_name, expl, task
+  in
+  add_transformation ~keygen ~goal env_session tr_name g subgoals
 
 (*****************************************************)
 (**                    Prover Loaded                **)
@@ -1166,7 +1182,8 @@ let load_prover eS prover =
     let r = match r with
       | None -> None
       | Some pr ->
-        let dr = Driver.load_driver eS.env pr.Whyconf.driver pr.Whyconf.extra_drivers in
+        let dr = Driver.load_driver eS.env
+          pr.Whyconf.driver pr.Whyconf.extra_drivers in
         Some { prover_config = pr;
                prover_driver = dr}
     in
@@ -1321,315 +1338,49 @@ let print_external_proof fmt p =
 (**    Reload a session with the current transformation    *)
 (***********************************************************)
 
+(** Pairing *)
 
-(*************************************************************)
-(* pairing of new and old subgoals of a given transformation *)
-(*************************************************************)
+module AssoGoals : sig
+  val associate : 'a goal list -> 'b goal list ->
+    ('b goal * ('a goal option) * bool) list
+end = struct
+(** When Why3 will require 3.12 put all of that in a function using
+    explicit type argument "(type t)" and remove all the Obj.magic *)
 
-(* we have an ordered list of new subgoals
+  module ToGoal = struct
+    (** The functor can't be instantiated with an 'a t so we will give
+        a t *)
+    type tto (** will represent any type *)
+    type t = tto goal
+    let checksum g = g.goal_checksum
+    let shape g    = g.goal_shape
+    let name g     = g.goal_name
+  end
+  module FromGoal = struct
+    (** The functor can't be instantiated with an 'a t so we will give
+        a t *)
+    type ffrom (** will represent any type *)
+    type t = ffrom goal
+    let checksum g = g.goal_checksum
+    let shape g    = g.goal_shape
+    let name g     = g.goal_name
+  end
 
-           subgoals = [g1; g2; g3; ...]
+  module AssoGoals = Tc.AssoMake(FromGoal)(ToGoal)
+  open ToGoal
+  open FromGoal
 
-   and a list of old subgoals
+  let associate (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
+      ('tto goal * ('ffrom goal option) * bool) list =
+    let from_goals : ffrom goal list =
+      Obj.magic (from_goals : 'ffrom goal list) in
+    let to_goals   : tto goal list =
+      Obj.magic (to_goals : 'tto goal list) in
+    let associated : (tto goal * (ffrom goal option) * bool) list =
+      AssoGoals.associate from_goals to_goals in
+    (Obj.magic associated : ('tto goal * ('ffrom goal option) * bool) list)
 
-          old_subgoals = [h1 ; h2 ; ... ]
-
-   we build a map from each new subgoal g to tuples
-       (id,subgoal_name,subtask,sum,old_subgoal,obsolete)
-
-   where
-     id = name of the goal of g
-     subgoal_name = name of parent goal with "dot n" added
-     subtask = the corresponding task
-     sum = the checksum of that task
-     old_subgoal = ref to an optional old subgoal which is paired with g
-     obsolete = true when paired to an old goal with different checksum
-
-*)
-
-
-type 'a any_goal =
-  | New_goal of int
-  | Old_goal of 'a goal
-
-let array_map_list f l =
-  let r = ref l in
-  Array.init (List.length l)
-    (fun i ->
-       match !r with
-         | [] -> assert false
-         | x::rem -> r := rem; f i x)
-
-let associate_subgoals gname (old_goals : 'a goal list) 
-    new_goals =
-  dprintf debug "[Info] associate_subgoals, shape_version = %d@\n" !current_shape_version;
-  (*
-     we make a map of old goals indexed by their checksums
-  *)
-  let old_goals_map = Hashtbl.create 7 in
-  List.iter
-    (fun g -> Hashtbl.add old_goals_map g.goal_checksum g)
-    old_goals;
-  (*
-     we make an array of new goals with their numbers and checksums
-  *)
-  let new_goals_array =
-    array_map_list
-      (fun i g ->
-         let id = (Task.task_goal g).Decl.pr_name in
-         let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (i+1)) in
-         let goal_name = Ident.id_register (Ident.id_derive goal_name id) in
-         let sum = Termcode.task_checksum ~version:!current_shape_version g in
-         (i,id,goal_name,g,sum))
-      new_goals
-  in
-  let pairing_array =
-    Array.make (Array.length new_goals_array) None
-  in
-  let shape_array =
-    Array.make (Array.length new_goals_array) ""
-  in
-  let obsolete_array =
-    Array.make (Array.length new_goals_array) false
-  in
-  (*
-     Phase 1: we first associate each new goal for which there is an
-     old goal with the same checksum.
-  *)
-  let associate_goals ~obsolete i g =
-    pairing_array.(i) <- Some g;
-    obsolete_array.(i) <- obsolete;
-    Hashtbl.remove old_goals_map g.goal_checksum
-  in
-  Array.iter
-    (fun (i,_,goal_name,_,sum) ->
-       try
-         let h = Hashtbl.find old_goals_map sum in
-         (* an old goal has the same checksum *)
-         Debug.dprintf debug_pairing
-           "Merge phase 1: old goal '%s' -> new goal '%s'@."
-           h.goal_name.Ident.id_string goal_name.Ident.id_string;
-         shape_array.(i) <- h.goal_shape;
-         associate_goals ~obsolete:false i h
-       with Not_found ->
-         Debug.dprintf debug_pairing
-           "Merge phase 1: no old goal -> new goal '%s'@."
-           goal_name.Ident.id_string;
-         ())
-    new_goals_array;
-  (* Phase 2: we now build a list of all remaining new and old goals,
-     ordered by shapes, then by name *)
-  let old_goals_without_pairing =
-    Hashtbl.fold
-      (fun _ g acc ->
-         let s = g.goal_shape in
-         if s = "" then
-           (* We don't try to associate old goals without shapes:
-              they will be paired in order in next phase *)
-           acc
-         else
-           (s,Old_goal g)::acc)
-      old_goals_map
-      []
-  in
-  let all_goals_without_pairing =
-    Array.fold_left
-      (fun acc (i,_,_, g, _) ->
-         match pairing_array.(i) with
-           | Some _ -> acc
-           | None ->
-               let shape =
-                 Termcode.t_shape_buf ~version:!current_shape_version
-                   (Task.task_goal_fmla g)
-               in
-               shape_array.(i) <- shape;
-               (shape,New_goal i)::acc)
-      old_goals_without_pairing
-      new_goals_array
-  in
-  let sort_by_shape =
-    List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
-      all_goals_without_pairing
-  in
-  if Debug.test_flag debug_pairing then begin
-    Debug.dprintf debug_pairing "[Merge] pairing the following shapes:@.";
-    List.iter
-      (fun (s,g) ->
-         match g with
-           | New_goal _ ->
-               Debug.dprintf debug_pairing "new: %s@." s
-           | Old_goal _ ->
-               Debug.dprintf debug_pairing "old: %s@." s)
-      sort_by_shape;
-  end;
-  let rec similarity_shape n s1 s2 =
-    if String.length s1 <= n || String.length s2 <= n then n else
-      if s1.[n] = s2.[n] then similarity_shape (n+1) s1 s2
-      else n
-  in
-(*  let rec match_shape (opt:int option) goals : bool =
-    (* when [opt] is [Some n] then it means [goals] starts with a goal g
-       which is already claimed to be associated by the former goal h.
-       We return a boolean which is true when that first goal g was also
-       claimed by the next goal, with a proximity measure larger than n,
-       meaning that the former goal h cannot associate with g
-    *)
-    match goals with
-      | [] -> false
-      | (si,New_goal i)::rem ->
-          begin match rem with
-            | [] -> false
-            | (_,New_goal _)::_ ->
-                let (_:bool) = match_shape None rem in false
-            | (sh,Old_goal h)::_ ->
-                try_associate si i sh h opt rem
-          end
-      | (sh,Old_goal h)::rem ->
-          begin match rem with
-            | [] -> false
-            | (_,Old_goal _)::_ ->
-                let (_:bool) = match_shape None rem in false
-            | (si,New_goal i)::_ ->
-                try_associate si i sh h opt rem
-          end
-  and try_associate si i sh h opt rem =
-    let n = similarity_shape 0 si sh in
-    Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
-      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
-    if (match opt with
-      | None ->
-          Debug.dprintf debug_pairing "[Merge] try_associate: \
-            no previous claim@.";
-          true
-      | Some m ->
-          Debug.dprintf debug_pairing "[Merge] try_associate: \
-            previous claim was %d@." m;
-          m < n)
-    then
-      (* try to associate i with h *)
-      let b = match_shape (Some n) rem in
-      if b then
-        begin
-          (* h or i was already paired in rem *)
-          Debug.dprintf debug_pairing "[Merge] try_associate: \
-            failed because claimed further@.";
-          false
-        end
-      else
-        begin
-          Debug.dprintf debug_pairing "[Merge] try_associate: \
-            succeeded to associate new goal@\n%s@\nwith \
-            old goal@\n%s@." si sh;
-          associate_goals ~obsolete:true i h;
-          true
-        end
-    else
-      (* no need to try to associate i with h *)
-      begin
-        Debug.dprintf debug_pairing "[Merge] try_associate: \
-          no claim further attempted@.";
-        let (_:bool) = match_shape None rem in
-        false
-      end
-  in
-  let (_:bool) = match_shape None sort_by_shape in
-*)
-  let rec match_shape (min:int) goals : bool * (string * 'a any_goal) list =
-    (* try to associate in [goals] each pair of old and new goal whose
-       similarity is at least [min]. Returns a pair [(b,rem)] where
-       [rem] is the sublist of [goals] made of goals which have not
-       been paired, and [b] is a boolean telling that the head of
-       [rem] is the same has the head of [goals] *)
-    match goals with
-      | [] -> (true, goals)
-      | ((si,New_goal i) as hd)::rem ->
-          begin match rem with
-            | [] -> (true, goals)
-            | (_,New_goal _)::_ ->
-                let (b,rem2) = match_shape min rem in
-                if b then
-                  (true, hd::rem2)
-                else
-                  match_shape min (hd::rem2)
-            | (sh,Old_goal h)::_ ->
-                try_associate min si i sh h hd rem
-          end
-      | ((sh,Old_goal h) as hd)::rem ->
-          begin match rem with
-            | [] -> (true, goals)
-            | (_,Old_goal _)::_ ->
-                let (b,rem2) = match_shape min rem in
-                if b then
-                  (true, hd::rem2)
-                else
-                  match_shape min (hd::rem2)
-            | (si,New_goal i)::_ ->
-                try_associate min si i sh h hd rem
-          end
-  and try_associate min si i sh h hd rem =
-    let n = similarity_shape 0 si sh in
-    Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
-      similarity %d for new shape@\n%s@\nand old shape@\n%s@." n si sh;
-    if n < min then
-      begin
-        Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
-          dropped because similarity lower than min = %d@." min;
-        let (b,rem2) = match_shape min rem in
-        if b then
-          (true, hd::rem2)
-        else
-          match_shape min (hd::rem2)
-      end
-    else
-      match match_shape n rem with
-        | false, rem2 ->
-            Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
-              dropped because head was consumed by larger similarity@.";
-            match_shape min (hd::rem2)
-        | true, [] -> assert false
-        | true, _::rem2 ->
-            Debug.dprintf debug_pairing "[Merge] try_associate: claiming \
-              succeeded (similarity %d) for new shape@\n%s@\nand \
-              old shape@\n%s@." n si sh;
-            associate_goals ~obsolete:true i h;
-            let (_,rem3) = match_shape min rem2 in
-            (false, rem3)
-  in
-  let (_b,_rem) = match_shape 0 sort_by_shape in
-  (*
-     Phase 3: we now associate remaining new goals to the remaining
-     old goals in the same order as original
-  *)
-  Debug.dprintf debug_pairing "[Merge] phase 3: associate remaining goals@.";
-  let remaining_old_goals =
-    Hashtbl.fold
-      (fun _ g acc -> (g.goal_name,g)::acc)
-      old_goals_map
-      []
-  in
-  let remaining_old_goals =
-    ref (List.sort (fun (s1,_) (s2,_) ->
-      String.compare s1.Ident.id_string s2.Ident.id_string)
-           remaining_old_goals)
-  in
-  Array.iteri
-    (fun i opt ->
-       match opt with
-         | Some _ -> ()
-         | None ->
-             match !remaining_old_goals with
-               | [] -> ()
-               | (_,h) :: rem ->
-                   remaining_old_goals := rem;
-                   associate_goals ~obsolete:true i h)
-    pairing_array;
-  let res = ref [] in
-  Array.iter
-    (fun (i,id,goal_name,g,sum) ->
-       res := (id,goal_name,g,sum,shape_array.(i),pairing_array.(i),
-               obsolete_array.(i)) :: !res)
-    new_goals_array;
-  List.rev !res
+end
 
 (**********************************)
 (* merge a file into another      *)
@@ -1658,20 +1409,18 @@ and merge_trans ~keygen env to_goal _ from_transf =
   let to_goal_name = to_goal.goal_name in
   dprintf debug "[Reload] transformation %s for goal %s @\n"
     from_transf_name to_goal_name.Ident.id_string;
-  let subgoals =
-    Trans.apply_transform from_transf.transf_name env (goal_task to_goal) in
-  let goals =
-    associate_subgoals to_goal_name from_transf.transf_goals subgoals
-  in
-  let goal (gid,name,t,_,_,_,_) = name, get_explanation gid t, t in
-  let transf = add_transformation ~keygen ~goal
-    from_transf_name to_goal goals in
-  set_transf_expanded transf from_transf.transf_expanded;
-  List.iter2 (fun (_,_,_,_,_,from_goal,obsolete) to_goal ->
-    match from_goal with
-      | Some from_goal -> merge_any_goal ~keygen env obsolete
-        from_goal to_goal
-      | None -> ()) goals transf.transf_goals
+  let to_transf =
+    add_registered_transformation
+      ~keygen env from_transf_name to_goal in
+  let associated =
+    dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+      env.session.session_shape_version;
+    AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
+  List.iter (function
+  | (to_goal, Some from_goal, obsolete) ->
+    merge_any_goal ~keygen env obsolete  from_goal to_goal
+  | (_, None, _) -> ()
+  ) associated
 
 exception OutdatedSession
 
@@ -1703,7 +1452,8 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
     ) to_th.theory_goals
 
 let merge_file ~keygen env ~allow_obsolete from_f to_f  =
-  dprintf debug "[Info] merge_file, shape_version = %d@." !current_shape_version;
+  dprintf debug "[Info] merge_file, shape_version = %d@."
+    env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
@@ -1747,14 +1497,15 @@ let recompute_all_shapes_file _ f =
   List.iter recompute_all_shapes_theory f.file_theories
 
 let recompute_all_shapes session =
-  PHstr.iter recompute_all_shapes_file session.session_files;
-  session.session_shape_version <- Termcode.current_shape_version
+  session.session_shape_version <- Termcode.current_shape_version;
+  PHstr.iter recompute_all_shapes_file session.session_files
 
 let update_session ~keygen ~allow_obsolete old_session env whyconf =
-  current_shape_version := old_session.session_shape_version;
-  dprintf debug "[Info] update_session: shape_version = %d@\n" !current_shape_version;
+  dprintf debug "[Info] update_session: shape_version = %d@\n"
+    old_session.session_shape_version;
   let new_session =
-    create_session ~shape_version:!current_shape_version old_session.session_dir
+    create_session ~shape_version:old_session.session_shape_version
+      old_session.session_dir
   in
   let new_env_session =
     { session = new_session;
@@ -1765,23 +1516,25 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
   in
   let obsolete = PHstr.fold (fun _ old_file acc ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-    let new_file = add_file ~keygen new_env_session
+    let new_file = add_file
+      ~keygen new_env_session
       ?format:old_file.file_format old_file.file_name
     in
-    merge_file ~keygen env ~allow_obsolete old_file new_file
+    merge_file ~keygen new_env_session ~allow_obsolete old_file new_file
     || acc)
     old_session.session_files false 
   in
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
-    if !current_shape_version <> Termcode.current_shape_version then
+    if old_session.session_shape_version <> Termcode.current_shape_version then
       begin
-        current_shape_version := Termcode.current_shape_version;
         dprintf debug "[Info] update_session: recompute shapes@\n";
         recompute_all_shapes new_session;
         true
       end
     else obsolete in
+  assert (new_env_session.session.session_shape_version
+          = Termcode.current_shape_version);
   new_env_session, obsolete
 
 let get_project_dir fname =

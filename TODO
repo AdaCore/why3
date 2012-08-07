@@ -43,16 +43,13 @@ WhyML
     The type cast can then play the role of the "close" instruction.
     Do we need it? What's the good syntax for open types?
 
-  - we check the context type invariants around Eany, but not around
-    Eabstr, which is rather strange. Should Eabstr have preconditions?
-    If not, why should it post-ensure the invariants that didn't
-    necessarily hold before its execution? Probably, we shouldn't
-    add the context invariants to the outer spec of Eany.
+  - we check the context type invariants around Eany and after Eabstr.
+    It might be strange that Eabstr post-ensures the invariants that
+    didn't necessarily hold before its execution. Also, what about
+    return/raise invariants, should Eany and Eabstr enforce them?
+    (at the moment, they do)
 
-  - and what about return/raise invariants, should Eany and Eabstr
-    ensure them? (at the moment, they do)
-
-  - currently every unhandled exception has postcondition "true".
+  - currently every unhandled exception has the postcondition "true".
     "false" would be a poor choice, as it could introduce inconsistency
     in the WPs of the caller. Should we allow unhandled exceptions at all?
 
@@ -120,3 +117,12 @@ tools
         Andrei: isn't this done?
 
   - Maybe : make something generic for the dialog box with memory.
+
+
+provers
+-------
+
+  - PVS: use a better name for PVS theory when printing a task, e.g.
+    file_theory_goal. Solution: do that when we have idents with origin
+    information (necessary for parsing a task).
+

@@ -39,12 +39,12 @@ _why3()
             return 0
             ;;
         -P|--prover)
-            provers=$($1 --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
+            provers=$($1 --list-provers | grep '^  [^ ]' | cut -d ' ' -f 3)
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
             return 0
             ;;
         -F|--format)
-            formats=$($1 --list-formats | grep -v '^Known ' | cut -d ' ' -f 3)
+            formats=$($1 --list-formats | grep '^  [^ ]' | cut -d ' ' -f 3)
             COMPREPLY=( $( compgen -W "$formats" -- "$cur" ) )
             return 0
             ;;
@@ -52,12 +52,12 @@ _why3()
             return 0
             ;;
         -a|--apply-transform)
-            transforms=$($1 --list-transforms | grep -v '^Known ')
+            transforms=$($1 --list-transforms | grep '^  [^ ]')
             COMPREPLY=( $( compgen -W "$transforms" -- "$cur" ) )
             return 0
             ;;
         -M|--meta)
-            metas=$($1 --list-metas | grep -v '^Known ' |
+            metas=$($1 --list-metas | grep '^  [^ ]' |
                 grep -v '\[\(function/predicate\|type\) symbol\]' |
                 grep -v '\[\(type\|proposition\|integer\)\]' |
                 grep -v '\] \[' | sed -e 's/(flag) //' |
@@ -87,12 +87,12 @@ _why3()
             return 0
             ;;
         --debug)
-            flags=$($1 --list-debug-flags | grep -v '^Known ' | cut -d ' ' -f 3)
+            flags=$($1 --list-debug-flags | grep '^  [^ ]' | cut -d ' ' -f 3)
             COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
             return 0
             ;;
         --filter-prover)
-            provers=$(${1/session/} --list-provers | grep -v '^Known ' | cut -d ' ' -f 3)
+            provers=$(${1/session/} --list-provers | grep '^  [^ ]' | cut -d ' ' -f 3)
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
             return 0
             ;;

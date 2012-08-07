@@ -6,10 +6,10 @@ provided by the \why environment. These are as follows:
 \begin{description}
 \item[\texttt{why3config}] tool for managing the user's configuration,
   including the detection of installed provers.
-\item[\texttt{why3}] reads \why input files and call provers, on the command-line
+\item[\texttt{why3}] reads \why\ and \whyml input files and calls
+  provers, on the command-line.
 \item[\texttt{why3ide}] graphical interface to display goals, run
   provers and transformations on them.
-\item[\texttt{why3ml}] as \texttt{why3} but reads \whyml programs instead
 \item[\texttt{why3replayer}] replay the proofs stored in a session,
   for regression test purposes
 \item[\texttt{why3bench}] produces benchmarks.
@@ -103,8 +103,9 @@ can be obtained by the option \verb|--list-prover-ids|.
 \label{sec:why3ref}
 
 \why is primarily used to call provers on goals contained in an
-input file. By default, such a file must be written in \why language
-and have the extension \texttt{.why}. However, a dynamically loaded
+input file. By default, such a file must be written either in \why language
+(extension \texttt{.why}) or in \whyml language (extension \texttt{.mlw}).
+However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
 \eg{} TPTP or SMTlib.
 
@@ -120,6 +121,8 @@ The \texttt{why3} tool executes the following steps:
   the filename extension or the \verb|--format| option to choose
   among the available parsers. The \verb|--list-format| option gives
   the list of registered parsers.
+  \whyml modules are turned into
+  theories containing verification conditions as goals.
 \item Extract the selected goals inside each of the selected theories
   into tasks. The goals and theories are selected using the options
   \verb|-G/--goal| and \verb|-T/--theory|. The option
@@ -316,22 +319,6 @@ are groups together under several tabs
   decision by clicking on it.
 \end{description}
 
-\section{The \texttt{why3ml} tool}
-
-The \texttt{why3ml} tool is a layer on  top of the \why library for
-generating verification conditions from \whyml programs.
-The command-line of \texttt{why3ml} is identical to that of
-\texttt{why3}, but also accepts files with extension \texttt{.mlw} as
-input files containing \whyml modules (see Chapter~\ref{chap:whyml}
-and Section~\ref{sec:syntax:whyml}). Modules are turned into
-theories containing verification conditions as goals, and then
-\texttt{why3ml} behaves exactly as \texttt{why3} for the remaining of
-the process.
-Note that files with extension \texttt{.mlw} can also be loaded in
-\texttt{why3ide}.
-
-For those who want to experiment with \whyml, many examples are provided in
-\texttt{examples/programs}.
 
 \section{The \texttt{why3bench} tool}
 

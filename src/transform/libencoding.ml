@@ -25,10 +25,12 @@ open Term
 open Decl
 open Theory
 
-let debug = Debug.register_flag "encoding"
+let debug = Debug.register_info_flag "encoding"
+  ~desc:"About the encoding of polymorphism."
 
 (* meta to tag the protected types *)
 let meta_kept = register_meta "encoding : kept" [MTty]
+  ~desc:"Specify a type to keep during the encoding of polymorphism."
 
 (* sort symbol of the "universal" type *)
 let ts_base = create_tysymbol (id_fresh "uni") [] None

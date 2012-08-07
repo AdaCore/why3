@@ -38,6 +38,7 @@ val th_mark_old : Theory.theory
 
 val e_now : expr
 
+val pv_old : pvsymbol
 val remove_old : Term.term -> Term.term
 
 val full_invariant :

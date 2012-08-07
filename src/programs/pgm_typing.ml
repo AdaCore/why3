@@ -34,7 +34,8 @@ open Pgm_types
 open Pgm_types.T
 open Pgm_module
 
-let debug = Debug.register_flag "program_typing"
+let debug = Debug.register_info_flag "whyml_typing"
+  ~desc:"Print@ details@ of@ program@ typechecking."
 let is_debug () = Debug.test_flag debug
 
 let error = Loc.error
@@ -2328,7 +2329,7 @@ type program_decl =
   | PDpdecl of Ptree.pdecl
   | PDuseclone of Ptree.use_clone
   | PDuse of Ptree.use
-  | PDnamespace of string option * bool * (Ptree.loc * program_decl) list
+  | PDnamespace of string * bool * (Ptree.loc * program_decl) list
 
 (* env  = to retrieve theories and modules from the loadpath
    lmod = local modules *)
@@ -2418,18 +2419,18 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
       begin try match imp_exp with
         | Some imp ->
             (* use T = namespace T use_export T end *)
-            let uc = open_namespace uc in
+            let uc = open_namespace uc use_as in
             let uc = use_export uc m in
-            close_namespace uc imp use_as
+            close_namespace uc imp
         | None ->
             use_export uc m
       with ClashSymbol s ->
         errorm ~loc "clash with previous symbol %s" s
       end
   | PDnamespace (id, import, dl) ->
-      let uc = open_namespace uc in
+      let uc = open_namespace uc id in
       let uc = List.fold_left (decl ~wp env ltm lmod) uc dl in
-      begin try close_namespace uc import id
+      begin try close_namespace uc import
       with ClashSymbol s -> errorm ~loc "clash with previous symbol %s" s end
   | PDdecl (Ptree.TypeDecl d) ->
       add_types loc uc d

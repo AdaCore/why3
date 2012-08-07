@@ -34,11 +34,12 @@ type 'a pp = Format.formatter -> 'a -> unit
 
 type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
 
-val register_printer : string -> printer -> unit
+val register_printer : desc:Pp.formatted -> string -> printer -> unit
 
 val lookup_printer : string -> printer
 
-val list_printers : unit -> string list
+val list_printers : unit -> (string * Pp.formatted) list
+val print_printer_desc : Pp.formatter -> (string * Pp.formatted) -> unit
 
 (** {2 use printers} *)
 

@@ -85,6 +85,7 @@ type uc = {
   uc_effect : theory_uc; (* the theory used for typing effects *)
   uc_pure   : theory_uc; (* the logic theory used to type annotations *)
   uc_decls  : decl list; (* the program declarations *)
+  uc_prefix : string list;
   uc_import : namespace list;
   uc_export : namespace list;
 }
@@ -102,30 +103,32 @@ let add_pervasives uc =
   in
   add_ty_decl uc ts
 
-let open_namespace uc = match uc.uc_import with
+let open_namespace uc s = match uc.uc_import with
   | ns :: _ -> { uc with
-      uc_impure = Theory.open_namespace uc.uc_impure;
-      uc_effect = Theory.open_namespace uc.uc_effect;
-      uc_pure   = Theory.open_namespace uc.uc_pure;
+      uc_impure = Theory.open_namespace uc.uc_impure s;
+      uc_effect = Theory.open_namespace uc.uc_effect s;
+      uc_pure   = Theory.open_namespace uc.uc_pure s;
+      uc_prefix =        s :: uc.uc_prefix;
       uc_import =       ns :: uc.uc_import;
       uc_export = empty_ns :: uc.uc_export; }
   | [] -> assert false
 
 exception NoOpenedNamespace
 
-let close_namespace uc import s =
-  match uc.uc_import, uc.uc_export with
-  | _ :: i1 :: sti, e0 :: e1 :: ste ->
+let close_namespace uc import =
+  match uc.uc_prefix, uc.uc_import, uc.uc_export with
+  | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
-      let i1 = match s with Some s -> add_ns false s e0 i1 | _ -> i1 in
-      let e1 = match s with Some s -> add_ns true  s e0 e1 | _ -> e1 in
-      let ith = Theory.close_namespace uc.uc_impure import s in
-      let eth = Theory.close_namespace uc.uc_effect import s in
-      let pth = Theory.close_namespace uc.uc_pure   import s in
+      let i1 = add_ns false s e0 i1 in
+      let e1 = add_ns true  s e0 e1 in
+      let ith = Theory.close_namespace uc.uc_impure import in
+      let eth = Theory.close_namespace uc.uc_effect import in
+      let pth = Theory.close_namespace uc.uc_pure   import in
       { uc with uc_impure = ith; uc_effect = eth; uc_pure = pth;
-                uc_import = i1 :: sti; uc_export = e1 :: ste; }
-  | [_], [_] -> raise NoOpenedNamespace
+                uc_import = i1 :: sti; uc_export = e1 :: ste;
+                uc_prefix = prf; }
+  | [], [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
 (** Insertion of new declarations *)
@@ -201,6 +204,7 @@ let empty_module path n =
     uc_effect = Theory.create_theory ~path n;
     uc_pure   = Theory.create_theory ~path n;
     uc_decls  = [];
+    uc_prefix = [];
     uc_import = [empty_ns];
     uc_export = [empty_ns]; }
   in

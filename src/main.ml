@@ -235,30 +235,33 @@ let () = try
 
   (** listings*)
 
+  let sort_pair (x,_) (y,_) = String.compare x y in
   let opt_list = ref false in
   if !opt_list_transforms then begin
     opt_list := true;
     printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Trans.list_transforms ()));
+      (Pp.print_list Pp.newline2 Trans.print_trans_desc)
+      (List.sort sort_pair (Trans.list_transforms ()));
     printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Trans.list_transforms_l ()))
+      (Pp.print_list Pp.newline2 Trans.print_trans_desc)
+      (List.sort sort_pair (Trans.list_transforms_l ()))
   end;
   if !opt_list_printers then begin
     opt_list := true;
     printf "@[<hov 2>Known printers:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Printer.list_printers ()))
+      (Pp.print_list Pp.newline2 Printer.print_printer_desc)
+      (List.sort sort_pair (Printer.list_printers ()))
   end;
   if !opt_list_formats then begin
     opt_list := true;
     let print1 fmt s = fprintf fmt "%S" s in
-    let print fmt (p, l) =
-      fprintf fmt "%s [%a]" p (Pp.print_list Pp.comma print1) l
+    let print fmt (p, l, f) =
+      fprintf fmt "@[%s [%a]@\n  @[%a@]@]"
+        p (Pp.print_list Pp.comma print1) l
+        Pp.formatted f
     in
-    printf "@[<hov 2>Known input formats:@\n%a@]@."
-      (Pp.print_list Pp.newline print)
+    printf "@[Known input formats:@\n  @[%a@]@]@."
+      (Pp.print_list Pp.newline2 print)
       (List.sort Pervasives.compare (Env.list_formats ()))
   end;
   if !opt_list_provers then begin
@@ -272,15 +275,16 @@ let () = try
   end;
   if !opt_list_metas then begin
     opt_list := true;
-    let print fmt m = fprintf fmt "@[%s %s%a@]"
+    let print fmt m = fprintf fmt "@[<h 2>%s %s%a@\n@[<hov>%a@]@]"
       (let s = m.meta_name in
         if String.contains s ' ' then "\"" ^ s ^ "\"" else s)
       (if m.meta_excl then "(flag) " else "")
       (Pp.print_list Pp.space Pretty.print_meta_arg_type) m.meta_type
+      Pp.formatted m.meta_desc
     in
     let cmp m1 m2 = Pervasives.compare m1.meta_name m2.meta_name in
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline print) (List.sort cmp (Theory.list_metas ()))
+      (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
   end;
   opt_list :=  Debug.Opt.option_list () || !opt_list;
   if !opt_list then exit 0;

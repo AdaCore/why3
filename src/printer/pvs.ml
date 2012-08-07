@@ -913,7 +913,13 @@ let print_task_real env pr thpr ?old fmt task =
   print_task env pr thpr true  ?old fmt task
 
 let () = register_printer "pvs" print_task_full
+  ~desc:"Printer@ for@ the@ PVS@ proof@ assistant@ \
+         (without@ realization@ capabilities)."
+
 let () = register_printer "pvs-realize" print_task_real
+  ~desc:"Printer@ for@ the@ PVS@ proof@ assistant@ \
+         (with@ realization@ capabilities)."
+
 
 (*
 Local Variables:

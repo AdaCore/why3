@@ -134,7 +134,10 @@ type modul = {
 
 type module_uc = {
   muc_theory : theory_uc;
+  muc_name   : string;
+  muc_path   : string list;
   muc_decls  : pdecl list;
+  muc_prefix : string list;
   muc_import : namespace list;
   muc_export : namespace list;
   muc_known  : known_map;
@@ -142,10 +145,15 @@ type module_uc = {
   muc_used   : Sid.t;
   muc_env    : Env.env;
 }
+(* FIXME? We wouldn't need to store muc_name, muc_path,
+   and muc_prefix if theory_uc was exported *)
 
 let empty_module env n p = {
   muc_theory = create_theory ~path:p n;
+  muc_name   = Ident.preid_name n;
+  muc_path   = p;
   muc_decls  = [];
+  muc_prefix = [];
   muc_import = [empty_ns];
   muc_export = [empty_ns];
   muc_known  = Mid.empty;
@@ -167,23 +175,25 @@ let get_theory uc = uc.muc_theory
 let get_namespace uc = List.hd uc.muc_import
 let get_known uc = uc.muc_known
 
-let open_namespace uc = match uc.muc_import with
+let open_namespace uc s = match uc.muc_import with
   | ns :: _ -> { uc with
-      muc_theory = Theory.open_namespace uc.muc_theory;
+      muc_theory = Theory.open_namespace uc.muc_theory s;
+      muc_prefix =        s :: uc.muc_prefix;
       muc_import =       ns :: uc.muc_import;
       muc_export = empty_ns :: uc.muc_export; }
   | [] -> assert false
 
-let close_namespace uc import s =
-  let th = Theory.close_namespace uc.muc_theory import s in (* catches errors *)
-  match uc.muc_import, uc.muc_export with
-  | _ :: i1 :: sti, e0 :: e1 :: ste ->
+let close_namespace uc import =
+  let th = Theory.close_namespace uc.muc_theory import in (* catches errors *)
+  match uc.muc_prefix, uc.muc_import, uc.muc_export with
+  | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
-      let i1 = match s with Some s -> add_ns false s e0 i1 | _ -> i1 in
-      let e1 = match s with Some s -> add_ns true  s e0 e1 | _ -> e1 in
+      let i1 = add_ns false s e0 i1 in
+      let e1 = add_ns true  s e0 e1 in
       { uc with
 	  muc_theory = th;
+          muc_prefix = prf;
 	  muc_import = i1 :: sti;
 	  muc_export = e1 :: ste; }
   | _ ->
@@ -213,7 +223,19 @@ let use_export uc m =
 
 let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
 
+let store_path, restore_path =
+  let id_to_path = Wid.create 17 in
+  let store_path uc path id =
+    (* this symbol already belongs to some theory *)
+    if Wid.mem id_to_path id then () else
+    let prefix = List.rev (id.id_string :: path @ uc.muc_prefix) in
+    Wid.set id_to_path id (uc.muc_path, uc.muc_name, prefix)
+  in
+  let restore_path id = Wid.find id_to_path id in
+  store_path, restore_path
+
 let add_symbol add id v uc =
+  store_path uc [] id;
   match uc.muc_import, uc.muc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       muc_import = add false id.id_string v i0 :: sti;
@@ -249,14 +271,18 @@ let clone_export_theory uc th inst =
     | _ -> assert false in
   let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
   let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
-  let f_ts ts = TS (Mts.find_def ts ts sm.sm_ts) in
-  let f_ls ls = LS (Mls.find_def ls ls sm.sm_ls) in
-  let rec f_ns ns = {
-    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.Theory.ns_ts);
-    ns_ps = Mstr.map f_ls (Mstr.filter g_ls ns.Theory.ns_ls);
-    ns_ns = Mstr.map f_ns ns.Theory.ns_ns; }
+  let f_ts p ts =
+    try let ts = Mts.find ts sm.sm_ts in store_path uc p ts.ts_name; TS ts
+    with Not_found -> TS ts in
+  let f_ls p ls =
+    try let ls = Mls.find ls sm.sm_ls in store_path uc p ls.ls_name; LS ls
+    with Not_found -> LS ls in
+  let rec f_ns p ns = {
+    ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.Theory.ns_ts);
+    ns_ps = Mstr.map (f_ls p) (Mstr.filter g_ls ns.Theory.ns_ls);
+    ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.Theory.ns_ns; }
   in
-  add_to_module uc nth (f_ns th.th_export)
+  add_to_module uc nth (f_ns [] th.th_export)
 
 let add_meta uc m al =
   { uc with muc_theory = Theory.add_meta uc.muc_theory m al }
@@ -343,22 +369,29 @@ let th_unit =
   close_theory uc
 
 let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
-let pd_exit = create_exn_decl xs_exit
 
-let mod_exit = {
-  mod_theory = close_theory (create_theory (id_fresh "Exit"));
-  mod_decls  = [pd_exit];
-  mod_export = add_ps true xs_exit.xs_name.id_string (XS xs_exit) empty_ns;
-  mod_known  = Mid.singleton xs_exit.xs_name pd_exit;
-  mod_local  = Sid.singleton xs_exit.xs_name;
-  mod_used   = Sid.empty;
-}
+let mod_prelude env =
+  let pd_exit = create_exn_decl xs_exit in
+  let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
+  let uc = empty_module env (id_fresh "Prelude") [] in
+  let uc = add_pdecl ~wp:false uc pd_old in
+  let uc = add_pdecl ~wp:false uc pd_exit in
+  close_module uc
+
+let mod_prelude =
+  let one_time = ref None in
+  fun env -> match !one_time with
+    | Some m -> m
+    | None ->
+        let m = mod_prelude env in
+        one_time := Some m;
+        m
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m th_unit in
-  let m = use_export m mod_exit in
+  let m = use_export m (mod_prelude env) in
   m
 
 (** Clone *)
@@ -394,7 +427,6 @@ let clone_export uc m inst =
   let conv_pv pv =
     create_pvsymbol (id_clone pv.pv_vs.vs_name) (conv_vtv pv.pv_vtv) in
   let psh = Hid.create 3 in
-  let find_ps def id = try Hid.find psh id with Not_found -> def in
   let conv_xs xs = try match Hid.find psh xs.xs_name with
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
   let conv_eff eff =
@@ -501,17 +533,36 @@ let clone_export uc m inst =
   let g_ps _ = function
     | LS ls -> not (Mls.mem ls inst.inst_ls)
     | _ -> true in
-  let f_ts = function
-    | TS ts -> TS (Mts.find_def ts ts sm.Theory.sm_ts)
-    | PT pt -> PT (Mits.find_def pt pt psm.sm_its) in
-  let f_ps prs = match prs with
-    | LS ls -> LS (Mls.find_def ls ls sm.Theory.sm_ls)
-    | PL pl -> PL (Mls.find_def pl pl.pl_ls psm.sm_pls)
-    | PV pv -> find_ps prs pv.pv_vs.vs_name
-    | PS ps -> find_ps prs ps.ps_name
-    | XS xs -> find_ps prs xs.xs_name in
-  let rec f_ns ns = {
-    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
-    ns_ps = Mstr.map f_ps (Mstr.filter g_ps ns.ns_ps);
-    ns_ns = Mstr.map f_ns ns.ns_ns; } in
-  add_to_module uc nth (f_ns m.mod_export)
+  let f_ts p = function
+    | TS ts ->
+        begin try let ts = Mts.find ts sm.Theory.sm_ts in
+          store_path uc p ts.ts_name; TS ts
+        with Not_found -> TS ts end
+    | PT pt ->
+        begin try let pt = Mits.find pt psm.sm_its in
+          store_path uc p pt.its_pure.ts_name; PT pt
+        with Not_found -> PT pt end in
+  let find_prs p def id =
+    try let s = Hid.find psh id in match s with
+      | PV pv -> store_path uc p pv.pv_vs.vs_name; s
+      | PS ps -> store_path uc p ps.ps_name; s
+      | XS xs -> store_path uc p xs.xs_name; s
+      | LS _ | PL _ -> assert false
+    with Not_found -> def in
+  let f_ps p prs = match prs with
+    | LS ls ->
+        begin try let ls = Mls.find ls sm.Theory.sm_ls in
+          store_path uc p ls.ls_name; LS ls
+        with Not_found -> LS ls end
+    | PL pl ->
+        begin try let pl = Mls.find pl.pl_ls psm.sm_pls in
+          store_path uc p pl.pl_ls.ls_name; PL pl
+        with Not_found -> PL pl end
+    | PV pv -> find_prs p prs pv.pv_vs.vs_name
+    | PS ps -> find_prs p prs ps.ps_name
+    | XS xs -> find_prs p prs xs.xs_name in
+  let rec f_ns p ns = {
+    ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.ns_ts);
+    ns_ps = Mstr.map (f_ps p) (Mstr.filter g_ps ns.ns_ps);
+    ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.ns_ns; } in
+  add_to_module uc nth (f_ns [] m.mod_export)

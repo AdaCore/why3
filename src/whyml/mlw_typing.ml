@@ -669,12 +669,27 @@ let env_invariant lenv eff pvs =
     let ity = pv.pv_vtv.vtv_ity in
     let written r = reg_occurs r ity.ity_vars in
     let inv = Mlw_wp.full_invariant lkn kn pv.pv_vs ity in
-    t_and_simp pinv inv,
-    if Sreg.exists written regs then t_and_simp qinv inv else qinv
+    let qinv = (* we reprove invariants for modified non-reset variables *)
+      if Sreg.exists written regs && not (eff_stale_region eff ity.ity_vars)
+      then t_and_simp qinv inv else qinv in
+    t_and_simp pinv inv, qinv
   in
   Spv.fold add_pv pvs (t_true,t_true)
 
-let post_invariant lenv inv ity q =
+let rec check_reset rvs t = match t.t_node with
+  | Tvar vs when Svs.mem vs rvs ->
+      errorm "The variable %s is reset and can only be used \
+        under `old' in the postcondition" vs.vs_name.id_string
+  | Tapp (ls,_) when ls_equal ls fs_at -> false
+  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+      let rvs = Mvs.set_inter rvs t.t_vars in
+      if Mvs.is_empty rvs then false else
+      t_any (check_reset rvs) t
+  | _ ->
+      t_any (check_reset rvs) t
+
+let post_invariant lenv rvs inv ity q =
+  ignore (check_reset rvs q);
   let vs, q = open_post q in
   let kn = get_known lenv.mod_uc in
   let lkn = Theory.get_known (get_theory lenv.mod_uc) in
@@ -686,27 +701,39 @@ let ity_or_unit = function
   | VTvalue v -> v.vtv_ity
   | VTarrow _ -> ity_unit
 
+let reset_vars eff pvs =
+  let add pv s =
+    if eff_stale_region eff pv.pv_vtv.vtv_ity.ity_vars
+    then Svs.add pv.pv_vs s else s in
+  if Mreg.is_empty eff.eff_resets then Svs.empty else
+  Spv.fold add pvs Svs.empty
+
 let spec_invariant lenv pvs vty spec =
   let ity = ity_or_unit vty in
   let pvs = spec_pvset pvs spec in
+  let rvs = reset_vars spec.c_effect pvs in
   let pinv,qinv = env_invariant lenv spec.c_effect pvs in
-  let post_inv = post_invariant lenv qinv in
+  let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { spec with c_pre   = t_and_simp spec.c_pre pinv;
               c_post  = post_inv ity spec.c_post;
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
-let abst_invariant lenv e q xq =
+let abstr_invariant lenv e q xq =
   let ity = ity_or_unit e.e_vty in
-  let post_inv = post_invariant lenv t_true in
+  let pvs = abstr_pvset Spv.empty e q xq in
+  let rvs = reset_vars e.e_effect pvs in
+  let _,qinv = env_invariant lenv e.e_effect pvs in
+  let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   post_inv ity q, Mexn.mapi xpost_inv xq
 
 let lambda_invariant lenv pvs lam =
   let ity = ity_or_unit lam.l_expr.e_vty in
   let pvs = List.fold_right Spv.add lam.l_args pvs in
+  let rvs = reset_vars lam.l_expr.e_effect pvs in
   let pinv,qinv = env_invariant lenv lam.l_expr.e_effect pvs in
-  let post_inv = post_invariant lenv qinv in
+  let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { lam with  l_pre   = t_and_simp lam.l_pre pinv;
               l_post  = post_inv ity lam.l_post;
@@ -893,7 +920,10 @@ let rec type_c lenv gh pvs vars dtyc =
   let xpost = if Svs.is_empty esvs then spec.c_xpost else
     let exn = Invalid_argument "Mlw_typing.type_c" in
     let res = create_vsymbol (id_fresh "dummy") ty_unit in
-    let add vs f = let t = t_var vs in t_and_simp (t_equ t t) f in
+    let t_old = t_var pv_old.pv_vs in
+    let add vs f = (* put under 'old' in case of reset *)
+      let t = fs_app fs_at [t_var vs; t_old] vs.vs_ty in
+      t_and_simp (t_equ t t) f in
     let xq = Mlw_ty.create_post res (Svs.fold add esvs t_true) in
     Mexn.add_new exn xs_exit xq spec.c_xpost in
   let spec = { spec with c_xpost = xpost } in
@@ -1028,7 +1058,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let e1 = expr lenv de1 in
       let q = create_post lenv "result" e1.e_vty q in
       let xq = complete_xpost lenv e1.e_effect xq in
-      let q, xq = abst_invariant lenv e1 q xq in
+      let q, xq = abstr_invariant lenv e1 q xq in
       e_abstract e1 q xq
   | DEassert (ak, f) ->
       let ak = match ak with
@@ -1612,7 +1642,8 @@ let use_clone_pure lib mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
   let th = find_theory loc lib mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp <> None then Theory.open_namespace uc else uc in
+  let uc = if use.use_imp_exp = None then uc
+  else Theory.open_namespace uc use.use_as in
   (* use or clone *)
   let uc = match inst with
     | None -> Theory.use_export uc th
@@ -1620,7 +1651,7 @@ let use_clone_pure lib mth uc loc (use,inst) =
   (* close namespace, if any *)
   match use.use_imp_exp with
     | None -> uc
-    | Some imp -> Theory.close_namespace uc imp use.use_as
+    | Some imp -> Theory.close_namespace uc imp
 
 let use_clone_pure lib mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1631,7 +1662,8 @@ let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+  let uc = if use.use_imp_exp = None then uc
+  else open_namespace uc use.use_as in
   (* use or clone *)
   let uc = match mth, inst with
     | Module m, None -> use_export uc m
@@ -1643,7 +1675,7 @@ let use_clone lib mmd mth uc loc (use,inst) =
   (* close namespace, if any *)
   match use.use_imp_exp with
     | None -> uc
-    | Some imp -> close_namespace uc imp use.use_as
+    | Some imp -> close_namespace uc imp
 
 let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1654,7 +1686,8 @@ let use_module lib mmd mth uc loc use =
   let path, s = Typing.split_qualid use.use_theory in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp <> None then open_namespace uc else uc in
+  let uc = if use.use_imp_exp = None then uc
+  else open_namespace uc use.use_as in
   (* use or clone *)
   let uc = match mth with
     | Theory _ ->
@@ -1663,7 +1696,7 @@ let use_module lib mmd mth uc loc use =
   (* close namespace, if any *)
   match use.use_imp_exp with
     | None -> uc
-    | Some imp -> close_namespace uc imp use.use_as
+    | Some imp -> close_namespace uc imp
 
 let use_module lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -1704,12 +1737,12 @@ let open_file, close_file =
       Stack.push (close_theory (Stack.pop lenv) (Stack.pop tuc)) lenv in
     let close_module () = ignore (Stack.pop inm);
       Stack.push (close_module (Stack.pop lenv) (Stack.pop muc)) lenv in
-    let open_namespace () = if Stack.top inm
-      then Stack.push (Mlw_module.open_namespace (Stack.pop muc)) muc
-      else Stack.push (Theory.open_namespace (Stack.pop tuc)) tuc in
-    let close_namespace imp name = if Stack.top inm
-      then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp name) muc
-      else Stack.push (Theory.close_namespace (Stack.pop tuc) imp name) tuc in
+    let open_namespace name = if Stack.top inm
+      then Stack.push (Mlw_module.open_namespace (Stack.pop muc) name) muc
+      else Stack.push (Theory.open_namespace (Stack.pop tuc) name) tuc in
+    let close_namespace imp = if Stack.top inm
+      then Stack.push (Mlw_module.close_namespace (Stack.pop muc) imp) muc
+      else Stack.push (Theory.close_namespace (Stack.pop tuc) imp) tuc in
     let new_decl loc d = if Stack.top inm
       then Stack.push (add_decl ~wp loc (Stack.pop muc) d) muc
       else Stack.push (Typing.add_decl loc (Stack.pop tuc) d) tuc in
@@ -1725,7 +1758,7 @@ let open_file, close_file =
       open_module = open_module;
       close_module = close_module;
       open_namespace = open_namespace;
-      close_namespace = (fun loc -> Loc.try2 loc close_namespace);
+      close_namespace = (fun loc -> Loc.try1 loc close_namespace);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
       use_clone = use_clone;

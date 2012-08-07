@@ -26,26 +26,32 @@ type flag = bool ref
 
 let flag_table = Hashtbl.create 17
 
-let gen_register_flag s stop =
+let fst3 (flag,_,_) = flag
+let snd3 (_,info,_) = info
+let thd3 (_,_,desc) = desc
+
+let gen_register_flag (desc : Pp.formatted) s info =
   try
-    fst (Hashtbl.find flag_table s)
+    fst3 (Hashtbl.find flag_table s)
   with Not_found ->
     let flag = ref false in
-    Hashtbl.replace flag_table s (flag,stop);
+    Hashtbl.replace flag_table s (flag,info,desc);
     flag
 
-let register_flag s = gen_register_flag s false
+let register_info_flag ~desc s = gen_register_flag desc s true
+let register_flag      ~desc s = gen_register_flag desc s false
 
-let register_stop_flag s = gen_register_flag s true
+let list_flags () =
+  Hashtbl.fold (fun s (v,_,desc) acc -> (s,v,!v,desc)::acc) flag_table []
 
 let lookup_flag s =
-  try fst (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
+  try fst3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
-let list_flags () = Hashtbl.fold (fun s (v,_) acc -> (s,v,!v)::acc)
-  flag_table []
+let is_info_flag s =
+  try snd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
-let is_stop_flag s =
-  try snd (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
+let flag_desc s =
+  try thd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
 let test_flag s = !s
 let nottest_flag s = not !s
@@ -58,8 +64,12 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnknownFlag s -> Format.fprintf fmt "unknown debug flag `%s'@." s
   | _ -> raise e)
 
-let stack_trace = register_flag "stack_trace"
-let timestamp = register_flag "timestamp"
+let stack_trace = register_info_flag "stack_trace"
+  ~desc:"Avoid@ catching@ exceptions@ in@ order@ to@ get@ the@ stack@ trace."
+
+let timestamp = register_info_flag "timestamp"
+  ~desc:"Print@ a@ timestamp@ before@ debug@ messages."
+
 let time_start = Unix.gettimeofday ()
 
 let set_debug_formatter = (:=) formatter
@@ -88,13 +98,15 @@ module Opt = struct
     let list () =
       if !opt_list_flags then begin
         let list =
-          Hashtbl.fold (fun s (_,stop) acc -> (s,stop)::acc)
+          Hashtbl.fold (fun s (_,info,desc) acc -> (s,info,desc)::acc)
             flag_table [] in
-        let print fmt (p,stop) =
-          if stop then Format.fprintf fmt "%s *" p
-          else Format.pp_print_string fmt p in
+        let print fmt (p,info,desc) =
+          Format.fprintf fmt "@[%s%s@\n  @[%a@]@]"
+            p (if info then " *" else "")
+            Pp.formatted desc
+        in
         Format.printf "@[<hov 2>Known debug flags \
-(`*' marks the flags that change Why3 behavior):@\n%a@]@."
+            (`*' marks the flags selected by --debug-all):@\n%a@]@."
           (Pp.print_list Pp.newline print)
           (List.sort Pervasives.compare list);
       end;
@@ -118,40 +130,14 @@ module Opt = struct
   let desc_debug_all =
     let desc_debug =
       Pp.sprintf
-        " Set all debug flags (except flags which change the behavior)" in
+        " Set all debug flags that do not change Why3 behaviour" in
     ("--debug-all", Arg.Set opt_debug_all, desc_debug)
 
   let set_flags_selected () =
     if !opt_debug_all then
       List.iter
-        (fun (s,f,_) -> if not (is_stop_flag s) then set_flag f)
+        (fun (s,f,_,_) -> if not (is_info_flag s) then set_flag f)
         (list_flags ());
     Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
       opt_list_flags
-
 end
-
-(*
-
-  "--parse-only", Arg.Set opt_parse_only,
-      " Stop after parsing (same as --debug parse_only)";
-  "--type-only", Arg.Set opt_type_only,
-      " Stop after type checking (same as --debug type_only)";
-  "--debug-all", Arg.Set opt_debug_all,
-      " Set all debug flags (except parse_only and type_only)";
-  "--debug", Arg.String add_opt_debug,
-      "<flag> Set a debug flag";
-
-
-  (** Debug flag *)
-  if !opt_debug_all then begin
-    List.iter (fun (_,f,_) -> Debug.set_flag f) (Debug.list_flags ());
-    Debug.unset_flag Typing.debug_parse_only;
-    Debug.unset_flag Typing.debug_type_only
-  end;
-
-  List.iter (fun s -> Debug.set_flag (Debug.lookup_flag s)) !opt_debug;
-
-  if !opt_parse_only then Debug.set_flag Typing.debug_parse_only;
-  if !opt_type_only then Debug.set_flag Typing.debug_type_only;
-*)

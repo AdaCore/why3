@@ -83,8 +83,10 @@ open Format
 type callback = tool_id -> prob_id ->
     task -> int ->  proof_attempt_status -> unit
 
-let debug_call = Debug.register_flag "call"
-let debug = Debug.register_flag "bench_core"
+let debug_call = Debug.register_info_flag "call"
+  ~desc:"Show when call to provers are done"
+let debug = Debug.register_info_flag "bench_core"
+  ~desc:"About the scheduling"
 
 
 module BenchUtil =

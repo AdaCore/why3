@@ -91,6 +91,7 @@ let fold in_goal notdeft notdeff notls task_hd (env, task) =
 let inline_label = Ident.create_label "inline"
 
 let meta = Theory.register_meta "inline : no" [Theory.MTlsymbol]
+  ~desc:"Disallow@ the@ inlining@ of@ the@ given@ logic@ symbols."
 
 let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
   let trans notls =
@@ -138,8 +139,20 @@ let tagged =
      ~notdeft:notdef ~notdeff:notdef ~notls:notls
 
 let () =
-  Trans.register_transform "inline_all" all;
-  Trans.register_transform "inline_goal" goal;
-  Trans.register_transform "inline_trivial" trivial;
-  Trans.register_transform "inline_tagged" tagged
+  let register ~desc name t =
+    Trans.register_transform ~desc name t
+      ~desc_metas:[meta, Pp.empty_formatted]
+  in
+  register "inline_all" all
+    ~desc:"Inline@ all@ the@ non-recursive@ defined@ symbols.";
+  register "inline_goal" goal
+    ~desc:"Same@ as@ inline_all, but@ only@ in@ goals.";
+  register "inline_tagged" tagged
+    ~desc:"Inline everywhere all symbols with the 'inline' tag";
+  register "inline_trivial" trivial
+    ~desc:"Inline@ only@ the@ non-recursive@ symbols@ that@ have@ a@ trivial@ \
+           definition:\
+@[<hov>\
+  - just@ a@ constant,@\n\
+  - all the variables appear at most once.@]"
 

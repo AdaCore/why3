@@ -102,8 +102,13 @@ type meta = {
   meta_name : string;
   meta_type : meta_arg_type list;
   meta_excl : bool;
+  meta_desc : Pp.formatted;
   meta_tag  : int;
 }
+
+let print_meta_desc fmt m =
+  fprintf fmt "@[%s@\n  @[%a@]@]"
+    m.meta_name Pp.formatted m.meta_desc
 
 module SMmeta = StructMake(struct type t = meta let tag m = m.meta_tag end)
 
@@ -124,24 +129,26 @@ let meta_table = Hashtbl.create 17
 
 let mk_meta =
   let c = ref (-1) in
-  fun s al excl -> {
+  fun desc s al excl -> {
     meta_name = s;
     meta_type = al;
     meta_excl = excl;
-    meta_tag  = (incr c; !c) }
+    meta_desc = desc;
+    meta_tag  = (incr c; !c);
+  }
 
-let register_meta s al excl =
+let register_meta ~desc s al excl =
   try
     let m = Hashtbl.find meta_table s in
     if al = m.meta_type && excl = m.meta_excl then m
     else raise (KnownMeta m)
   with Not_found ->
-    let m = mk_meta s al excl in
+    let m = mk_meta desc s al excl in
     Hashtbl.add meta_table s m;
     m
 
-let register_meta_excl s al = register_meta s al true
-let register_meta      s al = register_meta s al false
+let register_meta_excl ~desc s al = register_meta ~desc s al true
+let register_meta      ~desc s al = register_meta ~desc s al false
 
 let lookup_meta s =
   try Hashtbl.find meta_table s
@@ -254,6 +261,7 @@ type theory_uc = {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
+  uc_prefix : string list;
   uc_import : namespace list;
   uc_export : namespace list;
   uc_known  : known_map;
@@ -268,6 +276,7 @@ let empty_theory n p = {
   uc_name   = id_register n;
   uc_path   = p;
   uc_decls  = [];
+  uc_prefix = [];
   uc_import = [empty_ns];
   uc_export = [empty_ns];
   uc_known  = Mid.empty;
@@ -288,24 +297,24 @@ let close_theory uc = match uc.uc_export with
 
 let get_namespace uc = List.hd uc.uc_import
 let get_known uc = uc.uc_known
-
 let get_rev_decls uc = uc.uc_decls
 
-let open_namespace uc = match uc.uc_import with
+let open_namespace uc s = match uc.uc_import with
   | ns :: _ -> { uc with
+      uc_prefix =        s :: uc.uc_prefix;
       uc_import =       ns :: uc.uc_import;
       uc_export = empty_ns :: uc.uc_export; }
   | [] -> assert false
 
-let close_namespace uc import s =
-  match uc.uc_import, uc.uc_export with
-  | _ :: i1 :: sti, e0 :: e1 :: ste ->
+let close_namespace uc import =
+  match uc.uc_prefix, uc.uc_import, uc.uc_export with
+  | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let _  = if import then merge_ns true  e0 e1 else e1 in
-      let i1 = match s with Some s -> add_ns false s e0 i1 | _ -> i1 in
-      let e1 = match s with Some s -> add_ns true  s e0 e1 | _ -> e1 in
-      { uc with uc_import = i1 :: sti; uc_export = e1 :: ste; }
-  | [_], [_] -> raise NoOpenedNamespace
+      let i1 = add_ns false s e0 i1 in
+      let e1 = add_ns true  s e0 e1 in
+      { uc with uc_prefix = prf; uc_import = i1::sti; uc_export = e1::ste; }
+  | [], [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
 (* Base constructors *)
@@ -342,7 +351,19 @@ let add_tdecl uc td = match td.td_node with
 
 (** Declarations *)
 
+let store_path, restore_path =
+  let id_to_path = Wid.create 17 in
+  let store_path uc path id =
+    (* this symbol already belongs to some theory *)
+    if Wid.mem id_to_path id then () else
+    let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
+    Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix)
+  in
+  let restore_path id = Wid.find id_to_path id in
+  store_path, restore_path
+
 let add_symbol add id v uc =
+  store_path uc [] id;
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = add false id.id_string v i0 :: sti;
@@ -637,17 +658,23 @@ let clone_export uc th inst =
   let g_ts _ ts = not (Mts.mem ts inst.inst_ts) in
   let g_ls _ ls = not (Mls.mem ls inst.inst_ls) in
 
-  let f_ts ts = Mts.find_def ts ts cl.ts_table in
-  let f_ls ls = Mls.find_def ls ls cl.ls_table in
-  let f_pr pr = Mpr.find_def pr pr cl.pr_table in
+  let f_ts p ts =
+    try let ts = Mts.find ts cl.ts_table in store_path uc p ts.ts_name; ts
+    with Not_found -> ts in
+  let f_ls p ls =
+    try let ls = Mls.find ls cl.ls_table in store_path uc p ls.ls_name; ls
+    with Not_found -> ls in
+  let f_pr p pr =
+    try let pr = Mpr.find pr cl.pr_table in store_path uc p pr.pr_name; pr
+    with Not_found -> pr in
 
-  let rec f_ns ns = {
-    ns_ts = Mstr.map f_ts (Mstr.filter g_ts ns.ns_ts);
-    ns_ls = Mstr.map f_ls (Mstr.filter g_ls ns.ns_ls);
-    ns_pr = Mstr.map f_pr ns.ns_pr;
-    ns_ns = Mstr.map f_ns ns.ns_ns; } in
+  let rec f_ns p ns = {
+    ns_ts = Mstr.map (f_ts p) (Mstr.filter g_ts ns.ns_ts);
+    ns_ls = Mstr.map (f_ls p) (Mstr.filter g_ls ns.ns_ls);
+    ns_pr = Mstr.map (f_pr p) ns.ns_pr;
+    ns_ns = Mstr.mapi (fun n -> f_ns (n::p)) ns.ns_ns; } in
 
-  let ns = f_ns th.th_export in
+  let ns = f_ns [] th.th_export in
 
   match uc.uc_import, uc.uc_export with
     | i0 :: sti, e0 :: ste -> { uc with
@@ -836,4 +863,3 @@ let () = Exn_printer.register
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | _ -> raise exn
   end
-

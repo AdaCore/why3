@@ -169,13 +169,30 @@ let split_goal    = Trans.goal_l (split_goal    true)
 let split_all     = Trans.decl_l (split_all     true) None
 let split_premise = Trans.decl   (split_premise true) None
 
+let desc_labels =
+  [asym_split,
+   ("Use@ the@ left@ part@ as@ hypothesis@ for@ the@ right@ part@ of@ \
+     the@ labeled@ term.": Pp.formatted);
+   stop_split,("Don't@ split@ the@ labeled@ term.": Pp.formatted)]
+
 let () = Trans.register_transform_l "split_goal"    split_goal
+  ~desc_labels ~desc:"Same@ as@ full_split_goal,@ \
+                      but@ don't@ split:@\n  \
+@[- @[conjunctions under disjunctions@]@\n\
+  - @[and conjunctions on the left of implications.@]@]"
 let () = Trans.register_transform_l "split_all"     split_all
+  ~desc_labels ~desc:"Same@ as@ split_goal@ but@ also@ for@ premises."
 let () = Trans.register_transform   "split_premise" split_premise
+  ~desc_labels ~desc:"Same@ as@ split_goal@ but@ only@ for@ premises."
 
 let () = Trans.register_transform_l "full_split_goal"    full_split_goal
+  ~desc_labels ~desc:"Puts@ the@ goal@ in@ a@ conjunctive@ form,@ \
+  returns@ the@ corresponding@ set@ of@ subgoals.@ The@ number@ of@ subgoals@ \
+  generated@ may@ be@ exponential@ in@ the@ size@ of@ the@ initial@ goal."
 let () = Trans.register_transform_l "full_split_all"     full_split_all
+  ~desc_labels ~desc:"Same@ as@ full@ split@ goal@ but@ also@ for@ premises."
 let () = Trans.register_transform   "full_split_premise" full_split_premise
+  ~desc_labels ~desc:"Same@ as@ full@ split@ goal@ but@ only for@ premises."
 
 let ls_of_var v =
   create_fsymbol (id_fresh ("spl_" ^ v.vs_name.id_string)) [] v.vs_ty
@@ -215,4 +232,4 @@ let rec split_intro pr dl acc f =
 let split_intro = Trans.goal_l (fun pr f -> split_intro pr [] [] f)
 
 let () = Trans.register_transform_l "split_intro" split_intro
-
+  ~desc_labels ~desc:"TODO: intro and split??."

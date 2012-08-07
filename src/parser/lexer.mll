@@ -343,6 +343,7 @@ and string = parse
     (), parse_logic_file env path lb
 
   let library_of_env = Env.register_format "why" ["why"] read_channel
+    ~desc:"Why@ logical@ language"
 
   let parse_logic_file env = parse_logic_file (library_of_env env)
 }

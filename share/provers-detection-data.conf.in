@@ -165,7 +165,7 @@ driver = "drivers/simplify.drv"
 [ATP spass]
 name = "Spass"
 exec = "SPASS"
-version_switch = "-TPTP || true"
+version_switch = " | grep 'SPASS V'"
 version_regexp = "SPASS V \\([^ \n\t]+\\)"
 version_ok = "3.7"
 # we pass time 0 to why3-cpulimit to avoid race

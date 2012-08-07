@@ -55,4 +55,7 @@ let split_goal pr f =
 let split_conj = Trans.goal_l split_goal
 
 let split_conj_name = "split_conj"
-let () = Trans.register_transform_l split_conj_name split_conj
+let () =
+   Trans.register_transform_l split_conj_name split_conj
+   ~desc:"Split conjunctions, equivalences, if-then-else and case in the goal,\
+   on the right hand side, and only there."

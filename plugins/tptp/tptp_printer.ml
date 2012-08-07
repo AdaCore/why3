@@ -234,5 +234,5 @@ let print_task fof _env pr thpr ?old:_ fmt task =
   fprintf fmt "@[%a@]@."
     (print_list nothing (print_decl info)) (Task.task_decls task)
 
-let () = register_printer "tptp-tff" (print_task false)
-let () = register_printer "tptp-fof" (print_task true)
+let () = register_printer "tptp-tff" (print_task false) ~desc:"TPTP TFF format"
+let () = register_printer "tptp-fof" (print_task true) ~desc:"TPTP FOF format"

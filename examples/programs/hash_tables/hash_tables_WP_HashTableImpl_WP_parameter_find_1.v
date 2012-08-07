@@ -153,21 +153,21 @@ Axiom idx_bounds : forall (a:Type) (b:Type), forall (h:(t a b)), (valid h) ->
   forall (k:a), (0%Z <= (idx h k))%Z /\ ((idx h k) < (length (data h)))%Z.
 
 (* Why3 goal *)
-Theorem WP_parameter_find : forall (a:Type) (b:Type), forall (h:(map a
-  (option b))) (h1:Z) (k:a), forall (rho:(map Z (list (a* b)%type))),
-  (valid (mk_t h (mk_array h1 rho))) -> let i :=
-  (ZOmod (Zabs (hash k)) h1) in (((0%Z <= i)%Z /\ (i < h1)%Z) ->
-  ((forall (v:b), ~ (mem (k, v) (get rho i))) -> ((get h k) = (None :(option
-  b))))).
-intros a b h h1 k rho.
+Theorem WP_parameter_find : forall (a:Type) (b:Type), forall (h:Z) (k:a),
+  forall (rho:(map Z (list (a* b)%type))) (rho1:(map a (option b))),
+  (valid (mk_t rho1 (mk_array h rho))) -> let i :=
+  (ZOmod (Zabs (hash k)) h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
+  ((forall (v:b), ~ (mem (k, v) (get rho i))) -> ((get rho1
+  k) = (None :(option b))))).
+intros a b h k rho rho1.
 unfold valid.
-pose (i := (Zabs (hash k) mod h1)).
+pose (i := (Zabs (hash k) mod h)).
 unfold get1; simpl.
 intuition.
 generalize (H0 k); clear H0.
 generalize (H5 k); clear H5.
 unfold get2; simpl; intuition.
-destruct (get h k); auto.
+destruct (get rho1 k); auto.
 elim (H1 b0); clear H1.
 generalize (H3 b0); clear H3.
 intuition.

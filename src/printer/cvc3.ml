@@ -340,3 +340,4 @@ let () = register_printer "cvc3"
   (fun _env pr thpr ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr fmt task)
+  ~desc:"Printer@ for@ the@ CVC3@ theorem@ prover."

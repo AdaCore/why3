@@ -56,8 +56,8 @@ type t = private {
 val create_module : ?path:string list -> preid -> uc
 val close_module : uc -> t
 
-val open_namespace  : uc -> uc
-val close_namespace : uc -> bool -> string option -> uc
+val open_namespace  : uc -> string -> uc
+val close_namespace : uc -> bool -> uc
 
 val use_export : uc -> t -> uc
 val use_export_theory : uc -> Theory.theory -> uc

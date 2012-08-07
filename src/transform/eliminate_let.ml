@@ -40,7 +40,10 @@ let eliminate_let_fmla = Trans.rewrite (elim_t false true Mvs.empty) None
 let eliminate_let      = Trans.rewrite (elim_t true true  Mvs.empty) None
 
 let () =
-  Trans.register_transform "eliminate_let_term" eliminate_let_term;
-  Trans.register_transform "eliminate_let_fmla" eliminate_let_fmla;
+  Trans.register_transform "eliminate_let_term" eliminate_let_term
+    ~desc:"Eliminates@ let@ by@ substitution,@ at@ the@ term@ level.";
+  Trans.register_transform "eliminate_let_fmla" eliminate_let_fmla
+    ~desc:"Eliminates@ let@ by@ substitution,@ at@ the@ predicate@ level.";
   Trans.register_transform "eliminate_let" eliminate_let
+    ~desc:"Apply@ both@ eliminate_let_term/fmla"
 
