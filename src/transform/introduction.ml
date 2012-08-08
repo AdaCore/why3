@@ -33,7 +33,7 @@ open Task
 let rec intros pr f = match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
-      let l = Split_goal.split_pos f1 in
+      let l = Split_goal.split_pos_wp f1 in
       List.fold_right
         (fun f acc ->
            let id = create_prsymbol (id_fresh "H") in

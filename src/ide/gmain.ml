@@ -550,7 +550,7 @@ let display_task t =
   task_view#source_buffer#set_text task_text;
   task_view#scroll_to_mark `INSERT
 
-let split_transformation = "split_goal"
+let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
