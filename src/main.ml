@@ -103,6 +103,7 @@ let opt_memlimit = ref None
 let opt_command = ref None
 let opt_task = ref None
 let opt_realize = ref false
+let opt_extract = ref false
 let opt_bisect = ref false
 
 let opt_print_libdir = ref false
@@ -178,6 +179,10 @@ let option_list = Arg.align [
       " same as -o";
   "--realize", Arg.Set opt_realize,
       " Realize selected theories from the library";
+  "-E", Arg.Set opt_extract,
+      " Generate OCaml code for selected theories/modules from the library";
+  "--extract", Arg.Set opt_extract,
+      " same as -E";
   "--bisect", Arg.Set opt_bisect,
       " Reduce the set of needed axioms which prove a goal, \
         and output the resulting task";
@@ -300,11 +305,14 @@ let () = try
     exit 1
   end;
 
+  if !opt_output <> None
+  && !opt_driver = None && !opt_prover = None && not !opt_extract then begin
+    eprintf
+      "Option '-o'/'--output' requires a prover, a driver, or option '-E'.@.";
+    exit 1
+  end;
+
   if !opt_prover = None then begin
-    if !opt_driver = None && !opt_output <> None then begin
-      eprintf "Option '-o'/'--output' requires a prover or a driver.@.";
-      exit 1
-    end;
     if !opt_timelimit <> None then begin
       eprintf "Option '-t'/'--timelimit' requires a prover.@.";
       exit 1
@@ -319,6 +327,12 @@ let () = try
     end;
     if !opt_driver = None && not !opt_print_namespace then
       opt_print_theory := true
+  end;
+
+  if !opt_extract && !opt_output = None then begin
+    eprintf
+      "Option '-E'/'--extract' require a directory to output the result.@.";
+    exit 1
   end;
 
   if !opt_bisect && !opt_output = None then begin
@@ -505,12 +519,81 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
   in
   do_theory env drv fname tname th glist
 
+(* program extraction *)
+
+let do_extract_theory _env tname th _glist =
+  printf "do_extract_theory: tname=%s th_path=%a@." tname
+    (Pp.print_list Pp.dot Format.pp_print_string) th.th_path
+
+let do_extract_module _env tname m _glist =
+  printf "do_extract_module: tname=%s th_path=%a@." tname
+    (Pp.print_list Pp.dot Format.pp_print_string)
+    m.Mlw_module.mod_theory.th_path
+
+let do_global_extract env (tname,p,t,glist) =
+  try
+    let lib = Mlw_main.library_of_env env in
+    let mm, thm = Env.read_lib_file lib p in
+    try
+      let m = Mstr.find t mm in
+      do_extract_module env tname m glist
+    with Not_found ->
+      let th = Mstr.find t thm in
+      do_extract_theory env tname th glist
+  with Env.LibFileNotFound _ | Not_found -> try
+    let format = Util.def_option "why" !opt_parser in
+    let th = Env.read_theory ~format env p t in
+    do_extract_theory env tname th glist
+  with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
+    eprintf "Theory/module '%s' not found.@." tname;
+    exit 1
+
+let do_extract_theory_from env fname m (tname,_,t,glist) =
+  let th = try Mstr.find t m with Not_found ->
+    eprintf "Theory '%s' not found in file '%s'.@." tname fname;
+    exit 1
+  in
+  do_extract_theory env tname th glist
+
+let do_extract_module_from env fname mm thm (tname,_,t,glist) =
+  try
+    let m = Mstr.find t mm in do_extract_module env tname m glist
+  with Not_found -> try
+    let th = Mstr.find t thm in do_extract_theory env tname th glist
+  with Not_found ->
+    eprintf "Theory/module '%s' not found in file '%s'.@." tname fname;
+    exit 1
+
+let do_local_extract env fname cin tlist =
+  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then begin
+    let lib = Mlw_main.library_of_env env in
+    let mm, thm = Mlw_main.read_channel lib [] fname cin in
+    if Queue.is_empty tlist then begin
+      let glist = Queue.create () in
+      let do_m t m thm = do_extract_module env t m glist; Mstr.remove t thm in
+      let thm = Mstr.fold do_m mm thm in
+      Mstr.iter (fun t th -> do_extract_theory env t th glist) thm
+    end else
+      Queue.iter (do_extract_module_from env fname mm thm) tlist
+  end else begin
+    let m = Env.read_channel ?format:!opt_parser env fname cin in
+    if Queue.is_empty tlist then
+      let glist = Queue.create () in
+      let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+      let do_th _ (t,th) = do_extract_theory env t th glist in
+      Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+    else
+      Queue.iter (do_extract_theory_from env fname m) tlist
+  end
+
 let total_annot_tokens = ref 0
 let total_program_tokens = ref 0
 
 let do_input env drv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
       ()
+  | None, tlist when !opt_extract ->
+      Queue.iter (do_global_extract env) tlist
   | None, tlist ->
       Queue.iter (do_global_theory env drv) tlist
   | Some f, tlist ->
@@ -518,24 +601,24 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      if !opt_token_count then
+      if !opt_token_count then begin
         let lb = Lexing.from_channel cin in
         let a,p = Lexer.token_counter lb in
         close_in cin;
-        if a = 0 then
-          begin
-            (* hack: we assume it is a why file and not a mlw *)
-            total_annot_tokens := !total_annot_tokens + p;
-            Format.printf "File %s: %d tokens@." f p;
-          end
-        else
-          begin
-            total_program_tokens := !total_program_tokens + p;
-            total_annot_tokens := !total_annot_tokens + a;
-            Format.printf "File %s: %d tokens in annotations@." f a;
-            Format.printf "File %s: %d tokens in programs@." f p
-          end
-      else
+        if a = 0 then begin
+          (* hack: we assume it is a why file and not a mlw *)
+          total_annot_tokens := !total_annot_tokens + p;
+          Format.printf "File %s: %d tokens@." f p;
+        end else begin
+          total_program_tokens := !total_program_tokens + p;
+          total_annot_tokens := !total_annot_tokens + a;
+          Format.printf "File %s: %d tokens in annotations@." f a;
+          Format.printf "File %s: %d tokens in programs@." f p
+        end
+      end else if !opt_extract then begin
+        do_local_extract env fname cin tlist;
+        close_in cin
+      end else begin
         let m = Env.read_channel ?format:!opt_parser env fname cin in
         close_in cin;
         if !opt_type_only then
@@ -548,6 +631,7 @@ let do_input env drv = function
             Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
           else
             Queue.iter (do_local_theory env drv fname m) tlist
+      end
 
 let () =
   try

@@ -27,9 +27,8 @@ open Ty
 open Term
 open Decl
 open Theory
-open Pgm_types.T
-open Pgm_ttree
-open Pgm_module
+open Mlw_expr
+open Mlw_decl
 
 (** Driver *)
 
@@ -434,9 +433,11 @@ let logic_tdecl fmt td = match td.td_node with
 let extract_theory _path _th =
   assert false (*TODO*)
 
-(** Program Expression *)
+(** Program expressions *)
 
-let rec print_expr fmt e = match e.expr_desc with
+let rec print_expr _fmt e = match e.e_node with
+  | _ -> assert false (*TODO*)
+(***
   | Elogic t ->
       print_term fmt t
   | Elocal v ->
@@ -507,10 +508,13 @@ and print_branch fmt (p, e) =
 
 and print_pattern fmt p =
   print_pat fmt p.ppat_pat
+***)
 
 (** Program Declarations *)
 
-let decl fmt = function
+let decl _fmt pd = match pd.pd_node with
+  | _ -> assert false (*TODO*)
+(***
   | Dlet (ps, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
         print_ls ps.ps_pure print_expr e
@@ -518,9 +522,11 @@ let decl fmt = function
       fprintf fmt "(* pgm let rec *)" (* TODO *)
   | Dparam ps ->
       print_param_decl fmt ps.ps_pure
+***)
 
 (** Modules *)
 
+(***
 let extract_module_to m fmt =
   (* extract all logic decls first *)
   print_list newline2 logic_tdecl fmt m.m_pure.th_decls;
@@ -540,6 +546,11 @@ let extract_module path m =
     eprintf "  to file %s@." file;
     print_in_file (extract_module_to m) file
   end
+***)
+
+let extract_module _env _pr _thpr ?old _fmt _m =
+  ignore (old);
+  assert false (*TODO*)
 
 (*
 Local Variables:

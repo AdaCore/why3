@@ -20,5 +20,9 @@
 
 (* OCaml program extraction *)
 
-val extract_module: string list -> Pgm_module.t -> unit
+open Why3
+
+val extract_module:
+  Env.env -> Printer.prelude -> Printer.prelude_map ->
+  ?old:Pervasives.in_channel -> Format.formatter -> Mlw_module.modul -> unit
 

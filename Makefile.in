@@ -364,7 +364,7 @@ install_no_local::
 ########
 
 PGM_FILES = pgm_ttree pgm_types pgm_pretty \
-	    pgm_module pgm_wp pgm_typing pgm_ocaml pgm_main
+	    pgm_module pgm_wp pgm_typing pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
@@ -392,7 +392,7 @@ clean::
 ########
 
 MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
-	    mlw_dtree mlw_dty mlw_typing mlw_main
+	    mlw_dtree mlw_dty mlw_typing mlw_ocaml mlw_main
 
 MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
 
@@ -422,6 +422,9 @@ clean::
 src/main.cmo: src/why3.cma
 src/main.cmx: src/why3.cmxa
 
+src/main.cmo src/main.cmx: INCLUDES += -I src/whyml
+src/main.dep: DEPFLAGS += -I src/whyml
+
 byte: bin/why3.byte
 opt:  bin/why3.opt
 
@@ -440,6 +443,12 @@ install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 
 install_local: bin/why3
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include src/main.dep
+endif
+
+depend: src/main.dep
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
