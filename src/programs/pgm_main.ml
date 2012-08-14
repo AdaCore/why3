@@ -29,9 +29,6 @@ open Typing
 open Ptree
 open Pgm_module
 
-let debug_extraction = Debug.register_flag "extraction"
-  ~desc:"for internal use"
-
 exception ClashModule of string
 
 let () = Exn_printer.register (fun fmt e -> match e with

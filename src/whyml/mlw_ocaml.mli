@@ -22,6 +22,8 @@
 
 open Why3
 
+val debug: Debug.flag
+
 val extract_module:
   Env.env -> Printer.prelude -> Printer.prelude_map ->
   ?old:Pervasives.in_channel -> Format.formatter -> Mlw_module.modul -> unit

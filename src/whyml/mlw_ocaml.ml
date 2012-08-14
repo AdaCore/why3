@@ -30,6 +30,10 @@ open Theory
 open Mlw_expr
 open Mlw_decl
 
+let debug =
+  Debug.register_info_flag
+    ~desc:"Print details on program extraction." "extraction"
+
 (** Driver *)
 
 (* (path,id) -> string Hid *)

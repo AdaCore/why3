@@ -521,14 +521,39 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
 
 (* program extraction *)
 
-let do_extract_theory _env tname th _glist =
-  printf "do_extract_theory: tname=%s th_path=%a@." tname
-    (Pp.print_list Pp.dot Format.pp_print_string) th.th_path
+let extract_to ?fname th extract =
+  let dir = match !opt_output with Some dir -> dir | None -> assert false in
+  let fname = match fname, th.th_path with
+    | Some fname, _ ->
+        let fname = Filename.basename fname in
+        (try Filename.chop_extension fname with _ -> fname)
+    | None, [] -> assert false
+    | None, path -> List.hd (List.rev path)
+  in
+  let mname = fname ^ "__" ^ th.th_name.Ident.id_string ^ ".ml" in
+  let mname = String.uncapitalize mname in
+  let file = Filename.concat dir mname in
+  let old =
+    if Sys.file_exists file then begin
+      let backup = file ^ ".bak" in
+      Sys.rename file backup;
+      Some (open_in backup)
+    end else None in
+  let cout = open_out file in
+  extract file ?old (formatter_of_out_channel cout);
+  close_out cout
 
-let do_extract_module _env tname m _glist =
-  printf "do_extract_module: tname=%s th_path=%a@." tname
-    (Pp.print_list Pp.dot Format.pp_print_string)
-    m.Mlw_module.mod_theory.th_path
+let do_extract_theory _env ?fname tname th _glist =
+  let extract fname ?old _fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname fname
+  in
+  extract_to ?fname th extract
+
+let do_extract_module _env ?fname tname m _glist =
+  let extract fname ?old _fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname fname
+  in
+  extract_to ?fname m.Mlw_module.mod_theory extract
 
 let do_global_extract env (tname,p,t,glist) =
   try
@@ -553,13 +578,13 @@ let do_extract_theory_from env fname m (tname,_,t,glist) =
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_extract_theory env tname th glist
+  do_extract_theory env ~fname tname th glist
 
 let do_extract_module_from env fname mm thm (tname,_,t,glist) =
   try
-    let m = Mstr.find t mm in do_extract_module env tname m glist
+    let m = Mstr.find t mm in do_extract_module env ~fname tname m glist
   with Not_found -> try
-    let th = Mstr.find t thm in do_extract_theory env tname th glist
+    let th = Mstr.find t thm in do_extract_theory env ~fname tname th glist
   with Not_found ->
     eprintf "Theory/module '%s' not found in file '%s'.@." tname fname;
     exit 1
@@ -570,9 +595,10 @@ let do_local_extract env fname cin tlist =
     let mm, thm = Mlw_main.read_channel lib [] fname cin in
     if Queue.is_empty tlist then begin
       let glist = Queue.create () in
-      let do_m t m thm = do_extract_module env t m glist; Mstr.remove t thm in
+      let do_m t m thm =
+        do_extract_module env ~fname t m glist; Mstr.remove t thm in
       let thm = Mstr.fold do_m mm thm in
-      Mstr.iter (fun t th -> do_extract_theory env t th glist) thm
+      Mstr.iter (fun t th -> do_extract_theory env ~fname t th glist) thm
     end else
       Queue.iter (do_extract_module_from env fname mm thm) tlist
   end else begin
@@ -580,7 +606,7 @@ let do_local_extract env fname cin tlist =
     if Queue.is_empty tlist then
       let glist = Queue.create () in
       let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-      let do_th _ (t,th) = do_extract_theory env t th glist in
+      let do_th _ (t,th) = do_extract_theory env ~fname t th glist in
       Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
     else
       Queue.iter (do_extract_theory_from env fname m) tlist
