@@ -1,3 +1,15 @@
+module TestGhost
+  use import ref.Ref
+
+  val x: ref int
+  let test1 () =
+    {}
+    ghost x := 0;
+    ()
+    { !x = 0 }
+
+end
+
 module Johannes
 
   type a = {| mutable f1 : int |}
