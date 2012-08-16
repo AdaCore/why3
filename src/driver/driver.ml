@@ -199,6 +199,10 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_tag         = !driver_tag
   }
 
+let syntax_map drv =
+  let addth _ (_,tds) acc = Stdecl.fold Printer.add_syntax_map tds acc in
+  Mid.fold addth drv.drv_meta Mid.empty
+
 (** apply drivers *)
 
 exception UnknownSpec of string

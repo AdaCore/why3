@@ -24,7 +24,11 @@ open Why3
 
 val debug: Debug.flag
 
+val extract_theory:
+  Env.env -> ?old:Pervasives.in_channel -> Format.formatter ->
+  Theory.theory -> unit
+
 val extract_module:
-  Env.env -> Printer.prelude -> Printer.prelude_map ->
-  ?old:Pervasives.in_channel -> Format.formatter -> Mlw_module.modul -> unit
+  Env.env -> ?old:Pervasives.in_channel -> Format.formatter ->
+  Mlw_module.modul -> unit
 

@@ -523,15 +523,16 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
 
 let extract_to ?fname th extract =
   let dir = match !opt_output with Some dir -> dir | None -> assert false in
-  let fname = match fname, th.th_path with
+  let _fname = match fname, th.th_path with
     | Some fname, _ ->
         let fname = Filename.basename fname in
         (try Filename.chop_extension fname with _ -> fname)
     | None, [] -> assert false
     | None, path -> List.hd (List.rev path)
   in
-  let mname = fname ^ "__" ^ th.th_name.Ident.id_string ^ ".ml" in
-  let mname = String.uncapitalize mname in
+  (* FIXME: use fname to forge the OCaml filename *)
+  let mname = (* fname ^ "__" ^ *) th.th_name.Ident.id_string ^ ".ml" in
+  (* let mname = String.uncapitalize mname in *)
   let file = Filename.concat dir mname in
   let old =
     if Sys.file_exists file then begin
@@ -543,48 +544,50 @@ let extract_to ?fname th extract =
   extract file ?old (formatter_of_out_channel cout);
   close_out cout
 
-let do_extract_theory _env ?fname tname th _glist =
-  let extract fname ?old _fmt = ignore (old);
-    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname fname
+let do_extract_theory env ?fname tname th =
+  let extract fname ?old fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname fname;
+    Mlw_ocaml.extract_theory env ?old fmt th
   in
   extract_to ?fname th extract
 
-let do_extract_module _env ?fname tname m _glist =
-  let extract fname ?old _fmt = ignore (old);
-    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname fname
+let do_extract_module env ?fname tname m =
+  let extract fname ?old fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname fname;
+    Mlw_ocaml.extract_module env ?old fmt m
   in
   extract_to ?fname m.Mlw_module.mod_theory extract
 
-let do_global_extract env (tname,p,t,glist) =
+let do_global_extract env (tname,p,t,_) =
   try
     let lib = Mlw_main.library_of_env env in
     let mm, thm = Env.read_lib_file lib p in
     try
       let m = Mstr.find t mm in
-      do_extract_module env tname m glist
+      do_extract_module env tname m
     with Not_found ->
       let th = Mstr.find t thm in
-      do_extract_theory env tname th glist
+      do_extract_theory env tname th
   with Env.LibFileNotFound _ | Not_found -> try
     let format = Util.def_option "why" !opt_parser in
     let th = Env.read_theory ~format env p t in
-    do_extract_theory env tname th glist
+    do_extract_theory env tname th
   with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
     eprintf "Theory/module '%s' not found.@." tname;
     exit 1
 
-let do_extract_theory_from env fname m (tname,_,t,glist) =
+let do_extract_theory_from env fname m (tname,_,t,_) =
   let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_extract_theory env ~fname tname th glist
+  do_extract_theory env ~fname tname th
 
-let do_extract_module_from env fname mm thm (tname,_,t,glist) =
+let do_extract_module_from env fname mm thm (tname,_,t,_) =
   try
-    let m = Mstr.find t mm in do_extract_module env ~fname tname m glist
+    let m = Mstr.find t mm in do_extract_module env ~fname tname m
   with Not_found -> try
-    let th = Mstr.find t thm in do_extract_theory env ~fname tname th glist
+    let th = Mstr.find t thm in do_extract_theory env ~fname tname th
   with Not_found ->
     eprintf "Theory/module '%s' not found in file '%s'.@." tname fname;
     exit 1
@@ -594,19 +597,17 @@ let do_local_extract env fname cin tlist =
     let lib = Mlw_main.library_of_env env in
     let mm, thm = Mlw_main.read_channel lib [] fname cin in
     if Queue.is_empty tlist then begin
-      let glist = Queue.create () in
       let do_m t m thm =
-        do_extract_module env ~fname t m glist; Mstr.remove t thm in
+        do_extract_module env ~fname t m; Mstr.remove t thm in
       let thm = Mstr.fold do_m mm thm in
-      Mstr.iter (fun t th -> do_extract_theory env ~fname t th glist) thm
+      Mstr.iter (fun t th -> do_extract_theory env ~fname t th) thm
     end else
       Queue.iter (do_extract_module_from env fname mm thm) tlist
   end else begin
     let m = Env.read_channel ?format:!opt_parser env fname cin in
     if Queue.is_empty tlist then
-      let glist = Queue.create () in
       let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-      let do_th _ (t,th) = do_extract_theory env ~fname t th glist in
+      let do_th _ (t,th) = do_extract_theory env ~fname t th in
       Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
     else
       Queue.iter (do_extract_theory_from env fname m) tlist

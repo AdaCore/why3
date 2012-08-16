@@ -251,14 +251,11 @@ let get_syntax_map task =
   let sm = Task.on_meta meta_remove_prop sm_add_pr sm task in
   sm
 
-(*
-let get_syntax_map_of_theory theory =
-  let sm = Mid.empty in
-  let sm = Theory.on_meta meta_syntax_type sm_add_ts sm theory in
-  let sm = Theory.on_meta meta_syntax_logic sm_add_ls sm theory in
-  let sm = Theory.on_meta meta_remove_prop sm_add_pr sm theory in
-  sm
-*)
+let add_syntax_map td sm = match td.td_node with
+  | Meta (m, args) when meta_equal m meta_syntax_type  -> sm_add_ts sm args
+  | Meta (m, args) when meta_equal m meta_syntax_logic -> sm_add_ls sm args
+  | Meta (m, args) when meta_equal m meta_remove_prop  -> sm_add_pr sm args
+  | _ -> sm
 
 let query_syntax sm id = Mid.find_opt id sm
 

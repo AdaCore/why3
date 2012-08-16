@@ -44,6 +44,7 @@ bads () {
 
 drivers () {
     for f in $1/*.drv; do
+        if [ $f = "drivers/ocaml.drv" ]; then continue; fi
 	echo -n "  "$f"... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f - > /dev/null 2>&1; then

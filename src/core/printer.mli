@@ -60,9 +60,8 @@ type syntax_map = string Mid.t
 (* [syntax_map] maps the idents of removed props to "" *)
 
 val get_syntax_map : task -> syntax_map
-(*
-val get_syntax_map_of_theory : theory -> syntax_map
-*)
+val add_syntax_map : tdecl -> syntax_map -> syntax_map
+  (* interprets a declaration as a syntax rule, if any *)
 
 val query_syntax : syntax_map -> ident -> string option
 

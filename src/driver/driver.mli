@@ -84,3 +84,7 @@ val prove_task_prepared :
   ?inplace   : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
 
+
+(** Traverse all metas from a driver *)
+
+val syntax_map: driver -> Printer.syntax_map
