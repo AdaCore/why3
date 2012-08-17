@@ -28,9 +28,6 @@ open Term
 open Decl
 open Theory
 open Printer
-open Mlw_expr
-open Mlw_decl
-open Mlw_module
 
 let debug =
   Debug.register_info_flag
@@ -81,8 +78,10 @@ type info = {
   (* symbol_printers : (string * ident_printer) Mid.t; *)
 }
 
-let is_constructor info ls = match Mid.find ls.ls_name info.known_map with
-  | { d_node = Ddata dl } ->
+let is_constructor info ls =
+  (* eprintf "is_constructor: ls=%s@." ls.ls_name.id_string; *)
+  match Mid.find_opt ls.ls_name info.known_map with
+  | Some { d_node = Ddata dl } ->
       let constr (_,csl) = List.exists (fun (cs,_) -> ls_equal cs ls) csl in
       List.exists constr dl
   | _ -> false
@@ -129,7 +128,7 @@ let print_path_id fmt = function
   | p , id -> fprintf fmt "%a.%a" print_path p print_ident id
 
 let print_theory_name fmt th = print_path_id fmt (th.th_path, th.th_name)
-let print_module_name fmt m  = print_theory_name fmt m.mod_theory
+let print_module_name fmt m  = print_theory_name fmt m.Mlw_module.mod_theory
 
 let to_be_implemented fmt s =
   fprintf fmt "failwith \"to be implemented\" (* %s *)" s
@@ -141,6 +140,8 @@ let tbi s = "failwith \"to be implemented\" (* " ^^ s ^^ " *)"
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let star fmt () = fprintf fmt " *@ "
+
+let has_syntax info id = Mid.mem id info.info_syn
 
 let rec print_ty_node inn info fmt ty = match ty.ty_node with
   | Tyvar v ->
@@ -201,7 +202,10 @@ let print_type_decl info fmt ts = match ts.ts_def with
         print_tv_args ts.ts_args (print_ts info) ts (print_ty info) ty
 
 let print_type_decl info fmt ts =
-  print_type_decl info fmt ts; forget_tvs ()
+  if has_syntax info ts.ts_name then
+    fprintf fmt "(* type %a is overridden by driver *)"
+      (print_lident info) ts.ts_name
+  else begin print_type_decl info fmt ts; forget_tvs () end
 
 let print_data_decl info fst fmt (ts,csl) =
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
@@ -210,8 +214,11 @@ let print_data_decl info fst fmt (ts,csl) =
     print_tv_args ts.ts_args (print_ts info) ts
     (print_list newline (print_constr info ty)) csl
 
-let print_data_decl first info fmt d =
-  print_data_decl first info fmt d; forget_tvs ()
+let print_data_decl info first fmt (ts, _ as d) =
+  if has_syntax info ts.ts_name then
+    fprintf fmt "(* type %a is overridden by driver *)"
+      (print_lident info) ts.ts_name
+  else begin print_data_decl info first fmt d; forget_tvs () end
 
 (** Inductive *)
 
@@ -220,16 +227,23 @@ let name_args l =
   let mk ty = incr r; create_vsymbol (id_fresh "x") ty in
   List.map mk l
 
-let print_ind_decl info fst fmt (ps,_) =
+let print_ind_decl info sign fst fmt (ps,_ as d) =
+  let print_ind fmt d =
+    if fst then Pretty.print_ind_decl fmt sign d
+    else Pretty.print_next_ind_decl fmt d in
   let vars = name_args ps.ls_args in
-  fprintf fmt "@[<hov 2>%s %a %a : bool =@ @[<hov>%a@]@]"
+  fprintf fmt "@[<hov 2>%s %a %a : bool =@ @[<hov>%a@\n(* @[%a@] *)@]@]"
     (if fst then "let rec" else "and") (print_ls info) ps
     (print_list space (print_vs_arg info)) vars
-    to_be_implemented "inductive";
+    to_be_implemented "inductive"
+    print_ind d;
   forget_vars vars
 
-let print_ind_decl first info fmt d =
-  print_ind_decl first info fmt d; forget_tvs ()
+let print_ind_decl info sign first fmt (ls, _ as d) =
+  if has_syntax info ls.ls_name then
+    fprintf fmt "(* inductive %a is overridden by driver *)"
+      (print_lident info) ls.ls_name
+  else begin print_ind_decl info sign first fmt d; forget_tvs () end
 
 (** Functions/Predicates *)
 
@@ -379,7 +393,7 @@ and print_tnode pri info fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
         (print_lterm (p + 1) info) f1 print_binop b (print_lterm p info) f2
   | Tnot f ->
-      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4 info) f
+      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 5 info) f
 
 and print_tbranch info fmt br =
   let p,t = t_open_branch br in
@@ -397,26 +411,37 @@ let print_ls_type info fmt = function
 
 let print_defn info fmt e =
   if is_exec_term e then print_term info fmt e
-  else to_be_implemented fmt "not executable"
+  else fprintf fmt "@[<hov>%a@ @[(* %a *)@]@]"
+    to_be_implemented "not executable" Pretty.print_term e
 
 let print_param_decl info fmt ls =
-  let vars = name_args ls.ls_args in
-  fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
-    (print_ls info) ls
-    (print_list space (print_vs_arg info)) vars
-    (print_ls_type info) ls.ls_value
-    to_be_implemented "uninterpreted symbol";
-  forget_vars vars;
-  forget_tvs ()
+  if has_syntax info ls.ls_name then
+    fprintf fmt "(* parameter %a is overridden by driver *)"
+      (print_lident info) ls.ls_name
+  else begin
+    let vars = name_args ls.ls_args in
+    fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
+      (print_ls info) ls
+      (print_list space (print_vs_arg info)) vars
+      (print_ls_type info) ls.ls_value
+      to_be_implemented "uninterpreted symbol";
+    forget_vars vars;
+    forget_tvs ()
+  end
 
 let print_logic_decl info fst fmt (ls,ld) =
-  let vl,e = open_ls_defn ld in
-  fprintf fmt "@[<hov 2>%s %a %a : %a =@ %a@]"
-    (if fst then "let rec" else "and") (print_ls info) ls
-    (print_list space (print_vs_arg info)) vl
-    (print_ls_type info) ls.ls_value (print_defn info) e;
-  forget_vars vl;
-  forget_tvs ()
+  if has_syntax info ls.ls_name then
+    fprintf fmt "(* symbol %a is overridden by driver *)"
+      (print_lident info) ls.ls_name
+  else begin
+    let vl,e = open_ls_defn ld in
+    fprintf fmt "@[<hov 2>%s %a %a : %a =@ %a@]"
+      (if fst then "let rec" else "and") (print_ls info) ls
+      (print_list space (print_vs_arg info)) vl
+      (print_ls_type info) ls.ls_value (print_defn info) e;
+    forget_vars vl;
+    forget_tvs ()
+  end
 
 (** Logic Declarations *)
 
@@ -431,42 +456,48 @@ let print_list_next sep print fmt = function
 
 let logic_decl info fmt d = match d.d_node with
   | Dtype ts ->
-      print_type_decl info fmt ts
+      print_type_decl info fmt ts;
+      fprintf fmt "@\n@\n"
   | Ddata tl ->
-      print_list_next newline (print_data_decl info) fmt tl
+      print_list_next newline (print_data_decl info) fmt tl;
+      fprintf fmt "@\n@\n"
   | Decl.Dparam ls ->
-      print_param_decl info fmt ls
+      print_param_decl info fmt ls;
+      fprintf fmt "@\n@\n"
   | Dlogic ll ->
-      print_list_next newline (print_logic_decl info) fmt ll
-  | Dind (_, il) ->
-      print_list_next newline (print_ind_decl info) fmt il
-  | Dprop (pk, pr, _) ->
-      fprintf fmt "(* %a %a *)" Pretty.print_pkind pk Pretty.print_pr pr
+      print_list_next newline (print_logic_decl info) fmt ll;
+      fprintf fmt "@\n@\n"
+  | Dind (s, il) ->
+      print_list_next newline (print_ind_decl info s) fmt il;
+      fprintf fmt "@\n@\n"
+  | Dprop (_pk, _pr, _) ->
+      ()
+      (* fprintf fmt "(* %a %a *)" Pretty.print_pkind pk Pretty.print_pr pr *)
 
 let logic_decl info fmt td = match td.td_node with
   | Decl d ->
       logic_decl info fmt d
-  | Use th ->
-      fprintf fmt "(* use %a *)" print_theory_name th
-  | Clone (th, _) ->
-      fprintf fmt "(* clone %a *)" print_theory_name th
+  | Use _th ->
+      () (* fprintf fmt "(* use %a *)" print_theory_name th *)
+  | Clone (_th, _) ->
+      () (* fprintf fmt "(* clone %a *)" print_theory_name th *)
   | Meta _ ->
-      fprintf fmt "(* meta *)"
+      () (* fprintf fmt "(* meta *)" *)
 
 (** Theories *)
 
 let ocaml_driver env =
   try
     let file = Filename.concat Config.datadir "drivers/ocaml.drv" in
-    Driver.load_driver env file []
+    let drv = Driver.load_driver env file [] in
+    Driver.syntax_map drv
   with e ->
     eprintf "cannot find driver 'ocaml'@.";
     raise e
 
 let extract_theory env ?old fmt th =
   ignore (old);
-  let drv = ocaml_driver env in
-  let sm = Driver.syntax_map drv in
+  let sm = ocaml_driver env in
   let info = {
     info_syn = sm;
     current_theory = th.th_name.id_string;
@@ -474,113 +505,226 @@ let extract_theory env ?old fmt th =
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     print_theory_name th;
-  print_list newline2 (logic_decl info) fmt th.th_decls;
+  print_list nothing (logic_decl info) fmt th.th_decls;
   fprintf fmt "@."
 
-(** Program expressions *)
+(** Programs *)
 
-let rec print_expr _fmt e = match e.e_node with
-  | _ -> assert false (*TODO*)
-(***
+open Mlw_ty
+open Mlw_ty.T
+open Mlw_expr
+open Mlw_decl
+open Mlw_module
+
+let print_its info fmt ts = print_ts info fmt ts.its_pure
+let print_pv info fmt pv = print_lident info fmt pv.pv_vs.vs_name
+let print_ps info fmt ps = print_lident info fmt ps.ps_name
+let print_lv info fmt = function
+  | LetV pv -> print_pv info fmt pv
+  | LetA ps -> print_ps info fmt ps
+
+let print_xs info fmt xs = print_uident info fmt xs.xs_name
+
+let forget_ps ps = forget_id iprinter ps.ps_name
+let forget_pv pv = forget_var pv.pv_vs
+let forget_lv = function
+  | LetV pv -> forget_pv pv
+  | LetA ps -> forget_ps ps
+
+let rec print_ity_node inn info fmt ity = match ity.ity_node with
+  | Ityvar v ->
+      print_tv fmt v
+  | Itypur (ts, []) when is_ts_tuple ts ->
+      fprintf fmt "unit"
+  | Itypur (ts, tl) when is_ts_tuple ts ->
+      fprintf fmt "(%a)" (print_list star (print_ity_node false info)) tl
+  | Itypur (ts, tl) ->
+      begin match query_syntax info.info_syn ts.ts_name with
+        | Some s -> syntax_arguments s (print_ity_node true info) fmt tl
+        | None -> begin match tl with
+            | [] -> print_ts info fmt ts
+            | [ity] -> fprintf fmt (protect_on inn "%a@ %a")
+                  (print_ity_node true info) ity (print_ts info) ts
+            | _ -> fprintf fmt (protect_on inn "(%a)@ %a")
+              (print_list comma (print_ity_node false info)) tl
+              (print_ts info) ts
+        end
+      end
+  | Ityapp (ts, tl, _) ->
+      begin match query_syntax info.info_syn ts.its_pure.ts_name with
+        | Some s -> syntax_arguments s (print_ity_node true info) fmt tl
+        | None -> begin match tl with
+            | [] -> print_its info fmt ts
+            | [ity] -> fprintf fmt (protect_on inn "%a@ %a")
+                  (print_ity_node true info) ity (print_its info) ts
+            | _ -> fprintf fmt (protect_on inn "(%a)@ %a")
+              (print_list comma (print_ity_node false info)) tl
+              (print_its info) ts
+        end
+      end
+
+let print_ity info = print_ity_node false info
+
+let print_vtv info fmt vtv = print_ity info fmt vtv.vtv_ity
+
+let print_pvty info fmt pv =
+  fprintf fmt "@[(%a:@ %a)@]"
+    (print_lident info) pv.pv_vs.vs_name (print_vtv info) pv.pv_vtv
+
+let rec print_vta info fmt vta =
+  let print_arg fmt pv = print_vtv info fmt pv.pv_vtv in
+  fprintf fmt "(%a -> %a)" (print_list arrow print_arg) vta.vta_args
+    (print_vty info) vta.vta_result
+
+and print_vty info fmt = function
+  | VTvalue vtv -> print_vtv info fmt vtv
+  | VTarrow vta -> print_vta info fmt vta
+
+let ity_mark = ity_pur Mlw_wp.ts_mark []
+
+let rec print_expr info fmt e = print_lexpr 0 info fmt e
+
+and print_lexpr pri info fmt e = match e.e_node with
   | Elogic t ->
-      print_term fmt t
-  | Elocal v ->
-      print_pv fmt v
-  | Eglobal ps ->
-      print_ls fmt ps.ps_pure
-  | Efun (bl, t) ->
-      fprintf fmt "@[<hov 2>fun %a ->@ %a@]"
-        (print_list space print_pv_arg) bl print_triple t
-  | Elet (v, e1, e2) ->
-      fprintf fmt "@[<hv 0>@[<hov 2>let %a =@ %a in@]@ %a@]"
-        print_vs v.pv_pure
-        print_lexpr e1 print_lexpr e2;
-    forget_var v.pv_pure
-
-  | Eif (e1, e2, e3) ->
-      fprintf fmt "@[if %a@ then@ %a else@ %a@]"
-        print_lexpr e1 print_lexpr e2 print_lexpr e3
-
-  | Eany _c ->
-      fprintf fmt "assert false (* TODO: call *)"
-
-  | Emark (_, _)  ->
-      fprintf fmt "<todo: Emark>"
-  | Eassert (_, f) ->
-      fprintf fmt "@[assert {%a}@]" print_term f
-  | Efor (_, _, _, _, _, e) ->
-      fprintf fmt "@[<hov 2>for ... do@ %a@ done@]" print_lexpr e
-  | Etry (e1, bl) ->
-      let print_handler fmt (es, vs, e) =
-        fprintf fmt "| %a %a -> %a" print_cs es (print_option print_pv) vs
-          print_expr e
-      in
-      fprintf fmt "@[<hov 2>begin try@ %a@\nwith@\n%a end@]"
-        print_expr e1 (print_list newline print_handler) bl
-  | Eraise (es, e)  ->
-      fprintf fmt "(raise (%a %a))" print_cs es (print_option print_expr) e
-  | Ematch (v, cl) ->
-      fprintf fmt "@[<hov 2>match %a with@ %a@]" print_pv v
-        (print_list newline print_branch) cl
-  | Eloop (_, e1) ->
-      fprintf fmt "@[<hov 2>while true do@ %a done@]" print_expr e1
-  | Eletrec (_, _)  ->
-      fprintf fmt "<todo: Eletrec>"
+      fprintf fmt "(%a)" (print_term info) t
+  | Evalue v ->
+      print_pv info fmt v
+  | Earrow a ->
+      print_ps info fmt a
+  | Eapp (e,v,_) ->
+      fprintf fmt "(%a@ %a)" (print_lexpr pri info) e (print_pv info) v
+  | Elet ({ let_sym = LetV pv }, e2)
+    when ity_equal pv.pv_vtv.vtv_ity ity_mark ->
+      print_expr info fmt e2
+  | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
+    when pv.pv_vs.vs_name.id_string = "_" &&
+         ity_equal pv.pv_vtv.vtv_ity ity_unit ->
+      fprintf fmt (protect_on (pri > 0) "@[begin %a;@ %a end@]")
+        (print_expr info) e1 (print_expr info) e2;
+  | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
+      fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
+        (print_lv info) lv (print_lexpr 4 info) e1 (print_expr info) e2;
+      forget_lv lv
+  | Eif (e0,e1,e2) ->
+      fprintf fmt (protect_on (pri > 0)
+                     "@[<hv>if %a@ @[<hov 2>then %a@]@ @[<hov 2>else %a@]@]")
+        (print_expr info) e0 (print_expr info) e1 (print_expr info) e2
+  | Eassign (e,_,pv) ->
+      fprintf fmt (protect_on (pri > 0) "%a <- %a")
+        (print_expr info) e (print_pv info) pv
+  | Eloop (_,_,e) ->
+      fprintf fmt "@[while true do@ %a@ done@]" (print_expr info) e
+  | Efor (pv,(pvfrom,dir,pvto),_,e) ->
+      (* TODO: avoid conversion to/from int *)
+      fprintf fmt "@[<hov 2>for@ %a =@ Num.int_of_num %a@ %s@ \
+        Num.int_of_num %a do@\nlet %a = Num.num_of_int %a in@ %a@]@\ndone"
+        (print_pv info) pv (print_pv info) pvfrom
+        (if dir = To then "to" else "downto") (print_pv info) pvto
+        (print_pv info) pv (print_pv info) pv (print_expr info) e
+  | Eraise (xs,_) when ity_equal xs.xs_ity ity_unit ->
+      fprintf fmt "raise %a" (print_xs info) xs
+  | Eraise (xs,e) ->
+      fprintf fmt "raise (%a %a)" (print_xs info) xs (print_expr info) e
+  | Etry (e,bl) ->
+      fprintf fmt "@[try %a with@\n@[<hov>%a@]@]"
+        (print_expr info) e (print_list newline (print_xbranch info)) bl
+  | Eabstr (e,_,_) ->
+      print_lexpr pri info fmt e
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
-  | Eabstract(e, _) ->
-      fprintf fmt "@[%a (* abstract *)@]" print_expr e
+  | Eassert _ ->
+      fprintf fmt "() (* assert *)"
+  | Eghost _ ->
+      fprintf fmt "() (* ghost *)"
+  | Eany _ ->
+      fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
+        (print_vty info) e.e_vty
+  | Ecase _ ->
+      fprintf fmt "assert false (* TODO Ecase *)"
+  | Erec _ ->
+      fprintf fmt "assert false (* TODO Erec *)"
 
-and print_lexpr fmt e =
-  print_expr fmt e
+and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
+  let print_arg fmt pv = fprintf fmt "@[%a@]" (print_pvty info) pv in
+  fprintf fmt "@[<hov 2>%s %a %a =@ %a@]"
+    (if fst then if lr > 0 then "let rec" else "let" else "with")
+    (print_ps info) ps (print_list space print_arg) lam.l_args
+    (print_expr info) lam.l_expr
 
-and print_pv fmt v =
-  fprintf fmt "%a" print_vs v.pv_pure
+and print_xbranch info fmt (xs, pv, e) =
+  if ity_equal xs.xs_ity ity_unit then
+    fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_xs info) xs (print_expr info) e
+  else
+    fprintf fmt "@[<hov 4>| %a %a ->@ %a@]"
+      (print_xs info) xs (print_pv info) pv (print_expr info) e;
+  forget_pv pv
 
-and print_pv_arg fmt v =
-  fprintf fmt "(%a)" print_vsty v.pv_pure
+let print_rec_decl lr info fst fmt rd =
+  print_rec lr info fst fmt rd;
+  forget_tvs ()
 
-and print_triple fmt (_, e, _) =
-  print_expr fmt e
+let print_let_decl info fmt { let_sym = lv ; let_expr = e } =
+  fprintf fmt "@[<hov 2>let %a =@ %a@]" (print_lv info) lv (print_expr info) e;
+  forget_tvs ()
 
-and print_recfun fmt (v, bl, t, _) =
-  fprintf fmt "@[<hov 2>rec %a@ %a =@ %a@]"
-    print_pv v (print_list space print_pv_arg) bl print_triple t
+let rec extract_vta_args args vta =
+  let new_args = List.map (fun pv -> pv.pv_vs) vta.vta_args in
+  let args = List.rev_append new_args args in
+  match vta.vta_result with
+  | VTvalue vtv -> List.rev args, vtv
+  | VTarrow vta -> extract_vta_args args vta
 
-and print_branch fmt (p, e) =
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pattern p print_expr e
+let extract_lv_args = function
+  | LetV pv -> [], pv.pv_vtv
+  | LetA ps -> extract_vta_args [] ps.ps_vta
 
-and print_pattern fmt p =
-  print_pat fmt p.ppat_pat
-***)
+let print_val_decl info fmt lv =
+  let vars, vtv = extract_lv_args lv in
+  fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
+    (print_lv info) lv
+    (print_list space (print_vs_arg info)) vars
+    (print_vtv info) vtv
+    to_be_implemented "val";
+  forget_vars vars;
+  forget_tvs ()
 
-(** Program Declarations *)
-
-let pdecl _fmt pd = match pd.pd_node with
-  | _ -> () (*TODO*)
-(***
-  | Dlet (ps, e) ->
-      fprintf fmt "@[<hov 2>let %a =@ %a@]"
-        print_ls ps.ps_pure print_expr e
-  | Dletrec _dl ->
-      fprintf fmt "(* pgm let rec *)" (* TODO *)
-  | Dparam ps ->
-      print_param_decl fmt ps.ps_pure
-***)
+let pdecl info fmt pd = match pd.pd_node with
+  | PDtype _ ->
+      fprintf fmt "(* TODO PDtype *)@\n@\n"
+  | PDdata _ ->
+      fprintf fmt "(* TODO PDdata *)@\n@\n"
+  | PDval vd ->
+      fprintf fmt "%a@\n@\n" (print_val_decl info) vd
+  | PDlet ld ->
+      fprintf fmt "%a@\n@\n" (print_let_decl info) ld
+  | PDrec { rec_defn = rdl; rec_letrec = lr } ->
+      print_list_next newline (print_rec_decl lr info) fmt rdl;
+      fprintf fmt "@\n@\n"
+  | PDexn xs when ity_equal xs.xs_ity ity_unit -> (* OPTIM *)
+      fprintf fmt "exception %a@\n@\n" (print_xs info) xs
+  | PDexn xs ->
+      fprintf fmt "exception %a of %a@\n@\n" (print_uident info) xs.xs_name
+        (print_ity info) xs.xs_ity
 
 (** Modules *)
 
-let extract_module _env ?old fmt m =
+let extract_module env ?old fmt m =
   ignore (old);
+  let sm = ocaml_driver env in
+  let th = m.mod_theory in
+  let info = {
+    info_syn = sm;
+    current_theory = th.th_name.id_string;
+    known_map = Task.task_known (Task.use_export None th) } in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     print_module_name m;
-  print_list newline2 pdecl fmt m.mod_decls;
+  print_list nothing (pdecl info) fmt m.mod_decls;
   fprintf fmt "@."
 
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. testl"
+compile-command: "unset LANG; make -C ../.."
 End:
 *)

@@ -19,10 +19,10 @@ theory Bool
 end
 
 theory bool.Bool
-  syntax function andb  "(%1 && %2)"
-  syntax function orb   "(%1 || %2)"
+  syntax function andb  "((%1) && (%2))"
+  syntax function orb   "((%1) || (%2))"
   (* syntax function xorb  "(xorb %1 %2)" *)
-  syntax function notb  "(not %1)"
+  syntax function notb  "(not (%1))"
   (* syntax function implb "(implb %1)" *)
 end
 
