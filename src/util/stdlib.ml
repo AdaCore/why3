@@ -739,3 +739,39 @@ module Make(Ord: OrderedType) = struct
 end
 
 end
+
+module Hashtbl = struct
+
+  let hash = Hashtbl.hash
+
+  module type S = sig
+    include Hashtbl.S
+    val is_empty : 'a t -> bool
+    val memo : int -> (key -> 'a) -> key -> 'a
+    exception Key_not_found of key
+    val find' : 'a t -> key -> 'a
+    val set : unit t -> key -> unit
+  end
+
+  module Make (X:Hashtbl.HashedType) = struct
+    module M = Hashtbl.Make(X)
+    include M
+    let is_empty h =
+      try
+        M.iter (fun _ _ -> raise Exit) h;
+        true
+      with Exit -> false
+
+    let memo size f =
+      let h = create size in
+      fun x -> try find h x
+        with Not_found -> let y = f x in add h x y; y
+
+    exception Key_not_found of key
+    let find' h k =
+      try find h k with Not_found -> raise (Key_not_found k)
+
+    let set h k   = replace h k ()
+
+  end
+end

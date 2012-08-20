@@ -384,6 +384,7 @@ end)
 module Sdecl = Decl.S
 module Mdecl = Decl.M
 module Wdecl = Decl.W
+module Hdecl = Decl.H
 
 let d_equal : decl -> decl -> bool = (==)
 

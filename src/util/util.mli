@@ -160,17 +160,19 @@ val concat_non_empty : string -> string list -> string
 (* useful function on char *)
 val is_uppercase : char -> bool
 
+(* useful function on int *)
+val count : int -> ('a -> int)
+(** return the consecutie number from the first given *)
+
 (* Set and Map on ints and strings *)
 
 module Mint : Map.S with type key = int
 module Sint : Mint.Set
+module Hint : Hashtbl.S with type key = int
 
 module Mstr : Map.S with type key = string
 module Sstr : Mstr.Set
 module Hstr : Hashtbl.S with type key = string
-
-val memo_int : int -> (int -> 'a) -> int -> 'a
-val memo_string : int -> (string -> 'a) -> string -> 'a
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
@@ -212,14 +214,14 @@ module type PrivateHashtbl = sig
   type key
 
   val find : 'a t -> key -> 'a
-    (** Same as {Hashtbl.find} *)
+    (** Same as {!Hashtbl.find} *)
   val iter : (key -> 'a -> unit) -> 'a t -> unit
-    (** Same as {Hashtbl.iter} *)
+    (** Same as {!Hashtbl.iter} *)
   val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
-    (** Same as {Hashtbl.fold} *)
+    (** Same as {!Hashtbl.fold} *)
   val mem : 'a t -> key -> bool
-    (** Same as {Hashtbl.mem} *)
+    (** Same as {!Hashtbl.mem} *)
   val length : 'a t -> int
-    (** Same as {Hashtbl.length} *)
+    (** Same as {!Hashtbl.length} *)
 
 end

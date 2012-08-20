@@ -172,5 +172,5 @@ let mono kept =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.compose (deco kept) (mono kept))
 
-let () = Hashtbl.replace Encoding.ft_enco_poly "decoexp" (const t)
+let () = Hstr.replace Encoding.ft_enco_poly "decoexp" (const t)
 

@@ -234,12 +234,23 @@ let is_uppercase c = 'A' <= c && c <= 'Z'
 let concat_non_empty sep l =
   String.concat sep (List.filter (fun s -> s <> "") l)
 
+(** useful function on char *)
+let count n =
+  let r = ref (n-1) in
+  fun _ -> incr r; !r
+
 (* Set and Map on ints and strings *)
 
-module Int  = struct type t = int let compare = Pervasives.compare end
+module Int  = struct
+  type t = int
+  let compare = Pervasives.compare
+  let equal x y = x = y
+  let hash x = x
+ end
 
 module Mint = Map.Make(Int)
 module Sint = Mint.Set
+module Hint = Hashtbl.Make(Int)
 
 module Mstr = Map.Make(String)
 module Sstr = Mstr.Set
@@ -307,15 +318,6 @@ struct
   module H = Hashtbl.Make(T)
   module W = Hashweak.Make(X)
 end
-
-(* memoization *)
-
-let memo_int size f =
-  let h = Hashtbl.create size in
-  fun x -> try Hashtbl.find h x
-  with Not_found -> let y = f x in Hashtbl.add h x y; y
-
-let memo_string = memo_int
 
 module type PrivateHashtbl = sig
   (** Private Hashtbl *)

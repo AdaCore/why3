@@ -108,7 +108,7 @@ let preid_name id = id.id_string
 (** Unique names for pretty printing *)
 
 type ident_printer = {
-  indices   : (string, int) Hashtbl.t;
+  indices   : int Hstr.t;
   values    : string Hid.t;
   sanitizer : string -> string;
   blacklist : string list;
@@ -116,7 +116,7 @@ type ident_printer = {
 
 let find_unique indices name =
   let specname ind = name ^ string_of_int ind in
-  let testname ind = Hashtbl.mem indices (specname ind) in
+  let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in
   let rec retreat ind =
@@ -124,11 +124,11 @@ let find_unique indices name =
   let fetch ind =
     if testname ind then advance (succ ind) else retreat ind in
   let name = try
-    let ind = fetch (succ (Hashtbl.find indices name)) in
-    Hashtbl.replace indices name ind;
+    let ind = fetch (succ (Hstr.find indices name)) in
+    Hstr.replace indices name ind;
     specname ind
   with Not_found -> name in
-  Hashtbl.replace indices name 0;
+  Hstr.replace indices name 0;
   name
 
 let reserve indices name = ignore (find_unique indices name)
@@ -136,7 +136,7 @@ let reserve indices name = ignore (find_unique indices name)
 let same x = x
 
 let create_ident_printer ?(sanitizer = same) sl =
-  let indices = Hashtbl.create 1997 in
+  let indices = Hstr.create 1997 in
   List.iter (reserve indices) sl;
   { indices   = indices;
     values    = Hid.create 1997;
@@ -157,13 +157,13 @@ let string_unique printer s = find_unique printer.indices s
 let forget_id printer id =
   try
     let name = Hid.find printer.values id in
-    Hashtbl.remove printer.indices name;
+    Hstr.remove printer.indices name;
     Hid.remove printer.values id
   with Not_found -> ()
 
 let forget_all printer =
   Hid.clear printer.values;
-  Hashtbl.clear printer.indices;
+  Hstr.clear printer.indices;
   List.iter (reserve printer.indices) printer.blacklist
 
 (** Sanitizers *)

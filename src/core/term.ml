@@ -21,6 +21,7 @@
 open Util
 open Ident
 open Ty
+open Stdlib
 
 (** Variable symbols *)
 
@@ -812,7 +813,7 @@ let t_bool_false = fs_app fs_bool_false [] ty_bool
 
 let fs_tuple_ids = Hid.create 17
 
-let fs_tuple = Util.memo_int 17 (fun n ->
+let fs_tuple = Util.Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in

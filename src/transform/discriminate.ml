@@ -226,13 +226,13 @@ let map env d = match d.d_node with
 
 
 let ft_select_inst =
-  ((Hashtbl.create 17) : (Env.env,Sty.t) Trans.flag_trans)
+  ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
 
 let ft_select_lskept =
-  ((Hashtbl.create 17) : (Env.env,Sls.t) Trans.flag_trans)
+  ((Hstr.create 17) : (Env.env,Sls.t) Trans.flag_trans)
 
 let ft_select_lsinst =
-  ((Hashtbl.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
+  ((Hstr.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
 let metas_from_env env =
   let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
   let fold_ls _ insts s = Mtyl.fold fold_inst insts s in

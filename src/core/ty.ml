@@ -240,7 +240,7 @@ let ty_pred ty_a = ty_app ts_pred [ty_a]
 
 let ts_tuple_ids = Hid.create 17
 
-let ts_tuple = Util.memo_int 17 (fun n ->
+let ts_tuple = Util.Hint.memo 17 (fun n ->
   let vl = ref [] in
   for i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
   let ts = create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None in

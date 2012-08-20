@@ -238,16 +238,16 @@ type pre_ppattern =
   | PPas   of pre_ppattern * preid
 
 let make_ppattern pp vtv =
-  let hv = Hashtbl.create 3 in
+  let hv = Hstr.create 3 in
   let find id vtv =
     let nm = preid_name id in
     try
-      let pv = Hashtbl.find hv nm in
+      let pv = Hstr.find hv nm in
       ity_equal_check vtv.vtv_ity pv.pv_vtv.vtv_ity;
       pv
     with Not_found ->
       let pv = create_pvsymbol id vtv in
-      Hashtbl.add hv nm pv; pv
+      Hstr.add hv nm pv; pv
   in
   let rec make vtv = function
     | PPwild -> {
@@ -311,7 +311,7 @@ let make_ppattern pp vtv =
           ppat_effect  = pp.ppat_effect; }
   in
   let pp = make (vtv_unmut vtv) pp in
-  Hashtbl.fold Mstr.add hv Mstr.empty, pp
+  Hstr.fold Mstr.add hv Mstr.empty, pp
 
 (** program symbols *)
 

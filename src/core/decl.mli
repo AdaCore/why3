@@ -115,6 +115,7 @@ and decl_node =
 module Mdecl : Map.S with type key = decl
 module Sdecl : Mdecl.Set
 module Wdecl : Hashweak.S with type key = decl
+module Hdecl : Hashtbl.S  with type key = decl
 
 val d_equal : decl -> decl -> bool
 val d_hash : decl -> int
