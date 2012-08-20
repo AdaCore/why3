@@ -50,6 +50,8 @@ val print_prelude_for_theory : theory -> prelude_map pp
 val meta_syntax_type : meta
 val meta_syntax_logic : meta
 val meta_remove_prop : meta
+val meta_remove_logic : meta
+val meta_remove_type_symbol : meta
 val meta_realized : meta
 
 val syntax_type : tysymbol -> string -> tdecl

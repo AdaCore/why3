@@ -216,6 +216,12 @@ let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
   ~desc:"Specify@ the@ logical@ propositions@ to@ remove.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ remove@ prop@ rule."
 
+let meta_remove_type_symbol  = register_meta "remove_type_symbol" [MTtysymbol]
+  ~desc:"Specify@ the@ type@ symbol@ to@ remove."
+
+let meta_remove_logic  = register_meta "remove_logic" [MTlsymbol]
+  ~desc:"Specify@ the@ logic@ symbol@ propositions@ to@ remove."
+
 let meta_realized     = register_meta "realized" [MTstring; MTstring]
   ~desc:"TODO??"
 

@@ -21,6 +21,12 @@
 open Stdlib
 open Debug
 open Util
+open Ty
+open Ident
+open Decl
+open Term
+open Theory
+open Task
 
 module Mprover = Whyconf.Mprover
 module Sprover = Whyconf.Sprover
@@ -49,6 +55,133 @@ type proof_attempt_status =
 
 type task_option = Task.task option
 
+type pos_task =
+  { pos_decl  : int; (* nth decl in the task from top *)
+    pos_def   : int; (* nth def in the decl *)
+    pos_const : int; (* nth constructor in the type def *)
+    pos_proj  : int; (* nth proj for the constructor (-1 for the constructor) *)
+    pos_checksum : Termcode.checksum;
+  (** the checksum of the prefix of the task starting at this decl *)
+  }
+
+let compare_pos_task x y =
+  let c = compare x.pos_decl y.pos_decl in
+  if c <> 0 then -c else (* in order to be bottom up *)
+  let c = compare x.pos_def y.pos_def in
+  if c <> 0 then c else
+  let c = compare x.pos_const y.pos_const in
+  if c <> 0 then c else
+  let c = compare x.pos_proj y.pos_proj in
+  if c <> 0 then c
+  else if x.pos_checksum <> y.pos_checksum
+  then invalid_arg "Session : virtual_metas of different task have been mixed"
+  else c (* 0 *)
+
+let empty_pos =
+  { pos_decl  = -1;
+    pos_def   = -1;
+    pos_const = -1;
+    pos_proj  = -1;
+    pos_checksum = Termcode.dumb_checksum;
+  }
+
+module Pos = struct
+  type t = pos_task
+  let compare = compare_pos_task
+  let equal x y = (x : t) = y
+  let hash x = Hashtbl.hash (x : t)
+end
+
+module Mpos = Map.Make(Pos)
+module Spos = Mpos.Set
+module Hpos = Hashtbl.Make(Pos)
+
+(* type virtual_ty = *)
+(*   | Vtyvar of int (\* debruin id *\) *)
+(*   | Vtyapp of virtual_ident * virtual_ty list *)
+
+(* let rec compare_vty x y = *)
+(*   match x,y with *)
+(*   | Vtyvar xi, Vtyvar yi -> compare xi yi *)
+(*   | Vtyapp (xi, xl), Vtyapp (yi, yl) -> *)
+(*     let c = compare_vi xi yi in *)
+(*     if c <> 0 then c else *)
+(*       list_compare compare_vty xl yl *)
+(*   | Vtyvar _, _ ->  1 *)
+(*   | _, Vtyvar _ -> -1 *)
+
+(* type virtual_meta_arg = *)
+(*   | VMAty  of virtual_ty *)
+(*   | VMAts  of virtual_ident *)
+(*   | VMAls  of virtual_ident *)
+(*   | VMApr  of virtual_ident *)
+(*   | VMAstr of string *)
+(*   | VMAint of int *)
+
+(* type virtual_meta = *)
+(*   { *)
+(*     (\* why3 name of the meta *\) *)
+(*     vm_name : string; *)
+(*     vm_args : virtual_meta_arg list; *)
+(*   } *)
+
+type meta_args = meta_arg list
+
+module Mmeta_args = Map.Make(struct
+  type t = meta_args
+
+  let meta_arg_id = function
+    | MAty _  -> 0
+    | MAts _  -> 1
+    | MAls _  -> 2
+    | MApr _  -> 3
+    | MAstr _ -> 4
+    | MAint _ -> 5
+
+  let compare_meta_arg x y =
+    match x,y with
+  (** These hash are in fact tag *)
+    | MAty  x, MAty  y -> compare (ty_hash x) (ty_hash y)
+    | MAts  x, MAts  y -> compare (ts_hash x) (ts_hash y)
+    | MAls  x, MAls  y -> compare (ls_hash x) (ls_hash y)
+    | MApr  x, MApr  y -> compare (pr_hash x) (pr_hash y)
+    | MAstr x, MAstr y -> String.compare x y
+    | MAint x, MAint y -> compare x y
+    | _ -> compare (meta_arg_id x) (meta_arg_id y)
+
+  let compare = list_compare compare_meta_arg
+end)
+module Smeta_args = Mmeta_args.Set
+
+type metas_args =  Smeta_args.t Mstr.t
+module Mmetas_args = Map.Make(struct
+  type t = metas_args
+  let compare = Mstr.compare Smeta_args.compare
+end)
+
+type idpos = {
+  idpos_ts : pos_task Mts.t;
+  idpos_ls : pos_task Mls.t;
+  idpos_pr : pos_task Mpr.t;
+}
+
+let empty_idpos =
+  {
+    idpos_ts = Mts.empty;
+    idpos_ls = Mls.empty;
+    idpos_pr = Mpr.empty;
+  }
+
+let posid_of_idpos idpos =
+  let posid = Mpos.empty in
+  let posid = Mts.fold (fun ts pos ->
+    Mpos.add pos (MAts ts)) idpos.idpos_ts posid  in
+  let posid = Mls.fold (fun ls pos ->
+    Mpos.add pos (MAls ls)) idpos.idpos_ls posid  in
+  let posid = Mpr.fold (fun pr pos ->
+    Mpos.add pos (MApr pr)) idpos.idpos_pr posid  in
+  posid
+
 type 'a goal =
   { mutable goal_key  : 'a;
     goal_name : Ident.ident;
@@ -61,6 +194,7 @@ type 'a goal =
     mutable goal_expanded : bool;
     goal_external_proofs : 'a proof_attempt PHprover.t;
     goal_transformations : 'a transf PHstr.t;
+    mutable goal_metas : 'a metas Mmetas_args.t;
   }
 
 and 'a proof_attempt =
@@ -78,6 +212,18 @@ and 'a proof_attempt =
 and 'a goal_parent =
   | Parent_theory of 'a theory
   | Parent_transf of 'a transf
+  | Parent_metas  of 'a metas
+
+and 'a metas =
+  { mutable metas_key : 'a;
+    metas_added : metas_args;
+    metas_idpos : idpos;
+    metas_parent : 'a goal;
+    mutable metas_verified : bool;
+    mutable metas_goal : 'a goal;
+    (** Not mutated after the creation *)
+    mutable metas_expanded : bool;
+  }
 
 and 'a transf =
     { mutable transf_key : 'a;
@@ -139,16 +285,24 @@ type 'a any =
   | Goal of 'a goal
   | Proof_attempt of 'a proof_attempt
   | Transf of 'a transf
+  | Metas of 'a metas
 
 let rec goal_iter_proof_attempt f g =
   PHprover.iter (fun _ a -> f a) g.goal_external_proofs;
-  PHstr.iter (fun _ t -> transf_iter_proof_attempt f t) g.goal_transformations
+  PHstr.iter (fun _ t -> transf_iter_proof_attempt f t) g.goal_transformations;
+  Mmetas_args.iter (fun _ t -> metas_iter_proof_attempt f t) g.goal_metas;
 
 and transf_iter_proof_attempt f t =
   List.iter (goal_iter_proof_attempt f) t.transf_goals
 
+and metas_iter_proof_attempt f t =
+  goal_iter_proof_attempt f t.metas_goal
+
 let theory_iter_proof_attempt f t =
   List.iter (goal_iter_proof_attempt f) t.theory_goals
+
+let metas_iter_proof_attempt f m =
+  goal_iter_proof_attempt f m.metas_goal
 
 let file_iter_proof_attempt f t =
   List.iter (theory_iter_proof_attempt f) t.file_theories
@@ -162,6 +316,7 @@ let rec iter_proof_attempt f = function
     | File file -> file_iter_proof_attempt f file
     | Proof_attempt a -> f a
     | Transf tr -> transf_iter_proof_attempt f tr
+    | Metas m -> metas_iter_proof_attempt f m
 
 let rec goal_iter_leaf_goal ~unproved_only f g =
   if not (g.goal_verified && unproved_only) then
@@ -173,20 +328,28 @@ let rec goal_iter_leaf_goal ~unproved_only f g =
     if !r then f g
 
 (** iterators not reccursive *)
-let iter_goal fp ft g =
+let iter_goal fp ft fm g =
   PHprover.iter (fun _ a -> fp a) g.goal_external_proofs;
-  PHstr.iter (fun _ t -> ft t) g.goal_transformations
+  PHstr.iter (fun _ t -> ft t) g.goal_transformations;
+  Mmetas_args.iter (fun _ t -> fm t) g.goal_metas
 
 let iter_transf f t =
   List.iter (fun g -> f g) t.transf_goals
 
+let iter_metas f t = f t.metas_goal
+
 let goal_iter f g =
   PHprover.iter
     (fun _ a -> f (Proof_attempt a)) g.goal_external_proofs;
-  PHstr.iter (fun _ t -> f (Transf t)) g.goal_transformations
+  PHstr.iter (fun _ t -> f (Transf t)) g.goal_transformations;
+  Mmetas_args.iter (fun _ t -> f (Metas t)) g.goal_metas
+
 
 let transf_iter f t =
   List.iter (fun g -> f (Goal g)) t.transf_goals
+
+let metas_iter f t =
+  f (Goal t.metas_goal)
 
 let theory_iter f t =
   List.iter (fun g -> f (Goal g)) t.theory_goals
@@ -203,6 +366,7 @@ let iter f = function
     | File file -> file_iter f file
     | Proof_attempt _ -> ()
     | Transf tr -> transf_iter f tr
+    | Metas m -> metas_iter f m
 
 (** Print session *)
 
@@ -237,7 +401,12 @@ module PTreeT = struct
         | Transf tr ->
           if tr.transf_verified
           then tr.transf_name
-          else tr.transf_name^"?" in
+          else tr.transf_name^"?"
+        | Metas metas ->
+          if metas.metas_verified
+          then "metas..."
+          else "metas..."^"?"
+      in
       let l = ref [] in
       iter (fun a -> l := (Any a)::!l) t;
       s,!l
@@ -299,8 +468,11 @@ let rec get_session_goal goal =
   match goal.goal_parent with
     | Parent_transf trans -> get_session_trans trans
     | Parent_theory th    -> get_session_theory th
+    | Parent_metas  metas -> get_session_metas metas
 
 and get_session_trans transf = get_session_goal transf.transf_parent
+
+and get_session_metas metas = get_session_goal metas.metas_parent
 
 let get_session_proof_attempt pa = get_session_goal pa.proof_parent
 
@@ -402,6 +574,7 @@ expanded=\"%b\"@ shape=\"%a\">"
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
   PHstr.iter (save_trans provers fmt) g.goal_transformations;
+  Mmetas_args.iter (save_metas provers fmt) g.goal_metas;
   fprintf fmt "@]@\n</goal>"
 
 and save_trans provers fmt _ t =
@@ -409,6 +582,74 @@ and save_trans provers fmt _ t =
     save_string t.transf_name t.transf_verified t.transf_expanded;
   List.iter (save_goal provers fmt) t.transf_goals;
   fprintf fmt "@]@\n</transf>"
+
+and save_metas provers fmt _ m =
+  fprintf fmt "@\n@[<v 1><metas@ proved=\"%b\"@ expanded=\"%b\">"
+    m.metas_verified m.metas_expanded;
+  let save_pos fmt pos =
+    fprintf fmt "decl=\"%i\"@ \
+    def=\"%i\"@ const=\"%i\"@ proj=\"%i\"@ \
+    sum=\"%a\""
+      pos.pos_decl pos.pos_def pos.pos_const pos.pos_proj
+      save_string (Tc.string_of_checksum pos.pos_checksum) in
+  let save_ts_pos fmt ts pos =
+    fprintf fmt "@\n@[<v 1><ts_pos@ name=\"%a\"@ arity=\"%i\"@ \
+    id=\"%i\"@ %a/>@]"
+      save_string ts.ts_name.id_string (List.length ts.ts_args)
+      (ts_hash ts) save_pos pos in
+  let save_ls_pos fmt ls pos =
+    (** TODO: add the signature? *)
+    fprintf fmt "@\n@[<v 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ decl=\"%i\"@ \
+    def=\"%i\"@ const=\"%i\"@ proj=\"%i\"@ \
+    sum=\"%a\"/>@]"
+      save_string ls.ls_name.id_string
+      (ls_hash ls) pos.pos_decl pos.pos_def pos.pos_const pos.pos_proj
+      save_string (Tc.string_of_checksum pos.pos_checksum)
+  in
+  let save_pr_pos fmt pr pos =
+    fprintf fmt "@\n@[<v 1><pr_pos@ name=\"%a\"@ id=\"%i\"@ decl=\"%i\"@ \
+    def=\"%i\"@ const=\"%i\"@ proj=\"%i\"@ \
+    sum=\"%a\"/>@]"
+      save_string pr.pr_name.id_string
+      (pr_hash pr) pos.pos_decl pos.pos_def pos.pos_const pos.pos_proj
+      save_string (Tc.string_of_checksum pos.pos_checksum)
+  in
+  Mts.iter (save_ts_pos fmt) m.metas_idpos.idpos_ts;
+  Mls.iter (save_ls_pos fmt) m.metas_idpos.idpos_ls;
+  Mpr.iter (save_pr_pos fmt) m.metas_idpos.idpos_pr;
+  Mstr.iter (fun s smeta_args ->
+    Smeta_args.iter (save_meta_args fmt s) smeta_args) m.metas_added;
+  save_goal provers fmt m.metas_goal;
+  fprintf fmt "@]@\n</metas>"
+
+and save_meta_args fmt s l =
+  fprintf fmt "@\n@[<v 1><meta@ name=\"%a\">" save_string s;
+  let save_meta_arg fmt = function
+    | MAty ty -> fprintf fmt "@\n@[<v 1><meta_arg_ty/>";
+      save_ty fmt ty;
+      fprintf fmt "@]@\n</meta_arg_ty>"
+    | MAts ts ->
+      fprintf fmt "@\n@[<v 1><meta_arg_ts@ id=\"%i\"/>@]" (ts_hash ts)
+    | MAls ls ->
+      fprintf fmt "@\n@[<v 1><meta_arg_ls@ id=\"%i\"/>@]" (ls_hash ls)
+    | MApr pr ->
+      fprintf fmt "@\n@[<v 1><meta_arg_pr@ id=\"%i\"/>@]" (pr_hash pr)
+    | MAstr s ->
+      fprintf fmt "@\n@[<v 1><meta_arg_str@ val=\"%s\"/>@]" s
+    | MAint i ->
+      fprintf fmt "@\n@[<v 1><meta_arg_int@ val=\"%i\"/>@]" i
+  in
+  List.iter (save_meta_arg fmt) l;
+  fprintf fmt "@]@\n</meta_args>"
+
+and save_ty fmt ty =
+  match ty.ty_node with
+  | Tyvar tv ->
+    fprintf fmt "@\n@[<v 1><ty_var@ id=\"%i\"/>@]" (tv_hash tv)
+  | Tyapp (ts,l) ->
+    fprintf fmt "@\n@[<v 1><ty_app@ id=\"%i\"/>" (ts_hash ts);
+    List.iter (save_ty fmt) l;
+    fprintf fmt "@]@\n</ty_app>"
 
 let save_theory provers fmt t =
   fprintf fmt
@@ -508,6 +749,8 @@ let theory_verified t =
 let transf_verified t =
   List.for_all (fun g -> g.goal_verified) t.transf_goals
 
+let metas_verified m = m.metas_goal.goal_verified
+
 let proof_verified a =
   (not a.proof_obsolete) &&
     match a.proof_state with
@@ -524,6 +767,9 @@ let goal_verified g =
       PHstr.iter
         (fun _ t -> if t.transf_verified then raise Exit)
         g.goal_transformations;
+      Mmetas_args.iter
+        (fun _ t -> if t.metas_verified then raise Exit)
+        g.goal_metas;
       false
     with Exit -> true
 
@@ -550,6 +796,7 @@ let rec check_goal_proved notify g =
     match g.goal_parent with
       | Parent_theory t -> check_theory_proved notify t
       | Parent_transf t -> check_transf_proved notify t
+      | Parent_metas t -> check_metas_proved notify t
   end
 
 and check_transf_proved notify t =
@@ -558,6 +805,15 @@ and check_transf_proved notify t =
     t.transf_verified <- b;
     notify (Transf t);
     check_goal_proved notify t.transf_parent
+  end
+
+
+and check_metas_proved notify m =
+  let b = metas_verified m in
+  if m.metas_verified <> b then begin
+    m.metas_verified <- b;
+    notify (Metas m);
+    check_goal_proved notify m.metas_parent
   end
 
 (******************************)
@@ -628,6 +884,7 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
+    | Parent_metas  mms -> mms.metas_key
   in
   let key = keygen ~parent:parent_key () in
   let goal = { goal_name = name;
@@ -639,6 +896,7 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
                goal_key = key;
                goal_external_proofs = PHprover.create 7;
                goal_transformations = PHstr.create 3;
+               goal_metas = Mmetas_args.empty;
                goal_verified = false;
                goal_expanded = exp;
              }
@@ -649,6 +907,7 @@ let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
+    | Parent_metas  mms -> mms.metas_key
   in
   let key = keygen ~parent:parent_key () in
   let sum = Termcode.task_checksum ~version t in
@@ -663,6 +922,7 @@ let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
                goal_key = key;
                goal_external_proofs = PHprover.create 7;
                goal_transformations = PHstr.create 3;
+               goal_metas = Mmetas_args.empty;
                goal_verified = false;
                goal_expanded = exp;
              }
@@ -686,6 +946,21 @@ let raw_add_transformation ~(keygen:'a keygen) g name exp =
   in
   PHstr.replace g.goal_transformations name tr;
   tr
+
+let raw_add_metas ~(keygen:'a keygen) g added idpos exp =
+  let parent = g.goal_key in
+  let key = keygen ~parent () in
+  let ms = { metas_added = added;
+             metas_idpos = idpos;
+             metas_parent = g;
+             metas_verified = false;
+             metas_key = key;
+             metas_goal = g;
+             metas_expanded = exp;
+           }
+  in
+  g.goal_metas <- Mmetas_args.add added ms g.goal_metas;
+  ms
 
 let raw_add_theory ~(keygen:'a keygen) mfile thname exp =
   let parent = mfile.file_key in
@@ -730,10 +1005,19 @@ let bool_attribute field r def =
       | _ -> assert false
   with Not_found -> def
 
-let int_attribute field r def =
+let int_attribute_def field r def =
   try
     int_of_string (List.assoc field r.Xml.attributes)
   with Not_found | Invalid_argument _ -> def
+
+let int_attribute field r =
+  try
+    int_of_string (List.assoc field r.Xml.attributes)
+  with Not_found | Invalid_argument _ ->
+    (** TODO: use real error *)
+    eprintf "[Error] missing required attribute '%s' from element '%s'@."
+      field r.Xml.name;
+    assert false
 
 let string_attribute_def field r def=
   try
@@ -852,8 +1136,8 @@ and load_proof_or_transf ~old_provers mg a =
         let edit = match edit with None | Some "" -> None | _ -> edit in
         let obsolete = bool_attribute "obsolete" a true in
         let archived = bool_attribute "archived" a false in
-        let timelimit = int_attribute "timelimit" a 2 in
-        let memlimit = int_attribute "memlimit" a 0 in
+        let timelimit = int_attribute_def "timelimit" a 2 in
+        let memlimit = int_attribute_def "memlimit" a 0 in
 (*
         if timelimit < 0 then begin
             eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
@@ -876,14 +1160,127 @@ and load_proof_or_transf ~old_provers mg a =
           (List.fold_left
              (load_goal ~old_provers (Parent_transf mtr))
              [] a.Xml.elements);
-        (* already done by raw_add_transformation
+        (* already done by raw_add_transformation:
            Hashtbl.add mg.transformations trname mtr *)
+        (** The attribute "proved" is required but not read *)
         mtr.transf_verified <- transf_verified mtr
+    | "metas" -> load_metas ~old_provers mg a;
     | "label" -> ()
     | s ->
         eprintf
           "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
           s
+
+and load_metas ~old_provers mg a =
+  let hts = Hint.create 10 in
+  let hls = Hint.create 10 in
+  let hpr = Hint.create 10 in
+  let idpos, metas_args, goal =
+    List.fold_left (fun (idpos, metas, goal) a ->
+      match a.Xml.name with
+      | "ts_pos" | "ls_pos" | "pr_pos" ->
+        let name = string_attribute "name" a in
+        let intid = int_attribute "id" a in
+        let pos = { pos_decl = int_attribute "decl" a;
+                    pos_def = int_attribute "def" a;
+                    pos_const = int_attribute "const" a;
+                    pos_proj = int_attribute "proj" a;
+                    pos_checksum =
+            Termcode.checksum_of_string (string_attribute "sum" a);
+                  } in
+        let idpos = begin match a.Xml.name with
+          | "ts_pos" ->
+            let arity = int_attribute "arity" a in
+            let tvs = foldi (fun l _ ->
+              (create_tvsymbol (Ident.id_fresh "a"))::l)
+              [] 0 arity in
+            let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs None in
+            Hint.add hts intid ts;
+            let idpos_ts = Mts.add ts pos idpos.idpos_ts in
+            { idpos with idpos_ts = idpos_ts }
+          | "ls_pos" ->
+            (** TODO signature? *)
+            let ls = Term.create_lsymbol (Ident.id_fresh name) [] None in
+            Hint.add hls intid ls;
+            let idpos_ls = Mls.add ls pos idpos.idpos_ls in
+            { idpos with idpos_ls = idpos_ls }
+          | "pr_pos" ->
+            let pr = Decl.create_prsymbol (Ident.id_fresh name) in
+            Hint.add hpr intid pr;
+            let idpos_pr = Mpr.add pr pos idpos.idpos_pr in
+            { idpos with idpos_pr = idpos_pr }
+          | _ -> assert false
+        end in
+        (idpos, metas, goal)
+
+      | "meta" -> (idpos, a::metas, goal)
+      | "goal"  -> (idpos, metas, a::goal)
+      | _ ->
+        raise (LoadError(a,"Unexpected element"))
+    ) (empty_idpos,[],[]) a.Xml.elements in
+  let load_ty a =
+    let newtv = Hint.memo 0 (fun _ ->
+      Ty.ty_var (create_tvsymbol (Ident.id_fresh "a"))) in
+    let rec aux a =
+      match a.Xml.name with
+      | "ty_var" -> newtv (int_attribute "id" a)
+      | "ty_app" ->
+        let intid = int_attribute "id" a in
+        let ts = Hint.find hts intid in
+        Ty.ty_app ts (List.map aux a.Xml.elements)
+    | _ ->
+      raise (LoadError(a,"Unexpected element")) in
+    aux a in
+  let load_meta_args a =
+    try match a.Xml.name with
+    | "meta_arg_ty" -> begin match a.Xml.elements with
+      | [ty] -> MAty (load_ty ty)
+      | _ -> raise (LoadError (a,"This element must contain only one element"))
+    end
+    | "meta_arg_str" -> MAstr (string_attribute "val" a)
+    | "meta_arg_int" -> MAint (int_attribute "val" a)
+    | "meta_arg_ts" ->
+      let intid = int_attribute "id" a in
+      let ts = Hint.find hts intid in
+      MAts ts
+    | "meta_arg_ls" ->
+      let intid = int_attribute "id" a in
+      let ls = Hint.find hls intid in
+      MAls ls
+    | "meta_arg_pr" ->
+      let intid = int_attribute "id" a in
+      let pr = Hint.find hpr intid in
+      MApr pr
+    | _ ->
+      raise (LoadError(a,"Unexpected element"))
+    with Not_found ->
+      raise (LoadError (a,"Unknown id"))
+  in
+  let load_meta metas_args a =
+    let args = List.map load_meta_args a.Xml.elements in
+    Mstr.change (function
+    | None -> Some (Smeta_args.singleton args)
+    | Some s -> Some (Smeta_args.add args s))
+      (string_attribute "name" a)
+      metas_args
+  in
+  let metas_args =
+    List.fold_left load_meta Mstr.empty metas_args in
+  let exp = bool_attribute "expanded" a true in
+  let metas = raw_add_metas ~keygen mg metas_args idpos exp in
+  let goal = match goal with
+    | [] -> raise (LoadError (a,"No subgoal for this metas"))
+    | [goal] -> goal
+    | _ ->
+      raise (LoadError (a,"Only one goal can appear in a metas element")) in
+  metas.metas_goal <-
+    List.hd (load_goal ~old_provers (Parent_metas metas) [] goal);
+  (* already done by raw_add_transformation:
+     Hashtbl.add mg.transformations trname mtr *)
+  (** The attribute "proved" is required but not read *)
+  metas.metas_verified <- metas_verified metas
+
+
 
 let load_theory ~old_provers mf acc th =
   match th.Xml.name with
@@ -935,7 +1332,7 @@ let get_old_provers () = !old_provers
 let load_session session xml =
   match xml.Xml.name with
     | "why3session" ->
-      let shape_version = int_attribute "shape_version" xml 1 in
+      let shape_version = int_attribute_def "shape_version" xml 1 in
       session.session_shape_version <- shape_version;
       dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
@@ -987,6 +1384,10 @@ and set_transf_expanded tr b =
   tr.transf_expanded <- b;
   if not b then
     List.iter (fun g -> set_goal_expanded g b) tr.transf_goals
+
+and set_metas_expanded m b =
+  m.metas_expanded <- b;
+  if not b then set_goal_expanded m.metas_goal b
 
 let set_theory_expanded t b =
   t.theory_expanded <- b;
@@ -1096,7 +1497,9 @@ let remove_file file =
   let s = file.file_parent in
   PHstr.remove s.session_files file.file_name
 
-(** Transformation *)
+(***************************)
+(*      transformations    *)
+(***************************)
 
 module AddTransf(X : sig
   type key
@@ -1151,9 +1554,6 @@ let remove_transformation ?(notify=notify) t =
   check_goal_proved notify g
 
 
-(***************************)
-(*      transformations    *)
-(***************************)
 let add_registered_transformation ~keygen env_session tr_name g =
   let task = goal_task g in
   let gname = g.goal_name in
@@ -1168,6 +1568,163 @@ let add_registered_transformation ~keygen env_session tr_name g =
     goal_name, expl, task
   in
   add_transformation ~keygen ~goal env_session tr_name g subgoals
+
+(****************)
+(**    metas    *)
+(****************)
+
+let task_nb_decl task =
+  Task.task_fold
+    (fun n tdecl -> match tdecl.td_node with Decl _ -> n+1 | _ -> n)
+    0 task
+
+let pos_of_metas ?version_shape lms task =
+  (** put in hde all the declarations to find in the task *)
+  let already_done hdid id = Hid.mem hdid id || (Hid.add hdid id (); false) in
+  let add_ts_ident hdid hde known ts =
+    let id = ts.ts_name in
+    if not (already_done hdid id) then
+      let decl = Mid.find id known in
+      let pos = match decl.d_node with
+        | Dtype _ -> {empty_pos with pos_def = 0}
+        | Ddata l ->
+          {empty_pos with pos_def =
+              Util.list_find_nth (fun (t,_ ) -> ts_equal t ts) l}
+        | Dprop _ | Dind _ | Dlogic _ | Dparam _ ->
+          assert false (** type can't be defined somewhere else *) in
+      let f idpos pos_decl pos_checksum =
+        let pos =
+          {pos with pos_decl     = pos_decl;
+            pos_checksum = pos_checksum} in
+        {idpos with idpos_ts = Mts.add ts pos idpos.idpos_ts} in
+      Hdecl.add hde decl f
+  in
+  let add_ls_ident hdid hde known ls =
+    let id = ls.ls_name in
+    if not (already_done hdid id) then
+      let decl = Mid.find id known in
+      let pos = match decl.d_node with
+        | Ddata l ->
+          let nthd,pos = Util.list_first_nth (fun (_ts,l) ->
+            try
+              let nthc,pos = Util.list_first_nth
+                (fun (c,projs) ->
+                  if (ls_equal c ls) then Some {empty_pos with pos_proj = -1}
+                  else try
+                         Some {empty_pos with pos_proj =
+                             Util.list_find_nth (function
+                             | None -> false
+                             | Some proj -> ls_equal proj ls) projs}
+                    with Not_found -> None
+                ) l in
+              Some {pos with pos_const = nthc}
+            with Not_found -> None) l in
+          {pos with pos_def = nthd}
+        | Dparam _ -> {empty_pos with pos_def = 0}
+        | Dlogic l ->
+          {empty_pos with pos_def =
+              Util.list_find_nth (fun (l,_ ) -> ls_equal l ls) l}
+        | Dind (_,l) ->
+          {empty_pos with pos_def =
+              Util.list_find_nth (fun (l,_ ) -> ls_equal l ls) l}
+        | Dprop _ | Dtype _ ->
+          assert false  (** symbols can't be defined somewhere else *) in
+
+      let f idpos pos_decl pos_checksum =
+        let pos =
+          {pos with pos_decl     = pos_decl;
+            pos_checksum = pos_checksum} in
+        {idpos with idpos_ls = Mls.add ls pos idpos.idpos_ls} in
+      Hdecl.add hde decl f
+  in
+  let add_pr_ident hdid hde known pr =
+    let id = pr.pr_name in
+    if not (already_done hdid id) then
+      let decl = Mid.find id known in
+      let pos = match decl.d_node with
+        | Dprop _ -> {empty_pos with pos_def = 0}
+        | Dind (_,l) ->
+          let nthd,pos = Util.list_first_nth (fun (_,l) ->
+            try
+              Some {empty_pos with pos_const =
+                  Util.list_find_nth (fun (p,_) -> pr_equal pr p) l}
+            with Not_found -> None) l in
+          {pos with pos_def = nthd}
+        | Dlogic _ | Dparam _ | Ddata _ | Dtype _ ->
+          assert false  (** props can't be defined somewhere else *) in
+
+      let f idpos pos_decl pos_checksum =
+        let pos =
+          {pos with pos_decl     = pos_decl;
+            pos_checksum = pos_checksum} in
+        {idpos with idpos_pr = Mpr.add pr pos idpos.idpos_pr} in
+      Hdecl.add hde decl f in
+
+  let look_for_ident hdid hde known = function
+    | MAty ty -> ty_s_fold (fun () ts -> add_ts_ident hdid hde known ts) () ty
+    | MAts ts -> add_ts_ident hdid hde known ts
+    | MAls ls -> add_ls_ident hdid hde known ls
+    | MApr pr -> add_pr_ident hdid hde known pr
+    | MAstr _ | MAint _ -> ()  in
+
+  let hdid = Hid.create 10 in
+  let hde = Hdecl.create 10 in
+  List.iter (fun (_,args) ->
+    List.iter (look_for_ident hdid hde (Task.task_known task)) args) lms;
+
+  (** find them and update the position with the pos_decl and checksum *)
+  let rec compute_virtual_ident idpos hde n = function
+    | None -> idpos
+    | Some task as task0 ->
+      match task.task_decl.td_node with
+      | Decl d ->
+        let idpos =
+          let lidm = Hdecl.find_all hde d in
+          match lidm with
+          | [] -> idpos
+          | _ ->
+            let checksum =
+            Termcode.task_checksum ?version:version_shape task0 in
+            List.fold_left
+              (fun idpos f -> f idpos n checksum) idpos lidm
+        in
+        compute_virtual_ident idpos hde (n-1) task.task_prev
+      | _ -> compute_virtual_ident idpos hde n task.task_prev in
+
+  let idpos =
+    if Hdecl.is_empty hde then empty_idpos
+    else
+      let nmax = task_nb_decl task in
+      compute_virtual_ident empty_idpos hde nmax task
+  in
+  idpos
+
+let add_registered_metas ~keygen env added g =
+  let goal,task0 = Task.task_separate_goal (goal_task g) in
+  let add_meta task (s,l) =
+    let m = Theory.lookup_meta s in
+    Task.add_meta task m l in
+  (** add before the goal *)
+  let task = List.fold_left add_meta task0 added in
+  let task = add_tdecl task goal in
+  let idpos = pos_of_metas added task in
+  let added = List.fold_left (fun ma (s,l) ->
+    Mstr.change (function
+    | None -> Some (Smeta_args.singleton l)
+    | Some std ->
+      Some (Smeta_args.add l std)) s ma) Mstr.empty added in
+  let metas = raw_add_metas ~keygen g added idpos false in
+  let goal = raw_add_task ~version:env.session.session_shape_version
+    ~keygen (Parent_metas metas)
+    g.goal_name g.goal_expl task false in
+  metas.metas_goal <- goal;
+  metas
+
+let remove_metas ?(notify=notify) m =
+  let g = m.metas_parent in
+  g.goal_metas <- Mmetas_args.remove m.metas_added g.goal_metas;
+  check_goal_proved notify g
+
 
 (*****************************************************)
 (**                    Prover Loaded                **)
@@ -1209,6 +1766,7 @@ let ft_of_th th =
 let rec ft_of_goal g =
   match g.goal_parent with
     | Parent_transf tr -> ft_of_goal tr.transf_parent
+    | Parent_metas ms  -> ft_of_goal ms.metas_parent
     | Parent_theory th -> ft_of_th th
 
 let ft_of_pa a =
@@ -1398,11 +1956,15 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
        from_proof.proof_prover
        from_proof.proof_state)
 
+exception MalformedMetas of pos_task
+
 let rec merge_any_goal ~keygen env obsolete from_goal to_goal =
   set_goal_expanded to_goal from_goal.goal_expanded;
   PHprover.iter (merge_proof ~keygen obsolete to_goal)
     from_goal.goal_external_proofs;
-  PHstr.iter (merge_trans ~keygen env to_goal) from_goal.goal_transformations
+  PHstr.iter (merge_trans ~keygen env to_goal) from_goal.goal_transformations;
+  Mmetas_args.iter (merge_metas ~keygen env to_goal) from_goal.goal_metas
+
 
 and merge_trans ~keygen env to_goal _ from_transf =
   let from_transf_name = from_transf.transf_name in
@@ -1421,6 +1983,270 @@ and merge_trans ~keygen env to_goal _ from_transf =
     merge_any_goal ~keygen env obsolete  from_goal to_goal
   | (_, None, _) -> ()
   ) associated
+
+
+(** convert the ident from the olf task to the ident at the same
+    position in the new task *)
+and merge_metas ~keygen env to_goal _ from_metas =
+  (** Find in the new task the new symbol (ts,ls,pr) *)
+  (** We order the position bottom up and find the ident as we go
+      through the task *)
+  dprintf debug "[Reload] metas for goal %s@\n"
+    to_goal.goal_name.Ident.id_string;
+  (** For the enumeration of the position *)
+  let module Exc = struct
+    (** only [MAts], [MAls] and [MApr] is used inside these
+        [Theory.meta_arg] *)
+    exception LevelZero
+    exception LevelDecl of Theory.meta_arg Mpos.enumeration * pos_task
+    exception LevelDef  of Theory.meta_arg Mpos.enumeration * pos_task
+    exception LevelConst of Theory.meta_arg Mpos.enumeration * pos_task
+    exception LevelProj of Theory.meta_arg Mpos.enumeration * pos_task
+    let pos_enum enum = match Mpos.val_enum enum with
+      | None -> raise LevelZero
+      | Some (pos,_) -> pos
+    let ts_enum enum = match Mpos.val_enum enum with
+      | Some (_,MAts ts) -> ts
+      | _ -> assert false
+    let ls_enum enum = match Mpos.val_enum enum with
+      | Some (_,MAls ls) -> ls
+      | _ -> assert false
+    let pr_enum enum = match Mpos.val_enum enum with
+      | Some (_,MApr pr) -> pr
+      | _ -> assert false
+    type leveltogo =
+    | ToLevelDecl
+    | ToLevelDef
+    | ToLevelConst
+    | ToLevelProj
+
+    let rec next leveltogo pos enum =
+      match leveltogo, pos_enum enum with
+      | _, epos when epos.pos_decl  <> pos.pos_decl  ->
+        if leveltogo = ToLevelDecl then (enum,epos)
+        else raise (LevelDecl (enum,epos))
+      | ToLevelDecl, _ -> next leveltogo pos (Mpos.next_enum enum)
+
+      | _, epos when epos.pos_def   <> pos.pos_def   ->
+        if leveltogo = ToLevelDef then (enum,epos)
+        else raise (LevelDef (enum,epos))
+      | ToLevelDef, _ -> next leveltogo pos (Mpos.next_enum enum)
+
+      | _, epos when epos.pos_const <> pos.pos_const ->
+        if leveltogo = ToLevelConst then (enum,epos)
+        else raise (LevelConst (enum,epos))
+      | ToLevelConst, _ -> next leveltogo pos (Mpos.next_enum enum)
+
+      | _, epos when epos.pos_proj  <> pos.pos_proj  ->
+        if leveltogo = ToLevelProj then (enum,epos)
+        else raise (LevelProj (enum,epos))
+      | ToLevelProj, _ -> next leveltogo pos (Mpos.next_enum enum)
+
+    let fold_nth test f acc pos l =
+      let rec aux test f acc n pos = function
+        | [] -> acc,pos
+        | a::l when test n pos ->
+          let acc,pos = f acc pos a in aux test f acc (n+1) pos l
+        | _::l  -> aux test f acc (n+1) pos l in
+      aux test f acc 0 pos l
+    let samedecl  n pos = n = pos.pos_decl
+    let samedef   n pos = n = pos.pos_def
+    let sameconst n pos = n = pos.pos_const
+    let sameproj  n pos = n = pos.pos_proj
+
+  end in
+
+  (** hashtbl that will contain the conversion *)
+  let hts = Hts.create 4 in
+  let hls = Hls.create 4 in
+  let hpr = Hpr.create 10 in
+
+  (** The new idpos *)
+  let converted_idpos = ref empty_idpos in
+  (** add the conversion in the previous datastructure *)
+  let add_conversion_ts pos from_ts to_ts =
+    Hts.add hts from_ts to_ts;
+    converted_idpos := {!converted_idpos with
+      idpos_ts = Mts.add to_ts pos (!converted_idpos).idpos_ts} in
+  let add_conversion_ls pos from_ls to_ls =
+    Hls.add hls from_ls to_ls;
+    converted_idpos := {!converted_idpos with
+      idpos_ls = Mls.add to_ls pos (!converted_idpos).idpos_ls} in
+  let add_conversion_pr pos from_pr to_pr =
+    Hpr.add hpr from_pr to_pr;
+    converted_idpos := {!converted_idpos with
+      idpos_pr = Mpr.add to_pr pos (!converted_idpos).idpos_pr} in
+
+  (** Its obsolete if one identifier can't be found in the exact same prefix *)
+  let obsolete = ref false in
+  let set_obsolete () =
+    (* if not allow_obsolete then raise OutdatedSession *)
+    (* else  *)obsolete := true
+  in
+
+  (** The main function *)
+  let rec find_symbol enum n pos task =
+    match task with
+    | None -> assert false (** enum must be empty before *)
+    | Some task_hd ->
+      match task_hd.task_decl.td_node with
+      | Use _ | Clone _ | Meta _ ->
+        find_symbol enum n pos task_hd.task_prev
+      | Decl d ->
+        if not (Exc.samedecl n pos)
+        then find_symbol enum (n-1) pos task_hd.task_prev
+        else
+          let checksum_a = pos.pos_checksum in
+          let checksum_b = Termcode.task_checksum task
+                                   ~version:env.session.session_shape_version
+          in
+          if not (Termcode.equal_checksum checksum_a checksum_b)
+          then begin
+            set_obsolete ();
+            let enum,pos = Exc.next Exc.ToLevelDecl pos enum in
+            find_symbol enum (n-1) pos task_hd.task_prev end
+          else
+            let enum,pos = try begin match d.d_node with
+              | Dtype ts ->
+                add_conversion_ts pos (Exc.ts_enum enum) ts;
+                Exc.next Exc.ToLevelDecl pos enum
+              | Dparam ls ->
+                add_conversion_ls pos (Exc.ls_enum enum) ls;
+                Exc.next Exc.ToLevelDecl pos enum
+              | Dprop (_,pr,_) ->
+                add_conversion_pr pos (Exc.pr_enum enum) pr;
+                Exc.next Exc.ToLevelDecl pos enum
+              | Ddata ldef ->
+                Exc.fold_nth Exc.samedef (fun enum pos (ts,lconst) ->
+                (** data_decl *)
+                  let enum,pos =
+                    if Exc.sameconst (-1) pos
+                    then begin
+                      add_conversion_ts pos (Exc.ts_enum enum) ts;
+                      Exc.next Exc.ToLevelConst pos enum end
+                    else (enum,pos)
+                  in
+                  try
+                    Exc.fold_nth Exc.sameconst (fun enum pos (ls, lproj) ->
+                    (** constructor *)
+                      let enum,pos =
+                        if Exc.sameproj (-1) pos
+                        then begin
+                          add_conversion_ls pos (Exc.ls_enum enum) ls;
+                          Exc.next Exc.ToLevelProj pos enum end
+                        else (enum,pos)
+                      in
+                      try
+                        Exc.fold_nth Exc.sameproj (fun enum pos lso ->
+                        (** lsymbol option list *)
+                          match lso with
+                          | None -> raise (MalformedMetas pos)
+                          | Some ls ->
+                            add_conversion_ls pos (Exc.ls_enum enum) ls;
+                            Exc.next Exc.ToLevelProj pos enum
+                        ) enum pos lproj
+                      with Exc.LevelConst (enum,pos) -> (enum,pos)
+                    ) enum pos lconst
+                  with Exc.LevelDef (enum,pos) -> enum,pos
+                ) enum pos ldef
+              | Dlogic ldef ->
+                Exc.fold_nth Exc.samedef (fun enum pos (ls,_) ->
+                (** logic_decl *)
+                  add_conversion_ls pos (Exc.ls_enum enum) ls;
+                  Exc.next Exc.ToLevelDef pos enum
+                ) enum pos ldef
+              | Dind (_,ldef) ->
+                Exc.fold_nth Exc.samedef (fun enum pos (ls,lcases) ->
+                (** ind_decl *)
+                  let enum,pos =
+                    if Exc.sameconst (-1) pos
+                    then begin
+                      add_conversion_ls pos (Exc.ls_enum enum) ls;
+                      Exc.next Exc.ToLevelConst pos enum end
+                    else (enum,pos)
+                  in
+                  try
+                    Exc.fold_nth Exc.sameconst (fun enum pos (pr, _) ->
+                    (** case *)
+                      add_conversion_pr pos (Exc.pr_enum enum) pr;
+                      Exc.next Exc.ToLevelConst pos enum
+                    ) enum pos lcases
+                  with Exc.LevelDef (enum,pos) -> enum,pos
+                ) enum pos ldef
+            end
+           with Exc.LevelDecl (enum,pos) -> enum,pos in
+           find_symbol enum (n-1) pos task_hd.task_prev in
+
+  let task = goal_task to_goal in
+  let nmax = task_nb_decl task in
+  begin try
+          let enum = Mpos.start_enum (posid_of_idpos from_metas.metas_idpos) in
+          let pos = Exc.pos_enum enum in
+          find_symbol enum nmax pos task
+    with Exc.LevelZero -> () (* finished *) end;
+
+  (** Now convert the metas to the new symbol *)
+  let add_meta ((metas,task) as acc) meta_name meta_args =
+    let map = function
+      | MAty ty -> MAty (Ty.ty_s_map (Hts.find' hts) ty)
+      | MAts ts -> MAts (Hts.find' hts ts)
+      | MAls ls -> MAls (Hls.find' hls ls)
+      | MApr pr -> MApr (Hpr.find' hpr pr)
+      | (MAstr _ | MAint _) as m -> m
+    in
+    try
+      let meta = Theory.lookup_meta meta_name in
+      let smeta_args,task = Smeta_args.fold_left
+        (fun ((smeta_args,task) as acc) meta_args ->
+          try
+            let meta_args = List.map map meta_args in
+            Smeta_args.add meta_args smeta_args,
+            Task.add_meta task meta meta_args
+          with
+          | Hts.Key_not_found ts ->
+            let pos = Mts.find ts from_metas.metas_idpos.idpos_ts in
+            dprintf debug
+              "Remove a meta during merge: the type symbol argument %a can't \
+               be found in the new task at position (%i,%i,%i,%i)@\n"
+              Pretty.print_ts ts
+              pos.pos_decl pos.pos_def pos.pos_const pos.pos_proj;
+            acc
+          | Hls.Key_not_found ls ->
+            let pos = Mls.find ls from_metas.metas_idpos.idpos_ls in
+            dprintf debug
+              "Remove a meta during merge: the logic symbol argument %a can't \
+               be found in the new task at position (%i,%i,%i,%i)@\n"
+              Pretty.print_ls ls
+              pos.pos_decl pos.pos_def pos.pos_const pos.pos_proj;
+            acc
+          | Hpr.Key_not_found pr ->
+            let pos = Mpr.find pr from_metas.metas_idpos.idpos_pr in
+            dprintf debug
+              "Remove a meta during merge: the proposition symbol argument %a \
+               can't be found in the new task at position (%i,%i,%i,%i)@\n"
+              Pretty.print_pr pr
+              pos.pos_decl pos.pos_def pos.pos_const pos.pos_proj;
+            acc
+        )
+        (Smeta_args.empty,task) meta_args in
+      (Mstr.add meta_name smeta_args metas,task)
+    with
+    | Theory.UnknownMeta s ->
+      dprintf debug "Remove a meta during merge: meta %s unknown" s;
+      acc
+  in
+  let goal,task = Task.task_separate_goal task in
+  let metas,task = Mstr.fold_left add_meta (Mstr.empty,task)
+    from_metas.metas_added in
+  let task = Task.add_tdecl task goal in
+  let to_metas = raw_add_metas ~keygen to_goal metas (!converted_idpos)
+    from_metas.metas_expanded in
+  let to_goal = raw_add_task ~version:env.session.session_shape_version
+    ~keygen (Parent_metas to_metas)
+    to_goal.goal_name to_goal.goal_expl task false in
+  to_metas.metas_goal <- to_goal;
+  dprintf debug "[Reload] metas done@\n";
+  merge_any_goal ~keygen env !obsolete from_metas.metas_goal to_goal
 
 exception OutdatedSession
 
@@ -1451,8 +2277,8 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
-let merge_file ~keygen env ~allow_obsolete from_f to_f  =
-  dprintf debug "[Info] merge_file, shape_version = %d@."
+let merge_file ~keygen env ~allow_obsolete from_f to_f =
+  dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
@@ -1561,6 +2387,7 @@ let key_any = function
   | Goal g -> g.goal_key
   | Proof_attempt p -> p.proof_key
   | Theory th -> th.theory_key
+  | Metas  ms -> ms.metas_key
 
 (*
 Local Variables:

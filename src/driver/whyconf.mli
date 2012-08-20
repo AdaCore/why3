@@ -119,6 +119,9 @@ type config_prover = {
   extra_drivers : string list;
 }
 
+val get_complete_command : config_prover -> string
+(** add the extra_options to the command *)
+
 val get_provers : config  -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)

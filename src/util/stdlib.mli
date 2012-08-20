@@ -307,6 +307,12 @@ module type S =
     (** get the next (or same) step of the enumeration which key is
         greater or equal to the given key *)
 
+    val fold_left: ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
+    (** same as {!fold} but in the order of {!List.fold_left} *)
+
+    val of_list: (key * 'a) list -> 'a t
+    (** construct a map from a pair of bindings *)
+
     module type Set =
     sig
       type elt = key
@@ -439,6 +445,11 @@ module type S =
       val is_num_elt : int -> t -> bool
       (** check if the map has the given number of elements *)
 
+      val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+      (** same as {!fold} but in the order of {!List.fold_left} *)
+
+      val of_list: elt list -> t
+      (** construct a set from a list of elements *)
     end
 
     module Set : Set

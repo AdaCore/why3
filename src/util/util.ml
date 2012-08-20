@@ -146,6 +146,21 @@ let rec list_first f = function
       | None -> list_first f l
       | Some r -> r
 
+let list_find_nth p l =
+  let rec aux p n = function
+    | [] -> raise Not_found
+    | a::l -> if p a then n else aux p (n+1) l in
+  aux p 0 l
+
+
+let list_first_nth f l =
+  let rec aux f n = function
+    | [] -> raise Not_found
+    | a::l -> match f a with
+      | None -> aux f (n+1) l
+      | Some r -> n,r in
+  aux f 0 l
+
 let list_iteri f l =
   let rec iter i = function
     | [] -> ()
@@ -334,5 +349,17 @@ module type PrivateHashtbl = sig
     (** Same as {Hashtbl.mem} *)
   val length : 'a t -> int
     (** Same as {Hashtbl.length} *)
+
+end
+
+module type PrivateArray = sig
+  (** Private Array *)
+  type 'a t
+
+  val get : 'a t -> int -> 'a
+  val iter : ('a -> unit) -> 'a t -> unit
+    (** Same as {!Array.iter} *)
+  val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
+    (** Same as {!Array.fold} *)
 
 end

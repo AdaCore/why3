@@ -175,6 +175,8 @@ let loadpath m =
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max
+let get_complete_command pc =
+  String.concat " " (pc.command :: pc.extra_options)
 
 let set_limits m time mem running =
   { m with timelimit = time; memlimit = mem; running_provers_max = running }

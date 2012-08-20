@@ -25,6 +25,8 @@
     Use session_scheduler if you want to queue the operations
 *)
 
+open Stdlib
+
 val debug : Debug.flag
 (** The debug flag "session" *)
 
@@ -58,6 +60,27 @@ type task_option
 (** Currently just an option on a task, but later perhaps
     we should be able to release a task and rebuild it when needed *)
 
+type pos_task =
+  { pos_decl  : int; (* nth decl in the task from top *)
+    pos_def   : int; (* nth def in the decl *)
+    pos_const : int; (* nth constructor in the type def *)
+    pos_proj  : int; (* nth proj for the constructor (-1 for the constructor) *)
+    pos_checksum : Termcode.checksum;
+  (** the checksum of the prefix of the task starting at this decl *)
+  }
+
+type meta_args = Theory.meta_arg list
+module Mmeta_args : Map.S with type key = meta_args
+module Smeta_args : Mmeta_args.Set
+type metas_args =  Smeta_args.t Util.Mstr.t
+module Mmetas_args : Map.S with type key = metas_args
+
+type idpos = {
+  idpos_ts : pos_task Ty.Mts.t;
+  idpos_ls : pos_task Term.Mls.t;
+  idpos_pr : pos_task Decl.Mpr.t;
+}
+
 (** {2 Session} *)
 
 (** All the element of a session contain a key which can hold whatever
@@ -76,6 +99,7 @@ type 'a goal = private
       mutable goal_expanded : bool;
       goal_external_proofs : 'a proof_attempt PHprover.t;
       goal_transformations : 'a transf PHstr.t;
+      mutable goal_metas : 'a metas Mmetas_args.t;
     }
 
 and 'a proof_attempt = private
@@ -93,6 +117,18 @@ and 'a proof_attempt = private
 and 'a goal_parent = private
                      | Parent_theory of 'a theory
                      | Parent_transf of 'a transf
+                     | Parent_metas  of 'a metas
+
+and 'a metas =
+  { mutable metas_key : 'a;
+    metas_added : metas_args;
+    metas_idpos : idpos;
+    metas_parent : 'a goal;
+    mutable metas_verified : bool;
+    mutable metas_goal : 'a goal;
+    (** Not mutated after the creation *)
+    mutable metas_expanded : bool;
+  }
 
 and 'a transf = private
     { mutable transf_key : 'a;
@@ -236,9 +272,13 @@ val proof_verified : 'key proof_attempt -> bool
 val get_used_provers : 'a session -> Whyconf.Sprover.t
 (** Get the set of provers which appear in the session *)
 
+(* val metas_of_virtuals : 'a metas -> Theory.Smeta.t *)
+(* (\** Get the set of metas added (the parent goal must contain a task) *\) *)
+
 (** {2 Modificator} *)
 
 val set_transf_expanded : 'key transf -> bool -> unit
+val set_metas_expanded : 'key metas -> bool -> unit
 val set_goal_expanded : 'key goal -> bool -> unit
 val set_theory_expanded : 'key theory -> bool -> unit
 val set_file_expanded : 'key file -> bool -> unit
@@ -252,6 +292,7 @@ type 'a any =
   | Goal of 'a goal
   | Proof_attempt of 'a proof_attempt
   | Transf of 'a transf
+  | Metas of 'a metas
 
 val print_any : Format.formatter -> 'a any -> unit
 (** Print a subtree with a pstree format (cf Tree module) *)
@@ -363,6 +404,18 @@ val add_registered_transformation :
 val remove_transformation : ?notify:'key notify -> 'key transf -> unit
   (** Remove a transformation *)
 
+(** {2 Metas} *)
+val add_registered_metas :
+  keygen:'key keygen ->
+  'key env_session ->
+  (string * Theory.meta_arg list) list ->
+  'key goal ->
+  'key metas
+(** Add some metas to a task *)
+
+val remove_metas : ?notify:'key notify -> 'key metas -> unit
+  (** Remove the addition of metas *)
+
 (** {2 File} *)
 
 val add_file :
@@ -407,15 +460,21 @@ val goal_iter_leaf_goal :
 (** {3 not recursive} *)
 
 val iter_goal :
-  ('key proof_attempt -> unit) -> ('key transf -> unit) -> 'key goal -> unit
+  ('key proof_attempt -> unit) ->
+  ('key transf -> unit) ->
+  ('key metas -> unit) ->
+  'key goal -> unit
 val iter_transf :
   ('key goal -> unit) -> 'key transf -> unit
+val iter_metas :
+  ('key goal -> unit) -> 'key metas -> unit
 
 
 val goal_iter : ('key any -> unit) -> 'key goal -> unit
 val transf_iter : ('key any -> unit) -> 'key transf -> unit
 val theory_iter : ('key any -> unit) -> 'key theory -> unit
 val transf_iter : ('key any -> unit) -> 'key transf -> unit
+val metas_iter : ('key any -> unit) -> 'key metas -> unit
 val file_iter : ('key any -> unit) -> 'key file -> unit
 val session_iter : ('key any -> unit) -> 'key session -> unit
 val iter : ('key any -> unit) -> 'key any -> unit

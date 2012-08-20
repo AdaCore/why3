@@ -197,6 +197,8 @@ module Make(O: OBSERVER) : sig
 
   val remove_transformation : O.key transf -> unit
 
+  val remove_metas : O.key metas -> unit
+
   val set_archive : O.key proof_attempt -> bool -> unit
 
   val clean : O.key any -> unit
@@ -241,6 +243,15 @@ module Make(O: OBSERVER) : sig
         [callback] is called when all tasks are finished.
         Useful for benchmarking provers
     *)
+
+  val schedule_proof_attempt:
+    timelimit:int ->
+    memlimit:int ->
+    ?old:string ->
+    inplace:bool ->
+    command:string ->
+    driver:Driver.driver ->
+    callback:(Session.proof_attempt_status -> unit) -> t -> Task.task -> unit
 
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)

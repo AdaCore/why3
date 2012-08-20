@@ -111,9 +111,11 @@ val constant_string : string -> formatter -> unit -> unit
 val formatted : formatter -> formatted -> unit
 val constant_formatted : formatted -> formatter -> unit -> unit
 val print0 : formatter -> unit -> unit
-val hov : int -> formatter -> ('a -> unit) -> 'a -> unit
-val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+val hov : int -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+val indent : int -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+(** add the indentation at the first line *)
 
+val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
 
 val open_formatter : ?margin:int -> out_channel -> formatter
 val close_formatter : formatter -> unit

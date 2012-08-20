@@ -86,6 +86,8 @@ module type S =
     val next_enum : 'a enumeration -> 'a enumeration
     val start_ge_enum : key -> 'a t -> 'a enumeration
     val next_ge_enum : key -> 'a enumeration -> 'a enumeration
+    val fold_left : ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
+    val of_list : (key * 'a) list -> 'a t
 
     module type Set =
     sig
@@ -123,6 +125,8 @@ module type S =
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
       val is_num_elt : int -> t -> bool
+      val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+      val of_list : elt list -> t
     end
 
     module Set : Set
@@ -654,6 +658,15 @@ module Make(Ord: OrderedType) = struct
 
     let next_ge_enum k e = next_ge_enum k Empty e
 
+    let rec fold_left f accu m =
+      match m with
+        Empty -> accu
+      | Node(l, v, d, r, _) ->
+          fold_left f (f (fold_left f accu l) v d) r
+
+    let of_list l =
+      List.fold_left (fun acc (k,d) -> add k d acc) empty l
+
     module type Set =
     sig
       type elt = key
@@ -690,6 +703,8 @@ module Make(Ord: OrderedType) = struct
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
       val is_num_elt : int -> t -> bool
+      val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+      val of_list : elt list -> t
     end
 
     module Set =
@@ -734,6 +749,9 @@ module Make(Ord: OrderedType) = struct
         let translate = translate
         let add_new e x s = add_new e x () s
         let is_num_elt n m = is_num_elt n m
+        let fold_left f = fold_left (fun accu k () -> f accu k)
+        let of_list l =
+          List.fold_left (fun acc a -> add a acc) empty l
       end
 
 end
