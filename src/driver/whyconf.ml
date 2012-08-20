@@ -570,9 +570,9 @@ let merge_config config filename =
     let version = get_stringo section "version" in
     let altern = get_stringo section "alternative" in
     mk_filter_prover ?version ?altern name in
-  let prover_modifiers = get_family rc "prover_modifiers" in
+  let prover_modifiers = get_simple_family rc "prover_modifiers" in
   let prover_modifiers =
-    List.map (fun (_,sec) -> create_filter_prover sec, sec) prover_modifiers in
+    List.map (fun sec -> create_filter_prover sec, sec) prover_modifiers in
   (** add provers *)
   let provers = List.fold_left
     (fun provers (fp, section) ->
