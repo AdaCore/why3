@@ -1555,19 +1555,22 @@ let remove_transformation ?(notify=notify) t =
 
 
 let add_registered_transformation ~keygen env_session tr_name g =
-  let task = goal_task g in
-  let gname = g.goal_name in
-  let subgoals = Trans.apply_transform tr_name env_session.env task in
-  let i = ref 1 in
-  let goal task =
-    let gid = (Task.task_goal task).Decl.pr_name in
-    let expl = get_explanation gid task in
-    let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (!i)) in
-    incr i;
-    let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
-    goal_name, expl, task
-  in
-  add_transformation ~keygen ~goal env_session tr_name g subgoals
+  try
+    Hstr.find g.goal_transformations tr_name
+  with Not_found ->
+    let task = goal_task g in
+    let gname = g.goal_name in
+    let subgoals = Trans.apply_transform tr_name env_session.env task in
+    let i = ref 1 in
+    let goal task =
+      let gid = (Task.task_goal task).Decl.pr_name in
+      let expl = get_explanation gid task in
+      let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (!i)) in
+      incr i;
+      let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
+      goal_name, expl, task
+    in
+    add_transformation ~keygen ~goal env_session tr_name g subgoals
 
 (****************)
 (**    metas    *)
@@ -1699,26 +1702,29 @@ let pos_of_metas ?version_shape lms task =
   in
   idpos
 
-let add_registered_metas ~keygen env added g =
-  let goal,task0 = Task.task_separate_goal (goal_task g) in
-  let add_meta task (s,l) =
-    let m = Theory.lookup_meta s in
-    Task.add_meta task m l in
-  (** add before the goal *)
-  let task = List.fold_left add_meta task0 added in
-  let task = add_tdecl task goal in
-  let idpos = pos_of_metas added task in
+let add_registered_metas ~keygen env added0 g =
   let added = List.fold_left (fun ma (s,l) ->
     Mstr.change (function
     | None -> Some (Smeta_args.singleton l)
     | Some std ->
-      Some (Smeta_args.add l std)) s ma) Mstr.empty added in
-  let metas = raw_add_metas ~keygen g added idpos false in
-  let goal = raw_add_task ~version:env.session.session_shape_version
-    ~keygen (Parent_metas metas)
-    g.goal_name g.goal_expl task false in
-  metas.metas_goal <- goal;
-  metas
+      Some (Smeta_args.add l std)) s ma) Mstr.empty added0 in
+  match Mmetas_args.find_opt added g.goal_metas with
+  | Some metas -> metas
+  | None ->
+    let goal,task0 = Task.task_separate_goal (goal_task g) in
+    let add_meta task (s,l) =
+      let m = Theory.lookup_meta s in
+      Task.add_meta task m l in
+    (** add before the goal *)
+    let task = List.fold_left add_meta task0 added0 in
+    let task = add_tdecl task goal in
+    let idpos = pos_of_metas added0 task in
+    let metas = raw_add_metas ~keygen g added idpos false in
+    let goal = raw_add_task ~version:env.session.session_shape_version
+      ~keygen (Parent_metas metas)
+      g.goal_name g.goal_expl task false in
+    metas.metas_goal <- goal;
+    metas
 
 let remove_metas ?(notify=notify) m =
   let g = m.metas_parent in

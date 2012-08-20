@@ -399,7 +399,9 @@ val add_registered_transformation :
   'key goal ->
   'key transf
 (** Apply a real transformation by its why3 name,
-    raise NoTask if the goal doesn't contain a task *)
+    raise NoTask if the goal doesn't contain a task.
+    If the goal already has a transformation with this name,
+    it is returned. *)
 
 val remove_transformation : ?notify:'key notify -> 'key transf -> unit
   (** Remove a transformation *)
@@ -411,10 +413,12 @@ val add_registered_metas :
   (string * Theory.meta_arg list) list ->
   'key goal ->
   'key metas
-(** Add some metas to a task *)
+(** Add some metas to a task. If the goal already contain a {!metas}
+    with same metas, the old one is returned.
+*)
 
 val remove_metas : ?notify:'key notify -> 'key metas -> unit
-  (** Remove the addition of metas *)
+(** Remove the addition of metas *)
 
 (** {2 File} *)
 
