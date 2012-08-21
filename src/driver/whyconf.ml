@@ -703,7 +703,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ProverAmbiguity (config,fp,provers ) ->
     fprintf fmt "More than one prover@ in %s@ correspond@ to \"%a\":@ %a@."
       (get_conf_file config) print_filter_prover fp
-      (Pp.print_iter2 Mprover.iter Pp.space Pp.nothing print_prover Pp.nothing)
+      (Pp.print_iter2 Mprover.iter Pp.comma Pp.nothing print_prover Pp.nothing)
       provers
   | ParseFilterProver s ->
     fprintf fmt

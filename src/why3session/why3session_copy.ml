@@ -194,7 +194,12 @@ but@ one@ is@ needed.@.";
   end;
   (** get the provers *)
   let pk = read_to_prover config in
-  iter_files (run_one ~action env config filters pk)
+  try
+    iter_files (run_one ~action env config filters pk)
+  with OutdatedSession as e ->
+    eprintf "@.%a@ You@ can@ allow@ it@ with@ the@ option@ -F.@."
+      Exn_printer.exn_printer e
+
 
 let cmd_copy =
   { cmd_spec     = spec;

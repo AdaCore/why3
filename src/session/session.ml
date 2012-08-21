@@ -1755,15 +1755,6 @@ let load_prover eS prover =
 
 let unload_provers eS = PHprover.clear eS.loaded_provers
 
-let () = Exn_printer.register
-  (fun fmt exn ->
-    match exn with
-      | NoTask ->
-        Format.fprintf fmt
-          "A goal doesn't contain a task but here it needs one"
-      | _ -> raise exn)
-
-
 let ft_of_th th =
   let fn = Filename.basename th.theory_parent.file_name in
   let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
@@ -2394,6 +2385,19 @@ let key_any = function
   | Proof_attempt p -> p.proof_key
   | Theory th -> th.theory_key
   | Metas  ms -> ms.metas_key
+
+let () = Exn_printer.register
+  (fun fmt exn ->
+    match exn with
+      | NoTask ->
+        Format.fprintf fmt
+          "A goal doesn't contain a task but here it needs one"
+      | OutdatedSession ->
+        Format.fprintf fmt
+          "The session@ is@ outdated@ (not@ in@ sync@ with@ the@ current@ \
+           file).@ In@ this@ configuration@ it@ is@ forbidden."
+      | _ -> raise exn)
+
 
 (*
 Local Variables:
