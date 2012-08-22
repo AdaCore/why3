@@ -1046,11 +1046,11 @@ let load_result r =
             | "timeout" -> Call_provers.Timeout
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
-            | "highfailure" -> Call_provers.Failure ""
+            | "highfailure" -> Call_provers.HighFailure
             | s ->
                 eprintf
                   "[Warning] Session.load_result: unexpected status '%s'@." s;
-                Call_provers.Failure ""
+                Call_provers.HighFailure 
         in
         let time =
           try float_of_string (List.assoc "time" r.Xml.attributes)
