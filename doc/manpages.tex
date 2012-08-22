@@ -181,7 +181,56 @@ given to the \verb|-o/--output| option.
 The basic usage of the GUI is described by the tutorial of
 Section~\ref{sec:gui}. There are no specific command-line options,
 apart from the common options detailed in introduction to this chapter.
-We describe the actions of the various menus and buttons of the interface.
+We describe the actions of the various menus and buttons of the
+interface.
+
+\subsection{Session}
+\label{sec:idref:session}
+Why3 stores in a session the way you achieve to prove goals that come
+from a file (.why), from weakest-precondition (.mlw) or by other
+means. A session stores which file you prove, by applying which
+transformations, by using which prover. A proof attempt records the
+complete name of a prover (name, version, optional attribute), the
+time limit and memory limit given, and the result of the prover. The
+result of the prover is the same than when you run the why3 tool. It
+contain the time taken and the state of the proof:
+
+\begin{itemize}
+\item \texttt{Valid}: the task is valid according to the prover. The
+  goal is considered proved.
+\item \texttt{Invalid}: the task is invalid.
+\item \texttt{Timeout}: the prover exceeds the time or memory limit.
+\item \texttt{Unknown}: the prover can't determine if the task
+  is valid; Some additional information can be provided.
+\item \texttt{Failure}: the prover reports a failure.
+\item \texttt{HighFailure}: an error occurred while trying to call the
+  prover, or the prover answer was not understood.
+\end{itemize}
+
+Additionally a proof attempt can have the following attribute:
+
+\begin{itemize}
+\item obsolete:\index{obsolete} the proof attempt has not been run in
+  its current state. You'll need to replay the proof attempt, ie run
+  the prover with the current state of the proof attempt, in order to
+  update the answer of the prover and remove this attribute.
+\item archived:\index{archived} the proof attempt is not useful
+  anymore it is kept for history, no why3 tools will select it by
+  default. The section \ref{sec:uninstalledprovers} shows an example
+  of its utilization.
+\end{itemize}
+
+Generally proof attempt are marked obsolete\index{obsolete} just after
+the start of why3ide. Indeed when you load a session in order to
+modify it (not with \texttt{why3session info} for instance), why3
+rebuilds the goals to prove by using the information provided in the
+session. If you modify the original file (.why, .mlw) or if the
+transformations have changed (new version of why3) why3 will detect
+that. The provers will perhaps answer differently on this new
+problems. So the proof attempts that corresponds to a goal that
+changed are marked obsolete. We say that a session is obsolete if new
+goals are made obsolete by this method during start-up. A session can
+be not obsolete even if it contains obsolete goals.
 
 \subsection{Left toolbar actions}
 
@@ -211,7 +260,7 @@ We describe the actions of the various menus and buttons of the interface.
   corresponding proof script. The modifications are saved, and can be
   retrieved later even if the goal was modified.
 
-\item[Replay] Replay all obsolete proofs
+\item[Replay] Replay all obsolete\index{obsolete} proofs
 
   If ``only unproved goals'' is selected, only formerly successful
   proofs are rerun. If ``all goals'', then all obsolete proofs are
@@ -253,8 +302,9 @@ We describe the actions of the various menus and buttons of the interface.
 \item[Menu \textsf{Tools}]
 A copy of the tools already available in the left toolbar, plus:
 \begin{description}
-\item[Mark as obsolete] marks all the proof as obsolete. This allows to
-  replay every proofs.
+\item[Mark as obsolete] marks all the proof as
+  obsolete\index{obsolete}.
+  This allows to replay every proofs.
 \end{description}
 
 \item[Menu \textsf{Help}]
@@ -424,8 +474,9 @@ file is fully proved, the subtree is not shown.
 
 \paragraph{Obsolete proofs}
 
-When some proofs stored in the session file are obsolete, the replay is
-run anyway, as with the replay button in the IDE. Then, the session
+When some proofs stored in the session file are
+obsolete\index{obsolete},
+the replay is run anyway, as with the replay button in the IDE. Then, the session
 file will be updated if both 
 \begin{itemize}
 \item all the replayed proof attempts give the same result as what
@@ -445,7 +496,7 @@ option \verb|-force| described below.
 \item Option \verb|-force| enforces saving the session, if all proof
   attempts replayed correctly, even if some goals are not proved.
 \item Option \verb|-obsolete-only| replays the proofs only if the session
-  is obsolete.
+  is obsolete\index{obsolete}.
 \item Option \texttt{-smoke-detector \{none|top|deep\}} tries to detect
   if the context is self-contradicting.
 \end{itemize}
@@ -515,14 +566,14 @@ The available commands are the following:
 \item[\texttt{mod}] modifies some of the proofs, selected by a filter.
 \item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
 \item[\texttt{copy-archive}] same as copy but also archives the
-  original proofs.
+  original proofs\index{archived}.
 \item[\texttt{rm}] remove some of the proofs, selected by a filter.
 \end{description}
 
 The first three commands do not modify the sessions, whereas the four
 last modify them. Only the proof attempts recorded are modified. No
 prover is called on the modified or created proof attempts, and
-consequently the proof status is always marked as obsolete.
+consequently the proof status is always marked as obsolete\index{obsolete}.
 
 All the commands above share the following common set of options:
 common options:
@@ -575,12 +626,13 @@ The hierarchical structure of the session is printed as a tree in
 ASCII. The files, theories, goals are marked with a question mark
 \verb|?|, if they are not verified. A proof is usually said to be
 verified if the proof result is \verb|valid| and the proof is not
-obsolete. However here specially we separate these two properties. On
+obsolete\index{obsolete}.
+However here specially we separate these two properties. On
 the one hand if the proof suffers from an internal failure we mark it
 with an exclamation mark \verb|!|, otherwise if it is not valid we
 mark it with a question mark \verb|?|, finally if it is valid we add
 nothing. On the other hand if the proof is obsolete we mark it with an
-\verb|O| and if it is archived we mark it with an \verb|A|.
+\verb|O| and if it is archived\index{archived} we mark it with an \verb|A|.
 
 For example, here are the session tree produced on the ``hello
 proof'' example of Section~\ref{chap:starting}.
@@ -753,8 +805,9 @@ Specific options for this command are as follows.
 
 \subsection{Commands modifying the proof attempts}
 
-The subcommands \texttt{mod}, \texttt{copy}, and \texttt{rm} share the
-same set of options for selecting the proof attempts to work on:
+The subcommands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
+and \texttt{rm} share the same set of options for selecting the proof
+attempts to work on:
 \begin{itemize}
 \item Option \verb|--filter-prover| selects only the proof attempt with
   the given prover. This option can be specified multiple times to
@@ -769,31 +822,36 @@ same set of options for selecting the proof attempts to work on:
   to the proofs of verified goals (that does not mean that the proof is
   verified). Same for the other cases \verb|no| and \verb|all|.
 \item Option \verb|--filter-archived yes| restricts the selection
-  to the proofs that are archived. Same for the other cases \verb|no|
+  to the proofs that are archived\index{archived}.
+  Same for the other cases \verb|no|
   and \verb|all| except the default is \verb|no|.
 \end{itemize}
 
 \noindent
-The subcommand \texttt{mod} modifies properties of proof
-attempts:
+The subcommand \texttt{mod}, \texttt{copy} and \texttt{copy-archive}
+share the same set of option to specify the modification. The
+subcommand \texttt{mod} modify directly the proof attempt,
+\texttt{copy} copy the proof attempt before doing the modification,
+\texttt{copy-archive} mark the original proof attempt as
+archived\index{archived}.
+The options are:
 \begin{itemize}
 \item Option \verb|--set-obsolete| marks the selected proofs as
   obsolete.
 \item Option \verb|--set-archived| marks the selected proofs as archived.
-\item Option \verb|--unset-archived| removes the archived mark from the selected proofs.
-\end{itemize}
-
-The subcommand \texttt{copy} copies the proof attempt of a given goal to another
-prover. The new prover is specified by the option
-\verb|--to-prover|, for example \texttt{-{}-to-prover Alt-Ergo,0.94}.
-A conflict arises if a proof with this prover already exists.
-You can choose between four behaviors of \texttt{why3session}:
+\item Option \verb|--unset-archived| removes the archived attribute
+  from the selected proofs.
+\item Option \verb|--to-prover| modify the prover, for example
+  \texttt{-{}-to-prover Alt-Ergo,0.94}. A conflict arises if a proof
+  with this prover already exists. In this case you can choose between four
+  behaviors:
 \begin{itemize}
 \item replace the proof (\verb|-f|, \verb|--force|);
-\item do not replace thr proof (\verb|-n|, \verb|--never|);
+\item do not replace the proof (\verb|-n|, \verb|--never|);
 \item replace the proof unless it is verified (valid and not
   obsolete) (\verb|-c|, \verb|--conservative|); this is the default;
 \item ask the user each time the case arises (\verb|-i|, \verb|--interactive|).
+\end{itemize}
 \end{itemize}
 
 
@@ -806,7 +864,12 @@ corresponds to \verb|--filter-verified-goal --conservative| and
 removes the proof attempts that are not verified but which correspond
 to verified goals.
 
-% pour l'instant on ne documente pas
+The subcommands of this section don't accept by default to modify an
+obsolete session (as defined in \ref{sec:idref:session}). You need to
+add the option \verb|-F| to force this behavior.
+
+
+% pour l'instant on ne documente pas parce que commenté dans le code
 % \todo{A adapter en fonction de la decision sur l'upgrade de prover}
 
 % If you just want to update one session with updated provers you can

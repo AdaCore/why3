@@ -153,11 +153,11 @@ with the GUI, and replay the proofs, you will be asked to choose
 between 3 options:
 \begin{itemize}
 \item Keep the former proofs as they are. They will be marked as
-  ``archived''.
+  ``archived''\index{archived}.
 \item Upgrade the former proofs to an installed prover (typically a
   upgraded version). The corresponding proof attempts will become
-  attached to this new prover, and marked as obsolete, to make their
-  replay mandatory.
+  attached to this new prover, and marked as obsolete\index{obsolete},
+  to make their replay mandatory.
 \item Copy the former proofs to an installed prover. This is a
   combination of the actions above: each proof attempt is duplicated,
   one with the former prover marked as archived, and one for the new
@@ -174,7 +174,8 @@ discard these choices via the \textsf{Preferences} dialog.
 
 Outside the GUI, the prover upgrades are handled as follows. The
 \texttt{why3replayer} tool will just ignore proof attempts marked as
-archived. Conversely, a non-archived proof attempt with a non-existent
+archived\index{archived}.
+Conversely, a non-archived proof attempt with a non-existent
 prover will be reported as a replay failure. The tool
 \texttt{why3session} allows you to perform move or copy operations on
 proof attempts in a fine-grain way, using filters, as detailed in

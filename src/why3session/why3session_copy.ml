@@ -58,13 +58,7 @@ let spec =
   ("--set-archive", Arg.Unit set_opt_archived,
    " the proof is set to archive" ) ::
   ("--unset-archive", Arg.Unit unset_opt_archived,
-   " the proof is set to replayable" ) ::
-  ("--set-obsolete", Arg.Set tobe_obsolete,
-   " the proof is set to obsolete" ) ::
-  ("--set-archive", Arg.Unit set_opt_archived,
-   " the proof is set to archive" ) ::
-  ("--unset-archive", Arg.Unit unset_opt_archived,
-   " the proof is set to replayable" ) ::
+   " the proof attribute archive is unset" ) ::
 (*
   ("--to-known-prover",
    Arg.Set opt_to_known,

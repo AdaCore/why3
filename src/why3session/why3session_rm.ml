@@ -56,7 +56,7 @@ associated to proved goals (same as --filter-verified-goal --conservative)")::
 (*  ("--never", Arg.Unit (set_remove Never),
    " never remove a proof")::
   ("-n", Arg.Unit (set_remove Never), " same as --never")::*)
-  (filter_spec @ common_options)
+  (force_obsolete_spec @ filter_spec @ common_options)
 
 let rec interactive to_remove =
   eprintf "Do you want to remove the external proof %a (y/n)@."
@@ -69,7 +69,7 @@ let rec interactive to_remove =
 
 let run_one env config filters fname =
   let env_session,_ =
-    read_update_session ~allow_obsolete:false env config fname in
+    read_update_session ~allow_obsolete:!opt_force_obsolete env config fname in
   session_iter_proof_attempt_by_filter filters
     (fun pr ->
       let remove = match !opt_remove with
