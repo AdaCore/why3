@@ -298,8 +298,11 @@ $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
-plugins.byte: $(addsuffix .cmo, $(addprefix lib/plugins/, $(PLUGINS)))
-plugins.opt : $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+LIBPLUGCMO =  $(addsuffix .cmo,  $(addprefix lib/plugins/, $(PLUGINS)))
+LIBPLUGCMXS = $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+
+plugins.byte: $(LIBPLUGCMO)
+plugins.opt : $(LIBPLUGCMXS)
 
 lib/plugins/%.cmxs: plugins/parser/%.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -356,7 +359,7 @@ clean::
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
-	cp -f lib/plugins/* $(LIBDIR)/why3/plugins
+	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
 
 ########
