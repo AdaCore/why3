@@ -245,7 +245,7 @@ let set_prover _ (prover,shortcuts) family =
   let section = set_string section "driver" prover.driver in
   let section = set_string section "version" prover.prover.prover_version in
   let section =
-    set_string ~default:"" section "alternative"prover.prover.prover_altern in
+    set_string ~default:"" section "alternative" prover.prover.prover_altern in
   let section = set_string section "editor" prover.editor in
   let section = set_bool section "interactive" prover.interactive in
   let section = set_bool section "in_place" prover.in_place in
@@ -344,54 +344,68 @@ let add_prover_shortcuts acc prover shortcuts =
 
 
 let load_prover dirname (provers,shortcuts) section =
-  let name = get_string section "name" in
-  let version = get_string ~default:"" section "version" in
-  let altern = get_string ~default:"" section "alternative" in
-  let prover =
-    { prover_name = name;
-      prover_version = version;
-      prover_altern = altern;
-    }
-  in
-  let provers = Mprover.add prover
-    { prover  = prover;
-      command = get_string section "command";
-      driver  = absolute_filename dirname (get_string section "driver");
-      in_place = get_bool ~default:false section "in_place";
-      editor  = get_string ~default:"" section "editor";
-      interactive = get_bool ~default:false section "interactive";
-      extra_options = [];
-      extra_drivers = [];
-    } provers in
-  let lshort = get_stringl section ~default:[] "shortcut" in
-  let shortcuts = add_prover_shortcuts shortcuts prover lshort in
-  provers,shortcuts
+  try
+    let name = get_string section "name" in
+    let version = get_string ~default:"" section "version" in
+    let altern = get_string ~default:"" section "alternative" in
+    let prover =
+      { prover_name = name;
+        prover_version = version;
+        prover_altern = altern;
+      }
+    in
+    let provers = Mprover.add prover
+      { prover  = prover;
+        command = get_string section "command";
+        driver  = absolute_filename dirname (get_string section "driver");
+        in_place = get_bool ~default:false section "in_place";
+        editor  = get_string ~default:"" section "editor";
+        interactive = get_bool ~default:false section "interactive";
+        extra_options = [];
+        extra_drivers = [];
+      } provers in
+    let lshort = get_stringl section ~default:[] "shortcut" in
+    let shortcuts = add_prover_shortcuts shortcuts prover lshort in
+    provers,shortcuts
+  with MissingField s ->
+    eprintf "[Warning] cannot load a prover: missing field '%s'@." s;
+    provers,shortcuts
+
 
 let load_shortcut acc section =
-  let name = get_string section "name" in
-  let version = get_string section "version" in
-  let altern = get_string ~default:"" section "alternative" in
-  let shortcuts = get_stringl section "shortcut" in
-  let prover = { prover_name = name;
-                 prover_version = version;
-                 prover_altern= altern} in
-  add_prover_shortcuts acc prover shortcuts
+  try
+    let name = get_string section "name" in
+    let version = get_string section "version" in
+    let altern = get_string ~default:"" section "alternative" in
+    let shortcuts = get_stringl section "shortcut" in
+    let prover = { prover_name = name;
+                   prover_version = version;
+                   prover_altern= altern} in
+    add_prover_shortcuts acc prover shortcuts
+  with MissingField s ->
+    eprintf "[Warning] cannot load shortcut: missing field '%s'@." s;
+    acc
 
 let load_editor editors (id, section) =
-  Meditor.add id
-    { editor_name = get_string ~default:id section "name";
-      editor_command = get_string section "command";
-      editor_options = [];
-    } editors
+  try
+    Meditor.add id
+      { editor_name = get_string ~default:id section "name";
+        editor_command = get_string section "command";
+        editor_options = [];
+      } editors
+  with MissingField s ->
+    eprintf "[Warning] cannot load an editor: missing field '%s'@." s;
+    editors
 
 let load_policy provers acc (_,section) =
-  let source =
-    {prover_name = get_string section "name";
-     prover_version = get_string section "version";
-     prover_altern = get_string ~default:"" section "alternative"
-    } in
   try
-    match get_string section "policy" with
+    let source =
+      {prover_name = get_string section "name";
+       prover_version = get_string section "version";
+       prover_altern = get_string ~default:"" section "alternative"
+      } in
+    try
+      match get_string section "policy" with
       | "keep" -> Mprover.add source CPU_keep acc
       | "upgrade" ->
         let target =
@@ -412,7 +426,10 @@ let load_policy provers acc (_,section) =
         let _target = Mprover.find target provers in
         Mprover.add source (CPU_duplicate target) acc
       | _ -> raise Not_found
-  with Not_found -> acc
+    with Not_found -> acc
+      with MissingField s ->
+        eprintf "[Warning] cannot load a policy: missing field '%s'@." s;
+        acc
 
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
@@ -568,10 +585,15 @@ let merge_config config filename =
       { config.main with loadpath = loadpath; plugins = plugins } in
   (** modify provers *)
   let create_filter_prover section =
-    let name = get_string section "name" in
-    let version = get_stringo section "version" in
-    let altern = get_stringo section "alternative" in
-    mk_filter_prover ?version ?altern name in
+    try
+      let name = get_string section "name" in
+      let version = get_stringo section "version" in
+      let altern = get_stringo section "alternative" in
+      mk_filter_prover ?version ?altern name 
+    with MissingField s ->
+      eprintf "[Warning] sec prover_modifiers is missing a '%s' field@." s;
+      mk_filter_prover "none"
+  in
   let prover_modifiers = get_simple_family rc "prover_modifiers" in
   let prover_modifiers =
     List.map (fun sec -> create_filter_prover sec, sec) prover_modifiers in
