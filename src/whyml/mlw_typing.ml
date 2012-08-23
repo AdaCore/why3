@@ -728,11 +728,11 @@ let abstr_invariant lenv e q xq =
   let xpost_inv xs q = post_inv xs.xs_ity q in
   post_inv ity q, Mexn.mapi xpost_inv xq
 
-let lambda_invariant lenv pvs lam =
+let lambda_invariant lenv pvs eff lam =
   let ity = ity_or_unit lam.l_expr.e_vty in
   let pvs = List.fold_right Spv.add lam.l_args pvs in
-  let rvs = reset_vars lam.l_expr.e_effect pvs in
-  let pinv,qinv = env_invariant lenv lam.l_expr.e_effect pvs in
+  let rvs = reset_vars eff pvs in
+  let pinv,qinv = env_invariant lenv eff pvs in
   let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { lam with  l_pre   = t_and_simp lam.l_pre pinv;
@@ -1124,13 +1124,15 @@ and expr_rec lenv rdl =
   let rdl = List.map step2 rdl in
   let rd_pvset pvs (_, lam) = l_pvset pvs lam in
   let pvs = List.fold_left rd_pvset Spv.empty rdl in
-  let step3 (ps, lam) = ps, lambda_invariant lenv pvs lam in
+  let rd_effect eff (_, lam) = eff_union eff lam.l_expr.e_effect in
+  let eff = List.fold_left rd_effect eff_empty rdl in
+  let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   create_rec_defn (List.map step3 rdl)
 
 and expr_fun lenv x gh lam =
   let lam = expr_lam lenv gh lam in
   let pvs = l_pvset Spv.empty lam in
-  let lam = lambda_invariant lenv pvs lam in
+  let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   let def = create_fun_defn (Denv.create_user_id x) lam in
   def, (List.hd def.rec_defn).fun_ps
 
