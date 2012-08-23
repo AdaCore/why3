@@ -959,8 +959,11 @@ let rec clean = function
     iter_goal
       (fun _ -> ())
       (fun t ->
-        if not t.transf_verified then remove_transformation t
-        else transf_iter clean t)
+        (* NO !!! 
+           if not t.transf_verified then remove_transformation t
+        else 
+        *)
+        transf_iter clean t)
       (fun m ->
         if not m.metas_verified then remove_metas m
         else metas_iter clean m)
