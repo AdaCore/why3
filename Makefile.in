@@ -880,7 +880,7 @@ COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -897,6 +897,7 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
+	echo 'theory BuiltIn meta "realized" "BuiltIn", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
 	echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_REAL_FILES); do \
@@ -912,6 +913,7 @@ opt byte: $(COQVO)
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
 	mkdir -p $(LIBDIR)/why3/coq/int
+	cp lib/coq/BuiltIn.vo $(LIBDIR)/why3/coq/
 	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	mkdir -p $(LIBDIR)/why3/coq/real
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
@@ -926,7 +928,9 @@ endif
 install_local: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS)" "update-coq"
 include $(COQVD)
+endif
 endif
 
 depend: $(COQVD)

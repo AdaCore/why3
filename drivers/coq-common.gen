@@ -21,11 +21,8 @@ transformation "simplify_formula"
 
 theory BuiltIn
 
-  prelude "Require Import ZArith."
-  prelude "Require Import Rbase."
+  prelude "Require Import BuiltIn."
 
-  syntax type   int   "Z"
-  syntax type   real  "R"
   syntax predicate  (=)   "(%1 = %2)"
 end
 

@@ -64,12 +64,12 @@ let print_tv fmt tv =
 let print_tv_binder fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "(%s:Type)" n
+  fprintf fmt "(%s:Type) {%s_WT:WhyType %s}" n n n
 
 let print_implicit_tv_binder fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "{%s:Type}" n
+  fprintf fmt "{%s:Type} {%s_WT:WhyType %s}" n n n
 
 let print_ne_params fmt stv =
   Stv.iter
@@ -136,6 +136,12 @@ let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
 let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 (** Types *)
+
+let print_ts_tv fmt ts =
+  match ts.ts_args with
+  | [] -> fprintf fmt "%a" print_ts ts
+  | _ -> fprintf fmt "(%a %a)" print_ts ts
+    (print_list space print_tv) ts.ts_args
 
 let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
@@ -618,8 +624,10 @@ let print_type_decl ~prev info fmt ts =
             print_ts ts print_params_list ts.ts_args
             (print_previous_proof None) prev
       else
-        fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@\n"
+        fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@[<hov 2>Axiom %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
           print_ts ts print_params_list ts.ts_args
+          print_ts ts print_params_list ts.ts_args print_ts_tv ts
+          print_ts ts
     | Some ty ->
       fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
         print_ts ts (print_list space print_tv_binder) ts.ts_args
@@ -635,14 +643,16 @@ let print_data_decl info fmt (ts,csl) =
   fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %s %a :=@\n@[<hov>%a@].@]@\n"
     name (print_list space print_tv_binder) ts.ts_args
     (print_list newline (print_constr info ts)) csl;
+  fprintf fmt "@[<hov 2>Axiom %s_WhyType : %aWhyType %a.@]@\nExisting Instance %s_WhyType.@\n"
+    name print_params_list ts.ts_args print_ts_tv ts name;
   List.iter
     (fun (cs,_) ->
       let _, _, all_ty_params = ls_ty_vars cs in
       if not (Stv.is_empty all_ty_params) then
-        let print fmt tv = fprintf fmt "[%a]" print_tv tv in
-        fprintf fmt "Implicit Arguments %a [%a].@\n"
-           print_ls cs
-           (print_list space print) ts.ts_args)
+        let print fmt tv = fprintf fmt "[%a]@ [%a_WT]" print_tv tv print_tv tv in
+        fprintf fmt "@[<hov 2>Implicit Arguments %a@ [%a].@]@\n"
+          print_ls cs
+          (print_list space print) ts.ts_args)
     csl;
   fprintf fmt "@\n"
 
