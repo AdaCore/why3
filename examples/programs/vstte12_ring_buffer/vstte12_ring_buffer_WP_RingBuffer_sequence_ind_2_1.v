@@ -7,198 +7,159 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter qtmark : Type.
-
-Parameter at1: forall (a:Type), a -> qtmark -> a.
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a -> a.
-Implicit Arguments old.
-
-(* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
 (* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
-Set Contextual Implicit.
-Implicit Arguments Nil.
-Unset Contextual Implicit.
-Implicit Arguments Cons.
+Implicit Arguments Nil [[a]].
+Implicit Arguments Cons [[a]].
 
 (* Why3 assumption *)
-Set Implicit Arguments.
-Fixpoint infix_plpl (a:Type)(l1:(list a)) (l2:(list a)) {struct l1}: (list
+Fixpoint infix_plpl {a:Type}(l1:(list a)) (l2:(list a)) {struct l1}: (list
   a) :=
   match l1 with
   | Nil => l2
   | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
   end.
-Unset Implicit Arguments.
 
-Axiom Append_assoc : forall (a:Type), forall (l1:(list a)) (l2:(list a))
+Axiom Append_assoc : forall {a:Type}, forall (l1:(list a)) (l2:(list a))
   (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
   l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
 
-Axiom Append_l_nil : forall (a:Type), forall (l:(list a)), ((infix_plpl l
+Axiom Append_l_nil : forall {a:Type}, forall (l:(list a)), ((infix_plpl l
   (Nil :(list a))) = l).
 
 (* Why3 assumption *)
-Set Implicit Arguments.
-Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
+Fixpoint length {a:Type}(l:(list a)) {struct l}: Z :=
   match l with
   | Nil => 0%Z
   | (Cons _ r) => (1%Z + (length r))%Z
   end.
-Unset Implicit Arguments.
 
-Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
+Axiom Length_nonnegative : forall {a:Type}, forall (l:(list a)),
   (0%Z <= (length l))%Z.
 
-Axiom Length_nil : forall (a:Type), forall (l:(list a)),
+Axiom Length_nil : forall {a:Type}, forall (l:(list a)),
   ((length l) = 0%Z) <-> (l = (Nil :(list a))).
 
-Axiom Append_length : forall (a:Type), forall (l1:(list a)) (l2:(list a)),
+Axiom Append_length : forall {a:Type}, forall (l1:(list a)) (l2:(list a)),
   ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
 
 (* Why3 assumption *)
-Set Implicit Arguments.
-Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
+Fixpoint mem {a:Type}(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
   | Nil => False
   | (Cons y r) => (x = y) \/ (mem x r)
   end.
-Unset Implicit Arguments.
 
-Axiom mem_append : forall (a:Type), forall (x:a) (l1:(list a)) (l2:(list a)),
+Axiom mem_append : forall {a:Type}, forall (x:a) (l1:(list a)) (l2:(list a)),
   (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x l2)).
 
-Axiom mem_decomp : forall (a:Type), forall (x:a) (l:(list a)), (mem x l) ->
+Axiom mem_decomp : forall {a:Type}, forall (x:a) (l:(list a)), (mem x l) ->
   exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-Implicit Arguments get.
+Parameter get: forall {a:Type} {b:Type}, (map a b) -> a -> b.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-Implicit Arguments set.
+Parameter set: forall {a:Type} {b:Type}, (map a b) -> a -> b -> (map a b).
 
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_eq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
   a2) = b1).
 
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_neq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b -> (map a b).
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
+Parameter const: forall {a:Type} {b:Type}, b -> (map a b).
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
+Axiom Const : forall {a:Type} {b:Type}, forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
-Implicit Arguments mk_array.
+Implicit Arguments mk_array [[a]].
 
 (* Why3 assumption *)
-Definition elts (a:Type)(v:(array a)): (map Z a) :=
+Definition elts {a:Type}(v:(array a)): (map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
-Implicit Arguments elts.
 
 (* Why3 assumption *)
-Definition length1 (a:Type)(v:(array a)): Z :=
+Definition length1 {a:Type}(v:(array a)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
-Implicit Arguments length1.
 
 (* Why3 assumption *)
-Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
-Implicit Arguments get1.
+Definition get1 {a:Type}(a1:(array a)) (i:Z): a := (get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
+Definition set1 {a:Type}(a1:(array a)) (i:Z) (v:a): (array a) :=
   (mk_array (length1 a1) (set (elts a1) i v)).
-Implicit Arguments set1.
 
 (* Why3 assumption *)
 Inductive buffer (a:Type) :=
   | mk_buffer : Z -> Z -> (array a) -> buffer a.
-Implicit Arguments mk_buffer.
+Implicit Arguments mk_buffer [[a]].
 
 (* Why3 assumption *)
-Definition data (a:Type)(v:(buffer a)): (array a) :=
+Definition data {a:Type}(v:(buffer a)): (array a) :=
   match v with
   | (mk_buffer x x1 x2) => x2
   end.
-Implicit Arguments data.
 
 (* Why3 assumption *)
-Definition len (a:Type)(v:(buffer a)): Z :=
+Definition len {a:Type}(v:(buffer a)): Z :=
   match v with
   | (mk_buffer x x1 x2) => x1
   end.
-Implicit Arguments len.
 
 (* Why3 assumption *)
-Definition first (a:Type)(v:(buffer a)): Z :=
+Definition first {a:Type}(v:(buffer a)): Z :=
   match v with
   | (mk_buffer x x1 x2) => x
   end.
-Implicit Arguments first.
 
 (* Why3 assumption *)
-Definition size (a:Type)(b:(buffer a)): Z := (length1 (data b)).
-Implicit Arguments size.
+Definition size {a:Type}(b:(buffer a)): Z := (length1 (data b)).
 
 (* Why3 assumption *)
-Definition buffer_invariant (a:Type)(b:(buffer a)): Prop :=
-  ((0%Z <= (first b))%Z /\ ((first b) <  (size b))%Z) /\
+Definition buffer_invariant {a:Type}(b:(buffer a)): Prop :=
+  ((0%Z <= (first b))%Z /\ ((first b) < (size b))%Z) /\
   ((0%Z <= (len b))%Z /\ ((len b) <= (size b))%Z).
-Implicit Arguments buffer_invariant.
 
-Parameter sequence: forall (a:Type), (buffer a) -> (list a).
-Implicit Arguments sequence.
+Parameter sequence: forall {a:Type}, (buffer a) -> (list a).
 
-Axiom sequence_def_1 : forall (a:Type), forall (b:(buffer a)),
+Axiom sequence_def_1 : forall {a:Type}, forall (b:(buffer a)),
   (buffer_invariant b) -> (((len b) = 0%Z) -> ((sequence b) = (Nil :(list
   a)))).
 
-Axiom sequence_def_2 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
-  ((((first b) + 1%Z)%Z <  (size b))%Z ->
-  ((sequence b) = (Cons (get1 (data b) (first b))
-  (sequence (mk_buffer ((first b) + 1%Z)%Z ((len b) - 1%Z)%Z (data b))))))).
+Axiom sequence_def_2 : forall {a:Type}, forall (b:(buffer a)),
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
+  ((((first b) + 1%Z)%Z < (size b))%Z -> ((sequence b) = (Cons (get1 (data b)
+  (first b)) (sequence (mk_buffer ((first b) + 1%Z)%Z ((len b) - 1%Z)%Z
+  (data b))))))).
 
-Axiom sequence_def_3 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
+Axiom sequence_def_3 : forall {a:Type}, forall (b:(buffer a)),
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
   ((((first b) + 1%Z)%Z = (size b)) -> ((sequence b) = (Cons (get1 (data b)
   (first b)) (sequence (mk_buffer 0%Z ((len b) - 1%Z)%Z (data b))))))).
 
-Axiom sequence_ind_1 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
-  (((((first b) + (len b))%Z - 1%Z)%Z <  (size b))%Z ->
+Axiom sequence_ind_1 : forall {a:Type}, forall (b:(buffer a)),
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
+  (((((first b) + (len b))%Z - 1%Z)%Z < (size b))%Z ->
   ((sequence b) = (infix_plpl (sequence (mk_buffer (first b)
   ((len b) - 1%Z)%Z (data b))) (Cons (get1 (data b)
   (((first b) + (len b))%Z - 1%Z)%Z) (Nil :(list a))))))).
 
 
-
 (* Why3 goal *)
-Theorem sequence_ind_2 : forall (a:Type), forall (b:(buffer a)),
-  (buffer_invariant b) -> ((0%Z <  (len b))%Z ->
+Theorem sequence_ind_2 : forall {a:Type}, forall (b:(buffer a)),
+  (buffer_invariant b) -> ((0%Z < (len b))%Z ->
   (((size b) <= (((first b) + (len b))%Z - 1%Z)%Z)%Z ->
   ((sequence b) = (infix_plpl (sequence (mk_buffer (first b)
   ((len b) - 1%Z)%Z (data b))) (Cons (get1 (data b)
@@ -222,7 +183,7 @@ apply False_ind; omega.
 assert (case: (f+1 < length1 d \/ f+1 = length1 d)%Z) by omega. destruct case.
 (* 2.1 f+1 < size *)
 rewrite sequence_def_2. rewrite IH.
-rewrite (sequence_def_2 _ (mk_buffer f (l - 1) d)).
+rewrite (sequence_def_2 (mk_buffer f (l - 1) d)).
 simpl.
 do 5 (apply f_equal2; auto).
 omega.
@@ -239,7 +200,7 @@ unfold buffer_invariant, first, len, size, data; intuition.
 (* 2.2 f+1=size *)
 rewrite sequence_def_3. simpl.
 rewrite sequence_ind_1. simpl.
-rewrite (sequence_def_3 _ (mk_buffer f (l - 1) d)).
+rewrite (sequence_def_3 (mk_buffer f (l - 1) d)).
 simpl.
 do 4 (apply f_equal2; auto).
 omega.
