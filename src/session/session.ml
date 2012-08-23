@@ -1941,10 +1941,14 @@ end
 (* merge a file into another      *)
 (**********************************)
 
+let found_obsolete = ref false
+
 let merge_proof ~keygen obsolete to_goal _ from_proof =
+  let obsolete = obsolete || from_proof.proof_obsolete in
+  found_obsolete := obsolete || ! found_obsolete;
   ignore
     (add_external_proof ~keygen
-       ~obsolete:(obsolete || from_proof.proof_obsolete)
+       ~obsolete
        ~archived:from_proof.proof_archived
        ~timelimit:from_proof.proof_timelimit
        ~memlimit:from_proof.proof_memlimit
@@ -2254,7 +2258,7 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
       Util.Mstr.add g.goal_name.Ident.id_string g from_goals)
     Util.Mstr.empty from_th.theory_goals
   in
-  Util.list_or
+  List.iter
     (fun to_goal ->
       try
         let from_goal =
@@ -2265,12 +2269,12 @@ let merge_theory ~keygen env ~allow_obsolete from_th to_th =
             dprintf debug "[Reload] Goal %s.%s has changed@\n"
               to_th.theory_name.Ident.id_string
               to_goal.goal_name.Ident.id_string;
-            if not allow_obsolete then raise OutdatedSession
+            if not allow_obsolete then raise OutdatedSession;
+            found_obsolete := true;
           end;
-        merge_any_goal ~keygen env goal_obsolete from_goal to_goal;
-        goal_obsolete
+        merge_any_goal ~keygen env goal_obsolete from_goal to_goal
       with
-        | Not_found when allow_obsolete -> true
+        | Not_found when allow_obsolete -> ()
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
@@ -2282,8 +2286,7 @@ let merge_file ~keygen env ~allow_obsolete from_f to_f =
     (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
     Util.Mstr.empty from_f.file_theories
   in
-  let b = 
-    Util.list_or
+  List.iter
     (fun to_th ->
       try
         let from_th =
@@ -2294,14 +2297,11 @@ let merge_file ~keygen env ~allow_obsolete from_f to_f =
         in
         merge_theory ~keygen env ~allow_obsolete from_th to_th
       with
-        | Not_found when allow_obsolete -> true
+        | Not_found when allow_obsolete -> ()
         | Not_found -> raise OutdatedSession
     )
-    to_f.file_theories
-  in
-  dprintf debug "[Info] merge_file, done@\n";
-  b
-
+    to_f.file_theories;
+  dprintf debug "[Info] merge_file, done@\n"
 
 
 let rec recompute_all_shapes_goal g =
@@ -2337,25 +2337,27 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
       loaded_provers = PHprover.create 5;
     }
   in
-  let obsolete = PHstr.fold (fun _ old_file acc ->
+  found_obsolete := false;
+  PHstr.iter (fun _ old_file ->
     dprintf debug "[Load] file '%s'@\n" old_file.file_name;
     let new_file = add_file
       ~keygen new_env_session
       ?format:old_file.file_format old_file.file_name
     in
-    merge_file ~keygen new_env_session ~allow_obsolete old_file new_file
-    || acc)
-    old_session.session_files false 
-  in
+    merge_file ~keygen new_env_session ~allow_obsolete old_file new_file)
+    old_session.session_files;
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
-    if old_session.session_shape_version <> Termcode.current_shape_version then
+    if old_session.session_shape_version <> Termcode.current_shape_version 
+    then
       begin
         dprintf debug "[Info] update_session: recompute shapes@\n";
         recompute_all_shapes new_session;
         true
       end
-    else obsolete in
+    else
+      !found_obsolete
+  in
   assert (new_env_session.session.session_shape_version
           = Termcode.current_shape_version);
   new_env_session, obsolete

@@ -192,8 +192,8 @@ means. A session stores which file you prove, by applying which
 transformations, by using which prover. A proof attempt records the
 complete name of a prover (name, version, optional attribute), the
 time limit and memory limit given, and the result of the prover. The
-result of the prover is the same than when you run the why3 tool. It
-contain the time taken and the state of the proof:
+result of the prover is the same as when you run the why3 tool. It
+contains the time taken and the state of the proof:
 
 \begin{itemize}
 \item \texttt{Valid}: the task is valid according to the prover. The
@@ -229,8 +229,11 @@ transformations have changed (new version of why3) why3 will detect
 that. The provers will perhaps answer differently on this new
 problems. So the proof attempts that corresponds to a goal that
 changed are marked obsolete. We say that a session is obsolete if new
-goals are made obsolete by this method during start-up. A session can
-be not obsolete even if it contains obsolete goals.
+goals are made obsolete by this method during start-up. 
+
+% Claude: Alors la je ne vois pas pourquoi
+% A session can
+% be not obsolete even if it contains obsolete goals.
 
 \subsection{Left toolbar actions}
 
