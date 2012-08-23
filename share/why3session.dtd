@@ -1,10 +1,12 @@
 <!ELEMENT why3session (prover*, file*)>
 <!ATTLIST why3session name CDATA #REQUIRED>
+<!ATTLIST why3session shape_version CDATA #IMPLIED>
 
 <!ELEMENT prover EMPTY>
 <!ATTLIST prover id CDATA #REQUIRED>
 <!ATTLIST prover name CDATA #REQUIRED>
 <!ATTLIST prover version CDATA #REQUIRED>
+<!ATTLIST prover alternative CDATA #IMPLIED>
 
 <!ELEMENT file (theory*)>
 <!ATTLIST file name CDATA #REQUIRED>
@@ -41,7 +43,7 @@
 <!ATTLIST proof archived CDATA #IMPLIED>
 
 <!ELEMENT result EMPTY>
-<!ATTLIST result status (valid|invalid|unknown|timeout|failure) #REQUIRED>
+<!ATTLIST result status (valid|invalid|unknown|timeout|outofmemory|failure) #REQUIRED>
 <!ATTLIST result time CDATA #IMPLIED>
 
 <!ELEMENT undone EMPTY>
@@ -86,7 +88,8 @@
 <!ATTLIST pr_pos proj CDATA #REQUIRED>
 <!ATTLIST pr_pos sum CDATA #REQUIRED>
 
-<!ELEMENT meta (meta_arg_ty*, meta_arg_ts*, meta_arg_ls*, meta_arg_pr*, meta_arg_str*, meta_arg_int*)>
+<!ELEMENT meta (meta_arg_ty*, meta_arg_ts*, meta_arg_ls*,
+          meta_arg_pr*, meta_arg_str*, meta_arg_int*)>
 <!ATTLIST meta name CDATA #REQUIRED>
 
 <!ELEMENT meta_args_ty (ty_var|ty_app)>
