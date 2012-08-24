@@ -999,6 +999,8 @@ let vta_app vta pv =
     | vty -> vty in
   let result = vty_subst vta.vta_result in
   let spec = spec_subst sbs vta.vta_spec in
+  if not vtv.vtv_ghost && arg.pv_vtv.vtv_ghost then
+    Loc.errorm "non-ghost value passed as a ghost argument";
   let ghost = vta.vta_ghost || (vtv.vtv_ghost && not arg.pv_vtv.vtv_ghost) in
   if rest = [] then spec, (if ghost then vty_ghostify result else result)
   else spec_empty ty_unit, VTarrow (vty_arrow_unsafe rest ~ghost ~spec result)

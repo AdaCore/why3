@@ -705,6 +705,8 @@ let e_plapp pls el ity =
             | None -> t_if_simp t t_bool_true t_bool_false in
           let evtv = vtv_of_expr e in
           let ghost = ghost || (evtv.vtv_ghost && not vtv.vtv_ghost) in
+          if vtv.vtv_ghost && not evtv.vtv_ghost then
+            Loc.errorm "non-ghost value passed as a ghost argument";
           let eff = eff_union eff e.e_effect in
           let sbs = ity_match sbs vtv.vtv_ity evtv.vtv_ity in
           app (t::tl) (add_e_vars e varm) ghost eff sbs vtvl argl
@@ -716,6 +718,8 @@ let e_plapp pls el ity =
             let sbs = ity_match sbs vtv.vtv_ity pv.pv_vtv.vtv_ity in
             app (t::tl) (add_pv_vars pv varm) ghost eff sbs vtvl argl
           in
+          if vtv.vtv_ghost && not (vty_ghost e.e_vty) then
+            Loc.errorm "non-ghost value passed as a ghost argument";
           on_value apply_to_pv e
   in
   let vtvl = List.rev pls.pl_args in

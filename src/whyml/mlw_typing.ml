@@ -950,6 +950,22 @@ let vty_ghostify gh vty =
 let e_ghostify gh e =
   if gh && not (vty_ghost e.e_vty) then e_ghost e else e
 
+let e_app_gh e el =
+  let rec decomp = function
+    | VTvalue _ -> []
+    | VTarrow a -> a.vta_args @ decomp a.vta_result in
+  let rec ghostify = function
+    | _, [] -> []
+    | [], _ -> assert false
+    | pv :: pvl, e :: el ->
+        e_ghostify pv.pv_vtv.vtv_ghost e :: ghostify (pvl, el)
+  in
+  e_app e (ghostify (decomp e.e_vty, el))
+
+let e_plapp_gh pl el ity =
+  let ghostify vtv e = e_ghostify vtv.vtv_ghost e in
+  e_plapp pl (List.map2 ghostify pl.pl_args el) ity
+
 let rec expr lenv de =
   let loc = de.de_loc in
   let e = Loc.try3 loc expr_desc lenv loc de in
@@ -1019,9 +1035,9 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEapply (de1, del) ->
       let el = List.map (expr lenv) del in
       begin match de1.de_desc with
-        | DEglobal_pl pls -> e_plapp pls el (ity_of_dity (snd de.de_type))
-        | DEglobal_ls ls  -> e_lapp  ls  el (ity_of_dity (snd de.de_type))
-        | _               -> e_app (expr lenv de1) el
+        | DEglobal_pl pls -> e_plapp_gh pls el (ity_of_dity (snd de.de_type))
+        | DEglobal_ls ls  -> e_lapp ls el (ity_of_dity (snd de.de_type))
+        | _               -> e_app_gh (expr lenv de1) el
       end
   | DEglobal_pv pv ->
       e_value pv
