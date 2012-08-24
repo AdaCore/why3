@@ -540,7 +540,9 @@ open Mlw_decl
 open Mlw_module
 
 let print_its info fmt ts = print_ts info fmt ts.its_pure
-let print_pv info fmt pv = print_lident info fmt pv.pv_vs.vs_name
+let print_pv info fmt pv =
+  if pv.pv_vtv.vtv_ghost then fprintf fmt "((* ghost *))" else
+  print_lident info fmt pv.pv_vs.vs_name
 let print_ps info fmt ps = print_lident info fmt ps.ps_name
 let print_lv info fmt = function
   | LetV pv -> print_pv info fmt pv
@@ -591,6 +593,7 @@ let print_ity info = print_ity_node false info
 let print_vtv info fmt vtv = print_ity info fmt vtv.vtv_ity
 
 let print_pvty info fmt pv =
+  if pv.pv_vtv.vtv_ghost then fprintf fmt "((* ghost *))" else
   fprintf fmt "@[(%a:@ %a)@]"
     (print_lident info) pv.pv_vs.vs_name (print_vtv info) pv.pv_vtv
 
@@ -607,7 +610,10 @@ let ity_mark = ity_pur Mlw_wp.ts_mark []
 
 let rec print_expr info fmt e = print_lexpr 0 info fmt e
 
-and print_lexpr pri info fmt e = match e.e_node with
+and print_lexpr pri info fmt e =
+  if vty_ghost e.e_vty then
+    fprintf fmt "((* ghost *))"
+  else match e.e_node with
   | Elogic t ->
       fprintf fmt "(%a)" (print_term info) t
   | Evalue v ->
@@ -616,6 +622,8 @@ and print_lexpr pri info fmt e = match e.e_node with
       print_ps info fmt a
   | Eapp (e,v,_) ->
       fprintf fmt "(%a@ %a)" (print_lexpr pri info) e (print_pv info) v
+  | Elet ({ let_expr = e1 }, e2) when vty_ghost e1.e_vty ->
+      print_expr info fmt e2
   | Elet ({ let_sym = LetV pv }, e2)
     when ity_equal pv.pv_vtv.vtv_ity ity_mark ->
       print_expr info fmt e2
@@ -656,9 +664,9 @@ and print_lexpr pri info fmt e = match e.e_node with
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
   | Eassert _ ->
-      fprintf fmt "() (* assert *)"
+      fprintf fmt "((* assert *))"
   | Eghost _ ->
-      fprintf fmt "() (* ghost *)"
+      assert false
   | Eany _ ->
       fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
         (print_vty info) e.e_vty
