@@ -37,6 +37,9 @@ theory TwoPlayerGame
   constant infinity : int
   function position_value position : int
 
+  axiom position_value_bound :
+    forall p:position. - infinity <= position_value p <= infinity
+
   (*
 
     [minmax p d] returns the min-max evaluation of position [p] at depth [d].
@@ -75,6 +78,10 @@ theory TwoPlayerGame
       let moves = legal_moves p in
       Mem.mem m moves -> - (position_value (do_move p m)) <= minmax p 1
 
+
+  lemma minmax_bound:
+    forall p:position, d:int.
+      d >= 0 -> - infinity <= minmax p d <= infinity
 end
 
 
@@ -91,47 +98,64 @@ module AlphaBeta
 
   use TwoPlayerGame as G
   use import list.List
+  use list.Elements
+  use set.Fset
 
-  let rec move_value_alpha_beta alpha beta pos max_prof prof move =
+  let rec move_value_alpha_beta alpha beta pos depth move =
+    { depth >= 1 }
     let pos' = G.do_move pos move in
-    let s =
-      if prof = max_prof
-      then G.position_value pos'
-      else
-	negabeta (-beta) (-alpha) pos' max_prof (prof+1)
+    let s = negabeta (-beta) (-alpha) pos' (depth-1)
     in -s
+    { let pos' = G.do_move pos move in
+      let m = G.minmax pos' (depth-1) in
+      if - beta <= m <= - alpha then result = - m
+      else if m < - beta then result > beta
+      else result < alpha
+    }
 
-  with negabeta alpha beta pos max_prof prof =
-    { }
+  with negabeta alpha beta pos depth =
+    { depth >= 0 }
+    if depth = 0 then G.position_value pos else
     let l = G.legal_moves pos in
     match l with
       | Nil -> G.position_value pos
-      | Cons c l ->
+      | Cons m l ->
 	  let best =
-	    move_value_alpha_beta alpha beta pos max_prof prof c
+	    move_value_alpha_beta alpha beta pos depth m
 	  in
 	  if best >= beta then best else
-	    negabeta_rec (max best alpha) beta pos max_prof prof best l
+	    negabeta_rec (max best alpha) beta pos depth best l
     end
-    { result = G.minmax pos (max_prof - prof + 1) }
+    { if alpha <= G.minmax pos depth <= beta then result = G.minmax pos depth else
+      if G.minmax pos depth < alpha then result < alpha else
+      result > beta
+    }
 
-  with negabeta_rec alpha beta pos max_prof prof best l =
+  with negabeta_rec alpha beta pos depth best l =
+    { depth >= 1 }
     match l with
       |	Nil -> best
       | Cons c l ->
 	  let s =
-            move_value_alpha_beta alpha beta pos max_prof prof c
+            move_value_alpha_beta alpha beta pos depth c
           in
 	  let new_best  = max s best in
 	  if new_best >= beta then new_best else
-   	    negabeta_rec (max new_best alpha) beta pos max_prof prof new_best l
+   	    negabeta_rec (max new_best alpha) beta pos depth new_best l
     end
+    { let moves = Elements.elements l in
+      if Fset.is_empty moves then result = best else
+      let m = G.MinMaxRec.min (pos,depth) moves in
+      if alpha <= m <= beta then result = m 
+      else if m < alpha then result < alpha else
+      result > beta
+    }
 
 (* alpha-beta at a given depth *)
 
-let alpha_beta pos depth = 
-  { }
-  negabeta (-G.infinity) G.infinity pos depth 1
+let alpha_beta pos depth =
+  { depth >= 0 }
+  negabeta (-G.infinity) G.infinity pos depth
   { result = G.minmax pos depth }
 
 (* iterative deepening *)
@@ -150,7 +174,7 @@ let alpha_beta pos depth =
 	  (List.sort (fun (x,_) (y,_) -> compare y x) l)
       in
       try
-	for max_prof = 3 to 1000 do
+	for max_depth = 3 to 1000 do
 	  begin
 	    match !current_best_moves with
 	      | (v1,_)::(v2,_)::_ ->
@@ -162,7 +186,7 @@ let alpha_beta pos depth =
 	    List.map
 	      (fun c ->
 		 (move_value_alpha_beta (-G.infinity) G.infinity
-		    pos max_prof 0 c,c))
+		    pos max_depth 0 c,c))
 	      (G.legal_moves pos)
 	  in
 	  current_best_moves :=
@@ -176,3 +200,9 @@ let alpha_beta pos depth =
 
 end
 
+
+(*
+Local Variables:
+compile-command: "../../bin/why3ide.byte alphaBeta.mlw"
+End:
+*)
