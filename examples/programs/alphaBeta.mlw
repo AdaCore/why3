@@ -38,7 +38,7 @@ theory TwoPlayerGame
   function position_value position : int
 
   axiom position_value_bound :
-    forall p:position. - infinity <= position_value p <= infinity
+    forall p:position. - infinity < position_value p < infinity
 
   (*
 
@@ -65,11 +65,11 @@ theory TwoPlayerGame
   use set.Fset
 
   axiom minmax_depth_non_zero:
-    forall p:position, n:int. n >= 0 ->
-     minmax p (n+1) =
+    forall p:position, n:int. n > 0 ->
+     minmax p n =
         let moves = Elements.elements (legal_moves p) in
         if Fset.is_empty moves then position_value p else
-          - MinMaxRec.min (p,n) moves
+          - MinMaxRec.min (p,n-1) moves
 
   use list.Mem
 
@@ -81,7 +81,12 @@ theory TwoPlayerGame
 
   lemma minmax_bound:
     forall p:position, d:int.
-      d >= 0 -> - infinity <= minmax p d <= infinity
+      d >= 0 -> - infinity < minmax p d < infinity
+
+  lemma minmax_nomove :
+    forall p:position, d:int.
+      d >= 0 /\ legal_moves p = Nil ->
+         minmax p d = position_value p
 end
 
 
@@ -108,9 +113,9 @@ module AlphaBeta
     in -s
     { let pos' = G.do_move pos move in
       let m = G.minmax pos' (depth-1) in
-      if - beta <= m <= - alpha then result = - m
-      else if m < - beta then result > beta
-      else result < alpha
+      if - beta < m < - alpha then result = - m
+      else if m <= - beta then result >= beta
+      else result <= alpha
     }
 
   with negabeta alpha beta pos depth =
@@ -126,9 +131,9 @@ module AlphaBeta
 	  if best >= beta then best else
 	    negabeta_rec (max best alpha) beta pos depth best l
     end
-    { if alpha <= G.minmax pos depth <= beta then result = G.minmax pos depth else
-      if G.minmax pos depth < alpha then result < alpha else
-      result > beta
+    { if alpha < G.minmax pos depth < beta then result = G.minmax pos depth else
+      if G.minmax pos depth <= alpha then result <= alpha else
+      result >= beta
     }
 
   with negabeta_rec alpha beta pos depth best l =
@@ -146,9 +151,9 @@ module AlphaBeta
     { let moves = Elements.elements l in
       if Fset.is_empty moves then result = best else
       let m = G.MinMaxRec.min (pos,depth) moves in
-      if alpha <= m <= beta then result = m
-      else if m < alpha then result < alpha else
-      result > beta
+      if alpha < m < beta then result = m
+      else if m <= alpha then result <= alpha else
+      result >= beta
     }
 
 (* alpha-beta at a given depth *)

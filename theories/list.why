@@ -52,6 +52,9 @@ theory Elements
     forall l:list 'a, x:'a.
       Mem.mem x l <-> FSet.mem x (elements l)
 
+  lemma elements_Nil:
+    elements (Nil : list 'a) = FSet.empty
+
 end
 
 (** {2 Nth element of a list} *)
