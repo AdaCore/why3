@@ -24,11 +24,13 @@ open Why3
 
 val debug: Debug.flag
 
+val extract_filename: ?fname:string -> Theory.theory -> string
+
 val extract_theory:
-  Env.env -> ?old:Pervasives.in_channel -> Format.formatter ->
-  Theory.theory -> unit
+  Env.env -> ?old:Pervasives.in_channel -> ?fname:string ->
+  Format.formatter -> Theory.theory -> unit
 
 val extract_module:
-  Env.env -> ?old:Pervasives.in_channel -> Format.formatter ->
-  Mlw_module.modul -> unit
+  Env.env -> ?old:Pervasives.in_channel -> ?fname:string ->
+  Format.formatter -> Mlw_module.modul -> unit
 

@@ -522,18 +522,8 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
 (* program extraction *)
 
 let extract_to ?fname th extract =
-  let dir = match !opt_output with Some dir -> dir | None -> assert false in
-  let _fname = match fname, th.th_path with
-    | Some fname, _ ->
-        let fname = Filename.basename fname in
-        (try Filename.chop_extension fname with _ -> fname)
-    | None, [] -> assert false
-    | None, path -> List.hd (List.rev path)
-  in
-  (* FIXME: use fname to forge the OCaml filename *)
-  let mname = (* fname ^ "__" ^ *) th.th_name.Ident.id_string ^ ".ml" in
-  (* let mname = String.uncapitalize mname in *)
-  let file = Filename.concat dir mname in
+  let dir = Util.of_option !opt_output in
+  let file = Filename.concat dir (Mlw_ocaml.extract_filename ?fname th) in
   let old =
     if Sys.file_exists file then begin
       let backup = file ^ ".bak" in
@@ -545,16 +535,16 @@ let extract_to ?fname th extract =
   close_out cout
 
 let do_extract_theory env ?fname tname th =
-  let extract fname ?old fmt = ignore (old);
-    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname fname;
-    Mlw_ocaml.extract_theory env ?old fmt th
+  let extract file ?old fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname file;
+    Mlw_ocaml.extract_theory env ?old ?fname fmt th
   in
   extract_to ?fname th extract
 
 let do_extract_module env ?fname tname m =
-  let extract fname ?old fmt = ignore (old);
-    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname fname;
-    Mlw_ocaml.extract_module env ?old fmt m
+  let extract file ?old fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname file;
+    Mlw_ocaml.extract_module env ?old ?fname fmt m
   in
   extract_to ?fname m.Mlw_module.mod_theory extract
 

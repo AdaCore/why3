@@ -33,6 +33,24 @@ let debug =
   Debug.register_info_flag
     ~desc:"Print details on program extraction." "extraction"
 
+let clean_fname fname =
+  let fname = Filename.basename fname in
+  (try Filename.chop_extension fname with _ -> fname)
+
+let modulename ?fname th =
+  let fname = match fname, th.th_path with
+    | Some fname, _ -> clean_fname fname
+    | None, [] -> assert false
+    | None, path -> String.concat "__" path
+  in
+  fname ^ "__" ^ th.th_name.Ident.id_string
+
+let extract_filename ?fname th =
+  (modulename ?fname th) ^ ".ml"
+
+let modulename path t =
+  String.capitalize ((String.concat "__" path) ^ "__" ^ t)
+
 (** Driver *)
 
 (* (path,id) -> string Hid *)
@@ -73,8 +91,9 @@ let forget_all () =
 
 type info = {
   info_syn: syntax_map;
-  current_theory: string;
+  current_theory: Theory.theory;
   known_map: Decl.known_map;
+  fname: string option;
   (* symbol_printers : (string * ident_printer) Mid.t; *)
 }
 
@@ -105,15 +124,18 @@ let print_ident fmt id =
 let print_path = print_list dot pp_print_string
 
 let print_qident ~sanitizer info fmt id =
-  let s = id_unique ~sanitizer iprinter id in
   try
-    let _lp, t, _p = Theory.restore_path id in
-    (* fprintf fmt "%a/%s/%a" print_path lp t print_path p *)
-    if t = info.current_theory then
+    let lp, t, p = Theory.restore_path id in
+    let lp = if lp <> [] then lp else [Util.def_option "Builtin" info.fname] in
+    let s = String.concat "__" p in
+    let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
+    let s = sanitizer s in
+    if Sid.mem id info.current_theory.th_local then
       fprintf fmt "%s" s
     else
-      fprintf fmt "%s.%s" t s
+      fprintf fmt "%s.%s" (modulename lp t) s
   with Not_found ->
+    let s = id_unique ~sanitizer iprinter id in
     fprintf fmt "%s" s
 
 let print_lident = print_qident ~sanitizer:String.uncapitalize
@@ -495,13 +517,14 @@ let ocaml_driver env =
     eprintf "cannot find driver 'ocaml'@.";
     raise e
 
-let extract_theory env ?old fmt th =
-  ignore (old);
+let extract_theory env ?old ?fname fmt th =
+  ignore (old); ignore (fname);
   let sm = ocaml_driver env in
   let info = {
     info_syn = sm;
-    current_theory = th.th_name.id_string;
-    known_map = Task.task_known (Task.use_export None th) } in
+    current_theory = th;
+    known_map = Task.task_known (Task.use_export None th);
+    fname = Util.option_map clean_fname fname; } in
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     print_theory_name th;
@@ -708,14 +731,15 @@ let pdecl info fmt pd = match pd.pd_node with
 
 (** Modules *)
 
-let extract_module env ?old fmt m =
-  ignore (old);
+let extract_module env ?old ?fname fmt m =
+  ignore (old); ignore (fname);
   let sm = ocaml_driver env in
   let th = m.mod_theory in
   let info = {
     info_syn = sm;
-    current_theory = th.th_name.id_string;
-    known_map = Task.task_known (Task.use_export None th) } in
+    current_theory = th;
+    known_map = Task.task_known (Task.use_export None th);
+    fname = Util.option_map clean_fname fname; } in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     print_module_name m;
