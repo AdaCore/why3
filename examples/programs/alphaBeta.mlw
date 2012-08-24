@@ -20,7 +20,7 @@ theory TwoPlayerGame
   function legal_moves position : list move
 
   (** [do_move p m] returns the position obtained by doing the move [m]
-     on position [p]. 
+     on position [p].
   *)
   function do_move position move : position
 
@@ -56,7 +56,7 @@ theory TwoPlayerGame
     match p with (p,n) -> minmax (do_move p m) n
     end
 
-  clone import set.Min as MinMaxRec with 
+  clone import set.Min as MinMaxRec with
     type param = param,
     type elt = move,
     function cost = cost
@@ -66,7 +66,7 @@ theory TwoPlayerGame
 
   axiom minmax_depth_non_zero:
     forall p:position, n:int. n >= 0 ->
-     minmax p (n+1) = 
+     minmax p (n+1) =
         let moves = Elements.elements (legal_moves p) in
         if Fset.is_empty moves then position_value p else
           - MinMaxRec.min (p,n) moves
@@ -146,7 +146,7 @@ module AlphaBeta
     { let moves = Elements.elements l in
       if Fset.is_empty moves then result = best else
       let m = G.MinMaxRec.min (pos,depth) moves in
-      if alpha <= m <= beta then result = m 
+      if alpha <= m <= beta then result = m
       else if m < alpha then result < alpha else
       result > beta
     }
