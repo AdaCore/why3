@@ -26,11 +26,11 @@ open Ty
 open Term
 open Decl
 open Theory
-open Task
 open Printer
-open Trans
 open Driver_ast
-open Call_provers
+open Mlw_ty
+open Mlw_expr
+open Mlw_module
 
 type driver = {
   drv_lib         : Mlw_typing.mlw_library;
@@ -58,10 +58,13 @@ let load_file file =
   Stack.iter close_in to_close;
   f
 
+exception NoPrinter
 exception Duplicate    of string
 exception UnknownType  of (string list * string list)
 exception UnknownLogic of (string list * string list)
 exception UnknownProp  of (string list * string list)
+exception UnknownVal   of (string list * string list)
+exception UnknownExn   of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
@@ -87,13 +90,13 @@ let load_driver lib file extra_files =
   let syntax_map = ref Mid.empty in
   let qualid    = ref [] in
 
-  let find_pr th (loc,q) = try ns_find_pr th.th_export q
+  let find_pr th (loc,q) = try Theory.ns_find_pr th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownProp (!qualid,q)))
   in
-  let find_ls th (loc,q) = try ns_find_ls th.th_export q
+  let find_ls th (loc,q) = try Theory.ns_find_ls th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownLogic (!qualid,q)))
   in
-  let find_ts th (loc,q) = try ns_find_ts th.th_export q
+  let find_ts th (loc,q) = try Theory.ns_find_ts th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownType (!qualid,q)))
   in
   let find_fs th q =
@@ -136,6 +139,31 @@ let load_driver lib file extra_files =
   let add_local th (loc,rule) =
     try add_local th rule with e -> raise (Loc.Located (loc,e))
   in
+  let find_val m (loc,q) =
+    try match ns_find_ps m.mod_export q with
+    | PV pv -> pv.pv_vs.vs_name
+    | PS ps -> ps.ps_name
+    | PL _ | XS _ | LS _ -> raise Not_found
+    with Not_found -> raise (Loc.Located (loc, UnknownVal (!qualid,q)))
+  in
+  let find_xs m (loc,q) =
+    try match ns_find_ps m.mod_export q with
+    | XS xs -> xs
+    | PV _ | PS _ | PL _ | LS _ -> raise Not_found
+    with Not_found -> raise (Loc.Located (loc, UnknownExn (!qualid,q)))
+  in
+  let add_local_module loc m = function
+    | MRtheory trule -> add_local m.mod_theory (loc,trule)
+    | MRexception (_,q,s) ->
+        let xs = find_xs m q in
+        add_syntax xs.xs_name s
+    | MRval (_,q,s) ->
+        let id = find_val m q in
+        add_syntax id s
+  in
+  let add_local_module m (loc,rule) =
+    try add_local_module loc m rule with e -> raise (Loc.Located (loc,e))
+  in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
     let th =
@@ -145,8 +173,14 @@ let load_driver lib file extra_files =
     qualid := q;
     List.iter (add_local th) trl
   in
-  let add_module _ =
-    assert false (*TODO*)
+  let add_module { mor_name = (loc,q); mor_rules = mrl } =
+    let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
+    let m =
+      try let mm, _ = Env.read_lib_file lib f in Mstr.find id mm
+      with e -> raise (Loc.Located (loc,e))
+    in
+    qualid := q;
+    List.iter (add_local_module m) mrl
   in
   List.iter add_theory f.fe_th_rules;
   List.iter add_module f.fe_mo_rules;
@@ -165,5 +199,31 @@ let load_driver lib file extra_files =
   }
 
 
+
+(* exception report *)
+
+let string_of_qualid thl idl =
+  String.concat "." thl ^ "." ^ String.concat "." idl
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | NoPrinter -> Format.fprintf fmt
+      "No printer specified in the driver file"
+  | Duplicate s -> Format.fprintf fmt
+      "Duplicate %s specification" s
+  | UnknownType (thl,idl) -> Format.fprintf fmt
+      "Unknown type symbol %s" (string_of_qualid thl idl)
+  | UnknownLogic (thl,idl) -> Format.fprintf fmt
+      "Unknown logical symbol %s" (string_of_qualid thl idl)
+  | UnknownProp (thl,idl) -> Format.fprintf fmt
+      "Unknown proposition %s" (string_of_qualid thl idl)
+  | UnknownVal (thl,idl) -> Format.fprintf fmt
+      "Unknown val %s" (string_of_qualid thl idl)
+  | UnknownExn (thl,idl) -> Format.fprintf fmt
+      "Unknown exception %s" (string_of_qualid thl idl)
+  | FSymExpected ls -> Format.fprintf fmt
+      "%a is not a function symbol" Pretty.print_ls ls
+  | PSymExpected ls -> Format.fprintf fmt
+      "%a is not a predicate symbol" Pretty.print_ls ls
+  | e -> raise e)
 
 

@@ -205,6 +205,8 @@ list0_mrule:
 ;
 
 mrule:
-| trule { MRtheory $1 }
+| trule                                 { MRtheory $1 }
+| SYNTAX cloned EXCEPTION qualid STRING { MRexception ($2, $4, $5) }
+| SYNTAX cloned VAL qualid STRING       { MRval ($2, $4, $5) }
 ;
 
