@@ -115,7 +115,7 @@ let check_syntax s len =
   in
   iter_group regexp_arg_pos arg s
 
-let check_syntax_typed ls s =
+let check_syntax_logic ls s =
   let len = List.length ls.ls_args in
   let ret = ls.ls_value <> None in
   let nfv = Stv.cardinal (ls_ty_freevars ls) in
@@ -227,12 +227,14 @@ let meta_remove_logic  = register_meta "remove_logic" [MTlsymbol]
 let meta_realized     = register_meta "realized" [MTstring; MTstring]
   ~desc:"TODO??"
 
+let check_syntax_type ts s = check_syntax s (List.length ts.ts_args)
+
 let syntax_type ts s =
-  check_syntax s (List.length ts.ts_args);
+  check_syntax_type ts s;
   create_meta meta_syntax_type [MAts ts; MAstr s]
 
 let syntax_logic ls s =
-  check_syntax_typed ls s;
+  check_syntax_logic ls s;
   create_meta meta_syntax_logic [MAls ls; MAstr s]
 
 let remove_prop pr =

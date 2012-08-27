@@ -81,8 +81,13 @@ type file = {
   f_rules  : theory_rules list;
 }
 
+type global_extract =
+  | EPrelude   of string
+  | EPrinter   of string
+  | EBlacklist of string list
+
 type file_extract = {
-  fe_global   : (loc * global) list;
+  fe_global   : (loc * global_extract) list;
   fe_th_rules : theory_rules list;
   fe_mo_rules : module_rules list;
 }

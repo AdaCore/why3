@@ -18,19 +18,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* OCaml program extraction *)
-
-open Why3
-
-val debug: Debug.flag
-
-val extract_filename: ?fname:string -> Theory.theory -> string
-
-val extract_theory:
-  Mlw_driver.driver -> ?old:Pervasives.in_channel -> ?fname:string ->
-  Format.formatter -> Theory.theory -> unit
-
-val extract_module:
-  Mlw_driver.driver -> ?old:Pervasives.in_channel -> ?fname:string ->
-  Format.formatter -> Mlw_module.modul -> unit
+val parse_file:
+  (string -> Lexing.lexbuf) -> Lexing.lexbuf -> Driver_ast.file
+val parse_file_extract:
+  (string -> Lexing.lexbuf) -> Lexing.lexbuf -> Driver_ast.file_extract
 

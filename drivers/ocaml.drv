@@ -65,3 +65,15 @@ theory int.ComputerDivision
   syntax function mod "(Num.mod_num %1 %2)"
 end
 
+(* WhyML *)
+
+(*
+module ref.Ref
+  syntax type     ref      "(%1 Pervasives.ref)"
+  syntax function contents "(%1).Pervasives.contents"
+  syntax val      ref      "(Pervasives.ref %1)"
+  syntax val      (!)      "(%1).Pervasives.contents"
+  syntax val      (:=)     "((%1) := (%2))"
+end
+*)
+

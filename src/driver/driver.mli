@@ -26,7 +26,7 @@ type driver
 
 val load_driver : Env.env -> string -> string list -> driver
 (** loads a driver from a file
-    @param env TODO
+    @param env    environment to interpret theories
     @param string driver file name
     @param string list additional driver files containing only theories
 *)

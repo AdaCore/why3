@@ -18,19 +18,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* OCaml program extraction *)
-
 open Why3
 
-val debug: Debug.flag
+type driver = private {
+  drv_lib         : Mlw_typing.mlw_library;
+  drv_printer     : string option;
+  drv_prelude     : Printer.prelude;
+  drv_thprelude   : Printer.prelude_map;
+  drv_blacklist   : Printer.blacklist;
+  drv_syntax      : Printer.syntax_map;
+}
 
-val extract_filename: ?fname:string -> Theory.theory -> string
+val load_driver :
+  Mlw_typing.mlw_library -> string -> string list -> driver
+  (** loads a driver from a file
+      @param env    environment to interpret theories and modules
+      @param string driver file name
+      @param string list additional drivers containing only theories/modules *)
 
-val extract_theory:
-  Mlw_driver.driver -> ?old:Pervasives.in_channel -> ?fname:string ->
-  Format.formatter -> Theory.theory -> unit
-
-val extract_module:
-  Mlw_driver.driver -> ?old:Pervasives.in_channel -> ?fname:string ->
-  Format.formatter -> Mlw_module.modul -> unit
 

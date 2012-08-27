@@ -60,6 +60,9 @@ val syntax_type : tysymbol -> string -> tdecl
 val syntax_logic : lsymbol -> string -> tdecl
 val remove_prop : prsymbol -> tdecl
 
+val check_syntax_type: tysymbol -> string -> unit
+val check_syntax_logic: lsymbol -> string -> unit
+
 type syntax_map = string Mid.t
 (* [syntax_map] maps the idents of removed props to "" *)
 

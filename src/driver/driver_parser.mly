@@ -180,12 +180,18 @@ file_extract:
 
 list0_global_theory_module:
 | /* epsilon */      { { fe_global = []; fe_th_rules = []; fe_mo_rules = [] } }
-| global list0_global_theory_module
+| global_extract list0_global_theory_module
     { {$2 with fe_global = (loc_i 1, $1) :: ($2.fe_global)} }
 | theory list0_global_theory_module
     { {$2 with fe_th_rules = $1 :: ($2.fe_th_rules)} }
 | module_ list0_global_theory_module
     { {$2 with fe_mo_rules = $1 :: ($2.fe_mo_rules)} }
+;
+
+global_extract:
+| PRELUDE STRING { EPrelude $2 }
+| PRINTER STRING { EPrinter $2 }
+| BLACKLIST list1_string_list { EBlacklist $2 }
 ;
 
 module_:

@@ -217,7 +217,8 @@ let print_constr info ty fmt (cs,_) =
 
 let print_type_decl info fmt ts = match ts.ts_def with
   | None ->
-      fprintf fmt "@[<hov 2>type %a%a@]"
+      fprintf fmt
+        "@[<hov 2>type %a%a (* to be defined (uninterpreted type) *)@]"
         print_tv_args ts.ts_args (print_ts info) ts
   | Some ty ->
       fprintf fmt "@[<hov 2>type %a%a =@ %a@]"
@@ -451,14 +452,15 @@ let print_param_decl info fmt ls =
     forget_tvs ()
   end
 
-let print_logic_decl info fst fmt (ls,ld) =
+let print_logic_decl info isrec fst fmt (ls,ld) =
   if has_syntax info ls.ls_name then
     fprintf fmt "(* symbol %a is overridden by driver *)"
       (print_lident info) ls.ls_name
   else begin
     let vl,e = open_ls_defn ld in
     fprintf fmt "@[<hov 2>%s %a %a : %a =@ %a@]"
-      (if fst then "let rec" else "and") (print_ls info) ls
+      (if fst then if isrec then "let rec" else "let" else "and")
+      (print_ls info) ls
       (print_list space (print_vs_arg info)) vl
       (print_ls_type info) ls.ls_value (print_defn info) e;
     forget_vars vl;
@@ -486,8 +488,12 @@ let logic_decl info fmt d = match d.d_node with
   | Decl.Dparam ls ->
       print_param_decl info fmt ls;
       fprintf fmt "@\n@\n"
+  | Dlogic [ls,_ as ld] ->
+      let isrec = Sid.mem ls.ls_name d.d_syms in
+      print_logic_decl info isrec true fmt ld;
+      fprintf fmt "@\n@\n"
   | Dlogic ll ->
-      print_list_next newline (print_logic_decl info) fmt ll;
+      print_list_next newline (print_logic_decl info true) fmt ll;
       fprintf fmt "@\n@\n"
   | Dind (s, il) ->
       print_list_next newline (print_ind_decl info s) fmt il;
@@ -508,18 +514,9 @@ let logic_decl info fmt td = match td.td_node with
 
 (** Theories *)
 
-let ocaml_driver env =
-  try
-    let file = Filename.concat Config.datadir "drivers/ocaml.drv" in
-    let drv = Driver.load_driver env file [] in
-    Driver.syntax_map drv
-  with e ->
-    eprintf "cannot find driver 'ocaml'@.";
-    raise e
-
-let extract_theory env ?old ?fname fmt th =
+let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
-  let sm = ocaml_driver env in
+  let sm = drv.Mlw_driver.drv_syntax in
   let info = {
     info_syn = sm;
     current_theory = th;
@@ -739,9 +736,9 @@ let pdecl info fmt pd = match pd.pd_node with
 
 (** Modules *)
 
-let extract_module env ?old ?fname fmt m =
+let extract_module drv ?old ?fname fmt m =
   ignore (old); ignore (fname);
-  let sm = ocaml_driver env in
+  let sm = drv.Mlw_driver.drv_syntax in
   let th = m.mod_theory in
   let info = {
     info_syn = sm;
