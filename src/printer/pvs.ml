@@ -824,7 +824,7 @@ let init_printer th =
   Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
   pr
 
-let print_task env pr thpr realize ?old fmt task =
+let print_task env pr thpr _blacklist realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -906,11 +906,11 @@ let print_task env pr thpr realize ?old fmt task =
   output_remaining fmt !old;
   fprintf fmt "@]@\nEND %s@\n@]" thname
 
-let print_task_full env pr thpr ?old fmt task =
-  print_task env pr thpr false ?old fmt task
+let print_task_full env pr thpr blacklist ?old fmt task =
+  print_task env pr thpr blacklist false ?old fmt task
 
-let print_task_real env pr thpr ?old fmt task =
-  print_task env pr thpr true  ?old fmt task
+let print_task_real env pr thpr blacklist ?old fmt task =
+  print_task env pr thpr blacklist true  ?old fmt task
 
 let () = register_printer "pvs" print_task_full
   ~desc:"Printer@ for@ the@ PVS@ proof@ assistant@ \

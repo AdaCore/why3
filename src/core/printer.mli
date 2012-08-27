@@ -29,10 +29,12 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type blacklist = string list
 
 type 'a pp = Format.formatter -> 'a -> unit
 
-type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
+type printer =
+    Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 

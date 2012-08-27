@@ -791,7 +791,7 @@ let print_decl ~old info fmt d =
 let print_decls ~old info fmt dl =
   fprintf fmt "@\n@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
-let print_task env pr thpr realize ?old fmt task =
+let print_task env pr thpr _blacklist realize ?old fmt task =
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -842,11 +842,11 @@ let print_task env pr thpr realize ?old fmt task =
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old
 
-let print_task_full env pr thpr ?old fmt task =
-  print_task env pr thpr false ?old fmt task
+let print_task_full env pr thpr blacklist ?old fmt task =
+  print_task env pr thpr blacklist false ?old fmt task
 
-let print_task_real env pr thpr ?old fmt task =
-  print_task env pr thpr true  ?old fmt task
+let print_task_real env pr thpr blacklist ?old fmt task =
+  print_task env pr thpr blacklist true  ?old fmt task
 
 let () = register_printer "coq" print_task_full
   ~desc:"Printer@ for@ the@ Coq@ proof@ assistant@ \

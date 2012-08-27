@@ -225,7 +225,7 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task fof _env pr thpr ?old:_ fmt task =
+let print_task fof _env pr thpr _blacklist ?old:_ fmt task =
   forget_all ident_printer;
   forget_all pr_printer;
   print_prelude fmt pr;

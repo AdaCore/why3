@@ -31,10 +31,12 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type blacklist = string list
 
 type 'a pp = formatter -> 'a -> unit
 
-type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
+type printer =
+  Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
 type reg_printer =
   { reg_desc    : formatted;
@@ -62,7 +64,7 @@ let print_printer_desc fmt (s,f) =
     s Pp.formatted f
 
 let () = register_printer ~desc:"Print nothing" "(null)"
-  (fun _ _ _ ?old:_ _ _ -> ())
+  (fun _ _ _ _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
 

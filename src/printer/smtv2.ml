@@ -311,7 +311,7 @@ let distingued =
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
       Trans.return dis2))
 
-let print_task_old pr thpr fmt task =
+let print_task_old pr thpr _blacklist fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
@@ -324,9 +324,9 @@ let print_task_old pr thpr fmt task =
   fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
 
 let () = register_printer "smtv2"
-  (fun _env pr thpr ?old:_ fmt task ->
+  (fun _env pr thpr blacklist ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task_old pr thpr fmt task)
+     print_task_old pr thpr blacklist fmt task)
   ~desc:"Printer for the smtlib version 2 format."
 
 let print_decls =
@@ -344,7 +344,7 @@ let print_decls =
   Trans.on_meta Discriminate.meta_lsinst (fun dls ->
     Printer.sprint_decls (print dls))
 
-let print_task _env pr thpr ?old:_ fmt task =
+let print_task _env pr thpr _blacklist ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is taboo *)
   (* forget_all ident_printer; *)
   print_prelude fmt pr;

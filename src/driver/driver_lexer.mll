@@ -55,7 +55,12 @@
         "prop", PROP;
         "filename", FILENAME;
         "transformation", TRANSFORM;
-        "plugin", PLUGIN
+        "plugin", PLUGIN;
+        "blacklist", BLACKLIST;
+        (* WhyML *)
+        "module", MODULE;
+        "exception", EXCEPTION;
+        "val", VAL;
       ]
 
 }

@@ -325,7 +325,7 @@ let distingued =
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
       Trans.return dis2))
 
-let print_task pr thpr fmt task =
+let print_task pr thpr _blacklist fmt task =
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
   let info = {
@@ -338,7 +338,7 @@ let print_task pr thpr fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "yices"
-  (fun _env pr thpr ?old:_ fmt task ->
+  (fun _env pr thpr blacklist ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task pr thpr fmt task)
+     print_task pr thpr blacklist fmt task)
   ~desc:"Printer@ for@ the@ Yices@ theorem@ prover version 1."

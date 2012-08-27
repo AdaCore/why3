@@ -40,6 +40,7 @@ type driver = {
   drv_transform   : string list;
   drv_prelude     : prelude;
   drv_thprelude   : prelude_map;
+  drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_meta_cl     : (theory * Stdecl.t) Mid.t;
   drv_regexps     : (Str.regexp * prover_answer) list;
@@ -87,6 +88,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let printer   = ref None in
   let transform = ref [] in
   let timeregexps = ref [] in
+  let blacklist = Queue.create () in
 
   let set_or_raise loc r v error = match !r with
     | Some _ -> raise (Loc.Located (loc, Duplicate error))
@@ -112,6 +114,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Printer s -> set_or_raise loc printer s "printer"
     | Transform s -> add_to_list transform s
     | Plugin files -> load_plugin (Filename.dirname file) files
+    | Blacklist sl -> List.iter (fun s -> Queue.add s blacklist) sl
   in
   let f = load_file file in
   List.iter add_global f.f_global;
@@ -191,6 +194,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_filename    = !filename;
     drv_transform   = List.rev !transform;
     drv_thprelude   = Mid.map List.rev !thprelude;
+    drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_meta        = !meta;
     drv_meta_cl     = !meta_cl;
     drv_regexps     = List.rev !regexps;
@@ -293,6 +297,7 @@ let print_task_prepared ?old drv fmt task =
   in
   let printer =
     lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
+      drv.drv_blacklist
   in
   fprintf fmt "@[%a@]@?" (printer ?old) task
 
