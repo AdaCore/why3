@@ -723,7 +723,7 @@ predicate expr_writes (e:expr) (w:Set.set mident) =
     | Ederef x -> Flet result (Tderef x) q
     | Eassert f ->
         (* asymmetric and *)
-        Fand f (Fimplies f q)
+        Fand f (Fimplies f (Flet result (Tvalue Vvoid) q))
     | Eseq e1 e2 -> wp e1 (wp e2 q)
     | Elet id e1 e2 -> wp e1 (Flet id (Tvar result) (wp e2 q))
     | Ebin e1 op e2 ->
@@ -754,6 +754,10 @@ predicate expr_writes (e:expr) (w:Set.set mident) =
               (Fimplies (Fand (Fnot (Fterm (Tvar result))) inv) q))))
 
     end
+
+
+  lemma result_always_fresh_in_wp:
+     forall e:expr, q:fmla. fresh_in_fmla result (wp e q)
 
   (* lemma wp_subst: *)
   (*   forall e:expr, q:fmla, id :mident, id':ident. *)
