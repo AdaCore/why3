@@ -442,15 +442,15 @@ and de_desc denv loc = function
       DElet (id, gh, e1, e2), e2.de_type
   | Ptree.Eletrec (rdl, e1) ->
       let rdl = dletrec denv rdl in
-      let add_one denv (_, { id = id }, _, dvty, _) =
+      let add_one denv ({ id = id }, _, dvty, _, _) =
         { denv with locals = Mstr.add id (denv.tvars, dvty) denv.locals } in
       let denv = List.fold_left add_one denv rdl in
       let e1 = dexpr denv e1 in
       DEletrec (rdl, e1), e1.de_type
   | Ptree.Efun (bl, tr) ->
       let denv, bl, tyl = dbinders denv bl in
-      let lam, (argl, res) = dlambda denv bl [] tr in
-      DEfun lam, (tyl @ argl, res)
+      let tr, (argl, res) = dtriple denv [] tr in
+      DEfun (bl, tr), (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in
       expected_type e1 (dity_of_pty denv pty);
@@ -625,19 +625,19 @@ and dletrec denv rdl =
     denv,bl,tyl,res in
   let denvl = List.map2 bind_one rdl dvtyl in
   (* then type-check the bodies *)
-  let type_one (loc, id, gh, _, var, tr) (denv,bl,tyl,tyv) =
-    let lam, (argl, res) = dlambda denv bl var tr in
+  let type_one (loc,id,gh,_,var,tr) (denv,bl,tyl,tyv) =
+    let tr, (argl, res) = dtriple denv var tr in
     if argl <> [] then errorm ~loc
       "The body of a recursive function must be a first-order value";
     unify_loc unify loc tyv res;
-    loc, id, gh, (tyl, tyv), lam in
+    id, gh, (tyl, tyv), bl, tr in
   List.map2 type_one rdl denvl
 
-and dlambda denv bl var (p, e, (q, xq)) =
+and dtriple denv var (p, e, (q, xq)) =
   let e = dexpr denv e in
   let var = dvariant denv.uc var in
   let xq = dxpost denv.uc xq in
-  (bl, var, p, e, q, xq), e.de_type
+  (var, p, e, q, xq), e.de_type
 
 (** stage 2 *)
 
@@ -780,12 +780,15 @@ let add_local x lv lenv = match lv with
 
 exception DuplicateException of xsymbol
 
-let binders lenv bl =
-  let binder lenv (id, ghost, dity) =
+let binders bl =
+  let binder (id, ghost, dity) =
     let vtv = vty_value ~ghost (ity_of_dity dity) in
-    let pv = create_pvsymbol (Denv.create_user_id id) vtv in
-    add_local id.id (LetV pv) lenv, pv in
-  Util.map_fold_left binder lenv bl
+    create_pvsymbol (Denv.create_user_id id) vtv in
+  List.map binder bl
+
+let add_binders lenv pvl =
+  let add lenv pv = add_local pv.pv_vs.vs_name.id_string (LetV pv) lenv in
+  List.fold_left add lenv pvl
 
 let xpost lenv xq =
   let add_exn m (xs,f) =
@@ -935,7 +938,8 @@ and type_v lenv gh pvs vars = function
       let ghost = ghost || gh in
       VTvalue (vty_value ~ghost (ity_of_dity v))
   | DSpecA (bl,tyc) ->
-      let lenv, pvl = binders lenv bl in
+      let pvl = binders bl in
+      let lenv = add_binders lenv pvl in
       let add_pv pv s = vars_union pv.pv_vars s in
       let vars = List.fold_right add_pv pvl vars in
       let pvs = List.fold_right Spv.add pvl pvs in
@@ -982,20 +986,20 @@ and expr_desc lenv loc de = match de.de_desc with
             | VTvalue _ -> assert false
           end
       end
-  | DElet (x, gh, { de_desc = DEfun lam }, de2) ->
-      let def, ps = expr_fun lenv x gh lam in
+  | DElet (x, gh, { de_desc = DEfun (bl, tr) }, de2) ->
+      let def, ps = expr_fun lenv x gh bl tr in
       let lenv = add_local x.id (LetA ps) lenv in
       let e2 = expr lenv de2 in
       e_rec def e2
-  | DEfun lam ->
+  | DEfun (bl, tr) ->
       let x = mk_id "fn" loc in
-      let def, ps = expr_fun lenv x false lam in
+      let def, ps = expr_fun lenv x false bl tr in
       let e2 = e_arrow ps ps.ps_vta in
       e_rec def e2
   (* FIXME? (ghost "lab" fun x -> ...) loses the label "lab" *)
-  | DEghost { de_desc = DEfun lam } ->
+  | DEghost { de_desc = DEfun (bl, tr) } ->
       let x = mk_id "fn" loc in
-      let def, ps = expr_fun lenv x true lam in
+      let def, ps = expr_fun lenv x true bl tr in
       let e2 = e_arrow ps ps.ps_vta in
       e_rec def e2
   | DElet (x, gh, de1, de2) ->
@@ -1129,14 +1133,13 @@ and expr_desc lenv loc de = match de.de_desc with
       e_for pv efrom dir eto inv e1
 
 and expr_rec lenv rdl =
-  let step1 lenv (_loc, id, gh, dvty, lam) =
-    let vta = match vty_ghostify gh (vty_of_dvty dvty) with
-      | VTarrow vta -> vta
-      | VTvalue _ -> assert false in
+  let step1 lenv (id, gh, _, bl, tr) =
+    let pvl = binders bl in let (_,_,de,_,_) = tr in
+    let vta = vty_arrow pvl ~ghost:gh (vty_of_dvty de.de_type) in
     let ps = create_psymbol (Denv.create_user_id id) vta in
-    add_local id.id (LetA ps) lenv, (ps, gh, lam) in
+    add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, rdl = Util.map_fold_left step1 lenv rdl in
-  let step2 (ps, gh, lam) = ps, expr_lam lenv gh lam in
+  let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
   let rdl = List.map step2 rdl in
   let rd_pvset pvs (_, lam) = l_pvset pvs lam in
   let pvs = List.fold_left rd_pvset Spv.empty rdl in
@@ -1145,15 +1148,15 @@ and expr_rec lenv rdl =
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   create_rec_defn (List.map step3 rdl)
 
-and expr_fun lenv x gh lam =
-  let lam = expr_lam lenv gh lam in
+and expr_fun lenv x gh bl tr =
+  let lam = expr_lam lenv gh (binders bl) tr in
   let pvs = l_pvset Spv.empty lam in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   let def = create_fun_defn (Denv.create_user_id x) lam in
   def, (List.hd def.rec_defn).fun_ps
 
-and expr_lam lenv gh (bl, var, p, de, q, xq) =
-  let lenv, pvl = binders lenv bl in
+and expr_lam lenv gh pvl (var, p, de, q, xq) =
+  let lenv = add_binders lenv pvl in
   let e = e_ghostify gh (expr lenv de) in
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
@@ -1613,8 +1616,8 @@ let add_pdecl ~wp loc uc = function
   | Dlet (id, gh, e) ->
       let e = dexpr (create_denv uc) e in
       let pd = match e.de_desc with
-        | DEfun lam ->
-            let def, _ = expr_fun (create_lenv uc) id gh lam in
+        | DEfun (bl, tr) ->
+            let def, _ = expr_fun (create_lenv uc) id gh bl tr in
             create_rec_decl def
         | _ ->
             let e = e_ghostify gh (expr (create_lenv uc) e) in
