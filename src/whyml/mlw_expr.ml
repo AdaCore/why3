@@ -1035,7 +1035,10 @@ let ps_compat ps1 ps2 =
   vta_compat ps1.ps_vta ps2.ps_vta &&
   Mid.equal (fun _ _ -> true) ps1.ps_varm ps2.ps_varm
 
-let rec expr_subst psm e = match e.e_node with
+let rec expr_subst psm e =
+  let e' = expr_subst_node psm e in
+  { e' with e_loc = e.e_loc; e_label = e.e_label }
+and expr_subst_node psm e = match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
       e_arrow (Mid.find ps.ps_name psm) (vta_of_expr e)
   | Eapp (e,pv,_) ->
