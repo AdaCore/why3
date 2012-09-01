@@ -1023,7 +1023,7 @@ let type_term uc denv env t =
   term env t
 
 let type_fmla uc denv env f =
-  let f = dfmla uc denv f in
+  let f = dfmla ~localize:(Some None) uc denv f in
   fmla env f
 
 let add_prop k loc s f th =
