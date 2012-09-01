@@ -190,6 +190,7 @@ theory Exponentiation
   type t
   constant one : t
   function (*) t t : t
+  clone algebra.CommutativeMonoid with type t = t, constant unit = one, function op = (*)
 
   function power t int : t
 
@@ -199,7 +200,7 @@ theory Exponentiation
 
   lemma Power_1 : forall x : t. power x 1 = x
 
-  lemma Power_sum : forall x: t, n m: int. n >= 0 /\ m >= 0 ->
+  lemma Power_sum : forall x: t, n m: int. 0 <= n -> 0 <= m ->
     power x (n+m) = power x n * power x m
 
   lemma Power_mult : forall x:t, n m : int. 0 <= n -> 0 <= m ->
@@ -216,8 +217,10 @@ theory Power
 
   use import Int
 
-  clone export
-    Exponentiation with type t = int, constant one = one, function (*) = (*)
+  clone export Exponentiation with type t = int, constant one = one,
+    function (*) = (*), goal CommutativeMonoid.Assoc,
+    goal CommutativeMonoid.Unit_def_l, goal CommutativeMonoid.Unit_def_r,
+    goal CommutativeMonoid.Comm.Comm
 
 end
 
