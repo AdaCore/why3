@@ -408,7 +408,7 @@ let read_generated_name =
   with StringValue name -> name
 
 let read_old_proof =
-  let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\)[ ]+\\([^ :(.]+\\)" in
+  let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\|Variable\\|Hypothesis\\)[ ]+\\([^ :(.]+\\)" in
   let def_end = Str.regexp ".*[.]$" in
   let qed = Str.regexp "\\(Qed\\|Defined\\|Save\\|Admitted\\)[.]" in
   fun ch ->
@@ -420,18 +420,21 @@ let read_old_proof =
     let name = Str.matched_group 2 s in
     if not (Str.string_match def_end s (Str.match_end ())) then
       while not (Str.string_match def_end (input_line ch) 0) do () done;
-    let k =
-      if kind = "Notation" then Notation
-      else begin
-        start := pos_in ch;
-        while not (Str.string_match qed (input_line ch) 0) do () done;
-        Vernacular
-      end in
-    let len = pos_in ch - !start in
-    let s = String.create len in
-    seek_in ch !start;
-    really_input ch s 0 len;
-    Query (name, k, s)
+    match kind with
+    | "Variable" | "Hypothesis" -> Axiom name
+    | _  ->
+      let k =
+        if kind = "Notation" then Notation
+        else begin
+          start := pos_in ch;
+          while not (Str.string_match qed (input_line ch) 0) do () done;
+          Vernacular
+        end in
+      let len = pos_in ch - !start in
+      let s = String.create len in
+      seek_in ch !start;
+      really_input ch s 0 len;
+      Query (name, k, s)
   with StringValue s -> Other s
 
 (* Load old-style proofs where users were confined to a few sections. *)
@@ -512,19 +515,11 @@ let output_till_statement fmt script name =
     | _ :: t -> find t in
   find !script
 
-let rec output_remaining fmt ?(in_other=false) script =
-  match script with
-  | Axiom _ :: t -> output_remaining fmt t
-  | Query (n,_,c) :: t ->
-    if in_other then fprintf fmt "*)@\n";
-    fprintf fmt "(* Unused content named %s@\n%s *)@\n" n c;
-    output_remaining fmt t
-  | Other c :: t ->
-    if not in_other then fprintf fmt "(* ";
-    fprintf fmt "%s@\n" c;
-    output_remaining fmt ~in_other:true t
-  | [] ->
-    if in_other then fprintf fmt "*)@\n"
+let output_remaining fmt script =
+  List.iter (function
+    | Axiom _ -> ()
+    | Query (n,_,c) -> fprintf fmt "(* Unused content named %s@\n%s *)@\n" n c
+    | Other c -> fprintf fmt "%s@\n" c) script
 
 let rec intros_hyp n fmt f =
   match f.t_node with
@@ -603,12 +598,12 @@ let print_empty_proof fmt def =
 
 let print_previous_proof def fmt previous =
   match previous with
-  | None | Some (Axiom _) ->
+  | None ->
     print_empty_proof fmt def
   | Some (Query (_,Vernacular,c)) ->
     fprintf fmt "%s" c
   | Some (Query (_,Notation,_))
-  | Some (Other _) ->
+  | Some (Axiom _) | Some (Other _) ->
     assert false
 
 let print_type_decl ~prev info fmt ts =
@@ -619,12 +614,17 @@ let print_type_decl ~prev info fmt ts =
         match prev with
         | Some (Query (_,Notation,c)) ->
           fprintf fmt "(* Why3 goal *)@\n%s@\n" c
+        | Some (Axiom _) ->
+          fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Variable %a : %aType.@]@\n@[<hov 2>Hypothesis %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
+            print_ts ts print_params_list ts.ts_args
+            print_ts ts print_params_list ts.ts_args print_ts_tv ts
+            print_ts ts
         | _ ->
           fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a : %aType.@]@\n%a@\n"
             print_ts ts print_params_list ts.ts_args
             (print_previous_proof None) prev
       else
-        fprintf fmt "@[<hov 2>Parameter %a : %aType.@]@\n@[<hov 2>Axiom %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
+        fprintf fmt "@[<hov 2>Axiom %a : %aType.@]@\n@[<hov 2>Parameter %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
           print_ts ts print_params_list ts.ts_args
           print_ts ts print_params_list ts.ts_args print_ts_tv ts
           print_ts ts
@@ -668,23 +668,26 @@ let print_ls_type ?(arrow=false) info fmt ls =
 
 let print_param_decl ~prev info fmt ls =
   let _, _, all_ty_params = ls_ty_vars ls in
-  begin if info.realization then
+  if info.realization then
     match prev with
-      | Some (Query (_,Notation,c)) ->
-        fprintf fmt "(* Why3 goal *)@\n%s" c
-      | _ ->
-        fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a: %a%a%a.@]@\n%a"
-          print_ls ls print_params all_ty_params
-          (print_arrow_list (print_ty info)) ls.ls_args
-          (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-          (print_previous_proof None) prev
-    else
-      fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n"
+    | Some (Query (_,Notation,c)) ->
+      fprintf fmt "(* Why3 goal *)@\n%s@\n" c
+    | Some (Axiom _) ->
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Variable %a: %a%a%a.@]@\n@\n"
         print_ls ls print_params all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-  end;
-  fprintf fmt "@\n"
+    | _ ->
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a: %a%a%a.@]@\n%a@\n"
+        print_ls ls print_params all_ty_params
+        (print_arrow_list (print_ty info)) ls.ls_args
+        (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+        (print_previous_proof None) prev
+  else
+    fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n@\n"
+      print_ls ls print_params all_ty_params
+      (print_arrow_list (print_ty info)) ls.ls_args
+      (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
 
 let print_param_decl ~prev info fmt ls =
   if not (Mid.mem ls.ls_name info.info_syn) then
@@ -757,10 +760,16 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Pskip -> assert false (* impossible *) 
   in
   if stt <> "" then
-    fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
-      stt print_pr pr print_params params
-      (print_fmla info) f
-      (print_previous_proof (Some (params,f))) prev
+    match prev with
+    | Some (Axiom _) when stt = "Lemma" ->
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Hypothesis %a : %a%a.@]@\n@\n"
+        print_pr pr print_params params
+        (print_fmla info) f
+    | _ ->
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
+        stt print_pr pr print_params params
+        (print_fmla info) f
+        (print_previous_proof (Some (params,f))) prev
   else
     fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
       print_pr pr print_params params
