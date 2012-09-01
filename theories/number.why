@@ -116,7 +116,7 @@ theory Gcd
   (* gcd is associative commutative *)
 
   clone algebra.AC with type t = int, function op = gcd,
-    lemma Comm.Comm, lemma Assoc.Assoc
+    lemma Comm.Comm, lemma Assoc
 
   (*** FIXME: Alt-Ergo proves gcd_0_pos even without gcd_unique *)
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a

@@ -25,30 +25,41 @@ end
 
 theory AC
 
-  type t
-  function op t t : t
-  clone Assoc with type t = t, function op = op
-  clone Comm  with type t = t, function op = op
+  clone export Assoc
+  clone Comm with type t = t, function op = op
   meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
 
 end
 
-(** {2 Group theory} *)
+(** {2 Monoids} *)
+
+theory Monoid
+
+  clone export Assoc
+  constant unit : t
+  axiom Unit_def_l : forall x:t. op unit x = x
+  axiom Unit_def_r : forall x:t. op x unit = x
+
+end
+
+(** {2 Commutative Monoids} *)
+
+theory CommutativeMonoid
+
+  clone export Monoid
+  clone Comm with type t = t, function op = op
+  meta AC function op (*, prop Assoc.Assoc, prop Comm.Comm*)
+
+end
+
+(** {2 Groups} *)
 
 theory Group
 
-  type t
-
-  constant unit : t
-
-  function op t t : t
+  clone export Monoid
   function inv t : t
-
-  axiom Unit_def : forall x:t. op x unit = x
-
-  clone Assoc with type t = t, function op = op
-
-  axiom Inv_def : forall x:t. op x (inv x) = unit
+  axiom Inv_def_l : forall x:t. op (inv x) x = unit
+  axiom Inv_def_r : forall x:t. op x (inv x) = unit
 
 (***
   lemma Inv_unit : forall x y:t. op x (inv y) = unit -> x = y
@@ -56,7 +67,7 @@ theory Group
 
 end
 
-(** {2 Commutative groups} *)
+(** {2 Commutative Groups} *)
 
 theory CommutativeGroup
 
@@ -83,7 +94,8 @@ theory Ring
 
   clone Assoc with type t = t, function op = (*)
 
-  axiom Mul_distr: forall x y z : t. x * (y + z) = x * y + x * z
+  axiom Mul_distr_l : forall x y z : t. x * (y + z) = x * y + x * z
+  axiom Mul_distr_r : forall x y z : t. (y + z) * x = y * x + z * x
 
   function (-) (x y : t) : t = x + -y
 
