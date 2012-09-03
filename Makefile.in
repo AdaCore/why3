@@ -865,7 +865,7 @@ endif
 
 ifeq (@enable_coq_libs@,yes)
 
-COQLIBS_INT_FILES = Abs ComputerDivision EuclideanDivision Int MinMax Power
+COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 
