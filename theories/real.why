@@ -253,7 +253,7 @@ theory PowerReal
   function pow real real : real
 
   axiom Pow_zero_y:
-    forall y:real. y <> 0.0 -> pow 0.0 y = 0.0
+    forall y:real. y > 0.0 -> pow 0.0 y = 0.0
 
   axiom Pow_x_zero:
     forall x:real. x <> 0.0 -> pow x 0.0 = 1.0
