@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
 <why3session
  name="hoare_logic/wp4/why3session.xml" shape_version="2">
  <prover
@@ -40,7 +40,7 @@
     name="eq_refident_dec"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="23" loccnumb="6" loccnume="21"
-    sum="060869b21cf12aade1e27e86bef08497"
+    sum="365005cb01a97b0cadbb84e859094a3c"
     proved="true"
     expanded="false"
     shape="ainfix =V0V1NOainfix =V0V1F">
@@ -57,7 +57,7 @@
     name="get_stack_eq"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="69" loccnumb="6" loccnume="18"
-    sum="8026c0c5b82bd19d9bdc98bf637b64a1"
+    sum="58913f8cace7285bce9314f9c021ec40"
     proved="true"
     expanded="false"
     shape="ainfix =aget_stackV0aConsaTuple2V0V1V2V1F">
@@ -67,7 +67,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="0"
@@ -83,7 +83,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -98,7 +98,7 @@
     name="get_stack_neq"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="73" loccnumb="6" loccnume="19"
-    sum="781e05f015be0d11848a013431ca0296"
+    sum="11151b62b6bf0a4d38b631befc70c63a"
     proved="true"
     expanded="false"
     shape="ainfix =aget_stackV1aConsaTuple2V0V2V3aget_stackV1V3Iainfix =V0V1NF">
@@ -116,7 +116,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -124,7 +124,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="1"
@@ -139,7 +139,7 @@
     name="eval_subst_term"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="125" loccnumb="6" loccnume="21"
-    sum="86e5193bac56f4360cfdf6e9d5a94ae3"
+    sum="994aa07ca7e545ae3672e51970109c43"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termV0V1asubst_termV2V3V4aeval_termasetV0V3aget_stackV4V1V1V2Iafresh_in_termV4V2F">
@@ -150,14 +150,14 @@
      edited="wp4_ImpExpr_eval_subst_term_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.50"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal
     name="eval_vsubst_term"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="131" loccnumb="6" loccnume="22"
-    sum="4caf13acf27161664774c789437e272f"
+    sum="45296e0dbe197b3ddef8a37c472a9eb6"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termV0V1avsubst_termV2V3aTvalueV4aeval_termV0aConsaTuple2V3V4V1V2F">
@@ -168,14 +168,14 @@
      edited="wp4_ImpExpr_eval_vsubst_term_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal
     name="eval_term_change_free"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="136" loccnumb="6" loccnume="27"
-    sum="31a08fa1d67a51d6665bde95254a65da"
+    sum="c5cd6715d5f718dbab5bd86aa35e2945"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termV1aConsaTuple2V3V4V2V0aeval_termV1V2V0Iafresh_in_termV3V0F">
@@ -186,14 +186,14 @@
      edited="wp4_ImpExpr_eval_term_change_free_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.48"/>
+     <result status="valid" time="0.60"/>
     </proof>
    </goal>
    <goal
     name="eval_subst"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="173" loccnumb="6" loccnume="16"
-    sum="76ade95bb4f9afba77e756f1d9d7ed26"
+    sum="a2136a45382983d41e676ee0534298bf"
     proved="true"
     expanded="false"
     shape="aeval_fmlaasetV1V3aget_stackV4V2V2V0qaeval_fmlaV1V2asubstV0V3V4Iafresh_in_fmlaV4V0F">
@@ -204,14 +204,14 @@
      edited="wp4_ImpExpr_eval_subst_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.03"/>
+     <result status="valid" time="2.27"/>
     </proof>
    </goal>
    <goal
     name="eval_vsubst"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="179" loccnumb="6" loccnume="17"
-    sum="411422fa67dc2794a2afae74e1698c4d"
+    sum="d03156e5f619b5991ad8896b9f8f03f7"
     proved="false"
     expanded="false"
     shape="aeval_fmlaV1aConsaTuple2V3V4V2V0qaeval_fmlaV1V2avsubstV0V3aTvalueV4F">
@@ -220,7 +220,7 @@
     name="eval_swap"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="184" loccnumb="6" loccnume="15"
-    sum="e72960ef759e015365dabda8a4b4c37f"
+    sum="4a4325bcbf43a6d5cb140d23753ebc53"
     proved="false"
     expanded="true"
     shape="aeval_fmlaV1aConsaTuple2V4V6aConsaTuple2V3V5V2V0qaeval_fmlaV1aConsaTuple2V3V5aConsaTuple2V4V6V2V0Iainfix =V3V4NF">
@@ -231,14 +231,14 @@
      edited="wp4_ImpExpr_eval_swap_1.v"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.51"/>
+     <result status="unknown" time="0.56"/>
     </proof>
    </goal>
    <goal
     name="eval_change_free"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="190" loccnumb="6" loccnume="22"
-    sum="ece9fc61ad2b2d6e29bd2b89593e0d79"
+    sum="a7f4b4de0cd8395b2ecbc71225d98640"
     proved="true"
     expanded="false"
     shape="aeval_fmlaV1V2V0qaeval_fmlaV1aConsaTuple2V3V4V2V0Iafresh_in_fmlaV3V0F">
@@ -249,14 +249,14 @@
      edited="wp4_ImpExpr_eval_change_free_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.34"/>
+     <result status="valid" time="2.66"/>
     </proof>
    </goal>
    <goal
     name="steps_non_neg"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="300" loccnumb="6" loccnume="19"
-    sum="a620856630e997752fe5ddfb9d9c39c5"
+    sum="d1aa57c5d2861600f57299dc5fca3546"
     proved="true"
     expanded="false"
     shape="ainfix &gt;=V6c0Iamany_stepsV0V2V4V1V3V5V6F">
@@ -267,14 +267,14 @@
      edited="wp4_ImpExpr_steps_non_neg_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.52"/>
+     <result status="valid" time="0.63"/>
     </proof>
    </goal>
    <goal
     name="many_steps_seq"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="304" loccnumb="6" loccnume="20"
-    sum="82b4887cd9f154ccfd9cbd320b44b7bb"
+    sum="c1b328963a685e39c29ca5385dbb9606"
     proved="true"
     expanded="false"
     shape="ainfix =V6ainfix +ainfix +c1V9V10Aamany_stepsV7V8V5V1V3avoidV10Aamany_stepsV0V2V4V7V8avoidV9EIamany_stepsV0V2aEseqV4V5V1V3avoidV6F">
@@ -285,14 +285,14 @@
      edited="wp4_ImpExpr_many_steps_seq_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.73"/>
+     <result status="valid" time="0.95"/>
     </proof>
    </goal>
    <goal
     name="many_steps_let"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="312" loccnumb="6" loccnume="20"
-    sum="d8a35882d4460363c1b2445679b775a1"
+    sum="6e28e0d0ea0f6109eca6c627821f2376"
     proved="true"
     expanded="false"
     shape="ainfix =V8ainfix +ainfix +c1V12V13Aamany_stepsV9aConsaTuple2V4V11V10V6V1V3aEvalueV7V13Aamany_stepsV0V2V5V9V10aEvalueV11V12EIamany_stepsV0V2aEletV4V5V6V1V3aEvalueV7V8F">
@@ -303,7 +303,7 @@
      edited="wp4_ImpExpr_many_steps_let_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.76"/>
+     <result status="valid" time="1.01"/>
     </proof>
    </goal>
   </theory>
@@ -317,10 +317,68 @@
     name="Test13"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="352" loccnumb="5" loccnume="11"
-    sum="86d2880548f91f082f4d63fa255943aa"
+    sum="a0d13c4ac6cf91fc6a0ae33edb875e76"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTvalueaVintc13aVintc13">
+    <proof
+     prover="0"
+     timelimit="2"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="2"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test13expr"
+    locfile="hoare_logic/wp4/../wp4.mlw"
+    loclnum="355" loccnumb="5" loccnume="15"
+    sum="299e2d685fdb04b3d72ca1e2fa524c3c"
+    proved="true"
+    expanded="false"
+    shape="amany_stepsamy_sigmaamy_piaEvalueaVintc13amy_sigmaamy_piaEvalueaVintc13c0">
+    <proof
+     prover="0"
+     timelimit="2"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="2"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="2"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.34"/>
+    </proof>
+   </goal>
+   <goal
+    name="Test42"
+    locfile="hoare_logic/wp4/../wp4.mlw"
+    loclnum="358" loccnumb="5" loccnume="11"
+    sum="90afc3dd928f3b6789f56a01825410e2"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aeval_termamy_sigmaamy_piaTvarc0aVintc42">
     <proof
      prover="0"
      timelimit="2"
@@ -339,68 +397,10 @@
     </proof>
    </goal>
    <goal
-    name="Test13expr"
-    locfile="hoare_logic/wp4/../wp4.mlw"
-    loclnum="355" loccnumb="5" loccnume="15"
-    sum="bda3f03d61e71ae272bc16194cf44806"
-    proved="true"
-    expanded="false"
-    shape="amany_stepsamy_sigmaamy_piaEvalueaVintc13amy_sigmaamy_piaEvalueaVintc13c0">
-    <proof
-     prover="0"
-     timelimit="2"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="2"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.33"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test42"
-    locfile="hoare_logic/wp4/../wp4.mlw"
-    loclnum="358" loccnumb="5" loccnume="11"
-    sum="efcc0366866552b5fc3a952f6e80265f"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aeval_termamy_sigmaamy_piaTvarc0aVintc42">
-    <proof
-     prover="0"
-     timelimit="2"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-   <goal
     name="Test42expr"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="361" loccnumb="5" loccnume="15"
-    sum="b35003d3ba2876f049e1cadc15caa574"
+    sum="2b3b9613f0acf470efb98d695e404aba"
     proved="true"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEvarc0amy_sigmaamy_piaEvalueaVintc42c1">
@@ -411,14 +411,14 @@
      edited="wp4_TestSemantics_Test42expr_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.54"/>
+     <result status="valid" time="0.59"/>
     </proof>
    </goal>
    <goal
     name="Test0"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="364" loccnumb="5" loccnume="10"
-    sum="e713622ca08d644113e57c0aff8f01ed"
+    sum="3d856337fc2b5985419964a6b71140d4"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTderefamy_xaVintc0">
@@ -436,14 +436,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.15"/>
     </proof>
    </goal>
    <goal
     name="Test0expr"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="367" loccnumb="5" loccnume="14"
-    sum="077b3d4ed58b87a34369dc311affda27"
+    sum="c8b4005cf153d7d63b64b319d758eed7"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEderefamy_xamy_sigmaamy_piaEvalueaVintc0c1">
@@ -453,7 +453,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="4.02"/>
+     <result status="timeout" time="4.29"/>
     </proof>
     <proof
      prover="3"
@@ -461,7 +461,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.01"/>
+     <result status="timeout" time="2.32"/>
     </proof>
     <proof
      prover="5"
@@ -469,14 +469,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.01"/>
+     <result status="timeout" time="2.32"/>
     </proof>
    </goal>
    <goal
     name="Test55"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="370" loccnumb="5" loccnume="11"
-    sum="16e2e78c8890a2bc6be565c56a4029bf"
+    sum="0befe96b0deaec12ae87bdb73a4fd1a0"
     proved="false"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTbinaTvarc0aOplusaTvalueaVintc13aVintc55">
@@ -502,14 +502,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.01"/>
+     <result status="timeout" time="2.12"/>
     </proof>
    </goal>
    <goal
     name="Test55expr"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="373" loccnumb="5" loccnume="15"
-    sum="023ef99f2a006692e68d2984b5e2648b"
+    sum="82501c68cddea95010265c0f529c9525"
     proved="false"
     expanded="false"
     shape="amany_stepsamy_sigmaamy_piaEbinaEvarc0aOplusaEvalueaVintc13amy_sigmaamy_piaEvalueaVintc55c3">
@@ -527,7 +527,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.11"/>
+     <result status="timeout" time="2.01"/>
     </proof>
     <proof
      prover="5"
@@ -535,14 +535,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.02"/>
+     <result status="timeout" time="2.01"/>
     </proof>
    </goal>
    <goal
     name="Ass42"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="376" loccnumb="5" loccnume="10"
-    sum="4c51b059e294c9d8574bf69297d7aa5e"
+    sum="2681b0b0877c0b649b820d1d199ce3f9"
     proved="true"
     expanded="false"
     shape="ainfix =agetV0amy_xaVintc42Iaone_stepamy_sigmaamy_piaEassignamy_xaEvalueaVintc42V0V1avoidF">
@@ -560,7 +560,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.27"/>
+     <result status="valid" time="0.28"/>
     </proof>
     <proof
      prover="5"
@@ -568,14 +568,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.35"/>
+     <result status="valid" time="0.36"/>
     </proof>
    </goal>
    <goal
     name="If42"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="381" loccnumb="5" loccnume="9"
-    sum="b6d75c675a6452821f9d8879108f820c"
+    sum="a8b8eede1ac22b544ad8b97ebaff1992"
     proved="true"
     expanded="false"
     shape="ainfix =agetV1amy_xaVintc13Iaone_stepV0V2V4V1V3avoidIaone_stepamy_sigmaamy_piaEifaEbinaEderefamy_xaOleaEvalueaVintc10aEassignamy_xaEvalueaVintc13aEassignamy_xaEvalueaVintc42V0V2V4F">
@@ -585,7 +585,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.77"/>
+     <result status="valid" time="1.67"/>
     </proof>
     <proof
      prover="5"
@@ -607,7 +607,7 @@
     name="consequence_rule"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="402" loccnumb="6" loccnume="22"
-    sum="0822857a1bc7efd155ebe1401e236c98"
+    sum="4f404cfc820edb7c06704b1163a8efb4"
     proved="true"
     expanded="false"
     shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
@@ -618,14 +618,14 @@
      edited="wp4_HoareLogic_consequence_rule_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.55"/>
+     <result status="valid" time="0.61"/>
     </proof>
    </goal>
    <goal
     name="value_rule"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="409" loccnumb="6" loccnume="16"
-    sum="834b7609519c2852613fb1f5d3bd74c2"
+    sum="dd47f9c88f5ec7ed37b2edc31cfcd80c"
     proved="true"
     expanded="false"
     shape="avalid_tripleavsubstV0aresultaTvalueV1aEvalueV1V0F">
@@ -636,14 +636,14 @@
      edited="wp4_HoareLogic_value_rule_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.70"/>
+     <result status="valid" time="0.75"/>
     </proof>
    </goal>
    <goal
     name="assign_rule"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="413" loccnumb="6" loccnume="17"
-    sum="75f6797473d8e2110b5841ff4aa95a8a"
+    sum="cb7d81a1da8f5b9c1b8d9107c2baf452"
     proved="false"
     expanded="true"
     shape="avalid_tripleV0aEassignV2V3V1Iavalid_tripleV0V3asubstV1V2aresultF">
@@ -652,7 +652,7 @@
     name="seq_rule"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="418" loccnumb="6" loccnume="14"
-    sum="4f659ff77fc2b9a96eae6a9020aa3456"
+    sum="e46fe753a4e89806dfe066fc9649140a"
     proved="false"
     expanded="true"
     shape="avalid_tripleV0aEseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
@@ -661,7 +661,7 @@
     name="let_rule"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="423" loccnumb="6" loccnume="14"
-    sum="384d38fee36b2c7864f833eb8e7f4089"
+    sum="3047c76d0b0afcf26c70ff0cc9f22b36"
     proved="true"
     expanded="false"
     shape="avalid_tripleV0aEletV3V4V5V1Iavalid_tripleaFletaresultaTvarV3V2V5V1Aavalid_tripleV0V4V2Iafresh_in_fmlaV3V2Iainfix =V3aresultNF">
@@ -672,14 +672,14 @@
      edited="wp4_HoareLogic_let_rule_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.90"/>
+     <result status="valid" time="0.95"/>
     </proof>
    </goal>
    <goal
     name="assert_rule"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="437" loccnumb="6" loccnume="17"
-    sum="0a3adf74e2d105576d9e1872d1cb48c3"
+    sum="5190ee361d8bb4e6db43bf14190b6866"
     proved="false"
     expanded="true"
     shape="avalid_tripleV1aEassertV0V1Iavalid_fmlaaFimpliesV1V0F">
@@ -688,7 +688,7 @@
     name="assert_rule_ext"
     locfile="hoare_logic/wp4/../wp4.mlw"
     loclnum="441" loccnumb="6" loccnume="21"
-    sum="057c28ac3f0c465a015a97eed10354a5"
+    sum="6b574fa593ee1373661618fe65b2b237"
     proved="false"
     expanded="true"
     shape="avalid_tripleaFimpliesV0V1aEassertV0V1F">

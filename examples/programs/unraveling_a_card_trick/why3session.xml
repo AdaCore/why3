@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/unraveling_a_card_trick/why3session.xml" shape_version="2">
+ name="programs/unraveling_a_card_trick/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -20,15 +20,15 @@
   expanded="true">
   <theory
    name="GilbreathCardTrickPure"
-   locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+   locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
    loclnum="11" loccnumb="7" loccnume="29"
    verified="true"
    expanded="true">
    <goal
     name="shuffle_nil_nil_nil"
-    locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+    locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
     loclnum="39" loccnumb="8" loccnume="27"
-    sum="9cee60a6cc789ed03752a04280bc6074"
+    sum="cdf118a027c8179c5a723af5f653bb87"
     proved="true"
     expanded="false"
     shape="ashuffleaNilaNilaNil">
@@ -38,14 +38,14 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="shuffle_sym"
-    locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+    locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
     loclnum="41" loccnumb="8" loccnume="19"
-    sum="49c14ddc8f9ac5955fb428f2e109c718"
+    sum="ce23eceb8f57194fa1d9efac0319d1fb"
     proved="true"
     expanded="true"
     shape="ashuffleV1V0V2IashuffleV0V1V2F">
@@ -56,14 +56,14 @@
      edited="unraveling_a_card_trick_GilbreathCardTrickPure_shuffle_sym_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.45"/>
+     <result status="valid" time="0.54"/>
     </proof>
    </goal>
    <goal
     name="shuffle_length"
-    locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+    locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
     loclnum="44" loccnumb="8" loccnume="22"
-    sum="a28ee5e8f50723467d6710c7ea6d254f"
+    sum="faa6860be5719a40682a853fb115d224"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix +alengthV0alengthV1alengthV2IashuffleV0V1V2F">
@@ -74,22 +74,22 @@
      edited="unraveling_a_card_trick_GilbreathCardTrickPure_shuffle_length_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.47"/>
+     <result status="valid" time="0.53"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="GilbreathCardTrick"
-   locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+   locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
    loclnum="67" loccnumb="7" loccnume="25"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter shuffle"
-    locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+    locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
     loclnum="72" loccnumb="6" loccnume="13"
     expl="parameter shuffle"
-    sum="b25090fca93d4df63e5aab229c148ba8"
+    sum="0738f0cde21cdd2cd64ba90a984bacad"
     proved="true"
     expanded="true"
     shape="iainfix =V6aTrueiainfix =V7aTrueNiainfix =V8aTrueNiainfix =V9aTrueOainfix =V10aTrueainfix &lt;ainfix +alengthV11alengthV4ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4AashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV4V15Aainfix =areverseV1ainfix ++areverseV11V14EIainfix =V13aConsV12V3FICV5aNilfaConsVVainfix =V11V17Aainfix =V12V16FFainfix &lt;ainfix +alengthV5alengthV18ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4AashuffleV21V22V20Aainfix =areverseV0ainfix ++areverseV18V22Aainfix =areverseV1ainfix ++areverseV5V21EIainfix =V20aConsV19V3FICV4aNilfaConsVVainfix =V18V24Aainfix =V19V23FFIainfix =V4aNilqainfix =V10aTrueFFainfix &lt;ainfix +alengthV5alengthV25ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4AashuffleV28V29V27Aainfix =areverseV0ainfix ++areverseV25V29Aainfix =areverseV1ainfix ++areverseV5V28EIainfix =V27aConsV26V3FICV4aNilfaConsVVainfix =V25V31Aainfix =V26V30FFIainfix =V5aNilqainfix =V8aTrueFashuffleareverseV1areverseV0V3Aainfix =V4aNilAainfix =V5aNilIainfix =V4aNilqainfix =V7aTrueFiainfix =V32aTrueNiainfix =V33aTrueOainfix =V34aTrueainfix &lt;ainfix +alengthV35alengthV4ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4AashuffleV38V39V37Aainfix =areverseV0ainfix ++areverseV4V39Aainfix =areverseV1ainfix ++areverseV35V38EIainfix =V37aConsV36V3FICV5aNilfaConsVVainfix =V35V41Aainfix =V36V40FFainfix &lt;ainfix +alengthV5alengthV42ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4AashuffleV45V46V44Aainfix =areverseV0ainfix ++areverseV42V46Aainfix =areverseV1ainfix ++areverseV5V45EIainfix =V44aConsV43V3FICV4aNilfaConsVVainfix =V42V48Aainfix =V43V47FFIainfix =V4aNilqainfix =V34aTrueFFainfix &lt;ainfix +alengthV5alengthV49ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4AashuffleV52V53V51Aainfix =areverseV0ainfix ++areverseV49V53Aainfix =areverseV1ainfix ++areverseV5V52EIainfix =V51aConsV50V3FICV4aNilfaConsVVainfix =V49V55Aainfix =V50V54FFIainfix =V5aNilqainfix =V32aTrueFIainfix =V5aNilqainfix =V6aTrueFIashuffleV56V57V3Aainfix =areverseV0ainfix ++areverseV4V57Aainfix =areverseV1ainfix ++areverseV5V56EFAashuffleV58V59V2Aainfix =areverseV0ainfix ++areverseV0V59Aainfix =areverseV1ainfix ++areverseV1V58EIainfix =V2aNilFF">
@@ -101,10 +101,10 @@
      expanded="true">
      <goal
       name="WP_parameter shuffle.1"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant init"
-      sum="0c1ec52b80c5a86b40e55aad2ffa5759"
+      sum="f28e0a4b98d899933a4e28543e043fa9"
       proved="true"
       expanded="false"
       shape="ashuffleV3V4V2Aainfix =areverseV0ainfix ++areverseV0V4Aainfix =areverseV1ainfix ++areverseV1V3EIainfix =V2aNilFF">
@@ -121,10 +121,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.2"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant preservation"
-      sum="ed3174c37a49e3ed0db10f04ed78fb0a"
+      sum="aa1cd62674d600f79663fb7f761074fd"
       proved="true"
       expanded="false"
       shape="ashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV4V15Aainfix =areverseV1ainfix ++areverseV11V14EIainfix =V13aConsV12V3FICV5aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V9aTrueOainfix =V10aTrueIainfix =V4aNilqainfix =V10aTrueFFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFIainfix =V2aNilFF">
@@ -141,10 +141,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.3"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop variant decreases"
-      sum="1087c3297d94c9bd54d6a40d5b5ddfa1"
+      sum="4f6d8665c3814be2f85e0b94e44ba508"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +alengthV11alengthV4ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4Iainfix =V13aConsV12V3FICV5aNilfaConsVVainfix =V11V15Aainfix =V12V14FFIainfix =V9aTrueOainfix =V10aTrueIainfix =V4aNilqainfix =V10aTrueFFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV16V17V3Aainfix =areverseV0ainfix ++areverseV4V17Aainfix =areverseV1ainfix ++areverseV5V16EFIainfix =V2aNilFF">
@@ -161,10 +161,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.4"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant preservation"
-      sum="4d637ac62e71b7e0750b5e68e7f36b32"
+      sum="ff27295ee491d9d1db63e8e63314492e"
       proved="true"
       expanded="false"
       shape="ashuffleV14V15V13Aainfix =areverseV0ainfix ++areverseV11V15Aainfix =areverseV1ainfix ++areverseV5V14EIainfix =V13aConsV12V3FICV4aNilfaConsVVainfix =V11V17Aainfix =V12V16FFIainfix =V9aTrueOainfix =V10aTrueNIainfix =V4aNilqainfix =V10aTrueFFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV18V19V3Aainfix =areverseV0ainfix ++areverseV4V19Aainfix =areverseV1ainfix ++areverseV5V18EFIainfix =V2aNilFF">
@@ -181,10 +181,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.5"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop variant decreases"
-      sum="bf2afa947acc5942b04a582c0be39163"
+      sum="11001e9dd60cb00da15a2477c6a247ac"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +alengthV5alengthV11ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4Iainfix =V13aConsV12V3FICV4aNilfaConsVVainfix =V11V15Aainfix =V12V14FFIainfix =V9aTrueOainfix =V10aTrueNIainfix =V4aNilqainfix =V10aTrueFFIainfix =V8aTrueNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV16V17V3Aainfix =areverseV0ainfix ++areverseV4V17Aainfix =areverseV1ainfix ++areverseV5V16EFIainfix =V2aNilFF">
@@ -201,10 +201,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.6"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant preservation"
-      sum="ac64be0bf0665882929c373a1bd8e179"
+      sum="479bb8dba6965001462c289ee171d9ec"
       proved="true"
       expanded="true"
       shape="ashuffleV12V13V11Aainfix =areverseV0ainfix ++areverseV9V13Aainfix =areverseV1ainfix ++areverseV5V12EIainfix =V11aConsV10V3FICV4aNilfaConsVVainfix =V9V15Aainfix =V10V14FFIainfix =V8aTrueNNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV16V17V3Aainfix =areverseV0ainfix ++areverseV4V17Aainfix =areverseV1ainfix ++areverseV5V16EFIainfix =V2aNilFF">
@@ -217,15 +217,15 @@
        edited="unraveling_a_card_trick_WP_GilbreathCardTrick_WP_parameter_shuffle_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.51"/>
+       <result status="valid" time="0.61"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.7"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop variant decreases"
-      sum="cac7d0ada20e1cf6dee3f54731c197b1"
+      sum="58094c092cbce56029bccb2d04b54d7d"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +alengthV5alengthV9ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4Iainfix =V11aConsV10V3FICV4aNilfaConsVVainfix =V9V13Aainfix =V10V12FFIainfix =V8aTrueNNIainfix =V5aNilqainfix =V8aTrueFIainfix =V7aTrueNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV14V15V3Aainfix =areverseV0ainfix ++areverseV4V15Aainfix =areverseV1ainfix ++areverseV5V14EFIainfix =V2aNilFF">
@@ -242,10 +242,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.8"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="normal postcondition"
-      sum="a6f1f3bc90b64c92c00d012b699b2436"
+      sum="6bb2c865ff85c6e6ba35ec771e1181b6"
       proved="true"
       expanded="false"
       shape="ashuffleareverseV1areverseV0V3Aainfix =V4aNilAainfix =V5aNilIainfix =V7aTrueNNIainfix =V4aNilqainfix =V7aTrueFIainfix =V6aTrueIainfix =V5aNilqainfix =V6aTrueFIashuffleV8V9V3Aainfix =areverseV0ainfix ++areverseV4V9Aainfix =areverseV1ainfix ++areverseV5V8EFIainfix =V2aNilFF">
@@ -262,10 +262,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.9"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant preservation"
-      sum="2f90b3ecb334d095a2475e3e3901be02"
+      sum="86a9f124d4f53d319e17b8932fe07516"
       proved="true"
       expanded="true"
       shape="ashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV4V14Aainfix =areverseV1ainfix ++areverseV10V13EIainfix =V12aConsV11V3FICV5aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V8aTrueOainfix =V9aTrueIainfix =V4aNilqainfix =V9aTrueFFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFIainfix =V2aNilFF">
@@ -278,15 +278,15 @@
        edited="unraveling_a_card_trick_WP_GilbreathCardTrick_WP_parameter_shuffle_2.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.51"/>
+       <result status="valid" time="0.59"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.10"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop variant decreases"
-      sum="a83f464084cfd4fdf157e60263988f87"
+      sum="0fc9f10df3ee181d008744ed9adcaa4d"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +alengthV10alengthV4ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4Iainfix =V12aConsV11V3FICV5aNilfaConsVVainfix =V10V14Aainfix =V11V13FFIainfix =V8aTrueOainfix =V9aTrueIainfix =V4aNilqainfix =V9aTrueFFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV15V16V3Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV5V15EFIainfix =V2aNilFF">
@@ -303,10 +303,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.11"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant preservation"
-      sum="722d68f0fd82292031176e5f41185ed8"
+      sum="cc2e61172eac6fbe8ed19b608ffeeadd"
       proved="true"
       expanded="true"
       shape="ashuffleV13V14V12Aainfix =areverseV0ainfix ++areverseV10V14Aainfix =areverseV1ainfix ++areverseV5V13EIainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V16Aainfix =V11V15FFIainfix =V8aTrueOainfix =V9aTrueNIainfix =V4aNilqainfix =V9aTrueFFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV17V18V3Aainfix =areverseV0ainfix ++areverseV4V18Aainfix =areverseV1ainfix ++areverseV5V17EFIainfix =V2aNilFF">
@@ -319,15 +319,15 @@
        edited="unraveling_a_card_trick_WP_GilbreathCardTrick_WP_parameter_shuffle_3.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.50"/>
+       <result status="valid" time="0.59"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.12"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop variant decreases"
-      sum="646d2560db6bd920d04fcdb6711d09a4"
+      sum="f8a9b5fa6206b399549ed77a0cf5b685"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +alengthV5alengthV10ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4Iainfix =V12aConsV11V3FICV4aNilfaConsVVainfix =V10V14Aainfix =V11V13FFIainfix =V8aTrueOainfix =V9aTrueNIainfix =V4aNilqainfix =V9aTrueFFIainfix =V7aTrueNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV15V16V3Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV5V15EFIainfix =V2aNilFF">
@@ -344,10 +344,10 @@
      </goal>
      <goal
       name="WP_parameter shuffle.13"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop invariant preservation"
-      sum="ac10d8e3df0e6221b26ebd1290481074"
+      sum="ba745cf089aee634c78f90460ca3480e"
       proved="true"
       expanded="false"
       shape="ashuffleV11V12V10Aainfix =areverseV0ainfix ++areverseV8V12Aainfix =areverseV1ainfix ++areverseV5V11EIainfix =V10aConsV9V3FICV4aNilfaConsVVainfix =V8V14Aainfix =V9V13FFIainfix =V7aTrueNNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV15V16V3Aainfix =areverseV0ainfix ++areverseV4V16Aainfix =areverseV1ainfix ++areverseV5V15EFIainfix =V2aNilFF">
@@ -359,15 +359,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter shuffle.14"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="72" loccnumb="6" loccnume="13"
       expl="loop variant decreases"
-      sum="c605c090f48def26db535715d06ea9e4"
+      sum="03a19d94aab8f517999568c63e79da97"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +alengthV5alengthV8ainfix +alengthV5alengthV4Aainfix &lt;=c0ainfix +alengthV5alengthV4Iainfix =V10aConsV9V3FICV4aNilfaConsVVainfix =V8V12Aainfix =V9V11FFIainfix =V7aTrueNNIainfix =V5aNilqainfix =V7aTrueFIainfix =V6aTrueNIainfix =V5aNilqainfix =V6aTrueFIashuffleV13V14V3Aainfix =areverseV0ainfix ++areverseV4V14Aainfix =areverseV1ainfix ++areverseV5V13EFIainfix =V2aNilFF">
@@ -386,10 +386,10 @@
    </goal>
    <goal
     name="WP_parameter card_trick"
-    locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+    locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
     loclnum="93" loccnumb="6" loccnume="16"
     expl="parameter card_trick"
-    sum="5526cb47ebd932c8efddcf11de7f520a"
+    sum="a2c7698df1eb250eee03f818a30cbc4a"
     proved="true"
     expanded="true"
     shape="asuit_sortedV7Aainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFAainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1Aainfix =V0ainfix ++areverseV11V9Aainfix =alengthV11ainfix -ainfix +V8c1c1Aainfix =alengthV9ainfix +ainfix -ainfix *anamainfix +V8c1c1Iainfix =V11aConsV10V3FICV4aNilfaConsVVainfix =V9V13Aainfix =V10V12FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V8c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV8c1Iainfix &lt;=V8V2Aainfix &lt;=c1V8FFAainfix =V0ainfix ++areverseV1V0Aainfix =alengthV1ainfix -c1c1Aainfix =alengthV0ainfix +ainfix -ainfix *anamc1c1Iainfix &lt;=c1V2Aasuit_sortedV16Aainfix =alengthV16ainfix *anamIashuffleareverseV0areverseV1V16Aainfix =V14aNilAainfix =V15aNilFFAainfix =V0ainfix ++areverseV1V0Iainfix &gt;c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -401,10 +401,10 @@
      expanded="true">
      <goal
       name="WP_parameter card_trick.1"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="93" loccnumb="6" loccnume="16"
       expl="assertion"
-      sum="5842c7548c37e174b991879fb573c7bf"
+      sum="95c67554ba2a2439a748b0794eab9f92"
       proved="true"
       expanded="false"
       shape="ainfix =V0ainfix ++areverseV1V0Iainfix &gt;c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -421,10 +421,10 @@
      </goal>
      <goal
       name="WP_parameter card_trick.2"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="93" loccnumb="6" loccnume="16"
       expl="normal postcondition"
-      sum="013a700667154db3f1d2256a5e3fed74"
+      sum="d08607aa2a0d250c3fb99d87c030c389"
       proved="true"
       expanded="true"
       shape="asuit_sortedV5Aainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFIainfix =V0ainfix ++areverseV1V0Iainfix &gt;c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -436,10 +436,10 @@
        expanded="true">
        <goal
         name="WP_parameter card_trick.2.1"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="parameter card_trick"
-        sum="a0b21ae094108c8f7edb3170123b250c"
+        sum="557b5021b0892073a21cc042afea2170"
         proved="true"
         expanded="false"
         shape="ainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFIainfix =V0ainfix ++areverseV1V0Iainfix &gt;c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -456,10 +456,10 @@
        </goal>
        <goal
         name="WP_parameter card_trick.2.2"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="parameter card_trick"
-        sum="fd036a64bbb1d01d8b9e5c22a4c41980"
+        sum="548d3a8f595fd1e234f2f5d32f790362"
         proved="true"
         expanded="true"
         shape="asuit_sortedV5Iainfix =alengthV5ainfix *anamIashuffleareverseV0areverseV1V5Aainfix =V3aNilAainfix =V4aNilFFIainfix =V0ainfix ++areverseV1V0Iainfix &gt;c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -471,17 +471,17 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter card_trick.3"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="93" loccnumb="6" loccnume="16"
       expl="for loop initialization"
-      sum="25ce1ca5f0a5515c66a921c63fa01068"
+      sum="7f0845b3c29b68396ea13a52533d4386"
       proved="true"
       expanded="false"
       shape="ainfix =V0ainfix ++areverseV1V0Aainfix =alengthV1ainfix -c1c1Aainfix =alengthV0ainfix +ainfix -ainfix *anamc1c1Iainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -498,10 +498,10 @@
      </goal>
      <goal
       name="WP_parameter card_trick.4"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="93" loccnumb="6" loccnume="16"
       expl="for loop preservation"
-      sum="72ab30e5dd95a13abba563f13dc100ed"
+      sum="318d880c8f7127a025db46a1593745eb"
       proved="true"
       expanded="true"
       shape="ainfix =V0ainfix ++areverseV8V6Aainfix =alengthV8ainfix -ainfix +V5c1c1Aainfix =alengthV6ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix &lt;=V5V2Aainfix &lt;=c1V5FFIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -513,10 +513,10 @@
        expanded="true">
        <goal
         name="WP_parameter card_trick.4.1"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="for loop preservation"
-        sum="43cea486074fb80fda7c8d2ba37b27ef"
+        sum="66d89cb3f50ae4935e8efcfd83ce2700"
         proved="true"
         expanded="false"
         shape="ainfix =alengthV6ainfix +ainfix -ainfix *anamainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix &lt;=V5V2Aainfix &lt;=c1V5FFIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -528,15 +528,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter card_trick.4.2"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="for loop preservation"
-        sum="4144e4a0fbe2ee89405f5afbecde2507"
+        sum="0d1e03f7887326b8f801db4c1fe7c43e"
         proved="true"
         expanded="false"
         shape="ainfix =alengthV8ainfix -ainfix +V5c1c1Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix &lt;=V5V2Aainfix &lt;=c1V5FFIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -553,10 +553,10 @@
        </goal>
        <goal
         name="WP_parameter card_trick.4.3"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="for loop preservation"
-        sum="30d38931fda80c278a38c647b038e73d"
+        sum="95ba899a3ac5c1062db49361f7f37314"
         proved="true"
         expanded="false"
         shape="ainfix =V0ainfix ++areverseV8V6Iainfix =V8aConsV7V3FICV4aNilfaConsVVainfix =V6V10Aainfix =V7V9FFIainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -V5c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamV5c1Iainfix &lt;=V5V2Aainfix &lt;=c1V5FFIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -575,10 +575,10 @@
      </goal>
      <goal
       name="WP_parameter card_trick.5"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="93" loccnumb="6" loccnume="16"
       expl="assertion"
-      sum="2947cab086f27e7bde90b3fd3e4377f9"
+      sum="d52240c26dad293b792c03ff8b633b1a"
       proved="true"
       expanded="false"
       shape="ainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -595,10 +595,10 @@
      </goal>
      <goal
       name="WP_parameter card_trick.6"
-      locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+      locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
       loclnum="93" loccnumb="6" loccnume="16"
       expl="normal postcondition"
-      sum="a9eabff57fb4124294dfe2b1590ddabe"
+      sum="872b412a7f356cc7e2d6482491b8ae53"
       proved="true"
       expanded="true"
       shape="asuit_sortedV7Aainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -610,10 +610,10 @@
        expanded="true">
        <goal
         name="WP_parameter card_trick.6.1"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="parameter card_trick"
-        sum="684496f0899f0b0722439bb175305615"
+        sum="5b9190d28eb6dea432d08fa5ba02b825"
         proved="true"
         expanded="false"
         shape="ainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -625,15 +625,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.02"/>
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter card_trick.6.2"
-        locfile="examples/programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
+        locfile="programs/unraveling_a_card_trick/../unraveling_a_card_trick.mlw"
         loclnum="93" loccnumb="6" loccnume="16"
         expl="parameter card_trick"
-        sum="2ccc647e264cf2e82681424aefeccd73"
+        sum="bde45935a8cbc820bc343f9469aba56a"
         proved="true"
         expanded="false"
         shape="asuit_sortedV7Iainfix =alengthV7ainfix *anamIashuffleareverseV4areverseV3V7Aainfix =V5aNilAainfix =V6aNilFFIainfix =V0ainfix ++areverseV3V4Iainfix =V0ainfix ++areverseV3V4Aainfix =alengthV3ainfix -ainfix +V2c1c1Aainfix =alengthV4ainfix +ainfix -ainfix *anamainfix +V2c1c1FIainfix &lt;=c1V2Iainfix &lt;=V2ainfix *anamAainfix &lt;=c0V2FIainfix =V1aNilFIasuit_orderedV0Aainfix =alengthV0ainfix *anamF">
@@ -645,7 +645,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.48"/>
+         <result status="valid" time="0.50"/>
         </proof>
        </goal>
       </transf>
