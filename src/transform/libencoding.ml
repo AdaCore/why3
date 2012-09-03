@@ -131,6 +131,7 @@ let ls_of_const =
   let ht = Hterm.create 63 in
   fun t -> match t.t_node with
     | Tconst _ ->
+        let t = t_label Slab.empty t in
         begin try Hterm.find ht t with Not_found ->
           let s = "const_" ^ Pp.string_of_wnl Pretty.print_term t in
           let ls = create_fsymbol (id_fresh s) [] ty_base in
