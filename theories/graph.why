@@ -57,7 +57,7 @@ theory IntPathWeight
   end
 
   lemma path_weight_right_extension:
-    forall x y z: vertex, l: list vertex.
+    forall x y: vertex, l: list vertex.
     path_weight (l ++ Cons x Nil) y = path_weight l x + weight x y
 
   lemma path_weight_decomposition:

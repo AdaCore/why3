@@ -37,7 +37,7 @@ theory LambdaCalc
   forall t : term 'b.
   subst (Var j) i t = if i = j then t else (Var j)  (* correct ?*)
 
-  axiom Subst_def1 : forall i j : nat.
+  axiom Subst_def1 : forall i : nat.
   forall t : term 'b. subst (Var i) i t = t
 
   axiom Subst_def2 : forall t1 : term 'a. forall i : nat.
@@ -48,7 +48,7 @@ theory LambdaCalc
   function app (t1 : term 'a) (t2 : term 'b) : term 'a
 
   axiom App_def :
-  forall t1 : term 'a. forall i : nat. forall t2 : term 'b.
+  forall t1 : term 'a. forall t2 : term 'b.
   app (Lambda t1) t2 = subst t1 Zero t2
 
 (* When we remove one of the following example the axiomatic is not anymore inconsistent *)
@@ -142,7 +142,7 @@ theory LambdaCalc2
   function app (t1 : app 'b 'a) (t2 : 'b) : 'a
 
   axiom App_def :
-  forall t1 : 'a. forall i : nat. forall t2 : 'b.
+  forall t1 : 'a. forall t2 : 'b.
   app (lambda t1) t2 = subst t1 Zero t2
 
   (* axiom Subst_app : *)

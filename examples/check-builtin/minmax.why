@@ -4,5 +4,5 @@ theory MinMax
   goal G : forall x y z : t. ge z y -> ge z x -> ge y x ->
                              min x (max (min z x) y) = x
 
-  goal G2 : forall x y z : t. max x y = x -> ge x y
+  goal G2 : forall x y: t. max x y = x -> ge x y
 end

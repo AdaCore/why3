@@ -45,11 +45,11 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
      (* Note: we take for granted that [fib] is an
         increasing sequence *)
 
-  axiom SumYes: forall n m s:int.
+  axiom SumYes: forall n m:int.
      n >= 0 -> (fib n) < m -> mod (fib n) 2 = 0 ->
        fib_sum_even_lt_from m n = fib_sum_even_lt_from m (n+1) + (fib n)
 
-  axiom SumOdd: forall n m s:int.
+  axiom SumOdd: forall n m:int.
      n >= 0 -> mod (fib n) 2 <> 0 ->
        fib_sum_even_lt_from m n = fib_sum_even_lt_from m (n+1)
 

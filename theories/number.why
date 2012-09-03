@@ -135,7 +135,7 @@ theory Gcd
   use int.EuclideanDivision
 
   lemma Gcd_euclidean_mod:
-    forall a b g: int [gcd b (EuclideanDivision.mod a b)].
+    forall a b: int [gcd b (EuclideanDivision.mod a b)].
     b <> 0 -> gcd b (EuclideanDivision.mod a b) = gcd a b
 
   lemma gcd_mult: forall a b c: int. 0 <= c -> gcd (c * a) (c * b) = c * gcd a b
