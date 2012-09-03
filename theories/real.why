@@ -236,7 +236,9 @@ theory PowerInt
   use Real
 
   clone export int.Exponentiation with
-    type t = real, constant one = Real.one, function (*) = Real.(*)
+    type t = real, constant one = Real.one, function (*) = Real.(*),
+    goal CommutativeMonoid.Assoc, goal CommutativeMonoid.Unit_def_l,
+    goal CommutativeMonoid.Unit_def_r, goal CommutativeMonoid.Comm.Comm
 
 end
 
