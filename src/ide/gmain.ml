@@ -724,13 +724,6 @@ let rec init_any any =
   init (S.key_any any) any;
   S.iter init_any any
 
-
-(*
-let unknown_prover = Gconfig.unknown_prover gconfig
-
-let replace_prover _ _ = false (* Gconfig.replace_prover gconfig *)
-*)
-
 let uninstalled_prover = Gconfig.uninstalled_prover gconfig
 
 end
@@ -738,6 +731,8 @@ end
 module M = Session_scheduler.Make(MA)
 
 
+let () = w#add_accel_group accel_group
+let () = w#show ()
 
 (********************)
 (* opening database *)
@@ -777,7 +772,6 @@ let () =
       Unix.mkdir project_dir 0o777
     end
 
-
 let info_window ?(callback=(fun () -> ())) mt s =
   let buttons = match mt with
     | `INFO -> GWindow.Buttons.close
@@ -800,6 +794,19 @@ let info_window ?(callback=(fun () -> ())) mt s =
                    d#destroy ();
                    if mt <> `QUESTION || x = `OK then callback ())
   in ()
+
+let warning_window ?loc msg = 
+  let msg = match loc with
+    | None -> msg
+    | Some l -> 
+      Format.fprintf Format.str_formatter "%a: %s" 
+        Loc.gen_report_position l msg;
+      Format.flush_str_formatter ()
+  in
+  info_window `WARNING msg
+
+let () = Warning.set_hook warning_window
+
 
 (* check if provers are present *)
 let () =
@@ -1960,8 +1967,6 @@ let (_ : GtkSignal.id) =
 let () = Debug.set_flag (Debug.lookup_flag "transform")
 *)
 
-let () = w#add_accel_group accel_group
-let () = w#show ()
 let () = GMain.main ()
 
 (*
