@@ -795,14 +795,23 @@ let info_window ?(callback=(fun () -> ())) mt s =
                    if mt <> `QUESTION || x = `OK then callback ())
   in ()
 
-let warning_window ?loc msg = 
-  let msg = match loc with
-    | None -> msg
-    | Some l -> 
-      Format.fprintf Format.str_formatter "%a: %s" 
-        Loc.gen_report_position l msg;
-      Format.flush_str_formatter ()
+let file_info = GMisc.label ~text:""
+  ~packing:(right_hb#pack ~fill:true) ()
+
+let warning_window ?loc msg =
+  begin
+    match loc with
+    | None ->
+      Format.fprintf Format.str_formatter "%s" msg
+    | Some l ->
+      (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+      Format.fprintf Format.str_formatter "%a: %s"
+        Loc.gen_report_position l msg
+  end;
+  let msg =
+    Format.flush_str_formatter ()
   in
+  file_info#set_text msg;
   info_window `WARNING msg
 
 let () = Warning.set_hook warning_window
@@ -1536,9 +1545,6 @@ let () = source_view#source_buffer#set_text (source_text fname)
 
 let current_file = ref ""
 
-let file_info = GMisc.label ~text:""
-  ~packing:(right_hb#pack ~fill:true) ()
-
 let set_current_file f =
   current_file := f;
   file_info#set_text ("file: " ^ !current_file)
@@ -1586,7 +1592,7 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
   move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
   (* FIXME: use another color or none at all *)
-  (* color_loc source_view ~color l b e *)
+  color_loc source_view ~color l b e;
   ignore (color,l,b,e)
 
 let scroll_to_id ~color id =
@@ -1666,10 +1672,8 @@ let reload () =
         fprintf str_formatter
           "@[Error:@ %a@]" Exn_printer.exn_printer e;
         let msg = flush_str_formatter () in
-        file_info#set_text msg
-(*
+        file_info#set_text msg;
         info_window `ERROR msg
-*)
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._R
