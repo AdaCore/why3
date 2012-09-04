@@ -196,20 +196,13 @@ and dtrigger =
   | TRterm of dterm
   | TRfmla of dfmla
 
-
-exception UnusedVar of string
-
-let () = Exn_printer.register (fun fmt e -> match e with
-  | UnusedVar s ->
-      fprintf fmt "Unused variable %s" s
-  | _ -> raise e)
-
 let allowed_unused s = String.length s > 0 && s.[0] = '_'
 
 let check_used_var vars v =
   if not (Mvs.mem v vars) then
     let s = v.vs_name.id_string in
-    if allowed_unused s then () else raise (UnusedVar s)
+    if not (allowed_unused s) then
+      Warning.emit ?loc:v.vs_name.Ident.id_loc "unused variable %s" s
 
 let check_used_vars vars =
   List.iter (check_used_var vars)
