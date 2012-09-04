@@ -1472,15 +1472,15 @@ let t_quant_simp q ((vl,_,_,f) as qf) =
     t_quant q qf
   else
     let vl,tl,f = t_open_quant qf in
-    let vl = vl_filter f vl in if vl = [] then f else
-    t_quant_close q vl (tr_filter f tl) f
+    let vl = vl_filter f vl in
+    if vl = [] then f else t_quant_close q vl (tr_filter f tl) f
 
 let t_quant_close_simp q vl tl f =
   if List.for_all (v_occurs f) vl then
     t_quant_close q vl tl f
   else
-    let vl = vl_filter f vl in if vl = [] then f else
-    t_quant_close q vl (tr_filter f tl) f
+    let vl = vl_filter f vl in
+    if vl = [] then f else t_quant_close q vl (tr_filter f tl) f
 
 let t_forall_simp = t_quant_simp Tforall
 let t_exists_simp = t_quant_simp Texists
