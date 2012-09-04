@@ -93,6 +93,9 @@ type stmt =
   | Sassert fmla
   | Swhile term fmla stmt  (* while cond invariant inv body *)
 
+lemma decide_is_skip:
+  forall s:stmt. s = Sskip \/ s <> Sskip
+
 (** Typing *)
 
 function type_value (v:value) : datatype =
@@ -247,6 +250,15 @@ function eval_term (sigma:env) (pi:stack) (t:term) : value =
   | {| term_node = Tbin t1 op t2 |} ->
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
   end
+
+
+lemma eval_bool_term:
+  forall sigma:env, pi:stack, sigmat:type_env, pit:type_stack, t:term.
+    type_term sigmat pit t TYbool ->
+    (* TODO: compatibility sigma, sigmat and pi,pit *)
+    exists b:bool.
+      eval_term sigma pi t = Vbool b
+
 
 predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   match f with
@@ -604,16 +616,6 @@ lemma while_rule_ext:
 
 end
 
-theory Simpl_tautology
-
-  predicate p
-  predicate q
-
-  lemma simpl_tautology :
-    (p -> q) <-> (p /\ q <-> p)
-
-end
-
 (** {2 WP calculus} *)
 
 theory WP
@@ -716,7 +718,9 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
     forall s:stmt, sigma:env, pi:stack,
       sigmat: type_env, pit: type_stack, q:fmla.
       type_stmt sigmat pit s ->
+(* useful ?
       type_fmla sigmat pit q ->
+*)
       eval_fmla sigma pi (wp s q) -> 
       s <> Sskip ->
       exists sigma':env, pi':stack, s':stmt.
