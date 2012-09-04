@@ -698,13 +698,9 @@ Theorem progress : forall (s:stmt),
   | Sskip => True
   | (Sassign m t) => True
   | (Sseq s1 s2) => True
-  | (Sif t s1 s2) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (q:fmla), (type_stmt sigmat pit s2) ->
-      ((eval_fmla sigma pi (wp s2 q)) -> ((~ (s2 = Sskip)) ->
-      exists sigma':(map mident value), exists pi':(list (ident*
-      value)%type), exists s':stmt, (one_step sigma pi s2 sigma' pi'
-      s')))) -> ((forall (sigma:(map mident value)) (pi:(list (ident*
+  | (Sif t s1 s2) => True
+  | (Sassert f) => True
+  | (Swhile t f s1) => (forall (sigma:(map mident value)) (pi:(list (ident*
       value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
       datatype)%type)) (q:fmla), (type_stmt sigmat pit s1) ->
       ((eval_fmla sigma pi (wp s1 q)) -> ((~ (s1 = Sskip)) ->
@@ -715,19 +711,19 @@ Theorem progress : forall (s:stmt),
       datatype)%type)) (q:fmla), (type_stmt sigmat pit s) ->
       ((eval_fmla sigma pi (wp s q)) -> ((~ (s = Sskip)) ->
       exists sigma':(map mident value), exists pi':(list (ident*
-      value)%type), exists s':stmt, (one_step sigma pi s sigma' pi' s'))))
-  | (Sassert f) => True
-  | (Swhile t f s1) => True
+      value)%type), exists s':stmt, (one_step sigma pi s sigma' pi' s')))
   end.
 destruct s; auto.
 intros.
-inversion H1; subst; clear H1.
-elim (eval_bool_term sigma pi _ _ _ H9).
-destruct x; intros Hval.
+simpl in H1.
+destruct H1 as (h1 & h2).
+inversion H0; subst; clear H0.
+elim (eval_bool_term sigma pi _ _ _ H8).
+destruct x; intro Hval.
 do 3 eexists.
-apply one_step_if_true; auto.
+apply one_step_while_true; auto.
 do 3 eexists.
-apply one_step_if_false; auto.
+apply one_step_while_false; auto.
 Qed.
 
 

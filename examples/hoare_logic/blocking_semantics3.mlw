@@ -460,7 +460,7 @@ inductive one_step env stack stmt env stack stmt =
         one_step sigma pi (Swhile cond inv body) sigma pi
         (Sseq body (Swhile cond inv body))
 
-  | one_step_while_falsee:
+  | one_step_while_false:
       forall sigma:env, pi:stack, cond:term, inv:fmla, body:stmt.
         (* blocking semantics *)
         eval_fmla sigma pi inv ->
@@ -668,6 +668,11 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
   function abstract_effects (s:stmt) (f:fmla) : fmla
 
+  axiom abstract_effects_generalize :
+     forall sigma:env, pi:stack, s:stmt, f:fmla.
+        eval_fmla sigma pi (abstract_effects s f) ->
+        eval_fmla sigma pi f
+
   function wp (s:stmt) (q:fmla) : fmla =
     match s with
     | Sskip -> q
@@ -689,6 +694,12 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
               (Fimplies (Fand (Fnot (Fterm cond)) inv) q)))
 
     end
+
+
+  axiom abstract_effects_writes :
+     forall sigma:env, pi:stack, s:stmt, q:fmla.
+        eval_fmla sigma pi (abstract_effects s q) ->
+        eval_fmla sigma pi (wp s (abstract_effects s q))
 
 
   (* lemma wp_subst: *)

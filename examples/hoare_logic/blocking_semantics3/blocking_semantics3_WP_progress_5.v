@@ -499,7 +499,7 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
       inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
       pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
-  | one_step_while_falsee : forall (sigma:(map mident value)) (pi:(list
+  | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
       (eval_fmla sigma pi inv) -> (((eval_term sigma pi
       cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
@@ -698,36 +698,21 @@ Theorem progress : forall (s:stmt),
   | Sskip => True
   | (Sassign m t) => True
   | (Sseq s1 s2) => True
-  | (Sif t s1 s2) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (q:fmla), (type_stmt sigmat pit s2) ->
-      ((eval_fmla sigma pi (wp s2 q)) -> ((~ (s2 = Sskip)) ->
-      exists sigma':(map mident value), exists pi':(list (ident*
-      value)%type), exists s':stmt, (one_step sigma pi s2 sigma' pi'
-      s')))) -> ((forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (q:fmla), (type_stmt sigmat pit s1) ->
-      ((eval_fmla sigma pi (wp s1 q)) -> ((~ (s1 = Sskip)) ->
-      exists sigma':(map mident value), exists pi':(list (ident*
-      value)%type), exists s':stmt, (one_step sigma pi s1 sigma' pi'
-      s')))) -> forall (sigma:(map mident value)) (pi:(list (ident*
+  | (Sif t s1 s2) => True
+  | (Sassert f) => forall (sigma:(map mident value)) (pi:(list (ident*
       value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
       datatype)%type)) (q:fmla), (type_stmt sigmat pit s) ->
       ((eval_fmla sigma pi (wp s q)) -> ((~ (s = Sskip)) ->
       exists sigma':(map mident value), exists pi':(list (ident*
-      value)%type), exists s':stmt, (one_step sigma pi s sigma' pi' s'))))
-  | (Sassert f) => True
+      value)%type), exists s':stmt, (one_step sigma pi s sigma' pi' s')))
   | (Swhile t f s1) => True
   end.
 destruct s; auto.
 intros.
-inversion H1; subst; clear H1.
-elim (eval_bool_term sigma pi _ _ _ H9).
-destruct x; intros Hval.
+simpl in H0.
+destruct H0 as (h1 & h2).
 do 3 eexists.
-apply one_step_if_true; auto.
-do 3 eexists.
-apply one_step_if_false; auto.
+apply one_step_assert; auto.
 Qed.
 
 
