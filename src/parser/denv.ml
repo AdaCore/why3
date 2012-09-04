@@ -196,6 +196,24 @@ and dtrigger =
   | TRterm of dterm
   | TRfmla of dfmla
 
+
+exception UnusedVar of string
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | UnusedVar s ->
+      fprintf fmt "Unused variable %s" s
+  | _ -> raise e)
+
+let allowed_unused s = String.length s > 0 && s.[0] = '_'
+
+let check_used_var vars v =
+  if not (Mvs.mem v vars) then
+    let s = v.vs_name.id_string in
+    if allowed_unused s then () else raise (UnusedVar s)
+
+let check_used_vars vars =
+  List.iter (check_used_var vars)
+
 let rec term env t = match t.dt_node with
   | Tvar x ->
       assert (Mstr.mem x env);
@@ -213,6 +231,7 @@ let rec term env t = match t.dt_node with
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let e2 = term env e2 in
+      check_used_var e2.t_vars v;
       t_let_close v e1 e2
   | Tmatch (t1, bl) ->
       let branch (p,e) =
@@ -254,7 +273,9 @@ and fmla env = function
         | TRfmla f -> fmla env f
       in
       let trl = List.map (List.map trigger) trl in
-      t_quant_close q vl trl (fmla env f1)
+      let f = fmla env f1 in
+      check_used_vars f.Term.t_vars vl;
+      t_quant_close q vl trl f
   | Fapp (s, tl) ->
       ps_app s (List.map (term env) tl)
   | Flet (e1, id, f2) ->
@@ -262,6 +283,7 @@ and fmla env = function
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let f2 = fmla env f2 in
+      check_used_var f2.t_vars v;
       t_let_close v e1 f2
   | Fmatch (t, bl) ->
       let branch (p,e) =
