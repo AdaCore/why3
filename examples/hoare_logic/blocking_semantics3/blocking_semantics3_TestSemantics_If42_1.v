@@ -551,10 +551,19 @@ Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem Test55 : ((eval_term (const (Vint 0%Z):(map mident value)) (Cons (x,
-  (Vint 42%Z)) (Nil :(list (ident* value)%type))) (mk_tbin (mk_tvar x) Oplus
-  (mk_tvalue (Vint 13%Z)))) = (Vint 55%Z)).
-simpl.
+Theorem If42 : forall (sigma1:(map mident value)) (sigma2:(map mident value))
+  (pi1:(list (ident* value)%type)) (pi2:(list (ident* value)%type)) (s:stmt),
+  (one_step (const (Vint 0%Z):(map mident value)) (Cons (x, (Vint 42%Z))
+  (Nil :(list (ident* value)%type))) (Sif (mk_tbin (mk_tderef y) Ole
+  (mk_tvalue (Vint 10%Z))) (Sassign y (mk_tvalue (Vint 13%Z))) (Sassign y
+  (mk_tvalue (Vint 42%Z)))) sigma1 pi1 s) -> ((one_step sigma1 pi1 s sigma2
+  pi2 Sskip) -> ((get sigma2 y) = (Vint 13%Z))).
+intros sigma1 sigma2 pi1 pi2 s h1 h2.
+inversion h1; subst; clear h1.
+inversion h2; subst; clear h2.
+ae.
+inversion h2; subst; clear h2.
+simpl in H7.
 ae.
 Qed.
 

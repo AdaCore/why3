@@ -637,12 +637,17 @@ let print_type_decl ~prev info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn) then
     (print_type_decl ~prev info fmt ts; forget_tvs ())
 
-let print_data_decl info fmt (ts,csl) =
-  if is_ts_tuple ts then () else
+let print_data_decl ~first info fmt ts csl =
   let name = id_unique iprinter ts.ts_name in
-  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive %s %a :=@\n@[<hov>%a@].@]@\n"
+  if first then
+    fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive"
+  else fprintf fmt "@\nwith";
+  fprintf fmt " %s %a :=@\n@[<hov>%a@]"
     name (print_list space print_tv_binder) ts.ts_args
     (print_list newline (print_constr info ts)) csl;
+  name
+
+let print_data_whytype_and_implicits fmt (name,ts,csl) =
   fprintf fmt "@[<hov 2>Axiom %s_WhyType : %aWhyType %a.@]@\nExisting Instance %s_WhyType.@\n"
     name print_params_list ts.ts_args print_ts_tv ts name;
   List.iter
@@ -656,9 +661,22 @@ let print_data_decl info fmt (ts,csl) =
     csl;
   fprintf fmt "@\n"
 
-let print_data_decl info fmt d =
-  if not (Mid.mem (fst d).ts_name info.info_syn) then
-    (print_data_decl info fmt d; forget_tvs ())
+let print_data_decls info fmt tl =
+  let none,d =
+    List.fold_left
+      (fun ((first,l) as acc) (ts,csl) ->
+        if is_ts_tuple ts || Mid.mem ts.ts_name info.info_syn
+        then acc else
+        let name = print_data_decl info ~first fmt ts csl in
+        forget_tvs ();
+        (false,(name,ts,csl)::l))
+      (true,[]) tl
+  in
+  if none then () else
+    begin
+      fprintf fmt ".@]@\n";
+      List.iter (print_data_whytype_and_implicits fmt) d
+    end
 
 let print_ls_type ?(arrow=false) info fmt ls =
   if arrow then fprintf fmt " ->@ ";
@@ -792,8 +810,7 @@ let print_decl ~old info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl ~prev info fmt ts
-  | Ddata tl ->
-      print_list nothing (print_data_decl info) fmt tl
+  | Ddata tl -> print_data_decls info fmt tl
   | Dparam ls ->
       print_param_decl ~prev info fmt ls
   | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
