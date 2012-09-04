@@ -1,0 +1,85 @@
+
+(* Polymorphic binary trees with elements at nodes *)
+
+theory Tree
+
+  type tree 'a = Empty | Node (tree 'a) 'a (tree 'a)
+
+end
+
+theory Size
+
+  use export Tree
+  use export int.Int
+
+  (* number of nodes *)
+  function size (t: tree 'a) : int = match t with
+    | Empty -> 0
+    | Node l _ r -> 1 + size l + size r
+  end
+
+  lemma size_nonneg: forall t: tree 'a. 0 <= size t
+
+end
+
+theory Inorder "inorder traversal"
+
+  use export Tree
+  use export list.Append
+
+  function inorder (t: tree 'a) : list 'a = match t with
+    | Empty -> Nil
+    | Node l x r -> inorder l ++ Cons x (inorder r)
+  end
+
+end
+
+theory InorderLength
+
+  use import Size
+  use import Inorder
+  use import list.Length
+
+  lemma inorder_length: forall t: tree 'a. length (inorder t) = size t
+
+end
+
+theory Zipper "Huet's zipper"
+
+  use export Tree
+
+  type zipper 'a =
+    | Top
+    | Left  (zipper 'a) 'a (tree 'a)
+    | Right (tree 'a)   'a (zipper 'a)
+
+  function zip (t: tree 'a) (z: zipper 'a) : tree 'a = match z with
+    | Top -> t
+    | Left z x r -> zip (Node t x r) z
+    | Right l x z -> zip (Node l x t) z
+  end
+
+  (* navigating in a tree using a zipper *)
+
+  type pointer 'a = (tree 'a, zipper 'a)
+
+  function start (t: tree 'a) : pointer 'a = (t, Top)
+
+  function up (p: pointer 'a) : pointer 'a = match p with
+    | _, Top -> p (* do nothing *)
+    | l, Left z x r | r, Right l x z -> (Node l x r, z)
+  end
+
+  function top (p: pointer 'a) : tree 'a = let t, z = p in zip t z
+
+  function down_left (p: pointer 'a) : pointer 'a = match p with
+    | Empty, _ -> p (* do nothing *)
+    | Node l x r, z -> (l, Left z x r)
+  end
+
+  function down_right (p: pointer 'a) : pointer 'a = match p with
+    | Empty, _ -> p (* do nothing *)
+    | Node l x r, z -> (r, Right l x z)
+  end
+
+end
