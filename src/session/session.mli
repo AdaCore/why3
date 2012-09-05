@@ -60,13 +60,11 @@ type task_option
 (** Currently just an option on a task, but later perhaps
     we should be able to release a task and rebuild it when needed *)
 
-type pos_task =
-  { pos_decl  : int; (* nth decl in the task from top *)
-    pos_def   : int; (* nth def in the decl *)
-    pos_const : int; (* nth constructor in the type def *)
-    pos_proj  : int; (* nth proj for the constructor (-1 for the constructor) *)
-    pos_checksum : Termcode.checksum;
-  (** the checksum of the prefix of the task starting at this decl *)
+
+type ident_path =
+  { ip_library : string list;
+    ip_theory : string;
+    ip_qualid : string list;
   }
 
 type meta_args = Theory.meta_arg list
@@ -76,9 +74,9 @@ type metas_args =  Smeta_args.t Util.Mstr.t
 module Mmetas_args : Map.S with type key = metas_args
 
 type idpos = {
-  idpos_ts : pos_task Ty.Mts.t;
-  idpos_ls : pos_task Term.Mls.t;
-  idpos_pr : pos_task Decl.Mpr.t;
+  idpos_ts : ident_path Ty.Mts.t;
+  idpos_ls : ident_path Term.Mls.t;
+  idpos_pr : ident_path Decl.Mpr.t;
 }
 
 (** {2 Session} *)
