@@ -713,10 +713,12 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
        (eval_fmla sigma pi (wp s p)) /\
        (eval_fmla sigma pi (wp s q))
 
+(*
   lemma monotonicity:
     forall s:stmt, p q:fmla.
       valid_fmla (Fimplies p q)
      ->	valid_fmla (Fimplies (wp s p) (wp s q) )
+*)
 
   lemma wp_reduction:
     forall sigma sigma':env, pi pi':stack, s s':stmt.

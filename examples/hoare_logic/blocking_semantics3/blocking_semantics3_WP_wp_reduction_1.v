@@ -693,9 +693,6 @@ Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp s (Fand p
   q))) <-> ((eval_fmla sigma pi (wp s p)) /\ (eval_fmla sigma pi (wp s q))).
 
-Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
-
 (* Why3 goal *)
 Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
   value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
@@ -705,8 +702,11 @@ induction 1; intros q Hq.
 (* case Sassign *)
 simpl.
 simpl in Hq.
+noadmit. 
+(*
 rewrite eval_msubst in Hq.
-(* TODO *)
+
+TODO *)
 
 (* case Sseq *)
 simpl.
