@@ -1051,6 +1051,49 @@ let apply_bisect_on_selection () =
       S.iter_proof_attempt bisect_proof_attempt a
     ) (get_selected_row_references ())
 
+(**************************************)
+(* Copy Paste proof, transf and metas *)
+(**************************************)
+let copy_queue = Queue.create ()
+
+let copy_on_selection () =
+  Queue.clear copy_queue;
+    List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      let rec add = function
+      | S.Goal g -> S.goal_iter add g
+      | S.Transf f -> Queue.push (S.Transf (S.copy_transf f)) copy_queue
+      | S.Metas m -> Queue.push (S.Metas (S.copy_metas m)) copy_queue
+      | S.Proof_attempt pa ->
+        Queue.push (S.Proof_attempt (S.copy_proof pa)) copy_queue
+      | _ -> () in
+      add a
+    ) (get_selected_row_references ())
+
+let paste_on_selection () =
+    List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      match a with
+      | S.Goal g ->
+        let keygen = MA.keygen in
+        let rec paste = function
+          | S.Transf f ->
+            MA.init_any
+              (S.Transf (S.add_transf_to_goal ~keygen (env_session()) g f))
+          | S.Metas m  ->
+            MA.init_any
+              (S.Metas (S.add_metas_to_goal  ~keygen (env_session()) g m))
+          | S.Proof_attempt pa ->
+            MA.init_any (S.Proof_attempt
+                           (S.add_proof_to_goal ~keygen (env_session()) g pa))
+          | _ -> () in
+        Queue.iter paste copy_queue
+      | _ -> ()
+    ) (get_selected_row_references ())
+
+
 
 (*********************************)
 (* add a new file in the project *)
@@ -1446,7 +1489,18 @@ let () =
              ~label:"Bisect in selection"
              ~callback:apply_bisect_on_selection
              () : GMenu.image_menu_item) in
+  let add_copy_past_item () =
+    ignore(tools_factory#add_image_item
+             ~label:"Copy"
+             ~callback:copy_on_selection
+             () : GMenu.image_menu_item);
+    ignore(tools_factory#add_image_item
+             ~label:"Paste"
+             ~callback:paste_on_selection
+             () : GMenu.image_menu_item) in
 
+  add_refresh_provers add_separator "add separator in tools menu";
+  add_refresh_provers add_copy_past_item "add copy paste item";
   add_refresh_provers add_separator "add separator in tools menu";
   add_refresh_provers add_item_split "add split in tools menu";
   add_refresh_provers add_item_inline  "add inline in tools menu";
@@ -1457,6 +1511,8 @@ let () =
   add_refresh_provers add_separator "add separator for metas in tools menu";
   add_refresh_provers add_item_bisect "add bisect in tools menu";
   (** execute them *)
+  add_separator ();
+  add_copy_past_item ();
   add_separator ();
   add_item_split ();
   add_item_inline ();

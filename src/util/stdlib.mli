@@ -485,6 +485,9 @@ module Hashtbl : sig
     val set : unit t -> key -> unit
     (** Add a binding that can be tested by mem *)
 
+    val map : ('a -> 'b) -> 'a t -> 'b t
+  (** just a shortcut not as efficient as doable *)
+
   end
   module Make (X:Hashtbl.HashedType) : S with type key = X.t
 end

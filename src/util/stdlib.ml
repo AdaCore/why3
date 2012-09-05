@@ -769,6 +769,7 @@ module Hashtbl = struct
     exception Key_not_found of key
     val find' : 'a t -> key -> 'a
     val set : unit t -> key -> unit
+    val map : ('a -> 'b) -> 'a t -> 'b t
   end
 
   module Make (X:Hashtbl.HashedType) = struct
@@ -790,6 +791,11 @@ module Hashtbl = struct
       try find h k with Not_found -> raise (Key_not_found k)
 
     let set h k   = replace h k ()
+
+    let map f h =
+      let h' = create (length h) in
+      iter (fun k x -> add h' k (f x)) h;
+      h'
 
   end
 end

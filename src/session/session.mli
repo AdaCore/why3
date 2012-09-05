@@ -184,6 +184,8 @@ val get_project_dir : string -> string
     return {Not_found} if the file or the directory doesn't exists
 *)
 
+(** {2 Read/Write} *)
+
 type notask
 (** A phantom type which is used for session which doesn't contain task. The
     only session that can not contain task are session that come from the
@@ -249,6 +251,24 @@ val update_session : keygen:'a keygen ->
     raises [Failure msg] if the database file cannot be read correctly
 
 *)
+
+(** {2 Copy/Paste } *)
+
+val copy_proof:  'a proof_attempt -> 'a proof_attempt
+val copy_transf: 'a transf        -> 'a transf
+val copy_metas:  'a metas         -> 'a metas
+(** keys are copied *)
+
+val add_proof_to_goal :
+  keygen:'a keygen -> 'a env_session ->
+  'a goal -> 'a proof_attempt ->'a proof_attempt
+val add_transf_to_goal:
+  keygen:'a keygen -> 'a env_session ->
+  'a goal -> 'a transf        -> 'a transf
+val add_metas_to_goal :
+  keygen:'a keygen -> 'a env_session ->
+  'a goal -> 'a metas         -> 'a metas
+(** keys are normally generated *)
 
 (** {2 Accessor} *)
 
@@ -366,7 +386,7 @@ val copy_external_proof :
     {ul
     {- the goal is not modified}
     {- the prover is not modified}
-    {- a session or env_session is given}
+    {- a session is given}
     }
     The edited file is regenerated if
     {ul

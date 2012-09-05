@@ -2081,7 +2081,6 @@ let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
     to_f.file_theories;
   dprintf debug "[Info] merge_file, done@\n"
 
-
 let rec recompute_all_shapes_goal g =
   let t = goal_task g in
   g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t);
@@ -2140,6 +2139,127 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
   assert (new_env_session.session.session_shape_version
           = Termcode.current_shape_version);
   new_env_session, obsolete
+
+
+(** Copy/Paste *)
+let rec copy_goal parent from_g =
+  let to_g = { from_g with
+               goal_parent = parent;
+               goal_external_proofs =
+      PHprover.create (PHprover.length from_g.goal_external_proofs);
+               goal_transformations =
+      PHstr.create (PHstr.length from_g.goal_transformations);
+               goal_metas = Mmetas_args.empty;
+             } in
+  PHprover.iter (fun k p -> PHprover.add to_g.goal_external_proofs
+    k (copy_proof to_g p)) from_g.goal_external_proofs;
+  PHstr.iter (fun k t -> PHstr.add to_g.goal_transformations
+    k (copy_transf to_g t)) from_g.goal_transformations;
+  to_g.goal_metas <- Mmetas_args.map
+    (fun m -> copy_metas to_g m) from_g.goal_metas;
+  to_g
+
+and copy_proof to_goal from_pa =
+  { from_pa with proof_parent = to_goal}
+
+and copy_transf to_goal from_transf =
+  let to_transf = { from_transf with
+    transf_parent = to_goal;
+    transf_goals = []
+  } in
+  to_transf.transf_goals <-
+    List.map (copy_goal (Parent_transf from_transf))
+                from_transf.transf_goals;
+  to_transf
+
+and copy_metas to_goal from_metas =
+  let to_metas = { from_metas with
+    metas_goal = to_goal;
+  } in
+  to_metas.metas_goal <- copy_goal (Parent_metas to_metas)
+    from_metas.metas_goal;
+  to_metas
+
+let copy_proof  from_p = copy_proof  from_p.proof_parent  from_p
+let copy_transf from_t = copy_transf from_t.transf_parent from_t
+let copy_metas  from_m = copy_metas  from_m.metas_parent  from_m
+
+exception Paste_error
+
+let rec add_goal_to_parent ~keygen env from_goal to_goal =
+  set_goal_expanded to_goal from_goal.goal_expanded;
+  PHprover.iter (fun _ pa -> ignore (add_proof_to_goal ~keygen env to_goal pa))
+    from_goal.goal_external_proofs;
+  PHstr.iter (fun _ t -> ignore (add_transf_to_goal ~keygen env to_goal t))
+    from_goal.goal_transformations;
+  Mmetas_args.iter (fun _ m -> ignore (add_metas_to_goal ~keygen env to_goal m))
+    from_goal.goal_metas
+
+
+
+(** This function is the main difference with merge_metas_aux.
+    It use directly the metas doesn't convert them.
+ *)
+and add_metas_to_goal ~keygen env to_goal from_metas =
+  let to_metas = raw_add_metas ~keygen to_goal
+    from_metas.metas_added from_metas.metas_idpos
+    from_metas.metas_expanded in
+  let goal,task0 = Task.task_separate_goal (goal_task to_goal) in
+    (** add before the goal *)
+  let task =
+    try
+      Mstr.fold_left
+        (fun task name s ->
+          let m = Theory.lookup_meta name in
+          Smeta_args.fold_left
+            (fun task l -> Task.add_meta task m l) (** TODO: try with *)
+            task s)
+        task0 from_metas.metas_added
+    with exn ->
+      dprintf debug "[Paste] addition of metas produces an error:%a"
+        Exn_printer.exn_printer exn;
+      raise Paste_error  in
+  let task = add_tdecl task goal in
+  let to_goal =
+    raw_add_task ~version:env.session.session_shape_version
+      ~keygen (Parent_metas to_metas)
+      from_metas.metas_goal.goal_name
+      from_metas.metas_goal.goal_expl task false in
+  to_metas.metas_goal <- to_goal;
+  add_goal_to_parent ~keygen env from_metas.metas_goal to_goal;
+  to_metas
+
+and add_proof_to_goal ~keygen env to_goal from_proof_attempt =
+  copy_external_proof ~keygen ~obsolete:true ~env_session:env ~goal:to_goal
+    from_proof_attempt
+
+and add_transf_to_goal ~keygen env to_goal from_transf =
+  let from_transf_name = from_transf.transf_name in
+  let to_goal_name = to_goal.goal_name in
+  dprintf debug "[Paste] transformation %s for goal %s @\n"
+    from_transf_name to_goal_name.Ident.id_string;
+  let to_transf =
+    try
+      add_registered_transformation
+        ~keygen env from_transf_name to_goal
+    with exn when not (Debug.test_flag Debug.stack_trace) ->
+      dprintf debug "[Paste] transformation %s produce an error:%a"
+        from_transf_name Exn_printer.exn_printer exn;
+      raise Paste_error
+  in
+  let associated =
+    dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+      env.session.session_shape_version;
+    AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
+  List.iter (function
+  | (to_goal, Some from_goal, _obsolete) ->
+    add_goal_to_parent ~keygen env from_goal to_goal
+  | (_, None, _) -> ()
+  ) associated;
+  to_transf
+
+(**)
+
 
 let get_project_dir fname =
   if not (Sys.file_exists fname) then raise Not_found;
