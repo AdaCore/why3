@@ -1968,22 +1968,30 @@ let rec merge_any_goal ~keygen env obsolete from_goal to_goal =
 
 
 and merge_trans ~keygen env to_goal _ from_transf =
-  let from_transf_name = from_transf.transf_name in
-  let to_goal_name = to_goal.goal_name in
-  dprintf debug "[Reload] transformation %s for goal %s @\n"
-    from_transf_name to_goal_name.Ident.id_string;
-  let to_transf =
-    add_registered_transformation
-      ~keygen env from_transf_name to_goal in
-  let associated =
-    dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
-      env.session.session_shape_version;
-    AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
-  List.iter (function
-  | (to_goal, Some from_goal, obsolete) ->
-    merge_any_goal ~keygen env obsolete  from_goal to_goal
-  | (_, None, _) -> ()
-  ) associated
+  try
+    let from_transf_name = from_transf.transf_name in
+    let to_goal_name = to_goal.goal_name in
+    dprintf debug "[Reload] transformation %s for goal %s @\n"
+      from_transf_name to_goal_name.Ident.id_string;
+    let to_transf =
+      try
+        add_registered_transformation
+          ~keygen env from_transf_name to_goal
+      with exn when not (Debug.test_flag Debug.stack_trace) ->
+        dprintf debug "[Reload] transformation %s produce an error:%a"
+          from_transf_name Exn_printer.exn_printer exn;
+        raise Exit
+    in
+    let associated =
+      dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+        env.session.session_shape_version;
+      AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
+    List.iter (function
+    | (to_goal, Some from_goal, obsolete) ->
+      merge_any_goal ~keygen env obsolete  from_goal to_goal
+    | (_, None, _) -> ()
+    ) associated
+  with Exit -> ()
 
 
 (** convert the ident from the olf task to the ident at the same
