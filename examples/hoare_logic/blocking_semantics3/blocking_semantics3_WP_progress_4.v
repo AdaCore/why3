@@ -499,7 +499,7 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
       inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
       pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
-  | one_step_while_falsee : forall (sigma:(map mident value)) (pi:(list
+  | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
       (eval_fmla sigma pi inv) -> (((eval_term sigma pi
       cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
@@ -665,6 +665,10 @@ Axiom fresh_from_stmt : forall (s:stmt) (f:fmla),
 
 Parameter abstract_effects: stmt -> fmla -> fmla.
 
+Axiom abstract_effects_generalize : forall (sigma:(map mident value))
+  (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
+  (abstract_effects s f)) -> (eval_fmla sigma pi f).
+
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
   match s with
@@ -680,12 +684,14 @@ Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
       (Fimplies (Fand (Fnot (Fterm cond)) inv) q))))
   end.
 
+Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (s:stmt) (q:fmla), (eval_fmla sigma pi
+  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
+  q))).
+
 Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp s (Fand p
   q))) <-> ((eval_fmla sigma pi (wp s p)) /\ (eval_fmla sigma pi (wp s q))).
-
-Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
 Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
   value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))

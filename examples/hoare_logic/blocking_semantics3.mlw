@@ -709,9 +709,9 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
   lemma distrib_conj:
     forall sigma:env, pi:stack, s:stmt, p q:fmla.
-     eval_fmla sigma pi (wp s (Fand p q)) <->
-       (eval_fmla sigma pi (wp s p)) /\
-       (eval_fmla sigma pi (wp s q))
+     (eval_fmla sigma pi (wp s p)) /\
+     (eval_fmla sigma pi (wp s q)) ->
+     eval_fmla sigma pi (wp s (Fand p q)) 
 
 (*
   lemma monotonicity:

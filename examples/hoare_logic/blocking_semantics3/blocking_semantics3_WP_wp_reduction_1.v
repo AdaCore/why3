@@ -690,8 +690,8 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   q))).
 
 Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (s:stmt) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp s (Fand p
-  q))) <-> ((eval_fmla sigma pi (wp s p)) /\ (eval_fmla sigma pi (wp s q))).
+  value)%type)) (s:stmt) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
 (* Why3 goal *)
 Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
@@ -735,7 +735,7 @@ intuition.
 simpl.
 simpl in Hq.
 destruct Hq as (h1 & h2).
-rewrite distrib_conj; split.
+apply distrib_conj; split.
 generalize (abstract_effects_generalize _ _ _ _ h2).
 intros h3.
 simpl in h3.
