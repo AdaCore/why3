@@ -135,7 +135,7 @@ module PrefixSumRec
     'Init:
     a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0; a[4] <- 4; a[5] <- 1;
     a[6] <- 6; a[7] <- 3;
-    let a0 = copy a in (** TODO make it as ghost *)
+    let a0 = ghost (copy a) in
     assert { power 2 2 = 4 }; (** for is_power_of_2 existential *)
     upsweep 3 7 a;
     a[7] <- 0;
