@@ -121,21 +121,29 @@ let env =
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
    Whyconf.get_provers config
 
-
 let prover : Whyconf.config_prover =
   try
-(*     match !opt_prover with
-      | Some s -> Whyconf.prover_by_id config s
-      | None -> *)
-            let conf =
-               { Whyconf.prover_name = "Alt-Ergo";
+     match !opt_prover with
+     | Some s ->
+              Whyconf.filter_one_prover config
+                (Whyconf.mk_filter_prover s)
+     | None ->
+           let conf =
+              { Whyconf.prover_name = "Alt-Ergo";
                  prover_version      = "0.94";
                  prover_altern       = "";
-               } in
-            Whyconf.Mprover.find conf provers
-  with Not_found ->
-    Gnat_util.abort_with_message
-      "Prover not installed or not configured."
+              } in
+           Whyconf.Mprover.find conf provers
+  with
+  | Not_found ->
+        Gnat_util.abort_with_message
+          "Default prover not installed or not configured."
+  | Whyconf.ProverNotFound _ ->
+        Gnat_util.abort_with_message
+          "Selected prover not installed or not configured."
+  | Whyconf.ProverAmbiguity _ ->
+        Gnat_util.abort_with_message
+          "Several provers match the selection."
 
 (* loading the driver driver *)
 let prover_driver : Driver.driver =
