@@ -38,10 +38,6 @@ module PrefixSumRec
   (** The step must be a power of 2 *)
   predicate is_power_of_2 (x:int) = exists k:int. (k >= 0 /\ x = power 2 k)
 
-  (** Needed for proving is_power_of_2_1.
-      Can it be added to the theory Power? *)
-  lemma is_power_of_2_0:
-    forall k:int. k > 0 -> power 2 k = 2 * power 2 (k-1)
   lemma is_power_of_2_1:
     forall x:int. is_power_of_2 x -> x > 1 -> 2 * div x 2 = x
 

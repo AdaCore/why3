@@ -190,13 +190,16 @@ theory Exponentiation
   type t
   constant one : t
   function (*) t t : t
-  clone algebra.CommutativeMonoid with type t = t, constant unit = one, function op = (*)
+  clone algebra.CommutativeMonoid
+    with type t = t, constant unit = one, function op = (*)
 
   function power t int : t
 
   axiom Power_0 : forall x: t. power x 0 = one
 
   axiom Power_s : forall x: t, n: int. n >= 0 -> power x (n+1) = x * power x n
+
+  lemma Power_s_alt: forall x: t, n: int. n > 0 -> power x n = x * power x (n-1)
 
   lemma Power_1 : forall x : t. power x 1 = x
 
