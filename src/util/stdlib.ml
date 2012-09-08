@@ -770,9 +770,10 @@ module Hashtbl = struct
     val find' : 'a t -> key -> 'a
     val set : unit t -> key -> unit
     val map : ('a -> 'b) -> 'a t -> 'b t
+    val find_option : 'a t -> key -> 'a option
   end
 
-  module Make (X:Hashtbl.HashedType) = struct
+  module Make (X:Hashtbl.HashedType) : S with type key = X.t = struct
     module M = Hashtbl.Make(X)
     include M
     let is_empty h =
@@ -797,5 +798,15 @@ module Hashtbl = struct
       iter (fun k x -> add h' k (f x)) h;
       h'
 
+    let find_option h k =
+      try Some (find h k) with Not_found -> None
+
   end
+
+  module Make_Poly (X : sig type t end) =
+    Make(struct type t = X.t
+                let hash = Hashtbl.hash
+                let equal = (=)
+    end)
+
 end

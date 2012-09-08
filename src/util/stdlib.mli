@@ -488,6 +488,11 @@ module Hashtbl : sig
     val map : ('a -> 'b) -> 'a t -> 'b t
   (** just a shortcut not as efficient as doable *)
 
+    val find_option : 'a t -> key -> 'a option
+      (** version of find without exception *)
+
   end
   module Make (X:Hashtbl.HashedType) : S with type key = X.t
+
+  module Make_Poly (X:sig type t end) : S with type key = X.t
 end
