@@ -261,7 +261,7 @@ let add_discriminator (state,task) ts ty csl =
     let ax = t_forall_close (List.rev ul) [[t1]] ax in
     add_prop_decl task Paxiom pr ax
   in
-  let rec dl_add task = function
+  let dl_add task = function
     | c :: cl -> List.fold_left (d_add c) task cl
     | _ -> task
   in

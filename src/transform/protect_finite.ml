@@ -18,13 +18,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Util
 open Ident
 open Ty
 open Term
-open Task
-open Theory
-open Task
 open Decl
 
 let protect tenv hls t =

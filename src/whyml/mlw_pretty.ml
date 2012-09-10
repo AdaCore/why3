@@ -21,11 +21,9 @@
 open Format
 open Why3
 open Pp
-open Util
 open Ident
 open Ty
 open Term
-open Theory
 open Pretty
 open Mlw_ty
 open Mlw_ty.T

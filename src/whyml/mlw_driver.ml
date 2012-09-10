@@ -18,13 +18,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
 open Why3
 open Util
 open Ident
 open Ty
 open Term
-open Decl
 open Theory
 open Printer
 open Driver_ast
@@ -58,7 +56,9 @@ let load_file file =
   Stack.iter close_in to_close;
   f
 
+(* dead code
 exception NoPrinter
+*)
 exception Duplicate    of string
 exception UnknownType  of (string list * string list)
 exception UnknownLogic of (string list * string list)
@@ -206,8 +206,10 @@ let string_of_qualid thl idl =
   String.concat "." thl ^ "." ^ String.concat "." idl
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
+(* dead code
   | NoPrinter -> Format.fprintf fmt
       "No printer specified in the driver file"
+*)
   | Duplicate s -> Format.fprintf fmt
       "Duplicate %s specification" s
   | UnknownType (thl,idl) -> Format.fprintf fmt

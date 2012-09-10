@@ -193,7 +193,7 @@ let fmla_unflatten conj f formulas =
     substitutions are not exported outside quantifiers (even if their free
     variables are untouched), so the transformation is possibly incomplete
     (but still correct) on formulas that have inner quantifiers *)
-let rec fmla_cond_subst filter f =
+let fmla_cond_subst filter f =
   let rec aux f =
     match f.t_node with
     | Tbinop (o, _, _) when o <> Tiff ->

@@ -25,7 +25,6 @@ open Ident
 open Ptree
 open Ty
 open Term
-open Theory
 
 (** types with destructive type variables *)
 

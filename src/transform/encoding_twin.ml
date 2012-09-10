@@ -22,11 +22,7 @@ open Util
 open Ident
 open Ty
 open Term
-open Task
-open Theory
-open Task
 open Decl
-open Encoding
 
 let make_pont ty () =
   let t2tb =

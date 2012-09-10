@@ -72,7 +72,7 @@ let option_map_fold f acc x = match x with
 (* useful iterator on int *)
 let rec foldi f acc min max =
   if min > max then acc else foldi f (f acc min) (succ min) max
-let rec mapi f = foldi (fun acc i -> f i::acc) []
+let mapi f = foldi (fun acc i -> f i::acc) []
 
 (* useful iterator on float *)
 let rec iterf f min max step =
@@ -272,7 +272,6 @@ module Sstr = Mstr.Set
 module Hstr = Hashtbl.Make
   (struct
     type t = String.t
-    let compare = String.compare
     let hash    = (Hashtbl.hash : string -> int)
     let equal   = ((=) : string -> string -> bool)
   end)

@@ -19,13 +19,8 @@
 (**************************************************************************)
 
 open Why3
-open Ident
-open Denv
-open Ty
 open Mlw_ty
-open Mlw_ty.T
 open Mlw_expr
-open Mlw_module
 open Mlw_dty
 
 type loc = Loc.position

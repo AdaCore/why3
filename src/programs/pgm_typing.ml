@@ -38,7 +38,9 @@ let debug = Debug.register_info_flag "whyml_typing"
   ~desc:"Print@ details@ of@ program@ typechecking."
 let is_debug () = Debug.test_flag debug
 
+(* dead code
 let error = Loc.error
+*)
 let errorm = Loc.errorm
 
 let id_result = "result"
@@ -59,8 +61,10 @@ let declare_mutable_field ts i j =
 
 let mutable_field ts i =
   Hashtbl.find (Hts.find mutable_fields ts) i
+(* dead code
 let is_mutable_field ts i =
   Hashtbl.mem (Hts.find mutable_fields ts) i
+*)
 
 (* phase 1: typing programs (using destructive type inference) **************)
 
@@ -91,7 +95,9 @@ let create_denv uc =
 
 let loc_of_id id = Util.of_option id.Ident.id_loc
 
+(* dead code
 let loc_of_ls ls = ls.ls_name.Ident.id_loc
+*)
 
 let dcurrying tyl ty =
   let make_arrow_type ty1 ty2 = tyapp ts_arrow [ty1; ty2] in
@@ -230,6 +236,7 @@ let expected_type e ty =
       "@[this expression has type %a,@ but is expected to have type %a@]"
       print_dty e.dexpr_type print_dty ty
 
+(* dead code
 let check_mutable_type loc dty = match view_dty dty with
   | Denv.Tyapp (ts, _) when is_mutable_ts ts ->
       ()
@@ -237,6 +244,7 @@ let check_mutable_type loc dty = match view_dty dty with
       errorm ~loc
       "@[this expression has type %a,@ but is expected to have a mutable type@]"
         print_dty dty
+*)
 
 let dexception uc qid =
   let sl = Typing.string_list_of_qualid [] qid in
@@ -850,7 +858,7 @@ let iadd_local env x ty =
   in
   env, v
 
-let rec type_effect_term env t =
+let type_effect_term env t =
   let loc = t.pp_loc in
   match t.pp_desc with
   | PPvar (Qident x) when Mstr.mem x.id env.i_effects ->
@@ -928,6 +936,7 @@ let iueffect env e = {
   ie_raises = e.du_raises;
 }
 
+(* dead code
 let pre env = Denv.fmla env.i_pures
 
 let post env ((ty, f), ql) =
@@ -947,6 +956,8 @@ let post env ((ty, f), ql) =
   let v_result = create_vsymbol (id_fresh id_result) ty in
   let env = Mstr.add id_result v_result env in
   (v_result, Denv.fmla env f), List.map exn ql
+
+*)
 
 let iterm env l =
   let t = dterm (pure_uc env.i_uc) env.i_denv l in
@@ -1159,9 +1170,9 @@ let ipattern env p =
 
 (* pretty-printing (for debugging) *)
 
-open Pp
 open Pretty
 
+(* dead code
 let print_iregion = R.print
 
 let rec print_iexpr fmt e = match e.iexpr_desc with
@@ -1189,6 +1200,8 @@ let rec print_iexpr fmt e = match e.iexpr_desc with
         print_iexpr e1 print_iexpr e2 print_iexpr e3
   | _ ->
       fprintf fmt "<other>"
+
+*)
 
 let mtv_of_htv htv =
   Htv.fold
@@ -1560,6 +1573,7 @@ let make_apply loc e1 ty c =
   Elet (x, e1, any_c), v, ef
 
 let exn_check = ref true
+(* dead code
 let without_exn_check f x =
   if !exn_check then begin
     exn_check := false;
@@ -1567,6 +1581,7 @@ let without_exn_check f x =
     with e -> exn_check := true; raise e
   end else
     f x
+*)
 
 (*s Pure expressions. Used in [Slazy_and] and [Slazy_or] to decide
     whether to use [strict_bool_and_] and [strict_bool_or_] or not. *)
@@ -2026,6 +2041,7 @@ let cannot_be_generalized = function
   | Tpure ty -> let _, m = cannot_be_generalized_ty ty in m
   | Tarrow _ -> false
 
+(* dead code
 let check_type_vars ~loc vars ty =
   let h = Htv.create 17 in
   List.iter (fun v -> Htv.add h v ()) vars;
@@ -2038,6 +2054,7 @@ let check_type_vars ~loc vars ty =
         List.iter check tyl
   in
   check ty
+*)
 
 let make_immutable_type td =
   if td.td_vis = Private then errorm ~loc:td.td_loc
@@ -2152,7 +2169,7 @@ let add_types loc uc dl =
       | PPTtyapp (tyl, q) ->
           let n = nregions_of_qualid q in
           let reg = ref [] in
-          for i = 1 to n do reg := PPTtyvar (snd (region ())) :: !reg done;
+          for _i = 1 to n do reg := PPTtyvar (snd (region ())) :: !reg done;
           PPTtyapp (List.rev !reg @ List.map add_regions_to_type tyl, q)
       | PPTtuple tyl ->
           PPTtuple (List.map add_regions_to_type tyl)
@@ -2205,7 +2222,7 @@ let add_types loc uc dl =
   let visited = Hashtbl.create 17 in
   let th = effect_uc uc in
   let km = get_known th in
-  let rec visit x =
+  let visit x =
     if not (Hashtbl.mem visited x) then begin
       Hashtbl.add visited x ();
       if is_debug () then
@@ -2277,7 +2294,7 @@ let add_logics loc uc d =
         let ts = ns_find_ts (get_namespace (impure_uc uc)) p in
         let n = (get_mtsymbol ts).mt_regions in
         let reg = ref [] in
-        for i = 1 to n do reg := PPTtyvar (region loc) :: !reg done;
+        for _i = 1 to n do reg := PPTtyvar (region loc) :: !reg done;
         PPTtyapp (List.rev !reg @ List.map add_regions_to_type tyl, q)
     | PPTtuple tyl ->
         PPTtuple (List.map add_regions_to_type tyl)

@@ -19,10 +19,8 @@
 (**************************************************************************)
 
 open Util
-open Ident
 open Ty
 open Term
-open Task
 open Decl
 open Theory
 open Task

@@ -25,7 +25,6 @@ open Whyconf
 open Theory
 open Task
 open Driver
-open Trans
 
 let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."

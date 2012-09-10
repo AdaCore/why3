@@ -21,7 +21,6 @@
 open Format
 open Util
 open Ident
-open Ty
 open Term
 open Decl
 open Theory

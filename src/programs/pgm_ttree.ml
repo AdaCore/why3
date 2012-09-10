@@ -19,7 +19,7 @@
 (**************************************************************************)
 
 open Why3
-open Ident
+(*open Ident*)
 open Denv
 open Ty
 open Pgm_types

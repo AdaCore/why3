@@ -20,7 +20,6 @@
 
 open Format
 open Why3
-open Util
 open Rc
 open Whyconf
 
@@ -170,6 +169,7 @@ let set_locs_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
+(* dead code
 let load_altern alterns (_,section) =
   let unknown =
     {prover_name = get_string section "unknown_name";
@@ -186,6 +186,7 @@ let load_altern alterns (_,section) =
          prover_altern = get_string ~default:"" section "known_alternative";
         } in
   Mprover.add unknown known alterns
+*)
 
 let load_config config original_config =
   (* let main = get_main config in *)

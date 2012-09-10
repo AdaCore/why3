@@ -22,8 +22,7 @@
   open Format
   open Lexing
   open Term
-  open Ptree
-  open Parser
+   open Parser
 
   (* lexical errors *)
 

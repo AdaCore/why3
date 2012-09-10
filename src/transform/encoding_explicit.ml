@@ -21,13 +21,11 @@
 (** transformation from polymorphic logic to untyped logic. The polymorphic
 logic must not have finite support types. *)
 
+(* dead code
 
-open Util
 open Ident
-open Ty
-open Term
-open Decl
-open Task
+open Ty 
+open Term 
 open Libencoding
 
 (** module with printing functions *)
@@ -150,6 +148,8 @@ let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   let kept = Sty.add ty_type kept in
   let decl = d_monomorph kept (lsmap kept) in
   Trans.decl decl (Task.add_decl None d_ts_base))
+
+*)
 
 (* This encoding method is unsound in presence of finite types. *)
 

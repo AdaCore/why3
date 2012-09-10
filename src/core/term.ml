@@ -1243,6 +1243,7 @@ let t_equal_alpha = t_equal_alpha (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty
 
 (* hash modulo alpha *)
 
+(* dead code
 let rec pat_hash_alpha p =
   match p.pat_node with
   | Pwild -> 0
@@ -1254,6 +1255,7 @@ let rec pat_hash_alpha p =
   | Por (p, q) ->
       Hashcons.combine
         (Hashcons.combine 4 (pat_hash_alpha p)) (pat_hash_alpha q)
+*)
 
 let rec t_hash_alpha c m t =
   let fn = t_hash_alpha c m in

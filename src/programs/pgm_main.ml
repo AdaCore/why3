@@ -23,8 +23,6 @@
 open Format
 open Why3
 open Util
-open Ident
-open Theory
 open Typing
 open Ptree
 open Pgm_module

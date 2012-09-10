@@ -50,13 +50,17 @@ exception MissingField of string
 exception DuplicateSection of string
 exception DuplicateField of string * rc_value * rc_value
 exception StringExpected of string * rc_value
+(* dead code
 exception IdentExpected of string * rc_value
+*)
 exception IntExpected of string * rc_value
 exception BoolExpected of string * rc_value
 
+(* dead code
 let error ?loc e = match loc with
   | None -> raise e
   | Some loc -> raise (Loc.Located (loc, e))
+*)
 
 (* conf files *)
 
@@ -115,9 +119,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | StringExpected (s,v) ->
       fprintf fmt "cannot set field '%s' to %a: a string is expected"
         s print_rc_value v
+(* dead code
   | IdentExpected (s,v) ->
       fprintf fmt "cannot set field '%s' to %a: an identifier is expected"
         s print_rc_value v
+*)
   | IntExpected (s,v) ->
       fprintf fmt "cannot set field '%s' to %a: an integer is expected"
         s print_rc_value v

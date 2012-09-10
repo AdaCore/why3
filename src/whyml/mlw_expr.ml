@@ -19,7 +19,6 @@
 (**************************************************************************)
 
 open Why3
-open Stdlib
 open Util
 open Ident
 open Ty

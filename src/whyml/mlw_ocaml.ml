@@ -29,8 +29,6 @@ open Decl
 open Theory
 open Printer
 open Mlw_ty
-open Mlw_expr
-open Mlw_decl
 
 let debug =
   Debug.register_info_flag

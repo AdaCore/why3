@@ -23,22 +23,25 @@
   open Lexing
   open Tptp_ast
   open Tptp_parser
-  open Tptp_typing
-
+ 
   open Why3
 
   (* lexical errors *)
 
   exception IllegalCharacter of char
   exception UnterminatedComment
+(* dead code
   exception UnterminatedString
+*)
   exception UnknownDDW of string
   exception UnknownDW of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
     | UnterminatedComment -> fprintf fmt "unterminated comment"
+(* dead code
     | UnterminatedString -> fprintf fmt "unterminated string"
+*)
     | UnknownDDW s -> fprintf fmt "unknown system_word %s" s
     | UnknownDW s -> fprintf fmt "unknown defined_word %s" s
     | _ -> raise e)
@@ -243,6 +246,7 @@ and comment_line = parse
       { comment_line lexbuf }
 
 {
+(* dead code
   let with_location f lb =
     if Debug.test_flag Debug.stack_trace then f lb else
     try f lb with
@@ -257,6 +261,7 @@ and comment_line = parse
 
   let library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
     ~desc:"TPTP format (CNF FOF FOFX TFF)"
+*)
 }
 
 (*

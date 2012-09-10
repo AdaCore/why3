@@ -27,7 +27,6 @@ open Term
 open Decl
 open Theory
 open Eval_match
-open Pretty
 open Pgm_ttree
 open Pgm_types
 open Pgm_types.T
@@ -151,11 +150,13 @@ let rec unref ~now s t = match t.t_node with
   | _ ->
       t_map (unref ~now s) t
 
+(* dead code
 let find_constructor env ts =
   let km = get_known (pure_uc env) in
   match find_constructors km ts with
   | [ls] -> ls
   | _ -> assert false
+*)
 
 let get_ty_subst ty = match ty.ty_node with
   | Tyapp (ts, tyl) ->

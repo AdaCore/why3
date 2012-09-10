@@ -109,7 +109,7 @@ let ht_tuple   = Hashtbl.create 3
 let ts_tuple n = Hashtbl.replace ht_tuple n (); ts_tuple n
 let fs_tuple n = Hashtbl.replace ht_tuple n (); fs_tuple n
 
-let rec check_at f0 =
+let check_at f0 =
   let rec check f = match f.t_node with
     | Term.Tapp (ls, _) when ls_equal ls fs_at ->
         let d = Mvs.set_diff f.t_vars f0.t_vars in
@@ -178,7 +178,9 @@ let dity_int  = ts_app ts_int  []
 let dity_real = ts_app ts_real []
 let dity_bool = ts_app ts_bool []
 let dity_unit = ts_app ts_unit []
+(* dead code
 let dity_mark = ts_app ts_mark []
+*)
 
 let unify_loc unify_fn loc x1 x2 = try unify_fn x1 x2 with
   | TypeMismatch (ity1,ity2) -> errorm ~loc
@@ -948,8 +950,10 @@ and type_v lenv gh pvs vars = function
 
 (* expressions *)
 
+(* dead code
 let vty_ghostify gh vty =
   if gh && not (vty_ghost vty) then vty_ghostify vty else vty
+*)
 
 let e_ghostify gh e =
   if gh && not (vty_ghost e.e_vty) then e_ghost e else e

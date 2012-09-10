@@ -20,7 +20,7 @@
 
 %{
   open Driver_ast
-  open Parsing
+
   let loc () = Loc.extract (symbol_start_pos (), symbol_end_pos ())
   let loc_i i = Loc.extract (rhs_start_pos i, rhs_end_pos i)
   let infix s = "infix " ^ s

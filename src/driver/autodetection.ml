@@ -50,7 +50,6 @@ The regexp must start with ^.
 
 open Format
 open Util
-open Ident
 open Whyconf
 open Stdlib
 module Wc = Whyconf
@@ -112,10 +111,12 @@ let load_prover kind (id,section) =
       (sprintf "In section prover %s command specified without driver" id);
   prover
 
+(* dead code
 let editor_keys =
   let add acc k = Sstr.add k acc in
   List.fold_left add Sstr.empty
     ["command"]
+*)
 
 let load_editor section =
   check_exhaustive section prover_keys;
@@ -187,7 +188,9 @@ let read_auto_detection_data main =
     | Not_found ->
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
+(* dead code
 let provers_found = ref 0
+*)
 
 let read_editors main =
   let filename = Filename.concat (Whyconf.datadir main)
@@ -212,6 +215,7 @@ let make_command =
     in
     Str.global_substitute cmd_regexp replace com
 
+(* dead code
 let sanitize_exec =
   let first c = match c with
     | '_' | ' ' -> "_"
@@ -222,6 +226,7 @@ let sanitize_exec =
     | _ -> char_to_alnumus c
   in
   sanitizer first rest
+*)
 
 let ask_prover_version exec_name version_switch =
   let out = Filename.temp_file "out" "" in

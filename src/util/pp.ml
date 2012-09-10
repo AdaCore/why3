@@ -116,7 +116,7 @@ let print_pair pr1 = print_pair_delim lparen comma rparen pr1
 
 let hov n f fmt x = pp_open_hovbox fmt n; f fmt x; pp_close_box fmt ()
 let indent n f fmt x =
-  for i = 0 to n do
+  for _i = 0 to n do
     pp_print_char fmt ' '
   done;
   hov 0 f fmt x

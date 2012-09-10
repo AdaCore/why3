@@ -1078,7 +1078,7 @@ let paste_on_selection () =
       match a with
       | S.Goal g ->
         let keygen = MA.keygen in
-        let rec paste = function
+        let paste = function
           | S.Transf f ->
             MA.init_any
               (S.Transf (S.add_transf_to_goal ~keygen (env_session()) g f))

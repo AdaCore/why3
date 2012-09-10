@@ -23,7 +23,6 @@
 
 
 open Why3
-open Format
 
 (**************)
 (*

@@ -66,9 +66,11 @@ type symbol =
   | Sdobj of lsymbol
   | Suse  of theory
 
+(* dead code
 type env = symbol Mstr.t
 
 type implicit = (string,symbol) Hashtbl.t
+*)
 
 (** Defined symbols : arithmetic etc... *)
 

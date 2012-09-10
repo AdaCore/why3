@@ -133,6 +133,7 @@ let empty_idpos =
     idpos_pr = Mpr.empty;
   }
 
+(* dead code
 let posid_of_idpos idpos =
   let posid = Mpos.empty in
   let posid = Mts.fold (fun ts pos ->
@@ -142,6 +143,7 @@ let posid_of_idpos idpos =
   let posid = Mpr.fold (fun pr pos ->
     Mpos.add pos (MApr pr)) idpos.idpos_pr posid  in
   posid
+*)
 
 type 'a goal =
   { mutable goal_key  : 'a;
@@ -271,7 +273,7 @@ let file_iter_proof_attempt f t =
 let session_iter_proof_attempt f s =
   PHstr.iter (fun _ file -> file_iter_proof_attempt f file) s.session_files
 
-let rec iter_proof_attempt f = function
+let iter_proof_attempt f = function
     | Goal g -> goal_iter_proof_attempt f g
     | Theory th -> theory_iter_proof_attempt f th
     | File file -> file_iter_proof_attempt f file
@@ -407,6 +409,7 @@ let create_session ?shape_version project_dir =
   empty_session ?shape_version project_dir
 
 
+(* dead code
 let load_env_session ?(includes=[]) session conf_path_opt =
   let config = Whyconf.read_config conf_path_opt in
   let loadpath = (Whyconf.loadpath (Whyconf.get_main config)) @ includes in
@@ -416,6 +419,7 @@ let load_env_session ?(includes=[]) session conf_path_opt =
     whyconf = config;
     loaded_provers = PHprover.create 5;
   }
+*)
 
 (************************)
 (* session accessor     *)
@@ -423,19 +427,24 @@ let load_env_session ?(includes=[]) session conf_path_opt =
 
 let get_session_file file = file.file_parent
 
+(* dead code
 let get_session_theory th = get_session_file th.theory_parent
+*)
 
+(* dead code
 let rec get_session_goal goal =
   match goal.goal_parent with
     | Parent_transf trans -> get_session_trans trans
     | Parent_theory th    -> get_session_theory th
     | Parent_metas  metas -> get_session_metas metas
 
+
 and get_session_trans transf = get_session_goal transf.transf_parent
 
 and get_session_metas metas = get_session_goal metas.metas_parent
 
 let get_session_proof_attempt pa = get_session_goal pa.proof_parent
+*)
 
 let get_used_provers session =
   let sprover = ref Sprover.empty in
@@ -1289,7 +1298,9 @@ let load_file session old_provers f =
         old_provers
 
 let old_provers = ref Util.Mstr.empty
+(* dead code
 let get_old_provers () = !old_provers
+*)
 
 let load_session session xml =
   match xml.Xml.name with
@@ -1542,10 +1553,12 @@ let add_registered_transformation ~keygen env_session tr_name g =
 (**    metas    *)
 (****************)
 
+(* dead code
 let task_nb_decl task =
   Task.task_fold
     (fun n tdecl -> match tdecl.td_node with Decl _ -> n+1 | _ -> n)
     0 task
+*)
 
 let pos_of_metas lms =
   let restore_path id =
@@ -1833,7 +1846,9 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
        from_proof.proof_prover
        from_proof.proof_state)
 
+(* dead code
 exception MalformedMetas of ident_path
+*)
 
 (** ~theories is the current theory library path empty : [] *)
 let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =

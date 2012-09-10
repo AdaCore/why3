@@ -19,16 +19,18 @@
 /**************************************************************************/
 
 %{
-open Parsing
+
 open Tptp_ast
 
 let loc () = (symbol_start_pos (), symbol_end_pos ())
 let floc () = Why3.Loc.extract (loc ())
 
+(* dead code
 let loc_i i = (rhs_start_pos i, rhs_end_pos i)
 let floc_i i = Why3.Loc.extract (loc_i i)
 let loc_ij i j = (rhs_start_pos i, rhs_end_pos j)
 let floc_ij i j = Why3.Loc.extract (loc_ij i j)
+*)
 
 let mk_e n = { e_node = n ; e_loc = floc () }
 

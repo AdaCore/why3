@@ -186,9 +186,13 @@ let wp_forall_post v p f =
 
 (* regs_of_reads, and therefore regs_of_effect, only take into account
    reads in program expressions and ignore the variables in specification *)
+(* dead code
 let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
+*)
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
+(* dead code
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
+*)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let open_post q =
@@ -429,9 +433,11 @@ type state = {
   st_next : point ref;
 }
 
+(* dead code
 type names = point Mvs.t  (* variable -> point *)
 type condition = lsymbol Mint.t (* point -> constructor *)
 type lesson = condition list Mint.t (* point -> conditions for invariant *)
+*)
 
 let empty_state lkm km = {
   st_km   = km;
@@ -996,13 +1002,17 @@ let fast_wp = Debug.register_flag "fast_wp"
 
 module Subst = struct
 
+(* dead code
   type t = unit
+*)
 
   let empty = ()
 
   let term _s t = t
 
+(* dead code
   let frame _ef s = s
+*)
 
 end
 

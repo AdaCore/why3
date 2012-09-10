@@ -21,7 +21,6 @@
 open Why3
 open Util
 open Mlw_module
-open Mlw_typing
 
 let debug = Debug.register_info_flag "print_modules"
   ~desc:"Print@ program@ modules@ after@ typechecking."

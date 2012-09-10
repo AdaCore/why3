@@ -683,7 +683,9 @@ let set_policies config policies =
 
 (*******)
 
+(* dead code
 let set_conf_file config conf_file = {config with conf_file = conf_file}
+*)
 let get_conf_file config           =  config.conf_file
 
 (*******)

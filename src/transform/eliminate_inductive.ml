@@ -21,7 +21,6 @@
 open Ident
 open Term
 open Decl
-open Task
 
 let log acc (ps,_) = create_param_decl ps :: acc
 let axm acc (pr,f) = create_prop_decl Paxiom pr f :: acc

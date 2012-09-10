@@ -79,11 +79,13 @@ let init_session session = session_iter init_any session
 (*   | Detected_prover p -> p.prover_id *)
 (*   | Undetected_prover s -> s *)
 
+(* dead code
 let theory_name t = t.theory_name
 let theory_key t = t.theory_key
 let verified t = t.theory_verified
 let goals t = t.theory_goals
 let theory_expanded t = t.theory_expanded
+*)
 
 let running a = match a.proof_state with
   | Undone (Scheduled | Running) -> true
@@ -208,10 +210,12 @@ let schedule_any_timeout t callback =
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
+(* dead code 
 let add_a_check t callback =
   dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
   run_timeout_handler t
+*)
 
 (* idle handler *)
 
@@ -644,8 +648,10 @@ module Todo = struct
     todo.todo <- todo.todo - 1;
     todo.push_report todo.report v
 
+(* dead code
   let stop todo =
     todo.todo <- todo.todo - 1
+*)
 
   let todo todo =
     todo.todo <- todo.todo + 1
@@ -653,8 +659,10 @@ module Todo = struct
   let _end todo =
     if todo.todo<>0 then None else Some todo.report
 
+(* dead code
   let print todo =
     dprintf debug "[Sched] todo : %i@." todo.todo
+*)
 end
 
 let push_report report (g,p,t,r) =
@@ -727,8 +735,10 @@ let check_external_proof eS eT todo a =
             Todo._done todo (g,a.proof_prover,0,Edited_file_absent f);
     end
 
+(* dead code
 let check_goal_and_children eS eT todo g =
   goal_iter_proof_attempt (check_external_proof eS eT todo) g
+*)
 
 let check_all eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
