@@ -689,71 +689,16 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (s:stmt) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
-  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
-
 (* Why3 goal *)
-Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
-induction 1; intros q Hq.
-(* case Sassign *)
-simpl.
-simpl in Hq.
-admit. 
-(*
-rewrite eval_msubst in Hq.
+Theorem monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
+unfold valid_fmla.
+induction s
+intros s p q h1.
+intros sigma pi.
+simpl in *.
+intro H.
 
-TODO *)
-
-(* case Sseq *)
-simpl.
-apply IHone_step.
-apply Hq.
-
-(* case Skip ; s2 *)
-simpl in Hq; auto.
-
-(* case if true *)
-simpl in Hq.
-intuition.
-
-(* case if false *)
-simpl in Hq.
-destruct Hq as (_ & h2).
-apply h2.
-rewrite H; discriminate.
-
-(* case assert *)
-simpl.
-simpl in Hq.
-intuition.
-
-(* case While true *)
-simpl.
-simpl in Hq.
-destruct Hq as (h1 & h2).
-apply distrib_conj; split.
-generalize (abstract_effects_generalize _ _ _ _ h2).
-intros h3.
-simpl in h3.
-intuition.
-
-apply abstract_effects_writes; auto.
-
-(* case While False *)
-simpl.
-simpl in Hq.
-destruct Hq as (h1 & h2).
-generalize (abstract_effects_generalize _ _ _ _ h2).
-intros h3.
-simpl in h3.
-destruct h3 as (_ & h4). 
-apply h4.
-split; auto.
-rewrite H0; discriminate.
 
 Qed.
 

@@ -669,6 +669,9 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
+Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
+  (valid_fmla f) -> (valid_fmla (abstract_effects s f)).
+
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
   match s with
@@ -689,72 +692,23 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (s:stmt) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
-  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
-
 (* Why3 goal *)
-Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
-induction 1; intros q Hq.
-(* case Sassign *)
-simpl.
-simpl in Hq.
-admit. 
-(*
-rewrite eval_msubst in Hq.
-
-TODO *)
-
-(* case Sseq *)
-simpl.
-apply IHone_step.
-apply Hq.
-
-(* case Skip ; s2 *)
-simpl in Hq; auto.
-
-(* case if true *)
-simpl in Hq.
-intuition.
-
-(* case if false *)
-simpl in Hq.
-destruct Hq as (_ & h2).
-apply h2.
-rewrite H; discriminate.
-
-(* case assert *)
-simpl.
-simpl in Hq.
-intuition.
-
-(* case While true *)
-simpl.
-simpl in Hq.
-destruct Hq as (h1 & h2).
-apply distrib_conj; split.
-generalize (abstract_effects_generalize _ _ _ _ h2).
-intros h3.
-simpl in h3.
-intuition.
-
-apply abstract_effects_writes; auto.
-
-(* case While False *)
-simpl.
-simpl in Hq.
-destruct Hq as (h1 & h2).
-generalize (abstract_effects_generalize _ _ _ _ h2).
-intros h3.
-simpl in h3.
-destruct h3 as (_ & h4). 
-apply h4.
+Theorem monotonicity : forall (s:stmt),
+  match s with
+  | Sskip => True
+  | (Sassign m t) => True
+  | (Sseq s1 s2) => True
+  | (Sif t s1 s2) => True
+  | (Sassert f) => True
+  | (Swhile t f s1) => (forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
+      q)) -> (valid_fmla (Fimplies (wp s1 p) (wp s1 q)))) -> forall (p:fmla)
+      (q:fmla), (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p)
+      (wp s q)))
+  end.
+destruct s; auto.
+unfold valid_fmla; simpl.
+intros H1 p q H2 sigma pi (H3 & H4).
 split; auto.
-rewrite H0; discriminate.
+generalize (abstract_effects_monotonic _ _ H4).
 
 Qed.
-
-

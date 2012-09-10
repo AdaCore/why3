@@ -689,72 +689,42 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (s:stmt) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
-  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
+Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
 (* Why3 goal *)
-Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
-induction 1; intros q Hq.
-(* case Sassign *)
-simpl.
-simpl in Hq.
-admit. 
-(*
-rewrite eval_msubst in Hq.
-
-TODO *)
-
-(* case Sseq *)
-simpl.
-apply IHone_step.
-apply Hq.
-
-(* case Skip ; s2 *)
-simpl in Hq; auto.
-
-(* case if true *)
-simpl in Hq.
-intuition.
-
-(* case if false *)
-simpl in Hq.
-destruct Hq as (_ & h2).
-apply h2.
-rewrite H; discriminate.
-
-(* case assert *)
-simpl.
-simpl in Hq.
-intuition.
-
-(* case While true *)
-simpl.
-simpl in Hq.
-destruct Hq as (h1 & h2).
-apply distrib_conj; split.
-generalize (abstract_effects_generalize _ _ _ _ h2).
-intros h3.
-simpl in h3.
-intuition.
-
-apply abstract_effects_writes; auto.
-
-(* case While False *)
-simpl.
-simpl in Hq.
-destruct Hq as (h1 & h2).
-generalize (abstract_effects_generalize _ _ _ _ h2).
-intros h3.
-simpl in h3.
-destruct h3 as (_ & h4). 
-apply h4.
-split; auto.
-rewrite H0; discriminate.
-
+Theorem distrib_conj : forall (s:stmt),
+  match s with
+  | Sskip => True
+  | (Sassign m t) => True
+  | (Sseq s1 s2) => (forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s2 p)) /\
+      (eval_fmla sigma pi (wp s2 q))) -> (eval_fmla sigma pi (wp s2 (Fand p
+      q)))) -> ((forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s1 p)) /\
+      (eval_fmla sigma pi (wp s1 q))) -> (eval_fmla sigma pi (wp s1 (Fand p
+      q)))) -> forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+      (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p
+      q))))
+  | (Sif t s1 s2) => True
+  | (Sassert f) => True
+  | (Swhile t f s1) => True
+  end.
+destruct s; auto.
+intros H1 H2 sigma pi p q (H3 & H4).
+simpl in *.
+assert (H: valid_fmla 
+        (Fimplies (Fand (wp s2 p) (wp s2 q)) (wp s2 (Fand p q)))).
+unfold valid_fmla ; simpl.
+intros sigma' pi' (H5 & H6).
+apply H1; auto; clear H1.
+generalize (monotonicity s1 _ _ H).
+clear H; intro H.
+unfold valid_fmla in H.
+simpl in H.
+apply H; clear H.
+apply H2; auto.
 Qed.
 
 

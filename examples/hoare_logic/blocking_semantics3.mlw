@@ -673,6 +673,11 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         eval_fmla sigma pi (abstract_effects s f) ->
         eval_fmla sigma pi f
 
+  axiom abstract_effects_monotonic :
+     forall s:stmt, f:fmla.
+        valid_fmla f ->
+        valid_fmla (abstract_effects s f)
+
   function wp (s:stmt) (q:fmla) : fmla =
     match s with
     | Sskip -> q
@@ -695,7 +700,6 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
     end
 
-
   axiom abstract_effects_writes :
      forall sigma:env, pi:stack, s:stmt, q:fmla.
         eval_fmla sigma pi (abstract_effects s q) ->
@@ -707,18 +711,16 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
   (*   fresh_in_stmt id e -> *)
   (*     subst (wp e q) id id' = wp e (subst q id id') *)
 
-  lemma distrib_conj:
-    forall sigma:env, pi:stack, s:stmt, p q:fmla.
-     (eval_fmla sigma pi (wp s p)) /\
-     (eval_fmla sigma pi (wp s q)) ->
-     eval_fmla sigma pi (wp s (Fand p q)) 
-
-(*
   lemma monotonicity:
     forall s:stmt, p q:fmla.
       valid_fmla (Fimplies p q)
      ->	valid_fmla (Fimplies (wp s p) (wp s q) )
-*)
+
+  lemma distrib_conj:
+    forall s:stmt, sigma:env, pi:stack, p q:fmla.
+     (eval_fmla sigma pi (wp s p)) /\
+     (eval_fmla sigma pi (wp s q)) ->
+     eval_fmla sigma pi (wp s (Fand p q)) 
 
   lemma wp_reduction:
     forall sigma sigma':env, pi pi':stack, s s':stmt.
