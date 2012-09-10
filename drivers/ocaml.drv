@@ -2,7 +2,6 @@
 printer "ocaml"
 
 theory BuiltIn
-  syntax type       int   "Num.num"
   syntax predicate  (=)   "(%1 = %2)"
 end
 
@@ -13,7 +12,7 @@ theory option.Option
 end
 
 theory Bool
-  syntax type bool "bool"
+  syntax type     bool  "bool"
   syntax function True  "true"
   syntax function False "false"
 end
@@ -32,38 +31,6 @@ theory list.List
   syntax function Cons "(%1 :: %2)"
 end
 
-theory int.Int
-  (* TODO: make a for_num prelude function *)
-
-  syntax function zero "(Num.num_of_int 0)"
-  syntax function one  "(Num.num_of_int 1)"
-
-  syntax function (+)  "(Num.add_num %1 %2)"
-  syntax function (-)  "(Num.sub_num %1 %2)"
-  syntax function (*)  "(Num.mult_num %1 %2)"
-  syntax function (-_) "(Num.minus_num %1)"
-
-  syntax predicate (<=) "(Num.le_num %1 %2)"
-  syntax predicate (<)  "(Num.lt_num %1 %2)"
-  syntax predicate (>=) "(Num.ge_num %1 %2)"
-  syntax predicate (>)  "(Num.gt_num %1 %2)"
-end
-
-theory int.Abs
-  syntax function abs "(Num.abs_num %1)"
-end
-
-theory int.MinMax
-  syntax function min "(Num.min_num %1 %2)"
-  syntax function max "(Num.max_num %1 %2)"
-end
-
-(* Note: documentation for Num says ``Euclidean division'' but this is
-   rather a computer division *)
-theory int.ComputerDivision
-  syntax function div "(Num.quo_num %1 %2)"
-  syntax function mod "(Num.mod_num %1 %2)"
-end
 
 (* WhyML *)
 

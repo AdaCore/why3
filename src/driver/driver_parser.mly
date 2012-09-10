@@ -164,6 +164,7 @@ operator:
 | OPERATOR UNDERSCORE   { prefix $1 }
 | LEFTSQ RIGHTSQ        { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW { mixfix "[]<-" }
 ;
 
 list1_string_list:

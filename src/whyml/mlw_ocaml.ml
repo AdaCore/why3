@@ -52,7 +52,8 @@ let extract_filename ?fname th =
   (modulename ?fname th) ^ ".ml"
 
 let modulename path t =
-  String.capitalize ((String.concat "__" path) ^ "__" ^ t)
+  String.capitalize
+    (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t)
 
 (** Driver *)
 
@@ -62,24 +63,29 @@ let is_stdlib path id = Hashtbl.mem stdlib (path, id)
 
 (** Printers *)
 
+let ocaml_keywords =
+  ["and"; "as"; "assert"; "asr"; "begin";
+   "class"; "constraint"; "do"; "done"; "downto"; "else"; "end";
+   "exception"; "external"; "false"; "for"; "fun"; "function";
+   "functor"; "if"; "in"; "include"; "inherit"; "initializer";
+   "land"; "lazy"; "let"; "lor"; "lsl"; "lsr"; "lxor"; "match";
+   "method"; "mod"; "module"; "mutable"; "new"; "object"; "of";
+   "open"; "or"; "private"; "rec"; "sig"; "struct"; "then"; "to";
+   "true"; "try"; "type"; "val"; "virtual"; "when"; "while"; "with";
+   "raise";]
+
+let is_ocaml_keyword =
+  let h = Hashtbl.create 17 in
+  List.iter (fun s -> Hashtbl.add h s ()) ocaml_keywords;
+  Hashtbl.mem h
+
 let iprinter,aprinter,tprinter,pprinter =
-  let bl = (* OCaml keywords *)
-    ["and"; "as"; "assert"; "asr"; "begin";
-     "class"; "constraint"; "do"; "done"; "downto"; "else"; "end";
-     "exception"; "external"; "false"; "for"; "fun"; "function";
-     "functor"; "if"; "in"; "include"; "inherit"; "initializer";
-     "land"; "lazy"; "let"; "lor"; "lsl"; "lsr"; "lxor"; "match";
-     "method"; "mod"; "module"; "mutable"; "new"; "object"; "of";
-     "open"; "or"; "private"; "rec"; "sig"; "struct"; "then"; "to";
-     "true"; "try"; "type"; "val"; "virtual"; "when"; "while"; "with";
-     "raise";]
-  in
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:isanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:isanitize
+  create_ident_printer ocaml_keywords ~sanitizer:isanitize,
+  create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
+  create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
+  create_ident_printer ocaml_keywords ~sanitizer:isanitize
 
 let forget_tvs () =
   forget_all aprinter
@@ -143,10 +149,10 @@ let print_path = print_list dot pp_print_string
 let print_qident ~sanitizer info fmt id =
   try
     let lp, t, p = Theory.restore_path id in
-    let lp = if lp <> [] then lp else [Util.def_option "Builtin" info.fname] in
     let s = String.concat "__" p in
     let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
     let s = sanitizer s in
+    let s = if is_ocaml_keyword s then s ^ "_renamed" else s in
     if Sid.mem id info.current_theory.th_local then
       fprintf fmt "%s" s
     else
@@ -343,7 +349,8 @@ and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
 let print_const fmt = function
-  | ConstInt (IConstDecimal s) -> fprintf fmt "(Num.num_of_string \"%s\")" s
+  | ConstInt (IConstDecimal s) ->
+      fprintf fmt "(Why3__BuiltIn.int_constant \"%s\")" s
   | ConstInt (IConstHexa s) -> fprintf fmt (tbi "0x%s") s
   | ConstInt (IConstOctal s) -> fprintf fmt (tbi "0o%s") s
   | ConstInt (IConstBinary s) -> fprintf fmt (tbi "0b%s") s
@@ -717,12 +724,11 @@ and print_lexpr pri info fmt e =
   | Eloop (_,_,e) ->
       fprintf fmt "@[while true do@ %a@ done@]" (print_expr info) e
   | Efor (pv,(pvfrom,dir,pvto),_,e) ->
-      (* TODO: avoid conversion to/from int *)
-      fprintf fmt "@[<hov 2>for@ %a =@ Num.int_of_num %a@ %s@ \
-        Num.int_of_num %a do@\nlet %a = Num.num_of_int %a in@ %a@]@\ndone"
-        (print_pv info) pv (print_pv info) pvfrom
-        (if dir = To then "to" else "downto") (print_pv info) pvto
-        (print_pv info) pv (print_pv info) pv (print_expr info) e
+      fprintf fmt
+        "@[<hov 2>(Int__Int.for_loop_%s %a %a@ (fun %a -> %a))@]"
+        (if dir = To then "to" else "downto")
+        (print_pv info) pvfrom (print_pv info) pvto
+        (print_pv info) pv (print_expr info) e
   | Eraise (xs,e) ->
       begin match query_syntax info.info_syn xs.xs_name with
         | Some s -> syntax_arguments s (print_expr info) fmt [e]
@@ -946,13 +952,15 @@ let print_pprojections info fmt (ts, _, _ as d) =
 
 let pdecl info fmt pd = match pd.pd_node with
   | PDtype ts ->
-      print_type_decl info fmt ts
+      print_type_decl info fmt ts;
+      fprintf fmt "@\n@\n"
   | PDdata tl ->
       print_list_next newline (print_pdata_decl info) fmt tl;
       fprintf fmt "@\n@\n";
       print_list nothing (print_pprojections info) fmt tl
   | PDval lv ->
-      print_val_decl info fmt lv
+      print_val_decl info fmt lv;
+      fprintf fmt "@\n@\n"
   | PDlet ld ->
       print_let_decl info fmt ld
   | PDrec { rec_defn = rdl; rec_letrec = lr } ->
