@@ -220,17 +220,12 @@ let print_tv_args fmt = function
 let print_ty_arg info fmt ty = fprintf fmt "%a" (print_ty_node true info) ty
 let print_vs_arg info fmt vs = fprintf fmt "(%a)" (print_vsty info) vs
 
-(* FIXME: print projections! *)
-let print_constr info ty fmt (cs,_) =
-  let ty_val = of_option cs.ls_value in
-  let m = ty_match Mtv.empty ty_val ty in
-  let tl = List.map (ty_inst m) cs.ls_args in
-  match tl with
-    | [] ->
-        fprintf fmt "@[<hov 4>| %a@]" (print_cs info) cs
-    | _ ->
-        fprintf fmt "@[<hov 4>| %a of %a@]" (print_cs info) cs
-          (print_list star (print_ty_arg info)) tl
+let print_constr info fmt (cs,_) = match cs.ls_args with
+  | [] ->
+      fprintf fmt "@[<hov 4>| %a@]" (print_cs info) cs
+  | tl ->
+      fprintf fmt "@[<hov 4>| %a of %a@]" (print_cs info) cs
+        (print_list star (print_ty_arg info)) tl
 
 let print_type_decl info fmt ts = match ts.ts_def with
   | None ->
@@ -248,8 +243,7 @@ let print_type_decl info fmt ts =
   else begin print_type_decl info fmt ts; forget_tvs () end
 
 let print_data_decl info fst fmt (ts,csl) =
-  let ty = ty_app ts (List.map ty_var ts.ts_args) in
-  let print_default () = print_list newline (print_constr info ty) fmt csl in
+  let print_default () = print_list newline (print_constr info) fmt csl in
   let print_field fmt ls =
     fprintf fmt "%a: %a"
       (print_ls info) ls (print_ty info) (Util.of_option ls.ls_value) in
@@ -270,6 +264,32 @@ let print_data_decl info first fmt (ts, _ as d) =
     fprintf fmt "(* type %a is overridden by driver *)"
       (print_lident info) ts.ts_name
   else begin print_data_decl info first fmt d; forget_tvs () end
+
+let is_record = function
+  | _, [_, pjl] -> List.for_all ((<>) None) pjl
+  | _ -> false
+
+let print_projections info fmt (_, csl) =
+  let pjl = List.filter ((<>) None) (snd (List.hd csl)) in
+  let pjl = List.map Util.of_option pjl in
+  let print ls =
+    let print_branch fmt (cs, pjl) =
+      let print_arg fmt = function
+        | Some ls' when ls_equal ls' ls -> fprintf fmt "x"
+        | _ -> fprintf fmt "_" in
+      fprintf fmt "| %a (%a) -> x"
+        (print_cs info) cs (print_list comma print_arg) pjl
+    in
+    fprintf fmt "@[<hov 2>let %a = function@\n" (print_ls info) ls;
+    print_list newline print_branch fmt csl;
+    fprintf fmt "@]@\n@\n"
+  in
+  List.iter print pjl
+
+let print_projections info fmt (ts, _ as d) =
+  if not (has_syntax info ts.ts_name) && not (is_record d) then begin
+    print_projections info fmt d; forget_tvs ()
+  end
 
 (** Inductive *)
 
@@ -389,21 +409,25 @@ and print_lterm pri info fmt t =
   print_tnode pri info fmt t
 
 and print_app pri ls info fmt tl =
-  let isc = is_constructor info ls in
-  let isp = match Mid.find_opt ls.ls_name info.th_known_map with
-    | Some { d_node = Ddata _ } -> not isc
+  let isconstr = is_constructor info ls in
+  let is_field (_, csl) = match csl with
+    | [_, pjl] ->
+        List.for_all ((<>) None) pjl && List.exists ((=) (Some ls)) pjl
+    | _ -> false in
+  let isfield = match Mid.find_opt ls.ls_name info.th_known_map with
+    | Some { d_node = Ddata dl } -> not isconstr && List.exists is_field dl
     | _ -> false
   in
-  let print = if isc then print_cs else print_ls in
+  let print = if isconstr then print_cs else print_ls in
   match tl with
   | [] ->
       print info fmt ls
-  | [t1] when isp ->
+  | [t1] when isfield ->
       fprintf fmt "(%a).%a" (print_term info) t1 (print info) ls
   | [t1] ->
       fprintf fmt (protect_on (pri > 4) "%a %a")
         (print info) ls (print_lterm 5 info) t1
-  | tl when isc ->
+  | tl when isconstr ->
       let pjl = get_record info ls in
       if pjl = [] then
         fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ (%a)@]")
@@ -526,7 +550,8 @@ let logic_decl info fmt d = match d.d_node with
       fprintf fmt "@\n@\n"
   | Ddata tl ->
       print_list_next newline (print_data_decl info) fmt tl;
-      fprintf fmt "@\n@\n"
+      fprintf fmt "@\n@\n";
+      print_list nothing (print_projections info) fmt tl
   | Decl.Dparam ls ->
       print_param_decl info fmt ls;
       fprintf fmt "@\n@\n"
@@ -720,8 +745,9 @@ and print_lexpr pri info fmt e =
   | Eany _ ->
       fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
         (print_vty info) e.e_vty
-  | Ecase _ ->
-      fprintf fmt "assert false (* TODO Ecase *)"
+  | Ecase (e1, bl) ->
+      fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
+        (print_expr info) e1 (print_list newline (print_ebranch info)) bl
   | Erec ({ rec_defn = rdl; rec_letrec = lr }, e) ->
       (* print non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
@@ -742,6 +768,10 @@ and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
       (if fst then if lr > 0 then "let rec" else "let" else "and")
       (print_ps info) ps (print_list space print_arg) lam.l_args
       (print_expr info) lam.l_expr
+
+and print_ebranch info fmt ({ppat_pattern=p}, e) =
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat info) p (print_expr info) e;
+  Svs.iter forget_var p.pat_vars
 
 and print_xbranch info fmt (xs, pv, e) =
   begin match query_syntax info.info_syn xs.xs_name with
@@ -825,6 +855,21 @@ let print_val_decl info fmt lv =
   else
     print_val_decl info fmt lv
 
+let print_type_decl info fmt its = match its.its_def with
+  | None ->
+      fprintf fmt
+        "@[<hov 2>type %a%a (* to be defined (uninterpreted type) *)@]@\n@\n"
+        print_tv_args its.its_args (print_its info) its
+  | Some ty ->
+      fprintf fmt "@[<hov 2>type %a%a =@ %a@]@\n@\n"
+        print_tv_args its.its_args (print_its info) its (print_ity info) ty
+
+let print_type_decl info fmt its =
+  if has_syntax info its.its_pure.ts_name then
+    fprintf fmt "(* type %a is overridden by driver *)"
+      (print_lident info) its.its_pure.ts_name
+  else begin print_type_decl info fmt its; forget_tvs () end
+
 let print_exn_decl info fmt xs =
   if ity_equal xs.xs_ity ity_unit then
     fprintf fmt "exception %a@\n@\n" (print_xs info) xs
@@ -839,11 +884,73 @@ let print_exn_decl info fmt xs =
   else
     print_exn_decl info fmt xs
 
+let print_pconstr info fmt (cs,_) = match cs.pl_args with
+  | [] ->
+      fprintf fmt "@[<hov 4>| %a@]" (print_cs info) cs.pl_ls
+  | tl ->
+      let print_vtv fmt vtv =
+        if vtv.vtv_ghost then fprintf fmt "unit" else print_vtv info fmt vtv in
+      fprintf fmt "@[<hov 4>| %a of %a@]" (print_cs info) cs.pl_ls
+        (print_list star print_vtv) tl
+
+let print_pdata_decl info fst fmt (its, csl, _) =
+  let print_default () = print_list newline (print_pconstr info) fmt csl in
+  let print_field fmt (ls, vtv) =
+    fprintf fmt "%s%a: "
+      (if vtv.vtv_mut <> None then "mutable " else "") (print_ls info) ls;
+    if vtv.vtv_ghost then fprintf fmt "unit" else print_vtv info fmt vtv in
+  let print_defn fmt = function
+    | [cs, _] ->
+        let pjl = get_record info cs.pl_ls in
+        if pjl = [] then print_default ()
+        else fprintf fmt "{ %a }" (print_list semi print_field)
+          (List.combine pjl cs.pl_args)
+    | _ ->
+        print_default ()
+  in
+  fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]"
+    (if fst then "type" else "and")
+    print_tv_args its.its_args (print_its info) its print_defn csl
+
+let print_pdata_decl info first fmt (its, _, _ as d) =
+  if has_syntax info its.its_pure.ts_name then
+    fprintf fmt "(* type %a is overridden by driver *)"
+      (print_lident info) its.its_pure.ts_name
+  else begin print_pdata_decl info first fmt d; forget_tvs () end
+
+let is_record = function
+  | _, [_, pjl], _ -> List.for_all ((<>) None) pjl
+  | _ -> false
+
+let print_pprojections info fmt (_, csl, _) =
+  let pjl = List.filter ((<>) None) (snd (List.hd csl)) in
+  let pjl = List.map Util.of_option pjl in
+  let print ls =
+    let print_branch fmt (cs, pjl) =
+      let print_arg fmt = function
+        | Some ls' when pl_equal ls' ls -> fprintf fmt "x"
+        | _ -> fprintf fmt "_" in
+      fprintf fmt "| %a (%a) -> x"
+        (print_cs info) cs.pl_ls (print_list comma print_arg) pjl
+    in
+    fprintf fmt "@[<hov 2>let %a = function@\n" (print_ls info) ls.pl_ls;
+    print_list newline print_branch fmt csl;
+    fprintf fmt "@]@\n@\n"
+  in
+  List.iter print pjl
+
+let print_pprojections info fmt (ts, _, _ as d) =
+  if not (has_syntax info ts.its_pure.ts_name) && not (is_record d) then begin
+    print_pprojections info fmt d; forget_tvs ()
+  end
+
 let pdecl info fmt pd = match pd.pd_node with
-  | PDtype _ ->
-      fprintf fmt "(* TODO PDtype *)@\n@\n"
-  | PDdata _ ->
-      fprintf fmt "(* TODO PDdata *)@\n@\n"
+  | PDtype ts ->
+      print_type_decl info fmt ts
+  | PDdata tl ->
+      print_list_next newline (print_pdata_decl info) fmt tl;
+      fprintf fmt "@\n@\n";
+      print_list nothing (print_pprojections info) fmt tl
   | PDval lv ->
       print_val_decl info fmt lv
   | PDlet ld ->
