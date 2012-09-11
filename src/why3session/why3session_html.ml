@@ -132,7 +132,8 @@ let print_results fmt provers proofs =
       try
         let pr = S.PHprover.find proofs p in
         let s = pr.S.proof_state in
-        match s with
+        begin
+          match s with
 	  | S.Done res ->
 	    begin
 	      match res.Call_provers.pr_answer with
@@ -153,6 +154,8 @@ let print_results fmt provers proofs =
 	    end
 	  | S.Undone _ -> fprintf fmt "E0E0E0\">Undone"
 	  | S.InternalFailure _ -> fprintf fmt "E0E0E0\">Internal Failure"
+        end;
+        if pr.S.proof_obsolete then fprintf fmt "(obsolete)"
       with Not_found -> fprintf fmt "E0E0E0\">---"
     end;
     fprintf fmt "</td>") provers

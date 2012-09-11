@@ -771,9 +771,13 @@ There are three styles of output: 'table', 'simpletree' and
 \end{figure}
 
 The style 'table' outputs the contents of the session as a table,
-similar to the LaTeX output above. Figure~\ref{fig:html} is the HTML table
-produced for the 'HelloProof' example, as typically shown in a Web
-browser.
+similar to the LaTeX output above. Figure~\ref{fig:html} is the HTML
+table produced for the 'HelloProof' example, as typically shown in a
+Web browser. The gray cells filled with \texttt{---} just mean that
+the prover was not run on the corresponding goal. Green background
+means the result was ``Valid'', other cases are in orange
+background. The red background for a goal means that the goal was not
+proved.
 
 The style ''simpletree' displays the contents of the session under the form of tree, similar to the tree view in the IDE. It uses only basic HTMl tags such as \verb|<ul>| and \verb|<li>|.
 
