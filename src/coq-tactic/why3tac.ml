@@ -1082,8 +1082,8 @@ let is_goal s =
   n >= 11 && String.sub s 0 11 = "Unnamed_thm" ||
   n >= 9 && String.sub s (n - 9) 9 = "_admitted"
 
-let tr_top_decl = function
-  | (sp, kn as _oname), Lib.Leaf lobj ->
+let tr_top_decl ((sp, kn),node) = 
+  CoqCompat.on_leaf_node node (function lobj ->
     let dep = empty_dep () in
     let env = Global.env () in
     let bv = Idmap.empty in
@@ -1122,14 +1122,7 @@ let tr_top_decl = function
         ()
     end
 (* Format.printf "done@." *)
-  | _, Lib.CompilingLibrary _
-  | _, Lib.OpenedModule _
-  | _, Lib.ClosedModule  _
-  | _, Lib.OpenedModtype _
-  | _, Lib.ClosedModtype _
-  | _, Lib.OpenedSection _
-  | _, Lib.ClosedSection _
-  | _, Lib.FrozenState _ -> ()
+  )
 
 let pr_fp fp =
   pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)
