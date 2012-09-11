@@ -425,13 +425,11 @@ let load_env_session ?(includes=[]) session conf_path_opt =
 (* session accessor     *)
 (************************)
 
+(* dead code
 let get_session_file file = file.file_parent
 
-(* dead code
 let get_session_theory th = get_session_file th.theory_parent
-*)
 
-(* dead code
 let rec get_session_goal goal =
   match goal.goal_parent with
     | Parent_transf trans -> get_session_trans trans

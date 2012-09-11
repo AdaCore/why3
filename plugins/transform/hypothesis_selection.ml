@@ -22,9 +22,7 @@
 a graph-based heuristic finds close enough to the goal *)
 
 open Why3
-open Util
 open Ident
-open Ty
 open Term
 open Decl
 open Task
@@ -37,7 +35,6 @@ module Int_Dft = struct
   let default = max_int
 end
 
-open Graph
 module GP = Graph.Persistent.Digraph.ConcreteLabeled(
   struct
     type t = lsymbol
@@ -403,7 +400,7 @@ module Select = struct
     in List.fold_left fmla_get_pred acc clause
 
   (** get all sub-formulae *)
-  let rec get_sub_fmlas fTbl tTbl fmla =
+  let get_sub_fmlas fTbl tTbl fmla =
     let rec gather_sub_fmla fTbl tTbl acc fmla = match fmla.t_node with
       | Tapp (_,terms) ->
           let acc = List.fold_left (gather_sub_term fTbl tTbl) acc terms in

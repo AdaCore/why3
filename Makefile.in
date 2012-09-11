@@ -806,12 +806,13 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
-src/coq-tactic/coqCompat.cmi:  BFLAGS+=-rectypes 
-src/coq-tactic/coqCompat.cmo:  BFLAGS+=-rectypes 
+src/coq-tactic/coqCompat.cmi: BFLAGS+=-rectypes 
+src/coq-tactic/coqCompat.cmo: BFLAGS+=-rectypes 
 src/coq-tactic/coqCompat.cmx: OFLAGS+=-rectypes 
-src/coq-tactic/why3tac.cmo:  BFLAGS+=-rectypes -I +camlp5
-src/coq-tactic/why3tac.cmx:  BFLAGS+=-rectypes -I +camlp5
-lib/coq-tactic/why3tac.cma:  BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/why3tac.cmi: BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/why3tac.cmo: BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/why3tac.cmx: OFLAGS+=-rectypes -I +camlp5
+lib/coq-tactic/why3tac.cma: BFLAGS+=-rectypes -I +camlp5
 lib/coq-tactic/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
 lib/coq-tactic/why3tac.cmxs: src/why3.cmxa $(COQPCMX)

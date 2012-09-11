@@ -55,9 +55,13 @@ let modulename path t =
 
 (** Driver *)
 
+(* dead code
+
 (* (path,id) -> string Hid *)
 let stdlib = Hashtbl.create 17
 let is_stdlib path id = Hashtbl.mem stdlib (path, id)
+
+*)
 
 (** Printers *)
 
@@ -77,7 +81,7 @@ let is_ocaml_keyword =
   List.iter (fun s -> Hashtbl.add h s ()) ocaml_keywords;
   Hashtbl.mem h
 
-let iprinter,aprinter,tprinter,pprinter =
+let iprinter,aprinter,_tprinter,_pprinter =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
   create_ident_printer ocaml_keywords ~sanitizer:isanitize,
@@ -88,11 +92,13 @@ let iprinter,aprinter,tprinter,pprinter =
 let forget_tvs () =
   forget_all aprinter
 
+(* dead code
 let forget_all () =
   forget_all iprinter;
   forget_all aprinter;
   forget_all tprinter;
   forget_all pprinter
+*)
 
 (* info *)
 
@@ -494,10 +500,11 @@ and print_tbranch info fmt br =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat info) p (print_term info) t;
   Svs.iter forget_var p.pat_vars
 
+(* dead code
 and print_tl info fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma (print_term info))) tl
-
+*)
 
 let print_ls_type info fmt = function
   | None -> fprintf fmt "bool"

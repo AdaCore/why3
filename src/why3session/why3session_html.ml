@@ -113,7 +113,7 @@ struct
     List.fold_left
       (fun depth g -> max depth (goal_depth g)) 0 t.S.theory_goals
 
-  let rec provers_stats provers theory =
+  let provers_stats provers theory =
     S.theory_iter_proof_attempt (fun a ->
       Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
 
@@ -166,13 +166,13 @@ let rec num_lines acc tr =
 
   let rec print_transf fmt depth max_depth provers tr =
     fprintf fmt "<tr>";
-    for i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
+    for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
     fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) tr.S.transf_verified
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" tr.transf_name ;
-    for i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
+    for _i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
       fprintf fmt "<td bgcolor=\"#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
