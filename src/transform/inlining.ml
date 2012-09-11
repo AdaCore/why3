@@ -133,7 +133,8 @@ let trivial = t ~use_meta:true ~in_goal:false
 
 let tagged =
    let notdef _ = false in
-   let notls symbol = not (Slab.mem inline_label symbol.ls_name.id_label) in
+   let notls symbol =
+      not (Ident.Slab.mem inline_label symbol.ls_name.Ident.id_label) in
    t ~use_meta:true ~in_goal:false
      ~notdeft:notdef ~notdeff:notdef ~notls:notls
 
