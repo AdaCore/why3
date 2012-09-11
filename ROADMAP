@@ -121,22 +121,27 @@ scheduled on Sep 2012
 == New Features to announce ==
 
 New features:
-  o
+  o Support for Coq 8.4
+  o dropped support for Coq 8.2
+  o new scheme for Coq realizations using type classes
+  o new API for programs
+  o Support for PVS 6.0
 
-Bug fix:
+Bug fixes:
   o
 
 == Final preparation ==
 
+* do "make update-coq" and "make", fix Coq realizations if needed
 * check that nightly bench is OK
 * check that "make xml-validate" is OK
 * put 0.74 in file Version
 * check headers
-* check the file CHANGES
+* check the file CHANGES, add the release date
 * manual in PDF: check that macro \todo is commented out
     in ./macros.tex, and then "make doc"
 * do "make distrib"
-* test the distrib why3-0.73.tar.gz
+* test the distrib why3-0.74.tar.gz
 * make a last commit:
  - add tag 0.74 to the git repository 
  - do not forget to push it using git push --tags
@@ -157,7 +162,7 @@ Bug fix:
  - update the main HTML page (sources are in why3-papers/www)
 
 * produce the Why3 part of ProVal gallery 
-  -> add also a ZIP file of it
+  -> add also a tar.gz and a ZIP file of it
 * Announce the distrib
  - What to put in the announcement: see New Features above
 * The next commit : add +git to the version in file Version
@@ -167,7 +172,7 @@ Bug fix:
 * Sortie PVS
 ** avec mecanisme de realization
 
-* Yices 2 ? interesserait Cesar
+* support de Yices 2 ? interesserait Cesar
 
 * mettre au propre les loc des fichiers de sessions, en particulier
   les noms de fichiers doivent etre relatifs au fichier de session
@@ -183,14 +188,14 @@ Bug fix:
  - (CLAUDE) complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 
-* PRIORITAIRE Coq output
+* DONE (PRIORITAIRE) Coq output
  - corriger l'incoherence, comprendre si on veut vraiment accepter
 
   function x : 'a
   (cf: en caml cela ne marche pas)
  Solution proposee: utiliser des types classes, en particulier Inhabited
 
-* PRIORITAIRE, JCF et ANDREI, clone de module
+* DONE ? PRIORITAIRE, JCF et ANDREI, clone de module
  - demarche: ecrire une API avec smart constructors garantissant
    le bon typage, et clone sera en premier lieu un de ces constructors
  - cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
