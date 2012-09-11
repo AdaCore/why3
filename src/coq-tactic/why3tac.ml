@@ -1125,10 +1125,8 @@ let tr_top_decl = function
   | _, Lib.CompilingLibrary _
   | _, Lib.OpenedModule _
   | _, Lib.ClosedModule  _
-(*
   | _, Lib.OpenedModtype _
   | _, Lib.ClosedModtype _
-*)
   | _, Lib.OpenedSection _
   | _, Lib.ClosedSection _
   | _, Lib.FrozenState _ -> ()
