@@ -39,7 +39,9 @@ exception TermExpected
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 exception ClashTheory of string
+(* dead code
 exception UnboundTheory of qualid
+*)
 exception UnboundTypeVar of string
 exception UnboundType of string list
 exception UnboundSymbol of string list
@@ -67,8 +69,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
       fprintf fmt "%a is not a predicate symbol" Pretty.print_ls ls
   | ClashTheory s ->
       fprintf fmt "Clash with previous theory %s" s
+(* dead code
   | UnboundTheory q ->
       fprintf fmt "unbound theory %a" print_qualid q
+*)
   | UnboundTypeVar s ->
       fprintf fmt "unbound type variable '%s" s
   | UnboundType sl ->
@@ -203,7 +207,9 @@ let find_psymbol q uc = find_psymbol_ns q (get_namespace uc)
 
 let get_dummy_id _ = Glob.dummy_id
 let find_namespace_ns = find_ns get_dummy_id ns_find_ns
+(* dead code
 let find_namespace q uc = find_namespace_ns q (get_namespace uc)
+*)
 
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
@@ -1023,7 +1029,7 @@ let type_term uc denv env t =
   term env t
 
 let type_fmla uc denv env f =
-  let f = dfmla uc denv f in
+  let f = dfmla ~localize:(Some None) uc denv f in
   fmla env f
 
 let add_prop k loc s f th =

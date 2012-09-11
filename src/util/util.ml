@@ -72,7 +72,7 @@ let option_map_fold f acc x = match x with
 (* useful iterator on int *)
 let rec foldi f acc min max =
   if min > max then acc else foldi f (f acc min) (succ min) max
-let rec mapi f = foldi (fun acc i -> f i::acc) []
+let mapi f = foldi (fun acc i -> f i::acc) []
 
 (* useful iterator on float *)
 let rec iterf f min max step =
@@ -145,6 +145,21 @@ let rec list_first f = function
   | a::l -> match f a with
       | None -> list_first f l
       | Some r -> r
+
+let list_find_nth p l =
+  let rec aux p n = function
+    | [] -> raise Not_found
+    | a::l -> if p a then n else aux p (n+1) l in
+  aux p 0 l
+
+
+let list_first_nth f l =
+  let rec aux f n = function
+    | [] -> raise Not_found
+    | a::l -> match f a with
+      | None -> aux f (n+1) l
+      | Some r -> n,r in
+  aux f 0 l
 
 let list_iteri f l =
   let rec iter i = function
@@ -234,19 +249,29 @@ let is_uppercase c = 'A' <= c && c <= 'Z'
 let concat_non_empty sep l =
   String.concat sep (List.filter (fun s -> s <> "") l)
 
+(** useful function on char *)
+let count n =
+  let r = ref (n-1) in
+  fun _ -> incr r; !r
+
 (* Set and Map on ints and strings *)
 
-module Int  = struct type t = int let compare = Pervasives.compare end
+module Int  = struct
+  type t = int
+  let compare = Pervasives.compare
+  let equal x y = x = y
+  let hash x = x
+ end
 
 module Mint = Map.Make(Int)
 module Sint = Mint.Set
+module Hint = Hashtbl.Make(Int)
 
 module Mstr = Map.Make(String)
 module Sstr = Mstr.Set
 module Hstr = Hashtbl.Make
   (struct
     type t = String.t
-    let compare = String.compare
     let hash    = (Hashtbl.hash : string -> int)
     let equal   = ((=) : string -> string -> bool)
   end)
@@ -308,15 +333,6 @@ struct
   module W = Hashweak.Make(X)
 end
 
-(* memoization *)
-
-let memo_int size f =
-  let h = Hashtbl.create size in
-  fun x -> try Hashtbl.find h x
-  with Not_found -> let y = f x in Hashtbl.add h x y; y
-
-let memo_string = memo_int
-
 module type PrivateHashtbl = sig
   (** Private Hashtbl *)
   type 'a t
@@ -332,5 +348,17 @@ module type PrivateHashtbl = sig
     (** Same as {Hashtbl.mem} *)
   val length : 'a t -> int
     (** Same as {Hashtbl.length} *)
+
+end
+
+module type PrivateArray = sig
+  (** Private Array *)
+  type 'a t
+
+  val get : 'a t -> int -> 'a
+  val iter : ('a -> unit) -> 'a t -> unit
+    (** Same as {!Array.iter} *)
+  val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
+    (** Same as {!Array.fold} *)
 
 end

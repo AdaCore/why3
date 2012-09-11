@@ -23,6 +23,7 @@ open Term
 open Decl
 open Theory
 open Task
+open Util
 
 (** Task transformation *)
 
@@ -90,7 +91,7 @@ val on_tagged_pr : meta -> (Spr.t -> 'a trans) -> 'a trans
 exception UnknownFlagTrans of meta * string * string list
 exception IllegalFlagTrans of meta
 
-type ('a,'b) flag_trans = (string, 'a -> 'b trans) Hashtbl.t
+type ('a,'b) flag_trans = ('a -> 'b trans) Hstr.t
 
 val on_flag : meta -> ('a,'b) flag_trans -> string -> 'a -> 'b trans
 (** [on_flag m ft def arg] takes an exclusive meta [m] of type [[MTstring]],

@@ -5,43 +5,29 @@ Require Import Rbase.
 Require int.Int.
 
 (* Why3 assumption *)
-Definition implb(x:bool) (y:bool): bool := match (x,
-  y) with
-  | (true, false) => false
-  | (_, _) => true
-  end.
-
-(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
-Set Contextual Implicit.
-Implicit Arguments Nil.
-Unset Contextual Implicit.
-Implicit Arguments Cons.
+Implicit Arguments Nil [[a]].
+Implicit Arguments Cons [[a]].
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-Implicit Arguments get.
+Parameter get: forall {a:Type} {b:Type}, (map a b) -> a -> b.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-Implicit Arguments set.
+Parameter set: forall {a:Type} {b:Type}, (map a b) -> a -> b -> (map a b).
 
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_eq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
   a2) = b1).
 
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_neq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (a:Type) (b:Type), b -> (map a b).
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
+Parameter const: forall {a:Type} {b:Type}, b -> (map a b).
 
-Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
+Axiom Const : forall {a:Type} {b:Type}, forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
@@ -255,7 +241,6 @@ Axiom eval_bin_def : forall (x:value) (op:operator) (y:value), match (x,
   end.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint eval_term(sigma:(map mident value)) (pi:(list (ident* value)%type))
   (t:term) {struct t}: value :=
   match t with
@@ -265,10 +250,8 @@ Fixpoint eval_term(sigma:(map mident value)) (pi:(list (ident* value)%type))
   | (Tbin t1 op t2) => (eval_bin (eval_term sigma pi t1) op (eval_term sigma
       pi t2))
   end.
-Unset Implicit Arguments.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint eval_fmla(sigma:(map mident value)) (pi:(list (ident* value)%type))
   (f:fmla) {struct f}: Prop :=
   match f with
@@ -284,7 +267,6 @@ Fixpoint eval_fmla(sigma:(map mident value)) (pi:(list (ident* value)%type))
       (Vbool b)) pi) f1)
   | (Fforall x TYunit f1) => (eval_fmla sigma (Cons (x, Vvoid) pi) f1)
   end.
-Unset Implicit Arguments.
 
 Parameter msubst_term: term -> mident -> ident -> term.
 
@@ -309,7 +291,6 @@ Axiom subst_term_def : forall (e:term) (r:ident) (v:ident),
   end.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint fresh_in_term(id:ident) (t:term) {struct t}: Prop :=
   match t with
   | (Tvalue _) => True
@@ -317,7 +298,6 @@ Fixpoint fresh_in_term(id:ident) (t:term) {struct t}: Prop :=
   | (Tderef _) => True
   | (Tbin t1 _ t2) => (fresh_in_term id t1) /\ (fresh_in_term id t2)
   end.
-Unset Implicit Arguments.
 
 Axiom eval_msubst_term : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (e:term) (x:mident) (v:ident), (fresh_in_term v e) ->
@@ -334,7 +314,6 @@ Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
   t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm e) => (fresh_in_term id e)
@@ -345,10 +324,8 @@ Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
       (fresh_in_fmla id f1))
   | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
   end.
-Unset Implicit Arguments.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint subst(f:fmla) (x:ident) (v:ident) {struct f}: fmla :=
   match f with
   | (Fterm e) => (Fterm (subst_term e x v))
@@ -358,10 +335,8 @@ Fixpoint subst(f:fmla) (x:ident) (v:ident) {struct f}: fmla :=
   | (Flet y t f1) => (Flet y (subst_term t x v) (subst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (subst f1 x v))
   end.
-Unset Implicit Arguments.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
   match f with
   | (Fterm e) => (Fterm (msubst_term e x v))
@@ -371,7 +346,6 @@ Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
   | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
   end.
-Unset Implicit Arguments.
 
 Axiom subst_fresh : forall (f:fmla) (x:ident) (v:ident), (fresh_in_fmla x
   f) -> ((subst f x v) = f).
@@ -423,7 +397,6 @@ Axiom let_implies : forall (id:ident) (t:term) (p:fmla) (q:fmla),
   t q))).
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint fresh_in_expr(id:ident) (e:expr) {struct e}: Prop :=
   match e with
   | (Evalue _) => True
@@ -440,7 +413,6 @@ Fixpoint fresh_in_expr(id:ident) (e:expr) {struct e}: Prop :=
   | (Ewhile cond inv body) => (fresh_in_expr id cond) /\ ((fresh_in_fmla id
       inv) /\ (fresh_in_expr id body))
   end.
-Unset Implicit Arguments.
 
 (* Why3 assumption *)
 Inductive one_step : (map mident value) -> (list (ident* value)%type) -> expr
@@ -567,84 +539,68 @@ Definition total_valid_triple(p:fmla) (e:expr) (q:fmla): Prop :=
 
 Parameter set1 : forall (a:Type), Type.
 
-Parameter mem: forall (a:Type), a -> (set1 a) -> Prop.
-Implicit Arguments mem.
+Parameter mem: forall {a:Type}, a -> (set1 a) -> Prop.
 
 (* Why3 assumption *)
-Definition infix_eqeq (a:Type)(s1:(set1 a)) (s2:(set1 a)): Prop :=
+Definition infix_eqeq {a:Type}(s1:(set1 a)) (s2:(set1 a)): Prop :=
   forall (x:a), (mem x s1) <-> (mem x s2).
-Implicit Arguments infix_eqeq.
 
-Axiom extensionality : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)),
+Axiom extensionality : forall {a:Type}, forall (s1:(set1 a)) (s2:(set1 a)),
   (infix_eqeq s1 s2) -> (s1 = s2).
 
 (* Why3 assumption *)
-Definition subset (a:Type)(s1:(set1 a)) (s2:(set1 a)): Prop := forall (x:a),
+Definition subset {a:Type}(s1:(set1 a)) (s2:(set1 a)): Prop := forall (x:a),
   (mem x s1) -> (mem x s2).
-Implicit Arguments subset.
 
-Axiom subset_trans : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a))
+Axiom subset_trans : forall {a:Type}, forall (s1:(set1 a)) (s2:(set1 a))
   (s3:(set1 a)), (subset s1 s2) -> ((subset s2 s3) -> (subset s1 s3)).
 
-Parameter empty: forall (a:Type), (set1 a).
-Set Contextual Implicit.
-Implicit Arguments empty.
-Unset Contextual Implicit.
+Parameter empty: forall {a:Type}, (set1 a).
 
 (* Why3 assumption *)
-Definition is_empty (a:Type)(s:(set1 a)): Prop := forall (x:a), ~ (mem x s).
-Implicit Arguments is_empty.
+Definition is_empty {a:Type}(s:(set1 a)): Prop := forall (x:a), ~ (mem x s).
 
-Axiom empty_def1 : forall (a:Type), (is_empty (empty :(set1 a))).
+Axiom empty_def1 : forall {a:Type}, (is_empty (empty :(set1 a))).
 
-Parameter add: forall (a:Type), a -> (set1 a) -> (set1 a).
-Implicit Arguments add.
+Parameter add: forall {a:Type}, a -> (set1 a) -> (set1 a).
 
-Axiom add_def1 : forall (a:Type), forall (x:a) (y:a), forall (s:(set1 a)),
+Axiom add_def1 : forall {a:Type}, forall (x:a) (y:a), forall (s:(set1 a)),
   (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
 
-Parameter remove: forall (a:Type), a -> (set1 a) -> (set1 a).
-Implicit Arguments remove.
+Parameter remove: forall {a:Type}, a -> (set1 a) -> (set1 a).
 
-Axiom remove_def1 : forall (a:Type), forall (x:a) (y:a) (s:(set1 a)), (mem x
+Axiom remove_def1 : forall {a:Type}, forall (x:a) (y:a) (s:(set1 a)), (mem x
   (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
 
-Axiom subset_remove : forall (a:Type), forall (x:a) (s:(set1 a)),
+Axiom subset_remove : forall {a:Type}, forall (x:a) (s:(set1 a)),
   (subset (remove x s) s).
 
-Parameter union: forall (a:Type), (set1 a) -> (set1 a) -> (set1 a).
-Implicit Arguments union.
+Parameter union: forall {a:Type}, (set1 a) -> (set1 a) -> (set1 a).
 
-Axiom union_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
+Axiom union_def1 : forall {a:Type}, forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
   (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
 
-Parameter inter: forall (a:Type), (set1 a) -> (set1 a) -> (set1 a).
-Implicit Arguments inter.
+Parameter inter: forall {a:Type}, (set1 a) -> (set1 a) -> (set1 a).
 
-Axiom inter_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
+Axiom inter_def1 : forall {a:Type}, forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
   (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
 
-Parameter diff: forall (a:Type), (set1 a) -> (set1 a) -> (set1 a).
-Implicit Arguments diff.
+Parameter diff: forall {a:Type}, (set1 a) -> (set1 a) -> (set1 a).
 
-Axiom diff_def1 : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
+Axiom diff_def1 : forall {a:Type}, forall (s1:(set1 a)) (s2:(set1 a)) (x:a),
   (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
 
-Axiom subset_diff : forall (a:Type), forall (s1:(set1 a)) (s2:(set1 a)),
+Axiom subset_diff : forall {a:Type}, forall (s1:(set1 a)) (s2:(set1 a)),
   (subset (diff s1 s2) s1).
 
-Parameter choose: forall (a:Type), (set1 a) -> a.
-Implicit Arguments choose.
+Parameter choose: forall {a:Type}, (set1 a) -> a.
 
-Axiom choose_def : forall (a:Type), forall (s:(set1 a)), (~ (is_empty s)) ->
+Axiom choose_def : forall {a:Type}, forall (s:(set1 a)), (~ (is_empty s)) ->
   (mem (choose s) s).
 
-Parameter all: forall (a:Type), (set1 a).
-Set Contextual Implicit.
-Implicit Arguments all.
-Unset Contextual Implicit.
+Parameter all: forall {a:Type}, (set1 a).
 
-Axiom all_def : forall (a:Type), forall (x:a), (mem x (all :(set1 a))).
+Axiom all_def : forall {a:Type}, forall (x:a), (mem x (all :(set1 a))).
 
 (* Why3 assumption *)
 Definition assigns(sigma:(map mident value)) (a:(set1 mident)) (sigma':(map
@@ -667,7 +623,6 @@ Axiom assigns_union_right : forall (sigma:(map mident value)) (sigma':(map
   sigma') -> (assigns sigma (union s1 s2) sigma').
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint expr_writes(e:expr) (w:(set1 mident)) {struct e}: Prop :=
   match e with
   | ((Evalue _)|((Evar _)|((Ederef _)|(Eassert _)))) => True
@@ -679,7 +634,6 @@ Fixpoint expr_writes(e:expr) (w:(set1 mident)) {struct e}: Prop :=
       (expr_writes e3 w))
   | (Ewhile cond _ body) => (expr_writes cond w) /\ (expr_writes body w)
   end.
-Unset Implicit Arguments.
 
 Parameter fresh_from: fmla -> expr -> ident.
 
@@ -692,13 +646,12 @@ Axiom fresh_from_expr : forall (e:expr) (f:fmla),
 Parameter abstract_effects: expr -> fmla -> fmla.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
 Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
   match e with
   | (Evalue v) => (Flet result (Tvalue v) q)
   | (Evar v) => (Flet result (Tvar v) q)
   | (Ederef x) => (Flet result (Tderef x) q)
-  | (Eassert f) => (Fand f (Fimplies f q))
+  | (Eassert f) => (Fand f (Fimplies f (Flet result (Tvalue Vvoid) q)))
   | (Eseq e1 e2) => (wp e1 (wp e2 q))
   | (Elet id e1 e2) => (wp e1 (Flet id (Tvar result) (wp e2 q)))
   | (Ebin e1 op e2) => let t1 := (fresh_from q e) in let t2 :=
@@ -713,7 +666,9 @@ Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
       (Fand (Fimplies (Fand (Fterm (Tvar result)) inv) (wp body inv))
       (Fimplies (Fand (Fnot (Fterm (Tvar result))) inv) q)))))
   end.
-Unset Implicit Arguments.
+
+Axiom result_always_fresh_in_wp : forall (e:expr) (q:fmla),
+  (fresh_in_fmla result (wp e q)).
 
 Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (e:expr) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp e (Fand p
@@ -728,11 +683,11 @@ Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
   (e:expr) (e':expr), (one_step sigma pi e sigma' pi' e') -> forall (q:fmla),
   (eval_fmla sigma pi (wp e q)) -> (eval_fmla sigma' pi' (wp e' q)).
 induction 1.
-(* case 1: var *)
+(* case 1/16: var *)
 auto.
-(* case 2: deref *)
+(* case 2/16: deref *)
 auto.
-(* case 3: e_1 bin_op e_2 *)
+(* case 3/16: e_1 bin_op e_2 *)
 intros q.
 simpl in *.
 pose (t1 := fresh_from q (Ebin e1 op e2)).
@@ -762,19 +717,19 @@ rewrite (subst_term_def (Tvar result) t1' t1).
 
 admit. (* needs lemmas on fresh_from *)
 admit.*)
-(* case 4: v_1 bin_op e_2 *)
+(* case 4/16: v_1 bin_op e_2 *)
 intros q h.
 admit. 
 
-(* case 5: v_1 bin_op v_2 *)
+(* case 5/16: v_1 bin_op v_2 *)
 intros q h.
 admit. 
 
-(* case x := e -> x := e' *)
+(* case 6/16: x := e -> x := e' *)
 intros.
 admit.
 
-(* case x := v -> void *)
+(* case 7/16: x := v -> void *)
 simpl; intros.
 apply eval_msubst in H.
 rewrite get_stack_neq in H.
@@ -785,33 +740,49 @@ simpl in H.
 rewrite eval_swap in H.
 rewrite eval_change_free in H.
 rewrite eval_same_var in H; auto.
-
-
-(* case Eseq e_1 e_2 *)
+admit.
+admit.
+admit.
 admit.
 
-(* case Eseq void e_2 *)
+(* case 8/16: Eseq e_1 e_2 *)
 admit.
 
-(* case Elet id e_1 e_2 *)
+(* case 9/16: Eseq void e_2 *)
 admit.
 
-(* case Elet id v_1 e_2 *)
+(* case 10/16: Elet id e_1 e_2 *)
 admit.
 
-(* case Eif e_1 e_2 e_3*)
+(* case 11/16: Elet id v_1 e_2 *)
 admit.
 
-(* case Eif true e_1 e_2 *)
+(* case 12/16: Eif e_1 e_2 e_3*)
 admit.
 
-(* case Eif false e_1 e_2 *)
-admit.
+(* case 13/16: Eif true e_1 e_2 *)
+simpl.
+rewrite get_stack_eq.
+intros q (h & _ ).
+rewrite <- eval_change_free.
+apply h; auto.
+apply result_always_fresh_in_wp.
 
-(* case Eassert f *)
-admit.
+(* case 14/16: Eif false e_1 e_2 *)
+simpl.
+rewrite get_stack_eq.
+intros q (_ & h ).
+rewrite <- eval_change_free.
+apply h.
+discriminate.
+apply result_always_fresh_in_wp.
 
-(* case Ewhile cond inv body *)
+(* case 15/16: Eassert f *)
+simpl.
+intros q (h1 & h2).
+apply (h2 h1).
+
+(* case 16/16: Ewhile cond inv body *)
 admit.
 
 Qed.

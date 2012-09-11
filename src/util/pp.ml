@@ -114,7 +114,12 @@ let add_flush sep fmt x = sep fmt x; pp_print_flush fmt ()
 
 let print_pair pr1 = print_pair_delim lparen comma rparen pr1
 
-let hov n fmt f x = pp_open_hovbox fmt n; f x; pp_close_box fmt ()
+let hov n f fmt x = pp_open_hovbox fmt n; f fmt x; pp_close_box fmt ()
+let indent n f fmt x =
+  for _i = 0 to n do
+    pp_print_char fmt ' '
+  done;
+  hov 0 f fmt x
 
 let open_formatter ?(margin=78) cout =
   let fmt = formatter_of_out_channel cout in

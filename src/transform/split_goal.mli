@@ -20,29 +20,43 @@
 
 val stop_split : Ident.label
 
-val split_pos : Term.term -> Term.term list
-(** [split_pos f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 /\ .. /\ gk] *)
-
-val split_neg : Term.term -> Term.term list
-(** [split_neg f] returns a list [[g1;..;gk]] such that
- [f] is logically equivalent to [g1 \/ .. \/ gk] *)
-
-val full_split_pos : Term.term -> Term.term list
-(** [full_split_pos f] returns a list [[g1;..;gk]] such that
+val split_pos_full : Term.term -> Term.term list
+(** [split_pos_full f] returns a list [[g1;..;gk]] such that
  [f] is logically equivalent to [g1 /\ .. /\ gk] and the length
  of the resulting list can be exponential wrt the size of [f] *)
 
-val full_split_neg : Term.term -> Term.term list
-(** [full_split_neg f] returns a list [[g1;..;gk]] such that
+val split_neg_full : Term.term -> Term.term list
+(** [split_neg_full f] returns a list [[g1;..;gk]] such that
  [f] is logically equivalent to [g1 \/ .. \/ gk] and the length
  of the resulting list can be exponential wrt the size of [f] *)
 
-val split_goal : Task.task Trans.tlist
-val split_all  : Task.task Trans.tlist
+val split_pos_right : Term.term -> Term.term list
+(** [split_pos_right] works as [split_pos_full] but does not split
+ conjunctions under disjunctions and on the left of implications *)
 
-val full_split_goal : Task.task Trans.tlist
-val full_split_all  : Task.task Trans.tlist
+val split_neg_right : Term.term -> Term.term list
+(** [split_neg_right] works as [split_neg_full] but does not split
+ disjunctions and implications under conjunctions *)
+
+val split_pos_wp : Term.term -> Term.term list
+(** [split_pos_wp] works as [split_pos_right] but stops at
+ the `[stop_split]' label and removes the label *)
+
+val split_neg_wp : Term.term -> Term.term list
+(** [split_neg_wp] works as [split_neg_right] but stops at
+ the `[stop_split]' label and removes the label *)
+
+val split_goal_full : Task.task Trans.tlist
+val split_all_full : Task.task Trans.tlist
+val split_premise_full : Task.task Trans.trans
+
+val split_goal_right : Task.task Trans.tlist
+val split_all_right : Task.task Trans.tlist
+val split_premise_right : Task.task Trans.trans
+
+val split_goal_wp : Task.task Trans.tlist
+val split_all_wp : Task.task Trans.tlist
+val split_premise_wp : Task.task Trans.trans
 
 val split_intro : Task.task Trans.tlist
-(** [split_intro] is [split_goal] with skolemization and formula separation *)
+(** [split_intro] is [split_goal_wp] with skolemization and formula separation *)

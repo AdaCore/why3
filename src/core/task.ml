@@ -51,6 +51,8 @@ let tds_singleton td = mk_tds (Stdecl.singleton td)
 
 let tds_equal : tdecl_set -> tdecl_set -> bool = (==)
 let tds_hash tds = Hashweak.tag_hash tds.tds_tag
+let tds_compare tds1 tds2 = compare
+  (Hashweak.tag_hash tds1.tds_tag) (Hashweak.tag_hash tds2.tds_tag)
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
@@ -140,6 +142,13 @@ let task_goal task = match find_goal task with
 let task_goal_fmla task  = match find_goal task with
   | Some (_,f)  -> f
   | None        -> raise GoalNotFound
+
+let task_separate_goal = function
+  | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}} as goal;
+          task_prev = task} ->
+      goal,task
+  | _ -> raise GoalNotFound
+
 
 let check_task task = match find_goal task with
   | Some _  -> raise GoalFound
@@ -369,6 +378,13 @@ let rec split i l acc = match i,l with
 
 let merge task l = List.fold_left add_tdecl task l
 
+type bisect_step =
+ | BSdone of task
+ | BSstep of task * (bool -> bisect_step)
+
+(*
+Simple version
+
 let rec bisect_aux f task lt i lk =
   if i < 2 then
     if try f (merge task lk) with UnknownIdent _ -> false then [] else
@@ -402,3 +418,55 @@ let bisect f task =
   let task = merge None tacc in
   let lt = bisect_aux f task lt i [goal] in
   add_tdecl (merge task lt) goal
+*)
+
+let rec bisect_aux cont task lt i lk =
+  if i < 2 then
+    let res0 b =
+      if b then cont [] else
+        (assert (List.length lt = 1); cont lt) in
+    try BSstep (merge task lk, res0) with UnknownIdent _ -> res0 false
+  else
+    let i1 = i/2 in
+    let i2 =  i/2 + i mod 2 in
+    let lt1,lt2 = split i1 lt [] in
+    let task1 = merge task lt1 in (** Can't fail *)
+    (** These "if then else" allow to remove big chunck with one call to f *)
+    let res1 b =
+      if b
+      then bisect_aux cont task lt1 i1 lk
+      else
+        let res2 b =
+          if b
+          then bisect_aux cont task lt2 i2 lk
+          else
+            let c1 lt2 =
+              let lk2 = List.append lt2 lk in
+              let c2 lt1 = cont (List.append lt1 lt2) in
+              bisect_aux c2 task lt1 i1 lk2 in
+            bisect_aux c1 task1 lt2 i2 lk in
+        try BSstep (merge (merge task lt2) lk, res2)
+        with UnknownIdent _ -> res2 false in
+    try BSstep (merge task1 lk,res1) with UnknownIdent _ -> res1 false
+
+
+
+let bisect_step task =
+  let task,goal = match task with
+    | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}} as td;
+            task_prev = task} -> task,td
+    | _ -> raise GoalNotFound in
+  let lt,i,tacc = task_fold (fun (acc,i,tacc) td ->
+    match td.td_node with
+      | Decl _ -> (td::acc,succ i,tacc)
+      | _ -> (acc,i,td::tacc)) ([],0,[]) task in
+  let task = merge None tacc in
+  let c1 lt =
+    BSdone (add_tdecl (merge task lt) goal) in
+  bisect_aux c1 task lt i [goal]
+
+let bisect f task =
+  let rec run = function
+    | BSdone r -> r
+    | BSstep (t,c) -> run (c (f t)) in
+  run (bisect_step task)

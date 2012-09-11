@@ -49,3 +49,13 @@ val full_invariant :
 val wp_val: Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
 val wp_let: Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
 val wp_rec: Env.env -> known_map -> theory_uc -> rec_defn -> theory_uc
+
+
+(** Efficient weakest preconditions *)
+
+val fast_wp: Debug.flag
+
+val fast_wp_val: Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
+val fast_wp_let: Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
+val fast_wp_rec: Env.env -> known_map -> theory_uc -> rec_defn -> theory_uc
+

@@ -18,10 +18,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Util
-open Ident
 open Term
-open Decl
 
 (* eliminate let *)
 

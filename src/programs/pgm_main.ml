@@ -23,14 +23,9 @@
 open Format
 open Why3
 open Util
-open Ident
-open Theory
 open Typing
 open Ptree
 open Pgm_module
-
-let debug_extraction = Debug.register_flag "extraction"
-  ~desc:"for internal use"
 
 exception ClashModule of string
 
@@ -81,7 +76,6 @@ let add_module ?(type_only=false) env path (ltm, lmod) m =
   let uc = use_export_theory uc prelude in
   let uc = List.fold_left (Pgm_typing.decl ~wp env ltm lmod) uc m.mod_decl in
   let md = close_module uc in
-  if Debug.test_flag debug_extraction then Pgm_ocaml.extract_module path md;
   Mstr.add ("WP " ^ id.id) md.m_pure ltm, (* avoids a theory/module clash *)
   Mstr.add id.id md lmod
 

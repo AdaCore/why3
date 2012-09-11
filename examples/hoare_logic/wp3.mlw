@@ -179,7 +179,7 @@ inductive one_step env env expr env env expr =
                  sigma' pi' (Eassign x e')
 
   | one_step_assign_value:
-      forall sigma pi:env, x:ident, v:value, e:term.
+      forall sigma pi:env, x:ident, v:value.
         one_step sigma pi (Eassign x (Evalue v))
                  (IdMap.set sigma x v) pi void
 

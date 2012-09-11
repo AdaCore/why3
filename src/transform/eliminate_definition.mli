@@ -20,6 +20,12 @@
 
 val eliminate_builtin         : Task.task Trans.trans
 
+val compute_diff :
+  (Theory.meta * Theory.meta_arg list) list Trans.trans Trans.trans
+(** compute the meta_remove given two tasks one included in the other *)
+
+
+
 val eliminate_definition_func : Task.task Trans.trans
 val eliminate_definition_pred : Task.task Trans.trans
 val eliminate_definition      : Task.task Trans.trans

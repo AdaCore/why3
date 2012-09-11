@@ -18,7 +18,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
 open Util
 open Ident
 open Ty
@@ -384,6 +383,7 @@ end)
 module Sdecl = Decl.S
 module Mdecl = Decl.M
 module Wdecl = Decl.W
+module Hdecl = Decl.H
 
 let d_equal : decl -> decl -> bool = (==)
 
@@ -519,6 +519,9 @@ let create_ind_decl s idl =
       | Tquant (Tforall, f) ->
           let _,_,f = t_open_quant f in clause acc f
       | Tbinop (Timplies, g, f) -> clause (g::acc) f
+      | Tlet (t, bf) ->
+          let v, f = t_open_bound bf in
+          clause (t_equ (t_var v) t :: acc) f
       | _ -> (acc, f)
     in
     let cls, g = clause [] (check_fvs f) in

@@ -18,8 +18,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Config
-
 type plugin = string
 
 let debug = Debug.register_info_flag "load_plugin"

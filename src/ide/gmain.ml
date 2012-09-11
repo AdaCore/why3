@@ -25,6 +25,7 @@ open Why3
 open Whyconf
 open Gconfig
 open Util
+open Debug
 module C = Whyconf
 
 let debug = Debug.lookup_flag "ide_info"
@@ -530,6 +531,9 @@ let row_expanded b iter _path =
     | S.Transf tr ->
         S.set_transf_expanded tr b
     | S.Proof_attempt _ -> ()
+    | S.Metas m ->
+      S.set_metas_expanded m b
+
 
 
 let (_:GtkSignal.id) =
@@ -550,7 +554,7 @@ let display_task t =
   task_view#source_buffer#set_text task_text;
   task_view#scroll_to_mark `INSERT
 
-let split_transformation = "split_goal"
+let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
@@ -591,9 +595,21 @@ let update_task_view a =
         task_view#source_buffer#set_text o
     | S.Transf _tr ->
         task_view#source_buffer#set_text ""
+   | S.Metas m ->
+     let print_meta_args =
+       Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
+     let print =
+       Pp.print_iter2 Mstr.iter Pp.newline2 Pp.newline Pp.string
+         (Pp.indent 2
+            (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
+     in
+     task_view#source_buffer#set_text
+       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
 
-module M = Session_scheduler.Make
-  (struct
+
+
+
+module MA = struct
      type key = GTree.row_reference
 
      let create ?parent () =
@@ -606,6 +622,7 @@ module M = Session_scheduler.Make
        goals_model#set ~row:iter ~column:index_column (-1);
        goals_model#get_row_reference (goals_model#get_path iter)
 
+     let keygen = create
 
      let remove row =
        session_needs_saving := true;
@@ -641,6 +658,7 @@ let notify any =
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
       | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
+      | S.Metas m -> m.S.metas_key,m.S.metas_expanded
   in
   (* name is set by notify since upgrade policy may update the prover name *)
   goals_model#set ~row:row#iter ~column:name_column
@@ -651,7 +669,9 @@ let notify any =
       | S.Proof_attempt a ->
         let p = a.S.proof_prover in
         Pp.string_of_wnl C.print_prover p
-      | S.Transf tr -> tr.S.transf_name);
+      | S.Transf tr -> tr.S.transf_name
+      | S.Metas _m -> "Metas..."
+   );
   let ind = goals_model#get ~row:row#iter ~column:index_column in
   begin
     match !current_selected_row with
@@ -672,6 +692,8 @@ let notify any =
         set_proof_state a
     | S.Transf tr ->
         set_row_status row tr.S.transf_verified
+   | S.Metas m ->
+        set_row_status row m.S.metas_verified
 
 let init =
   let cpt = ref (-1) in
@@ -694,19 +716,23 @@ let init =
          | S.Theory _ -> !image_theory
          | S.File _ -> !image_file
          | S.Proof_attempt _ -> !image_prover
-         | S.Transf _ -> !image_transf);
+         | S.Transf _ -> !image_transf
+         | S.Metas _ -> !image_metas);
     notify any
 
-(*
-let unknown_prover = Gconfig.unknown_prover gconfig
-
-let replace_prover _ _ = false (* Gconfig.replace_prover gconfig *)
-*)
+let rec init_any any =
+  init (S.key_any any) any;
+  S.iter init_any any
 
 let uninstalled_prover = Gconfig.uninstalled_prover gconfig
 
-   end)
+end
 
+module M = Session_scheduler.Make(MA)
+
+
+let () = w#add_accel_group accel_group
+let () = w#show ()
 
 (********************)
 (* opening database *)
@@ -746,7 +772,6 @@ let () =
       Unix.mkdir project_dir 0o777
     end
 
-
 let info_window ?(callback=(fun () -> ())) mt s =
   let buttons = match mt with
     | `INFO -> GWindow.Buttons.close
@@ -769,6 +794,28 @@ let info_window ?(callback=(fun () -> ())) mt s =
                    d#destroy ();
                    if mt <> `QUESTION || x = `OK then callback ())
   in ()
+
+let file_info = GMisc.label ~text:""
+  ~packing:(right_hb#pack ~fill:true) ()
+
+let warning_window ?loc msg =
+  begin
+    match loc with
+    | None ->
+      Format.fprintf Format.str_formatter "%s" msg
+    | Some l ->
+      (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+      Format.fprintf Format.str_formatter "%a: %s"
+        Loc.gen_report_position l msg
+  end;
+  let msg =
+    Format.flush_str_formatter ()
+  in
+  file_info#set_text msg;
+  info_window `WARNING msg
+
+let () = Warning.set_hook warning_window
+
 
 (* check if provers are present *)
 let () =
@@ -794,6 +841,7 @@ let sched =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
+    Debug.dprintf debug "@]@\n[Info] Opening session: update done@.  @[<hov 2>";
     let sched = M.init (Whyconf.running_provers_max
                           (Whyconf.get_main gconfig.config))
     in
@@ -897,6 +945,154 @@ let apply_trans_on_selection tr =
           tr
           a)
     (get_selected_row_references ())
+
+(*****************************************************)
+(* method: bisect goal *)
+(*****************************************************)
+
+let bisect_proof_attempt pa =
+  let eS = env_session () in
+  let timelimit = ref (-1) in
+  let set_timelimit res =
+    timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
+  let rec callback lp pa c = function
+    | S.Undone (S.Running | S.Scheduled) -> ()
+    | S.Undone S.Interrupted ->
+      dprintf debug "Bisecting interrupted.@."
+    | S.Undone (S.Unedited | S.JustEdited) -> assert false
+    | S.InternalFailure exn ->
+      (** Perhaps the test can be considered false in this case? *)
+      dprintf debug "Bisecting interrupted by an error %a.@."
+        Exn_printer.exn_printer exn
+    | S.Done res ->
+      let b = res.Call_provers.pr_answer = Call_provers.Valid in
+      dprintf debug "Bisecting: %a.@."
+        Call_provers.print_prover_result res;
+      if b then set_timelimit res;
+      let r = c b in
+      match r with
+      | Task.BSdone t2 ->
+        dprintf debug "Bisecting done.@.";
+        let t1 = S.goal_task pa.S.proof_parent in
+        if Task.task_equal t2 t1 then
+          dprintf debug "But doesn't reduced the task.@."
+        else
+        begin try
+        let keygen = MA.keygen in
+        let notify = MA.notify in
+        let diff =
+          Trans.apply (Trans.apply Eliminate_definition.compute_diff t1) t2 in
+        (* we know that this metas are registered *)
+        let diff = List.map (fun (m,l) -> m.Theory.meta_name,l) diff in
+        let metas = S.add_registered_metas ~keygen eS diff pa.S.proof_parent in
+        let trans = S.add_registered_transformation ~keygen
+          eS "eliminate_builtin" metas.S.metas_goal in
+        let goal = List.hd trans.S.transf_goals in (* only one *)
+        let npa = S.copy_external_proof ~notify ~keygen ~obsolete:true
+          ~goal ~env_session:eS pa in
+        MA.init_any (S.Metas metas);
+        M.run_external_proof eS sched npa
+        with e ->
+          dprintf debug "Bisecting error:@\n%a@."
+            Exn_printer.exn_printer e end
+      | Task.BSstep (t,c) ->
+        M.schedule_proof_attempt
+          ~timelimit:!timelimit
+          ~memlimit:pa.S.proof_memlimit
+          ?old:(S.get_edited_as_abs eS.S.session pa)
+          ~inplace:lp.S.prover_config.C.in_place
+          ~command:(C.get_complete_command lp.S.prover_config)
+          ~driver:lp.S.prover_driver
+          ~callback:(callback lp pa c) sched t
+  in
+    (** Run once the complete goal in order to verify its validity and
+        update the proof attempt *)
+  let first_callback pa = function
+    (** this pa can be different than the first pa *)
+    | S.Undone (S.Running | S.Scheduled) -> ()
+    | S.Undone S.Interrupted ->
+      dprintf debug "Bisecting interrupted.@."
+    | S.Undone (S.Unedited | S.JustEdited) -> assert false
+    | S.InternalFailure exn ->
+        dprintf debug "proof of the initial task interrupted by an error %a.@."
+          Exn_printer.exn_printer exn
+    | S.Done res ->
+      if res.Call_provers.pr_answer <> Call_provers.Valid
+      then dprintf debug "Initial task can't be proved.@."
+      else
+        let t = S.goal_task pa.S.proof_parent in
+        let r = Task.bisect_step t in
+        match r with
+        | Task.BSdone res ->
+          assert (Task.task_equal res t);
+          dprintf debug "Task can't be reduced.@."
+        | Task.BSstep (t,c) ->
+          set_timelimit res;
+          match S.load_prover eS pa.S.proof_prover with
+          | None -> (* No prover so we do nothing *)
+            dprintf debug "Prover can't be loaded.@."
+          | Some lp ->
+            M.schedule_proof_attempt
+              ~timelimit:!timelimit
+              ~memlimit:pa.S.proof_memlimit
+              ?old:(S.get_edited_as_abs eS.S.session pa)
+              ~inplace:lp.S.prover_config.C.in_place
+              ~command:(C.get_complete_command lp.S.prover_config)
+              ~driver:lp.S.prover_driver
+              ~callback:(callback lp pa c) sched t in
+  dprintf debug "Bisecting with %a started.@."
+    C.print_prover pa.S.proof_prover;
+  M.run_external_proof eS sched ~callback:first_callback pa
+
+let apply_bisect_on_selection () =
+  List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      S.iter_proof_attempt bisect_proof_attempt a
+    ) (get_selected_row_references ())
+
+(**************************************)
+(* Copy Paste proof, transf and metas *)
+(**************************************)
+let copy_queue = Queue.create ()
+
+let copy_on_selection () =
+  Queue.clear copy_queue;
+    List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      let rec add = function
+      | S.Goal g -> S.goal_iter add g
+      | S.Transf f -> Queue.push (S.Transf (S.copy_transf f)) copy_queue
+      | S.Metas m -> Queue.push (S.Metas (S.copy_metas m)) copy_queue
+      | S.Proof_attempt pa ->
+        Queue.push (S.Proof_attempt (S.copy_proof pa)) copy_queue
+      | _ -> () in
+      add a
+    ) (get_selected_row_references ())
+
+let paste_on_selection () =
+    List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      match a with
+      | S.Goal g ->
+        let keygen = MA.keygen in
+        let paste = function
+          | S.Transf f ->
+            MA.init_any
+              (S.Transf (S.add_transf_to_goal ~keygen (env_session()) g f))
+          | S.Metas m  ->
+            MA.init_any
+              (S.Metas (S.add_metas_to_goal  ~keygen (env_session()) g m))
+          | S.Proof_attempt pa ->
+            MA.init_any (S.Proof_attempt
+                           (S.add_proof_to_goal ~keygen (env_session()) g pa))
+          | _ -> () in
+        Queue.iter paste copy_queue
+      | _ -> ()
+    ) (get_selected_row_references ())
+
 
 
 (*********************************)
@@ -1288,6 +1484,23 @@ let () =
     let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
     List.iter iter trans in
 
+  let add_item_bisect () =
+    ignore(tools_factory#add_image_item
+             ~label:"Bisect in selection"
+             ~callback:apply_bisect_on_selection
+             () : GMenu.image_menu_item) in
+  let add_copy_past_item () =
+    ignore(tools_factory#add_image_item
+             ~label:"Copy"
+             ~callback:copy_on_selection
+             () : GMenu.image_menu_item);
+    ignore(tools_factory#add_image_item
+             ~label:"Paste"
+             ~callback:paste_on_selection
+             () : GMenu.image_menu_item) in
+
+  add_refresh_provers add_separator "add separator in tools menu";
+  add_refresh_provers add_copy_past_item "add copy paste item";
   add_refresh_provers add_separator "add separator in tools menu";
   add_refresh_provers add_item_split "add split in tools menu";
   add_refresh_provers add_item_inline  "add inline in tools menu";
@@ -1295,12 +1508,18 @@ let () =
     "add non splitting transformations in tools menu";
   add_refresh_provers (add_submenu_transform false)
     "add splitting transformations in tools menu";
+  add_refresh_provers add_separator "add separator for metas in tools menu";
+  add_refresh_provers add_item_bisect "add bisect in tools menu";
+  (** execute them *)
+  add_separator ();
+  add_copy_past_item ();
   add_separator ();
   add_item_split ();
   add_item_inline ();
   add_submenu_transform true ();
-  add_submenu_transform false ()
-
+  add_submenu_transform false ();
+  add_separator ();
+  add_item_bisect ()
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
@@ -1382,9 +1601,6 @@ let () = source_view#source_buffer#set_text (source_text fname)
 
 let current_file = ref ""
 
-let file_info = GMisc.label ~text:""
-  ~packing:(right_hb#pack ~fill:true) ()
-
 let set_current_file f =
   current_file := f;
   file_info#set_text ("file: " ^ !current_file)
@@ -1432,7 +1648,7 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
   move_to_line ~yalign source_view (l-1);
   erase_color_loc source_view;
   (* FIXME: use another color or none at all *)
-  (* color_loc source_view ~color l b e *)
+  color_loc source_view ~color l b e;
   ignore (color,l,b,e)
 
 let scroll_to_id ~color id =
@@ -1512,10 +1728,8 @@ let reload () =
         fprintf str_formatter
           "@[Error:@ %a@]" Exn_printer.exn_printer e;
         let msg = flush_str_formatter () in
-        file_info#set_text msg
-(*
+        file_info#set_text msg;
         info_window `ERROR msg
-*)
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._R
@@ -1589,6 +1803,7 @@ let edit_selected_row r =
 *)
         M.edit_proof e sched ~default_editor:gconfig.default_editor a
     | S.Transf _ -> ()
+    | S.Metas _ -> ()
 
 let edit_current_proof () =
   match get_selected_row_references () with
@@ -1687,6 +1902,12 @@ let confirm_remove_row r =
           `QUESTION
           "Do you really want to remove the selected transformation\n\
 and all its subgoals?"
+    | S.Metas m ->
+      info_window
+        ~callback:(fun () -> M.remove_metas m)
+        `QUESTION
+        "Do you really want to remove the selected addition of metas\n\
+and all its subgoals?"
 
 let remove_proof r =
   match get_any_from_row_reference r with
@@ -1695,6 +1916,7 @@ let remove_proof r =
     | S.File _file -> ()
     | S.Proof_attempt a -> M.remove_proof_attempt a
     | S.Transf _tr -> ()
+    | S.Metas _m -> ()
 
 let confirm_remove_selection () =
   match get_selected_row_references () with
@@ -1788,6 +2010,8 @@ let select_row r =
         scroll_to_source_goal a.S.proof_parent
     | S.Transf tr ->
         scroll_to_source_goal tr.S.transf_parent
+    | S.Metas m ->
+        scroll_to_source_goal m.S.metas_parent
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =
@@ -1803,8 +2027,6 @@ let (_ : GtkSignal.id) =
 let () = Debug.set_flag (Debug.lookup_flag "transform")
 *)
 
-let () = w#add_accel_group accel_group
-let () = w#show ()
 let () = GMain.main ()
 
 (*

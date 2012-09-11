@@ -564,7 +564,7 @@ let () = Exn_printer.register
         print_pr pr
   | Decl.NonPositiveIndDecl (_ls, pr, ls1) ->
       fprintf fmt "Inductive clause %a contains \
-          a negative occurrence of symbol %a"
+          a non strictly positive occurrence of symbol %a"
         print_pr pr print_ls ls1
   | Decl.BadLogicDecl (ls1,ls2) ->
       fprintf fmt "Ill-formed definition: symbols %a and %a are different"

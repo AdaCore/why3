@@ -307,6 +307,12 @@ module type S =
     (** get the next (or same) step of the enumeration which key is
         greater or equal to the given key *)
 
+    val fold_left: ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
+    (** same as {!fold} but in the order of {!List.fold_left} *)
+
+    val of_list: (key * 'a) list -> 'a t
+    (** construct a map from a pair of bindings *)
+
     module type Set =
     sig
       type elt = key
@@ -439,6 +445,11 @@ module type S =
       val is_num_elt : int -> t -> bool
       (** check if the map has the given number of elements *)
 
+      val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+      (** same as {!fold} but in the order of {!List.fold_left} *)
+
+      val of_list: elt list -> t
+      (** construct a set from a list of elements *)
     end
 
     module Set : Set
@@ -451,4 +462,37 @@ module Make (Ord : OrderedType) : S with type key = Ord.t
 (** Functor building an implementation of the map/set structure
     given a totally ordered type. *)
 
+end
+
+module Hashtbl : sig
+
+  val hash : 'a -> int
+
+  module type S = sig
+    include Hashtbl.S
+    val is_empty : 'a t -> bool
+    (** test if the hashtbl is empty *)
+
+    val memo : int -> (key -> 'a) -> key -> 'a
+    (** convenience function, memoize a function *)
+
+    exception Key_not_found of key
+    val find' : 'a t -> key -> 'a
+    (** return the first binding or raise Key_not_found with the given
+      key as argument *)
+
+  (** hashtbl used as hashset *)
+    val set : unit t -> key -> unit
+    (** Add a binding that can be tested by mem *)
+
+    val map : ('a -> 'b) -> 'a t -> 'b t
+  (** just a shortcut not as efficient as doable *)
+
+    val find_option : 'a t -> key -> 'a option
+      (** version of find without exception *)
+
+  end
+  module Make (X:Hashtbl.HashedType) : S with type key = X.t
+
+  module Make_Poly (X:sig type t end) : S with type key = X.t
 end

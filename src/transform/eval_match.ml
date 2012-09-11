@@ -165,6 +165,7 @@ let eval_match ~inline kn t =
 
 let rec linear vars t = match t.t_node with
   | Tvar x -> Svs.add_new Exit x vars
+  | Tif _ -> raise Exit
   | _ -> t_fold linear vars t
 
 let linear t =

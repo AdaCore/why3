@@ -22,7 +22,6 @@ open Why3
 open Util
 open Ident
 open Ty
-open Decl
 open Theory
 open Term
 
@@ -64,7 +63,9 @@ let ns_add eq chk x v m = Mstr.change (function
   | Some vo -> Some (ns_replace eq chk x vo v)) x m
 
 let ex_add = ns_add ls_equal
+(* dead code
 let mt_add = ns_add mt_equal
+*)
 
 let add_ex chk x ls ns = { ns with ns_ex = ex_add chk x ls ns.ns_ex }
 let add_ns chk x nn ns = { ns with ns_ns = nm_add chk x nn ns.ns_ns }
@@ -95,6 +96,7 @@ let impure_uc uc = uc.uc_impure
 let effect_uc uc = uc.uc_effect
 let pure_uc   uc = uc.uc_pure
 
+(* dead code
 let add_pervasives uc =
   (* type unit = () *)
   let ts =
@@ -102,6 +104,7 @@ let add_pervasives uc =
       (id_fresh "unit") [] (Some (Ty.ty_app (Ty.ts_tuple 0) []))
   in
   add_ty_decl uc ts
+*)
 
 let open_namespace uc s = match uc.uc_import with
   | ns :: _ -> { uc with

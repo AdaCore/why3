@@ -72,8 +72,9 @@ let common_options = [
   Debug.Opt.desc_debug;
 ]
 
+(* dead code
 let env_spec = common_options 
-
+*)
 
 let read_env_spec () =
   (** Configuration *)

@@ -20,7 +20,6 @@
 
 open Why3
 open Why3session_lib
-open Whyconf
 open Format
 
 
@@ -118,7 +117,7 @@ let print_head n depth provers fmt =
 let print_tabular_head n depth provers fmt =
   fprintf fmt "\\begin{tabular}";
   fprintf fmt "{| l |";
-  for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
+  for _i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "}@.";
   print_head n depth provers fmt
 
@@ -165,11 +164,11 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	if subgoal > 0 then
 	  begin
 	    if(depth < depth_max)  then
-	      for i = 1 to depth do
+	      for _i = 1 to depth do
                 fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
               done
 	    else
-	      for i = 1 to depth - 1 do
+	      for _i = 1 to depth - 1 do
                 fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
               done
 	  end
@@ -181,7 +180,7 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
     else
       begin
 	if subgoal > 0  then
-	  for i = 1 to depth  do
+	  for _i = 1 to depth  do
 	    fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
 	else
 	  if depth > 0 then
@@ -197,18 +196,18 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	  if depth_max <= 1 then
 	    begin
 	      if depth > 0 then
-		for i = depth to (depth_max - depth) do
+		for _i = depth to (depth_max - depth) do
                   fprintf fmt "& \\explanation{%s}" " " done
 	      else
-		for i = depth to (depth_max - depth - 1) do
+		for _i = depth to (depth_max - depth - 1) do
                   fprintf fmt "& \\explanation{%s}" " " done
 	    end
 	  else
 	    if depth > 0 then
-	      for i = depth to (depth_max - depth - 1) do
+	      for _i = depth to (depth_max - depth - 1) do
 		fprintf fmt "& \\explanation{%s}" " " done
 	    else
-	      for i = depth to (depth_max - depth - 2) do
+	      for _i = depth to (depth_max - depth - 2) do
 		fprintf fmt "& \\explanation{%s}" " " done;
 	  print_result_prov proofs prov fmt;
 	end;
@@ -230,7 +229,7 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
     fprintf fmt "\\cline{%d-%d} @." 2 column
   else
     fprintf fmt "\\hline @.";
-  for i = 1 to depth do fprintf fmt "\\quad" done;
+  for _i = 1 to depth do fprintf fmt "\\quad" done;
   if (depth <= 1) then
     fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
   else
@@ -285,7 +284,7 @@ let latex_tabular_file n fmt depth provers f =
 let latex_longtable n fmt depth name provers t=
   fprintf fmt "\\begin{longtable}";
   fprintf fmt "{| l |";
-  for i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
+  for _i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
   fprintf fmt "}@.";
   (** First head *)
   print_head n depth provers fmt;

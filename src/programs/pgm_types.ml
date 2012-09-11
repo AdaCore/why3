@@ -19,12 +19,9 @@
 (**************************************************************************)
 
 open Why3
-open Util
 open Ident
 open Ty
-open Theory
 open Term
-open Decl
 
 (* model type symbols *)
 
@@ -314,8 +311,10 @@ end = struct
 
   let compare_pvsymbol v1 v2 =
     compare (id_hash v1.pv_name) (id_hash v2.pv_name)
+(* dead code
   let equal_pvsymbol v1 v2 =
     compare_pvsymbol v1 v2 = 0
+*)
 
   (* purify: turns program types into logic types *)
 
@@ -699,7 +698,9 @@ end = struct
 
   let print_rset fmt s = print_list comma R.print  fmt (Sreg.elements s)
   let print_eset fmt s = print_list comma print_ls fmt (Sexn.elements s)
+(* dead code
   let print_pvset fmt s = print_list comma T.print_pvsymbol fmt (Spv.elements s)
+*)
 
   let print fmt e =
     if not (Sreg.is_empty e.reads) then

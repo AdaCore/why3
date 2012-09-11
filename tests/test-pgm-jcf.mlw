@@ -1,130 +1,15 @@
-module Johannes
-
-  type a = {| mutable f1 : int |}
-  type b =  {| f2 : a |}
-
-  val r1 : a
-  val r2 : b
-
-  let h () =
-    {}
-    let x = r2.f2 in
-    x.f1 <- 5
-    { r2.f2.f1 = 5 }
-
-  let g () =
-    { }
-    let z = {|f2 = r1|} in
-    z.f2.f1 <- 5
-    { r1.f1 = 5 }
-
-end
-
-(*
-module ExcepAndRec
-
-use import int.Int
-
-exception E
-
-let rec f (x:int) : int =
-  if x = 42 then raise E else
-  try
-    let n = f (x-1) in
-    n
-  with E -> 42
-  end
-
-end
-*)
-(*
-module Test
-
-  use import module ref.Ref
-
-  type foo = (ref int, ref int)
-
-  let test_foo (f: foo) =
-    let r = ref 0 in
-    let y = (r, r) in
-    let (x,_) = y in (* local reference would escape its scope *)
-    r
-
-  let test () =
-    let f = ref in
-    let x = f 0 in
-    let y = f 1 in
-    assert { !x = 0 /\ !y = 1 };
-    x := 2;
-    assert { !x = 2 /\ !y = 1 } (* BUG: alias should be detected *)
-
-end
-
-*)
-module M
-
+module TestGhost
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
 
-  type t 'a 'b = (int, 'a, ('b, int))
-
-  use import list.List
-
-  type tree 'a = E | N (forest 'a)
-  with forest 'b = list (tree 'b)
-
-  inductive even int int int =
-    | even0: even 0 1 2
-  with odd int int =
-    | odd0: odd 1 2
-
-  function c : int = 0b010101010
-
-  function f (x:int) : int = g (x+1)
-  with g (x:int) : int
-
-  predicate p (x:int) = forall y: int. q x y
-  with q (x:int) (y:int) = x >= y
-
-  predicate is_zero (a:int) = a=0
-
-  val foo: x:ref int -> unit
-
-  let test1 () =
-    let x = ref 0 in
-    while is_zero !x do variant { !x } () done
-
-(*
-  use import option.Option
-
-  val clear (o : option (ref int)) :
-    {}
-    unit writes (match o with Some r -> r end).contents
-    { match o with None -> true | Some r -> !r = 0 end }
-*)
-
-  (* BUG: x escapes its scope (in the postcondition) => should be an error *)
-  (* let scope (a: ref int) = let x = a in fun () -> {} x := 0 { !x = 0 } *)
-
-  (* let foo (a: ref int) = let x = a in fun () -> {} x := 0 { !a = 0 } *)
-  (* let test3 () = let x = ref 0 in begin foo x (); assert { !x = 0 } end *)
+  let test1 (x: int) =
+    { x = 40 }
+    assert { x > 0 };
+    x+2
+    { result = 42 }
 
 end
 
-
-module CodeAnnotations
-
-  use import int.Int
-  use import module ref.Ref
-
-  let f (x:int) : int =
-    { }
-    let y = ref 0 in
-    abstract y := !y + 1 { !y > 0 };
-    !y
-    { result = 1 (* should not be proved !*) }
-
-end
 
 
 (*

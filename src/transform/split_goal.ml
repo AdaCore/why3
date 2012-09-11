@@ -50,8 +50,13 @@ let stop f = Slab.mem stop_split f.t_label
 let unstop f =
   t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
 
+type split = {
+  right_only : bool;
+  stop_label : bool;
+}
+
 let rec split_pos ro acc f = match f.t_node with
-  | _ when ro && stop f -> unstop f :: acc
+  | _ when ro.stop_label && stop f -> unstop f :: acc
   | Ttrue -> acc
   | Tfalse -> f::acc
   | Tapp _ -> f::acc
@@ -59,7 +64,7 @@ let rec split_pos ro acc f = match f.t_node with
       split_pos ro (split_pos ro acc (t_implies f1 f2)) f1
   | Tbinop (Tand,f1,f2) ->
       split_pos ro (split_pos ro acc f2) f1
-  | Tbinop (Timplies,f1,f2) when ro ->
+  | Tbinop (Timplies,f1,f2) when ro.right_only ->
       let fn f2 = t_label_copy f (t_implies f1 f2) in
       apply_append fn acc (split_pos ro [] f2)
   | Tbinop (Timplies,f1,f2) ->
@@ -69,7 +74,7 @@ let rec split_pos ro acc f = match f.t_node with
       let f12 = t_label_copy f (t_implies f1 f2) in
       let f21 = t_label_copy f (t_implies f2 f1) in
       split_pos ro (split_pos ro acc f21) f12
-  | Tbinop (Tor,_,_) when ro -> f::acc
+  | Tbinop (Tor,_,_) when ro.right_only -> f::acc
   | Tbinop (Tor,f1,f2) ->
       let fn f1 f2 = t_label_copy f (t_or f1 f2) in
       apply_append2 fn acc (split_pos ro [] f1) (split_pos ro [] f2)
@@ -94,11 +99,11 @@ let rec split_pos ro acc f = match f.t_node with
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and split_neg ro acc f = match f.t_node with
-  | _ when ro && stop f -> unstop f :: acc
+  | _ when ro.stop_label && stop f -> unstop f :: acc
   | Ttrue -> f::acc
   | Tfalse -> acc
   | Tapp _ -> f::acc
-  | Tbinop (Tand,_,_) when ro -> f::acc
+  | Tbinop (Tand,_,_) when ro.right_only -> f::acc
   | Tbinop (Tand,f1,f2) ->
       let fn f1 f2 = t_label_copy f (t_and f1 f2) in
       apply_append2 fn acc (split_neg ro [] f1) (split_neg ro [] f2)
@@ -155,19 +160,30 @@ let split_premise ro d = match d.d_node with
   | Dprop (Paxiom,pr,f) ->  split_axiom ro pr f
   | _ -> [d]
 
-let full_split_pos = split_pos false []
-let full_split_neg = split_neg false []
+let full_split  = { right_only = false; stop_label = false }
+let right_split = { right_only = true;  stop_label = false }
+let wp_split    = { right_only = true;  stop_label = true }
 
-let split_pos = split_pos true []
-let split_neg = split_neg true []
+let split_pos_full  = split_pos full_split []
+let split_neg_full  = split_neg full_split []
 
-let full_split_goal    = Trans.goal_l (split_goal    false)
-let full_split_all     = Trans.decl_l (split_all     false) None
-let full_split_premise = Trans.decl   (split_premise false) None
+let split_pos_right = split_pos right_split []
+let split_neg_right = split_neg right_split []
 
-let split_goal    = Trans.goal_l (split_goal    true)
-let split_all     = Trans.decl_l (split_all     true) None
-let split_premise = Trans.decl   (split_premise true) None
+let split_pos_wp    = split_pos wp_split []
+let split_neg_wp    = split_neg wp_split []
+
+let split_goal_full  = Trans.goal_l (split_goal full_split)
+let split_goal_right = Trans.goal_l (split_goal right_split)
+let split_goal_wp    = Trans.goal_l (split_goal wp_split)
+
+let split_all_full  = Trans.decl_l (split_all full_split) None
+let split_all_right = Trans.decl_l (split_all right_split) None
+let split_all_wp    = Trans.decl_l (split_all wp_split) None
+
+let split_premise_full  = Trans.decl (split_premise full_split) None
+let split_premise_right = Trans.decl (split_premise right_split) None
+let split_premise_wp    = Trans.decl (split_premise wp_split) None
 
 let desc_labels =
   [asym_split,
@@ -175,24 +191,35 @@ let desc_labels =
      the@ labeled@ term.": Pp.formatted);
    stop_split,("Don't@ split@ the@ labeled@ term.": Pp.formatted)]
 
-let () = Trans.register_transform_l "split_goal"    split_goal
-  ~desc_labels ~desc:"Same@ as@ full_split_goal,@ \
-                      but@ don't@ split:@\n  \
-@[- @[conjunctions under disjunctions@]@\n\
-  - @[and conjunctions on the left of implications.@]@]"
-let () = Trans.register_transform_l "split_all"     split_all
-  ~desc_labels ~desc:"Same@ as@ split_goal@ but@ also@ for@ premises."
-let () = Trans.register_transform   "split_premise" split_premise
-  ~desc_labels ~desc:"Same@ as@ split_goal@ but@ only@ for@ premises."
-
-let () = Trans.register_transform_l "full_split_goal"    full_split_goal
+let () = Trans.register_transform_l "split_goal_full" split_goal_full
   ~desc_labels ~desc:"Puts@ the@ goal@ in@ a@ conjunctive@ form,@ \
   returns@ the@ corresponding@ set@ of@ subgoals.@ The@ number@ of@ subgoals@ \
   generated@ may@ be@ exponential@ in@ the@ size@ of@ the@ initial@ goal."
-let () = Trans.register_transform_l "full_split_all"     full_split_all
-  ~desc_labels ~desc:"Same@ as@ full@ split@ goal@ but@ also@ for@ premises."
-let () = Trans.register_transform   "full_split_premise" full_split_premise
-  ~desc_labels ~desc:"Same@ as@ full@ split@ goal@ but@ only for@ premises."
+let () = Trans.register_transform_l "split_all_full" split_all_full
+  ~desc_labels ~desc:"Same@ as@ split_goal_full,@ but@ also@ splits@ premises."
+let () = Trans.register_transform "split_premise_full" split_premise_full
+  ~desc_labels ~desc:"Same@ as@ split_all_full,@ but@ splits@ only@ premises."
+
+let () = Trans.register_transform_l "split_goal_right" split_goal_right
+  ~desc_labels ~desc:"Same@ as@ split_goal_full,@ but@ don't@ split:@\n  \
+    @[- @[conjunctions under disjunctions@]@\n\
+      - @[conjunctions on the left of implications.@]@]"
+let () = Trans.register_transform_l "split_all_right" split_all_right
+  ~desc_labels ~desc:"Same@ as@ split_goal_right,@ but@ also@ splits@ premises."
+let () = Trans.register_transform "split_premise_right" split_premise_right
+  ~desc_labels ~desc:"Same@ as@ split_all_right,@ but@ splits@ only@ premises."
+
+let () = Trans.register_transform_l "split_goal_wp" split_goal_wp
+  ~desc_labels ~desc:"Same@ as@ split_goal_right,@ but@ stops@ at@ \
+    the `stop_split' label and removes the label."
+let () = Trans.register_transform_l "split_all_wp" split_all_wp
+  ~desc_labels ~desc:"Same@ as@ split_goal_wp,@ but@ also@ splits@ premises."
+let () = Trans.register_transform "split_premise_wp" split_premise_wp
+  ~desc_labels ~desc:"Same@ as@ split_all_wp,@ but@ splits@ only@ premises."
+
+let () = Trans.register_transform_l "split_goal" split_goal_wp
+  ~desc_labels ~desc:"The@ deprecated@ name@ of@ split_goal_wp,@ \
+    kept@ for@ compatibility@ purposes."
 
 let ls_of_var v =
   create_fsymbol (id_fresh ("spl_" ^ v.vs_name.id_string)) [] v.vs_ty
@@ -227,9 +254,10 @@ let rec split_intro pr dl acc f =
       split_intro pr dl acc f
   | _ ->
       let goal f = List.rev (create_prop_decl Pgoal pr f :: dl) in
-      List.rev_append (List.rev_map goal (split_pos f)) acc
+      List.rev_append (List.rev_map goal (split_pos_wp f)) acc
 
 let split_intro = Trans.goal_l (fun pr f -> split_intro pr [] [] f)
 
 let () = Trans.register_transform_l "split_intro" split_intro
-  ~desc_labels ~desc:"TODO: intro and split??."
+  ~desc_labels ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
+    the@ implication@ antecedents@ to@ premises."

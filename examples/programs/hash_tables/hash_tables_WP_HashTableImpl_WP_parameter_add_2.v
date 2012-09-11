@@ -14,148 +14,126 @@ Definition unit  := unit.
 Inductive option (a:Type) :=
   | None : option a
   | Some : a -> option a.
-Set Contextual Implicit.
-Implicit Arguments None.
-Unset Contextual Implicit.
-Implicit Arguments Some.
+Implicit Arguments None [[a]].
+Implicit Arguments Some [[a]].
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-Implicit Arguments get.
+Parameter get: forall {a:Type} {b:Type}, (map a b) -> a -> b.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-Implicit Arguments set.
+Parameter set: forall {a:Type} {b:Type}, (map a b) -> a -> b -> (map a b).
 
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_eq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
   a2) = b1).
 
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_neq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (a:Type) (b:Type), b -> (map a b).
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
+Parameter const: forall {a:Type} {b:Type}, b -> (map a b).
 
-Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
+Axiom Const : forall {a:Type} {b:Type}, forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
-Set Contextual Implicit.
-Implicit Arguments Nil.
-Unset Contextual Implicit.
-Implicit Arguments Cons.
+Implicit Arguments Nil [[a]].
+Implicit Arguments Cons [[a]].
 
 (* Why3 assumption *)
-Set Implicit Arguments.
-Fixpoint mem (a:Type)(x:a) (l:(list a)) {struct l}: Prop :=
+Fixpoint mem {a:Type}(x:a) (l:(list a)) {struct l}: Prop :=
   match l with
   | Nil => False
   | (Cons y r) => (x = y) \/ (mem x r)
   end.
-Unset Implicit Arguments.
 
 (* Why3 assumption *)
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
-Implicit Arguments mk_array.
+Implicit Arguments mk_array [[a]].
 
 (* Why3 assumption *)
-Definition elts (a:Type)(v:(array a)): (map Z a) :=
+Definition elts {a:Type}(v:(array a)): (map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
-Implicit Arguments elts.
 
 (* Why3 assumption *)
-Definition length (a:Type)(v:(array a)): Z :=
+Definition length {a:Type}(v:(array a)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
-Implicit Arguments length.
 
 (* Why3 assumption *)
-Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
-Implicit Arguments get1.
+Definition get1 {a:Type}(a1:(array a)) (i:Z): a := (get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
+Definition set1 {a:Type}(a1:(array a)) (i:Z) (v:a): (array a) :=
   (mk_array (length a1) (set (elts a1) i v)).
-Implicit Arguments set1.
 
 (* Why3 assumption *)
 Inductive t (a:Type)
   (b:Type) :=
   | mk_t : (map a (option b)) -> (array (list (a* b)%type)) -> t a b.
-Implicit Arguments mk_t.
+Implicit Arguments mk_t [[a]
+[b]].
 
 (* Why3 assumption *)
-Definition data (a:Type) (b:Type)(v:(t a b)): (array (list (a* b)%type)) :=
+Definition data {a:Type} {b:Type}(v:(t a b)): (array (list (a* b)%type)) :=
   match v with
   | (mk_t x x1) => x1
   end.
-Implicit Arguments data.
 
 (* Why3 assumption *)
-Definition contents (a:Type) (b:Type)(v:(t a b)): (map a (option b)) :=
+Definition contents {a:Type} {b:Type}(v:(t a b)): (map a (option b)) :=
   match v with
   | (mk_t x x1) => x
   end.
-Implicit Arguments contents.
 
 (* Why3 assumption *)
-Definition get2 (a:Type) (b:Type)(h:(t a b)) (k:a): (option b) :=
+Definition get2 {a:Type} {b:Type}(h:(t a b)) (k:a): (option b) :=
   (get (contents h) k).
-Implicit Arguments get2.
 
-Parameter hash: forall (a:Type), a -> Z.
-Implicit Arguments hash.
+Parameter hash: forall {a:Type}, a -> Z.
 
 (* Why3 assumption *)
-Definition idx (a:Type) (b:Type)(h:(t a b)) (k:a): Z :=
+Definition idx {a:Type} {b:Type}(h:(t a b)) (k:a): Z :=
   (ZOmod (Zabs (hash k)) (length (data h))).
-Implicit Arguments idx.
 
 (* Why3 assumption *)
-Set Implicit Arguments.
-Fixpoint occurs_first (a:Type) (b:Type)(k:a) (v:b) (l:(list (a*
+Fixpoint occurs_first {a:Type} {b:Type}(k:a) (v:b) (l:(list (a*
   b)%type)) {struct l}: Prop :=
   match l with
   | Nil => False
   | (Cons (k', v') r) => ((k = k') /\ (v = v')) \/ ((~ (k = k')) /\
       (occurs_first k v r))
   end.
-Unset Implicit Arguments.
 
-Axiom mem_occurs_first : forall (a:Type) (b:Type), forall (k:a) (v:b)
+Axiom mem_occurs_first : forall {a:Type} {b:Type}, forall (k:a) (v:b)
   (l:(list (a* b)%type)), (occurs_first k v l) -> (mem (k, v) l).
 
-Axiom cons_occurs_first : forall (a:Type) (b:Type), forall (k1:a) (v1:b)
+Axiom cons_occurs_first : forall {a:Type} {b:Type}, forall (k1:a) (v1:b)
   (l:(list (a* b)%type)), (occurs_first k1 v1 l) -> forall (k:a) (v:b),
   (~ (k = k1)) -> (occurs_first k1 v1 (Cons (k, v) l)).
 
 (* Why3 assumption *)
-Definition valid (a:Type) (b:Type)(h:(t a b)): Prop :=
+Definition valid {a:Type} {b:Type}(h:(t a b)): Prop :=
   (0%Z < (length (data h)))%Z /\ ((forall (k:a) (v:b), ((get2 h
   k) = (Some v)) <-> (occurs_first k v (get1 (data h) (idx h k)))) /\
   forall (k:a) (v:b), forall (i:Z), ((0%Z <= i)%Z /\
   (i < (length (data h)))%Z) -> ((mem (k, v) (get1 (data h) i)) ->
   (i = (idx h k)))).
-Implicit Arguments valid.
 
-Axiom idx_bounds : forall (a:Type) (b:Type), forall (h:(t a b)), (valid h) ->
+Axiom idx_bounds : forall {a:Type} {b:Type}, forall (h:(t a b)), (valid h) ->
   forall (k:a), (0%Z <= (idx h k))%Z /\ ((idx h k) < (length (data h)))%Z.
 
 Require Import Classical.
 
 (* Why3 goal *)
-Theorem WP_parameter_add : forall (a:Type) (b:Type), forall (h:Z) (k:a)
+Theorem WP_parameter_add : forall {a:Type} {b:Type}, forall (h:Z) (k:a)
   (v:b), forall (rho:(map Z (list (a* b)%type))) (rho1:(map a (option b))),
   ((0%Z < (length (data (mk_t rho1 (mk_array h rho)))))%Z /\ ((forall (k1:a)
   (v1:b), ((get2 (mk_t rho1 (mk_array h rho)) k1) = (Some v1)) <->
@@ -189,7 +167,7 @@ injection H2; intros; subst. auto.
 (* k1,v1 <> k,v *)
 inversion H5.
 absurd ((k1,v1)=(k,v)); auto.
-fold mem in H3.
+fold @mem in H3.
 destruct H.
 destruct H7.
 clear H7.

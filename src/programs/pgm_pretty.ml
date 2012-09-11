@@ -21,7 +21,6 @@
 open Format
 open Why3
 open Pp
-open Ident
 open Term
 open Pretty
 open Pgm_types.T

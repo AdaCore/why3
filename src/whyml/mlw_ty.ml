@@ -281,7 +281,7 @@ let rec reg_any fn vars =
   Sreg.exists on_reg vars.vars_reg
 
 let rec reg_iter fn vars =
-  let rec on_reg r = fn r; reg_iter fn r.reg_ity.ity_vars in
+  let on_reg r = fn r; reg_iter fn r.reg_ity.ity_vars in
   Sreg.iter on_reg vars.vars_reg
 
 let reg_occurs r vars = reg_any (reg_equal r) vars
@@ -300,8 +300,10 @@ exception TypeMismatch of ity * ity
 let ity_equal_check ty1 ty2 =
   if not (ity_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
 
+(* dead code
 let reg_equal_check r1 r2 =
   if not (reg_equal r1 r2) then raise (RegionMismatch (r1, r2))
+*)
 
 type ity_subst = {
   ity_subst_tv  : ity Mtv.t;
@@ -999,6 +1001,8 @@ let vta_app vta pv =
     | vty -> vty in
   let result = vty_subst vta.vta_result in
   let spec = spec_subst sbs vta.vta_spec in
+  if not vtv.vtv_ghost && arg.pv_vtv.vtv_ghost then
+    Loc.errorm "non-ghost value passed as a ghost argument";
   let ghost = vta.vta_ghost || (vtv.vtv_ghost && not arg.pv_vtv.vtv_ghost) in
   if rest = [] then spec, (if ghost then vty_ghostify result else result)
   else spec_empty ty_unit, VTarrow (vty_arrow_unsafe rest ~ghost ~spec result)

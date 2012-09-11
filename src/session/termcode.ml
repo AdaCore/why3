@@ -25,6 +25,8 @@ type checksum = string
 let print_checksum = Format.pp_print_string
 let string_of_checksum x = x
 let checksum_of_string x = x
+let equal_checksum x y = (x : checksum) = y
+let dumb_checksum = ""
 
 type shape    = string
 let print_shape = Format.pp_print_string

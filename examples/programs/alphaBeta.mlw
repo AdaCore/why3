@@ -1,0 +1,213 @@
+
+theory TwoPlayerGame
+
+  use import int.Int
+  use import list.List
+
+
+  (** type describing a position in the game. It must include every
+     needed info, in particular in general it will include whose
+     turn it is. *)
+  type position
+
+  (** type describing a move *)
+  type move
+
+  (** the initial_position of the game *)
+  constant initial_position : position
+
+  (** gives the list of legal moves in the given position *)
+  function legal_moves position : list move
+
+  (** [do_move p m] returns the position obtained by doing the move [m]
+     on position [p].
+  *)
+  function do_move position move : position
+
+  (** [position_value p] returns an evaluation of position [p], an
+     integer [v] between [-infinity] and [+infinity] which is supposed
+     to be as higher as the position is good FOR THE PLAYER WHO HAS
+     THE TURN. [v] must be 0 for a position where nobody can win
+     anymore (draw game). For a position where the player who has the
+     turn wins, [v] must be between [winning_value] and [infinity],
+     and if the other player wins, [v] must be between [-infinity] and
+     [-winning_value].
+  *)
+  constant winning_value : int
+  constant infinity : int
+  function position_value position : int
+
+  axiom position_value_bound :
+    forall p:position. - infinity < position_value p < infinity
+
+  (*
+
+    [minmax p d] returns the min-max evaluation of position [p] at depth [d].
+    As for [position_value], the value is for the player who has the turn.
+
+  *)
+  function minmax position int : int
+
+  axiom minmax_depth_0 :
+    forall p:position. minmax p 0 = position_value p
+
+  type param = (position,int)
+  function cost (p:param) (m:move) : int =
+    match p with (p,n) -> minmax (do_move p m) n
+    end
+
+  clone import set.Min as MinMaxRec with
+    type param = param,
+    type elt = move,
+    function cost = cost
+
+  use list.Elements
+  use set.Fset
+
+  axiom minmax_depth_non_zero:
+    forall p:position, n:int. n > 0 ->
+     minmax p n =
+        let moves = Elements.elements (legal_moves p) in
+        if Fset.is_empty moves then position_value p else
+          - MinMaxRec.min (p,n-1) moves
+
+  use list.Mem
+
+  goal Test:
+    forall p:position, m:move.
+      let moves = legal_moves p in
+      Mem.mem m moves -> - (position_value (do_move p m)) <= minmax p 1
+
+
+  lemma minmax_bound:
+    forall p:position, d:int.
+      d >= 0 -> - infinity < minmax p d < infinity
+
+  lemma minmax_nomove :
+    forall p:position, d:int.
+      d >= 0 /\ legal_moves p = Nil ->
+         minmax p d = position_value p
+end
+
+
+(*
+
+   alpha-beta
+
+*)
+
+module AlphaBeta
+
+  use import int.Int
+  use import int.MinMax
+
+  use TwoPlayerGame as G
+  use import list.List
+  use list.Elements
+  use set.Fset
+
+  let rec move_value_alpha_beta alpha beta pos depth move =
+    { depth >= 1 }
+    let pos' = G.do_move pos move in
+    let s = negabeta (-beta) (-alpha) pos' (depth-1)
+    in -s
+    { let pos' = G.do_move pos move in
+      let m = G.minmax pos' (depth-1) in
+      if - beta < m < - alpha then result = - m
+      else if m <= - beta then result >= beta
+      else result <= alpha
+    }
+
+  with negabeta alpha beta pos depth =
+    { depth >= 0 }
+    if depth = 0 then G.position_value pos else
+    let l = G.legal_moves pos in
+    match l with
+      | Nil -> G.position_value pos
+      | Cons m l ->
+	  let best =
+	    move_value_alpha_beta alpha beta pos depth m
+	  in
+	  if best >= beta then best else
+	    negabeta_rec (max best alpha) beta pos depth best l
+    end
+    { if alpha < G.minmax pos depth < beta then result = G.minmax pos depth else
+      if G.minmax pos depth <= alpha then result <= alpha else
+      result >= beta
+    }
+
+  with negabeta_rec alpha beta pos depth best l =
+    { depth >= 1 }
+    match l with
+      |	Nil -> best
+      | Cons c l ->
+	  let s =
+            move_value_alpha_beta alpha beta pos depth c
+          in
+	  let new_best  = max s best in
+	  if new_best >= beta then new_best else
+   	    negabeta_rec (max new_best alpha) beta pos depth new_best l
+    end
+    { let moves = Elements.elements l in
+      if Fset.is_empty moves then result = best else
+      let m = G.MinMaxRec.min (pos,depth) moves in
+      if alpha < m < beta then result = m
+      else if m <= alpha then result <= alpha else
+      result >= beta
+    }
+
+(* alpha-beta at a given depth *)
+
+let alpha_beta pos depth =
+  { depth >= 0 }
+  negabeta (-G.infinity) G.infinity pos depth
+  { result = G.minmax pos depth }
+
+(* iterative deepening *)
+
+(*
+  let best_move_alpha_beta pos =
+    let l =
+      List.map
+	(fun c ->
+	   (move_value_alpha_beta (-G.infinity) G.infinity pos 2 0 c,c))
+	(G.legal_moves pos)
+    in
+    if List.length l < 2 then l else
+      let current_best_moves =
+	ref
+	  (List.sort (fun (x,_) (y,_) -> compare y x) l)
+      in
+      try
+	for max_depth = 3 to 1000 do
+	  begin
+	    match !current_best_moves with
+	      | (v1,_)::(v2,_)::_ ->
+		  if v1 >= G.winning_value or v2 <= - G.winning_value
+		  then raise Timeout
+	      | _ -> assert false
+	  end;
+	  let l =
+	    List.map
+	      (fun c ->
+		 (move_value_alpha_beta (-G.infinity) G.infinity
+		    pos max_depth 0 c,c))
+	      (G.legal_moves pos)
+	  in
+	  current_best_moves :=
+	  (List.sort (fun (x,_) (y,_) -> compare y x) l)
+	done;
+	!current_best_moves
+      with
+	| Timeout -> !current_best_moves
+
+*)
+
+end
+
+
+(*
+Local Variables:
+compile-command: "../../bin/why3ide.byte alphaBeta.mlw"
+End:
+*)

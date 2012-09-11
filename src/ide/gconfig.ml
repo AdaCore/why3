@@ -20,7 +20,6 @@
 
 open Format
 open Why3
-open Util
 open Rc
 open Whyconf
 
@@ -170,6 +169,7 @@ let set_locs_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
+(* dead code
 let load_altern alterns (_,section) =
   let unknown =
     {prover_name = get_string section "unknown_name";
@@ -186,6 +186,7 @@ let load_altern alterns (_,section) =
          prover_altern = get_string ~default:"" section "known_alternative";
         } in
   Mprover.add unknown known alterns
+*)
 
 let load_config config original_config =
   (* let main = get_main config in *)
@@ -343,6 +344,7 @@ let image_theory = ref !image_default
 let image_goal = ref !image_default
 let image_prover = ref !image_default
 let image_transf = ref !image_default
+let image_metas = ref !image_default
 let image_editor = ref !image_default
 let image_replay = ref !image_default
 let image_cancel = ref !image_default
@@ -387,6 +389,7 @@ let iconname_theory = ref ""
 let iconname_goal = ref ""
 let iconname_prover = ref ""
 let iconname_transf = ref ""
+let iconname_metas  = ref ""
 let iconname_editor = ref ""
 let iconname_replay = ref ""
 let iconname_cancel = ref ""
@@ -430,6 +433,7 @@ let load_icon_names () =
   iconname_goal := get_icon_name "goal";
   iconname_prover := get_icon_name "prover";
   iconname_transf := get_icon_name "transf";
+  iconname_metas  := get_icon_name "metas";
   iconname_editor := get_icon_name "editor";
   iconname_replay := get_icon_name "replay";
   iconname_cancel := get_icon_name "cancel";
@@ -462,6 +466,7 @@ let resize_images size =
   image_goal := image ~size !iconname_goal;
   image_prover := image ~size !iconname_prover;
   image_transf := image ~size !iconname_transf;
+  image_metas := image ~size !iconname_metas;
   image_editor := image ~size !iconname_editor;
   image_replay := image ~size !iconname_replay;
   image_cancel := image ~size !iconname_cancel;

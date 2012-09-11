@@ -50,8 +50,8 @@ The regexp must start with ^.
 
 open Format
 open Util
-open Ident
 open Whyconf
+open Stdlib
 module Wc = Whyconf
 open Rc
 
@@ -111,10 +111,12 @@ let load_prover kind (id,section) =
       (sprintf "In section prover %s command specified without driver" id);
   prover
 
+(* dead code
 let editor_keys =
   let add acc k = Sstr.add k acc in
   List.fold_left add Sstr.empty
     ["command"]
+*)
 
 let load_editor section =
   check_exhaustive section prover_keys;
@@ -141,26 +143,36 @@ let load_prover_shortcut acc (_, section) =
     (fp,shortcut)::acc
   ) acc shortcuts
 
+module Hstr2 = Hashtbl.Make_Poly(struct type t = string * string end)
+
 type env =
   {
     (** memoization of (exec_name,version_switch)
         -> Some output | None doesn't exists *)
-    prover_output : ((string * string),string option) Hashtbl.t;
+    prover_output : string option Hstr2.t;
     (** existing executable table:
-        exec_name -> | Some prover_config unknown version (neither good or bad)
+        exec_name -> | Some (priority, id, prover_config)
+                                  unknown version (neither good or bad)
                      | None               there is a good version *)
-    prover_unknown_version : (string, config_prover option) Hashtbl.t;
-    (** string -> prover *)
-    prover_shortcuts : (string, prover) Hashtbl.t;
+    prover_unknown_version :
+      (int * string * config_prover) option Hstr.t;
+    (** string -> priority * prover  *)
+    prover_shortcuts : (int * prover) Hstr.t;
     mutable possible_prover_shortcuts : (filter_prover * string) list;
   }
 
 let create_env shortcuts =
-{ prover_output = Hashtbl.create 10;
-  prover_unknown_version = Hashtbl.create 10;
-  prover_shortcuts = Hashtbl.create 5;
+{ prover_output = Hstr2.create 10;
+  prover_unknown_version = Hstr.create 10;
+  prover_shortcuts = Hstr.create 5;
   possible_prover_shortcuts = shortcuts;
  }
+
+let next_priority =
+  let r = ref 0 in
+  fun () -> decr r; !r
+
+let highest_priority = 0
 
 let read_auto_detection_data main =
   let filename = Filename.concat (Whyconf.datadir main)
@@ -176,7 +188,9 @@ let read_auto_detection_data main =
     | Not_found ->
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
+(* dead code
 let provers_found = ref 0
+*)
 
 let read_editors main =
   let filename = Filename.concat (Whyconf.datadir main)
@@ -201,6 +215,7 @@ let make_command =
     in
     Str.global_substitute cmd_regexp replace com
 
+(* dead code
 let sanitize_exec =
   let first c = match c with
     | '_' | ' ' -> "_"
@@ -211,6 +226,7 @@ let sanitize_exec =
     | _ -> char_to_alnumus c
   in
   sanitizer first rest
+*)
 
 let ask_prover_version exec_name version_switch =
   let out = Filename.temp_file "out" "" in
@@ -234,20 +250,21 @@ let ask_prover_version exec_name version_switch =
 
 let ask_prover_version env exec_name version_switch =
   try
-    Hashtbl.find env.prover_output (exec_name,version_switch)
+    Hstr2.find env.prover_output (exec_name,version_switch)
   with Not_found ->
     let res = ask_prover_version exec_name version_switch in
-    Hashtbl.replace env.prover_output (exec_name,version_switch) res;
+    Hstr2.add env.prover_output (exec_name,version_switch) res;
     res
 
 let check_version version schema = Str.string_match schema version 0
 
 let known_version env exec_name =
-  Hashtbl.replace env.prover_unknown_version exec_name None
+  Hstr.replace env.prover_unknown_version exec_name None
 
-let unknown_version env exec_name prover_config =
-  if not (Hashtbl.mem env.prover_unknown_version exec_name)
-  then Hashtbl.replace env.prover_unknown_version exec_name (Some prover_config)
+let unknown_version env exec_name prover_id prover_config priority =
+  if not (Hstr.mem env.prover_unknown_version exec_name)
+  then Hstr.replace env.prover_unknown_version exec_name
+    (Some (priority,prover_id,prover_config))
 
 
 let empty_alt s = if s = "" then "alt" else s
@@ -282,14 +299,16 @@ let add_prover_shortcuts env prover =
   let rec aux = function
     | [] -> []
     | (fp,s)::l when filter_prover fp prover ->
-      Hashtbl.replace env.prover_shortcuts s prover;
+      Hstr.replace env.prover_shortcuts s (highest_priority,prover);
       aux l
     | a::l -> a::(aux l) in
   env.possible_prover_shortcuts <- aux env.possible_prover_shortcuts
 
-let add_id_prover_shortcut env id prover =
-  if not (Hashtbl.mem env.prover_shortcuts id) then
-    Hashtbl.replace env.prover_shortcuts id prover
+let add_id_prover_shortcut env id prover priority =
+  match Hstr.find_option env.prover_shortcuts id with
+  | Some (p,_) when p >= priority -> ()
+  | _ -> Hstr.replace env.prover_shortcuts id (priority,prover)
+
 
 let detect_exec env main data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
@@ -348,6 +367,7 @@ let detect_exec env main data acc exec_name =
        extra_options = [];
        extra_drivers = [] } in
 
+    let priority = next_priority () in
     if good || old then begin
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
@@ -357,29 +377,35 @@ let detect_exec env main data acc exec_name =
            data.message);
       known_version env exec_name;
       add_prover_shortcuts env prover;
-      add_id_prover_shortcut env data.prover_id prover;
+      add_id_prover_shortcut env data.prover_id prover priority;
       add_prover_with_uniq_id prover_config acc
     end
-    else (unknown_version env exec_name prover_config; acc)
+    else (unknown_version env exec_name data.prover_id prover_config priority;
+          acc)
 
 let detect_prover env main acc data =
   List.fold_left (detect_exec env main data) acc data.execs
 
 (** add the prover unknown *)
 let detect_unknown env detected =
-  Hashtbl.fold (fun _ pc acc ->
+  Hstr.fold (fun _ pc acc ->
     match pc with
     | None -> acc
-    | Some prover_config ->
+    | Some (priority,prover_id,prover_config) ->
       let prover = prover_config.prover in
       eprintf "Warning: prover %s version %s is not known to be \
                      supported, use it at your own risk!@."
         prover.Wc.prover_name prover.prover_version;
+      (** Pb: Even if it match the first prover section (normally
+          highest priority) since it is unknown it has the lower
+          priority for its id as shortcut. Perhaps we don't want
+          that. *)
+      add_id_prover_shortcut env prover_id prover priority;
       add_prover_with_uniq_id prover_config acc)
     env.prover_unknown_version detected
 
 let convert_shortcuts env =
-  Hashtbl.fold (fun s p acc ->
+  Hstr.fold (fun s (_,p) acc ->
     Mstr.add s p acc
   ) env.prover_shortcuts Mstr.empty
 
@@ -425,9 +451,10 @@ let get_altern id path =
 
 let add_existing_shortcuts env shortcuts =
   let aux shortcut prover =
-    Hashtbl.replace env.prover_shortcuts shortcut prover;
+    Hstr.replace env.prover_shortcuts shortcut (highest_priority,prover);
     env.possible_prover_shortcuts <-
-    List.filter (fun (_,s) -> s = shortcut) env.possible_prover_shortcuts
+      List.filter (fun (_,s) -> s = shortcut)
+      env.possible_prover_shortcuts
   in
   Mstr.iter aux shortcuts
 

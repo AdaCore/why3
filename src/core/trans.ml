@@ -299,43 +299,43 @@ let mk_reg_trans ?(desc_labels=[]) ?(desc_metas=[]) ~desc f =
        reg_desc        = desc}
 
 
-let transforms   : (string, task reg_trans) Hashtbl.t = Hashtbl.create 17
-let transforms_l : (string, task list reg_trans) Hashtbl.t = Hashtbl.create 17
+let transforms   : (task reg_trans) Hstr.t = Hstr.create 17
+let transforms_l : (task list reg_trans) Hstr.t = Hstr.create 17
 
 let register_transform ?desc_labels ?desc_metas ~desc s p =
-  if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s
+  if Hstr.mem transforms s then raise (KnownTrans s);
+  Hstr.replace transforms s
     (mk_reg_trans ?desc_labels ?desc_metas ~desc (fun _ -> named s p))
 
 let register_transform_l ?desc_labels ?desc_metas ~desc s p =
-  if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s
+  if Hstr.mem transforms_l s then raise (KnownTrans s);
+  Hstr.replace transforms_l s
     (mk_reg_trans ?desc_labels ?desc_metas ~desc (fun _ -> named s p))
 
 let register_env_transform ?desc_labels ?desc_metas ~desc s p =
-  if Hashtbl.mem transforms s then raise (KnownTrans s);
-  Hashtbl.replace transforms s
+  if Hstr.mem transforms s then raise (KnownTrans s);
+  Hstr.replace transforms s
     (mk_reg_trans ?desc_labels ?desc_metas ~desc
        (Wenv.memoize 3 (fun e -> named s (p e))))
 
 let register_env_transform_l ?desc_labels ?desc_metas ~desc s p =
-  if Hashtbl.mem transforms_l s then raise (KnownTrans s);
-  Hashtbl.replace transforms_l s
+  if Hstr.mem transforms_l s then raise (KnownTrans s);
+  Hstr.replace transforms_l s
     (mk_reg_trans ?desc_labels ?desc_metas ~desc
        (Wenv.memoize 3 (fun e -> named s (p e))))
 
 let lookup_transform s =
-  try fst (Hashtbl.find transforms s)
+  try fst (Hstr.find transforms s)
   with Not_found -> raise (UnknownTrans s)
 
 let lookup_transform_l s =
-  try fst (Hashtbl.find transforms_l s)
+  try fst (Hstr.find transforms_l s)
   with Not_found -> raise (UnknownTrans s)
 
-let list_transforms ()   = Hashtbl.fold (fun k r acc ->
+let list_transforms ()   = Hstr.fold (fun k r acc ->
   (k,snd r)::acc) transforms []
 
-let list_transforms_l ()   = Hashtbl.fold
+let list_transforms_l ()   = Hstr.fold
   (fun k r acc -> (k,snd r)::acc) transforms_l []
 
 (** fast transform *)
@@ -361,7 +361,7 @@ let apply_transform tr_name env task =
 exception UnknownFlagTrans of meta * string * string list
 exception IllegalFlagTrans of meta
 
-type ('a,'b) flag_trans = (string, 'a -> 'b trans) Hashtbl.t
+type ('a,'b) flag_trans = ('a -> 'b trans) Hstr.t
 
 let on_flag m ft def arg =
   on_meta_excl m (fun alo ->
@@ -370,9 +370,9 @@ let on_flag m ft def arg =
       | Some [MAstr s] -> s
       | _ -> raise (IllegalFlagTrans m)
     in
-    let t = try Hashtbl.find ft s with
+    let t = try Hstr.find ft s with
       | Not_found ->
-          let l = Hashtbl.fold (fun s _ l -> s :: l) ft [] in
+          let l = Hstr.fold (fun s _ l -> s :: l) ft [] in
           raise (UnknownFlagTrans (m,s,l))
     in
     let tr_name = Printf.sprintf "%s : %s" m.meta_name s in

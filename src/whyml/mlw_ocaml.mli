@@ -1,0 +1,36 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (C) 2010-2012                                               *)
+(*    François Bobot                                                      *)
+(*    Jean-Christophe Filliâtre                                           *)
+(*    Claude Marché                                                       *)
+(*    Guillaume Melquiond                                                 *)
+(*    Andrei Paskevich                                                    *)
+(*                                                                        *)
+(*  This software is free software; you can redistribute it and/or        *)
+(*  modify it under the terms of the GNU Library General Public           *)
+(*  License version 2.1, with the special exception on linking            *)
+(*  described in file LICENSE.                                            *)
+(*                                                                        *)
+(*  This software is distributed in the hope that it will be useful,      *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
+(*                                                                        *)
+(**************************************************************************)
+
+(* OCaml program extraction *)
+
+open Why3
+
+val debug: Debug.flag
+
+val extract_filename: ?fname:string -> Theory.theory -> string
+
+val extract_theory:
+  Mlw_driver.driver -> ?old:Pervasives.in_channel -> ?fname:string ->
+  Format.formatter -> Theory.theory -> unit
+
+val extract_module:
+  Mlw_driver.driver -> ?old:Pervasives.in_channel -> ?fname:string ->
+  Format.formatter -> Mlw_module.modul -> unit
+

@@ -111,7 +111,7 @@ theory FromInt
   axiom Mul:
     forall x y:int. from_int (Int.(*) x y) = from_int x * from_int y
   axiom Neg:
-    forall x y:int. from_int (Int.(-_) (x)) = - from_int x
+    forall x:int. from_int (Int.(-_) (x)) = - from_int x
 
 end
 
@@ -236,7 +236,9 @@ theory PowerInt
   use Real
 
   clone export int.Exponentiation with
-    type t = real, constant one = Real.one, function (*) = Real.(*)
+    type t = real, constant one = Real.one, function (*) = Real.(*),
+    goal CommutativeMonoid.Assoc, goal CommutativeMonoid.Unit_def_l,
+    goal CommutativeMonoid.Unit_def_r, goal CommutativeMonoid.Comm.Comm
 
 end
 
@@ -251,7 +253,7 @@ theory PowerReal
   function pow real real : real
 
   axiom Pow_zero_y:
-    forall y:real. y <> 0.0 -> pow 0.0 y = 0.0
+    forall y:real. y > 0.0 -> pow 0.0 y = 0.0
 
   axiom Pow_x_zero:
     forall x:real. x <> 0.0 -> pow x 0.0 = 1.0

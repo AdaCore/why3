@@ -97,11 +97,12 @@ module NQueensSets
   use import module ref.Refint
   use import Solution
 
-  val col: ref solution  (* solution under construction *)
-  val k  : ref int       (* current row in the current solution *)
+  val ghost col: ref solution  (* solution under construction *)
+  val ghost k  : ref int       (* current row in the current solution *)
 
-  val sol: ref solutions (* all solutions *)
-  val s  : ref int       (* next slot for a solution = number of solutions *)
+  val ghost sol: ref solutions (* all solutions *)
+  val ghost s  : ref int       (* next slot for a solution
+                                  = current number of solutions *)
 
   let rec t3 (a b c : set int) variant { cardinal a } =
     { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
@@ -131,16 +132,16 @@ module NQueensSets
           eq_prefix (at !sol 'L) !sol (at !s 'L) }
         variant { cardinal !e }
         let d = min_elt !e in
-        (* ghost *) col := !col[!k <- d];
-        (* ghost *) incr k;
+        ghost col := !col[!k <- d];
+        ghost incr k;
         f += t3 (remove d a) (succ (add d b)) (pred (add d c));
-        (* ghost *) decr k;
+        ghost decr k;
         e := remove d !e
       done;
       !f
     end else begin
-      (* ghost *) sol := !sol[!s <- !col];
-      (* ghost *) incr s;
+      ghost sol := !sol[!s <- !col];
+      ghost incr s;
       1
     end
     { result = !s - old !s >= 0 /\ !k = old !k /\
@@ -270,16 +271,16 @@ module NQueensBits
           eq_prefix (at !sol 'L) !sol (at !s 'L) }
         variant { cardinal (bits !e) }
         let d = !e & (- !e) in
-        (* ghost *) col := !col[!k <- min_elt d];
-        (* ghost *) incr k;
+        ghost col := !col[!k <- min_elt d];
+        ghost incr k;
         f += t (a - d) ((b+d) * 2) ((c+d)/2);
-        (* ghost *) decr k;
+        ghost decr k;
         e -= d
       done;
       !f
     end else begin
-      (* ghost *) sol := !sol[!s <- !col];
-      (* ghost *) incr s;
+      ghost sol := !sol[!s <- !col];
+      ghost incr s;
       1
     end
     { result = !s - old !s >= 0 /\ !k = old !k /\

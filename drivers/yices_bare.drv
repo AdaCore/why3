@@ -54,11 +54,14 @@ theory int.Int
   syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc.Assoc
-  remove prop CommutativeGroup.Unit_def
-  remove prop CommutativeGroup.Inv_def
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
   remove prop Assoc.Assoc
-  remove prop Mul_distr
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
   remove prop Comm.Comm
   remove prop Unitary
   remove prop Refl
@@ -94,14 +97,17 @@ theory real.Real
   syntax predicate (>)  "(> %1 %2)"
 
   remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc.Assoc
-  remove prop CommutativeGroup.Unit_def
-  remove prop CommutativeGroup.Inv_def
-  remove prop Inverse
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
   remove prop Assoc.Assoc
-  remove prop Mul_distr
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
   remove prop Comm.Comm
   remove prop Unitary
+  remove prop Inverse
   remove prop Refl
   remove prop Trans
   remove prop Antisymm

@@ -10,37 +10,31 @@ Definition unit  := unit.
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
-Implicit Arguments mk_ref.
+Implicit Arguments mk_ref [[a]].
 
 (* Why3 assumption *)
-Definition contents (a:Type)(v:(ref a)): a :=
+Definition contents {a:Type}(v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
-Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a -> b.
-Implicit Arguments get.
+Parameter get: forall {a:Type} {b:Type}, (map a b) -> a -> b.
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b -> (map a b).
-Implicit Arguments set.
+Parameter set: forall {a:Type} {b:Type}, (map a b) -> a -> b -> (map a b).
 
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_eq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
   a2) = b1).
 
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_neq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (a:Type) (b:Type), b -> (map a b).
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
+Parameter const: forall {a:Type} {b:Type}, b -> (map a b).
 
-Axiom Const : forall (a:Type) (b:Type), forall (b1:b) (a1:a),
+Axiom Const : forall {a:Type} {b:Type}, forall (b1:b) (a1:a),
   ((get (const b1:(map a b)) a1) = b1).
 
 Parameter pointer : Type.
@@ -93,7 +87,6 @@ Axiom frame_list : forall (next1:(map pointer pointer)) (p:pointer)
 Definition sep_node_list(next1:(map pointer pointer)) (p1:pointer)
   (p2:pointer): Prop := ~ (in_ft p1 (list_ft next1 p2)).
 
-
 (* Why3 goal *)
 Theorem frame_list_ft : forall (next1:(map pointer pointer)) (p:pointer)
   (q:pointer) (v:pointer), (~ (in_ft q (list_ft next1 p))) -> ((is_list next1
@@ -109,14 +102,14 @@ apply (list_ft_node_null_cor _ _ _ H0) in H1;contradiction.
 (* some asserts *)
 assert (q<>p) by (intro eq;apply H;rewrite eq;clear eq;apply (list_ft_node_next2 _ _ H0 H2)).
 assert  (H2' : is_list (set next1 q v) (get (set next1 q v) p))
-by (rewrite (Select_neq _ _ _ _ _ v H3);refine (frame_list _ _ _ _ _ H2);contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H)).
+by (rewrite (Select_neq _ _ _ v H3);refine (frame_list _ _ _ _ _ H2);contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H)).
 (* *)
 destruct (pointer_dec p q0).
 rewrite <- H4.
 exact (list_ft_node_next2 _ p H0 H2').
 (* p <> q0 *)
 apply (list_ft_node_next1 _ _ _ H0 H2').
-rewrite (Select_neq _ _ _ _ _ _ H3).
+rewrite (Select_neq _ _ _ _ H3).
 apply IHis_list.
 contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H).
 exact (list_ft_node_next_inv _ _ _ H0 H2 H4 H1).
@@ -126,7 +119,7 @@ apply (list_ft_node_null_cor _ _ _ H0) in H1;contradiction.
 (* some asserts *)
 assert (q<>p) by (intro eq;apply H;rewrite eq;clear eq;apply (list_ft_node_next2 _ _ H0 H2)).
 assert  (H2' : is_list (set next1 q v) (get (set next1 q v) p))
-by (rewrite (Select_neq _ _ _ _ _ v H3);refine (frame_list _ _ _ _ _ H2);contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H)).
+by (rewrite (Select_neq _ _ _ v H3);refine (frame_list _ _ _ _ _ H2);contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H)).
 (* *)
 destruct (pointer_dec p q0).
 rewrite <- H4.
@@ -135,7 +128,7 @@ exact (list_ft_node_next2 _ p H0 H2).
 apply (list_ft_node_next1 _ _ _ H0 H2).
 apply IHis_list.
 contradict H;exact (list_ft_node_next1 _ _ _ H0 H2 H).
-rewrite <- (Select_neq _ _ _ _ _ v H3).
+rewrite <- (Select_neq _ _ _ v H3).
 exact (list_ft_node_next_inv _ _ _ H0 H2' H4 H1).
 Qed.
 

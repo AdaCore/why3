@@ -25,7 +25,6 @@ open Whyconf
 open Theory
 open Task
 open Driver
-open Trans
 
 let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
@@ -103,6 +102,7 @@ let opt_memlimit = ref None
 let opt_command = ref None
 let opt_task = ref None
 let opt_realize = ref false
+let opt_extract = ref None
 let opt_bisect = ref false
 
 let opt_print_libdir = ref false
@@ -178,6 +178,10 @@ let option_list = Arg.align [
       " same as -o";
   "--realize", Arg.Set opt_realize,
       " Realize selected theories from the library";
+  "-E", Arg.String (fun s -> opt_extract := Some s),
+      "<driver> Generate code for selected theories/modules";
+  "--extract", Arg.String (fun s -> opt_extract := Some s),
+      " same as -E";
   "--bisect", Arg.Set opt_bisect,
       " Reduce the set of needed axioms which prove a goal, \
         and output the resulting task";
@@ -300,11 +304,14 @@ let () = try
     exit 1
   end;
 
+  if !opt_output <> None
+  && !opt_driver = None && !opt_prover = None && !opt_extract = None then begin
+    eprintf
+      "Option '-o'/'--output' requires a prover, a driver, or option '-E'.@.";
+    exit 1
+  end;
+
   if !opt_prover = None then begin
-    if !opt_driver = None && !opt_output <> None then begin
-      eprintf "Option '-o'/'--output' requires a prover or a driver.@.";
-      exit 1
-    end;
     if !opt_timelimit <> None then begin
       eprintf "Option '-t'/'--timelimit' requires a prover.@.";
       exit 1
@@ -319,6 +326,12 @@ let () = try
     end;
     if !opt_driver = None && not !opt_print_namespace then
       opt_print_theory := true
+  end;
+
+  if !opt_extract <> None && !opt_output = None then begin
+    eprintf
+      "Option '-E'/'--extract' require a directory to output the result.@.";
+    exit 1
   end;
 
   if !opt_bisect && !opt_output = None then begin
@@ -505,12 +518,100 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
   in
   do_theory env drv fname tname th glist
 
+(* program extraction *)
+
+let extract_to ?fname th extract =
+  let dir = Util.of_option !opt_output in
+  let file = Filename.concat dir (Mlw_ocaml.extract_filename ?fname th) in
+  let old =
+    if Sys.file_exists file then begin
+      let backup = file ^ ".bak" in
+      Sys.rename file backup;
+      Some (open_in backup)
+    end else None in
+  let cout = open_out file in
+  extract file ?old (formatter_of_out_channel cout);
+  close_out cout
+
+let do_extract_theory edrv ?fname tname th =
+  let extract file ?old fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname file;
+    Mlw_ocaml.extract_theory edrv ?old ?fname fmt th
+  in
+  extract_to ?fname th extract
+
+let do_extract_module edrv ?fname tname m =
+  let extract file ?old fmt = ignore (old);
+    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname file;
+    Mlw_ocaml.extract_module edrv ?old ?fname fmt m
+  in
+  extract_to ?fname m.Mlw_module.mod_theory extract
+
+let do_global_extract edrv (tname,p,t,_) =
+  let lib = edrv.Mlw_driver.drv_lib in
+  try
+    let mm, thm = Env.read_lib_file lib p in
+    try
+      let m = Mstr.find t mm in
+      do_extract_module edrv tname m
+    with Not_found ->
+      let th = Mstr.find t thm in
+      do_extract_theory edrv tname th
+  with Env.LibFileNotFound _ | Not_found -> try
+    let format = Util.def_option "why" !opt_parser in
+    let env = Env.env_of_library lib in
+    let th = Env.read_theory ~format env p t in
+    do_extract_theory edrv tname th
+  with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
+    eprintf "Theory/module '%s' not found.@." tname;
+    exit 1
+
+let do_extract_theory_from env fname m (tname,_,t,_) =
+  let th = try Mstr.find t m with Not_found ->
+    eprintf "Theory '%s' not found in file '%s'.@." tname fname;
+    exit 1
+  in
+  do_extract_theory env ~fname tname th
+
+let do_extract_module_from env fname mm thm (tname,_,t,_) =
+  try
+    let m = Mstr.find t mm in do_extract_module env ~fname tname m
+  with Not_found -> try
+    let th = Mstr.find t thm in do_extract_theory env ~fname tname th
+  with Not_found ->
+    eprintf "Theory/module '%s' not found in file '%s'.@." tname fname;
+    exit 1
+
+let do_local_extract edrv fname cin tlist =
+  let lib = edrv.Mlw_driver.drv_lib in
+  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then begin
+    let mm, thm = Mlw_main.read_channel lib [] fname cin in
+    if Queue.is_empty tlist then begin
+      let do_m t m thm =
+        do_extract_module edrv ~fname t m; Mstr.remove t thm in
+      let thm = Mstr.fold do_m mm thm in
+      Mstr.iter (fun t th -> do_extract_theory edrv ~fname t th) thm
+    end else
+      Queue.iter (do_extract_module_from edrv fname mm thm) tlist
+  end else begin
+    let env = Env.env_of_library lib in
+    let m = Env.read_channel ?format:!opt_parser env fname cin in
+    if Queue.is_empty tlist then
+      let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+      let do_th _ (t,th) = do_extract_theory edrv ~fname t th in
+      Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+    else
+      Queue.iter (do_extract_theory_from edrv fname m) tlist
+  end
+
 let total_annot_tokens = ref 0
 let total_program_tokens = ref 0
 
-let do_input env drv = function
+let do_input env drv edrv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
       ()
+  | None, tlist when edrv <> None ->
+      Queue.iter (do_global_extract (Util.of_option edrv)) tlist
   | None, tlist ->
       Queue.iter (do_global_theory env drv) tlist
   | Some f, tlist ->
@@ -518,24 +619,24 @@ let do_input env drv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      if !opt_token_count then
+      if !opt_token_count then begin
         let lb = Lexing.from_channel cin in
         let a,p = Lexer.token_counter lb in
         close_in cin;
-        if a = 0 then
-          begin
-            (* hack: we assume it is a why file and not a mlw *)
-            total_annot_tokens := !total_annot_tokens + p;
-            Format.printf "File %s: %d tokens@." f p;
-          end
-        else
-          begin
-            total_program_tokens := !total_program_tokens + p;
-            total_annot_tokens := !total_annot_tokens + a;
-            Format.printf "File %s: %d tokens in annotations@." f a;
-            Format.printf "File %s: %d tokens in programs@." f p
-          end
-      else
+        if a = 0 then begin
+          (* hack: we assume it is a why file and not a mlw *)
+          total_annot_tokens := !total_annot_tokens + p;
+          Format.printf "File %s: %d tokens@." f p;
+        end else begin
+          total_program_tokens := !total_program_tokens + p;
+          total_annot_tokens := !total_annot_tokens + a;
+          Format.printf "File %s: %d tokens in annotations@." f a;
+          Format.printf "File %s: %d tokens in programs@." f p
+        end
+      end else if edrv <> None then begin
+        do_local_extract (Util.of_option edrv) fname cin tlist;
+        close_in cin
+      end else begin
         let m = Env.read_channel ?format:!opt_parser env fname cin in
         close_in cin;
         if !opt_type_only then
@@ -548,13 +649,29 @@ let do_input env drv = function
             Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
           else
             Queue.iter (do_local_theory env drv fname m) tlist
+      end
+
+let driver_file s =
+  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then
+    s
+  else
+    Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
+
+let load_driver env (s,ef) =
+  let file = driver_file s in
+  load_driver env file ef
+
+let load_driver_extract env s =
+  let file = driver_file s in
+  let lib = Mlw_main.library_of_env env in
+  Mlw_driver.load_driver lib file []
 
 let () =
   try
     let env = Env.create_env !opt_loadpath in
-    let drv =
-      Util.option_map (fun (f,ef) -> load_driver env f ef) !opt_driver in
-    Queue.iter (do_input env drv) opt_queue;
+    let drv = Util.option_map (load_driver env) !opt_driver in
+    let edrv = Util.option_map (load_driver_extract env) !opt_extract in
+    Queue.iter (do_input env drv edrv) opt_queue;
     if !opt_token_count then
       Format.printf "Total: %d annot/%d programs, ratio = %.3f@."
         !total_annot_tokens !total_program_tokens

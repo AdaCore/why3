@@ -36,20 +36,22 @@ module Incremental = struct
 end
 
   open Ptree
-  open Parsing
 
   let loc () = (symbol_start_pos (), symbol_end_pos ())
   let floc () = Loc.extract (loc ())
 
   let loc_i i = (rhs_start_pos i, rhs_end_pos i)
   let floc_i i = Loc.extract (loc_i i)
+(* dead code
   let loc_ij i j = (rhs_start_pos i, rhs_end_pos j)
   let floc_ij i j = Loc.extract (loc_ij i j)
+*)
 
   let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
   let mk_pp d = mk_ppl (floc ()) d
+(* dead code
   let mk_pp_i i d = mk_ppl (floc_i i) d
-
+*)
   let mk_pat p = { pat_loc = floc (); pat_desc = p }
 
   let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
@@ -132,7 +134,9 @@ end
   let id_anonymous () = mk_id "_" (floc ())
   let ty_unit () = PPTtuple []
 
+(* dead code
   let id_lt_nat () = Qident (mk_id "lt_nat" (floc ()))
+*)
 
   let empty_effect = { pe_reads = []; pe_writes = []; pe_raises = [] }
 
@@ -149,9 +153,11 @@ end
       pc_pre         = p;
       pc_post        = q; }
 
+(* dead code
   let add_init_mark e =
     let init = { id = "Init"; id_lab = []; id_loc = e.expr_loc } in
     { e with expr_desc = Emark (init, e) }
+*)
 
   let small_integer i =
     try

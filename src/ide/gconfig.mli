@@ -72,6 +72,7 @@ val image_theory : GdkPixbuf.pixbuf ref
 val image_goal : GdkPixbuf.pixbuf ref
 val image_prover : GdkPixbuf.pixbuf ref
 val image_transf : GdkPixbuf.pixbuf ref
+val image_metas  : GdkPixbuf.pixbuf ref
 val image_editor : GdkPixbuf.pixbuf ref
 val image_replay : GdkPixbuf.pixbuf ref
 val image_cancel : GdkPixbuf.pixbuf ref

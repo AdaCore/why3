@@ -55,7 +55,12 @@
         "prop", PROP;
         "filename", FILENAME;
         "transformation", TRANSFORM;
-        "plugin", PLUGIN
+        "plugin", PLUGIN;
+        "blacklist", BLACKLIST;
+        (* WhyML *)
+        "module", MODULE;
+        "exception", EXCEPTION;
+        "val", VAL;
       ]
 
 }
@@ -114,7 +119,7 @@ rule token = parse
   let with_location f lb =
     try f lb with e -> raise (Loc.Located (loc lb, e))
 
-  let parse_file input_lexbuf lexbuf =
+  let parse_file_gen parse input_lexbuf lexbuf =
     let s = Stack.create () in
     Stack.push lexbuf s;
     let rec multifile lex_dumb =
@@ -132,5 +137,8 @@ rule token = parse
         | _ -> tok in
     let lex_dumb = Lexing.from_function (fun _ _ -> assert false) in
     Loc.transfer_loc lexbuf lex_dumb;
-    with_location (Driver_parser.file multifile) lex_dumb
+    with_location (parse multifile) lex_dumb
+
+  let parse_file = parse_file_gen Driver_parser.file
+  let parse_file_extract = parse_file_gen Driver_parser.file_extract
 }

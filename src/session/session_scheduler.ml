@@ -79,11 +79,13 @@ let init_session session = session_iter init_any session
 (*   | Detected_prover p -> p.prover_id *)
 (*   | Undetected_prover s -> s *)
 
+(* dead code
 let theory_name t = t.theory_name
 let theory_key t = t.theory_key
 let verified t = t.theory_verified
 let goals t = t.theory_goals
 let theory_expanded t = t.theory_expanded
+*)
 
 let running a = match a.proof_state with
   | Undone (Scheduled | Running) -> true
@@ -208,10 +210,12 @@ let schedule_any_timeout t callback =
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
+(* dead code 
 let add_a_check t callback =
   dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
   run_timeout_handler t
+*)
 
 (* idle handler *)
 
@@ -318,6 +322,7 @@ let update_session ~allow_obsolete old_session env whyconf  =
   O.reset ();
   let (env_session,_) as res =
     update_session ~keygen:O.create ~allow_obsolete old_session env whyconf in
+  dprintf debug "Init_session@\n";
   init_session env_session.session;
   res
 
@@ -485,9 +490,7 @@ let run_external_proof eS eT ?callback a =
                 end
           in
           let inplace = npc.prover_config.Whyconf.in_place in
-          let command =
-            String.concat " " (npc.prover_config.Whyconf.command ::
-                                 npc.prover_config.Whyconf.extra_options) in
+          let command = Whyconf.get_complete_command npc.prover_config in
           (* eprintf "scheduling it...@."; *)
           schedule_proof_attempt
             ~timelimit ~memlimit
@@ -545,6 +548,9 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
           (prover_on_goal_or_children eS eT
              ~context_unproved_goals_only ~timelimit ~memlimit pr)
           tr.transf_goals
+    | Metas m ->
+      prover_on_goal_or_children eS eT
+        ~context_unproved_goals_only ~timelimit ~memlimit pr m.metas_goal
 
 (**********************************)
 (* method: replay obsolete proofs *)
@@ -558,19 +564,20 @@ let proof_successful_or_just_edited a =
 
 let rec replay_on_goal_or_children eS eT
     ~obsolete_only ~context_unproved_goals_only g =
-  PHprover.iter
-    (fun _ a ->
+  iter_goal
+    (fun a ->
        if not obsolete_only || a.proof_obsolete then
          if not context_unproved_goals_only || proof_successful_or_just_edited a
          then run_external_proof eS eT a)
-    g.goal_external_proofs;
-  PHstr.iter
-    (fun _ t ->
-       List.iter
-         (replay_on_goal_or_children eS eT
-            ~obsolete_only ~context_unproved_goals_only)
-         t.transf_goals)
-    g.goal_transformations
+    (iter_transf
+       (replay_on_goal_or_children eS eT
+          ~obsolete_only ~context_unproved_goals_only)
+    )
+    (iter_metas
+       (replay_on_goal_or_children eS eT
+          ~obsolete_only ~context_unproved_goals_only)
+    )
+    g
 
 let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
   match a with
@@ -598,6 +605,10 @@ let replay eS eT ~obsolete_only ~context_unproved_goals_only a =
           (replay_on_goal_or_children eS eT
              ~obsolete_only ~context_unproved_goals_only)
           tr.transf_goals
+    | Metas m ->
+      replay_on_goal_or_children eS eT
+        ~obsolete_only ~context_unproved_goals_only m.metas_goal
+
 
 (***********************************)
 (* method: mark proofs as obsolete *)
@@ -637,8 +648,10 @@ module Todo = struct
     todo.todo <- todo.todo - 1;
     todo.push_report todo.report v
 
+(* dead code
   let stop todo =
     todo.todo <- todo.todo - 1
+*)
 
   let todo todo =
     todo.todo <- todo.todo + 1
@@ -646,8 +659,10 @@ module Todo = struct
   let _end todo =
     if todo.todo<>0 then None else Some todo.report
 
+(* dead code
   let print todo =
     dprintf debug "[Sched] todo : %i@." todo.todo
+*)
 end
 
 let push_report report (g,p,t,r) =
@@ -709,9 +724,7 @@ let check_external_proof eS eT todo a =
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     result a
             in
-            let command =
-              String.concat " " (npc.prover_config.Whyconf.command ::
-                                   npc.prover_config.Whyconf.extra_options) in
+            let command = Whyconf.get_complete_command npc.prover_config in
             schedule_proof_attempt eT
               ~timelimit ~memlimit
               ?old ~inplace ~command
@@ -722,8 +735,10 @@ let check_external_proof eS eT todo a =
             Todo._done todo (g,a.proof_prover,0,Edited_file_absent f);
     end
 
+(* dead code
 let check_goal_and_children eS eT todo g =
   goal_iter_proof_attempt (check_external_proof eS eT todo) g
+*)
 
 let check_all eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
@@ -758,12 +773,15 @@ let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
       (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
       prover_on_goal eS eT ~callback ~timelimit ~memlimit p g)
     l;
-  PHstr.iter
-    (fun _ t ->
-       List.iter
-         (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
-         t.transf_goals)
-    g.goal_transformations
+  iter_goal
+    (fun _ -> ())
+    (iter_transf
+       (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
+    )
+    (iter_metas
+       (play_on_goal_and_children eS eT ~timelimit ~memlimit todo l)
+    )
+    g
 
 
 let play_all eS eT ~callback ~timelimit ~memlimit l =
@@ -929,6 +947,10 @@ let remove_transformation t =
   O.remove t.transf_key;
   remove_transformation ~notify t
 
+let remove_metas t =
+  O.remove t.metas_key;
+  remove_metas ~notify t
+
 let rec clean = function
   | Goal g when g.goal_verified ->
     iter_goal
@@ -937,10 +959,25 @@ let rec clean = function
           remove_proof_attempt a)
       (fun t ->
         if not t.transf_verified then remove_transformation t
-        else transf_iter clean t) g
+        else transf_iter clean t)
+      (fun m ->
+        if not m.metas_verified then remove_metas m
+        else metas_iter clean m)
+      g
   | Goal g ->
-    (** iter only on transformations if the goal is not proved *)
-    PHstr.iter (fun _ t -> transf_iter clean t) g.goal_transformations
+    (** don't iter on proof_attempt if the goal is not proved *)
+    iter_goal
+      (fun _ -> ())
+      (fun t ->
+        (* NO !!! 
+           if not t.transf_verified then remove_transformation t
+        else 
+        *)
+        transf_iter clean t)
+      (fun m ->
+        if not m.metas_verified then remove_metas m
+        else metas_iter clean m)
+      g
   | Proof_attempt a -> clean (Goal a.proof_parent)
   | any -> iter clean any
 

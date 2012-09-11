@@ -24,6 +24,8 @@ type checksum
 val print_checksum: Format.formatter -> checksum -> unit
 val string_of_checksum: checksum -> string
 val checksum_of_string: string -> checksum
+val equal_checksum: checksum -> checksum -> bool
+val dumb_checksum: checksum
 
 type shape
 val print_shape: Format.formatter -> shape -> unit

@@ -29,10 +29,12 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type blacklist = string list
 
 type 'a pp = Format.formatter -> 'a -> unit
 
-type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
+type printer =
+    Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 
@@ -50,19 +52,23 @@ val print_prelude_for_theory : theory -> prelude_map pp
 val meta_syntax_type : meta
 val meta_syntax_logic : meta
 val meta_remove_prop : meta
+val meta_remove_logic : meta
+val meta_remove_type_symbol : meta
 val meta_realized : meta
 
 val syntax_type : tysymbol -> string -> tdecl
 val syntax_logic : lsymbol -> string -> tdecl
 val remove_prop : prsymbol -> tdecl
 
+val check_syntax_type: tysymbol -> string -> unit
+val check_syntax_logic: lsymbol -> string -> unit
+
 type syntax_map = string Mid.t
 (* [syntax_map] maps the idents of removed props to "" *)
 
 val get_syntax_map : task -> syntax_map
-(*
-val get_syntax_map_of_theory : theory -> syntax_map
-*)
+val add_syntax_map : tdecl -> syntax_map -> syntax_map
+  (* interprets a declaration as a syntax rule, if any *)
 
 val query_syntax : syntax_map -> ident -> string option
 

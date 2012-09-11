@@ -1,5 +1,6 @@
 
 
+(* obsolete
 module M
 
   use import int.Int
@@ -14,5 +15,37 @@ module M
   function f (n:int) : int = n + ! x
 
   goal C : f(3) = 4
+
+end
+*)
+
+
+module Termination
+
+
+  type t = A t | B
+
+  predicate p (x:t) =
+    match x with
+    | A y -> p y
+    | B -> true
+    end
+
+  predicate q (x:t) =
+    match x with
+    | A (A y) -> q y
+    | A y -> false
+    | B -> true
+    end
+
+  type t1 = E t2
+  with t2 = C t1 | D
+
+  predicate r (x:t1) =
+    match x with
+    | E (C y) -> r y
+    | E D -> true
+    end
+
 
 end

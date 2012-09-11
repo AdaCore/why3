@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
 <why3session
- name="examples/programs/gcd/why3session.xml" shape_version="2">
+ name="programs/gcd/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -28,16 +28,16 @@
   expanded="true">
   <theory
    name="EuclideanAlgorithm"
-   locfile="examples/programs/gcd/../gcd.mlw"
+   locfile="programs/gcd/../gcd.mlw"
    loclnum="4" loccnumb="7" loccnume="25"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter gcd"
-    locfile="examples/programs/gcd/../gcd.mlw"
+    locfile="programs/gcd/../gcd.mlw"
     loclnum="10" loccnumb="10" loccnume="13"
     expl="parameter gcd"
-    sum="e7fb9f71ca8d13171325c792ae210df1"
+    sum="56380e19c2b5b0c876cbe75f8f68d59a"
     proved="true"
     expanded="true"
     shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1amodV0V1agcdV0V1Aainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Aainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -49,10 +49,10 @@
      expanded="true">
      <goal
       name="WP_parameter gcd.1"
-      locfile="examples/programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="normal postcondition"
-      sum="21e0a1e39c6afd846fceea9fe201061c"
+      sum="aff67e94d75b8c6f0e60f082ef4fb444"
       proved="true"
       expanded="true"
       shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -64,7 +64,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -80,15 +80,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter gcd.2"
-      locfile="examples/programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="variant decreases"
-      sum="bc3a27e8c6c197ade6b87e38ae3d4e11"
+      sum="4b4c39ee1875678b00e9c7b278a9c92b"
       proved="true"
       expanded="true"
       shape="ainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -100,7 +100,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.19"/>
+       <result status="valid" time="0.20"/>
       </proof>
       <proof
        prover="2"
@@ -113,10 +113,10 @@
      </goal>
      <goal
       name="WP_parameter gcd.3"
-      locfile="examples/programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="precondition"
-      sum="cc2ddc4bf2af2fbb8b21ccf4713ad7f3"
+      sum="71ef822c09945728e72bb556c54c079b"
       proved="true"
       expanded="true"
       shape="ainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -128,7 +128,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -136,7 +136,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="0"
@@ -149,10 +149,10 @@
      </goal>
      <goal
       name="WP_parameter gcd.4"
-      locfile="examples/programs/gcd/../gcd.mlw"
+      locfile="programs/gcd/../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="normal postcondition"
-      sum="861fc38869cd46405cd74dad09288c6a"
+      sum="8c935721b94f1ac90fc16aa90cb62bad"
       proved="true"
       expanded="true"
       shape="ainfix =agcdV1amodV0V1agcdV0V1Iainfix &gt;=amodV0V1c0Aainfix &gt;=V1c0Aainfix &lt;amodV0V1V1Aainfix &lt;=c0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -165,7 +165,7 @@
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.56"/>
+       <result status="valid" time="0.59"/>
       </proof>
      </goal>
     </transf>

@@ -31,10 +31,12 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type blacklist = string list
 
 type 'a pp = formatter -> 'a -> unit
 
-type printer = Env.env -> prelude -> prelude_map -> ?old:in_channel -> task pp
+type printer =
+  Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
 type reg_printer =
   { reg_desc    : formatted;
@@ -62,7 +64,7 @@ let print_printer_desc fmt (s,f) =
     s Pp.formatted f
 
 let () = register_printer ~desc:"Print nothing" "(null)"
-  (fun _ _ _ ?old:_ _ _ -> ())
+  (fun _ _ _ _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
 
@@ -113,7 +115,7 @@ let check_syntax s len =
   in
   iter_group regexp_arg_pos arg s
 
-let check_syntax_typed ls s =
+let check_syntax_logic ls s =
   let len = List.length ls.ls_args in
   let ret = ls.ls_value <> None in
   let nfv = Stv.cardinal (ls_ty_freevars ls) in
@@ -216,15 +218,23 @@ let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
   ~desc:"Specify@ the@ logical@ propositions@ to@ remove.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ remove@ prop@ rule."
 
+let meta_remove_type_symbol  = register_meta "remove_type_symbol" [MTtysymbol]
+  ~desc:"Specify@ the@ type@ symbol@ to@ remove."
+
+let meta_remove_logic  = register_meta "remove_logic" [MTlsymbol]
+  ~desc:"Specify@ the@ logic@ symbol@ propositions@ to@ remove."
+
 let meta_realized     = register_meta "realized" [MTstring; MTstring]
   ~desc:"TODO??"
 
+let check_syntax_type ts s = check_syntax s (List.length ts.ts_args)
+
 let syntax_type ts s =
-  check_syntax s (List.length ts.ts_args);
+  check_syntax_type ts s;
   create_meta meta_syntax_type [MAts ts; MAstr s]
 
 let syntax_logic ls s =
-  check_syntax_typed ls s;
+  check_syntax_logic ls s;
   create_meta meta_syntax_logic [MAls ls; MAstr s]
 
 let remove_prop pr =
@@ -251,14 +261,11 @@ let get_syntax_map task =
   let sm = Task.on_meta meta_remove_prop sm_add_pr sm task in
   sm
 
-(*
-let get_syntax_map_of_theory theory =
-  let sm = Mid.empty in
-  let sm = Theory.on_meta meta_syntax_type sm_add_ts sm theory in
-  let sm = Theory.on_meta meta_syntax_logic sm_add_ls sm theory in
-  let sm = Theory.on_meta meta_remove_prop sm_add_pr sm theory in
-  sm
-*)
+let add_syntax_map td sm = match td.td_node with
+  | Meta (m, args) when meta_equal m meta_syntax_type  -> sm_add_ts sm args
+  | Meta (m, args) when meta_equal m meta_syntax_logic -> sm_add_ls sm args
+  | Meta (m, args) when meta_equal m meta_remove_prop  -> sm_add_pr sm args
+  | _ -> sm
 
 let query_syntax sm id = Mid.find_opt id sm
 

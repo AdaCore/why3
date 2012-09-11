@@ -75,6 +75,9 @@ WhyML
     require tedious checks pretty much everywhere in the code,
     and they cannot be translated to OCaml.
 
+  - accept match e1 with pat -> e2 end as non-ghost when e1 is ghost
+    and e2 is not ghost
+
 syntax
 ------
 
@@ -109,6 +112,8 @@ session
   - the filenames in the location inside a session should be relative
     to the session_dir.
 
+  - use the new restore_path for the metas in session?
+
 tools
 -----
 
@@ -119,10 +124,20 @@ tools
   - Maybe : make something generic for the dialog box with memory.
 
 
+OCaml extraction
+----------------
+
+  - allow other realizations for arithmetic, such as Zarith or GMP
+    (currently this is Num)
+
+  - avoid conversion to/from int in the for-loop
+
+  - driver
+    - %Exit -> Pervasives.Exit
+
 provers
 -------
 
   - PVS: use a better name for PVS theory when printing a task, e.g.
     file_theory_goal. Solution: do that when we have idents with origin
     information (necessary for parsing a task).
-

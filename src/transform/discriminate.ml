@@ -101,12 +101,14 @@ module Lsmap = struct
     let insts = Mls.find_def Mtyl.empty ls lsmap in
     Mls.add ls (Mtyl.change newls (oty_cons tyl tyv) insts) lsmap
 
+(* dead code
   let print_env fmt menv =
     Format.fprintf fmt "defined_lsymbol (%a)@."
       (Pp.print_iter2 Mls.iter Pp.semi Pp.comma Pretty.print_ls
          (Pp.print_iter2 Mtyl.iter Pp.semi Pp.arrow
             (Pp.print_list Pp.space Pretty.print_ty)
             Pretty.print_ls)) menv
+*)
 
   (** From/To metas *)
   let metas lsmap =
@@ -140,7 +142,7 @@ module Ssubst = Set.Make(struct
 
 (* find all the possible instantiation which can create a kept instantiation *)
 let ty_quant env t =
-  let rec add_vs acc0 ls tyl tyv =
+  let add_vs acc0 ls tyl tyv =
     if ls_equal ls ps_equ then acc0 else
       try
         let insts = Mls.find ls env in
@@ -226,13 +228,13 @@ let map env d = match d.d_node with
 
 
 let ft_select_inst =
-  ((Hashtbl.create 17) : (Env.env,Sty.t) Trans.flag_trans)
+  ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
 
 let ft_select_lskept =
-  ((Hashtbl.create 17) : (Env.env,Sls.t) Trans.flag_trans)
+  ((Hstr.create 17) : (Env.env,Sls.t) Trans.flag_trans)
 
 let ft_select_lsinst =
-  ((Hashtbl.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
+  ((Hstr.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
 let metas_from_env env =
   let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
   let fold_ls _ insts s = Mtyl.fold fold_inst insts s in

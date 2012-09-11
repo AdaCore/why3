@@ -309,11 +309,16 @@ let add_rec uc { fun_ps = ps } =
 let add_exn uc xs =
   add_symbol add_ps xs.xs_name (XS xs) uc
 
+let if_fast_wp f1 f2 x = if Debug.test_flag Mlw_wp.fast_wp then f1 x else f2 x
+let wp_val = if_fast_wp Mlw_wp.fast_wp_val Mlw_wp.wp_val
+let wp_let = if_fast_wp Mlw_wp.fast_wp_let Mlw_wp.wp_let
+let wp_rec = if_fast_wp Mlw_wp.fast_wp_rec Mlw_wp.wp_rec
+
 let pdecl_vc env km th d = match d.pd_node with
   | PDtype _ | PDdata _ | PDexn _ -> th
-  | PDval lv -> Mlw_wp.wp_val env km th lv
-  | PDlet ld -> Mlw_wp.wp_let env km th ld
-  | PDrec rdl -> Mlw_wp.wp_rec env km th rdl
+  | PDval lv -> wp_val env km th lv
+  | PDlet ld -> wp_let env km th ld
+  | PDrec rdl ->wp_rec env km th rdl
 
 let add_pdecl ~wp uc d =
   let uc = { uc with

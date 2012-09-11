@@ -19,10 +19,7 @@
 (**************************************************************************)
 
 open Util
-open Ident
 open Ty
-open Term
-open Decl
 open Theory
 open Task
 open Trans
@@ -66,9 +63,9 @@ let def_enco_select_tptp = "none"
 let def_enco_kept_tptp   = "twin"
 let def_enco_poly_tptp   = "decorate"
 
-let ft_select_kept = ((Hashtbl.create 17) : (Env.env,Sty.t) Trans.flag_trans)
-let ft_enco_kept   = ((Hashtbl.create 17) : (Env.env,task)  Trans.flag_trans)
-let ft_enco_poly   = ((Hashtbl.create 17) : (Env.env,task)  Trans.flag_trans)
+let ft_select_kept = ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
+let ft_enco_kept   = ((Hstr.create 17) : (Env.env,task)  Trans.flag_trans)
+let ft_enco_poly   = ((Hstr.create 17) : (Env.env,task)  Trans.flag_trans)
 
 let select_kept def env =
   let select = Trans.on_flag meta_select_kept ft_select_kept def env in

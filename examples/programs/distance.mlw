@@ -54,7 +54,7 @@ module Distance
         (* local optimality *)
         (forall k: int. 0 < k < i ->
            g[g[k]] < f k <= g[k] < k /\
-           0 <= d[k] = d[g[k]] + 1 /\
+           0 < d[k] = d[g[k]] + 1 /\
            forall k': int. g[k] < k' < k -> d[g[k]] < d[k']) /\
         (* could be deduced from above, but avoids induction *)
         (forall k: int. 0 <= k < i -> path d[k] k) }

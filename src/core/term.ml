@@ -21,6 +21,7 @@
 open Util
 open Ident
 open Ty
+open Stdlib
 
 (** Variable symbols *)
 
@@ -812,7 +813,7 @@ let t_bool_false = fs_app fs_bool_false [] ty_bool
 
 let fs_tuple_ids = Hid.create 17
 
-let fs_tuple = Util.memo_int 17 (fun n ->
+let fs_tuple = Util.Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
@@ -1242,6 +1243,7 @@ let t_equal_alpha = t_equal_alpha (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty
 
 (* hash modulo alpha *)
 
+(* dead code
 let rec pat_hash_alpha p =
   match p.pat_node with
   | Pwild -> 0
@@ -1253,6 +1255,7 @@ let rec pat_hash_alpha p =
   | Por (p, q) ->
       Hashcons.combine
         (Hashcons.combine 4 (pat_hash_alpha p)) (pat_hash_alpha q)
+*)
 
 let rec t_hash_alpha c m t =
   let fn = t_hash_alpha c m in
@@ -1471,15 +1474,15 @@ let t_quant_simp q ((vl,_,_,f) as qf) =
     t_quant q qf
   else
     let vl,tl,f = t_open_quant qf in
-    let vl = vl_filter f vl in if vl = [] then f else
-    t_quant_close q vl (tr_filter f tl) f
+    let vl = vl_filter f vl in
+    if vl = [] then f else t_quant_close q vl (tr_filter f tl) f
 
 let t_quant_close_simp q vl tl f =
   if List.for_all (v_occurs f) vl then
     t_quant_close q vl tl f
   else
-    let vl = vl_filter f vl in if vl = [] then f else
-    t_quant_close q vl (tr_filter f tl) f
+    let vl = vl_filter f vl in
+    if vl = [] then f else t_quant_close q vl (tr_filter f tl) f
 
 let t_forall_simp = t_quant_simp Tforall
 let t_exists_simp = t_quant_simp Texists

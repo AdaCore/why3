@@ -18,7 +18,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* OCaml program extraction *)
+val emit:
+  ?loc:Loc.position -> ('b, Format.formatter, unit, unit) format4 -> 'b
 
-val extract_module: string list -> Pgm_module.t -> unit
+(* The default behavior is to emit warning on standard error,
+   with position on a first line (if any) and message on a second line.
+   This can be changed using the following function. *)
+
+val set_hook: (?loc:Loc.position -> string -> unit) -> unit
+
 

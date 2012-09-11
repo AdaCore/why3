@@ -19,13 +19,8 @@
 (**************************************************************************)
 
 open Why3
-open Ident
-open Denv
-open Ty
 open Mlw_ty
-open Mlw_ty.T
 open Mlw_expr
-open Mlw_module
 open Mlw_dty
 
 type loc = Loc.position
@@ -74,7 +69,7 @@ and dexpr_desc =
   | DEglobal_pl of plsymbol
   | DEglobal_ls of Term.lsymbol
   | DEapply of dexpr * dexpr list
-  | DEfun of dlambda
+  | DEfun of dbinder list * dtriple
   | DElet of ident * ghost * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
   | DEassign of dexpr * dexpr
@@ -93,6 +88,5 @@ and dexpr_desc =
   | DEghost of dexpr
   | DEany of dtype_c
 
-and drecfun = loc * ident * ghost * dvty * dlambda
-
-and dlambda = dbinder list * dvariant list * dpre * dexpr * dpost * dxpost
+and drecfun = ident * ghost * dvty * dbinder list * dtriple
+and dtriple = dvariant list * dpre * dexpr * dpost * dxpost

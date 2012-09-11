@@ -20,7 +20,6 @@
 
 open Format
 open Why3
-open Util
 open Whyconf
 
 let usage_msg =

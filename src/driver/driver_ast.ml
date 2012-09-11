@@ -45,6 +45,16 @@ type theory_rules = {
   thr_rules : (loc * th_rule) list;
 }
 
+type mo_rule =
+  | MRtheory    of th_rule
+  | MRexception of cloned * qualid * string
+  | MRval       of cloned * qualid * string
+
+type module_rules = {
+  mor_name  : qualid;
+  mor_rules : (loc * mo_rule) list;
+}
+
 type global =
   | Prelude of string
   | Printer of string
@@ -64,9 +74,20 @@ type global =
   | Filename of string
   | Transform of string
   | Plugin of (string * string)
+  | Blacklist of string list
 
 type file = {
   f_global : (loc * global) list;
   f_rules  : theory_rules list;
 }
 
+type global_extract =
+  | EPrelude   of string
+  | EPrinter   of string
+  | EBlacklist of string list
+
+type file_extract = {
+  fe_global   : (loc * global_extract) list;
+  fe_th_rules : theory_rules list;
+  fe_mo_rules : module_rules list;
+}

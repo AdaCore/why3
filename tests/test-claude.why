@@ -1,3 +1,10 @@
+(*
+
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
+
+*)
 
 
 
@@ -197,3 +204,19 @@ theory TestInline
   goal G : p 4 4
 
 end
+
+theory TestInductive
+
+use import int.Int
+
+inductive p (x:int) =
+
+  | C0 : forall x:int. p x -> p x
+(* NonPositiveIndDecl
+  | C1 : forall x:int.
+     (if p x then true else false) -> p x
+*)
+  | C2 : let x=0 in p x
+end
+
+

@@ -58,13 +58,7 @@ let spec =
   ("--set-archive", Arg.Unit set_opt_archived,
    " the proof is set to archive" ) ::
   ("--unset-archive", Arg.Unit unset_opt_archived,
-   " the proof is set to replayable" ) ::
-  ("--set-obsolete", Arg.Set tobe_obsolete,
-   " the proof is set to obsolete" ) ::
-  ("--set-archive", Arg.Unit set_opt_archived,
-   " the proof is set to archive" ) ::
-  ("--unset-archive", Arg.Unit unset_opt_archived,
-   " the proof is set to replayable" ) ::
+   " the proof attribute archive is unset" ) ::
 (*
   ("--to-known-prover",
    Arg.Set opt_to_known,
@@ -194,7 +188,12 @@ but@ one@ is@ needed.@.";
   end;
   (** get the provers *)
   let pk = read_to_prover config in
-  iter_files (run_one ~action env config filters pk)
+  try
+    iter_files (run_one ~action env config filters pk)
+  with OutdatedSession as e ->
+    eprintf "@.%a@ You@ can@ allow@ it@ with@ the@ option@ -F.@."
+      Exn_printer.exn_printer e
+
 
 let cmd_copy =
   { cmd_spec     = spec;

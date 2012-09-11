@@ -18,31 +18,43 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Util
 open Ident
+open Ty
 open Term
 open Decl
 
 (** Discard definitions of built-in symbols *)
 
-let add_id q (ls,ld) (abst,defn) = if Sls.mem ls q
+let add_id undef_ls rem_ls (ls,ld) (abst,defn) =
+  if Sls.mem ls rem_ls then
+    abst,defn
+  else if Sls.mem ls undef_ls
   then create_param_decl ls :: abst, defn
   else abst, (ls,ld) :: defn
 
-let elim q spr d = match d.d_node with
+(** TODO: go further? such as constructor that are removed? *)
+
+let elim undef_ls rem_pr rem_ls rem_ts d = match d.d_node with
   | Dlogic l ->
-      let ld, id = List.fold_right (add_id q) l ([],[]) in
+      let ld, id = List.fold_right (add_id undef_ls rem_ls) l ([],[]) in
       ld @ (if id = [] then [] else [create_logic_decl id])
   | Dind (s, l) ->
-      let ld, id = List.fold_right (add_id q) l ([],[]) in
+      let ld, id = List.fold_right (add_id undef_ls rem_ls) l ([],[]) in
       ld @ (if id = [] then [] else [create_ind_decl s id])
-  | Dprop (Paxiom,pr,_) when Spr.mem pr spr -> []
+  | Dprop (Paxiom,pr,_) when Spr.mem pr rem_pr -> []
+  | Dtype ts when Sts.mem ts rem_ts -> []
+  | Ddata l ->
+    let test_id (ts,_) = not (Sts.mem ts rem_ts) in
+    let l = List.filter test_id l in
+    (if l = [] then [] else [create_data_decl l])
   | _ -> [d]
 
 let eliminate_builtin =
-  Trans.on_tagged_ls Printer.meta_syntax_logic (fun rem_ls ->
+  Trans.on_tagged_ls Printer.meta_syntax_logic (fun undef_ls ->
   Trans.on_tagged_pr Printer.meta_remove_prop  (fun rem_pr ->
-  Trans.decl (elim rem_ls rem_pr) None))
+  Trans.on_tagged_ls Printer.meta_remove_logic  (fun rem_ls ->
+  Trans.on_tagged_ts Printer.meta_remove_type_symbol  (fun rem_ts ->
+    Trans.decl (elim undef_ls rem_pr rem_ls rem_ts) None))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
   ~desc_metas:[Printer.meta_syntax_logic,
@@ -52,6 +64,32 @@ let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
                Printer.meta_remove_prop, Pp.empty_formatted]
   ~desc:"Eliminate@ facts@ which@ are@ builtin@ in@ the@ prover:@ symbol@ \
          definitions@ or@ axiomatics."
+
+(** compute the meta_remove_* given two task one included in the other *)
+let compute_diff t1 t2 =
+  let km = Mid.set_diff (Task.task_known t1) (Task.task_known t2) in
+  let hdone = Hdecl.create 10 in
+  let remove_ts acc ts =
+    (Printer.meta_remove_type_symbol, [Theory.MAts ts])::acc in
+  let remove_ls acc ls =
+    (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
+  let remove_pr acc pr =
+    (Printer.meta_remove_prop, [Theory.MApr pr])::acc in
+  Mid.fold_left (fun acc _ decl ->
+    if Hdecl.mem hdone decl then acc
+    else begin
+      Hdecl.set hdone decl;
+      match decl.d_node with
+      | Dtype ts -> remove_ts acc ts
+      | Ddata l -> List.fold_left (fun acc (ts,_) -> remove_ts acc ts) acc l
+      | Dparam ls -> remove_ls acc ls
+      | Dlogic l -> List.fold_left (fun acc (ls,_) -> remove_ls acc ls) acc l
+      | Dind (_,l) -> List.fold_left (fun acc (ls,_) -> remove_ls acc ls) acc l
+      | Dprop (_,pr,_) -> remove_pr acc pr
+    end) [] km
+
+let compute_diff =
+  Trans.store (fun t1 -> Trans.store (fun t2 -> compute_diff t1 t2))
 
 (** Eliminate definitions of functions and predicates *)
 

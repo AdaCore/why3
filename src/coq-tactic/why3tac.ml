@@ -19,7 +19,6 @@
 (**************************************************************************)
 
 open Names
-open Nameops
 open Namegen
 open Term
 open Termops
@@ -142,12 +141,23 @@ let coq_iff = lazy (constant "iff")
 
 let is_constant t c = try t = Lazy.force c with _ -> false
 
+let coq_WhyType =
+  lazy (gen_constant_in_modules "why" [["Why3"; "BuiltIn"]] "WhyType")
+
+let rec is_WhyType c = match kind_of_term c with
+  | App (f, [|_|]) -> is_constant f coq_WhyType
+  | Cast (c, _, _) -> is_WhyType c
+  | _ -> false
+
+let has_WhyType env c = is_WhyType (type_of env Evd.empty c)
+
 (* not first-order expressions *)
 exception NotFO
 
 (* coq_rename_vars env [(x1,t1);...;(xn,tn)] renames the xi outside of
    env names, and returns the new variables together with the new
    environment *)
+(*
 let coq_rename_vars env vars =
   let avoid = ref (ids_of_named_context (Environ.named_context env)) in
   List.fold_right
@@ -156,8 +166,9 @@ let coq_rename_vars env vars =
        avoid := id :: !avoid;
        id :: newvars, Environ.push_named (id, None, t) newenv)
     vars ([],env)
+*)
 
-let coq_rename_var env (na,t) =
+let coq_rename_var env na t =
   let avoid = ids_of_named_context (Environ.named_context env) in
   let id = next_name_away na avoid in
   id, Environ.push_named (id, None, t) env
@@ -182,32 +193,40 @@ let rec_names_for c =
 (* extract the prenex type quantifications i.e.
    type_quantifiers env (A1:Set)...(Ak:Set)t = A1...An, (env+Ai), t *)
 let decomp_type_quantifiers env t =
-  let rec loop vars t = match kind_of_term t with
+  let add m id =
+    let tv = Ty.create_tvsymbol (preid_of_id id) in
+    Idmap.add id (Some (Ty.ty_var tv)) m, tv
+  in
+  let rec loop env tvm vars t = match kind_of_term t with
     | Prod (n, a, t) when is_Set a || is_Type a ->
-        loop ((n, a) :: vars) t
+        let n, env = coq_rename_var env n a in
+        let t = subst1 (mkVar n) t in
+        let tvm, tv = add tvm n in
+        loop env tvm (tv :: vars) t
+    | Prod (n, a, t) when is_WhyType a ->
+        let n, env = coq_rename_var env n a in
+        let t = subst1 (mkVar n) t in
+        loop env tvm vars t
     | _ ->
-        let vars, env = coq_rename_vars env vars in
-        let t = substl (List.map mkVar vars) t in
-        let add m id =
-          let tv = Ty.create_tvsymbol (preid_of_id id) in
-          Idmap.add id (Some (Ty.ty_var tv)) m, tv
-        in
-        let tvm, vars = Util.map_fold_left add Idmap.empty vars in
         (tvm, List.rev vars), env, t
   in
-  loop [] t
+  loop env Idmap.empty [] t
 
 (* decomposes the first n type lambda abstractions correspondings to
    the list of type variables vars *)
 let decomp_type_lambdas tvm env vars t =
   let rec loop tvm env vars t = match vars, kind_of_term t with
-    | [], _ ->
-        tvm, env, t
+    | vars, Lambda (n, a, t) when is_WhyType a ->
+        let id, env = coq_rename_var env n a in
+        let t = subst1 (mkVar id) t in
+        loop tvm env vars t
     | tv :: vars, Lambda (n, a, t) when is_Set a || is_Type a ->
-        let id, env = coq_rename_var env (n, a) in
+        let id, env = coq_rename_var env n a in
         let t = subst1 (mkVar id) t in
         let tvm = Idmap.add id (Some (Ty.ty_var tv)) tvm in
         loop tvm env vars t
+    | [], _ ->
+        tvm, env, t
     | _ ->
         raise NotFO (*TODO: eta-expansion*)
   in
@@ -230,7 +249,7 @@ let decomp_lambdas _dep _tvm bv env vars t =
     | [], _ ->
         (bv, List.rev vsl), env, t
     | ty :: vars, Lambda (n, a, t) ->
-        let id, env = coq_rename_var env (n, a) in
+        let id, env = coq_rename_var env n a in
         let t = subst1 (mkVar id) t in
         let vs = create_vsymbol (preid_of_id id) ty in
         let bv = Idmap.add id (Some vs) bv in
@@ -434,6 +453,7 @@ let rec tr_type dep tvm env t =
         begin try
           let r = global_of_constr f in
           let ts = tr_task_ts dep env r in
+          let cl = List.filter (fun c -> not (has_WhyType env c)) cl in
           assert (List.length ts.Ty.ts_args = List.length cl);
           (* since t:Set *)
           Ty.ty_app ts (List.map (tr_type dep tvm env) cl)
@@ -483,7 +503,7 @@ and tr_global_ts dep env r =
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id (Nametab.basename_of_global r) in
-          let ts = match (Global.lookup_constant c).const_body with
+          let ts = match CoqCompat.body_of_constant (Global.lookup_constant c) with
             | Some b ->
                 let b = force b in
                 let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
@@ -631,7 +651,7 @@ and make_one_ls dep env r =
   add_poly_arity ls vars
 
 and decompose_definition dep env c =
-  let dl = match (Global.lookup_constant c).const_body with
+  let dl = match CoqCompat.body_of_constant (Global.lookup_constant c) with
     | None ->
         [ConstRef c, None]
     | Some b ->
@@ -846,6 +866,7 @@ and tr_term dep tvm bv env t =
         let ls = tr_task_ls dep env r in
         begin match ls.Term.ls_value with
           | Some _ ->
+              let cl = List.filter (fun c -> not (has_WhyType env c)) cl in
               let k = get_poly_arity ls in
               let cl = skip_k_args k cl in
               let ty = type_of env Evd.empty t in
@@ -872,8 +893,7 @@ and tr_term dep tvm bv env t =
 (*               abstract app l *)
 
 and quantifiers n a b dep tvm bv env =
-  let vars, env = coq_rename_vars env [n,a] in
-  let id = match vars with [x] -> x | _ -> assert false in
+  let id, env = coq_rename_var env n a in
   let b = subst1 (mkVar id) b in
   let t = tr_type dep tvm env a in
   let vs = Term.create_vsymbol (preid_of_id id) t in
@@ -988,6 +1008,7 @@ and tr_formula dep tvm bv env f = match kind_of_term f with
       let ls = tr_task_ls dep env r in
       begin match ls.Term.ls_value with
         | None ->
+            let args = List.filter (fun c -> not (has_WhyType env c)) args in
             let k = get_poly_arity ls in
             let args = skip_k_args k args in
             Term.ps_app ls (List.map (tr_term dep tvm bv env) args)
@@ -1013,6 +1034,9 @@ let tr_goal gl =
         tr_ctxt tvm bv ctxt
     | (id, None, ty) :: ctxt when is_fo_kind ty ->
         let tvm = Idmap.add id None tvm in
+        tr_ctxt tvm bv ctxt
+    | (id, None, ty) :: ctxt when is_WhyType ty ->
+        let bv = Idmap.add id None bv in
         tr_ctxt tvm bv ctxt
     | (id, None, ty) :: ctxt ->
         let t = type_of env Evd.empty ty in
@@ -1058,8 +1082,8 @@ let is_goal s =
   n >= 11 && String.sub s 0 11 = "Unnamed_thm" ||
   n >= 9 && String.sub s (n - 9) 9 = "_admitted"
 
-let tr_top_decl = function
-  | (sp, kn as _oname), Lib.Leaf lobj ->
+let tr_top_decl ((sp, kn),node) = 
+  CoqCompat.on_leaf_node node (function lobj ->
     let dep = empty_dep () in
     let env = Global.env () in
     let bv = Idmap.empty in
@@ -1098,14 +1122,7 @@ let tr_top_decl = function
         ()
     end
 (* Format.printf "done@." *)
-  | _, Lib.CompilingLibrary _
-  | _, Lib.OpenedModule _
-  | _, Lib.ClosedModule  _
-  | _, Lib.OpenedModtype _
-  | _, Lib.ClosedModtype _
-  | _, Lib.OpenedSection _
-  | _, Lib.ClosedSection _
-  | _, Lib.FrozenState _ -> ()
+  )
 
 let pr_fp fp =
   pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)

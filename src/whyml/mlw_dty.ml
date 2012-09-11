@@ -21,7 +21,6 @@
 (* destructive types for program type inference *)
 
 open Why3
-open Util
 open Ident
 open Ty
 open Term
@@ -29,7 +28,6 @@ open Ptree
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
-open Mlw_module
 
 type dity =
   | Dvar  of dvar ref

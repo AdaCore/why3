@@ -86,6 +86,8 @@ module type S =
     val next_enum : 'a enumeration -> 'a enumeration
     val start_ge_enum : key -> 'a t -> 'a enumeration
     val next_ge_enum : key -> 'a enumeration -> 'a enumeration
+    val fold_left : ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
+    val of_list : (key * 'a) list -> 'a t
 
     module type Set =
     sig
@@ -123,6 +125,8 @@ module type S =
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
       val is_num_elt : int -> t -> bool
+      val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+      val of_list : elt list -> t
     end
 
     module Set : Set
@@ -654,6 +658,15 @@ module Make(Ord: OrderedType) = struct
 
     let next_ge_enum k e = next_ge_enum k Empty e
 
+    let rec fold_left f accu m =
+      match m with
+        Empty -> accu
+      | Node(l, v, d, r, _) ->
+          fold_left f (f (fold_left f accu l) v d) r
+
+    let of_list l =
+      List.fold_left (fun acc (k,d) -> add k d acc) empty l
+
     module type Set =
     sig
       type elt = key
@@ -690,6 +703,8 @@ module Make(Ord: OrderedType) = struct
       val translate : (elt -> elt) -> t -> t
       val add_new : exn -> elt -> t -> t
       val is_num_elt : int -> t -> bool
+      val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+      val of_list : elt list -> t
     end
 
     module Set =
@@ -734,8 +749,64 @@ module Make(Ord: OrderedType) = struct
         let translate = translate
         let add_new e x s = add_new e x () s
         let is_num_elt n m = is_num_elt n m
+        let fold_left f = fold_left (fun accu k () -> f accu k)
+        let of_list l =
+          List.fold_left (fun acc a -> add a acc) empty l
       end
 
 end
+
+end
+
+module Hashtbl = struct
+
+  let hash = Hashtbl.hash
+
+  module type S = sig
+    include Hashtbl.S
+    val is_empty : 'a t -> bool
+    val memo : int -> (key -> 'a) -> key -> 'a
+    exception Key_not_found of key
+    val find' : 'a t -> key -> 'a
+    val set : unit t -> key -> unit
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val find_option : 'a t -> key -> 'a option
+  end
+
+  module Make (X:Hashtbl.HashedType) : S with type key = X.t = struct
+    module M = Hashtbl.Make(X)
+    include M
+    let is_empty h =
+      try
+        M.iter (fun _ _ -> raise Exit) h;
+        true
+      with Exit -> false
+
+    let memo size f =
+      let h = create size in
+      fun x -> try find h x
+        with Not_found -> let y = f x in add h x y; y
+
+    exception Key_not_found of key
+    let find' h k =
+      try find h k with Not_found -> raise (Key_not_found k)
+
+    let set h k   = replace h k ()
+
+    let map f h =
+      let h' = create (length h) in
+      iter (fun k x -> add h' k (f x)) h;
+      h'
+
+    let find_option h k =
+      try Some (find h k) with Not_found -> None
+
+  end
+
+  module Make_Poly (X : sig type t end) =
+    Make(struct type t = X.t
+                let hash = Hashtbl.hash
+                let equal = (=)
+    end)
 
 end

@@ -389,13 +389,14 @@ else
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         case $COQVERSION in
-          8.0*|8.1*|8.2*)
-                enable_coq_support=no
-                AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
-                reason_coq_support=" (need version 8.3 or later)"
+          8.3*)
+	        enable_coq_support=yes
+                cp -f src/coq-tactic/coqCompat.8.3.ml src/coq-tactic/coqCompat.ml
+                AC_MSG_RESULT($COQVERSION)
                 ;;
           8.*|trunk)
 	        enable_coq_support=yes
+                cp -f src/coq-tactic/coqCompat.8.4.ml src/coq-tactic/coqCompat.ml
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           *)

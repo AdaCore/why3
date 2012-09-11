@@ -2,68 +2,40 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+Require int.MinMax.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter mark : Type.
-
-Parameter at1: forall (a:Type), a -> mark  -> a.
-
-Implicit Arguments at1.
-
-Parameter old: forall (a:Type), a  -> a.
-
-Implicit Arguments old.
-
-Axiom Max_is_ge : forall (x:Z) (y:Z), (x <= (Zmax x y))%Z /\
-  (y <= (Zmax x y))%Z.
-
-Axiom Max_is_some : forall (x:Z) (y:Z), ((Zmax x y) = x) \/ ((Zmax x y) = y).
-
-Axiom Min_is_le : forall (x:Z) (y:Z), ((Zmin x y) <= x)%Z /\
-  ((Zmin x y) <= y)%Z.
-
-Axiom Min_is_some : forall (x:Z) (y:Z), ((Zmin x y) = x) \/ ((Zmin x y) = y).
-
-Axiom Max_x : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = x).
-
-Axiom Max_y : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmax x y) = y).
-
-Axiom Min_x : forall (x:Z) (y:Z), (x <= y)%Z -> ((Zmin x y) = x).
-
-Axiom Min_y : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = y).
-
-Axiom Max_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmax x y) = (Zmax y x)).
-
-Axiom Min_sym : forall (x:Z) (y:Z), (y <= x)%Z -> ((Zmin x y) = (Zmin y x)).
-
+(* Why3 assumption *)
 Inductive list (a:Type) :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
-Set Contextual Implicit.
-Implicit Arguments Nil.
-Unset Contextual Implicit.
-Implicit Arguments Cons.
+Implicit Arguments Nil [[a]].
+Implicit Arguments Cons [[a]].
 
-Set Implicit Arguments.
-Fixpoint length (a:Type)(l:(list a)) {struct l}: Z :=
+(* Why3 assumption *)
+Fixpoint length {a:Type}(l:(list a)) {struct l}: Z :=
   match l with
-  | Nil  => 0%Z
-  | Cons _ r => (1%Z + (length r))%Z
+  | Nil => 0%Z
+  | (Cons _ r) => (1%Z + (length r))%Z
   end.
-Unset Implicit Arguments.
 
-Axiom Length_nonnegative : forall (a:Type), forall (l:(list a)),
+Axiom Length_nonnegative : forall {a:Type}, forall (l:(list a)),
   (0%Z <= (length l))%Z.
 
-Axiom Length_nil : forall (a:Type), forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil:(list a))).
+Axiom Length_nil : forall {a:Type}, forall (l:(list a)),
+  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
 
 Parameter char : Type.
 
+(* Why3 assumption *)
 Definition word  := (list char).
 
+(* Why3 assumption *)
 Inductive dist : (list char) -> (list char) -> Z -> Prop :=
-  | dist_eps : (dist (Nil:(list char)) (Nil:(list char)) 0%Z)
+  | dist_eps : (dist (Nil :(list char)) (Nil :(list char)) 0%Z)
   | dist_add_left : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
       w2 n) -> forall (a:char), (dist (Cons a w1) w2 (n + 1%Z)%Z)
   | dist_add_right : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
@@ -71,8 +43,82 @@ Inductive dist : (list char) -> (list char) -> Z -> Prop :=
   | dist_context : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
       w2 n) -> forall (a:char), (dist (Cons a w1) (Cons a w2) n).
 
+(* Why3 assumption *)
 Definition min_dist(w1:(list char)) (w2:(list char)) (n:Z): Prop := (dist w1
   w2 n) /\ forall (m:Z), (dist w1 w2 m) -> (n <= m)%Z.
+
+(* Why3 assumption *)
+Fixpoint infix_plpl {a:Type}(l1:(list a)) (l2:(list a)) {struct l1}: (list
+  a) :=
+  match l1 with
+  | Nil => l2
+  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
+  end.
+
+Axiom Append_assoc : forall {a:Type}, forall (l1:(list a)) (l2:(list a))
+  (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
+  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
+
+Axiom Append_l_nil : forall {a:Type}, forall (l:(list a)), ((infix_plpl l
+  (Nil :(list a))) = l).
+
+Axiom Append_length : forall {a:Type}, forall (l1:(list a)) (l2:(list a)),
+  ((length (infix_plpl l1 l2)) = ((length l1) + (length l2))%Z).
+
+(* Why3 assumption *)
+Fixpoint mem {a:Type}(x:a) (l:(list a)) {struct l}: Prop :=
+  match l with
+  | Nil => False
+  | (Cons y r) => (x = y) \/ (mem x r)
+  end.
+
+Axiom mem_append : forall {a:Type}, forall (x:a) (l1:(list a)) (l2:(list a)),
+  (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x l2)).
+
+Axiom mem_decomp : forall {a:Type}, forall (x:a) (l:(list a)), (mem x l) ->
+  exists l1:(list a), exists l2:(list a), (l = (infix_plpl l1 (Cons x l2))).
+
+(* Why3 assumption *)
+Fixpoint last_char(a:char) (u:(list char)) {struct u}: char :=
+  match u with
+  | Nil => a
+  | (Cons c u') => (last_char c u')
+  end.
+
+(* Why3 assumption *)
+Fixpoint but_last(a:char) (u:(list char)) {struct u}: (list char) :=
+  match u with
+  | Nil => (Nil :(list char))
+  | (Cons c u') => (Cons a (but_last c u'))
+  end.
+
+Axiom first_last_explicit : forall (u:(list char)) (a:char),
+  ((infix_plpl (but_last a u) (Cons (last_char a u) (Nil :(list
+  char)))) = (Cons a u)).
+
+Axiom first_last : forall (a:char) (u:(list char)), exists v:(list char),
+  exists b:char, ((infix_plpl v (Cons b (Nil :(list char)))) = (Cons a u)) /\
+  ((length v) = (length u)).
+
+Axiom key_lemma_right : forall (w1:(list char)) (w'2:(list char)) (m:Z)
+  (a:char), (dist w1 w'2 m) -> forall (w2:(list char)), (w'2 = (Cons a
+  w2)) -> exists u1:(list char), exists v1:(list char), exists k:Z,
+  (w1 = (infix_plpl u1 v1)) /\ ((dist v1 w2 k) /\
+  ((k + (length u1))%Z <= (m + 1%Z)%Z)%Z).
+
+Axiom dist_symetry : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
+  w2 n) -> (dist w2 w1 n).
+
+Axiom key_lemma_left : forall (w1:(list char)) (w2:(list char)) (m:Z)
+  (a:char), (dist (Cons a w1) w2 m) -> exists u2:(list char), exists v2:(list
+  char), exists k:Z, (w2 = (infix_plpl u2 v2)) /\ ((dist w1 v2 k) /\
+  ((k + (length u2))%Z <= (m + 1%Z)%Z)%Z).
+
+Axiom dist_concat_left : forall (u:(list char)) (v:(list char)) (w:(list
+  char)) (n:Z), (dist v w n) -> (dist (infix_plpl u v) w ((length u) + n)%Z).
+
+Axiom dist_concat_right : forall (u:(list char)) (v:(list char)) (w:(list
+  char)) (n:Z), (dist v w n) -> (dist v (infix_plpl u w) ((length u) + n)%Z).
 
 Axiom min_dist_equal : forall (w1:(list char)) (w2:(list char)) (a:char)
   (n:Z), (min_dist w1 w2 n) -> (min_dist (Cons a w1) (Cons a w2) n).
@@ -83,84 +129,77 @@ Axiom min_dist_diff : forall (w1:(list char)) (w2:(list char)) (a:char)
   ((Zmin m p) + 1%Z)%Z))).
 
 Axiom min_dist_eps : forall (w:(list char)) (a:char) (n:Z), (min_dist w
-  (Nil:(list char)) n) -> (min_dist (Cons a w) (Nil:(list char))
+  (Nil :(list char)) n) -> (min_dist (Cons a w) (Nil :(list char))
   (n + 1%Z)%Z).
 
-Axiom min_dist_eps_length : forall (w:(list char)), (min_dist (Nil:(list
+Axiom min_dist_eps_length : forall (w:(list char)), (min_dist (Nil :(list
   char)) w (length w)).
 
+(* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
-Implicit Arguments mk_ref.
+Implicit Arguments mk_ref [[a]].
 
-Definition contents (a:Type)(u:(ref a)): a :=
-  match u with
-  | mk_ref contents1 => contents1
+(* Why3 assumption *)
+Definition contents {a:Type}(v:(ref a)): a :=
+  match v with
+  | (mk_ref x) => x
   end.
-Implicit Arguments contents.
 
 Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter get: forall (a:Type) (b:Type), (map a b) -> a  -> b.
+Parameter get: forall {a:Type} {b:Type}, (map a b) -> a -> b.
 
-Implicit Arguments get.
+Parameter set: forall {a:Type} {b:Type}, (map a b) -> a -> b -> (map a b).
 
-Parameter set: forall (a:Type) (b:Type), (map a b) -> a -> b  -> (map a b).
-
-Implicit Arguments set.
-
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_eq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
   a2) = b1).
 
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(map a b)),
+Axiom Select_neq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter const: forall (b:Type) (a:Type), b  -> (map a b).
+Parameter const: forall {a:Type} {b:Type}, b -> (map a b).
 
-Set Contextual Implicit.
-Implicit Arguments const.
-Unset Contextual Implicit.
+Axiom Const : forall {a:Type} {b:Type}, forall (b1:b) (a1:a),
+  ((get (const b1:(map a b)) a1) = b1).
 
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a), ((get (const(
-  b1):(map a b)) a1) = b1).
-
+(* Why3 assumption *)
 Inductive array (a:Type) :=
   | mk_array : Z -> (map Z a) -> array a.
-Implicit Arguments mk_array.
+Implicit Arguments mk_array [[a]].
 
-Definition elts (a:Type)(u:(array a)): (map Z a) :=
-  match u with
-  | mk_array _ elts1 => elts1
+(* Why3 assumption *)
+Definition elts {a:Type}(v:(array a)): (map Z a) :=
+  match v with
+  | (mk_array x x1) => x1
   end.
-Implicit Arguments elts.
 
-Definition length1 (a:Type)(u:(array a)): Z :=
-  match u with
-  | mk_array length2 _ => length2
+(* Why3 assumption *)
+Definition length1 {a:Type}(v:(array a)): Z :=
+  match v with
+  | (mk_array x x1) => x
   end.
-Implicit Arguments length1.
 
-Definition get1 (a:Type)(a1:(array a)) (i:Z): a := (get (elts a1) i).
-Implicit Arguments get1.
+(* Why3 assumption *)
+Definition get1 {a:Type}(a1:(array a)) (i:Z): a := (get (elts a1) i).
 
-Definition set1 (a:Type)(a1:(array a)) (i:Z) (v:a): (array a) :=
-  match a1 with
-  | mk_array xcl0 _ => (mk_array xcl0 (set (elts a1) i v))
-  end.
-Implicit Arguments set1.
+(* Why3 assumption *)
+Definition set1 {a:Type}(a1:(array a)) (i:Z) (v:a): (array a) :=
+  (mk_array (length1 a1) (set (elts a1) i v)).
 
-Parameter suffix: (array char) -> Z  -> (list char).
-
+Parameter suffix: (array char) -> Z -> (list char).
 
 Axiom suffix_nil : forall (a:(array char)), ((suffix a
-  (length1 a)) = (Nil:(list char))).
+  (length1 a)) = (Nil :(list char))).
 
 Axiom suffix_cons : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
-  (i <  (length1 a))%Z) -> ((suffix a i) = (Cons (get1 a i) (suffix a
+  (i < (length1 a))%Z) -> ((suffix a i) = (Cons (get1 a i) (suffix a
   (i + 1%Z)%Z))).
 
+
+(* Why3 goal *)
 Theorem suffix_length : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
   (i <= (length1 a))%Z) -> ((length (suffix a i)) = ((length1 a) - i)%Z).
 (* YOU MAY EDIT THE PROOF BELOW *)
@@ -181,7 +220,7 @@ intros.
 rewrite suffix_cons.
 2: unfold length; simpl; omega.
 unfold get1.
-unfold length; fold length.
+unfold length; fold @length.
 unfold Zsucc; ring_simplify.
 replace (n - (x + 1) + 1)%Z with (n - x)%Z; [ idtac | ring ].
 rewrite H0; omega.
@@ -189,6 +228,5 @@ omega.
 omega.
 omega.
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

@@ -213,6 +213,30 @@ theory Fsetint
 
 end
 
+(** {2 Finite set iterators} *)
+
+theory Min
+
+  use import Fset
+  use import int.Int
+
+  type param
+
+  type elt
+
+  function cost param elt : int
+
+  function min param (set elt) : int
+
+  axiom min_is_a_lower_bound:
+    forall p:param, s:set elt, x:elt. mem x s -> cost p x >= min p s
+
+  axiom min_appears_in_set:
+    forall p:param, s:set elt. not (is_empty s) ->
+      exists x:elt. mem x s /\ cost p x = min p s
+
+end
+
 (** {2 Sets realized as maps} *)
 
 theory SetMap

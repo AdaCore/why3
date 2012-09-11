@@ -222,7 +222,7 @@ and stats2_of_transf ~nb_proofs tr : (notask goal * notask goal_stat) list =
 let print_res fmt (p,t) = fprintf fmt "%a (%.2f)" print_prover p t
 
 let rec print_goal_stats depth (g,l) = 
-  for i=1 to depth do printf "  " done;
+  for _i=1 to depth do printf "  " done;
   printf "+-- goal %s" g.goal_name.Ident.id_string;
   match l with
     | No l ->
@@ -237,7 +237,7 @@ let rec print_goal_stats depth (g,l) =
       List.iter (print_transf_stats (depth+1)) l
 
 and print_transf_stats depth (tr,l) =
-  for i=1 to depth do printf "  " done;
+  for _i=1 to depth do printf "  " done;
   printf "+-- transformation %s@\n" tr.transf_name;
   List.iter (print_goal_stats (depth+1)) l
 

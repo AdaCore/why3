@@ -38,8 +38,10 @@ let transfer_loc lb_from lb_to =
 
 (*s Error locations. *)
 
+(* dead code
 let finally ff f x =
   let y = try f x with e -> ff (); raise e in ff (); y
+*)
 
 open Format
 

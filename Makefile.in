@@ -117,7 +117,7 @@ LIBGENERATED = src/util/rc.ml src/parser/lexer.ml \
 	       src/driver/driver_lexer.ml src/session/xml.ml
 
 LIB_UTIL = stdlib exn_printer pp debug loc print_tree \
-	   cmdline hashweak hashcons util sysutil rc plugin
+	   cmdline hashweak hashcons util warning sysutil rc plugin
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
 
@@ -299,8 +299,11 @@ $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
-plugins.byte: $(addsuffix .cmo, $(addprefix lib/plugins/, $(PLUGINS)))
-plugins.opt : $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+LIBPLUGCMO =  $(addsuffix .cmo,  $(addprefix lib/plugins/, $(PLUGINS)))
+LIBPLUGCMXS = $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
+
+plugins.byte: $(LIBPLUGCMO)
+plugins.opt : $(LIBPLUGCMXS)
 
 lib/plugins/%.cmxs: plugins/parser/%.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -357,7 +360,7 @@ clean::
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
-	cp -f lib/plugins/* $(LIBDIR)/why3/plugins
+	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
 
 ########
@@ -365,7 +368,7 @@ install_no_local::
 ########
 
 PGM_FILES = pgm_ttree pgm_types pgm_pretty \
-	    pgm_module pgm_wp pgm_typing pgm_ocaml pgm_main
+	    pgm_module pgm_wp pgm_typing pgm_main
 
 PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
 
@@ -393,7 +396,7 @@ clean::
 ########
 
 MLW_FILES = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
-	    mlw_dtree mlw_dty mlw_typing mlw_main
+	    mlw_dtree mlw_dty mlw_typing mlw_driver mlw_ocaml mlw_main
 
 MLWMODULES = $(addprefix src/whyml/, $(MLW_FILES))
 
@@ -423,6 +426,9 @@ clean::
 src/main.cmo: src/why3.cma
 src/main.cmx: src/why3.cmxa
 
+src/main.cmo src/main.cmx: INCLUDES += -I src/whyml
+src/main.dep: DEPFLAGS += -I src/whyml
+
 byte: bin/why3.byte
 opt:  bin/why3.opt
 
@@ -441,6 +447,12 @@ install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 
 install_local: bin/why3
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include src/main.dep
+endif
+
+depend: src/main.dep
 
 clean::
 	rm -f src/main.cm[iox] src/main.annot src/main.o
@@ -542,7 +554,8 @@ gallery::
 
 xml-validate:
 	@for x in `find examples/ -name why3session.xml`; do \
-	  xmllint --noout --valid $$x 2>&1 | head -1; \
+	  xmllint --noout --dtdvalid share/why3session.dtd \
+			$$x 2>&1 | head -1; \
 	done
 
 ########
@@ -819,9 +832,9 @@ endif
 
 ifeq (@enable_coq_plugin@,yes)
 
-COQPGENERATED = src/coq-tactic/g_why3tac.ml
+COQPGENERATED = src/coq-tactic/coqCompat.ml src/coq-tactic/g_why3tac.ml
 
-COQP_FILES = why3tac g_why3tac
+COQP_FILES = coqCompat why3tac g_why3tac
 
 COQPMODULES = $(addprefix src/coq-tactic/, $(COQP_FILES))
 
@@ -840,7 +853,13 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
-lib/coq-tactic/why3tac.cma:  BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/coqCompat.cmi: BFLAGS+=-rectypes 
+src/coq-tactic/coqCompat.cmo: BFLAGS+=-rectypes 
+src/coq-tactic/coqCompat.cmx: OFLAGS+=-rectypes 
+src/coq-tactic/why3tac.cmi: BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/why3tac.cmo: BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/why3tac.cmx: OFLAGS+=-rectypes -I +camlp5
+lib/coq-tactic/why3tac.cma: BFLAGS+=-rectypes -I +camlp5
 lib/coq-tactic/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
 lib/coq-tactic/why3tac.cmxs: src/why3.cmxa $(COQPCMX)
@@ -899,10 +918,11 @@ endif
 
 ifeq (@enable_coq_libs@,yes)
 
-COQLIBS_INT_FILES = Abs ComputerDivision EuclideanDivision Int MinMax Power
-COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_FILES))
+COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
+COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
+COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 
-COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax Real Square RealInfix
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime
@@ -914,7 +934,7 @@ COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -931,6 +951,7 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
+	echo 'theory BuiltIn meta "realized" "BuiltIn", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
 	echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_REAL_FILES); do \
@@ -946,6 +967,7 @@ opt byte: $(COQVO)
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq
 	mkdir -p $(LIBDIR)/why3/coq/int
+	cp lib/coq/BuiltIn.vo $(LIBDIR)/why3/coq/
 	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
 	mkdir -p $(LIBDIR)/why3/coq/real
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
@@ -960,7 +982,9 @@ endif
 install_local: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS)" "update-coq"
 include $(COQVD)
+endif
 endif
 
 depend: $(COQVD)
@@ -969,7 +993,7 @@ clean::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
 update-coq: bin/why3 drivers/coq-realizations.aux
-	for f in $(COQLIBS_INT_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+	for f in $(COQLIBS_INT_ALL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
 	for f in $(COQLIBS_REAL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
 	for f in $(COQLIBS_NUMBER_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
 	for f in $(COQLIBS_FP_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
@@ -1230,7 +1254,7 @@ doc/bnf: doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLOPT) -o $@ doc/bnf.ml
 
-DOC = api glossary ide intro library macros manpages coq_tactic \
+DOC = api glossary ide intro library macros manpages install coq_tactic \
       realizations manual starting syntax syntaxref technical version whyml
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))

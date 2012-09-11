@@ -111,11 +111,21 @@ val list_first : ('a -> 'b option) -> 'a list -> 'b
     [f] to an element of [l] which doesn't return [None]. [raise
     Not_found] if all the element of [l] return [None] *)
 
+val list_find_nth : ('a -> bool) -> 'a list -> int
+(** [list_find_nth p l] returns the index of the first element that
+    satifies the predicate [p]. [raise Not_found] if no element of [l]
+    verify the predicate *)
+
+
+val list_first_nth : ('a -> 'b option) -> 'a list -> int * 'b
+(** The combinaison of {!list_first} and {!list_find_nth}. *)
+
+
 val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
 val list_iteri : (int -> 'a -> unit) -> 'a list -> unit
 val list_fold_lefti : ('a -> int -> 'b -> 'a) -> 'a -> 'b list -> 'a
-  (** similar to List.map, List.iter and List.fold_left,
-      but with element index passed as extra argument (in 0..len-1) *)
+(** similar to List.map, List.iter and List.fold_left,
+    but with element index passed as extra argument (in 0..len-1) *)
 
 val list_or : ('a -> bool) -> 'a list -> bool
 val list_and : ('a -> bool) -> 'a list -> bool
@@ -160,17 +170,19 @@ val concat_non_empty : string -> string list -> string
 (* useful function on char *)
 val is_uppercase : char -> bool
 
+(* useful function on int *)
+val count : int -> ('a -> int)
+(** return the consecutie number from the first given *)
+
 (* Set and Map on ints and strings *)
 
 module Mint : Map.S with type key = int
 module Sint : Mint.Set
+module Hint : Hashtbl.S with type key = int
 
 module Mstr : Map.S with type key = string
 module Sstr : Mstr.Set
 module Hstr : Hashtbl.S with type key = string
-
-val memo_int : int -> (int -> 'a) -> int -> 'a
-val memo_string : int -> (string -> 'a) -> string -> 'a
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
@@ -212,14 +224,26 @@ module type PrivateHashtbl = sig
   type key
 
   val find : 'a t -> key -> 'a
-    (** Same as {Hashtbl.find} *)
+    (** Same as {!Hashtbl.find} *)
   val iter : (key -> 'a -> unit) -> 'a t -> unit
-    (** Same as {Hashtbl.iter} *)
+    (** Same as {!Hashtbl.iter} *)
   val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
-    (** Same as {Hashtbl.fold} *)
+    (** Same as {!Hashtbl.fold} *)
   val mem : 'a t -> key -> bool
-    (** Same as {Hashtbl.mem} *)
+    (** Same as {!Hashtbl.mem} *)
   val length : 'a t -> int
-    (** Same as {Hashtbl.length} *)
+    (** Same as {!Hashtbl.length} *)
+
+end
+
+module type PrivateArray = sig
+  (** Private Array *)
+  type 'a t
+
+  val get : 'a t -> int -> 'a
+  val iter : ('a -> unit) -> 'a t -> unit
+    (** Same as {!Array.iter} *)
+  val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
+    (** Same as {!Array.fold} *)
 
 end

@@ -21,11 +21,10 @@ transformation "simplify_formula"
 
 theory BuiltIn
 
-  prelude "Require Import ZArith."
-  prelude "Require Import Rbase."
+  prelude "Require Import BuiltIn."
 
-  syntax type   int   "Z"
-  syntax type   real  "R"
+  syntax type int "Z"
+  syntax type real "R"
   syntax predicate  (=)   "(%1 = %2)"
 end
 
@@ -64,11 +63,14 @@ theory int.Int
   syntax predicate (>)  "(%1 > %2)%Z"
 
   remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc.Assoc
-  remove prop CommutativeGroup.Unit_def
-  remove prop CommutativeGroup.Inv_def
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
   remove prop Assoc.Assoc
-  remove prop Mul_distr
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
   remove prop Comm.Comm
   remove prop Unitary
   remove prop Refl
@@ -164,11 +166,14 @@ theory real.Real
   syntax predicate (>)  "(%1 > %2)%R"
 
   remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc.Assoc
-  remove prop CommutativeGroup.Unit_def
-  remove prop CommutativeGroup.Inv_def
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
   remove prop Assoc.Assoc
-  remove prop Mul_distr
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
   remove prop Comm.Comm
   remove prop Unitary
   remove prop Inverse
@@ -268,15 +273,6 @@ theory real.PowerInt
   remove prop Power_1 (* already as powerRZ_1 *)
   (* remove prop Power_sum *) (* not the same as powerRZ_add *)
   (* remove prop Power_mult *)
-
-
-end
-
-theory real.PowerReal
-
-  prelude "Require Import Rpower."
-
-  syntax function pow "(Rpower %1 %2)"
 
 end
 

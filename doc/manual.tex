@@ -8,7 +8,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 %\usepackage{url}
-\usepackage[a4paper,pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
+\usepackage[pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xspace}
@@ -26,8 +26,12 @@
 \setcounter{bottomnumber}{4}
 \setcounter{totalnumber}{8}
 
-%\usepackage[toc,nonumberlist]{glossaries}
-%\makeglossaries
+% \usepackage[toc,nonumberlist]{glossaries}
+% \makeglossaries
+
+% \usepackage{glossary}
+% \makeglossary
+% \glossary{name={entry name}, description={entry description}}
 
 % for ocamldoc generated pages
 %\usepackage{ocamldoc}
@@ -220,8 +224,6 @@ are the following.
 
 \part{Reference Manual}
 
-% \input{glossary.tex}
-
 \input{install.tex}
 
 \input{manpages.tex}
@@ -247,6 +249,9 @@ are the following.
 \bibliography{manual}
 %\input{biblio-demons}
 
+
+% \cleardoublepage
+% \input{glossary.tex}
 
 \cleardoublepage
 \listoffigures

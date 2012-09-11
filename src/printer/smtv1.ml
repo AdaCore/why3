@@ -216,7 +216,7 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task pr thpr fmt task =
+let print_task pr thpr _blacklist fmt task =
   fprintf fmt "(benchmark why3@\n"
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
@@ -231,7 +231,7 @@ let print_task pr thpr fmt task =
   fprintf fmt "@\n)@."
 
 let () = register_printer "smtv1"
-  (fun _env pr thpr ?old:_ fmt task ->
+  (fun _env pr thpr blacklist ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task pr thpr fmt task)
+     print_task pr thpr blacklist fmt task)
   ~desc:"Printer@ for@ the@ smtlib@ version@ 1@ format."

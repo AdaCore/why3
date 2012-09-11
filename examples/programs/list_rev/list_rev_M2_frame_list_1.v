@@ -2,108 +2,98 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import ZArith.
 Require Import Rbase.
+Require int.Int.
+
+(* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter ignore: forall (a:Type), a  -> unit.
+(* Why3 assumption *)
+Inductive ref (a:Type) :=
+  | mk_ref : a -> ref a.
+Implicit Arguments mk_ref [[a]].
 
-Implicit Arguments ignore.
+(* Why3 assumption *)
+Definition contents {a:Type}(v:(ref a)): a :=
+  match v with
+  | (mk_ref x) => x
+  end.
 
-Parameter label_ : Type.
+Parameter map : forall (a:Type) (b:Type), Type.
 
-Parameter at1: forall (a:Type), a -> label_  -> a.
+Parameter get: forall {a:Type} {b:Type}, (map a b) -> a -> b.
 
-Implicit Arguments at1.
+Parameter set: forall {a:Type} {b:Type}, (map a b) -> a -> b -> (map a b).
 
-Parameter old: forall (a:Type), a  -> a.
+Axiom Select_eq : forall {a:Type} {b:Type}, forall (m:(map a b)),
+  forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1)
+  a2) = b1).
 
-Implicit Arguments old.
-
-Parameter ref : forall (a:Type), Type.
-
-Parameter t : forall (a:Type) (b:Type), Type.
-
-Parameter get: forall (a:Type) (b:Type), (t a b) -> a  -> b.
-
-Implicit Arguments get.
-
-Parameter set: forall (a:Type) (b:Type), (t a b) -> a -> b  -> (t a b).
-
-Implicit Arguments set.
-
-Axiom Select_eq : forall (a:Type) (b:Type), forall (m:(t a b)), forall (a1:a)
-  (a2:a), forall (b1:b), (a1 = a2) -> ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall (a:Type) (b:Type), forall (m:(t a b)),
+Axiom Select_neq : forall {a:Type} {b:Type}, forall (m:(map a b)),
   forall (a1:a) (a2:a), forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1)
   a2) = (get m a2)).
 
-Parameter create_const: forall (b:Type) (a:Type), b  -> (t a b).
+Parameter const: forall {a:Type} {b:Type}, b -> (map a b).
 
-Set Contextual Implicit.
-Implicit Arguments create_const.
-Unset Contextual Implicit.
-
-Axiom Const : forall (b:Type) (a:Type), forall (b1:b) (a1:a),
-  ((get (create_const(b1):(t a b)) a1) = b1).
+Axiom Const : forall {a:Type} {b:Type}, forall (b1:b) (a1:a),
+  ((get (const b1:(map a b)) a1) = b1).
 
 Parameter pointer : Type.
 
-Definition next  := (t pointer pointer).
+Axiom pointer_dec : forall (p1:pointer) (p2:pointer), (p1 = p2) \/
+  ~ (p1 = p2).
 
-Parameter null:  pointer.
+(* Why3 assumption *)
+Definition next  := (map pointer pointer).
 
+Parameter null: pointer.
 
-Parameter value:  (t pointer Z).
-
-
-Parameter next1:  (t pointer pointer).
-
-
-Inductive is_list : (t pointer pointer) -> pointer -> Prop :=
-  | is_list_null : forall (next2:(t pointer pointer)) (p:pointer),
-      (p = (null )) -> (is_list next2 p)
-  | is_list_next : forall (next3:(t pointer pointer)) (p:pointer),
-      (~ (p = (null ))) -> ((is_list next3 (get next3 p)) -> (is_list next3
-      p)).
+(* Why3 assumption *)
+Inductive is_list : (map pointer pointer) -> pointer -> Prop :=
+  | is_list_null : forall (next1:(map pointer pointer)) (p:pointer),
+      (p = null) -> (is_list next1 p)
+  | is_list_next : forall (next1:(map pointer pointer)) (p:pointer),
+      (~ (p = null)) -> ((is_list next1 (get next1 p)) -> (is_list next1 p)).
 
 Parameter ft : forall (a:Type), Type.
 
-Parameter in_ft: pointer -> (ft pointer)  -> Prop.
+Parameter in_ft: pointer -> (ft pointer) -> Prop.
+
+Axiom set_eq : forall (ft1:(ft pointer)) (ft2:(ft pointer)),
+  (forall (q:pointer), (in_ft q ft1) <-> (in_ft q ft2)) -> (ft1 = ft2).
+
+Parameter list_ft: (map pointer pointer) -> pointer -> (ft pointer).
+
+Axiom list_ft_node_null_cor : forall (next1:(map pointer pointer))
+  (q:pointer) (p:pointer), (q = null) -> ~ (in_ft p (list_ft next1 q)).
+
+Axiom list_ft_node_next1 : forall (next1:(map pointer pointer)) (q:pointer)
+  (p:pointer), (~ (q = null)) -> ((is_list next1 (get next1 q)) -> ((in_ft p
+  (list_ft next1 (get next1 q))) -> (in_ft p (list_ft next1 q)))).
+
+Axiom list_ft_node_next2 : forall (next1:(map pointer pointer)) (q:pointer),
+  (~ (q = null)) -> ((is_list next1 (get next1 q)) -> (in_ft q (list_ft next1
+  q))).
+
+Axiom list_ft_node_next_inv : forall (next1:(map pointer pointer))
+  (q:pointer) (p:pointer), (~ (q = null)) -> ((is_list next1 (get next1
+  q)) -> ((~ (q = p)) -> ((in_ft p (list_ft next1 q)) -> (in_ft p
+  (list_ft next1 (get next1 q)))))).
 
 
-Parameter list_ft: (t pointer pointer) -> pointer  -> (ft pointer).
-
-
-Axiom list_ft_node_null_cor : forall (next4:(t pointer pointer)) (q:pointer)
-  (p:pointer), (q = (null )) -> ~ (in_ft p (list_ft next4 q)).
-
-Axiom list_ft_node_next1 : forall (next5:(t pointer pointer)) (q:pointer)
-  (p:pointer), (~ (q = (null ))) -> ((is_list next5 (get next5 q)) ->
-  ((in_ft p (list_ft next5 (get next5 q))) -> (in_ft p (list_ft next5 q)))).
-
-Axiom list_ft_node_next2 : forall (next6:(t pointer pointer)) (q:pointer),
-  (~ (q = (null ))) -> ((is_list next6 (get next6 q)) -> (in_ft q
-  (list_ft next6 q))).
-
-Axiom list_ft_node_next_inv : forall (next7:(t pointer pointer)) (q:pointer)
-  (p:pointer), (~ (q = (null ))) -> ((is_list next7 (get next7 q)) ->
-  ((~ (q = p)) -> ((in_ft p (list_ft next7 q)) -> (in_ft p (list_ft next7
-  (get next7 q)))))).
-
-Theorem frame_list : forall (next8:(t pointer pointer)) (p:pointer)
-  (q:pointer) (v:pointer), (~ (in_ft q (list_ft next8 p))) -> ((is_list next8
-  p) -> (is_list (set next8 q v) p)).
+(* Why3 goal *)
+Theorem frame_list : forall (next1:(map pointer pointer)) (p:pointer)
+  (q:pointer) (v:pointer), (~ (in_ft q (list_ft next1 p))) -> ((is_list next1
+  p) -> (is_list (set next1 q v) p)).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros.
 induction H0.
 apply (is_list_null _ _ H0).
 apply (is_list_next _ _ H0).
 assert (q<>p) by (intro eq;apply H;rewrite eq;clear eq;apply (list_ft_node_next2 _ _ H0 H1)).
-rewrite (Select_neq _ _ _ _ _ _ H2).
+rewrite (Select_neq _ _ _ _ H2).
 apply IHis_list.
 contradict H.
 exact (list_ft_node_next1 _ _ _ H0 H1 H).
 Qed.
-(* DO NOT EDIT BELOW *)
 
 

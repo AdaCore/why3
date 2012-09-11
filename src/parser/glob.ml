@@ -30,10 +30,12 @@ let dummy_id = id_register (id_fresh "dummy")
 let glob = Hashtbl.create 5003
   (* could be improved with nested hash tables *)
 
+(* dead code
 let with_loc f = function
   | None -> ()
   | Some loc when loc = Loc.dummy_position -> ()
   | Some loc -> f loc
+*)
 
 let use loc id =
   let f, l, c, _ = Loc.get loc in

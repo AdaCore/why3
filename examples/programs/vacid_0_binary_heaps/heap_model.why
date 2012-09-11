@@ -16,7 +16,7 @@ lemma Model_empty :
 lemma Model_singleton : forall a: array int. model (a,1) = singleton(a[0])
 
 lemma Model_set :
-  forall a a': array int,v: int, i n : int.
+  forall a: array int,v: int, i n : int.
     0 <= i < n ->
         add (a[i]) (model (a[i <- v],n)) =
         add v (model (a, n))

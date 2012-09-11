@@ -525,10 +525,10 @@ let encoding_instantiate complete =
   (Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
     create_trans_complete kept complete))
 
-let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate"
+let () = Hstr.replace Encoding.ft_enco_kept "instantiate"
   (const (encoding_instantiate Incomplete))
 
-let () = Hashtbl.replace Encoding.ft_enco_kept "instantiate_complete"
+let () = Hstr.replace Encoding.ft_enco_kept "instantiate_complete"
   (const (encoding_instantiate Complete))
 
 (*

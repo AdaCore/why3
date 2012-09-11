@@ -186,9 +186,13 @@ let wp_forall_post v p f =
 
 (* regs_of_reads, and therefore regs_of_effect, only take into account
    reads in program expressions and ignore the variables in specification *)
+(* dead code
 let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
+*)
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
+(* dead code
 let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
+*)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let open_post q =
@@ -429,9 +433,11 @@ type state = {
   st_next : point ref;
 }
 
+(* dead code
 type names = point Mvs.t  (* variable -> point *)
 type condition = lsymbol Mint.t (* point -> constructor *)
 type lesson = condition list Mint.t (* point -> conditions for invariant *)
+*)
 
 let empty_state lkm km = {
   st_km   = km;
@@ -967,3 +973,180 @@ let wp_rec env km th rdl =
   List.fold_left2 add_one th rdl.rec_defn fl
 
 let wp_val _env _km th _lv = th
+
+(*****************************************************************************)
+
+(* Efficient Weakest Preconditions
+
+  Following Leino, see
+  http://research.microsoft.com/apps/pubs/default.aspx?id=70052
+
+  Roughly, the idea is the following. From a program expression e, we compute
+  two formulas OK and N. Formula OK means ``the execution of e does not go
+  wrong'' and formula N is an input-output relation between initial and
+  final state of e's execution.
+
+  Thus the weakest precondition of e is simply OK.
+  N is involved in recursive computations, e.g.
+  OK(fun x -> {p} e {q}) = forall x. p => OK(e) /\ (forall result. N(e) => q)
+  And so on.
+
+  In practice, this is a bit more involved, since execution of e may raise
+  exceptions. So formula N comes with other formulas E(x), once for each
+  exception x that is possibly raised by e. E(x) is the input-output relation
+  that holds when exception x is raised.
+*)
+
+let fast_wp = Debug.register_flag "fast_wp"
+  ~desc:"Efficient Weakest Preconditions."
+
+module Subst = struct
+
+(* dead code
+  type t = unit
+*)
+
+  let empty = ()
+
+  let term _s t = t
+
+(* dead code
+  let frame _ef s = s
+*)
+
+end
+
+let xs_result xs = create_vsymbol (id_fresh "result") (ty_of_ity xs.xs_ity)
+let result e =
+  vs_result e, Mexn.mapi (fun xs _ -> xs_result xs) e.e_effect.eff_raises
+
+let is_vty_unit = function
+  | VTvalue vtv -> ity_equal vtv.vtv_ity ity_unit
+  | VTarrow _   -> false
+
+let map_exns e f = Mexn.mapi (fun xs _ -> f xs) e.e_effect.eff_raises
+
+let wp_nimplies ((n, _), xn) ((result, q), xq) =
+  let f = wp_forall [result] (wp_implies n q) in
+  assert (Mexn.cardinal xn = Mexn.cardinal xq);
+  let x_implies _xs (n, _) (xresult, q) f =
+    wp_forall [xresult] (wp_and ~sym:true f (wp_implies n q)) in
+  Mexn.fold2_inter x_implies xn xq f
+
+(* Input
+   - a state s: Subst.t
+   - names r = (result: vsymbol, xresult: vsymbol Mexn.t)
+   - an expression e
+   with: dom(xresult) = XS, the set of exceptions possibly raised
+                            by a, that is e.e_effect.eff_raises
+
+   Output is a triple (OK, ((NE, s), EX)) where
+   - formula OK means ``e evaluates without any fault''
+     (whatever the execution flow is)
+   - formula NE means
+     ``e terminates normally with final state s and output result''
+   - for each exception x, EX(x) = (fx,sx), where formula fx means
+     ``e raises exception x, with final state sw and value xresult(x) in x''
+*)
+
+let rec fast_wp_expr env s r e =
+  let ok, _ as res = fast_wp_desc env s r e in
+  if Debug.test_flag debug then begin
+    Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
+    Format.eprintf "@[<hov 2>OK = %a@]@\n" Pretty.print_term ok;
+  end;
+  res
+
+and fast_wp_desc env s r e =
+  let result, xresult = r in
+  match e.e_node with
+  | Elogic t ->
+      (* OK: true
+	 NE: result=t *)
+      let t = wp_label e t in
+      let t = Subst.term s (to_term t) in
+      let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
+      t_true, ((ne, s), Mexn.empty)
+  | Eassert (kind, f) ->
+      (* assert: OK = f    / NE = f    *)
+      (* check : OK = f    / NE = true *)
+      (* assume: OK = true / NE = f    *)
+      let ok = if kind = Aassume then t_true else f in
+      let ne = if kind = Acheck then t_true else f in
+      ok, ((ne, s), Mexn.empty)
+  | Eabstr (_, _, _) -> assert false (*TODO*)
+  | Etry (_, _) -> assert false (*TODO*)
+  | Eraise (_, _) -> assert false (*TODO*)
+  | Efor (_, _, _, _) -> assert false (*TODO*)
+  | Eloop (_, _, _) -> assert false (*TODO*)
+  | Eany _ -> assert false (*TODO*)
+  | Eghost _ -> assert false (*TODO*)
+  | Eassign (_, _, _) -> assert false (*TODO*)
+  | Ecase (_, _) -> assert false (*TODO*)
+  | Eif (_, _, _) -> assert false (*TODO*)
+  | Erec (_, _) -> assert false (*TODO*)
+  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
+      (* OK: ok(e1) /\ (ne(e1) => ok(e2))
+         NE: ne(e1) /\ ne(e2)
+         Ex: *)
+      let ok1, ((ne1,s1),_ee1) = fast_wp_expr env s (v.pv_vs, xresult) e1 in
+      let ok2, ((ne2,s2),_ee2) = fast_wp_expr env s1 r e2 in
+      let ok = wp_and ~sym:true ok1 (wp_implies ne1 ok2) in
+      let ne = wp_and ~sym:true ne1 ne2 in
+      let ee _xs = t_true, s2 (*TODO*) in
+      ok, ((ne, s2), map_exns e ee)
+  | Elet (_, _) -> assert false (*TODO*)
+  | Eapp (_, _, _) -> assert false (*TODO*)
+  | Earrow _ -> assert false (*TODO*)
+  | Evalue _ -> assert false (*TODO*)
+  | Eabsurd -> assert false (*TODO*)
+
+and fast_wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
+  (* OK: forall bl. pl => ok(e)
+     NE: true *)
+  let lab = fresh_mark () in
+  let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
+  let subst = List.fold_left add_arg ps.ps_subst l.l_args in
+  let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
+  let args = List.map (fun pv -> pv.pv_vs) l.l_args in
+  let env = if lr = 0 || l.l_variant = [] then env else
+    let lab = t_var lab in
+    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
+    let tl = List.map t_at_lab l.l_variant in
+    { env with letrec_var = Mint.add lr tl env.letrec_var }
+  in
+  let q = old_mark lab (wp_expl expl_post l.l_post) in
+  let result, _ as q = open_post q in
+  let conv p = old_mark lab (wp_expl expl_xpost p) in
+  let xq = Mexn.map conv l.l_xpost in
+  let xq = Mexn.map open_post xq in
+  let xresult = Mexn.map fst xq in
+  let ok, n = fast_wp_expr env Subst.empty (result, xresult) l.l_expr in
+  let f = wp_and ~sym:true ok (wp_nimplies n (q, xq)) in
+  let f = wp_implies l.l_pre (erase_mark lab f) in
+  wp_forall args (quantify env regs f)
+
+and fast_wp_rec_defn env { rec_defn = rdl; rec_letrec = lr } =
+  List.map (fast_wp_fun_defn env lr) rdl
+
+let fast_wp_let env km th { let_sym = lv; let_expr = e } =
+  let env = mk_env env km th in
+  let ok, _ = fast_wp_expr env Subst.empty (result e) e in
+  let f = wp_forall (Mvs.keys ok.t_vars) ok in
+  let id = match lv with
+    | LetV pv -> pv.pv_vs.vs_name
+    | LetA ps -> ps.ps_name in
+  add_wp_decl km id f th
+
+let fast_wp_rec env km th rdl =
+  let env = mk_env env km th in
+  let fl = fast_wp_rec_defn env rdl in
+  let add_one th d f =
+    Debug.dprintf debug "wp %s = %a@\n----------------@."
+      d.fun_ps.ps_name.id_string Pretty.print_term f;
+    let f = wp_forall (Mvs.keys f.t_vars) f in
+    add_wp_decl km d.fun_ps.ps_name f th
+  in
+  List.fold_left2 add_one th rdl.rec_defn fl
+
+let fast_wp_val _env _km th _lv = th

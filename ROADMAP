@@ -8,6 +8,8 @@
     particulier la solution avec les types classes qui reste a
     implanter
 
+  * paper on the proof management system
+
   * DONE Encodings and transformations (Andrei+Francois FroCos 11)
   * DONE Why presentation at the IVL workshop of CADE:
     (http://research.microsoft.com/en-us/um/people/moskal/boogie2011/)
@@ -17,9 +19,8 @@
     - DONE (Boogie 11)
     - DONE FOL + poly (FroCos 11)
     -  alg + ind + rec ? + theories
-  * proof sessions
   * VACID-0
-  * system description (e.g. at CAD, TACAS)
+  * system description (e.g. at CADE, TACAS)
   * rapports recherche ?
 
 == stages ==
@@ -117,6 +118,52 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 scheduled on Sep 2012
 
+== New Features to announce ==
+
+New features:
+  o
+
+Bug fix:
+  o
+
+== Final preparation ==
+
+* check that nightly bench is OK
+* check that "make xml-validate" is OK
+* put 0.74 in file Version
+* check headers
+* check the file CHANGES
+* manual in PDF: check that macro \todo is commented out
+    in ./macros.tex, and then "make doc"
+* do "make distrib"
+* test the distrib why3-0.73.tar.gz
+* make a last commit:
+ - add tag 0.74 to the git repository 
+ - do not forget to push it using git push --tags
+
+* put on the web page
+ - why3-0.74.tar.gz
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   (make stdlibdoc ;
+    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.74;
+    ln -s /users/www-perso/projets/why3/stdlib-0.74 \
+            /users/www-perso/projets/why3/stdlib)
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
+    Note: check that URL of API doc is correct in doc/api.tex line 9.
+     (make apidoc ;
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.74;
+    ln -s /users/www-perso/projets/why3/api-0.74 \
+            /users/www-perso/projets/why3/api    )
+ - update the main HTML page (sources are in why3-papers/www)
+
+* produce the Why3 part of ProVal gallery 
+  -> add also a ZIP file of it
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+== TODOs ==
+
 * Sortie PVS
 ** avec mecanisme de realization
 
@@ -194,7 +241,9 @@ Bug fix:
 * do "make distrib"
 * test the distrib why3-0.73.tar.gz
 * make a last commit:
- - add tag 0.73 to the git repository (do not forget to push it)
+ - add tag 0.73 to the git repository 
+ - do not forget to push it using git push --tags
+
 * put on the web page
  - why3-0.73.tar.gz
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/

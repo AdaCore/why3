@@ -19,7 +19,6 @@
 (**************************************************************************)
 
 open Why3
-open Stdlib
 open Util
 open Ident
 open Ty
@@ -238,16 +237,16 @@ type pre_ppattern =
   | PPas   of pre_ppattern * preid
 
 let make_ppattern pp vtv =
-  let hv = Hashtbl.create 3 in
+  let hv = Hstr.create 3 in
   let find id vtv =
     let nm = preid_name id in
     try
-      let pv = Hashtbl.find hv nm in
+      let pv = Hstr.find hv nm in
       ity_equal_check vtv.vtv_ity pv.pv_vtv.vtv_ity;
       pv
     with Not_found ->
       let pv = create_pvsymbol id vtv in
-      Hashtbl.add hv nm pv; pv
+      Hstr.add hv nm pv; pv
   in
   let rec make vtv = function
     | PPwild -> {
@@ -311,7 +310,7 @@ let make_ppattern pp vtv =
           ppat_effect  = pp.ppat_effect; }
   in
   let pp = make (vtv_unmut vtv) pp in
-  Hashtbl.fold Mstr.add hv Mstr.empty, pp
+  Hstr.fold Mstr.add hv Mstr.empty, pp
 
 (** program symbols *)
 
@@ -705,6 +704,8 @@ let e_plapp pls el ity =
             | None -> t_if_simp t t_bool_true t_bool_false in
           let evtv = vtv_of_expr e in
           let ghost = ghost || (evtv.vtv_ghost && not vtv.vtv_ghost) in
+          if vtv.vtv_ghost && not evtv.vtv_ghost then
+            Loc.errorm "non-ghost value passed as a ghost argument";
           let eff = eff_union eff e.e_effect in
           let sbs = ity_match sbs vtv.vtv_ity evtv.vtv_ity in
           app (t::tl) (add_e_vars e varm) ghost eff sbs vtvl argl
@@ -716,6 +717,8 @@ let e_plapp pls el ity =
             let sbs = ity_match sbs vtv.vtv_ity pv.pv_vtv.vtv_ity in
             app (t::tl) (add_pv_vars pv varm) ghost eff sbs vtvl argl
           in
+          if vtv.vtv_ghost && not (vty_ghost e.e_vty) then
+            Loc.errorm "non-ghost value passed as a ghost argument";
           on_value apply_to_pv e
   in
   let vtvl = List.rev pls.pl_args in
@@ -1031,7 +1034,10 @@ let ps_compat ps1 ps2 =
   vta_compat ps1.ps_vta ps2.ps_vta &&
   Mid.equal (fun _ _ -> true) ps1.ps_varm ps2.ps_varm
 
-let rec expr_subst psm e = match e.e_node with
+let rec expr_subst psm e =
+  let e' = expr_subst_node psm e in
+  { e' with e_loc = e.e_loc; e_label = e.e_label }
+and expr_subst_node psm e = match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
       e_arrow (Mid.find ps.ps_name psm) (vta_of_expr e)
   | Eapp (e,pv,_) ->

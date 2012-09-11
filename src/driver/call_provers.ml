@@ -19,7 +19,6 @@
 (**************************************************************************)
 
 open Format
-open Sysutil
 
 (** time regexp "%h:%m:%s" *)
 type timeunit =

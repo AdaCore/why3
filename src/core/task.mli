@@ -34,7 +34,10 @@ type tdecl_set = private {
 
 val tds_equal : tdecl_set -> tdecl_set -> bool
 val tds_hash : tdecl_set -> int
+val tds_compare : tdecl_set -> tdecl_set -> int
 val tds_empty : tdecl_set
+
+val mk_tds : Stdecl.t -> tdecl_set
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
@@ -96,6 +99,13 @@ val bisect : (task -> bool) -> task -> task
        included in [task] and if any declarations are removed from it the
        task doesn't verify test anymore *)
 
+type bisect_step =
+ | BSdone of task
+ | BSstep of task * (bool -> bisect_step)
+
+val bisect_step : task -> bisect_step
+(** Same as before but doing it step by step *)
+
 (** {2 realization utilities} *)
 
 val used_theories : task -> theory Mid.t
@@ -120,6 +130,7 @@ val task_decls  : task -> decl list
 
 val task_goal  : task -> prsymbol
 val task_goal_fmla  : task -> term
+val task_separate_goal : task -> tdecl * task
 
 (** {2 selectors} *)
 

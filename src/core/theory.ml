@@ -797,7 +797,7 @@ let highord_theory =
   let uc = add_param_decl uc ps_pred_app in
   close_theory uc
 
-let tuple_theory = Util.memo_int 17 (fun n ->
+let tuple_theory = Util.Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in

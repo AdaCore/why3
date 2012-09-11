@@ -20,7 +20,7 @@
 
 %{
   open Driver_ast
-  open Parsing
+
   let loc () = Loc.extract (symbol_start_pos (), symbol_end_pos ())
   let loc_i i = Loc.extract (rhs_start_pos i, rhs_end_pos i)
   let infix s = "infix " ^ s
@@ -37,12 +37,16 @@
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
 %token VALID INVALID TIMEOUT OUTOFMEMORY UNKNOWN FAIL TIME
 %token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
+%token BLACKLIST
+%token MODULE EXCEPTION VAL
 %token FUNCTION PREDICATE TYPE PROP FILENAME TRANSFORM PLUGIN
 %token LEFTPAR_STAR_RIGHTPAR COMMA
 %token LEFTSQ RIGHTSQ LARROW
 
 %type <Driver_ast.file> file
 %start file
+%type <Driver_ast.file_extract> file_extract
+%start file_extract
 
 %%
 
@@ -77,6 +81,7 @@ global:
 | FILENAME STRING { Filename $2 }
 | TRANSFORM STRING { Transform $2 }
 | PLUGIN STRING STRING { Plugin ($2,$3) }
+| BLACKLIST list1_string_list { Blacklist $2 }
 ;
 
 theory:
@@ -159,5 +164,50 @@ operator:
 | OPERATOR UNDERSCORE   { prefix $1 }
 | LEFTSQ RIGHTSQ        { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW { mixfix "[]<-" }
+;
+
+list1_string_list:
+| STRING                   { [$1] }
+| list1_string_list STRING { $2 :: $1 }
+;
+
+/* WhyML */
+
+file_extract:
+| list0_global_theory_module EOF
+{ $1 }
+;
+
+list0_global_theory_module:
+| /* epsilon */      { { fe_global = []; fe_th_rules = []; fe_mo_rules = [] } }
+| global_extract list0_global_theory_module
+    { {$2 with fe_global = (loc_i 1, $1) :: ($2.fe_global)} }
+| theory list0_global_theory_module
+    { {$2 with fe_th_rules = $1 :: ($2.fe_th_rules)} }
+| module_ list0_global_theory_module
+    { {$2 with fe_mo_rules = $1 :: ($2.fe_mo_rules)} }
+;
+
+global_extract:
+| PRELUDE STRING { EPrelude $2 }
+| PRINTER STRING { EPrinter $2 }
+| BLACKLIST list1_string_list { EBlacklist $2 }
+;
+
+module_:
+| MODULE tqualid list0_mrule END
+    { { mor_name = $2; mor_rules = $3 } }
+;
+
+list0_mrule:
+| /* epsilon */     { [] }
+| mrule list0_mrule { (loc_i 1, $1) :: $2 }
+;
+
+mrule:
+| trule                                 { MRtheory $1 }
+| SYNTAX cloned EXCEPTION qualid STRING { MRexception ($2, $4, $5) }
+| SYNTAX cloned VAL qualid STRING       { MRval ($2, $4, $5) }
 ;
 
