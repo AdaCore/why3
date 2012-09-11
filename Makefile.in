@@ -806,6 +806,7 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
+src/coq-tactic/coqCompat.cmi:  BFLAGS+=-rectypes 
 src/coq-tactic/coqCompat.cmo:  BFLAGS+=-rectypes 
 src/coq-tactic/coqCompat.cmx: OFLAGS+=-rectypes 
 src/coq-tactic/why3tac.cmo:  BFLAGS+=-rectypes -I +camlp5
