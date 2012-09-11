@@ -19,7 +19,6 @@
 (**************************************************************************)
 
 open Names
-open Nameops
 open Namegen
 open Term
 open Termops
@@ -504,7 +503,7 @@ and tr_global_ts dep env r =
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id (Nametab.basename_of_global r) in
-          let ts = match (Global.lookup_constant c).const_body with
+          let ts = match CoqCompat.body_of_constant (Global.lookup_constant c) with
             | Some b ->
                 let b = force b in
                 let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
@@ -652,7 +651,7 @@ and make_one_ls dep env r =
   add_poly_arity ls vars
 
 and decompose_definition dep env c =
-  let dl = match (Global.lookup_constant c).const_body with
+  let dl = match CoqCompat.body_of_constant (Global.lookup_constant c) with
     | None ->
         [ConstRef c, None]
     | Some b ->
@@ -1126,8 +1125,10 @@ let tr_top_decl = function
   | _, Lib.CompilingLibrary _
   | _, Lib.OpenedModule _
   | _, Lib.ClosedModule  _
+(*
   | _, Lib.OpenedModtype _
   | _, Lib.ClosedModtype _
+*)
   | _, Lib.OpenedSection _
   | _, Lib.ClosedSection _
   | _, Lib.FrozenState _ -> ()

@@ -785,9 +785,9 @@ endif
 
 ifeq (@enable_coq_plugin@,yes)
 
-COQPGENERATED = src/coq-tactic/g_why3tac.ml
+COQPGENERATED = src/coq-tactic/coqCompat.ml src/coq-tactic/g_why3tac.ml
 
-COQP_FILES = why3tac g_why3tac
+COQP_FILES = coqCompat why3tac g_why3tac
 
 COQPMODULES = $(addprefix src/coq-tactic/, $(COQP_FILES))
 
@@ -806,6 +806,10 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
+src/coq-tactic/coqCompat.cmo:  BFLAGS+=-rectypes 
+src/coq-tactic/coqCompat.cmx: OFLAGS+=-rectypes 
+src/coq-tactic/why3tac.cmo:  BFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/why3tac.cmx:  BFLAGS+=-rectypes -I +camlp5
 lib/coq-tactic/why3tac.cma:  BFLAGS+=-rectypes -I +camlp5
 lib/coq-tactic/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
 
