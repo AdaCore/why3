@@ -13,7 +13,7 @@ Lemma infix_lseq_Zle :
   forall x y, infix_lseq x y <-> Zle x y.
 Proof.
 intros x y.
-apply iff_Symmetric.
+apply iff_sym.
 apply Zle_lt_or_eq_iff.
 Qed.
 
