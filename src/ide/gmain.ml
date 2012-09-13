@@ -657,12 +657,8 @@ let notify any =
       | S.Theory t -> t.S.theory_key, t.S.theory_expanded
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
-      | S.Transf tr -> 
-        (**)
-        Format.eprintf "[notify] tr.transf_expanded = %b@." tr.S.transf_expanded;
-        (**)
+      | S.Transf tr ->
         tr.S.transf_key,tr.S.transf_expanded
-
       | S.Metas m -> m.S.metas_key,m.S.metas_expanded
   in
   (* name is set by notify since upgrade policy may update the prover name *)
