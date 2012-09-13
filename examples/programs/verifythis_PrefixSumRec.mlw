@@ -126,16 +126,28 @@ module PrefixSumRec
       (forall i: int. i <= left-(right-left) -> a[i] = (old a)[i]) /\
       (forall i: int. i > right -> a[i] = (old a)[i]) }
 
-  let main () =
+  let compute_sums a =
+    { a.length >= 2 && is_power_of_2 a.length }
+    let a0 = ghost (copy a) in
+    let l = a.length in
+    let left = div l 2 - 1 in
+    let right = l - 1 in
+    upsweep left right a;
+    assert { phase1 left right a0 a };
+    a[right] <- 0;
+    assert { phase1 left right a0 a };
+    downsweep left right a0 a;
+    assert { forall i : int.
+      left-(right-left) < i <= right -> a[i] = sum a0 0 i }
+    { forall i : int. 0 <= i < a.length -> a[i] = sum (old a) 0 i }
+
+
+  let test_harness () =
     let a = make 8 0 in
-    'Init:
+    assert { power 2 3 = a.length };
     a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0; a[4] <- 4; a[5] <- 1;
     a[6] <- 6; a[7] <- 3;
-    let a0 = ghost (copy a) in
-    assert { power 2 2 = 4 }; (** for is_power_of_2 existential *)
-    upsweep 3 7 a;
-    a[7] <- 0;
-    downsweep 3 7 a0 a;
+    compute_sums a;
     assert { a[0] = 0 };
     assert { a[1] = 3 };
     assert { a[2] = 4 };
@@ -146,3 +158,10 @@ module PrefixSumRec
     assert { a[7] = 22 }
 
 end
+
+(***
+Local Variables:
+compile-command: "why3ide verifythis_PrefixSumRec.mlw"
+End:
+*)
+
