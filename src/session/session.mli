@@ -19,9 +19,9 @@
 (**************************************************************************)
 
 (** Proof sessions *)
-(** Define all the function needed for managing a session :
+(** Define all the functions needed for managing a session:
     Creation, saving, loading, modification, ...
-    All the operation are immediately done.
+    All the operations are immediately done.
     Use session_scheduler if you want to queue the operations
 *)
 
@@ -504,6 +504,7 @@ val iter : ('key any -> unit) -> 'key any -> unit
 (** {2 Some functorized interface (not very useful...)}*)
 
 
+(* Claude: if "not very useful" then -> removed
 module AddTransf (X : sig
   type key
   val keygen : key keygen
@@ -516,7 +517,9 @@ module AddTransf (X : sig
 end) : sig
   val add_transformation : X.key goal -> string -> X.transf -> X.key transf
 end
+*)
 
+(*
 module AddFile(X : sig
   type key
   val keygen : key keygen
@@ -536,6 +539,7 @@ end) : sig
   val add_file :
     X.key session -> string -> ?format:string -> X.file -> X.key file
 end
+*)
 
 
 (*

@@ -844,7 +844,7 @@ let get_edited_as_abs session pr =
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
 *)
-let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
+let raw_add_no_task ~(keygen:'a keygen) ~(expanded:bool) parent name expl sum shape =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
@@ -862,12 +862,12 @@ let raw_add_no_task ~(keygen:'a keygen) parent name expl sum shape exp =
                goal_transformations = PHstr.create 3;
                goal_metas = Mmetas_args.empty;
                goal_verified = false;
-               goal_expanded = exp;
+               goal_expanded = expanded;
              }
   in
   goal
 
-let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
+let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl t =
   let parent_key = match parent with
     | Parent_theory mth -> mth.theory_key
     | Parent_transf mtr -> mtr.transf_key
@@ -888,7 +888,7 @@ let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
                goal_transformations = PHstr.create 3;
                goal_metas = Mmetas_args.empty;
                goal_verified = false;
-               goal_expanded = exp;
+               goal_expanded = expanded;
              }
   in
   goal
@@ -897,7 +897,7 @@ let raw_add_task ~version ~(keygen:'a keygen) parent name expl t exp =
 (* [raw_add_transformation g name adds a transformation to the given goal g
    Adds no subgoals, thus this should not be exported
 *)
-let raw_add_transformation ~(keygen:'a keygen) g name exp =
+let raw_add_transformation ~(keygen:'a keygen) ~(expanded:bool) g name =
   let parent = g.goal_key in
   let key = keygen ~parent () in
   let tr = { transf_name = name;
@@ -905,13 +905,13 @@ let raw_add_transformation ~(keygen:'a keygen) g name exp =
              transf_verified = false;
              transf_key = key;
              transf_goals = [];
-             transf_expanded = exp;
+             transf_expanded = expanded;
            }
   in
   PHstr.replace g.goal_transformations name tr;
   tr
 
-let raw_add_metas ~(keygen:'a keygen) g added idpos exp =
+let raw_add_metas ~(keygen:'a keygen) ~(expanded:bool) g added idpos =
   let parent = g.goal_key in
   let key = keygen ~parent () in
   let ms = { metas_added = added;
@@ -920,13 +920,13 @@ let raw_add_metas ~(keygen:'a keygen) g added idpos exp =
              metas_verified = false;
              metas_key = key;
              metas_goal = g;
-             metas_expanded = exp;
+             metas_expanded = expanded;
            }
   in
   g.goal_metas <- Mmetas_args.add added ms g.goal_metas;
   ms
 
-let raw_add_theory ~(keygen:'a keygen) mfile thname exp =
+let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool) mfile thname =
   let parent = mfile.file_key in
   let key = keygen ~parent () in
   let mth = { theory_name = thname;
@@ -934,19 +934,19 @@ let raw_add_theory ~(keygen:'a keygen) mfile thname exp =
               theory_parent = mfile;
               theory_goals = [];
               theory_verified = false;
-              theory_expanded = exp;
+              theory_expanded = expanded;
             }
   in
   mth
 
-let raw_add_file ~(keygen:'a keygen) session f fmt exp =
+let raw_add_file ~(keygen:'a keygen) ~(expanded:bool) session f fmt =
   let key = keygen () in
   let mfile = { file_name = f;
                 file_key = key;
                 file_format = fmt;
                 file_theories = [];
                 file_verified = false;
-                file_expanded = exp;
+                file_expanded = expanded;
                 file_parent  = session;
               }
   in
@@ -1014,7 +1014,7 @@ let load_result r =
             | s ->
                 eprintf
                   "[Warning] Session.load_result: unexpected status '%s'@." s;
-                Call_provers.HighFailure 
+                Call_provers.HighFailure
         in
         let time =
           try float_of_string (List.assoc "time" r.Xml.attributes)
@@ -1066,8 +1066,10 @@ let rec load_goal ~old_provers parent acc g =
         let expl = load_option "expl" g in
         let sum = Tc.checksum_of_string (string_attribute_def "sum" g "") in
         let shape = Tc.shape_of_string (string_attribute_def "shape" g "") in
-        let exp = bool_attribute "expanded" g true in
-        let mg = raw_add_no_task ~keygen parent gname expl sum shape exp in
+        let expanded = bool_attribute "expanded" g true in
+        let mg =
+          raw_add_no_task ~keygen ~expanded parent gname expl sum shape
+        in
         List.iter (load_proof_or_transf ~old_provers mg) g.Xml.elements;
         mg.goal_verified <- goal_verified mg;
         mg::acc
@@ -1117,8 +1119,8 @@ and load_proof_or_transf ~old_provers mg a =
         ()
     | "transf" ->
         let trname = string_attribute "name" a in
-        let exp = bool_attribute "expanded" a true in
-        let mtr = raw_add_transformation ~keygen mg trname exp in
+        let expanded = bool_attribute "expanded" a true in
+        let mtr = raw_add_transformation ~keygen ~expanded mg trname in
         mtr.transf_goals <-
           List.rev
           (List.fold_left
@@ -1235,8 +1237,8 @@ and load_metas ~old_provers mg a =
   in
   let metas_args =
     List.fold_left load_meta Mstr.empty metas_args in
-  let exp = bool_attribute "expanded" a true in
-  let metas = raw_add_metas ~keygen mg metas_args idpos exp in
+  let expanded = bool_attribute "expanded" a true in
+  let metas = raw_add_metas ~keygen ~expanded mg metas_args idpos in
   let goal = match goal with
     | [] -> raise (LoadError (a,"No subgoal for this metas"))
     | [goal] -> goal
@@ -1255,8 +1257,8 @@ let load_theory ~old_provers mf acc th =
   match th.Xml.name with
     | "theory" ->
         let thname = load_ident th in
-        let exp = bool_attribute "expanded" th true in
-        let mth = raw_add_theory ~keygen mf thname exp in
+        let expanded = bool_attribute "expanded" th true in
+        let mth = raw_add_theory ~keygen ~expanded mf thname in
         mth.theory_goals <-
           List.rev
           (List.fold_left
@@ -1273,8 +1275,8 @@ let load_file session old_provers f =
     | "file" ->
         let fn = string_attribute "name" f in
         let fmt = load_option "format" f in
-        let exp = bool_attribute "expanded" f true in
-        let mf = raw_add_file ~keygen session fn fmt exp in
+        let expanded = bool_attribute "expanded" f true in
+        let mf = raw_add_file ~keygen ~expanded session fn fmt in
         mf.file_theories <-
           List.rev
           (List.fold_left
@@ -1376,12 +1378,18 @@ let raw_add_file ~version ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
   let add_goal parent acc goal =
     let g =
       let name,expl,task = x_goal goal in
-      raw_add_task ~version ~keygen:x_keygen parent name expl task false in
-    g::acc in
+      raw_add_task ~version ~keygen:x_keygen ~expanded:true
+        parent name expl task
+    in g::acc
+  in
   let add_file session f_name fmt file =
-    let rfile = raw_add_file ~keygen:x_keygen session f_name fmt false in
+    let rfile =
+      raw_add_file ~keygen:x_keygen ~expanded:true session f_name fmt
+    in
     let add_theory acc thname theory =
-      let rtheory = raw_add_theory ~keygen:x_keygen rfile thname false in
+      let rtheory =
+        raw_add_theory ~keygen:x_keygen ~expanded:true rfile thname
+      in
       let parent = Parent_theory rtheory in
       let goals = x_fold_theory (add_goal parent) [] theory in
       rtheory.theory_goals <- List.rev goals;
@@ -1390,11 +1398,13 @@ let raw_add_file ~version ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
     in
     let theories = x_fold_file add_theory [] file in
     rfile.file_theories <- List.rev theories;
-    rfile in
+    rfile
+  in
   add_file
 
 (** nice functor *)
 
+(* Claude: "nice" ? but not used anyway
 module AddFile(X : sig
   type key
   val keygen : key keygen
@@ -1422,6 +1432,7 @@ end : sig
   val add_file :
     X.key session -> string -> ?format:string -> X.file -> X.key file
 end)
+*)
 
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
@@ -1476,6 +1487,8 @@ let remove_file file =
 (*      transformations    *)
 (***************************)
 
+(*
+
 module AddTransf(X : sig
   type key
   val keygen : key keygen
@@ -1491,14 +1504,15 @@ end) = (struct
     let name,expl,task = X.goal goal in
     let g =
       raw_add_task ~version:Termcode.current_shape_version
-        ~keygen:X.keygen parent
-        name expl task false in
-    (** no verified since that can't be empty (no proof no transf) and true *)
+        ~keygen:X.keygen ~expanded:true parent name expl task
+    in
     g::acc
 
   let add_transformation g name transf =
     let task = goal_task g in
-    let rtransf = raw_add_transformation ~keygen:X.keygen g name true in
+    let rtransf =
+      raw_add_transformation ~keygen:X.keygen ~expanded:transf.transf_expanded g name
+    in
     let parent = Parent_transf rtransf in
     let goals = X.fold_transf (add_goal parent) [] task transf in
     rtransf.transf_goals <- List.rev goals;
@@ -1509,14 +1523,18 @@ end : sig
   val add_transformation : X.key goal -> string -> X.transf -> X.key transf
 end)
 
+  *)
+
 let add_transformation ~keygen ~goal env_session transfn g goals =
-  let rtransf = raw_add_transformation ~keygen g transfn true in
+  let rtransf = raw_add_transformation ~keygen ~expanded:false g transfn in
   let parent = Parent_transf rtransf in
   let add_goal acc g =
     let name,expl,task = goal g in
     let g = raw_add_task ~version:env_session.session.session_shape_version
-      ~keygen parent name expl task  false in
-    g::acc in
+      ~keygen ~expanded:false parent name expl task
+    in
+    g::acc
+  in
   let goals = List.fold_left add_goal [] goals in
   rtransf.transf_goals <- List.rev goals;
   rtransf.transf_verified <- transf_verified rtransf;
@@ -1606,10 +1624,11 @@ let add_registered_metas ~keygen env added0 g =
     let task = List.fold_left add_meta task0 added0 in
     let task = add_tdecl task goal in
     let idpos = pos_of_metas added0 in
-    let metas = raw_add_metas ~keygen g added idpos false in
-    let goal = raw_add_task ~version:env.session.session_shape_version
-      ~keygen (Parent_metas metas)
-      g.goal_name g.goal_expl task false in
+    let metas = raw_add_metas ~keygen ~expanded:true g added idpos in
+    let goal =
+      raw_add_task ~version:env.session.session_shape_version
+        ~keygen ~expanded:true (Parent_metas metas) g.goal_name g.goal_expl task
+    in
     metas.metas_goal <- goal;
     metas
 
@@ -1874,6 +1893,7 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
           from_transf_name Exn_printer.exn_printer exn;
         raise Exit
     in
+    set_transf_expanded to_transf from_transf.transf_expanded;
     let associated =
       dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
@@ -2021,14 +2041,19 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
       acc
   in
   let goal,task = Task.task_separate_goal (goal_task to_goal) in
-  let metas,task = Mstr.fold_left add_meta (Mstr.empty,task)
-    from_metas.metas_added in
+  let metas,task =
+    Mstr.fold_left add_meta (Mstr.empty,task) from_metas.metas_added
+  in
   let task = Task.add_tdecl task goal in
-  let to_metas = raw_add_metas ~keygen to_goal metas to_idpos
-    from_metas.metas_expanded in
-  let to_goal = raw_add_task ~version:env.session.session_shape_version
-    ~keygen (Parent_metas to_metas)
-    to_goal.goal_name to_goal.goal_expl task false in
+  let to_metas =
+    raw_add_metas ~keygen ~expanded:from_metas.metas_expanded
+      to_goal metas to_idpos
+  in
+  let to_goal =
+    raw_add_task ~version:env.session.session_shape_version
+      ~keygen (Parent_metas to_metas) ~expanded:true
+      to_goal.goal_name to_goal.goal_expl task
+  in
   to_metas.metas_goal <- to_goal;
   dprintf debug "[Reload] metas done@\n";
   merge_any_goal ~keygen ~theories env !obsolete from_metas.metas_goal to_goal
@@ -2139,7 +2164,7 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
     old_session.session_files;
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
-    if old_session.session_shape_version <> Termcode.current_shape_version 
+    if old_session.session_shape_version <> Termcode.current_shape_version
     then
       begin
         dprintf debug "[Info] update_session: recompute shapes@\n";
@@ -2214,11 +2239,12 @@ let rec add_goal_to_parent ~keygen env from_goal to_goal =
     It use directly the metas doesn't convert them.
  *)
 and add_metas_to_goal ~keygen env to_goal from_metas =
-  let to_metas = raw_add_metas ~keygen to_goal
-    from_metas.metas_added from_metas.metas_idpos
-    from_metas.metas_expanded in
+  let to_metas =
+    raw_add_metas ~keygen ~expanded:from_metas.metas_expanded to_goal
+      from_metas.metas_added from_metas.metas_idpos
+  in
   let goal,task0 = Task.task_separate_goal (goal_task to_goal) in
-    (** add before the goal *)
+  (** add before the goal *)
   let task =
     try
       Mstr.fold_left
@@ -2235,9 +2261,10 @@ and add_metas_to_goal ~keygen env to_goal from_metas =
   let task = add_tdecl task goal in
   let to_goal =
     raw_add_task ~version:env.session.session_shape_version
-      ~keygen (Parent_metas to_metas)
+      ~keygen ~expanded:true (Parent_metas to_metas)
       from_metas.metas_goal.goal_name
-      from_metas.metas_goal.goal_expl task false in
+      from_metas.metas_goal.goal_expl task
+  in
   to_metas.metas_goal <- to_goal;
   add_goal_to_parent ~keygen env from_metas.metas_goal to_goal;
   to_metas
@@ -2270,8 +2297,6 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
   | (_, None, _) -> ()
   ) associated;
   to_transf
-
-(**)
 
 
 let get_project_dir fname =

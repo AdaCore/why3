@@ -651,13 +651,18 @@ module MA = struct
 
 let notify any =
   session_needs_saving := true;
-  let row,exp =
+  let row,expanded =
     match any with
       | S.Goal g -> g.S.goal_key, g.S.goal_expanded
       | S.Theory t -> t.S.theory_key, t.S.theory_expanded
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
-      | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
+      | S.Transf tr -> 
+        (**)
+        Format.eprintf "[notify] tr.transf_expanded = %b@." tr.S.transf_expanded;
+        (**)
+        tr.S.transf_key,tr.S.transf_expanded
+
       | S.Metas m -> m.S.metas_key,m.S.metas_expanded
   in
   (* name is set by notify since upgrade policy may update the prover name *)
@@ -679,7 +684,7 @@ let notify any =
         update_task_view any
       | _ -> ()
   end;
-  if exp then goals_view#expand_to_path row#path else
+  if expanded then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
     | S.Goal g ->
