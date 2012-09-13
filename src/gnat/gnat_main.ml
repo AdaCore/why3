@@ -495,8 +495,10 @@ and interpret_result pa pas =
          if (Objectives.is_interesting goal) then begin
             let answer = r.Call_provers.pr_answer in
             if answer = Call_provers.HighFailure then begin
-               Format.eprintf "An error occured when calling alt-ergo:@.";
-               Format.eprintf "%s@." r.Call_provers.pr_output;
+               Format.eprintf "An error occured when calling alt-ergo@.";
+               if Gnat_config.verbose then begin
+                  Format.eprintf "%s@." r.Call_provers.pr_output
+               end;
             end;
             handle_vc_result goal (answer = Call_provers.Valid) (Some answer)
          end
