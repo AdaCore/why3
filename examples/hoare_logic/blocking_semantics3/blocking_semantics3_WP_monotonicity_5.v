@@ -445,6 +445,11 @@ Axiom eval_change_free : forall (f:fmla) (sigma:(map mident value)) (pi:(list
 Definition valid_fmla(p:fmla): Prop := forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)), (eval_fmla sigma pi p).
 
+Axiom msubst_implies : forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
+  q)) -> forall (sigma:(map mident value)) (pi:(list (ident* value)%type))
+  (x:mident) (id:ident), (fresh_in_fmla id (Fand p q)) -> (eval_fmla sigma
+  (Cons (id, (get sigma x)) pi) (Fimplies (msubst p x id) (msubst q x id))).
+
 Axiom let_equiv : forall (id:ident) (id':ident) (t:term) (f:fmla),
   forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
   (fresh_in_fmla id' f) -> ((eval_fmla sigma pi (Flet id' t (subst f id
@@ -698,29 +703,21 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
 Theorem monotonicity : forall (s:stmt),
   match s with
   | Sskip => True
-  | (Sassign m t) => True
+  | (Sassign m t) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
+      (valid_fmla (Fimplies (wp s p) (wp s q)))
   | (Sseq s1 s2) => True
   | (Sif t s1 s2) => True
   | (Sassert f) => True
-  | (Swhile t f s1) => (forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
-      q)) -> (valid_fmla (Fimplies (wp s1 p) (wp s1 q)))) -> forall (p:fmla)
-      (q:fmla), (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p)
-      (wp s q)))
+  | (Swhile t f s1) => True
   end.
 destruct s; auto.
 unfold valid_fmla; simpl.
-intros H1 p q H2 sigma pi (H3 & H4).
-split; auto.
-apply abstract_effects_monotonic with (sigma := sigma) (pi:=pi).
-simpl.
-split; simpl; intros (H5 & H6); 
-  apply abstract_effects_generalize in H4;
-  simpl in H4; destruct H4.
-(* True *)
-apply H; auto.
-(* False *)
-apply H2.
-apply H0; auto.
+intros p q H2 sigma pi H.
+pose (id1 := fresh_from p (Sassign m t)).
+fold id1 in H.
+pose (id2 := fresh_from q (Sassign m t)).
+fold id2.
+
 Qed.
 
 

@@ -383,9 +383,15 @@ lemma eval_change_free :
     fresh_in_fmla id f ->
     (eval_fmla sigma (Cons (id,v) pi) f <-> eval_fmla sigma pi f)
 
-
-  (** [valid_fmla f] is true when [f] is valid in any environment *)
+(** [valid_fmla f] is true when [f] is valid in any environment *)
   predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
+
+axiom msubst_implies :
+forall p q:fmla.
+  valid_fmla (Fimplies p q) ->
+  forall sigma:env, pi:stack, x:mident, id:ident.
+    fresh_in_fmla id (Fand p q) -> 
+    eval_fmla sigma (Cons (id, (get_env x sigma)) pi) (Fimplies (msubst p x id) (msubst q x id)) 
 
 (** let id' = t in f[id <- id'] <=> let id = t in f*)
 lemma let_equiv :
@@ -675,8 +681,8 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
   axiom abstract_effects_monotonic :
      forall s:stmt, f:fmla.
-        valid_fmla f ->
-        valid_fmla (abstract_effects s f)
+        forall sigma:env, pi:stack. eval_fmla sigma pi f ->
+        forall sigma:env, pi:stack. eval_fmla sigma pi (abstract_effects s f)
 
   function wp (s:stmt) (q:fmla) : fmla =
     match s with
@@ -749,4 +755,3 @@ Local Variables:
 compile-command: "why3ide blocking_semantics3.mlw"
 End:
 *)
-
