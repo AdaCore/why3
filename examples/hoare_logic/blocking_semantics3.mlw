@@ -303,6 +303,11 @@ function subst_term (t:term) (r:ident) (v:ident) : term =
 predicate fresh_in_term (id:ident) (t:term) =
   id.ident_index > t.term_maxvar
 
+lemma fresh_in_binop:
+  forall t t':term, op:operator, v:ident.
+    fresh_in_term v (mk_tbin t op t') ->
+      fresh_in_term v t  /\ fresh_in_term v t'
+	  
 lemma eval_msubst_term:
   forall e:term, sigma:env, pi:stack, x:mident, v:ident.
     fresh_in_term v e ->
