@@ -524,11 +524,15 @@ let pv_effect pv = match pv.pv_vtv.vtv_mut with
 
 let add_e_vars e m = varmap_union e.e_varm m
 
-let e_pvset pvs e =
+let varmap_pvset pvs varm =
   let add_id id _ s =
     try Spv.add (restore_pv_by_id id) s
     with Not_found -> s in
-  Mid.fold add_id e.e_varm pvs
+  Mid.fold add_id varm pvs
+
+let ps_pvset pvs ps = varmap_pvset pvs ps.ps_varm
+
+let e_pvset pvs e = varmap_pvset pvs e.e_varm
 
 let spec_of_lambda lam letrec = {
   c_pre     = lam.l_pre;

@@ -270,52 +270,26 @@ let decrease ?loc env olds varl =
 
 (** Reconstruct pure values after writes *)
 
-let find_constructors lkm km sts ity = match ity.ity_node with
-  | Itypur (ts,_) ->
-      let base = ity_pur ts (List.map ity_var ts.ts_args) in
-      let sbs = ity_match ity_subst_empty base ity in
-      let csl = Decl.find_constructors lkm ts in
-      if csl = [] || Sts.mem ts sts then Loc.errorm
-        "Cannot update values of type %a" Mlw_pretty.print_ity base;
-      let subst ty = ity_full_inst sbs (ity_of_ty ty), None in
-      let cnstr (cs,_) = cs, List.map subst cs.ls_args in
-      Sts.add ts sts, List.map cnstr csl
-  | Ityapp (its,_,_) ->
-      let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
-      let sbs = ity_match ity_subst_empty base ity in
-      let csl = Mlw_decl.find_constructors km its in
-      if csl = [] || Sts.mem its.its_pure sts then Loc.errorm
-        "Cannot update values of type %a" Mlw_pretty.print_ity base;
-      let subst vtv =
-        ity_full_inst sbs vtv.vtv_ity,
-        Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
-      let cnstr (cs,_) = cs.pl_ls, List.map subst cs.pl_args in
-      Sts.add its.its_pure sts, List.map cnstr csl
-  | Ityvar _ -> assert false
-
-let analyze_var fn_down fn_join lkm km sts vs ity =
-  let sts, csl = find_constructors lkm km sts ity in
-  let branch (cs,ityl) =
-    let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
-    let vars = List.map mk_var ityl in
-    let mk_arg vs (ity, mut) = fn_down sts vs ity mut in
-    let t = fn_join cs (List.map2 mk_arg vars ityl) vs.vs_ty in
+let analyze_var fn_down fn_join lkm km vs ity =
+  let branch (cs,vtvl) =
+    let mk_var vtv = create_vsymbol (id_fresh "y") (ty_of_ity vtv.vtv_ity) in
+    let vars = List.map mk_var vtvl in
+    let t = fn_join cs (List.map2 fn_down vars vtvl) vs.vs_ty in
     let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
     t_close_branch pat t in
-  t_case (t_var vs) (List.map branch csl)
+  t_case (t_var vs) (List.map branch (Mlw_decl.inst_constructors lkm km ity))
 
 let update_var env mreg vs =
-  let rec update sts vs ity mut =
+  let rec update vs { vtv_ity = ity; vtv_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
     let vs = Util.option_apply vs get_vs mut in
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
-    else analyze_var update fs_app env.pure_known env.prog_known sts vs ity
+    else analyze_var update fs_app env.pure_known env.prog_known vs ity
   in
-  let vtv = vtv_of_vs vs in
-  update Sts.empty vs vtv.vtv_ity vtv.vtv_mut
+  update vs (vtv_of_vs vs)
 
 (* substitute the updated values in the "contemporary" variables *)
 let rec subst_at_now now m t = match t.t_node with
@@ -404,7 +378,7 @@ let ps_inv = Term.create_psymbol (id_fresh "inv")
   [ty_var (create_tvsymbol (id_fresh "a"))]
 
 let full_invariant lkm km vs ity =
-  let rec update sts vs ity _ =
+  let rec update vs { vtv_ity = ity } =
     if not (ity_inv ity) then t_true else
     (* what is our current invariant? *)
     let f = match ity.ity_node with
@@ -415,11 +389,11 @@ let full_invariant lkm km vs ity =
       | _ -> t_true in
     (* what are our sub-invariants? *)
     let join _ fl _ = wp_ands ~sym:true fl in
-    let g = analyze_var update join lkm km sts vs ity in
+    let g = analyze_var update join lkm km vs ity in
     (* put everything together *)
     wp_and ~sym:true f g
   in
-  update Sts.empty vs ity None
+  update vs (vty_value ity)
 
 (** Value tracking *)
 

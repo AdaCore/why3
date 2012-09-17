@@ -121,6 +121,7 @@ val create_psymbol : preid -> vty_arrow -> psymbol
 val create_psymbol_extra : preid -> vty_arrow -> Spv.t -> Sps.t -> psymbol
 
 val spec_pvset : Spv.t -> spec -> Spv.t
+val ps_pvset : Spv.t -> psymbol -> Spv.t
 
 (** program expressions *)
 

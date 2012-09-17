@@ -465,8 +465,8 @@ let () = Exn_printer.register
   | Mlw_expr.GhostWrite (_e, _reg) ->
       fprintf fmt "This expression stores a ghost value in a non-ghost location"
   | Mlw_expr.GhostRaise (_e, xs) ->
-      fprintf fmt "This expression raises a ghost exception %a \
-        catched by a non-ghost code" print_xs xs
+      fprintf fmt "This expression raises an escaping ghost exception %a"
+        print_xs xs
   | Mlw_expr.StaleRegion (_e, id) ->
       fprintf fmt "This expression prohibits further \
         usage of variable %s" id.id_string
@@ -476,5 +476,7 @@ let () = Exn_printer.register
       fprintf fmt "This expression is not a function and cannot be applied"
   | Mlw_expr.Immutable _e ->
       fprintf fmt "Mutable expression expected"
+  | Mlw_decl.NonupdatableType ity ->
+      fprintf fmt "Cannot update values of type @[%a@]" print_ity ity
   | _ -> raise exn
   end

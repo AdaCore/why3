@@ -86,3 +86,8 @@ val merge_known : known_map -> known_map -> known_map
 
 val find_constructors : known_map -> itysymbol -> constructor list
 val find_invariant : known_map -> itysymbol -> post
+
+exception NonupdatableType of ity
+
+val inst_constructors :
+  Decl.known_map -> known_map -> ity -> (lsymbol * vty_value list) list

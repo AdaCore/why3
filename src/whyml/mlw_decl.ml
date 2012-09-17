@@ -320,7 +320,24 @@ let known_add_decl lkn0 kn0 d =
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 
-let check_match lkn d =
+let rec find_td its1 = function
+  | (its2,csl,inv) :: _ when its_equal its1 its2 -> csl,inv
+  | _ :: tdl -> find_td its1 tdl
+  | [] -> raise Not_found
+
+let find_constructors kn its =
+  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  | PDtype _ -> []
+  | PDdata tdl -> fst (find_td its tdl)
+  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
+
+let find_invariant kn its =
+  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  | PDtype _ -> null_invariant its
+  | PDdata tdl -> snd (find_td its tdl)
+  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
+
+let check_match lkn _kn d =
   let rec checkE () e = match e.e_node with
     | Ecase (e1,bl) ->
         let typ = ty_of_ity (vtv_of_expr e1).vtv_ity in
@@ -340,24 +357,70 @@ let check_match lkn d =
   | PDlet { let_expr = e } -> checkE () e
   | PDval _ | PDtype _ | PDdata _ | PDexn _ -> ()
 
+exception NonupdatableType of ity
+
+let inst_constructors lkn kn ity = match ity.ity_node with
+  | Itypur (ts,_) ->
+      let csl = Decl.find_constructors lkn ts in
+      let d = Mid.find ts.ts_name lkn in
+      let is_rec = Mid.mem ts.ts_name d.Decl.d_syms in
+      if csl = [] || is_rec then raise (NonupdatableType ity);
+      let base = ity_pur ts (List.map ity_var ts.ts_args) in
+      let sbs = ity_match ity_subst_empty base ity in
+      let subst ty = vty_value (ity_full_inst sbs (ity_of_ty ty)) in
+      List.map (fun (cs,_) -> cs, List.map subst cs.ls_args) csl
+  | Ityapp (its,_,_) ->
+      let csl = find_constructors kn its in
+      let d = Mid.find its.its_pure.ts_name lkn in
+      let is_rec = Mid.mem its.its_pure.ts_name d.Decl.d_syms in
+      if csl = [] || is_rec then raise (NonupdatableType ity);
+      let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
+      let sbs = ity_match ity_subst_empty base ity in
+      let subst vtv =
+        let ghost = vtv.vtv_ghost in
+        let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
+        vty_value ~ghost ?mut (ity_full_inst sbs vtv.vtv_ity) in
+      List.map (fun (cs,_) -> cs.pl_ls, List.map subst cs.pl_args) csl
+  | Ityvar _ ->
+      invalid_arg "Mlw_decl.inst_constructors"
+
+let check_ghost lkn kn d =
+  let rec access regs ity =
+    let check vtv = match vtv.vtv_mut with
+      | _ when vtv.vtv_ghost -> ()
+      | Some r when Sreg.mem r regs -> raise (GhostWrite (e_void, r))
+      | _ -> access regs vtv.vtv_ity in
+    let check (_cs,vtvl) = List.iter check vtvl in
+    let occurs r = reg_occurs r ity.ity_vars in
+    if not (Sreg.exists occurs regs) then () else
+    List.iter check (inst_constructors lkn kn ity)
+  in
+  let rec check pvs vta =
+    let eff = vta.vta_spec.c_effect in
+    if not (Sexn.is_empty eff.eff_ghostx) then
+      raise (GhostRaise (e_void, Sexn.choose eff.eff_ghostx));
+    let pvs = List.fold_right Spv.add vta.vta_args pvs in
+    let test pv =
+      if pv.pv_vtv.vtv_ghost then () else
+      access eff.eff_ghostw pv.pv_vtv.vtv_ity
+    in
+    Spv.iter test pvs;
+    match vta.vta_result with
+    | VTarrow vta -> check pvs vta
+    | VTvalue _ -> ()
+  in
+  let check ps =
+    if ps.ps_vta.vta_ghost then () else
+    check (ps_pvset Spv.empty ps) ps.ps_vta
+  in
+  match d.pd_node with
+  | PDrec rd -> List.iter (fun fd -> check fd.fun_ps) rd.rec_defn
+  | PDval (LetA ps) | PDlet { let_sym = LetA ps } -> check ps
+  | PDval _ | PDlet _ | PDtype _ | PDdata _ | PDexn _ -> ()
+
 let known_add_decl lkn kn d =
   let kn = known_add_decl lkn kn d in
-  check_match lkn d;
+  check_ghost lkn kn d;
+  check_match lkn kn d;
   kn
 
-let rec find_td its1 = function
-  | (its2,csl,inv) :: _ when its_equal its1 its2 -> csl,inv
-  | _ :: tdl -> find_td its1 tdl
-  | [] -> raise Not_found
-
-let find_constructors kn its =
-  match (Mid.find its.its_pure.ts_name kn).pd_node with
-  | PDtype _ -> []
-  | PDdata tdl -> fst (find_td its tdl)
-  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
-
-let find_invariant kn its =
-  match (Mid.find its.its_pure.ts_name kn).pd_node with
-  | PDtype _ -> null_invariant its
-  | PDdata tdl -> snd (find_td its tdl)
-  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
