@@ -308,20 +308,42 @@ let pd_vars pd = match pd.pd_node with
       Mid.map (fun _ -> ()) varm
   | PDtype _ | PDdata _ | PDexn _ -> Sid.empty
 
-let known_add_decl lkn0 kn0 decl =
-  let kn = Mid.map (const decl) decl.pd_news in
+let known_add_decl lkn0 kn0 d =
+  let kn = Mid.map (const d) d.pd_news in
   let check id decl0 _ =
-    if pd_equal decl0 decl
+    if pd_equal decl0 d
     then raise (KnownIdent id)
-    else raise (RedeclaredIdent id)
-  in
+    else raise (RedeclaredIdent id) in
   let kn = Mid.union check kn0 kn in
-  let unk = Mid.set_diff (pd_vars decl) kn in
+  let unk = Mid.set_diff (pd_vars d) kn in
   let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 
-(* TODO: known_add_decl must check pattern matches for exhaustiveness *)
+let check_match lkn d =
+  let rec checkE () e = match e.e_node with
+    | Ecase (e1,bl) ->
+        let typ = ty_of_ity (vtv_of_expr e1).vtv_ity in
+        let tye = ty_of_ity (vtv_of_expr e).vtv_ity in
+        let t_p = t_var (create_vsymbol (id_fresh "x") typ) in
+        let t_e = t_var (create_vsymbol (id_fresh "y") tye) in
+        let bl = List.map (fun (pp,_) -> [pp.ppat_pattern], t_e) bl in
+        let try3 f = match e.e_loc with Some l -> Loc.try3 l f | None -> f in
+        let find ts = List.map fst (Decl.find_constructors lkn ts) in
+        ignore (try3 Pattern.CompileTerm.compile find [t_p] bl);
+        e_fold checkE () e
+    | _ -> e_fold checkE () e
+  in
+  match d.pd_node with
+  | PDrec { rec_defn = fdl } ->
+      List.iter (fun fd -> checkE () fd.fun_lambda.l_expr) fdl
+  | PDlet { let_expr = e } -> checkE () e
+  | PDval _ | PDtype _ | PDdata _ | PDexn _ -> ()
+
+let known_add_decl lkn kn d =
+  let kn = known_add_decl lkn kn d in
+  check_match lkn d;
+  kn
 
 let rec find_td its1 = function
   | (its2,csl,inv) :: _ when its_equal its1 its2 -> csl,inv
