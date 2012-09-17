@@ -717,7 +717,17 @@ pose (id1 := fresh_from p (Sassign m t)).
 fold id1 in H.
 pose (id2 := fresh_from q (Sassign m t)).
 fold id2.
-
+rewrite eval_msubst.
+rewrite get_stack_eq.
+rewrite eval_change_free.
+apply H2.
+rewrite eval_msubst in H.
+rewrite get_stack_eq in H.
+rewrite eval_change_free in H; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
 Qed.
 
 

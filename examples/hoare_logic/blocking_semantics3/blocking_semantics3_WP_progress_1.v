@@ -162,6 +162,8 @@ Inductive stmt  :=
 Axiom stmt_WhyType : WhyType stmt.
 Existing Instance stmt_WhyType.
 
+Axiom decide_is_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
+
 (* Why3 assumption *)
 Definition type_value(v:value): datatype :=
   match v with
@@ -312,6 +314,11 @@ Fixpoint eval_term(sigma:(map mident value)) (pi:(list (ident* value)%type))
       (eval_term sigma pi t2))
   end.
 
+Axiom eval_bool_term : forall (sigma:(map mident value)) (pi:(list (ident*
+  value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
+  datatype)%type)) (t:term), (type_term sigmat pit t TYbool) ->
+  exists b:bool, ((eval_term sigma pi t) = (Vbool b)).
+
 (* Why3 assumption *)
 Fixpoint eval_fmla(sigma:(map mident value)) (pi:(list (ident* value)%type))
   (f:fmla) {struct f}: Prop :=
@@ -438,6 +445,11 @@ Axiom eval_change_free : forall (f:fmla) (sigma:(map mident value)) (pi:(list
 Definition valid_fmla(p:fmla): Prop := forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)), (eval_fmla sigma pi p).
 
+Axiom msubst_implies : forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
+  q)) -> forall (sigma:(map mident value)) (pi:(list (ident* value)%type))
+  (x:mident) (id:ident), (fresh_in_fmla id (Fand p q)) -> (eval_fmla sigma
+  (Cons (id, (get sigma x)) pi) (Fimplies (msubst p x id) (msubst q x id))).
+
 Axiom let_equiv : forall (id:ident) (id':ident) (t:term) (f:fmla),
   forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
   (fresh_in_fmla id' f) -> ((eval_fmla sigma pi (Flet id' t (subst f id
@@ -492,7 +504,7 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
       inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
       pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
-  | one_step_while_falsee : forall (sigma:(map mident value)) (pi:(list
+  | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
       (eval_fmla sigma pi inv) -> (((eval_term sigma pi
       cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
@@ -658,6 +670,15 @@ Axiom fresh_from_stmt : forall (s:stmt) (f:fmla),
 
 Parameter abstract_effects: stmt -> fmla -> fmla.
 
+Axiom abstract_effects_generalize : forall (sigma:(map mident value))
+  (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
+  (abstract_effects s f)) -> (eval_fmla sigma pi f).
+
+Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
+  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
+  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
+  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
+
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
   match s with
@@ -673,12 +694,17 @@ Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
       (Fimplies (Fand (Fnot (Fterm cond)) inv) q))))
   end.
 
-Axiom distrib_conj : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (s:stmt) (p:fmla) (q:fmla), (eval_fmla sigma pi (wp s (Fand p
-  q))) <-> ((eval_fmla sigma pi (wp s p)) /\ (eval_fmla sigma pi (wp s q))).
+Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (s:stmt) (q:fmla), (eval_fmla sigma pi
+  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
+  q))).
 
 Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
+
+Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
 Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
   value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
@@ -695,10 +721,9 @@ Theorem progress : forall (s:stmt),
   | (Sassign m t) => forall (sigma:(map mident value)) (pi:(list (ident*
       value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
       datatype)%type)) (q:fmla), (type_stmt sigmat pit s) ->
-      ((type_fmla sigmat pit q) -> ((eval_fmla sigma pi (wp s q)) ->
-      ((~ (s = Sskip)) -> exists sigma':(map mident value), exists pi':(list
-      (ident* value)%type), exists s':stmt, (one_step sigma pi s sigma' pi'
-      s'))))
+      ((eval_fmla sigma pi (wp s q)) -> ((~ (s = Sskip)) ->
+      exists sigma':(map mident value), exists pi':(list (ident*
+      value)%type), exists s':stmt, (one_step sigma pi s sigma' pi' s')))
   | (Sseq s1 s2) => True
   | (Sif t s1 s2) => True
   | (Sassert f) => True

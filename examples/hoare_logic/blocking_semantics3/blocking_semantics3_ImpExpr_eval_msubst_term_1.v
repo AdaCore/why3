@@ -317,18 +317,82 @@ Fixpoint eval_term(sigma:(map mident value)) (pi:(list (ident* value)%type))
       (eval_term sigma pi t2))
   end.
 
-(* Why3 goal *)
-Theorem eval_bool_term : forall (sigma:(map mident value)) (pi:(list (ident*
+Axiom eval_bool_term : forall (sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
   datatype)%type)) (t:term), (type_term sigmat pit t TYbool) ->
   exists b:bool, ((eval_term sigma pi t) = (Vbool b)).
-intros sigma pi sigmat pit t h1.
-inversion h1.
-destruct v.
-simpl in H3; discriminate.
-simpl in H3; discriminate.
-exists b; auto.
 
+(* Why3 assumption *)
+Fixpoint eval_fmla(sigma:(map mident value)) (pi:(list (ident* value)%type))
+  (f:fmla) {struct f}: Prop :=
+  match f with
+  | (Fterm t) => ((eval_term sigma pi t) = (Vbool true))
+  | (Fand f1 f2) => (eval_fmla sigma pi f1) /\ (eval_fmla sigma pi f2)
+  | (Fnot f1) => ~ (eval_fmla sigma pi f1)
+  | (Fimplies f1 f2) => (eval_fmla sigma pi f1) -> (eval_fmla sigma pi f2)
+  | (Flet x t f1) => (eval_fmla sigma (Cons (x, (eval_term sigma pi t)) pi)
+      f1)
+  | (Fforall x TYint f1) => forall (n:Z), (eval_fmla sigma (Cons (x,
+      (Vint n)) pi) f1)
+  | (Fforall x TYbool f1) => forall (b:bool), (eval_fmla sigma (Cons (x,
+      (Vbool b)) pi) f1)
+  | (Fforall x TYunit f1) => (eval_fmla sigma (Cons (x, Vvoid) pi) f1)
+  end.
+
+Parameter msubst_term: term -> mident -> ident -> term.
+
+Axiom msubst_term_def : forall (t:term) (r:mident) (v:ident),
+  match t with
+  | (mk_term ((Tvalue _)|(Tvar _)) _) => ((msubst_term t r v) = t)
+  | (mk_term (Tderef x) _) => ((r = x) -> ((msubst_term t r
+      v) = (mk_tvar v))) /\ ((~ (r = x)) -> ((msubst_term t r v) = t))
+  | (mk_term (Tbin t1 op t2) _) => ((msubst_term t r
+      v) = (mk_tbin (msubst_term t1 r v) op (msubst_term t2 r v)))
+  end.
+
+Parameter subst_term: term -> ident -> ident -> term.
+
+Axiom subst_term_def : forall (t:term) (r:ident) (v:ident),
+  match t with
+  | (mk_term ((Tvalue _)|(Tderef _)) _) => ((subst_term t r v) = t)
+  | (mk_term (Tvar x) _) => ((r = x) -> ((subst_term t r
+      v) = (mk_tvar v))) /\ ((~ (r = x)) -> ((subst_term t r v) = t))
+  | (mk_term (Tbin t1 op t2) _) => ((subst_term t r
+      v) = (mk_tbin (subst_term t1 r v) op (subst_term t2 r v)))
+  end.
+
+(* Why3 assumption *)
+Definition fresh_in_term(id:ident) (t:term): Prop :=
+  ((term_maxvar t) < (ident_index id))%Z.
+
+Require Import Why3.
+
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
+(* Why3 goal *)
+Theorem eval_msubst_term : forall (e:term) (sigma:(map mident value))
+  (pi:(list (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v
+  e) -> ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
+  (get_stack v pi)) pi e)).
+induction e.
+destruct t.
+(* Value *)
+ae.
+(* Var *)
+intros sigma pi x v H.
+simpl.
+rewrite (msubst_term_def (mk_term (Tvar i) z)).
+easy.
+(* Ref *)
+intros sigma pi x v H.
+simpl.
+destruct (mident_decide m x).
+(* m = x*)
+ae.
+(* m <> x*)
+ae.
+(* Bin *)
+(*Il manque le bon schema d'induction*)
 Qed.
 
 
