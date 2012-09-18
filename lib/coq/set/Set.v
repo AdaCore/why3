@@ -4,31 +4,35 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 Require Import ClassicalEpsilon.
-Require Import FunctionalExtensionality.
+
+Lemma predicate_extensionality:
+  forall A (P Q : A -> Prop),
+    (forall x, P x <-> Q x) -> P = Q.
+Admitted.
 (* "it is folklore that the two are consistent" *)
 
-Variable eq : forall {a:Type} {a_WT:WhyType a}, a -> a -> bool.
-
+(*
 Hypothesis eq_dec:
   forall {a:Type} {a_WT:WhyType a} (x y:a),
-  if eq x y then x=y else x<>y.
+  x=y \/ x<>y.
+*)
 
 (* Why3 goal *)
 Definition set : forall (a:Type) {a_WT:WhyType a}, Type.
 intros. 
-exact (a -> bool). 
+exact (a -> Prop). 
 Defined.
 
 Global Instance set_WhyType : forall a {a_WT:WhyType a}, WhyType (set a).
 Proof.
 intros.
-exact (fun _ => true).
+exact (fun _ => True).
 Qed.
 
 (* Why3 goal *)
 Definition mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
 intros a a_WT x s.
-exact (s x = true).
+exact (s x).
 Defined.
 
 Hint Unfold mem.
@@ -44,17 +48,20 @@ Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 Lemma extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
 intros a a_WT s1 s2 h1.
-extensionality x.
-red in h1.
-unfold mem in h1.
-generalize (h1 x); clear h1.
-intro H.
-destruct (s1 x); destruct (s2 x); intuition.
+apply predicate_extensionality; intro x.
+apply h1.
 Qed.
 
 (* Why3 assumption *)
 Definition subset {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set a)): Prop :=
   forall (x:a), (mem x s1) -> (mem x s2).
+
+(* Why3 goal *)
+Lemma subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+  (subset s s).
+intros a a_WT s.
+unfold subset; auto.
+Qed.
 
 (* Why3 goal *)
 Lemma subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
@@ -67,7 +74,7 @@ Qed.
 (* Why3 goal *)
 Definition empty: forall {a:Type} {a_WT:WhyType a}, (set a).
 intros.
-exact (fun _ => false).
+exact (fun _ => False).
 Defined.
 
 (* Why3 assumption *)
@@ -84,33 +91,27 @@ Qed.
 (* Why3 goal *)
 Definition add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 intros a a_WT x s.
-exact (fun y => orb (eq x y) (s y)).
+exact (fun y => x = y \/ s y).
 Defined.
 
 (* Why3 goal *)
 Lemma add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
   forall (s:(set a)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
 intros a a_WT x y s.
-unfold add, mem.
-generalize (eq_dec y x); intro.
-rewrite Bool.orb_true_iff.
-destruct (eq y x); intuition. 
+unfold add, mem; intuition. 
 Qed.
 
 (* Why3 goal *)
 Definition remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 intros a a_WT x s.
-exact (fun y => andb (negb (eq x y)) (s y)).
+exact (fun y => x <> y /\ s y).
 Defined.
 
 (* Why3 goal *)
 Lemma remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
   (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
 intros a a_WT x y s.
-unfold mem, remove.
-generalize (eq_dec y x); intro.
-rewrite Bool.andb_true_iff.
-destruct (eq y x); intuition. 
+unfold remove, mem; intuition. 
 Qed.
 
 (* Why3 goal *)
@@ -125,50 +126,42 @@ Qed.
 Definition union: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
   (set a).
 intros a a_WT s1 s2.
-exact (fun x => orb (s1 x) (s2 x)).
+exact (fun x => s1 x \/ s2 x).
 Defined.
 
 (* Why3 goal *)
 Lemma union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
 intros a a_WT s1 s2 x.
-unfold union, mem.
-apply Bool.orb_true_iff.
+now unfold union.
 Qed.
 
 (* Why3 goal *)
 Definition inter: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
   (set a).
 intros a a_WT s1 s2.
-exact (fun x => andb (s1 x) (s2 x)).
+exact (fun x => s1 x /\ s2 x).
 Defined.
 
 (* Why3 goal *)
 Lemma inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
 intros a a_WT s1 s2 x.
-unfold inter, mem.
-apply Bool.andb_true_iff.
+now unfold inter.
 Qed.
 
 (* Why3 goal *)
 Definition diff: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
   a).
 intros a a_WT s1 s2.
-exact (fun x => andb (s1 x) (negb (s2 x))).
+exact (fun x => s1 x /\ ~(s2 x)).
 Defined.
 
 (* Why3 goal *)
 Lemma diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
 intros a a_WT s1 s2 x.
-unfold diff, mem.
-rewrite Bool.andb_true_iff.
-rewrite Bool.negb_true_iff.
-intuition.
-rewrite H in H1; discriminate.
-apply Bool.not_true_is_false.
-auto.
+now unfold diff.
 Qed.
 
 (* Why3 goal *)
@@ -198,14 +191,14 @@ Qed.
 (* Why3 goal *)
 Definition all: forall {a:Type} {a_WT:WhyType a}, (set a).
 intros a a_WT.
-exact (fun x => true).
+exact (fun x => True).
 Defined.
 
 (* Why3 goal *)
 Lemma all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem x
   (all :(set a))).
 intros a a_WT x.
-unfold all,mem; easy.
+now unfold all.
 Qed.
 
 
