@@ -102,3 +102,4 @@ replace 1%R with (1*1)%R by auto with real.
 apply Rmult_le_compat; auto with real.
 Qed.
 
+

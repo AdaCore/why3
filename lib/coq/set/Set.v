@@ -7,18 +7,23 @@ Require Import ClassicalEpsilon.
 Require Import FunctionalExtensionality.
 (* "it is folklore that the two are consistent" *)
 
-Parameter eq : forall {a:Type} {a_WT:WhyType a}, a -> a -> bool.
+Variable eq : forall {a:Type} {a_WT:WhyType a}, a -> a -> bool.
 
-Axiom eq_dec:
- forall {a:Type} {a_WT:WhyType a} (x y:a),
-   if eq x y then x=y else x<>y.
-
+Hypothesis eq_dec:
+  forall {a:Type} {a_WT:WhyType a} (x y:a),
+  if eq x y then x=y else x<>y.
 
 (* Why3 goal *)
 Definition set : forall (a:Type) {a_WT:WhyType a}, Type.
 intros. 
 exact (a -> bool). 
 Defined.
+
+Global Instance set_WhyType : forall a {a_WT:WhyType a}, WhyType (set a).
+Proof.
+intros.
+exact (fun _ => true).
+Qed.
 
 (* Why3 goal *)
 Definition mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
