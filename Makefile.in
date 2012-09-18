@@ -829,12 +829,12 @@ src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
 
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3NOCONFIG=42 $(COQC) -byte -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -byte -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
 src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3NOCONFIG=42 $(COQC) -opt -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -opt -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
 test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
@@ -953,11 +953,11 @@ clean::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
 update-coq: bin/why3 drivers/coq-realizations.aux
-	for f in $(COQLIBS_INT_ALL_FILES); do WHY3LOADPATH=theories bin/why3.@OCAMLBEST@ --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
-	for f in $(COQLIBS_REAL_FILES); do WHY3LOADPATH=theories bin/why3.@OCAMLBEST@ --realize -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
-	for f in $(COQLIBS_NUMBER_FILES); do WHY3LOADPATH=theories bin/why3.@OCAMLBEST@ --realize -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
-	for f in $(COQLIBS_SET_FILES); do WHY3LOADPATH=theories bin/why3.@OCAMLBEST@ --realize -D drivers/coq-realize.drv -T set.$$f -o lib/coq/set/; done
-	for f in $(COQLIBS_FP_FILES); do WHY3LOADPATH=theories bin/why3.@OCAMLBEST@ --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
+	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
+	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
+	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T set.$$f -o lib/coq/set/; done
+	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
 else
 
@@ -1301,7 +1301,7 @@ STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))
 stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc.@OCAMLBEST@
 	mkdir -p doc/stdlibdoc
 	rm -f doc/stdlibdoc/style.css
-	WHY3LOADPATH=theories bin/why3doc.@OCAMLBEST@ -L modules \
+	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ -L theories -L modules \
           -o doc/stdlibdoc --title "Why3 Standard Library" \
 	  $(STDLIBFILES) $(STDMODFILES)
 

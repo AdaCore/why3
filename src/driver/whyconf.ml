@@ -210,16 +210,19 @@ type config = {
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
 }
 
-let default_main =
+let empty_main =
   {
     libdir = Config.libdir;
     datadir = Config.datadir;
-    loadpath = default_loadpath;
+    loadpath = [];
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
   }
+
+let default_main =
+  { empty_main with loadpath = default_loadpath }
 
 let set_main rc main =
   let section = empty_section in
@@ -453,7 +456,10 @@ let read_config_rc conf_file =
           else raise Exit
         end
   in
-  filename, Rc.from_file filename
+  let rc =
+    if filename = "" then set_main Rc.empty empty_main
+    else Rc.from_file filename in
+  filename, rc
 
 exception ConfigFailure of string (* filename *) * string
 
@@ -631,8 +637,10 @@ let merge_config config filename =
 
 let save_config config =
   let filename = config.conf_file in
-  Sysutil.backup_file filename;
-  to_file filename config.config
+  if filename <> "" then begin
+    Sysutil.backup_file filename;
+    to_file filename config.config
+  end
 
 let get_main config = config.main
 let get_provers config = config.provers

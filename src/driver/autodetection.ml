@@ -427,7 +427,7 @@ let run_auto_detection config =
   config
 
 let list_prover_ids () =
-  let config = default_config "/dev/null" in
+  let config = default_config "" in
   let main = get_main config in
   let l,_ = read_auto_detection_data main in
   let s = List.fold_left (fun s p -> Sstr.add p.prover_id s) Sstr.empty l in
