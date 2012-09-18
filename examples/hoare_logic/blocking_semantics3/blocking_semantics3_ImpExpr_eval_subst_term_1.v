@@ -96,11 +96,6 @@ Existing Instance term_WhyType.
 Axiom term_node_WhyType : WhyType term_node.
 Existing Instance term_node_WhyType.
 
-Scheme term_induc := Induction for term Sort Prop 
-   with term_node_induc := Induction for term_node Sort Prop.
-
-Print term_induc.
-
 (* Why3 assumption *)
 Definition term_maxvar(v:term): Z := match v with
   | (mk_term x x1) => x1
@@ -158,8 +153,6 @@ Inductive fmla  :=
   | Fforall : ident -> datatype -> fmla -> fmla .
 Axiom fmla_WhyType : WhyType fmla.
 Existing Instance fmla_WhyType.
-
-Print fmla_ind.
 
 (* Why3 assumption *)
 Inductive stmt  :=
@@ -376,57 +369,17 @@ Axiom fresh_in_binop : forall (t:term) (t':term) (op:operator) (v:ident),
   (fresh_in_term v (mk_tbin t op t')) -> ((fresh_in_term v t) /\
   (fresh_in_term v t')).
 
-Require Import Why3.
-
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v e) ->
+  ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
+  (get_stack v pi)) pi e)).
 
 (* Why3 goal *)
-Theorem eval_msubst_term : forall (e:term) (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v
-  e) -> ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
-  (get_stack v pi)) pi e)).
-Check term_induc.
-intros e.
-apply term_induc with (P := fun e => 
-  forall (sigma : map mident value) (pi : list (ident * value))
-     (x : mident) (v : ident),
-     fresh_in_term v e ->
-     eval_term sigma pi (msubst_term e x v) =
-     eval_term (set sigma x (get_stack v pi)) pi e) 
-     (P0 := fun t => 
-       forall (i : int) (sigma : map mident value) (pi : list (ident * value))
-       (x : mident) (v : ident),
-       fresh_in_term v (mk_term t i) ->
-       eval_term sigma pi (msubst_term (mk_term t i) x v) =
-       eval_term (set sigma x (get_stack v pi)) pi (mk_term t i)).
-(* mk_term*)
-ae.
-(* Value *)
-ae.
-(* Var *)
-intros i i0 sigma pi x v H.
-simpl.
-rewrite (msubst_term_def (mk_term (Tvar i) i0)).
-easy.
-(* Ref *)
-intros m i sigma pi x v H.
-simpl.
-destruct (mident_decide m x).
-(* m = x*)
-ae.
-(* m <> x*)
-ae.
-(* Bin *)
-intros t H1.
-intros op t' H2.
-intros i sigma pi x v H3.
-rewrite (msubst_term_def (mk_term (Tbin t op t') i)).
-simpl.
-rewrite H1.
-rewrite H2; auto.
-apply fresh_in_binop with (t:=t) (t':=t') (op := op).
-apply fresh_in_binop with (t:=t) (t':=t') (op := op);
-admit.
+Theorem eval_subst_term : forall (sigma:(map mident value)) (pi:(list (ident*
+  value)%type)) (e:term) (x:ident) (v:ident), (fresh_in_term v e) ->
+  ((eval_term sigma pi (subst_term e x v)) = (eval_term sigma (Cons (x,
+  (get_stack v pi)) pi) e)).
+intros sigma pi e x v h1.
 
 Qed.
 

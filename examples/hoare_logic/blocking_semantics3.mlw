@@ -359,35 +359,36 @@ lemma subst_fresh :
   forall f:fmla, x:ident, v:ident.
    fresh_in_fmla x f -> subst f x v = f
 
-lemma let_subst:
-    forall t:term, f:fmla, x id':ident, id :mident.
-    msubst (Flet x t f) id id' = Flet x (msubst_term t id id') (msubst f id id')
+(* Not needed *)
+(* lemma let_subst: *)
+(*     forall t:term, f:fmla, x id':ident, id :mident. *)
+(*     msubst (Flet x t f) id id' = Flet x (msubst_term t id id') (msubst f id id') *)
 
-(* Need it for monotonicity*)
+(* Need it for monotonicity and wp_reduction *)
 lemma eval_msubst:
   forall f:fmla, sigma:env, pi:stack, x:mident, v:ident.
     fresh_in_fmla v f ->
     (eval_fmla sigma pi (msubst f x v) <->
      eval_fmla (IdMap.set sigma x (get_stack v pi)) pi f)
 
-lemma eval_subst:
-  forall f:fmla, sigma:env, pi:stack, x:ident, v:ident.
-    fresh_in_fmla v f ->
-    (eval_fmla sigma pi (subst f x v) <->
-     eval_fmla sigma (Cons(x, (get_stack v pi)) pi) f)
+(* lemma eval_subst: *)
+(*   forall f:fmla, sigma:env, pi:stack, x:ident, v:ident. *)
+(*     fresh_in_fmla v f -> *)
+(*     (eval_fmla sigma pi (subst f x v) <-> *)
+(*      eval_fmla sigma (Cons(x, (get_stack v pi)) pi) f) *)
 
-lemma eval_swap:
-  forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
-    id1 <> id2 ->
-    (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <->
-    eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f)
+(* lemma eval_swap: *)
+(*   forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value. *)
+(*     id1 <> id2 -> *)
+(*     (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <-> *)
+(*     eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f) *)
 
-lemma eval_same_var:
-  forall f:fmla, sigma:env, pi:stack, id:ident, v1 v2:value.
-    eval_fmla sigma (Cons (id,v1) (Cons (id,v2) pi)) f <->
-    eval_fmla sigma (Cons (id,v1) pi) f
+(* lemma eval_same_var: *)
+(*   forall f:fmla, sigma:env, pi:stack, id:ident, v1 v2:value. *)
+(*     eval_fmla sigma (Cons (id,v1) (Cons (id,v2) pi)) f <-> *)
+(*     eval_fmla sigma (Cons (id,v1) pi) f *)
 
-  (* Need it for monotonicity*)
+ (* Need it for monotonicity*)
 lemma eval_change_free :
   forall f:fmla, sigma:env, pi:stack, id:ident, v:value.
     fresh_in_fmla id f ->
@@ -397,25 +398,26 @@ lemma eval_change_free :
   predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
 
 (* Not needed *)
-axiom msubst_implies :
-forall p q:fmla.
-  valid_fmla (Fimplies p q) ->
-  forall sigma:env, pi:stack, x:mident, id:ident.
-    fresh_in_fmla id (Fand p q) -> 
-    eval_fmla sigma (Cons (id, (get_env x sigma)) pi) (Fimplies (msubst p x id) (msubst q x id)) 
+(* axiom msubst_implies : *)
+(* forall p q:fmla. *)
+(*   valid_fmla (Fimplies p q) -> *)
+(*   forall sigma:env, pi:stack, x:mident, id:ident. *)
+(*     fresh_in_fmla id (Fand p q) ->  *)
+(*     eval_fmla sigma (Cons (id, (get_env x sigma)) pi) (Fimplies (msubst p x id) (msubst q x id))  *)
 
 (** let id' = t in f[id <- id'] <=> let id = t in f*)
-lemma let_equiv :
-  forall id:ident, id':ident, t:term, f:fmla.
-    forall sigma:env, pi:stack.
-      fresh_in_fmla id' f ->
-	eval_fmla sigma pi (Flet id' t (subst f id id'))
-	 -> eval_fmla sigma pi (Flet id t f)
+(* Not needed *)
+(* lemma let_equiv : *)
+(*   forall id:ident, id':ident, t:term, f:fmla. *)
+(*     forall sigma:env, pi:stack. *)
+(*       fresh_in_fmla id' f -> *)
+(* 	eval_fmla sigma pi (Flet id' t (subst f id id')) *)
+(* 	 -> eval_fmla sigma pi (Flet id t f) *)
 
-lemma let_implies :
-  forall id:ident, t:term, p q:fmla.
-    valid_fmla (Fimplies p q) ->
-    valid_fmla (Fimplies (Flet id t p) (Flet id t q))
+(* lemma let_implies : *)
+(*   forall id:ident, t:term, p q:fmla. *)
+(*     valid_fmla (Fimplies p q) -> *)
+(*     valid_fmla (Fimplies (Flet id t p) (Flet id t q)) *)
 
 predicate fresh_in_stmt (id:ident) (s:stmt) =
   match s with
@@ -488,10 +490,12 @@ inductive one_step env stack stmt env stack stmt =
        many_steps sigma2 pi2 s2 sigma3 pi3 s3 n ->
        many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n+1)
 
-  lemma steps_non_neg:
-    forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int.
-      many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
+(* Not neede *)
+(* lemma steps_non_neg: *)
+(*   forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int. *)
+(*     many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0 *)
 
+(* Used by Hoare_logic/seq_rule*)
   lemma many_steps_seq:
     forall sigma1 sigma3:env, pi1 pi3:stack, s1 s2:stmt, n:int.
       many_steps sigma1 pi1 (Sseq s1 s2) sigma3 pi3 Sskip n ->
@@ -500,12 +504,11 @@ inductive one_step env stack stmt env stack stmt =
         many_steps sigma2 pi2 s2 sigma3 pi3 Sskip n2 /\
         n = 1 + n1 + n2
 
- lemma one_step_change_free :
-  forall s s':stmt, sigma sigma':env, pi pi':stack, id:ident, v:value.
-    fresh_in_stmt id s ->
-    one_step sigma (Cons (id,v) pi) s sigma' pi' s' ->
-    one_step sigma pi s sigma' pi' s'
-
+ (* lemma one_step_change_free : *)
+ (*  forall s s':stmt, sigma sigma':env, pi pi':stack, id:ident, v:value. *)
+ (*    fresh_in_stmt id s -> *)
+ (*    one_step sigma (Cons (id,v) pi) s sigma' pi' s' -> *)
+ (*    one_step sigma pi s sigma' pi' s' *)
 
 
 (** {3 Hoare triples} *)
