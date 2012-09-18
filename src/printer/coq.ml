@@ -571,7 +571,7 @@ let intros_params fmt params =
   Stv.iter
     (fun tv ->
       let n = id_unique iprinter tv.tv_name in
-      fprintf fmt "@ %s" n)
+      fprintf fmt "@ %s %s_WT" n n)
     params
 
 let intros fmt params fmla =
