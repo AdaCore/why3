@@ -23,11 +23,9 @@ open Util
 open Ident
 open Ty
 open Term
-open Task
 open Theory
 open Task
 open Decl
-open Encoding
 
 exception TooMuchInstantiation of int
 let max_instantiation = 512 (* 7 ** 3 = 343 *)
@@ -66,9 +64,11 @@ type tty =
   | Tyterm of ty
   | Tyty of ty
 
+(* dead code
 let print_tty fmt = function
   | Tyterm ty -> Format.fprintf fmt "(Tyterm %a)" Pretty.print_ty ty
   | Tyty ty -> Format.fprintf fmt "(Tyty %a)" Pretty.print_ty ty
+*)
 
 (* It can be backprojected to type, ty_dumb is like a bottom type it
    never appear in final formulas *)
@@ -102,7 +102,9 @@ type env = {
   edefined_tsymbol : tysymbol Mtyl.t Mts.t;
 }
 
+(* dead code
 type auto_clone = task -> tenv -> Sty.t -> task * env
+*)
 
 (* The environnement of the transformation during
    the transformation of a formula *)
@@ -130,7 +132,7 @@ let print_env fmt menv =
 
 type tvar = ty Mtv.t
 
-let rec projty menv tvar ty =
+let projty menv tvar ty =
   let rec aux ty =
     match ty.ty_node with
       | Tyvar _ -> Tyterm ty

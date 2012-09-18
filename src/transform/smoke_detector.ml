@@ -24,10 +24,8 @@
    universal quantification (replace implication by conjunction).
 *)
 
-open Ident
 open Term
 open Decl
-open Task
 
 let create app =
   Trans.goal (fun pr t -> [create_prop_decl Pgoal pr (app t)])

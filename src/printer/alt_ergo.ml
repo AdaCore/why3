@@ -26,7 +26,6 @@ open Ident
 open Ty
 open Term
 open Decl
-open Task
 open Printer
 
 let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]

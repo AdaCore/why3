@@ -22,7 +22,6 @@
 open Ident
 open Term
 open Decl
-open Task
 
 let abstraction (keep : lsymbol -> bool) =
   let term_table = Hterm_alpha.create 257 in

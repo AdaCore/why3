@@ -20,7 +20,6 @@
 
 open Theory
 open Decl
-open Task
 open Term
 
 let is_func_ty t =

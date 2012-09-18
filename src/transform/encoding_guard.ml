@@ -153,7 +153,7 @@ module Transform = struct
 
   and f_type_close_select kept f' =
     let tvs = t_ty_freevars Stv.empty f' in
-    let rec trans fn acc f = match f.t_node with
+    let trans fn acc f = match f.t_node with
       | Tquant(Tforall as q,_) -> (* Exists same thing? *)
         let vsl,trl,fmla = f_open_all_quant q f in
         let add acc vs = (t_var vs)::acc in
