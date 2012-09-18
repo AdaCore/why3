@@ -339,14 +339,16 @@ let register_goal goal =
 let goal_has_been_tried g =
    (* Check whether the goal has been tried already *)
    try
-      Session.goal_iter_proof_attempt
-         (fun pa ->
-            (* only count non-obsolete proof attempts with identical options *)
-            if not pa.Session.proof_obsolete &&
+      Session.goal_iter (fun child ->
+         match child with
+         | Session.Proof_attempt pa ->
+               (* only count non-obsolete proof attempts with identical
+                  options *)
+               if not pa.Session.proof_obsolete &&
                pa.Session.proof_prover = Gnat_config.prover.Whyconf.prover &&
                pa.Session.proof_timelimit = Gnat_config.timeout then
                   raise Exit
-         ) g;
+         | _ -> ()) g;
       false
    with Exit -> true
 
