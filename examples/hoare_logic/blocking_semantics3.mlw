@@ -314,11 +314,11 @@ lemma eval_msubst_term:
     eval_term sigma pi (msubst_term e x v) =
     eval_term (IdMap.set sigma x (get_stack v pi)) pi e
 
-lemma eval_subst_term:
-  forall sigma:env, pi:stack, e:term, x:ident, v:ident.
-    fresh_in_term v e ->
-    eval_term sigma pi (subst_term e x v) =
-    eval_term sigma (Cons (x, (get_stack v pi)) pi) e
+(* lemma eval_subst_term: *)
+(*   forall sigma:env, pi:stack, e:term, x:ident, v:ident. *)
+(*     fresh_in_term v e -> *)
+(*     eval_term sigma pi (subst_term e x v) = *)
+(*     eval_term sigma (Cons (x, (get_stack v pi)) pi) e *)
 
 lemma eval_term_change_free :
   forall t:term, sigma:env, pi:stack, id:ident, v:value.
@@ -377,11 +377,17 @@ lemma eval_msubst:
 (*     (eval_fmla sigma pi (subst f x v) <-> *)
 (*      eval_fmla sigma (Cons(x, (get_stack v pi)) pi) f) *)
 
-(* lemma eval_swap: *)
-(*   forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value. *)
-(*     id1 <> id2 -> *)
-(*     (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <-> *)
-(*     eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f) *)
+lemma eval_swap_term:
+  forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
+    id1 <> id2 ->
+    (eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t =
+    eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t)
+
+lemma eval_swap:
+  forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
+    id1 <> id2 ->
+    (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <->
+    eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f)
 
 (* lemma eval_same_var: *)
 (*   forall f:fmla, sigma:env, pi:stack, id:ident, v1 v2:value. *)
@@ -490,10 +496,9 @@ inductive one_step env stack stmt env stack stmt =
        many_steps sigma2 pi2 s2 sigma3 pi3 s3 n ->
        many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n+1)
 
-(* Not neede *)
-(* lemma steps_non_neg: *)
-(*   forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int. *)
-(*     many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0 *)
+lemma steps_non_neg:
+  forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int.
+    many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
 
 (* Used by Hoare_logic/seq_rule*)
   lemma many_steps_seq:

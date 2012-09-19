@@ -374,6 +374,11 @@ Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
   ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
   (get_stack v pi)) pi e)).
 
+Axiom eval_subst_term : forall (sigma:(map mident value)) (pi:(list (ident*
+  value)%type)) (e:term) (x:ident) (v:ident), (fresh_in_term v e) ->
+  ((eval_term sigma pi (subst_term e x v)) = (eval_term sigma (Cons (x,
+  (get_stack v pi)) pi) e)).
+
 Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
   t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
@@ -420,23 +425,117 @@ Axiom eval_msubst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   ((eval_fmla sigma pi (msubst f x v)) <-> (eval_fmla (set sigma x
   (get_stack v pi)) pi f)).
 
-Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-  (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2) pi))
-  f) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f)).
+Axiom eval_change_free : forall (f:fmla) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (id:ident) (v:value), (fresh_in_fmla id f) ->
+  ((eval_fmla sigma (Cons (id, v) pi) f) <-> (eval_fmla sigma pi f)).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+(* Why3 assumption *)
+Definition valid_fmla(p:fmla): Prop := forall (sigma:(map mident value))
+  (pi:(list (ident* value)%type)), (eval_fmla sigma pi p).
+
+(* Why3 assumption *)
+Fixpoint fresh_in_stmt(id:ident) (s:stmt) {struct s}: Prop :=
+  match s with
+  | Sskip => True
+  | (Sseq s1 s2) => (fresh_in_stmt id s1) /\ (fresh_in_stmt id s2)
+  | (Sassign _ t) => (fresh_in_term id t)
+  | (Sif t s1 s2) => (fresh_in_term id t) /\ ((fresh_in_stmt id s1) /\
+      (fresh_in_stmt id s2))
+  | (Sassert f) => (fresh_in_fmla id f)
+  | (Swhile cond inv body) => (fresh_in_term id cond) /\ ((fresh_in_fmla id
+      inv) /\ (fresh_in_stmt id body))
+  end.
+
+(* Why3 assumption *)
+Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
+  -> (map mident value) -> (list (ident* value)%type) -> stmt -> Prop :=
+  | one_step_assign : forall (sigma:(map mident value)) (sigma':(map mident
+      value)) (pi:(list (ident* value)%type)) (x:mident) (t:term),
+      (sigma' = (set sigma x (eval_term sigma pi t))) -> (one_step sigma pi
+      (Sassign x t) sigma' pi Sskip)
+  | one_step_seq_noskip : forall (sigma:(map mident value)) (sigma':(map
+      mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
+      value)%type)) (s1:stmt) (s1':stmt) (s2:stmt), (one_step sigma pi s1
+      sigma' pi' s1') -> (one_step sigma pi (Sseq s1 s2) sigma' pi' (Sseq s1'
+      s2))
+  | one_step_seq_skip : forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (s:stmt), (one_step sigma pi (Sseq Sskip s) sigma pi s)
+  | one_step_if_true : forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (t:term) (s1:stmt) (s2:stmt), ((eval_term sigma pi
+      t) = (Vbool true)) -> (one_step sigma pi (Sif t s1 s2) sigma pi s1)
+  | one_step_if_false : forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (t:term) (s1:stmt) (s2:stmt), ((eval_term sigma pi
+      t) = (Vbool false)) -> (one_step sigma pi (Sif t s1 s2) sigma pi s2)
+  | one_step_assert : forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
+      (Sassert f) sigma pi Sskip)
+  | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
+      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+  | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
+      (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
+      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
+      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip)).
+
+(* Why3 assumption *)
+Inductive many_steps : (map mident value) -> (list (ident* value)%type)
+  -> stmt -> (map mident value) -> (list (ident* value)%type) -> stmt
+  -> Z -> Prop :=
+  | many_steps_refl : forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (s:stmt), (many_steps sigma pi s sigma pi s 0%Z)
+  | many_steps_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
+      value)) (sigma3:(map mident value)) (pi1:(list (ident* value)%type))
+      (pi2:(list (ident* value)%type)) (pi3:(list (ident* value)%type))
+      (s1:stmt) (s2:stmt) (s3:stmt) (n:Z), (one_step sigma1 pi1 s1 sigma2 pi2
+      s2) -> ((many_steps sigma2 pi2 s2 sigma3 pi3 s3 n) ->
+      (many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n + 1%Z)%Z)).
+
+Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
+  value)) (pi1:(list (ident* value)%type)) (pi2:(list (ident* value)%type))
+  (s1:stmt) (s2:stmt) (n:Z), (many_steps sigma1 pi1 s1 sigma2 pi2 s2 n) ->
+  (0%Z <= n)%Z.
 
 (* Why3 goal *)
-Theorem eval_change_free : forall (f:fmla) (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_fmla id
-  f) -> ((eval_fmla sigma (Cons (id, v) pi) f) <-> (eval_fmla sigma pi f)).
-intros f sigma pi id v h1.
-split; intro.
-apply subst_fresh with (v := v) in h1.
-rewrite <- h1 in H.
+Theorem many_steps_seq : forall (sigma1:(map mident value)) (sigma3:(map
+  mident value)) (pi1:(list (ident* value)%type)) (pi3:(list (ident*
+  value)%type)) (s1:stmt) (s2:stmt) (n:Z), (many_steps sigma1 pi1 (Sseq s1
+  s2) sigma3 pi3 Sskip n) -> exists sigma2:(map mident value),
+  exists pi2:(list (ident* value)%type), exists n1:Z, exists n2:Z,
+  (many_steps sigma1 pi1 s1 sigma2 pi2 Sskip n1) /\ ((many_steps sigma2 pi2
+  s2 sigma3 pi3 Sskip n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
+intros sigma1 sigma3 pi1 pi3 s1 s2 n Hred.
+generalize Hred.
+generalize (steps_non_neg _ _ _ _ _ _ _ Hred).
+clear Hred.
+intros H.
+generalize sigma1 pi1 s1; clear sigma1 pi1 s1.
+pattern n; apply Z_lt_induction; auto.
+intros.
+inversion Hred; subst; clear Hred.
+inversion H1; subst; clear H1.
+(* case s1 <> Sskip *)
+assert (h:(0 <= n0 < n0+1)%Z).
+  generalize (steps_non_neg _ _ _ _ _ _ _ H2); omega.
+generalize (H0 n0 h _ _ _ H2).
+intros (s4 & p4 & n4 & n5 & h1 & h2 & h3).
+exists s4.
+exists p4.
+exists (n4+1)%Z.
+exists n5.
+split.
+apply many_steps_trans with (1:=H10); auto.
+split; auto with zarith.
 
+(* case s1 = Sskip *)
+exists sigma2.
+exists pi2.
+exists 0%Z.
+exists n0.
+split.
+constructor.
+split; auto with zarith.
 Qed.
 
 
