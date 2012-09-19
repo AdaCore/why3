@@ -14,11 +14,13 @@ Currently, realizations are supported for the proof assistants Coq and PVS.
 Generating the skeleton for a theory is done by passing to \why the
 \verb+--realize+ option, a driver suitable for realizations, the names of
 the theories to realize, and a target directory.
+\index{--realize@\verb+--realize+}
 
 \begin{verbatim}
 why3 --realize -D path/to/drivers/prover-realize.drv
       -T env_path.theory_name -o path/to/target/dir/
 \end{verbatim}
+
 The name of the generated file is inferred from the theory name. If the
 target directory already contains a file with the same name, \why
 extracts all the parts that it assumes to be user-edited and merges them in
@@ -37,15 +39,19 @@ will no longer output declarations for that theory but instead simply put
 a directive to load the realization. In order to tell the printer
 that a given theory is realized, one has to add a meta declaration in the
 corresponding theory section of the driver.
+\index{driver file}
+
 \begin{verbatim}
 theory env_path.theory_name
   meta "realized" "env_path.theory_name", "optional_naming"
 end
 \end{verbatim}
+
 The first parameter is the theory name for \why. The second
 parameter, if not empty, provides a name to be used inside generated
 scripts to point to the realization, in case the default name is not
 suitable for the interactive prover.
+\index{realized@\verb+realized+}
 
 \section{Generated/edited files}
 
@@ -101,6 +107,7 @@ configuration file that indicates how to modify paths, provers, and
 editors, and a driver file that contains only the needed
 \verb+meta "realized"+ declarations. The configuration file should be as
 follows.
+\index{configuration file}
 
 \begin{verbatim}
 [main]
@@ -121,6 +128,11 @@ option="--eval \"(setq coq-load-path (cons '(\\\"path/to/vo/files\\\" \
 
 This configuration file can be passed to \why thanks to the
 \verb+--extra-config+ option.
+\index{--extra-config@\verb+--extra-config+}
+\index{prover_modifiers@\verb+prover_modifiers+}
+\index{editor_modifiers@\verb+editor_modifiers+}
+\index{option@\verb+option+}
+\index{driver@\verb+driver+}
 
 
 %%% Local Variables:
