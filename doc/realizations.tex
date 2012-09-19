@@ -14,12 +14,14 @@ Currently, realizations are supported for the proof assistants Coq and PVS.
 Generating the skeleton for a theory is done by passing to \why the
 \verb+--realize+ option, a driver suitable for realizations, the names of
 the theories to realize, and a target directory.
-\index{--realize@\verb+--realize+}
+\index{realize@\verb+--realize+}
 
 \begin{verbatim}
 why3 --realize -D path/to/drivers/prover-realize.drv
       -T env_path.theory_name -o path/to/target/dir/
 \end{verbatim}
+\index{driver@\verb+--driver+}
+\index{theory@\verb+--theory+}
 
 The name of the generated file is inferred from the theory name. If the
 target directory already contains a file with the same name, \why
@@ -128,7 +130,7 @@ option="--eval \"(setq coq-load-path (cons '(\\\"path/to/vo/files\\\" \
 
 This configuration file can be passed to \why thanks to the
 \verb+--extra-config+ option.
-\index{--extra-config@\verb+--extra-config+}
+\index{extra-config@\verb+--extra-config+}
 \index{prover_modifiers@\verb+prover_modifiers+}
 \index{editor_modifiers@\verb+editor_modifiers+}
 \index{option@\verb+option+}

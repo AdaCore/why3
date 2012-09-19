@@ -23,22 +23,31 @@ particular the option \verb|-help| which displays the usage and options.
 \begin{description}
 \item[\texttt{-L} $d$]
   adds $d$ in the load path, to search for theories.
+  \index{L@\verb+-L+|see{\texttt{-{}-library}}}
 \item[\texttt{-{}-library} $d$]
   same as \verb|-L|
+  \index{library@\verb+--library+}
 \item[\texttt{-I} $d$]
   same as \verb|-L| (deprecated)
+  \index{I@\verb+-I+|see{\texttt{-{}-library}}}
 \item[\texttt{-C} $file$]
   reads configuration from $file$
+  \index{C@\verb+-C+|see{\texttt{-{}-config}}}
 \item[\texttt{-{}-config} $file$]
   same as \verb|-C|
+  \index{config@\verb+--config+}
 \item[\texttt{-{}-extra-config} $file$]
   reads additional configuration from $file$
+  \index{extra-config@\verb+--extra-config+}
 \item[\texttt{-{}-list-debug-flags}]
   lists known debug flags
+  \index{list-debug-flags@\verb+--list-debug-flags+}
 \item[\texttt{-{}-debug-all}]
   sets all debug flags (except flags which change the behavior)
+  \index{debug-all@\verb+--debug-all+}
 \item[\texttt{-{}-debug} $flag$]
   set a debug flag
+  \index{debug@\verb+--debug+}
 \item[\texttt{-v}]
   print version information
 \item[\texttt{-help}]
@@ -58,6 +67,8 @@ the command line tool \texttt{why3config}.
 %%\end{verbatim}
 %%of the IDE.
 This must be redone each time a new prover is installed.
+\index{why3config@\texttt{why3config}}
+\index{configuration file}
 
 The provers which \why attempts to detect are described in
 the readable configuration file \texttt{provers-detection-data.conf}
@@ -78,6 +89,7 @@ versions of the same prover, or with different options.
 plugins directory (\eg{} \texttt{/usr/local/lib/why3/plugins}). A
 plugin must register itself as a parser, a transformation or a
 printer, as explained in the corresponding section.
+\index{plugin}
 
 If the user's configuration file is already present,
 \texttt{why3config} will only reset unset variables to default value,
@@ -86,6 +98,8 @@ The option \verb|--detect-provers| should be used to force
 \why to detect again the available
 provers and to replace them in the configuration file. The option
 \verb|--detect-plugins| will do the same for plugins.
+\index{detect-provers@\verb+--detect-provers+}
+\index{detect-plugins@\verb+--detect-plugins+}
 
 If a supported prover is installed under a name
 that is not automatically recognized by \texttt{why3config},
@@ -98,6 +112,8 @@ why3config --add-prover alt-ergo /home/me/bin/alt-ergo-trunc
 As the first argument, one should put a prover
 identification string. The list of known prover identifiers
 can be obtained by the option \verb|--list-prover-ids|.
+\index{add-prover@\verb+--add-prover+}
+\index{list-prover-ids@\verb+--list-prover-ids+}
 
 \section{The \texttt{why3} command-line tool}
 \label{sec:why3ref}
@@ -108,6 +124,7 @@ input file. By default, such a file must be written either in \why language
 However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
 \eg{} TPTP or SMTlib.
+\index{why3@\texttt{why3}}
 
 The \texttt{why3} tool executes the following steps:
 \begin{enumerate}
@@ -131,14 +148,25 @@ The \texttt{why3} tool executes the following steps:
   appearing on the command line. If no theories are selected in a file,
   then every theory is considered as selected. If no goals are selected
   in a theory, then every goal is considered as selected.
+  \index{G@\verb+-G+|see{\texttt{-{}-goal}}}
+  \index{goal@\verb+--goal+}
+  \index{T@\verb+-T+|see{\texttt{-{}-theory}}}
+  \index{theory@\verb+--theory+}
 \item Apply the transformation requested
   with \verb|-a/--apply-transform| in their order of appearance on the
   command line. \verb|--list-transforms| list the known
   transformations, plugins can add more of them.
+  \index{a@\verb+-a+|see{\texttt{-{}-apply-transform}}}
+  \index{apply-transform@\verb+--apply-transform+}
+  \index{list-transforms@\verb+--list-transforms+}
 \item Apply the driver selected with the \verb|-D/--driver| option,
   or the driver of the prover selected with \verb|-P/--prover|
   option. \verb|--list-provers| lists the known provers, \ie the ones
   that appear in the configuration file.
+  \index{D@\verb+-D+|see{\texttt{-{}-driver}}}
+  \index{driver@\verb+--driver+}
+  \index{P@\verb+-P+|see{\texttt{-{}-prover}}}
+  \index{prover@\verb+--prover+}
 \item If the option \verb|-P/--prover| is given, call the selected prover
   on each generated task and print the results. If the option
   \verb|-D/--driver| is given, print each generated task using
@@ -183,6 +211,7 @@ Section~\ref{sec:gui}. There are no specific command-line options,
 apart from the common options detailed in introduction to this chapter.
 We describe the actions of the various menus and buttons of the
 interface.
+\index{why3ide@\texttt{why3ide}}
 
 \subsection{Session}
 \label{sec:idref:session}
@@ -461,6 +490,7 @@ stored in a \why session file, as the one produced by the IDE. Its
 main goal is to play non-regression tests, \eg you can find in
 \texttt{examples/regtests.sh} a script that runs regression tests on
 all the examples.
+\index{why3replayer@\texttt{why3replayer}}
 
 The tool is invoked in a terminal or a script using
 \begin{flushleft}\ttfamily
