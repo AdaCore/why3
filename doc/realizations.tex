@@ -7,8 +7,7 @@ some of its uninterpreted symbols and proofs for some of its
 axioms. This way, one can show the consistency of an axiomatized
 theory and/or make a connection to an existing library (of the proof
 assistant) to ease some proofs.
-Currently, realizations are supported only for the proof assistant Coq.
-% Currently, realizations are supported for the proof assistants Coq and PVS.
+Currently, realizations are supported for the proof assistants Coq and PVS.
 
 \section{Generating a realization}
 
@@ -43,7 +42,7 @@ theory env_path.theory_name
   meta "realized" "env_path.theory_name", "optional_naming"
 end
 \end{verbatim}
-The first parameter is the theory name for \why, while the second
+The first parameter is the theory name for \why. The second
 parameter, if not empty, provides a name to be used inside generated
 scripts to point to the realization, in case the default name is not
 suitable for the interactive prover.
@@ -80,7 +79,10 @@ generated parts or adding empty lines inside them.
 	\verb+Save+, or \verb+Defined+, whichever comes first. In the
 	case of definitions, the original statement can be replaced by
 	a \verb+Notation+ directive, in order to ease the usage of
-	already defined symbols.
+	already defined symbols. \why also recognizes \verb+Variable+
+	and \verb+Hypothesis+ and preserves them; they should be used in
+	conjunction with Coq's \verb+Section+ mechanism to realize
+	theories that still need some abstract symbols and axioms.
 \end{enumerate}
 
 Currently, the parser for Coq scripts is rather naive and does not know
@@ -94,19 +96,31 @@ comment.
 
 While modifying an existing driver file might be sufficient for local
 use, it does not scale well when the realizations are to be shipped to
-other users. Instead, an additional configuration file should be created.
+other users. Instead, one should create two additional files: a
+configuration file that indicates how to modify paths, provers, and
+editors, and a driver file that contains only the needed
+\verb+meta "realized"+ declarations. The configuration file should be as
+follows.
 
 \begin{verbatim}
 [main]
 loadpath="path/to/theories"
 
-[prover coq]
+[prover_modifiers]
+name="Coq"
 option="-R path/to/vo/files Logical_directory"
-driver="path/to/extra_coq.drv"
+driver="path/to/file/with/meta.drv"
+
+[editor_modifiers coqide]
+option="-R path/to/vo/files Logical_directory"
+
+[editor_modifiers proofgeneral-coq]
+option="--eval \"(setq coq-load-path (cons '(\\\"path/to/vo/files\\\" \
+  \\\"Logical_directory\\\") coq-load-path))\""
 \end{verbatim}
 
-This file can be passed to \why thanks to the \verb+--extra-config+
-option.
+This configuration file can be passed to \why thanks to the
+\verb+--extra-config+ option.
 
 
 %%% Local Variables:
