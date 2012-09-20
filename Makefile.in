@@ -888,7 +888,7 @@ COQLIBS_SET_FILES = Set
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
 COQLIBS_SETTHEORY_FILES = Interval PowerSet Relation Identity Image \
-	InverseDomRan Function Sequence
+	InverseDomRan Function 
 COQLIBS_SETTHEORY = $(addprefix lib/coq/settheory/, $(COQLIBS_SETTHEORY_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
