@@ -130,20 +130,28 @@ scheduled on Sep 2012
 == New Features to announce ==
 
 New features:
+
+  o new API for programs
+  o type invariants ?
   o Support for Coq 8.4
   o dropped support for Coq 8.2
   o new scheme for Coq realizations using type classes
-  o new API for programs
-  o Support for PVS 6.0
+  o Support for PVS 6.0, including realizations
 
 Bug fixes:
-  o
+
+  o fixed bug on merging config files which prevented the use
+    of Why3 back-end of the Frama-C/Jessie plugin when Coq is
+    not installed. (Bug 14672 of the Bug Tracking System)
+  o fixed bugs 13503 and 13375 of the Bug Tracking System
 
 == Final preparation ==
 
+* faire une passe sur le BTS
 * do "make update-coq" and "make", fix Coq realizations if needed
 * check that nightly bench is OK
 * check that "make xml-validate" is OK
+  (see below : copy the dtd on the web)
 * put 0.74 in file Version
 * check headers
 * check the file CHANGES, add the release date
@@ -157,6 +165,7 @@ Bug fixes:
 
 * put on the web page
  - why3-0.74.tar.gz
+ - why3session.dtd
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    (make stdlibdoc ;
     cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.74;
