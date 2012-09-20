@@ -235,6 +235,12 @@ theory Identity
 end
 
 
+(** {2 Sequences}
+
+    Finite sequences as total functions on domain 1..n
+
+*)
+
 
 theory Sequence
 
@@ -242,10 +248,8 @@ theory Sequence
   use import Interval
   use import Identity
 
-  function seq_length int (set 'a) : set (rel int 'a)
-
-  axiom mem_seq_length : forall n:int, s:set 'a.
-     seq_length n s == ((mk 1 n) --> s)
+  function seq_length (n:int) (s : set 'a) : set (rel int 'a) =
+    (mk 1 n) --> s
 
   function seq (set 'a) : set (rel int 'a)
 

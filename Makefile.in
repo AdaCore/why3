@@ -887,7 +887,8 @@ COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 COQLIBS_SET_FILES = Set
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
-COQLIBS_SETTHEORY_FILES = Interval PowerSet Relation Identity Image InverseDomRan Function
+COQLIBS_SETTHEORY_FILES = Interval PowerSet Relation Identity Image \
+	InverseDomRan Function Sequence
 COQLIBS_SETTHEORY = $(addprefix lib/coq/settheory/, $(COQLIBS_SETTHEORY_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
@@ -942,7 +943,7 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3/coq/set
 	cp $(addsuffix .vo, $(COQLIBS_SET)) $(LIBDIR)/why3/coq/set/
 	mkdir -p $(LIBDIR)/why3/coq/settheory
-	cp $(addsuffix .vo, $(COQLIBS_SETTHEORY_FILES)) $(LIBDIR)/why3/coq/settheory/
+	cp $(addsuffix .vo, $(COQLIBS_SETTHEORY)) $(LIBDIR)/why3/coq/settheory/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
@@ -1301,7 +1302,8 @@ STDLIBS = algebra \
 	option \
 	real \
 	relations \
-	set
+	set \
+	settheory
 # function ? sum ? tptp ?
 
 STDMODS = arith array hashtbl impset pqueue queue random ref stack string
