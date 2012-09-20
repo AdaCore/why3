@@ -30,35 +30,52 @@ axiom mident_decide :
 type ident = {| ident_index : int |}
 
 (** Terms *)
-type term =
+type term_node =
   | Tvalue value
   | Tvar ident
   | Tderef mident
   | Tbin term operator term
 
+with term = {| term_node : term_node;
+               term_maxvar : int;
+             |}
 
 predicate var_occurs_in_term (x:ident) (t:term) =
   match t with
-  | Tvalue _  -> false
-  |  Tvar i  -> x=i
-  |  Tderef _  -> false
-  |  Tbin t1 _ t2 -> var_occurs_in_term x t1 \/ var_occurs_in_term x t2
+  | {| term_node = Tvalue _ |} -> false
+  | {| term_node = Tvar i |} -> x=i
+  | {| term_node = Tderef _ |} -> false
+  | {| term_node = Tbin t1 _ t2 |} -> var_occurs_in_term x t1 \/ var_occurs_in_term x t2
   end
 
-(* predicate term_inv (t:term) = *)
-(*   forall x:ident. var_occurs_in_term x t -> x.ident_index <= t.term_maxvar *)
+predicate term_inv (t:term) =
+  forall x:ident. var_occurs_in_term x t -> x.ident_index <= t.term_maxvar
 
 function mk_tvalue (v:value) : term =
-   Tvalue v
+   {| term_node = Tvalue v; term_maxvar = -1 |}
+
+lemma mk_tvalue_inv :
+   forall v:value. term_inv (mk_tvalue v)
 
 function mk_tvar (i:ident) : term =
-   Tvar i
+   {| term_node = Tvar i; term_maxvar = i.ident_index |}
+
+lemma mk_tvar_inv :
+   forall i:ident. term_inv (mk_tvar i)
 
 function mk_tderef (r:mident) : term =
-   Tderef r
+   {| term_node = Tderef r; term_maxvar = -1 |}
+
+lemma mk_tderef_inv :
+   forall r:mident. term_inv (mk_tderef r)
 
 function mk_tbin (t1:term) (o:operator) (t2:term) : term =
-    Tbin t1 o t2
+   {| term_node = Tbin t1 o t2;
+      term_maxvar = max t1.term_maxvar t2.term_maxvar |}
+
+lemma mk_tbin_inv :
+   forall t1 t2:term, o:operator. term_inv t1 /\ term_inv t2 ->
+     term_inv (mk_tbin t1 o t2)
 
 
 (** Formulas *)
@@ -109,23 +126,23 @@ function get_reftype (i:mident) (e:type_env) : datatype = IdMap.get e i
 
 inductive type_term type_env type_stack term datatype =
   | Type_value :
-      forall sigma: type_env, pi:type_stack, v:value.
-	type_term sigma pi  (Tvalue v) (type_value v)
+      forall sigma: type_env, pi:type_stack, v:value, m:int.
+	type_term sigma pi {| term_node = Tvalue v; term_maxvar = m |} (type_value v)
   | Type_var :
-      forall sigma: type_env, pi:type_stack, v: ident, ty:datatype.
+      forall sigma: type_env, pi:type_stack, v: ident, m:int, ty:datatype.
         (get_vartype v pi = ty) ->
-        type_term sigma pi (Tvar v) ty
+        type_term sigma pi {| term_node = Tvar v ; term_maxvar = m |} ty
   | Type_deref :
-      forall sigma: type_env, pi:type_stack, v: mident, ty:datatype.
+      forall sigma: type_env, pi:type_stack, v: mident, m:int, ty:datatype.
         (get_reftype v sigma = ty) ->
-        type_term sigma pi (Tderef v) ty
+        type_term sigma pi {| term_node = Tderef v; term_maxvar = m |} ty
   | Type_bin :
       forall sigma: type_env, pi:type_stack, t1 t2 : term, op:operator,
-        ty1 ty2 ty:datatype.
+        m:int, ty1 ty2 ty:datatype.
         type_term sigma pi t1 ty1 ->
 	type_term sigma pi t2 ty2 ->
 	type_operator op ty1 ty2 ty ->
-        type_term sigma pi (Tbin t1 op t2) ty
+        type_term sigma pi {| term_node = Tbin t1 op t2; term_maxvar = m |} ty
 
 inductive type_fmla type_env type_stack fmla =
   | Type_term :
@@ -230,10 +247,10 @@ function eval_bin (x:value) (op:operator) (y:value) : value =
 
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
-  | Tvalue v -> v
-  |  Tvar id  -> get_stack id pi
-  |  Tderef id  -> get_env id sigma
-  |  Tbin t1 op t2  ->
+  | {| term_node = Tvalue v |} -> v
+  | {| term_node = Tvar id |} -> get_stack id pi
+  | {| term_node = Tderef id |} -> get_env id sigma
+  | {| term_node = Tbin t1 op t2 |} ->
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
   end
 
@@ -267,24 +284,24 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
 
 function msubst_term (t:term) (r:mident) (v:ident) : term =
   match t with
-  | Tvalue _ | Tvar _  -> t
-  | Tderef x -> if r = x then mk_tvar v else t
-  | Tbin t1 op t2  ->
+  | {| term_node = Tvalue _ | Tvar _ |} -> t
+  | {| term_node = Tderef x |} -> if r = x then mk_tvar v else t
+  | {| term_node = Tbin t1 op t2 |} ->
       mk_tbin (msubst_term t1 r v) op (msubst_term t2 r v) 
   end
 
 function subst_term (t:term) (r:ident) (v:ident) : term =
   match t with
-  | Tvalue _ | Tderef _  -> t
-  | Tvar x  ->
+  | {| term_node = Tvalue _ | Tderef _ |} -> t
+  | {| term_node = Tvar x |} ->
       if r = x then mk_tvar v else t
-  | Tbin t1 op t2  ->
+  | {| term_node = Tbin t1 op t2 |} ->
      mk_tbin (subst_term t1 r v) op (subst_term t2 r v)
   end
 
 (** [fresh_in_term id t] is true when [id] does not occur in [t] *)
 predicate fresh_in_term (id:ident) (t:term) =
-    not (var_occurs_in_term id t)
+  id.ident_index > t.term_maxvar
 
 lemma fresh_in_binop:
   forall t t':term, op:operator, v:ident.
