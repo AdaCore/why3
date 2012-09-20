@@ -43,266 +43,12 @@ let search_labels f =
       accumulator *)
    search_labels { expl = None; trace = [] } f
 
-type key = int
-(* The key type, with which we identify nodes in the Why3 VC tree *)
-
-type goal = key Session.goal
-(* the type of goals; a goal is an elementary VC *)
-
-module GoalHash = struct
-   (* module to provide hashing and fast equality on goals *)
-   type t = goal
-   let equal a b = a.Session.goal_key = b.Session.goal_key
-   let hash a = a.Session.goal_key
-end
-module GoalMap = Hashtbl.Make (GoalHash)
-(* module to provide a map on goals *)
-
-module GoalSet : sig
-   (* module to provide mutable sets on goals *)
-   type t
-   val empty : unit -> t
-   val is_empty : t -> bool
-   val add : t -> goal -> unit
-   val remove : t -> goal -> unit
-   val choose : t -> goal
-   val mem    : t -> goal -> bool
-   val count  : t -> int
-end =
-struct
-   type t = unit GoalMap.t
-
-   let empty () = GoalMap.create 3
-   let is_empty t = GoalMap.length t = 0
-   let add t x = GoalMap.add t x ()
-   let remove t x = GoalMap.remove t x
-   let mem t x = GoalMap.mem t x
-   let count t = GoalMap.length t
-
-   exception Found of goal
-   let choose t =
-      try
-         GoalMap.iter (fun k () -> raise (Found k)) t;
-         raise Not_found
-      with Found k -> k
-end
-
-module Objectives : sig
-   (* The module dealing with the mapping between objectives and goals.
-
-      An objective is something to be proved in Ada, say, a range check. A goal
-      is a VC that will be sent to Alt-Ergo. In general, there will be many
-      goals for each objective. Each objective is identified with an
-      explanation (reason + Ada location), and each goal comes with a trace
-      (list of locations).
-      *)
-
-
-   val add_to_expl : Gnat_expl.expl -> goal -> Gnat_loc.loc list -> unit
-   (* register the goal with the given objective and trace. If this is the
-      first time we register a goal for given objective, the objective is
-      registered as well. Only do the registering if the objective is to de
-      discharged (ie, if the --limit-subp / --limit-line directives apply). *)
-
-   val add_expl    : Gnat_expl.expl -> unit
-   (* register an objective without associating a goal (useful for trivial
-      goals) *)
-
-   val add_clone   : derive:goal -> goal -> unit
-   (* [add_clone ~derive:from new_goal] adds [new_goal] to the objective of
-      [from], with the same trace as [from] *)
-
-   val discharge   : goal -> GoalSet.t
-   (* Assume that the goal is proven, return the set of remaining goals for the
-      same objective *)
-
-   val set_not_interesting : goal -> unit
-   (* Goals can be not interesting, when they are trivial *)
-
-   val is_not_interesting : goal -> bool
-   val is_interesting : goal -> bool
-   (* query the "interesting" bit *)
-
-   val get_goals : Gnat_expl.expl -> GoalSet.t
-   (* get all remaining goals for a given objective *)
-
-   val get_objective : goal -> Gnat_expl.expl
-   (* get the objective associated with a goal *)
-
-   val get_trace : goal -> Gnat_loc.loc list
-   (* get the trace of a given goal *)
-
-   val iter : (Gnat_expl.expl -> GoalSet.t -> unit) -> unit
-   (* iterate over all objectives *)
-
-   val stat : unit -> unit
-   (* print statistics *)
-
-   val get_num_goals : unit -> int
-   (* return the number of goals *)
-end = struct
-
-   let nb_objectives = ref 0
-   let nb_goals = ref 0
-
-   let explmap : GoalSet.t Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
-   (* maps proof objectives to goals *)
-
-   let goalmap : Gnat_expl.expl GoalMap.t = GoalMap.create 17
-   (* maps goals to their objectives *)
-
-   let tracemap : Gnat_loc.loc list GoalMap.t = GoalMap.create 17
-
-   let get_goals expl = Gnat_expl.HExpl.find explmap expl
-   let get_objective goal = GoalMap.find goalmap goal
-   let get_trace goal = GoalMap.find tracemap goal
-
-   let find e =
-      try get_goals e
-      with Not_found ->
-         let r = GoalSet.empty () in
-         Gnat_expl.HExpl.add explmap e r;
-         incr nb_objectives;
-         r
-
-   let add_to_expl ex go trace_list =
-      let filter =
-         match Gnat_config.limit_line with
-         | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
-         | None ->
-             match Gnat_config.limit_subp with
-             | None -> true
-             | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_subp_loc ex)
-      in
-      if filter then begin
-         incr nb_goals;
-         GoalMap.add goalmap go ex;
-         let set = find ex in
-         GoalSet.add set go;
-         GoalMap.add tracemap go trace_list
-      end
-
-   let add_expl e = ignore (find e)
-
-   let add_clone ~derive goal =
-      let obj = get_objective derive in
-      let trace = get_trace derive in
-      add_to_expl obj goal trace
-
-   let discharge goal =
-      let expl = get_objective goal in
-      let goalset = get_goals expl in
-      GoalSet.remove goalset goal;
-      goalset
-
-   let not_interesting : GoalSet.t = GoalSet.empty ()
-   let set_not_interesting x = GoalSet.add not_interesting x
-   let is_not_interesting x = GoalSet.mem not_interesting x
-   let is_interesting x = not (is_not_interesting x)
-
-   let iter f = Gnat_expl.HExpl.iter f explmap
-
-   let stat () =
-      Format.printf "Obtained %d proof objectives and %d VCs@."
-        !nb_objectives !nb_goals
-
-   let get_num_goals () = !nb_goals
-end
-
 let print ?(endline=true) b task expl =
    (* Print a positive or negative message for objectives *)
    if endline then
       Format.printf "%a@." (Gnat_expl.print_expl b task) expl
    else
       Format.printf "%a" (Gnat_expl.print_expl b task) expl
-
-let count = ref 0
-
-let keygen ?parent () =
-   ignore (parent);
-   incr count;
-   !count
-
-module Scheduler = Session_scheduler.Base_scheduler (struct end)
-(* a simple scheduler provided by the Why3 library *)
-
-module Implem =
-   (* Simplify the base scheduler above, and provide the right interface for
-    * the Session_scheduler functor *)
-  struct
-
-     type key = int
-
-     let create = keygen
-
-     let remove _ = ()
-
-     let reset () = ()
-
-     let notify _ = ()
-     let init _ _ = ()
-     let timeout ~ms x = Scheduler.timeout ~ms x
-     let idle x    = Scheduler.idle x
-     let notify_timer_state _ _ _= ()
-
-     let uninstalled_prover _ _ = Whyconf.CPU_keep
-  end
-
-module M = Session_scheduler.Make (Implem)
-(* this is the module for interaction with the Why3 scheduler *)
-
-let sched_state = M.init Gnat_config.parallel
-let project_dir = Session.get_project_dir Gnat_config.filename
-
-let env_session, is_new_session =
-   (* either create a new session, or read an existing ession *)
-   let session, is_new_session =
-      if Sys.file_exists project_dir then
-         Session.read_session project_dir, false
-      else
-         Session.create_session project_dir, true in
-   let env_session, (_:bool) =
-      M.update_session ~allow_obsolete:true session Gnat_config.env
-      Gnat_config.config in
-   env_session, is_new_session
-
-let iter_main_goals fu =
-   (* Main goals are at the following point in the theory:
-        session -> file -> theory -> subgoal
-                                     *here*
-
-      They correspond to program functions (one big goal for each program)
-   *)
-   Session.session_iter (fun any ->
-      match any with
-      | Session.File f ->
-            Session.file_iter (fun any ->
-               match any with
-               | Session.Theory t ->
-                     Session.theory_iter (fun any ->
-                        match any with
-                        | Session.Goal g ->
-                              fu g
-                        | _ -> ()) t
-               | _ -> ()) f
-      | _ -> ()) env_session.Session.session
-
-let iter_leaf_goals f =
-   (* Leaf goals are at the following point in the theory:
-        session -> file -> theory -> subgoal -> transformation -> subgoal
-                                                                  *here*
-      A leaf goal corresponds to a "goal", ie a VC sent to Alt-Ergo
-   *)
-   iter_main_goals (fun g ->
-      Session.goal_iter (fun any ->
-         match any with
-         | Session.Transf t
-            when t.Session.transf_name = Gnat_config.split_name ->
-               Session.transf_iter (fun any ->
-                  match any with
-                  | Session.Goal g -> f g
-                  | _ -> ()) t
-         | _ -> ()) g)
 
 let rec is_trivial fml =
    (* Check wether the formula is trivial.  *)
@@ -329,40 +75,31 @@ let register_goal goal =
    let fml = Task.task_goal_fmla task in
    match is_trivial fml, search_labels fml with
    | true, { expl = None } ->
-         Objectives.set_not_interesting goal
+         Gnat_objectives.set_not_interesting goal
    | _, { expl = None } ->
          Gnat_util.abort_with_message
          "Task has no tracability label."
    | _, { expl = Some e ; trace = l } ->
-         Objectives.add_to_expl e goal l
-
-let goal_has_been_tried g =
-   (* Check whether the goal has been tried already *)
-   try
-      Session.goal_iter (fun child ->
-         match child with
-         | Session.Proof_attempt pa ->
-               (* only count non-obsolete proof attempts with identical
-                  options *)
-               if not pa.Session.proof_obsolete &&
-               pa.Session.proof_prover = Gnat_config.prover.Whyconf.prover &&
-               pa.Session.proof_timelimit = Gnat_config.timeout then
-                  raise Exit
-         | _ -> ()) g;
-      false
-   with Exit -> true
+         Gnat_objectives.add_to_objective e goal l
 
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
-   val save_vc : goal -> unit
+   val save_vc : Gnat_objectives.goal -> unit
    (* Save the goal to a file *)
 
-   val save_trace : goal -> unit
+   val save_trace : Gnat_objectives.goal -> unit
    (* save the trace to a file *)
+
+   val vc_file : Gnat_objectives.goal -> string
+   (* get the file name for a given goal *)
 end = struct
 
    let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
+
+   module GM = Gnat_objectives.GoalMap
+
+   let goal_map : string GM.t = GM.create 17
 
    let find expl =
       try Gnat_expl.HExpl.find count_map expl
@@ -370,6 +107,9 @@ end = struct
          let r = ref 0 in
          Gnat_expl.HExpl.add count_map expl r;
          r
+
+   let vc_file goal =
+      GM.find goal_map goal
 
    let with_fmt_channel filename f =
       let cout = open_out filename in
@@ -387,45 +127,24 @@ end = struct
       else base ^ "_" ^ string_of_int n ^ suffix
 
    let save_vc goal =
-      let expl = Objectives.get_objective goal in
+      let expl = Gnat_objectives.get_objective goal in
       let task = Session.goal_task goal in
       let dr = Gnat_config.prover_driver in
       let vc_fn = vc_name expl in
+      GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
       Format.printf "saved VC to %s@." vc_fn
 
    let save_trace goal =
-      let expl = Objectives.get_objective goal in
+      let expl = Gnat_objectives.get_objective goal in
       let base = Gnat_expl.to_filename expl in
       let trace_fn = base ^ ".trace" in
       with_fmt_channel trace_fn (fun fmt ->
          List.iter (fun l ->
             Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
            (Gnat_loc.orig_loc l))
-      (Objectives.get_trace goal))
+      (Gnat_objectives.get_trace goal))
 
-end
-
-module Display_Progress : sig
-  val set_num_goals : int -> unit
-  val complete_goals : int -> unit
-  val incr_num_goals : unit -> unit
-end = struct
-
-  let total_num_goals = ref 0
-  let current_num_goals = ref 0
-
-  let set_num_goals num = total_num_goals := num
-
-  let incr_num_goals () = incr total_num_goals
-
-  let complete_goals num =
-    if Gnat_config.ide_progress_bar then begin
-      current_num_goals := !current_num_goals + num;
-      Format.printf "completed %d out of %d (%d%%)...@."
-        !current_num_goals !total_num_goals
-        (!current_num_goals * 100 / !total_num_goals)
-    end
 end
 
 let is_full_split_goal goal =
@@ -438,55 +157,32 @@ let rec handle_vc_result goal result detailed =
        result    a boolean, true if the prover has proved the VC
        detailed  a boolean, true if detailed reports are requested
    *)
-   let remaining = Objectives.discharge goal in
-   if result then begin
-      Display_Progress.complete_goals 1;
-      if GoalSet.is_empty remaining then begin
-         match Gnat_config.report with
+   let obj, status = Gnat_objectives.register_result goal result in
+   Gnat_objectives.display_progress ();
+   match status with
+   | Gnat_objectives.Proved ->
+         begin match Gnat_config.report with
          | (Gnat_config.Verbose | Gnat_config.Detailed) ->
-               print true (Session.goal_task goal)
-                 (Objectives.get_objective goal)
+               print true (Session.goal_task goal) obj
          | _ -> ()
-      end else begin
-         schedule_goal (GoalSet.choose remaining)
-      end
-   end else begin
-      Display_Progress.complete_goals (GoalSet.count remaining + 1);
-      (* When a "leaf goal" has not been proved, we try to further split it.
-         Here we don't know yet, whether "goal" is an original VC or if it has
-         been split already. We check that first. Then we check whether an
-         additional split actually gives new goals. Only in that case do we add
-         new goals, in all other cases we give up and declare the goal as not
-         proved. *)
-      try
-         if is_full_split_goal goal then raise Exit;
-         let transf =
-           Session.add_registered_transformation
-              ~keygen env_session Gnat_split_conj.split_conj_name goal in
-         let new_goals = transf.Session.transf_goals in
-         if List.length new_goals <= 1 then begin
-            Session.remove_transformation transf;
-            raise Exit
-         end else begin
-            List.iter (fun g ->
-               Objectives.add_clone ~derive:goal g;
-               Display_Progress.incr_num_goals ()) new_goals;
-            schedule_goal (List.hd new_goals)
          end
-      with Exit ->
+   | Gnat_objectives.Not_Proved ->
          if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
          begin
             let detailed =
                match detailed with None -> assert false | Some x -> x in
             print ~endline:false false (Session.goal_task goal)
-               (Objectives.get_objective goal);
+               (Gnat_objectives.get_objective goal);
             Format.printf " (%a)@." Call_provers.print_prover_answer detailed
          end else begin
             print false (Session.goal_task goal)
-              (Objectives.get_objective goal)
+              (Gnat_objectives.get_objective goal)
          end;
          Save_VCs.save_trace goal
-   end
+   | Gnat_objectives.Work_Left ->
+         match Gnat_objectives.next obj with
+         | Some g -> schedule_goal g
+         | None -> ()
 
 and interpret_result pa pas =
    (* callback function for the scheduler, here we filter if an interesting
@@ -494,20 +190,19 @@ and interpret_result pa pas =
    match pas with
    | Session.Done r ->
          let goal = pa.Session.proof_parent in
-         if (Objectives.is_interesting goal) then begin
-            let answer = r.Call_provers.pr_answer in
-            if answer = Call_provers.HighFailure then begin
-               Format.eprintf "An error occured when calling alt-ergo@.";
-               if Gnat_config.verbose then begin
-                  Format.eprintf "%s@." r.Call_provers.pr_output
-               end;
+         let answer = r.Call_provers.pr_answer in
+         if answer = Call_provers.HighFailure then begin
+            Format.eprintf "An error occured when calling alt-ergo@.";
+            if Gnat_config.verbose then begin
+               Format.eprintf "%s@." r.Call_provers.pr_output
             end;
-            handle_vc_result goal (answer = Call_provers.Valid) (Some answer)
-         end
-   | _ -> ()
+         end;
+         handle_vc_result goal (answer = Call_provers.Valid) (Some answer)
+   | _ ->
+         ()
 
 
-and schedule_goal g =
+and schedule_goal (g : Gnat_objectives.goal) =
    (* schedule a goal for proof - the goal may not be scheduled actually,
       because we detect that it is not necessary. This may have several
       reasons:
@@ -517,8 +212,9 @@ and schedule_goal g =
    *)
 
    (* first deal with command line options *)
-   if Gnat_config.debug then
+   if Gnat_config.debug then begin
       Save_VCs.save_vc g;
+   end;
    if Gnat_config.force then
       actually_schedule_goal g
    else
@@ -528,7 +224,7 @@ and schedule_goal g =
       if g.Session.goal_verified then begin
          handle_vc_result g true None
       (* Maybe there was a previous proof attempt with identical parameters *)
-      end else if goal_has_been_tried g then begin
+      end else if Gnat_objectives.goal_has_been_tried g then begin
          (* the proof attempt was necessarily false *)
          handle_vc_result g false None
       end else begin
@@ -537,36 +233,7 @@ and schedule_goal g =
    end
 
 and actually_schedule_goal g =
-   (* actually schedule the goal, ie call the prover. This function returns
-      immediately. *)
-   M.prover_on_goal env_session sched_state
-     ~callback:interpret_result
-     ~timelimit:Gnat_config.timeout
-     ~memlimit:0
-     Gnat_config.prover.Whyconf.prover g
-
-let apply_split_goal_if_needed g =
-   (* before doing any proofs, we apply "split" to all "main goals" (see
-      iter_main_goals). This function applies that transformation, but only
-      when needed. *)
-   if Session.PHstr.mem g.Session.goal_transformations Gnat_config.split_name
-   then ()
-   else
-      ignore
-        (Session.add_registered_transformation
-           ~keygen env_session Gnat_config.split_name g)
-
-let has_file session =
-   (* Check whether the session has a file associated with it. Sessions without
-      files can happen in strange cases (gnatwhy3 crashes in the wrong moment)
-      *)
-   try
-      Session.session_iter (fun any ->
-         match any with
-         | Session.File _ -> raise Exit
-         | _ -> ()) session.Session.session;
-      false
-   with Exit -> true
+   Gnat_objectives.schedule_goal interpret_result g
 
 let _ =
    (* This is the main code. We read the file into the session if not already
@@ -574,31 +241,23 @@ let _ =
       the first VC of all objectives. When done, we save the session.
    *)
    try
-      if is_new_session || not (has_file env_session) then begin
-         (* This is a brand new session, simply apply the transformation
-            "split_goal" to the entire file *)
-         let file = M.add_file env_session
-           (Sysutil.relativize_filename project_dir Gnat_config.filename) in
-         M.transform env_session sched_state ~context_unproved_goals_only:false
-         Gnat_config.split_name (Session.File file)
-      end else begin
-         iter_main_goals apply_split_goal_if_needed
-      end;
-      (* apply transformation *)
-      Scheduler.main_loop ();
-      iter_leaf_goals register_goal;
+      Gnat_objectives.init ();
+      Gnat_objectives.iter_leaf_goals register_goal;
       if Gnat_config.verbose then begin
-         Objectives.stat ()
+         Gnat_objectives.stat ()
       end;
-      Display_Progress.set_num_goals (Objectives.get_num_goals ());
-      Objectives.iter (fun expl goalset ->
-         if GoalSet.is_empty goalset then begin
-            Format.printf "%a@." Gnat_expl.print_simple_proven expl
+      Gnat_objectives.iter (fun obj ->
+         if Gnat_objectives.objective_status obj =
+            Gnat_objectives.Proved then begin
+            Format.printf "%a@." Gnat_expl.print_simple_proven obj
          end else begin
-         schedule_goal (GoalSet.choose goalset)
+            match Gnat_objectives.next obj with
+            | Some g -> schedule_goal g
+            | None -> ()
          end);
-      Scheduler.main_loop ();
-      Session.save_session Gnat_config.config env_session.Session.session
+      Gnat_objectives.do_scheduled_jobs ();
+      (* should do nothing *)
+      Gnat_objectives.save_session ()
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""
