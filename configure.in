@@ -394,7 +394,7 @@ else
                 cp -f src/coq-tactic/coqCompat.8.3.ml src/coq-tactic/coqCompat.ml
                 AC_MSG_RESULT($COQVERSION)
                 ;;
-          8.*|trunk)
+          8.4*|trunk)
 	        enable_coq_support=yes
                 cp -f src/coq-tactic/coqCompat.8.4.ml src/coq-tactic/coqCompat.ml
                 AC_MSG_RESULT($COQVERSION)
@@ -402,7 +402,7 @@ else
           *)
                 enable_coq_support=no
 	        AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
-                reason_coq_support=" (need version 8.3 or later)"
+                reason_coq_support=" (version is $COQVERSION but need version 8.3 or higher)"
                 ;;
         esac
     fi
