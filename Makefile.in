@@ -1236,7 +1236,7 @@ doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
 # the dependency on the pdf ensures the bbl was built
-doc/html/manual.html: doc/manual.pdf
+doc/html/manual.html: doc/manual.pdf doc/fix.hva
 	cd doc; rm -rf html; mkdir -p html
 	cp doc/manual.bbl doc/html/
 	cd doc; $(HEVEA) -o html/manual.html -fix fix.hva makeidx.hva manual.tex
