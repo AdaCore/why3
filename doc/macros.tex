@@ -39,7 +39,16 @@
 \RequirePackage{listings}
 \RequirePackage{amssymb}
 
-\lstset{basicstyle={\ttfamily},framesep=2pt,frame=single}
+\lstset{
+  basicstyle={\ttfamily},
+  framesep=2pt,
+  frame=single,
+  keywordstyle={\color{blue}},
+  stringstyle=\itshape,
+  commentstyle=\itshape,
+  columns=[l]fullflexible,
+  showstringspaces=false,
+}
 
 \lstdefinelanguage{why3}
 {
@@ -48,13 +57,7 @@ import,export,theory,module,end,in,with,%
 let,rec,for,to,do,done,match,if,then,else,while,try,invariant,variant,%
 absurd,raise,assert,exception,%
 goal,axiom,lemma,forall},%
-keywordstyle={\color{blue}},%
-otherkeywords={},%
 string=[b]",%
-showstringspaces=false,%
-stringstyle=\itshape,%
-commentstyle=\itshape,%
-columns=[l]fullflexible,%
 sensitive=true,%
 morecomment=[s]{(*}{*)},%
 keepspaces=true,
@@ -82,6 +85,7 @@ literate=%
 }
 
 \lstnewenvironment{whycode}{\lstset{language=why3}}{}
+\lstnewenvironment{ocamlcode}{\lstset{language={[Objective]Caml}}}{}
 
 %%% Local Variables:
 %%% mode: latex
