@@ -258,20 +258,22 @@ let _ =
    try
       Gnat_objectives.init ();
       Gnat_objectives.iter_subps (fun subp ->
-         Gnat_objectives.init_subp_vcs subp;
-         Gnat_objectives.iter_leaf_goals ~subp register_goal;
-         Gnat_objectives.stat ();
-         Gnat_objectives.iter (fun obj ->
-         if Gnat_objectives.objective_status obj =
-            Gnat_objectives.Proved then begin
-            Format.printf "%a@." Gnat_expl.print_simple_proven obj
-         end else begin
-            match Gnat_objectives.next obj with
-            | Some g -> schedule_goal g
-            | None -> ()
-         end);
+         if Gnat_objectives.matches_subp_filter subp then begin
+            Gnat_objectives.init_subp_vcs subp;
+            Gnat_objectives.iter_leaf_goals ~subp register_goal;
+            Gnat_objectives.stat ();
+            Gnat_objectives.iter (fun obj ->
+            if Gnat_objectives.objective_status obj =
+               Gnat_objectives.Proved then begin
+               Format.printf "%a@." Gnat_expl.print_simple_proven obj
+            end else begin
+               match Gnat_objectives.next obj with
+               | Some g -> schedule_goal g
+               | None -> ()
+            end);
          Gnat_objectives.do_scheduled_jobs ();
-         Gnat_objectives.clear ());
+         Gnat_objectives.clear ()
+      end);
       Gnat_objectives.save_session ()
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;

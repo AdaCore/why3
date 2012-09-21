@@ -147,3 +147,6 @@ val init_subp_vcs : subp -> unit
 
 val clear : unit -> unit
 (* delete all info from the database, except for the session tree itself *)
+
+val matches_subp_filter : subp -> bool
+(* check if the subprogram is filtered by command line option --limit-subp *)

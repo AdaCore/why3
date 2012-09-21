@@ -16,7 +16,7 @@ let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 
 let opt_limit_line : Gnat_loc.loc option ref = ref None
-let opt_limit_subp : Gnat_loc.loc option ref = ref None
+let opt_limit_subp : string option ref = ref None
 
 let set_filename s =
    if !opt_filename = None then
@@ -54,7 +54,7 @@ let parse_line_spec caller s =
         ": incorrect line specification - does not end with line number")
 
 let set_limit_line s = opt_limit_line := Some (parse_line_spec "limit-line" s)
-let set_limit_subp s = opt_limit_subp := Some (parse_line_spec "limit-subp" s)
+let set_limit_subp s = opt_limit_subp := Some s
 
 let usage_msg =
   "Usage: gnatwhy3 [options] file"
@@ -165,7 +165,12 @@ let force = !opt_force
 let noproof = !opt_noproof
 let split_name = "split_goal"
 let limit_line = !opt_limit_line
-let limit_subp = !opt_limit_subp
+
+let limit_subp =
+   match !opt_limit_subp with
+   | None -> None
+   | Some s -> Some (Ident.create_label ("GP_Subp:" ^ s))
+
 let ide_progress_bar = !opt_ide_progress_bar
 let parallel = !opt_parallel
 

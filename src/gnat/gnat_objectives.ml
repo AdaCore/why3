@@ -131,10 +131,7 @@ let add_to_objective ex go trace_list =
    let filter =
       match Gnat_config.limit_line with
       | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
-      | None ->
-          match Gnat_config.limit_subp with
-          | None -> true
-          | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_subp_loc ex)
+      | None -> true
    in
    if filter then begin
       incr total_nb_goals;
@@ -272,8 +269,10 @@ let get_num_goals_done () =
    !nb_goals_done
 
 let stat () =
-   Format.printf "Obtained %d proof objectives and %d VCs@."
-   !nb_objectives ! total_nb_goals
+   if Gnat_config.verbose then begin
+      Format.printf "Obtained %d proof objectives and %d VCs@."
+      !nb_objectives ! total_nb_goals
+   end
 
 module Base_Sched = Session_scheduler.Base_scheduler (struct end)
 (* a simple scheduler provided by the Why3 library *)
@@ -441,3 +440,12 @@ let display_progress () =
    end
 
 let iter_subps = iter_main_goals
+
+let matches_subp_filter subp =
+   match Gnat_config.limit_subp with
+   | None -> true
+   | Some lab ->
+         let task = Session.goal_task subp in
+         let goal_ident = (Task.task_goal task).Decl.pr_name in
+         let label_set = goal_ident.Ident.id_label in
+         Ident.Slab.mem lab label_set

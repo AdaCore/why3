@@ -44,7 +44,7 @@ val split_name : string
 val limit_line : Gnat_loc.loc option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 
-val limit_subp : Gnat_loc.loc option
+val limit_subp : Ident.label option
 (* set if option --limit-subp was given; we only prove VCs from that subprogram
    *)
 
