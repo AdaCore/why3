@@ -13,12 +13,12 @@
 \newif\ifspace
 \newif\ifnewentry
 \newcommand{\addspace}{\ifspace ~ \spacefalse \fi}
-\newcommand{\term}[2]{\addspace\hbox{\lstinline|#1|%
+\newcommand{\term}[2]{\addspace\mbox{\lstinline|#1|%
 \ifthenelse{\equal{#2}{}}{}{\indexttbase{#2}{#1}}}\spacetrue}
 \newcommand{\nonterm}[2]{%
   \ifthenelse{\equal{#2}{}}%
-             {\addspace\hbox{\textsl{#1}\ifnewentry\index{#1@\textsl{#1}}\fi}\spacetrue}%
-             {\addspace\hbox{\textsl{#1}\footnote{#2}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}}
+             {\addspace\mbox{\textsl{#1}\ifnewentry\index{#1@\textsl{#1}}\fi}\spacetrue}%
+             {\addspace\mbox{\textsl{#1}\footnote{#2}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}}
 \newcommand{\repetstar}{$^*$\spacetrue}
 \newcommand{\repetplus}{$^+$\spacetrue}
 \newcommand{\repetone}{$^?$\spacetrue}
@@ -61,7 +61,8 @@ string=[b]",%
 sensitive=true,%
 morecomment=[s]{(*}{*)},%
 keepspaces=true,
-literate=%
+}
+%literate=%
 %{'a}{$\alpha$}{1}%
 %{'b}{$\beta$}{1}%
 %{<}{$<$}{1}%
@@ -80,9 +81,6 @@ literate=%
 % %{-->}{$\longrightarrow$}{2}%
 % {->}{$\rightarrow$}{2}%
 % {<->}{$\leftrightarrow$}{2}%
-%
-%
-}
 
 \lstnewenvironment{whycode}{\lstset{language=why3}}{}
 \lstnewenvironment{ocamlcode}{\lstset{language={[Objective]Caml}}}{}
