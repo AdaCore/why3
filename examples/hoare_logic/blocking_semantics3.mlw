@@ -28,6 +28,9 @@ axiom mident_decide :
 
 (** ident for immutable variables *)
 type ident = {| ident_index : int |}
+ 
+axiom ident_decide :
+  forall m1 m2: ident. m1 = m2 \/ m1 <> m2
 
 (** Terms *)
 type term =
@@ -384,7 +387,7 @@ lemma eval_swap:
 
  (* Need it for monotonicity*)
 lemma eval_change_free :
-  forall f:fmla, sigma:env, pi:stack, id:ident, v:value.
+  forall sigma:env, pi:stack, f:fmla, id:ident, v:value.
     fresh_in_fmla id f ->
     (eval_fmla sigma (Cons (id,v) pi) f <-> eval_fmla sigma pi f)
 
