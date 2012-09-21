@@ -256,7 +256,6 @@ let _ =
             | None -> ()
          end);
       Gnat_objectives.do_scheduled_jobs ();
-      (* should do nothing *)
       Gnat_objectives.save_session ()
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
