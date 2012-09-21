@@ -14,53 +14,6 @@ Existing Instance list_WhyType.
 Implicit Arguments Nil [[a] [a_WT]].
 Implicit Arguments Cons [[a] [a_WT]].
 
-(* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
 Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
 Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
   (b:Type) {b_WT:WhyType b}, WhyType (map a b).
@@ -431,64 +384,30 @@ Axiom eval_same_var_term : forall (t:term) (sigma:(map mident value))
   ((eval_term sigma (Cons (id, v1) (Cons (id, v2) pi)) t) = (eval_term sigma
   (Cons (id, v1) pi) t)).
 
-Axiom eval_same_var : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (id:ident) (v1:value) (v2:value), (eval_fmla sigma
-  (Cons (id, v1) (Cons (id, v2) pi)) f) <-> (eval_fmla sigma (Cons (id, v1)
-  pi) f).
-
-Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-  (~ (id1 = id2)) -> ((eval_term sigma (Cons (id1, v1) (Cons (id2, v2) pi))
-  t) = (eval_term sigma (Cons (id2, v2) (Cons (id1, v1) pi)) t)).
-
-Axiom eval_swap_any : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
-
 (* Why3 goal *)
-Theorem eval_swap : forall (f:fmla),
+Theorem eval_same_var : forall (f:fmla),
   match f with
   | (Fterm t) => True
   | (Fand f1 f2) => True
   | (Fnot f1) => True
   | (Fimplies f1 f2) => True
   | (Flet i t f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-      (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2)
-      pi)) f1) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi))
-      f1))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-      (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2)
-      pi)) f) -> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f))
+      value)%type)) (id:ident) (v1:value) (v2:value), (eval_fmla sigma
+      (Cons (id, v1) (Cons (id, v2) pi)) f1) <-> (eval_fmla sigma (Cons (id,
+      v1) pi) f1)) -> forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (id:ident) (v1:value) (v2:value), (eval_fmla sigma
+      (Cons (id, v1) (Cons (id, v2) pi)) f) -> (eval_fmla sigma (Cons (id,
+      v1) pi) f)
   | (Fforall i d f1) => True
   end.
 destruct f; auto.
-intros H sigma pi id1 id2 v1 v2 H1 H2.
-simpl in *.
-rewrite eval_swap_term in H2; auto.
-destruct (ident_decide i id2).
-(* i = id1*)
+simpl.
+intros H_induc sigma pi id v1 v2 H.
+destruct (ident_decide i id).
+(* i = id *)
 subst.
-apply H in H2; auto.
-destruct (ident_decide i id1).
-(* i = id1*)
-subst.
-apply H; auto.
 
-
-
-simpl in *.
-rewrite eval_swap_term in H2; auto.
-apply eval_same_var.
-
-
-
-
- eval_same_var_term.
-
-(* i <> id2*)
+(* i <> id *)
 
 Qed.
 

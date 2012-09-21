@@ -436,60 +436,57 @@ Axiom eval_same_var : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   (Cons (id, v1) (Cons (id, v2) pi)) f) <-> (eval_fmla sigma (Cons (id, v1)
   pi) f).
 
-Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-  (~ (id1 = id2)) -> ((eval_term sigma (Cons (id1, v1) (Cons (id2, v2) pi))
-  t) = (eval_term sigma (Cons (id2, v2) (Cons (id1, v1) pi)) t)).
-
-Axiom eval_swap_any : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
-
 (* Why3 goal *)
-Theorem eval_swap : forall (f:fmla),
-  match f with
-  | (Fterm t) => True
-  | (Fand f1 f2) => True
-  | (Fnot f1) => True
-  | (Fimplies f1 f2) => True
-  | (Flet i t f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-      (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2)
-      pi)) f1) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi))
-      f1))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-      (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2)
-      pi)) f) -> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f))
-  | (Fforall i d f1) => True
+Theorem eval_swap_term_any : forall (t:term),
+  match t with
+  | (Tvalue v) => True
+  | (Tvar i) => forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (l:(list (ident* value)%type)) (id1:ident) (id2:ident)
+      (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_term sigma
+      (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi)))
+      t) = (eval_term sigma (infix_plpl l (Cons (id2, v2) (Cons (id1, v1)
+      pi))) t))
+  | (Tderef m) => True
+  | (Tbin t1 o t2) => True
   end.
-destruct f; auto.
-intros H sigma pi id1 id2 v1 v2 H1 H2.
-simpl in *.
-rewrite eval_swap_term in H2; auto.
-destruct (ident_decide i id2).
-(* i = id1*)
-subst.
-apply H in H2; auto.
+destruct t;auto.
+intros.
+simpl.
+induction l.
+(* l = Nil *)
+simpl.
 destruct (ident_decide i id1).
-(* i = id1*)
 subst.
-apply H; auto.
-
-
-
-simpl in *.
-rewrite eval_swap_term in H2; auto.
-apply eval_same_var.
-
-
-
-
- eval_same_var_term.
-
-(* i <> id2*)
-
+pattern (get_stack id1 (Cons (id1, v1) (Cons (id2, v2) pi))); 
+rewrite get_stack_eq.
+rewrite get_stack_neq; auto.
+rewrite get_stack_eq; auto.
+(* i <> id1 *)
+  destruct (ident_decide i id2).
+  (* i = id2 *)
+  subst.
+  pattern (get_stack id2 (Cons (id2, v2) (Cons (id1, v1) pi))); 
+  rewrite get_stack_eq.
+  rewrite get_stack_neq; auto.
+  rewrite get_stack_eq; auto.
+  (* i <> id2 *)
+  rewrite get_stack_neq; auto.
+  rewrite get_stack_neq; auto.
+  rewrite get_stack_neq; auto.
+  rewrite get_stack_neq; auto.
+(* Cons *)
+simpl.
+destruct a.
+destruct (ident_decide i0 i).
+(* i = i0 *)
+subst.
+pattern (get_stack i 
+    (Cons (i, v) (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))))); 
+rewrite get_stack_eq; auto.
+rewrite get_stack_eq; auto.
+(* i <> i0 *)
+rewrite get_stack_neq; auto.
+rewrite get_stack_neq; auto.
 Qed.
 
 

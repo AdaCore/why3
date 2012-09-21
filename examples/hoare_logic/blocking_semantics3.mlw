@@ -9,6 +9,7 @@ use import int.Int
 use import int.MinMax
 use import bool.Bool
 use export list.List
+use export list.Append
 use map.Map as IdMap
 
 (** types and values *)
@@ -107,6 +108,7 @@ function get_vartype (i:ident) (pi:type_stack) : datatype =
   | Cons (x,ty) r -> if x=i then ty else get_vartype i r
   end
 
+    
 type type_env = IdMap.map mident datatype  (* map global mutable variables to their type *)
 function get_reftype (i:mident) (e:type_env) : datatype = IdMap.get e i
 
@@ -238,7 +240,7 @@ function eval_term (sigma:env) (pi:stack) (t:term) : value =
   |  Tderef id  -> get_env id sigma
   |  Tbin t1 op t2  ->
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
-  end
+end
 
 
 lemma eval_bool_term:
@@ -293,7 +295,7 @@ lemma fresh_in_binop:
   forall t t':term, op:operator, v:ident.
     fresh_in_term v (mk_tbin t op t') ->
       fresh_in_term v t  /\ fresh_in_term v t'
-	  
+ 
 lemma eval_msubst_term:
   forall e:term, sigma:env, pi:stack, x:mident, v:ident.
     fresh_in_term v e ->
@@ -373,11 +375,23 @@ lemma eval_same_var:
     eval_fmla sigma (Cons (id,v1) (Cons (id,v2) pi)) f <->
     eval_fmla sigma (Cons (id,v1) pi) f
 
+lemma eval_swap_term_any:
+  forall t:term, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
+    id1 <> id2 ->
+    (eval_term sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) t =
+    eval_term sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) t)
+
 lemma eval_swap_term:
   forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->
     (eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t =
     eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t)
+
+lemma eval_swap_any:
+  forall f:fmla, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
+    id1 <> id2 ->
+    (eval_fmla sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) f <->
+    eval_fmla sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) f)
 
 lemma eval_swap:
   forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
