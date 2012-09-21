@@ -228,8 +228,6 @@ we can launch the following command:
 > why3 lists.why -T SortedIntList
 \end{verbatim}
 to see the resulting theory \texttt{SortedIntList}:
-\ifhevea
-\else
 \begin{whycode}
 theory SortedIntList
   (* use BuiltIn *)
@@ -258,7 +256,6 @@ theory SortedIntList
     prop Le_refl2 = Le_refl *)
 end
 \end{whycode}
-\fi
 
 In conclusion, let us briefly explain the concept of namespaces
 in \why. Both \texttt{use} and \texttt{clone} instructions can
