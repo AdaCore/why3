@@ -64,6 +64,7 @@ DEPFLAGS += -native
 endif
 
 RUBBER = @RUBBER@
+HEVEA = @HEVEA@
 
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
@@ -1233,8 +1234,9 @@ DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
-# doc/manual.html: doc/manual.tex doc/version.tex
-# 	$(MAKE) -C doc manual.html
+# the dependency on the pdf ensures the bbl was built
+doc/manual.html: doc/manual.pdf
+	cd doc; $(HEVEA) -fix fix.hva makeidx.hva manual.tex
 
 clean::
 	cd doc; $(RUBBER) --pdf --clean manual.tex

@@ -299,6 +299,9 @@ if test "$RUBBER" = no ; then
 fi
 fi
 
+# checking for hevea
+AC_CHECK_PROG(HEVEA,hevea,hevea,no)
+
 # checking for lablgtk2
 if test "$enable_ide" = yes ; then
    if test "$USEOCAMLFIND" = yes; then
