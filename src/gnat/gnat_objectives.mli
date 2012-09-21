@@ -30,6 +30,9 @@ type key = int
 
 type goal = key Session.goal
 
+type subp
+(*    See function "iter_subp" *)
+
 (* various possibilities to add objectives and goals to the database, and the
    "interesting" bit *)
 
@@ -91,7 +94,7 @@ val register_result : goal -> bool -> objective * status
 val iter : (objective -> unit) -> unit
 (* iterate over all objectives *)
 
-val iter_leaf_goals : (goal -> unit) -> unit
+val iter_leaf_goals : ?subp:subp -> (goal -> unit) -> unit
 (* iterate over all VCs *)
 
 val goal_has_been_tried : goal -> bool
@@ -108,9 +111,6 @@ val get_num_goals : unit -> int
 
 val get_num_goals_done : unit -> int
 (* return the number of goals done *)
-
-val reset : unit -> unit
-(* delete all info from the database, except for the session data *)
 
 module Scheduler : Session_scheduler.OBSERVER with type key = int
 (* to be used with Session_scheduler.Make *)
@@ -137,3 +137,13 @@ val display_progress : unit -> unit
 module GoalMap : Hashtbl.S with type key = goal
 (* a map of goals *)
 
+(* dealing with a main goal *)
+
+val iter_subps : (subp -> unit) -> unit
+(* iterate over all subprograms. *)
+
+val init_subp_vcs : subp -> unit
+(* init the vcs for a given subp *)
+
+val clear : unit -> unit
+(* delete all info from the database, except for the session tree itself *)

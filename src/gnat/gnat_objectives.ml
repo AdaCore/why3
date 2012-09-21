@@ -21,6 +21,8 @@ end
 type goal = key Session.goal
 (* the type of goals; a goal is an elementary VC *)
 
+type subp = goal
+
 type objective = Gnat_expl.expl
 (* an objective is identified by its explanation, which contains the source
    location and the kind of the check *)
@@ -107,7 +109,7 @@ let nb_goals_done : int ref = ref 0
 
 let not_interesting : GoalSet.t = GoalSet.empty ()
 
-let reset () =
+let clear () =
    Gnat_expl.HExpl.reset explmap;
    GoalMap.reset goalmap;
    GoalMap.reset tracemap;
@@ -343,13 +345,7 @@ let iter_main_goals fu =
                | _ -> ()) f
       | _ -> ()) (get_session ()).Session.session
 
-let iter_leaf_goals f =
-   (* Leaf goals are at the following point in the theory:
-        session -> file -> theory -> subgoal -> transformation -> subgoal
-                                                                  *here*
-      A leaf goal corresponds to a "goal", ie a VC sent to Alt-Ergo
-   *)
-   iter_main_goals (fun g ->
+let iter_leafs f g =
       Session.goal_iter (fun any ->
          match any with
          | Session.Transf t
@@ -358,7 +354,17 @@ let iter_leaf_goals f =
                   match any with
                   | Session.Goal g -> f g
                   | _ -> ()) t
-         | _ -> ()) g)
+         | _ -> ()) g
+
+let iter_leaf_goals ?subp f =
+   (* Leaf goals are at the following point in the theory:
+        session -> file -> theory -> subgoal -> transformation -> subgoal
+                                                                  *here*
+      A leaf goal corresponds to a "goal", ie a VC sent to Alt-Ergo
+   *)
+   match subp with
+   | None -> iter_main_goals (iter_leafs f)
+   | Some g -> iter_leafs f g
 
 let goal_has_been_tried g =
    (* Check whether the goal has been tried already *)
@@ -399,6 +405,10 @@ let schedule_goal callback g =
 let do_scheduled_jobs () =
    Scheduler.main_loop ()
 
+let init_subp_vcs goal =
+   apply_split_goal_if_needed goal;
+   Scheduler.main_loop ()
+
 let init () =
    sched_state := Some (M.init Gnat_config.parallel);
    let project_dir = Session.get_project_dir Gnat_config.filename in
@@ -417,18 +427,9 @@ let init () =
    if is_new_session || not (has_file env_session) then begin
       (* This is a brand new session, simply apply the transformation
          "split_goal" to the entire file *)
-      let file = M.add_file env_session
-        (Sysutil.relativize_filename project_dir Gnat_config.filename) in
-      M.transform env_session
-         (get_sched_state ())
-         ~context_unproved_goals_only:false
-         Gnat_config.split_name
-         (Session.File file)
-   end else begin
-      iter_main_goals apply_split_goal_if_needed
-   end;
-   (* apply transformation *)
-   do_scheduled_jobs ()
+      ignore (M.add_file env_session
+        (Sysutil.relativize_filename project_dir Gnat_config.filename));
+   end
 
 let save_session () =
    Session.save_session Gnat_config.config (get_session ()).Session.session
@@ -438,3 +439,5 @@ let display_progress () =
       Format.printf "completed %d out of %d (%d%%)...@."
       !nb_goals_done !total_nb_goals (!nb_goals_done * 100 / !total_nb_goals)
    end
+
+let iter_subps = iter_main_goals
