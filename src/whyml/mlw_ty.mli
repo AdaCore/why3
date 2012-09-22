@@ -256,7 +256,6 @@ type spec = {
   c_xpost   : xpost;
   c_effect  : effect;
   c_variant : variant list;
-  c_letrec  : int;
 }
 
 (** program variables *)
@@ -303,6 +302,7 @@ and vty_arrow = private {
   vta_result : vty;
   vta_spec   : spec;
   vta_ghost  : bool;
+  vta_family : int;
 }
 
 exception UnboundException of xsymbol

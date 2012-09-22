@@ -907,8 +907,7 @@ let rec type_c lenv gh pvs vars dtyc =
     c_effect  = eff;
     c_post    = create_post lenv "result" vty dtyc.dc_post;
     c_xpost   = complete_xpost lenv eff dtyc.dc_xpost;
-    c_variant = [];
-    c_letrec  = 0 } in
+    c_variant = []; } in
   (* we add an exception postcondition for %Exit that mentions
      every external variable in effect expressions which also
      does not occur in pre/post/xpost. In this way, we keep

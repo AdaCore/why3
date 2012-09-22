@@ -171,14 +171,14 @@ and let_defn = private {
   let_expr : expr;
 }
 
-and rec_defn = private {
+and rec_defn = {
   rec_defn   : fun_defn list;
-  rec_letrec : int;
 }
 
 and fun_defn = private {
   fun_ps     : psymbol;
   fun_lambda : lambda;
+  fun_varm   : varmap;
 }
 
 and lambda = {

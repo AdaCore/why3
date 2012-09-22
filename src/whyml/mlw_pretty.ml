@@ -220,6 +220,10 @@ let print_list_next sep print fmt = function
   | x :: r -> print true fmt x; sep fmt ();
       print_list sep (print false) fmt r
 
+let is_letrec = function
+  | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
+  | _ -> true
+
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
 and print_lexpr pri fmt e =
@@ -277,11 +281,10 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
-  | Erec ({ rec_defn = rdl; rec_letrec = lr }, e) ->
+  | Erec ({ rec_defn = fdl }, e) ->
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
-        (print_list_next newline (print_rec lr)) rdl print_expr e;
-      let forget_rd rd = forget_ps rd.fun_ps in
-      List.iter forget_rd rdl
+        (print_list_next newline (print_rec (is_letrec fdl))) fdl print_expr e;
+      List.iter (fun fd -> forget_ps fd.fun_ps) fdl
   | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_expr e0 print_expr e1 print_expr e2
@@ -327,7 +330,7 @@ and print_xbranch fmt (xs, pv, e) =
 and print_rec lr fst fmt { fun_ps = ps ; fun_lambda = lam } =
   let print_arg fmt pv = fprintf fmt "@[(%a)@]" print_pvty pv in
   fprintf fmt "@[<hov 2>%s (%a)@ %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
-    (if fst then if lr > 0 then "let rec" else "let" else "with")
+    (if fst then if lr then "let rec" else "let" else "with")
     print_psty ps
     (print_list space print_arg) lam.l_args
     print_term lam.l_pre
@@ -422,8 +425,8 @@ let print_pdecl fmt d = match d.pd_node with
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
   | PDval  vd -> print_val_decl fmt vd
   | PDlet  ld -> print_let_decl fmt ld
-  | PDrec { rec_defn = rdl; rec_letrec = lr } ->
-      print_list_next newline (print_rec_decl lr) fmt rdl
+  | PDrec { rec_defn = fdl } ->
+      print_list_next newline (print_rec_decl (is_letrec fdl)) fmt fdl
   | PDexn  xs -> print_exn_decl fmt xs
 
 (* Print exceptions *)

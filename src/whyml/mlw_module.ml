@@ -318,7 +318,7 @@ let pdecl_vc env km th d = match d.pd_node with
   | PDtype _ | PDdata _ | PDexn _ -> th
   | PDval lv -> wp_val env km th lv
   | PDlet ld -> wp_let env km th ld
-  | PDrec rdl ->wp_rec env km th rdl
+  | PDrec rd -> wp_rec env km th rd
 
 let add_pdecl ~wp uc d =
   let uc = { uc with
@@ -456,8 +456,7 @@ let clone_export uc m inst =
     c_post    = conv_term mv c.c_post;
     c_xpost   = Mexn.fold (addx mv) c.c_xpost Mexn.empty;
     c_effect  = conv_eff c.c_effect;
-    c_variant = [];
-    c_letrec  = 0; } in
+    c_variant = []; } in
   let rec conv_vta mv a =
     let args = List.map conv_pv a.vta_args in
     let add mv pv npv = Mvs.add pv.pv_vs npv.pv_vs mv in

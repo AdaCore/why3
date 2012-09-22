@@ -409,7 +409,7 @@ let vtv_check vars eff vtv =
 let rec vta_check vars vta =
   let add_arg vars pv = vars_union vars pv.pv_vars in
   let vars = List.fold_left add_arg vars vta.vta_args in
-  if vta.vta_spec.c_variant <> [] || vta.vta_spec.c_letrec <> 0 then
+  if vta.vta_spec.c_variant <> [] then
     Loc.errorm "variants are not allowed in a parameter declaration";
   eff_check vars vta.vta_result vta.vta_spec.c_effect;
   match vta.vta_result with
@@ -479,12 +479,12 @@ and let_defn = {
 
 and rec_defn = {
   rec_defn   : fun_defn list;
-  rec_letrec : int;
 }
 
 and fun_defn = {
   fun_ps     : psymbol;
   fun_lambda : lambda;
+  fun_varm   : varmap;
 }
 
 and lambda = {
@@ -534,17 +534,16 @@ let ps_pvset pvs ps = varmap_pvset pvs ps.ps_varm
 
 let e_pvset pvs e = varmap_pvset pvs e.e_varm
 
-let spec_of_lambda lam letrec = {
+let spec_of_lambda lam = {
   c_pre     = lam.l_pre;
   c_effect  = lam.l_expr.e_effect;
   c_post    = lam.l_post;
   c_xpost   = lam.l_xpost;
-  c_variant = lam.l_variant;
-  c_letrec  = letrec; }
+  c_variant = lam.l_variant; }
 
 let l_pvset pvs lam =
   let pvs = e_pvset pvs lam.l_expr in
-  let pvs = spec_pvset pvs (spec_of_lambda lam 0) in
+  let pvs = spec_pvset pvs (spec_of_lambda lam) in
   List.fold_right Spv.remove lam.l_args pvs
 
 let spec_of_abstract e q xq = {
@@ -552,8 +551,7 @@ let spec_of_abstract e q xq = {
   c_post    = q;
   c_xpost   = xq;
   c_effect  = e.e_effect;
-  c_variant = [];
-  c_letrec  = 0; }
+  c_variant = []; }
 
 let abstr_pvset pvs e q xq =
   let pvs = e_pvset pvs e in
@@ -988,24 +986,25 @@ let e_absurd ity =
 
 (* simple functional definitions *)
 
-let create_fun_defn id lam letrec recsyms =
-  let spec = spec_of_lambda lam letrec in
+let create_fun_defn id lam recsyms =
+  let spec = spec_of_lambda lam in
   let varm = spec_varmap lam.l_expr.e_varm spec in
-  let varm = Mid.set_diff varm recsyms in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
+  let varm_ps = Mid.set_diff varm recsyms in
   let vty = match lam.l_expr.e_vty with
     | VTvalue ({ vtv_mut = Some _ } as vtv) -> VTvalue (vtv_unmut vtv)
     | vty -> vty in
   let vta = vty_arrow lam.l_args ~spec vty in
-  { fun_ps     = create_psymbol_poly id vta varm;
-    fun_lambda = lam; }
+  { fun_ps     = create_psymbol_poly id vta varm_ps;
+    fun_lambda = lam;
+    fun_varm   = varm; }
 
 let e_rec rdl e =
-  let add_rd m { fun_ps = ps } =
-    (* psymbols defined in rdl can't occur in ps.ps_varm *)
-    varmap_union (Mid.remove ps.ps_name m) ps.ps_varm in
+  let add_rd m rd = varmap_union rd.fun_varm m in
+  let del_rd m rd = Mid.remove rd.fun_ps.ps_name m in
   let varm = List.fold_left add_rd e.e_varm rdl.rec_defn in
+  let varm = List.fold_left del_rd varm rdl.rec_defn in
   mk_expr (Erec (rdl,e)) e.e_vty e.e_effect varm
 
 (* compute the fixpoint on recursive definitions *)
@@ -1038,10 +1037,7 @@ let ps_compat ps1 ps2 =
   vta_compat ps1.ps_vta ps2.ps_vta &&
   Mid.equal (fun _ _ -> true) ps1.ps_varm ps2.ps_varm
 
-let rec expr_subst psm e =
-  let e' = expr_subst_node psm e in
-  { e' with e_loc = e.e_loc; e_label = e.e_label }
-and expr_subst_node psm e = match e.e_node with
+let rec expr_subst psm e = e_label_copy e (match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
       e_arrow (Mid.find ps.ps_name psm) (vta_of_expr e)
   | Eapp (e,pv,_) ->
@@ -1055,10 +1051,10 @@ and expr_subst_node psm e = match e.e_node with
       let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in
       let ns = match ld.let_sym with LetA a -> a | LetV _ -> assert false in
       e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
-  | Erec ({ rec_defn = rdl; rec_letrec = letrec }, e) ->
+  | Erec ({ rec_defn = rdl }, e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
       let defl = List.map (fun rd -> rd.fun_ps, conv rd.fun_lambda) rdl in
-      let rdl = create_rec_defn letrec defl in
+      let rdl = create_rec_defn defl in
       let add psm (ps,_) rd = Mid.add ps.ps_name rd.fun_ps psm in
       e_rec rdl (expr_subst (List.fold_left2 add psm defl rdl.rec_defn) e)
   | Eif (e,e1,e2) ->
@@ -1081,24 +1077,23 @@ and expr_subst_node psm e = match e.e_node with
       e_loop inv var (expr_subst psm e)
   | Efor (pv,bounds,inv,e) ->
       e_for_real pv bounds inv (expr_subst psm e)
-  | Elogic _ | Evalue _ | Earrow _ | Eany _ | Eabsurd | Eassert _ -> e
+  | Elogic _ | Evalue _ | Earrow _ | Eany _ | Eabsurd | Eassert _ -> e)
 
-and create_rec_defn letrec defl =
+and create_rec_defn defl =
   let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
   let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) =
-    let rd = create_fun_defn (id_clone ps.ps_name) lam letrec recsyms in
+    let rd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
     if ps_compat ps rd.fun_ps then m, { rd with fun_ps = ps }
     else Mid.add ps.ps_name rd.fun_ps m, rd in
   let m, rdl = Util.map_fold_left conv Mid.empty defl in
-  if Mid.is_empty m then { rec_defn = rdl; rec_letrec = letrec }
-  else subst_rd letrec m rdl
+  if Mid.is_empty m then { rec_defn = rdl } else subst_rd m rdl
 
-and subst_rd letrec psm rdl =
+and subst_rd psm rdl =
   let subst { fun_ps = ps; fun_lambda = lam } =
     Mid.find_def ps ps.ps_name psm,
     { lam with l_expr = expr_subst psm lam.l_expr } in
-  create_rec_defn letrec (List.map subst rdl)
+  create_rec_defn (List.map subst rdl)
 
 (* Before we start computing the fixpoint for effects, we must
    get the pre/post/xpost right. Therefore we require every ps
@@ -1109,8 +1104,7 @@ and subst_rd letrec psm rdl =
    and with the same final spec (except the effect). The result
    is passed to create_rec_defn above which repeats substitution
    until the effects are stabilized. TODO: prove correctness *)
-let create_rec_defn = let letrec = ref 0 in fun defl ->
-  incr letrec;
+let create_rec_defn defl =
   if defl = [] then invalid_arg "Mlw_expr.create_rec_defn";
   (* check that the all variants use the same order *)
   let variant1 = (snd (List.hd defl)).l_variant in
@@ -1130,16 +1124,15 @@ let create_rec_defn = let letrec = ref 0 in fun defl ->
     | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
         "The body of a recursive function must be a first-order value"
     | VTvalue _ ->
-        let rd = create_fun_defn (id_clone ps.ps_name) lam !letrec recsyms in
+        let rd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
         Mid.add ps.ps_name rd.fun_ps m, rd in
   let m, rdl = Util.map_fold_left conv Mid.empty defl in
-  subst_rd !letrec m rdl
+  subst_rd m rdl
 
 let create_fun_defn id lam =
   if lam.l_variant <> [] then
     Loc.errorm "variants are not allowed in a non-recursive definition";
-  let fd = create_fun_defn id lam 0 Sid.empty in
-  { rec_defn = [fd]; rec_letrec = 0 }
+  { rec_defn = [create_fun_defn id lam Sid.empty] }
 
 (* fold *)
 

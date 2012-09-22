@@ -303,8 +303,10 @@ let pd_vars pd = match pd.pd_node with
   | PDval (LetA ps) -> Mid.map (fun _ -> ()) ps.ps_varm
   | PDlet ld -> Mid.map (fun _ -> ()) ld.let_expr.e_varm
   | PDrec rd ->
-      let add_rd s fd = Mid.set_union s fd.fun_ps.ps_varm in
+      let add_rd s fd = Mid.set_union s fd.fun_varm in
+      let del_rd s fd = Mid.remove fd.fun_ps.ps_name s in
       let varm = List.fold_left add_rd Mid.empty rd.rec_defn in
+      let varm = List.fold_left del_rd varm rd.rec_defn in
       Mid.map (fun _ -> ()) varm
   | PDtype _ | PDdata _ | PDexn _ -> Sid.empty
 
