@@ -250,7 +250,6 @@ lemma eval_bool_term:
     exists b:bool.
       eval_term sigma pi t = Vbool b
 
-
 predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   match f with
   | Fterm t -> eval_term sigma pi t = Vbool True
@@ -381,23 +380,23 @@ lemma eval_swap_term_any:
     (eval_term sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) t =
     eval_term sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) t)
 
-lemma eval_swap_term:
-  forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
-    id1 <> id2 ->
-    (eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t =
-    eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t)
-
+(* lemma eval_swap_term: *)
+(*   forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value. *)
+(*     id1 <> id2 -> *)
+(*     (eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t = *)
+(*     eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t) *)
+   
 lemma eval_swap_any:
   forall f:fmla, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->
     (eval_fmla sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) f <->
     eval_fmla sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) f)
 
-lemma eval_swap:
-  forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
-    id1 <> id2 ->
-    (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <->
-    eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f)
+(* lemma eval_swap: *)
+(*   forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value. *)
+(*     id1 <> id2 -> *)
+(*     (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <-> *)
+(*     eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f) *)
 
  (* Need it for monotonicity*)
 lemma eval_change_free :
