@@ -763,13 +763,13 @@ and print_lexpr pri info fmt e =
   | Ecase (e1, bl) ->
       fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
         (print_expr info) e1 (print_list newline (print_ebranch info)) bl
-  | Erec ({ rec_defn = rdl }, e) ->
+  | Erec (fdl, e) ->
       (* print non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
         Pervasives.compare ps1.ps_vta.vta_ghost ps2.ps_vta.vta_ghost in
-      let rdl = List.sort cmp rdl in
+      let fdl = List.sort cmp fdl in
       fprintf fmt "@[<v>%a@\nin@\n%a@]"
-        (print_list_next newline (print_rec_decl (is_letrec rdl) info)) rdl
+        (print_list_next newline (print_rec_decl (is_letrec fdl) info)) fdl
         (print_expr info) e
 
 and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
@@ -800,16 +800,16 @@ and print_xbranch info fmt (xs, pv, e) =
   end;
   forget_pv pv
 
-and print_rec_decl lr info fst fmt rd =
-  print_rec lr info fst fmt rd;
+and print_rec_decl lr info fst fmt fd =
+  print_rec lr info fst fmt fd;
   forget_tvs ()
 
-let print_rec_decl lr info fst fmt rd =
-  let id = rd.fun_ps.ps_name in
+let print_rec_decl lr info fst fmt fd =
+  let id = fd.fun_ps.ps_name in
   if has_syntax info id then
     fprintf fmt "(* symbol %a is overridden by driver *)" (print_lident info) id
   else
-    print_rec_decl lr info fst fmt rd
+    print_rec_decl lr info fst fmt fd
 
 let print_let_decl info fmt { let_sym = lv ; let_expr = e } =
   fprintf fmt "@[<hov 2>let %a =@ %a@]" (print_lv info) lv (print_expr info) e;
@@ -972,14 +972,14 @@ let pdecl info fmt pd = match pd.pd_node with
       fprintf fmt "@\n@\n"
   | PDlet ld ->
       print_let_decl info fmt ld
-  | PDrec { rec_defn = rdl } ->
+  | PDrec fdl ->
       (* print defined, non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
         Pervasives.compare
           (ps1.ps_vta.vta_ghost || has_syntax info ps1.ps_name)
           (ps2.ps_vta.vta_ghost || has_syntax info ps2.ps_name) in
-      let rdl = List.sort cmp rdl in
-      print_list_next newline (print_rec_decl (is_letrec rdl) info) fmt rdl;
+      let fdl = List.sort cmp fdl in
+      print_list_next newline (print_rec_decl (is_letrec fdl) info) fmt fdl;
       fprintf fmt "@\n@\n"
   | PDexn xs ->
       print_exn_decl info fmt xs

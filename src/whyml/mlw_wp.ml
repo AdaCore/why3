@@ -632,8 +632,8 @@ and wp_desc env e q xq = match e.e_node with
       let w = wp_expr env e2 q xq in
       let q = create_unit_post w in
       wp_label e (wp_expr env e1 q xq)
-  | Erec (rdl, e1) ->
-      let fr = wp_rec_defn env rdl in
+  | Erec (fdl, e1) ->
+      let fr = wp_rec_defn env fdl in
       let fe = wp_expr env e1 q xq in
       let fr = wp_ands ~sym:true fr in
       wp_label e (wp_and ~sym:true fr fe)
@@ -838,7 +838,7 @@ and wp_fun_defn env faml { fun_ps = ps ; fun_lambda = l } =
   let f = wp_implies l.l_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
-and wp_rec_defn env { rec_defn = fdl } =
+and wp_rec_defn env fdl =
   let faml = List.map (fun fd -> fd.fun_ps.ps_vta.vta_family) fdl in
   List.map (wp_fun_defn env faml) fdl
 
@@ -941,16 +941,16 @@ let wp_let env km th { let_sym = lv; let_expr = e } =
     | LetA ps -> ps.ps_name in
   add_wp_decl km id f th
 
-let wp_rec env km th rdl =
+let wp_rec env km th fdl =
   let env = mk_env env km th in
-  let fl = wp_rec_defn env rdl in
+  let fl = wp_rec_defn env fdl in
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
     let f = wp_forall (Mvs.keys f.t_vars) f in
     add_wp_decl km d.fun_ps.ps_name f th
   in
-  List.fold_left2 add_one th rdl.rec_defn fl
+  List.fold_left2 add_one th fdl fl
 
 let wp_val _env _km th _lv = th
 
@@ -1108,7 +1108,7 @@ and fast_wp_fun_defn env faml { fun_ps = ps ; fun_lambda = l } =
   let f = wp_implies l.l_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
-and fast_wp_rec_defn env { rec_defn = fdl } =
+and fast_wp_rec_defn env fdl =
   let faml = List.map (fun fd -> fd.fun_ps.ps_vta.vta_family) fdl in
   List.map (fast_wp_fun_defn env faml) fdl
 
@@ -1121,15 +1121,15 @@ let fast_wp_let env km th { let_sym = lv; let_expr = e } =
     | LetA ps -> ps.ps_name in
   add_wp_decl km id f th
 
-let fast_wp_rec env km th rdl =
+let fast_wp_rec env km th fdl =
   let env = mk_env env km th in
-  let fl = fast_wp_rec_defn env rdl in
+  let fl = fast_wp_rec_defn env fdl in
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
     let f = wp_forall (Mvs.keys f.t_vars) f in
     add_wp_decl km d.fun_ps.ps_name f th
   in
-  List.fold_left2 add_one th rdl.rec_defn fl
+  List.fold_left2 add_one th fdl fl
 
 let fast_wp_val _env _km th _lv = th

@@ -44,7 +44,7 @@ and pdecl_node =
   | PDdata of data_decl list
   | PDval  of let_sym
   | PDlet  of let_defn
-  | PDrec  of rec_defn
+  | PDrec  of fun_defn list
   | PDexn  of xsymbol
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
@@ -223,12 +223,12 @@ let create_let_decl ld =
 *)
   mk_decl (PDlet ld) (*syms*) news
 
-let create_rec_decl ({ rec_defn = rdl } as d) =
-  let add_rd s { fun_ps = p } =
+let create_rec_decl fdl =
+  let add_fd s { fun_ps = p } =
     check_vars p.ps_vars; news_id s p.ps_name in
-  let news = List.fold_left add_rd Sid.empty rdl in
+  let news = List.fold_left add_fd Sid.empty fdl in
 (*
-  let add_rd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
+  let add_fd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
     let syms = syms_varmap syms vm in
     let syms = syms_vta syms ps.ps_vta in
     let syms = syms_term syms l.l_pre in
@@ -238,9 +238,9 @@ let create_rec_decl ({ rec_defn = rdl } as d) =
       Util.option_fold syms_ls (syms_term s t) ls in
     let syms = List.fold_left addv syms l.l_variant in
     syms_expr syms l.l_expr in
-  let syms = List.fold_left add_rd Sid.empty rdl in
+  let syms = List.fold_left add_fd Sid.empty fdl in
 *)
-  mk_decl (PDrec d) (*syms*) news
+  mk_decl (PDrec fdl) (*syms*) news
 
 let create_val_decl lv =
   let news = letvar_news lv in
@@ -302,11 +302,11 @@ let pd_vars pd = match pd.pd_node with
   | PDval (LetV _) -> Sid.empty
   | PDval (LetA ps) -> Mid.map (fun _ -> ()) ps.ps_varm
   | PDlet ld -> Mid.map (fun _ -> ()) ld.let_expr.e_varm
-  | PDrec rd ->
-      let add_rd s fd = Mid.set_union s fd.fun_varm in
-      let del_rd s fd = Mid.remove fd.fun_ps.ps_name s in
-      let varm = List.fold_left add_rd Mid.empty rd.rec_defn in
-      let varm = List.fold_left del_rd varm rd.rec_defn in
+  | PDrec fdl ->
+      let add_fd s fd = Mid.set_union s fd.fun_varm in
+      let del_fd s fd = Mid.remove fd.fun_ps.ps_name s in
+      let varm = List.fold_left add_fd Mid.empty fdl in
+      let varm = List.fold_left del_fd varm fdl in
       Mid.map (fun _ -> ()) varm
   | PDtype _ | PDdata _ | PDexn _ -> Sid.empty
 
@@ -354,8 +354,7 @@ let check_match lkn _kn d =
     | _ -> e_fold checkE () e
   in
   match d.pd_node with
-  | PDrec { rec_defn = fdl } ->
-      List.iter (fun fd -> checkE () fd.fun_lambda.l_expr) fdl
+  | PDrec fdl -> List.iter (fun fd -> checkE () fd.fun_lambda.l_expr) fdl
   | PDlet { let_expr = e } -> checkE () e
   | PDval _ | PDtype _ | PDdata _ | PDexn _ -> ()
 
@@ -416,7 +415,7 @@ let check_ghost lkn kn d =
     check (ps_pvset Spv.empty ps) ps.ps_vta
   in
   match d.pd_node with
-  | PDrec rd -> List.iter (fun fd -> check fd.fun_ps) rd.rec_defn
+  | PDrec fdl -> List.iter (fun fd -> check fd.fun_ps) fdl
   | PDval (LetA ps) | PDlet { let_sym = LetA ps } -> check ps
   | PDval _ | PDlet _ | PDtype _ | PDdata _ | PDexn _ -> ()
 

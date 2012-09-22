@@ -45,7 +45,7 @@ and pdecl_node = private
   | PDdata of data_decl list
   | PDval  of let_sym
   | PDlet  of let_defn
-  | PDrec  of rec_defn
+  | PDrec  of fun_defn list
   | PDexn  of xsymbol
 
 (** {2 Declaration constructors} *)
@@ -62,7 +62,7 @@ val create_val_decl : let_sym -> pdecl
 
 val create_let_decl : let_defn -> pdecl
 
-val create_rec_decl : rec_defn -> pdecl
+val create_rec_decl : fun_defn list -> pdecl
 
 val create_exn_decl : xsymbol -> pdecl
 

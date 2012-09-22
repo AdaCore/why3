@@ -281,7 +281,7 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
-  | Erec ({ rec_defn = fdl }, e) ->
+  | Erec (fdl, e) ->
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
         (print_list_next newline (print_rec (is_letrec fdl))) fdl print_expr e;
       List.iter (fun fd -> forget_ps fd.fun_ps) fdl
@@ -410,8 +410,8 @@ let print_let_decl fmt { let_sym = lv ; let_expr = e } =
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
 
-let print_rec_decl lr fst fmt rd =
-  print_rec lr fst fmt rd;
+let print_rec_decl lr fst fmt fd =
+  print_rec lr fst fmt fd;
   forget_tvs_regs ()
 
 let print_exn_decl fmt xs =
@@ -425,7 +425,7 @@ let print_pdecl fmt d = match d.pd_node with
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
   | PDval  vd -> print_val_decl fmt vd
   | PDlet  ld -> print_let_decl fmt ld
-  | PDrec { rec_defn = fdl } ->
+  | PDrec fdl ->
       print_list_next newline (print_rec_decl (is_letrec fdl)) fmt fdl
   | PDexn  xs -> print_exn_decl fmt xs
 

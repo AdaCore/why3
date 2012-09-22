@@ -458,7 +458,7 @@ and expr_node =
   | Earrow  of psymbol
   | Eapp    of expr * pvsymbol * spec
   | Elet    of let_defn * expr
-  | Erec    of rec_defn * expr
+  | Erec    of fun_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
   | Eassign of expr * region * pvsymbol
@@ -475,10 +475,6 @@ and expr_node =
 and let_defn = {
   let_sym  : let_sym;
   let_expr : expr;
-}
-
-and rec_defn = {
-  rec_defn   : fun_defn list;
 }
 
 and fun_defn = {
@@ -1000,12 +996,12 @@ let create_fun_defn id lam recsyms =
     fun_lambda = lam;
     fun_varm   = varm; }
 
-let e_rec rdl e =
-  let add_rd m rd = varmap_union rd.fun_varm m in
-  let del_rd m rd = Mid.remove rd.fun_ps.ps_name m in
-  let varm = List.fold_left add_rd e.e_varm rdl.rec_defn in
-  let varm = List.fold_left del_rd varm rdl.rec_defn in
-  mk_expr (Erec (rdl,e)) e.e_vty e.e_effect varm
+let e_rec fdl e =
+  let add_fd m fd = varmap_union fd.fun_varm m in
+  let del_fd m fd = Mid.remove fd.fun_ps.ps_name m in
+  let varm = List.fold_left add_fd e.e_varm fdl in
+  let varm = List.fold_left del_fd varm fdl in
+  mk_expr (Erec (fdl,e)) e.e_vty e.e_effect varm
 
 (* compute the fixpoint on recursive definitions *)
 
@@ -1051,12 +1047,12 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in
       let ns = match ld.let_sym with LetA a -> a | LetV _ -> assert false in
       e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
-  | Erec ({ rec_defn = rdl }, e) ->
+  | Erec (fdl, e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
-      let defl = List.map (fun rd -> rd.fun_ps, conv rd.fun_lambda) rdl in
-      let rdl = create_rec_defn defl in
-      let add psm (ps,_) rd = Mid.add ps.ps_name rd.fun_ps psm in
-      e_rec rdl (expr_subst (List.fold_left2 add psm defl rdl.rec_defn) e)
+      let defl = List.map (fun fd -> fd.fun_ps, conv fd.fun_lambda) fdl in
+      let fdl = create_rec_defn defl in
+      let add psm (ps,_) fd = Mid.add ps.ps_name fd.fun_ps psm in
+      e_rec fdl (expr_subst (List.fold_left2 add psm defl fdl) e)
   | Eif (e,e1,e2) ->
       e_if (expr_subst psm e) (expr_subst psm e1) (expr_subst psm e2)
   | Ecase (e,bl) ->
@@ -1083,17 +1079,17 @@ and create_rec_defn defl =
   let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
   let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) =
-    let rd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
-    if ps_compat ps rd.fun_ps then m, { rd with fun_ps = ps }
-    else Mid.add ps.ps_name rd.fun_ps m, rd in
-  let m, rdl = Util.map_fold_left conv Mid.empty defl in
-  if Mid.is_empty m then { rec_defn = rdl } else subst_rd m rdl
+    let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
+    if ps_compat ps fd.fun_ps then m, { fd with fun_ps = ps }
+    else Mid.add ps.ps_name fd.fun_ps m, fd in
+  let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  if Mid.is_empty m then fdl else subst_fd m fdl
 
-and subst_rd psm rdl =
+and subst_fd psm fdl =
   let subst { fun_ps = ps; fun_lambda = lam } =
     Mid.find_def ps ps.ps_name psm,
     { lam with l_expr = expr_subst psm lam.l_expr } in
-  create_rec_defn (List.map subst rdl)
+  create_rec_defn (List.map subst fdl)
 
 (* Before we start computing the fixpoint for effects, we must
    get the pre/post/xpost right. Therefore we require every ps
@@ -1124,29 +1120,29 @@ let create_rec_defn defl =
     | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
         "The body of a recursive function must be a first-order value"
     | VTvalue _ ->
-        let rd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
-        Mid.add ps.ps_name rd.fun_ps m, rd in
-  let m, rdl = Util.map_fold_left conv Mid.empty defl in
-  subst_rd m rdl
+        let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
+        Mid.add ps.ps_name fd.fun_ps m, fd in
+  let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  subst_fd m fdl
 
 let create_fun_defn id lam =
   if lam.l_variant <> [] then
     Loc.errorm "variants are not allowed in a non-recursive definition";
-  { rec_defn = [create_fun_defn id lam Sid.empty] }
+  create_fun_defn id lam Sid.empty
 
 (* fold *)
 
 let e_fold fn acc e = match e.e_node with
   | Elet (ld,e) -> fn (fn acc ld.let_expr) e
-  | Erec (rdl,e) ->
-      let fnrd acc rd = fn acc rd.fun_lambda.l_expr in
-      fn (List.fold_left fnrd acc rdl.rec_defn) e
+  | Erec (fdl,e) ->
+      let fn_fd acc fd = fn acc fd.fun_lambda.l_expr in
+      fn (List.fold_left fn_fd acc fdl) e
   | Ecase (e,bl) ->
       let fnbr acc (_,e) = fn acc e in
       List.fold_left fnbr (fn acc e) bl
   | Etry (e,bl) ->
-      let fnbr acc (_,_,e) = fn acc e in
-      List.fold_left fnbr (fn acc e) bl
+      let fn_br acc (_,_,e) = fn acc e in
+      List.fold_left fn_br (fn acc e) bl
   | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
   | Eapp (e,_,_) | Eassign (e,_,_) | Eghost e
   | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)

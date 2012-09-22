@@ -152,7 +152,7 @@ and expr_node = private
   | Earrow  of psymbol
   | Eapp    of expr * pvsymbol * spec
   | Elet    of let_defn * expr
-  | Erec    of rec_defn * expr
+  | Erec    of fun_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
   | Eassign of expr * region * pvsymbol
@@ -169,10 +169,6 @@ and expr_node = private
 and let_defn = private {
   let_sym  : let_sym;
   let_expr : expr;
-}
-
-and rec_defn = {
-  rec_defn   : fun_defn list;
 }
 
 and fun_defn = private {
@@ -216,14 +212,14 @@ val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
-val create_fun_defn : preid -> lambda -> rec_defn
-val create_rec_defn : (psymbol * lambda) list -> rec_defn
+val create_fun_defn : preid -> lambda -> fun_defn
+val create_rec_defn : (psymbol * lambda) list -> fun_defn list
 
 exception StaleRegion of expr * ident
 (* freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr
-val e_rec : rec_defn -> expr -> expr
+val e_rec : fun_defn list -> expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
 val e_case : expr -> (ppattern * expr) list -> expr
