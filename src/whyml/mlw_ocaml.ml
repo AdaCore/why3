@@ -749,7 +749,7 @@ and print_lexpr pri info fmt e =
   | Etry (e,bl) ->
       fprintf fmt "@[(try %a with@\n@[<hov>%a@])@]"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
-  | Eabstr (e,_,_) ->
+  | Eabstr (e,_) ->
       print_lexpr pri info fmt e
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"

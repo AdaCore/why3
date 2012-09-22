@@ -162,7 +162,7 @@ and expr_node = private
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
-  | Eabstr  of expr * post * xpost
+  | Eabstr  of expr * spec
   | Eassert of assertion_kind * term
   | Eabsurd
 
@@ -178,17 +178,13 @@ and fun_defn = private {
 }
 
 and lambda = {
-  l_args    : pvsymbol list;
-  l_variant : variant list; (* lexicographic order *)
-  l_pre     : pre;
-  l_expr    : expr;
-  l_post    : post;
-  l_xpost   : xpost;
+  l_args : pvsymbol list;
+  l_expr : expr;
+  l_spec : spec;
 }
 
 val e_pvset : Spv.t -> expr -> Spv.t
 val l_pvset : Spv.t -> lambda -> Spv.t
-val abstr_pvset : Spv.t -> expr -> post -> xpost -> Spv.t
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
@@ -248,7 +244,7 @@ val e_for :
   pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
 val e_any : spec -> vty -> expr
-val e_abstract : expr -> post -> xpost -> expr
+val e_abstract : expr -> spec -> expr
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
 

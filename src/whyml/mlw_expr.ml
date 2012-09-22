@@ -468,7 +468,7 @@ and expr_node =
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
-  | Eabstr  of expr * post * xpost
+  | Eabstr  of expr * spec
   | Eassert of assertion_kind * term
   | Eabsurd
 
@@ -484,12 +484,9 @@ and fun_defn = {
 }
 
 and lambda = {
-  l_args    : pvsymbol list;
-  l_variant : variant list; (* lexicographic order *)
-  l_pre     : pre;
-  l_expr    : expr;
-  l_post    : post;
-  l_xpost   : xpost;
+  l_args : pvsymbol list;
+  l_expr : expr;
+  l_spec : spec;
 }
 
 (* base tools *)
@@ -530,28 +527,10 @@ let ps_pvset pvs ps = varmap_pvset pvs ps.ps_varm
 
 let e_pvset pvs e = varmap_pvset pvs e.e_varm
 
-let spec_of_lambda lam = {
-  c_pre     = lam.l_pre;
-  c_effect  = lam.l_expr.e_effect;
-  c_post    = lam.l_post;
-  c_xpost   = lam.l_xpost;
-  c_variant = lam.l_variant; }
-
 let l_pvset pvs lam =
   let pvs = e_pvset pvs lam.l_expr in
-  let pvs = spec_pvset pvs (spec_of_lambda lam) in
+  let pvs = spec_pvset pvs lam.l_spec in
   List.fold_right Spv.remove lam.l_args pvs
-
-let spec_of_abstract e q xq = {
-  c_pre     = t_true;
-  c_post    = q;
-  c_xpost   = xq;
-  c_effect  = e.e_effect;
-  c_variant = []; }
-
-let abstr_pvset pvs e q xq =
-  let pvs = e_pvset pvs e in
-  spec_pvset pvs (spec_of_abstract e q xq)
 
 (* check admissibility of consecutive events *)
 
@@ -965,11 +944,13 @@ let e_any spec vty =
   vta_check (vars_merge varm vars_empty) vta;
   mk_expr (Eany spec) vty spec.c_effect varm
 
-let e_abstract e q xq =
-  let spec = spec_of_abstract e q xq in
+let e_abstract e spec =
+  if spec.c_variant <> [] then
+    Loc.errorm "variants are not allowed in `abstract'";
+  let spec = { spec with c_effect = e.e_effect } in
   spec_check spec e.e_vty;
   let varm = spec_varmap e.e_varm spec in
-  mk_expr (Eabstr (e,q,xq)) e.e_vty e.e_effect varm
+  mk_expr (Eabstr (e,spec)) e.e_vty e.e_effect varm
 
 let e_assert ak f =
   let varm = add_t_vars f.t_vars Mid.empty in
@@ -983,7 +964,7 @@ let e_absurd ity =
 (* simple functional definitions *)
 
 let create_fun_defn id lam recsyms =
-  let spec = spec_of_lambda lam in
+  let spec = { lam.l_spec with c_effect = lam.l_expr.e_effect } in
   let varm = spec_varmap lam.l_expr.e_varm spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
@@ -993,7 +974,7 @@ let create_fun_defn id lam recsyms =
     | vty -> vty in
   let vta = vty_arrow lam.l_args ~spec vty in
   { fun_ps     = create_psymbol_poly id vta varm_ps;
-    fun_lambda = lam;
+    fun_lambda = { lam with l_spec = spec };
     fun_varm   = varm; }
 
 let e_rec fdl e =
@@ -1062,8 +1043,8 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       e_assign_real (expr_subst psm e) pv
   | Eghost e ->
       e_ghost (expr_subst psm e)
-  | Eabstr (e,q,xq) ->
-      e_abstract (expr_subst psm e) q xq
+  | Eabstr (e,spec) ->
+      e_abstract (expr_subst psm e) spec
   | Eraise (xs,e0) ->
       e_raise xs (expr_subst psm e0) (vtv_of_expr e).vtv_ity
   | Etry (e,bl) ->
@@ -1103,8 +1084,8 @@ and subst_fd psm fdl =
 let create_rec_defn defl =
   if defl = [] then invalid_arg "Mlw_expr.create_rec_defn";
   (* check that the all variants use the same order *)
-  let variant1 = (snd (List.hd defl)).l_variant in
-  let check_variant (_, { l_variant = vl }) =
+  let variant1 = (snd (List.hd defl)).l_spec.c_variant in
+  let check_variant (_, { l_spec = { c_variant = vl }}) =
     let res = try List.for_all2 (fun (_,r1) (_,r2) ->
         Util.option_eq ls_equal r1 r2) vl variant1
       with Invalid_argument _ -> false in
@@ -1126,7 +1107,7 @@ let create_rec_defn defl =
   subst_fd m fdl
 
 let create_fun_defn id lam =
-  if lam.l_variant <> [] then
+  if lam.l_spec.c_variant <> [] then
     Loc.errorm "variants are not allowed in a non-recursive definition";
   create_fun_defn id lam Sid.empty
 
@@ -1146,6 +1127,6 @@ let e_fold fn acc e = match e.e_node with
   | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
   | Eapp (e,_,_) | Eassign (e,_,_) | Eghost e
   | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
-  | Eabstr (e,_,_) -> fn acc e
+  | Eabstr (e,_) -> fn acc e
   | Elogic _ | Evalue _ | Earrow _
   | Eany _ | Eassert _ | Eabsurd -> acc

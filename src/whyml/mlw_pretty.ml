@@ -311,9 +311,9 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "absurd"
   | Eassert (ak,f) ->
       fprintf fmt "%a { %a }" print_ak ak print_term f
-  | Eabstr (e,q,_xq) ->
-    (* TODO: print_xpost *)
-      fprintf fmt "abstract %a@ { %a }" print_expr e print_post q
+  | Eabstr (e,spec) ->
+    (* TODO: print_spec *)
+      fprintf fmt "abstract %a@ { %a }" print_expr e print_post spec.c_post
   | Eghost e ->
       fprintf fmt "ghost@ %a" print_expr e
   | Eany spec ->
@@ -333,11 +333,11 @@ and print_rec lr fst fmt { fun_ps = ps ; fun_lambda = lam } =
     (if fst then if lr then "let rec" else "let" else "with")
     print_psty ps
     (print_list space print_arg) lam.l_args
-    print_term lam.l_pre
-    print_variant lam.l_variant
+    print_term lam.l_spec.c_pre
+    print_variant lam.l_spec.c_variant
     print_expr lam.l_expr
-    print_post lam.l_post
-    (* TODO: print_xpost *)
+    print_post lam.l_spec.c_post
+    (* TODO: print_spec *)
 
 (*
 and print_tl fmt tl =

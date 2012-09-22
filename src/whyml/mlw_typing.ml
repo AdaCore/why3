@@ -721,25 +721,18 @@ let spec_invariant lenv pvs vty spec =
               c_post  = post_inv ity spec.c_post;
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
-let abstr_invariant lenv e q xq =
-  let ity = ity_or_unit e.e_vty in
-  let pvs = abstr_pvset Spv.empty e q xq in
-  let rvs = reset_vars e.e_effect pvs in
-  let _,qinv = env_invariant lenv e.e_effect pvs in
-  let post_inv = post_invariant lenv rvs qinv in
-  let xpost_inv xs q = post_inv xs.xs_ity q in
-  post_inv ity q, Mexn.mapi xpost_inv xq
+let abstr_invariant lenv e spec0 =
+  let pvs = e_pvset Spv.empty e in
+  let spec = { spec0 with c_effect = e.e_effect } in
+  let spec = spec_invariant lenv pvs e.e_vty spec in
+  (* we do not require invariants on free variables *)
+  { spec with c_pre = spec0.c_pre }
 
 let lambda_invariant lenv pvs eff lam =
-  let ity = ity_or_unit lam.l_expr.e_vty in
   let pvs = List.fold_right Spv.add lam.l_args pvs in
-  let rvs = reset_vars eff pvs in
-  let pinv,qinv = env_invariant lenv eff pvs in
-  let post_inv = post_invariant lenv rvs qinv in
-  let xpost_inv xs q = post_inv xs.xs_ity q in
-  { lam with  l_pre   = t_and_simp lam.l_pre pinv;
-              l_post  = post_inv ity lam.l_post;
-              l_xpost = Mexn.mapi xpost_inv lam.l_xpost }
+  let spec = { lam.l_spec with c_effect = eff } in
+  let spec = spec_invariant lenv pvs lam.l_expr.e_vty spec in
+  { lam with l_spec = spec }
 
 let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
@@ -1081,8 +1074,11 @@ and expr_desc lenv loc de = match de.de_desc with
       let e1 = expr lenv de1 in
       let q = create_post lenv "result" e1.e_vty q in
       let xq = complete_xpost lenv e1.e_effect xq in
-      let q, xq = abstr_invariant lenv e1 q xq in
-      e_abstract e1 q xq
+      let spec = {
+        c_pre = t_true; c_post = q; c_xpost = xq;
+        c_effect = eff_empty; c_variant = [] } in
+      let spec = abstr_invariant lenv e1 spec in
+      e_abstract e1 spec
   | DEassert (ak, f) ->
       let ak = match ak with
         | Ptree.Aassert -> Aassert
@@ -1162,12 +1158,14 @@ and expr_lam lenv gh pvl (var, p, de, q, xq) =
   let e = e_ghostify gh (expr lenv de) in
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
-  { l_args = pvl;
-    l_variant = List.map (create_variant lenv) var;
-    l_pre = create_pre lenv p;
-    l_expr = e;
-    l_post = create_post lenv "result" e.e_vty q;
-    l_xpost = complete_xpost lenv e.e_effect xq }
+  let spec = {
+    c_pre = create_pre lenv p;
+    c_post = create_post lenv "result" e.e_vty q;
+    c_xpost = complete_xpost lenv e.e_effect xq;
+    c_effect = e.e_effect;
+    c_variant = List.map (create_variant lenv) var; }
+  in
+  { l_args = pvl; l_expr = e; l_spec = spec }
 
 (** Type declaration *)
 
