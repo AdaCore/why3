@@ -71,7 +71,7 @@ struct
    let remove t x = GoalMap.remove t x
    let mem t x = GoalMap.mem t x
    let count t = GoalMap.length t
-   let reset t = GoalMap.reset t
+   let reset t = GoalMap.clear t
    let iter f t = GoalMap.iter (fun k () -> f k) t
 
    exception Found of goal
@@ -110,9 +110,9 @@ let nb_goals_done : int ref = ref 0
 let not_interesting : GoalSet.t = GoalSet.empty ()
 
 let clear () =
-   Gnat_expl.HExpl.reset explmap;
-   GoalMap.reset goalmap;
-   GoalMap.reset tracemap;
+   Gnat_expl.HExpl.clear explmap;
+   GoalMap.clear goalmap;
+   GoalMap.clear tracemap;
    GoalSet.reset not_interesting;
    total_nb_goals := 0;
    nb_objectives := 0;
