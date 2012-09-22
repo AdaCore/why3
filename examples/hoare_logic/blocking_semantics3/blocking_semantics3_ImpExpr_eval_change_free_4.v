@@ -431,53 +431,45 @@ Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
   (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) t) = (eval_term sigma
   (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) t)).
 
+Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
+  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
+  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
+  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
+
+Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
+  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
+  t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
+
 Require Import Why3.
 
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem eval_swap : forall (f:fmla),
+Theorem eval_change_free : forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (f:fmla),
   match f with
   | (Fterm t) => True
   | (Fand f1 f2) => True
   | (Fnot f1) => True
   | (Fimplies f1 f2) => True
   | (Flet i t f1) => True
-  | (Fforall i d f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (l:(list (ident* value)%type)) (id1:ident) (id2:ident)
-      (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-      (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f1) <->
-      (eval_fmla sigma (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi)))
-      f1))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (l:(list (ident* value)%type)) (id1:ident) (id2:ident)
-      (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-      (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f) ->
-      (eval_fmla sigma (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi)))
-      f))
+  | (Fforall i d f1) => (forall (id:ident) (v:value), (fresh_in_fmla id
+      f1) -> ((eval_fmla sigma (Cons (id, v) pi) f1) <-> (eval_fmla sigma pi
+      f1))) -> forall (id:ident) (v:value), (fresh_in_fmla id f) ->
+      ((eval_fmla sigma (Cons (id, v) pi) f) -> (eval_fmla sigma pi f))
   end.
 destruct f; auto.
 intros.
 simpl in *.
-assert (h: forall (l1 l2 : list (ident*value)) (a : (ident*value)), 
-   (Cons a (infix_plpl l1 l2)) = (infix_plpl (Cons a l1) l2)).
-intros.
-induction l1.
-simpl; auto.
-simpl; auto.
-destruct d; auto.
-(* Void *)
+destruct d.
+(* TYunit*)
+destruct H0.
+rewrite H in H1.
 ae.
-(*rewrite h.
-rewrite h in H1.
-apply H; auto.*)
-(* Int *)
-intros.
-rewrite h.
-ae.
-(* Bool *)
-intros.
-rewrite h.
-ae.
+(* TYint *)
+
+(*TYbool *)
 Qed.
 
 

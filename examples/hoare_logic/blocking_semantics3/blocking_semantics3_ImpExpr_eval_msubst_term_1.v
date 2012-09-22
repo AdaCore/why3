@@ -426,7 +426,6 @@ rewrite H1.
 rewrite H2; auto.
 apply fresh_in_binop with (t:=t) (t':=t') (op := op).
 apply fresh_in_binop with (t:=t) (t':=t') (op := op).
-admit.
 Qed.
 
 

@@ -375,6 +375,15 @@ Axiom fresh_in_binop : forall (t:term) (t':term) (op:operator) (v:ident),
   (fresh_in_term v (Tbin t op t')) -> ((fresh_in_term v t) /\
   (fresh_in_term v t')).
 
+Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v e) ->
+  ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
+  (get_stack v pi)) pi e)).
+
+Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
+  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
+  t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
+
 (* Why3 assumption *)
 Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
   match f with
@@ -412,72 +421,40 @@ Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
 Axiom subst_fresh_term : forall (t:term) (x:ident) (v:ident),
   (fresh_in_term x t) -> ((subst_term t x v) = t).
 
-Axiom subst_fresh : forall (f:fmla) (x:ident) (v:ident), (fresh_in_fmla x
-  f) -> ((subst f x v) = f).
-
-Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v e) ->
-  ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
-  (get_stack v pi)) pi e)).
-
-Axiom eval_msubst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v f) ->
-  ((eval_fmla sigma pi (msubst f x v)) <-> (eval_fmla (set sigma x
-  (get_stack v pi)) pi f)).
-
-Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_term sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) t) = (eval_term sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) t)).
-
 Require Import Why3.
 
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem eval_swap : forall (f:fmla),
+Theorem subst_fresh : forall (f:fmla),
   match f with
   | (Fterm t) => True
   | (Fand f1 f2) => True
   | (Fnot f1) => True
   | (Fimplies f1 f2) => True
-  | (Flet i t f1) => True
-  | (Fforall i d f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (l:(list (ident* value)%type)) (id1:ident) (id2:ident)
-      (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-      (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f1) <->
-      (eval_fmla sigma (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi)))
-      f1))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (l:(list (ident* value)%type)) (id1:ident) (id2:ident)
-      (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-      (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f) ->
-      (eval_fmla sigma (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi)))
-      f))
+  | (Flet i t f1) => (forall (x:ident) (v:ident), (fresh_in_fmla x f1) ->
+      ((subst f1 x v) = f1)) -> forall (x:ident) (v:ident), (fresh_in_fmla x
+      f) -> ((subst f x v) = f)
+  | (Fforall i d f1) => True
   end.
 destruct f; auto.
-intros.
-simpl in *.
-assert (h: forall (l1 l2 : list (ident*value)) (a : (ident*value)), 
-   (Cons a (infix_plpl l1 l2)) = (infix_plpl (Cons a l1) l2)).
-intros.
-induction l1.
-simpl; auto.
-simpl; auto.
-destruct d; auto.
-(* Void *)
+simpl.
+intros H x v (H1 & H2 & H3).
+simpl.
+destruct t.
+(* Tvalue *)
 ae.
-(*rewrite h.
-rewrite h in H1.
-apply H; auto.*)
-(* Int *)
-intros.
-rewrite h.
+(* Tvar *)
 ae.
-(* Bool *)
-intros.
-rewrite h.
+(* Tderef *)
 ae.
+(* Tbin *)
+rewrite H; auto.
+apply fresh_in_binop in H2.
+rewrite (subst_term_def (Tbin t1 o t2) x v).
+destruct H2.
+rewrite subst_fresh_term; auto.
+rewrite subst_fresh_term; auto.
 Qed.
 
 
