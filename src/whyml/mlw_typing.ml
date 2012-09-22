@@ -370,16 +370,28 @@ let deff_of_peff uc pe =
     deff_writes = pe.pe_writes;
     deff_raises = List.map (fun (gh,q) -> gh, find_xsymbol uc q) pe.pe_raises; }
 
-let dxpost uc ql = List.map (fun (q,f) -> find_xsymbol uc q, f) ql
+exception DuplicateException of xsymbol
 
-let rec dtype_c denv tyc =
-  let tyv, dvty = dtype_v denv tyc.pc_result_type in
-  { dc_result = tyv;
-    dc_effect = deff_of_peff denv.uc tyc.pc_effect;
-    dc_pre    = tyc.pc_pre;
-    dc_post   = fst tyc.pc_post;
-    dc_xpost  = dxpost denv.uc (snd tyc.pc_post); },
-  dvty
+let dxpost uc ql =
+  let add_exn m (q,f) =
+    let xs = find_xsymbol uc q in
+    Mexn.add_new (DuplicateException xs) xs f m in
+  List.fold_left add_exn Mexn.empty ql
+
+let dvariant uc var =
+  List.map (fun (le,q) -> le, Util.option_map (find_variant_ls uc) q) var
+
+let dspec uc sp = {
+  ds_pre     = sp.sp_pre;
+  ds_post    = sp.sp_post;
+  ds_xpost   = dxpost uc sp.sp_xpost;
+  ds_effect  = deff_of_peff uc sp.sp_effect;
+  ds_variant = dvariant uc sp.sp_variant;
+}
+
+let rec dtype_c denv (tyv, sp) =
+  let tyv, dvty = dtype_v denv tyv in
+  (tyv, dspec denv.uc sp), dvty
 
 and dtype_v denv = function
   | Tpure pty ->
@@ -389,9 +401,6 @@ and dtype_v denv = function
       let denv,bl,tyl = dbinders denv bl in
       let tyc,(argl,res) = dtype_c denv tyc in
       DSpecA (bl,tyc), (tyl @ argl,res)
-
-let dvariant uc var =
-  List.map (fun (le,q) -> le, Util.option_map (find_variant_ls uc) q) var
 
 (* expressions *)
 
@@ -451,7 +460,7 @@ and de_desc denv loc = function
       DEletrec (fdl, e1), e1.de_type
   | Ptree.Efun (bl, tr) ->
       let denv, bl, tyl = dbinders denv bl in
-      let tr, (argl, res) = dtriple denv [] tr in
+      let tr, (argl, res) = dtriple denv tr in
       DEfun (bl, tr), (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in
@@ -592,10 +601,10 @@ and de_desc denv loc = function
   | Ptree.Eghost e1 ->
       let e1 = dexpr denv e1 in
       DEghost e1, e1.de_type
-  | Ptree.Eabstract (e1, (q,xq)) ->
+  | Ptree.Eabstract (e1, sp) ->
       let e1 = dexpr denv e1 in
-      let xq = dxpost denv.uc xq in
-      DEabstract (e1, q, xq), e1.de_type
+      let sp = dspec denv.uc sp in
+      DEabstract (e1, sp), e1.de_type
   | Ptree.Eloop ({ loop_invariant = inv; loop_variant = var }, e1) ->
       let e1 = dexpr denv e1 in
       let var = dvariant denv.uc var in
@@ -613,7 +622,7 @@ and de_desc denv loc = function
 
 and dletrec denv fdl =
   (* add all functions into the environment *)
-  let add_one denv (_,id,_,bl,_,_) =
+  let add_one denv (_,id,_,bl,_) =
     let argl = List.map (fun _ -> create_type_variable ()) bl in
     let dvty = argl, create_type_variable () in
     let tvars = add_dvty denv.tvars dvty in
@@ -621,25 +630,24 @@ and dletrec denv fdl =
     { denv with locals = locals; tvars = tvars }, dvty in
   let denv, dvtyl = Util.map_fold_left add_one denv fdl in
   (* then unify the binders *)
-  let bind_one (_,_,_,bl,_,_) (argl,res) =
+  let bind_one (_,_,_,bl,_) (argl,res) =
     let denv,bl,tyl = dbinders denv bl in
     List.iter2 unify argl tyl;
     denv,bl,tyl,res in
   let denvl = List.map2 bind_one fdl dvtyl in
   (* then type-check the bodies *)
-  let type_one (loc,id,gh,_,var,tr) (denv,bl,tyl,tyv) =
-    let tr, (argl, res) = dtriple denv var tr in
+  let type_one (loc,id,gh,_,tr) (denv,bl,tyl,tyv) =
+    let tr, (argl, res) = dtriple denv tr in
     if argl <> [] then errorm ~loc
       "The body of a recursive function must be a first-order value";
     unify_loc unify loc tyv res;
     id, gh, (tyl, tyv), bl, tr in
   List.map2 type_one fdl denvl
 
-and dtriple denv var (p, e, (q, xq)) =
+and dtriple denv (e, sp) =
   let e = dexpr denv e in
-  let var = dvariant denv.uc var in
-  let xq = dxpost denv.uc xq in
-  (var, p, e, q, xq), e.de_type
+  let sp = dspec denv.uc sp in
+  (e, sp), e.de_type
 
 (** stage 2 *)
 
@@ -710,16 +718,30 @@ let reset_vars eff pvs =
   if Mreg.is_empty eff.eff_resets then Svs.empty else
   Spv.fold add pvs Svs.empty
 
+(* add dummy postconditions for uncovered exceptions *)
+let complete_xpost eff xq =
+  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
+(*
+  let check xs _ = Loc.errorm
+    "this expression does not raise exception %a" print_xs xs in
+  Mexn.iter check (Mexn.set_diff xq xe);
+*)
+  let dummy { xs_ity = ity } () =
+    let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
+    Mlw_ty.create_post v t_true in
+  Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xe xq))
+
 let spec_invariant lenv pvs vty spec =
   let ity = ity_or_unit vty in
   let pvs = spec_pvset pvs spec in
   let rvs = reset_vars spec.c_effect pvs in
+  let xpost = complete_xpost spec.c_effect spec.c_xpost in
   let pinv,qinv = env_invariant lenv spec.c_effect pvs in
   let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { spec with c_pre   = t_and_simp spec.c_pre pinv;
               c_post  = post_inv ity spec.c_post;
-              c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
+              c_xpost = Mexn.mapi xpost_inv xpost }
 
 let abstr_invariant lenv e spec0 =
   let pvs = e_pvset Spv.empty e in
@@ -751,6 +773,8 @@ let create_post lenv x ty f =
 let create_xpost lenv x xs f = create_post lenv x (ty_of_ity xs.xs_ity) f
 let create_post lenv x vty f = create_post lenv x (ty_of_vty vty) f
 
+let create_xpost lenv x xq = Mexn.mapi (create_xpost lenv x) xq
+
 let create_pre lenv f =
   let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
   count_term_tuples f;
@@ -773,8 +797,6 @@ let add_local x lv lenv = match lv with
         log_vars = Mstr.add x pv.pv_vs lenv.log_vars;
         log_denv = Typing.add_var x dty lenv.log_denv }
 
-exception DuplicateException of xsymbol
-
 let binders bl =
   let binder (id, ghost, dity) =
     let vtv = vty_value ~ghost (ity_of_dity dity) in
@@ -784,21 +806,6 @@ let binders bl =
 let add_binders lenv pvl =
   let add lenv pv = add_local pv.pv_vs.vs_name.id_string (LetV pv) lenv in
   List.fold_left add lenv pvl
-
-let xpost lenv xq =
-  let add_exn m (xs,f) =
-    let f = create_xpost lenv "result" xs f in
-    Mexn.add_new (DuplicateException xs) xs f m in
-  List.fold_left add_exn Mexn.empty xq
-
-(* add dummy postconditions for uncovered exceptions *)
-let complete_xpost lenv eff xq =
-  let xq = xpost lenv xq in
-  let dummy { xs_ity = ity } () =
-    let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
-    Mlw_ty.create_post v t_true in
-  let xs = Sexn.union eff.eff_raises eff.eff_ghostx in
-  Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xs xq))
 
 (* TODO: devise a good grammar for effect expressions *)
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
@@ -879,9 +886,16 @@ let eff_of_deff lenv deff =
   let eff = List.fold_left add_raise eff deff.deff_raises in
   eff, svs
 
-let rec type_c lenv gh pvs vars dtyc =
-  let vty = type_v lenv gh pvs vars dtyc.dc_result in
-  let eff, esvs = eff_of_deff lenv dtyc.dc_effect in
+let spec_of_dspec lenv eff vty dsp = {
+  c_pre     = create_pre lenv dsp.ds_pre;
+  c_post    = create_post lenv "result" vty dsp.ds_post;
+  c_xpost   = create_xpost lenv "result" dsp.ds_xpost;
+  c_effect  = eff;
+  c_variant = List.map (create_variant lenv) dsp.ds_variant; }
+
+let rec type_c lenv gh pvs vars (dtyv, dsp) =
+  let vty = type_v lenv gh pvs vars dtyv in
+  let eff, esvs = eff_of_deff lenv dsp.ds_effect in
   (* reset every new region in the result *)
   let eff = match vty with
     | VTvalue v ->
@@ -894,13 +908,7 @@ let rec type_c lenv gh pvs vars dtyc =
     let on_reg r e = if Sreg.mem r writes then e else eff_refresh e r u in
     reg_fold on_reg u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
-  (* create the spec *)
-  let spec = {
-    c_pre     = create_pre lenv dtyc.dc_pre;
-    c_effect  = eff;
-    c_post    = create_post lenv "result" vty dtyc.dc_post;
-    c_xpost   = complete_xpost lenv eff dtyc.dc_xpost;
-    c_variant = []; } in
+  let spec = spec_of_dspec lenv eff vty dsp in
   (* we add an exception postcondition for %Exit that mentions
      every external variable in effect expressions which also
      does not occur in pre/post/xpost. In this way, we keep
@@ -1070,13 +1078,9 @@ and expr_desc lenv loc de = match de.de_desc with
         let lenv = Mstr.fold (fun s pv -> add_local s (LetV pv)) vm lenv in
         pp, expr lenv de in
       e_case e1 (List.map branch bl)
-  | DEabstract (de1, q, xq) ->
+  | DEabstract (de1, dsp) ->
       let e1 = expr lenv de1 in
-      let q = create_post lenv "result" e1.e_vty q in
-      let xq = complete_xpost lenv e1.e_effect xq in
-      let spec = {
-        c_pre = t_true; c_post = q; c_xpost = xq;
-        c_effect = eff_empty; c_variant = [] } in
+      let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
@@ -1132,8 +1136,8 @@ and expr_desc lenv loc de = match de.de_desc with
       e_for pv efrom dir eto inv e1
 
 and expr_rec lenv fdl =
-  let step1 lenv (id, gh, _, bl, tr) =
-    let pvl = binders bl in let (_,_,de,_,_) = tr in
+  let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
+    let pvl = binders bl in
     let vta = vty_arrow pvl ~ghost:gh (vty_of_dvty de.de_type) in
     let ps = create_psymbol (Denv.create_user_id id) vta in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
@@ -1153,18 +1157,12 @@ and expr_fun lenv x gh bl tr =
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   create_fun_defn (Denv.create_user_id x) lam
 
-and expr_lam lenv gh pvl (var, p, de, q, xq) =
+and expr_lam lenv gh pvl (de, dsp) =
   let lenv = add_binders lenv pvl in
   let e = e_ghostify gh (expr lenv de) in
   if not gh && vty_ghost e.e_vty then
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
-  let spec = {
-    c_pre = create_pre lenv p;
-    c_post = create_post lenv "result" e.e_vty q;
-    c_xpost = complete_xpost lenv e.e_effect xq;
-    c_effect = e.e_effect;
-    c_variant = List.map (create_variant lenv) var; }
-  in
+  let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
 
 (** Type declaration *)

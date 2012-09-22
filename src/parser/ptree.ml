@@ -197,8 +197,16 @@ type effect = {
 }
 
 type pre = lexpr
+type post = lexpr
+type xpost = (qualid * post) list
 
-type post = lexpr * (qualid * lexpr) list
+type spec = {
+  sp_pre     : pre;
+  sp_post    : post;
+  sp_xpost   : xpost;
+  sp_effect  : effect;
+  sp_variant : variant list;
+}
 
 type binder = ident * ghost * pty option
 
@@ -206,12 +214,7 @@ type type_v =
   | Tpure of pty
   | Tarrow of binder list * type_c
 
-and type_c = {
-  pc_result_type : type_v;
-  pc_effect      : effect;
-  pc_pre         : pre;
-  pc_post        : post;
-}
+and type_c = type_v * spec
 
 type expr = {
   expr_desc : expr_desc;
@@ -247,12 +250,12 @@ and expr_desc =
   | Ecast of expr * pty
   | Eany of type_c
   | Eghost of expr
-  | Eabstract of expr * post
+  | Eabstract of triple
   | Enamed of label * expr
 
-and letrec = loc * ident * ghost * binder list * variant list * triple
+and letrec = loc * ident * ghost * binder list * triple
 
-and triple = pre * expr * post
+and triple = expr * spec
 
 type pdecl =
   | Dlet of ident * ghost * expr

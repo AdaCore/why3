@@ -315,12 +315,11 @@ let rec dutype_v env = function
       let c = dutype_c env c in
       DUTarrow (bl, c)
 
-and dutype_c env c =
-  let ty = dutype_v env c.Ptree.pc_result_type in
-  { duc_result_type = ty;
-    duc_effect      = dueffect env c.Ptree.pc_effect;
-    duc_pre         = c.Ptree.pc_pre;
-    duc_post        = dpost env.uc c.Ptree.pc_post;
+and dutype_c env (ty,sp) =
+  { duc_result_type = dutype_v env ty;
+    duc_effect      = dueffect env sp.Ptree.sp_effect;
+    duc_pre         = sp.Ptree.sp_pre;
+    duc_post        = dpost env.uc (sp.Ptree.sp_post, sp.Ptree.sp_xpost);
   }
 
 and dubinder env ({id=x; id_loc=loc} as id, gh, v) =
@@ -496,7 +495,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEapply (e1, e2), ty
   | Ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dubinder env bl in
-      let (_,e,_) as t = dtriple ~ghost ~userloc env t in
+      let _, ((_,e,_) as t) = dtriple ~ghost ~userloc env t in
       let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
@@ -735,7 +734,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEany c, dpurify_utype_v c.duc_result_type
   | Ptree.Eabstract(e1,q) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      let q = dpost env.uc q in
+      let q = dpost env.uc (q.sp_post, q.sp_xpost) in
       DEabstract(e1, q), e1.dexpr_type
   | Ptree.Eghost _ ->
       no_ghost true;
@@ -745,18 +744,17 @@ and dexpr_desc ~ghost ~userloc env loc = function
 
 and dletrec ~ghost ~userloc env dl =
   (* add all functions into environment *)
-  let add_one env (_loc, id, gh, bl, var, t) =
+  let add_one env (_loc, id, gh, bl, t) =
     no_ghost gh;
     let ty = create_type_var id.id_loc in
     let env = add_local_top env id.id ty in
-    env, ((id, ty), bl, var, t)
+    env, ((id, ty), bl, t)
   in
   let env, dl = map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
-  let type_one ((id, tyres), bl, v, t) =
+  let type_one ((id, tyres), bl, t) =
     let env, bl = map_fold_left dubinder env bl in
-    let v = dvariants env v in
-    let (_,e,_) as t = dtriple ~ghost ~userloc env t in
+    let v, ((_,e,_) as t) = dtriple ~ghost ~userloc env t in
     let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then
@@ -767,10 +765,11 @@ and dletrec ~ghost ~userloc env dl =
   in
   env, List.map type_one dl
 
-and dtriple ~ghost ~userloc env (p, e, q) =
+and dtriple ~ghost ~userloc env (e, sp) =
+  let v = dvariants env sp.sp_variant in
   let e = dexpr ~ghost ~userloc env e in
-  let q = dpost env.uc q in
-  (p, e, q)
+  let q = dpost env.uc (sp.sp_post, sp.sp_xpost) in
+  v, (sp.sp_pre, e, q)
 
 (*** regions tables ********************************************************)
 
