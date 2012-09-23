@@ -34,7 +34,7 @@ type data_decl = itysymbol * constructor list * post
 
 type pdecl = {
   pd_node : pdecl_node;
-(*   pd_syms : Sid.t;         (* idents used in declaration *) *)
+  pd_syms : Sid.t;         (* idents used in declaration *)
   pd_news : Sid.t;         (* idents introduced in declaration *)
   pd_tag  : int;           (* unique tag *)
 }
@@ -51,9 +51,9 @@ let pd_equal : pdecl -> pdecl -> bool = (==)
 
 let mk_decl =
   let r = ref 0 in
-  fun node (*syms*) news ->
+  fun node syms news ->
     incr r;
-    { pd_node = node; (*pd_syms = syms;*) pd_news = news; pd_tag = !r; }
+    { pd_node = node; pd_syms = syms; pd_news = news; pd_tag = !r; }
 
 let news_id s id = Sid.add_new (Decl.ClashIdent id) id s
 
@@ -116,7 +116,7 @@ let syms_expr s _e = s (* TODO *)
 let create_ty_decl its =
 (*   let syms = Util.option_fold syms_ity Sid.empty its.its_def in *)
   let news = Sid.singleton its.its_pure.ts_name in
-  mk_decl (PDtype its) (*syms*) news
+  mk_decl (PDtype its) Sid.empty news
 
 type pre_constructor = preid * (pvsymbol * bool) list
 
@@ -173,7 +173,7 @@ let create_data_decl tdl =
     its, List.map (build_constructor its) cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
-  mk_decl (PDdata tdl) (*!syms*) !news
+  mk_decl (PDdata tdl) Sid.empty !news
 
 let add_invariant pd its p =
   if not its.its_inv then invalid_arg "Mlw_decl.add_invariant";
@@ -191,7 +191,7 @@ let add_invariant pd its p =
     | [] -> raise Not_found
   in
   match pd.pd_node with
-    | PDdata tdl -> mk_decl (PDdata (add tdl)) (*pd.pd_syms*) pd.pd_news
+    | PDdata tdl -> mk_decl (PDdata (add tdl)) pd.pd_syms pd.pd_news
     | _ -> invalid_arg "Mlw_decl.add_invariant"
 
 let check_vars vars =
@@ -215,18 +215,20 @@ let create_let_decl ld =
   let news = match ld.let_sym with
     | LetA ps -> new_regs vars news ps.ps_vars
     | LetV pv -> new_regs vars news pv.pv_vars in
+  let syms = Mid.map (fun _ -> ()) ld.let_expr.e_varm in
 (*
   let syms = syms_varmap Sid.empty ld.let_expr.e_vars in
   let syms = syms_effect syms ld.let_expr.e_effect in
   let syms = syms_vty syms ld.let_expr.e_vty in
   let syms = syms_expr syms ld.let_expr in
 *)
-  mk_decl (PDlet ld) (*syms*) news
+  mk_decl (PDlet ld) syms news
 
 let create_rec_decl fdl =
   let add_fd s { fun_ps = p } =
     check_vars p.ps_vars; news_id s p.ps_name in
   let news = List.fold_left add_fd Sid.empty fdl in
+  let syms = Mid.map (fun _ -> ()) (rec_varmap Mid.empty fdl) in
 (*
   let add_fd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
     let syms = syms_varmap syms vm in
@@ -240,27 +242,27 @@ let create_rec_decl fdl =
     syms_expr syms l.l_expr in
   let syms = List.fold_left add_fd Sid.empty fdl in
 *)
-  mk_decl (PDrec fdl) (*syms*) news
+  mk_decl (PDrec fdl) syms news
 
 let create_val_decl lv =
   let news = letvar_news lv in
-  let news = match lv with
+  let news, syms = match lv with
     | LetV { pv_vtv = { vtv_mut = Some _ }} ->
         Loc.errorm "abstract parameters cannot be mutable"
-    | LetV pv -> new_regs vars_empty news pv.pv_vars
-    | LetA _ -> news in
+    | LetV pv -> new_regs vars_empty news pv.pv_vars, Sid.empty
+    | LetA ps -> news, Mid.map (fun _ -> ()) ps.ps_varm in
 (*
   let syms = syms_type_v Sid.empty vd.val_spec in
   let syms = syms_varmap syms vd.val_vars in
 *)
-  mk_decl (PDval lv) (*syms*) news
+  mk_decl (PDval lv) syms news
 
 let create_exn_decl xs =
   let news = Sid.singleton xs.xs_name in
 (*
   let syms = syms_ity Sid.empty xs.xs_ity in
 *)
-  mk_decl (PDexn xs) (*syms*) news
+  mk_decl (PDexn xs) Sid.empty news
 
 (** {2 Cloning} *)
 
@@ -281,7 +283,7 @@ let clone_data_decl sm pd = match pd.pd_node with
         news := news_id !news its.its_pure.ts_name;
         its, List.map add_cs csl, inv in
       let tdl = List.map add_td tdl in
-      mk_decl (PDdata tdl) (*!syms*) !news
+      mk_decl (PDdata tdl) Sid.empty !news
   | _ -> invalid_arg "Mlw_decl.clone_data_decl"
 
 (** {2 Known identifiers} *)
@@ -298,18 +300,6 @@ let merge_known kn1 kn2 =
   in
   Mid.union check_known kn1 kn2
 
-let pd_vars pd = match pd.pd_node with
-  | PDval (LetV _) -> Sid.empty
-  | PDval (LetA ps) -> Mid.map (fun _ -> ()) ps.ps_varm
-  | PDlet ld -> Mid.map (fun _ -> ()) ld.let_expr.e_varm
-  | PDrec fdl ->
-      let add_fd s fd = Mid.set_union s fd.fun_varm in
-      let del_fd s fd = Mid.remove fd.fun_ps.ps_name s in
-      let varm = List.fold_left add_fd Mid.empty fdl in
-      let varm = List.fold_left del_fd varm fdl in
-      Mid.map (fun _ -> ()) varm
-  | PDtype _ | PDdata _ | PDexn _ -> Sid.empty
-
 let known_add_decl lkn0 kn0 d =
   let kn = Mid.map (const d) d.pd_news in
   let check id decl0 _ =
@@ -317,7 +307,7 @@ let known_add_decl lkn0 kn0 d =
     then raise (KnownIdent id)
     else raise (RedeclaredIdent id) in
   let kn = Mid.union check kn0 kn in
-  let unk = Mid.set_diff (pd_vars d) kn in
+  let unk = Mid.set_diff d.pd_syms kn in
   let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))

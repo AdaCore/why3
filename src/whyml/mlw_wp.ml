@@ -708,21 +708,19 @@ and wp_desc env e q xq = match e.e_node with
       let p = t_label ?loc:e.e_loc p.t_label p in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
-      wp_and ~sym:false p w (* FIXME? do we need pre? *)
+      wp_and ~sym:false p w
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
       let d =
-        if spec.c_variant = [] then t_true else
-        let olds = match e1.e_vty with
-          | VTarrow a -> Mint.find_def [] a.vta_family env.letrec_var
-          | _ -> assert false in
+        if spec.c_letrec = 0 || spec.c_variant = [] then t_true else
+        let olds = Mint.find_def [] spec.c_letrec env.letrec_var in
         if olds = [] then t_true (* we are out of letrec *) else
         let d = decrease ?loc:e.e_loc env olds spec.c_variant in
         wp_expl expl_variant (t_label ?loc:e.e_loc d.t_label d) in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
-      let w = wp_and ~sym:false (wp_and ~sym:true d p) w in (* FIXME? ~sym? *)
+      let w = wp_and ~sym:false (wp_and ~sym:true d p) w in
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
   | Eabstr (e1, spec) ->
@@ -819,29 +817,26 @@ and wp_abstract env c_eff c_q c_xq q xq =
   in
   backstep proceed c_q c_xq
 
-and wp_fun_defn env faml { fun_ps = ps ; fun_lambda = l } =
+and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () and c = l.l_spec in
   let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env = if c.c_variant = [] then env else
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
     let lab = t_var lab in
     let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
     let tl = List.map t_at_lab c.c_variant in
-    let add_family lrv fam = Mint.add fam tl lrv in
-    let lrv = List.fold_left add_family env.letrec_var faml in
-    { env with letrec_var = lrv }
-  in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
   let q = old_mark lab (wp_expl expl_post c.c_post) in
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv c.c_xpost) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
-and wp_rec_defn env fdl =
-  let faml = List.map (fun fd -> fd.fun_ps.ps_vta.vta_family) fdl in
-  List.map (wp_fun_defn env faml) fdl
+and wp_rec_defn env fdl = List.map (wp_fun_defn env) fdl
 
 (***
 let bool_to_prop env f =
@@ -1082,7 +1077,7 @@ and fast_wp_desc env s r e =
   | Evalue _ -> assert false (*TODO*)
   | Eabsurd -> assert false (*TODO*)
 
-and fast_wp_fun_defn env faml { fun_ps = ps ; fun_lambda = l } =
+and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
      NE: true *)
   let lab = fresh_mark () and c = l.l_spec in
@@ -1090,14 +1085,13 @@ and fast_wp_fun_defn env faml { fun_ps = ps ; fun_lambda = l } =
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env = if c.c_variant = [] then env else
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
     let lab = t_var lab in
     let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
     let tl = List.map t_at_lab c.c_variant in
-    let add_family lrv fam = Mint.add fam tl lrv in
-    let lrv = List.fold_left add_family env.letrec_var faml in
-    { env with letrec_var = lrv }
-  in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
   let q = old_mark lab (wp_expl expl_post c.c_post) in
   let result, _ as q = open_post q in
   let conv p = old_mark lab (wp_expl expl_xpost p) in
@@ -1109,9 +1103,7 @@ and fast_wp_fun_defn env faml { fun_ps = ps ; fun_lambda = l } =
   let f = wp_implies c.c_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
-and fast_wp_rec_defn env fdl =
-  let faml = List.map (fun fd -> fd.fun_ps.ps_vta.vta_family) fdl in
-  List.map (fast_wp_fun_defn env faml) fdl
+and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
 let fast_wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in

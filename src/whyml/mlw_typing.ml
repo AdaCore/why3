@@ -891,7 +891,9 @@ let spec_of_dspec lenv eff vty dsp = {
   c_post    = create_post lenv "result" vty dsp.ds_post;
   c_xpost   = create_xpost lenv "result" dsp.ds_xpost;
   c_effect  = eff;
-  c_variant = List.map (create_variant lenv) dsp.ds_variant; }
+  c_variant = List.map (create_variant lenv) dsp.ds_variant;
+  c_letrec  = 0;
+}
 
 let rec type_c lenv gh pvs vars (dtyv, dsp) =
   let vty = type_v lenv gh pvs vars dtyv in

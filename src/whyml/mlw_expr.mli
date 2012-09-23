@@ -211,6 +211,8 @@ val create_let_defn : preid -> expr -> let_defn
 val create_fun_defn : preid -> lambda -> fun_defn
 val create_rec_defn : (psymbol * lambda) list -> fun_defn list
 
+val rec_varmap : varmap -> fun_defn list -> varmap
+
 exception StaleRegion of expr * ident
 (* freshness violation: a previously reset region is associated to an ident *)
 

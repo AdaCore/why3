@@ -409,7 +409,7 @@ let vtv_check vars eff vtv =
 let rec vta_check vars vta =
   let add_arg vars pv = vars_union vars pv.pv_vars in
   let vars = List.fold_left add_arg vars vta.vta_args in
-  if vta.vta_spec.c_variant <> [] then
+  if vta.vta_spec.c_variant <> [] || vta.vta_spec.c_letrec <> 0 then
     Loc.errorm "variants are not allowed in a parameter declaration";
   eff_check vars vta.vta_result vta.vta_spec.c_effect;
   match vta.vta_result with
@@ -939,16 +939,17 @@ let e_try e0 bl =
 let pv_dummy = create_pvsymbol (id_fresh "dummy") (vty_value ity_unit)
 
 let e_any spec vty =
+  if spec.c_variant <> [] || spec.c_letrec <> 0 then
+    Loc.errorm "variants are not allowed in `any'";
   let vta = vty_arrow [pv_dummy] ~spec vty in
   let varm = vta_varmap vta in
   vta_check (vars_merge varm vars_empty) vta;
   mk_expr (Eany spec) vty spec.c_effect varm
 
 let e_abstract e spec =
-  if spec.c_variant <> [] then
+  if spec.c_variant <> [] || spec.c_letrec <> 0 then
     Loc.errorm "variants are not allowed in `abstract'";
-  let spec = { spec with c_effect = e.e_effect } in
-  spec_check spec e.e_vty;
+  spec_check { spec with c_effect = e.e_effect } e.e_vty;
   let varm = spec_varmap e.e_varm spec in
   mk_expr (Eabstr (e,spec)) e.e_vty e.e_effect varm
 
@@ -974,14 +975,24 @@ let create_fun_defn id lam recsyms =
     | vty -> vty in
   let vta = vty_arrow lam.l_args ~spec vty in
   { fun_ps     = create_psymbol_poly id vta varm_ps;
-    fun_lambda = { lam with l_spec = spec };
+    fun_lambda = lam;
     fun_varm   = varm; }
 
-let e_rec fdl e =
+let rec_varmap varm fdl =
+  let fd, rest = match fdl with
+    | [] -> invalid_arg "Mlw_expr.rec_varm"
+    | fd :: fdl -> fd, fdl in
+  let lr = fd.fun_ps.ps_vta.vta_spec.c_letrec in
+  let bad fd = fd.fun_ps.ps_vta.vta_spec.c_letrec <> lr in
+  if List.exists bad rest then invalid_arg "Mlw_expr.rec_varm";
   let add_fd m fd = varmap_union fd.fun_varm m in
   let del_fd m fd = Mid.remove fd.fun_ps.ps_name m in
-  let varm = List.fold_left add_fd e.e_varm fdl in
+  let varm = List.fold_left add_fd varm fdl in
   let varm = List.fold_left del_fd varm fdl in
+  varm
+
+let e_rec fdl e =
+  let varm = rec_varmap e.e_varm fdl in
   mk_expr (Erec (fdl,e)) e.e_vty e.e_effect varm
 
 (* compute the fixpoint on recursive definitions *)
@@ -1081,7 +1092,7 @@ and subst_fd psm fdl =
    and with the same final spec (except the effect). The result
    is passed to create_rec_defn above which repeats substitution
    until the effects are stabilized. TODO: prove correctness *)
-let create_rec_defn defl =
+let create_rec_defn = let letrec = ref 1 in fun defl ->
   if defl = [] then invalid_arg "Mlw_expr.create_rec_defn";
   (* check that the all variants use the same order *)
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
@@ -1101,13 +1112,16 @@ let create_rec_defn defl =
     | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
         "The body of a recursive function must be a first-order value"
     | VTvalue _ ->
+        let spec = { lam.l_spec with c_letrec = !letrec } in
+        let lam = { lam with l_spec = spec } in
         let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
         Mid.add ps.ps_name fd.fun_ps m, fd in
   let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  incr letrec;
   subst_fd m fdl
 
 let create_fun_defn id lam =
-  if lam.l_spec.c_variant <> [] then
+  if lam.l_spec.c_variant <> [] || lam.l_spec.c_letrec <> 0 then
     Loc.errorm "variants are not allowed in a non-recursive definition";
   create_fun_defn id lam Sid.empty
 
