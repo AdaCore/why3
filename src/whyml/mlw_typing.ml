@@ -868,8 +868,7 @@ let get_eff_regs lenv fn (eff,svs) ghost le =
       let ghost_regs = List.fold_left add_cs Sreg.empty csl in
       let add_reg eff reg0 reg =
         let ghost = ghost || Sreg.mem reg0 ghost_regs in
-        fn eff ?ghost:(Some ghost) reg
-      in
+        fn eff ?ghost:(Some ghost) reg in
       List.fold_left2 add_reg eff its.its_regs regl, Svs.add vs svs
   | _ ->
       errorm ~loc:le.pp_loc "mutable expression expected"
@@ -883,6 +882,29 @@ let eff_of_deff lenv deff =
   let add_raise eff (gh,xs) = eff_raise eff ~ghost:gh xs in
   let eff = List.fold_left add_raise eff deff.deff_raises in
   eff, svs
+
+let check_user_effect lenv e dsp =
+  let acc = eff_empty, Svs.empty in
+  let read le eff ?(ghost=false) reg =
+    if (not ghost && Sreg.mem reg e.e_effect.eff_reads) ||
+           (ghost && Sreg.mem reg e.e_effect.eff_ghostr)
+    then eff else Loc.errorm ~loc:le.pp_loc
+      "this read effect never happens in the expression" in
+  let check_read (gh,e) = ignore (get_eff_regs lenv (read e) acc gh e) in
+  List.iter check_read dsp.ds_effect.deff_reads;
+  let write le eff ?(ghost=false) reg =
+    if (not ghost && Sreg.mem reg e.e_effect.eff_writes) ||
+           (ghost && Sreg.mem reg e.e_effect.eff_ghostw)
+    then eff else Loc.errorm ~loc:le.pp_loc
+      "this write effect never happens in the expression" in
+  let check_write (gh,e) = ignore (get_eff_regs lenv (write e) acc gh e) in
+  List.iter check_write dsp.ds_effect.deff_writes;
+  let check_raise (ghost,xs) =
+    if (not ghost && Sexn.mem xs e.e_effect.eff_raises) ||
+           (ghost && Sexn.mem xs e.e_effect.eff_ghostx)
+    then () else Loc.errorm
+      "this expression does not raise exception %a" print_xs xs in
+  List.iter check_raise dsp.ds_effect.deff_raises
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
@@ -909,6 +931,8 @@ let rec type_c lenv gh pvs vars (dtyv, dsp) =
     reg_fold on_reg u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
   let spec = spec_of_dspec lenv eff vty dsp in
+  if spec.c_variant <> [] then Loc.errorm
+    "variants are not allowed in a parameter declaration";
   (* we add a fake variant term for every external variable in effect
      expressions which also does not occur in pre/post/xpost. In this
      way, we store the variable in the specification in order to keep
@@ -1072,6 +1096,9 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEabstract (de1, dsp) ->
       let e1 = expr lenv de1 in
       let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
+      if spec.c_variant <> [] then Loc.errorm
+        "variants are not allowed in `abstract'";
+      check_user_effect lenv e1 dsp;
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
@@ -1126,13 +1153,13 @@ and expr_desc lenv loc de = match de.de_desc with
       let e1 = expr lenv de1 in
       e_for pv efrom dir eto inv e1
 
-and expr_rec lenv fdl =
+and expr_rec lenv dfdl =
   let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
     let pvl = binders bl in
     let vta = vty_arrow pvl ~ghost:gh (vty_of_dvty de.de_type) in
     let ps = create_psymbol (Denv.create_user_id id) vta in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
-  let lenv, fdl = Util.map_fold_left step1 lenv fdl in
+  let lenv, fdl = Util.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
   let fdl = List.map step2 fdl in
   let rd_pvset pvs (_, lam) = l_pvset pvs lam in
@@ -1140,10 +1167,17 @@ and expr_rec lenv fdl =
   let rd_effect eff (_, lam) = eff_union eff lam.l_expr.e_effect in
   let eff = List.fold_left rd_effect eff_empty fdl in
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
-  create_rec_defn (List.map step3 fdl)
+  let fdl = create_rec_defn (List.map step3 fdl) in
+  let check_user_effect { fun_lambda = l } (_,_,_,_,(de,dsp)) =
+    Loc.try3 de.de_loc check_user_effect lenv l.l_expr dsp in
+  List.iter2 check_user_effect fdl dfdl;
+  fdl
 
 and expr_fun lenv x gh bl tr =
   let lam = expr_lam lenv gh (binders bl) tr in
+  if lam.l_spec.c_variant <> [] then Loc.errorm
+    "variants are not allowed in a non-recursive definition";
+  check_user_effect lenv lam.l_expr (snd tr);
   let pvs = l_pvset Spv.empty lam in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   create_fun_defn (Denv.create_user_id x) lam
