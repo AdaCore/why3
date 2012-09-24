@@ -409,9 +409,8 @@ let vtv_check vars eff vtv =
 let rec vta_check vars vta =
   let add_arg vars pv = vars_union vars pv.pv_vars in
   let vars = List.fold_left add_arg vars vta.vta_args in
-  if vta.vta_spec.c_variant <> [] || vta.vta_spec.c_letrec <> 0 then
-    Loc.errorm "variants are not allowed in a parameter declaration";
   eff_check vars vta.vta_result vta.vta_spec.c_effect;
+  if vta.vta_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.vta_check";
   match vta.vta_result with
   | VTarrow a -> vta_check vars a
   | VTvalue v -> vtv_check vars vta.vta_spec.c_effect v
@@ -939,16 +938,14 @@ let e_try e0 bl =
 let pv_dummy = create_pvsymbol (id_fresh "dummy") (vty_value ity_unit)
 
 let e_any spec vty =
-  if spec.c_variant <> [] || spec.c_letrec <> 0 then
-    Loc.errorm "variants are not allowed in `any'";
+  if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_any";
   let vta = vty_arrow [pv_dummy] ~spec vty in
   let varm = vta_varmap vta in
   vta_check (vars_merge varm vars_empty) vta;
   mk_expr (Eany spec) vty spec.c_effect varm
 
 let e_abstract e spec =
-  if spec.c_variant <> [] || spec.c_letrec <> 0 then
-    Loc.errorm "variants are not allowed in `abstract'";
+  if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_abstract";
   spec_check { spec with c_effect = e.e_effect } e.e_vty;
   let varm = spec_varmap e.e_varm spec in
   mk_expr (Eabstr (e,spec)) e.e_vty e.e_effect varm
@@ -1112,6 +1109,7 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
     | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
         "The body of a recursive function must be a first-order value"
     | VTvalue _ ->
+        if lam.l_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.create_rec_defn";
         let spec = { lam.l_spec with c_letrec = !letrec } in
         let lam = { lam with l_spec = spec } in
         let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
@@ -1121,8 +1119,7 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   subst_fd m fdl
 
 let create_fun_defn id lam =
-  if lam.l_spec.c_variant <> [] || lam.l_spec.c_letrec <> 0 then
-    Loc.errorm "variants are not allowed in a non-recursive definition";
+  if lam.l_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.create_fun_defn";
   create_fun_defn id lam Sid.empty
 
 (* fold *)

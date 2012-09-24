@@ -721,11 +721,9 @@ let reset_vars eff pvs =
 (* add dummy postconditions for uncovered exceptions *)
 let complete_xpost eff xq =
   let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
-(*
   let check xs _ = Loc.errorm
     "this expression does not raise exception %a" print_xs xs in
   Mexn.iter check (Mexn.set_diff xq xe);
-*)
   let dummy { xs_ity = ity } () =
     let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
     Mlw_ty.create_post v t_true in
@@ -911,29 +909,20 @@ let rec type_c lenv gh pvs vars (dtyv, dsp) =
     reg_fold on_reg u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
   let spec = spec_of_dspec lenv eff vty dsp in
-  (* we add an exception postcondition for %Exit that mentions
-     every external variable in effect expressions which also
-     does not occur in pre/post/xpost. In this way, we keep
-     the variable in the specification in order to preserve
-     the effect in [Mlw_ty.spec_filter]. The exception %Exit
-     cannot be raised by an abstract parameter, so this xpost
-     will never appear in WP *)
+  (* we add a fake variant term for every external variable in effect
+     expressions which also does not occur in pre/post/xpost. In this
+     way, we store the variable in the specification in order to keep
+     the effect from being erased by Mlw_ty.spec_filter. Variants are
+     ignored outside of "let rec" definitions, so WP are not affected. *)
   let del_pv pv s = Svs.remove pv.pv_vs s in
   let esvs = Spv.fold del_pv pvs esvs in
   let drop _ t s = Mvs.set_diff s t.t_vars in
   let esvs = drop () spec.c_pre esvs in
   let esvs = drop () spec.c_post esvs in
   let esvs = Mexn.fold drop spec.c_xpost esvs in
-  let xpost = if Svs.is_empty esvs then spec.c_xpost else
-    let exn = Invalid_argument "Mlw_typing.type_c" in
-    let res = create_vsymbol (id_fresh "dummy") ty_unit in
-    let t_old = t_var pv_old.pv_vs in
-    let add vs f = (* put under 'old' in case of reset *)
-      let t = fs_app fs_at [t_var vs; t_old] vs.vs_ty in
-      t_and_simp (t_equ t t) f in
-    let xq = Mlw_ty.create_post res (Svs.fold add esvs t_true) in
-    Mexn.add_new exn xs_exit xq spec.c_xpost in
-  let spec = { spec with c_xpost = xpost } in
+  let add_vs vs varl = (t_var vs, None) :: varl in
+  let varl = Svs.fold add_vs esvs spec.c_variant in
+  let spec = { spec with c_variant = varl } in
   (* add the invariants *)
   spec_invariant lenv pvs vty spec, vty
 

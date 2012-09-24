@@ -451,12 +451,13 @@ let clone_export uc m inst =
     Mreg.fold conv eff.eff_resets e in
   let conv_term mv t = t_gen_map (ty_s_map conv_ts) conv_ls mv t in
   let addx mv xs t q = Mexn.add (conv_xs xs) (conv_term mv t) q in
+  let conv_vari mv (t,r) = conv_term mv t, Util.option_map conv_ls r in
   let conv_spec mv c = {
     c_pre     = conv_term mv c.c_pre;
     c_post    = conv_term mv c.c_post;
     c_xpost   = Mexn.fold (addx mv) c.c_xpost Mexn.empty;
     c_effect  = conv_eff c.c_effect;
-    c_variant = [];
+    c_variant = List.map (conv_vari mv) c.c_variant;
     c_letrec  = 0; } in
   let rec conv_vta mv a =
     let args = List.map conv_pv a.vta_args in
