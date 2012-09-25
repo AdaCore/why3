@@ -300,23 +300,23 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   end
 
 
-function eval_expr (sigma:env) (pi:stack) (e:expr) : value =
-  match e with
-  | Evalue v -> v
-  | Evar id  -> get_stack id pi
-  | Ederef id  -> get_env id sigma
-  | Ebin e1 op e2  ->
-     eval_bin (eval_expr sigma pi e1) op (eval_expr sigma pi e2)
-  | Eassign id e1 
-  | Eseq e1 e2 
-  | Elet id e1 e2 -> void
-  | Eif e1 e2 e3 -> 
-    if ((eval_expr sigma pi e1) = (Vbool True)) 
-    then eval_expr sigma pi e2
-    else eval_expr sigma pi e3
-  | Eassert f -> eval_fmla f
-  | Ewhile expr fmla expr  -> 
-end
+(* function eval_expr (sigma:env) (pi:stack) (e:expr) : value = *)
+(*   match e with *)
+(*   | Evalue v -> v *)
+(*   | Evar id  -> get_stack id pi *)
+(*   | Ederef id  -> get_env id sigma *)
+(*   | Ebin e1 op e2  -> *)
+(*      eval_bin (eval_expr sigma pi e1) op (eval_expr sigma pi e2) *)
+(*   | Eassign id e1  *)
+(*   | Eseq e1 e2  *)
+(*   | Elet id e1 e2 -> void *)
+(*   | Eif e1 e2 e3 ->  *)
+(*     if ((eval_expr sigma pi e1) = (Vbool True))  *)
+(*     then eval_expr sigma pi e2 *)
+(*     else eval_expr sigma pi e3 *)
+(*   | Eassert f -> eval_fmla f *)
+(*   | Ewhile expr fmla expr  ->  *)
+(* end *)
 
 (** substitution of a reference [r] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is "fresh",
