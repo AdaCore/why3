@@ -11,16 +11,10 @@ Lemma predicate_extensionality:
 Admitted.
 (* "it is folklore that the two are consistent" *)
 
-(*
-Hypothesis eq_dec:
-  forall {a:Type} {a_WT:WhyType a} (x y:a),
-  x=y \/ x<>y.
-*)
-
 (* Why3 goal *)
 Definition set : forall (a:Type) {a_WT:WhyType a}, Type.
-intros. 
-exact (a -> Prop). 
+intros.
+exact (a -> Prop).
 Defined.
 
 Global Instance set_WhyType : forall a {a_WT:WhyType a}, WhyType (set a).
@@ -98,7 +92,7 @@ Defined.
 Lemma add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
   forall (s:(set a)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
 intros a a_WT x y s.
-unfold add, mem; intuition. 
+unfold add, mem; intuition.
 Qed.
 
 (* Why3 goal *)
@@ -111,7 +105,7 @@ Defined.
 Lemma remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
   (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
 intros a a_WT x y s.
-unfold remove, mem; intuition. 
+unfold remove, mem; intuition.
 Qed.
 
 (* Why3 goal *)
