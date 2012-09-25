@@ -203,7 +203,7 @@ inductive type_expr type_env type_stack expr datatype =
         type_expr sigma pi e2 ty2 ->
         type_operator op ty1 ty2 ty -> type_expr sigma pi (Ebin e1 op e2) ty
   | Type_seq :
-      forall sigma: type_env, pi:type_stack, e1 e2:expr, $alt-ergo ty:datatype.
+      forall sigma: type_env, pi:type_stack, e1 e2:expr, ty:datatype.
         type_expr sigma pi e1 TYunit ->
 	type_expr sigma pi e2 ty ->
 	type_expr sigma pi (Eseq e1 e2) ty
