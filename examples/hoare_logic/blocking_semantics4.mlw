@@ -299,6 +299,25 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   | Fforall x TYunit f ->  eval_fmla sigma (Cons (x,Vvoid) pi) f
   end
 
+
+function eval_expr (sigma:env) (pi:stack) (e:expr) : value =
+  match e with
+  | Evalue v -> v
+  | Evar id  -> get_stack id pi
+  | Ederef id  -> get_env id sigma
+  | Ebin e1 op e2  ->
+     eval_bin (eval_expr sigma pi e1) op (eval_expr sigma pi e2)
+  | Eassign id e1 
+  | Eseq e1 e2 
+  | Elet id e1 e2 -> void
+  | Eif e1 e2 e3 -> 
+    if ((eval_expr sigma pi e1) = (Vbool True)) 
+    then eval_expr sigma pi e2
+    else eval_expr sigma pi e3
+  | Eassert f -> eval_fmla f
+  | Ewhile expr fmla expr  -> 
+end
+
 (** substitution of a reference [r] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is "fresh",
    i.e index(v) > term_maxvar(t) *)
@@ -632,13 +651,13 @@ goal Test42 :
   eval_term my_sigma my_pi (Tvar x) = Vint 42
 
 goal Test42expr :
-  many_steps my_sigma my_pi (Evar x) my_sigma my_pi (Evalue (Vint 42)) 1
+  one_step my_sigma my_pi (Evar x) my_sigma my_pi (Evalue (Vint 42))
 
 goal Test0 :
   eval_term my_sigma my_pi (Tderef y) = Vint 0
 
 goal Test0expr :
-  many_steps my_sigma my_pi (Ederef y) my_sigma my_pi (Evalue (Vint 0)) 1
+  one_step my_sigma my_pi (Ederef y) my_sigma my_pi (Evalue (Vint 0))
 
 goal Test55 :
   eval_term my_sigma my_pi (Tbin (Tvar x) Oplus (Tvalue (Vint 13))) = Vint 55

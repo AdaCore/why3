@@ -242,7 +242,6 @@ function eval_term (sigma:env) (pi:stack) (t:term) : value =
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
 end
 
-
 lemma eval_bool_term:
   forall sigma:env, pi:stack, sigmat:type_env, pit:type_stack, t:term.
     type_term sigmat pit t TYbool ->
