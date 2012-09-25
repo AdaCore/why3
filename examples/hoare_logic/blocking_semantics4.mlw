@@ -518,8 +518,8 @@ inductive one_step env stack expr env stack expr =
           one_step sigma pi (Ebin (Evalue v1) op e2) sigma' pi' (Ebin (Evalue v1) op e2')
 
   | one_step_bin_value:
-      forall sigma sigma':env, pi pi':stack, op:operator, v1 v2:value.
-        one_step sigma pi (Ebin (Evalue v1) op (Evalue v2)) sigma' pi' (Evalue (eval_bin v1 op v2))
+      forall sigma :env, pi :stack, op:operator, v1 v2:value.
+        one_step sigma pi (Ebin (Evalue v1) op (Evalue v2)) sigma pi (Evalue (eval_bin v1 op v2))
 
  | one_step_assign_ctxt:
      forall sigma sigma':env, pi pi':stack, x:mident, e e':expr.
