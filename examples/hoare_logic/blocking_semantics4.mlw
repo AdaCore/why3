@@ -588,9 +588,9 @@ inductive one_step env stack expr env stack expr =
      forall sigma:env, pi:stack, s:expr. many_steps sigma pi s sigma pi s 0
    | many_steps_trans:
      forall sigma1 sigma2 sigma3:env, pi1 pi2 pi3:stack, s1 s2 s3:expr, n:int.
-       one_step sigma1 pi1 s1 sigma2 pi2 s2 ->
-       many_steps sigma2 pi2 s2 sigma3 pi3 s3 n ->
-       many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n+1)
+       n > 0 -> one_step sigma1 pi1 s1 sigma2 pi2 s2 ->
+       many_steps sigma2 pi2 s2 sigma3 pi3 s3 (n - 1) ->
+       many_steps sigma1 pi1 s1 sigma3 pi3 s3 n
 
 lemma steps_non_neg:
   forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:expr, n:int.

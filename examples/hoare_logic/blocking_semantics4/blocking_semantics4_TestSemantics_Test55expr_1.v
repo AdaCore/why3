@@ -580,9 +580,9 @@ Inductive many_steps : (map mident value) -> (list (ident* value)%type)
   | many_steps_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
       value)) (sigma3:(map mident value)) (pi1:(list (ident* value)%type))
       (pi2:(list (ident* value)%type)) (pi3:(list (ident* value)%type))
-      (s1:expr) (s2:expr) (s3:expr) (n:Z), (one_step sigma1 pi1 s1 sigma2 pi2
-      s2) -> ((many_steps sigma2 pi2 s2 sigma3 pi3 s3 n) ->
-      (many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n + 1%Z)%Z)).
+      (s1:expr) (s2:expr) (s3:expr) (n:Z), (0%Z < n)%Z -> ((one_step sigma1
+      pi1 s1 sigma2 pi2 s2) -> ((many_steps sigma2 pi2 s2 sigma3 pi3 s3
+      (n - 1%Z)%Z) -> (many_steps sigma1 pi1 s1 sigma3 pi3 s3 n))).
 
 Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
   value)) (pi1:(list (ident* value)%type)) (pi2:(list (ident* value)%type))
@@ -622,12 +622,26 @@ Theorem Test55expr : (many_steps (const (Vint 0%Z):(map mident value))
   (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Evalue (Vint 55%Z)) 2%Z).
 simpl.
 
-assert (h: 2%Z = ((1%Z) + (1%Z))%Z).
-omega.
-rewrite h.
-
 pose (pi := (Cons (x, Vint 42) Nil)).
 fold pi.
+
+apply many_steps_trans with 
+   (sigma2 := (const (Vint 0))) 
+   (pi2 := pi) 
+   (s2 := (Ebin (Evalue (get_stack x pi)) Oplus (Evalue (Vint 13)))); 
+   auto with *.
+apply one_step_bin_ctxt1.
+apply one_step_var.
+replace (2 -1)%Z with 1%Z; auto with *.
+
+apply many_steps_trans with 
+   (sigma2 := (const (Vint 0))) 
+   (pi2 := pi) 
+   (s2 := Evalue (eval_bin (get_stack x pi) Oplus (Vint 13))); 
+   auto with *.
+apply one_step_bin_value.
+apply one_step_var.
+
 
 pose (s1 := (Ebin (Evar x) Oplus (Evalue (Vint 13)))).
 fold s1.
