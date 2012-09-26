@@ -212,9 +212,12 @@ clean::
 # installation
 ###############
 
+clean_old_install:
+	rm -f $(BINDIR)/why3*
+	rm -rf $(DATADIR)/why3
+
 install_no_local::
 	mkdir -p $(BINDIR)
-	rm -rf $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/images/boomy
@@ -251,7 +254,7 @@ install install-lib:
 	@echo "Why is configured in local installation mode."
 	@echo "To install Why, run ./configure --disable-local ; make ; make install"
 else
-install: install_no_local
+install: clean_old_install install_no_local
 install-lib: install_no_local_lib
 endif
 
