@@ -611,44 +611,30 @@ Definition total_valid_triple(p:fmla) (e:expr) (q:fmla): Prop :=
   exists pi':(list (ident* value)%type), exists n:Z, (many_steps sigma pi e
   sigma' pi' (Evalue Vvoid) n) /\ (eval_fmla sigma' pi' q).
 
-Parameter x: ident.
+Axiom consequence_rule : forall (p:fmla) (p':fmla) (q:fmla) (q':fmla)
+  (s:expr), (valid_fmla (Fimplies p' p)) -> ((valid_triple p s q) ->
+  ((valid_fmla (Fimplies q q')) -> (valid_triple p' s q'))).
 
-Parameter y: mident.
+Axiom skip_rule : forall (q:fmla), (valid_triple q (Evalue Vvoid) q).
 
-Require Import Why3.
+Axiom seq_rule : forall (p:fmla) (q:fmla) (r:fmla) (e1:expr) (e2:expr),
+  ((valid_triple p e1 r) /\ (valid_triple r e2 q)) -> (valid_triple p
+  (Eseq e1 e2) q).
 
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
+  (valid_triple p (Eassert f) p).
 
 (* Why3 goal *)
-Theorem Test55expr : (many_steps (const (Vint 0%Z):(map mident value))
-  (Cons (x, (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Ebin (Evar x)
-  Oplus (Evalue (Vint 13%Z))) (const (Vint 0%Z):(map mident value)) (Cons (x,
-  (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Evalue (Vint 55%Z)) 2%Z).
-simpl.
-
-pose (pi := (Cons (x, Vint 42) Nil)).
-fold pi.
-
-apply many_steps_trans with 
-   (sigma2 := (const (Vint 0))) 
-   (pi2 := pi) 
-   (s2 := (Ebin (Evalue (get_stack x pi)) Oplus (Evalue (Vint 13)))); 
-   auto with *.
-apply one_step_bin_ctxt1.
-apply one_step_var.
-replace (2 -1)%Z with 1%Z; auto with *.
-
-apply many_steps_trans with 
-   (sigma2 := (const (Vint 0))) 
-   (pi2 := pi) 
-   (s2 := Evalue (eval_bin (get_stack x pi) Oplus (Vint 13))); 
-   auto with *.
-apply one_step_bin_value.
-replace (1 -1)%Z with 0%Z; auto with *.
-assert (Evalue (eval_bin (get_stack x pi) Oplus (Vint 13)) = Evalue (Vint 55)).
-ae.
-rewrite H.
-apply many_steps_refl.
+Theorem assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
+  p) (Eassert f) p).
+unfold valid_triple.
+intros f p.
+intros.
+inversion H0; subst; clear H0.
+simpl in H.
+inversion H2; subst; clear H2.
+inversion H3; subst; clear H3; auto.
+inversion H2.
 Qed.
 
 

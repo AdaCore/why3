@@ -52,6 +52,14 @@ predicate var_occurs_in_term (x:ident) (t:term) =
   |  Tbin t1 _ t2 -> var_occurs_in_term x t1 \/ var_occurs_in_term x t2
   end
 
+(* predicate mvar_occurs_in_term (x:mident) (t:term) = *)
+(*   match t with *)
+(*   | Tvalue _  -> false *)
+(*   |  Tvar i  -> x = i *)
+(*   |  Tderef _  -> false *)
+(*   |  Tbin t1 _ t2 -> mvar_occurs_in_term x t1 \/ mvar_occurs_in_term x t2 *)
+(*   end *)
+
 (* predicate term_inv (t:term) = *)
 (*   forall x:ident. var_occurs_in_term x t -> x.ident_index <= t.term_maxvar *)
 
@@ -339,9 +347,13 @@ function subst_term (t:term) (r:ident) (v:ident) : term =
      mk_tbin (subst_term t1 r v) op (subst_term t2 r v)
   end
 
+
 (** [fresh_in_term id t] is true when [id] does not occur in [t] *)
 predicate fresh_in_term (id:ident) (t:term) =
     not (var_occurs_in_term id t)
+
+(* predicate mfresh_in_term (id:mident) (t:term) = *)
+(*     not (mvar_occurs_in_term id t) *)
 
 lemma fresh_in_binop:
   forall t t':term, op:operator, v:ident.
@@ -363,6 +375,16 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
   | Flet y t f -> id <> y /\ fresh_in_term id t /\ fresh_in_fmla id f
   | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
   end
+
+(* predicate mfresh_in_fmla (id:mident) (f:fmla) = *)
+(*   match f with *)
+(*   | Fterm e -> mfresh_in_term id e *)
+(*   | Fand f1 f2   | Fimplies f1 f2 -> *)
+(*       mfresh_in_fmla id f1 /\ mfresh_in_fmla id f2 *)
+(*   | Fnot f -> mfresh_in_fmla id f *)
+(*   | Flet y t f -> id <> y /\ mfresh_in_term id t /\ mfresh_in_fmla id f *)
+(*   | Fforall y ty f -> id <> y /\ mfresh_in_fmla id f *)
+(* end *)
 
 function subst (f:fmla) (x:ident) (v:ident) : fmla =
   match f with
@@ -388,6 +410,7 @@ lemma subst_fresh_term :
   forall t:term, x:ident, v:ident.
    fresh_in_term x t -> subst_term t x v = t
 
+(*Needed ???*)
 lemma subst_fresh :
   forall f:fmla, x:ident, v:ident.
    fresh_in_fmla x f -> subst f x v = f
@@ -785,6 +808,10 @@ predicate expr_writes (s:expr) (w:Set.set mident) =
   end
 
   function fresh_from (f:fmla) (s:expr) : ident
+
+ lemma msubst_fresh :
+  forall f:fmla, x:mident, s:expr.
+   msubst f x (fresh_from f s) = f
 
   (* Need it for monotonicity*)
   axiom fresh_from_fmla: forall s:expr, f:fmla.
