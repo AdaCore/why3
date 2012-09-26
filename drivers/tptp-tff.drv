@@ -5,16 +5,19 @@ filename "%f-%t-%g.p"
 
 valid   "Proof found"
 invalid "Completion found"
-invalid "SZS status CounterSatisfiable"
+valid   "^% SZS status Theorem"
+valid   "^% SZS status Unsatisfiable"
+unknown "^% SZS status CounterSatisfiable" ""
+unknown "^% SZS status Satisfiable" ""
+timeout "^% SZS status Timeout"
+unknown "^% SZS status GaveUp" ""
+fail    "^% SZS status Error" ""
 timeout "Ran out of time"
-(* timeout "Resource limit exceeded" *)
 timeout "CPU time limit exceeded"
 outofmemory "Out of Memory"
 unknown "No Proof Found"            ""
 fail    "Failure.*"                   "\"\\0\""
 time "why3cpulimit time : %s s"
-(* time    "%h:%m:%s on the problem" *)
-(* time    "Total time[ ]*: %s s" *)
 
 
 (* to be improved *)

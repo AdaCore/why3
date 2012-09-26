@@ -109,7 +109,7 @@ version_regexp = "E \\([-0-9.]+\\) [^\n]+"
 version_ok = "1.4"
 # we pass time 0 to why3-cpulimit to avoid race
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -s -R -xAuto -tAuto --cpu-limit=%t --tstp-in %f"
-driver = "drivers/tptp.drv"
+driver = "drivers/eprover.drv"
 
 [ATP gappa]
 name = "Gappa"
@@ -170,7 +170,7 @@ version_regexp = "SPASS V \\([^ \n\t]+\\)"
 version_ok = "3.7"
 # we pass time 0 to why3-cpulimit to avoid race
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
-driver = "drivers/tptp.drv"
+driver = "drivers/spass.drv"
 
 [ATP vampire]
 name = "Vampire"
@@ -278,7 +278,7 @@ exec = "iprover"
 version_switch = " | grep iProver"
 version_regexp = "iProver v\\([^ \n\t]+\\)"
 version_ok = "0.8.1"
-command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --clausifier eprover --clausifier_options \"--tstp-format \" %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none --time_out_virtual %t --clausifier /usr/bin/env --clausifier_options \"eprover --cnf --tstp-format \" %f"
 driver = "drivers/iprover.drv"
 
 [ITP coq]

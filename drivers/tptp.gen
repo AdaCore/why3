@@ -1,0 +1,34 @@
+(* Why common driver for first-order tptp provers *)
+
+printer "tptp-fof"
+filename "%f-%t-%g.p"
+
+valid   "^% SZS status Theorem"
+valid   "^% SZS status Unsatisfiable"
+unknown "^% SZS status CounterSatisfiable" ""
+unknown "^% SZS status Satisfiable" ""
+timeout "^% SZS status Timeout"
+unknown "^% SZS status GaveUp" ""
+fail    "^% SZS status Error" ""
+
+time "why3cpulimit time : %s s"
+
+(* to be improved *)
+
+(*transformation "simplify_recursive_definition"*)
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_if"
+transformation "eliminate_let"
+
+transformation "encoding_tptp"
+
+theory BuiltIn
+  syntax predicate (=)  "(%1 = %2)"
+  meta "eliminate_algebraic" "no_index"
+end
+

@@ -1,46 +1,6 @@
 (* Why driver for first-order tptp provers *)
 
-printer "tptp-fof"
-filename "%f-%t-%g.p"
-
-valid   "PROOF-FOUND"
-(* timeout "Aborted by signal SIGXCPU on" *)
-unknown "Time limit reached" "Time out"
-unknown "Refutation not found" ""
-outofmemory "Memory limit exceeded"
-(* invalid "Completion found" *)
-(* invalid "SZS status CounterSatisfiable" *)
-(* timeout "Ran out of time" *)
-(* timeout "Resource limit exceeded" *)
-(* unknown "No Proof Found"            "" *)
-(* fail    "Failure.*"                   "\"\\0\"" *)
-time "why3cpulimit time : %s s"
-(* time    "%h:%m:%s on the problem" *)
-(* time    "Total time[ ]*: %s s" *)
+timeout "Time Out Virtual"
 
 
-(* to be improved *)
-
-(*transformation "simplify_recursive_definition"*)
-transformation "inline_trivial"
-
-transformation "eliminate_builtin"
-transformation "eliminate_definition"
-transformation "eliminate_inductive"
-transformation "eliminate_algebraic"
-transformation "eliminate_if"
-transformation "eliminate_let"
-
-transformation "encoding_tptp"
-
-theory BuiltIn
-  syntax predicate (=)  "(%1 = %2)"
-  meta "eliminate_algebraic" "no_index"
-end
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
+import "tptp.gen"
