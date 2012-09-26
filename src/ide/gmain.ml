@@ -843,8 +843,7 @@ let sched =
         gconfig.Gconfig.config
     in
     Debug.dprintf debug "@]@\n[Info] Opening session: update done@.  @[<hov 2>";
-    let sched = M.init (Whyconf.running_provers_max
-                          (Whyconf.get_main gconfig.config))
+    let sched = M.init (gconfig.session_nb_processes)
     in
     Debug.dprintf debug "@]@\n[Info] Opening session: done@.";
     session_needs_saving := false;
@@ -881,9 +880,8 @@ let () =
 (*****************************************************)
 
 let prover_on_selected_goals pr =
-  let main = Whyconf.get_main gconfig.config in
-  let timelimit = Whyconf.timelimit main in
-  let memlimit = Whyconf.memlimit main in
+  let timelimit = gconfig.session_time_limit in
+  let memlimit = gconfig.session_mem_limit in
   List.iter
     (fun row ->
       try
@@ -1178,7 +1176,7 @@ let (_ : GMenu.image_menu_item) =
             pi.editor)
         (Whyconf.get_provers gconfig.config);
 *)
-      let nb = Whyconf.running_provers_max (Whyconf.get_main gconfig.config) in
+      let nb = gconfig.session_nb_processes in
       M.set_maximum_running_proofs nb sched)
     ()
 

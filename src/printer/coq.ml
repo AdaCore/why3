@@ -121,7 +121,9 @@ type info = {
   realization : bool;
 }
 
+(* unused printing function
 let print_path = print_list (constant_string ".") string
+*)
 
 let print_id fmt id = string fmt (id_unique iprinter id)
 
@@ -133,7 +135,9 @@ let print_id_real info fmt id =
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
+(* unused printing function
 let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
+*)
 
 (** Types *)
 
@@ -179,10 +183,14 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
+(* unused
 let lparen_l fmt () = fprintf fmt "@ ("
+*)
 let lparen_r fmt () = fprintf fmt "(@,"
+(* unused
 let print_paren_l fmt x =
   print_list_delim ~start:lparen_l ~stop:rparen ~sep:comma fmt x
+*)
 let print_paren_r fmt x =
   print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
 
@@ -219,7 +227,9 @@ let print_binop fmt = function
   | Timplies -> fprintf fmt "->"
   | Tiff -> fprintf fmt "<->"
 
+(* unused
 let print_label fmt (l,_) = fprintf fmt "(*%s*)" l
+*)
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -227,7 +237,9 @@ let rec print_term info fmt t = print_lrterm false false info fmt t
 and     print_fmla info fmt f = print_lrfmla false false info fmt f
 and print_opl_term info fmt t = print_lrterm true  false info fmt t
 and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
+(* unused
 and print_opr_term info fmt t = print_lrterm false true  info fmt t
+*)
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
 and print_lrterm opl opr info fmt t = match t.t_label with

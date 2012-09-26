@@ -63,6 +63,9 @@ type t =
       (* mutable replace_prover : conf_replace_prover; *)
       (* hidden prover buttons *)
       mutable hidden_provers : string list;
+      mutable session_time_limit : int;
+      mutable session_mem_limit : int;
+      mutable session_nb_processes : int;
     }
 
 
@@ -189,7 +192,7 @@ let load_altern alterns (_,section) =
 *)
 
 let load_config config original_config =
-  (* let main = get_main config in *)
+  let main = get_main config in 
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
@@ -222,7 +225,10 @@ let load_config config original_config =
     (* altern_provers = alterns; *)
     (* replace_prover = ide.ide_replace_prover; *)
     hidden_provers = ide.ide_hidden_provers;
-  }
+    session_time_limit = Whyconf.timelimit main;
+    session_mem_limit = Whyconf.memlimit main;
+    session_nb_processes = Whyconf.running_provers_max main;
+}
 
 
 (*
@@ -562,7 +568,7 @@ let show_about_window () =
 
 (**** Preferences Window ***)
 
-let general_settings c (notebook:GPack.notebook) =
+let general_settings (c : t) (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"General" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
@@ -579,45 +585,63 @@ let general_settings c (notebook:GPack.notebook) =
       (fun () -> c.verbose <- 1 - c.verbose)
   in
 *)
+  let external_processes_options_frame =
+    GBin.frame ~label:"External provers options"
+      ~packing:page#pack ()
+  in
+  let vb = GPack.vbox ~homogeneous:false
+    ~packing:external_processes_options_frame#add ()
+  in
   (* time limit *)
-  let main = Whyconf.get_main c.config in
   let width = 200 and xalign = 0.0 in
-  let timelimit = ref (Whyconf.timelimit main) in
-  let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add ()
+  in
   let _ = GMisc.label ~text:"Time limit (in sec.): " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:300. ~step_incr:1. ();
-  timelimit_spin#adjustment#set_value (float_of_int !timelimit);
+  timelimit_spin#adjustment#set_value (float_of_int c.session_time_limit);
   let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:
-      (fun () -> timelimit := timelimit_spin#value_as_int)
+      (fun () -> c.session_time_limit <- timelimit_spin#value_as_int)
   in
   (* mem limit *)
-  let memlimit = ref (Whyconf.memlimit main) in
-  let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add ()
+  in
   let _ = GMisc.label ~text:"Memory limit (in Mb): " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let memlimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   memlimit_spin#adjustment#set_bounds ~lower:0. ~upper:4000. ~step_incr:100. ();
-  memlimit_spin#adjustment#set_value (float_of_int !memlimit);
+  memlimit_spin#adjustment#set_value (float_of_int c.session_mem_limit);
   let (_ : GtkSignal.id) =
     memlimit_spin#connect#value_changed ~callback:
-      (fun () -> memlimit := memlimit_spin#value_as_int)
+      (fun () -> c.session_mem_limit <- memlimit_spin#value_as_int)
   in
-  (* nb of processes ? *)
-  let nb_processes = ref (Whyconf.running_provers_max main) in
-  let hb = GPack.hbox ~homogeneous:false ~packing:page#pack () in
+  (* nb of processes *)
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add ()
+  in
   let _ = GMisc.label ~text:"Nb of processes: " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds
     ~lower:1. ~upper:16. ~step_incr:1. ();
   nb_processes_spin#adjustment#set_value
-    (float_of_int !nb_processes);
+    (float_of_int c.session_nb_processes);
   let (_ : GtkSignal.id) =
     nb_processes_spin#connect#value_changed ~callback:
-      (fun () -> nb_processes := nb_processes_spin#value_as_int)
+      (fun () -> c.session_nb_processes <- nb_processes_spin#value_as_int)
+  in
+  let hb = GPack.hbox ~homogeneous:false ~packing:vb#add () in
+  let save_for_future = ref false in
+  let save =
+    GButton.check_button
+      ~label:"save settings above for future sessions"
+      ~packing:hb#add ()
+      ~active:false
+  in
+  let (_ : GtkSignal.id) =
+    save#connect#toggled ~callback:
+      (fun () -> save_for_future := not !save_for_future)
   in
   let display_options_frame =
     GBin.frame ~label:"Display options"
@@ -710,10 +734,10 @@ let general_settings c (notebook:GPack.notebook) =
   let (_ : GtkSignal.id) =
     choice2#connect#toggled ~callback:(set_saving_policy 2)
   in
-  let _fillbox =
+  let (_ : GPack.box) =
     GPack.vbox ~packing:(page#pack ~expand:true) ()
   in
-  timelimit, memlimit, nb_processes
+  save_for_future
 
 (* Page "Provers" *)
 
@@ -872,7 +896,7 @@ let preferences (c : t) =
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page "general settings" **)
-  let t,m,n = general_settings c notebook in
+  let save_for_future_session = general_settings c notebook in
   (*** page "editors" **)
   editors_page c notebook;
   (** page "Provers" **)
@@ -901,8 +925,10 @@ let preferences (c : t) =
   (*      t.time_limit t.mem_limit t.max_running_processes) *)
   (* in *)
 
-  c.config <- Whyconf.set_main c.config
-    (Whyconf.set_limits (Whyconf.get_main c.config) !t !m !n);
+  if !save_for_future_session then
+    c.config <- Whyconf.set_main c.config
+      (Whyconf.set_limits (Whyconf.get_main c.config)
+         c.session_time_limit c.session_mem_limit c.session_nb_processes);
   save_config ();
   dialog#destroy ()
 
