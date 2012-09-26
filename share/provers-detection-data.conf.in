@@ -269,7 +269,7 @@ exec = "zenon-0.7.1"
 version_switch = "-v"
 version_regexp = "zenon version \\([^ \n\t]+\\)"
 version_ok = "0.7.1"
-command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -itptp -max-size %mM -max-time %ts %f"
+command = "'@LOCALBIN@why3-cpulimit' %T 0 -s %e -p0 -itptp -max-size %mM -max-time %ts %f"
 driver = "drivers/zenon.drv"
 
 [ATP iprover]

@@ -865,7 +865,10 @@ let editors_page c (notebook:GPack.notebook) =
 
 
 let preferences (c : t) =
-  let dialog = GWindow.dialog ~title:"Why3: preferences" () in
+  let dialog = GWindow.dialog
+    ~modal:true
+    ~title:"Why3: preferences" ()
+  in
   let vbox = dialog#vbox in
   let notebook = GPack.notebook ~packing:vbox#add () in
   (** page "general settings" **)
