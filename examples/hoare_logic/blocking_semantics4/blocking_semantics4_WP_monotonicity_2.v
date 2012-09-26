@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require set.Set.
 
 (* Why3 assumption *)
 Inductive list (a:Type) {a_WT:WhyType a} :=
@@ -611,51 +612,113 @@ Definition total_valid_triple(p:fmla) (e:expr) (q:fmla): Prop :=
   exists pi':(list (ident* value)%type), exists n:Z, (many_steps sigma pi e
   sigma' pi' (Evalue Vvoid) n) /\ (eval_fmla sigma' pi' q).
 
-Parameter x: ident.
+(* Why3 assumption *)
+Definition assigns(sigma:(map mident value)) (a:(set.Set.set mident))
+  (sigma':(map mident value)): Prop := forall (i:mident), (~ (set.Set.mem i
+  a)) -> ((get sigma i) = (get sigma' i)).
 
-Parameter y: mident.
+Axiom assigns_refl : forall (sigma:(map mident value)) (a:(set.Set.set
+  mident)), (assigns sigma a sigma).
+
+Axiom assigns_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
+  value)) (sigma3:(map mident value)) (a:(set.Set.set mident)),
+  ((assigns sigma1 a sigma2) /\ (assigns sigma2 a sigma3)) -> (assigns sigma1
+  a sigma3).
+
+Axiom assigns_union_left : forall (sigma:(map mident value)) (sigma':(map
+  mident value)) (s1:(set.Set.set mident)) (s2:(set.Set.set mident)),
+  (assigns sigma s1 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
+
+Axiom assigns_union_right : forall (sigma:(map mident value)) (sigma':(map
+  mident value)) (s1:(set.Set.set mident)) (s2:(set.Set.set mident)),
+  (assigns sigma s2 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
+
+(* Why3 assumption *)
+Fixpoint expr_writes(s:expr) (w:(set.Set.set mident)) {struct s}: Prop :=
+  match s with
+  | ((Evalue _)|((Evar _)|((Ederef _)|(Eassert _)))) => True
+  | (Eassign id _) => (set.Set.mem id w)
+  | (Eseq e1 e2) => (expr_writes e1 w) /\ (expr_writes e2 w)
+  | (Eif e1 e2 e3) => (expr_writes e1 w) /\ ((expr_writes e2 w) /\
+      (expr_writes e3 w))
+  | (Ewhile cond _ body) => (expr_writes cond w) /\ (expr_writes body w)
+  | (Ebin e1 o e2) => (expr_writes e1 w) /\ (expr_writes e2 w)
+  | (Elet id e1 e2) => (expr_writes e1 w) /\ (expr_writes e2 w)
+  end.
+
+Parameter fresh_from: fmla -> expr -> ident.
+
+Axiom fresh_from_fmla : forall (s:expr) (f:fmla),
+  (fresh_in_fmla (fresh_from f s) f).
+
+Axiom fresh_from_expr : forall (s:expr) (f:fmla),
+  (fresh_in_expr (fresh_from f s) s).
+
+Parameter abstract_effects: expr -> fmla -> fmla.
+
+Axiom abstract_effects_generalize : forall (sigma:(map mident value))
+  (pi:(list (ident* value)%type)) (s:expr) (f:fmla), (eval_fmla sigma pi
+  (abstract_effects s f)) -> (eval_fmla sigma pi f).
+
+Axiom abstract_effects_monotonic : forall (s:expr) (f:fmla),
+  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
+  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
+  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
+
+(* Why3 assumption *)
+Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
+  match e with
+  | (Evalue v) => (Flet result (Tvalue v) q)
+  | (Evar v) => (Flet result (Tvar v) q)
+  | (Ederef v) => (Flet result (Tderef v) q)
+  | (Eassert f) => (Fand f (Fimplies f q))
+  | (Eseq e1 e2) => (wp e1 (wp e2 q))
+  | (Elet id e1 e2) => (wp e1 (Flet id (Tvar result) (wp e2 q)))
+  | (Ebin e1 op e2) => let t1 := (fresh_from q e) in let t2 :=
+      (fresh_from (Fand (Fterm (Tvar t1)) q) e) in let q' := (Flet result
+      (Tbin (Tvar t1) op (Tvar t2)) q) in let f := (wp e2 (Flet t2
+      (Tvar result) q')) in (wp e1 (Flet t1 (Tvar result) f))
+  | (Eassign x e1) => let id := (fresh_from q e1) in let q' := (Flet result
+      (Tvalue Vvoid) q) in (wp e1 (Flet id (Tvar result) (msubst q' x id)))
+  | (Eif e1 e2 e3) => let f := (Fand (Fimplies (Fterm (Tvar result)) (wp e2
+      q)) (Fimplies (Fnot (Fterm (Tvar result))) (wp e3 q))) in (wp e1 f)
+  | (Ewhile cond inv body) => (Fand inv (abstract_effects body (wp cond
+      (Fand (Fimplies (Fand (Fterm (Tvar result)) inv) (wp body inv))
+      (Fimplies (Fand (Fnot (Fterm (Tvar result))) inv) q)))))
+  end.
+
+Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (s:expr) (q:fmla), (eval_fmla sigma pi
+  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
+  q))).
 
 (* Why3 goal *)
-Theorem Test55expr : (many_steps (const (Vint 0%Z):(map mident value))
-  (Cons (x, (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Ebin (Evar x)
-  Oplus (Evalue (Vint 13%Z))) (const (Vint 0%Z):(map mident value)) (Cons (x,
-  (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Evalue (Vint 55%Z)) 2%Z).
+Theorem monotonicity : forall (s:expr),
+  match s with
+  | (Evalue v) => True
+  | (Ebin e o e1) => (forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
+      q)) -> (valid_fmla (Fimplies (wp e1 p) (wp e1 q)))) ->
+      ((forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
+      (valid_fmla (Fimplies (wp e p) (wp e q)))) -> forall (p:fmla) (q:fmla),
+      (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s
+      q))))
+  | (Evar i) => True
+  | (Ederef m) => True
+  | (Eassign m e) => True
+  | (Eseq e e1) => True
+  | (Elet i e e1) => True
+  | (Eif e e1 e2) => True
+  | (Eassert f) => True
+  | (Ewhile e f e1) => True
+  end.
+destruct s; auto.
+unfold valid_fmla.
 simpl.
+intros H1 h2 p q H sigma pi.
+pose (id1 := fresh_from q (Ebin s1 o s2)); fold id1.
+pose (id2 := fresh_from p (Ebin s1 o s2)); fold id2.
+simpl fresh_from. 
 
-assert (h: 2%Z = ((1%Z) + (1%Z))%Z).
-omega.
-rewrite h.
-
-pose (pi := (Cons (x, Vint 42) Nil)).
-fold pi.
-
-pose (s1 := (Ebin (Evar x) Oplus (Evalue (Vint 13)))).
-fold s1.
-pose (s2 := (Ebin (Evalue (get_stack x pi)) Oplus (Evalue (Vint 13)))).
-
-assert ((one_step (const (Vint 0)) pi s1 (const (Vint 0)) pi s2)).
-apply one_step_bin_ctxt1.
-apply one_step_var.
-
-pose (s3 := Evalue (eval_bin (get_stack x pi) Oplus (Vint 13))).
-assert ((one_step (const (Vint 0)) pi s2 (const (Vint 0)) pi s3)).
-apply one_step_bin_value.
-
-assert (Evalue (eval_bin (get_stack x pi) Oplus (Vint 13)) = Evalue (Vint 55)).
-admit.
-
-apply many_steps_trans with 
-   (sigma2 := (const (Vint 0))) (pi2 := pi) (s2 := s2); auto.
-
-clear h.
-assert (h: 1%Z = ((0%Z) + (1%Z))%Z).
-omega.
-rewrite h.
-
-apply many_steps_trans with 
-   (sigma2 := (const (Vint 0))) (pi2 := pi) (s2 := s3); auto.
-rewrite <- H1.
-apply many_steps_refl.
 
 Qed.
 
