@@ -724,70 +724,50 @@ Fixpoint expr_writes(s:expr) (w:(set1 mident)) {struct s}: Prop :=
 
 Parameter fresh_from: fmla -> expr -> ident.
 
-Axiom fresh_from_fmla : forall (s:expr) (f:fmla),
-  (fresh_in_fmla (fresh_from f s) f).
+Require Import Why3.
 
-Axiom fresh_from_expr : forall (s:expr) (f:fmla),
-  (fresh_in_expr (fresh_from f s) s).
-
-Parameter abstract_effects: expr -> fmla -> fmla.
-
-Axiom abstract_effects_generalize : forall (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (s:expr) (f:fmla), (eval_fmla sigma pi
-  (abstract_effects s f)) -> (eval_fmla sigma pi f).
-
-Axiom abstract_effects_monotonic : forall (s:expr) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
-  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
-
-(* Why3 assumption *)
-Fixpoint wp(e:expr) (q:fmla) {struct e}: fmla :=
-  match e with
-  | (Evalue v) => (Flet result (Tvalue v) q)
-  | (Evar v) => (Flet result (Tvar v) q)
-  | (Ederef v) => (Flet result (Tderef v) q)
-  | (Eassert f) => (Fand f (Fimplies f q))
-  | (Eseq e1 e2) => (wp e1 (wp e2 q))
-  | (Elet id e1 e2) => (wp e1 (Flet id (Tvar result) (wp e2 q)))
-  | (Ebin e1 op e2) => let t1 := (fresh_from q e) in let t2 :=
-      (fresh_from (Fand (Fterm (Tvar t1)) q) e) in let q' := (Flet result
-      (Tbin (Tvar t1) op (Tvar t2)) q) in let f := (wp e2 (Flet t2
-      (Tvar result) q')) in (wp e1 (Flet t1 (Tvar result) f))
-  | (Eassign x e1) => let id := (fresh_from q e1) in let q' := (Flet result
-      (Tvalue Vvoid) q) in (wp e1 (Flet id (Tvar result) (msubst q' x id)))
-  | (Eif e1 e2 e3) => let f := (Fand (Fimplies (Fterm (Tvar result)) (wp e2
-      q)) (Fimplies (Fnot (Fterm (Tvar result))) (wp e3 q))) in (wp e1 f)
-  | (Ewhile cond inv body) => (Fand inv (abstract_effects body (wp cond
-      (Fand (Fimplies (Fand (Fterm (Tvar result)) inv) (wp body inv))
-      (Fimplies (Fand (Fnot (Fterm (Tvar result))) inv) q)))))
-  end.
-
-Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (s:expr) (q:fmla), (eval_fmla sigma pi
-  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
-  q))).
+Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem monotonicity : forall (s:expr),
-  match s with
-  | (Evalue v) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
-      (valid_fmla (Fimplies (wp s p) (wp s q)))
-  | (Ebin e o e1) => True
-  | (Evar i) => True
-  | (Ederef m) => True
-  | (Eassign m e) => True
-  | (Eseq e e1) => True
-  | (Elet i e e1) => True
-  | (Eif e e1 e2) => True
-  | (Eassert f) => True
-  | (Ewhile e f e1) => True
+Theorem msubst_fresh : forall (f:fmla),
+  match f with
+  | (Fterm t) => forall (x:mident) (s:expr), ((msubst f x (fresh_from f
+      s)) = f)
+  | (Fand f1 f2) => True
+  | (Fnot f1) => True
+  | (Fimplies f1 f2) => True
+  | (Flet i t f1) => True
+  | (Fforall i d f1) => True
   end.
-destruct s; auto.
-unfold valid_fmla.
-simpl.
+destruct f; auto.
 intros.
-apply H; auto.
+simpl.
+induction t.
+assert (msubst_term (Tvalue v) x (fresh_from (Fterm (Tvalue v)) s) = (Tvalue v)).
+ae.
+rewrite H; auto.
+assert (msubst_term (Tvar i) x (fresh_from (Fterm (Tvar i)) s) = (Tvar i)).
+ae.
+rewrite H; auto.
+
+assert (msubst_term (Tderef m) x (fresh_from (Fterm (Tderef m)) s) = (Tderef m)).
+destruct (mident_decide m x).
+(* x = m*)
+subst.
+admit.
+(* x <> m*)
+ae.
+rewrite H; auto.
+
+assert (msubst_term (Tbin t1 o t2) x (fresh_from (Fterm (Tbin t1 o t2)) s) = 
+  (Tbin t1 o t2)).
+assert (msubst_term (Tbin t1 o t2) x (fresh_from (Fterm (Tbin t1 o t2)) s) = 
+ Tbin (msubst_term t1 x (fresh_from (Fterm (Tbin t1 o t2)) s)) o 
+ (msubst_term t2 x (fresh_from (Fterm (Tbin t1 o t2)) s))).
+ae.
+
+.
+rewrite H; auto.
 Qed.
 
 
