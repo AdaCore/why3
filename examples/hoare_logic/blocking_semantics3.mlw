@@ -24,13 +24,13 @@ type operator = Oplus | Ominus | Omult | Ole
 (** ident for mutable variables *)
 type mident
 
-axiom mident_decide :
+lemma mident_decide :
   forall m1 m2: mident. m1 = m2 \/ m1 <> m2
 
 (** ident for immutable variables *)
 type ident = {| ident_index : int |}
  
-axiom ident_decide :
+lemma ident_decide :
   forall m1 m2: ident. m1 = m2 \/ m1 <> m2
 
 (** Terms *)
@@ -108,7 +108,7 @@ function get_vartype (i:ident) (pi:type_stack) : datatype =
   | Cons (x,ty) r -> if x=i then ty else get_vartype i r
   end
 
-    
+
 type type_env = IdMap.map mident datatype  (* map global mutable variables to their type *)
 function get_reftype (i:mident) (e:type_env) : datatype = IdMap.get e i
 
@@ -242,12 +242,29 @@ function eval_term (sigma:env) (pi:stack) (t:term) : value =
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
 end
 
-lemma eval_bool_term:
-  forall sigma:env, pi:stack, sigmat:type_env, pit:type_stack, t:term.
-    type_term sigmat pit t TYbool ->
-    (* TODO: compatibility sigma, sigmat and pi,pit *)
-    exists b:bool.
-      eval_term sigma pi t = Vbool b
+inductive compatible datatype value =
+    | Compatible_bool : 
+	forall b: bool. compatible TYbool (Vbool b)
+    | Compatible_int : 
+	forall n: int. compatible TYint (Vint n)
+    | Compatible_void : 
+	compatible TYunit Vvoid
+
+predicate existe_compatible (ty:datatype) (v:value) =
+   match ty with
+    | TYbool -> exists b: bool. v = Vbool b
+    | TYint -> exists n: int. v = Vint n
+    | TYunit -> v = Vvoid
+end 
+
+predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) = 
+ (forall id: mident. compatible (get_reftype id sigmat) (IdMap.get sigma id)) /\
+   (forall id: ident. compatible (get_vartype id pit) (get_stack id pi))
+
+lemma eval_type_term:
+  forall t:term, sigma:env, pi:stack, sigmat:type_env, pit:type_stack, ty:datatype.
+    compatible_env sigma sigmat pi pit ->
+    type_term sigmat pit t ty -> existe_compatible ty (eval_term sigma pi t)
 
 predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   match f with
@@ -723,7 +740,6 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         eval_fmla sigma pi (abstract_effects s q) ->
         eval_fmla sigma pi (wp s (abstract_effects s q))
 
-
   (* lemma wp_subst: *)
   (*   forall e:expr, q:fmla, id :mident, id':ident. *)
   (*   fresh_in_stmt id e -> *)
@@ -748,9 +764,10 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
       eval_fmla sigma' pi' (wp s' q)
 
   lemma progress:
-    forall s:stmt, sigma:env, pi:stack,
+	forall s:stmt, sigma:env, pi:stack,
       sigmat: type_env, pit: type_stack, q:fmla.
-      type_stmt sigmat pit s ->
+	compatible_env sigma sigmat pi pit ->
+	  type_stmt sigmat pit s ->
 (* useful ?
       type_fmla sigmat pit q ->
 *)
