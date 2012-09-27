@@ -685,6 +685,24 @@ let rec get_expl_fmla f =
       let (_,f) = Term.t_open_bound fb in get_expl_fmla f
     | Term.Tcase(_,[fb]) ->
       let (_,f) = Term.t_open_branch fb in get_expl_fmla f
+    | Term.Tcase(_,bl) ->
+      (* we check if the match is post-split, i.e. only one
+         branch has an explanation label *)
+      let rec rest_expl s = function
+        | [] -> raise (Found s)
+        | fb :: bl ->
+            let (_,f) = Term.t_open_branch fb in
+            (try get_expl_fmla f with Found _ -> ());
+            rest_expl s bl
+      in
+      let rec find_expl = function
+        | [] -> ()
+        | fb :: bl ->
+            let (_,f) = Term.t_open_branch fb in
+            (try get_expl_fmla f with Found s -> rest_expl s bl);
+            find_expl bl
+      in
+      find_expl bl
     | _ -> ())
 
 type expl = string option
