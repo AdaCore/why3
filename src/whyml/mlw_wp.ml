@@ -720,7 +720,7 @@ and wp_desc env e q xq = match e.e_node with
         wp_expl expl_variant (t_label ?loc:e.e_loc d.t_label d) in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
-      let w = wp_and ~sym:false (wp_and ~sym:true d p) w in
+      let w = wp_and ~sym:true d (wp_and ~sym:false p w) in
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
   | Eabstr (e1, spec) ->
