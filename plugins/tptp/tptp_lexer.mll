@@ -246,7 +246,7 @@ and comment_line = parse
       { comment_line lexbuf }
 
 {
-(* dead code
+
   let with_location f lb =
     if Debug.test_flag Debug.stack_trace then f lb else
     try f lb with
@@ -259,9 +259,9 @@ and comment_line = parse
     let ast = with_location (tptp_file token) lb in
     (), Tptp_typing.typecheck env path ast
 
-  let library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
+  let _library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
     ~desc:"TPTP format (CNF FOF FOFX TFF)"
-*)
+
 }
 
 (*

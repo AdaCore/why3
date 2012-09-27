@@ -366,6 +366,7 @@ clean::
 	rm -f lib/plugins/*
 
 install_no_local::
+	rm -rf $(LIBDIR)/why3/plugins
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
