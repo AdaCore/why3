@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/generate_all_trees/why3session.xml" shape_version="2">
+ name="examples/programs/generate_all_trees/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,6 +16,14 @@
   version="8.3pl4"/>
  <prover
   id="3"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="4"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="5"
   name="Z3"
   version="2.19"/>
  <file
@@ -24,13 +32,13 @@
   expanded="true">
   <theory
    name="GenerateAllTrees"
-   locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+   locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
    loclnum="11" loccnumb="7" loccnume="23"
    verified="true"
    expanded="true">
    <goal
     name="size_nonneg"
-    locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+    locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
     loclnum="28" loccnumb="8" loccnume="19"
     sum="2235ca1ba8f0defb5d8b59cceb01d0d3"
     proved="true"
@@ -48,7 +56,7 @@
    </goal>
    <goal
     name="size_left"
-    locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+    locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
     loclnum="30" loccnumb="8" loccnume="17"
     sum="773d75f6bcd404be5bf258ef60ffa555"
     proved="true"
@@ -65,7 +73,7 @@
    </goal>
    <goal
     name="all_trees_0"
-    locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+    locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
     loclnum="38" loccnumb="8" loccnume="19"
     sum="24abdaea81ba11be982260ff7f7fa6fb"
     proved="true"
@@ -83,7 +91,7 @@
    </goal>
    <goal
     name="tree_diff"
-    locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+    locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
     loclnum="40" loccnumb="8" loccnume="17"
     sum="712e9c51348f9a1962232ae445085630"
     proved="true"
@@ -100,7 +108,7 @@
    </goal>
    <goal
     name="WP_parameter combine"
-    locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+    locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
     loclnum="46" loccnumb="6" loccnume="13"
     expl="parameter combine"
     sum="cca9d0f409954b90872d800375255fec"
@@ -115,9 +123,9 @@
      expanded="true">
      <goal
       name="WP_parameter combine.1"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
+      expl="normal postcondition"
       sum="5bef54de2e976d66ac4bdcfe913e0782"
       proved="true"
       expanded="false"
@@ -135,9 +143,9 @@
      </goal>
      <goal
       name="WP_parameter combine.2"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
+      expl="normal postcondition"
       sum="f9aa20051401735f4170bacd18e8806c"
       proved="true"
       expanded="true"
@@ -155,9 +163,9 @@
      </goal>
      <goal
       name="WP_parameter combine.3"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
+      expl="variant decreases"
       sum="3226892ac5c39a8c2e202a47e954dbb4"
       proved="true"
       expanded="true"
@@ -175,9 +183,9 @@
      </goal>
      <goal
       name="WP_parameter combine.4"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
+      expl="precondition"
       sum="5f12527aadc6864dda2b432d95fddf58"
       proved="true"
       expanded="true"
@@ -195,13 +203,13 @@
      </goal>
      <goal
       name="WP_parameter combine.5"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
-      sum="7cf47f7b42aff309aea21ae66f316d7a"
+      expl="normal postcondition"
+      sum="8c016a96810fc0aac7975ad310f8424b"
       proved="true"
       expanded="true"
-      shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EqamemV11aConsaNodeV5V8V10FAadistinctaConsaNodeV5V8V10IamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9Aainfix &lt;alengthV9alengthV7Aainfix &lt;=c0alengthV7IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EqamemV11aConsaNodeV5V8V10FAadistinctaConsaNodeV5V8V10IamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:parameter combine"/>
       <transf
@@ -210,13 +218,13 @@
        expanded="true">
        <goal
         name="WP_parameter combine.5.1"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
-        sum="5f6fd08fd9a4c4a47bff7ae0fe8d9356"
+        sum="82fdd2d8fa4e3dd93e7b4d975a5799d0"
         proved="true"
         expanded="false"
-        shape="CV4aNiltaConsVVCV7aNiltaConsVVadistinctaConsaNodeV5V8V10IamemV12V9Aainfix =V11aNodeV5V12EqamemV11V10FAadistinctV10FIadistinctV9Aainfix &lt;alengthV9alengthV7Aainfix &lt;=c0alengthV7IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        shape="CV4aNiltaConsVVCV7aNiltaConsVVadistinctaConsaNodeV5V8V10IamemV12V9Aainfix =V11aNodeV5V12EqamemV11V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:parameter combine"/>
         <proof
@@ -225,20 +233,28 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.06"/>
+         <result status="valid" time="1.32"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter combine.5.2"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
-        sum="f0ef4874f512049983172fe6598e3729"
+        sum="7b59ede395b3db2f973e9f01b3a8f110"
         proved="true"
         expanded="true"
-        shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EIamemV11aConsaNodeV5V8V10FIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9Aainfix &lt;alengthV9alengthV7Aainfix &lt;=c0alengthV7IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EIamemV11aConsaNodeV5V8V10FIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:parameter combine"/>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.23"/>
+        </proof>
         <proof
          prover="2"
          timelimit="10"
@@ -246,18 +262,26 @@
          edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.56"/>
+         <result status="valid" time="0.52"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.17"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter combine.5.3"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
-        sum="346ad7a98e1497c39cfd9f01e265adfa"
+        sum="8ebd6ac976e03fb553d36b09fc0d6ea6"
         proved="true"
         expanded="false"
-        shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV11aConsaNodeV5V8V10IamemV12V7Aainfix =V11aNodeV5V12EFIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9Aainfix &lt;alengthV9alengthV7Aainfix &lt;=c0alengthV7IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV11aConsaNodeV5V8V10IamemV12V7Aainfix =V11aNodeV5V12EFIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:parameter combine"/>
         <proof
@@ -266,16 +290,16 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.00"/>
+         <result status="valid" time="0.86"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter combine.6"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
+      expl="variant decreases"
       sum="7cd8483c32a0e90b9ba9bf6d71c35f07"
       proved="true"
       expanded="false"
@@ -293,9 +317,9 @@
      </goal>
      <goal
       name="WP_parameter combine.7"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
+      expl="precondition"
       sum="16481091c2f6fd018f220ebce095d0d4"
       proved="true"
       expanded="false"
@@ -313,13 +337,13 @@
      </goal>
      <goal
       name="WP_parameter combine.8"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
-      sum="6097dd848115647493473943e9e70e35"
+      expl="precondition"
+      sum="2f6579c6ea418c40fc39898c5ec3c5a8"
       proved="true"
       expanded="false"
-      shape="CV4aNiltaConsVVadistinctV3IamemV10V3AamemV9V6Aainfix =V8aNodeV9V10EqamemV8V7FAadistinctV7FIadistinctV6Aainfix &lt;alengthV6alengthV4Aainfix &lt;=c0alengthV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      shape="CV4aNiltaConsVVadistinctV3IamemV10V3AamemV9V6Aainfix =V8aNodeV9V10EqamemV8V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:parameter combine"/>
       <proof
@@ -333,13 +357,13 @@
      </goal>
      <goal
       name="WP_parameter combine.9"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
-      expl="parameter combine"
-      sum="a3b08fed7057c239fb916c098dc87ac5"
+      expl="normal postcondition"
+      sum="7e4015bd4c645f3d2c05477004495683"
       proved="true"
       expanded="true"
-      shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EqamemV9ainfix ++V8V7FAadistinctainfix ++V8V7IamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6Aainfix &lt;alengthV6alengthV4Aainfix &lt;=c0alengthV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EqamemV9ainfix ++V8V7FAadistinctainfix ++V8V7IamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:parameter combine"/>
       <transf
@@ -348,13 +372,13 @@
        expanded="true">
        <goal
         name="WP_parameter combine.9.1"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
-        sum="0f178a854a2e6394d95dbefc5fdbe4be"
+        sum="a48810c51ad2be6015ba825d6f757f81"
         proved="true"
         expanded="false"
-        shape="CV4aNiltaConsVVadistinctainfix ++V8V7IamemV10V3Aainfix =V9aNodeV5V10EqamemV9V8FAadistinctV8FIadistinctV3IamemV13V3AamemV12V6Aainfix =V11aNodeV12V13EqamemV11V7FAadistinctV7FIadistinctV6Aainfix &lt;alengthV6alengthV4Aainfix &lt;=c0alengthV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        shape="CV4aNiltaConsVVadistinctainfix ++V8V7IamemV10V3Aainfix =V9aNodeV5V10EqamemV9V8FAadistinctV8FIadistinctV3IamemV13V3AamemV12V6Aainfix =V11aNodeV12V13EqamemV11V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:parameter combine"/>
         <proof
@@ -363,38 +387,38 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.95"/>
+         <result status="valid" time="2.99"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter combine.9.2"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
-        sum="96e0b5acd84e5f7e37df572a8d9289e0"
+        sum="8ccd6f8084ff84383400d60de1e7d4e5"
         proved="true"
         expanded="false"
-        shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EIamemV9ainfix ++V8V7FIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6Aainfix &lt;alengthV6alengthV4Aainfix &lt;=c0alengthV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EIamemV9ainfix ++V8V7FIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:parameter combine"/>
         <proof
-         prover="3"
+         prover="5"
          timelimit="10"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.83"/>
+         <result status="valid" time="6.56"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter combine.9.3"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
-        sum="da900bdef3b553a8a89906ade91fbb1f"
+        sum="5d9fdc73d5b665b6c67d6f6cca2ffd75"
         proved="true"
         expanded="false"
-        shape="CV4aNiltaConsVVamemV9ainfix ++V8V7IamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EFIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6Aainfix &lt;alengthV6alengthV4Aainfix &lt;=c0alengthV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        shape="CV4aNiltaConsVVamemV9ainfix ++V8V7IamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EFIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:parameter combine"/>
         <proof
@@ -403,14 +427,14 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.64"/>
+         <result status="valid" time="0.89"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter combine.10"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="656d1be6da5fd817749779f93eddc002"
@@ -430,7 +454,7 @@
      </goal>
      <goal
       name="WP_parameter combine.11"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="normal postcondition"
       sum="627a5c614364983f6d55c8b9ae546c5c"
@@ -445,7 +469,7 @@
        expanded="true">
        <goal
         name="WP_parameter combine.11.1"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
         sum="ebe2efe71037623c03a771b0779772d6"
@@ -465,7 +489,7 @@
        </goal>
        <goal
         name="WP_parameter combine.11.2"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
         sum="1efe610050f6fb570ac7df2bd0cd6ee0"
@@ -485,7 +509,7 @@
        </goal>
        <goal
         name="WP_parameter combine.11.3"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="parameter combine"
         sum="9ecd129f4c9356a440a018953d6b7b51"
@@ -509,7 +533,7 @@
    </goal>
    <goal
     name="WP_parameter all_trees"
-    locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+    locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
     loclnum="74" loccnumb="6" loccnume="15"
     expl="parameter all_trees"
     sum="e87ca624dee019b16bc3bc4685a62efa"
@@ -524,7 +548,7 @@
      expanded="true">
      <goal
       name="WP_parameter all_trees.1"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="dee8ae98e830eb9fab95001431d7a584"
@@ -544,7 +568,7 @@
      </goal>
      <goal
       name="WP_parameter all_trees.2"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="f3d25556da3d4dd03e5c285bc0f193e8"
@@ -564,7 +588,7 @@
      </goal>
      <goal
       name="WP_parameter all_trees.3"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="normal postcondition"
       sum="a9910deaeecfdea0489d6d5588438b83"
@@ -584,7 +608,7 @@
      </goal>
      <goal
       name="WP_parameter all_trees.4"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="for loop initialization"
       sum="10c9a4ef1c397c772afae7949bac31d3"
@@ -599,7 +623,7 @@
        expanded="true">
        <goal
         name="WP_parameter all_trees.4.1"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="for loop initialization"
         sum="10c9a4ef1c397c772afae7949bac31d3"
@@ -621,7 +645,7 @@
      </goal>
      <goal
       name="WP_parameter all_trees.5"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="for loop preservation"
       sum="4239c9a187e5959ecb8a14b3936b7b80"
@@ -636,7 +660,7 @@
        expanded="true">
        <goal
         name="WP_parameter all_trees.5.1"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="for loop preservation"
         sum="26510798a994abb630363aa23b855193"
@@ -656,7 +680,7 @@
        </goal>
        <goal
         name="WP_parameter all_trees.5.2"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="for loop preservation"
         sum="f6fcc3329b547cedc631a6d5c72f7c33"
@@ -676,7 +700,7 @@
        </goal>
        <goal
         name="WP_parameter all_trees.5.3"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="for loop preservation"
         sum="c93690221336ceb548ecbe210831e2a3"
@@ -696,7 +720,7 @@
        </goal>
        <goal
         name="WP_parameter all_trees.5.4"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="for loop preservation"
         sum="3a5d16bfbe9f2fb889b2d6123d8d82f1"
@@ -711,7 +735,7 @@
          expanded="true">
          <goal
           name="WP_parameter all_trees.5.4.1"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="f150ee3374b68e81b428589f675e370f"
@@ -731,7 +755,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.2"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="e86d1cec45c507e729cf0006ac36ab5d"
@@ -751,7 +775,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.3"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="b38aff16635c8ae65117d174a7ece1ce"
@@ -771,7 +795,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.4"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="28175b7e869340ed77d696229bcf2fe6"
@@ -791,7 +815,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.5"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="9710b51d2e9729ddb656364f53a99914"
@@ -811,7 +835,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.6"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="47116d3b303efc40169026f4a84a5451"
@@ -831,7 +855,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.7"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="a4de1ad2c1776b0ebe03c59db7495fb7"
@@ -859,7 +883,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.8"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="2deab8a49b414243d2ac4693e4c85f0a"
@@ -879,7 +903,7 @@
          </goal>
          <goal
           name="WP_parameter all_trees.5.4.9"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="5de1d77310339f625f226d7ed1082e0c"
@@ -901,7 +925,7 @@
        </goal>
        <goal
         name="WP_parameter all_trees.5.5"
-        locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+        locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="for loop preservation"
         sum="e2b572faff8eeeb24177c83af608af03"
@@ -916,7 +940,7 @@
          expanded="true">
          <goal
           name="WP_parameter all_trees.5.5.1"
-          locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+          locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
           loclnum="74" loccnumb="6" loccnume="15"
           expl="for loop preservation"
           sum="56477b42f9de602160ca4e738f4d39c5"
@@ -931,7 +955,7 @@
            expanded="true">
            <goal
             name="WP_parameter all_trees.5.5.1.1"
-            locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+            locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
             loclnum="74" loccnumb="6" loccnume="15"
             expl="for loop preservation"
             sum="977e09868873964de23eb0ac3b4c37da"
@@ -951,7 +975,7 @@
            </goal>
            <goal
             name="WP_parameter all_trees.5.5.1.2"
-            locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+            locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
             loclnum="74" loccnumb="6" loccnume="15"
             expl="for loop preservation"
             sum="de740ba250fb8395a2fe445282b33ef9"
@@ -971,7 +995,7 @@
            </goal>
            <goal
             name="WP_parameter all_trees.5.5.1.3"
-            locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+            locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
             loclnum="74" loccnumb="6" loccnume="15"
             expl="for loop preservation"
             sum="0cc048d9e434fcf64ab2a936046b3531"
@@ -997,7 +1021,7 @@
      </goal>
      <goal
       name="WP_parameter all_trees.6"
-      locfile="programs/generate_all_trees/../generate_all_trees.mlw"
+      locfile="examples/programs/generate_all_trees/../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="normal postcondition"
       sum="e2a00e31d0c20ff20c47a466888f228f"
