@@ -142,9 +142,11 @@ let print_results fmt provers proofs =
 		| Call_provers.Invalid ->
                   fprintf fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
-                  fprintf fmt "FF8000\">Timeout"
+                  fprintf fmt "FF8000\">Timeout (%ds)"
+                    pr.S.proof_timelimit
 		| Call_provers.OutOfMemory ->
-                  fprintf fmt "FF8000\">Out Of Memory"
+                  fprintf fmt "FF8000\">Out Of Memory (%dM)"
+                    pr.S.proof_memlimit
 		| Call_provers.Unknown _ ->
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
 		| Call_provers.Failure _ ->
