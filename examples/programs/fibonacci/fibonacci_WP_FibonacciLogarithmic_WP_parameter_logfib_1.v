@@ -67,6 +67,9 @@ Axiom Power_0 : forall (x:t), ((power x 0%Z) = (mk_t 1%Z 0%Z 0%Z 1%Z)).
 Axiom Power_s : forall (x:t) (n:Z), (0%Z <= n)%Z -> ((power x
   (n + 1%Z)%Z) = (mult x (power x n))).
 
+Axiom Power_s_alt : forall (x:t) (n:Z), (0%Z < n)%Z -> ((power x n) = (mult x
+  (power x (n - 1%Z)%Z))).
+
 Axiom Power_1 : forall (x:t), ((power x 1%Z) = x).
 
 Axiom Power_sum : forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
@@ -78,11 +81,9 @@ Axiom Power_mult : forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
 Axiom Power_mult2 : forall (x:t) (y:t) (n:Z), (0%Z <= n)%Z -> ((power (mult x
   y) n) = (mult (power x n) (power y n))).
 
-
 (* Why3 goal *)
 Theorem WP_parameter_logfib : forall (n:Z), (0%Z <= n)%Z -> ((~ (n = 0%Z)) ->
-  ((((0%Z <= n)%Z /\ ((int.EuclideanDivision.div n 2%Z) < n)%Z) /\
-  (0%Z <= (int.EuclideanDivision.div n 2%Z))%Z) -> forall (result:Z)
+  ((0%Z <= (int.EuclideanDivision.div n 2%Z))%Z -> forall (result:Z)
   (result1:Z), ((power (mk_t 1%Z 1%Z 1%Z 0%Z) (int.EuclideanDivision.div n
   2%Z)) = (mk_t (result + result1)%Z result1 result1 result)) ->
   ((((int.EuclideanDivision.mod1 n 2%Z) = 0%Z) -> let a :=
@@ -102,7 +103,7 @@ intuition.
 rewrite H4 in H3.
 rewrite H3.
 replace (2 * div n 2 + 0)%Z with (div n 2 + div n 2)%Z by omega.
-rewrite Power_sum by exact H5.
+rewrite Power_sum by exact H1.
 rewrite H2; simpl.
 unfold mult; simpl.
 apply f_equal4; ring.
@@ -115,7 +116,7 @@ rewrite h' in H3.
 rewrite H3.
 replace (2 * div n 2 + 1)%Z with ((div n 2 + div n 2) + 1)%Z by omega.
 rewrite Power_s.
-rewrite Power_sum by exact H5.
+rewrite Power_sum by exact H1.
 rewrite H2; simpl.
 unfold mult at 2; simpl.
 unfold mult.
