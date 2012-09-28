@@ -1,0 +1,47 @@
+
+module ResizableArrayImplem
+
+  use import int.Int
+  use import int.MinMax
+  use import array.Array
+
+  type elt
+  val dummy: elt
+
+  type rarray = {| mutable length: int; mutable data: array elt |}
+    invariant { 0 <= length <= Array.length data }
+
+  let get (r: rarray) (i: int) =
+    { 0 <= i < r.length }
+    r.data[i]
+    { result = r.data[i] }
+
+  let set (r: rarray) (i: int) (v: elt) =
+    { 0 <= i < r.length }
+    r.data[i] <- v
+    { r.data = (old r.data)[i <- v] }
+
+  let resize (r: rarray) (len: int) =
+    { 0 <= len }
+    let n = Array.length r.data in
+    if len > n then begin
+      let a = Array.make (max len (2 * n)) dummy in
+      Array.blit r.data 0 a 0 n;
+      r.data <- a
+    end;
+    r.length <- len
+    { r.length = len /\
+      forall i: int.
+        0 <= i < min (old r.length) len -> r.data[i] = (old r.data)[i] }
+
+  let append (r1: rarray) (r2: rarray) =
+     {}
+     let n1 = length r1 in
+     resize r1 (length r1 + length r2);
+     Array.blit r2.data 0 r1.data n1 (length r2)
+     { r1.length = old r1.length + r2.length /\
+       forall i: int. 0 <= i < r1.length ->
+         (i < old r1.length  -> r1.data[i] = (old r1.data)[i]) /\
+         (old r1.length <= i -> r1.data[i] = r2.data[i - old r1.length]) }
+
+end
