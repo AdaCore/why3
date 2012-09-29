@@ -368,7 +368,7 @@ let dbinders denv bl =
 let deff_of_peff uc pe =
   { deff_reads  = pe.pe_reads;
     deff_writes = pe.pe_writes;
-    deff_raises = List.map (fun (gh,q) -> gh, find_xsymbol uc q) pe.pe_raises; }
+    deff_raises = List.map (find_xsymbol uc) pe.pe_raises; }
 
 exception DuplicateException of xsymbol
 
@@ -854,54 +854,58 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
   | _ ->
       errorm ~loc "unsupported effect expression"
 
-let get_eff_regs lenv fn (eff,svs) ghost le =
+let get_eff_regs lenv fn (eff,svs) le =
   let vs, vtv = get_eff_expr lenv le in
-  let ghost = ghost || vtv.vtv_ghost in
   match vtv.vtv_mut, vtv.vtv_ity.ity_node with
   | Some reg, _ ->
-      fn eff ?ghost:(Some ghost) reg, Svs.add vs svs
+      fn eff ?ghost:(Some vtv.vtv_ghost) reg, Svs.add vs svs
   | None, Ityapp (its,_,(_::_ as regl)) ->
-      let add_arg regs vtv = match vtv.vtv_mut with
-        | Some r when vtv.vtv_ghost -> Sreg.add r regs | _ -> regs in
-      let add_cs regs (cs,_) = List.fold_left add_arg regs cs.pl_args in
       let csl = find_constructors (get_known lenv.mod_uc) its in
-      let ghost_regs = List.fold_left add_cs Sreg.empty csl in
+      let add_arg ((ngr,ghr) as regs) vtv = match vtv.vtv_mut with
+        | Some r when vtv.vtv_ghost -> ngr, Sreg.add r ghr
+        | Some r                    -> Sreg.add r ngr, ghr
+        | None -> regs in
+      let add_cs regs (cs,_) = List.fold_left add_arg regs cs.pl_args in
+      let ngr, ghr = List.fold_left add_cs (Sreg.empty,Sreg.empty) csl in
       let add_reg eff reg0 reg =
-        let ghost = ghost || Sreg.mem reg0 ghost_regs in
-        fn eff ?ghost:(Some ghost) reg in
+        let eff = if not (Sreg.mem reg0 ngr) then eff else
+          fn eff ?ghost:(Some vtv.vtv_ghost) reg in
+        let eff = if not (Sreg.mem reg0 ghr) then eff else
+          fn eff ?ghost:(Some true) reg in
+        eff in
       List.fold_left2 add_reg eff its.its_regs regl, Svs.add vs svs
   | _ ->
       errorm ~loc:le.pp_loc "mutable expression expected"
 
 let eff_of_deff lenv deff =
   let acc = eff_empty, Svs.empty in
-  let add_read acc (gh,e) = get_eff_regs lenv eff_read acc gh e in
+  let add_read acc e = get_eff_regs lenv eff_read acc e in
   let acc = List.fold_left add_read acc deff.deff_reads in
-  let add_write acc (gh,e) = get_eff_regs lenv eff_write acc gh e in
+  let add_write acc e = get_eff_regs lenv eff_write acc e in
   let eff, svs = List.fold_left add_write acc deff.deff_writes in
-  let add_raise eff (gh,xs) = eff_raise eff ~ghost:gh xs in
-  let eff = List.fold_left add_raise eff deff.deff_raises in
-  eff, svs
+  List.fold_left (eff_raise ~ghost:false) eff deff.deff_raises, svs
 
 let check_user_effect lenv e dsp =
   let acc = eff_empty, Svs.empty in
   let read le eff ?(ghost=false) reg =
-    if (not ghost && Sreg.mem reg e.e_effect.eff_reads) ||
-           (ghost && Sreg.mem reg e.e_effect.eff_ghostr)
+    ignore ghost;
+    if Sreg.mem reg e.e_effect.eff_reads ||
+       Sreg.mem reg e.e_effect.eff_ghostr
     then eff else Loc.errorm ~loc:le.pp_loc
       "this read effect never happens in the expression" in
-  let check_read (gh,e) = ignore (get_eff_regs lenv (read e) acc gh e) in
+  let check_read e = ignore (get_eff_regs lenv (read e) acc e) in
   List.iter check_read dsp.ds_effect.deff_reads;
   let write le eff ?(ghost=false) reg =
-    if (not ghost && Sreg.mem reg e.e_effect.eff_writes) ||
-           (ghost && Sreg.mem reg e.e_effect.eff_ghostw)
+    ignore ghost;
+    if Sreg.mem reg e.e_effect.eff_writes ||
+       Sreg.mem reg e.e_effect.eff_ghostw
     then eff else Loc.errorm ~loc:le.pp_loc
       "this write effect never happens in the expression" in
-  let check_write (gh,e) = ignore (get_eff_regs lenv (write e) acc gh e) in
+  let check_write e = ignore (get_eff_regs lenv (write e) acc e) in
   List.iter check_write dsp.ds_effect.deff_writes;
-  let check_raise (ghost,xs) =
-    if (not ghost && Sexn.mem xs e.e_effect.eff_raises) ||
-           (ghost && Sexn.mem xs e.e_effect.eff_ghostx)
+  let check_raise xs =
+    if Sexn.mem xs e.e_effect.eff_raises ||
+       Sexn.mem xs e.e_effect.eff_ghostx
     then () else Loc.errorm
       "this expression does not raise exception %a" print_xs xs in
   List.iter check_raise dsp.ds_effect.deff_raises

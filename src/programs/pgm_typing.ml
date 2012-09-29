@@ -260,14 +260,12 @@ let dexception uc qid =
 let no_ghost gh =
   if gh then errorm "ghost types are not supported in this version of WhyML"
 
-let eff_no_ghost l = List.map (fun (gh,x) -> no_ghost gh; x) l
-
 let dueffect env e =
-  { du_reads  = eff_no_ghost e.Ptree.pe_reads;
-    du_writes = eff_no_ghost e.Ptree.pe_writes;
-    du_raises =
-      List.map (fun id -> let ls,_,_ = dexception env.uc id in ls)
-        (eff_no_ghost e.Ptree.pe_raises); }
+  { du_reads  = e.Ptree.pe_reads;
+    du_writes = e.Ptree.pe_writes;
+    du_raises = List.map
+      (fun id -> let ls,_,_ = dexception env.uc id in ls)
+        e.Ptree.pe_raises; }
 
 let dpost uc (q, ql) =
   let dexn (id, l) = let s, _, _ = dexception uc id in s, l in

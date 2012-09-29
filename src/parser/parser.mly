@@ -147,8 +147,6 @@ end
     let { pe_reads = r2; pe_writes = w2; pe_raises = x2 } = e2 in
     { pe_reads = r1 @ r2; pe_writes = w1 @ w2; pe_raises = x1 @ x2 }
 
-  let effect_exprs ghost l = List.map (fun x -> (ghost, x)) l
-
   let spec p (q,xq) ef vl = {
     sp_pre     = p;
     sp_post    = q;
@@ -1357,18 +1355,9 @@ effects:
 ;
 
 effect:
-| READS list1_lexpr_arg
-    { { pe_reads = effect_exprs false $2; pe_writes = []; pe_raises = [] } }
-| WRITES list1_lexpr_arg
-    { { pe_writes = effect_exprs false $2; pe_reads = []; pe_raises = [] } }
-| RAISES list1_uqualid
-    { { pe_raises = effect_exprs false $2; pe_writes = []; pe_reads = [] } }
-| GHOST READS list1_lexpr_arg
-    { { pe_reads = effect_exprs true $3; pe_writes = []; pe_raises = [] } }
-| GHOST WRITES list1_lexpr_arg
-    { { pe_writes = effect_exprs true $3; pe_reads = []; pe_raises = [] } }
-| GHOST RAISES list1_uqualid
-    { { pe_raises = effect_exprs true $3; pe_writes = []; pe_reads = [] } }
+| READS list1_lexpr_arg { { pe_reads = $2; pe_writes = []; pe_raises = [] } }
+| WRITES list1_lexpr_arg { { pe_writes = $2; pe_reads = []; pe_raises = [] } }
+| RAISES list1_uqualid { { pe_raises = $2; pe_writes = []; pe_reads = [] } }
 ;
 
 opt_variant:

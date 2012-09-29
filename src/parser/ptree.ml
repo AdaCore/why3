@@ -191,9 +191,9 @@ type for_direction = To | Downto
 type ghost = bool
 
 type effect = {
-  pe_reads  : (ghost * lexpr) list;
-  pe_writes : (ghost * lexpr) list;
-  pe_raises : (ghost * qualid) list;
+  pe_reads  : lexpr list;
+  pe_writes : lexpr list;
+  pe_raises : qualid list;
 }
 
 type pre = lexpr

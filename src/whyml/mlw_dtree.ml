@@ -27,16 +27,17 @@ type loc = Loc.position
 type ident = Ptree.ident
 
 type ghost = bool
+
 type dpre = Ptree.pre
 type dpost = Ptree.pre
 type dxpost = dpost Mexn.t
-type dinvariant = Ptree.lexpr option
 type dvariant = Ptree.lexpr * Term.lsymbol option
+type dinvariant = Ptree.lexpr option
 
 type deffect = {
-  deff_reads  : (ghost * Ptree.lexpr) list;
-  deff_writes : (ghost * Ptree.lexpr) list;
-  deff_raises : (ghost * xsymbol) list;
+  deff_reads  : Ptree.lexpr list;
+  deff_writes : Ptree.lexpr list;
+  deff_raises : xsymbol list;
 }
 
 type dspec = {
