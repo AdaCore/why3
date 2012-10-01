@@ -692,14 +692,11 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
   | Swhile _ _ body -> stmt_writes body w
   end
 
-  function fresh_from (f:fmla) (s:stmt) : ident
+  function fresh_from (f:fmla) : ident
 
   (* Need it for monotonicity*)
-  axiom fresh_from_fmla: forall s:stmt, f:fmla.
-     fresh_in_fmla (fresh_from f s) f
-
-  axiom fresh_from_stmt: forall s:stmt, f:fmla.
-     fresh_in_stmt (fresh_from f s) s
+  axiom fresh_from_fmla: forall f:fmla.
+     fresh_in_fmla (fresh_from f) f
 
   function abstract_effects (s:stmt) (f:fmla) : fmla
 
@@ -721,7 +718,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         Fand f (Fimplies f q)
     | Sseq s1 s2 -> wp s1 (wp s2 q)
     | Sassign x t ->
-        let id = fresh_from q s in
+        let id = fresh_from q in
         Flet id t (msubst q x id)
     | Sif t s1 s2 ->
         Fand (Fimplies (Fterm t) (wp s1 q))
