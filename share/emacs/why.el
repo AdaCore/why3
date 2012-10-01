@@ -9,14 +9,14 @@
 
 (if why-mode-map nil
   (setq why-mode-map (make-keymap))
-  (define-key why-mode-map "\C-c\C-c" 'why-generate-obligations)
-  (define-key why-mode-map "\C-c\C-a" 'why-find-alternate-file)
-  (define-key why-mode-map "\C-c\C-v" 'why-viewer)
+  ;; (define-key why-mode-map "\C-c\C-c" 'why-generate-obligations) **)
+  ;; (define-key why-mode-map "\C-c\C-a" 'why-find-alternate-file) **)
+  ;; (define-key why-mode-map "\C-c\C-v" 'why-viewer) **)
   (define-key why-mode-map [(control return)] 'font-lock-fontify-buffer))
 
 (setq auto-mode-alist
       (append
-       '(("\\.mlw" . why-mode))
+       '(("\\.\\(why\\|mlw\\)" . why-mode))
        auto-mode-alist))
 
 ;; font-lock
@@ -60,7 +60,7 @@
     (modify-syntax-entry ?* ". 23" why-mode-syntax-table)
     ))
 
-;; utility functions 
+;; utility functions
 
 (defun why-go-and-get-next-proof ()
   (let ((bp (search-forward "Proof." nil t)))
@@ -137,7 +137,7 @@
 (defun why-menu ()
   (easy-menu-define
    why-mode-menu (list why-mode-map)
-   "Why Mode Menu." 
+   "Why Mode Menu."
    '("Why"
      ["Customize Why mode" (customize-group 'why) t]
      "---"
@@ -177,22 +177,22 @@
               (if (< cur-indent 0)
                   (setq cur-indent 0)))
           (progn
-            (if (looking-at "^[ \t]*\\(logic\\|type\\|prop\\)") ; check for clone 
+            (if (looking-at "^[ \t]*\\(logic\\|type\\|prop\\)") ; check for clone
                 (progn
                   (save-excursion
                     (forward-line -1)
                     (if (looking-at "^[ \t]*\\(logic\\|type\\|prop\\).*,[ \t]*$")
-                        (progn 
+                        (progn
                           (setq cur-indent (current-indentation))
                           (setq not-indented nil))
                       (if (looking-at "^[ \t]*clone.*with ")
-                          (progn 
+                          (progn
                             (setq cur-indent (+ (current-indentation) why-indent))
                             (setq not-indented nil)
                             ))))))
         ;For the definition its very badly done...
           (if (looking-at "^[ \t]*$")
-	      ;; (save-excursion 
+	      ;; (save-excursion
 	      ;; 	(forward-line -1)
 	      ;; 	(setq cur-indent (current-indentation))
 	      ;; 	(setq not-indented nil))
@@ -201,23 +201,23 @@
                 (setq not-indented nil))
 	    (if (not
 		 (looking-at "^[ \t]*(\*.*"))
-            (if (not 
+            (if (not
                  (looking-at "^[ \t]*\\(logic\\|type\\|axiom\\|goal\\|lemma\\|inductive\\|use\\|theory\\|clone\\)"))
                 (save-excursion
                   (condition-case nil
-                      (save-excursion 
+                      (save-excursion
                         (backward-up-list)
                         (setq cur-indent (+ (current-column) 1))
                         (setq not-indented nil))
-                    (error 
+                    (error
                      (forward-line -1)
-                     (if (looking-at  
+                     (if (looking-at
                           "^[ \t]*\\(logic\\|type\\|axiom\\|goal\\|lemma\\|inductive\\)")
                          (setq cur-indent (+ (current-indentation) why-indent))
                        (setq cur-indent (current-indentation)))
                      (setq not-indented nil)))))))
           ;For inside theory or namespace
-          (save-excursion 
+          (save-excursion
             (while not-indented
               (forward-line -1)
               (if (looking-at "^[ \t]*end") ; Check for rule 3
@@ -235,6 +235,17 @@
             (indent-line-to cur-indent)
           (indent-line-to 0)))))))
 
+; compile will propose "why3ide file" is no Makefile is present
+
+(add-hook 'why-mode-hook
+          (lambda ()
+            (unless (file-exists-p "Makefile")
+              (set (make-local-variable 'compile-command)
+                   (let ((file (file-name-nondirectory buffer-file-name)))
+                     (format "why3ide %s" file))))))
+
+
+
 ;; setting the mode
 (defun why-mode ()
   "Major mode for editing Why programs.
@@ -250,14 +261,14 @@
   ;(make-local-variable 'indent-line-function)
   ;(setq indent-line-function 'why-indent-line)
   ; OCaml style comments for comment-region, comment-dwim, etc.
-  ; (setq comment-start "(\\*" comment-end "\\*)")
+  (setq comment-start "(*" comment-end "*)")
   ; menu
   ; providing the mode
   (setq major-mode 'why-mode)
   (setq mode-name "WHY")
   (use-local-map why-mode-map)
   (font-lock-mode 1)
-  (why-menu)
+  ; (why-menu)
   (run-hooks 'why-mode-hook))
 
 (provide 'why-mode)
