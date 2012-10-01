@@ -721,32 +721,54 @@ Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
   (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
-Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
-
 (* Why3 goal *)
-Theorem progress : forall (s:stmt),
+Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
+  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
+  (s:stmt),
   match s with
   | Sskip => True
   | (Sassign m t) => True
   | (Sseq s1 s2) => True
   | (Sif t s1 s2) => True
-  | (Sassert f) => forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
-      ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
-      ((~ (s = Sskip)) -> exists sigma':(map mident value), exists pi':(list
-      (ident* value)%type), exists s':stmt, (one_step sigma pi s sigma' pi'
-      s'))))
-  | (Swhile t f s1) => True
+  | (Sassert f) => True
+  | (Swhile t f s1) => (forall (s':stmt), (one_step sigma pi s1 sigma' pi'
+      s') -> forall (q:fmla), (eval_fmla sigma pi (wp s1 q)) ->
+      (eval_fmla sigma' pi' (wp s' q))) -> forall (s':stmt), (one_step sigma
+      pi s sigma' pi' s') -> forall (q:fmla), (eval_fmla sigma pi (wp s
+      q)) -> (eval_fmla sigma' pi' (wp s' q))
   end.
 destruct s; auto.
 simpl.
-intros sigma pi sigmat pit q H H1 (H2 & H3) H4.
-do 3 eexists.
-apply one_step_assert; auto.
+intros H s' H0 q (H1 & H2).
+apply H; auto.
+apply abstract_effects_generalize in H2.
+simpl in H2.
+destruct H2.
+
+inversion H0; subst; auto.
+(* case while true *)
+
+
+apply distrib_conj; split.
+generalize (abstract_effects_generalize _ _ _ _ h2).
+intros h3.
+simpl in h3.
+intuition.
+
+apply abstract_effects_writes; auto.
+
+(* case While False *)
+simpl.
+simpl in Hq.
+destruct Hq as (h1 & h2).
+generalize (abstract_effects_generalize _ _ _ _ h2).
+intros h3.
+simpl in h3.
+destruct h3 as (_ & h4). 
+apply h4.
+split; auto.
+rewrite H0; discriminate.
+
 Qed.
 
 

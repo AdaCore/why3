@@ -721,32 +721,39 @@ Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
   (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
-Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
-
 (* Why3 goal *)
-Theorem progress : forall (s:stmt),
+Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
+  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
+  (s:stmt),
   match s with
   | Sskip => True
   | (Sassign m t) => True
   | (Sseq s1 s2) => True
   | (Sif t s1 s2) => True
-  | (Sassert f) => forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
-      ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
-      ((~ (s = Sskip)) -> exists sigma':(map mident value), exists pi':(list
-      (ident* value)%type), exists s':stmt, (one_step sigma pi s sigma' pi'
-      s'))))
-  | (Swhile t f s1) => True
+  | (Sassert f) => True
+  | (Swhile t f s1) => (forall (s':stmt), (one_step sigma pi s1 sigma' pi'
+      s') -> forall (q:fmla), (eval_fmla sigma pi (wp s1 q)) ->
+      (eval_fmla sigma' pi' (wp s' q))) -> forall (s':stmt), (one_step sigma
+      pi s sigma' pi' s') -> forall (q:fmla), (eval_fmla sigma pi (wp s
+      q)) -> (eval_fmla sigma' pi' (wp s' q))
   end.
 destruct s; auto.
 simpl.
-intros sigma pi sigmat pit q H H1 (H2 & H3) H4.
-do 3 eexists.
-apply one_step_assert; auto.
+intros H s' H1 q (_ & H3).
+apply abstract_effects_generalize in H3; simpl in H3.
+inversion H1; subst; auto.
+simpl.
+apply distrib_conj.
+split.
+apply H3; auto.
+apply abstract_effects_writes.
+apply abstract_effects_monotonic with (sigma := sigma') (pi := pi').
+simpl; auto.
+(* false *)
+apply H3.
+split; auto.
+rewrite H11; auto.
+easy.
 Qed.
 
 

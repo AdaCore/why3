@@ -323,10 +323,32 @@ Fixpoint eval_term(sigma:(map mident value)) (pi:(list (ident* value)%type))
       pi t2))
   end.
 
-Axiom eval_bool_term : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-  datatype)%type)) (t:term), (type_term sigmat pit t TYbool) ->
-  exists b:bool, ((eval_term sigma pi t) = (Vbool b)).
+(* Why3 assumption *)
+Inductive compatible : datatype -> value -> Prop :=
+  | Compatible_bool : forall (b:bool), (compatible TYbool (Vbool b))
+  | Compatible_int : forall (n:Z), (compatible TYint (Vint n))
+  | Compatible_void : (compatible TYunit Vvoid).
+
+(* Why3 assumption *)
+Definition existe_compatible(ty:datatype) (v:value): Prop :=
+  match ty with
+  | TYbool => exists b:bool, (v = (Vbool b))
+  | TYint => exists n:Z, (v = (Vint n))
+  | TYunit => (v = Vvoid)
+  end.
+
+(* Why3 assumption *)
+Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
+  datatype)) (pi:(list (ident* value)%type)) (pit:(list (ident*
+  datatype)%type)): Prop := (forall (id:mident), (compatible (get sigmat id)
+  (get sigma id))) /\ forall (id:ident), (compatible (get_vartype id pit)
+  (get_stack id pi)).
+
+Axiom eval_type_term : forall (t:term) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
+  datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
+  ((type_term sigmat pit t ty) -> (existe_compatible ty (eval_term sigma pi
+  t))).
 
 (* Why3 assumption *)
 Fixpoint eval_fmla(sigma:(map mident value)) (pi:(list (ident* value)%type))
