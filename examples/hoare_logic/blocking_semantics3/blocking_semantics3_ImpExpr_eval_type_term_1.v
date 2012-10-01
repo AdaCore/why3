@@ -371,28 +371,10 @@ Theorem eval_type_term : forall (t:term),
 destruct t; auto.
 simpl.
 intros.
-induction ty.
-ae.
-induction o; ae.
-(* TYbool *)
-induction o.
-(* Oplus *)
-ae.
-(* Ominus *)
-ae.
-(* Omult *)
-ae.
-(* Ole *)
-eexists.
 inversion H2; subst; clear H2.
-clear H1.
-assert (ty1 = TYint).
-admit.
-subst.
-assert (ty2 = TYint).
-admit.
-subst.
-
+generalize (H0 sigma pi _ _ _ H1 H8).
+generalize (H sigma pi _ _ _ H1 H10).
+ae.
 Qed.
 
 
