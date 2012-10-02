@@ -152,7 +152,9 @@ let print_path = print_list dot pp_print_string
 
 let print_qident ~sanitizer info fmt id =
   try
-    let lp, t, p = Theory.restore_path id in
+    let lp, t, p =
+      try Mlw_module.restore_path id
+      with Not_found -> Theory.restore_path id in
     let s = String.concat "__" p in
     let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
     let s = sanitizer s in
