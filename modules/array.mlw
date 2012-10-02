@@ -48,11 +48,13 @@ module Array
     { 0 <= i < length a /\ a = (old a)[i <- v] }
     | OutOfBounds -> { i < 0 \/ i >= length a }
 
+  function make (n: int) (v: 'a) : array 'a =
+    {| length = n; elts = M.const v |}
+
   val make (n: int) (v: 'a) :
     { n >= 0 }
     array 'a
-    { result = {| length = n; elts = M.const v |} }
-     (*** { length result = n /\ forall i:int. 0 <= i < n -> result[i] = v} *)
+    { result = make n v }
 
   val append (a1: array 'a) (a2: array 'a) :
     {}

@@ -6,7 +6,7 @@ module ResizableArrayImplem
   use array.Array as A
 
   type elt
-  val dummy: elt
+  constant dummy: elt
 
   type rarray = {| mutable length: int; mutable data: A.array elt |}
     invariant { 0 <= length <= A.length data }
@@ -15,12 +15,20 @@ module ResizableArrayImplem
   function ([<-]) (r: rarray) (i: int) (v: elt) : rarray =
      {| r with data = A.set r.data i v |}
 
-  let get (r: rarray) (i: int) =
+  function make (len: int) : rarray =
+    {| length = len; data = A.make len dummy |}
+
+  let make (len: int) =
+    { 0 <= len }
+    {| length = len; data = A.make len dummy |}
+    { result = make len }
+
+  let ([]) (r: rarray) (i: int) =
     { 0 <= i < r.length }
     A.([]) r.data i
     { result = r[i] }
 
-  let set (r: rarray) (i: int) (v: elt) =
+  let ([]<-) (r: rarray) (i: int) (v: elt) =
     { 0 <= i < r.length }
     A.([]<-) r.data i v
     { r = (old r)[i <- v] }
@@ -47,5 +55,59 @@ module ResizableArrayImplem
        forall i: int. 0 <= i < r1.length ->
          (i < old r1.length  -> r1[i] = (old r1)[i]) /\
          (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
+
+  (* sanity checks for WhyML typing system *)
+
+(*
+  let test_reset1 (r: rarray) =
+    let a = A.make 10 dummy in
+    r.data <- a;
+    A.([]) a 0 (* <-- we cannot access array a anymore *)
+
+  let test_reset2 (r: rarray) =
+     let b = r.data in
+     r.data <- A.make 10 dummy;
+     let x = A.([]) r.data 0 in (* <-- this is accepted *)
+     let y = A.([]) b      0 in (* <-- but we cannot access array b anymore *)
+     ()
+
+  (* the same, using resize *)
+  let test_reset3 (r: rarray) =
+     let c = r.data in
+     resize r 10;
+     let x = A.([]) r.data 0 in (* <-- this is accepted *)
+     let y = A.([]) c      0 in (* <-- but we cannot access array c anymore *)
+     ()
+*)
+
+end
+
+module Test
+
+  use import int.Int
+  clone import ResizableArrayImplem
+    with type elt = int, constant dummy = Int.zero
+
+  let test1 () =
+    let r = make 10 in
+    assert { r.length = 10 };
+    r[0] <- 17;
+    resize r 7;
+    assert { r[0] = 17 };
+    assert { r.length = 7 }
+
+  let test2 () =
+    let r1 = make 10 in
+    r1[0] <- 17;
+    let r2 = make 10 in
+    r2[0] <- 42;
+    append r1 r2;
+    assert { r1.length = 20 };
+    assert { r1[0] = 17 };
+    let x = r1[10] in
+    assert { x = 42 };
+    let y = r2[0] in
+    assert { y = 42 };
+    ()
 
 end

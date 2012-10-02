@@ -17,39 +17,59 @@
    verified="true"
    expanded="true">
    <goal
-    name="WP_parameter get"
+    name="WP_parameter make"
     locfile="resizable_array/../resizable_array.mlw"
-    loclnum="18" loccnumb="6" loccnume="9"
-    expl="parameter get"
-    sum="80732f9bc4cf9e96a7a21c00a23650be"
+    loclnum="21" loccnumb="6" loccnume="10"
+    expl="parameter make"
+    sum="a19ae2c800cc23a1b6ec5f755b47c883"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=V0V0Aainfix &lt;=c0V0Aainfix =amk rarrayV0amk arrayV0aconstadummyamakeV0Aainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+    <label
+     name="expl:parameter make"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter mixfix []"
+    locfile="resizable_array/../resizable_array.mlw"
+    loclnum="26" loccnumb="6" loccnume="10"
+    expl="parameter mixfix []"
+    sum="4f2cb89785a6333fae9173a8e9d221f4"
     proved="true"
     expanded="true"
     shape="ainfix =agetV2V0agetV2V0Aainfix &lt;V0V1Aainfix &lt;=c0V0Iainfix &lt;=V3V1Aainfix &lt;=c0V3Aainfix &lt;V0V3Aainfix &lt;=c0V0FF">
     <label
-     name="expl:parameter get"/>
+     name="expl:parameter mixfix []"/>
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
-    name="WP_parameter set"
+    name="WP_parameter mixfix []&lt;-"
     locfile="resizable_array/../resizable_array.mlw"
-    loclnum="23" loccnumb="6" loccnume="9"
-    expl="parameter set"
-    sum="e14e1728fd449cffb2da5c6cca3e62f2"
+    loclnum="31" loccnumb="6" loccnume="12"
+    expl="parameter mixfix []&lt;-"
+    sum="fb72ea62a8cb1f9ba6345681c82a5e93"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=V4V2Aainfix &lt;=c0V4Aainfix =asetV3V0V1V5Iainfix =V5asetV3V0V1FAainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix &lt;=V4V2Aainfix &lt;=c0V4Aainfix &lt;V0V4Aainfix &lt;=c0V0FF">
     <label
-     name="expl:parameter set"/>
+     name="expl:parameter mixfix []&lt;-"/>
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -59,29 +79,29 @@
    <goal
     name="WP_parameter resize"
     locfile="resizable_array/../resizable_array.mlw"
-    loclnum="28" loccnumb="6" loccnume="12"
+    loclnum="36" loccnumb="6" loccnume="12"
     expl="parameter resize"
-    sum="86857b8fc103ac1904720b281c9210f8"
+    sum="c1a3d9dc7058cd4d8b257ee76e8c7efe"
     proved="true"
     expanded="true"
-    shape="iainfix &gt;V1V2ainfix &lt;=V8V6Aainfix &lt;=c0V8Aainfix =agetV7V9agetV3V9Iainfix &lt;V9aminV4V1Aainfix &lt;=c0V9FAainfix =V8V1Iainfix =V8V1FIainfix =V7V5Aainfix =V6amaxV1ainfix *c2V2FIainfix =agetV5V10agetV3ainfix -ainfix +c0V10c0Iainfix &lt;V10ainfix +c0V2Aainfix &lt;=c0V10FAainfix =agetV5V11agetaconstV0V11Iainfix &lt;V11amaxV1ainfix *c2V2Aainfix &lt;=ainfix +c0V2V11Oainfix &lt;V11c0Aainfix &lt;=c0V11FFAainfix &lt;=ainfix +c0V2amaxV1ainfix *c2V2Aainfix &lt;=c0c0Aainfix &lt;=ainfix +c0V2V2Aainfix &lt;=c0c0Aainfix &gt;=amaxV1ainfix *c2V2c0ainfix &lt;=V12V2Aainfix &lt;=c0V12Aainfix =agetV3V13agetV3V13Iainfix &lt;V13aminV4V1Aainfix &lt;=c0V13FAainfix =V12V1Iainfix =V12V1FIainfix &lt;=V4V2Aainfix &lt;=c0V4Aainfix &lt;=c0V1FFF">
+    shape="iainfix &gt;V0V1ainfix &lt;=V7V5Aainfix &lt;=c0V7Aainfix =agetV6V8agetV2V8Iainfix &lt;V8aminV3V0Aainfix &lt;=c0V8FAainfix =V7V0Iainfix =V7V0FIainfix =V6V4Aainfix =V5amaxV0ainfix *c2V1FIainfix =agetV4V9agetV2ainfix -ainfix +c0V9c0Iainfix &lt;V9ainfix +c0V1Aainfix &lt;=c0V9FAainfix =agetV4V10agetaconstadummyV10Iainfix &lt;V10amaxV0ainfix *c2V1Aainfix &lt;=ainfix +c0V1V10Oainfix &lt;V10c0Aainfix &lt;=c0V10FFAainfix &lt;=ainfix +c0V1amaxV0ainfix *c2V1Aainfix &lt;=c0c0Aainfix &lt;=ainfix +c0V1V1Aainfix &lt;=c0c0Aainfix &gt;=amaxV0ainfix *c2V1c0ainfix &lt;=V11V1Aainfix &lt;=c0V11Aainfix =agetV2V12agetV2V12Iainfix &lt;V12aminV3V0Aainfix &lt;=c0V12FAainfix =V11V0Iainfix =V11V0FIainfix &lt;=V3V1Aainfix &lt;=c0V3Aainfix &lt;=c0V0FF">
     <label
      name="expl:parameter resize"/>
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.08"/>
+     <result status="valid" time="0.07"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter append"
     locfile="resizable_array/../resizable_array.mlw"
-    loclnum="41" loccnumb="6" loccnume="12"
+    loclnum="49" loccnumb="6" loccnume="12"
     expl="parameter append"
-    sum="3ff8d06ffe759209b160cce40a2b4199"
+    sum="08986505f421b564ca07c69d9f2c723d"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=V8V6Aainfix &lt;=c0V8Aainfix =agetV9V10agetV1ainfix -V10V5Iainfix &lt;=V5V10Aainfix =agetV9V10agetV4V10Iainfix &lt;V10V5Iainfix &lt;V10V8Aainfix &lt;=c0V10FAainfix =V8ainfix +V5V2Iainfix =agetV9V11agetV1ainfix -ainfix +c0V11V5Iainfix &lt;V11ainfix +V5V2Aainfix &lt;=V5V11FAainfix =agetV9V12agetV7V12Iainfix &lt;V12V6Aainfix &lt;=ainfix +V5V2V12Oainfix &lt;V12V5Aainfix &lt;=c0V12FFAainfix &lt;=ainfix +V5V2V6Aainfix &lt;=c0V5Aainfix &lt;=ainfix +c0V2V0Aainfix &lt;=c0c0Iainfix &lt;=V8V6Aainfix &lt;=c0V8Aainfix =agetV7V13agetV4V13Iainfix &lt;V13aminV5ainfix +V5V2Aainfix &lt;=c0V13FAainfix =V8ainfix +V5V2FAainfix &lt;=c0ainfix +V5V2Iainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V5V3Aainfix &lt;=c0V5F">
@@ -89,11 +109,58 @@
      name="expl:parameter append"/>
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="Test"
+   locfile="resizable_array/../resizable_array.mlw"
+   loclnum="85" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter test1"
+    locfile="resizable_array/../resizable_array.mlw"
+    loclnum="91" loccnumb="6" loccnume="11"
+    expl="parameter test1"
+    sum="ce5252b87a5c865bca66be86294309b4"
+    proved="true"
+    expanded="true"
+    shape="ainfix =CV0amk rarrayVVV4c7Aainfix =agetCV0amk rarrayVVV3c0c17ICV0amk rarrayVVtACV0amk rarrayVVainfix &lt;=V4V2Aainfix &lt;=c0V4Aainfix =agetCV0amk rarrayVVV3V13agetCV0amk rarrayVVCV17amk arrayVVV1V13Iainfix &lt;V13aminCV0amk rarrayVVV20c7Aainfix &lt;=c0V13FAainfix =CV0amk rarrayVVV4c7FACV0amk rarrayVVtAainfix &lt;=c0c7ICV0amk rarrayVVtACV0amk rarrayVVainfix &lt;=V28CV29amk arrayVVV30Aainfix &lt;=c0V28ACV0amk rarrayVVCV33amk arrayVVainfix =asetaeltsadataV0c0c17V1Aainfix =alengthadataV0V34Aainfix =alengthV0V32FACV0amk rarrayVVtAainfix &lt;c0alengthV0Aainfix &lt;=c0c0Aainfix =alengthV0c10ICV0amk rarrayVVtACV0amk rarrayVVainfix &lt;=V40alengthV41Aainfix &lt;=c0V40Lamakec10Aainfix &lt;=c0c10">
+    <label
+     name="expl:parameter test1"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter test2"
+    locfile="resizable_array/../resizable_array.mlw"
+    loclnum="99" loccnumb="6" loccnume="11"
+    expl="parameter test2"
+    sum="28614e4975c656520e943526f8b369dd"
+    proved="true"
+    expanded="true"
+    shape="ainfix =agetCV2amk rarrayVVCV8amk arrayVVV3c0c42ACV2amk rarrayVVtAainfix &lt;c0CV2amk rarrayVVV13Aainfix &lt;=c0c0Aainfix =agetCV0amk rarrayVVV5c10c42ACV0amk rarrayVVtAainfix &lt;c10CV0amk rarrayVVV6Aainfix &lt;=c0c10Aainfix =agetCV0amk rarrayVVV5c0c17Aainfix =CV0amk rarrayVVV6c20ICV0amk rarrayVVtACV0amk rarrayVVainfix &lt;=V6V4Aainfix &lt;=c0V6Aainfix =agetCV0amk rarrayVVV5V29agetCV2amk rarrayVVCV33amk arrayVVV3ainfix -V29CV0amk rarrayVVV36Iainfix &lt;=CV0amk rarrayVVV38V29Aainfix =agetCV0amk rarrayVVV5V29agetCV0amk rarrayVVCV43amk arrayVVV1V29Iainfix &lt;V29CV0amk rarrayVVV46Iainfix &lt;V29CV0amk rarrayVVV6Aainfix &lt;=c0V29FAainfix =CV0amk rarrayVVV6ainfix +CV0amk rarrayVVV52CV2amk rarrayVVV54FACV2amk rarrayVVtACV0amk rarrayVVtICV2amk rarrayVVtACV2amk rarrayVVainfix &lt;=V62CV63amk arrayVVV64Aainfix &lt;=c0V62ACV2amk rarrayVVCV67amk arrayVVainfix =asetaeltsadataV2c0c42V3Aainfix =alengthadataV2V68Aainfix =alengthV2V66FACV2amk rarrayVVtAainfix &lt;c0alengthV2Aainfix &lt;=c0c0ICV2amk rarrayVVtACV2amk rarrayVVainfix &lt;=V74alengthV75Aainfix &lt;=c0V74Lamakec10Aainfix &lt;=c0c10ICV0amk rarrayVVtACV0amk rarrayVVainfix &lt;=V78CV79amk arrayVVV80Aainfix &lt;=c0V78ACV0amk rarrayVVCV83amk arrayVVainfix =asetaeltsadataV0c0c17V1Aainfix =alengthadataV0V84Aainfix =alengthV0V82FACV0amk rarrayVVtAainfix &lt;c0alengthV0Aainfix &lt;=c0c0ICV0amk rarrayVVtACV0amk rarrayVVainfix &lt;=V90alengthV91Aainfix &lt;=c0V90Lamakec10Aainfix &lt;=c0c10">
+    <label
+     name="expl:parameter test2"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.17"/>
     </proof>
    </goal>
   </theory>
