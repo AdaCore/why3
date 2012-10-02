@@ -466,7 +466,8 @@ let () = Exn_printer.register
       fprintf fmt "'%a' is a constructor/field of an abstract type \
       and cannot be used in a program" print_ls ls;
   | Mlw_expr.GhostWrite (_e, _reg) ->
-      fprintf fmt "This expression stores a ghost value in a non-ghost location"
+      fprintf fmt
+        "This expression performs a ghost write in a non-ghost location"
   | Mlw_expr.GhostRaise (_e, xs) ->
       fprintf fmt "This expression raises an escaping ghost exception %a"
         print_xs xs
