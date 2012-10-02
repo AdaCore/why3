@@ -468,7 +468,7 @@ let clone_export uc m inst =
       | VTarrow a -> VTarrow (conv_vta mv a)
       | VTvalue v -> VTvalue (conv_vtv v) in
     vty_arrow args ~spec ~ghost:a.vta_ghost vty in
-  let mvs = ref Mvs.empty in
+  let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
