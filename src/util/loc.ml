@@ -115,7 +115,7 @@ let errorm ?loc f =
        let s = Buffer.contents buf in
        Buffer.clear buf;
        error ?loc (Message s))
-    fmt f
+    fmt ("@[" ^^ f ^^ "@]")
 
 let () = Exn_printer.register
   (fun fmt exn -> match exn with
