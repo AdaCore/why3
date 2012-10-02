@@ -897,6 +897,7 @@ lident_op:
 | OPPREF                { prefix $1 }
 | LEFTSQ RIGHTSQ        { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW { mixfix "[]<-" }
 ;
 
 prefix_op:
@@ -1009,27 +1010,20 @@ use_module:
 ;
 
 pdecl:
-| LET ghost lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
+| LET ghost lident_rich labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $3 $4, $2, mk_expr_i 8 (Efun ($5, cast_body $6 $8))) }
-| LET ghost lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
+| LET ghost lident_rich labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $3 $4, $2, mk_expr_i 9 (Efun ($7, $9))) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
-| VAL ghost lident_rich_pgm labels COLON type_v
+| VAL ghost lident_rich labels COLON type_v
     { Dparam (add_lab $3 $4, $2, $6) }
-| VAL ghost lident_rich_pgm labels list1_type_v_param COLON type_c
+| VAL ghost lident_rich labels list1_type_v_param COLON type_c
     { Dparam (add_lab $3 $4, $2, Tarrow ($5, $7)) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, Some $4) }
-;
-
-lident_rich_pgm:
-| lident_rich
-    { $1 }
-| LEFTPAR LEFTSQ RIGHTSQ LARROW RIGHTPAR
-    { mk_id (mixfix "[]<-") (floc ()) }
 ;
 
 opt_semicolon:
@@ -1043,7 +1037,7 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| ghost lident_rich_pgm labels list1_type_v_binder
+| ghost lident_rich labels list1_type_v_binder
      opt_cast opt_variant EQUAL triple
    { floc (), add_lab $2 $3, $1, $4, add_variant $6 (cast_body $5 $8) }
 ;
