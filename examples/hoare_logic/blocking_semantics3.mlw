@@ -761,17 +761,39 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
       eval_fmla sigma' pi' (wp s' q)
 
   lemma progress:
-	forall s:stmt, sigma:env, pi:stack,
-      sigmat: type_env, pit: type_stack, q:fmla.
-	compatible_env sigma sigmat pi pit ->
-	  type_stmt sigmat pit s ->
-(* useful ?
-      type_fmla sigmat pit q ->
-*)
-      eval_fmla sigma pi (wp s q) -> 
+    forall s:stmt, sigma:env, pi:stack,
+           sigmat: type_env, pit: type_stack, q:fmla.
+      compatible_env sigma sigmat pi pit ->
+      type_stmt sigmat pit s ->
+      eval_fmla sigma pi (wp s q) ->
       s <> Sskip ->
       exists sigma':env, pi':stack, s':stmt.
       one_step sigma pi s sigma' pi' s'
+
+
+  predicate reducible (sigma:env) (pi:stack) (s:stmt) =
+    exists sigma':env, pi':stack, s':stmt.
+      one_step sigma pi s sigma' pi' s'
+
+  lemma progress2:
+    forall s:stmt, sigma:env, pi:stack,
+           sigmat: type_env, pit: type_stack, q:fmla.
+      compatible_env sigma sigmat pi pit ->
+      type_stmt sigmat pit s ->
+      eval_fmla sigma pi (wp s q) ->
+      s <> Sskip -> reducible sigma pi s
+
+  (** {3 main soundness result} *)
+
+  lemma wp_soundness:
+    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt, 
+           sigmat: type_env, pit: type_stack, q:fmla.
+      compatible_env sigma sigmat pi pit ->
+      type_stmt sigmat pit s ->
+      many_steps sigma pi s sigma' pi' s' n /\
+      not (reducible sigma' pi' s') /\
+      eval_fmla sigma pi (wp s q) ->
+      s' = Sskip /\ eval_fmla sigma' pi' q
 
 end
 

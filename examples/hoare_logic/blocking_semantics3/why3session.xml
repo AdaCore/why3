@@ -30,15 +30,19 @@
  <prover
   id="6"
   name="Coq"
-  version="8.3pl4"/>
+  version="8.3pl3"/>
  <prover
   id="7"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="8"
   name="Z3"
   version="4.0"/>
  <file
   name="../blocking_semantics3.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="ImpExpr"
    locfile="blocking_semantics3/../blocking_semantics3.mlw"
@@ -254,7 +258,7 @@
         expanded="false"
         shape="CV0aTvalueVtaTvarVtaTderefVtaTbinVVVaexiste_compatibleV11aeval_termV7V8V0Iatype_termV9V10V0V11Iacompatible_envV7V9V8V10FIaexiste_compatibleV16aeval_termV12V13V4Iatype_termV14V15V4V16Iacompatible_envV12V14V13V15FIaexiste_compatibleV21aeval_termV17V18V6Iatype_termV19V20V6V21Iacompatible_envV17V19V18V20FF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_type_term_1.v"
@@ -421,7 +425,7 @@
         expanded="false"
         shape="CV0aFtermVainfix =asubstV0V2V3V0Iafresh_in_fmlaV2V0FaFandVVtaFnotVtaFimpliesVVtaFletVVVtaFforallVVVtF">
         <proof
-         prover="7"
+         prover="8"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -513,7 +517,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVainfix =asubstV0V10V11V0Iafresh_in_fmlaV10V0FIainfix =asubstV9V12V13V9Iafresh_in_fmlaV12V9FaFforallVVVtF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_subst_fresh_3.v"
@@ -929,7 +933,7 @@
         expanded="false"
         shape="CV0aTvalueVtaTvarVainfix =aeval_termV3ainfix ++V5aConsaTuple2V6V8aConsaTuple2V7V9V4V0aeval_termV3ainfix ++V5aConsaTuple2V7V9aConsaTuple2V6V8V4V0Iainfix =V6V7NFaTderefVtaTbinVVVtF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_term_1.v"
@@ -1275,7 +1279,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVtaFforallVVVaeval_fmlaV13ainfix ++V15aConsaTuple2V17V19aConsaTuple2V16V18V14V0Iaeval_fmlaV13ainfix ++V15aConsaTuple2V16V18aConsaTuple2V17V19V14V0Iainfix =V16V17NFIaeval_fmlaV20ainfix ++V22aConsaTuple2V24V26aConsaTuple2V23V25V21V12qaeval_fmlaV20ainfix ++V22aConsaTuple2V23V25aConsaTuple2V24V26V21V12Iainfix =V23V24NFF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_1.v"
@@ -1293,7 +1297,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVtaFforallVVVaeval_fmlaV13ainfix ++V15aConsaTuple2V16V18aConsaTuple2V17V19V14V0Iaeval_fmlaV13ainfix ++V15aConsaTuple2V17V19aConsaTuple2V16V18V14V0Iainfix =V16V17NFIaeval_fmlaV20ainfix ++V22aConsaTuple2V24V26aConsaTuple2V23V25V21V12qaeval_fmlaV20ainfix ++V22aConsaTuple2V23V25aConsaTuple2V24V26V21V12Iainfix =V23V24NFF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_2.v"
@@ -1475,7 +1479,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVaeval_fmlaV14aConsaTuple2V11V13aConsaTuple2V10V12V15V0Iaeval_fmlaV14aConsaTuple2V10V12aConsaTuple2V11V13V15V0FIainfix =V10V11NFIaeval_fmlaV20aConsaTuple2V17V19aConsaTuple2V16V18V21V9qaeval_fmlaV20aConsaTuple2V16V18aConsaTuple2V17V19V21V9FIainfix =V16V17NFaFforallVVVtF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_2_3.v"
@@ -1493,7 +1497,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVaeval_fmlaV14aConsaTuple2V10V12aConsaTuple2V11V13V15V0Iaeval_fmlaV14aConsaTuple2V11V13aConsaTuple2V10V12V15V0FIainfix =V10V11NFIaeval_fmlaV20aConsaTuple2V17V19aConsaTuple2V16V18V21V9qaeval_fmlaV20aConsaTuple2V16V18aConsaTuple2V17V19V21V9FIainfix =V16V17NFaFforallVVVtF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_2_2.v"
@@ -1511,7 +1515,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVtaFforallVVVaeval_fmlaV17aConsaTuple2V14V16aConsaTuple2V13V15V18V0Iaeval_fmlaV17aConsaTuple2V13V15aConsaTuple2V14V16V18V0FIainfix =V13V14NFIaeval_fmlaV23aConsaTuple2V20V22aConsaTuple2V19V21V24V12qaeval_fmlaV23aConsaTuple2V19V21aConsaTuple2V20V22V24V12FIainfix =V19V20NFF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="8"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_2_4.v"
@@ -1529,7 +1533,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVtaFforallVVVaeval_fmlaV17aConsaTuple2V13V15aConsaTuple2V14V16V18V0Iaeval_fmlaV17aConsaTuple2V14V16aConsaTuple2V13V15V18V0FIainfix =V13V14NFIaeval_fmlaV23aConsaTuple2V20V22aConsaTuple2V19V21V24V12qaeval_fmlaV23aConsaTuple2V19V21aConsaTuple2V20V22V24V12FIainfix =V19V20NFF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="7"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_swap_2_5.v"
@@ -2065,7 +2069,7 @@
         expanded="false"
         shape="CV0aFtermVtaFandVVtaFnotVtaFimpliesVVtaFletVVVtaFforallVVVaeval_fmlaV15V16V0Iaeval_fmlaV15aConsaTuple2V13V14V16V0FIafresh_in_fmlaV13V0FIaeval_fmlaV19V20V12qaeval_fmlaV19aConsaTuple2V17V18V20V12FIafresh_in_fmlaV17V12FF">
         <proof
-         prover="6"
+         prover="7"
          timelimit="5"
          memlimit="1000"
          edited="blocking_semantics3_ImpExpr_eval_change_free_5.v"
@@ -2104,7 +2108,7 @@
     expanded="false"
     shape="ainfix &gt;=V6c0Iamany_stepsV0V2V4V1V3V5V6F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      edited="blocking_semantics3_ImpExpr_steps_non_neg_3.v"
@@ -2122,7 +2126,7 @@
     expanded="false"
     shape="ainfix =V6ainfix +ainfix +c1V9V10Aamany_stepsV7V8V5V1V3aSskipV10Aamany_stepsV0V2V4V7V8aSskipV9EIamany_stepsV0V2aSseqV4V5V1V3aSskipV6F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      edited="blocking_semantics3_ImpExpr_many_steps_seq_2.v"
@@ -2254,7 +2258,7 @@
      <result status="valid" time="1.57"/>
     </proof>
     <proof
-     prover="6"
+     prover="7"
      timelimit="4"
      memlimit="1000"
      edited="blocking_semantics3_TestSemantics_Test55_1.v"
@@ -2305,7 +2309,7 @@
     expanded="false"
     shape="ainfix =agetV1ayaVintc13Iaone_stepV0V2V4V1V3aSskipIaone_stepamy_sigmaamy_piaSifamk_tbinamk_tderefayaOleamk_tvalueaVintc10aSassignayamk_tvalueaVintc13aSassignayamk_tvalueaVintc42V0V2V4F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="7"
      memlimit="1000"
      edited="blocking_semantics3_TestSemantics_If42_1.v"
@@ -2330,7 +2334,7 @@
     expanded="false"
     shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
     <proof
-     prover="7"
+     prover="8"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -2372,7 +2376,7 @@
     expanded="false"
     shape="avalid_tripleaFletV2V3amsubstV0V1V2aSassignV1V3V0Iafresh_in_fmlaV2V0F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="7"
      memlimit="1000"
      edited="blocking_semantics3_HoareLogic_assign_rule_1.v"
@@ -2390,7 +2394,7 @@
     expanded="false"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
     <proof
-     prover="7"
+     prover="8"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2407,7 +2411,7 @@
     expanded="false"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="6"
      memlimit="1000"
      edited="blocking_semantics3_HoareLogic_if_rule_1.v"
@@ -2425,7 +2429,7 @@
     expanded="false"
     shape="avalid_tripleV1aSassertV0V1Iavalid_fmlaaFimpliesV1V0F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="4"
      memlimit="1000"
      edited="blocking_semantics3_HoareLogic_assert_rule_1.v"
@@ -2443,7 +2447,7 @@
     expanded="false"
     shape="avalid_tripleaFimpliesV0V1aSassertV0V1F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="4"
      memlimit="1000"
      edited="blocking_semantics3_HoareLogic_assert_rule_ext_1.v"
@@ -2463,7 +2467,7 @@
     name="assigns_refl"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="669" loccnumb="6" loccnume="18"
-    sum="fc4f78baae87c0ee52f2df6a43e48ba2"
+    sum="094a84a39ecb84e242bbcb2ec9e9e1ed"
     proved="true"
     expanded="false"
     shape="aassignsV0V1V0F">
@@ -2473,22 +2477,22 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.10"/>
+     <result status="valid" time="0.18"/>
     </proof>
    </goal>
    <goal
     name="assigns_trans"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="672" loccnumb="6" loccnume="19"
-    sum="df3a2c6e45b6a8bcf9dbef9ac7a05f8e"
+    sum="2a35248429dd834babc117be7346a99b"
     proved="true"
     expanded="false"
     shape="aassignsV0V3V2IaassignsV1V3V2AaassignsV0V3V1F">
@@ -2498,22 +2502,22 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.12"/>
+     <result status="valid" time="0.18"/>
     </proof>
    </goal>
    <goal
     name="assigns_union_left"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="677" loccnumb="6" loccnume="24"
-    sum="1f88243cbc736e448f40a75ffffee1bb"
+    sum="7821c631b03a197780892ec0b06b223a"
     proved="true"
     expanded="false"
     shape="aassignsV0aunionV2V3V1IaassignsV0V2V1F">
@@ -2523,22 +2527,22 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.18"/>
     </proof>
    </goal>
    <goal
     name="assigns_union_right"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="681" loccnumb="6" loccnume="25"
-    sum="c390fd55d7516557bc146b60d3ccb342"
+    sum="44ab17c6124e9d6a1e3983a6f5a52090"
     proved="true"
     expanded="false"
     shape="aassignsV0aunionV2V3V1IaassignsV0V3V1F">
@@ -2548,22 +2552,22 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="7"
+     prover="8"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.17"/>
     </proof>
    </goal>
    <goal
     name="monotonicity"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="745" loccnumb="8" loccnume="20"
-    sum="218ee23644064c36aecb0ffc9792bc28"
+    sum="05265a93fac28b412fadac4406892b8f"
     proved="true"
     expanded="false"
     shape="avalid_fmlaaFimpliesawpV0V1awpV0V2Iavalid_fmlaaFimpliesV1V2F">
@@ -2575,7 +2579,7 @@
       name="monotonicity.1"
       locfile="blocking_semantics3/../blocking_semantics3.mlw"
       loclnum="745" loccnumb="8" loccnume="20"
-      sum="7143caafe90881465a3ede15e89b093a"
+      sum="c4594f6dd028832753f550715485bab9"
       proved="true"
       expanded="false"
       shape="CV0aSskipavalid_fmlaaFimpliesawpV0V1awpV0V2Iavalid_fmlaaFimpliesV1V2FaSassignVVavalid_fmlaaFimpliesawpV0V5awpV0V6Iavalid_fmlaaFimpliesV5V6FaSseqVVavalid_fmlaaFimpliesawpV0V9awpV0V10Iavalid_fmlaaFimpliesV9V10FIavalid_fmlaaFimpliesawpV7V11awpV7V12Iavalid_fmlaaFimpliesV11V12FIavalid_fmlaaFimpliesawpV8V13awpV8V14Iavalid_fmlaaFimpliesV13V14FaSifVVVavalid_fmlaaFimpliesawpV0V18awpV0V19Iavalid_fmlaaFimpliesV18V19FIavalid_fmlaaFimpliesawpV16V20awpV16V21Iavalid_fmlaaFimpliesV20V21FIavalid_fmlaaFimpliesawpV17V22awpV17V23Iavalid_fmlaaFimpliesV22V23FaSassertVavalid_fmlaaFimpliesawpV0V25awpV0V26Iavalid_fmlaaFimpliesV25V26FaSwhileVVVavalid_fmlaaFimpliesawpV0V30awpV0V31Iavalid_fmlaaFimpliesV30V31FIavalid_fmlaaFimpliesawpV29V32awpV29V33Iavalid_fmlaaFimpliesV32V33FF">
@@ -2587,45 +2591,10 @@
         name="monotonicity.1.1"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="745" loccnumb="8" loccnume="20"
-        sum="59466c4682a08f49cceb6b03cc6d384d"
+        sum="ed7f805a917f7ef49819fef066e8c2b1"
         proved="true"
         expanded="false"
         shape="CV0aSskipavalid_fmlaaFimpliesawpV0V1awpV0V2Iavalid_fmlaaFimpliesV1V2FaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal
-        name="monotonicity.1.2"
-        locfile="blocking_semantics3/../blocking_semantics3.mlw"
-        loclnum="745" loccnumb="8" loccnume="20"
-        sum="0c45e3fc6e929de977d45be932bebb41"
-        proved="true"
-        expanded="false"
-        shape="CV0aSskiptaSassignVVavalid_fmlaaFimpliesawpV0V3awpV0V4Iavalid_fmlaaFimpliesV3V4FaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
-        <proof
-         prover="6"
-         timelimit="5"
-         memlimit="1000"
-         edited="blocking_semantics3_WP_monotonicity_5.v"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.64"/>
-        </proof>
-       </goal>
-       <goal
-        name="monotonicity.1.3"
-        locfile="blocking_semantics3/../blocking_semantics3.mlw"
-        loclnum="745" loccnumb="8" loccnume="20"
-        sum="b7e2ee1c1c14293b9b59fd131879d14b"
-        proved="true"
-        expanded="false"
-        shape="CV0aSskiptaSassignVVtaSseqVVavalid_fmlaaFimpliesawpV0V5awpV0V6Iavalid_fmlaaFimpliesV5V6FIavalid_fmlaaFimpliesawpV3V7awpV3V8Iavalid_fmlaaFimpliesV7V8FIavalid_fmlaaFimpliesawpV4V9awpV4V10Iavalid_fmlaaFimpliesV9V10FaSifVVVtaSassertVtaSwhileVVVtF">
         <proof
          prover="1"
          timelimit="5"
@@ -2636,10 +2605,45 @@
         </proof>
        </goal>
        <goal
+        name="monotonicity.1.2"
+        locfile="blocking_semantics3/../blocking_semantics3.mlw"
+        loclnum="745" loccnumb="8" loccnume="20"
+        sum="bc284cf0b99df03ba7e1b272d798d77e"
+        proved="true"
+        expanded="false"
+        shape="CV0aSskiptaSassignVVavalid_fmlaaFimpliesawpV0V3awpV0V4Iavalid_fmlaaFimpliesV3V4FaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         edited="blocking_semantics3_WP_monotonicity_5.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.37"/>
+        </proof>
+       </goal>
+       <goal
+        name="monotonicity.1.3"
+        locfile="blocking_semantics3/../blocking_semantics3.mlw"
+        loclnum="745" loccnumb="8" loccnume="20"
+        sum="8779955d65a25c89bf620d4e43da4e0d"
+        proved="true"
+        expanded="false"
+        shape="CV0aSskiptaSassignVVtaSseqVVavalid_fmlaaFimpliesawpV0V5awpV0V6Iavalid_fmlaaFimpliesV5V6FIavalid_fmlaaFimpliesawpV3V7awpV3V8Iavalid_fmlaaFimpliesV7V8FIavalid_fmlaaFimpliesawpV4V9awpV4V10Iavalid_fmlaaFimpliesV9V10FaSifVVVtaSassertVtaSwhileVVVtF">
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal
         name="monotonicity.1.4"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="745" loccnumb="8" loccnume="20"
-        sum="7125c62b1a7c64c6e191dfec88d6b85a"
+        sum="75e4dcf42378017d0e73253dee6bc505"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVavalid_fmlaaFimpliesawpV0V8awpV0V9Iavalid_fmlaaFimpliesV8V9FIavalid_fmlaaFimpliesawpV6V10awpV6V11Iavalid_fmlaaFimpliesV10V11FIavalid_fmlaaFimpliesawpV7V12awpV7V13Iavalid_fmlaaFimpliesV12V13FaSassertVtaSwhileVVVtF">
@@ -2650,14 +2654,14 @@
          edited="blocking_semantics3_WP_monotonicity_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.67"/>
+         <result status="valid" time="1.34"/>
         </proof>
        </goal>
        <goal
         name="monotonicity.1.5"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="745" loccnumb="8" loccnume="20"
-        sum="b0bc400f93ae1d7bb91fe95e3d4a055a"
+        sum="27124cf4534444662333341b84219422"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVavalid_fmlaaFimpliesawpV0V9awpV0V10Iavalid_fmlaaFimpliesV9V10FaSwhileVVVtF">
@@ -2668,14 +2672,14 @@
          edited="blocking_semantics3_WP_monotonicity_2.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.66"/>
+         <result status="valid" time="1.25"/>
         </proof>
        </goal>
        <goal
         name="monotonicity.1.6"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="745" loccnumb="8" loccnume="20"
-        sum="20e395c99dde979c7a6bc505ca77d571"
+        sum="17f9cdd6c752fa6eb1590a36bd18750e"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVavalid_fmlaaFimpliesawpV0V12awpV0V13Iavalid_fmlaaFimpliesV12V13FIavalid_fmlaaFimpliesawpV11V14awpV11V15Iavalid_fmlaaFimpliesV14V15FF">
@@ -2686,7 +2690,7 @@
          edited="blocking_semantics3_WP_monotonicity_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.67"/>
+         <result status="valid" time="1.31"/>
         </proof>
        </goal>
       </transf>
@@ -2697,7 +2701,7 @@
     name="distrib_conj"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="750" loccnumb="8" loccnume="20"
-    sum="2dada4242245cca01af8bba82ee5fef9"
+    sum="9093a5bc507bb8968d856849c26e0a43"
     proved="true"
     expanded="false"
     shape="aeval_fmlaV1V2awpV0aFandV3V4Iaeval_fmlaV1V2awpV0V4Aaeval_fmlaV1V2awpV0V3F">
@@ -2709,7 +2713,7 @@
       name="distrib_conj.1"
       locfile="blocking_semantics3/../blocking_semantics3.mlw"
       loclnum="750" loccnumb="8" loccnume="20"
-      sum="74c775e20d8b021f14699722d83a2aa3"
+      sum="77ffe507780c701a553fcdd9f83cc1a0"
       proved="true"
       expanded="false"
       shape="CV0aSskipaeval_fmlaV1V2awpV0aFandV3V4Iaeval_fmlaV1V2awpV0V4Aaeval_fmlaV1V2awpV0V3FaSassignVVaeval_fmlaV7V8awpV0aFandV9V10Iaeval_fmlaV7V8awpV0V10Aaeval_fmlaV7V8awpV0V9FaSseqVVaeval_fmlaV13V14awpV0aFandV15V16Iaeval_fmlaV13V14awpV0V16Aaeval_fmlaV13V14awpV0V15FIaeval_fmlaV17V18awpV11aFandV19V20Iaeval_fmlaV17V18awpV11V20Aaeval_fmlaV17V18awpV11V19FIaeval_fmlaV21V22awpV12aFandV23V24Iaeval_fmlaV21V22awpV12V24Aaeval_fmlaV21V22awpV12V23FaSifVVVaeval_fmlaV28V29awpV0aFandV30V31Iaeval_fmlaV28V29awpV0V31Aaeval_fmlaV28V29awpV0V30FIaeval_fmlaV32V33awpV26aFandV34V35Iaeval_fmlaV32V33awpV26V35Aaeval_fmlaV32V33awpV26V34FIaeval_fmlaV36V37awpV27aFandV38V39Iaeval_fmlaV36V37awpV27V39Aaeval_fmlaV36V37awpV27V38FaSassertVaeval_fmlaV41V42awpV0aFandV43V44Iaeval_fmlaV41V42awpV0V44Aaeval_fmlaV41V42awpV0V43FaSwhileVVVaeval_fmlaV48V49awpV0aFandV50V51Iaeval_fmlaV48V49awpV0V51Aaeval_fmlaV48V49awpV0V50FIaeval_fmlaV52V53awpV47aFandV54V55Iaeval_fmlaV52V53awpV47V55Aaeval_fmlaV52V53awpV47V54FF">
@@ -2721,7 +2725,7 @@
         name="distrib_conj.1.1"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="750" loccnumb="8" loccnume="20"
-        sum="d3b178642a024a2c70b60aaff755a464"
+        sum="6a16ca17ad9558a1f3c973203ae3466c"
         proved="true"
         expanded="false"
         shape="CV0aSskipaeval_fmlaV1V2awpV0aFandV3V4Iaeval_fmlaV1V2awpV0V4Aaeval_fmlaV1V2awpV0V3FaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
@@ -2731,93 +2735,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.05"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.05"/>
-        </proof>
-       </goal>
-       <goal
-        name="distrib_conj.1.2"
-        locfile="blocking_semantics3/../blocking_semantics3.mlw"
-        loclnum="750" loccnumb="8" loccnume="20"
-        sum="04f9b26c71b461191ef277de1e55999f"
-        proved="true"
-        expanded="false"
-        shape="CV0aSskiptaSassignVVaeval_fmlaV3V4awpV0aFandV5V6Iaeval_fmlaV3V4awpV0V6Aaeval_fmlaV3V4awpV0V5FaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
-        <proof
-         prover="6"
-         timelimit="5"
-         memlimit="1000"
-         edited="blocking_semantics3_WP_distrib_conj_5.v"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.65"/>
-        </proof>
-       </goal>
-       <goal
-        name="distrib_conj.1.3"
-        locfile="blocking_semantics3/../blocking_semantics3.mlw"
-        loclnum="750" loccnumb="8" loccnume="20"
-        sum="561f28e2b2f0822372ebee3c3367c830"
-        proved="true"
-        expanded="false"
-        shape="CV0aSskiptaSassignVVtaSseqVVaeval_fmlaV5V6awpV0aFandV7V8Iaeval_fmlaV5V6awpV0V8Aaeval_fmlaV5V6awpV0V7FIaeval_fmlaV9V10awpV3aFandV11V12Iaeval_fmlaV9V10awpV3V12Aaeval_fmlaV9V10awpV3V11FIaeval_fmlaV13V14awpV4aFandV15V16Iaeval_fmlaV13V14awpV4V16Aaeval_fmlaV13V14awpV4V15FaSifVVVtaSassertVtaSwhileVVVtF">
-        <proof
-         prover="6"
-         timelimit="5"
-         memlimit="1000"
-         edited="blocking_semantics3_WP_distrib_conj_3.v"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.64"/>
-        </proof>
-       </goal>
-       <goal
-        name="distrib_conj.1.4"
-        locfile="blocking_semantics3/../blocking_semantics3.mlw"
-        loclnum="750" loccnumb="8" loccnume="20"
-        sum="69bed88583e91333a2ced7317beb701f"
-        proved="true"
-        expanded="false"
-        shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVaeval_fmlaV8V9awpV0aFandV10V11Iaeval_fmlaV8V9awpV0V11Aaeval_fmlaV8V9awpV0V10FIaeval_fmlaV12V13awpV6aFandV14V15Iaeval_fmlaV12V13awpV6V15Aaeval_fmlaV12V13awpV6V14FIaeval_fmlaV16V17awpV7aFandV18V19Iaeval_fmlaV16V17awpV7V19Aaeval_fmlaV16V17awpV7V18FaSassertVtaSwhileVVVtF">
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.18"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.18"/>
-        </proof>
-       </goal>
-       <goal
-        name="distrib_conj.1.5"
-        locfile="blocking_semantics3/../blocking_semantics3.mlw"
-        loclnum="750" loccnumb="8" loccnume="20"
-        sum="2f5b5fb45930fe164d59e1c23a1e6998"
-        proved="true"
-        expanded="false"
-        shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVaeval_fmlaV9V10awpV0aFandV11V12Iaeval_fmlaV9V10awpV0V12Aaeval_fmlaV9V10awpV0V11FaSwhileVVVtF">
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.10"/>
+         <result status="valid" time="0.08"/>
         </proof>
         <proof
          prover="2"
@@ -2829,10 +2747,96 @@
         </proof>
        </goal>
        <goal
+        name="distrib_conj.1.2"
+        locfile="blocking_semantics3/../blocking_semantics3.mlw"
+        loclnum="750" loccnumb="8" loccnume="20"
+        sum="f39105a114f3bf4117b5868ffebd3d87"
+        proved="true"
+        expanded="false"
+        shape="CV0aSskiptaSassignVVaeval_fmlaV3V4awpV0aFandV5V6Iaeval_fmlaV3V4awpV0V6Aaeval_fmlaV3V4awpV0V5FaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         edited="blocking_semantics3_WP_distrib_conj_5.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.30"/>
+        </proof>
+       </goal>
+       <goal
+        name="distrib_conj.1.3"
+        locfile="blocking_semantics3/../blocking_semantics3.mlw"
+        loclnum="750" loccnumb="8" loccnume="20"
+        sum="f7fb354822e3298ccacb5836cfed3e8c"
+        proved="true"
+        expanded="false"
+        shape="CV0aSskiptaSassignVVtaSseqVVaeval_fmlaV5V6awpV0aFandV7V8Iaeval_fmlaV5V6awpV0V8Aaeval_fmlaV5V6awpV0V7FIaeval_fmlaV9V10awpV3aFandV11V12Iaeval_fmlaV9V10awpV3V12Aaeval_fmlaV9V10awpV3V11FIaeval_fmlaV13V14awpV4aFandV15V16Iaeval_fmlaV13V14awpV4V16Aaeval_fmlaV13V14awpV4V15FaSifVVVtaSassertVtaSwhileVVVtF">
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         edited="blocking_semantics3_WP_distrib_conj_3.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.26"/>
+        </proof>
+       </goal>
+       <goal
+        name="distrib_conj.1.4"
+        locfile="blocking_semantics3/../blocking_semantics3.mlw"
+        loclnum="750" loccnumb="8" loccnume="20"
+        sum="6c9a556c22992ad1d22d9f718ed275ee"
+        proved="true"
+        expanded="false"
+        shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVaeval_fmlaV8V9awpV0aFandV10V11Iaeval_fmlaV8V9awpV0V11Aaeval_fmlaV8V9awpV0V10FIaeval_fmlaV12V13awpV6aFandV14V15Iaeval_fmlaV12V13awpV6V15Aaeval_fmlaV12V13awpV6V14FIaeval_fmlaV16V17awpV7aFandV18V19Iaeval_fmlaV16V17awpV7V19Aaeval_fmlaV16V17awpV7V18FaSassertVtaSwhileVVVtF">
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.28"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.27"/>
+        </proof>
+       </goal>
+       <goal
+        name="distrib_conj.1.5"
+        locfile="blocking_semantics3/../blocking_semantics3.mlw"
+        loclnum="750" loccnumb="8" loccnume="20"
+        sum="1ae9e6a9a95c503f2d9e90e25e2ce00d"
+        proved="true"
+        expanded="false"
+        shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVaeval_fmlaV9V10awpV0aFandV11V12Iaeval_fmlaV9V10awpV0V12Aaeval_fmlaV9V10awpV0V11FaSwhileVVVtF">
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.15"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.14"/>
+        </proof>
+       </goal>
+       <goal
         name="distrib_conj.1.6"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="750" loccnumb="8" loccnume="20"
-        sum="f74d7f19ff35c8188414a96b5c2fdd2e"
+        sum="7884a79b6123c52eda76a7db2bd79dc2"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVaeval_fmlaV12V13awpV0aFandV14V15Iaeval_fmlaV12V13awpV0V15Aaeval_fmlaV12V13awpV0V14FIaeval_fmlaV16V17awpV11aFandV18V19Iaeval_fmlaV16V17awpV11V19Aaeval_fmlaV16V17awpV11V18FF">
@@ -2843,7 +2847,7 @@
          edited="blocking_semantics3_WP_distrib_conj_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.70"/>
+         <result status="valid" time="1.33"/>
         </proof>
        </goal>
       </transf>
@@ -2854,7 +2858,7 @@
     name="wp_reduction"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="756" loccnumb="8" loccnume="20"
-    sum="d5e2c05743f01d198633e287910bbf22"
+    sum="32233398d53486fdda4abef1404c85ee"
     proved="true"
     expanded="false"
     shape="aeval_fmlaV1V3awpV5V6Iaeval_fmlaV0V2awpV4V6FIaone_stepV0V2V4V1V3V5F">
@@ -2866,7 +2870,7 @@
       name="wp_reduction.1"
       locfile="blocking_semantics3/../blocking_semantics3.mlw"
       loclnum="756" loccnumb="8" loccnume="20"
-      sum="ee811e915dce4055019a224d9cc473ff"
+      sum="feb1d43268c3931887af4493e49f5a39"
       proved="true"
       expanded="false"
       shape="CV4aSskipaeval_fmlaV1V3awpV5V6Iaeval_fmlaV0V2awpV4V6FIaone_stepV0V2V4V1V3V5FaSassignVVaeval_fmlaV1V3awpV9V10Iaeval_fmlaV0V2awpV4V10FIaone_stepV0V2V4V1V3V9FaSseqVVaeval_fmlaV1V3awpV13V14Iaeval_fmlaV0V2awpV4V14FIaone_stepV0V2V4V1V3V13FIaeval_fmlaV1V3awpV15V16Iaeval_fmlaV0V2awpV11V16FIaone_stepV0V2V11V1V3V15FIaeval_fmlaV1V3awpV17V18Iaeval_fmlaV0V2awpV12V18FIaone_stepV0V2V12V1V3V17FaSifVVVaeval_fmlaV1V3awpV22V23Iaeval_fmlaV0V2awpV4V23FIaone_stepV0V2V4V1V3V22FIaeval_fmlaV1V3awpV24V25Iaeval_fmlaV0V2awpV20V25FIaone_stepV0V2V20V1V3V24FIaeval_fmlaV1V3awpV26V27Iaeval_fmlaV0V2awpV21V27FIaone_stepV0V2V21V1V3V26FaSassertVaeval_fmlaV1V3awpV29V30Iaeval_fmlaV0V2awpV4V30FIaone_stepV0V2V4V1V3V29FaSwhileVVVaeval_fmlaV1V3awpV34V35Iaeval_fmlaV0V2awpV4V35FIaone_stepV0V2V4V1V3V34FIaeval_fmlaV1V3awpV36V37Iaeval_fmlaV0V2awpV33V37FIaone_stepV0V2V33V1V3V36FF">
@@ -2878,24 +2882,24 @@
         name="wp_reduction.1.1"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="756" loccnumb="8" loccnume="20"
-        sum="8794499d65c2da4c82e0118f87a3123c"
+        sum="348c33bc76360fbecb83f673366655c2"
         proved="true"
         expanded="false"
         shape="CV4aSskipaeval_fmlaV1V3awpV5V6Iaeval_fmlaV0V2awpV4V6FIaone_stepV0V2V4V1V3V5FaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
         <proof
-         prover="0"
+         prover="1"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.22"/>
+         <result status="valid" time="0.14"/>
         </proof>
        </goal>
        <goal
         name="wp_reduction.1.2"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="756" loccnumb="8" loccnume="20"
-        sum="54182c25900b815df53cff9c6c8a7f64"
+        sum="6323328f6bdd0496cc4962d8d2e210fb"
         proved="true"
         expanded="false"
         shape="CV4aSskiptaSassignVVaeval_fmlaV1V3awpV7V8Iaeval_fmlaV0V2awpV4V8FIaone_stepV0V2V4V1V3V7FaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
@@ -2906,14 +2910,14 @@
          edited="blocking_semantics3_WP_wp_reduction_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.82"/>
+         <result status="valid" time="3.15"/>
         </proof>
        </goal>
        <goal
         name="wp_reduction.1.3"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="756" loccnumb="8" loccnume="20"
-        sum="3e4275642c80c4a5928ebf232dfc31f1"
+        sum="a449430554cce14fbd3e3a22b7a0172e"
         proved="true"
         expanded="false"
         shape="CV4aSskiptaSassignVVtaSseqVVaeval_fmlaV1V3awpV9V10Iaeval_fmlaV0V2awpV4V10FIaone_stepV0V2V4V1V3V9FIaeval_fmlaV1V3awpV11V12Iaeval_fmlaV0V2awpV7V12FIaone_stepV0V2V7V1V3V11FIaeval_fmlaV1V3awpV13V14Iaeval_fmlaV0V2awpV8V14FIaone_stepV0V2V8V1V3V13FaSifVVVtaSassertVtaSwhileVVVtF">
@@ -2924,14 +2928,14 @@
          edited="blocking_semantics3_WP_wp_reduction_6.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.74"/>
+         <result status="valid" time="1.37"/>
         </proof>
        </goal>
        <goal
         name="wp_reduction.1.4"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="756" loccnumb="8" loccnume="20"
-        sum="55433ac02afa1eba6c1c57f78e855957"
+        sum="04703a4045da7b75e59c9b47db93897b"
         proved="true"
         expanded="false"
         shape="CV4aSskiptaSassignVVtaSseqVVtaSifVVVaeval_fmlaV1V3awpV12V13Iaeval_fmlaV0V2awpV4V13FIaone_stepV0V2V4V1V3V12FIaeval_fmlaV1V3awpV14V15Iaeval_fmlaV0V2awpV10V15FIaone_stepV0V2V10V1V3V14FIaeval_fmlaV1V3awpV16V17Iaeval_fmlaV0V2awpV11V17FIaone_stepV0V2V11V1V3V16FaSassertVtaSwhileVVVtF">
@@ -2941,7 +2945,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.68"/>
+         <result status="valid" time="7.36"/>
         </proof>
         <proof
          prover="2"
@@ -2949,31 +2953,31 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.88"/>
+         <result status="valid" time="7.45"/>
         </proof>
        </goal>
        <goal
         name="wp_reduction.1.5"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="756" loccnumb="8" loccnume="20"
-        sum="19cfa86adbcbf11a0fbb10c4121c6926"
+        sum="ca91a74831d5488acfa828fedff8a57c"
         proved="true"
         expanded="false"
         shape="CV4aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVaeval_fmlaV1V3awpV13V14Iaeval_fmlaV0V2awpV4V14FIaone_stepV0V2V4V1V3V13FaSwhileVVVtF">
         <proof
-         prover="0"
-         timelimit="8"
+         prover="1"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.53"/>
+         <result status="valid" time="1.59"/>
         </proof>
        </goal>
        <goal
         name="wp_reduction.1.6"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="756" loccnumb="8" loccnume="20"
-        sum="75f145400b9f808a32ae2d1cd9f97b04"
+        sum="f6e5cf6d3dbd596d668db7b37c5e31ef"
         proved="true"
         expanded="false"
         shape="CV4aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVaeval_fmlaV1V3awpV16V17Iaeval_fmlaV0V2awpV4V17FIaone_stepV0V2V4V1V3V16FIaeval_fmlaV1V3awpV18V19Iaeval_fmlaV0V2awpV15V19FIaone_stepV0V2V15V1V3V18FF">
@@ -2984,7 +2988,7 @@
          edited="blocking_semantics3_WP_wp_reduction_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.81"/>
+         <result status="valid" time="1.41"/>
         </proof>
        </goal>
       </transf>
@@ -2995,7 +2999,7 @@
     name="progress"
     locfile="blocking_semantics3/../blocking_semantics3.mlw"
     loclnum="763" loccnumb="8" loccnume="16"
-    sum="c221f9f036b38f9b8287a3771decd844"
+    sum="6536e9887b7807d43dcc6de5056b1177"
     proved="true"
     expanded="false"
     shape="aone_stepV1V2V0V6V7V8EIainfix =V0aSskipNIaeval_fmlaV1V2awpV0V5Iatype_stmtV3V4V0Iacompatible_envV1V3V2V4F">
@@ -3007,7 +3011,7 @@
       name="progress.1"
       locfile="blocking_semantics3/../blocking_semantics3.mlw"
       loclnum="763" loccnumb="8" loccnume="16"
-      sum="7f13d36c48c49c962d8c3dc6748955de"
+      sum="9718153be6e949abe94ac0fa3dbe738b"
       proved="true"
       expanded="false"
       shape="CV0aSskipaone_stepV1V2V0V6V7V8EIainfix =V0aSskipNIaeval_fmlaV1V2awpV0V5Iatype_stmtV3V4V0Iacompatible_envV1V3V2V4FaSassignVVaone_stepV11V12V0V16V17V18EIainfix =V0aSskipNIaeval_fmlaV11V12awpV0V15Iatype_stmtV13V14V0Iacompatible_envV11V13V12V14FaSseqVVaone_stepV21V22V0V26V27V28EIainfix =V0aSskipNIaeval_fmlaV21V22awpV0V25Iatype_stmtV23V24V0Iacompatible_envV21V23V22V24FIaone_stepV29V30V19V34V35V36EIainfix =V19aSskipNIaeval_fmlaV29V30awpV19V33Iatype_stmtV31V32V19Iacompatible_envV29V31V30V32FIaone_stepV37V38V20V42V43V44EIainfix =V20aSskipNIaeval_fmlaV37V38awpV20V41Iatype_stmtV39V40V20Iacompatible_envV37V39V38V40FaSifVVVaone_stepV48V49V0V53V54V55EIainfix =V0aSskipNIaeval_fmlaV48V49awpV0V52Iatype_stmtV50V51V0Iacompatible_envV48V50V49V51FIaone_stepV56V57V46V61V62V63EIainfix =V46aSskipNIaeval_fmlaV56V57awpV46V60Iatype_stmtV58V59V46Iacompatible_envV56V58V57V59FIaone_stepV64V65V47V69V70V71EIainfix =V47aSskipNIaeval_fmlaV64V65awpV47V68Iatype_stmtV66V67V47Iacompatible_envV64V66V65V67FaSassertVaone_stepV73V74V0V78V79V80EIainfix =V0aSskipNIaeval_fmlaV73V74awpV0V77Iatype_stmtV75V76V0Iacompatible_envV73V75V74V76FaSwhileVVVaone_stepV84V85V0V89V90V91EIainfix =V0aSskipNIaeval_fmlaV84V85awpV0V88Iatype_stmtV86V87V0Iacompatible_envV84V86V85V87FIaone_stepV92V93V83V97V98V99EIainfix =V83aSskipNIaeval_fmlaV92V93awpV83V96Iatype_stmtV94V95V83Iacompatible_envV92V94V93V95FF">
@@ -3019,7 +3023,7 @@
         name="progress.1.1"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="763" loccnumb="8" loccnume="16"
-        sum="4ba08e5478ff6f4de81a2050b55e881a"
+        sum="c091bc2eba525a630599b86f71ccd144"
         proved="true"
         expanded="false"
         shape="CV0aSskipaone_stepV1V2V0V6V7V8EIainfix =V0aSskipNIaeval_fmlaV1V2awpV0V5Iatype_stmtV3V4V0Iacompatible_envV1V3V2V4FaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
@@ -3029,22 +3033,22 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="7"
+         prover="8"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
         name="progress.1.2"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="763" loccnumb="8" loccnume="16"
-        sum="8af6b907b653f6532bc4e4e9782c1c34"
+        sum="05f98754784de2b032810abc68cc0ca8"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVaone_stepV3V4V0V8V9V10EIainfix =V0aSskipNIaeval_fmlaV3V4awpV0V7Iatype_stmtV5V6V0Iacompatible_envV3V5V4V6FaSseqVVtaSifVVVtaSassertVtaSwhileVVVtF">
@@ -3055,14 +3059,14 @@
          edited="blocking_semantics3_WP_progress_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.70"/>
+         <result status="valid" time="1.34"/>
         </proof>
        </goal>
        <goal
         name="progress.1.3"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="763" loccnumb="8" loccnume="16"
-        sum="a0009dd554b43a1334a1c9d2abc3af00"
+        sum="b1d4331561a6431898952059dd370373"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVaone_stepV5V6V0V10V11V12EIainfix =V0aSskipNIaeval_fmlaV5V6awpV0V9Iatype_stmtV7V8V0Iacompatible_envV5V7V6V8FIaone_stepV13V14V3V18V19V20EIainfix =V3aSskipNIaeval_fmlaV13V14awpV3V17Iatype_stmtV15V16V3Iacompatible_envV13V15V14V16FIaone_stepV21V22V4V26V27V28EIainfix =V4aSskipNIaeval_fmlaV21V22awpV4V25Iatype_stmtV23V24V4Iacompatible_envV21V23V22V24FaSifVVVtaSassertVtaSwhileVVVtF">
@@ -3073,14 +3077,14 @@
          edited="blocking_semantics3_WP_progress_2.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.74"/>
+         <result status="valid" time="1.38"/>
         </proof>
        </goal>
        <goal
         name="progress.1.4"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="763" loccnumb="8" loccnume="16"
-        sum="d6f94f1d92a88ead5a6e2f5d4e770462"
+        sum="fdbf8ec0744120d300af72f44c94ce41"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVaone_stepV8V9V0V13V14V15EIainfix =V0aSskipNIaeval_fmlaV8V9awpV0V12Iatype_stmtV10V11V0Iacompatible_envV8V10V9V11FIaone_stepV16V17V6V21V22V23EIainfix =V6aSskipNIaeval_fmlaV16V17awpV6V20Iatype_stmtV18V19V6Iacompatible_envV16V18V17V19FIaone_stepV24V25V7V29V30V31EIainfix =V7aSskipNIaeval_fmlaV24V25awpV7V28Iatype_stmtV26V27V7Iacompatible_envV24V26V25V27FaSassertVtaSwhileVVVtF">
@@ -3091,14 +3095,14 @@
          edited="blocking_semantics3_WP_progress_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.76"/>
+         <result status="valid" time="1.36"/>
         </proof>
        </goal>
        <goal
         name="progress.1.5"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="763" loccnumb="8" loccnume="16"
-        sum="d6e8f2227b0e03aeb5b7f0a1949b665f"
+        sum="581b1e47a0c5453aa30aa87ddc33f055"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVaone_stepV9V10V0V14V15V16EIainfix =V0aSskipNIaeval_fmlaV9V10awpV0V13Iatype_stmtV11V12V0Iacompatible_envV9V11V10V12FaSwhileVVVtF">
@@ -3109,14 +3113,14 @@
          edited="blocking_semantics3_WP_progress_5.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.64"/>
+         <result status="valid" time="1.26"/>
         </proof>
        </goal>
        <goal
         name="progress.1.6"
         locfile="blocking_semantics3/../blocking_semantics3.mlw"
         loclnum="763" loccnumb="8" loccnume="16"
-        sum="e3d04cc6856fce744d2c672bb705a170"
+        sum="ea013eb71469de8bd080455a0f8c3631"
         proved="true"
         expanded="false"
         shape="CV0aSskiptaSassignVVtaSseqVVtaSifVVVtaSassertVtaSwhileVVVaone_stepV12V13V0V17V18V19EIainfix =V0aSskipNIaeval_fmlaV12V13awpV0V16Iatype_stmtV14V15V0Iacompatible_envV12V14V13V15FIaone_stepV20V21V11V25V26V27EIainfix =V11aSskipNIaeval_fmlaV20V21awpV11V24Iatype_stmtV22V23V11Iacompatible_envV20V22V21V23FF">
@@ -3127,12 +3131,47 @@
          edited="blocking_semantics3_WP_progress_4.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.70"/>
+         <result status="valid" time="1.18"/>
         </proof>
        </goal>
       </transf>
      </goal>
     </transf>
+   </goal>
+   <goal
+    name="progress2"
+    locfile="blocking_semantics3/../blocking_semantics3.mlw"
+    loclnum="778" loccnumb="8" loccnume="17"
+    sum="01519d004d57dfd973377ce358a1d649"
+    proved="true"
+    expanded="false"
+    shape="areducibleV1V2V0Iainfix =V0aSskipNIaeval_fmlaV1V2awpV0V5Iatype_stmtV3V4V0Iacompatible_envV1V3V2V4F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+   </goal>
+   <goal
+    name="wp_soundness"
+    locfile="blocking_semantics3/../blocking_semantics3.mlw"
+    loclnum="788" loccnumb="8" loccnume="20"
+    sum="f7ed72f8259a85bc3263363a503dac0f"
+    proved="true"
+    expanded="false"
+    shape="aeval_fmlaV2V4V9Aainfix =V6aSskipIaeval_fmlaV1V3awpV5V9AareducibleV2V4V6NAamany_stepsV1V3V5V2V4V6V0Iatype_stmtV7V8V5Iacompatible_envV1V7V3V8F">
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     edited="blocking_semantics3_WP_wp_soundness_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.27"/>
+    </proof>
    </goal>
   </theory>
  </file>
