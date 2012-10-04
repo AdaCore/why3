@@ -375,8 +375,11 @@ exception DuplicateException of xsymbol
 let dxpost uc ql =
   let add_exn m (q,f) =
     let xs = find_xsymbol uc q in
-    Mexn.add_new (DuplicateException xs) xs f m in
-  List.fold_left add_exn Mexn.empty ql
+    Mexn.add_new (DuplicateException xs) xs [f] m in
+  let exn_map ql = List.fold_left add_exn Mexn.empty ql in
+  let add_map ql m =
+    Mexn.union (fun _ l r -> Some (l @ r)) (exn_map ql) m in
+  List.fold_right add_map ql Mexn.empty
 
 let dvariant uc var =
   List.map (fun (le,q) -> le, Util.option_map (find_variant_ls uc) q) var
@@ -758,32 +761,39 @@ let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
   | Ty.Tyvar v -> Denv.tyuvar v
 
-let create_post lenv x ty f =
-  let res = create_vsymbol (id_fresh x) ty in
-  let log_vars = Mstr.add x res lenv.log_vars in
-  let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
-  let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
-  let f = remove_old f in
-  count_term_tuples f;
-  check_at f;
-  create_post res f
-
-let create_xpost lenv x xs f = create_post lenv x (ty_of_ity xs.xs_ity) f
-let create_post lenv x vty f = create_post lenv x (ty_of_vty vty) f
-
-let create_xpost lenv x xq = Mexn.mapi (create_xpost lenv x) xq
-
-let create_pre lenv f =
-  let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
-  count_term_tuples f;
-  check_at f;
-  f
-
 let create_variant lenv (t,r) =
   let t = Typing.type_term lenv.th_at lenv.log_denv lenv.log_vars t in
   count_term_tuples t;
   check_at t;
   t, r
+
+let create_assert lenv f =
+  let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
+  count_term_tuples f;
+  check_at f;
+  f
+
+let create_pre lenv fs = t_and_simp_l (List.map (create_assert lenv) fs)
+
+let create_post lenv log_denv log_vars f =
+  let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
+  let f = remove_old f in
+  count_term_tuples f;
+  check_at f;
+  f
+
+let create_post lenv x ty fs =
+  let res = create_vsymbol (id_fresh x) ty in
+  let log_vars = Mstr.add x res lenv.log_vars in
+  let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
+  let f = t_and_simp_l (List.map (create_post lenv log_denv log_vars) fs) in
+  Mlw_ty.create_post res f
+
+let create_xpost lenv x xs fs = create_post lenv x (ty_of_ity xs.xs_ity) fs
+
+let create_post lenv x vty fs = create_post lenv x (ty_of_vty vty) fs
+
+let create_xpost lenv x xq = Mexn.mapi (create_xpost lenv x) xq
 
 let add_local x lv lenv = match lv with
   | LetA _ ->
@@ -1110,7 +1120,7 @@ and expr_desc lenv loc de = match de.de_desc with
         | Ptree.Aassert -> Aassert
         | Ptree.Aassume -> Aassume
         | Ptree.Acheck  -> Acheck in
-      e_assert ak (create_pre lenv f)
+      e_assert ak (create_assert lenv f)
   | DEabsurd ->
       e_absurd (ity_of_dity (snd de.de_type))
   | DEraise (xs, de1) ->
@@ -1138,9 +1148,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEghost de1 ->
       e_ghostify true (expr lenv de1)
   | DEloop (var,inv,de1) ->
-      let inv = match inv with
-        | Some inv -> create_pre lenv inv
-        | None -> t_true in
+      let inv = create_pre lenv inv in
       let var = List.map (create_variant lenv) var in
       e_loop inv var (expr lenv de1)
   | DEfor (x,defrom,dir,deto,inv,de1) ->
@@ -1148,13 +1156,11 @@ and expr_desc lenv loc de = match de.de_desc with
       let eto = expr lenv deto in
       let pv = create_pvsymbol (Denv.create_user_id x) (vty_value ity_int) in
       let lenv = add_local x.id (LetV pv) lenv in
+      let inv = create_pre lenv inv in
+      let e1 = expr lenv de1 in
       let dir = match dir with
         | Ptree.To -> To
         | Ptree.Downto -> DownTo in
-      let inv = match inv with
-        | Some inv -> create_pre lenv inv
-        | None -> t_true in
-      let e1 = expr lenv de1 in
       e_for pv efrom dir eto inv e1
 
 and expr_rec lenv dfdl =
@@ -1260,7 +1266,7 @@ let add_types ~wp uc tdl =
       Hashtbl.replace mutables x false;
       let mut =
         let td = Mstr.find x def in
-        td.td_inv <> None ||
+        td.td_inv <> [] ||
         match td.td_def with
         | TDabstract -> false
         | TDalias ty -> check ty
@@ -1284,7 +1290,7 @@ let add_types ~wp uc tdl =
       | Some ts -> ts
       | None ->
           let td = Mstr.find x def in let loc = td.td_loc in
-          if td.td_inv <> None
+          if td.td_inv <> []
           then errorm ~loc "Recursive types cannot have invariants"
           else errorm ~loc "Recursive types cannot have mutable components"
     with Not_found ->
@@ -1352,7 +1358,7 @@ let add_types ~wp uc tdl =
               let s,pjl = Util.map_fold_left mk_proj s pjl in
               s, (Denv.create_user_id cid, pjl)
             in
-            let init = (Sreg.empty, d.td_inv <> None) in
+            let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),def = Util.map_fold_left mk_constr init csl in
             Hashtbl.replace predefs x def;
             create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None
@@ -1371,7 +1377,7 @@ let add_types ~wp uc tdl =
               let vtv = vty_value ?mut ~ghost ity in
               (regs, inv), (create_pvsymbol fid vtv, true)
             in
-            let init = (Sreg.empty, d.td_inv <> None) in
+            let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),pjl = Util.map_fold_left mk_field init fl in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
             Hashtbl.replace predefs x [Denv.create_user_id cid, pjl];
@@ -1493,31 +1499,30 @@ let add_types ~wp uc tdl =
     else
       add_decl_with_tuples uc (Decl.create_ty_decl ts.its_pure)
   in
-  let add_invariant uc d = match d.td_inv with
-    | None -> uc
-    | Some f ->
-        let ts = Util.of_option (Hashtbl.find tysymbols d.td_ident.id) in
-        let ty = ty_app ts.its_pure (List.map ty_var ts.its_pure.ts_args) in
-        let x = "result" in
-        let f = match d.td_def with
-          | TDrecord fl ->
-              let loc = f.pp_loc in
-              let field { f_loc = loc; f_ident = id } =
-                Qident id, { pat_loc = loc; pat_desc = PPpvar id } in
-              let pat = PPprec (List.map field fl) in
-              let pat = { pat_loc = loc; pat_desc = pat } in
-              let id = { id = x; id_lab = []; id_loc = loc } in
-              let id = { pp_loc = loc; pp_desc = Ptree.PPvar (Qident id) } in
-              { pp_loc = loc; pp_desc = Ptree.PPmatch (id, [pat, f]) }
-          | TDabstract | TDalias _ | TDalgebraic _ -> f
-        in
-        let res = create_vsymbol (id_fresh x) ty in
-        let log_vars = Mstr.singleton x res in
-        let log_denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
-        let f = Typing.type_fmla (get_theory uc) log_denv log_vars f in
-        let uc = (count_term_tuples f; flush_tuples uc) in
-        Mlw_module.add_invariant uc ts (Mlw_ty.create_post res f)
+  let add_invariant d uc f =
+    let ts = Util.of_option (Hashtbl.find tysymbols d.td_ident.id) in
+    let ty = ty_app ts.its_pure (List.map ty_var ts.its_pure.ts_args) in
+    let x = "result" in
+    let f = match d.td_def with
+      | TDrecord fl ->
+          let loc = f.pp_loc in
+          let field { f_loc = loc; f_ident = id } =
+            Qident id, { pat_loc = loc; pat_desc = PPpvar id } in
+          let pat = PPprec (List.map field fl) in
+          let pat = { pat_loc = loc; pat_desc = pat } in
+          let id = { id = x; id_lab = []; id_loc = loc } in
+          let id = { pp_loc = loc; pp_desc = Ptree.PPvar (Qident id) } in
+          { pp_loc = loc; pp_desc = Ptree.PPmatch (id, [pat, f]) }
+      | TDabstract | TDalias _ | TDalgebraic _ -> f
+    in
+    let res = create_vsymbol (id_fresh x) ty in
+    let log_vars = Mstr.singleton x res in
+    let log_denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
+    let f = Typing.type_fmla (get_theory uc) log_denv log_vars f in
+    let uc = (count_term_tuples f; flush_tuples uc) in
+    Mlw_module.add_invariant uc ts (Mlw_ty.create_post res f)
   in
+  let add_invariant uc d = List.fold_left (add_invariant d) uc d.td_inv in
   try
     let uc = List.fold_left add_type_decl uc abstr in
     let uc = if algeb = [] then uc else

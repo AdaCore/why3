@@ -126,7 +126,7 @@ type type_def =
 
 type visibility = Public | Private | Abstract
 
-type invariant = lexpr option
+type invariant = lexpr list
 
 type type_decl = {
   td_loc    : loc;
@@ -196,9 +196,9 @@ type effect = {
   pe_raises : qualid list;
 }
 
-type pre = lexpr
-type post = lexpr
-type xpost = (qualid * post) list
+type pre = lexpr list
+type post = lexpr list
+type xpost = (qualid * lexpr) list list
 
 type spec = {
   sp_pre     : pre;

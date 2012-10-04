@@ -29,10 +29,10 @@ type ident = Ptree.ident
 type ghost = bool
 
 type dpre = Ptree.pre
-type dpost = Ptree.pre
+type dpost = Ptree.post
 type dxpost = dpost Mexn.t
 type dvariant = Ptree.lexpr * Term.lsymbol option
-type dinvariant = Ptree.lexpr option
+type dinvariant = Ptree.lexpr list
 
 type deffect = {
   deff_reads  : Ptree.lexpr list;

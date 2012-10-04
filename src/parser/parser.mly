@@ -148,9 +148,9 @@ end
     { pe_reads = r1 @ r2; pe_writes = w1 @ w2; pe_raises = x1 @ x2 }
 
   let spec p (q,xq) ef vl = {
-    sp_pre     = p;
-    sp_post    = q;
-    sp_xpost   = xq;
+    sp_pre     = [p];
+    sp_post    = [q];
+    sp_xpost   = [xq];
     sp_effect  = ef;
     sp_variant = vl;
   }
@@ -419,7 +419,7 @@ type_args:
 
 typedefn:
 | /* epsilon */
-    { false, Public, TDabstract, None }
+    { false, Public, TDabstract, [] }
 | equal_model visibility typecases invariant
     { $1, $2, TDalgebraic $3, $4 }
 | equal_model visibility BAR typecases invariant
@@ -429,7 +429,7 @@ typedefn:
 /* abstract/private is not allowed for alias type */
 | equal_model visibility primitive_type
     { if $2 <> Public then Loc.error ~loc:(floc_i 2) Parsing.Parse_error;
-      $1, Public, TDalias $3, None }
+      $1, Public, TDalias $3, [] }
 ;
 
 visibility:
@@ -1242,8 +1242,8 @@ loop_annotation:
 ;
 
 invariant:
-| INVARIANT annotation { Some $2 }
-| /* epsilon */        { None    }
+| INVARIANT annotation { [$2] }
+| /* epsilon */        { [] }
 ;
 
 list1_type_v_binder:

@@ -305,6 +305,17 @@ let rec dtype ~user env = function
       let ts = ts_tuple (List.length tyl) in
       tyapp ts (List.map (dtype ~user env) tyl)
 
+let rec lexpr_conj = function
+  | [] -> { pp_desc = PPtrue; pp_loc = Loc.dummy_position }
+  | [l] -> l
+  | l :: ll -> { l with pp_desc = PPbinop (l, PPand, lexpr_conj ll) }
+
+let get_xpost = function
+  | [] -> []
+  | [l] -> l
+  | _ :: _ -> Loc.errorm "Multiple exceptional postconditions \
+      are not supported in this version of WhyML"
+
 let rec dutype_v env = function
   | Ptree.Tpure pt ->
       DUTpure (dtype ~user:true env pt)
@@ -316,8 +327,9 @@ let rec dutype_v env = function
 and dutype_c env (ty,sp) =
   { duc_result_type = dutype_v env ty;
     duc_effect      = dueffect env sp.Ptree.sp_effect;
-    duc_pre         = sp.Ptree.sp_pre;
-    duc_post        = dpost env.uc (sp.Ptree.sp_post, sp.Ptree.sp_xpost);
+    duc_pre         = lexpr_conj sp.Ptree.sp_pre;
+    duc_post        = dpost env.uc
+      (lexpr_conj sp.Ptree.sp_post, get_xpost sp.Ptree.sp_xpost);
   }
 
 and dubinder env ({id=x; id_loc=loc} as id, gh, v) =
@@ -353,8 +365,12 @@ let dvariants env = function
   | [v] -> Some (dvariant env v)
   | _ -> errorm "multiple variants are not supported"
 
+let lexpr_conj_opt = function
+  | [] -> None
+  | ll -> Some (lexpr_conj ll)
+
 let dloop_annotation env a =
-  { dloop_invariant = a.Ptree.loop_invariant;
+  { dloop_invariant = lexpr_conj_opt a.Ptree.loop_invariant;
     dloop_variant   = dvariants env a.Ptree.loop_variant; }
 
 (***
@@ -713,7 +729,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let env = add_local env x.id dty_int in
       let e3 = dexpr ~ghost ~userloc env e3 in
       expected_type e3 dty_unit;
-      DEfor (x, e1, d, e2, inv, e3), dty_unit
+      DEfor (x, e1, d, e2, lexpr_conj_opt inv, e3), dty_unit
   | Ptree.Eassert (k, le) ->
       DEassert (k, le), dty_unit
   | Ptree.Emark ({id=s}, e1) ->
@@ -732,7 +748,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEany c, dpurify_utype_v c.duc_result_type
   | Ptree.Eabstract(e1,q) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      let q = dpost env.uc (q.sp_post, q.sp_xpost) in
+      let q = dpost env.uc (lexpr_conj q.sp_post, get_xpost q.sp_xpost) in
       DEabstract(e1, q), e1.dexpr_type
   | Ptree.Eghost _ ->
       no_ghost true;
@@ -766,8 +782,8 @@ and dletrec ~ghost ~userloc env dl =
 and dtriple ~ghost ~userloc env (e, sp) =
   let v = dvariants env sp.sp_variant in
   let e = dexpr ~ghost ~userloc env e in
-  let q = dpost env.uc (sp.sp_post, sp.sp_xpost) in
-  v, (sp.sp_pre, e, q)
+  let q = dpost env.uc (lexpr_conj sp.sp_post, get_xpost sp.sp_xpost) in
+  v, (lexpr_conj sp.sp_pre, e, q)
 
 (*** regions tables ********************************************************)
 
@@ -2056,7 +2072,7 @@ let check_type_vars ~loc vars ty =
 let make_immutable_type td =
   if td.td_vis = Private then errorm ~loc:td.td_loc
     "private types are not supported in this version of WhyML";
-  if td.td_inv <> None then errorm ~loc:td.td_loc
+  if td.td_inv <> [] then errorm ~loc:td.td_loc
     "type invariants are not supported in this version of WhyML";
   let td = { td with td_model = false; td_vis = Public } in
   let make_immutable_field f = { f with f_mutable = false; f_ghost = false } in
