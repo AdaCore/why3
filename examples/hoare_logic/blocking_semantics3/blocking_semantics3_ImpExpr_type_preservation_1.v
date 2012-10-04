@@ -554,234 +554,29 @@ Axiom many_steps_seq : forall (sigma1:(map mident value)) (sigma3:(map mident
   pi2 Sskip n1) /\ ((many_steps sigma2 pi2 s2 sigma3 pi3 Sskip n2) /\
   (n = ((1%Z + n1)%Z + n2)%Z)).
 
-Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 5.
+
+(* Why3 goal *)
+Theorem type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
   value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
   (pi2:(list (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list
   (ident* datatype)%type)), ((type_stmt sigmat pit s1) /\
   ((compatible_env sigma1 sigmat pi1 pit) /\ (one_step sigma1 pi1 s1 sigma2
   pi2 s2))) -> ((type_stmt sigmat pit s2) /\ (compatible_env sigma2 sigmat
   pi2 pit)).
-
-(* Why3 assumption *)
-Definition valid_triple(p:fmla) (s:stmt) (q:fmla): Prop := forall (sigma:(map
-  mident value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
-  forall (sigma':(map mident value)) (pi':(list (ident* value)%type)) (n:Z),
-  (many_steps sigma pi s sigma' pi' Sskip n) -> (eval_fmla sigma' pi' q).
-
-(* Why3 assumption *)
-Definition total_valid_triple(p:fmla) (s:stmt) (q:fmla): Prop :=
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi p) -> exists sigma':(map mident value),
-  exists pi':(list (ident* value)%type), exists n:Z, (many_steps sigma pi s
-  sigma' pi' Sskip n) /\ (eval_fmla sigma' pi' q).
-
-Axiom set1 : forall (a:Type) {a_WT:WhyType a}, Type.
-Parameter set1_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set1 a).
-Existing Instance set1_WhyType.
-
-Parameter mem1: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> Prop.
-
-(* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set1 a)) (s2:(set1
-  a)): Prop := forall (x:a), (mem1 x s1) <-> (mem1 x s2).
-
-Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)), (infix_eqeq s1 s2) -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set1 a)) (s2:(set1
-  a)): Prop := forall (x:a), (mem1 x s1) -> (mem1 x s2).
-
-Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (s3:(set1 a)), (subset s1 s2) -> ((subset s2 s3) ->
-  (subset s1 s3)).
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set1 a).
-
-(* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set1 a)): Prop :=
-  forall (x:a), ~ (mem1 x s).
-
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set1
-  a))).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> (set1 a).
-
-Axiom add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
-  forall (s:(set1 a)), (mem1 x (add y s)) <-> ((x = y) \/ (mem1 x s)).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> (set1
-  a).
-
-Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
-  (s:(set1 a)), (mem1 x (remove y s)) <-> ((~ (x = y)) /\ (mem1 x s)).
-
-Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set1
-  a)), (subset (remove x s) s).
-
-Parameter union: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (union s1 s2)) <-> ((mem1 x s1) \/ (mem1 x
-  s2)).
-
-Parameter inter: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (inter s1 s2)) <-> ((mem1 x s1) /\ (mem1 x
-  s2)).
-
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (diff s1 s2)) <-> ((mem1 x s1) /\ ~ (mem1 x
-  s2)).
-
-Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)), (subset (diff s1 s2) s1).
-
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> a.
-
-Axiom choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(set1 a)),
-  (~ (is_empty s)) -> (mem1 (choose s) s).
-
-Parameter all: forall {a:Type} {a_WT:WhyType a}, (set1 a).
-
-Axiom all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem1 x
-  (all :(set1 a))).
-
-(* Why3 assumption *)
-Definition assigns(sigma:(map mident value)) (a:(set1 mident)) (sigma':(map
-  mident value)): Prop := forall (i:mident), (~ (mem1 i a)) -> ((get sigma
-  i) = (get sigma' i)).
-
-Axiom assigns_refl : forall (sigma:(map mident value)) (a:(set1 mident)),
-  (assigns sigma a sigma).
-
-Axiom assigns_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
-  value)) (sigma3:(map mident value)) (a:(set1 mident)), ((assigns sigma1 a
-  sigma2) /\ (assigns sigma2 a sigma3)) -> (assigns sigma1 a sigma3).
-
-Axiom assigns_union_left : forall (sigma:(map mident value)) (sigma':(map
-  mident value)) (s1:(set1 mident)) (s2:(set1 mident)), (assigns sigma s1
-  sigma') -> (assigns sigma (union s1 s2) sigma').
-
-Axiom assigns_union_right : forall (sigma:(map mident value)) (sigma':(map
-  mident value)) (s1:(set1 mident)) (s2:(set1 mident)), (assigns sigma s2
-  sigma') -> (assigns sigma (union s1 s2) sigma').
-
-(* Why3 assumption *)
-Fixpoint stmt_writes(s:stmt) (w:(set1 mident)) {struct s}: Prop :=
-  match s with
-  | (Sskip|(Sassert _)) => True
-  | (Sassign id _) => (mem1 id w)
-  | (Sseq s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
-  | (Sif t s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
-  | (Swhile _ _ body) => (stmt_writes body w)
-  end.
-
-Parameter fresh_from: fmla -> ident.
-
-Axiom fresh_from_fmla : forall (f:fmla), (fresh_in_fmla (fresh_from f) f).
-
-Parameter abstract_effects: stmt -> fmla -> fmla.
-
-Axiom abstract_effects_generalize : forall (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
-  (abstract_effects s f)) -> (eval_fmla sigma pi f).
-
-Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
-  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
-
-(* Why3 assumption *)
-Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
-  match s with
-  | Sskip => q
-  | (Sassert f) => (Fand f (Fimplies f q))
-  | (Sseq s1 s2) => (wp s1 (wp s2 q))
-  | (Sassign x t) => let id := (fresh_from q) in (Flet id t (msubst q x id))
-  | (Sif t s1 s2) => (Fand (Fimplies (Fterm t) (wp s1 q))
-      (Fimplies (Fnot (Fterm t)) (wp s2 q)))
-  | (Swhile cond inv body) => (Fand inv (abstract_effects body
-      (Fand (Fimplies (Fand (Fterm cond) inv) (wp body inv))
-      (Fimplies (Fand (Fnot (Fterm cond)) inv) q))))
-  end.
-
-Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (s:stmt) (q:fmla), (eval_fmla sigma pi
-  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
-  q))).
-
-Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
-
-Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
-  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
-
-Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
-  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
-  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
-  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
-
-Axiom progress : forall (s:stmt) (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-  datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
-  ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
-  ((~ (s = Sskip)) -> exists sigma':(map mident value), exists pi':(list
-  (ident* value)%type), exists s':stmt, (one_step sigma pi s sigma' pi'
-  s')))).
-
-(* Why3 assumption *)
-Definition reducible(sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
-  exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
-  sigma' pi' s').
-
-Axiom progress2 : forall (s:stmt) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-  datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
-  ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
-  ((~ (s = Sskip)) -> (reducible sigma pi s)))).
-
-(* Why3 goal *)
-Theorem wp_soundness : forall (n:Z) (sigma:(map mident value)) (sigma':(map
-  mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-  value)%type)) (s:stmt) (s':stmt) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
-  ((type_stmt sigmat pit s) -> (((many_steps sigma pi s sigma' pi' s' n) /\
-  ((~ (reducible sigma' pi' s')) /\ (eval_fmla sigma pi (wp s q)))) ->
-  ((s' = Sskip) /\ (eval_fmla sigma' pi' q)))).
-intros n sigma sigma' pi pi' s s' sigmat pit q.
-intros Hcomp Htype (h1,(h2,h3)).
-generalize (steps_non_neg _ _ _ _ _ _ _ h1).
-intros Hnpos.
-generalize sigma sigma' pi pi' s s' sigmat pit q Hcomp Htype h1 h2 h3.
-clear sigma sigma' pi pi' s s' sigmat pit q Hcomp Htype h1 h2 h3.
-generalize Hnpos.
-pattern n; apply Z_lt_induction; auto.
-intros x Hind Hxpos.
-intros.
+intros s1 s2 sigma1 sigma2 pi1 pi2 sigmat pit (h1,(h2,h3)).
+inversion h3; subst; clear h3.
+split.
+constructor.
 inversion h1; subst; clear h1.
-(* cas zero etapes *)
-destruct (decide_is_skip s').
-subst s'.
-split; auto.
-contradiction h2; clear h2.
-apply progress2 with (q:=q) (1:=Hcomp); auto.
-(* cas au moins une etape *)
-generalize (steps_non_neg _ _ _ _ _ _ _ H0).
-intro.
-generalize (type_preservation s s2 sigma sigma2 pi pi2 sigmat pit).
-intros h.
-apply Hind with (y:=n0) (sigmat:=sigmat) (pit:=pit) (5:=H0); 
-  intuition.
-apply wp_reduction with (1:=H); auto.
+unfold compatible_env in *.
+intuition.
+destruct (mident_decide x id).
+subst x.
+rewrite Select_eq; auto.
+
+Check compatible.
 Qed.
 
 
