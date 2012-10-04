@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require set.Set.
 
 (* Why3 assumption *)
 Inductive list (a:Type) {a_WT:WhyType a} :=
@@ -554,6 +555,14 @@ Axiom many_steps_seq : forall (sigma1:(map mident value)) (sigma3:(map mident
   pi2 Sskip n1) /\ ((many_steps sigma2 pi2 s2 sigma3 pi3 Sskip n2) /\
   (n = ((1%Z + n1)%Z + n2)%Z)).
 
+Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
+  value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
+  (pi2:(list (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)), ((type_stmt sigmat pit s1) /\
+  ((compatible_env sigma1 sigmat pi1 pit) /\ (one_step sigma1 pi1 s1 sigma2
+  pi2 s2))) -> ((type_stmt sigmat pit s2) /\ (compatible_env sigma2 sigmat
+  pi2 pit)).
+
 (* Why3 assumption *)
 Definition valid_triple(p:fmla) (s:stmt) (q:fmla): Prop := forall (sigma:(map
   mident value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
@@ -567,121 +576,40 @@ Definition total_valid_triple(p:fmla) (s:stmt) (q:fmla): Prop :=
   exists pi':(list (ident* value)%type), exists n:Z, (many_steps sigma pi s
   sigma' pi' Sskip n) /\ (eval_fmla sigma' pi' q).
 
-Axiom set1 : forall (a:Type) {a_WT:WhyType a}, Type.
-Parameter set1_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set1 a).
-Existing Instance set1_WhyType.
-
-Parameter mem1: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> Prop.
-
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set1 a)) (s2:(set1
-  a)): Prop := forall (x:a), (mem1 x s1) <-> (mem1 x s2).
+Definition assigns(sigma:(map mident value)) (a:(set.Set.set mident))
+  (sigma':(map mident value)): Prop := forall (i:mident), (~ (set.Set.mem i
+  a)) -> ((get sigma i) = (get sigma' i)).
 
-Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)), (infix_eqeq s1 s2) -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set1 a)) (s2:(set1
-  a)): Prop := forall (x:a), (mem1 x s1) -> (mem1 x s2).
-
-Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (s3:(set1 a)), (subset s1 s2) -> ((subset s2 s3) ->
-  (subset s1 s3)).
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set1 a).
-
-(* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set1 a)): Prop :=
-  forall (x:a), ~ (mem1 x s).
-
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set1
-  a))).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> (set1 a).
-
-Axiom add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
-  forall (s:(set1 a)), (mem1 x (add y s)) <-> ((x = y) \/ (mem1 x s)).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> (set1
-  a).
-
-Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
-  (s:(set1 a)), (mem1 x (remove y s)) <-> ((~ (x = y)) /\ (mem1 x s)).
-
-Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set1
-  a)), (subset (remove x s) s).
-
-Parameter union: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (union s1 s2)) <-> ((mem1 x s1) \/ (mem1 x
-  s2)).
-
-Parameter inter: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (inter s1 s2)) <-> ((mem1 x s1) /\ (mem1 x
-  s2)).
-
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (diff s1 s2)) <-> ((mem1 x s1) /\ ~ (mem1 x
-  s2)).
-
-Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)), (subset (diff s1 s2) s1).
-
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> a.
-
-Axiom choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(set1 a)),
-  (~ (is_empty s)) -> (mem1 (choose s) s).
-
-Parameter all: forall {a:Type} {a_WT:WhyType a}, (set1 a).
-
-Axiom all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem1 x
-  (all :(set1 a))).
-
-(* Why3 assumption *)
-Definition assigns(sigma:(map mident value)) (a:(set1 mident)) (sigma':(map
-  mident value)): Prop := forall (i:mident), (~ (mem1 i a)) -> ((get sigma
-  i) = (get sigma' i)).
-
-Axiom assigns_refl : forall (sigma:(map mident value)) (a:(set1 mident)),
-  (assigns sigma a sigma).
+Axiom assigns_refl : forall (sigma:(map mident value)) (a:(set.Set.set
+  mident)), (assigns sigma a sigma).
 
 Axiom assigns_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
-  value)) (sigma3:(map mident value)) (a:(set1 mident)), ((assigns sigma1 a
-  sigma2) /\ (assigns sigma2 a sigma3)) -> (assigns sigma1 a sigma3).
+  value)) (sigma3:(map mident value)) (a:(set.Set.set mident)),
+  ((assigns sigma1 a sigma2) /\ (assigns sigma2 a sigma3)) -> (assigns sigma1
+  a sigma3).
 
 Axiom assigns_union_left : forall (sigma:(map mident value)) (sigma':(map
-  mident value)) (s1:(set1 mident)) (s2:(set1 mident)), (assigns sigma s1
-  sigma') -> (assigns sigma (union s1 s2) sigma').
+  mident value)) (s1:(set.Set.set mident)) (s2:(set.Set.set mident)),
+  (assigns sigma s1 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
 
 Axiom assigns_union_right : forall (sigma:(map mident value)) (sigma':(map
-  mident value)) (s1:(set1 mident)) (s2:(set1 mident)), (assigns sigma s2
-  sigma') -> (assigns sigma (union s1 s2) sigma').
+  mident value)) (s1:(set.Set.set mident)) (s2:(set.Set.set mident)),
+  (assigns sigma s2 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
 
 (* Why3 assumption *)
-Fixpoint stmt_writes(s:stmt) (w:(set1 mident)) {struct s}: Prop :=
+Fixpoint stmt_writes(s:stmt) (w:(set.Set.set mident)) {struct s}: Prop :=
   match s with
   | (Sskip|(Sassert _)) => True
-  | (Sassign id _) => (mem1 id w)
+  | (Sassign id _) => (set.Set.mem id w)
   | (Sseq s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
   | (Sif t s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
   | (Swhile _ _ body) => (stmt_writes body w)
   end.
 
-Parameter fresh_from: fmla -> stmt -> ident.
+Parameter fresh_from: fmla -> ident.
 
-Axiom fresh_from_fmla : forall (s:stmt) (f:fmla),
-  (fresh_in_fmla (fresh_from f s) f).
-
-Axiom fresh_from_stmt : forall (s:stmt) (f:fmla),
-  (fresh_in_stmt (fresh_from f s) s).
+Axiom fresh_from_fmla : forall (f:fmla), (fresh_in_fmla (fresh_from f) f).
 
 Parameter abstract_effects: stmt -> fmla -> fmla.
 
@@ -700,8 +628,7 @@ Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
   | Sskip => q
   | (Sassert f) => (Fand f (Fimplies f q))
   | (Sseq s1 s2) => (wp s1 (wp s2 q))
-  | (Sassign x t) => let id := (fresh_from q s) in (Flet id t (msubst q x
-      id))
+  | (Sassign x t) => let id := (fresh_from q) in (Flet id t (msubst q x id))
   | (Sif t s1 s2) => (Fand (Fimplies (Fterm t) (wp s1 q))
       (Fimplies (Fnot (Fterm t)) (wp s2 q)))
   | (Swhile cond inv body) => (Fand inv (abstract_effects body
