@@ -722,9 +722,11 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         eval_fmla sigma pi f
 
   axiom abstract_effects_monotonic :
-     forall s:stmt, f:fmla.
-        forall sigma:env, pi:stack. eval_fmla sigma pi f ->
-        forall sigma:env, pi:stack. eval_fmla sigma pi (abstract_effects s f)
+     forall s:stmt, p q:fmla.
+        valid_fmla (Fimplies p q) ->
+        forall sigma:env, pi:stack.
+           eval_fmla sigma pi (abstract_effects s p) ->
+           eval_fmla sigma pi (abstract_effects s q) 
 
   function wp (s:stmt) (q:fmla) : fmla =
     match s with
