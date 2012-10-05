@@ -693,7 +693,7 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
 Theorem monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 unfold valid_fmla.
-induction s
+induction s.
 intros s p q h1.
 intros sigma pi.
 simpl in *.
