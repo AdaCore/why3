@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
  name="programs/vstte12_ring_buffer/why3session.xml" shape_version="2">
  <prover
@@ -32,7 +32,7 @@
     name="sequence_ind_1"
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="51" loccnumb="8" loccnume="22"
-    sum="ed14040f287f3037deb310849cbb1b4a"
+    sum="09d2dac622c503a3708567868d10ee6b"
     proved="true"
     expanded="true"
     shape="ainfix =asequenceV0ainfix ++asequenceamk bufferafirstV0ainfix -alenV0c1adataV0aConsamixfix []adataV0ainfix -ainfix +afirstV0alenV0c1aNilIainfix &lt;ainfix -ainfix +afirstV0alenV0c1asizeV0Iainfix &gt;alenV0c0Iabuffer_invariantV0F">
@@ -43,14 +43,14 @@
      edited="vstte12_ring_buffer_WP_RingBuffer_sequence_ind_1_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.21"/>
+     <result status="valid" time="1.08"/>
     </proof>
    </goal>
    <goal
     name="sequence_ind_2"
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="57" loccnumb="8" loccnume="22"
-    sum="6731355d24560e11b377b426e4478f62"
+    sum="07274d47e7a1e163968bb2f65e883ac4"
     proved="true"
     expanded="true"
     shape="ainfix =asequenceV0ainfix ++asequenceamk bufferafirstV0ainfix -alenV0c1adataV0aConsamixfix []adataV0ainfix -ainfix -ainfix +afirstV0alenV0c1asizeV0aNilIainfix &gt;=ainfix -ainfix +afirstV0alenV0c1asizeV0Iainfix &gt;alenV0c0Iabuffer_invariantV0F">
@@ -61,14 +61,14 @@
      edited="vstte12_ring_buffer_WP_RingBuffer_sequence_ind_2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.11"/>
+     <result status="valid" time="0.95"/>
     </proof>
    </goal>
    <goal
     name="sequence_invariance"
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="63" loccnumb="8" loccnume="27"
-    sum="72d870e19ab2515c815ca6a587cfb416"
+    sum="471a406a62c97a98fe9cf75bf17f3d7e"
     proved="true"
     expanded="true"
     shape="ainfix =asequenceV0asequenceV1Iainfix =amixfix []adataV0V2amixfix []adataV1V2Iainfix &lt;V2ainfix -ainfix +afirstV0alenV0asizeV0Aainfix &lt;=c0V2FIainfix =amixfix []adataV0V3amixfix []adataV1V3Iainfix &lt;V3asizeV0Iainfix &lt;V3ainfix +afirstV0alenV0Aainfix &lt;=afirstV0V3FIainfix =asizeV0asizeV1Iainfix =alenV0alenV1Iainfix =afirstV0afirstV1Iabuffer_invariantV1Iabuffer_invariantV0F">
@@ -79,7 +79,7 @@
      edited="vstte12_ring_buffer_WP_RingBuffer_sequence_invariance_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.58"/>
+     <result status="valid" time="1.50"/>
     </proof>
    </goal>
    <goal
@@ -87,7 +87,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="74" loccnumb="6" loccnume="12"
     expl="parameter create"
-    sum="2ed78208e3b5ca7f4e3b6ab883b54062"
+    sum="64f783682f970f44738bd6ee7499f7e0"
     proved="true"
     expanded="true"
     shape="ainfix =asequenceamk bufferc0c0V2aNilAainfix =V0V0Aabuffer_invariantamk bufferc0c0V2Lamk arrayV0aconstV1Aainfix &gt;=V0c0Iainfix &gt;V0c0F">
@@ -99,15 +99,15 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter length"
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="79" loccnumb="6" loccnume="12"
-    expl="normal postcondition"
-    sum="c031291de4eafcf7243739a46cdca63c"
+    expl="postcondition"
+    sum="06614d1768e1953744699bf9e32e59f6"
     proved="true"
     expanded="true"
     shape="ainfix =V2V2Iabuffer_invariantamk bufferV3V2amk arrayV0V1FF">
@@ -126,8 +126,8 @@
     name="WP_parameter clear"
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="84" loccnumb="6" loccnume="11"
-    expl="normal postcondition"
-    sum="a600cb126ac65756277242dc7967ac5b"
+    expl="postcondition"
+    sum="3339ffdd435cf120addc51ca5e747d83"
     proved="true"
     expanded="true"
     shape="ainfix =asequenceV5aNilAainfix =V4c0Aabuffer_invariantV5Iainfix =V4c0Lamk bufferV3V4amk arrayV0V1FIabuffer_invariantamk bufferV3V2amk arrayV0V1FF">
@@ -139,7 +139,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
@@ -147,7 +147,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="89" loccnumb="6" loccnume="10"
     expl="parameter push"
-    sum="9543c2bca3dcfa4020abb28e4a75dfe9"
+    sum="3f6853d3d06347e15ce67d02408ab36b"
     proved="true"
     expanded="true"
     shape="ainfix =asequenceV8ainfix ++asequenceV5aConsV1aNilAainfix =V7ainfix +V3c1Aabuffer_invariantV8Iainfix =V7ainfix +V3c1Lamk bufferV4V7amk arrayV0V6FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FAainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
@@ -162,7 +162,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="89" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="89964ec602067cb440cab757cbea5de7"
+      sum="f3aa9cf6d35074e8a54807f4c5d77200"
       proved="true"
       expanded="true"
       shape="ainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
@@ -181,8 +181,8 @@
       name="WP_parameter push.2"
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="89" loccnumb="6" loccnume="10"
-      expl="normal postcondition"
-      sum="a056ddc262ef3301712e2f0a88c50083"
+      expl="postcondition"
+      sum="5c64ea70ac4de4dc79f1e9346792db8f"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV8ainfix ++asequenceV5aConsV1aNilAainfix =V7ainfix +V3c1Aabuffer_invariantV8Iainfix =V7ainfix +V3c1Lamk bufferV4V7amk arrayV0V6FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
@@ -197,10 +197,30 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="89" loccnumb="6" loccnume="10"
         expl="parameter push"
-        sum="1c81d7532b5d24665f4669af014828e6"
+        sum="cc415f74c737ff5e006a9a8fe7b9f94f"
         proved="true"
         expanded="true"
         shape="abuffer_invariantV8Iainfix =V7ainfix +V3c1Lamk bufferV4V7amk arrayV0V6FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
+        <label
+         name="expl:parameter push"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter push.2.2"
+        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
+        loclnum="89" loccnumb="6" loccnume="10"
+        expl="parameter push"
+        sum="14ca09c2b1e453494dbe3ae4eac41e88"
+        proved="true"
+        expanded="true"
+        shape="ainfix =V7ainfix +V3c1Iainfix =V7ainfix +V3c1Lamk bufferV4V7amk arrayV0V6FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
         <label
          name="expl:parameter push"/>
         <proof
@@ -213,31 +233,11 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter push.2.2"
-        locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
-        loclnum="89" loccnumb="6" loccnume="10"
-        expl="parameter push"
-        sum="f00d6c764b7982b165976a56956f29ab"
-        proved="true"
-        expanded="true"
-        shape="ainfix =V7ainfix +V3c1Iainfix =V7ainfix +V3c1Lamk bufferV4V7amk arrayV0V6FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
-        <label
-         name="expl:parameter push"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
         name="WP_parameter push.2.3"
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="89" loccnumb="6" loccnume="10"
         expl="parameter push"
-        sum="164a530cf36c0ad19ad37b2c33dc789a"
+        sum="c0174c953a1f2848367127b1945584ff"
         proved="true"
         expanded="true"
         shape="ainfix =asequenceV8ainfix ++asequenceV5aConsV1aNilIainfix =V7ainfix +V3c1Lamk bufferV4V7amk arrayV0V6FIainfix =V6asetV2iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V1FIainfix &lt;iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3V0Aainfix &lt;=c0iainfix &gt;=ainfix +V4V3V0ainfix -ainfix +V4V3V0ainfix +V4V3Iabuffer_invariantV5Aainfix &lt;V3V0Lamk bufferV4V3amk arrayV0V2FF">
@@ -250,7 +250,7 @@
          edited="vstte12_ring_buffer_WP_RingBuffer_WP_parameter_push_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.97"/>
+         <result status="valid" time="0.88"/>
         </proof>
        </goal>
       </transf>
@@ -262,7 +262,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="98" loccnumb="6" loccnume="10"
     expl="parameter head"
-    sum="e2c8baa0d903a5b77011f2bbab593534"
+    sum="97a6f6370d77b46834f98bccc0a64c3b"
     proved="true"
     expanded="true"
     shape="CasequenceV4aNilfaConsVwainfix =agetV1V3V5Aainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -277,7 +277,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="98" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="cdb9a3024cfe348a64852ebe9ae9382e"
+      sum="5f53c4cac2ba8e686ef426aaf6503369"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -296,8 +296,8 @@
       name="WP_parameter head.2"
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="98" loccnumb="6" loccnume="10"
-      expl="normal postcondition"
-      sum="5db7244001e649752995034fd470feda"
+      expl="postcondition"
+      sum="ff44384a78706893c1ff4af2bce4aab6"
       proved="true"
       expanded="true"
       shape="CasequenceV4aNilfaConsVwainfix =agetV1V3V5Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -309,7 +309,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
     </transf>
@@ -319,7 +319,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="103" loccnumb="6" loccnume="9"
     expl="parameter pop"
-    sum="c84ed6a25c277978f787f717d8f7b224"
+    sum="c5bf4414abd93cc6cec448060bdc49d3"
     proved="true"
     expanded="true"
     shape="iainfix =V7V0CasequenceV4aNilfaConsVVainfix =asequenceV10V12Aainfix =V5V11Aainfix =V6ainfix -V2c1Aabuffer_invariantV10Iainfix =V9c0Lamk bufferV9V6amk arrayV0V1FCasequenceV4aNilfaConsVVainfix =asequenceV8V14Aainfix =V5V13Aainfix =V6ainfix -V2c1Aabuffer_invariantV8Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Aainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -334,7 +334,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="103" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="9508d84cdf6bc8f34a7c3824a828d419"
+      sum="c32b5087a3408b0ada28e425ca9c34ac"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -346,15 +346,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter pop.2"
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="103" loccnumb="6" loccnume="9"
-      expl="normal postcondition"
-      sum="6fa0f1bba947850b515c5688ec13d8af"
+      expl="postcondition"
+      sum="8e1745fade14b803a6b8e5ced49030d8"
       proved="true"
       expanded="true"
       shape="CasequenceV4aNilfaConsVVainfix =asequenceV10V12Aainfix =V5V11Aainfix =V6ainfix -V2c1Aabuffer_invariantV10Iainfix =V9c0Lamk bufferV9V6amk arrayV0V1FIainfix =V7V0Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -369,7 +369,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="cfc75e185648cf17920bc24cdf2a0793"
+        sum="a2b96f75cb12b75f0ebb8d2bd7015827"
         proved="true"
         expanded="true"
         shape="abuffer_invariantV10Iainfix =V9c0Lamk bufferV9V6amk arrayV0V1FIainfix =V7V0Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -389,7 +389,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="4b009311f88424b41dac149fd74045f3"
+        sum="46f0f908ebe0b02d8139d1081ee545db"
         proved="true"
         expanded="true"
         shape="ainfix =V6ainfix -V2c1Iainfix =V9c0Lamk bufferV9V6amk arrayV0V1FIainfix =V7V0Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -401,7 +401,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -409,7 +409,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="16d2ff63e06d29e2c2c4fc0f0d3344c2"
+        sum="e8ac2a0d0bde24f32722ed0c4616d0ec"
         proved="true"
         expanded="true"
         shape="CasequenceV4aNilfaConsVVtIainfix =V9c0Lamk bufferV9V6amk arrayV0V1FIainfix =V7V0Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -429,7 +429,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="6c27b0f726673ff35795db2c784f7baf"
+        sum="e568e3cc7ad5a9e2005bcb4721210ae0"
         proved="true"
         expanded="true"
         shape="CasequenceV4aNiltaConsVVainfix =V5V11Iainfix =V9c0Lamk bufferV9V6amk arrayV0V1FIainfix =V7V0Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -449,7 +449,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="8b0ffd23998ade60eed74a486cd4632f"
+        sum="689c5ae1a910d1e11ffe235b2e105c23"
         proved="true"
         expanded="true"
         shape="CasequenceV4aNiltaConsVVainfix =asequenceV10V12Iainfix =V9c0Lamk bufferV9V6amk arrayV0V1FIainfix =V7V0Iainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -470,8 +470,8 @@
       name="WP_parameter pop.3"
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="103" loccnumb="6" loccnume="9"
-      expl="normal postcondition"
-      sum="1d92568b01b824e687c8428e67b40287"
+      expl="postcondition"
+      sum="de8ea2f0257d6a7b7fc9ccc3b14656d8"
       proved="true"
       expanded="true"
       shape="CasequenceV4aNilfaConsVVainfix =asequenceV8V10Aainfix =V5V9Aainfix =V6ainfix -V2c1Aabuffer_invariantV8Iainfix =V7V0NIainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -486,7 +486,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="43e063e1cc5d494735ed6ed8fa40aec0"
+        sum="9e93b5395fc0d7b9daba55cd683293b0"
         proved="true"
         expanded="true"
         shape="abuffer_invariantV8Iainfix =V7V0NIainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -506,7 +506,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="796481cbf762bd62cd5bd573f4b2fe0c"
+        sum="0da1f6c77b01ea4f9c1dd8e35abe0781"
         proved="true"
         expanded="true"
         shape="ainfix =V6ainfix -V2c1Iainfix =V7V0NIainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -526,7 +526,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="5d78f79e6ba7edafc083385118a28018"
+        sum="aff7e1a0a44241df7ed528cb87167bff"
         proved="true"
         expanded="true"
         shape="CasequenceV4aNilfaConsVVtIainfix =V7V0NIainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -538,7 +538,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
        <goal
@@ -546,7 +546,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="183bebbe91b55df463980bfba8bccfb2"
+        sum="55f0881b18db8c1279b383f242452b55"
         proved="true"
         expanded="true"
         shape="CasequenceV4aNiltaConsVVainfix =V5V9Iainfix =V7V0NIainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -558,7 +558,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.09"/>
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
@@ -566,7 +566,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="103" loccnumb="6" loccnume="9"
         expl="parameter pop"
-        sum="c35ae65cf81e4b4666e9a3cb42a1e87a"
+        sum="a77170eae2025845d6fde882b1b14375"
         proved="true"
         expanded="true"
         shape="CasequenceV4aNiltaConsVVainfix =asequenceV8V10Iainfix =V7V0NIainfix =V7ainfix +V3c1Lamk bufferV7V6amk arrayV0V1FIainfix =V6ainfix -V2c1FLagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Iabuffer_invariantV4Aainfix &gt;V2c0Lamk bufferV3V2amk arrayV0V1FF">
@@ -578,7 +578,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.07"/>
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
       </transf>
@@ -597,7 +597,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="122" loccnumb="6" loccnume="13"
     expl="parameter harness"
-    sum="a968b1b945b031cea325c6995c97c7e4"
+    sum="102ce16a40568a2eed9da49ee69ae899"
     proved="true"
     expanded="true"
     shape="ainfix =V25c3ICasequenceV20aNilfaConsVVainfix =asequenceV24V27Aainfix =V25V26Aainfix =V22ainfix -V18c1Aabuffer_invariantV24FLamk bufferV23V22amk arrayV2V11FAabuffer_invariantV20Aainfix &gt;V18c0Aainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V29Aainfix =V21V28Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FLamk bufferV19V18amk arrayV2V11FAabuffer_invariantV16Aainfix &gt;V14c0Aainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V31Aainfix =V17V30Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FAabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FAabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FAabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FAabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FAainfix &gt;c10c0">
@@ -612,7 +612,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="d94c898a40790df6f72e586b4ea5f514"
+      sum="3873863cb29b03fce383fdeaf6ef8fce"
       proved="true"
       expanded="true"
       shape="ainfix &gt;c10c0">
@@ -624,7 +624,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
@@ -632,7 +632,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="29bceca6f0b72be9d2220d2a50928e78"
+      sum="080a64ea9a731523986111a17784ea9f"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -652,7 +652,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="a1b45693173825944b3d17d335b4e50a"
+      sum="fba402d3813225eca002ffc7196231ec"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -664,7 +664,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
@@ -672,7 +672,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="0d03365dd3fb6ace85d54607a5db3e09"
+      sum="ff6f35505c1eb9a286875a67fb048ec9"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -692,7 +692,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="ad2fcbf63cbed4523e2d3782c78d4a72"
+      sum="ef24b995689fded47bc96f18e2bf4d98"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -712,7 +712,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="e0460e9e4a8e23d5ae1db241e8579fd8"
+      sum="11ef85b42add0756489e74789e3fb067"
       proved="true"
       expanded="true"
       shape="ainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -724,7 +724,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="3.70"/>
+       <result status="valid" time="4.29"/>
       </proof>
      </goal>
      <goal
@@ -732,7 +732,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="da89236e619e16053db9656e34db909f"
+      sum="326b9154140d91a083885063f5656d96"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -744,7 +744,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
@@ -752,7 +752,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="b4280a678bba617152d77198693ae235"
+      sum="895cb683717cb6f2677656e3f6d296fc"
       proved="true"
       expanded="true"
       shape="ainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V23Aainfix =V21V22Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FLamk bufferV19V18amk arrayV2V11FIabuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V25Aainfix =V17V24Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -765,7 +765,7 @@
        edited="vstte12_ring_buffer_WP_Harness_WP_parameter_harness_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.75"/>
+       <result status="valid" time="0.69"/>
       </proof>
      </goal>
      <goal
@@ -773,7 +773,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="1042a98160048c294972e877eb10fdaf"
+      sum="d3af66086b7d654ade21f3137b6572ec"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV20Aainfix &gt;V18c0Iainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V23Aainfix =V21V22Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FLamk bufferV19V18amk arrayV2V11FIabuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V25Aainfix =V17V24Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -785,7 +785,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -801,7 +801,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="122" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="50f50439bca757b48dcd16e985f6457d"
+      sum="d534ac4903140641fe1c1f11767b3913"
       proved="true"
       expanded="true"
       shape="ainfix =V25c3ICasequenceV20aNilfaConsVVainfix =asequenceV24V27Aainfix =V25V26Aainfix =V22ainfix -V18c1Aabuffer_invariantV24FLamk bufferV23V22amk arrayV2V11FIabuffer_invariantV20Aainfix &gt;V18c0Iainfix =V21c2ICasequenceV16aNilfaConsVVainfix =asequenceV20V29Aainfix =V21V28Aainfix =V18ainfix -V14c1Aabuffer_invariantV20FLamk bufferV19V18amk arrayV2V11FIabuffer_invariantV16Aainfix &gt;V14c0Iainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V31Aainfix =V17V30Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c10Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c10c0">
@@ -823,7 +823,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="132" loccnumb="6" loccnume="14"
     expl="parameter harness2"
-    sum="bff2856faba5a6e3526c6bee38e9a39f"
+    sum="7e62d4e33dfa9542109e70d00618c581"
     proved="true"
     expanded="true"
     shape="ainfix =V32c4ICasequenceV27aNilfaConsVVainfix =asequenceV31V34Aainfix =V32V33Aainfix =V29ainfix -V25c1Aabuffer_invariantV31FLamk bufferV30V29amk arrayV2V18FAabuffer_invariantV27Aainfix &gt;V25c0Aainfix =asequenceV27aConsc4aNilAainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V36Aainfix =V28V35Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV2V18FAabuffer_invariantV23Aainfix &gt;V21c0Aainfix =asequenceV23aConsc3aConsc4aNilAainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V38Aainfix =V24V37Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FAabuffer_invariantV20Aainfix &gt;V19c0Aainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FAabuffer_invariantV16Aainfix &lt;V14V2Aainfix =asequenceV16aConsc2aConsc3aNilAainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V40Aainfix =V17V39Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FAabuffer_invariantV13Aainfix &gt;V12c0Aainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FAabuffer_invariantV10Aainfix &lt;V9V2Aainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FAabuffer_invariantV7Aainfix &lt;V6V2Aainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FAabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FAainfix &gt;c3c0">
@@ -838,7 +838,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="3d672039a062023d98d760af4085e101"
+      sum="82c5a6d4747d2ab14050bd264ee0f2ae"
       proved="true"
       expanded="true"
       shape="ainfix &gt;c3c0">
@@ -850,7 +850,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -858,7 +858,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="09e6a9cfa2d2e76e4524210b80eca902"
+      sum="fd2ad23b64ba29caf9e30599419c120b"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -873,7 +873,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="132" loccnumb="6" loccnume="14"
         expl="parameter harness2"
-        sum="e7c00f7903e7edbd59b14fcc15e3e243"
+        sum="2cb7a80dbe38e307fcd69ff202ed8d6f"
         proved="true"
         expanded="true"
         shape="ainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -893,7 +893,7 @@
         locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
         loclnum="132" loccnumb="6" loccnume="14"
         expl="parameter harness2"
-        sum="4e8ca71ab8aeb3933d6f15185adc8da5"
+        sum="41371ddb654b29ee87c71d3a23e8990b"
         proved="true"
         expanded="true"
         shape="abuffer_invariantV4Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -905,7 +905,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.00"/>
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -915,7 +915,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="2e0ad313b04bfe250d7d76c7282669da"
+      sum="c0121f8de4703cb10165bc22f0a8f2e1"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -935,7 +935,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="14ec4e32cad6034f40ec75921f28d26c"
+      sum="813a5e032f0707a97c97a04572f2017b"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -947,7 +947,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
@@ -955,7 +955,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="e547c93d85147037e3c57e40b25753e0"
+      sum="fea820f29cff970eb18254bfc5246c7c"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -975,7 +975,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="aea68cd0fb022d541e3ba81800c717d3"
+      sum="360880dbd29093464559f3334e8ac4da"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -995,7 +995,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="31aa353d05e9d73cbddc8380c2c5d86d"
+      sum="4f0bfaf45fc50d50f4bc6aa07079f096"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1015,7 +1015,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="a89c761609759b18b18d36890c6dff3b"
+      sum="a47f08f747d3398b2644cdace25855b2"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1035,7 +1035,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="afc23e6bbae05309c573faa565046c2a"
+      sum="2ed586c7d6a5d88d7453a08075051ddb"
       proved="true"
       expanded="true"
       shape="ainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1047,7 +1047,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.08"/>
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
@@ -1055,7 +1055,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="f41ecc15552005f9d543f8f68c2d13e3"
+      sum="9e8313671f2bfa6a9b4dedcdee8242de"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1075,7 +1075,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="ae11486478c4a961377552ec54c0a165"
+      sum="65037c36a4c369d7de79177ed62f197b"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1095,7 +1095,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="73864c5fde4f9e7514be9d6f721eeefd"
+      sum="2fa666d3db6bddafbb41f0a816560b12"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1115,7 +1115,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="06481644e4f8cf908d1822284c2983b6"
+      sum="653316a5950dca41c7c33ad9ae5c8dec"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1135,7 +1135,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="213b2c39f37104aa75d3fc507a36d710"
+      sum="87b6392996826be2789287add10527be"
       proved="true"
       expanded="true"
       shape="ainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1155,7 +1155,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="cb4c4947db0f2eb703d4ccc7fd336302"
+      sum="c68aa8df23aa79ba8f98ead376d08945"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1175,7 +1175,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="266c5797fb78edb76975197a04738a10"
+      sum="b988239450fcd923e167ed9fef32bde4"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1187,7 +1187,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
@@ -1195,7 +1195,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="c861376cc6daf292b7c38ead0a1c65c1"
+      sum="c080162fab752ff84d65cb3a3a993fcf"
       proved="true"
       expanded="true"
       shape="ainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV2V18FIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1207,7 +1207,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.21"/>
+       <result status="valid" time="0.20"/>
       </proof>
      </goal>
      <goal
@@ -1215,7 +1215,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="e0319232a5cd1530c56b455767f93815"
+      sum="a71b6ffbf0ff07d4e0deac3197c6461e"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV27aConsc4aNilIainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV2V18FIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1235,7 +1235,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="precondition"
-      sum="a7ce79fb9302b35f3a1ca065da876733"
+      sum="e40509868fa76a880c5fcbca55db0669"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV27Aainfix &gt;V25c0Iainfix =asequenceV27aConsc4aNilIainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV2V18FIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1247,7 +1247,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
@@ -1255,7 +1255,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="132" loccnumb="6" loccnume="14"
       expl="assertion"
-      sum="1dd45cdb442f7740f83887dfc82b6a45"
+      sum="1b486ffcf501a68506198e191a09541e"
       proved="true"
       expanded="true"
       shape="ainfix =V32c4ICasequenceV27aNilfaConsVVainfix =asequenceV31V34Aainfix =V32V33Aainfix =V29ainfix -V25c1Aabuffer_invariantV31FLamk bufferV30V29amk arrayV2V18FIabuffer_invariantV27Aainfix &gt;V25c0Iainfix =asequenceV27aConsc4aNilIainfix =V28c3ICasequenceV23aNilfaConsVVainfix =asequenceV27V36Aainfix =V28V35Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV2V18FIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =asequenceV23aConsc3aConsc4aNilIainfix =V24c2ICasequenceV20aNilfaConsVVainfix =asequenceV23V38Aainfix =V24V37Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV2V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsc2aConsc3aConsc4aNilIainfix =asequenceV20ainfix ++asequenceV16aConsc4aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV2V18FIabuffer_invariantV16Aainfix &lt;V14V2Iainfix =asequenceV16aConsc2aConsc3aNilIainfix =V17c1ICasequenceV13aNilfaConsVVainfix =asequenceV16V40Aainfix =V17V39Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV2V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsc1aConsc2aConsc3aNilIainfix =asequenceV13ainfix ++asequenceV10aConsc3aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV0V12amk arrayV2V11FIabuffer_invariantV10Aainfix &lt;V9V2Iainfix =asequenceV10aConsc1aConsc2aNilIainfix =asequenceV10ainfix ++asequenceV7aConsc2aNilAainfix =V9ainfix +V6c1Aabuffer_invariantV10Lamk bufferV0V9amk arrayV2V8FIabuffer_invariantV7Aainfix &lt;V6V2Iainfix =asequenceV7aConsc1aNilIainfix =asequenceV7ainfix ++asequenceV4aConsc1aNilAainfix =V6ainfix +V1c1Aabuffer_invariantV7Lamk bufferV0V6amk arrayV2V5FIabuffer_invariantV4Aainfix &lt;V1V2Iainfix =asequenceV4aNilAainfix =V2c3Aabuffer_invariantV4Lamk bufferV0V1amk arrayV2V3FIainfix &gt;c3c0">
@@ -1267,7 +1267,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.21"/>
       </proof>
      </goal>
     </transf>
@@ -1277,7 +1277,7 @@
     locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
     loclnum="153" loccnumb="6" loccnume="10"
     expl="parameter test"
-    sum="701e1461d3e7c74ad193ca932aa59c13"
+    sum="73ec6f150bd29c05f4ef1ed3599da7c3"
     proved="true"
     expanded="true"
     shape="ainfix =V28V2ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV5V18FAabuffer_invariantV23Aainfix &gt;V21c0Aainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV5V18FAabuffer_invariantV20Aainfix &gt;V19c0Aainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV5V18FAabuffer_invariantV16Aainfix &lt;V14V5Aainfix =asequenceV16aConsV1aNilAainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FAabuffer_invariantV13Aainfix &gt;V12c0Aainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FAabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FAabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FAainfix &gt;c2c0F">
@@ -1292,7 +1292,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="db88dd58f058367aa164285b4bae5247"
+      sum="251be3352b60c18d83e7d006500df730"
       proved="true"
       expanded="true"
       shape="ainfix &gt;c2c0F">
@@ -1304,7 +1304,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -1312,7 +1312,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="52d38b9f0a5869dd38dae0435aeff4d1"
+      sum="3d9e0e8c5fc5b2130bbd3d28216ed309"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1332,7 +1332,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="ae5276c785e9aa96c2d75d022aa2e31a"
+      sum="0bc9586d6d7e8d7af0770c6260511c46"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1352,7 +1352,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="ffe80dbc9fa5f878ae3f19274830c7ca"
+      sum="855d4eeb7fae440d2256934a323f7473"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1364,7 +1364,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.43"/>
+       <result status="valid" time="1.38"/>
       </proof>
      </goal>
      <goal
@@ -1372,7 +1372,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="2956c7821115e83400c7f041787565c1"
+      sum="a659c60ea611554836de9a7673086f1d"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1384,7 +1384,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -1392,7 +1392,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="a99e34cdcc9e32096f30c346ff58d69b"
+      sum="cf6a358c387b576f598077ac2de22514"
       proved="true"
       expanded="true"
       shape="ainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1412,7 +1412,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="25e4a22988f4d61b584b44ed066219d3"
+      sum="aa3ba8f896ad7c356d1179133eb05311"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1432,7 +1432,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="026b9da27fbf62dee4107ec7c5b6ff1d"
+      sum="bbbe3cad672495ea158daeeab3b9f994"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V19Aainfix =V17V18Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1452,7 +1452,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="c83a2f21aaf3a74d1cb5bb05cb8e78be"
+      sum="b9e37853ab4bc0c25ec1eb1ebfd3096f"
       proved="true"
       expanded="true"
       shape="ainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV5V18FIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1472,7 +1472,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="99f417f1f21c3728b3dec9c1c4f9d0b8"
+      sum="f7a3eaab2bb1d106d21e785920d8523d"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV5V18FIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V22Aainfix =V17V21Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1492,7 +1492,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="3c8247967e6f285c16b53de39b050119"
+      sum="94046983084b5cc10c563ad62fc3422d"
       proved="true"
       expanded="true"
       shape="ainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV5V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV5V18FIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1504,7 +1504,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal
@@ -1512,7 +1512,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="d4ec06dad39762b22d1035f8d3fe9929"
+      sum="c39df32a697a1f8812585bc1aaa309da"
       proved="true"
       expanded="true"
       shape="abuffer_invariantV23Aainfix &gt;V21c0Iainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V26Aainfix =V24V25Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV5V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV5V18FIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V28Aainfix =V17V27Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
@@ -1540,7 +1540,7 @@
       locfile="programs/vstte12_ring_buffer/../vstte12_ring_buffer.mlw"
       loclnum="153" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="4df7a689378826bdf81a49c2e79c606e"
+      sum="2a773d6c7ab1862e21b5e75386959c5e"
       proved="true"
       expanded="true"
       shape="ainfix =V28V2ICasequenceV23aNilfaConsVVainfix =asequenceV27V30Aainfix =V28V29Aainfix =V25ainfix -V21c1Aabuffer_invariantV27FLamk bufferV26V25amk arrayV5V18FIabuffer_invariantV23Aainfix &gt;V21c0Iainfix =V24V1ICasequenceV20aNilfaConsVVainfix =asequenceV23V32Aainfix =V24V31Aainfix =V21ainfix -V19c1Aabuffer_invariantV23FLamk bufferV22V21amk arrayV5V18FIabuffer_invariantV20Aainfix &gt;V19c0Iainfix =asequenceV20aConsV1aConsV2aNilIainfix =asequenceV20ainfix ++asequenceV16aConsV2aNilAainfix =V19ainfix +V14c1Aabuffer_invariantV20Lamk bufferV15V19amk arrayV5V18FIabuffer_invariantV16Aainfix &lt;V14V5Iainfix =asequenceV16aConsV1aNilIainfix =V17V0ICasequenceV13aNilfaConsVVainfix =asequenceV16V34Aainfix =V17V33Aainfix =V14ainfix -V12c1Aabuffer_invariantV16FLamk bufferV15V14amk arrayV5V11FIabuffer_invariantV13Aainfix &gt;V12c0Iainfix =asequenceV13aConsV0aConsV1aNilIainfix =asequenceV13ainfix ++asequenceV10aConsV1aNilAainfix =V12ainfix +V9c1Aabuffer_invariantV13Lamk bufferV3V12amk arrayV5V11FIabuffer_invariantV10Aainfix &lt;V9V5Iainfix =asequenceV10ainfix ++asequenceV7aConsV0aNilAainfix =V9ainfix +V4c1Aabuffer_invariantV10Lamk bufferV3V9amk arrayV5V8FIabuffer_invariantV7Aainfix &lt;V4V5Iainfix =asequenceV7aNilAainfix =V5c2Aabuffer_invariantV7Lamk bufferV3V4amk arrayV5V6FIainfix &gt;c2c0F">
