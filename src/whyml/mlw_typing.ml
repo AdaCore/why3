@@ -757,6 +757,8 @@ let lambda_invariant lenv pvs eff lam =
   let spec = spec_invariant lenv pvs lam.l_expr.e_vty spec in
   { lam with l_spec = spec }
 
+(* specification handling *)
+
 let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
   | Ty.Tyvar v -> Denv.tyuvar v
@@ -769,6 +771,7 @@ let create_variant lenv (t,r) =
 
 let create_assert lenv f =
   let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
+  let f = t_label_add Split_goal.stop_split f in
   count_term_tuples f;
   check_at f;
   f
@@ -777,6 +780,7 @@ let create_pre lenv fs = t_and_simp_l (List.map (create_assert lenv) fs)
 
 let create_post lenv log_denv log_vars f =
   let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
+  let f = t_label_add Split_goal.stop_split f in
   let f = remove_old f in
   count_term_tuples f;
   check_at f;
@@ -1519,6 +1523,7 @@ let add_types ~wp uc tdl =
     let log_vars = Mstr.singleton x res in
     let log_denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
     let f = Typing.type_fmla (get_theory uc) log_denv log_vars f in
+    let f = t_label_add Split_goal.stop_split f in
     let uc = (count_term_tuples f; flush_tuples uc) in
     Mlw_module.add_invariant uc ts (Mlw_ty.create_post res f)
   in

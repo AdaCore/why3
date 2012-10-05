@@ -131,22 +131,22 @@ let wp_label e f =
   t_label ?loc lab f
 
 let expl_pre       = Ident.create_label "expl:precondition"
-let expl_post      = Ident.create_label "expl:normal postcondition"
+let expl_post      = Ident.create_label "expl:postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
+let expl_assume    = Ident.create_label "expl:assumption"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
-let expl_inv       = Ident.create_label "expl:type invariant"
-let expl_variant   = Ident.create_label "expl:variant decreases"
+let expl_type_inv  = Ident.create_label "expl:type invariant"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
-let expl_loop_var  = Ident.create_label "expl:loop variant decreases"
-(* FIXME? couldn't we just reuse "loop invariant" explanations? *)
-let expl_for_init  = Ident.create_label "expl:for loop initialization"
-let expl_for_keep  = Ident.create_label "expl:for loop preservation"
+let expl_loopvar   = Ident.create_label "expl:loop variant decrease"
+let expl_variant   = Ident.create_label "expl:variant decrease"
 
-let wp_expl l f =
-  let lab = Slab.add Split_goal.stop_split f.t_label in
-  t_label ?loc:f.t_loc (Slab.add l lab) f
+let rec wp_expl l f = match f.t_node with
+  | _ when Slab.mem Split_goal.stop_split f.t_label -> t_label_add l f
+  | Tbinop (Tand,f1,f2) -> t_label_copy f (t_and (wp_expl l f1) (wp_expl l f2))
+  | Teps _ -> t_label_add l f (* post-condition, push down later *)
+  | _ -> f
 
 let wp_and ~sym f1 f2 =
   if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
@@ -197,7 +197,7 @@ let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let open_post q =
   let v, f = open_post q in
-  v, t_label_copy q f
+  v, Slab.fold wp_expl q.t_label f
 
 let open_unit_post q =
   let v, q = open_post q in
@@ -252,7 +252,7 @@ let decrease_rel ?loc env old_t t = function
         (ps_app env.ps_int_lt [t; old_t])
   | None -> decrease_alg ?loc env old_t t
 
-let decrease ?loc env olds varl =
+let decrease loc lab env olds varl =
   let rec decr pr olds varl = match olds, varl with
     | [], [] -> (* empty variant *)
         t_true
@@ -266,7 +266,10 @@ let decrease ?loc env olds varl =
         t_or_simp dt (decr pr olds varl)
     | _ -> assert false
   in
-  decr t_true olds varl
+  t_label ?loc lab (decr t_true olds varl)
+
+let expl_variant = Slab.add Split_goal.stop_split (Slab.singleton expl_variant)
+let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
@@ -372,7 +375,7 @@ let get_invariant km t =
     | _ -> assert false in
   let sbs = Ty.ty_match Mtv.empty (t_type inv) ty in
   let u, p = open_post (t_ty_subst sbs Mvs.empty inv) in
-  wp_expl expl_inv (t_subst_single u t p)
+  wp_expl expl_type_inv (t_subst_single u t p)
 
 let ps_inv = Term.create_psymbol (id_fresh "inv")
   [ty_var (create_tvsymbol (id_fresh "a"))]
@@ -700,6 +703,7 @@ and wp_desc env e q xq = match e.e_node with
       wp_and ~sym:true (wp_label e f) q
   | Eassert (Aassume, f) ->
       let q = open_unit_post q in
+      let f = wp_expl expl_assume f in
       wp_implies (wp_label e f) q
   | Eabsurd ->
       wp_label e t_absurd
@@ -716,8 +720,7 @@ and wp_desc env e q xq = match e.e_node with
         if spec.c_letrec = 0 || spec.c_variant = [] then t_true else
         let olds = Mint.find_def [] spec.c_letrec env.letrec_var in
         if olds = [] then t_true (* we are out of letrec *) else
-        let d = decrease ?loc:e.e_loc env olds spec.c_variant in
-        wp_expl expl_variant (t_label ?loc:e.e_loc d.t_label d) in
+        decrease e.e_loc expl_variant env olds spec.c_variant in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
       let w = wp_and ~sym:true d (wp_and ~sym:false p w) in
@@ -746,8 +749,7 @@ and wp_desc env e q xq = match e.e_node with
       (* TODO: what do we do about well-foundness? *)
       let i = wp_expl expl_loop_keep inv in
       let olds = List.map (fun (t,_) -> t_at_old t) varl in
-      let d = decrease ?loc:e.e_loc env olds varl in
-      let d = wp_expl expl_loop_var d in
+      let d = decrease e.e_loc expl_loopvar env olds varl in
       let q = create_unit_post (wp_and ~sym:true i d) in
       let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
@@ -768,11 +770,11 @@ and wp_desc env e q xq = match e.e_node with
       let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
       let q = open_unit_post q in
       let wp_init =
-        wp_expl expl_for_init (t_subst_single x (t_var v1) inv) in
+        wp_expl expl_loop_init (t_subst_single x (t_var v1) inv) in
       let wp_step =
-        let nextx = fs_app env.fs_int_pl [t_var x; incr] ty_int in
-        let post = create_unit_post (t_subst_single x nextx inv) in
-        wp_expr env e1 post xq in
+        let next = fs_app env.fs_int_pl [t_var x; incr] ty_int in
+        let post = wp_expl expl_loop_keep (t_subst_single x next inv) in
+        wp_expr env e1 (create_unit_post post) xq in
       let wp_last =
         let v2pl1 = fs_app env.fs_int_pl [t_var v2; incr] ty_int in
         wp_implies (t_subst_single x v2pl1 inv) q in
@@ -780,10 +782,10 @@ and wp_desc env e q xq = match e.e_node with
         wp_init
         (quantify env (regs_of_writes e1.e_effect)
            (wp_and ~sym:true
-              (wp_expl expl_for_keep (wp_forall [x] (wp_implies
+              (wp_forall [x] (wp_implies
                 (wp_and ~sym:true (ps_app le [t_var v1; t_var x])
                                   (ps_app le [t_var x;  t_var v2]))
-                (wp_implies inv wp_step))))
+                (wp_implies inv wp_step)))
               wp_last))
       in
       let wp_full = wp_and ~sym:true
