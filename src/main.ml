@@ -232,6 +232,7 @@ let () = try
 
   (** Configuration *)
   let config = read_config !opt_config in
+  let config = List.fold_left merge_config config !opt_extra in
   let main = get_main config in
   Whyconf.load_plugins main;
 
@@ -270,8 +271,6 @@ let () = try
   end;
   if !opt_list_provers then begin
     opt_list := true;
-    let config = read_config !opt_config in
-    let config = List.fold_left merge_config config !opt_extra in
     let print = Pp.print_iter2 Mprover.iter Pp.newline Pp.nothing
       print_prover Pp.nothing in
     let provers = get_provers config in
