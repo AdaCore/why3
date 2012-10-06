@@ -668,52 +668,33 @@ let save_session config session =
 
 let expl_regexp = Str.regexp "expl:\\(.*\\)"
 
-exception Found of string
-
-let check_expl lab =
+let check_expl lab acc =
   let lab = lab.Ident.lab_string in
-  if Str.string_match expl_regexp lab 0 then
-    raise (Found (Str.matched_group 1 lab))
+  if Str.string_match expl_regexp lab 0
+  then Some (Str.matched_group 1 lab)
+  else acc
 
-let rec get_expl_fmla f =
-  Ident.Slab.iter check_expl f.Term.t_label;
-  (match f.Term.t_node with
-    | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla f
-    | Term.Tquant(Term.Tforall,fq) ->
-      let (_,_,f) = Term.t_open_quant fq in get_expl_fmla f
-    | Term.Tlet(_,fb) ->
-      let (_,f) = Term.t_open_bound fb in get_expl_fmla f
-    | Term.Tcase(_,[fb]) ->
-      let (_,f) = Term.t_open_branch fb in get_expl_fmla f
-    | Term.Tcase(_,bl) ->
-      (* we check if the match is post-split, i.e. only one
-         branch has an explanation label *)
-      let rec rest_expl s = function
-        | [] -> raise (Found s)
-        | fb :: bl ->
-            let (_,f) = Term.t_open_branch fb in
-            (try get_expl_fmla f with Found _ -> ());
-            rest_expl s bl
-      in
-      let rec find_expl = function
-        | [] -> ()
-        | fb :: bl ->
-            let (_,f) = Term.t_open_branch fb in
-            (try get_expl_fmla f with Found s -> rest_expl s bl);
-            find_expl bl
-      in
-      find_expl bl
-    | _ -> ())
+let check_expl lab = Ident.Slab.fold check_expl lab None
+
+let rec get_expl_fmla acc f =
+  if f.t_ty <> None then acc else
+  let res = check_expl f.Term.t_label in
+  if res = None then match f.t_node with
+    | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
+    | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla acc f
+    | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
+        Term.t_fold get_expl_fmla acc f
+    | _ -> raise Exit
+  else if acc = None then res else raise Exit
+
+let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
 
 type expl = string option
 
 let get_explanation id task =
   let fmla = Task.task_goal_fmla task in
-  try
-    get_expl_fmla fmla;
-    Ident.Slab.iter check_expl id.Ident.id_label;
-    None
-  with Found e -> Some e
+  let res = get_expl_fmla fmla in
+  if res <> None then res else check_expl id.Ident.id_label
 
 
 (*****************************)
