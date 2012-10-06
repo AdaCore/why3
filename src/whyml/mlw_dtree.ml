@@ -28,8 +28,8 @@ type ident = Ptree.ident
 
 type ghost = bool
 
-type dpre = Ptree.pre
-type dpost = Ptree.post
+type dpre = Ptree.lexpr list
+type dpost = (string * Ptree.lexpr) list
 type dxpost = dpost Mexn.t
 type dvariant = Ptree.lexpr * Term.lsymbol option
 type dinvariant = Ptree.lexpr list

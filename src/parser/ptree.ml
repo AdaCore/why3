@@ -196,14 +196,14 @@ type effect = {
   pe_raises : qualid list;
 }
 
-type pre = lexpr list
-type post = lexpr list
-type xpost = (qualid * lexpr) list list
+type pre = lexpr
+type post = loc * (pattern * lexpr) list
+type xpost = loc * (qualid * pattern * lexpr) list
 
 type spec = {
-  sp_pre     : pre;
-  sp_post    : post;
-  sp_xpost   : xpost;
+  sp_pre     : pre list;
+  sp_post    : post list;
+  sp_xpost   : xpost list;
   sp_effect  : effect;
   sp_variant : variant list;
 }

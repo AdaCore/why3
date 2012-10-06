@@ -370,13 +370,26 @@ let deff_of_peff uc pe =
     deff_writes = pe.pe_writes;
     deff_raises = List.map (find_xsymbol uc) pe.pe_raises; }
 
-exception DuplicateException of xsymbol
+let mk_dpost loc = function
+  | [] -> assert false
+  | [{ pat_desc = PPpvar { id = x }}, f] -> x, f
+  | l ->
+      let x = "result" in
+      let v = { id = x; id_loc = loc; id_lab = [] } in
+      let v = { pp_desc = Ptree.PPvar (Qident v); pp_loc = loc } in
+      x, { pp_desc = PPmatch (v,l); pp_loc = loc }
+
+let dpost ql = List.map (fun (loc, ql) -> mk_dpost loc ql) ql
 
 let dxpost uc ql =
-  let add_exn m (q,f) =
+  let add_exn (q,pat,f) m =
     let xs = find_xsymbol uc q in
-    Mexn.add_new (DuplicateException xs) xs [f] m in
-  let exn_map ql = List.fold_left add_exn Mexn.empty ql in
+    Mexn.change (function
+      | Some l -> Some ((pat,f) :: l)
+      | None   -> Some ((pat,f) :: [])) xs m in
+  let exn_map (loc,ql) =
+    let m = List.fold_right add_exn ql Mexn.empty in
+    Mexn.map (fun ql -> [mk_dpost loc ql]) m in
   let add_map ql m =
     Mexn.union (fun _ l r -> Some (l @ r)) (exn_map ql) m in
   List.fold_right add_map ql Mexn.empty
@@ -386,7 +399,7 @@ let dvariant uc var =
 
 let dspec uc sp = {
   ds_pre     = sp.sp_pre;
-  ds_post    = sp.sp_post;
+  ds_post    = dpost sp.sp_post;
   ds_xpost   = dxpost uc sp.sp_xpost;
   ds_effect  = deff_of_peff uc sp.sp_effect;
   ds_variant = dvariant uc sp.sp_variant;
@@ -778,7 +791,9 @@ let create_assert lenv f =
 
 let create_pre lenv fs = t_and_simp_l (List.map (create_assert lenv) fs)
 
-let create_post lenv log_denv log_vars f =
+let create_post lenv res dty x f =
+  let log_vars = Mstr.add x res lenv.log_vars in
+  let log_denv = Typing.add_var x dty lenv.log_denv in
   let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
   let f = t_label_add Split_goal.stop_split f in
   let f = remove_old f in
@@ -786,18 +801,19 @@ let create_post lenv log_denv log_vars f =
   check_at f;
   f
 
-let create_post lenv x ty fs =
+let create_post lenv ty fs =
+  let dty = dty_of_ty ty in
+  let x = match fs with (x,_)::_ -> x | [] -> "result" in
   let res = create_vsymbol (id_fresh x) ty in
-  let log_vars = Mstr.add x res lenv.log_vars in
-  let log_denv = Typing.add_var x (dty_of_ty ty) lenv.log_denv in
-  let f = t_and_simp_l (List.map (create_post lenv log_denv log_vars) fs) in
+  let post (x,f) = create_post lenv res dty x f in
+  let f = t_and_simp_l (List.map post fs) in
   Mlw_ty.create_post res f
 
-let create_xpost lenv x xs fs = create_post lenv x (ty_of_ity xs.xs_ity) fs
+let create_xpost lenv xs fs = create_post lenv (ty_of_ity xs.xs_ity) fs
 
-let create_post lenv x vty fs = create_post lenv x (ty_of_vty vty) fs
+let create_post lenv vty fs = create_post lenv (ty_of_vty vty) fs
 
-let create_xpost lenv x xq = Mexn.mapi (create_xpost lenv x) xq
+let create_xpost lenv xq = Mexn.mapi (create_xpost lenv) xq
 
 let add_local x lv lenv = match lv with
   | LetA _ ->
@@ -926,8 +942,8 @@ let check_user_effect lenv e dsp =
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
-  c_post    = create_post lenv "result" vty dsp.ds_post;
-  c_xpost   = create_xpost lenv "result" dsp.ds_xpost;
+  c_post    = create_post lenv vty dsp.ds_post;
+  c_xpost   = create_xpost lenv dsp.ds_xpost;
   c_effect  = eff;
   c_variant = List.map (create_variant lenv) dsp.ds_variant;
   c_letrec  = 0;

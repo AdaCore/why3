@@ -148,9 +148,9 @@ end
     { pe_reads = r1 @ r2; pe_writes = w1 @ w2; pe_raises = x1 @ x2 }
 
   let spec p (q,xq) ef vl = {
-    sp_pre     = [p];
-    sp_post    = [q];
-    sp_xpost   = [xq];
+    sp_pre     = p;
+    sp_post    = q;
+    sp_xpost   = xq;
     sp_effect  = ef;
     sp_variant = vl;
   }
@@ -1138,7 +1138,7 @@ expr:
 | GHOST expr
    { mk_expr (Eghost $2) }
 | ABSTRACT expr post
-   { mk_expr (Eabstract($2, spec (mk_pp PPtrue) $3 empty_effect [])) }
+   { mk_expr (Eabstract($2, spec [] $3 empty_effect [])) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
 ;
@@ -1148,7 +1148,7 @@ triple:
   { (* add_init_label *) $2, spec $1 $3 empty_effect [] }
 | expr %prec prec_triple
   { (* add_init_label *) $1,
-    spec (mk_pp PPtrue) (mk_pp PPtrue, []) empty_effect [] }
+    spec [] ([], []) empty_effect [] }
 ;
 
 expr_arg:
@@ -1303,7 +1303,7 @@ simple_type_v:
 
 type_c:
 | type_v
-    { $1, spec (mk_pp PPtrue) (mk_pp PPtrue, []) empty_effect [] }
+    { $1, spec [] ([], []) empty_effect [] }
 | pre type_v effects post
     { $2, spec $1 $4 $3 [] }
 ;
@@ -1311,7 +1311,7 @@ type_c:
 /* for ANY */
 simple_type_c:
 | simple_type_v
-    { $1, spec (mk_pp PPtrue) (mk_pp PPtrue, []) empty_effect [] }
+    { $1, spec [] ([], []) empty_effect [] }
 | pre type_v effects post
     { $2, spec $1 $4 $3 [] }
 ;
@@ -1322,11 +1322,16 @@ annotation:
 ;
 
 pre:
-| annotation { $1 }
+| annotation { [$1] }
 ;
 
 post:
-| annotation list0_post_exn { $1, $2 }
+| normal_post list0_post_exn { [floc_i 1, [$1]], [floc_i 2, $2] }
+;
+
+normal_post:
+| annotation
+    { mk_pat (PPpvar (mk_id "result" (floc ()))), $1 }
 ;
 
 list0_post_exn:
@@ -1340,7 +1345,8 @@ list1_post_exn:
 ;
 
 post_exn:
-| BAR uqualid ARROW annotation { $2, $4 }
+| BAR uqualid ARROW annotation
+    { $2, mk_pat (PPpvar (mk_id "result" (floc_i 2))), $4 }
 ;
 
 effects:

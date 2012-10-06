@@ -310,11 +310,25 @@ let rec lexpr_conj = function
   | [l] -> l
   | l :: ll -> { l with pp_desc = PPbinop (l, PPand, lexpr_conj ll) }
 
+let get_post l =
+  let conv = function
+    | _, [{pat_desc = PPpvar { id = "result" }}, le] -> le
+    | loc, _ -> Loc.errorm ~loc "Patterns in postconditions \
+        are not supported in this version of WhyML" in
+  lexpr_conj (List.map conv l)
+
 let get_xpost = function
   | [] -> []
-  | [l] -> l
+  | [loc, l] ->
+      let conv (xs, p, le) = match p.pat_desc with
+        | PPpvar { id = "result" } -> xs, le
+        | _ -> Loc.errorm ~loc "Patterns in postconditions \
+              are not supported in this version of WhyML" in
+      List.map conv l
   | _ :: _ -> Loc.errorm "Multiple exceptional postconditions \
       are not supported in this version of WhyML"
+
+let dpost uc sp = dpost uc (get_post sp.sp_post, get_xpost sp.sp_xpost)
 
 let rec dutype_v env = function
   | Ptree.Tpure pt ->
@@ -328,8 +342,7 @@ and dutype_c env (ty,sp) =
   { duc_result_type = dutype_v env ty;
     duc_effect      = dueffect env sp.Ptree.sp_effect;
     duc_pre         = lexpr_conj sp.Ptree.sp_pre;
-    duc_post        = dpost env.uc
-      (lexpr_conj sp.Ptree.sp_post, get_xpost sp.Ptree.sp_xpost);
+    duc_post        = dpost env.uc sp;
   }
 
 and dubinder env ({id=x; id_loc=loc} as id, gh, v) =
@@ -748,7 +761,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEany c, dpurify_utype_v c.duc_result_type
   | Ptree.Eabstract(e1,q) ->
       let e1 = dexpr ~ghost ~userloc env e1 in
-      let q = dpost env.uc (lexpr_conj q.sp_post, get_xpost q.sp_xpost) in
+      let q = dpost env.uc q in
       DEabstract(e1, q), e1.dexpr_type
   | Ptree.Eghost _ ->
       no_ghost true;
@@ -782,7 +795,7 @@ and dletrec ~ghost ~userloc env dl =
 and dtriple ~ghost ~userloc env (e, sp) =
   let v = dvariants env sp.sp_variant in
   let e = dexpr ~ghost ~userloc env e in
-  let q = dpost env.uc (lexpr_conj sp.sp_post, get_xpost sp.sp_xpost) in
+  let q = dpost env.uc sp in
   v, (lexpr_conj sp.sp_pre, e, q)
 
 (*** regions tables ********************************************************)
