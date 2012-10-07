@@ -236,143 +236,6 @@ Definition reducible(sigma:(map mident value)) (pi:(list (ident*
   sigma' pi' s').
 
 (* Why3 assumption *)
-Definition type_value(v:value): datatype :=
-  match v with
-  | Vvoid => TYunit
-  | (Vint int) => TYint
-  | (Vbool bool1) => TYbool
-  end.
-
-(* Why3 assumption *)
-Inductive type_operator : operator -> datatype -> datatype
-  -> datatype -> Prop :=
-  | Type_plus : (type_operator Oplus TYint TYint TYint)
-  | Type_minus : (type_operator Ominus TYint TYint TYint)
-  | Type_mult : (type_operator Omult TYint TYint TYint)
-  | Type_le : (type_operator Ole TYint TYint TYbool).
-
-(* Why3 assumption *)
-Definition type_stack  := (list (ident* datatype)%type).
-
-Parameter get_vartype: ident -> (list (ident* datatype)%type) -> datatype.
-
-Axiom get_vartype_def : forall (i:ident) (pi:(list (ident* datatype)%type)),
-  match pi with
-  | Nil => ((get_vartype i pi) = TYunit)
-  | (Cons (x, ty) r) => ((x = i) -> ((get_vartype i pi) = ty)) /\
-      ((~ (x = i)) -> ((get_vartype i pi) = (get_vartype i r)))
-  end.
-
-(* Why3 assumption *)
-Definition type_env  := (map mident datatype).
-
-(* Why3 assumption *)
-Inductive type_term : (map mident datatype) -> (list (ident* datatype)%type)
-  -> term -> datatype -> Prop :=
-  | Type_value : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:value), (type_term sigma pi (Tvalue v)
-      (type_value v))
-  | Type_var : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:ident) (ty:datatype), ((get_vartype v pi) = ty) ->
-      (type_term sigma pi (Tvar v) ty)
-  | Type_deref : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:mident) (ty:datatype), ((get sigma v) = ty) ->
-      (type_term sigma pi (Tderef v) ty)
-  | Type_bin : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (t1:term) (t2:term) (op:operator) (ty1:datatype)
-      (ty2:datatype) (ty:datatype), (type_term sigma pi t1 ty1) ->
-      ((type_term sigma pi t2 ty2) -> ((type_operator op ty1 ty2 ty) ->
-      (type_term sigma pi (Tbin t1 op t2) ty))).
-
-(* Why3 assumption *)
-Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
-  -> fmla -> Prop :=
-  | Type_term : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (t:term), (type_term sigma pi t TYbool) ->
-      (type_fmla sigma pi (Fterm t))
-  | Type_conj : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi f1) ->
-      ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fand f1 f2)))
-  | Type_neg : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f:fmla), (type_fmla sigma pi f) -> (type_fmla sigma
-      pi (Fnot f))
-  | Type_implies : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi f1) ->
-      ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fimplies f1 f2)))
-  | Type_let : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (t:term) (f:fmla) (ty:datatype),
-      (type_term sigma pi t ty) -> ((type_fmla sigma (Cons (x, ty) pi) f) ->
-      (type_fmla sigma pi (Flet x t f)))
-  | Type_forall1 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYint)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYint f))
-  | Type_forall2 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYbool)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYbool f))
-  | Type_forall3 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYunit)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYunit f)).
-
-(* Why3 assumption *)
-Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
-  -> stmt -> Prop :=
-  | Type_skip : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)), (type_stmt sigma pi Sskip)
-  | Type_seq : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (s1:stmt) (s2:stmt), (type_stmt sigma pi s1) ->
-      ((type_stmt sigma pi s2) -> (type_stmt sigma pi (Sseq s1 s2)))
-  | Type_assigns : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:mident) (t:term) (ty:datatype), ((get sigma
-      x) = ty) -> ((type_term sigma pi t ty) -> (type_stmt sigma pi
-      (Sassign x t)))
-  | Type_if : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (t:term) (s1:stmt) (s2:stmt), (type_term sigma pi t
-      TYbool) -> ((type_stmt sigma pi s1) -> ((type_stmt sigma pi s2) ->
-      (type_stmt sigma pi (Sif t s1 s2))))
-  | Type_assert : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (p:fmla), (type_fmla sigma pi p) -> (type_stmt sigma
-      pi (Sassert p))
-  | Type_while : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (guard:term) (body:stmt) (inv:fmla), (type_fmla sigma
-      pi inv) -> ((type_term sigma pi guard TYbool) -> ((type_stmt sigma pi
-      body) -> (type_stmt sigma pi (Swhile guard inv body)))).
-
-(* Why3 assumption *)
-Inductive compatible : datatype -> value -> Prop :=
-  | Compatible_bool : forall (b:bool), (compatible TYbool (Vbool b))
-  | Compatible_int : forall (n:Z), (compatible TYint (Vint n))
-  | Compatible_void : (compatible TYunit Vvoid).
-
-(* Why3 assumption *)
-Definition existe_compatible(ty:datatype) (v:value): Prop :=
-  match ty with
-  | TYbool => exists b:bool, (v = (Vbool b))
-  | TYint => exists n:Z, (v = (Vint n))
-  | TYunit => (v = Vvoid)
-  end.
-
-(* Why3 assumption *)
-Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
-  datatype)) (pi:(list (ident* value)%type)) (pit:(list (ident*
-  datatype)%type)): Prop := (forall (id:mident), (compatible (get sigmat id)
-  (get sigma id))) /\ forall (id:ident), (compatible (get_vartype id pit)
-  (get_stack id pi)).
-
-Axiom eval_type_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-  datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
-  ((type_term sigmat pit t ty) -> (existe_compatible ty (eval_term sigma pi
-  t))).
-
-Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
-  value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
-  (pi2:(list (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)), ((type_stmt sigmat pit s1) /\
-  ((compatible_env sigma1 sigmat pi1 pit) /\ (one_step sigma1 pi1 s1 sigma2
-  pi2 s2))) -> ((type_stmt sigmat pit s2) /\ (compatible_env sigma2 sigmat
-  pi2 pit)).
-
-(* Why3 assumption *)
 Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
   a)) {struct l1}: (list a) :=
   match l1 with
@@ -467,95 +330,32 @@ Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
   ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
   (get_stack v pi)) pi e)).
 
-Axiom eval_msubst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v f) ->
-  ((eval_fmla sigma pi (msubst f x v)) <-> (eval_fmla (set sigma x
-  (get_stack v pi)) pi f)).
-
-Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_term sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) t) = (eval_term sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) t)).
-
-Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
-
-Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
-  t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
-
-Axiom eval_change_free : forall (f:fmla) (id:ident) (v:value),
-  (fresh_in_fmla id f) -> forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)), (eval_fmla sigma (Cons (id, v) pi) f) <-> (eval_fmla sigma
-  pi f).
-
-Parameter fresh_from: fmla -> ident.
-
-Axiom fresh_from_fmla : forall (f:fmla), (fresh_in_fmla (fresh_from f) f).
-
-Parameter abstract_effects: stmt -> fmla -> fmla.
-
-Axiom abstract_effects_generalize : forall (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
-  (abstract_effects s f)) -> (eval_fmla sigma pi f).
-
-Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
-  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
-
-(* Why3 assumption *)
-Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
-  match s with
-  | Sskip => q
-  | (Sassert f) => (Fand f (Fimplies f q))
-  | (Sseq s1 s2) => (wp s1 (wp s2 q))
-  | (Sassign x t) => let id := (fresh_from q) in (Flet id t (msubst q x id))
-  | (Sif t s1 s2) => (Fand (Fimplies (Fterm t) (wp s1 q))
-      (Fimplies (Fnot (Fterm t)) (wp s2 q)))
-  | (Swhile cond inv body) => (Fand inv (abstract_effects body
-      (Fand (Fimplies (Fand (Fterm cond) inv) (wp body inv))
-      (Fimplies (Fand (Fnot (Fterm cond)) inv) q))))
-  end.
-
-Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (s:stmt) (q:fmla), (eval_fmla sigma pi
-  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
-  q))).
-
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
-
 (* Why3 goal *)
-Theorem monotonicity : forall (s:stmt),
-  match s with
-  | Sskip => True
-  | (Sassign m t) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
-      (valid_fmla (Fimplies (wp s p) (wp s q)))
-  | (Sseq s1 s2) => True
-  | (Sif t s1 s2) => True
-  | (Sassert f) => True
-  | (Swhile t f s1) => True
+Theorem eval_msubst : forall (f:fmla),
+  match f with
+  | (Fterm t) => True
+  | (Fand f1 f2) => True
+  | (Fnot f1) => True
+  | (Fimplies f1 f2) => True
+  | (Flet i t f1) => True
+  | (Fforall i d f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (x:mident) (v:ident), (fresh_in_fmla v f1) ->
+      ((eval_fmla sigma pi (msubst f1 x v)) <-> (eval_fmla (set sigma x
+      (get_stack v pi)) pi f1))) -> forall (sigma:(map mident value))
+      (pi:(list (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v
+      f) -> ((eval_fmla sigma pi (msubst f x v)) -> (eval_fmla (set sigma x
+      (get_stack v pi)) pi f))
   end.
-destruct s; auto.
-unfold valid_fmla.
+destruct f; auto.
 simpl.
 intros.
-apply eval_msubst.
-apply fresh_from_fmla.
-rewrite eval_msubst in H0.
-rewrite get_stack_eq; auto.
-rewrite get_stack_eq in H0; auto.
-apply eval_change_free.
-apply fresh_from_fmla.
-rewrite eval_change_free in H0.
-apply H; auto.
-apply fresh_from_fmla.
-apply fresh_from_fmla.
+destruct H0.
+destruct d.
+ae.
+ae.
+ae.
 Qed.
 
 

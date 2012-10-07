@@ -527,35 +527,42 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
 (* Why3 goal *)
-Theorem monotonicity : forall (s:stmt),
+Theorem distrib_conj : forall (s:stmt),
   match s with
   | Sskip => True
-  | (Sassign m t) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
-      (valid_fmla (Fimplies (wp s p) (wp s q)))
-  | (Sseq s1 s2) => True
+  | (Sassign m t) => True
+  | (Sseq s1 s2) => (forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s2 p)) /\
+      (eval_fmla sigma pi (wp s2 q))) -> (eval_fmla sigma pi (wp s2 (Fand p
+      q)))) -> ((forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s1 p)) /\
+      (eval_fmla sigma pi (wp s1 q))) -> (eval_fmla sigma pi (wp s1 (Fand p
+      q)))) -> forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+      (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p
+      q))))
   | (Sif t s1 s2) => True
   | (Sassert f) => True
   | (Swhile t f s1) => True
   end.
 destruct s; auto.
-unfold valid_fmla.
-simpl.
-intros.
-apply eval_msubst.
-apply fresh_from_fmla.
-rewrite eval_msubst in H0.
-rewrite get_stack_eq; auto.
-rewrite get_stack_eq in H0; auto.
-apply eval_change_free.
-apply fresh_from_fmla.
-rewrite eval_change_free in H0.
-apply H; auto.
-apply fresh_from_fmla.
-apply fresh_from_fmla.
+intros H1 H2 sigma pi p q (H3 & H4).
+simpl in *.
+assert (H: valid_fmla 
+        (Fimplies (Fand (wp s2 p) (wp s2 q)) (wp s2 (Fand p q)))).
+unfold valid_fmla ; simpl.
+intros sigma' pi' (H5 & H6).
+apply H1; auto; clear H1.
+generalize (monotonicity s1 _ _ H).
+clear H; intro H.
+unfold valid_fmla in H.
+simpl in H.
+apply H; clear H.
+apply H2; auto.
 Qed.
 
 

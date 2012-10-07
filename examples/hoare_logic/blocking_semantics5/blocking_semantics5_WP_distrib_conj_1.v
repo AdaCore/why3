@@ -527,35 +527,49 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
 (* Why3 goal *)
-Theorem monotonicity : forall (s:stmt),
+Theorem distrib_conj : forall (s:stmt),
   match s with
   | Sskip => True
-  | (Sassign m t) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
-      (valid_fmla (Fimplies (wp s p) (wp s q)))
+  | (Sassign m t) => forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+      (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p
+      q)))
   | (Sseq s1 s2) => True
   | (Sif t s1 s2) => True
   | (Sassert f) => True
   | (Swhile t f s1) => True
   end.
 destruct s; auto.
-unfold valid_fmla.
-simpl.
+unfold valid_fmla; simpl.
+intros sigma pi p q.
 intros.
-apply eval_msubst.
-apply fresh_from_fmla.
-rewrite eval_msubst in H0.
-rewrite get_stack_eq; auto.
-rewrite get_stack_eq in H0; auto.
-apply eval_change_free.
-apply fresh_from_fmla.
-rewrite eval_change_free in H0.
-apply H; auto.
-apply fresh_from_fmla.
-apply fresh_from_fmla.
+assert (fresh_in_fmla (fresh_from (Fand p q)) (Fand p q)).
+  apply fresh_from_fmla; auto.
+simpl in H0.
+destruct H0.
+destruct H.
+rewrite eval_msubst in *; auto.
+rewrite eval_msubst in *; auto.
+rewrite get_stack_eq in *; auto.
+rewrite eval_change_free in *; auto.
+split; auto.
+rewrite eval_change_free; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
+apply fresh_from_fmla; auto.
 Qed.
 
 

@@ -330,6 +330,9 @@ Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
   ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
   (get_stack v pi)) pi e)).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
 (* Why3 goal *)
 Theorem eval_msubst : forall (f:fmla),
   match f with
@@ -348,7 +351,10 @@ Theorem eval_msubst : forall (f:fmla),
   end.
 destruct f; auto.
 simpl.
-
+intros.
+destruct H0 as (h1 & h2 & h3).
+rewrite eval_msubst_term in H1; auto.
+ae.
 Qed.
 
 

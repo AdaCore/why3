@@ -678,5 +678,3 @@ do 3 eexists.
 econstructor.
 eauto.
 Qed.
-
-

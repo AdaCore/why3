@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require set.Set.
 
 (* Why3 assumption *)
 Inductive list (a:Type) {a_WT:WhyType a} :=
@@ -575,109 +576,32 @@ Definition total_valid_triple(p:fmla) (s:stmt) (q:fmla): Prop :=
   exists pi':(list (ident* value)%type), exists n:Z, (many_steps sigma pi s
   sigma' pi' Sskip n) /\ (eval_fmla sigma' pi' q).
 
-Axiom set1 : forall (a:Type) {a_WT:WhyType a}, Type.
-Parameter set1_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set1 a).
-Existing Instance set1_WhyType.
-
-Parameter mem1: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> Prop.
-
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set1 a)) (s2:(set1
-  a)): Prop := forall (x:a), (mem1 x s1) <-> (mem1 x s2).
+Definition assigns(sigma:(map mident value)) (a:(set.Set.set mident))
+  (sigma':(map mident value)): Prop := forall (i:mident), (~ (set.Set.mem i
+  a)) -> ((get sigma i) = (get sigma' i)).
 
-Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)), (infix_eqeq s1 s2) -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set1 a)) (s2:(set1
-  a)): Prop := forall (x:a), (mem1 x s1) -> (mem1 x s2).
-
-Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (s3:(set1 a)), (subset s1 s2) -> ((subset s2 s3) ->
-  (subset s1 s3)).
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set1 a).
-
-(* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set1 a)): Prop :=
-  forall (x:a), ~ (mem1 x s).
-
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set1
-  a))).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> (set1 a).
-
-Axiom add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
-  forall (s:(set1 a)), (mem1 x (add y s)) <-> ((x = y) \/ (mem1 x s)).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set1 a) -> (set1
-  a).
-
-Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
-  (s:(set1 a)), (mem1 x (remove y s)) <-> ((~ (x = y)) /\ (mem1 x s)).
-
-Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set1
-  a)), (subset (remove x s) s).
-
-Parameter union: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (union s1 s2)) <-> ((mem1 x s1) \/ (mem1 x
-  s2)).
-
-Parameter inter: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (inter s1 s2)) <-> ((mem1 x s1) /\ (mem1 x
-  s2)).
-
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> (set1 a) ->
-  (set1 a).
-
-Axiom diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)) (x:a), (mem1 x (diff s1 s2)) <-> ((mem1 x s1) /\ ~ (mem1 x
-  s2)).
-
-Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set1 a))
-  (s2:(set1 a)), (subset (diff s1 s2) s1).
-
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set1 a) -> a.
-
-Axiom choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(set1 a)),
-  (~ (is_empty s)) -> (mem1 (choose s) s).
-
-Parameter all: forall {a:Type} {a_WT:WhyType a}, (set1 a).
-
-Axiom all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem1 x
-  (all :(set1 a))).
-
-(* Why3 assumption *)
-Definition assigns(sigma:(map mident value)) (a:(set1 mident)) (sigma':(map
-  mident value)): Prop := forall (i:mident), (~ (mem1 i a)) -> ((get sigma
-  i) = (get sigma' i)).
-
-Axiom assigns_refl : forall (sigma:(map mident value)) (a:(set1 mident)),
-  (assigns sigma a sigma).
+Axiom assigns_refl : forall (sigma:(map mident value)) (a:(set.Set.set
+  mident)), (assigns sigma a sigma).
 
 Axiom assigns_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
-  value)) (sigma3:(map mident value)) (a:(set1 mident)), ((assigns sigma1 a
-  sigma2) /\ (assigns sigma2 a sigma3)) -> (assigns sigma1 a sigma3).
+  value)) (sigma3:(map mident value)) (a:(set.Set.set mident)),
+  ((assigns sigma1 a sigma2) /\ (assigns sigma2 a sigma3)) -> (assigns sigma1
+  a sigma3).
 
 Axiom assigns_union_left : forall (sigma:(map mident value)) (sigma':(map
-  mident value)) (s1:(set1 mident)) (s2:(set1 mident)), (assigns sigma s1
-  sigma') -> (assigns sigma (union s1 s2) sigma').
+  mident value)) (s1:(set.Set.set mident)) (s2:(set.Set.set mident)),
+  (assigns sigma s1 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
 
 Axiom assigns_union_right : forall (sigma:(map mident value)) (sigma':(map
-  mident value)) (s1:(set1 mident)) (s2:(set1 mident)), (assigns sigma s2
-  sigma') -> (assigns sigma (union s1 s2) sigma').
+  mident value)) (s1:(set.Set.set mident)) (s2:(set.Set.set mident)),
+  (assigns sigma s2 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
 
 (* Why3 assumption *)
-Fixpoint stmt_writes(s:stmt) (w:(set1 mident)) {struct s}: Prop :=
+Fixpoint stmt_writes(s:stmt) (w:(set.Set.set mident)) {struct s}: Prop :=
   match s with
   | (Sskip|(Sassert _)) => True
-  | (Sassign id _) => (mem1 id w)
+  | (Sassign id _) => (set.Set.mem id w)
   | (Sseq s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
   | (Sif t s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
   | (Swhile _ _ body) => (stmt_writes body w)
@@ -720,6 +644,9 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
 Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
 (* Why3 goal *)
 Theorem distrib_conj : forall (s:stmt),
   match s with
@@ -738,22 +665,15 @@ Theorem distrib_conj : forall (s:stmt),
   end.
 destruct s; auto.
 simpl.
-intros H sigma pi p q ((H0 & H1) & (_ & H2)).
+intros H sigma pi p q (H0 & H1).
+destruct H0.
+destruct H1; clear H1.
 split; auto.
 apply abstract_effects_monotonic.
-red; simpl; intuition.
- with (sigma := sigma) (pi:=pi).
-simpl.
-split; apply abstract_effects_generalize in H1;
-  simpl in H1; destruct H1; intros (H5 & _).
-(* True *)
-apply H1; auto.
-(* False *)
-clear  H1.
-split; auto.
 apply abstract_effects_generalize in H2;
 simpl in H2; destruct H2.
-apply H2; auto.
+apply abstract_effects_generalize in H3;
+simpl in H3; destruct H3.
 Qed.
 
 

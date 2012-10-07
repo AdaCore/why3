@@ -527,35 +527,47 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
+
+Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
+
+Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
+  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
+  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
+  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
 
 (* Why3 goal *)
-Theorem monotonicity : forall (s:stmt),
+Theorem progress : forall (s:stmt),
   match s with
   | Sskip => True
-  | (Sassign m t) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
-      (valid_fmla (Fimplies (wp s p) (wp s q)))
+  | (Sassign m t) => True
   | (Sseq s1 s2) => True
   | (Sif t s1 s2) => True
   | (Sassert f) => True
-  | (Swhile t f s1) => True
+  | (Swhile t f s1) => (forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
+      datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
+      ((type_stmt sigmat pit s1) -> ((eval_fmla sigma pi (wp s1 q)) ->
+      ((~ (s1 = Sskip)) -> (reducible sigma pi s1))))) -> forall (sigma:(map
+      mident value)) (pi:(list (ident* value)%type)) (sigmat:(map mident
+      datatype)) (pit:(list (ident* datatype)%type)) (q:fmla),
+      (compatible_env sigma sigmat pi pit) -> ((type_stmt sigmat pit s) ->
+      ((eval_fmla sigma pi (wp s q)) -> ((~ (s = Sskip)) -> (reducible sigma
+      pi s))))
   end.
 destruct s; auto.
-unfold valid_fmla.
 simpl.
-intros.
-apply eval_msubst.
-apply fresh_from_fmla.
-rewrite eval_msubst in H0.
-rewrite get_stack_eq; auto.
-rewrite get_stack_eq in H0; auto.
-apply eval_change_free.
-apply fresh_from_fmla.
-rewrite eval_change_free in H0.
-apply H; auto.
-apply fresh_from_fmla.
-apply fresh_from_fmla.
+intros H sigma pi sigmat pit q H1 H2 (H3 & H4) H5.
+inversion H2; subst; clear H2.
+elim (eval_type_term t sigma pi _ _ _ H1 H11).
+destruct x; intro Hval.
+do 3 eexists.
+apply one_step_while_true; auto.
+do 3 eexists.
+apply one_step_while_false; auto.
 Qed.
 
 

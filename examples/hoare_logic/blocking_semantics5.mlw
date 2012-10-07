@@ -434,7 +434,6 @@ end
 (** {2 Problématique des variables fraîches} *)
 
 
-
 theory FreshVariables
 
 use import SemOp
@@ -518,7 +517,7 @@ lemma subst_fresh_term :
 (*
 lemma subst_fresh :
   forall f:fmla, x:ident, v:ident.
-   fresh_in_fmla x f -> subst f x v = f
+  fresh_in_fmla x f -> subst f x v = f
 *)
 
 (* Needed for monotonicity and wp_reduction *)
@@ -540,28 +539,11 @@ id1 <> id2 ->
 (eval_term sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) t =
 eval_term sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) t)
 
-(*
-lemma eval_swap_term_2:
-  forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
-    id1 <> id2 ->
-    (eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t =
-    eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t)
-*)
-
 lemma eval_swap:
   forall f:fmla, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->
     (eval_fmla sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) f <->
     eval_fmla sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) f)
-
-(*
-lemma eval_swap_2:
-  forall f:fmla, id1 id2:ident, v1 v2:value.
-    id1 <> id2 ->
-      forall sigma:env, pi:stack.
-    (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <->
-    eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f)
-*)
 
 lemma eval_term_change_free :
   forall t:term, sigma:env, pi:stack, id:ident, v:value.
@@ -578,14 +560,6 @@ lemma eval_change_free :
 
 
 end
-
-
-
-
-
-
-
-
 
 
 (** {2 Hoare logic} *)
@@ -722,6 +696,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
   | Swhile _ _ body -> stmt_writes body w
   end
 *)
+
 
   function fresh_from (f:fmla) : ident
 

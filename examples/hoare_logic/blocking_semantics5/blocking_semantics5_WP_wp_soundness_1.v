@@ -527,35 +527,57 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
+
+Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
+
+Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
+  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
+  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
+  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
+
+Axiom progress : forall (s:stmt) (sigma:(map mident value)) (pi:(list (ident*
+  value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
+  datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
+  ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
+  ((~ (s = Sskip)) -> (reducible sigma pi s)))).
 
 (* Why3 goal *)
-Theorem monotonicity : forall (s:stmt),
-  match s with
-  | Sskip => True
-  | (Sassign m t) => forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p q)) ->
-      (valid_fmla (Fimplies (wp s p) (wp s q)))
-  | (Sseq s1 s2) => True
-  | (Sif t s1 s2) => True
-  | (Sassert f) => True
-  | (Swhile t f s1) => True
-  end.
-destruct s; auto.
-unfold valid_fmla.
-simpl.
+Theorem wp_soundness : forall (n:Z) (sigma:(map mident value)) (sigma':(map
+  mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
+  value)%type)) (s:stmt) (s':stmt) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
+  ((type_stmt sigmat pit s) -> (((many_steps sigma pi s sigma' pi' s' n) /\
+  ((~ (reducible sigma' pi' s')) /\ (eval_fmla sigma pi (wp s q)))) ->
+  ((s' = Sskip) /\ (eval_fmla sigma' pi' q)))).
+intros n sigma sigma' pi pi' s s' sigmat pit q.
+intros Hcomp Htype (h1,(h2,h3)).
+generalize (steps_non_neg _ _ _ _ _ _ _ h1).
+intros Hnpos.
+generalize sigma sigma' pi pi' s s' sigmat pit q Hcomp Htype h1 h2 h3.
+clear sigma sigma' pi pi' s s' sigmat pit q Hcomp Htype h1 h2 h3.
+generalize Hnpos.
+pattern n; apply Z_lt_induction; auto.
+intros x Hind Hxpos.
 intros.
-apply eval_msubst.
-apply fresh_from_fmla.
-rewrite eval_msubst in H0.
-rewrite get_stack_eq; auto.
-rewrite get_stack_eq in H0; auto.
-apply eval_change_free.
-apply fresh_from_fmla.
-rewrite eval_change_free in H0.
-apply H; auto.
-apply fresh_from_fmla.
-apply fresh_from_fmla.
+inversion h1; subst; clear h1.
+(* cas zero etapes *)
+destruct (decide_is_skip s').
+subst s'.
+split; auto.
+contradiction h2; clear h2.
+apply progress with (q:=q) (1:=Hcomp); auto.
+(* cas au moins une etape *)
+generalize (steps_non_neg _ _ _ _ _ _ _ H0).
+intro.
+generalize (type_preservation s s2 sigma sigma2 pi pi2 sigmat pit).
+intros h.
+apply Hind with (y:=n0) (sigmat:=sigmat) (pit:=pit) (5:=H0); 
+  intuition.
+apply wp_reduction with (1:=H); auto.
 Qed.
 
 

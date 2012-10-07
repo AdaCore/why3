@@ -389,7 +389,6 @@ inversion H2; subst; clear H2.
 generalize (H0 sigma pi _ _ _ H1 H8).
 generalize (H sigma pi _ _ _ H1 H10).
 ae.
-
 Qed.
 
 

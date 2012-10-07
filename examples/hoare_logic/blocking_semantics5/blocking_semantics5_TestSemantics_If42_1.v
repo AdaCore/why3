@@ -235,152 +235,28 @@ Definition reducible(sigma:(map mident value)) (pi:(list (ident*
   exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
   sigma' pi' s').
 
-(* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
+Parameter x: ident.
 
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
-  match t with
-  | (Tvalue _) => True
-  | (Tvar i) => ~ (x = i)
-  | (Tderef _) => True
-  | (Tbin t1 _ t2) => (fresh_in_term x t1) /\ (fresh_in_term x t2)
-  end.
-
-(* Why3 assumption *)
-Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
-  match f with
-  | (Fterm e) => (fresh_in_term id e)
-  | ((Fand f1 f2)|(Fimplies f1 f2)) => (fresh_in_fmla id f1) /\
-      (fresh_in_fmla id f2)
-  | (Fnot f1) => (fresh_in_fmla id f1)
-  | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\
-      (fresh_in_fmla id f1))
-  | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
-  end.
-
-Parameter msubst_term: term -> mident -> ident -> term.
-
-Axiom msubst_term_def : forall (t:term) (r:mident) (v:ident),
-  match t with
-  | ((Tvalue _)|(Tvar _)) => ((msubst_term t r v) = t)
-  | (Tderef x) => ((r = x) -> ((msubst_term t r v) = (Tvar v))) /\
-      ((~ (r = x)) -> ((msubst_term t r v) = t))
-  | (Tbin t1 op t2) => ((msubst_term t r v) = (Tbin (msubst_term t1 r v) op
-      (msubst_term t2 r v)))
-  end.
-
-(* Why3 assumption *)
-Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
-  match f with
-  | (Fterm e) => (Fterm (msubst_term e x v))
-  | (Fand f1 f2) => (Fand (msubst f1 x v) (msubst f2 x v))
-  | (Fnot f1) => (Fnot (msubst f1 x v))
-  | (Fimplies f1 f2) => (Fimplies (msubst f1 x v) (msubst f2 x v))
-  | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
-  | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
-  end.
-
-Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v e) ->
-  ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
-  (get_stack v pi)) pi e)).
-
-Axiom eval_msubst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v f) ->
-  ((eval_fmla sigma pi (msubst f x v)) <-> (eval_fmla (set sigma x
-  (get_stack v pi)) pi f)).
-
-Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_term sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) t) = (eval_term sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) t)).
-
-Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
-  (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-  (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
-  (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
-
-Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
-  t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
+Parameter y: mident.
 
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem eval_change_free : forall (f:fmla),
-  match f with
-  | (Fterm t) => True
-  | (Fand f1 f2) => True
-  | (Fnot f1) => True
-  | (Fimplies f1 f2) => True
-  | (Flet i t f1) => (forall (id:ident) (v:value), (fresh_in_fmla id f1) ->
-      forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-      (eval_fmla sigma (Cons (id, v) pi) f1) <-> (eval_fmla sigma pi f1)) ->
-      forall (id:ident) (v:value), (fresh_in_fmla id f) -> forall (sigma:(map
-      mident value)) (pi:(list (ident* value)%type)), (eval_fmla sigma
-      (Cons (id, v) pi) f) -> (eval_fmla sigma pi f)
-  | (Fforall i d f1) => True
-  end.
-destruct f; auto.
-simpl.
-intros.
-destruct H0 as (h1 & h2 & h3).
-rewrite eval_term_change_free in H1; auto.
-assert (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
-       (Cons (i, eval_term sigma pi t) (Cons (id, v) pi))) f =
-       eval_fmla sigma 
-       (Cons (i, eval_term sigma pi t) (Cons (id, v) pi)) f);
-auto.
-rewrite <- H0 in H1; clear H0.
-apply eval_swap in H1; auto.
-apply H in H1; auto.
+Theorem If42 : forall (sigma1:(map mident value)) (sigma2:(map mident value))
+  (pi1:(list (ident* value)%type)) (pi2:(list (ident* value)%type)) (s:stmt),
+  (one_step (const (Vint 0%Z):(map mident value)) (Cons (x, (Vint 42%Z))
+  (Nil :(list (ident* value)%type))) (Sif (Tbin (Tderef y) Ole
+  (Tvalue (Vint 10%Z))) (Sassign y (Tvalue (Vint 13%Z))) (Sassign y
+  (Tvalue (Vint 42%Z)))) sigma1 pi1 s) -> ((one_step sigma1 pi1 s sigma2 pi2
+  Sskip) -> ((get sigma2 y) = (Vint 13%Z))).
+intros sigma1 sigma2 pi1 pi2 s h1 h2.
+inversion h1; subst; clear h1.
+inversion h2; subst; clear h2.
+ae.
+inversion h2; subst; clear h2.
+simpl in H7.
+ae.
 Qed.
+
 
