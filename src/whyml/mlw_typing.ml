@@ -88,6 +88,8 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
+let implicit_post = Debug.register_flag "implicit_post"
+  ~desc:"Generate@ a@ postcondition@ for@ pure@ functions@ without@ one."
 
 type denv = {
   uc     : module_uc;
@@ -1203,11 +1205,23 @@ and expr_rec lenv dfdl =
   List.iter2 check_user_effect fdl dfdl;
   fdl
 
-and expr_fun lenv x gh bl tr =
+and expr_fun lenv x gh bl (_, dsp as tr) =
   let lam = expr_lam lenv gh (binders bl) tr in
   if lam.l_spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a non-recursive definition";
-  check_user_effect lenv lam.l_expr (snd tr);
+  check_user_effect lenv lam.l_expr dsp;
+  let lam =
+    if Debug.nottest_flag implicit_post || dsp.ds_post <> [] ||
+       oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
+    else match e_purify lam.l_expr with
+    | None -> lam
+    | Some t ->
+        let vs, f = Mlw_ty.open_post lam.l_spec.c_post in
+        let f = t_and_simp (t_equ_simp (t_var vs) t) f in
+        let f = t_label_add Split_goal.stop_split f in
+        let post = Mlw_ty.create_post vs f in
+        let spec = { lam.l_spec with c_post = post } in
+        { lam with l_spec = spec } in
   let pvs = l_pvset Spv.empty lam in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   create_fun_defn (Denv.create_user_id x) lam

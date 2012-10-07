@@ -253,3 +253,5 @@ val e_absurd : ity -> expr
 (** expression traversal *)
 
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
+
+val e_purify : expr -> term option

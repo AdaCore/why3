@@ -1141,3 +1141,50 @@ let e_fold fn acc e = match e.e_node with
   | Eabstr (e,_) -> fn acc e
   | Elogic _ | Evalue _ | Earrow _
   | Eany _ | Eassert _ | Eabsurd -> acc
+
+let t_void = fs_app (fs_tuple 0) [] ty_unit
+
+let spec_purify sp =
+  let vs, f = Mlw_ty.open_post sp.c_post in
+  match f.t_node with
+  | Tapp (ps, [{t_node = Tvar us}; t])
+    when ls_equal ps ps_equ && vs_equal vs us && not (Mvs.mem vs t.t_vars) ->
+      t
+  | Tbinop (Tiff, {t_node = Tapp (ps,[{t_node = Tvar us};{t_node = Ttrue}])},f)
+    when ls_equal ps ps_equ && vs_equal vs us && not (Mvs.mem vs f.t_vars) ->
+      t_if f t_bool_true t_bool_false
+  | _ -> raise Exit
+
+let rec e_purify e =
+  let t = match e.e_node with
+    | Elogic f when f.t_ty = None ->
+        t_if f t_bool_true t_bool_false
+    | Elogic t -> t
+    | Evalue pv -> t_var pv.pv_vs
+    | Earrow _ | Eassert _ -> t_void
+    | Eapp (_,_,sp) -> spec_purify sp
+    | Elet ({ let_sym = LetV pv; let_expr = e1 }, e2) ->
+        t_let_close_simp pv.pv_vs (e_purify e1) (e_purify e2)
+    | Elet ({ let_sym = LetA _ }, e1)
+    | Erec (_,e1) | Eghost e1 ->
+        e_purify e1
+    | Eif (e1,e2,e3) ->
+        t_if_simp (t_equ_simp (e_purify e1) t_bool_true)
+          (e_purify e2) (e_purify e3)
+    | Ecase (e1,bl) ->
+        let conv (p,e) = t_close_branch p.ppat_pattern (e_purify e) in
+        t_case (e_purify e1) (List.map conv bl)
+    | Eany sp | Eabstr (_,sp) -> spec_purify sp
+    | Eassign _ | Eloop _ | Efor _
+    | Eraise _ | Etry _ | Eabsurd -> raise Exit
+  in
+  let loc = if t.t_loc = None then e.e_loc else t.t_loc in
+  t_label ?loc (Slab.union e.e_label t.t_label) t
+
+let e_purify e =
+  if Sreg.is_empty e.e_effect.eff_writes &&
+     Sreg.is_empty e.e_effect.eff_ghostw &&
+     Sexn.is_empty e.e_effect.eff_raises &&
+     Sexn.is_empty e.e_effect.eff_ghostx
+  then try Some (e_purify e) with Exit -> None
+  else None
