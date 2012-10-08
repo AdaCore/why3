@@ -579,5 +579,3 @@ inversion H1; subst; clear H1.
 inversion H2; subst; clear H2; auto.
 inversion H0.
 Qed.
-
-

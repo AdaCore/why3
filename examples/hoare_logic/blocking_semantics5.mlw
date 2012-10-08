@@ -206,12 +206,9 @@ lemma steps_non_neg:
     many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
 
 
-  predicate reducible (sigma:env) (pi:stack) (s:stmt) =
+  predicate reductible (sigma:env) (pi:stack) (s:stmt) =
     exists sigma':env, pi':stack, s':stmt.
       one_step sigma pi s sigma' pi' s'
-
-
-
 
 
 
@@ -478,27 +475,6 @@ function msubst_term (t:term) (r:mident) (v:ident) : term =
       Tbin (msubst_term t1 r v) op (msubst_term t2 r v)
   end
 
-(*
-function subst_term (t:term) (r:ident) (v:ident) : term =
-  match t with
-  | Tvalue _ | Tderef _  -> t
-  | Tvar x  ->
-      if r = x then Tvar v else t
-  | Tbin t1 op t2  ->
-     Tbin (subst_term t1 r v) op (subst_term t2 r v)
-  end
-
-function subst (f:fmla) (x:ident) (v:ident) : fmla =
-  match f with
-  | Fterm e -> Fterm (subst_term e x v)
-  | Fand f1 f2 -> Fand (subst f1 x v) (subst f2 x v)
-  | Fnot f -> Fnot (subst f x v)
-  | Fimplies f1 f2 -> Fimplies (subst f1 x v) (subst f2 x v)
-  | Flet y t f -> Flet y (subst_term t x v) (subst f x v)
-  | Fforall y ty f -> Fforall y ty (subst f x v)
-  end
-*)
-
 function msubst (f:fmla) (x:mident) (v:ident) : fmla =
   match f with
   | Fterm e -> Fterm (msubst_term e x v)
@@ -509,17 +485,6 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
   | Fforall y ty f -> Fforall y ty (msubst f x v)
   end
 
-(*
-lemma subst_fresh_term :
-  forall t:term, x:ident, v:ident.
-   fresh_in_term x t -> subst_term t x v = t
-*)
-
-(*
-lemma subst_fresh :
-  forall f:fmla, x:ident, v:ident.
-  fresh_in_fmla x f -> subst f x v = f
-*)
 
 (* Needed for monotonicity and wp_reduction *)
 lemma eval_msubst_term:
@@ -657,67 +622,59 @@ use import Typing
 use import TypingAndSemantics
 use import FreshVariables
 
-(*
-use set.Set
-*)
 
-(*
-(** [assigns sigma W sigma'] is true when the only differences between
-    [sigma] and [sigma'] are the value of references in [W] *)
-
-predicate assigns (sigma:env) (a:Set.set mident) (sigma':env) =
-  forall i:mident. not (Set.mem i a) ->
-    IdMap.get sigma i = IdMap.get sigma' i
-
-lemma assigns_refl:
-  forall sigma:env, a:Set.set mident. assigns sigma a sigma
-
-lemma assigns_trans:
-  forall sigma1 sigma2 sigma3:env, a:Set.set mident.
-    assigns sigma1 a sigma2 /\ assigns sigma2 a sigma3 ->
-    assigns sigma1 a sigma3
-
-lemma assigns_union_left:
-  forall sigma sigma':env, s1 s2:Set.set mident.
-    assigns sigma s1 sigma' -> assigns sigma (Set.union s1 s2) sigma'
-
-lemma assigns_union_right:
-  forall sigma sigma':env, s1 s2:Set.set mident.
-    assigns sigma s2 sigma' -> assigns sigma (Set.union s1 s2) sigma'
-*)
-
-(*
-(** [stmt_writes e W] is true when the only references modified by [e] are in [W] *)
-predicate stmt_writes (s:stmt) (w:Set.set mident) =
-  match s with
-  | Sskip | Sassert _ -> true
-  | Sassign id _ -> Set.mem id w
-  | Sseq s1 s2 -> stmt_writes s1 w /\ stmt_writes s2 w
-  | Sif t s1 s2 -> stmt_writes s1 w /\ stmt_writes s2 w
-  | Swhile _ _ body -> stmt_writes body w
-  end
-*)
-
-
-  function fresh_from (f:fmla) : ident
+function fresh_from (f:fmla) : ident
 
   (* Need it for monotonicity*)
-  axiom fresh_from_fmla: forall f:fmla.
-     fresh_in_fmla (fresh_from f) f
+axiom fresh_from_fmla: forall f:fmla.
+fresh_in_fmla (fresh_from f) f
 
+  (* intention:
+       abstract_effects s f = "forall w. f"
+     avec w = writes(s)
+  *)
   function abstract_effects (s:stmt) (f:fmla) : fmla
 
+  (* hypothese 1: si
+       sigma, pi |= forall w. f
+     alors
+       sigma, pi |= f
+  *)
   axiom abstract_effects_generalize :
      forall sigma:env, pi:stack, s:stmt, f:fmla.
         eval_fmla sigma pi (abstract_effects s f) ->
         eval_fmla sigma pi f
 
-  axiom abstract_effects_monotonic :
-     forall s:stmt, f:fmla.
-        forall sigma:env, pi:stack. eval_fmla sigma pi f ->
-        forall sigma:env, pi:stack. eval_fmla sigma pi (abstract_effects s f)
+  (* hypothese 2: si
+       |= p -> q
+     alors
+       |= (forall w, p) -> (forall w, q)
 
-  function wp (s:stmt) (q:fmla) : fmla =
+     remarque : il est essentiel de parler de validité dans tous les etats:
+     on n'a pas
+       sigma,pi |= p -> q
+     implique
+       sigma,pi |= (forall w, p) -> (forall w, q)
+
+     contre-exemple: sigma(x) = 42 alors true -> x=42
+        mais on n'a
+             (forall x, true) -> (forall  x, x=42)
+  *)
+
+  axiom abstract_effects_monotonic :
+     forall s:stmt, p q:fmla.
+        valid_fmla (Fimplies p q) ->
+        forall sigma:env, pi:stack.
+           eval_fmla sigma pi (abstract_effects s p) ->
+           eval_fmla sigma pi (abstract_effects s q)
+
+  axiom abstract_effects_distrib_conj :
+     forall s:stmt, p q:fmla, sigma:env, pi:stack.
+       eval_fmla sigma pi (abstract_effects s p) /\
+       eval_fmla sigma pi (abstract_effects s q) ->
+         eval_fmla sigma pi (abstract_effects s (Fand p q))
+
+function wp (s:stmt) (q:fmla) : fmla =
     match s with
     | Sskip -> q
     | Sassert f ->
@@ -749,6 +706,17 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
       valid_fmla (Fimplies p q)
      ->	valid_fmla (Fimplies (wp s p) (wp s q) )
 
+ (* remarque l'ordre des quantifications est essentiel, on n'a pas
+       sigma,pi |= p -> q
+     implique
+       sigma,pi |= (wp s p) -> (wp s q)
+
+     meme contre-exemple: sigma(x) = 42 alors true -> x=42
+        mais 
+          wp (x := 7) true = true
+          wp (x := 7) x=42 = 7=42
+  *)
+
   lemma distrib_conj:
     forall s:stmt, sigma:env, pi:stack, p q:fmla.
      (eval_fmla sigma pi (wp s p)) /\
@@ -768,7 +736,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
       compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->
       eval_fmla sigma pi (wp s q) ->
-      s <> Sskip -> reducible sigma pi s
+      s <> Sskip -> reductible sigma pi s
 
   (** {3 main soundness result} *)
 
@@ -778,7 +746,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
       compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->
       many_steps sigma pi s sigma' pi' s' n /\
-      not (reducible sigma' pi' s') /\
+      not (reductible sigma' pi' s') /\
       eval_fmla sigma pi (wp s q) ->
       s' = Sskip /\ eval_fmla sigma' pi' q
 

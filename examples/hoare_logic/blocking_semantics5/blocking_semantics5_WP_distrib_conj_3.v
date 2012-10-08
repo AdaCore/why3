@@ -337,15 +337,8 @@ Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
       pi inv) -> ((type_term sigma pi guard TYbool) -> ((type_stmt sigma pi
       body) -> (type_stmt sigma pi (Swhile guard inv body)))).
 
-(* Why3 assumption *)
-Inductive compatible : datatype -> value -> Prop :=
-  | Compatible_bool : forall (b:bool), (compatible TYbool (Vbool b))
-  | Compatible_int : forall (n:Z), (compatible TYint (Vint n))
-  | Compatible_void : (compatible TYunit Vvoid).
-
-(* Why3 assumption *)
-Definition existe_compatible(ty:datatype) (v:value): Prop :=
-  match ty with
+Axiom type_inversion : forall (v:value),
+  match (type_value v) with
   | TYbool => exists b:bool, (v = (Vbool b))
   | TYint => exists n:Z, (v = (Vint n))
   | TYunit => (v = Vvoid)
@@ -354,15 +347,15 @@ Definition existe_compatible(ty:datatype) (v:value): Prop :=
 (* Why3 assumption *)
 Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
   datatype)) (pi:(list (ident* value)%type)) (pit:(list (ident*
-  datatype)%type)): Prop := (forall (id:mident), (compatible (get sigmat id)
-  (get sigma id))) /\ forall (id:ident), (compatible (get_vartype id pit)
-  (get_stack id pi)).
+  datatype)%type)): Prop := (forall (id:mident), ((type_value (get sigma
+  id)) = (get sigmat id))) /\ forall (id:ident), ((type_value (get_stack id
+  pi)) = (get_vartype id pit)).
 
 Axiom eval_type_term : forall (t:term) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
   datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
-  ((type_term sigmat pit t ty) -> (existe_compatible ty (eval_term sigma pi
-  t))).
+  ((type_term sigmat pit t ty) -> ((type_value (eval_term sigma pi
+  t)) = ty)).
 
 Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
   value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
@@ -503,10 +496,16 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
-  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
+  (eval_fmla sigma pi (abstract_effects s q)).
+
+Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
+  (sigma:(map mident value)) (pi:(list (ident* value)%type)),
+  ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
+  (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
+  q))).
 
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
@@ -555,12 +554,14 @@ intros H sigma pi p q (H0 & H1).
 destruct H0.
 destruct H1; clear H1.
 split; auto.
-apply abstract_effects_monotonic with (sigma := sigma) (pi := pi).
-apply abstract_effects_generalize in H2;
-simpl in H2; destruct H2.
-apply abstract_effects_generalize in H3;
-simpl in H3; destruct H3.
-ae.
+apply abstract_effects_monotonic with (p:=
+(Fand (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
+             (Fimplies (Fand (Fnot (Fterm t)) f) p))
+  (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
+             (Fimplies (Fand (Fnot (Fterm t)) f) q)))).
+unfold valid_fmla; simpl.
+intuition.
+apply abstract_effects_distrib_conj; auto.
 Qed.
 
 

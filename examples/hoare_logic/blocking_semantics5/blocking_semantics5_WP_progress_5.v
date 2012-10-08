@@ -230,7 +230,7 @@ Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
   (0%Z <= n)%Z.
 
 (* Why3 assumption *)
-Definition reducible(sigma:(map mident value)) (pi:(list (ident*
+Definition reductible(sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
   exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
   sigma' pi' s').
@@ -337,15 +337,8 @@ Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
       pi inv) -> ((type_term sigma pi guard TYbool) -> ((type_stmt sigma pi
       body) -> (type_stmt sigma pi (Swhile guard inv body)))).
 
-(* Why3 assumption *)
-Inductive compatible : datatype -> value -> Prop :=
-  | Compatible_bool : forall (b:bool), (compatible TYbool (Vbool b))
-  | Compatible_int : forall (n:Z), (compatible TYint (Vint n))
-  | Compatible_void : (compatible TYunit Vvoid).
-
-(* Why3 assumption *)
-Definition existe_compatible(ty:datatype) (v:value): Prop :=
-  match ty with
+Axiom type_inversion : forall (v:value),
+  match (type_value v) with
   | TYbool => exists b:bool, (v = (Vbool b))
   | TYint => exists n:Z, (v = (Vint n))
   | TYunit => (v = Vvoid)
@@ -354,15 +347,15 @@ Definition existe_compatible(ty:datatype) (v:value): Prop :=
 (* Why3 assumption *)
 Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
   datatype)) (pi:(list (ident* value)%type)) (pit:(list (ident*
-  datatype)%type)): Prop := (forall (id:mident), (compatible (get sigmat id)
-  (get sigma id))) /\ forall (id:ident), (compatible (get_vartype id pit)
-  (get_stack id pi)).
+  datatype)%type)): Prop := (forall (id:mident), ((type_value (get sigma
+  id)) = (get sigmat id))) /\ forall (id:ident), ((type_value (get_stack id
+  pi)) = (get_vartype id pit)).
 
 Axiom eval_type_term : forall (t:term) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
   datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
-  ((type_term sigmat pit t ty) -> (existe_compatible ty (eval_term sigma pi
-  t))).
+  ((type_term sigmat pit t ty) -> ((type_value (eval_term sigma pi
+  t)) = ty)).
 
 Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
   value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
@@ -503,10 +496,16 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
-  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
+  (eval_fmla sigma pi (abstract_effects s q)).
+
+Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
+  (sigma:(map mident value)) (pi:(list (ident* value)%type)),
+  ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
+  (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
+  q))).
 
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
@@ -551,19 +550,23 @@ Theorem progress : forall (s:stmt),
       value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
       datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
       ((type_stmt sigmat pit s1) -> ((eval_fmla sigma pi (wp s1 q)) ->
-      ((~ (s1 = Sskip)) -> (reducible sigma pi s1))))) -> forall (sigma:(map
+      ((~ (s1 = Sskip)) -> (reductible sigma pi s1))))) -> forall (sigma:(map
       mident value)) (pi:(list (ident* value)%type)) (sigmat:(map mident
       datatype)) (pit:(list (ident* datatype)%type)) (q:fmla),
       (compatible_env sigma sigmat pi pit) -> ((type_stmt sigmat pit s) ->
-      ((eval_fmla sigma pi (wp s q)) -> ((~ (s = Sskip)) -> (reducible sigma
+      ((eval_fmla sigma pi (wp s q)) -> ((~ (s = Sskip)) -> (reductible sigma
       pi s))))
   end.
 destruct s; auto.
 simpl.
 intros H sigma pi sigmat pit q H1 H2 (H3 & H4) H5.
 inversion H2; subst; clear H2.
-elim (eval_type_term t sigma pi _ _ _ H1 H11).
-destruct x; intro Hval.
+unfold reductible.
+apply eval_type_term with (sigma := sigma) (pi := pi) in H11 ; auto.
+assert (eval_term sigma pi t = Vbool true \/ 
+        eval_term sigma pi t = Vbool false).
+admit.
+destruct H0.
 do 3 eexists.
 apply one_step_while_true; auto.
 do 3 eexists.
