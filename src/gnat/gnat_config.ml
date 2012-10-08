@@ -2,7 +2,7 @@ open Why3
 
 type report_mode = Fail | Verbose | Detailed
 
-type proof_mode = Normal | No_WP | All_Splitted
+type proof_mode = Normal | No_WP | All_Split
 
 let gnatprove_why3conf_file = "why3.conf"
 
@@ -38,12 +38,12 @@ let set_report s =
 let set_proof_mode s =
    if s = "no_wp" then
       opt_proof_mode := No_WP
-   else if s = "all_splitted" then
-      opt_proof_mode := All_Splitted
+   else if s = "all_split" then
+      opt_proof_mode := All_Split
    else if s <> "normal" then
       Gnat_util.abort_with_message
         "argument for option --proof should be one of\
-        (normal|no_wp|all_splitted)."
+        (normal|no_wp|all_split)."
 
 let set_prover s =
    opt_prover := Some s
@@ -88,7 +88,7 @@ let options = Arg.align [
    "--report", Arg.String set_report,
           " Set report mode, one of (fail | all | detailed), default is fail";
    "--proof", Arg.String set_proof_mode,
-          " Set proof mode, one of (normal | no_wp | all_splitted), default is\
+          " Set proof mode, one of (normal | no_wp | all_split), default is\
           normal";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given by \"file:line\"";

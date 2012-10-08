@@ -21,11 +21,11 @@ type report_mode = Fail | Verbose | Detailed
    In mode detailed, additionally print if VC was timeout or if prover stopped.
    *)
 
-type proof_mode = Normal | No_WP | All_Splitted
-(* In mode normal, compute VCs and splitted VCs as necessary, call prover as
+type proof_mode = Normal | No_WP | All_Split
+(* In mode normal, compute VCs and split VCs as necessary, call prover as
                    necessary;
    In mode no_wp, do not compute VCs and never call the prover
-   In mode all_splitted, compute all splitted VCs, and never call the prover
+   In mode all_split, compute all split VCs, and never call the prover
    *)
 
 val report : report_mode

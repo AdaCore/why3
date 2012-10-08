@@ -203,7 +203,7 @@ let normal_handle_one_subp subp =
       Gnat_objectives.clear ()
    end
 
-let all_splitted_subp subp =
+let all_split_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
       Gnat_objectives.init_subp_vcs subp;
       Gnat_objectives.iter_leaf_goals ~subp register_goal;
@@ -222,8 +222,8 @@ let _ =
       | Gnat_config.Normal ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
          Gnat_objectives.save_session ()
-      | Gnat_config.All_Splitted ->
-         Gnat_objectives.iter_subps all_splitted_subp
+      | Gnat_config.All_Split ->
+         Gnat_objectives.iter_subps all_split_subp
       | Gnat_config.No_WP ->
          (* we should never get here *)
          ()
