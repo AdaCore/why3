@@ -745,12 +745,32 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         mais on n'a
              (forall x, true) -> (forall  x, x=42)
   *)
+(*
   axiom abstract_effects_monotonic :
      forall s:stmt, p q:fmla.
         valid_fmla (Fimplies p q) ->
         forall sigma:env, pi:stack.
            eval_fmla sigma pi (abstract_effects s p) ->
            eval_fmla sigma pi (abstract_effects s q)
+*)
+(*
+  axiom abstract_effects_monotonic :
+     forall s:stmt, p:fmla.
+        valid_fmla p -> valid_fmla (abstract_effects s p)
+*)
+
+  axiom abstract_effects_monotonic_2 :
+     forall s:stmt, p q:fmla.
+        valid_fmla (Fimplies p q) ->
+        forall sigma:env, pi:stack.
+           eval_fmla sigma pi (abstract_effects s p) ->
+           eval_fmla sigma pi (abstract_effects s q)
+
+  axiom abstract_effects_distrib_conj :
+     forall s:stmt, p q:fmla, sigma:env, pi:stack.
+       eval_fmla sigma pi (abstract_effects s p) /\
+       eval_fmla sigma pi (abstract_effects s q) ->
+         eval_fmla sigma pi (abstract_effects s (Fand p q))
 
   function wp (s:stmt) (q:fmla) : fmla =
     match s with

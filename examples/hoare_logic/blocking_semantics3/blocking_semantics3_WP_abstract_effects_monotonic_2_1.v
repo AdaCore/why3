@@ -696,75 +696,13 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
 Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla),
   (valid_fmla p) -> (valid_fmla (abstract_effects s p)).
 
-Axiom abstract_effects_monotonic_2 : forall (s:stmt) (p:fmla) (q:fmla),
+(* Why3 goal *)
+Theorem abstract_effects_monotonic_2 : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
   (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
   (eval_fmla sigma pi (abstract_effects s q)).
+intros s p q h1 sigma pi h2.
 
-Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
-  (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
-  (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
-  q))).
-
-(* Why3 assumption *)
-Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
-  match s with
-  | Sskip => q
-  | (Sassert f) => (Fand f (Fimplies f q))
-  | (Sseq s1 s2) => (wp s1 (wp s2 q))
-  | (Sassign x t) => let id := (fresh_from q) in (Flet id t (msubst q x id))
-  | (Sif t s1 s2) => (Fand (Fimplies (Fterm t) (wp s1 q))
-      (Fimplies (Fnot (Fterm t)) (wp s2 q)))
-  | (Swhile cond inv body) => (Fand inv (abstract_effects body
-      (Fand (Fimplies (Fand (Fterm cond) inv) (wp body inv))
-      (Fimplies (Fand (Fnot (Fterm cond)) inv) q))))
-  end.
-
-Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (s:stmt) (q:fmla), (eval_fmla sigma pi
-  (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
-  q))).
-
-Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
-
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
-
-(* Why3 goal *)
-Theorem distrib_conj : forall (s:stmt),
-  match s with
-  | Sskip => True
-  | (Sassign m t) => True
-  | (Sseq s1 s2) => True
-  | (Sif t s1 s2) => True
-  | (Sassert f) => True
-  | (Swhile t f s1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s1 p)) /\
-      (eval_fmla sigma pi (wp s1 q))) -> (eval_fmla sigma pi (wp s1 (Fand p
-      q)))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
-      (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p
-      q)))
-  end.
-destruct s; auto.
-simpl.
-intros H sigma pi p q (H0 & H1).
-destruct H0.
-destruct H1; clear H1.
-split; auto.
-
-
-apply abstract_effects_monotonic_2 with (p:=
-(Fand (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
-             (Fimplies (Fand (Fnot (Fterm t)) f) p))
-  (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
-             (Fimplies (Fand (Fnot (Fterm t)) f) q))))
-.
-unfold valid_fmla; simpl.
-intuition.
-apply abstract_effects_distrib_conj; auto.
 Qed.
 
 

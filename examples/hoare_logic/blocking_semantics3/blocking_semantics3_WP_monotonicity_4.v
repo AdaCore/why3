@@ -693,7 +693,10 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla),
+  (valid_fmla p) -> (valid_fmla (abstract_effects s p)).
+
+Axiom abstract_effects_monotonic_2 : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
   (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
   (eval_fmla sigma pi (abstract_effects s q)).
@@ -734,14 +737,13 @@ Theorem monotonicity : forall (s:stmt),
       (wp s q)))
   end.
 destruct s; auto.
+unfold valid_fmla.
 simpl.
 intros H1 p q H2.
-red; simpl.
 intuition.
-apply abstract_effects_monotonic with (2:=H3).
-red in H2.
-simpl in H2.
-ae.
+apply abstract_effects_monotonic_2 with (2:=H3).
+unfold valid_fmla; simpl.
+intuition.
 Qed.
 
 
