@@ -337,51 +337,16 @@ Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
       pi inv) -> ((type_term sigma pi guard TYbool) -> ((type_stmt sigma pi
       body) -> (type_stmt sigma pi (Swhile guard inv body)))).
 
-Axiom type_inversion : forall (v:value),
+Require Import Why3.
+
+(* Why3 goal *)
+Theorem type_inversion : forall (v:value),
   match (type_value v) with
   | TYbool => exists b:bool, (v = (Vbool b))
   | TYint => exists n:Z, (v = (Vint n))
   | TYunit => (v = Vvoid)
   end.
-
-(* Why3 assumption *)
-Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
-  datatype)) (pi:(list (ident* value)%type)) (pit:(list (ident*
-  datatype)%type)): Prop := (forall (id:mident), ((type_value (get sigma
-  id)) = (get sigmat id))) /\ forall (id:ident), ((type_value (get_stack id
-  pi)) = (get_vartype id pit)).
-
-Require Import Why3.
-
-Ltac ae := why3 "alt-ergo" timelimit 3.
-
-(* Why3 goal *)
-Theorem eval_type_term : forall (t:term),
-  match t with
-  | (Tvalue v) => True
-  | (Tvar i) => True
-  | (Tderef m) => True
-  | (Tbin t1 o t2) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
-      ((type_term sigmat pit t2 ty) -> ((type_value (eval_term sigma pi
-      t2)) = ty))) -> ((forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
-      ((type_term sigmat pit t1 ty) -> ((type_value (eval_term sigma pi
-      t1)) = ty))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-      datatype)%type)) (ty:datatype), (compatible_env sigma sigmat pi pit) ->
-      ((type_term sigmat pit t ty) -> ((type_value (eval_term sigma pi
-      t)) = ty)))
-  end.
-destruct t; auto.
-simpl.
-intros.
-inversion H2; subst; clear H2.
-generalize (type_inversion (eval_term sigma pi t1)).
-generalize (type_inversion (eval_term sigma pi t2)).
-destruct H11; ae.
+destruct v; why3 "alt-ergo" timelimit 5.
 Qed.
 
 

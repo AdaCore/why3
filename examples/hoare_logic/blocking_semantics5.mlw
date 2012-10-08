@@ -392,6 +392,7 @@ theory TypingAndSemantics
 use import SemOp
 use import Typing
 
+(*
 inductive compatible datatype value =
     | Compatible_bool : 
 	forall b: bool. compatible TYbool (Vbool b)
@@ -400,23 +401,23 @@ inductive compatible datatype value =
     | Compatible_void : 
 	compatible TYunit Vvoid
 
-predicate existe_compatible (ty:datatype) (v:value) =
-   match ty with
+*)
+
+lemma type_inversion : forall v:value.
+   match (type_value v) with
     | TYbool -> exists b: bool. v = Vbool b
     | TYint -> exists n: int. v = Vint n
     | TYunit -> v = Vvoid
-end 
+  end
 
-predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) = 
- (forall id: mident. compatible (get_reftype id sigmat) (IdMap.get sigma id)) /\
-   (forall id: ident. compatible (get_vartype id pit) (get_stack id pi))
+predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) =
+  (forall id: mident. type_value (IdMap.get sigma id) = get_reftype id sigmat) /\
+  (forall id: ident. type_value (get_stack id pi) = get_vartype id pit)
 
 lemma eval_type_term:
   forall t:term, sigma:env, pi:stack, sigmat:type_env, pit:type_stack, ty:datatype.
     compatible_env sigma sigmat pi pit ->
-    type_term sigmat pit t ty -> existe_compatible ty (eval_term sigma pi t)
-
-
+    type_term sigmat pit t ty -> type_value (eval_term sigma pi t) = ty
 
 lemma type_preservation :
   forall s1 s2:stmt, sigma1 sigma2:env, pi1 pi2:stack,
