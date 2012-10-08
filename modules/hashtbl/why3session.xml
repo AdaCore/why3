@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "/home/jcf/why3/share/why3session.dtd">
+<why3session
+ name="hashtbl/why3session.xml" shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../hashtbl.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="Hashtbl"
+   locfile="hashtbl/../hashtbl.mlw"
+   loclnum="10" loccnumb="7" loccnume="14"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="TestHashtbl"
+   locfile="hashtbl/../hashtbl.mlw"
+   loclnum="82" loccnumb="7" loccnume="18"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter test1"
+    locfile="hashtbl/../hashtbl.mlw"
+    loclnum="93" loccnumb="6" loccnume="11"
+    expl="parameter test1"
+    sum="7bb3eacf0666171d5628a8208bee658e"
+    proved="true"
+    expanded="true"
+    shape="ainfix =agetV4ak1aConsaTrueaConsaTrueaNilIainfix =agetV4V5agetV3V5Iainfix =V5ak1NFAainfix =agetV4ak1aConsaTrueCagetV3ak1aNilaNilaConswVV6FAainfix =agetV3ak1aConsaFalseaConsaTrueaNilIainfix =agetV3V7agetV1V7Iainfix =V7ak1NFAainfix =agetV3ak1aConsaFalseagetV1ak1FAainfix =V2aTrueICagetV1ak1aNilfaConsVwainfix =V2V8FAainfix =agetV1ak1aNilNAainfix =agetV1ak2aNilAainfix =agetV1ak1aConsaTrueaNilIainfix =agetV1V9agetV0V9Iainfix =V9ak1NFAainfix =agetV1ak1aConsaTrueagetV0ak1FIainfix =agetV0V10aNilFF">
+    <label
+     name="expl:parameter test1"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="HashtblImpl"
+   locfile="hashtbl/../hashtbl.mlw"
+   loclnum="107" loccnumb="7" loccnume="18"
+   verified="true"
+   expanded="true">
+   <goal
+    name="bucket_bounds"
+    locfile="hashtbl/../hashtbl.mlw"
+    loclnum="123" loccnumb="8" loccnume="21"
+    sum="663627d464dd5ae9ae1169da6fd8ce8c"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;abucketV1V0V0Aainfix &lt;=c0abucketV1V0FIainfix &lt;c0V0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter create"
+    locfile="hashtbl/../hashtbl.mlw"
+    loclnum="142" loccnumb="6" loccnume="12"
+    expl="parameter create"
+    sum="af719481d48a64df06b4d55b25432d10"
+    proved="true"
+    expanded="true"
+    shape="ainfix =abucketV2V0V1IamemaTuple2V2V3agetaconstaNilV1FIainfix &lt;V1V0Aainfix &lt;=c0V1FAainfix &lt;c0V0Aainfix =amixfix []amk tc0amk arrayV0aconstaNilV4aNilFAainfix &gt;=V0c0Iainfix &lt;=c1V0F">
+    <label
+     name="expl:parameter create"/>
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter clear"
+    locfile="hashtbl/../hashtbl.mlw"
+    loclnum="147" loccnumb="6" loccnume="11"
+    expl="parameter clear"
+    sum="013950db2acf096e3daef24d65109e16"
+    proved="true"
+    expanded="true"
+    shape="ainfix =abucketV5V0V4IamemaTuple2V5V6agetV3V4FIainfix &lt;V4V0Aainfix &lt;=c0V4FAainfix &lt;c0V0Aainfix =amixfix []amk tV2amk arrayV0V3V7aNilFIainfix =agetV3V8aNilIainfix &lt;V8ainfix +c0V0Aainfix &lt;=c0V8FAainfix =agetV3V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=ainfix +c0V0V9Oainfix &lt;V9c0Aainfix &lt;=c0V9FFAainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V2c0FIainfix =abucketV11V0V10IamemaTuple2V11V12agetV1V10FIainfix &lt;V10V0Aainfix &lt;=c0V10FAainfix &lt;c0V0F">
+    <label
+     name="expl:parameter clear"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.17"/>
+    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter clear.1"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="147" loccnumb="6" loccnume="11"
+      expl="precondition"
+      sum="4336753fa2549741b1c1e5cd23301c6c"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V2c0FIainfix =abucketV4V0V3IamemaTuple2V4V5agetV1V3FIainfix &lt;V3V0Aainfix &lt;=c0V3FAainfix &lt;c0V0F">
+      <label
+       name="expl:parameter clear"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter clear.2"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="147" loccnumb="6" loccnume="11"
+      expl="postcondition"
+      sum="2d11aa5223aadf2f629ec58732d25369"
+      proved="true"
+      expanded="true"
+      shape="ainfix =amixfix []amk tV2amk arrayV0V3V4aNilFIainfix =agetV3V5aNilIainfix &lt;V5ainfix +c0V0Aainfix &lt;=c0V5FAainfix =agetV3V6agetV1V6Iainfix &lt;V6V0Aainfix &lt;=ainfix +c0V0V6Oainfix &lt;V6c0Aainfix &lt;=c0V6FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V2c0FIainfix =abucketV8V0V7IamemaTuple2V8V9agetV1V7FIainfix &lt;V7V0Aainfix &lt;=c0V7FAainfix &lt;c0V0F">
+      <label
+       name="expl:parameter clear"/>
+      <proof
+       prover="3"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.16"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter clear.2.1"
+        locfile="hashtbl/../hashtbl.mlw"
+        loclnum="147" loccnumb="6" loccnume="11"
+        expl="postcondition"
+        sum="154d3b99403ef1561aaae4945b8a963c"
+        proved="true"
+        expanded="true"
+        shape="ainfix =aextractV4agetadataamk tV2amk arrayV0V3abucketV4alengthadataamk tV2amk arrayV0V3aNilFIainfix =agetV3V5aNilIainfix &lt;V5ainfix +c0V0Aainfix =c0V5Oainfix &lt;c0V5FAainfix =agetV3V6agetV1V6Iainfix &lt;V6V0Aainfix =ainfix +c0V0V6Oainfix &lt;ainfix +c0V0V6Oainfix &lt;V6c0Aainfix =c0V6Oainfix &lt;c0V6FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V2c0FIainfix =amodahashV8V0V7IamemaTuple2V8V9agetV1V7FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix &lt;c0V0F">
+        <label
+         name="expl:parameter clear"/>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter clear.3"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="147" loccnumb="6" loccnume="11"
+      expl="type invariant"
+      sum="414c3f4c4aa4f98d243699c0f81ac77d"
+      proved="true"
+      expanded="true"
+      shape="ainfix =abucketV5V0V4IamemaTuple2V5V6agetV3V4FIainfix &lt;V4V0Aainfix &lt;=c0V4FAainfix &lt;c0V0Iainfix =amixfix []amk tV2amk arrayV0V3V7aNilFIainfix =agetV3V8aNilIainfix &lt;V8ainfix +c0V0Aainfix &lt;=c0V8FAainfix =agetV3V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=ainfix +c0V0V9Oainfix &lt;V9c0Aainfix &lt;=c0V9FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V2c0FIainfix =abucketV11V0V10IamemaTuple2V11V12agetV1V10FIainfix &lt;V10V0Aainfix &lt;=c0V10FAainfix &lt;c0V0F">
+      <label
+       name="expl:parameter clear"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="extract_neq"
+    locfile="hashtbl/../hashtbl.mlw"
+    loclnum="153" loccnumb="8" loccnume="19"
+    sum="77dbd172f1d2f0371956f771911a39c7"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aextractV1V3aextractV1aConsaTuple2V0V2V3Iainfix =V0V1NF">
+    <transf
+     name="induction_ty_lex"
+     proved="true"
+     expanded="true">
+     <goal
+      name="extract_neq.0"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="153" loccnumb="8" loccnume="19"
+      sum="28ecf0f2b3633b806af900b01bd8b147"
+      proved="true"
+      expanded="false"
+      shape="CV3aNilainfix =aextractV1V3aextractV1aConsaTuple2V0V2V3Iainfix =V0V1NaConsVVainfix =aextractV1V3aextractV1aConsaTuple2V0V2V3Iainfix =V0V1NIainfix =aextractV1V5aextractV1aConsaTuple2V0V2V5Iainfix =V0V1NF">
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="extract_neq.0.0"
+        locfile="hashtbl/../hashtbl.mlw"
+        loclnum="153" loccnumb="8" loccnume="19"
+        sum="f3508fa3353c7657fc864148fb846efe"
+        proved="true"
+        expanded="false"
+        shape="CV3aNilainfix =aextractV1V3aextractV1aConsaTuple2V0V2V3Iainfix =V0V1NaConsVVtF">
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="extract_neq.0.1"
+        locfile="hashtbl/../hashtbl.mlw"
+        loclnum="153" loccnumb="8" loccnume="19"
+        sum="0f7e364f46870d9cf69105ad74323fe3"
+        proved="true"
+        expanded="false"
+        shape="CV3aNiltaConsVVainfix =aextractV1V3aextractV1aConsaTuple2V0V2V3Iainfix =V0V1NIainfix =aextractV1V5aextractV1aConsaTuple2V0V2V5Iainfix =V0V1NF">
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter add"
+    locfile="hashtbl/../hashtbl.mlw"
+    loclnum="157" loccnumb="6" loccnume="9"
+    expl="parameter add"
+    sum="9dce629bd70a9a7aa9b392eb039ec455"
+    proved="true"
+    expanded="true"
+    shape="ainfix =abucketV9V2V8IamemaTuple2V9V10agetV6V8FIainfix &lt;V8V2Aainfix &lt;=c0V8FAainfix &lt;c0V2Aainfix =amixfix []V7V11amixfix []V5V11Iainfix =V11V0NFAainfix =amixfix []V7V0aConsV1amixfix []V5V0Iainfix =V6asetV3abucketV0V2aConsaTuple2V0V1agetV3abucketV0V2Lamk tV4amk arrayV2V6FAainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Aainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV13V2V12IamemaTuple2V13V14agetV3V12FIainfix &lt;V12V2Aainfix &lt;=c0V12FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+    <label
+     name="expl:parameter add"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter add.1"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="157" loccnumb="6" loccnume="9"
+      expl="precondition"
+      sum="4a2097f21c7a8f40118fc4fe6cb3feb3"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV7V2V6IamemaTuple2V7V8agetV3V6FIainfix &lt;V6V2Aainfix &lt;=c0V6FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+      <label
+       name="expl:parameter add"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.2"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="157" loccnumb="6" loccnume="9"
+      expl="precondition"
+      sum="6800385158ce2dbcf1d48b7bd8d06c37"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV7V2V6IamemaTuple2V7V8agetV3V6FIainfix &lt;V6V2Aainfix &lt;=c0V6FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+      <label
+       name="expl:parameter add"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.3"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="157" loccnumb="6" loccnume="9"
+      expl="postcondition"
+      sum="21d92b6140ba66469f349b50b460d1c6"
+      proved="true"
+      expanded="true"
+      shape="ainfix =amixfix []V7V8amixfix []V5V8Iainfix =V8V0NFAainfix =amixfix []V7V0aConsV1amixfix []V5V0Iainfix =V6asetV3abucketV0V2aConsaTuple2V0V1agetV3abucketV0V2Lamk tV4amk arrayV2V6FIainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV10V2V9IamemaTuple2V10V11agetV3V9FIainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+      <label
+       name="expl:parameter add"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter add.3.1"
+        locfile="hashtbl/../hashtbl.mlw"
+        loclnum="157" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="d5ce7514cfd7c58983b443ff335e4a5b"
+        proved="true"
+        expanded="false"
+        shape="ainfix =amixfix []V7V0aConsV1amixfix []V5V0Iainfix =V6asetV3abucketV0V2aConsaTuple2V0V1agetV3abucketV0V2Lamk tV4amk arrayV2V6FIainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV9V2V8IamemaTuple2V9V10agetV3V8FIainfix &lt;V8V2Aainfix &lt;=c0V8FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+        <label
+         name="expl:parameter add"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter add.3.2"
+        locfile="hashtbl/../hashtbl.mlw"
+        loclnum="157" loccnumb="6" loccnume="9"
+        expl="parameter add"
+        sum="839d5c8212ffc6720b01b0a7200e73bb"
+        proved="true"
+        expanded="false"
+        shape="ainfix =amixfix []V7V8amixfix []V5V8Iainfix =V8V0NFIainfix =V6asetV3abucketV0V2aConsaTuple2V0V1agetV3abucketV0V2Lamk tV4amk arrayV2V6FIainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV10V2V9IamemaTuple2V10V11agetV3V9FIainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+        <label
+         name="expl:parameter add"/>
+        <proof
+         prover="4"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter add.4"
+      locfile="hashtbl/../hashtbl.mlw"
+      loclnum="157" loccnumb="6" loccnume="9"
+      expl="type invariant"
+      sum="ba06e5ded3dd47ade3cd150f46b656c8"
+      proved="true"
+      expanded="true"
+      shape="ainfix =abucketV9V2V8IamemaTuple2V9V10agetV6V8FIainfix &lt;V8V2Aainfix &lt;=c0V8FAainfix &lt;c0V2Iainfix =amixfix []V7V11amixfix []V5V11Iainfix =V11V0NFAainfix =amixfix []V7V0aConsV1amixfix []V5V0Iainfix =V6asetV3abucketV0V2aConsaTuple2V0V1agetV3abucketV0V2Lamk tV4amk arrayV2V6FIainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix &lt;abucketV0V2V2Aainfix &lt;=c0abucketV0V2Iainfix =abucketV13V2V12IamemaTuple2V13V14agetV3V12FIainfix &lt;V12V2Aainfix &lt;=c0V12FAainfix &lt;c0V2Lamk tV4amk arrayV2V3FF">
+      <label
+       name="expl:parameter add"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
