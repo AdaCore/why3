@@ -29,7 +29,7 @@ lemma mident_decide :
 
 (** ident for immutable variables *)
 type ident = {| ident_index : int |}
- 
+
 lemma ident_decide :
   forall m1 m2: ident. m1 = m2 \/ m1 <> m2
 
@@ -198,7 +198,7 @@ inductive type_stmt type_env type_stack stmt =
 	type_fmla sigma pi inv ->
         type_term sigma pi guard TYbool ->
         type_stmt sigma pi body ->
-        type_stmt sigma pi (Swhile guard inv body) 
+        type_stmt sigma pi (Swhile guard inv body)
 
 (** Operational semantic *)
 type env = IdMap.map mident value  (* map global mutable variables to their value *)
@@ -243,11 +243,11 @@ function eval_term (sigma:env) (pi:stack) (t:term) : value =
 end
 
 inductive compatible datatype value =
-    | Compatible_bool : 
+    | Compatible_bool :
 	forall b: bool. compatible TYbool (Vbool b)
-    | Compatible_int : 
+    | Compatible_int :
 	forall n: int. compatible TYint (Vint n)
-    | Compatible_void : 
+    | Compatible_void :
 	compatible TYunit Vvoid
 
 predicate existe_compatible (ty:datatype) (v:value) =
@@ -255,9 +255,9 @@ predicate existe_compatible (ty:datatype) (v:value) =
     | TYbool -> exists b: bool. v = Vbool b
     | TYint -> exists n: int. v = Vint n
     | TYunit -> v = Vvoid
-end 
+end
 
-predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) = 
+predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) =
  (forall id: mident. compatible (get_reftype id sigmat) (IdMap.get sigma id)) /\
    (forall id: ident. compatible (get_vartype id pit) (get_stack id pi))
 
@@ -292,7 +292,7 @@ function msubst_term (t:term) (r:mident) (v:ident) : term =
   | Tvalue _ | Tvar _  -> t
   | Tderef x -> if r = x then mk_tvar v else t
   | Tbin t1 op t2  ->
-      mk_tbin (msubst_term t1 r v) op (msubst_term t2 r v) 
+      mk_tbin (msubst_term t1 r v) op (msubst_term t2 r v)
   end
 
 function subst_term (t:term) (r:ident) (v:ident) : term =
@@ -312,7 +312,7 @@ lemma fresh_in_binop:
   forall t t':term, op:operator, v:ident.
     fresh_in_term v (mk_tbin t op t') ->
       fresh_in_term v t  /\ fresh_in_term v t'
- 
+
 (* lemma eval_subst_term: *)
 (*   forall sigma:env, pi:stack, e:term, x:ident, v:ident. *)
 (*     fresh_in_term v e -> *)
@@ -714,19 +714,43 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
   axiom fresh_from_fmla: forall f:fmla.
      fresh_in_fmla (fresh_from f) f
 
+  (* intention:
+       abstract_effects s f = "forall w. f"
+     avec w = writes(s)
+  *)
   function abstract_effects (s:stmt) (f:fmla) : fmla
 
+  (* hypothese 1: si
+       sigma, pi |= forall w. f
+     alors
+       sigma, pi |= f
+  *)
   axiom abstract_effects_generalize :
      forall sigma:env, pi:stack, s:stmt, f:fmla.
         eval_fmla sigma pi (abstract_effects s f) ->
         eval_fmla sigma pi f
 
+  (* hypothese 2: si
+       |= p -> q
+     alors
+       |= (forall w, p) -> (forall w, q)
+
+     remarque : il est essentiel de parler de validité dans tous les etats:
+     on n'a pas
+       sigma,pi |= p -> q
+     implique
+       sigma,pi |= (forall w, p) -> (forall w, q)
+
+     contre-exemple: sigma(x) = 42 alors true -> x=42
+        mais on n'a
+             (forall x, true) -> (forall  x, x=42)
+  *)
   axiom abstract_effects_monotonic :
      forall s:stmt, p q:fmla.
         valid_fmla (Fimplies p q) ->
         forall sigma:env, pi:stack.
            eval_fmla sigma pi (abstract_effects s p) ->
-           eval_fmla sigma pi (abstract_effects s q) 
+           eval_fmla sigma pi (abstract_effects s q)
 
   function wp (s:stmt) (q:fmla) : fmla =
     match s with
@@ -750,6 +774,9 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
     end
 
+  (* hypothese 3: invariance de la formule "forall w. f"
+     par les effets de s si w = writes s
+  *)
   axiom abstract_effects_writes :
      forall sigma:env, pi:stack, s:stmt, q:fmla.
         eval_fmla sigma pi (abstract_effects s q) ->
@@ -765,11 +792,22 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
       valid_fmla (Fimplies p q)
      ->	valid_fmla (Fimplies (wp s p) (wp s q) )
 
+  (* remarque l'ordre des quantifications est essentiel, on n'a pas
+       sigma,pi |= p -> q
+     implique
+       sigma,pi |= (wp s p) -> (wp s q)
+
+     meme contre-exemple: sigma(x) = 42 alors true -> x=42
+        mais 
+          wp (x := 7) true = true
+          wp (x := 7) x=42 = 7=42
+  *)
+
   lemma distrib_conj:
     forall s:stmt, sigma:env, pi:stack, p q:fmla.
      (eval_fmla sigma pi (wp s p)) /\
      (eval_fmla sigma pi (wp s q)) ->
-     eval_fmla sigma pi (wp s (Fand p q)) 
+     eval_fmla sigma pi (wp s (Fand p q))
 
   lemma wp_reduction:
     forall sigma sigma':env, pi pi':stack, s s':stmt.
@@ -805,7 +843,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
   (** {3 main soundness result} *)
 
   lemma wp_soundness:
-    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt, 
+    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt,
            sigmat: type_env, pit: type_stack, q:fmla.
       compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->
