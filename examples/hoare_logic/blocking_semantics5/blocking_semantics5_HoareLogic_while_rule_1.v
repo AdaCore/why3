@@ -202,14 +202,14 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
-      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
-      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), ((eval_fmla sigma pi
+      inv) /\ ((eval_term sigma pi cond) = (Vbool true))) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body)))
   | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
-      sigma pi Sskip)).
+      ((eval_fmla sigma pi inv) /\ ((eval_term sigma pi
+      cond) = (Vbool false))) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip).
 
 (* Why3 assumption *)
 Inductive many_steps : (map mident value) -> (list (ident* value)%type)
@@ -421,6 +421,7 @@ apply Z_lt_induction
 intros.
 inversion H1; subst; clear H1.
 inversion H2; subst; clear H2.
+destruct H11 as (H4 & H5).
 (* case cond true *)
 generalize (many_steps_seq _ _ _ _ _ _ _ H3).
 intros (s3 & p3 & n1 & n2 & h1 & h2 & h3).
@@ -431,7 +432,9 @@ now (auto with zarith).
 apply Hinv_preserved with (2:=h1); simpl; auto.
 (* case cond false *)
 inversion H3; subst.
-simpl; rewrite H12; intuition.
+destruct H11 as (H4 & H5).
+simpl; rewrite H5; intuition.
 discriminate.
 now inversion H1.
 Qed.
+
