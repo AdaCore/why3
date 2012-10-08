@@ -646,6 +646,19 @@ fresh_in_fmla (fresh_from f) f
         eval_fmla sigma pi f
 
   (* hypothese 2: si
+       sigma, pi |= (forall w, p) /\ (forall w, q)
+     alors
+       sigma, pi |= forall w, (f /\ q)
+  *)
+(*
+  axiom abstract_effects_distrib_conj :
+     forall s:stmt, p q:fmla, sigma:env, pi:stack.
+       eval_fmla sigma pi (abstract_effects s p) /\
+       eval_fmla sigma pi (abstract_effects s q) ->
+         eval_fmla sigma pi (abstract_effects s (Fand p q))
+*)
+
+  (* hypothese 3: si
        |= p -> q
      alors
        |= (forall w, p) -> (forall w, q)
@@ -667,12 +680,6 @@ fresh_in_fmla (fresh_from f) f
         forall sigma:env, pi:stack.
            eval_fmla sigma pi (abstract_effects s p) ->
            eval_fmla sigma pi (abstract_effects s q)
-
-  axiom abstract_effects_distrib_conj :
-     forall s:stmt, p q:fmla, sigma:env, pi:stack.
-       eval_fmla sigma pi (abstract_effects s p) /\
-       eval_fmla sigma pi (abstract_effects s q) ->
-         eval_fmla sigma pi (abstract_effects s (Fand p q))
 
 function wp (s:stmt) (q:fmla) : fmla =
     match s with
@@ -723,7 +730,7 @@ function wp (s:stmt) (q:fmla) : fmla =
      (eval_fmla sigma pi (wp s q)) ->
      eval_fmla sigma pi (wp s (Fand p q)) 
 
-  lemma wp_reduction:
+  lemma wp_preserved_by_reduction:
     forall sigma sigma':env, pi pi':stack, s s':stmt.
     one_step sigma pi s sigma' pi' s' ->
     forall q:fmla.

@@ -554,6 +554,14 @@ Axiom many_steps_seq : forall (sigma1:(map mident value)) (sigma3:(map mident
   pi2 Sskip n1) /\ ((many_steps sigma2 pi2 s2 sigma3 pi3 Sskip n2) /\
   (n = ((1%Z + n1)%Z + n2)%Z)).
 
+Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
+  value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
+  (pi2:(list (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)), ((type_stmt sigmat pit s1) /\
+  ((compatible_env sigma1 sigmat pi1 pit) /\ (one_step sigma1 pi1 s1 sigma2
+  pi2 s2))) -> ((type_stmt sigmat pit s2) /\ (compatible_env sigma2 sigmat
+  pi2 pit)).
+
 (* Why3 assumption *)
 Definition valid_triple(p:fmla) (s:stmt) (q:fmla): Prop := forall (sigma:(map
   mident value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
@@ -675,13 +683,9 @@ Fixpoint stmt_writes(s:stmt) (w:(set1 mident)) {struct s}: Prop :=
   | (Swhile _ _ body) => (stmt_writes body w)
   end.
 
-Parameter fresh_from: fmla -> stmt -> ident.
+Parameter fresh_from: fmla -> ident.
 
-Axiom fresh_from_fmla : forall (s:stmt) (f:fmla),
-  (fresh_in_fmla (fresh_from f s) f).
-
-Axiom fresh_from_stmt : forall (s:stmt) (f:fmla),
-  (fresh_in_stmt (fresh_from f s) s).
+Axiom fresh_from_fmla : forall (f:fmla), (fresh_in_fmla (fresh_from f) f).
 
 Parameter abstract_effects: stmt -> fmla -> fmla.
 
@@ -689,10 +693,16 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
-  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
+Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
+  (sigma:(map mident value)) (pi:(list (ident* value)%type)),
+  ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
+  (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
+  q))).
+
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
+  (eval_fmla sigma pi (abstract_effects s q)).
 
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
@@ -700,8 +710,7 @@ Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
   | Sskip => q
   | (Sassert f) => (Fand f (Fimplies f q))
   | (Sseq s1 s2) => (wp s1 (wp s2 q))
-  | (Sassign x t) => let id := (fresh_from q s) in (Flet id t (msubst q x
-      id))
+  | (Sassign x t) => let id := (fresh_from q) in (Flet id t (msubst q x id))
   | (Sif t s1 s2) => (Fand (Fimplies (Fterm t) (wp s1 q))
       (Fimplies (Fnot (Fterm t)) (wp s2 q)))
   | (Swhile cond inv body) => (Fand inv (abstract_effects body
@@ -720,6 +729,8 @@ Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
 Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
   (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
+
+Require Import Why3.
 
 (* Why3 goal *)
 Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
@@ -744,8 +755,11 @@ destruct s; auto.
 simpl.
 intros H1 H2 s H q H3.
 inversion H; subst; auto.
+why3 "alt-ergo" timelimit 5.
+(*
 simpl.
 apply H2; auto.
+*)
 Qed.
 
 

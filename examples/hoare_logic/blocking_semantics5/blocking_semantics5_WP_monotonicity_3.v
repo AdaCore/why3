@@ -230,7 +230,7 @@ Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
   (0%Z <= n)%Z.
 
 (* Why3 assumption *)
-Definition reducible(sigma:(map mident value)) (pi:(list (ident*
+Definition reductible(sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
   exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
   sigma' pi' s').
@@ -540,10 +540,8 @@ Theorem monotonicity : forall (s:stmt),
       (wp s q)))
   end.
 destruct s; auto.
-unfold valid_fmla.
-simpl.
-intros H1 p q H2.
-intuition.
+unfold valid_fmla; simpl.
+intros H1 p q H2; intuition.
 apply abstract_effects_monotonic with (2:=H3).
 unfold valid_fmla; simpl.
 intuition.

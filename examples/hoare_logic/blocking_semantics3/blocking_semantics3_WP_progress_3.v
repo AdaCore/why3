@@ -693,16 +693,17 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
-  (eval_fmla sigma pi (abstract_effects s q)).
-
 Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
   (sigma:(map mident value)) (pi:(list (ident* value)%type)),
   ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
   (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
   q))).
+
+
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
+  (eval_fmla sigma pi (abstract_effects s q)).
 
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=

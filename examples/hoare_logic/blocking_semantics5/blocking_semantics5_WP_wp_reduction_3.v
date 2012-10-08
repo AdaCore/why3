@@ -529,6 +529,10 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
 Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
+(* Why3 
 Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
   (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
