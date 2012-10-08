@@ -565,7 +565,9 @@ unfold reductible.
 apply eval_type_term with (sigma := sigma) (pi := pi) in H11 ; auto.
 assert (eval_term sigma pi t = Vbool true \/ 
         eval_term sigma pi t = Vbool false).
-admit.
+generalize (type_inversion (eval_term sigma pi t)).
+destruct (eval_term sigma pi t); simpl;  try discriminate.
+destruct b; auto.
 destruct H0.
 do 3 eexists.
 apply one_step_while_true; auto.
