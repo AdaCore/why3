@@ -171,16 +171,22 @@ let next objective =
       None
 
 let is_full_split_goal goal =
+   (* check whether the goal has been obtained by split_conj transformation *)
    match goal.Session.goal_parent with
    | Session.Parent_transf t ->
          t.Session.transf_name = Gnat_split_conj.split_conj_name
    | _ -> false
 
 let is_already_split goal =
+   (* check whether the goal has already been split by split_conj *)
    Session.PHstr.mem goal.Session.goal_transformations
       Gnat_split_conj.split_conj_name
 
 let get_split_goals goal =
+   (* apply the split_conj transformation, if not already done;
+      return the goals that have been obtained through this transformation;
+      if not more than one new goal is obtained this way, the transformation is
+      removed, and the empty list is returned *)
       if is_already_split goal then
          let transf =
             Session.PHstr.find goal.Session.goal_transformations
@@ -424,8 +430,6 @@ let init () =
       env_session, is_new_session in
    my_session := Some env_session;
    if is_new_session || not (has_file env_session) then begin
-      (* This is a brand new session, simply apply the transformation
-         "split_goal" to the entire file *)
       ignore (M.add_file env_session
         (Sysutil.relativize_filename project_dir Gnat_config.filename));
    end
@@ -449,3 +453,75 @@ let matches_subp_filter subp =
          let goal_ident = (Task.task_goal task).Decl.pr_name in
          let label_set = goal_ident.Ident.id_label in
          Ident.Slab.mem lab label_set
+
+
+module Save_VCs = struct
+
+   let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
+
+   module GM = GoalMap
+
+   let goal_map : string GM.t = GM.create 17
+
+   let find expl =
+      try Gnat_expl.HExpl.find count_map expl
+      with Not_found ->
+         let r = ref 0 in
+         Gnat_expl.HExpl.add count_map expl r;
+         r
+
+   let vc_file goal =
+      GM.find goal_map goal
+
+   let with_fmt_channel filename f =
+      let cout = open_out filename in
+      let fmt  = Format.formatter_of_out_channel cout in
+      f fmt;
+      close_out cout
+
+   let vc_name expl =
+      let r = find expl in
+      incr r;
+      let n = !r in
+      let base = Gnat_expl.to_filename expl in
+      let suffix = ".why" in
+      if n = 1 then base ^ suffix
+      else base ^ "_" ^ string_of_int n ^ suffix
+
+   let save_vc goal =
+      let expl = get_objective goal in
+      let task = Session.goal_task goal in
+      let dr = Gnat_config.prover_driver in
+      let vc_fn = vc_name expl in
+      GM.add goal_map goal vc_fn;
+      with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
+      Format.printf "saved VC to %s@." vc_fn
+
+   let save_trace goal =
+      let expl = get_objective goal in
+      let base = Gnat_expl.to_filename expl in
+      let trace_fn = base ^ ".trace" in
+      with_fmt_channel trace_fn (fun fmt ->
+         List.iter (fun l ->
+            Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
+           (Gnat_loc.orig_loc l)) (get_trace goal))
+
+end
+
+let all_split_leaf_goals () =
+   iter_leaf_goals (fun goal ->
+      let is_registered =
+         try ignore (get_objective goal); true
+         with Not_found -> false in
+      if is_registered then
+         if is_full_split_goal goal then begin Save_VCs.save_vc goal end
+         else begin
+            let new_goals = get_split_goals goal in
+            if new_goals = [] then begin Save_VCs.save_vc goal end
+            else begin
+               List.iter (add_clone goal) new_goals;
+               List.iter Save_VCs.save_vc new_goals
+            end;
+         end
+      else ()
+   )

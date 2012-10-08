@@ -150,3 +150,20 @@ val clear : unit -> unit
 
 val matches_subp_filter : subp -> bool
 (* check if the subprogram is filtered by command line option --limit-subp *)
+
+module Save_VCs : sig
+   (* Provide saving of VCs, traces *)
+
+   val save_vc : goal -> unit
+   (* Save the goal to a file *)
+
+   val save_trace : goal -> unit
+   (* save the trace to a file *)
+
+   val vc_file : goal -> string
+   (* get the file name for a given goal *)
+end
+
+val all_split_leaf_goals : unit -> unit
+(* special-purpose function for "all_splitted" mode (see gnat_config.mli),
+   where all splitted VCs are saved to disk, and no prover is called. *)

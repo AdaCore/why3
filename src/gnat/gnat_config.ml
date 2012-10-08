@@ -2,6 +2,8 @@ open Why3
 
 type report_mode = Fail | Verbose | Detailed
 
+type proof_mode = Normal | No_WP | All_Splitted
+
 let gnatprove_why3conf_file = "why3.conf"
 
 let opt_verbose = ref false
@@ -9,7 +11,7 @@ let opt_timeout = ref 1
 let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
-let opt_noproof = ref false
+let opt_proof_mode = ref Normal
 let opt_filename : string option ref = ref None
 let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
@@ -32,6 +34,16 @@ let set_report s =
    else if s <> "fail" then
       Gnat_util.abort_with_message
         "argument for option --report should be one of (fail|all|detailed)."
+
+let set_proof_mode s =
+   if s = "no_wp" then
+      opt_proof_mode := No_WP
+   else if s = "all_splitted" then
+      opt_proof_mode := All_Splitted
+   else if s <> "normal" then
+      Gnat_util.abort_with_message
+        "argument for option --proof should be one of\
+        (normal|no_wp|all_splitted)."
 
 let set_prover s =
    opt_prover := Some s
@@ -73,10 +85,11 @@ let options = Arg.align [
           " Rerun VC generation and proofs, even when the result is up to date";
    "--force", Arg.Set opt_force,
           " Rerun VC generation and proofs, even when the result is up to date";
-   "--no-proof", Arg.Set opt_noproof,
-          " Do not call the prover";
    "--report", Arg.String set_report,
           " Set report mode, one of (fail | all | detailed), default is fail";
+   "--proof", Arg.String set_proof_mode,
+          " Set proof mode, one of (normal | no_wp | all_splitted), default is\
+          normal";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given by \"file:line\"";
    "--limit-subp", Arg.String set_limit_subp,
@@ -160,9 +173,9 @@ let prover_driver : Driver.driver =
 let timeout = !opt_timeout
 let verbose = !opt_verbose
 let report  = !opt_report
+let proof_mode = !opt_proof_mode
 let debug = !opt_debug
 let force = !opt_force
-let noproof = !opt_noproof
 let split_name = "split_goal"
 let limit_line = !opt_limit_line
 
@@ -175,4 +188,4 @@ let ide_progress_bar = !opt_ide_progress_bar
 let parallel = !opt_parallel
 
 (* when not doing proof, stop after typing to avoid the exponential WP work *)
-let () = if noproof then Debug.set_flag Typing.debug_type_only
+let () = if proof_mode = No_WP then Debug.set_flag Typing.debug_type_only

@@ -101,71 +101,6 @@ let register_goal goal =
    | _, { expl = Some e ; trace = l } ->
          Gnat_objectives.add_to_objective e goal l
 
-module Save_VCs : sig
-   (* Provide saving of VCs, traces *)
-
-   val save_vc : Gnat_objectives.goal -> unit
-   (* Save the goal to a file *)
-
-   val save_trace : Gnat_objectives.goal -> unit
-   (* save the trace to a file *)
-
-   val vc_file : Gnat_objectives.goal -> string
-   (* get the file name for a given goal *)
-end = struct
-
-   let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
-
-   module GM = Gnat_objectives.GoalMap
-
-   let goal_map : string GM.t = GM.create 17
-
-   let find expl =
-      try Gnat_expl.HExpl.find count_map expl
-      with Not_found ->
-         let r = ref 0 in
-         Gnat_expl.HExpl.add count_map expl r;
-         r
-
-   let vc_file goal =
-      GM.find goal_map goal
-
-   let with_fmt_channel filename f =
-      let cout = open_out filename in
-      let fmt  = Format.formatter_of_out_channel cout in
-      f fmt;
-      close_out cout
-
-   let vc_name expl =
-      let r = find expl in
-      incr r;
-      let n = !r in
-      let base = Gnat_expl.to_filename expl in
-      let suffix = ".why" in
-      if n = 1 then base ^ suffix
-      else base ^ "_" ^ string_of_int n ^ suffix
-
-   let save_vc goal =
-      let expl = Gnat_objectives.get_objective goal in
-      let task = Session.goal_task goal in
-      let dr = Gnat_config.prover_driver in
-      let vc_fn = vc_name expl in
-      GM.add goal_map goal vc_fn;
-      with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
-      Format.printf "saved VC to %s@." vc_fn
-
-   let save_trace goal =
-      let expl = Gnat_objectives.get_objective goal in
-      let base = Gnat_expl.to_filename expl in
-      let trace_fn = base ^ ".trace" in
-      with_fmt_channel trace_fn (fun fmt ->
-         List.iter (fun l ->
-            Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
-           (Gnat_loc.orig_loc l))
-      (Gnat_objectives.get_trace goal))
-
-end
-
 let rec handle_vc_result goal result detailed =
    (* This function is called when the prover has returned from a VC.
        goal      is the VC that the prover has dealt with
@@ -193,7 +128,7 @@ let rec handle_vc_result goal result detailed =
             print false (Session.goal_task goal)
               (Gnat_objectives.get_objective goal)
          end;
-         Save_VCs.save_trace goal
+         Gnat_objectives.Save_VCs.save_trace goal
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
@@ -228,7 +163,7 @@ and schedule_goal (g : Gnat_objectives.goal) =
 
    (* first deal with command line options *)
    if Gnat_config.debug then begin
-      Save_VCs.save_vc g;
+      Gnat_objectives.Save_VCs.save_vc g;
    end;
    if Gnat_config.force then
       actually_schedule_goal g
@@ -250,6 +185,32 @@ and schedule_goal (g : Gnat_objectives.goal) =
 and actually_schedule_goal g =
    Gnat_objectives.schedule_goal interpret_result g
 
+let normal_handle_one_subp subp =
+   if Gnat_objectives.matches_subp_filter subp then begin
+      Gnat_objectives.init_subp_vcs subp;
+      Gnat_objectives.iter_leaf_goals ~subp register_goal;
+      Gnat_objectives.stat ();
+      Gnat_objectives.iter (fun obj ->
+      if Gnat_objectives.objective_status obj =
+         Gnat_objectives.Proved then begin
+         Format.printf "%a@." Gnat_expl.print_simple_proven obj
+      end else begin
+         match Gnat_objectives.next obj with
+         | Some g -> schedule_goal g
+         | None -> ()
+      end);
+      Gnat_objectives.do_scheduled_jobs ();
+      Gnat_objectives.clear ()
+   end
+
+let all_splitted_subp subp =
+   if Gnat_objectives.matches_subp_filter subp then begin
+      Gnat_objectives.init_subp_vcs subp;
+      Gnat_objectives.iter_leaf_goals ~subp register_goal;
+      Gnat_objectives.all_split_leaf_goals ();
+      Gnat_objectives.clear ()
+   end
+
 let _ =
    (* This is the main code. We read the file into the session if not already
       done, we apply the split_goal transformation when needed, and we schedule
@@ -257,24 +218,15 @@ let _ =
    *)
    try
       Gnat_objectives.init ();
-      Gnat_objectives.iter_subps (fun subp ->
-         if Gnat_objectives.matches_subp_filter subp then begin
-            Gnat_objectives.init_subp_vcs subp;
-            Gnat_objectives.iter_leaf_goals ~subp register_goal;
-            Gnat_objectives.stat ();
-            Gnat_objectives.iter (fun obj ->
-            if Gnat_objectives.objective_status obj =
-               Gnat_objectives.Proved then begin
-               Format.printf "%a@." Gnat_expl.print_simple_proven obj
-            end else begin
-               match Gnat_objectives.next obj with
-               | Some g -> schedule_goal g
-               | None -> ()
-            end);
-         Gnat_objectives.do_scheduled_jobs ();
-         Gnat_objectives.clear ()
-      end);
-      Gnat_objectives.save_session ()
+      match Gnat_config.proof_mode with
+      | Gnat_config.Normal ->
+         Gnat_objectives.iter_subps normal_handle_one_subp;
+         Gnat_objectives.save_session ()
+      | Gnat_config.All_Splitted ->
+         Gnat_objectives.iter_subps all_splitted_subp
+      | Gnat_config.No_WP ->
+         (* we should never get here *)
+         ()
     with e when not (Debug.test_flag Debug.stack_trace) ->
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""

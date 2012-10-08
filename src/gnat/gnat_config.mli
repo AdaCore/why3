@@ -21,8 +21,18 @@ type report_mode = Fail | Verbose | Detailed
    In mode detailed, additionally print if VC was timeout or if prover stopped.
    *)
 
+type proof_mode = Normal | No_WP | All_Splitted
+(* In mode normal, compute VCs and splitted VCs as necessary, call prover as
+                   necessary;
+   In mode no_wp, do not compute VCs and never call the prover
+   In mode all_splitted, compute all splitted VCs, and never call the prover
+   *)
+
 val report : report_mode
-(* true if option --report was present *)
+(* reflects value of option --report, default "Fail" *)
+
+val proof_mode : proof_mode
+(* reflects value of option --proof, default "Normal" *)
 
 val debug : bool
 (* true if option --debug was present *)
@@ -34,9 +44,6 @@ val force : bool
 
 val filename : string
 (* the name of the input file *)
-
-val noproof : bool
-(* true if option --no-proof was present *)
 
 val split_name : string
 (* name of the "split_goal" transformation *)
