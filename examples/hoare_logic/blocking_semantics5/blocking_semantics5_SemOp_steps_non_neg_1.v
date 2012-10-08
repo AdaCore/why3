@@ -202,14 +202,14 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
-      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
-      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), ((eval_fmla sigma pi
+      inv) /\ ((eval_term sigma pi cond) = (Vbool true))) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body)))
   | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
-      sigma pi Sskip)).
+      ((eval_fmla sigma pi inv) /\ ((eval_term sigma pi
+      cond) = (Vbool false))) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip).
 
 (* Why3 assumption *)
 Inductive many_steps : (map mident value) -> (list (ident* value)%type)

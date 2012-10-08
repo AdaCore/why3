@@ -26,8 +26,8 @@ lemma mident_decide :
   forall m1 m2: mident. m1 = m2 \/ m1 <> m2
 
 (** ident for immutable variables *)
-type ident 
- 
+type ident
+
 lemma ident_decide :
   forall m1 m2: ident. m1 = m2 \/ m1 <> m2
 
@@ -112,9 +112,9 @@ function eval_bin (x:value) (op:operator) (y:value) : value =
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
   | Tvalue v -> v
-  |  Tvar id  -> get_stack id pi
-  |  Tderef id  -> get_env id sigma
-  |  Tbin t1 op t2  ->
+  | Tvar id  -> get_stack id pi
+  | Tderef id  -> get_env id sigma
+  | Tbin t1 op t2  ->
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
   end
 
@@ -136,7 +136,7 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
 
 
 (** [valid_fmla f] is true when [f] is valid in any environment *)
-  predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
+predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
 
 
 
@@ -145,72 +145,55 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
 
 inductive one_step env stack stmt env stack stmt =
 
-  | one_step_assign :
-      forall sigma sigma':env, pi:stack, x:mident, t:term.
-        sigma' = IdMap.set sigma x (eval_term sigma pi t) ->
-        one_step sigma pi (Sassign x t) sigma' pi Sskip
+  | one_step_assign : forall sigma sigma':env, pi:stack, x:mident, t:term.
+      sigma' = IdMap.set sigma x (eval_term sigma pi t) ->
+      one_step sigma pi (Sassign x t) sigma' pi Sskip
 
-  | one_step_seq_noskip:
-      forall sigma sigma':env, pi pi':stack, s1 s1' s2:stmt.
-        one_step sigma pi s1 sigma' pi' s1' ->
-          one_step sigma pi (Sseq s1 s2) sigma' pi' (Sseq s1' s2)
+  | one_step_seq_noskip: forall sigma sigma':env, pi pi':stack, s1 s1' s2:stmt.
+      one_step sigma pi s1 sigma' pi' s1' ->
+      one_step sigma pi (Sseq s1 s2) sigma' pi' (Sseq s1' s2)
 
-  | one_step_seq_skip:
-      forall sigma:env, pi:stack, s:stmt.
-        one_step sigma pi (Sseq Sskip s) sigma pi s
+  | one_step_seq_skip: forall sigma:env, pi:stack, s:stmt.
+      one_step sigma pi (Sseq Sskip s) sigma pi s
 
-  | one_step_if_true:
-      forall sigma:env, pi:stack, t:term, s1 s2:stmt.
-        eval_term sigma pi t = Vbool True ->
-        one_step sigma pi (Sif t s1 s2) sigma pi s1
+  | one_step_if_true: forall sigma:env, pi:stack, t:term, s1 s2:stmt.
+      eval_term sigma pi t = Vbool True ->
+      one_step sigma pi (Sif t s1 s2) sigma pi s1
 
-  | one_step_if_false:
-      forall sigma:env, pi:stack, t:term, s1 s2:stmt.
-        eval_term sigma pi t = Vbool False ->
-        one_step sigma pi (Sif t s1 s2) sigma pi s2
+  | one_step_if_false: forall sigma:env, pi:stack, t:term, s1 s2:stmt.
+      eval_term sigma pi t = Vbool False ->
+      one_step sigma pi (Sif t s1 s2) sigma pi s2
 
-  | one_step_assert:
-      forall sigma:env, pi:stack, f:fmla.
-        (* blocking semantics *)
-        eval_fmla sigma pi f ->
-          one_step sigma pi (Sassert f) sigma pi Sskip
+  | one_step_assert: forall sigma:env, pi:stack, f:fmla.
+      eval_fmla sigma pi f ->         (** blocking semantics *)
+      one_step sigma pi (Sassert f) sigma pi Sskip
 
-  | one_step_while_true:
-      forall sigma:env, pi:stack, cond:term, inv:fmla, body:stmt.
-        (* blocking semantics *)
-        eval_fmla sigma pi inv ->
-        eval_term sigma pi cond = Vbool True ->
-        one_step sigma pi (Swhile cond inv body) sigma pi
-        (Sseq body (Swhile cond inv body))
+  | one_step_while_true: forall sigma:env, pi:stack, cond:term, inv:fmla, body:stmt.
+      eval_fmla sigma pi inv /\       (** blocking semantics *)
+      eval_term sigma pi cond = Vbool True ->
+      one_step sigma pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))
 
-  | one_step_while_false:
-      forall sigma:env, pi:stack, cond:term, inv:fmla, body:stmt.
-        (* blocking semantics *)
-        eval_fmla sigma pi inv ->
+  | one_step_while_false: forall sigma:env, pi:stack, cond:term, inv:fmla, body:stmt.
+        eval_fmla sigma pi inv /\     (** blocking semantics *)
         eval_term sigma pi cond = Vbool False ->
         one_step sigma pi (Swhile cond inv body) sigma pi Sskip
 
  (** many steps of execution *)
 
- inductive many_steps env stack stmt env stack stmt int =
-   | many_steps_refl:
-     forall sigma:env, pi:stack, s:stmt. many_steps sigma pi s sigma pi s 0
-   | many_steps_trans:
-     forall sigma1 sigma2 sigma3:env, pi1 pi2 pi3:stack, s1 s2 s3:stmt, n:int.
-       one_step sigma1 pi1 s1 sigma2 pi2 s2 ->
-       many_steps sigma2 pi2 s2 sigma3 pi3 s3 n ->
-       many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n+1)
+inductive many_steps env stack stmt env stack stmt int =
+  | many_steps_refl: forall sigma:env, pi:stack, s:stmt. 
+      many_steps sigma pi s sigma pi s 0
+  | many_steps_trans: forall sigma1 sigma2 sigma3:env, pi1 pi2 pi3:stack, s1 s2 s3:stmt, n:int.
+      one_step sigma1 pi1 s1 sigma2 pi2 s2 ->
+      many_steps sigma2 pi2 s2 sigma3 pi3 s3 n ->
+      many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n+1)
 
-lemma steps_non_neg:
-  forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int.
-    many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
+lemma steps_non_neg: forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int.
+  many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
 
 
-  predicate reductible (sigma:env) (pi:stack) (s:stmt) =
-    exists sigma':env, pi':stack, s':stmt.
-      one_step sigma pi s sigma' pi' s'
-
-
+predicate reductible (sigma:env) (pi:stack) (s:stmt) =
+  exists sigma':env, pi':stack, s':stmt. one_step sigma pi s sigma' pi' s'
 
 end
 
@@ -274,10 +257,10 @@ function type_value (v:value) : datatype =
   end
 
 inductive type_operator (op:operator) (ty1 ty2 ty: datatype) =
-      | Type_plus : type_operator Oplus TYint TYint TYint
-      | Type_minus : type_operator Ominus TYint TYint TYint
-      | Type_mult : type_operator Omult TYint TYint TYint
-      | Type_le : type_operator Ole TYint TYint TYbool
+  | Type_plus : type_operator Oplus TYint TYint TYint
+  | Type_minus : type_operator Ominus TYint TYint TYint
+  | Type_mult : type_operator Omult TYint TYint TYint
+  | Type_le : type_operator Ole TYint TYint TYbool
 
 type type_stack = list (ident, datatype)  (* map local immutable variables to their type *)
 function get_vartype (i:ident) (pi:type_stack) : datatype =
@@ -291,92 +274,88 @@ type type_env = IdMap.map mident datatype  (* map global mutable variables to th
 function get_reftype (i:mident) (e:type_env) : datatype = IdMap.get e i
 
 inductive type_term type_env type_stack term datatype =
-  | Type_value :
-      forall sigma: type_env, pi:type_stack, v:value.
-	type_term sigma pi  (Tvalue v) (type_value v)
-  | Type_var :
-      forall sigma: type_env, pi:type_stack, v: ident, ty:datatype.
-        (get_vartype v pi = ty) ->
-        type_term sigma pi (Tvar v) ty
-  | Type_deref :
-      forall sigma: type_env, pi:type_stack, v: mident, ty:datatype.
-        (get_reftype v sigma = ty) ->
-        type_term sigma pi (Tderef v) ty
-  | Type_bin :
-      forall sigma: type_env, pi:type_stack, t1 t2 : term, op:operator,
-        ty1 ty2 ty:datatype.
-        type_term sigma pi t1 ty1 ->
-	type_term sigma pi t2 ty2 ->
-	type_operator op ty1 ty2 ty ->
-        type_term sigma pi (Tbin t1 op t2) ty
+
+  | Type_value : forall sigma: type_env, pi:type_stack, v:value.
+      type_term sigma pi  (Tvalue v) (type_value v)
+
+  | Type_var : forall sigma: type_env, pi:type_stack, v: ident, ty:datatype.
+      (get_vartype v pi = ty) ->
+      type_term sigma pi (Tvar v) ty
+
+  | Type_deref : forall sigma: type_env, pi:type_stack, v: mident, ty:datatype.
+      (get_reftype v sigma = ty) ->
+      type_term sigma pi (Tderef v) ty
+
+  | Type_bin : forall sigma: type_env, pi:type_stack, t1 t2 : term, op:operator, ty1 ty2 ty:datatype.
+      type_term sigma pi t1 ty1 /\ type_term sigma pi t2 ty2 /\ type_operator op ty1 ty2 ty ->
+      type_term sigma pi (Tbin t1 op t2) ty
 
 inductive type_fmla type_env type_stack fmla =
-  | Type_term :
-      forall sigma: type_env, pi:type_stack, t:term.
-	type_term sigma pi t TYbool ->
-	type_fmla sigma pi (Fterm t)
-  | Type_conj :
-      forall sigma: type_env, pi:type_stack, f1 f2:fmla.
-	type_fmla sigma pi f1 ->
-        type_fmla sigma pi f2 ->
-        type_fmla sigma pi (Fand f1 f2)
-  | Type_neg :
-      forall sigma: type_env, pi:type_stack, f:fmla.
-	type_fmla sigma pi f ->
-        type_fmla sigma pi (Fnot f)
-  | Type_implies :
-      forall sigma: type_env, pi:type_stack, f1 f2:fmla.
-	type_fmla sigma pi f1 ->
+
+  | Type_term : forall sigma: type_env, pi:type_stack, t:term.
+        type_term sigma pi t TYbool ->
+        type_fmla sigma pi (Fterm t)
+
+  | Type_conj : forall sigma: type_env, pi:type_stack, f1 f2:fmla.
+      type_fmla sigma pi f1 /\ type_fmla sigma pi f2 ->
+      type_fmla sigma pi (Fand f1 f2)
+
+  | Type_neg : forall sigma: type_env, pi:type_stack, f:fmla.
+      type_fmla sigma pi f ->
+      type_fmla sigma pi (Fnot f)
+
+  | Type_implies : forall sigma: type_env, pi:type_stack, f1 f2:fmla.
+       type_fmla sigma pi f1 ->
         type_fmla sigma pi f2 ->
         type_fmla sigma pi (Fimplies f1 f2)
   | Type_let :
       forall sigma: type_env, pi:type_stack, x:ident, t:term, f:fmla, ty:datatype.
-	type_term sigma pi t ty ->
+        type_term sigma pi t ty ->
         type_fmla sigma (Cons (x,ty) pi) f ->
         type_fmla sigma pi (Flet x t f)
   | Type_forall1 :
       forall sigma: type_env, pi:type_stack, x:ident, f:fmla.
         type_fmla sigma (Cons (x,TYint) pi) f ->
-  	type_fmla sigma pi (Fforall x TYint f)
+        type_fmla sigma pi (Fforall x TYint f)
   | Type_forall2 :
       forall sigma: type_env, pi:type_stack, x:ident, f:fmla.
         type_fmla sigma (Cons (x,TYbool) pi) f ->
-  	type_fmla sigma pi (Fforall x TYbool f)
+        type_fmla sigma pi (Fforall x TYbool f)
   | Type_forall3:
       forall sigma: type_env, pi:type_stack, x:ident, f:fmla.
         type_fmla sigma (Cons (x,TYunit) pi) f ->
-  	type_fmla sigma pi (Fforall x TYunit f)
+        type_fmla sigma pi (Fforall x TYunit f)
 
 inductive type_stmt type_env type_stack stmt =
   | Type_skip :
       forall sigma: type_env, pi:type_stack.
-	type_stmt sigma pi Sskip
+        type_stmt sigma pi Sskip
   | Type_seq :
       forall sigma: type_env, pi:type_stack, s1 s2:stmt.
         type_stmt sigma pi s1 ->
-	type_stmt sigma pi s2 ->
-	type_stmt sigma pi (Sseq s1 s2)
+        type_stmt sigma pi s2 ->
+        type_stmt sigma pi (Sseq s1 s2)
   | Type_assigns :
       forall sigma: type_env, pi:type_stack, x:mident, t:term, ty:datatype.
-	(get_reftype x sigma = ty) ->
+        (get_reftype x sigma = ty) ->
         type_term sigma pi t ty ->
         type_stmt sigma pi (Sassign x t)
   | Type_if :
       forall sigma: type_env, pi:type_stack, t:term, s1 s2:stmt.
-	type_term sigma pi t TYbool ->
-	type_stmt sigma pi s1 ->
-	type_stmt sigma pi s2 ->
-    	type_stmt sigma pi (Sif t s1 s2)
+        type_term sigma pi t TYbool ->
+        type_stmt sigma pi s1 ->
+        type_stmt sigma pi s2 ->
+        type_stmt sigma pi (Sif t s1 s2)
   | Type_assert :
       forall sigma: type_env, pi:type_stack, p:fmla.
-	type_fmla sigma pi p ->
-    	type_stmt sigma pi (Sassert p)
+        type_fmla sigma pi p ->
+        type_stmt sigma pi (Sassert p)
   | Type_while :
       forall sigma: type_env, pi:type_stack, guard:term, body:stmt, inv:fmla.
-	type_fmla sigma pi inv ->
+        type_fmla sigma pi inv ->
         type_term sigma pi guard TYbool ->
         type_stmt sigma pi body ->
-        type_stmt sigma pi (Swhile guard inv body) 
+        type_stmt sigma pi (Swhile guard inv body)
 
 
 end
@@ -391,12 +370,12 @@ use import Typing
 
 (*
 inductive compatible datatype value =
-    | Compatible_bool : 
-	forall b: bool. compatible TYbool (Vbool b)
-    | Compatible_int : 
-	forall n: int. compatible TYint (Vint n)
-    | Compatible_void : 
-	compatible TYunit Vvoid
+    | Compatible_bool :
+        forall b: bool. compatible TYbool (Vbool b)
+    | Compatible_int :
+        forall n: int. compatible TYint (Vint n)
+    | Compatible_void :
+        compatible TYunit Vvoid
 
 *)
 
@@ -650,13 +629,11 @@ fresh_in_fmla (fresh_from f) f
      alors
        sigma, pi |= forall w, (f /\ q)
   *)
-(*
   axiom abstract_effects_distrib_conj :
      forall s:stmt, p q:fmla, sigma:env, pi:stack.
        eval_fmla sigma pi (abstract_effects s p) /\
        eval_fmla sigma pi (abstract_effects s q) ->
          eval_fmla sigma pi (abstract_effects s (Fand p q))
-*)
 
   (* hypothese 3: si
        |= p -> q
@@ -711,7 +688,7 @@ function wp (s:stmt) (q:fmla) : fmla =
   lemma monotonicity:
     forall s:stmt, p q:fmla.
       valid_fmla (Fimplies p q)
-     ->	valid_fmla (Fimplies (wp s p) (wp s q) )
+     -> valid_fmla (Fimplies (wp s p) (wp s q) )
 
  (* remarque l'ordre des quantifications est essentiel, on n'a pas
        sigma,pi |= p -> q
@@ -719,7 +696,7 @@ function wp (s:stmt) (q:fmla) : fmla =
        sigma,pi |= (wp s p) -> (wp s q)
 
      meme contre-exemple: sigma(x) = 42 alors true -> x=42
-        mais 
+        mais
           wp (x := 7) true = true
           wp (x := 7) x=42 = 7=42
   *)
@@ -728,7 +705,7 @@ function wp (s:stmt) (q:fmla) : fmla =
     forall s:stmt, sigma:env, pi:stack, p q:fmla.
      (eval_fmla sigma pi (wp s p)) /\
      (eval_fmla sigma pi (wp s q)) ->
-     eval_fmla sigma pi (wp s (Fand p q)) 
+     eval_fmla sigma pi (wp s (Fand p q))
 
   lemma wp_preserved_by_reduction:
     forall sigma sigma':env, pi pi':stack, s s':stmt.
@@ -748,7 +725,7 @@ function wp (s:stmt) (q:fmla) : fmla =
   (** {3 main soundness result} *)
 
   lemma wp_soundness:
-    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt, 
+    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt,
            sigmat: type_env, pit: type_stack, q:fmla.
       compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->

@@ -202,14 +202,14 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
-      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
-      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), ((eval_fmla sigma pi
+      inv) /\ ((eval_term sigma pi cond) = (Vbool true))) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body)))
   | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
-      sigma pi Sskip)).
+      ((eval_fmla sigma pi inv) /\ ((eval_term sigma pi
+      cond) = (Vbool false))) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip).
 
 (* Why3 assumption *)
 Inductive many_steps : (map mident value) -> (list (ident* value)%type)
@@ -230,7 +230,7 @@ Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
   (0%Z <= n)%Z.
 
 (* Why3 assumption *)
-Definition reducible(sigma:(map mident value)) (pi:(list (ident*
+Definition reductible(sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
   exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
   sigma' pi' s').
@@ -280,9 +280,9 @@ Inductive type_term : (map mident datatype) -> (list (ident* datatype)%type)
       (type_term sigma pi (Tderef v) ty)
   | Type_bin : forall (sigma:(map mident datatype)) (pi:(list (ident*
       datatype)%type)) (t1:term) (t2:term) (op:operator) (ty1:datatype)
-      (ty2:datatype) (ty:datatype), (type_term sigma pi t1 ty1) ->
-      ((type_term sigma pi t2 ty2) -> ((type_operator op ty1 ty2 ty) ->
-      (type_term sigma pi (Tbin t1 op t2) ty))).
+      (ty2:datatype) (ty:datatype), ((type_term sigma pi t1 ty1) /\
+      ((type_term sigma pi t2 ty2) /\ (type_operator op ty1 ty2 ty))) ->
+      (type_term sigma pi (Tbin t1 op t2) ty).
 
 (* Why3 assumption *)
 Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
@@ -291,8 +291,8 @@ Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
       datatype)%type)) (t:term), (type_term sigma pi t TYbool) ->
       (type_fmla sigma pi (Fterm t))
   | Type_conj : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi f1) ->
-      ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fand f1 f2)))
+      datatype)%type)) (f1:fmla) (f2:fmla), ((type_fmla sigma pi f1) /\
+      (type_fmla sigma pi f2)) -> (type_fmla sigma pi (Fand f1 f2))
   | Type_neg : forall (sigma:(map mident datatype)) (pi:(list (ident*
       datatype)%type)) (f:fmla), (type_fmla sigma pi f) -> (type_fmla sigma
       pi (Fnot f))
@@ -501,12 +501,6 @@ Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
   (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
   (eval_fmla sigma pi (abstract_effects s q)).
 
-Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
-  (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
-  (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
-  q))).
-
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
   match s with
@@ -550,9 +544,7 @@ Theorem distrib_conj : forall (s:stmt),
   end.
 destruct s; auto.
 simpl.
-intros H sigma pi p q (H0 & H1).
-destruct H0.
-destruct H1; clear H1.
+intros H sigma pi p q ((h1 & h2) & (h3 & h4)).
 split; auto.
 apply abstract_effects_monotonic with (p:=
 (Fand (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
