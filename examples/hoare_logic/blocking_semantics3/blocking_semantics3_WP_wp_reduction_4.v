@@ -693,10 +693,7 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla),
-  (valid_fmla p) -> (valid_fmla (abstract_effects s p)).
-
-Axiom abstract_effects_monotonic_2 : forall (s:stmt) (p:fmla) (q:fmla),
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
   (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
   (eval_fmla sigma pi (abstract_effects s q)).
@@ -734,7 +731,7 @@ Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
   (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 2.
+Ltac ae := why3 "alt-ergo" timelimit 5.
 
 (* Why3 goal *)
 Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
@@ -753,7 +750,9 @@ Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
       q)) -> (eval_fmla sigma' pi' (wp s' q))
   end.
 destruct s; auto.
-intros _ s' H1 q (_ & H3).
+intros _ s' H1 q.
+simpl.
+intros (_ & H3).
 generalize H3.
 intro H4.
 apply abstract_effects_generalize in H4; simpl in H4.

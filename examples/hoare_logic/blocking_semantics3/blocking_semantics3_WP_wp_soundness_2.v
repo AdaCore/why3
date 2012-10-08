@@ -554,14 +554,6 @@ Axiom many_steps_seq : forall (sigma1:(map mident value)) (sigma3:(map mident
   pi2 Sskip n1) /\ ((many_steps sigma2 pi2 s2 sigma3 pi3 Sskip n2) /\
   (n = ((1%Z + n1)%Z + n2)%Z)).
 
-Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
-  value)) (sigma2:(map mident value)) (pi1:(list (ident* value)%type))
-  (pi2:(list (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list
-  (ident* datatype)%type)), ((type_stmt sigmat pit s1) /\
-  ((compatible_env sigma1 sigmat pi1 pit) /\ (one_step sigma1 pi1 s1 sigma2
-  pi2 s2))) -> ((type_stmt sigmat pit s2) /\ (compatible_env sigma2 sigmat
-  pi2 pit)).
-
 (* Why3 assumption *)
 Definition valid_triple(p:fmla) (s:stmt) (q:fmla): Prop := forall (sigma:(map
   mident value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
@@ -693,16 +685,10 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
-  (eval_fmla sigma pi (abstract_effects s q)).
-
-Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
-  (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
-  (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
-  q))).
+Axiom abstract_effects_monotonic : forall (s:stmt) (f:fmla),
+  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
+  (eval_fmla sigma pi f) -> forall (sigma1:(map mident value)) (pi1:(list
+  (ident* value)%type)), (eval_fmla sigma1 pi1 (abstract_effects s f)).
 
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
@@ -726,39 +712,45 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
 Axiom monotonicity : forall (s:stmt) (p:fmla) (q:fmla),
   (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
+
+Axiom wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
+  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
+  (s:stmt) (s':stmt), (one_step sigma pi s sigma' pi' s') -> forall (q:fmla),
+  (eval_fmla sigma pi (wp s q)) -> (eval_fmla sigma' pi' (wp s' q)).
+
+Axiom progress : forall (s:stmt) (sigma:(map mident value)) (pi:(list (ident*
+  value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
+  datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
+  ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
+  ((~ (s = Sskip)) -> exists sigma':(map mident value), exists pi':(list
+  (ident* value)%type), exists s':stmt, (one_step sigma pi s sigma' pi'
+  s')))).
+
+(* Why3 assumption *)
+Definition reducible(sigma:(map mident value)) (pi:(list (ident*
+  value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
+  exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
+  sigma' pi' s').
+
+Axiom progress2 : forall (s:stmt) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
+  datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
+  ((type_stmt sigmat pit s) -> ((eval_fmla sigma pi (wp s q)) ->
+  ((~ (s = Sskip)) -> (reducible sigma pi s)))).
 
 (* Why3 goal *)
-Theorem distrib_conj : forall (s:stmt),
-  match s with
-  | Sskip => True
-  | (Sassign m t) => True
-  | (Sseq s1 s2) => True
-  | (Sif t s1 s2) => True
-  | (Sassert f) => True
-  | (Swhile t f s1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s1 p)) /\
-      (eval_fmla sigma pi (wp s1 q))) -> (eval_fmla sigma pi (wp s1 (Fand p
-      q)))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
-      (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p
-      q)))
-  end.
-destruct s; auto.
-simpl.
-intros H sigma pi p q (H0 & H1).
-destruct H0.
-destruct H1; clear H1.
-split; auto.
-apply abstract_effects_monotonic with (p:=
-(Fand (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
-             (Fimplies (Fand (Fnot (Fterm t)) f) p))
-  (Fand (Fimplies (Fand (Fterm t) f) (wp s f))
-             (Fimplies (Fand (Fnot (Fterm t)) f) q)))).
-unfold valid_fmla; simpl.
-intuition.
-apply abstract_effects_distrib_conj; auto.
+Theorem wp_soundness : forall (n:Z) (sigma:(map mident value)) (sigma':(map
+  mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
+  value)%type)) (s:stmt) (s':stmt) (sigmat:(map mident datatype)) (pit:(list
+  (ident* datatype)%type)) (q:fmla), (compatible_env sigma sigmat pi pit) ->
+  ((type_stmt sigmat pit s) -> (((many_steps sigma pi s sigma' pi' s' n) /\
+  ((~ (reducible sigma' pi' s')) /\ (eval_fmla sigma pi (wp s q)))) ->
+  ((s' = Sskip) /\ (eval_fmla sigma' pi' q)))).
+intros n sigma sigma' pi pi' s s' sigmat pit q h1 h2 (h3,(h4,h5)).
+
 Qed.
 
 

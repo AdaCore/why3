@@ -759,7 +759,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         valid_fmla p -> valid_fmla (abstract_effects s p)
 *)
 
-  axiom abstract_effects_monotonic_2 :
+  axiom abstract_effects_monotonic :
      forall s:stmt, p q:fmla.
         valid_fmla (Fimplies p q) ->
         forall sigma:env, pi:stack.
