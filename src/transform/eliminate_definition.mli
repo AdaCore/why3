@@ -31,3 +31,18 @@ val eliminate_definition_pred : Task.task Trans.trans
 val eliminate_definition      : Task.task Trans.trans
 
 val eliminate_mutual_recursion: Task.task Trans.trans
+
+(** bisection *)
+
+val bisect : (Task.task -> bool) ->
+  Task.task -> (Theory.meta * Theory.meta_arg list) list
+  (** [bisect test task] return metas that specify the symbols that
+      can be removed without making the task invalid for
+      the function test. *)
+
+type bisect_step =
+| BSdone of (Theory.meta * Theory.meta_arg list) list
+| BSstep of Task.task * (bool -> bisect_step)
+
+val bisect_step : Task.task -> bisect_step
+(** Same as before but doing it step by step *)

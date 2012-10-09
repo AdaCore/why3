@@ -970,20 +970,15 @@ let bisect_proof_attempt pa =
       if b then set_timelimit res;
       let r = c b in
       match r with
-      | Task.BSdone t2 ->
+      | Eliminate_definition.BSdone [] ->
+        dprintf debug "Bisecting doesn't reduced the task.@."
+      | Eliminate_definition.BSdone reml ->
         dprintf debug "Bisecting done.@.";
-        let t1 = S.goal_task pa.S.proof_parent in
-        if Task.task_equal t2 t1 then
-          dprintf debug "But doesn't reduced the task.@."
-        else
         begin try
         let keygen = MA.keygen in
         let notify = MA.notify in
-        let diff =
-          Trans.apply (Trans.apply Eliminate_definition.compute_diff t1) t2 in
-        (* we know that this metas are registered *)
-        let diff = List.map (fun (m,l) -> m.Theory.meta_name,l) diff in
-        let metas = S.add_registered_metas ~keygen eS diff pa.S.proof_parent in
+        let reml = List.map (fun (m,l) -> m.Theory.meta_name,l) reml in
+        let metas = S.add_registered_metas ~keygen eS reml pa.S.proof_parent in
         let trans = S.add_registered_transformation ~keygen
           eS "eliminate_builtin" metas.S.metas_goal in
         let goal = List.hd trans.S.transf_goals in (* only one *)
@@ -994,11 +989,13 @@ let bisect_proof_attempt pa =
         with e ->
           dprintf debug "Bisecting error:@\n%a@."
             Exn_printer.exn_printer e end
-      | Task.BSstep (t,c) ->
+      | Eliminate_definition.BSstep (t,c) ->
+        assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
           ?old:(S.get_edited_as_abs eS.S.session pa)
+          (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
           ~command:(C.get_complete_command lp.S.prover_config)
           ~driver:lp.S.prover_driver
@@ -1020,12 +1017,12 @@ let bisect_proof_attempt pa =
       then dprintf debug "Initial task can't be proved.@."
       else
         let t = S.goal_task pa.S.proof_parent in
-        let r = Task.bisect_step t in
+        let r = Eliminate_definition.bisect_step t in
         match r with
-        | Task.BSdone res ->
-          assert (Task.task_equal res t);
+        | Eliminate_definition.BSdone res ->
+          assert (res = []);
           dprintf debug "Task can't be reduced.@."
-        | Task.BSstep (t,c) ->
+        | Eliminate_definition.BSstep (t,c) ->
           set_timelimit res;
           match S.load_prover eS pa.S.proof_prover with
           | None -> (* No prover so we do nothing *)

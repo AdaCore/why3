@@ -34,7 +34,7 @@ let add_id undef_ls rem_ls (ls,ld) (abst,defn) =
 
 (** TODO: go further? such as constructor that are removed? *)
 
-let elim undef_ls rem_pr rem_ls rem_ts d = match d.d_node with
+let elim_abstract undef_ls rem_pr rem_ls rem_ts d = match d.d_node with
   | Dlogic l ->
       let ld, id = List.fold_right (add_id undef_ls rem_ls) l ([],[]) in
       ld @ (if id = [] then [] else [create_logic_decl id])
@@ -54,7 +54,7 @@ let eliminate_builtin =
   Trans.on_tagged_pr Printer.meta_remove_prop  (fun rem_pr ->
   Trans.on_tagged_ls Printer.meta_remove_logic  (fun rem_ls ->
   Trans.on_tagged_ts Printer.meta_remove_type_symbol  (fun rem_ts ->
-    Trans.decl (elim undef_ls rem_pr rem_ls rem_ts) None))))
+    Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ts) None))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
   ~desc_metas:[Printer.meta_syntax_logic,
@@ -181,3 +181,140 @@ let () =
            recursive@ definition (at@ least@ two@ functions@ or@ \
            predicates@ defined@ at@ the@ same@ time)";
 
+
+
+
+
+(** Bisect *)
+open Task
+open Theory
+
+type bisect_step =
+ | BSdone of (Theory.meta * Theory.meta_arg list) list
+ | BSstep of task * (bool -> bisect_step)
+
+type rem = { rem_pr : Spr.t; rem_ls : Sls.t; rem_ts : Sts.t }
+
+let print_rem fmt rem = Format.fprintf fmt
+  "@[rem_pr:@[%a@]@\nrem_ls:@[%a@]@\nrem_ts:@[%a@]@\n"
+  (Pp.print_iter1 Spr.iter Pp.comma Pretty.print_pr) rem.rem_pr
+  (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) rem.rem_ls
+  (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) rem.rem_ts
+
+let rec elim_task task rem =
+  match task with
+  | Some ({task_decl = {td_node = Decl decl}} as task) ->
+    let task = elim_task task.task_prev rem in
+    let l = elim_abstract Sls.empty
+      rem.rem_pr rem.rem_ls rem.rem_ts decl in
+    List.fold_left Task.add_decl task l
+  | Some task ->
+    Task.add_tdecl (elim_task task.task_prev rem) task.task_decl
+  | None      -> None
+
+
+let add_rem rem decl =
+  let remove_ts rem ts =
+    { rem with rem_ts = Sts.add ts rem.rem_ts} in
+  let remove_ls rem ls =
+    { rem with rem_ls = Sls.add ls rem.rem_ls} in
+  let remove_pr rem pr =
+    { rem with rem_pr = Spr.add pr rem.rem_pr} in
+  match decl.d_node with
+  | Dtype ts -> remove_ts rem ts
+  | Ddata l -> List.fold_left (fun rem (ts,_) -> remove_ts rem ts) rem l
+  | Dparam ls -> remove_ls rem ls
+  | Dlogic l -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
+  | Dind (_,l) -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
+  | Dprop (_,pr,_) -> remove_pr rem pr
+
+let union_rem rem1 rem2 =
+  { rem_ts = Sts.union rem1.rem_ts rem2.rem_ts;
+    rem_ls = Sls.union rem1.rem_ls rem2.rem_ls;
+    rem_pr = Spr.union rem1.rem_pr rem2.rem_pr;
+  }
+
+let create_meta_rem_list rem =
+  let remove_ts acc ts =
+    (Printer.meta_remove_type_symbol, [Theory.MAts ts])::acc in
+  let remove_ls acc ls =
+    (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
+  let remove_pr acc pr =
+    (Printer.meta_remove_prop, [Theory.MApr pr])::acc in
+  let acc = Sts.fold_left remove_ts [] rem.rem_ts in
+  let acc = Sls.fold_left remove_ls acc rem.rem_ls in
+  let acc = Spr.fold_left remove_pr acc rem.rem_pr in
+  acc
+
+let fold_sub f acc a i1 i2 =
+  let acc = ref acc in
+  for i=i1 to i2-1 do
+    acc := f !acc a.(i)
+  done;
+  !acc
+
+let rec bisect_aux task a i1 i2 rem cont       (* lt i lk *) =
+  (* Format.eprintf "i1: %i, i2: %i@\nrem:%a@." i1 i2 *)
+  (*   print_rem rem; *)
+  let call rem valid invalid =
+    try BSstep (elim_task task rem,
+                fun b -> if b then valid () else invalid ())
+    with UnknownIdent _ -> invalid ()
+  in
+  if i2 - i1 < 2 then
+    let rem1 = add_rem rem a.(i1) in
+    call rem1
+      (fun () -> assert (i2 - i1 = 1); cont rem1)
+      (fun () -> cont rem)
+  else
+    let m = (i1+i2)/2 in
+    let rem1 = fold_sub add_rem rem a m i2 in
+    call rem1
+      (fun () -> bisect_aux task a i1 m rem1 cont)
+      (fun () ->
+        bisect_aux task a m i2 rem
+          (fun rem1 -> (* rem c rem1 c \old(rem1) *)
+            let rem2 = fold_sub add_rem rem1 a i1 m in
+            call rem2
+              (fun () -> cont rem2)
+              (fun () -> bisect_aux task a i1 m rem1 cont)))
+
+let bisect_step task0 =
+  let task= match task0 with
+    | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}};
+            task_prev = task} -> task
+    | _ -> raise GoalNotFound in
+  let rec length acc = function
+    | Some {task_decl = {td_node = Decl _};
+            task_prev = t} -> length (acc + 1) t
+    | Some {task_prev = t} -> length acc t
+    | None -> acc in
+  let n = length 0 task in
+  let a = Array.create n (Obj.magic 0) in
+  let rec init acc = function
+    | Some {task_decl = {td_node = Decl d}; task_prev = t} ->
+      a.(acc) <- d; init (acc - 1) t
+    | Some { task_prev = t} -> init acc t
+    | None -> assert (acc = -1) in
+  init (n-1) task;
+  let empty_rem = {rem_ts = Sts.empty; rem_ls = Sls.empty;
+                   rem_pr = Spr.empty} in
+  bisect_aux task0 a 0 n empty_rem
+    (fun rem -> BSdone (create_meta_rem_list rem))
+
+let bisect f task =
+  let rec run = function
+    | BSdone r -> r
+    | BSstep (t,c) -> run (c (f t)) in
+  run (bisect_step task)
+
+(** catch exception for debug *)
+(* let bisect_step task0 = *)
+(*   let res = try bisect_step task0 with exn -> *)
+(*     Format.eprintf "bisect_step fail: %a@." Exn_printer.exn_printer exn; *)
+(*     raise exn in *)
+(*   match res with *)
+(*   | BSdone _ as d -> d *)
+(*   | BSstep (t,f) -> BSstep (t,fun b -> try f b with exn -> *)
+(*     Format.eprintf "bisect_step fail: %a@." Exn_printer.exn_printer exn; *)
+(*     raise exn) *)

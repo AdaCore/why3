@@ -840,6 +840,7 @@ let print_decls ~old info fmt dl =
   fprintf fmt "@\n@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
 let print_task env pr thpr _blacklist realize ?old fmt task =
+  (* eprintf "Task:%a@.@." Pretty.print_task task; *)
   forget_all ();
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
@@ -866,6 +867,7 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
     Mid.map (fun (th,s) -> fprintf fmt "Require %s.@\n" s; th) realized_theories in
   let realized_symbols = Task.used_symbols realized_theories' in
   let local_decls = Task.local_decls task realized_symbols in
+  eprintf "local_decls:%i@." (List.length local_decls);
   (* associate a special printer to each symbol in a realized theory *)
   let symbol_printers =
     let printers =

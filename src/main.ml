@@ -433,19 +433,25 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
         exit 1
     | Some dir, Some command when !opt_bisect ->
         let test task =
-          let call = Driver.prove_task_prepared
+          let call = Driver.prove_task
             ~command ~timelimit ~memlimit drv task in
           let res = Call_provers.wait_on_call (call ()) () in
           printf "%s %s %s : %a@." fname tname
             (task_goal task).Decl.pr_name.Ident.id_string
             Call_provers.print_prover_result res;
           res.Call_provers.pr_answer = Call_provers.Valid in
-        let prepared_task = Driver.prepare_task drv task in
-        if not (test prepared_task)
+        if not (test task)
         then printf "I can't bisect %s %s %s which is not valid@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
         else
-          let prepared_task = Task.bisect test prepared_task in
+          let rem = Eliminate_definition.bisect test task in
+          let goal,task = Task.task_separate_goal task in
+          let task = List.fold_left
+            (fun task (m,ml) -> Task.add_meta task m ml) task rem in
+          let task = add_tdecl task goal in
+          (** We suppose here that the first transformation in the driver
+              is remove_builtin *)
+          let prepared_task = Driver.prepare_task drv task in
           output_task_prepared drv fname tname th prepared_task dir
     | None, Some command ->
         let call = Driver.prove_task ~command ~timelimit ~memlimit drv task in

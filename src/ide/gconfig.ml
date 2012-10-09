@@ -27,6 +27,17 @@ let debug = Debug.register_info_flag "ide_info"
   ~desc:"About why3ide."
 let () = Debug.set_flag debug
 
+(** set the exception call back handler to the Exn_printer of why3 *)
+let () = (***** TODO TODO make that work, it seems not called!!! *)
+  let why3_handler exn =
+    Format.eprintf "@[Why3ide callback raised an exception:@\n%a@]@.@."
+      Exn_printer.exn_printer exn;
+    (** print the stack trace if asked to (can't be done by the usual way) *)
+    if Debug.test_flag Debug.stack_trace then
+      Printf.eprintf "Backtrace:\n%t\n%!" Printexc.print_backtrace
+  in
+  GtkSignal.user_handler := why3_handler
+
 (* config file *)
 
 (* type altern_provers = prover option Mprover.t *)
