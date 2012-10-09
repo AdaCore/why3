@@ -405,9 +405,8 @@ let adapt_timelimit a =
     | Done { Call_provers.pr_answer = 
         (Call_provers.Valid | Call_provers.Unknown _ | Call_provers.Invalid);
              Call_provers.pr_time = t } ->
-      let time = max a.proof_timelimit (1 + truncate (2.0 *. t)) in
-      set_timelimit time a;
-      time
+      let t = truncate (1.0 +. 2.0 *. t) in
+      max a.proof_timelimit (min t (2 * a.proof_timelimit))
     | _ -> a.proof_timelimit
 
 
