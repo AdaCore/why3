@@ -313,18 +313,10 @@ inductive type_fmla type_env type_stack fmla =
         type_term sigma pi t ty ->
         type_fmla sigma (Cons (x,ty) pi) f ->
         type_fmla sigma pi (Flet x t f)
-  | Type_forall1 :
-      forall sigma: type_env, pi:type_stack, x:ident, f:fmla.
-        type_fmla sigma (Cons (x,TYint) pi) f ->
-        type_fmla sigma pi (Fforall x TYint f)
-  | Type_forall2 :
-      forall sigma: type_env, pi:type_stack, x:ident, f:fmla.
-        type_fmla sigma (Cons (x,TYbool) pi) f ->
-        type_fmla sigma pi (Fforall x TYbool f)
-  | Type_forall3:
-      forall sigma: type_env, pi:type_stack, x:ident, f:fmla.
-        type_fmla sigma (Cons (x,TYunit) pi) f ->
-        type_fmla sigma pi (Fforall x TYunit f)
+  | Type_forall :
+      forall sigma: type_env, pi:type_stack, x:ident, f:fmla, ty:datatype.
+        type_fmla sigma (Cons (x,ty) pi) f ->
+        type_fmla sigma pi (Fforall x ty f)
 
 inductive type_stmt type_env type_stack stmt =
   | Type_skip :
@@ -351,11 +343,11 @@ inductive type_stmt type_env type_stack stmt =
         type_fmla sigma pi p ->
         type_stmt sigma pi (Sassert p)
   | Type_while :
-      forall sigma: type_env, pi:type_stack, guard:term, body:stmt, inv:fmla.
+      forall sigma: type_env, pi:type_stack, cond:term, body:stmt, inv:fmla.
         type_fmla sigma pi inv ->
-        type_term sigma pi guard TYbool ->
+        type_term sigma pi cond TYbool ->
         type_stmt sigma pi body ->
-        type_stmt sigma pi (Swhile guard inv body)
+        type_stmt sigma pi (Swhile cond inv body)
 
 
 end
@@ -379,16 +371,16 @@ inductive compatible datatype value =
 
 *)
 
+predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) =
+  (forall id: mident. type_value (IdMap.get sigma id) = get_reftype id sigmat) /\
+  (forall id: ident. type_value (get_stack id pi) = get_vartype id pit)
+
 lemma type_inversion : forall v:value.
    match (type_value v) with
     | TYbool -> exists b: bool. v = Vbool b
     | TYint -> exists n: int. v = Vint n
     | TYunit -> v = Vvoid
   end
-
-predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) =
-  (forall id: mident. type_value (IdMap.get sigma id) = get_reftype id sigmat) /\
-  (forall id: ident. type_value (get_stack id pi) = get_vartype id pit)
 
 lemma eval_type_term:
   forall t:term, sigma:env, pi:stack, sigmat:type_env, pit:type_stack, ty:datatype.
@@ -416,33 +408,6 @@ theory FreshVariables
 use import SemOp
 use import list.Append
 
-(** [fresh_in_term id t] is true when [id] does not occur in [t] *)
-predicate fresh_in_term (x:ident) (t:term) =
-  match t with
-  | Tvalue _  -> true
-  | Tvar i  -> x <> i
-  | Tderef _  -> true
-  | Tbin t1 _ t2 -> fresh_in_term x t1 /\ fresh_in_term x t2
-  end
-
-(*
-lemma fresh_in_binop:
-  forall t t':term, op:operator, v:ident.
-    fresh_in_term v (Tbin t op t') ->
-      fresh_in_term v t  /\ fresh_in_term v t'
-*)
-
-predicate fresh_in_fmla (id:ident) (f:fmla) =
-  match f with
-  | Fterm e -> fresh_in_term id e
-  | Fand f1 f2   | Fimplies f1 f2 ->
-      fresh_in_fmla id f1 /\ fresh_in_fmla id f2
-  | Fnot f -> fresh_in_fmla id f
-  | Flet y t f -> id <> y /\ fresh_in_term id t /\ fresh_in_fmla id f
-  | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
-  end
-
-
 (** substitution of a reference [r] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is fresh *)
 
@@ -463,6 +428,28 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
   | Flet y t f -> Flet y (msubst_term t x v) (msubst f x v)
   | Fforall y ty f -> Fforall y ty (msubst f x v)
   end
+
+
+(** [fresh_in_term id t] is true when [id] does not occur in [t] *)
+predicate fresh_in_term (x:ident) (t:term) =
+  match t with
+  | Tvalue _  -> true
+  | Tvar i  -> x <> i
+  | Tderef _  -> true
+  | Tbin t1 _ t2 -> fresh_in_term x t1 /\ fresh_in_term x t2
+  end
+
+
+predicate fresh_in_fmla (id:ident) (f:fmla) =
+  match f with
+  | Fterm e -> fresh_in_term id e
+  | Fand f1 f2   | Fimplies f1 f2 ->
+      fresh_in_fmla id f1 /\ fresh_in_fmla id f2
+  | Fnot f -> fresh_in_fmla id f
+  | Flet y t f -> id <> y /\ fresh_in_term id t /\ fresh_in_fmla id f
+  | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
+  end
+
 
 
 (* Needed for monotonicity and wp_reduction *)
@@ -497,9 +484,8 @@ lemma eval_term_change_free :
 
  (* Need it for monotonicity*)
 lemma eval_change_free :
-  forall f:fmla, id:ident, v:value.
+  forall f:fmla, sigma:env, pi:stack, id:ident, v:value.
     fresh_in_fmla id f ->
-      forall sigma:env, pi:stack.
     (eval_fmla sigma (Cons (id,v) pi) f <-> eval_fmla sigma pi f)
 
 

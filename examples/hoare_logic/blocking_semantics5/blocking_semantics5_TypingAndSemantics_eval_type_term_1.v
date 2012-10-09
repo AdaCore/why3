@@ -303,15 +303,9 @@ Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
       datatype)%type)) (x:ident) (t:term) (f:fmla) (ty:datatype),
       (type_term sigma pi t ty) -> ((type_fmla sigma (Cons (x, ty) pi) f) ->
       (type_fmla sigma pi (Flet x t f)))
-  | Type_forall1 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYint)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYint f))
-  | Type_forall2 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYbool)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYbool f))
-  | Type_forall3 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYunit)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYunit f)).
+  | Type_forall : forall (sigma:(map mident datatype)) (pi:(list (ident*
+      datatype)%type)) (x:ident) (f:fmla) (ty:datatype), (type_fmla sigma
+      (Cons (x, ty) pi) f) -> (type_fmla sigma pi (Fforall x ty f)).
 
 (* Why3 assumption *)
 Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
@@ -333,16 +327,9 @@ Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
       datatype)%type)) (p:fmla), (type_fmla sigma pi p) -> (type_stmt sigma
       pi (Sassert p))
   | Type_while : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (guard:term) (body:stmt) (inv:fmla), (type_fmla sigma
-      pi inv) -> ((type_term sigma pi guard TYbool) -> ((type_stmt sigma pi
-      body) -> (type_stmt sigma pi (Swhile guard inv body)))).
-
-Axiom type_inversion : forall (v:value),
-  match (type_value v) with
-  | TYbool => exists b:bool, (v = (Vbool b))
-  | TYint => exists n:Z, (v = (Vint n))
-  | TYunit => (v = Vvoid)
-  end.
+      datatype)%type)) (cond:term) (body:stmt) (inv:fmla), (type_fmla sigma
+      pi inv) -> ((type_term sigma pi cond TYbool) -> ((type_stmt sigma pi
+      body) -> (type_stmt sigma pi (Swhile cond inv body)))).
 
 (* Why3 assumption *)
 Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
@@ -350,6 +337,13 @@ Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
   datatype)%type)): Prop := (forall (id:mident), ((type_value (get sigma
   id)) = (get sigmat id))) /\ forall (id:ident), ((type_value (get_stack id
   pi)) = (get_vartype id pit)).
+
+Axiom type_inversion : forall (v:value),
+  match (type_value v) with
+  | TYbool => exists b:bool, (v = (Vbool b))
+  | TYint => exists n:Z, (v = (Vint n))
+  | TYunit => (v = Vvoid)
+  end.
 
 Require Import Why3.
 

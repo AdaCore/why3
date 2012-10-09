@@ -202,14 +202,14 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
-      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
-      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), ((eval_fmla sigma pi
+      inv) /\ ((eval_term sigma pi cond) = (Vbool true))) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body)))
   | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
-      sigma pi Sskip)).
+      ((eval_fmla sigma pi inv) /\ ((eval_term sigma pi
+      cond) = (Vbool false))) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip).
 
 (* Why3 assumption *)
 Inductive many_steps : (map mident value) -> (list (ident* value)%type)
@@ -230,7 +230,7 @@ Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
   (0%Z <= n)%Z.
 
 (* Why3 assumption *)
-Definition reducible(sigma:(map mident value)) (pi:(list (ident*
+Definition reductible(sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
   exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
   sigma' pi' s').
@@ -282,27 +282,6 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
 
-(* Why3 assumption *)
-Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
-  match t with
-  | (Tvalue _) => True
-  | (Tvar i) => ~ (x = i)
-  | (Tderef _) => True
-  | (Tbin t1 _ t2) => (fresh_in_term x t1) /\ (fresh_in_term x t2)
-  end.
-
-(* Why3 assumption *)
-Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
-  match f with
-  | (Fterm e) => (fresh_in_term id e)
-  | ((Fand f1 f2)|(Fimplies f1 f2)) => (fresh_in_fmla id f1) /\
-      (fresh_in_fmla id f2)
-  | (Fnot f1) => (fresh_in_fmla id f1)
-  | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\
-      (fresh_in_fmla id f1))
-  | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
-  end.
-
 Parameter msubst_term: term -> mident -> ident -> term.
 
 Axiom msubst_term_def : forall (t:term) (r:mident) (v:ident),
@@ -323,6 +302,27 @@ Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
   | (Fimplies f1 f2) => (Fimplies (msubst f1 x v) (msubst f2 x v))
   | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
   | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
+  end.
+
+(* Why3 assumption *)
+Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
+  match t with
+  | (Tvalue _) => True
+  | (Tvar i) => ~ (x = i)
+  | (Tderef _) => True
+  | (Tbin t1 _ t2) => (fresh_in_term x t1) /\ (fresh_in_term x t2)
+  end.
+
+(* Why3 assumption *)
+Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
+  match f with
+  | (Fterm e) => (fresh_in_term id e)
+  | ((Fand f1 f2)|(Fimplies f1 f2)) => (fresh_in_fmla id f1) /\
+      (fresh_in_fmla id f2)
+  | (Fnot f1) => (fresh_in_fmla id f1)
+  | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\
+      (fresh_in_fmla id f1))
+  | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
   end.
 
 Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
@@ -359,17 +359,15 @@ Theorem eval_change_free : forall (f:fmla),
   | (Fnot f1) => True
   | (Fimplies f1 f2) => True
   | (Flet i t f1) => True
-  | (Fforall i d f1) => (forall (id:ident) (v:value), (fresh_in_fmla id
-      f1) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)), (eval_fmla sigma (Cons (id, v) pi) f1) <->
-      (eval_fmla sigma pi f1)) -> forall (id:ident) (v:value),
-      (fresh_in_fmla id f) -> forall (sigma:(map mident value)) (pi:(list
-      (ident* value)%type)), (eval_fmla sigma pi f) -> (eval_fmla sigma
-      (Cons (id, v) pi) f)
+  | (Fforall i d f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (id:ident) (v:value), (fresh_in_fmla id f1) ->
+      ((eval_fmla sigma (Cons (id, v) pi) f1) <-> (eval_fmla sigma pi
+      f1))) -> forall (sigma:(map mident value)) (pi:(list (ident*
+      value)%type)) (id:ident) (v:value), (fresh_in_fmla id f) ->
+      ((eval_fmla sigma (Cons (id, v) pi) f) -> (eval_fmla sigma pi f))
   end.
 destruct f; auto.
-simpl.
-intros.
+simpl; intros.
 destruct H0.
 destruct d.
 
@@ -378,31 +376,28 @@ assert
  (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
                   (Cons (i, Vvoid) (Cons (id, v) pi))) f =
  eval_fmla sigma (Cons (i, Vvoid) (Cons (id, v) pi)) f); auto.
-rewrite <- H3.
-rewrite eval_swap; auto.
-apply H; auto.
+rewrite <- H3 in H1.
+rewrite eval_swap in H1; auto.
+simpl in H1.
+rewrite H in H1; auto.
 
 (* Vint *)
 intro n.
-assert 
- (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
-                  (Cons (i, Vint n) (Cons (id, v) pi))) f =
- eval_fmla sigma (Cons (i, Vint n) (Cons (id, v) pi)) f); auto.
-rewrite <- H3.
-clear H3.
+rewrite <- (H _ _ id v); auto.
+replace (Cons (id, v) (Cons (i, Vint n) pi)) with
+  (infix_plpl (Nil : (list (ident*value)))
+  (Cons (id, v) (Cons (i, Vint n) pi))) by auto.
 rewrite eval_swap; auto.
-apply H; auto.
+apply H1.
 
 (* Vbool *)
-intro.
-assert 
- (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
-                  (Cons (i, Vbool b) (Cons (id, v) pi))) f =
- eval_fmla sigma (Cons (i, Vbool b) (Cons (id, v) pi)) f); auto.
-rewrite <- H3.
-clear H3.
+intro b.
+rewrite <- (H _ _ id v); auto.
+replace (Cons (id, v) (Cons (i, Vbool b) pi)) with
+  (infix_plpl (Nil : (list (ident*value)))
+  (Cons (id, v) (Cons (i, Vbool b) pi))) by auto.
 rewrite eval_swap; auto.
-apply H; auto.
+apply H1.
 Qed.
 
 
