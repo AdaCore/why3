@@ -87,9 +87,9 @@ let goals t = t.theory_goals
 let theory_expanded t = t.theory_expanded
 *)
 
-let running a = match a.proof_state with
-  | Undone (Scheduled | Running) -> true
-  | Undone (Unedited | JustEdited | Interrupted)
+let running = function
+  | Scheduled | Running -> true
+  | Unedited | JustEdited | Interrupted
   | Done _ | InternalFailure _ -> false
 
 (*************************)
@@ -170,7 +170,7 @@ let timeout_handler t =
     if List.length l < t.maximum_running_proofs then
       begin try
         let (callback,pre_call) = Queue.pop t.proof_attempts_queue in
-        callback (Undone Running);
+        callback Running;
         dprintf debug "[Sched] proof attempts started@.";
         let call = pre_call () in
         (Check_prover(callback,call))::l
@@ -271,7 +271,7 @@ let cancel_scheduled_proofs t =
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(_timelimit,_memlimit,_old,_inplace,_command,
                                _driver,callback,_goal) ->
-            callback (Undone Interrupted)
+            callback Interrupted
         | Action_delayed _ as a->
             Queue.push a new_queue
     done
@@ -280,7 +280,7 @@ let cancel_scheduled_proofs t =
     try
       while true do
         let (callback,_) = Queue.pop t.proof_attempts_queue in
-        callback (Undone Interrupted)
+        callback Interrupted
       done
     with
       | Queue.Empty ->
@@ -292,7 +292,7 @@ let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
   dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
-  callback (Undone Scheduled);
+  callback Scheduled;
   Queue.push
     (Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                         callback,goal))
@@ -305,7 +305,7 @@ let schedule_edition t command filename callback =
     Call_provers.call_on_file ~command ~regexps:[] ~timeregexps:[]
       ~exitcodes:[(0,Call_provers.Unknown "")] filename
   in
-  callback (Undone Running);
+  callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
   run_timeout_handler t
 
@@ -413,7 +413,7 @@ let adapt_timelimit a =
 let run_external_proof eS eT ?callback a =
   (* check that the state is not Scheduled or Running *)
   (* Perhaps this test, a.proof_archived, should be done somewhere else *)
-  if a.proof_archived || running a then ()
+  if a.proof_archived || running a.proof_state then ()
   else
     match find_prover eS a with
       | None ->
@@ -457,7 +457,7 @@ let run_external_proof eS eT ?callback a =
           npc.prover_config.Whyconf.interactive then
           begin
             set_proof_state ~notify ~obsolete:false ~archived:false
-              (Undone Unedited) a;
+              Unedited a;
             Util.apply_option2 () callback a a.proof_state
           end
         else
@@ -467,7 +467,7 @@ let run_external_proof eS eT ?callback a =
           let memlimit = a.proof_memlimit in
           let callback result =
             begin match result with
-              | Undone Interrupted ->
+              | Interrupted ->
                   set_proof_state ~notify
                     ~obsolete:previous_obs ~archived:false previous_result a
               | _ ->
@@ -510,7 +510,7 @@ let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
         ~archived:false ~timelimit ~memlimit 
-        ~edit:None g p (Undone Interrupted) in
+        ~edit:None g p Interrupted in
       O.init ep.proof_key (Proof_attempt ep);
       ep
   in
@@ -558,7 +558,7 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
 let proof_successful_or_just_edited a =
   match a.proof_state with
     | Done { Call_provers.pr_answer = Call_provers.Valid }
-    | Undone JustEdited -> true
+    | JustEdited -> true
     | _ -> false
 
 let rec replay_on_goal_or_children eS eT
@@ -674,7 +674,7 @@ let check_external_proof eS eT todo a =
   dprintf debug "[Sched] Check external proof : %a@."
     (fun fmt g -> pp_print_string fmt g.goal_name.Ident.id_string) g;
   (* check that the state is not Scheduled or Running *)
-  if a.proof_archived || running a then ()
+  if a.proof_archived || running a.proof_state then ()
   else
     begin
       Todo.todo todo;
@@ -704,8 +704,8 @@ let check_external_proof eS eT todo a =
             let memlimit = a.proof_memlimit in
             let callback result =
               match result with
-                | Undone Scheduled | Undone Running | Undone Interrupted -> ()
-                | Undone (Unedited | JustEdited) -> assert false
+                | Scheduled | Running -> ()
+                | Unedited | Interrupted | JustEdited -> assert false
                 | InternalFailure msg ->
                   Todo._done todo (g,ap,timelimit,(CallFailed msg));
                   set_proof_state ~notify ~obsolete:false ~archived:false
@@ -758,12 +758,7 @@ let check_all eS eT ~callback =
 
 let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
   let callback _key status =
-    match status with
-      | Undone Running | Undone Scheduled -> ()
-      |  _ ->
-        Todo._done todo ();
-        (* eprintf "todo decreased to %d@." todo.Todo.todo *)
-  in
+    if not (running status) then Todo._done todo () in
   List.iter
     (fun p ->
       Todo.todo todo;
@@ -868,7 +863,7 @@ let rec transform eS sched ~context_unproved_goals_only ?callback tr a =
 
 let edit_proof eS sched ~default_editor a =
   (* check that the state is not Scheduled or Running *)
-  if a.proof_archived || running a then ()
+  if a.proof_archived || running a.proof_state then ()
 (*
     info_window `ERROR "Edition already in progress"
 *)
@@ -910,7 +905,7 @@ let edit_proof eS sched ~default_editor a =
             match res with
               | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
                 set_proof_state ~notify ~obsolete:true ~archived:false
-                  (Undone JustEdited) a
+                  JustEdited a
               | _ ->
                   set_proof_state ~notify ~obsolete:false ~archived:false
                     res a

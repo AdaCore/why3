@@ -145,7 +145,10 @@ let print_result_prov proofs prov fmt=
 
 	    end
 	| Session.InternalFailure _ -> fprintf fmt "& Internal Failure"
-	| Session.Undone _ -> fprintf fmt "& Undone"
+	| Session.Interrupted -> fprintf fmt "& Not yet run"
+	| Session.Unedited -> fprintf fmt "& Not yet edited"
+	| Session.Scheduled | Session.Running
+	| Session.JustEdited -> assert false
   with Not_found -> fprintf fmt "& \\noresult") prov;
   fprintf fmt "\\\\ @."
 

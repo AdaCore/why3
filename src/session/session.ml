@@ -41,15 +41,12 @@ let debug = Debug.register_info_flag "session"
 
 module PHstr = Util.Hstr
 
-type undone_proof =
-    | Scheduled (** external proof attempt is scheduled *)
-    | Interrupted
-    | Running (** external proof attempt is in progress *)
-    | Unedited
-    | JustEdited
-
 type proof_attempt_status =
-    | Undone of undone_proof
+    | Unedited (** editor not yet run for interactive proof *)
+    | JustEdited (** edited but not run yet *)
+    | Interrupted (** external proof has never completed *)
+    | Scheduled (** external proof attempt is scheduled *)
+    | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
@@ -491,9 +488,9 @@ let save_result fmt r =
 
 let save_status fmt s =
   match s with
-    | Undone Unedited ->
+    | Unedited ->
         fprintf fmt "@\n<unedited/>"
-    | Undone _ ->
+    | Scheduled | Running | Interrupted | JustEdited ->
         fprintf fmt "@\n<undone/>"
     | InternalFailure msg ->
         fprintf fmt "@\n<internalfailure reason=\"%a\"/>"
@@ -1025,11 +1022,11 @@ let load_result r =
           Call_provers.pr_output = "";
           Call_provers.pr_status = Unix.WEXITED 0
         }
-    | "undone" -> Undone Interrupted
-    | "unedited" -> Undone Unedited
+    | "undone" -> Interrupted
+    | "unedited" -> Unedited
     | s ->
         eprintf "[Warning] Session.load_result: unexpected element '%s'@." s;
-        Undone Interrupted
+        Interrupted
 
 let load_option attr g =
   try Some (List.assoc attr g.Xml.attributes)
@@ -1091,7 +1088,7 @@ and load_proof_or_transf ~old_provers mg a =
         in
         let res = match a.Xml.elements with
           | [r] -> load_result r
-          | [] -> Undone Interrupted
+          | [] -> Interrupted
           | _ ->
             eprintf "[Error] Too many result elements@.";
             raise (LoadError (a,"too many result elements"))
@@ -1753,10 +1750,9 @@ let update_edit_external_proof env_session a =
         let file = Sysutil.uniquify file in
         let file = Sysutil.relativize_filename session_dir file in
         set_edited_as (Some file) a;
-        if a.proof_state = Undone Unedited
+        if a.proof_state = Unedited
         then set_proof_state ~notify ~obsolete:a.proof_obsolete
-          ~archived:a.proof_archived
-          (Undone Interrupted) a;
+          ~archived:a.proof_archived Interrupted a;
         file
       | Some f -> f
   in
@@ -1781,7 +1777,12 @@ let update_edit_external_proof env_session a =
   file
 
 let print_attempt_status fmt = function
-  | Undone _ -> pp_print_string fmt "Undone"
+  | Scheduled | Running ->
+    pp_print_string fmt "Running"
+  | JustEdited | Interrupted ->
+    pp_print_string fmt "Not yet run"
+  | Unedited ->
+    pp_print_string fmt "Not yet edited"
   | Done pr -> Call_provers.print_prover_result fmt pr
   | InternalFailure _ -> pp_print_string fmt "Failure"
 

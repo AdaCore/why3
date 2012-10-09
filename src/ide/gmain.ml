@@ -432,11 +432,11 @@ let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
   match result with
-    | Session.Undone Session.Interrupted -> !image_undone
-    | Session.Undone Session.Unedited
-    | Session.Undone Session.JustEdited -> !image_unknown
-    | Session.Undone Session.Scheduled -> !image_scheduled
-    | Session.Undone Session.Running -> !image_running
+    | Session.Interrupted -> !image_undone
+    | Session.Unedited -> !image_editor
+    | Session.JustEdited -> !image_unknown
+    | Session.Scheduled -> !image_scheduled
+    | Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
     | Session.Done r -> match r.Call_provers.pr_answer with
         | Call_provers.Valid ->
@@ -486,11 +486,11 @@ let set_proof_state a =
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
-    | S.Undone S.Unedited -> "(not yet edited)"
-    | S.Undone S.JustEdited -> "(edited)"
+    | S.Unedited -> "(not yet edited)"
+    | S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
-    | S.Undone S.Interrupted -> "(interrupted)"
-    | S.Undone (S.Scheduled | S.Running) ->
+    | S.Interrupted -> "(interrupted)"
+    | S.Scheduled | S.Running ->
         Format.sprintf "[limit=%d sec., %d M]"
           a.S.proof_timelimit a.S.proof_memlimit
   in
@@ -576,17 +576,16 @@ let update_task_view a =
     | S.Proof_attempt a ->
         let o =
           match a.S.proof_state with
-            | S.Undone S.Interrupted ->
-              "proof not yet scheduled for running"
-            | S.Undone S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
-            | S.Undone S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Interrupted -> "proof not yet scheduled for running"
+            | S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
+            | S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
             | S.Done ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
             | S.Done r -> r.Call_provers.pr_output
-            | S.Undone S.Scheduled-> "proof scheduled but not running yet"
-            | S.Undone S.Running -> "prover currently running"
+            | S.Scheduled-> "proof scheduled but not running yet"
+            | S.Running -> "prover currently running"
             | S.InternalFailure e ->
               let b = Buffer.create 37 in
               bprintf b "%a" Exn_printer.exn_printer e;
@@ -955,10 +954,10 @@ let bisect_proof_attempt pa =
   let set_timelimit res =
     timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
   let rec callback lp pa c = function
-    | S.Undone (S.Running | S.Scheduled) -> ()
-    | S.Undone S.Interrupted ->
+    | S.Running | S.Scheduled -> ()
+    | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
-    | S.Undone (S.Unedited | S.JustEdited) -> assert false
+    | S.Unedited | S.JustEdited -> assert false
     | S.InternalFailure exn ->
       (** Perhaps the test can be considered false in this case? *)
       dprintf debug "Bisecting interrupted by an error %a.@."
@@ -1005,10 +1004,10 @@ let bisect_proof_attempt pa =
         update the proof attempt *)
   let first_callback pa = function
     (** this pa can be different than the first pa *)
-    | S.Undone (S.Running | S.Scheduled) -> ()
-    | S.Undone S.Interrupted ->
+    | S.Running | S.Scheduled -> ()
+    | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
-    | S.Undone (S.Unedited | S.JustEdited) -> assert false
+    | S.Unedited | S.JustEdited -> assert false
     | S.InternalFailure exn ->
         dprintf debug "proof of the initial task interrupted by an error %a.@."
           Exn_printer.exn_printer exn

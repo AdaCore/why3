@@ -35,18 +35,13 @@ module PHprover : Util.PrivateHashtbl with type key = Whyconf.prover
 
 (** {2 Proof attempts} *)
 
-(** State of proof without result *)
-type undone_proof =
-    | Scheduled (** external proof attempt is scheduled *)
-    | Interrupted (** external proof has been interrupted or
-                      has never been scheduled*)
-    | Running (** external proof attempt is in progress *)
-    | Unedited (** unedited but editable *)
-    | JustEdited (** edited but not run yet *)
-
 (** State of a proof *)
 type proof_attempt_status =
-    | Undone of undone_proof
+    | Unedited (** editor not yet run for interactive proof *)
+    | JustEdited (** edited but not run yet *)
+    | Interrupted (** external proof has never completed *)
+    | Scheduled (** external proof attempt is scheduled *)
+    | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
