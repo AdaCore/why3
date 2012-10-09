@@ -492,11 +492,11 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
     | Undone Unedited ->
-        fprintf fmt "<unedited/>@\n"
+        fprintf fmt "@\n<unedited/>"
     | Undone _ ->
-        fprintf fmt "<undone/>@\n"
+        fprintf fmt "@\n<undone/>"
     | InternalFailure msg ->
-        fprintf fmt "<internalfailure reason=\"%a\"/>@\n"
+        fprintf fmt "@\n<internalfailure reason=\"%a\"/>"
           save_string (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
