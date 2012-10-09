@@ -226,7 +226,6 @@ let idle_handler t =
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
-            callback (Undone Scheduled);
             begin
               try
                 let pre_call =
@@ -290,9 +289,10 @@ let cancel_scheduled_proofs t =
 
 let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
     ~command ~driver ~callback t goal =
-    dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
-      (fun fmt g -> Format.pp_print_string fmt
-       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
+  dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
+    (fun fmt g -> Format.pp_print_string fmt
+      (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
+  callback (Undone Scheduled);
   Queue.push
     (Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                         callback,goal))
