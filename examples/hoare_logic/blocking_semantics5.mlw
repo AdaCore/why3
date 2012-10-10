@@ -431,12 +431,12 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
 
 
 (** [fresh_in_term id t] is true when [id] does not occur in [t] *)
-predicate fresh_in_term (x:ident) (t:term) =
+predicate fresh_in_term (id:ident) (t:term) =
   match t with
   | Tvalue _  -> true
-  | Tvar i  -> x <> i
+  | Tvar i  -> id <> i
   | Tderef _  -> true
-  | Tbin t1 _ t2 -> fresh_in_term x t1 /\ fresh_in_term x t2
+  | Tbin t1 _ t2 -> fresh_in_term id t1 /\ fresh_in_term id t2
   end
 
 
