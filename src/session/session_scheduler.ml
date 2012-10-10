@@ -992,6 +992,8 @@ module Base_scheduler (X : sig end)  =
     let idle_handler = ref None
     let timeout_handler = ref None
 
+    let verbose = ref true
+
      let idle f =
        match !idle_handler with
          | None -> idle_handler := Some f;
@@ -1003,7 +1005,8 @@ module Base_scheduler (X : sig end)  =
          | Some _ -> failwith "Replay.timeout: already one handler installed"
 
      let notify_timer_state w s r =
-       Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
+       if !verbose then
+         Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r
 
      let main_loop () =
        let last = ref (Unix.gettimeofday ()) in

@@ -711,7 +711,7 @@ function wp (s:stmt) (q:fmla) : fmla =
   (** {3 main soundness result} *)
 
   lemma wp_soundness:
-    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt,
+    forall n:int, sigma sigma':env, pi pi':stack, s s':stmt,
            sigmat: type_env, pit: type_stack, q:fmla.
       compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->

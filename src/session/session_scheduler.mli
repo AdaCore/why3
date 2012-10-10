@@ -265,6 +265,7 @@ module Base_scheduler (X : sig end) : sig
 
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: (unit -> bool) -> unit
+  val verbose : bool ref
   val notify_timer_state : int -> int -> int -> unit
   (** These functions have the properties required by OBSERVER *)
 

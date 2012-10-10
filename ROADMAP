@@ -132,14 +132,20 @@ scheduled on Sep 2012
 New features:
 
   o new API for programs
-  o type invariants ?
+  o type invariants
+
+  o transformations for induction
+
   o Support for Coq 8.4
   o dropped support for Coq 8.2
   o new scheme for Coq realizations using type classes
   o Support for PVS 6.0, including realizations
   o support for iProver and Zenon
+
   o a warning is emitted for unused bound logic variables in
     "forall", "exists" and "let"
+  o new warning: formulas of the form "exists x, P -> Q" 
+  o [replayer] new option -q
 
 Bug fixes:
 
@@ -189,6 +195,10 @@ Bug fixes:
 * The next commit : add +git to the version in file Version
 
 == TODOs ==
+
+
+* faire le menage dans les transformations d'induction : _int _ty
+  _ty_lex, et DOCUMENTER
 
 * Sortie PVS
 ** avec mecanisme de realization
