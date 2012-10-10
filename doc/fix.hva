@@ -4,3 +4,7 @@
 \newcommand{\bs}{\textbackslash}
 \newcommand{\vfill}{}
 \newcommand{\hrulefill}{}
+
+\makeatletter
+\RenewcommandHtml{\@boxed}[1]{{#1}}
+\makeatother
