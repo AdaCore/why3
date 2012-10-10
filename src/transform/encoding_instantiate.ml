@@ -118,7 +118,7 @@ type menv = {
   mutable undef_tsymbol : Sts.t;
 }
 
-let print_env fmt menv =
+let _print_env fmt menv =
   Format.fprintf fmt "defined_lsymbol (%a)@."
     (Pp.print_iter2 Mls.iter Pp.semi Pp.comma Pretty.print_ls
        (Pp.print_iter2 Mtyl.iter Pp.semi Pp.arrow
@@ -130,7 +130,7 @@ let print_env fmt menv =
           (Pp.print_list Pp.space Pretty.print_ty)
           Pretty.print_ts)) menv.defined_tsymbol
 
-type tvar = ty Mtv.t
+type _tvar = ty Mtv.t
 
 let projty menv tvar ty =
   let rec aux ty =
@@ -474,7 +474,7 @@ Perhaps you could use eliminate_definition"
       List.fold_left conv_f task tvarl
 
 
-let monomorphise_goal =
+let _monomorphise_goal =
   Trans.goal (fun pr f ->
     let stv = ty_quant f in
     let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
@@ -507,7 +507,7 @@ let create_env task tenv keep =
   }
 
 (* This one take use the tag but also all the type which appear in the goal *)
-let is_ty_mono ~only_mono ty =
+let _is_ty_mono ~only_mono ty =
   try
     let rec check () ty = match ty.ty_node with
       | Tyvar _ -> raise Exit
