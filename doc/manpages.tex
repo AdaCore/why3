@@ -766,12 +766,12 @@ The generated LaTeX files contain some macros that must be defined
 externally.  Various definitions can be given to them to customize the
 output.
 \begin{description}
-\item[\texttt{\bs{}provername}]: macro with one parameter, a prover name
-\item[\texttt{\bs{}valid}]: macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
-\item[\texttt{\bs{}noresult}]: macro without parameter, used where no result
+\item[\texttt{\bs{}provername}] macro with one parameter, a prover name
+\item[\texttt{\bs{}valid}] macro with one parameter, used where the corresponding prover answers that the goal is valid. The parameter is the time in seconds.
+\item[\texttt{\bs{}noresult}] macro without parameter, used where no result
   exists for the corresponding prover
-\item[\texttt{\bs{}timeout}]: macro without parameter, used where the corresponding prover reached the time limit
-\item[\texttt{\bs{}explanation}]: macro with one parameter, the goal name or its explanation
+\item[\texttt{\bs{}timeout}] macro without parameter, used where the corresponding prover reached the time limit
+\item[\texttt{\bs{}explanation}] macro with one parameter, the goal name or its explanation
 \end{description}
 
 \begin{figure}[t]
@@ -792,8 +792,8 @@ Section~\ref{chap:starting}.
 \subsection{Command \texttt{html}}
 
 This command produces a summary of the proof session in HTML syntax.
-There are three styles of output: 'table', 'simpletree' and
-'jstree'. The default is 'table'.
+There are three styles of output: `table', `simpletree', and
+`jstree'. The default is `table'.
 
 \begin{figure}[t]
 \begin{latexonly}
@@ -817,44 +817,47 @@ There are three styles of output: 'table', 'simpletree' and
 \label{fig:html}
 \end{figure}
 
-The style 'table' outputs the contents of the session as a table,
+The style `table' outputs the contents of the session as a table,
 similar to the LaTeX output above. Figure~\ref{fig:html} is the HTML
-table produced for the 'HelloProof' example, as typically shown in a
+table produced for the `HelloProof' example, as typically shown in a
 Web browser. The gray cells filled with \texttt{---} just mean that
 the prover was not run on the corresponding goal. Green background
 means the result was ``Valid'', other cases are in orange
 background. The red background for a goal means that the goal was not
 proved.
 
-The style ''simpletree' displays the contents of the session under the form of tree, similar to the tree view in the IDE. It uses only basic HTMl tags such as \verb|<ul>| and \verb|<li>|.
+The style `simpletree' displays the contents of the session under the
+form of tree, similar to the tree view in the IDE. It uses only basic
+HTML tags such as \verb|<ul>| and \verb|<li>|.
 
-The style 'jstree' displays a dynamic tree view of the session, where
-you can click on various parts to expand or shrink some part of the
-tree. Clicking on a edited proof script also shows the contents of
-this script. Technically, it use the 'jstree' plugin of the javascript
-library 'jquery'.
+The style `jstree' displays a dynamic tree view of the session, where
+you can click on various parts to expand or shrink some parts of the
+tree. Clicking on an edited proof script also shows the contents of
+this script. Technically, it uses the `jstree' plugin of the javascript
+library `jquery'.
 
 Specific options for this command are as follows.
 \begin{description}
-\item[\texttt{-{}-style <s>}] sets the style to use, among
-  \texttt{simpletree}, \texttt{jstree} and \texttt{table}, defaults to
+\item[\texttt{-{}-style <style>}] sets the style to use, among
+  \texttt{simpletree}, \texttt{jstree}, and \texttt{table}; defaults to
   \texttt{table}.
 
-\item[\texttt{-o}] the directory to output the produces files ('-' for
+\item[\texttt{-o <dir>}] sets the directory to output the produces files (`-' for
   stdout). The default is to output in the same directory as the session
   itself.
 
 \item[\texttt{-{}-context}] adds context around the generated code in
-  order to allow direct visualisation (header, css, ...). It also adds
+  order to allow direct visualization (header, css, ...). It also adds
   in the output directory all the needed external files. It can't be set with
   stdout output.
 
-\item[\texttt{-{}-add\_pp <suffix> <cmd> <out\_suffix>}] adds for the
-  given prefix the given pretty-printer, the new file as the given
-  out\_suffix. cmd must contain '\%i' which will be replaced by the
-  input file and '\%o' which will be replaced by the output file.
+\item[\texttt{-{}-add\_pp <suffix> <cmd> <out\_suffix>}] sets a specific
+  pretty-printer for files with the given suffix. Produced files use
+  \texttt{out\_suffix} as suffix. \texttt{cmd} must contain
+  `\texttt{\%i}' which will be replaced by the input file and
+  `\texttt{\%o}' which will be replaced by the output file.
 
-\item[\texttt{-{}-coqdoc}] use the \verb|coqdoc| command to display Coq proof
+\item[\texttt{-{}-coqdoc}] uses the \verb|coqdoc| command to display Coq proof
   scripts. This is equivalent to \texttt{-{}-add\_pp .v "coqdoc
     -{}-no-index -{}-html -o \%o \%i" .html}
 
@@ -863,7 +866,7 @@ Specific options for this command are as follows.
 \subsection{Commands modifying the proof attempts}
 
 The subcommands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
-and \texttt{rm} share the same set of options for selecting the proof
+and \texttt{rm}, share the same set of options for selecting the proof
 attempts to work on:
 \begin{itemize}
 \item Option \verb|--filter-prover| selects only the proof attempt with
