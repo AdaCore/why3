@@ -409,96 +409,81 @@ let adapt_timelimit a =
       max a.proof_timelimit (min t (2 * a.proof_timelimit))
     | _ -> a.proof_timelimit
 
+type run_external_status =
+  | Starting
+  | MissingProver
+  | MissingFile of string
+  | StatusChange of proof_attempt_status
+
+exception NoFile of string
+
+let run_external_proof_v2 eS eT a callback =
+  callback a a.proof_prover 0 None Starting;
+  match find_prover eS a with
+  | None ->
+    (* nothing to do *)
+    callback a a.proof_prover 0 None MissingProver
+  | Some(ap,npc,a) ->
+    if a.proof_edited_as = None &&
+       npc.prover_config.Whyconf.interactive
+    then begin
+      set_proof_state ~notify ~obsolete:false ~archived:false
+        Unedited a;
+      callback a ap 0 None (MissingFile "unedited")
+    end else begin
+      let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+      let timelimit = adapt_timelimit a in
+      let memlimit = a.proof_memlimit in
+      let inplace = npc.prover_config.Whyconf.in_place in
+      let command = Whyconf.get_complete_command npc.prover_config in
+      let cb result =
+        begin match result with
+        | Interrupted ->
+          set_proof_state ~notify ~obsolete:previous_obs
+            ~archived:false previous_result a
+        | _ ->
+          set_proof_state ~notify ~obsolete:false
+            ~archived:false result a
+        end;
+        callback a ap timelimit
+          (match previous_result with Done res -> Some res | _ -> None)
+          (StatusChange result) in
+      try
+        let old =
+          match get_edited_as_abs eS.session a with
+          | None -> None
+          | Some f ->
+            if Sys.file_exists f then Some f
+            else raise (NoFile f) in
+        schedule_proof_attempt
+          ~timelimit ~memlimit
+          ?old ~inplace ~command
+          ~driver:npc.prover_driver
+          ~callback:cb
+          eT
+          (goal_task a.proof_parent)
+      with NoFile f ->
+        set_proof_state ~notify ~obsolete:false ~archived:false
+          Unedited a;
+        callback a ap 0 None (MissingFile f)
+    end
+
+let run_external_proof_v2 eS eT a callback =
+  (* Perhaps the test a.proof_archived should be done somewhere else *)
+  if a.proof_archived || running a.proof_state then () else
+  run_external_proof_v2 eS eT a callback
 
 let run_external_proof eS eT ?callback a =
-  (* check that the state is not Scheduled or Running *)
-  (* Perhaps this test, a.proof_archived, should be done somewhere else *)
-  if a.proof_archived || running a.proof_state then ()
-  else
-    match find_prover eS a with
-      | None ->
-        (* nothing to do *)
-        Util.apply_option2 () callback a a.proof_state
-      | Some(_,npc,a) ->
-(* 
-    let ap = a.proof_prover in
-    match find_loadable_prover eS a.proof_prover with
-      | None ->
-        Debug.dprintf debug
-          "[Info] Can't redo an external proof since the prover %a is not loaded@."
-          Whyconf.print_prover a.proof_prover;
-        Util.apply_option2 () callback a a.proof_state
-      | Some (nap,npc) ->
-        (* eprintf "prover %a on goal %s@." *)
-        (*   Whyconf.print_prover a.proof_prover a.proof_parent.goal_name.Ident.id_string; *)
-        let g = a.proof_parent in
-        try
-          if nap == ap then raise Not_found;
-          let np_a = PHprover.find g.goal_external_proofs nap in
-          if O.replace_prover np_a a then
-            begin
-            (** The notification will be done by the new proof_attempt *)
-              O.remove np_a.proof_key;
-              raise Not_found
-            end
-        with Not_found ->
-          (** replace [a] by a new_proof attempt if [a.proof_prover] was not
-              loadable *)
-        let a = if nap == ap then a
-          else
-            let a = copy_external_proof
-              ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
-            O.init a.proof_key (Proof_attempt a);
-            a
-        in
-*)
-        let g = a.proof_parent in
-        if a.proof_edited_as = None &&
-          npc.prover_config.Whyconf.interactive then
-          begin
-            set_proof_state ~notify ~obsolete:false ~archived:false
-              Unedited a;
-            Util.apply_option2 () callback a a.proof_state
-          end
-        else
-          begin
-          let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
-          let timelimit = adapt_timelimit a in
-          let memlimit = a.proof_memlimit in
-          let callback result =
-            begin match result with
-              | Interrupted ->
-                  set_proof_state ~notify
-                    ~obsolete:previous_obs ~archived:false previous_result a
-              | _ ->
-                  set_proof_state ~notify ~obsolete:false
-                    ~archived:false result a end;
-            Util.apply_option2 () callback a result
-          in
-          let old =
-            match get_edited_as_abs eS.session a with
-              | None -> None
-              | Some f ->
-                if Sys.file_exists f then begin
-                  dprintf debug "Info: proving using edited file %s@." f;
-                  (Some f)
-                end
-                else begin
-                  dprintf debug "Warning: the file %s is not found@." f;
-                  None
-                end
-          in
-          let inplace = npc.prover_config.Whyconf.in_place in
-          let command = Whyconf.get_complete_command npc.prover_config in
-          (* eprintf "scheduling it...@."; *)
-          schedule_proof_attempt
-            ~timelimit ~memlimit
-            ?old ~inplace ~command
-            ~driver:npc.prover_driver
-            ~callback
-            eT
-            (goal_task g)
-        end
+  let callback =
+    match callback with
+    | None -> fun _ _ _ _ _ -> ()
+    | Some c -> fun a _ _ _ s ->
+      match s with
+      | Starting -> ()
+      | MissingProver -> c a Interrupted
+      | MissingFile _ -> c a a.proof_state
+      | StatusChange s -> c a s in
+  run_external_proof_v2 eS eT a callback
 
 let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
   let a =
@@ -667,72 +652,27 @@ end
 let push_report report (g,p,t,r) =
   report := (g.goal_name,p,t,r)::!report
 
-exception NoFile of string
-
 let check_external_proof eS eT todo a =
-  let g = a.proof_parent in
-  dprintf debug "[Sched] Check external proof : %a@."
-    (fun fmt g -> pp_print_string fmt g.goal_name.Ident.id_string) g;
-  (* check that the state is not Scheduled or Running *)
-  if a.proof_archived || running a.proof_state then ()
-  else
-    begin
-      Todo.todo todo;
-      match find_prover eS a with
-        | None ->
-          (* nothing to do 
-             TODO: report an non replayable proof if some option is set
-          *)
-          Todo._done todo (g,a.proof_prover,0,Prover_not_installed);
-        | Some(ap,npc,a) ->
-          try
-            let old =
-              match a.proof_edited_as with
-                | None -> None
-                | Some edited_as ->
-                  let f = Filename.concat eS.session.session_dir edited_as in
-                  if Sys.file_exists f then
-                    begin
-                    (* Format.eprintf "Info: proving using edited file %s@." f; *)
-                      (Some f)
-                    end
-                  else
-                    raise (NoFile f)
-            in
-            let inplace = npc.prover_config.Whyconf.in_place in
-            let timelimit = adapt_timelimit a in
-            let memlimit = a.proof_memlimit in
-            let callback result =
-              match result with
-                | Scheduled | Running -> ()
-                | Unedited | Interrupted | JustEdited -> assert false
-                | InternalFailure msg ->
-                  Todo._done todo (g,ap,timelimit,(CallFailed msg));
-                  set_proof_state ~notify ~obsolete:false ~archived:false
-                    result a
-                | Done new_res ->
-                  begin
-                    match a.proof_state with
-                      | Done old_res ->
-                          Todo._done todo
-                            (g,ap,timelimit,(Result(new_res,old_res)))
-                      | _ ->
-                        Todo._done todo
-                          (g,ap,timelimit,No_former_result new_res)
-                  end;
-                  set_proof_state ~notify ~obsolete:false ~archived:false
-                    result a
-            in
-            let command = Whyconf.get_complete_command npc.prover_config in
-            schedule_proof_attempt eT
-              ~timelimit ~memlimit
-              ?old ~inplace ~command
-              ~driver:npc.prover_driver
-              ~callback
-              (goal_task g)
-          with NoFile f ->
-            Todo._done todo (g,a.proof_prover,0,Edited_file_absent f);
-    end
+  let callback a ap tl old s =
+    let g = a.proof_parent in
+    match s with
+    | Starting ->
+      Todo.todo todo
+    | MissingFile f ->
+      Todo._done todo (g, ap, tl, Edited_file_absent f)
+    | MissingProver ->
+      Todo._done todo (g, ap, tl, Prover_not_installed)
+    | StatusChange (Scheduled | Running) -> ()
+    | StatusChange (Interrupted | Unedited | JustEdited) -> assert false
+    | StatusChange (InternalFailure e) ->
+      Todo._done todo (g, ap, tl, CallFailed e)
+    | StatusChange (Done res) ->
+      let r =
+        match old with
+        | None -> No_former_result res
+        | Some old -> Result (res, old) in
+      Todo._done todo (g, ap, tl, r) in
+  run_external_proof_v2 eS eT a callback
 
 (* dead code
 let check_goal_and_children eS eT todo g =
