@@ -49,37 +49,54 @@
 
 \makeindex
 
+%HEVEA\title{The Why3 platform}
+
 \begin{document}
 \sloppy
+%BEGIN LATEX
 \hbadness=5000
+%END LATEX
 
 \thispagestyle{empty}
 
 \begin{center}
 
+%BEGIN LATEX
 \rule\textwidth{0.8mm}
+%END LATEX
 
 \vfill
 
-{\Huge\fontsize{40}{40pt}
-\selectfont\bfseries\sffamily The Why3 platform}
+\begin{latexonly}
+{\fontsize{40}{40pt}\selectfont\bfseries\sffamily The Why3 platform}
+\end{latexonly}
+\begin{htmlonly}
+{\Huge\bfseries\sffamily The Why3 platform}
+\end{htmlonly}
 
 \vfill
 
+%BEGIN LATEX
 \rule\textwidth{0.8mm}
+%END LATEX
 
 \vfill
 
 % \todo{NE PAS DISTRIBUER TANT QU'IL RESTE DES TODOS}
 
-
+%BEGIN LATEX
 \begin{LARGE}
+%END LATEX
   Version \whyversion{}, May 2012
+%BEGIN LATEX
 \end{LARGE}
+%END LATEX
 
 \vfill
 
+%BEGIN LATEX
 \begin{Large}
+%END LATEX
   \begin{tabular}{c}
   Fran\c{c}ois Bobot$^{1,2}$ \\
   Jean-Christophe Filli\^atre$^{1,2}$  \\
@@ -87,7 +104,9 @@
   Guillaume Melquiond$^{2,1}$\\
   Andrei Paskevich$^{1,2}$
 \end{tabular}
+%BEGIN LATEX
 \end{Large}
+%END LATEX
 \vfill
 
 \begin{flushleft}
@@ -97,13 +116,19 @@ $^1$ LRI, CNRS, Univ Paris-Sud, Orsay, F-91405 \\
 $^2$ Inria Saclay -- \^Ile-de-France, Toccata, Palaiseau, F-91120
 \end{tabular}
 
+\begin{latexonly}
 \bigskip
+\end{latexonly}
 
   \textcopyright 2010-2012 Univ Paris-Sud, CNRS, INRIA
 
-  This work has been partly supported by the `U3CAT' national ANR project
-  (ANR-08-SEGI-021-08, \url{http://frama-c.cea.fr/u3cat}) and by the
-  Hi-Lite (\url{http://www.open-do.org/projects/hi-lite/}) FUI project of the
+\urldef{\urlutcat}{\url}{http://frama-c.cea.fr/u3cat}
+\urldef{\urlhilite}{\url}{http://www.open-do.org/projects/hi-lite/}
+
+  This work has been partly supported by the `\ahref{\urlutcat}{U3CAT}'
+  national ANR project (ANR-08-SEGI-021-08\begin{latexonly},
+  \urlutcat\end{latexonly}) and by the `\ahref{\urlhilite}{Hi-Lite}'
+  \begin{latexonly}(\urlhilite)\end{latexonly} FUI project of the
   System@tic competitivity cluster.
 
 \end{flushleft}
@@ -209,8 +234,9 @@ are the following.
 
 \cleardoublepage
 
+\begin{latexonly}
 \tableofcontents
-
+\end{latexonly}
 
 %\input{intro.tex}
 
