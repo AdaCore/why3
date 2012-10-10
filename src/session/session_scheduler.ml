@@ -417,6 +417,16 @@ type run_external_status =
 
 exception NoFile of string
 
+(* do not modify the proof duration if it changed by less than
+   10% or 0.1s, so as to avoid diff noise in session files *)
+let fuzzy_proof_time nres ores =
+  match ores, nres with
+  | Done { Call_provers.pr_time = told },
+    Done ({ Call_provers.pr_time = tnew } as res')
+    when tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1 ->
+    Done { res' with Call_provers.pr_time = told }
+  | _, _ -> nres
+
 let run_external_proof_v2 eS eT a callback =
   callback a a.proof_prover 0 None Starting;
   match find_prover eS a with
@@ -437,6 +447,7 @@ let run_external_proof_v2 eS eT a callback =
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in
       let cb result =
+        let result = fuzzy_proof_time result previous_result in
         begin match result with
         | Interrupted ->
           set_proof_state ~notify ~obsolete:previous_obs
