@@ -206,6 +206,12 @@ let check_used_var vars v =
 let check_used_vars vars =
   List.iter (check_used_var vars)
 
+let check_exists_implies q f =
+  match q,f.t_node with
+    | Texists, Tbinop(Timplies, _,_) ->
+       Warning.emit ?loc:f.t_loc "form \"exists, P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
+    | _ -> ()
+
 let rec term env t = match t.dt_node with
   | Tvar x ->
       assert (Mstr.mem x env);
@@ -267,6 +273,7 @@ and fmla env = function
       let trl = List.map (List.map trigger) trl in
       let f = fmla env f1 in
       check_used_vars f.Term.t_vars vl;
+      check_exists_implies q f;
       t_quant_close q vl trl f
   | Fapp (s, tl) ->
       ps_app s (List.map (term env) tl)

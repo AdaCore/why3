@@ -161,7 +161,7 @@ theory Fset
 
   axiom nth_surjective:
     forall s: set 'a, x: 'a. mem x s ->
-    exists i: int. 0 <= i < cardinal s -> x = nth i s
+    exists i: int. 0 <= i < cardinal s /\ x = nth i s
 
 end
 
