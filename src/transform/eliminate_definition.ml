@@ -195,7 +195,7 @@ type bisect_step =
 
 type rem = { rem_pr : Spr.t; rem_ls : Sls.t; rem_ts : Sts.t }
 
-let print_rem fmt rem = Format.fprintf fmt
+let _print_rem fmt rem = Format.fprintf fmt
   "@[rem_pr:@[%a@]@\nrem_ls:@[%a@]@\nrem_ts:@[%a@]@\n"
   (Pp.print_iter1 Spr.iter Pp.comma Pretty.print_pr) rem.rem_pr
   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) rem.rem_ls
@@ -228,7 +228,7 @@ let add_rem rem decl =
   | Dind (_,l) -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
   | Dprop (_,pr,_) -> remove_pr rem pr
 
-let union_rem rem1 rem2 =
+let _union_rem rem1 rem2 =
   { rem_ts = Sts.union rem1.rem_ts rem2.rem_ts;
     rem_ls = Sls.union rem1.rem_ls rem2.rem_ls;
     rem_pr = Spr.union rem1.rem_pr rem2.rem_pr;

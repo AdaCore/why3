@@ -798,24 +798,33 @@ let info_window ?(callback=(fun () -> ())) mt s =
 let file_info = GMisc.label ~text:""
   ~packing:(right_hb#pack ~fill:true) ()
 
-let warning_window ?loc msg =
-  begin
-    match loc with
-    | None ->
-      Format.fprintf Format.str_formatter "%s" msg
-    | Some l ->
-      (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-      Format.fprintf Format.str_formatter "%a: %s"
-        Loc.gen_report_position l msg
-  end;
-  let msg =
-    Format.flush_str_formatter ()
-  in
-  file_info#set_text msg;
-  info_window `WARNING msg
+let warnings = Queue.create ()
 
-let () = Warning.set_hook warning_window
+let record_warning ?loc msg = Queue.push (loc,msg) warnings
 
+let () = Warning.set_hook record_warning
+
+
+let display_warnings () =
+  if Queue.is_empty warnings then () else
+    begin
+      Queue.iter 
+        (fun (loc,msg) ->
+          match loc with
+            | None ->
+              Format.fprintf Format.str_formatter "%s@\n" msg
+            | Some l ->
+            (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+              Format.fprintf Format.str_formatter "%a: %s@\n"
+                Loc.gen_report_position l msg)
+        warnings;
+      Queue.clear warnings;
+      let msg =
+        Format.flush_str_formatter ()
+      in
+  (* file_info#set_text msg; *)
+      info_window `WARNING msg
+    end  
 
 (* check if provers are present *)
 let () =
@@ -867,7 +876,8 @@ let () =
         else
           try
             Debug.dprintf debug "[Info] adding file %s in database@." fn;
-            ignore (M.add_file (env_session()) ?format:!opt_parser fn)
+            ignore (M.add_file (env_session()) ?format:!opt_parser fn);
+            display_warnings ()
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -1122,7 +1132,8 @@ let select_file () =
               let f = Sysutil.relativize_filename project_dir f in
               Debug.dprintf debug "Adding file '%s'@." f;
               try
-                ignore (M.add_file (env_session()) f)
+                ignore (M.add_file (env_session()) f);
+                display_warnings ()
               with e ->
                 fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f

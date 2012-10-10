@@ -281,7 +281,7 @@ module type S = sig
   val name       : t -> Ident.ident
 end
 
-
+(*
 module type Sold = sig
   type t
   val checksum : t -> string
@@ -289,7 +289,9 @@ module type Sold = sig
   val id       : t -> Ident.ident
 (* .goal_name *)
 end
+*)
 
+(*
 module type Snew = sig
   type t
   val checksum : t -> string
@@ -311,6 +313,7 @@ module type Snew = sig
 
 
 end
+*)
 
 
 (*************************************************************)
