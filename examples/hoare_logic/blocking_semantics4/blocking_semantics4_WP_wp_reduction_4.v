@@ -768,57 +768,34 @@ Axiom abstract_effects_writes : forall (sigma:(map mident value)) (pi:(list
   (abstract_effects s q)) -> (eval_fmla sigma pi (wp s (abstract_effects s
   q))).
 
-Require Import Why3.
+Axiom monotonicity : forall (s:expr) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
 
-Ltac ae := why3 "alt-ergo" timelimit 5.
+Axiom distrib_conj : forall (s:expr) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
+  (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
 (* Why3 goal *)
-Theorem monotonicity : forall (s:expr),
+Theorem wp_reduction : forall (sigma:(map mident value)) (sigma':(map mident
+  value)) (pi:(list (ident* value)%type)) (pi':(list (ident* value)%type))
+  (s:expr),
   match s with
   | (Evalue v) => True
   | (Ebin e o e1) => True
   | (Evar i) => True
   | (Ederef m) => True
-  | (Eassign m e) => (forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
-      q)) -> (valid_fmla (Fimplies (wp e p) (wp e q)))) -> forall (p:fmla)
-      (q:fmla), (valid_fmla (Fimplies p q)) -> (valid_fmla (Fimplies (wp s p)
-      (wp s q)))
+  | (Eassign m e) => (forall (s':expr), (one_step sigma pi e sigma' pi'
+      s') -> forall (q:fmla), (eval_fmla sigma pi (wp e q)) ->
+      (eval_fmla sigma' pi' (wp s' q))) -> forall (s':expr), (one_step sigma
+      pi s sigma' pi' s') -> forall (q:fmla), (eval_fmla sigma pi (wp s
+      q)) -> (eval_fmla sigma' pi' (wp s' q))
   | (Eseq e e1) => True
   | (Elet i e e1) => True
   | (Eif e e1 e2) => True
   | (Eassert f) => True
   | (Ewhile e f e1) => True
   end.
-destruct s; auto.
-unfold valid_fmla.
-simpl.
-intros H0 p q H sigma pi.
-pose (id1 := (fresh_from p s)); fold id1.
-pose (id2 := (fresh_from q s)); fold id2.
-intros.
-
-apply H0 with (p := (Flet id1 (Tvar result)
-  (Flet result (msubst_term (Tvalue Vvoid) m id1) (msubst p m id1)))).
-intros.
-simpl in *.
-
-assert (forall (id : ident), (msubst_term (Tvalue Vvoid) m id)
-         = (Tvalue Vvoid)).
-ae.
-rewrite H3.
-simpl.
-apply eval_msubst; auto.
-apply fresh_from_fmla.
-clear H0 H1 H2.
-destruct (ident_decide id2 result).
-(* id2 = result*)
-rewrite H0.
-rewrite get_stack_eq; auto.
-admit.
-rewrite get_stack_neq; auto.
-rewrite get_stack_eq; auto.
-apply H.
-(* todo *)
+intros sigma sigma' pi pi' s.
 
 Qed.
 

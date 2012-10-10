@@ -756,7 +756,6 @@ unfold valid_fmla ; simpl.
 intros sigma' pi' (H5 & H6).
 apply H1; auto; clear H1.
 generalize (monotonicity s1 _ _ H).
-why3 "alt-ergo" timelimit 5.
 clear H; intro H.
 unfold valid_fmla in H.
 simpl in H.
