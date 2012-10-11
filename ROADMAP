@@ -122,30 +122,36 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 ==================== Roadmap for release 0.74 ========================
 
-scheduled on Sep 2012
+scheduled on Oct 2012
 
 == New Features to announce ==
 
-New features:
-
+Programs:
   o new API for programs
+  o new concrete syntax for programs
   o type invariants
+  o ghost code
 
+Transformations:
   o transformations for induction
 
+Provers support:
   o Support for Coq 8.4
   o dropped support for Coq 8.2
   o new scheme for Coq realizations using type classes
   o Support for PVS 6.0, including realizations
   o support for iProver and Zenon
 
-  o a warning is emitted for unused bound logic variables in
-    "forall", "exists" and "let"
-  o new warning: formulas of the form "exists x, P -> Q" 
+Misc:
   o [replayer] new option -q
+  o a warning is emitted for unused bound logic variables in "forall",
+    "exists" and "let"
+  o a warning is emitted for any occurrence of a formula of the form
+    "exists x, P -> Q". Formulas of this form are usually a user
+    mistake. If this is intended, one can write "exists x, not P \/ Q"
+   instead
 
 Bug fixes:
-
   o fixed bug on merging config files which prevented the use
     of Why3 back-end of the Frama-C/Jessie plugin when Coq is
     not installed. (Bug 14672 of the Bug Tracking System)
