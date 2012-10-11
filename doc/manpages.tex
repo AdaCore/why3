@@ -21,37 +21,37 @@ provided by the \why environment. These are as follows:
 All these tools accept a common subset of command-line options. In
 particular the option \verb|-help| which displays the usage and options.
 \begin{description}
-\item[\texttt{-L} $d$]
-  adds $d$ in the load path, to search for theories.
+\item[\texttt{-L \textsl{<dir>}}]
+  adds \texttt{\textsl{<dir>}} in the load path, to search for theories.
   \index{L@\verb+-L+|see{\texttt{-{}-library}}}
-\item[\texttt{-{}-library} $d$]
-  same as \verb|-L|
+\item[\texttt{-{}-library \textsl{<dir>}}]
+  is the same as \verb|-L|.
   \index{library@\verb+--library+}
-\item[\texttt{-I} $d$]
-  same as \verb|-L| (deprecated)
+\item[\texttt{-I \textsl{<dir>}}]
+  is the same as \verb|-L| (deprecated)
   \index{I@\verb+-I+|see{\texttt{-{}-library}}}
-\item[\texttt{-C} $file$]
-  reads configuration from $file$
+\item[\texttt{-C \textsl{<file>}}]
+  reads the configuration from the given file.
   \index{C@\verb+-C+|see{\texttt{-{}-config}}}
-\item[\texttt{-{}-config} $file$]
-  same as \verb|-C|
+\item[\texttt{-{}-config \textsl{<file>}}]
+  is the same as \verb|-C|.
   \index{config@\verb+--config+}
-\item[\texttt{-{}-extra-config} $file$]
-  reads additional configuration from $file$
+\item[\texttt{-{}-extra-config \textsl{<file>}}]
+  reads additional configuration from the given file.
   \index{extra-config@\verb+--extra-config+}
 \item[\texttt{-{}-list-debug-flags}]
-  lists known debug flags
+  lists known debug flags.
   \index{list-debug-flags@\verb+--list-debug-flags+}
 \item[\texttt{-{}-debug-all}]
-  sets all debug flags (except flags which change the behavior)
+  sets all debug flags (except flags which change the behavior).
   \index{debug-all@\verb+--debug-all+}
-\item[\texttt{-{}-debug} $flag$]
-  set a debug flag
+\item[\texttt{-{}-debug \textsl{<flag>}}]
+  set a specific debug flag.
   \index{debug@\verb+--debug+}
 \item[\texttt{-v}]
-  print version information
+  prints version information.
 \item[\texttt{-help}]
-  displays the usage and the exact list of options for the given tool
+  displays the usage and the exact list of options for the given tool.
 \end{description}
 
 \section{The \texttt{why3config} command-line tool}
@@ -524,19 +524,21 @@ option \verb|-force| described below.
 
 \paragraph{Exit code and options}
 
-\begin{itemize}
-\item The exit code is 0 if no difference was detected, 1 if there
-  was. Other exit codes mean some failure in running the replay.
-\item Option \verb|-s| suppresses the output of the final tree view.
-\item Option \verb|-q| runs quietly (no progress info)
-\item Option \texttt{-I \textsl{<path>}} adds \texttt{\textsl{<path>}} to the loadpath.
-\item Option \verb|-force| enforces saving the session, if all proof
+The exit code is 0 if no difference was detected, 1 if there
+was. Other exit codes mean some failure in running the replay.
+
+Options are:
+\begin{description}
+\item[\texttt{-s}] suppresses the output of the final tree view.
+\item[\texttt{-q}] runs quietly (no progress info).
+\item[\texttt{-I \textsl{<dir>}}] adds the given directory to the load path.
+\item[\texttt{-force}] enforces saving the session, if all proof
   attempts replayed correctly, even if some goals are not proved.
-\item Option \verb|-obsolete-only| replays the proofs only if the session
+\item[\texttt{-obsolete-only}] replays the proofs only if the session
   contains obsolete proof attempts.
-\item Option \texttt{-smoke-detector \{none|top|deep\}} tries to detect
+\item[\texttt{-smoke-detector \{none|top|deep\}}] tries to detect
   if the context is self-contradicting.
-\end{itemize}
+\end{description}
 
 \paragraph{Smoke Detector}
 
@@ -615,15 +617,15 @@ consequently the proof status is always marked as obsolete.
 All the commands above share the following common set of options:
 common options:
 \begin{description}
-\item[\texttt{-C <file>}] reads configuration from \texttt{file}
-\item[\texttt{-{}-config}]  same as \texttt{-C}
-\item[\texttt{-{}-extra-config <file>}] reads additional configuration from \texttt{<file>}
-\item[\texttt{-L <dir>}]              adds \texttt{<dir>} to the library search path
-\item[\texttt{-{}-library}]             same as \texttt{-L}
-\item[\texttt{-v}]                    prints version information
-\item[\texttt{-{}-list-debug-flags}]    lists known debug flags
-\item[\texttt{-{}-debug-all}]           sets all debug flags (except flags which change the behavior)
-\item[\texttt{-{}-debug <flag>}]        sets a debug flag
+\item[\texttt{-C \textsl{<file>}}] reads configuration from \texttt{file}.
+\item[\texttt{-{}-config}] is the same as \texttt{-C}.
+\item[\texttt{-{}-extra-config \textsl{<file>}}] reads additional configuration from \texttt{<file>}.
+\item[\texttt{-L \textsl{<dir>}}] adds \texttt{<dir>} to the library search path.
+\item[\texttt{-{}-library \textsl{<dir>}}] is the same as \texttt{-L}.
+\item[\texttt{-v}] prints version information.
+\item[\texttt{-{}-list-debug-flags}] lists known debug flags.
+\item[\texttt{-{}-debug-all}] sets all debug flags (except flags which change the behavior).
+\item[\texttt{-{}-debug \textsl{<flag>}}] sets a specific debug flag.
 \end{description}
 
 \subsection{Command \texttt{info}}
@@ -742,15 +744,15 @@ per file.
 
 The specific options are
 \begin{description}
-\item[\texttt{-style <n>}] sets output style (1 or 2, default 1)
+\item[\texttt{-style \textsl{<n>}}] sets output style (1 or 2, default 1)
   Option \texttt{-style 2} produces an alternate version of LaTeX
   output, with a different layout of the tables.
-\item[\texttt{-o <path>}] where
-  to produce LaTeX files (default: session dir)
-\item[\texttt{-longtable}] use 'longtable' environment instead of
-  'tabular'
-\item[\texttt{-e <elem>}] produces a table for element <elem>, which is
-  either a file, a theory or a root goal. The <elem> must be specified
+\item[\texttt{-o \textsl{<dir>}}] indicates where
+  to produce LaTeX files (default: the session directory).
+\item[\texttt{-longtable}] uses the `longtable' environment instead of
+  'tabular'.
+\item[\texttt{-e \textsl{<elem>}}] produces a table for the given element, which is
+  either a file, a theory or a root goal. The element must be specified
   using its path in dot notation, e.g. \verb|file.theory.goal|. The
   file produced is named accordingly,
   e.g. \verb|file.theory.goal.tex|.  This option can be given several
@@ -838,22 +840,22 @@ library `jquery'.
 
 Specific options for this command are as follows.
 \begin{description}
-\item[\texttt{-{}-style <style>}] sets the style to use, among
+\item[\texttt{-{}-style \textsl{<style>}}] sets the style to use, among
   \texttt{simpletree}, \texttt{jstree}, and \texttt{table}; defaults to
   \texttt{table}.
 
-\item[\texttt{-o <dir>}] sets the directory to output the produces files (`-' for
-  stdout). The default is to output in the same directory as the session
-  itself.
+\item[\texttt{-o \textsl{<dir>}}] sets the directory where to output
+  the produced files (`\texttt{-}' for stdout). The default is to output
+  in the same directory as the session itself.
 
 \item[\texttt{-{}-context}] adds context around the generated code in
   order to allow direct visualization (header, css, ...). It also adds
   in the output directory all the needed external files. It can't be set with
   stdout output.
 
-\item[\texttt{-{}-add\_pp <suffix> <cmd> <out\_suffix>}] sets a specific
+\item[\texttt{-{}-add\_pp \textsl{<suffix>} \textsl{<cmd>} \textsl{<out\_suffix>}}] sets a specific
   pretty-printer for files with the given suffix. Produced files use
-  \texttt{out\_suffix} as suffix. \texttt{cmd} must contain
+  \texttt{\textsl{<out\_suffix>}} as suffix. \texttt{\textsl{<cmd>}} must contain
   `\texttt{\%i}' which will be replaced by the input file and
   `\texttt{\%o}' which will be replaced by the output file.
 
@@ -868,24 +870,24 @@ Specific options for this command are as follows.
 The subcommands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
 and \texttt{rm}, share the same set of options for selecting the proof
 attempts to work on:
-\begin{itemize}
-\item Option \verb|--filter-prover| selects only the proof attempt with
+\begin{description}
+\item[\texttt{-{}-filter-prover \textsl{<prover>}}] selects only the proof attempt with
   the given prover. This option can be specified multiple times to
   allow to select all the proofs that corresponds to one of the given
   provers. If this option is not specified, the proof are simply not
   filtered by there corresponding prover.
-\item Option \verb|--filter-verified yes| restricts the selection to
+\item[\texttt{-{}-filter-verified yes}] restricts the selection to
   the proofs that are valid and not obsolete. On contrary the option
   \verb|--filter-verified no| select the ones that are not verified.
   \verb|--filter-verified all|, the default, does not select on this property.
-\item Option \verb|--filter-verified-goal yes| restricts the selection
+\item[\texttt{-{}-filter-verified-goal yes}] restricts the selection
   to the proofs of verified goals (that does not mean that the proof is
   verified). Same for the other cases \verb|no| and \verb|all|.
-\item Option \verb|--filter-archived yes| restricts the selection
+\item[\texttt{-{}-filter-archived yes}] restricts the selection
   to the proofs that are archived.
   Same for the other cases \verb|no|
   and \verb|all| except the default is \verb|no|.
-\end{itemize}
+\end{description}
 
 \noindent
 The subcommand \texttt{mod}, \texttt{copy} and \texttt{copy-archive}
@@ -895,13 +897,13 @@ subcommand \texttt{mod} modify directly the proof attempt,
 \texttt{copy-archive} mark the original proof attempt as
 archived.
 The options are:
-\begin{itemize}
-\item Option \verb|--set-obsolete| marks the selected proofs as
+\begin{description}
+\item[\texttt{-{}-set-obsolete}] marks the selected proofs as
   obsolete.
-\item Option \verb|--set-archived| marks the selected proofs as archived.
-\item Option \verb|--unset-archived| removes the archived attribute
+\item[\texttt{-{}-set-archived}] marks the selected proofs as archived.
+\item[\texttt{-{}-unset-archived}] removes the archived attribute
   from the selected proofs.
-\item Option \verb|--to-prover| modify the prover, for example
+\item[\texttt{-{}-to-prover \textsl{<prover>}}] modifies the prover, for example
   \texttt{-{}-to-prover Alt-Ergo,0.94}. A conflict arises if a proof
   with this prover already exists. In this case you can choose between four
   behaviors:
@@ -912,7 +914,7 @@ The options are:
   obsolete) (\verb|-c|, \verb|--conservative|); this is the default;
 \item ask the user each time the case arises (\verb|-i|, \verb|--interactive|).
 \end{itemize}
-\end{itemize}
+\end{description}
 
 
 The subcommand \texttt{rm} removes the selected proof
@@ -968,19 +970,19 @@ identifier use to its definition.
 
 \paragraph{Options}
 
-\begin{itemize}
-\item Option \texttt{-o \textsl{<dir>}} defines the directory where to
+\begin{description}
+\item[\texttt{-o \textsl{<dir>}}] defines the directory where to
   output the HTML files.
-\item Option \verb|--output| is the same as \verb|-o|.
-\item Option \verb|--index| (resp. \verb|--no-index|) to include
-  (resp. exclude) the generation of an index file \texttt{index.html}.
+\item[\texttt{-{}-output \textsl{<dir>}}] is the same as \verb|-o|.
+\item[\texttt{-{}-index}] (resp. \verb|--no-index|) generates
+  (resp. does not generate) an index file \texttt{index.html}.
   The default behavior is to generate an index if more than one file
   is passed on the command line.
-\item Option \verb|--title|~\textsl{s} sets title \textsl{s} for the
+\item[\texttt{-{}-title \textsl{<title>}}] sets title of the
   index page.
-\item Option \verb|--stdlib-url|~\textsl{url} sets a URL for files
+\item[\texttt{-{}-stdlib-url \textsl{<url>}}] sets a URL for files
   found in load path, so that links to definitions can be added.
-\end{itemize}
+\end{description}
 
 \paragraph{Typesetting textual comments}
 
