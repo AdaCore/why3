@@ -430,10 +430,10 @@ The compared components can be defined in an \emph{rc-file},
 generally a bench configuration file:
 \begin{verbatim}
 [probs "myprobs"]
-   file = "examples/monbut.why" #relatives to the rc file
-   file = "examples/monprogram.mlw"
-   theory = "monprogram.T"
-   goal = "monbut.T.G"
+   file = "examples/mygoal.why" #relatives to the rc file
+   file = "examples/myprogram.mlw"
+   theory = "myprogram.T"
+   goal = "mygoal.T.G"
 
    transform = "split_goal" #applied in this order
    transform = "..."
@@ -761,7 +761,6 @@ The specific options are
   table per theory is disabled.
 \end{description}
 
-
 \paragraph{Customizing LaTeX output}
 
 The generated LaTeX files contain some macros that must be defined
@@ -777,19 +776,27 @@ output.
 \end{description}
 
 \begin{figure}[t]
-\begin{latexonly}
-  \begin{center}
-    \input{HelloProof.tex}
-  \end{center}
-\end{latexonly}
-  \lstinputlisting{./replayer_macros.tex}
-  \caption{Sample macros for the LaTeX command}
+\begin{center}
+\lstinputlisting{./replayer_macros.tex}
+\end{center}
+\caption{Sample macros for the LaTeX command}
+\label{fig:custom-latex}
+\end{figure}
+
+\begin{figure}[t]
+\begin{center}
+\begin{toimage}
+\input{HelloProof.tex}
+\end{toimage}
+%HEVEA\imageflush
+\end{center}
+\caption{LaTeX table produced for the HelloProof example}
 \label{fig:latex}
 \end{figure}
 
-Figure~\ref{fig:latex} proposes some suggestions for these macros,
-together with the table obtained from the HelloProof example of
-Section~\ref{chap:starting}.
+Figure~\ref{fig:custom-latex} suggests some definitions for these macros,
+while Figure~\ref{fig:latex} shows the table obtained from the HelloProof
+example of Section~\ref{chap:starting}.
 
 \subsection{Command \texttt{html}}
 
@@ -798,10 +805,9 @@ There are three styles of output: `table', `simpletree', and
 `jstree'. The default is `table'.
 
 \begin{figure}[t]
+\begin{center}
 \begin{latexonly}
-  \begin{center}
-    \fbox{\includegraphics[width=0.9\textwidth]{hello_proof.png}}
-  \end{center}
+\fbox{\includegraphics[width=0.9\textwidth]{hello_proof.png}}
 \end{latexonly}
 \begin{htmlonly}
 \begin{rawhtml}
@@ -815,7 +821,8 @@ There are three styles of output: `table', `simpletree', and
 </table>
 \end{rawhtml}
 \end{htmlonly}
-  \caption{HTML table produced for the HelloProof example}
+\end{center}
+\caption{HTML table produced for the HelloProof example}
 \label{fig:html}
 \end{figure}
 
