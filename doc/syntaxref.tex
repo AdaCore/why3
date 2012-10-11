@@ -137,12 +137,14 @@ disequality (\texttt{<>}).
 \label{fig:bnf:formula}
 \end{figure}
 
-Notice that there are two symbols for the conjunction: \texttt{and}
-and \verb|&&|, and similarly for disjunction. There are logically
+Notice that there are two symbols for the conjunction: \verb|/\|
+and \verb|&&|, and similarly for disjunction. They are logically
 equivalent, but may be treated slightly differently by some
-transformation, \eg{} the \texttt{split} transformation transforms
-$A~\texttt{and}~B$ into subgoals $A$ and $B$, whereas it transforms
-$A~\verb|&&|~B$ into subgoals $A$ and $A\rightarrow B$.
+transformations. For instance, \texttt{split} transforms the goal
+\verb|A /\ B| into subgoals \verb|A| and \verb|B|, whereas it transforms
+\verb|A && B| into subgoals \verb|A| and \verb|A -> B|. Similarly, it
+transforms \verb!not (A || B)! into subgoals \verb|not A| and
+\verb|not ((not A) /\ B)|.
 
 \paragraph{Theories.}
 The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
