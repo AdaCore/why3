@@ -29,8 +29,8 @@ let fmla_false : Term.term = Term.t_false
 let fmla1 : Term.term = Term.t_or fmla_true fmla_false
 \end{ocamlcode}
 The library uses the common type \texttt{term} both for terms
-(i.e.~expressions that produce a value of some particular type)
-and formulas (i.e.~boolean-valued expressions).
+(\ie expressions that produce a value of some particular type)
+and formulas (\ie boolean-valued expressions).
 % To distinguish terms from formulas, one can look at the
 % \texttt{t_ty} field of the \texttt{term} record: in formulas,
 % this field has the value \texttt{None}, and in terms,
@@ -118,7 +118,7 @@ let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
 \end{ocamlcode}
 
 The task for our second formula is a bit more complex to build, because
-the variables A and B must be added as abstract (i.e.~not defined)
+the variables A and B must be added as abstract (\ie not defined)
 propositional symbols in the task.
 \begin{ocamlcode}
 (* task for formula 2 *)
@@ -239,7 +239,7 @@ is the maximum allowed memory in megabytes.  The type
 \texttt{prover\_result} is a record with three fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, explained below;
-\item \texttt{pr\_output}: the output of the prover, i.e. both
+\item \texttt{pr\_output}: the output of the prover, \ie both
   standard output and the standard error of the process
   (a redirection in \texttt{why3.conf} is required);
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
@@ -252,10 +252,10 @@ A \texttt{pr\_answer} is a sum of several kind of answers:
 \item \texttt{Unknown} $msg$: the prover can't determine if the task
   is valid; the string parameter $msg$ indicates some extra
   information.
-\item \texttt{Failure} $msg$: the prover reports a failure, i.e.~it
+\item \texttt{Failure} $msg$: the prover reports a failure, \ie it
   was unable to read correctly its input task.
 \item \texttt{HighFailure}: an error occurred while trying to call the
-  prover, or the prover answer was not understood (i.e.~none of the
+  prover, or the prover answer was not understood (\ie none of the
   given regular expressions in the driver file matches the output
   of the prover).
 \end{itemize}
