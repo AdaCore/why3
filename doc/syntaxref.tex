@@ -261,13 +261,13 @@ The corresponding rules for computing WP are as follows:
 The other forms of code contracts allow to abstract a piece of code by specifications.
 \begin{itemize}
 \item $\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \}$ is a
-  non-deterministic expression which requires the precondition $P$ to
-  hold, then makes some side effects $\epsilon$ and returns any value
+  non-deterministic expression that requires the precondition $P$ to
+  hold, then makes some side effects $\epsilon$, and returns any value
   of type $\tau$ such that $Q$ holds. This construct acts as an axiom
-  in the sense that it is not check whether there exists any program
+  in the sense that it does not check whether there exists any program
   that can effectively establish the post-condition (similarly as the
   introduction of a \texttt{val} at the global level).
-\item $\texttt{contract}~e~\{ Q \}$ evaluates expression $e$ and the
+\item $\texttt{contract}~e~\{ Q \}$ evaluates the expression $e$ and
   ensures that the post-condition $Q$ holds afterwards.
 \item $\texttt{abstract}~e~\{ Q \}$ makes sure that the evaluation of
   expression $e$ establishes the post-condition $Q$, and then abstract
