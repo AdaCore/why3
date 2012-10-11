@@ -153,6 +153,13 @@ theory Fset
     forall s: set 'a. cardinal s = 1 ->
     forall x: 'a. mem x s -> x = choose s
 
+end
+
+theory FsetNth
+
+  use import int.Int
+  use import Fset
+
   function nth (i: int) (s: set 'a) : 'a
 
   axiom nth_injective:
