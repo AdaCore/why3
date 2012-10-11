@@ -375,7 +375,7 @@ predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_sta
   (forall id: mident. type_value (IdMap.get sigma id) = get_reftype id sigmat) /\
   (forall id: ident. type_value (get_stack id pi) = get_vartype id pit)
 
-lemma type_inversion : forall v:value.
+lemma type_inversion : forall v "induction":value.
    match (type_value v) with
     | TYbool -> exists b: bool. v = Vbool b
     | TYint -> exists n: int. v = Vint n
@@ -408,15 +408,15 @@ theory FreshVariables
 use import SemOp
 use import list.Append
 
-(** substitution of a reference [r] by a logic variable [v]
+(** substitution of a reference [x] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is fresh *)
 
-function msubst_term (t:term) (r:mident) (v:ident) : term =
+function msubst_term (t:term) (x:mident) (v:ident) : term =
   match t with
   | Tvalue _ | Tvar _  -> t
-  | Tderef x -> if r = x then Tvar v else t
+  | Tderef y -> if x = y then Tvar v else t
   | Tbin t1 op t2  ->
-      Tbin (msubst_term t1 r v) op (msubst_term t2 r v)
+      Tbin (msubst_term t1 x v) op (msubst_term t2 x v)
   end
 
 function msubst (f:fmla) (x:mident) (v:ident) : fmla =

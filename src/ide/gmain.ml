@@ -549,32 +549,28 @@ let env_session () =
     | None -> assert false
     | Some e -> e
 
-let display_task t =
-  let task_text = Pp.string_of Pretty.print_task t in
-  task_view#source_buffer#set_text task_text;
-  task_view#scroll_to_mark `INSERT
+let task_text t = Pp.string_of Pretty.print_task t 
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
 let update_task_view a =
+  let text = 
   match a with
     | S.Goal g ->
       if (Gconfig.config ()).intro_premises then
         let trans =
           Trans.lookup_transform intro_transformation (env_session()).S.env
         in
-        display_task (try Trans.apply trans (S.goal_task g) with
+        task_text (try Trans.apply trans (S.goal_task g) with
           e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
       else
-        display_task (S.goal_task g)
-    | S.Theory _th ->
-        task_view#source_buffer#set_text ""
-    | S.File _file ->
-        task_view#source_buffer#set_text ""
+        task_text (S.goal_task g)
+    | S.Theory th -> "Theory " ^ th.S.theory_name.Ident.id_string
+    | S.File file -> "File " ^ file.S.file_name
     | S.Proof_attempt a ->
-        let o =
+        begin
           match a.S.proof_state with
             | S.Interrupted -> "proof not yet scheduled for running"
             | S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
@@ -583,17 +579,25 @@ let update_task_view a =
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
-            | S.Done r -> r.Call_provers.pr_output
+            | S.Done r -> 
+              let out = r.Call_provers.pr_output in
+              begin
+                let env = env_session () in
+                match S.get_edited_as_abs env.S.session a with
+                | None -> out
+                | Some f -> (source_text f) ^
+                  "\n----------------------------------------------\n\n"
+                  ^ out
+              end
             | S.Scheduled-> "proof scheduled but not running yet"
             | S.Running -> "prover currently running"
             | S.InternalFailure e ->
               let b = Buffer.create 37 in
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b
-        in
-        task_view#source_buffer#set_text o
-    | S.Transf _tr ->
-        task_view#source_buffer#set_text ""
+        end
+    | S.Transf tr ->
+        "transformation \"" ^ tr.S.transf_name ^ "\""
    | S.Metas m ->
      let print_meta_args =
        Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
@@ -602,8 +606,10 @@ let update_task_view a =
          (Pp.indent 2
             (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
      in
-     task_view#source_buffer#set_text
-       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+     (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+ in
+ task_view#source_buffer#set_text text;
+ task_view#scroll_to_mark `INSERT
 
 
 

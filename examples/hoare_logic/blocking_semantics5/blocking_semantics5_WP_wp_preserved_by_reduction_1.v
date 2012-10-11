@@ -202,14 +202,14 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
-      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
-      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), ((eval_fmla sigma pi
+      inv) /\ ((eval_term sigma pi cond) = (Vbool true))) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body)))
   | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
-      sigma pi Sskip)).
+      ((eval_fmla sigma pi inv) /\ ((eval_term sigma pi
+      cond) = (Vbool false))) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip).
 
 (* Why3 assumption *)
 Inductive many_steps : (map mident value) -> (list (ident* value)%type)
@@ -280,9 +280,9 @@ Inductive type_term : (map mident datatype) -> (list (ident* datatype)%type)
       (type_term sigma pi (Tderef v) ty)
   | Type_bin : forall (sigma:(map mident datatype)) (pi:(list (ident*
       datatype)%type)) (t1:term) (t2:term) (op:operator) (ty1:datatype)
-      (ty2:datatype) (ty:datatype), (type_term sigma pi t1 ty1) ->
-      ((type_term sigma pi t2 ty2) -> ((type_operator op ty1 ty2 ty) ->
-      (type_term sigma pi (Tbin t1 op t2) ty))).
+      (ty2:datatype) (ty:datatype), ((type_term sigma pi t1 ty1) /\
+      ((type_term sigma pi t2 ty2) /\ (type_operator op ty1 ty2 ty))) ->
+      (type_term sigma pi (Tbin t1 op t2) ty).
 
 (* Why3 assumption *)
 Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
@@ -291,8 +291,8 @@ Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
       datatype)%type)) (t:term), (type_term sigma pi t TYbool) ->
       (type_fmla sigma pi (Fterm t))
   | Type_conj : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi f1) ->
-      ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fand f1 f2)))
+      datatype)%type)) (f1:fmla) (f2:fmla), ((type_fmla sigma pi f1) /\
+      (type_fmla sigma pi f2)) -> (type_fmla sigma pi (Fand f1 f2))
   | Type_neg : forall (sigma:(map mident datatype)) (pi:(list (ident*
       datatype)%type)) (f:fmla), (type_fmla sigma pi f) -> (type_fmla sigma
       pi (Fnot f))
@@ -303,15 +303,9 @@ Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
       datatype)%type)) (x:ident) (t:term) (f:fmla) (ty:datatype),
       (type_term sigma pi t ty) -> ((type_fmla sigma (Cons (x, ty) pi) f) ->
       (type_fmla sigma pi (Flet x t f)))
-  | Type_forall1 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYint)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYint f))
-  | Type_forall2 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYbool)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYbool f))
-  | Type_forall3 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYunit)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYunit f)).
+  | Type_forall : forall (sigma:(map mident datatype)) (pi:(list (ident*
+      datatype)%type)) (x:ident) (f:fmla) (ty:datatype), (type_fmla sigma
+      (Cons (x, ty) pi) f) -> (type_fmla sigma pi (Fforall x ty f)).
 
 (* Why3 assumption *)
 Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
@@ -333,16 +327,9 @@ Inductive type_stmt : (map mident datatype) -> (list (ident* datatype)%type)
       datatype)%type)) (p:fmla), (type_fmla sigma pi p) -> (type_stmt sigma
       pi (Sassert p))
   | Type_while : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (guard:term) (body:stmt) (inv:fmla), (type_fmla sigma
-      pi inv) -> ((type_term sigma pi guard TYbool) -> ((type_stmt sigma pi
-      body) -> (type_stmt sigma pi (Swhile guard inv body)))).
-
-Axiom type_inversion : forall (v:value),
-  match (type_value v) with
-  | TYbool => exists b:bool, (v = (Vbool b))
-  | TYint => exists n:Z, (v = (Vint n))
-  | TYunit => (v = Vvoid)
-  end.
+      datatype)%type)) (cond:term) (body:stmt) (inv:fmla), (type_fmla sigma
+      pi inv) -> ((type_term sigma pi cond TYbool) -> ((type_stmt sigma pi
+      body) -> (type_stmt sigma pi (Swhile cond inv body)))).
 
 (* Why3 assumption *)
 Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
@@ -350,6 +337,13 @@ Definition compatible_env(sigma:(map mident value)) (sigmat:(map mident
   datatype)%type)): Prop := (forall (id:mident), ((type_value (get sigma
   id)) = (get sigmat id))) /\ forall (id:ident), ((type_value (get_stack id
   pi)) = (get_vartype id pit)).
+
+Axiom type_inversion : forall (v:value),
+  match (type_value v) with
+  | TYbool => exists b:bool, (v = (Vbool b))
+  | TYint => exists n:Z, (v = (Vint n))
+  | TYunit => (v = Vvoid)
+  end.
 
 Axiom eval_type_term : forall (t:term) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
@@ -412,13 +406,35 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
 
+Parameter msubst_term: term -> mident -> ident -> term.
+
+Axiom msubst_term_def : forall (t:term) (x:mident) (v:ident),
+  match t with
+  | ((Tvalue _)|(Tvar _)) => ((msubst_term t x v) = t)
+  | (Tderef y) => ((x = y) -> ((msubst_term t x v) = (Tvar v))) /\
+      ((~ (x = y)) -> ((msubst_term t x v) = t))
+  | (Tbin t1 op t2) => ((msubst_term t x v) = (Tbin (msubst_term t1 x v) op
+      (msubst_term t2 x v)))
+  end.
+
 (* Why3 assumption *)
-Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
+Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
+  match f with
+  | (Fterm e) => (Fterm (msubst_term e x v))
+  | (Fand f1 f2) => (Fand (msubst f1 x v) (msubst f2 x v))
+  | (Fnot f1) => (Fnot (msubst f1 x v))
+  | (Fimplies f1 f2) => (Fimplies (msubst f1 x v) (msubst f2 x v))
+  | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
+  | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
+  end.
+
+(* Why3 assumption *)
+Fixpoint fresh_in_term(id:ident) (t:term) {struct t}: Prop :=
   match t with
   | (Tvalue _) => True
-  | (Tvar i) => ~ (x = i)
+  | (Tvar i) => ~ (id = i)
   | (Tderef _) => True
-  | (Tbin t1 _ t2) => (fresh_in_term x t1) /\ (fresh_in_term x t2)
+  | (Tbin t1 _ t2) => (fresh_in_term id t1) /\ (fresh_in_term id t2)
   end.
 
 (* Why3 assumption *)
@@ -431,28 +447,6 @@ Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
   | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\
       (fresh_in_fmla id f1))
   | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
-  end.
-
-Parameter msubst_term: term -> mident -> ident -> term.
-
-Axiom msubst_term_def : forall (t:term) (r:mident) (v:ident),
-  match t with
-  | ((Tvalue _)|(Tvar _)) => ((msubst_term t r v) = t)
-  | (Tderef x) => ((r = x) -> ((msubst_term t r v) = (Tvar v))) /\
-      ((~ (r = x)) -> ((msubst_term t r v) = t))
-  | (Tbin t1 op t2) => ((msubst_term t r v) = (Tbin (msubst_term t1 r v) op
-      (msubst_term t2 r v)))
-  end.
-
-(* Why3 assumption *)
-Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
-  match f with
-  | (Fterm e) => (Fterm (msubst_term e x v))
-  | (Fand f1 f2) => (Fand (msubst f1 x v) (msubst f2 x v))
-  | (Fnot f1) => (Fnot (msubst f1 x v))
-  | (Fimplies f1 f2) => (Fimplies (msubst f1 x v) (msubst f2 x v))
-  | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
-  | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
   end.
 
 Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
@@ -481,10 +475,9 @@ Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
   t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
 
-Axiom eval_change_free : forall (f:fmla) (id:ident) (v:value),
-  (fresh_in_fmla id f) -> forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)), (eval_fmla sigma (Cons (id, v) pi) f) <-> (eval_fmla sigma
-  pi f).
+Axiom eval_change_free : forall (f:fmla) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (id:ident) (v:value), (fresh_in_fmla id f) ->
+  ((eval_fmla sigma (Cons (id, v) pi) f) <-> (eval_fmla sigma pi f)).
 
 Parameter fresh_from: fmla -> ident.
 
@@ -496,16 +489,16 @@ Axiom abstract_effects_generalize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
-Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
-  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
-  (eval_fmla sigma pi (abstract_effects s q)).
-
 Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
   (sigma:(map mident value)) (pi:(list (ident* value)%type)),
   ((eval_fmla sigma pi (abstract_effects s p)) /\ (eval_fmla sigma pi
   (abstract_effects s q))) -> (eval_fmla sigma pi (abstract_effects s (Fand p
   q))).
+
+Axiom abstract_effects_monotonic : forall (s:stmt) (p:fmla) (q:fmla),
+  (valid_fmla (Fimplies p q)) -> forall (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)), (eval_fmla sigma pi (abstract_effects s p)) ->
+  (eval_fmla sigma pi (abstract_effects s q)).
 
 (* Why3 assumption *)
 Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=

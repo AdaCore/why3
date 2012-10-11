@@ -135,6 +135,14 @@
     expanded="false"
     shape="ainfix =aget_stackV0aConsaTuple2V0V1V2V1F">
     <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
@@ -149,6 +157,30 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.09"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
     </proof>
    </goal>
    <goal
@@ -160,12 +192,20 @@
     expanded="false"
     shape="ainfix =aget_stackV1aConsaTuple2V0V2V3aget_stackV1V3Iainfix =V0V1NF">
     <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="1"
@@ -174,6 +214,30 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.08"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
     </proof>
    </goal>
    <goal
@@ -184,6 +248,54 @@
     proved="true"
     expanded="false"
     shape="ainfix &gt;=V6c0Iamany_stepsV0V2V4V1V3V5V6F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="outofmemory" time="3.92"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
     <proof
      prover="5"
      timelimit="5"
@@ -349,7 +461,7 @@
    locfile="blocking_semantics5/../blocking_semantics5.mlw"
    loclnum="358" loccnumb="7" loccnume="25"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="type_inversion"
     locfile="blocking_semantics5/../blocking_semantics5.mlw"
@@ -359,14 +471,124 @@
     expanded="false"
     shape="Catype_valueV0aTYboolainfix =V0aVboolV1EaTYintainfix =V0aVintV2EaTYunitainfix =V0aVvoidF">
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.03"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="6"
      memlimit="1000"
      edited="blocking_semantics5_TypingAndSemantics_type_inversion_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.21"/>
+     <result status="valid" time="1.02"/>
     </proof>
+    <transf
+     name="induction_ty_lex"
+     proved="true"
+     expanded="false">
+     <goal
+      name="type_inversion.0"
+      locfile="blocking_semantics5/../blocking_semantics5.mlw"
+      loclnum="378" loccnumb="6" loccnume="20"
+      sum="313ded9c59ff11a298405e338c3cecdc"
+      proved="true"
+      expanded="false"
+      shape="CV0aVvoidCatype_valueV0aTYboolainfix =V0aVboolV1EaTYintainfix =V0aVintV2EaTYunitainfix =V0aVvoidaVintVCatype_valueV0aTYboolainfix =V0aVboolV4EaTYintainfix =V0aVintV5EaTYunitainfix =V0aVvoidaVboolVCatype_valueV0aTYboolainfix =V0aVboolV7EaTYintainfix =V0aVintV8EaTYunitainfix =V0aVvoidF">
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.09"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="eval_type_term"
@@ -374,39 +596,79 @@
     loclnum="385" loccnumb="6" loccnume="20"
     sum="7330432967001ed473e52ed55123b7d4"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =atype_valueaeval_termV1V2V0V5Iatype_termV3V4V0V5Iacompatible_envV1V3V2V4F">
     <transf
      name="induction_ty_lex"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="eval_type_term.1"
       locfile="blocking_semantics5/../blocking_semantics5.mlw"
       loclnum="385" loccnumb="6" loccnume="20"
       sum="1393dc98cccd4df1fdbcb55e7b8af652"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="CV0aTvalueVainfix =atype_valueaeval_termV2V3V0V6Iatype_termV4V5V0V6Iacompatible_envV2V4V3V5FaTvarVainfix =atype_valueaeval_termV8V9V0V12Iatype_termV10V11V0V12Iacompatible_envV8V10V9V11FaTderefVainfix =atype_valueaeval_termV14V15V0V18Iatype_termV16V17V0V18Iacompatible_envV14V16V15V17FaTbinVVVainfix =atype_valueaeval_termV22V23V0V26Iatype_termV24V25V0V26Iacompatible_envV22V24V23V25FIainfix =atype_valueaeval_termV27V28V19V31Iatype_termV29V30V19V31Iacompatible_envV27V29V28V30FIainfix =atype_valueaeval_termV32V33V21V36Iatype_termV34V35V21V36Iacompatible_envV32V34V33V35FF">
       <transf
        name="split_goal_wp"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="eval_type_term.1.1"
         locfile="blocking_semantics5/../blocking_semantics5.mlw"
         loclnum="385" loccnumb="6" loccnume="20"
         sum="fee7f72e888522dcf2888805654f68fa"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="CV0aTvalueVainfix =atype_valueaeval_termV2V3V0V6Iatype_termV4V5V0V6Iacompatible_envV2V4V3V5FaTvarVtaTderefVtaTbinVVVtF">
         <proof
-         prover="3"
-         timelimit="30"
+         prover="1"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.21"/>
+         <result status="valid" time="0.13"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.50"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.18"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.23"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.04"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.04"/>
         </proof>
        </goal>
        <goal
@@ -415,15 +677,23 @@
         loclnum="385" loccnumb="6" loccnume="20"
         sum="be7ffbcaa3f68038f7e22be8c210ebd8"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="CV0aTvalueVtaTvarVainfix =atype_valueaeval_termV3V4V0V7Iatype_termV5V6V0V7Iacompatible_envV3V5V4V6FaTderefVtaTbinVVVtF">
         <proof
-         prover="1"
-         timelimit="8"
+         prover="3"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.17"/>
+         <result status="valid" time="0.27"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.14"/>
         </proof>
         <proof
          prover="0"
@@ -431,7 +701,31 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.70"/>
+         <result status="valid" time="0.62"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.31"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.04"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.03"/>
         </proof>
        </goal>
        <goal
@@ -440,8 +734,16 @@
         loclnum="385" loccnumb="6" loccnume="20"
         sum="ce82ecf97039dd7c03fb185780ad13ea"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="CV0aTvalueVtaTvarVtaTderefVainfix =atype_valueaeval_termV4V5V0V8Iatype_termV6V7V0V8Iacompatible_envV4V6V5V7FaTbinVVVtF">
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.22"/>
+        </proof>
         <proof
          prover="3"
          timelimit="5"
@@ -452,11 +754,35 @@
         </proof>
         <proof
          prover="0"
-         timelimit="10"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.70"/>
+         <result status="valid" time="0.66"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.03"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.03"/>
         </proof>
        </goal>
        <goal
@@ -465,8 +791,56 @@
         loclnum="385" loccnumb="6" loccnume="20"
         sum="e68c4714ef7fea96db3c9029de70a1d1"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="CV0aTvalueVtaTvarVtaTderefVtaTbinVVVainfix =atype_valueaeval_termV7V8V0V11Iatype_termV9V10V0V11Iacompatible_envV7V9V8V10FIainfix =atype_valueaeval_termV12V13V4V16Iatype_termV14V15V4V16Iacompatible_envV12V14V13V15FIainfix =atype_valueaeval_termV17V18V6V21Iatype_termV19V20V6V21Iacompatible_envV17V19V18V20FF">
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.10"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.08"/>
+        </proof>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.06"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.07"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.03"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.03"/>
+        </proof>
         <proof
          prover="5"
          timelimit="10"
@@ -487,7 +861,7 @@
     loclnum="390" loccnumb="6" loccnume="23"
     sum="48476609853c59babd9e5d7356c71e3a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="acompatible_envV3V6V5V7Aatype_stmtV6V7V1Iaone_stepV2V4V0V3V5V1Aacompatible_envV2V6V4V7Aatype_stmtV6V7V0F">
     <proof
      prover="5"
@@ -2451,7 +2825,7 @@
          edited="blocking_semantics5_WP_wp_preserved_by_reduction_1.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.14"/>
+         <result status="valid" time="0.94"/>
         </proof>
        </goal>
        <goal
@@ -2561,7 +2935,7 @@
          edited="blocking_semantics5_WP_wp_preserved_by_reduction_3.v"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.31"/>
+         <result status="valid" time="1.21"/>
         </proof>
        </goal>
       </transf>
