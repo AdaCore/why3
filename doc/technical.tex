@@ -27,22 +27,22 @@ file is reproduced below.
 \begin{figure}[p]
 {\footnotesize
 \begin{verbatim}
-[main ]
+[main]
 loadpath = "/usr/local/share/why3/theories"
 loadpath = "/usr/local/share/why3/modules"
-magic = 12
+magic = 14
 memlimit = 0
 plugin = "/usr/local/lib/why3/plugins/tptp"
 plugin = "/usr/local/lib/why3/plugins/genequlin"
-plugin = "/usr/local/lib/why3/plugins/tptpfof"
 plugin = "/usr/local/lib/why3/plugins/hypothesis_selection"
 running_provers_max = 4
 timelimit = 2
 
-[ide ]
+[ide]
 default_editor = "editor %f"
 error_color = "orange"
 goal_color = "gold"
+iconset = "boomy"
 intro_premises = true
 premise_color = "chartreuse"
 print_labels = false
@@ -55,21 +55,30 @@ verbose = 0
 window_height = 1173
 window_width = 1024
 
-[prover coq]
-command = "why3-cpulimit 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
+[prover]
+command = "'why3-cpulimit' 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
 driver = "/usr/local/share/why3/drivers/coq.drv"
 editor = "coqide"
+in_place = false
 interactive = true
 name = "Coq"
-version = "8.3pl3"
+shortcut = "coq"
+version = "8.3pl4"
 
-[prover alt-ergo]
-command = "why3-cpulimit %t %m -s alt-ergo %f"
+[prover]
+command = "'why3-cpulimit' %t %m -s alt-ergo %f"
 driver = "/usr/local/share/why3/drivers/alt_ergo_0.93.drv"
 editor = ""
+in_place = false
 interactive = false
 name = "Alt-Ergo"
-version = "0.93"
+shortcut = "altergo"
+shortcut = "alt-ergo"
+version = "0.93.1"
+
+[editor coqide]
+command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
+name = "CoqIDE"
 \end{verbatim}
 }
   \caption{Sample why3.conf file}
