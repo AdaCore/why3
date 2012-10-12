@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/vstte12_bfs/why3session.xml" shape_version="2">
+ name="examples/programs/vstte12_bfs/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,15 +24,15 @@
   expanded="false">
   <theory
    name="Graph"
-   locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+   locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
    loclnum="8" loccnumb="7" loccnume="12"
    verified="true"
    expanded="false">
    <goal
     name="path_nonneg"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="26" loccnumb="8" loccnume="19"
-    sum="79fa28a0bd80a544e7d9e1839f10bfbd"
+    sum="57529f5cd39140e0be6819fe790a4f2b"
     proved="true"
     expanded="false"
     shape="ainfix &gt;=V2c0IapathV0V1V2F">
@@ -48,9 +48,9 @@
    </goal>
    <goal
     name="path_inversion"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="30" loccnumb="8" loccnume="22"
-    sum="b14dea0726537e9ca43b39857f0417af"
+    sum="c22a388ac33b9f80c5ff0d885c7a7262"
     proved="true"
     expanded="false"
     shape="amemV1asuccV3AapathV0V3V2EIapathV0V1ainfix +V2c1Iainfix &gt;=V2c0F">
@@ -66,9 +66,9 @@
    </goal>
    <goal
     name="path_closure"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="36" loccnumb="8" loccnume="20"
-    sum="ef402bb2f01dfe3e13fc45a70e24474c"
+    sum="7dbdddd1410d07f076993f6ad952b8f3"
     proved="true"
     expanded="false"
     shape="amemV2V0IamemV1V0IapathV1V2V3FIamemV5V0IamemV5asuccV4FIamemV4V0FF">
@@ -85,16 +85,16 @@
   </theory>
   <theory
    name="BFS"
-   locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+   locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
    loclnum="49" loccnumb="7" loccnume="10"
    verified="false"
    expanded="true">
    <goal
     name="WP_parameter fill_next"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="82" loccnumb="6" loccnume="15"
     expl="parameter fill_next"
-    sum="31745b6c4b86c993be4fb6baac23e524"
+    sum="77e82e10540de437c2832560158050ad"
     proved="false"
     expanded="true"
     shape="iainfix =V10aTrueNiamemV12V9NaclosureV13V5V14V15Iainfix =V15V2NFAasubsetadiffasuccV2V11V13AasubsetV11asuccV2AainvV0V1V13V5V14V3Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FaclosureV9V5V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V5V8V3Iainfix =V11aremoveV12V7AamemV12V7FFAais_emptyV7NaclosureV9V5V8V17FAasubsetasuccV2V9AainvV0V1V9V5V8V3Iais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V18Iainfix =V18V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FAaclosureV6V5V4V19Iainfix =V19V2NFAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V5V4V3IaclosureV6V5V4V20Iainfix =V20V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -106,10 +106,10 @@
      expanded="true">
      <goal
       name="WP_parameter fill_next.1"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="82" loccnumb="6" loccnume="15"
       expl="loop invariant init"
-      sum="73ce6850c8980fe483e0356331d5329a"
+      sum="570828a3e5533a9b5b7b18d431902c6d"
       proved="true"
       expanded="false"
       shape="aclosureV6V5V4V7Iainfix =V7V2NFAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V5V4V3IaclosureV6V5V4V8Iainfix =V8V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -126,10 +126,10 @@
      </goal>
      <goal
       name="WP_parameter fill_next.2"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="82" loccnumb="6" loccnume="15"
       expl="precondition"
-      sum="903825ecb2144dcd115a16fcd84a2e83"
+      sum="ac054aba845f470a8a621b083e551e7d"
       proved="true"
       expanded="false"
       shape="ais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V11Iainfix =V11V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V12Iainfix =V12V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -146,10 +146,10 @@
      </goal>
      <goal
       name="WP_parameter fill_next.3"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="82" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
-      sum="7ae12aa0d2957a04732f21e24aa4edf7"
+      sum="3b174112dd920b5971a452e1270869b3"
       proved="true"
       expanded="true"
       shape="aclosureV13V5V14V15Iainfix =V15V2NFAasubsetadiffasuccV2V11V13AasubsetV11asuccV2AainvV0V1V13V5V14V3Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V17Iainfix =V17V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -161,10 +161,10 @@
        expanded="true">
        <goal
         name="WP_parameter fill_next.3.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="7dc02bcb9edcd3abaab3df4ced166d5b"
+        sum="b3b230b9b75e06d5c36a87f9736000dd"
         proved="true"
         expanded="false"
         shape="ainvV0V1V13V5V14V3Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V15Iainfix =V15V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V16Iainfix =V16V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -176,15 +176,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="7.83"/>
+         <result status="valid" time="3.53"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter fill_next.3.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="1b887b8efd6c7975d79853dbfa331b67"
+        sum="34080246935dbb9053141713949de20b"
         proved="true"
         expanded="false"
         shape="asubsetV11asuccV2Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V15Iainfix =V15V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V16Iainfix =V16V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -201,10 +201,10 @@
        </goal>
        <goal
         name="WP_parameter fill_next.3.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="5ed9d505e26b238fb8e709b69fa7b5ab"
+        sum="ec7169fcb33efbe4bba0b538ba1bd6d2"
         proved="true"
         expanded="false"
         shape="asubsetadiffasuccV2V11V13Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V15Iainfix =V15V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V16Iainfix =V16V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -221,10 +221,10 @@
        </goal>
        <goal
         name="WP_parameter fill_next.3.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="45016b24c457bb4677b9cfc74ce2b938"
+        sum="14e6894e392588e34b56c840bdc8784d"
         proved="true"
         expanded="false"
         shape="aclosureV13V5V14V15Iainfix =V15V2NFIainfix =V14aaddV12V8FIainfix =V13aaddV12V9FIamemV12V9NIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V17Iainfix =V17V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -243,10 +243,10 @@
      </goal>
      <goal
       name="WP_parameter fill_next.4"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="82" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
-      sum="aca8a54d7ad77584079824ef21d4f836"
+      sum="213dfeb01efdc4e82f685483f0142e85"
       proved="false"
       expanded="true"
       shape="aclosureV9V5V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V5V8V3IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V14Iainfix =V14V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V15Iainfix =V15V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -258,10 +258,10 @@
        expanded="true">
        <goal
         name="WP_parameter fill_next.4.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="e569d7dfaf2dac12bdf06b2d65ad16b4"
+        sum="958263dec5e808f8ab92179570001c96"
         proved="true"
         expanded="false"
         shape="ainvV0V1V9V5V8V3IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14Iainfix =V14V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -278,10 +278,10 @@
        </goal>
        <goal
         name="WP_parameter fill_next.4.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="4f3fe0f16fecacdb8b15abc7a1a5d0b3"
+        sum="47f6d86c4185c23b005de649172d5907"
         proved="false"
         expanded="false"
         shape="asubsetV11asuccV2IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14Iainfix =V14V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -290,10 +290,10 @@
        </goal>
        <goal
         name="WP_parameter fill_next.4.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="ebd6451e93b84bf3eb307d0ade594b63"
+        sum="b9286c7f43e370217929ee393a5d24e6"
         proved="true"
         expanded="false"
         shape="asubsetadiffasuccV2V11V9IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14Iainfix =V14V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -310,10 +310,10 @@
        </goal>
        <goal
         name="WP_parameter fill_next.4.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="0dbf57d2a697d541a91d50f251de97f8"
+        sum="1ca18b206e007c1026f90f9dd3d9af10"
         proved="true"
         expanded="true"
         shape="aclosureV9V5V8V13Iainfix =V13V2NFIamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V14Iainfix =V14V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V15Iainfix =V15V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -325,10 +325,10 @@
          expanded="true">
          <goal
           name="WP_parameter fill_next.4.4.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="82" loccnumb="6" loccnume="15"
           expl="parameter fill_next"
-          sum="c159eabf528e7427d3c26bf72bb5a4d8"
+          sum="cc7ba9581ff68d9f859154cb67691188"
           proved="true"
           expanded="false"
           shape="amemV14V9IamemV14asuccV13FIamemV13V8NIamemV13V5NIamemV13V9Iainfix =V13V2NFIamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIamemV15V7NFNIainfix =V10aTrueNIamemV16V7NFqainfix =V10aTrueFIamemV18V9IamemV18asuccV17FIamemV17V8NIamemV17V5NIamemV17V9Iainfix =V17V2NFAamemV19V9IamemV19adiffasuccV2V7FAamemV20asuccV2IamemV20V7FAamemV1V8OamemV1V5IamemV1V9AamemV21V9NOamemV21V8Iashortest_pathV0V21ainfix +V3c1FAainfix &lt;=V23ainfix +V3c1AapathV0V22V23EIamemV22V9FAamemV24V9Iainfix &lt;=V25V3IapathV0V24V25FAashortest_pathV0V26ainfix +V3c1IamemV26V8FAasubsetV8V9Aashortest_pathV0V27V3IamemV27V5FAasubsetV5V9FIamemV29V6IamemV29asuccV28FIamemV28V4NIamemV28V5NIamemV28V6Iainfix =V28V2NFAapathV0V2V30NIainfix &lt;V30V3FAapathV0V2V3AamemV1V4OamemV1V5IamemV1V6AamemV31V6NOamemV31V4Iashortest_pathV0V31ainfix +V3c1FAainfix &lt;=V33ainfix +V3c1AapathV0V32V33EIamemV32V6FAamemV34V6Iainfix &lt;=V35V3IapathV0V34V35FAashortest_pathV0V36ainfix +V3c1IamemV36V4FAasubsetV4V6Aashortest_pathV0V37V3IamemV37V5FAasubsetV5V6FF">
@@ -340,7 +340,7 @@
            memlimit="0"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.38"/>
+           <result status="valid" time="0.19"/>
           </proof>
          </goal>
         </transf>
@@ -349,10 +349,10 @@
      </goal>
      <goal
       name="WP_parameter fill_next.5"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="82" loccnumb="6" loccnume="15"
       expl="postcondition"
-      sum="7bb16c12e54fc2772685838deea79bb8"
+      sum="634d79769c0390e191624b0b3b8515bf"
       proved="true"
       expanded="true"
       shape="aclosureV9V5V8V11FAasubsetasuccV2V9AainvV0V1V9V5V8V3Iainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V12Iainfix =V12V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V13Iainfix =V13V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -364,10 +364,10 @@
        expanded="true">
        <goal
         name="WP_parameter fill_next.5.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="4a609634c053bb134ef3f7454edd3be8"
+        sum="817a0386ba5daa2ccd6f575e4f772ac0"
         proved="true"
         expanded="false"
         shape="ainvV0V1V9V5V8V3Iainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V11Iainfix =V11V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V12Iainfix =V12V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -384,10 +384,10 @@
        </goal>
        <goal
         name="WP_parameter fill_next.5.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="74332d9983b2d96dec8199e2cc4a9e24"
+        sum="f30995d51e31966bc50fbf020636b2ca"
         proved="true"
         expanded="false"
         shape="asubsetasuccV2V9Iainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V11Iainfix =V11V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V12Iainfix =V12V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -399,15 +399,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.05"/>
+         <result status="valid" time="1.29"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter fill_next.5.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="82" loccnumb="6" loccnume="15"
         expl="parameter fill_next"
-        sum="ba88cc390716930b2d1ac096367afc60"
+        sum="e09274b1c75b7ad8237c477c8bffea91"
         proved="true"
         expanded="false"
         shape="aclosureV9V5V8V11FIainfix =V10aTrueNNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V12Iainfix =V12V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V13Iainfix =V13V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
@@ -419,7 +419,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.38"/>
+         <result status="valid" time="0.53"/>
         </proof>
        </goal>
       </transf>
@@ -428,10 +428,10 @@
    </goal>
    <goal
     name="WP_parameter bfs"
-    locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+    locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
     loclnum="104" loccnumb="6" loccnume="9"
     expl="parameter bfs"
-    sum="3ed1616d32cb4f72f7cca8a22369491a"
+    sum="cf065ed7511ff80aa07e539656c68fdc"
     proved="true"
     expanded="true"
     shape="iainfix =V6aTrueNiainfix =V8V1ashortest_pathV0V1V2iainfix =V11aTrueainfix &lt;=c0V14AaclosureV10V12V13V15FAais_emptyV13Iais_emptyV12AainvV0V1V10V12V13V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9Fainfix &lt;=c0V2AaclosureV10V7V9V16FAais_emptyV9Iais_emptyV7AainvV0V1V10V7V9V2Iais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V17FAasubsetasuccV8V10AainvV0V1V10V7V9V2FAaclosureV5V7V3V18Iainfix =V18V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V7aremoveV8V4AamemV8V4FFAais_emptyV4NapathV0V1V19NFAamemV1V5NIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V20FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FAainfix &lt;=c0c0AaclosureasingletonV0asingletonV0aemptyV21FAais_emptyaemptyIais_emptyasingletonV0AainvV0V1asingletonV0asingletonV0aemptyc0F">
@@ -443,10 +443,10 @@
      expanded="true">
      <goal
       name="WP_parameter bfs.1"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="loop invariant init"
-      sum="137a0881252d3d22effe133b610740a9"
+      sum="c35343b5538c8b9db7919e55b7a4a833"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=c0c0AaclosureasingletonV0asingletonV0aemptyV2FAais_emptyaemptyIais_emptyasingletonV0AainvV0V1asingletonV0asingletonV0aemptyc0F">
@@ -458,10 +458,10 @@
        expanded="true">
        <goal
         name="WP_parameter bfs.1.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="84ca72fe7149a071450c0071a9aa0ba3"
+        sum="b9d71e54a900772aceac6bc46477820c"
         proved="true"
         expanded="false"
         shape="ainvV0V1asingletonV0asingletonV0aemptyc0F">
@@ -478,10 +478,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.1.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="33ea4b859ea8a3d51d488cc33bb043e0"
+        sum="7980f7f4a171f449d2401f204d8d131c"
         proved="true"
         expanded="false"
         shape="ais_emptyaemptyIais_emptyasingletonV0F">
@@ -498,10 +498,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.1.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="fc730c99319c3d75da264e038dd4399c"
+        sum="7218e981aecd4a189e4d77ec543d28d8"
         proved="true"
         expanded="true"
         shape="aclosureasingletonV0asingletonV0aemptyV2FF">
@@ -513,10 +513,10 @@
          expanded="true">
          <goal
           name="WP_parameter bfs.1.3.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="104" loccnumb="6" loccnume="9"
           expl="parameter bfs"
-          sum="ced18c7247bd980ad17165f6d4ae8067"
+          sum="443bf90344294162dded0802c6bf0d8f"
           proved="true"
           expanded="false"
           shape="amemV3asingletonV0IamemV3asuccV2FIamemV2aemptyNIamemV2asingletonV0NIamemV2asingletonV0FF">
@@ -535,10 +535,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.1.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="df60d66975f7aebf9a74dede19862d47"
+        sum="f232acfc2448c2c48462c50815c376b6"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=c0c0F">
@@ -557,10 +557,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.2"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="101118ab43fc391c4b2cded990254c15"
+      sum="2eb7c3b30ea1884cd262cd4f7876ce34"
       proved="true"
       expanded="false"
       shape="ais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -577,10 +577,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.3"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="exceptional postcondition"
-      sum="3045c0eed9bf41fdd9ee74217facf69e"
+      sum="37e5b377d9c11152213fb8fe7a8ebbb3"
       proved="true"
       expanded="false"
       shape="ashortest_pathV0V1V2Iainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -597,10 +597,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.4"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="precondition"
-      sum="8c684545cc5b5e3d11ad22885c3d9252"
+      sum="fbb82b185f9517055bef2f56c56ba201"
       proved="true"
       expanded="true"
       shape="aclosureV5V7V3V9Iainfix =V9V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V10FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -612,10 +612,10 @@
        expanded="true">
        <goal
         name="WP_parameter bfs.4.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="d3d8414ad4fbc82646f704786636a424"
+        sum="a4c33fe929f480bb134a8a2bc6426e21"
         proved="true"
         expanded="false"
         shape="ainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -632,10 +632,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.4.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="8e7e3487e492a7746b86f099c9b157fe"
+        sum="3f421c44d56d80271698c5786462ad77"
         proved="true"
         expanded="false"
         shape="ashortest_pathV0V8V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -652,10 +652,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.4.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="ab7bf578cc7d3c5a63de6f78ac4335dd"
+        sum="0e50705054f714ef3cbcaa3b96220f61"
         proved="true"
         expanded="true"
         shape="aclosureV5V7V3V9Iainfix =V9V8NFIainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V10FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -667,10 +667,10 @@
          expanded="true">
          <goal
           name="WP_parameter bfs.4.3.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="104" loccnumb="6" loccnume="9"
           expl="parameter bfs"
-          sum="7fe8c2da48f33012188d4b5e73843c30"
+          sum="a14614e9c8b843f1fb0e87ab34b6d26a"
           proved="true"
           expanded="false"
           shape="amemV10V5IamemV10asuccV9FIamemV9V3NIamemV9V7NIamemV9V5Iainfix =V9V8NFIainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV11V4NFNIainfix =V6aTrueNIamemV12V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV14V5IamemV14asuccV13FIamemV13V3NIamemV13V4NIamemV13V5FAamemV15V3NFIamemV16V4NFAamemV1V3OamemV1V4IamemV1V5AamemV17V5NOamemV17V3Iashortest_pathV0V17ainfix +V2c1FAainfix &lt;=V19ainfix +V2c1AapathV0V18V19EIamemV18V5FAamemV20V5Iainfix &lt;=V21V2IapathV0V20V21FAashortest_pathV0V22ainfix +V2c1IamemV22V3FAasubsetV3V5Aashortest_pathV0V23V2IamemV23V4FAasubsetV4V5FF">
@@ -691,10 +691,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.5"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="loop invariant preservation"
-      sum="1e11aae350a89f35cdf0af29bda434e3"
+      sum="3db2b145bd933b1488b7f2b824d2bfac"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=c0V14AaclosureV10V12V13V15FAais_emptyV13Iais_emptyV12AainvV0V1V10V12V13V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V16FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V17Iainfix =V17V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V18FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -706,10 +706,10 @@
        expanded="true">
        <goal
         name="WP_parameter bfs.5.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="c82fbd22a32bd9ed4ab77e0b479dfc15"
+        sum="5ba46d4b5189ccd669b8f0a14b30af48"
         proved="true"
         expanded="true"
         shape="ainvV0V1V10V12V13V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V16Iainfix =V16V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -721,10 +721,10 @@
          expanded="true">
          <goal
           name="WP_parameter bfs.5.1.1"
-          locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+          locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
           loclnum="104" loccnumb="6" loccnume="9"
           expl="parameter bfs"
-          sum="52703e04456c16c2e2a365c5d12ac16c"
+          sum="bfaaa577879ba274768d7b77cf3a94fc"
           proved="true"
           expanded="true"
           shape="amemV1V13OamemV1V12IamemV1V10AamemV15V10NOamemV15V13Iashortest_pathV0V15ainfix +V14c1FAainfix &lt;=V17ainfix +V14c1AapathV0V16V17EIamemV16V10FAamemV18V10Iainfix &lt;=V19V14IapathV0V18V19FAashortest_pathV0V20ainfix +V14c1IamemV20V13FAasubsetV13V10Aashortest_pathV0V21V14IamemV21V12FAasubsetV12V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV22V7NFqainfix =V11aTrueFIamemV24V10IamemV24asuccV23FIamemV23V9NIamemV23V7NIamemV23V10FAamemV25V10IamemV25asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV26V10NOamemV26V9Iashortest_pathV0V26ainfix +V2c1FAainfix &lt;=V28ainfix +V2c1AapathV0V27V28EIamemV27V10FAamemV29V10Iainfix &lt;=V30V2IapathV0V29V30FAashortest_pathV0V31ainfix +V2c1IamemV31V9FAasubsetV9V10Aashortest_pathV0V32V2IamemV32V7FAasubsetV7V10FIamemV34V5IamemV34asuccV33FIamemV33V3NIamemV33V7NIamemV33V5Iainfix =V33V8NFAapathV0V8V35NIainfix &lt;V35V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV36V5NOamemV36V3Iashortest_pathV0V36ainfix +V2c1FAainfix &lt;=V38ainfix +V2c1AapathV0V37V38EIamemV37V5FAamemV39V5Iainfix &lt;=V40V2IapathV0V39V40FAashortest_pathV0V41ainfix +V2c1IamemV41V3FAasubsetV3V5Aashortest_pathV0V42V2IamemV42V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV43V4NFNIainfix =V6aTrueNIamemV44V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV46V5IamemV46asuccV45FIamemV45V3NIamemV45V4NIamemV45V5FAamemV47V3NFIamemV48V4NFAamemV1V3OamemV1V4IamemV1V5AamemV49V5NOamemV49V3Iashortest_pathV0V49ainfix +V2c1FAainfix &lt;=V51ainfix +V2c1AapathV0V50V51EIamemV50V5FAamemV52V5Iainfix &lt;=V53V2IapathV0V52V53FAashortest_pathV0V54ainfix +V2c1IamemV54V3FAasubsetV3V5Aashortest_pathV0V55V2IamemV55V4FAasubsetV4V5FF">
@@ -736,10 +736,10 @@
            expanded="true">
            <goal
             name="WP_parameter bfs.5.1.1.1"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="bee895155b5abfc1921ec701d03fb0c3"
+            sum="5a3f387870e42b3427456be536532dca"
             proved="true"
             expanded="false"
             shape="asubsetV12V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV15V7NFqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FIamemV16V9NIamemV16V7NIamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV19V10NOamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix &lt;=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix &lt;=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FIamemV27V5IamemV27asuccV26FIamemV26V3NIamemV26V7NIamemV26V5Iainfix =V26V8NFAapathV0V8V28NIainfix &lt;V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV29V5NOamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix &lt;=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix &lt;=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV36V4NFNIainfix =V6aTrueNIamemV37V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV39V5IamemV39asuccV38FIamemV38V3NIamemV38V4NIamemV38V5FAamemV40V3NFIamemV41V4NFAamemV1V3OamemV1V4IamemV1V5AamemV42V5NOamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix &lt;=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix &lt;=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FF">
@@ -756,10 +756,10 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.2"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="4fd9efc61a08435ffbd858f390f69230"
+            sum="6311467111246439580444dbb089be0f"
             proved="true"
             expanded="false"
             shape="ashortest_pathV0V15V14IamemV15V12FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV16V7NFqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FIamemV17V9NIamemV17V7NIamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV20V10NOamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix &lt;=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix &lt;=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FIamemV28V5IamemV28asuccV27FIamemV27V3NIamemV27V7NIamemV27V5Iainfix =V27V8NFAapathV0V8V29NIainfix &lt;V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV30V5NOamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix &lt;=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix &lt;=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV37V4NFNIainfix =V6aTrueNIamemV38V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV40V5IamemV40asuccV39FIamemV39V3NIamemV39V4NIamemV39V5FAamemV41V3NFIamemV42V4NFAamemV1V3OamemV1V4IamemV1V5AamemV43V5NOamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix &lt;=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix &lt;=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FF">
@@ -776,10 +776,10 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.3"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="02596d92203049e7c675fe9b9eb091b2"
+            sum="dfe63b5022bdb47a4af2cc05523c5d19"
             proved="true"
             expanded="false"
             shape="asubsetV13V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV15V7NFqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FIamemV16V9NIamemV16V7NIamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV19V10NOamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix &lt;=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix &lt;=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FIamemV27V5IamemV27asuccV26FIamemV26V3NIamemV26V7NIamemV26V5Iainfix =V26V8NFAapathV0V8V28NIainfix &lt;V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV29V5NOamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix &lt;=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix &lt;=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV36V4NFNIainfix =V6aTrueNIamemV37V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV39V5IamemV39asuccV38FIamemV38V3NIamemV38V4NIamemV38V5FAamemV40V3NFIamemV41V4NFAamemV1V3OamemV1V4IamemV1V5AamemV42V5NOamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix &lt;=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix &lt;=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FF">
@@ -796,10 +796,10 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.4"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="d516807d2d58f066cef3926116f0b91a"
+            sum="4a1f1ac3064eb659f272ffe0378cb349"
             proved="true"
             expanded="false"
             shape="ashortest_pathV0V15ainfix +V14c1IamemV15V13FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV16V7NFqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FIamemV17V9NIamemV17V7NIamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV20V10NOamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix &lt;=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix &lt;=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FIamemV28V5IamemV28asuccV27FIamemV27V3NIamemV27V7NIamemV27V5Iainfix =V27V8NFAapathV0V8V29NIainfix &lt;V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV30V5NOamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix &lt;=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix &lt;=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV37V4NFNIainfix =V6aTrueNIamemV38V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV40V5IamemV40asuccV39FIamemV39V3NIamemV39V4NIamemV39V5FAamemV41V3NFIamemV42V4NFAamemV1V3OamemV1V4IamemV1V5AamemV43V5NOamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix &lt;=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix &lt;=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FF">
@@ -816,10 +816,10 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.5"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="79872893781a55c7902d00b3cbaf9975"
+            sum="6cce137c7ddefcf767fa3ebc22682c94"
             proved="true"
             expanded="false"
             shape="amemV15V10Iainfix &lt;=V16V14IapathV0V15V16FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV17V7NFqainfix =V11aTrueFIamemV19V10IamemV19asuccV18FIamemV18V9NIamemV18V7NIamemV18V10FAamemV20V10IamemV20asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV21V10NOamemV21V9Iashortest_pathV0V21ainfix +V2c1FAainfix &lt;=V23ainfix +V2c1AapathV0V22V23EIamemV22V10FAamemV24V10Iainfix &lt;=V25V2IapathV0V24V25FAashortest_pathV0V26ainfix +V2c1IamemV26V9FAasubsetV9V10Aashortest_pathV0V27V2IamemV27V7FAasubsetV7V10FIamemV29V5IamemV29asuccV28FIamemV28V3NIamemV28V7NIamemV28V5Iainfix =V28V8NFAapathV0V8V30NIainfix &lt;V30V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV31V5NOamemV31V3Iashortest_pathV0V31ainfix +V2c1FAainfix &lt;=V33ainfix +V2c1AapathV0V32V33EIamemV32V5FAamemV34V5Iainfix &lt;=V35V2IapathV0V34V35FAashortest_pathV0V36ainfix +V2c1IamemV36V3FAasubsetV3V5Aashortest_pathV0V37V2IamemV37V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV38V4NFNIainfix =V6aTrueNIamemV39V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV41V5IamemV41asuccV40FIamemV40V3NIamemV40V4NIamemV40V5FAamemV42V3NFIamemV43V4NFAamemV1V3OamemV1V4IamemV1V5AamemV44V5NOamemV44V3Iashortest_pathV0V44ainfix +V2c1FAainfix &lt;=V46ainfix +V2c1AapathV0V45V46EIamemV45V5FAamemV47V5Iainfix &lt;=V48V2IapathV0V47V48FAashortest_pathV0V49ainfix +V2c1IamemV49V3FAasubsetV3V5Aashortest_pathV0V50V2IamemV50V4FAasubsetV4V5FF">
@@ -836,10 +836,10 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.6"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="12ebca8701e8acc54d05da3b5758e2cd"
+            sum="c66d34974afd894afff9d79762110ce7"
             proved="true"
             expanded="false"
             shape="ainfix &lt;=V16ainfix +V14c1AapathV0V15V16EIamemV15V10FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV17V7NFqainfix =V11aTrueFIamemV19V10IamemV19asuccV18FIamemV18V9NIamemV18V7NIamemV18V10FAamemV20V10IamemV20asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV21V10NOamemV21V9Iashortest_pathV0V21ainfix +V2c1FAainfix &lt;=V23ainfix +V2c1AapathV0V22V23EIamemV22V10FAamemV24V10Iainfix &lt;=V25V2IapathV0V24V25FAashortest_pathV0V26ainfix +V2c1IamemV26V9FAasubsetV9V10Aashortest_pathV0V27V2IamemV27V7FAasubsetV7V10FIamemV29V5IamemV29asuccV28FIamemV28V3NIamemV28V7NIamemV28V5Iainfix =V28V8NFAapathV0V8V30NIainfix &lt;V30V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV31V5NOamemV31V3Iashortest_pathV0V31ainfix +V2c1FAainfix &lt;=V33ainfix +V2c1AapathV0V32V33EIamemV32V5FAamemV34V5Iainfix &lt;=V35V2IapathV0V34V35FAashortest_pathV0V36ainfix +V2c1IamemV36V3FAasubsetV3V5Aashortest_pathV0V37V2IamemV37V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV38V4NFNIainfix =V6aTrueNIamemV39V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV41V5IamemV41asuccV40FIamemV40V3NIamemV40V4NIamemV40V5FAamemV42V3NFIamemV43V4NFAamemV1V3OamemV1V4IamemV1V5AamemV44V5NOamemV44V3Iashortest_pathV0V44ainfix +V2c1FAainfix &lt;=V46ainfix +V2c1AapathV0V45V46EIamemV45V5FAamemV47V5Iainfix &lt;=V48V2IapathV0V47V48FAashortest_pathV0V49ainfix +V2c1IamemV49V3FAasubsetV3V5Aashortest_pathV0V50V2IamemV50V4FAasubsetV4V5FF">
@@ -851,15 +851,15 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="2.39"/>
+             <result status="valid" time="1.20"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.7"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="c72db32d71bfab12f696a8f0b86978a8"
+            sum="858916a8e2aeee0a63e8f7b25c8de074"
             proved="true"
             expanded="false"
             shape="amemV15V10NOamemV15V13Iashortest_pathV0V15ainfix +V14c1FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV16V7NFqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FIamemV17V9NIamemV17V7NIamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV20V10NOamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix &lt;=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix &lt;=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FIamemV28V5IamemV28asuccV27FIamemV27V3NIamemV27V7NIamemV27V5Iainfix =V27V8NFAapathV0V8V29NIainfix &lt;V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV30V5NOamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix &lt;=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix &lt;=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV37V4NFNIainfix =V6aTrueNIamemV38V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV40V5IamemV40asuccV39FIamemV39V3NIamemV39V4NIamemV39V5FAamemV41V3NFIamemV42V4NFAamemV1V3OamemV1V4IamemV1V5AamemV43V5NOamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix &lt;=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix &lt;=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FF">
@@ -876,10 +876,10 @@
            </goal>
            <goal
             name="WP_parameter bfs.5.1.1.8"
-            locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+            locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
             loclnum="104" loccnumb="6" loccnume="9"
             expl="parameter bfs"
-            sum="ee537851324723667d3a3c955ec0517c"
+            sum="3983222dcf6f6503ca16fa3fae0a3e44"
             proved="true"
             expanded="false"
             shape="amemV1V13OamemV1V12IamemV1V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIamemV15V7NFqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FIamemV16V9NIamemV16V7NIamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10AamemV19V10NOamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix &lt;=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix &lt;=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FIamemV27V5IamemV27asuccV26FIamemV26V3NIamemV26V7NIamemV26V5Iainfix =V26V8NFAapathV0V8V28NIainfix &lt;V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5AamemV29V5NOamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix &lt;=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix &lt;=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIamemV36V4NFNIainfix =V6aTrueNIamemV37V4NFqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV39V5IamemV39asuccV38FIamemV38V3NIamemV38V4NIamemV38V5FAamemV40V3NFIamemV41V4NFAamemV1V3OamemV1V4IamemV1V5AamemV42V5NOamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix &lt;=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix &lt;=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FF">
@@ -900,10 +900,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.5.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="8184c481251162323e5037b6df45f435"
+        sum="ce5a71f98d89b2ce88d2b33b952f00c6"
         proved="true"
         expanded="false"
         shape="ais_emptyV13Iais_emptyV12Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V16Iainfix =V16V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -920,10 +920,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.5.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="adfc9035219db4d3193f0012e579213f"
+        sum="9e67f54db667c3a1c4d8910134217f58"
         proved="true"
         expanded="false"
         shape="aclosureV10V12V13V15FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V16FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V17Iainfix =V17V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V18FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -940,10 +940,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.5.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="84421e1bd9c749b948373e906c242901"
+        sum="b6bca2c84e4c3ba75f91845e09b73bef"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=c0V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V16Iainfix =V16V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -962,10 +962,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.6"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="loop invariant preservation"
-      sum="ca044d2601ef3e5ff0ddcc59e579fa4f"
+      sum="c9ae1ca70637e2e5f26565572a845fda"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=c0V2AaclosureV10V7V9V12FAais_emptyV9Iais_emptyV7AainvV0V1V10V7V9V2Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V13FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V14Iainfix =V14V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V15FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -977,10 +977,10 @@
        expanded="true">
        <goal
         name="WP_parameter bfs.6.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="8c99963be40d685e695150947fb6ee3d"
+        sum="76abfa9c14a0cd7bfa6891e12828b71e"
         proved="true"
         expanded="false"
         shape="ainvV0V1V10V7V9V2Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V13Iainfix =V13V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -997,10 +997,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.6.2"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="794b7aa4207e30b28a3ffbb4842d1533"
+        sum="59d378f55da0d341f030ec8e6fc9893a"
         proved="true"
         expanded="false"
         shape="ais_emptyV9Iais_emptyV7Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V13Iainfix =V13V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -1017,10 +1017,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.6.3"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="82bdc55e958c2ae0fbce57f6438a1860"
+        sum="561b0584742a99091c24c176d221711a"
         proved="true"
         expanded="false"
         shape="aclosureV10V7V9V12FIainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V13FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V14Iainfix =V14V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V15FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -1037,10 +1037,10 @@
        </goal>
        <goal
         name="WP_parameter bfs.6.4"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="parameter bfs"
-        sum="acc695fb325722b0de6daad8f6a0ebbf"
+        sum="3ac2387d6c5cf7a8ae22d58a7d22a2d2"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=c0V2Iainfix =V11aTrueNIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V13Iainfix =V13V8NFAashortest_pathV0V8V2AainvV0V1V5V7V3V2Iainfix =V8V1NIainfix =V7aremoveV8V4AamemV8V4FFIais_emptyV4NIainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -1059,10 +1059,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.7"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="assertion"
-      sum="4c143433aac4d2c32716e8a3f3bf9eb3"
+      sum="d8f46a3a95e8b4654204017320361ee8"
       proved="true"
       expanded="true"
       shape="amemV1V5NIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -1074,10 +1074,10 @@
        expanded="true">
        <goal
         name="WP_parameter bfs.7.1"
-        locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+        locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
         loclnum="104" loccnumb="6" loccnume="9"
         expl="assertion"
-        sum="4c143433aac4d2c32716e8a3f3bf9eb3"
+        sum="d8f46a3a95e8b4654204017320361ee8"
         proved="true"
         expanded="false"
         shape="amemV1V5NIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
@@ -1104,10 +1104,10 @@
      </goal>
      <goal
       name="WP_parameter bfs.8"
-      locfile="programs/vstte12_bfs/../vstte12_bfs.mlw"
+      locfile="examples/programs/vstte12_bfs/../vstte12_bfs.mlw"
       loclnum="104" loccnumb="6" loccnume="9"
       expl="postcondition"
-      sum="95b204a12556c04f1f7ac6546934750b"
+      sum="d6b6d4f03fe87c03b1cf1a98d8ead156"
       proved="true"
       expanded="false"
       shape="apathV0V1V7NFIamemV1V5NIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V8FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">

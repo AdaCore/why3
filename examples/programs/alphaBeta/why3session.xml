@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="alphaBeta/why3session.xml" shape_version="2">
+ name="examples/programs/alphaBeta/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -44,18 +44,27 @@
   expanded="true">
   <theory
    name="TwoPlayerGame"
-   locfile="alphaBeta/../alphaBeta.mlw"
+   locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
    loclnum="2" loccnumb="7" loccnume="20"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="Test"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="76" loccnumb="7" loccnume="11"
-    sum="dddfa1ad0dedafc3ffa6d6d2ffdc8345"
+    sum="5a090932a31ec1b1207f5e1f9a4b78f5"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix &lt;=aprefix -aposition_valueado_moveV0V1aminmaxV0c1IamemV1V2Lalegal_movesV0F">
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="1000"
+     edited="alphaBeta_TwoPlayerGame_Test_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.51"/>
+    </proof>
     <proof
      prover="6"
      timelimit="10"
@@ -72,23 +81,14 @@
      archived="false">
      <result status="valid" time="0.05"/>
     </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="1000"
-     edited="alphaBeta_TwoPlayerGame_Test_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.51"/>
-    </proof>
    </goal>
    <goal
     name="minmax_bound"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="82" loccnumb="8" loccnume="20"
-    sum="917c0cf03e4aa5a2633dec99d30d80ea"
+    sum="854562e6024ee5671d836dd65bb41265"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix &lt;aminmaxV0V1ainfinityAainfix &lt;aprefix -ainfinityaminmaxV0V1Iainfix &gt;=V1c0F">
     <proof
      prover="5"
@@ -102,14 +102,30 @@
    </goal>
    <goal
     name="minmax_nomove"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="86" loccnumb="8" loccnume="21"
-    sum="c03ebf9fa83902dfbb8ee2a062065d13"
+    sum="4479f9caabc0235ea9e30dca6db09d05"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aminmaxV0V1aposition_valueV0Iainfix =alegal_movesV0aNilAainfix &gt;=V1c0F">
     <proof
-     prover="6"
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -125,22 +141,6 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
      prover="4"
      timelimit="3"
      memlimit="1000"
@@ -149,7 +149,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="8"
+     prover="6"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -165,7 +165,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="8"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -176,51 +176,43 @@
   </theory>
   <theory
    name="AlphaBeta"
-   locfile="alphaBeta/../alphaBeta.mlw"
+   locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
    loclnum="99" loccnumb="7" loccnume="16"
    verified="false"
    expanded="true">
    <goal
     name="WP_parameter move_value_alpha_beta"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="109" loccnumb="10" loccnume="31"
     expl="parameter move_value_alpha_beta"
-    sum="9e6527d21ba9d38bcab4d502f9e89bbd"
+    sum="4b336999e03530776848914d6a2e8af9"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6ainfix =aprefix -V5aprefix -V6iainfix &lt;=V6aprefix -V1ainfix &gt;=aprefix -V5V1ainfix &lt;=aprefix -V5V0Laminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FAainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
     <label
      name="expl:parameter move_value_alpha_beta"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter move_value_alpha_beta.1"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="109" loccnumb="10" loccnume="31"
       expl="precondition"
-      sum="e074602ff2bbf6a993c9cbefa307759d"
+      sum="eeb5a974014b7d7d6b993b76149033c8"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
       <label
        name="expl:parameter move_value_alpha_beta"/>
       <proof
-       prover="6"
+       prover="0"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="3"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -231,12 +223,20 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="4"
@@ -247,7 +247,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="8"
+       prover="6"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
@@ -263,37 +263,37 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="2"
+       prover="8"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter move_value_alpha_beta.2"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="109" loccnumb="10" loccnume="31"
-      expl="normal postcondition"
-      sum="9bb1b109095473086f9da0ecd837d15c"
+      expl="postcondition"
+      sum="9c52653fd676897e03b1c51d1ffafcb9"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6ainfix =aprefix -V5aprefix -V6iainfix &lt;=V6aprefix -V1ainfix &gt;=aprefix -V5V1ainfix &lt;=aprefix -V5V0Laminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
       <label
        name="expl:parameter move_value_alpha_beta"/>
       <transf
        name="split_goal_wp"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter move_value_alpha_beta.2.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="109" loccnumb="10" loccnume="31"
-        expl="normal postcondition"
-        sum="0dfdb39dc09e974007a7f5ca8335c7b7"
+        expl="postcondition"
+        sum="621badca9850a33aed20f605781199a3"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainfix =aprefix -V5aprefix -V6Iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6Laminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
         <label
          name="expl:parameter move_value_alpha_beta"/>
@@ -308,12 +308,12 @@
        </goal>
        <goal
         name="WP_parameter move_value_alpha_beta.2.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="109" loccnumb="10" loccnume="31"
-        expl="normal postcondition"
-        sum="a03b404ab754b5968d5c13c275d8b2d8"
+        expl="postcondition"
+        sum="5397719394aa372abe40ac343bd54032"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainfix &gt;=aprefix -V5V1Iainfix &lt;=V6aprefix -V1Iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6NLaminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
         <label
          name="expl:parameter move_value_alpha_beta"/>
@@ -328,12 +328,12 @@
        </goal>
        <goal
         name="WP_parameter move_value_alpha_beta.2.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="109" loccnumb="10" loccnume="31"
-        expl="normal postcondition"
-        sum="74363ae1536b97aa807e399616bd6492"
+        expl="postcondition"
+        sum="b77bd164cdcb4c16f5345cef2293106e"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainfix &lt;=aprefix -V5V0Iainfix &lt;=V6aprefix -V1NIainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6NLaminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
         <label
          name="expl:parameter move_value_alpha_beta"/>
@@ -352,10 +352,10 @@
    </goal>
    <goal
     name="WP_parameter negabeta"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="121" loccnumb="7" loccnume="15"
     expl="parameter negabeta"
-    sum="a04ea308b9a5928f077602040310df2e"
+    sum="e3e4cf03bf565f55a66abae9f6482b89"
     proved="false"
     expanded="true"
     shape="iainfix =V3c0iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1Calegal_movesV2aNiliainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1aConsVViainfix &gt;=V6V1iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V6aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V6V0ainfix &gt;=V6V1iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V7aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V7V0ainfix &gt;=V7V1Iiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FAainfix &gt;=V3c1Iiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FAainfix &gt;=V3c1Iainfix &gt;=V3c0F">
@@ -367,12 +367,12 @@
      expanded="true">
      <goal
       name="WP_parameter negabeta.1"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
-      expl="normal postcondition"
-      sum="a9b55032c2ea9f2f3c5484857af06ff9"
+      expl="postcondition"
+      sum="a1967aa71794b94a6a6cdf55a3f041b9"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1Iainfix =V3c0Iainfix &gt;=V3c0F">
       <label
        name="expl:parameter negabeta"/>
@@ -387,26 +387,18 @@
       <transf
        name="split_goal_wp"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter negabeta.1.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
-        expl="normal postcondition"
-        sum="38d94bffcfc8e7f1cd87a9d3c0dcf9ab"
+        expl="postcondition"
+        sum="9183e44c5ea7153046c81e84ebd30ad5"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainfix =aposition_valueV2aminmaxV2V3Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3Iainfix =V3c0Iainfix &gt;=V3c0F">
         <label
          name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
         <proof
          prover="7"
          timelimit="3"
@@ -415,18 +407,6 @@
          archived="false">
          <result status="valid" time="0.01"/>
         </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta.1.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="normal postcondition"
-        sum="aaa0ccfa902ac036a3e00e54ac94c2dd"
-        proved="true"
-        expanded="true"
-        shape="ainfix &lt;=aposition_valueV2V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix =V3c0Iainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
         <proof
          prover="8"
          timelimit="3"
@@ -435,8 +415,28 @@
          archived="false">
          <result status="valid" time="0.02"/>
         </proof>
+       </goal>
+       <goal
+        name="WP_parameter negabeta.1.2"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        loclnum="121" loccnumb="7" loccnume="15"
+        expl="postcondition"
+        sum="9ce23df25b9fda3007e2ab86e983ac45"
+        proved="true"
+        expanded="false"
+        shape="ainfix &lt;=aposition_valueV2V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix =V3c0Iainfix &gt;=V3c0F">
+        <label
+         name="expl:parameter negabeta"/>
         <proof
          prover="7"
+         timelimit="3"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="8"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -446,17 +446,17 @@
        </goal>
        <goal
         name="WP_parameter negabeta.1.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
-        expl="normal postcondition"
-        sum="3c4de9802bca430c9294fe298f403bd7"
+        expl="postcondition"
+        sum="f92e21601b3e39a709717cc78dec5a9a"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="ainfix &gt;=aposition_valueV2V1Iainfix &lt;=aminmaxV2V3V0NIainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix =V3c0Iainfix &gt;=V3c0F">
         <label
          name="expl:parameter negabeta"/>
         <proof
-         prover="8"
+         prover="7"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -464,7 +464,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="8"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -476,27 +476,27 @@
      </goal>
      <goal
       name="WP_parameter negabeta.2"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
-      expl="parameter negabeta"
-      sum="eb0ad391218d7e9d73aa948a67a12189"
+      expl="postcondition"
+      sum="20ae207f8e475810b8d8c8ab2a606c9d"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Calegal_movesV2aNiliainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1aConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
       <label
        name="expl:parameter negabeta"/>
       <transf
        name="split_goal_wp"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter negabeta.2.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="bd9e6cdfb2c6c6b38f3074456e5242b0"
+        expl="postcondition"
+        sum="b5ec68786af90c40fd3c6ca7d9a80d3e"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Calegal_movesV2aNilainfix =aposition_valueV2aminmaxV2V3Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3aConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
         <label
          name="expl:parameter negabeta"/>
@@ -509,7 +509,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -517,7 +517,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="8"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -527,12 +527,12 @@
        </goal>
        <goal
         name="WP_parameter negabeta.2.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="f7f5363848c92a449dd5b96a24ac89c9"
+        expl="postcondition"
+        sum="ffe39a0705cea025b1183db6092d8e05"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Calegal_movesV2aNilainfix &lt;=aposition_valueV2V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NaConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
         <label
          name="expl:parameter negabeta"/>
@@ -545,7 +545,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -553,7 +553,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="8"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -563,12 +563,12 @@
        </goal>
        <goal
         name="WP_parameter negabeta.2.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
+        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="e9c9c8eb27358f2aa593711aed4361f3"
+        expl="postcondition"
+        sum="b40a8cb8f2f0a328b9f5cb797d30cbb6"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="Calegal_movesV2aNilainfix &gt;=aposition_valueV2V1Iainfix &lt;=aminmaxV2V3V0NIainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NaConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
         <label
          name="expl:parameter negabeta"/>
@@ -581,7 +581,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -589,7 +589,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="7"
+         prover="8"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -601,17 +601,25 @@
      </goal>
      <goal
       name="WP_parameter negabeta.3"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
-      expl="parameter negabeta"
-      sum="3f1ef2e372c2d45efc91112dc1101b3f"
+      expl="precondition"
+      sum="46a3bb0bbd85261da9ac452487b49020"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Calegal_movesV2aNiltaConsVVainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
       <label
        name="expl:parameter negabeta"/>
       <proof
        prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="7"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
@@ -626,124 +634,27 @@
        archived="false">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof
-       prover="7"
-       timelimit="3"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter negabeta.4"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
-      expl="parameter negabeta"
-      sum="a273bebbec6a9083a767ce0e0f4686da"
+      expl="postcondition"
+      sum="89f09febe9b359f7e11731fdc8743303"
       proved="false"
       expanded="true"
       shape="Calegal_movesV2aNiltaConsVViainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V6aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V6V0ainfix &gt;=V6V1Iainfix &gt;=V6V1Iiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
       <label
        name="expl:parameter negabeta"/>
-      <transf
-       name="split_goal_wp"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter negabeta.4.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="9cc2a8eddab3f39be732c63853b6b725"
-        proved="false"
-        expanded="true"
-        shape="Calegal_movesV2aNiltaConsVVainfix =V6aminmaxV2V3Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3Iainfix &gt;=V6V1Iiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.03"/>
-        </proof>
-        <proof
-         prover="7"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.04"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta.4.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="55d9bb5bdf7027c77e2524379277afc8"
-        proved="false"
-        expanded="true"
-        shape="Calegal_movesV2aNiltaConsVVainfix &lt;=V6V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix &gt;=V6V1Iiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.05"/>
-        </proof>
-        <proof
-         prover="7"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.06"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta.4.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="1a583af6344bbd5b97698f37f560ce07"
-        proved="true"
-        expanded="true"
-        shape="Calegal_movesV2aNiltaConsVVainfix &gt;=V6V1Iainfix &lt;=aminmaxV2V3V0NIainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix &gt;=V6V1Iiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-        <proof
-         prover="7"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
      </goal>
      <goal
       name="WP_parameter negabeta.5"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
-      expl="parameter negabeta"
-      sum="1701b5119c301de6c1909893390d69c0"
+      expl="precondition"
+      sum="500ca5769932a7242df95924731a90e8"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="Calegal_movesV2aNiltaConsVVainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
       <label
        name="expl:parameter negabeta"/>
@@ -756,7 +667,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="8"
+       prover="7"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
@@ -764,7 +675,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="7"
+       prover="8"
        timelimit="3"
        memlimit="1000"
        obsolete="false"
@@ -774,113 +685,24 @@
      </goal>
      <goal
       name="WP_parameter negabeta.6"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
-      expl="parameter negabeta"
-      sum="d89cf513ec28f84639f2d030e304d8c3"
+      expl="postcondition"
+      sum="0c62fb57af952b3cf01548ae12f520fb"
       proved="false"
       expanded="true"
       shape="Calegal_movesV2aNiltaConsVViainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V7aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V7V0ainfix &gt;=V7V1Iiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FIainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
       <label
        name="expl:parameter negabeta"/>
-      <transf
-       name="split_goal_wp"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter negabeta.6.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="551157802ffc47284d5ff6b3d0174acc"
-        proved="false"
-        expanded="true"
-        shape="Calegal_movesV2aNiltaConsVVainfix =V7aminmaxV2V3Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3Iiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FIainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.02"/>
-        </proof>
-        <proof
-         prover="7"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta.6.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="7efadff22a5f08d5a6565eefd09be332"
-        proved="false"
-        expanded="true"
-        shape="Calegal_movesV2aNiltaConsVVainfix &lt;=V7V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FIainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.02"/>
-        </proof>
-        <proof
-         prover="7"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.04"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta.6.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="121" loccnumb="7" loccnume="15"
-        expl="parameter negabeta"
-        sum="bf9429d4c8534169afe5f10e9f7d4b97"
-        proved="false"
-        expanded="true"
-        shape="Calegal_movesV2aNiltaConsVVainfix &gt;=V7V1Iainfix &lt;=aminmaxV2V3V0NIainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FIainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
-        <label
-         name="expl:parameter negabeta"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.03"/>
-        </proof>
-        <proof
-         prover="7"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.03"/>
-        </proof>
-       </goal>
-      </transf>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter negabeta_rec"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="139" loccnumb="7" loccnume="19"
     expl="parameter negabeta_rec"
-    sum="5bf7bf43effd138b1648f5129d85c73c"
+    sum="c66a01f6b299603d0259e9d1c2fbfdfa"
     proved="false"
     expanded="true"
     shape="CV5aNiliainfix &lt;V7V1Aainfix &lt;V0V7ainfix =V4V7iainfix &lt;=V7V0ainfix &lt;=V4V0ainfix &gt;=V4V1LaminaTuple2V2V3V6Iais_emptyV6NLaelementsV5aConsVViainfix &gt;=amaxV10V4V1iais_emptyV11ainfix =amaxV10V4V4iainfix &lt;V12V1Aainfix &lt;V0V12ainfix =amaxV10V4V12iainfix &lt;=V12V0ainfix &lt;=amaxV10V4V0ainfix &gt;=amaxV10V4V1LaminaTuple2V2V3V11LaelementsV5iais_emptyV14ainfix =V13V4iainfix &lt;V15V1Aainfix &lt;V0V15ainfix =V13V15iainfix &lt;=V15V0ainfix &lt;=V13V0ainfix &gt;=V13V1LaminaTuple2V2V3V14LaelementsV5Iiais_emptyV16ainfix =V13amaxV10V4iainfix &lt;V17V1Aainfix &lt;amaxamaxV10V4V0V17ainfix =V13V17iainfix &lt;=V17amaxamaxV10V4V0ainfix &lt;=V13amaxamaxV10V4V0ainfix &gt;=V13V1LaminaTuple2V2V3V16LaelementsV9FAainfix &gt;=V3c1Iiainfix &lt;V18aprefix -V0Aainfix &lt;aprefix -V1V18ainfix =V10aprefix -V18iainfix &lt;=V18aprefix -V1ainfix &gt;=V10V1ainfix &lt;=V10V0Laminmaxado_moveV2V8ainfix -V3c1FAainfix &gt;=V3c1Iainfix &gt;=V3c1F">
@@ -892,12 +714,12 @@
      expanded="true">
      <goal
       name="WP_parameter negabeta_rec.1"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
-      expl="parameter negabeta_rec"
-      sum="9ff7c56f2e6e29490d579a495fa84a50"
+      expl="postcondition"
+      sum="a72723d0bf2dfef176587784dd8affcc"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV5aNiliainfix &lt;V7V1Aainfix &lt;V0V7ainfix =V4V7iainfix &lt;=V7V0ainfix &lt;=V4V0ainfix &gt;=V4V1LaminaTuple2V2V3V6Iais_emptyV6NLaelementsV5aConsVVtIainfix &gt;=V3c1F">
       <label
        name="expl:parameter negabeta_rec"/>
@@ -912,12 +734,12 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.2"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
-      expl="parameter negabeta_rec"
-      sum="7a743d6260b730614d8bc15ca1520e27"
+      expl="precondition"
+      sum="9cd99ff522ee31d63052332211a779ea"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV5aNiltaConsVVainfix &gt;=V3c1Iainfix &gt;=V3c1F">
       <label
        name="expl:parameter negabeta_rec"/>
@@ -932,93 +754,24 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.3"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
-      expl="parameter negabeta_rec"
-      sum="4fb41451abaf7fe10f1b7be184ba72b0"
+      expl="postcondition"
+      sum="10b8f31325e9daa35b3d3e2b5cbf8a28"
       proved="false"
       expanded="true"
       shape="CV5aNiltaConsVViais_emptyV9ainfix =amaxV8V4V4iainfix &lt;V10V1Aainfix &lt;V0V10ainfix =amaxV8V4V10iainfix &lt;=V10V0ainfix &lt;=amaxV8V4V0ainfix &gt;=amaxV8V4V1LaminaTuple2V2V3V9LaelementsV5Iainfix &gt;=amaxV8V4V1Iiainfix &lt;V11aprefix -V0Aainfix &lt;aprefix -V1V11ainfix =V8aprefix -V11iainfix &lt;=V11aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
       <label
        name="expl:parameter negabeta_rec"/>
-      <transf
-       name="split_goal_wp"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter negabeta_rec.3.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="2dcdeb438650fe0036af0f702cecccba"
-        proved="false"
-        expanded="true"
-        shape="CV5aNiltaConsVVainfix =amaxV8V4V4Iais_emptyV9LaelementsV5Iainfix &gt;=amaxV8V4V1Iiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V8aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta_rec.3.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="3776add4686adb7c947b5c70477f6019"
-        proved="false"
-        expanded="true"
-        shape="CV5aNiltaConsVVainfix =amaxV8V4V10Iainfix &lt;V10V1Aainfix &lt;V0V10LaminaTuple2V2V3V9Iais_emptyV9NLaelementsV5Iainfix &gt;=amaxV8V4V1Iiainfix &lt;V11aprefix -V0Aainfix &lt;aprefix -V1V11ainfix =V8aprefix -V11iainfix &lt;=V11aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.04"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta_rec.3.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="7e6ddc38fdfeda3a26a2fb427b37f939"
-        proved="false"
-        expanded="false"
-        shape="CV5aNiltaConsVVainfix &lt;=amaxV8V4V0Iainfix &lt;=V10V0Iainfix &lt;V10V1Aainfix &lt;V0V10NLaminaTuple2V2V3V9Iais_emptyV9NLaelementsV5Iainfix &gt;=amaxV8V4V1Iiainfix &lt;V11aprefix -V0Aainfix &lt;aprefix -V1V11ainfix =V8aprefix -V11iainfix &lt;=V11aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-       </goal>
-       <goal
-        name="WP_parameter negabeta_rec.3.4"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="039899b6780b8b77c91cf6c2d440ccad"
-        proved="false"
-        expanded="false"
-        shape="CV5aNiltaConsVVainfix &gt;=amaxV8V4V1Iainfix &lt;=V10V0NIainfix &lt;V10V1Aainfix &lt;V0V10NLaminaTuple2V2V3V9Iais_emptyV9NLaelementsV5Iainfix &gt;=amaxV8V4V1Iiainfix &lt;V11aprefix -V0Aainfix &lt;aprefix -V1V11ainfix =V8aprefix -V11iainfix &lt;=V11aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-       </goal>
-      </transf>
      </goal>
      <goal
       name="WP_parameter negabeta_rec.4"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
-      expl="parameter negabeta_rec"
-      sum="60216b66f8fcb5fef0d69edc2e2307c4"
+      expl="precondition"
+      sum="4329f1e96a2efe475056016c3f6199fa"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="CV5aNiltaConsVVainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V9aprefix -V0Aainfix &lt;aprefix -V1V9ainfix =V8aprefix -V9iainfix &lt;=V9aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
       <label
        name="expl:parameter negabeta_rec"/>
@@ -1033,95 +786,26 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.5"
-      locfile="alphaBeta/../alphaBeta.mlw"
+      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
-      expl="parameter negabeta_rec"
-      sum="c174d4435b8d9257ca55b3251b01a508"
+      expl="postcondition"
+      sum="f3ca8402c3c7812cc64e0c47a83dcb95"
       proved="false"
       expanded="true"
       shape="CV5aNiltaConsVViais_emptyV10ainfix =V9V4iainfix &lt;V11V1Aainfix &lt;V0V11ainfix =V9V11iainfix &lt;=V11V0ainfix &lt;=V9V0ainfix &gt;=V9V1LaminaTuple2V2V3V10LaelementsV5Iiais_emptyV12ainfix =V9amaxV8V4iainfix &lt;V13V1Aainfix &lt;amaxamaxV8V4V0V13ainfix =V9V13iainfix &lt;=V13amaxamaxV8V4V0ainfix &lt;=V9amaxamaxV8V4V0ainfix &gt;=V9V1LaminaTuple2V2V3V12LaelementsV7FIainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V14aprefix -V0Aainfix &lt;aprefix -V1V14ainfix =V8aprefix -V14iainfix &lt;=V14aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
       <label
        name="expl:parameter negabeta_rec"/>
-      <transf
-       name="split_goal_wp"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter negabeta_rec.5.1"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="90ec6b241f50ff259b866677bbb1c5e2"
-        proved="false"
-        expanded="true"
-        shape="CV5aNiltaConsVVainfix =V9V4Iais_emptyV10LaelementsV5Iiais_emptyV11ainfix =V9amaxV8V4iainfix &lt;V12V1Aainfix &lt;amaxamaxV8V4V0V12ainfix =V9V12iainfix &lt;=V12amaxamaxV8V4V0ainfix &lt;=V9amaxamaxV8V4V0ainfix &gt;=V9V1LaminaTuple2V2V3V11LaelementsV7FIainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V13aprefix -V0Aainfix &lt;aprefix -V1V13ainfix =V8aprefix -V13iainfix &lt;=V13aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta_rec.5.2"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="b6a64bab15f13d8dbaa447dfb085db20"
-        proved="false"
-        expanded="true"
-        shape="CV5aNiltaConsVVainfix =V9V11Iainfix &lt;V11V1Aainfix &lt;V0V11LaminaTuple2V2V3V10Iais_emptyV10NLaelementsV5Iiais_emptyV12ainfix =V9amaxV8V4iainfix &lt;V13V1Aainfix &lt;amaxamaxV8V4V0V13ainfix =V9V13iainfix &lt;=V13amaxamaxV8V4V0ainfix &lt;=V9amaxamaxV8V4V0ainfix &gt;=V9V1LaminaTuple2V2V3V12LaelementsV7FIainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V14aprefix -V0Aainfix &lt;aprefix -V1V14ainfix =V8aprefix -V14iainfix &lt;=V14aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-        <proof
-         prover="8"
-         timelimit="3"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="timeout" time="3.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter negabeta_rec.5.3"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="111af7509189844b8e54bb6500bb3ae3"
-        proved="false"
-        expanded="false"
-        shape="CV5aNiltaConsVVainfix &lt;=V9V0Iainfix &lt;=V11V0Iainfix &lt;V11V1Aainfix &lt;V0V11NLaminaTuple2V2V3V10Iais_emptyV10NLaelementsV5Iiais_emptyV12ainfix =V9amaxV8V4iainfix &lt;V13V1Aainfix &lt;amaxamaxV8V4V0V13ainfix =V9V13iainfix &lt;=V13amaxamaxV8V4V0ainfix &lt;=V9amaxamaxV8V4V0ainfix &gt;=V9V1LaminaTuple2V2V3V12LaelementsV7FIainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V14aprefix -V0Aainfix &lt;aprefix -V1V14ainfix =V8aprefix -V14iainfix &lt;=V14aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-       </goal>
-       <goal
-        name="WP_parameter negabeta_rec.5.4"
-        locfile="alphaBeta/../alphaBeta.mlw"
-        loclnum="139" loccnumb="7" loccnume="19"
-        expl="parameter negabeta_rec"
-        sum="f3dfaf5830b931c0ddabd82484884e16"
-        proved="false"
-        expanded="false"
-        shape="CV5aNiltaConsVVainfix &gt;=V9V1Iainfix &lt;=V11V0NIainfix &lt;V11V1Aainfix &lt;V0V11NLaminaTuple2V2V3V10Iais_emptyV10NLaelementsV5Iiais_emptyV12ainfix =V9amaxV8V4iainfix &lt;V13V1Aainfix &lt;amaxamaxV8V4V0V13ainfix =V9V13iainfix &lt;=V13amaxamaxV8V4V0ainfix &lt;=V9amaxamaxV8V4V0ainfix &gt;=V9V1LaminaTuple2V2V3V12LaelementsV7FIainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V14aprefix -V0Aainfix &lt;aprefix -V1V14ainfix =V8aprefix -V14iainfix &lt;=V14aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
-        <label
-         name="expl:parameter negabeta_rec"/>
-       </goal>
-      </transf>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter alpha_beta"
-    locfile="alphaBeta/../alphaBeta.mlw"
+    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
     loclnum="161" loccnumb="4" loccnume="14"
     expl="parameter alpha_beta"
-    sum="334640492f5a16adbb8a7a757e382f07"
+    sum="0aea44b26fbd3a7027d1d89dd329af75"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =V2aminmaxV0V1Iiainfix &lt;aminmaxV0V1ainfinityAainfix &lt;aprefix -ainfinityaminmaxV0V1ainfix =V2aminmaxV0V1iainfix &lt;=aminmaxV0V1aprefix -ainfinityainfix &lt;=V2aprefix -ainfinityainfix &gt;=V2ainfinityFAainfix &gt;=V1c0Iainfix &gt;=V1c0F">
     <label
      name="expl:parameter alpha_beta"/>

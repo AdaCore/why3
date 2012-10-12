@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="examples/programs/queens/why3session.xml" shape_version="2">
+ name="programs/queens/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,7 +32,7 @@
   expanded="true">
   <theory
    name="S"
-   locfile="examples/programs/queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="8" loccnumb="7" loccnume="8"
    verified="true"
    expanded="false">
@@ -41,16 +41,16 @@
   </theory>
   <theory
    name="NQueensSetsTermination"
-   locfile="examples/programs/queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="24" loccnumb="7" loccnume="29"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter t"
-    locfile="examples/programs/queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="29" loccnumb="10" loccnume="11"
     expl="parameter t"
-    sum="33077d6cf5def2f22423c9f6d0891ce8"
+    sum="bcd4ecb576375a6d47ea54b0ed111a25"
     proved="true"
     expanded="true"
     shape="ainfix &lt;acardinalV7acardinalV4Aainfix &lt;=c0acardinalV4AasubsetV7adiffadiffV0V1V2Iainfix =V7aremoveamin_eltV4V4FIainfix =V6ainfix +V3V5FFAainfix &lt;acardinalaremoveamin_eltV4V0acardinalV0Aainfix &lt;=c0acardinalV0Iais_emptyV4NIasubsetV4adiffadiffV0V1V2FAasubsetadiffadiffV0V1V2adiffadiffV0V1V2Iais_emptyV0NF">
@@ -62,10 +62,10 @@
      expanded="true">
      <goal
       name="WP_parameter t.1"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="loop invariant init"
-      sum="6faef13d231575a27a6604164cb52f32"
+      sum="7909d1817a759b95e32e6f4bc55ffa19"
       proved="true"
       expanded="false"
       shape="asubsetadiffadiffV0V1V2adiffadiffV0V1V2Iais_emptyV0NF">
@@ -82,10 +82,10 @@
      </goal>
      <goal
       name="WP_parameter t.2"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
-      expl="variant decreases"
-      sum="a8e479026c50d89e2cc648ce86b64b4e"
+      expl="variant decrease"
+      sum="57133b74e1e212169c4b6967a0b6d82c"
       proved="true"
       expanded="false"
       shape="ainfix &lt;acardinalaremoveamin_eltV4V0acardinalV0Aainfix &lt;=c0acardinalV0Iais_emptyV4NIasubsetV4adiffadiffV0V1V2FIais_emptyV0NF">
@@ -102,10 +102,10 @@
      </goal>
      <goal
       name="WP_parameter t.3"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="loop invariant preservation"
-      sum="1dde377827b998f401a217241a19267d"
+      sum="8d66edf47d5a53626dacf776f9a7185a"
       proved="true"
       expanded="false"
       shape="asubsetV7adiffadiffV0V1V2Iainfix =V7aremoveamin_eltV4V4FIainfix =V6ainfix +V3V5FFIais_emptyV4NIasubsetV4adiffadiffV0V1V2FIais_emptyV0NF">
@@ -122,10 +122,10 @@
      </goal>
      <goal
       name="WP_parameter t.4"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
-      expl="loop variant decreases"
-      sum="18089c6d94691c0121d7adb8b5bf6c59"
+      expl="loop variant decrease"
+      sum="43872977045ca2f2f7920cf1860e6cc0"
       proved="true"
       expanded="false"
       shape="ainfix &lt;acardinalV7acardinalV4Aainfix &lt;=c0acardinalV4Iainfix =V7aremoveamin_eltV4V4FIainfix =V6ainfix +V3V5FFIais_emptyV4NIasubsetV4adiffadiffV0V1V2FIais_emptyV0NF">
@@ -145,13 +145,13 @@
   </theory>
   <theory
    name="Solution"
-   locfile="examples/programs/queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="46" loccnumb="7" loccnume="15"
    verified="true"
    expanded="false">
    <goal
     name="partial_solution_eq_prefix"
-    locfile="examples/programs/queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="72" loccnumb="8" loccnume="34"
     sum="ff862f43551bc9f152ac52a02c0fdc59"
     proved="true"
@@ -168,7 +168,7 @@
    </goal>
    <goal
     name="no_duplicate"
-    locfile="examples/programs/queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="86" loccnumb="8" loccnume="20"
     sum="e067163d7a3ccc6a3e169e3715897726"
     proved="true"
@@ -186,16 +186,16 @@
   </theory>
   <theory
    name="NQueensSets"
-   locfile="examples/programs/queens/../queens.mlw"
+   locfile="programs/queens/../queens.mlw"
    loclnum="94" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter t3"
-    locfile="examples/programs/queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="107" loccnumb="10" loccnume="12"
     expl="parameter t3"
-    sum="28c5c98bfe1234d345821d2c2bbdef14"
+    sum="ef46f2552f2fbaf024a2723aaa1d8a47"
     proved="true"
     expanded="true"
     shape="iais_emptyV0Niais_emptyV8Nainfix &lt;acardinalV21acardinalV8Aainfix &lt;=c0acardinalV8Aaeq_prefixV4V16V3Aaeq_prefixV6V18V20Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V3V23Eqamemamixfix []V22V20adiffadiffadiffV0V1V2V21Aaeq_prefixV18V22V20AasolutionV22FAainfix &lt;V24V25IamemV25V21IamemV24adiffadiffadiffV0V1V2V21FAasortedV16V3V15Aapartial_solutionV20V18AasubsetV21adiffadiffV0V1V2Aainfix =V20V5Aainfix &gt;=ainfix -V15V3c0Aainfix =V19ainfix -V15V3Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV26amixfix []V16V27Aainfix &lt;V27V15Aainfix &lt;=V9V27Eqaeq_prefixV18V26V17AasolutionV26FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FAapartial_solutionV14V13Aainfix =amixfix []V13V29ainfix -ainfix +V28V14V29NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28apredaaddamin_eltV8V2NIainfix &gt;=V28c0FAainfix =amixfix []V13V31ainfix -ainfix +V30V31V14NIainfix &lt;V31V14Aainfix &lt;=c0V31FqamemV30asuccaaddamin_eltV8V1NIainfix &gt;=V30c0FAainfix =amixfix []V13V33V32NIainfix &lt;V33V14Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Aainfix &lt;acardinalaremoveamin_eltV8V0acardinalV0Aainfix &lt;=c0acardinalV0Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8Faeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqaeq_prefixV12V34V11AasolutionV34FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV36amixfix []V10V37Aainfix &lt;V37V9Aainfix &lt;=V3V37Eqamemamixfix []V36V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V36V11AasolutionV36FAainfix &lt;V38V39IamemV39V8IamemV38adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FAaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV40amixfix []V4V41Aainfix &lt;V41V3Aainfix &lt;=V3V41Eqamemamixfix []V40V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V40V5AasolutionV40FAainfix &lt;V42V43IamemV43adiffadiffV0V1V2IamemV42adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3aeq_prefixV4V44V3Aaeq_prefixV6V6V5Aaeq_solV46amixfix []V44V47Aainfix &lt;V47V45Aainfix &lt;=V3V47Eqaeq_prefixV6V46V5AasolutionV46FAasortedV44V3V45Aainfix =V5V5Aainfix &gt;=ainfix -V45V3c0Aainfix =c1ainfix -V45V3Iainfix =V45ainfix +V3c1FIainfix =V44amixfix [&lt;-]V4V3V6FIapartial_solutionV5V6Aainfix =amixfix []V6V49ainfix -ainfix +V48V5V49NIainfix &lt;V49V5Aainfix &lt;=c0V49FqamemV48V2NIainfix &gt;=V48c0FAainfix =amixfix []V6V51ainfix -ainfix +V50V51V5NIainfix &lt;V51V5Aainfix &lt;=c0V51FqamemV50V1NIainfix &gt;=V50c0FAainfix =amixfix []V6V53V52NIainfix &lt;V53V5Aainfix &lt;=c0V53FAainfix &lt;V52anAainfix &lt;=c0V52qamemV52V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -207,23 +207,15 @@
      expanded="true">
      <goal
       name="WP_parameter t3.1"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="loop invariant init"
-      sum="e7e7eaeda3fe480bf88bb82554afdf6e"
+      sum="d6ddcbc335222c53e0fd9bf4dff1f4d9"
       proved="true"
       expanded="false"
       shape="aeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV7amixfix []V4V8Aainfix &lt;V8V3Aainfix &lt;=V3V8Eqamemamixfix []V7V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V7V5AasolutionV7FAainfix &lt;V9V10IamemV10adiffadiffV0V1V2IamemV9adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3Iais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:parameter t3"/>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
       <proof
        prover="0"
        timelimit="10"
@@ -232,13 +224,21 @@
        archived="false">
        <result status="valid" time="0.04"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter t3.2"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
-      expl="variant decreases"
-      sum="0692b47c0825747101edac633ddcc7d6"
+      expl="variant decrease"
+      sum="84be2a5175588365da71ea7c52b7e1b1"
       proved="true"
       expanded="false"
       shape="ainfix &lt;acardinalaremoveamin_eltV8V0acardinalV0Aainfix &lt;=c0acardinalV0Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -250,15 +250,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.48"/>
+       <result status="valid" time="0.38"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter t3.3"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="precondition"
-      sum="a607a7541386f74ce614d33f4bb93ef1"
+      sum="3d04620d5c7d2fc00bfea9d6a9926306"
       proved="true"
       expanded="true"
       shape="apartial_solutionV14V13Aainfix =amixfix []V13V16ainfix -ainfix +V15V14V16NIainfix &lt;V16V14Aainfix &lt;=c0V16FqamemV15apredaaddamin_eltV8V2NIainfix &gt;=V15c0FAainfix =amixfix []V13V18ainfix -ainfix +V17V18V14NIainfix &lt;V18V14Aainfix &lt;=c0V18FqamemV17asuccaaddamin_eltV8V1NIainfix &gt;=V17c0FAainfix =amixfix []V13V20V19NIainfix &lt;V20V14Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV21amixfix []V10V22Aainfix &lt;V22V9Aainfix &lt;=V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V21V11AasolutionV21FAainfix &lt;V23V24IamemV24V8IamemV23adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V26ainfix -ainfix +V25V5V26NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V2NIainfix &gt;=V25c0FAainfix =amixfix []V6V28ainfix -ainfix +V27V28V5NIainfix &lt;V28V5Aainfix &lt;=c0V28FqamemV27V1NIainfix &gt;=V27c0FAainfix =amixfix []V6V30V29NIainfix &lt;V30V5Aainfix &lt;=c0V30FAainfix &lt;V29anAainfix &lt;=c0V29qamemV29V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -270,10 +270,10 @@
        expanded="true">
        <goal
         name="WP_parameter t3.3.1"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="768184e08dd966bf1db3889d30cd1c26"
+        sum="7a2f0e29357d44f1aa24aa3868719cc3"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -290,10 +290,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.2"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="43d87a5e0c473b9613f2abf9478ccb12"
+        sum="4dfacd923d2b2eda5af65e177ea7c747"
         proved="true"
         expanded="false"
         shape="ainfix =ainfix +V14acardinalaremoveamin_eltV8V0anIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -305,15 +305,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.45"/>
+         <result status="valid" time="0.16"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.3"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="bf61fe8f55cbd31c9836a5926dc99366"
+        sum="ef00522da1b1c2bcfe9933a24b6395d2"
         proved="true"
         expanded="false"
         shape="ainfix &gt;=V9c0Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -330,10 +330,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.4"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="3b3807319c7cd92abbd87db3d5727db3"
+        sum="5d6932ad17cbfe9d39d926139b431e3d"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=c0V15IamemV15aremoveamin_eltV8V0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV16amixfix []V10V17Aainfix &lt;V17V9Aainfix &lt;=V3V17Eqamemamixfix []V16V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V16V11AasolutionV16FAainfix &lt;V18V19IamemV19V8IamemV18adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V21ainfix -ainfix +V20V5V21NIainfix &lt;V21V5Aainfix &lt;=c0V21FqamemV20V2NIainfix &gt;=V20c0FAainfix =amixfix []V6V23ainfix -ainfix +V22V23V5NIainfix &lt;V23V5Aainfix &lt;=c0V23FqamemV22V1NIainfix &gt;=V22c0FAainfix =amixfix []V6V25V24NIainfix &lt;V25V5Aainfix &lt;=c0V25FAainfix &lt;V24anAainfix &lt;=c0V24qamemV24V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -350,10 +350,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.5"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="b78eac5fdfc19dbb99c8662401950120"
+        sum="10309ffd05938c38130cde9592783c12"
         proved="true"
         expanded="false"
         shape="ainfix &lt;V15anIamemV15aremoveamin_eltV8V0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV16amixfix []V10V17Aainfix &lt;V17V9Aainfix &lt;=V3V17Eqamemamixfix []V16V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V16V11AasolutionV16FAainfix &lt;V18V19IamemV19V8IamemV18adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V21ainfix -ainfix +V20V5V21NIainfix &lt;V21V5Aainfix &lt;=c0V21FqamemV20V2NIainfix &gt;=V20c0FAainfix =amixfix []V6V23ainfix -ainfix +V22V23V5NIainfix &lt;V23V5Aainfix &lt;=c0V23FqamemV22V1NIainfix &gt;=V22c0FAainfix =amixfix []V6V25V24NIainfix &lt;V25V5Aainfix &lt;=c0V25FAainfix &lt;V24anAainfix &lt;=c0V24qamemV24V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -370,10 +370,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.6"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="9f7eebf3a41ef2e8654e68068041baa3"
+        sum="6b34fd1b4055b0fcfc031eee90249888"
         proved="true"
         expanded="false"
         shape="ainfix =amixfix []V13V16V15NIainfix &lt;V16V14Aainfix &lt;=c0V16FIamemV15aremoveamin_eltV8V0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -385,15 +385,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.75"/>
+         <result status="valid" time="0.65"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.7"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="4405c158dd48210a2ab8d358e85cc7b6"
+        sum="420aba9fb4e4d11508893f7d73bdad25"
         proved="true"
         expanded="true"
         shape="amemV15aremoveamin_eltV8V0Iainfix =amixfix []V13V16V15NIainfix &lt;V16V14Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -411,10 +411,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.8"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="e2465516e0533fe6af9e7e197c4074c3"
+        sum="242acdf86129985e57d1f875888e9b4f"
         proved="true"
         expanded="false"
         shape="ainfix =amixfix []V13V16ainfix -ainfix +V15V16V14NIainfix &lt;V16V14Aainfix &lt;=c0V16FIamemV15asuccaaddamin_eltV8V1NIainfix &gt;=V15c0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -426,15 +426,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="6.63"/>
+         <result status="valid" time="2.46"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.9"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="631a8a5b71e680a83ae55fb172565950"
+        sum="4d13c4d1bb4c80216876a988cc316c8c"
         proved="true"
         expanded="true"
         shape="amemV15asuccaaddamin_eltV8V1NIainfix =amixfix []V13V16ainfix -ainfix +V15V16V14NIainfix &lt;V16V14Aainfix &lt;=c0V16FIainfix &gt;=V15c0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -452,10 +452,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.10"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="91b54177020b766b5db586dd0cc563f5"
+        sum="7fca8aacf7172c205e7c2cbe1de93083"
         proved="true"
         expanded="false"
         shape="ainfix =amixfix []V13V16ainfix -ainfix +V15V14V16NIainfix &lt;V16V14Aainfix &lt;=c0V16FIamemV15apredaaddamin_eltV8V2NIainfix &gt;=V15c0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -467,15 +467,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="6.51"/>
+         <result status="valid" time="2.92"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.3.11"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="579c2f33875f21789b42c7d2adb9a2b4"
+        sum="2eae4c99e07e3747a255d841ea9a86b5"
         proved="true"
         expanded="true"
         shape="amemV15apredaaddamin_eltV8V2NIainfix =amixfix []V13V16ainfix -ainfix +V15V14V16NIainfix &lt;V16V14Aainfix &lt;=c0V16FIainfix &gt;=V15c0FIainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -493,10 +493,10 @@
        </goal>
        <goal
         name="WP_parameter t3.3.12"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="0061fbc77410c7c8b8ff390b402d7c2b"
+        sum="ca5a0125e58ecc3909664c60fd8891c3"
         proved="true"
         expanded="true"
         shape="apartial_solutionV14V13Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -508,10 +508,10 @@
          expanded="true">
          <goal
           name="WP_parameter t3.3.12.1"
-          locfile="examples/programs/queens/../queens.mlw"
+          locfile="programs/queens/../queens.mlw"
           loclnum="107" loccnumb="10" loccnume="12"
           expl="parameter t3"
-          sum="48b8f48748a902aa67db4e2f25dc9e49"
+          sum="5e4d46e2f012509f4d92a38a323066d3"
           proved="true"
           expanded="true"
           shape="ainfix =ainfix -amixfix []V13V15amixfix []V13V16ainfix -V16V15NAainfix =ainfix -amixfix []V13V15amixfix []V13V16ainfix -V15V16NAainfix =amixfix []V13V15amixfix []V13V16NIainfix &lt;V16V15Aainfix &lt;=c0V16FAainfix &lt;amixfix []V13V15anAainfix &lt;=c0amixfix []V13V15Iainfix &lt;V15V14Aainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13asetV12V11amin_eltV8FIamemV17V8NFNIainfix =amixfix []V4V18amixfix []V10V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =amixfix []V6V19amixfix []V12V19Iainfix &lt;V19V11Aainfix &lt;=c0V19FAaeq_prefixV20amixfix []V10V21anAainfix &lt;V21V9Aainfix =V3V21Oainfix &lt;V3V21Eqamemamixfix []V20V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V22amixfix []V20V22Iainfix &lt;V22V11Aainfix &lt;=c0V22FAapartial_solutionanV20FAainfix &lt;V23V24IamemV24V8IamemV23adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V25amixfix []V10V26Iainfix &lt;V26V9Aainfix &lt;V25V26Aainfix &lt;=V3V25FAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V28V27NAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V27V28NAainfix =amixfix []V12V27amixfix []V12V28NIainfix &lt;V28V27Aainfix &lt;=c0V28FAainfix &lt;amixfix []V12V27anAainfix &lt;=c0amixfix []V12V27Iainfix &lt;V27V11Aainfix &lt;=c0V27FAamemV29adiffadiffV0V1V2IamemV29V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV30V0NFNIainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V32V31NAainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V31V32NAainfix =amixfix []V6V31amixfix []V6V32NIainfix &lt;V32V31Aainfix &lt;=c0V32FAainfix &lt;amixfix []V6V31anAainfix &lt;=c0amixfix []V6V31Iainfix &lt;V31V5Aainfix &lt;=c0V31FAainfix =agetV6V34ainfix +ainfix +V33V5aprefix -V34NIainfix &lt;V34V5Aainfix =c0V34Oainfix &lt;c0V34FqamemV33V2NIainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V36aprefix -V5NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V1NIainfix &lt;=c0V35FAainfix =agetV6V38V37NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FAainfix &lt;V37anAainfix =c0V37Oainfix &lt;c0V37qamemV37V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
@@ -523,10 +523,10 @@
            expanded="true">
            <goal
             name="WP_parameter t3.3.12.1.1"
-            locfile="examples/programs/queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="parameter t3"
-            sum="d1ef0d7097d737f7c34b5b0cb4f3529c"
+            sum="977f266768b263e169d5165626b220c6"
             proved="true"
             expanded="true"
             shape="ainfix &lt;=c0amixfix []V13V15Iainfix &lt;V15V14Aainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13asetV12V11amin_eltV8FIamemV16V8NFNIainfix =amixfix []V4V17amixfix []V10V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FAainfix =amixfix []V6V18amixfix []V12V18Iainfix &lt;V18V11Aainfix &lt;=c0V18FAaeq_prefixV19amixfix []V10V20anAainfix &lt;V20V9Aainfix =V3V20Oainfix &lt;V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V21amixfix []V19V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAapartial_solutionanV19FAainfix &lt;V22V23IamemV23V8IamemV22adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V24amixfix []V10V25Iainfix &lt;V25V9Aainfix &lt;V24V25Aainfix &lt;=V3V24FAainfix =ainfix -amixfix []V12V26amixfix []V12V27ainfix -V27V26NAainfix =ainfix -amixfix []V12V26amixfix []V12V27ainfix -V26V27NAainfix =amixfix []V12V26amixfix []V12V27NIainfix &lt;V27V26Aainfix &lt;=c0V27FAainfix &lt;amixfix []V12V26anAainfix &lt;=c0amixfix []V12V26Iainfix &lt;V26V11Aainfix &lt;=c0V26FAamemV28adiffadiffV0V1V2IamemV28V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV29V0NFNIainfix =ainfix -amixfix []V6V30amixfix []V6V31ainfix -V31V30NAainfix =ainfix -amixfix []V6V30amixfix []V6V31ainfix -V30V31NAainfix =amixfix []V6V30amixfix []V6V31NIainfix &lt;V31V30Aainfix &lt;=c0V31FAainfix &lt;amixfix []V6V30anAainfix &lt;=c0amixfix []V6V30Iainfix &lt;V30V5Aainfix &lt;=c0V30FAainfix =agetV6V33ainfix +ainfix +V32V5aprefix -V33NIainfix &lt;V33V5Aainfix =c0V33Oainfix &lt;c0V33FqamemV32V2NIainfix &lt;=c0V32FAainfix =agetV6V35ainfix +ainfix +V34V35aprefix -V5NIainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqamemV34V1NIainfix &lt;=c0V34FAainfix =agetV6V37V36NIainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FAainfix &lt;V36anAainfix =c0V36Oainfix &lt;c0V36qamemV36V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
@@ -538,7 +538,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="2.06"/>
+             <result status="valid" time="0.45"/>
             </proof>
             <proof
              prover="5"
@@ -546,35 +546,35 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.63"/>
+             <result status="valid" time="0.20"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.3.12.1.2"
-            locfile="examples/programs/queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="parameter t3"
-            sum="d7d4c84d178b711fcdd205096609c8ab"
+            sum="65f4597d9543e27434bf018e7ce0755a"
             proved="true"
             expanded="false"
             shape="ainfix &lt;amixfix []V13V15anIainfix &lt;V15V14Aainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13asetV12V11amin_eltV8FIamemV16V8NFNIainfix =amixfix []V4V17amixfix []V10V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FAainfix =amixfix []V6V18amixfix []V12V18Iainfix &lt;V18V11Aainfix &lt;=c0V18FAaeq_prefixV19amixfix []V10V20anAainfix &lt;V20V9Aainfix =V3V20Oainfix &lt;V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V21amixfix []V19V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAapartial_solutionanV19FAainfix &lt;V22V23IamemV23V8IamemV22adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V24amixfix []V10V25Iainfix &lt;V25V9Aainfix &lt;V24V25Aainfix &lt;=V3V24FAainfix =ainfix -amixfix []V12V26amixfix []V12V27ainfix -V27V26NAainfix =ainfix -amixfix []V12V26amixfix []V12V27ainfix -V26V27NAainfix =amixfix []V12V26amixfix []V12V27NIainfix &lt;V27V26Aainfix &lt;=c0V27FAainfix &lt;amixfix []V12V26anAainfix &lt;=c0amixfix []V12V26Iainfix &lt;V26V11Aainfix &lt;=c0V26FAamemV28adiffadiffV0V1V2IamemV28V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV29V0NFNIainfix =ainfix -amixfix []V6V30amixfix []V6V31ainfix -V31V30NAainfix =ainfix -amixfix []V6V30amixfix []V6V31ainfix -V30V31NAainfix =amixfix []V6V30amixfix []V6V31NIainfix &lt;V31V30Aainfix &lt;=c0V31FAainfix &lt;amixfix []V6V30anAainfix &lt;=c0amixfix []V6V30Iainfix &lt;V30V5Aainfix &lt;=c0V30FAainfix =agetV6V33ainfix +ainfix +V32V5aprefix -V33NIainfix &lt;V33V5Aainfix =c0V33Oainfix &lt;c0V33FqamemV32V2NIainfix &lt;=c0V32FAainfix =agetV6V35ainfix +ainfix +V34V35aprefix -V5NIainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqamemV34V1NIainfix &lt;=c0V34FAainfix =agetV6V37V36NIainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FAainfix &lt;V36anAainfix =c0V36Oainfix &lt;c0V36qamemV36V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:parameter t3"/>
             <proof
-             prover="1"
-             timelimit="30"
-             memlimit="0"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="1.43"/>
-            </proof>
-            <proof
              prover="0"
              timelimit="30"
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.22"/>
+             <result status="valid" time="0.10"/>
+            </proof>
+            <proof
+             prover="1"
+             timelimit="30"
+             memlimit="0"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.64"/>
             </proof>
             <proof
              prover="2"
@@ -582,7 +582,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="3.36"/>
+             <result status="valid" time="15.75"/>
             </proof>
             <proof
              prover="5"
@@ -590,15 +590,15 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.61"/>
+             <result status="valid" time="0.26"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.3.12.1.3"
-            locfile="examples/programs/queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="parameter t3"
-            sum="88f3e5df75768ab2bf2f26b266cf3696"
+            sum="1148f0fc442f8347b4502f5483ccc5ae"
             proved="true"
             expanded="true"
             shape="ainfix =amixfix []V13V15amixfix []V13V16NIainfix &lt;V16V15Aainfix &lt;=c0V16FIainfix &lt;V15V14Aainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13asetV12V11amin_eltV8FIamemV17V8NFNIainfix =amixfix []V4V18amixfix []V10V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =amixfix []V6V19amixfix []V12V19Iainfix &lt;V19V11Aainfix &lt;=c0V19FAaeq_prefixV20amixfix []V10V21anAainfix &lt;V21V9Aainfix =V3V21Oainfix &lt;V3V21Eqamemamixfix []V20V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V22amixfix []V20V22Iainfix &lt;V22V11Aainfix &lt;=c0V22FAapartial_solutionanV20FAainfix &lt;V23V24IamemV24V8IamemV23adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V25amixfix []V10V26Iainfix &lt;V26V9Aainfix &lt;V25V26Aainfix &lt;=V3V25FAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V28V27NAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V27V28NAainfix =amixfix []V12V27amixfix []V12V28NIainfix &lt;V28V27Aainfix &lt;=c0V28FAainfix &lt;amixfix []V12V27anAainfix &lt;=c0amixfix []V12V27Iainfix &lt;V27V11Aainfix &lt;=c0V27FAamemV29adiffadiffV0V1V2IamemV29V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV30V0NFNIainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V32V31NAainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V31V32NAainfix =amixfix []V6V31amixfix []V6V32NIainfix &lt;V32V31Aainfix &lt;=c0V32FAainfix &lt;amixfix []V6V31anAainfix &lt;=c0amixfix []V6V31Iainfix &lt;V31V5Aainfix &lt;=c0V31FAainfix =agetV6V34ainfix +ainfix +V33V5aprefix -V34NIainfix &lt;V34V5Aainfix =c0V34Oainfix &lt;c0V34FqamemV33V2NIainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V36aprefix -V5NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V1NIainfix &lt;=c0V35FAainfix =agetV6V38V37NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FAainfix &lt;V37anAainfix =c0V37Oainfix &lt;c0V37qamemV37V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
@@ -611,15 +611,15 @@
              edited="queens_WP_NQueensSets_WP_parameter_t3_7.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="8.63"/>
+             <result status="valid" time="4.31"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.3.12.1.4"
-            locfile="examples/programs/queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="parameter t3"
-            sum="83ad8cf588fbdb374b9fadb2acccbcee"
+            sum="0f38d759233c4f904d36b17e9973c9b4"
             proved="true"
             expanded="true"
             shape="ainfix =ainfix -amixfix []V13V15amixfix []V13V16ainfix -V15V16NIainfix &lt;V16V15Aainfix &lt;=c0V16FIainfix &lt;V15V14Aainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13asetV12V11amin_eltV8FIamemV17V8NFNIainfix =amixfix []V4V18amixfix []V10V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =amixfix []V6V19amixfix []V12V19Iainfix &lt;V19V11Aainfix &lt;=c0V19FAaeq_prefixV20amixfix []V10V21anAainfix &lt;V21V9Aainfix =V3V21Oainfix &lt;V3V21Eqamemamixfix []V20V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V22amixfix []V20V22Iainfix &lt;V22V11Aainfix &lt;=c0V22FAapartial_solutionanV20FAainfix &lt;V23V24IamemV24V8IamemV23adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V25amixfix []V10V26Iainfix &lt;V26V9Aainfix &lt;V25V26Aainfix &lt;=V3V25FAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V28V27NAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V27V28NAainfix =amixfix []V12V27amixfix []V12V28NIainfix &lt;V28V27Aainfix &lt;=c0V28FAainfix &lt;amixfix []V12V27anAainfix &lt;=c0amixfix []V12V27Iainfix &lt;V27V11Aainfix &lt;=c0V27FAamemV29adiffadiffV0V1V2IamemV29V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV30V0NFNIainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V32V31NAainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V31V32NAainfix =amixfix []V6V31amixfix []V6V32NIainfix &lt;V32V31Aainfix &lt;=c0V32FAainfix &lt;amixfix []V6V31anAainfix &lt;=c0amixfix []V6V31Iainfix &lt;V31V5Aainfix &lt;=c0V31FAainfix =agetV6V34ainfix +ainfix +V33V5aprefix -V34NIainfix &lt;V34V5Aainfix =c0V34Oainfix &lt;c0V34FqamemV33V2NIainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V36aprefix -V5NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V1NIainfix &lt;=c0V35FAainfix =agetV6V38V37NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FAainfix &lt;V37anAainfix =c0V37Oainfix &lt;c0V37qamemV37V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
@@ -632,15 +632,15 @@
              edited="queens_WP_NQueensSets_WP_parameter_t3_8.v"
              obsolete="false"
              archived="false">
-             <result status="valid" time="3.17"/>
+             <result status="valid" time="2.58"/>
             </proof>
            </goal>
            <goal
             name="WP_parameter t3.3.12.1.5"
-            locfile="examples/programs/queens/../queens.mlw"
+            locfile="programs/queens/../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="parameter t3"
-            sum="93ebea592cd1d4d4b9f6d7dfcce29efe"
+            sum="40a73aeedd9e8e48435f5fa925ff3331"
             proved="true"
             expanded="false"
             shape="ainfix =ainfix -amixfix []V13V15amixfix []V13V16ainfix -V16V15NIainfix &lt;V16V15Aainfix &lt;=c0V16FIainfix &lt;V15V14Aainfix &lt;=c0V15FIainfix =V14ainfix +V11c1FIainfix =V13asetV12V11amin_eltV8FIamemV17V8NFNIainfix =amixfix []V4V18amixfix []V10V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =amixfix []V6V19amixfix []V12V19Iainfix &lt;V19V11Aainfix &lt;=c0V19FAaeq_prefixV20amixfix []V10V21anAainfix &lt;V21V9Aainfix =V3V21Oainfix &lt;V3V21Eqamemamixfix []V20V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V22amixfix []V20V22Iainfix &lt;V22V11Aainfix &lt;=c0V22FAapartial_solutionanV20FAainfix &lt;V23V24IamemV24V8IamemV23adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V25amixfix []V10V26Iainfix &lt;V26V9Aainfix &lt;V25V26Aainfix &lt;=V3V25FAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V28V27NAainfix =ainfix -amixfix []V12V27amixfix []V12V28ainfix -V27V28NAainfix =amixfix []V12V27amixfix []V12V28NIainfix &lt;V28V27Aainfix &lt;=c0V28FAainfix &lt;amixfix []V12V27anAainfix &lt;=c0amixfix []V12V27Iainfix &lt;V27V11Aainfix &lt;=c0V27FAamemV29adiffadiffV0V1V2IamemV29V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV30V0NFNIainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V32V31NAainfix =ainfix -amixfix []V6V31amixfix []V6V32ainfix -V31V32NAainfix =amixfix []V6V31amixfix []V6V32NIainfix &lt;V32V31Aainfix &lt;=c0V32FAainfix &lt;amixfix []V6V31anAainfix &lt;=c0amixfix []V6V31Iainfix &lt;V31V5Aainfix &lt;=c0V31FAainfix =agetV6V34ainfix +ainfix +V33V5aprefix -V34NIainfix &lt;V34V5Aainfix =c0V34Oainfix &lt;c0V34FqamemV33V2NIainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V36aprefix -V5NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V1NIainfix &lt;=c0V35FAainfix =agetV6V38V37NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FAainfix &lt;V37anAainfix =c0V37Oainfix &lt;c0V37qamemV37V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
@@ -652,7 +652,7 @@
              memlimit="0"
              obsolete="false"
              archived="false">
-             <result status="valid" time="4.18"/>
+             <result status="valid" time="1.34"/>
             </proof>
            </goal>
           </transf>
@@ -663,10 +663,10 @@
      </goal>
      <goal
       name="WP_parameter t3.4"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="loop invariant preservation"
-      sum="a871fdace928fbd63e2bf8f0f3d70185"
+      sum="e6e85d0bb29188975ed53ef520b28d61"
       proved="true"
       expanded="true"
       shape="aeq_prefixV4V16V3Aaeq_prefixV6V18V20Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V3V23Eqamemamixfix []V22V20adiffadiffadiffV0V1V2V21Aaeq_prefixV18V22V20AasolutionV22FAainfix &lt;V24V25IamemV25V21IamemV24adiffadiffadiffV0V1V2V21FAasortedV16V3V15Aapartial_solutionV20V18AasubsetV21adiffadiffV0V1V2Aainfix =V20V5Aainfix &gt;=ainfix -V15V3c0Aainfix =V19ainfix -V15V3Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV26amixfix []V16V27Aainfix &lt;V27V15Aainfix &lt;=V9V27Eqaeq_prefixV18V26V17AasolutionV26FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V29ainfix -ainfix +V28V14V29NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28apredaaddamin_eltV8V2NIainfix &gt;=V28c0FAainfix =amixfix []V13V31ainfix -ainfix +V30V31V14NIainfix &lt;V31V14Aainfix &lt;=c0V31FqamemV30asuccaaddamin_eltV8V1NIainfix &gt;=V30c0FAainfix =amixfix []V13V33V32NIainfix &lt;V33V14Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V39ainfix -ainfix +V38V5V39NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V2NIainfix &gt;=V38c0FAainfix =amixfix []V6V41ainfix -ainfix +V40V41V5NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V1NIainfix &gt;=V40c0FAainfix =amixfix []V6V43V42NIainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -678,10 +678,10 @@
        expanded="true">
        <goal
         name="WP_parameter t3.4.1"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="7761d31b900a285b00b082105f2877df"
+        sum="d5bf4b38a0313fa07c4e7e421c80cad7"
         proved="true"
         expanded="false"
         shape="ainfix =V19ainfix -V15V3Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -698,10 +698,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.2"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="c1e2924910a2840cf586576df7ceeb2c"
+        sum="0976413939399b9556ba2d07099f0eb3"
         proved="true"
         expanded="false"
         shape="ainfix &gt;=ainfix -V15V3c0Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -718,10 +718,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.3"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="064419ef0dda64dc8e1014dee4e7f7af"
+        sum="cb6ed28566f5e54bd28c606398ac0cfb"
         proved="true"
         expanded="false"
         shape="ainfix =V20V5Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -738,10 +738,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.4"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="9485056a17f1980600d78157ab4f0cf4"
+        sum="9c24259e9b2c95f72e0832198761886d"
         proved="true"
         expanded="false"
         shape="asubsetV21adiffadiffV0V1V2Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -758,10 +758,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.5"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="95613c7bdb509aa65707e77ce9fcb312"
+        sum="50a7b09bd34023cb4f3865b7f55485ae"
         proved="true"
         expanded="true"
         shape="apartial_solutionV20V18Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -778,10 +778,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.6"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="5b81f2bb64e76698b1219965ef4df1cf"
+        sum="ce3ba03c4fd055f7ff589e7577d25be2"
         proved="true"
         expanded="true"
         shape="asortedV16V3V15Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -799,10 +799,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.7"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="cef0530f8981542334b71eaac239b8b7"
+        sum="5342774584675654ef67cfaf47598b10"
         proved="true"
         expanded="true"
         shape="ainfix &lt;V22V23IamemV23V21IamemV22adiffadiffadiffV0V1V2V21FIainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV24amixfix []V16V25Aainfix &lt;V25V15Aainfix &lt;=V9V25Eqaeq_prefixV18V24V17AasolutionV24FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V27ainfix -ainfix +V26V14V27NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26apredaaddamin_eltV8V2NIainfix &gt;=V26c0FAainfix =amixfix []V13V29ainfix -ainfix +V28V29V14NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28asuccaaddamin_eltV8V1NIainfix &gt;=V28c0FAainfix =amixfix []V13V31V30NIainfix &lt;V31V14Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -820,10 +820,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.8"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="f22b5c1211d145f4d476607da7c25957"
+        sum="de9bccde7aaf9a0a1435323c86b24c3e"
         proved="true"
         expanded="false"
         shape="aeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V3V23EIamemamixfix []V22V20adiffadiffadiffV0V1V2V21Aaeq_prefixV18V22V20AasolutionV22FIainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV24amixfix []V16V25Aainfix &lt;V25V15Aainfix &lt;=V9V25Eqaeq_prefixV18V24V17AasolutionV24FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V27ainfix -ainfix +V26V14V27NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26apredaaddamin_eltV8V2NIainfix &gt;=V26c0FAainfix =amixfix []V13V29ainfix -ainfix +V28V29V14NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28asuccaaddamin_eltV8V1NIainfix &gt;=V28c0FAainfix =amixfix []V13V31V30NIainfix &lt;V31V14Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -835,15 +835,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.65"/>
+         <result status="valid" time="1.28"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.4.9"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="a934c61bff74a538ae534647740b1b76"
+        sum="8cc6a057e1859cd13878999adad4d43b"
         proved="true"
         expanded="false"
         shape="asolutionV22Iaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V3V23EFIainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV24amixfix []V16V25Aainfix &lt;V25V15Aainfix &lt;=V9V25Eqaeq_prefixV18V24V17AasolutionV24FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V27ainfix -ainfix +V26V14V27NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26apredaaddamin_eltV8V2NIainfix &gt;=V26c0FAainfix =amixfix []V13V29ainfix -ainfix +V28V29V14NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28asuccaaddamin_eltV8V1NIainfix &gt;=V28c0FAainfix =amixfix []V13V31V30NIainfix &lt;V31V14Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -860,10 +860,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.10"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="8518b04451e259a8171a6144ddb6c05a"
+        sum="2952e674030ff02216a5867476a1ab88"
         proved="true"
         expanded="false"
         shape="aeq_prefixV18V22V20Iaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V3V23EFIainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV24amixfix []V16V25Aainfix &lt;V25V15Aainfix &lt;=V9V25Eqaeq_prefixV18V24V17AasolutionV24FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V27ainfix -ainfix +V26V14V27NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26apredaaddamin_eltV8V2NIainfix &gt;=V26c0FAainfix =amixfix []V13V29ainfix -ainfix +V28V29V14NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28asuccaaddamin_eltV8V1NIainfix &gt;=V28c0FAainfix =amixfix []V13V31V30NIainfix &lt;V31V14Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -875,15 +875,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.09"/>
+         <result status="valid" time="0.78"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.4.11"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="6f1d7be9f0d0a33730621ae7781e2c7b"
+        sum="8e84be15bf906a215d401429fb3aa038"
         proved="true"
         expanded="false"
         shape="amemamixfix []V22V20adiffadiffadiffV0V1V2V21Iaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V3V23EFIainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV24amixfix []V16V25Aainfix &lt;V25V15Aainfix &lt;=V9V25Eqaeq_prefixV18V24V17AasolutionV24FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V27ainfix -ainfix +V26V14V27NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26apredaaddamin_eltV8V2NIainfix &gt;=V26c0FAainfix =amixfix []V13V29ainfix -ainfix +V28V29V14NIainfix &lt;V29V14Aainfix &lt;=c0V29FqamemV28asuccaaddamin_eltV8V1NIainfix &gt;=V28c0FAainfix =amixfix []V13V31V30NIainfix &lt;V31V14Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -895,15 +895,15 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.63"/>
+         <result status="valid" time="1.46"/>
         </proof>
        </goal>
        <goal
         name="WP_parameter t3.4.12"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="5bbfc185daff454edaef1fff9ca5e842"
+        sum="952188e24f0137f1fb6d505d78854072"
         proved="true"
         expanded="false"
         shape="aeq_prefixV6V18V20Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -920,10 +920,10 @@
        </goal>
        <goal
         name="WP_parameter t3.4.13"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="7317ae37cd2303bbcea23d4cc07a367e"
+        sum="638ea08cfa4d23a0656d2c0ee72046b0"
         proved="true"
         expanded="false"
         shape="aeq_prefixV4V16V3Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -942,10 +942,10 @@
      </goal>
      <goal
       name="WP_parameter t3.5"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
-      expl="loop variant decreases"
-      sum="946eef241a74feb7c59a39cbd4eeacff"
+      expl="loop variant decrease"
+      sum="47bcd211a4152e568124b98d52069453"
       proved="true"
       expanded="false"
       shape="ainfix &lt;acardinalV21acardinalV8Aainfix &lt;=c0acardinalV8Iainfix =V21aremoveamin_eltV8V8FIainfix =V20ainfix -V17c1FIainfix =V19ainfix +V7ainfix -V15V9FIaeq_prefixV10V16V9Aaeq_prefixV13V18V17Aaeq_solV22amixfix []V16V23Aainfix &lt;V23V15Aainfix &lt;=V9V23Eqaeq_prefixV18V22V17AasolutionV22FAasortedV16V9V15Aainfix =V17V14Aainfix &gt;=ainfix -V15V9c0FIapartial_solutionV14V13Aainfix =amixfix []V13V25ainfix -ainfix +V24V14V25NIainfix &lt;V25V14Aainfix &lt;=c0V25FqamemV24apredaaddamin_eltV8V2NIainfix &gt;=V24c0FAainfix =amixfix []V13V27ainfix -ainfix +V26V27V14NIainfix &lt;V27V14Aainfix &lt;=c0V27FqamemV26asuccaaddamin_eltV8V1NIainfix &gt;=V26c0FAainfix =amixfix []V13V29V28NIainfix &lt;V29V14Aainfix &lt;=c0V29FAainfix &lt;V28anAainfix &lt;=c0V28qamemV28aremoveamin_eltV8V0FAainfix &gt;=V9c0Aainfix =ainfix +V14acardinalaremoveamin_eltV8V0anAainfix &lt;=c0V14Iainfix =V14ainfix +V11c1FIainfix =V13amixfix [&lt;-]V12V11amin_eltV8FIais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV30amixfix []V10V31Aainfix &lt;V31V9Aainfix &lt;=V3V31Eqamemamixfix []V30V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V30V11AasolutionV30FAainfix &lt;V32V33IamemV33V8IamemV32adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V35ainfix -ainfix +V34V5V35NIainfix &lt;V35V5Aainfix &lt;=c0V35FqamemV34V2NIainfix &gt;=V34c0FAainfix =amixfix []V6V37ainfix -ainfix +V36V37V5NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V1NIainfix &gt;=V36c0FAainfix =amixfix []V6V39V38NIainfix &lt;V39V5Aainfix &lt;=c0V39FAainfix &lt;V38anAainfix &lt;=c0V38qamemV38V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -962,10 +962,10 @@
      </goal>
      <goal
       name="WP_parameter t3.6"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
-      expl="normal postcondition"
-      sum="33ef3871a051ec51cf8259bcb056cc03"
+      expl="postcondition"
+      sum="bf29208423dca569f3b24c551751eeb5"
       proved="true"
       expanded="true"
       shape="aeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqaeq_prefixV12V13V11AasolutionV13FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -977,10 +977,10 @@
        expanded="true">
        <goal
         name="WP_parameter t3.6.1"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="f119a84dc99b0146252da37dc7812a34"
+        sum="769f978571be26847b63234895d9cf4a"
         proved="true"
         expanded="false"
         shape="ainfix =V7ainfix -V9V3Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -997,10 +997,10 @@
        </goal>
        <goal
         name="WP_parameter t3.6.2"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="d9774e51370c53197fb7afd0252fe3b7"
+        sum="916c78edf7c266d7b034e9d4331d23d8"
         proved="true"
         expanded="false"
         shape="ainfix &gt;=ainfix -V9V3c0Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1017,10 +1017,10 @@
        </goal>
        <goal
         name="WP_parameter t3.6.3"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="d00ad78dda1e2af4a5f3c71a5629e4b5"
+        sum="160199e39f87897045cde2eea25a922b"
         proved="true"
         expanded="false"
         shape="ainfix =V11V5Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1037,10 +1037,10 @@
        </goal>
        <goal
         name="WP_parameter t3.6.4"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="9dd10f0499bd72304089bca14efa6ed2"
+        sum="ef1ccb6f8b764b44c0cbd558328a9627"
         proved="true"
         expanded="false"
         shape="asortedV10V3V9Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1057,10 +1057,10 @@
        </goal>
        <goal
         name="WP_parameter t3.6.5"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="f1b2084b6048f0f5366e2a89f2f17488"
+        sum="f05603833020699d29a99fea43c987a8"
         proved="true"
         expanded="true"
         shape="aeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EIaeq_prefixV12V13V11AasolutionV13FIais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1078,10 +1078,10 @@
        </goal>
        <goal
         name="WP_parameter t3.6.6"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="5a455a541817ae4cec3aaf700be06f4c"
+        sum="c38a7776615e1be2fd420e20472470ba"
         proved="true"
         expanded="false"
         shape="asolutionV13Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFIais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1098,10 +1098,10 @@
        </goal>
        <goal
         name="WP_parameter t3.6.7"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="12086a82c6deef02481fd8b67c7f54df"
+        sum="d95214dfc0d00500d71c43132b41609d"
         proved="true"
         expanded="false"
         shape="aeq_prefixV12V13V11Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFIais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1118,17 +1118,17 @@
        </goal>
        <goal
         name="WP_parameter t3.6.8"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="d104b3a2e0fc6b74ed7269bbc72aca21"
+        sum="b354314ebc20f016aa0c1df249806bff"
         proved="true"
         expanded="false"
         shape="aeq_prefixV6V12V11Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:parameter t3"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1136,7 +1136,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="0"
+         prover="1"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1146,23 +1146,15 @@
        </goal>
        <goal
         name="WP_parameter t3.6.9"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="74af7f405b53ff303d4119d3300ec16e"
+        sum="c5cb36680baae2752f5b328eca9cc5c2"
         proved="true"
         expanded="false"
         shape="aeq_prefixV4V10V3Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:parameter t3"/>
-        <proof
-         prover="1"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
         <proof
          prover="0"
          timelimit="10"
@@ -1171,15 +1163,23 @@
          archived="false">
          <result status="valid" time="0.01"/>
         </proof>
+        <proof
+         prover="1"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter t3.7"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
-      expl="normal postcondition"
-      sum="26f561b3ce179861838971bb2409ed66"
+      expl="postcondition"
+      sum="d21d8ba0fec81023c519f8449d069acc"
       proved="true"
       expanded="true"
       shape="aeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix =V5V5Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1191,10 +1191,10 @@
        expanded="true">
        <goal
         name="WP_parameter t3.7.1"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="ff0c730405d96252dad5caa0ea52cbf9"
+        sum="94fea292374fee2097bdc01c131fba75"
         proved="true"
         expanded="true"
         shape="ainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1211,10 +1211,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.2"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="531e8a6f6869a8b7cadaf60f9e8871c4"
+        sum="ad051706b3093f5f3a9fa621227b46d6"
         proved="true"
         expanded="true"
         shape="ainfix &gt;=ainfix -V8V3c0Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1231,10 +1231,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.3"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="ac5144c469e1f3f1ca19a639b6b2ca00"
+        sum="d634ca4d5c99dc685a30cb12c861b62a"
         proved="true"
         expanded="true"
         shape="ainfix =V5V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1251,10 +1251,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.4"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="949ef521d3f32bc88491cc55d717e9e1"
+        sum="68a032ff5945c0f1ffbc719471b17aad"
         proved="true"
         expanded="true"
         shape="asortedV7V3V8Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1271,10 +1271,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.5"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="50beef61bc71e3f693155fc90269dc38"
+        sum="6e05dd8574aa14cebe11c6989af59379"
         proved="true"
         expanded="true"
         shape="aeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EIaeq_prefixV6V9V5AasolutionV9FIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1291,10 +1291,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.6"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="bc3fe68101419c1c6c3cbe4a1ac819a7"
+        sum="2fe61322add86f51867ae8fdffd85d56"
         proved="true"
         expanded="true"
         shape="asolutionV9Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1311,10 +1311,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.7"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="203d2a37c1abc3bb1ee51855c887e6b5"
+        sum="4058cd8aa36801d950185d4aefad4553"
         proved="true"
         expanded="false"
         shape="aeq_prefixV6V9V5Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1331,10 +1331,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.8"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="38f3ef653e1e2715fe75a435b8be6c95"
+        sum="54c139208ee6b44b1c87659d8ac8d084"
         proved="true"
         expanded="false"
         shape="aeq_prefixV6V6V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1351,10 +1351,10 @@
        </goal>
        <goal
         name="WP_parameter t3.7.9"
-        locfile="examples/programs/queens/../queens.mlw"
+        locfile="programs/queens/../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="parameter t3"
-        sum="9dca5360735b94012cee0a1e65335067"
+        sum="ab7258d8b9aed6d1c76adf2e2eb71733"
         proved="true"
         expanded="false"
         shape="aeq_prefixV4V7V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
@@ -1375,10 +1375,10 @@
    </goal>
    <goal
     name="WP_parameter queens3"
-    locfile="examples/programs/queens/../queens.mlw"
+    locfile="programs/queens/../queens.mlw"
     loclnum="156" loccnumb="6" loccnume="13"
     expl="parameter queens3"
-    sum="8bc426fc5cc82621e8ab6e1088299d95"
+    sum="8c7bc3936fac8da00d67085f464a82df"
     proved="true"
     expanded="true"
     shape="aeq_solV10amixfix []V6V11Aainfix &lt;V11V9Aainfix &lt;=c0V11EqasolutionV10FAasortedV6c0V5Aainfix =V9V5Iaeq_prefixV2V6V1Aaeq_prefixV4V8V7Aaeq_solV12amixfix []V6V13Aainfix &lt;V13V5Aainfix &lt;=V1V13Eqaeq_prefixV8V12V7AasolutionV12FAasortedV6V1V5Aainfix =V7V3Aainfix &gt;=ainfix -V5V1c0Lainfix -V5V1FAapartial_solutionV3V4Aainfix =amixfix []V4V15ainfix -ainfix +V14V3V15NIainfix &lt;V15V3Aainfix &lt;=c0V15FqamemV14aemptyNIainfix &gt;=V14c0FAainfix =amixfix []V4V17ainfix -ainfix +V16V17V3NIainfix &lt;V17V3Aainfix &lt;=c0V17FqamemV16aemptyNIainfix &gt;=V16c0FAainfix =amixfix []V4V19V18NIainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix &lt;V18anAainfix &lt;=c0V18qamemV18abelowV0FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalabelowV0anAainfix &lt;=c0V3Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
@@ -1390,10 +1390,10 @@
      expanded="true">
      <goal
       name="WP_parameter queens3.1"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="156" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="dec9015628394b54dc0ec7ca80b22324"
+      sum="358d329423f14f318b4cc77bf5764e1d"
       proved="true"
       expanded="false"
       shape="apartial_solutionV3V4Aainfix =amixfix []V4V6ainfix -ainfix +V5V3V6NIainfix &lt;V6V3Aainfix &lt;=c0V6FqamemV5aemptyNIainfix &gt;=V5c0FAainfix =amixfix []V4V8ainfix -ainfix +V7V8V3NIainfix &lt;V8V3Aainfix &lt;=c0V8FqamemV7aemptyNIainfix &gt;=V7c0FAainfix =amixfix []V4V10V9NIainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix &lt;V9anAainfix &lt;=c0V9qamemV9abelowV0FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalabelowV0anAainfix &lt;=c0V3Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
@@ -1410,10 +1410,10 @@
      </goal>
      <goal
       name="WP_parameter queens3.2"
-      locfile="examples/programs/queens/../queens.mlw"
+      locfile="programs/queens/../queens.mlw"
       loclnum="156" loccnumb="6" loccnume="13"
-      expl="normal postcondition"
-      sum="adb8d98a75eddca8661fdb1246080647"
+      expl="postcondition"
+      sum="ebb3d6f421b8e09fa9f9b40beb677ace"
       proved="true"
       expanded="false"
       shape="aeq_solV10amixfix []V6V11Aainfix &lt;V11V9Aainfix &lt;=c0V11EqasolutionV10FAasortedV6c0V5Aainfix =V9V5Iaeq_prefixV2V6V1Aaeq_prefixV4V8V7Aaeq_solV12amixfix []V6V13Aainfix &lt;V13V5Aainfix &lt;=V1V13Eqaeq_prefixV8V12V7AasolutionV12FAasortedV6V1V5Aainfix =V7V3Aainfix &gt;=ainfix -V5V1c0Lainfix -V5V1FIapartial_solutionV3V4Aainfix =amixfix []V4V15ainfix -ainfix +V14V3V15NIainfix &lt;V15V3Aainfix &lt;=c0V15FqamemV14aemptyNIainfix &gt;=V14c0FAainfix =amixfix []V4V17ainfix -ainfix +V16V17V3NIainfix &lt;V17V3Aainfix &lt;=c0V17FqamemV16aemptyNIainfix &gt;=V16c0FAainfix =amixfix []V4V19V18NIainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix &lt;V18anAainfix &lt;=c0V18qamemV18abelowV0FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalabelowV0anAainfix &lt;=c0V3Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">

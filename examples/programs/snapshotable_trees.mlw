@@ -175,6 +175,7 @@ module Harness
      let s = snapshot t in
      let it = iterator s in
      while hasNext it do
+       invariant { bst t.tree }
        variant { length (elements it) }
        let x = next it in
        let _ = add t (x * 3) in
