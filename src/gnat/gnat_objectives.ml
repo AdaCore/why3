@@ -266,7 +266,9 @@ let objective_status obj =
 
 
 let iter f =
-   Gnat_expl.HExpl.iter (fun k _ -> f k) explmap
+   let obj = Gnat_expl.HExpl.fold (fun k _ acc -> k :: acc) explmap [] in
+   let obj = List.sort Gnat_expl.expl_compare obj in
+   List.iter f obj
 
 let get_num_goals () =
    !total_nb_goals

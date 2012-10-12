@@ -16,6 +16,8 @@ type reason =
 
 type expl
 
+val expl_compare : expl -> expl -> int
+
 val reason_from_string : string -> reason
 
 val print_simple_proven : Format.formatter -> expl -> unit
