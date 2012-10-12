@@ -132,6 +132,23 @@ module HashtblImpl
   = h.size <- 0;
     Array.fill h.data 0 (Array.length h.data) Nil
 
+  let resize (h: t 'a)
+    ensures { forall k: key. h[k] = (old h)[k] }
+  = let odata = h.data in
+    let osize = Array.length odata in
+    let nsize = 2 * osize + 1 in
+    let ndata = Array.make nsize Nil in
+    let rec rehash l = match l with
+      | Nil -> ()
+      | Cons (k, v) r ->
+          let b = bucket k nsize in
+          ndata[b] <- Cons (k, v) (Array.([]) ndata b);
+          rehash r
+      end
+    in
+    for i = 0 to osize - 1 do rehash (Array.([]) odata i) done;
+    h.data <- ndata
+
   lemma extract_neq:
     forall k k': key, v: 'a, l: list (key, 'a).
     k <> k' -> extract k' l = extract k' (Cons (k, v) l)
@@ -141,5 +158,14 @@ module HashtblImpl
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
   = let b = bucket k (Array.length h.data) in
     h.data[b] <- Cons (k, v) (Array.([]) h.data b)
+
+(*
+  let add (h: t 'a) (k: key) (v: 'a) =
+    ensures { h[k] = Cons v (old h)[k] /\
+      forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+    let b = bucket k (Array.length h.data) in
+    h.data[b] <- Cons (k, v) (Array.([]) h.data b);
+    if h.size > 2 * Array.length h.data then resize h
+*)
 
 end
