@@ -6,8 +6,11 @@ type proof_mode = Normal | No_WP | All_Split
 
 let gnatprove_why3conf_file = "why3.conf"
 
+let default_timeout = 1
+
 let opt_verbose = ref false
-let opt_timeout = ref 1
+let opt_timeout : int option ref = ref None
+let opt_steps : int option ref = ref None
 let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
@@ -48,6 +51,12 @@ let set_proof_mode s =
 let set_prover s =
    opt_prover := Some s
 
+let set_timeout t =
+   opt_timeout := Some t
+
+let set_steps t =
+   opt_steps := Some t
+
 let parse_line_spec caller s =
    try
       let index = String.rindex s ':' in
@@ -75,10 +84,12 @@ let options = Arg.align [
    "-v", Arg.Set opt_verbose, " Output extra verbose information";
    "--verbose", Arg.Set opt_verbose, " Output extra verbose information";
 
-   "-t", Arg.Set_int opt_timeout,
-          " Set the timeout in seconds (default is 10 seconds)";
-   "--timeout", Arg.Set_int opt_timeout,
-          " Set the timeout in seconds (default is 10 seconds)";
+   "-t", Arg.Int set_timeout,
+          " Set the timeout in seconds (default is 1 second)";
+   "--timeout", Arg.Int set_timeout,
+          " Set the timeout in seconds (default is 1 second)";
+   "--steps", Arg.Int set_steps,
+       " Set the steps (default: no steps); this option no effect in gnatwhy3";
    "-j", Arg.Set_int opt_parallel,
           " Set the number of parallel processes (default is 1)";
    "-f", Arg.Set opt_force,
@@ -170,7 +181,13 @@ let prover_driver : Driver.driver =
 
 (* freeze values *)
 
-let timeout = !opt_timeout
+let timeout =
+   match !opt_timeout with
+   | Some x -> x
+   | None ->
+         if !opt_steps <> None then 0
+         else default_timeout
+
 let verbose = !opt_verbose
 let report  = !opt_report
 let proof_mode = !opt_proof_mode
