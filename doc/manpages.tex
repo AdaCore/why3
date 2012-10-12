@@ -777,7 +777,7 @@ output.
 
 \begin{figure}[t]
 \begin{center}
-\lstinputlisting{./replayer_macros.tex}
+\lstinputlisting[basicstyle={\ttfamily\small}]{./replayer_macros.tex}
 \end{center}
 \caption{Sample macros for the LaTeX command}
 \label{fig:custom-latex}
@@ -792,13 +792,25 @@ output.
 \end{toimage}
 %HEVEA\imageflush
 \end{center}
-\caption{LaTeX table produced for the HelloProof example}
+\caption{LaTeX table produced for the HelloProof example (style 1)}
 \label{fig:latex}
 \end{figure}
 
-Figure~\ref{fig:custom-latex} suggests some definitions for these macros,
-while Figure~\ref{fig:latex} shows the table obtained from the HelloProof
-example of Section~\ref{chap:starting}.
+\begin{figure}[t]
+\begin{center}
+\begin{toimage}
+\input{HelloProof-style2.tex}
+\end{toimage}
+%HEVEA\imageflush
+\end{center}
+\caption{LaTeX table produced for the HelloProof example (style 2)}
+\label{fig:latexstyle2}
+\end{figure}
+
+Figure~\ref{fig:custom-latex} suggests some definitions for these
+macros, while Figures~\ref{fig:latex} and~\ref{fig:latexstyle2} show
+the tables obtained from the HelloProof example of
+Section~\ref{chap:starting}, respectively with style 1 and 2.
 
 \subsection{Command \texttt{html}}
 
