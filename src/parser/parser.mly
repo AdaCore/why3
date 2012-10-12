@@ -1014,7 +1014,7 @@ pdecl:
     { Dlet (add_lab $3 $4, $2, mk_expr_i 8 (Efun ($5, cast_body $6 $8))) }
 | LET ghost lident_rich labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $3 $4, $2, mk_expr_i 9 (Efun ($7, $9))) }
-| LET ghost lident_rich_pgm labels EQUAL qualid
+| LET ghost lident_rich labels EQUAL qualid
     { Dlet (add_lab $3 $4, $2, mk_expr_i 5 (Eident $6)) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
