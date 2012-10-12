@@ -526,7 +526,6 @@ Axiom distrib_conj : forall (s:stmt) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (p:fmla) (q:fmla), ((eval_fmla sigma pi (wp s p)) /\
   (eval_fmla sigma pi (wp s q))) -> (eval_fmla sigma pi (wp s (Fand p q))).
 
-
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 2.
 
@@ -538,14 +537,14 @@ Theorem wp_preserved_by_reduction : forall (sigma:(map mident value))
   pi' (wp s' q)).
 intros sigma sigma' pi pi' s s' h1.
 induction h1; try (simpl; intro; ae).
+(* case while true do ... *)
 simpl; intros q (_ & h).
+(* need to keep a copy of h *)
 generalize h; intro h'.
-apply abstract_effects_generalize in h'; simpl in h'.
-ae.
+apply abstract_effects_generalize in h'; simpl in h'; ae.
+(* case while false do ... *)
 simpl; intros q (_ & h).
-generalize h; intro h'.
-apply abstract_effects_generalize in h'; simpl in h'.
-ae.
+apply abstract_effects_generalize in h; simpl in h; ae.
 Qed.
 
 
