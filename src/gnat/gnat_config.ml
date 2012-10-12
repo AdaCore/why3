@@ -89,7 +89,9 @@ let options = Arg.align [
    "--timeout", Arg.Int set_timeout,
           " Set the timeout in seconds (default is 1 second)";
    "--steps", Arg.Int set_steps,
-       " Set the steps (default: no steps); this option no effect in gnatwhy3";
+       " Set the steps (default: no steps). " ^
+         "This option is *not* passed to alt-ergo, " ^
+         "only used to compute the timeout";
    "-j", Arg.Set_int opt_parallel,
           " Set the number of parallel processes (default is 1)";
    "-f", Arg.Set opt_force,
