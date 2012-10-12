@@ -270,23 +270,21 @@ changed are marked obsolete.
 \subsection{Left toolbar actions}
 
 \begin{description}
-\item[Context] The context in which the other tools below will
+\item[Context] presents the context in which the other tools below will
   apply. If ``only unproved goals'' is selected, no action will ever
   be applied to an already proved goal.  If ``all goals'', then
   actions are performed even if the goal is already proved. The second
   choice allows to compare provers on the same goal.
 
-\item[Provers] To each detected prover corresponds to a button in this
-  prover framed box. Clicking on this button starts the prover on the
-  selected goal(s).
+\item[Provers] provide a button for each detected prover. Clicking on such a
+  button starts the corresponding prover on the selected goal(s).
 
-\item[Split] This splits the current goal into subgoals if it is a
+\item[Split] splits the current goal into subgoals if it is a
   conjunction of two or more goals.
 
-\item[Inline] If the goal is headed by a defined predicate symbol,
-  expands it with this definition.
+\item[Inline] replaces the head predicate symbol of the goal with its definition.
 
-\item[Edit] Start an editor on the selected task.
+\item[Edit] starts an editor on the selected task.
 
   For automatic provers, this allows to see the file sent to the
   prover.
@@ -295,18 +293,18 @@ changed are marked obsolete.
   corresponding proof script. The modifications are saved, and can be
   retrieved later even if the goal was modified.
 
-\item[Replay] Replay all obsolete proofs
+\item[Replay] replays all the obsolete proofs.
 
   If ``only unproved goals'' is selected, only formerly successful
   proofs are rerun. If ``all goals'', then all obsolete proofs are
   rerun, successful or not.
 
-\item[Remove] Removes a proof attempt or a transformation.
+\item[Remove] removes a proof attempt or a transformation.
 
-\item[Clean] Removes any unsuccessful proof attempt for which there is
+\item[Clean] removes any unsuccessful proof attempt for which there is
   another successful proof attempt for the same goal
 
-\item[Interrupt] Cancels all the proof attempts currently scheduled
+\item[Interrupt] cancels all the proof attempts currently scheduled
   but not yet started.
 
 \end{description}
@@ -352,13 +350,16 @@ The preferences dialog allows you to customize various settings. These
 are groups together under several tabs
 
 \begin{description}
-\item[\textsf{General Settings} tab] This tab allows one to set
+\item[\textsf{General Settings} tab] allows one to set
   various general settings.
 \begin{itemize}
-\item the time limit given to provers, in seconds
-\item the maximal number of simultaneous provers allowed to run in
-  parallel.
-\item A few display settings:
+\item the limits set on resource usages:
+  \begin{itemize}
+  \item the time limit given to provers, in seconds
+  \item the memory given to provers, in megabytes
+  \item the maximal number of simultaneous provers allowed to run in parallel
+  \end{itemize}
+\item a few display settings:
   \begin{itemize}
   \item introduce premises: if selected, the goal of the task shown in
     top-right window is displayed after introduction of universally
@@ -379,12 +380,13 @@ are groups together under several tabs
 \item the policy for saving session:
   \begin{itemize}
   \item always save on exit (default): the current state of the proof session is saving on exit
-  \item never save on exit: the current state of the session is never save automatically, you must use menu \textsf{File/Save session} to save when wanted
-  \item ask whether to save: on exit, a popup window ask whether you
+  \item never save on exit: the current state of the session is never saved
+    automatically, you must use menu \textsf{File/Save session}
+  \item ask whether to save: on exit, a popup window asks whether you
     want to save or not.
   \end{itemize}
 \end{itemize}
-\item[\textsf{Editors} tab] This tab allows one to customize the use
+\item[\textsf{Editors} tab] allows one to customize the use
   of external editors for proof scripts.
 \begin{itemize}
 \item The default editor to use when the \textsf{Edit} button is
@@ -392,14 +394,16 @@ are groups together under several tabs
 \item For each installed prover, a specific editor can be selected to
   override the default. Typically if you install the Coq prover, then
   the editor to use will be set to ``CoqIDE'' by default, and this
-  dialog allows you the select the Emacs editor, and its Proof General
-  mode (\url{http://proofgeneral.inf.ed.ac.uk/}).
+  \urldef{\urlprfgen}{\url}{http://proofgeneral.inf.ed.ac.uk/}
+  dialog allows you to select the Emacs editor and its
+  \ahref{\urlprfgen}{Proof General} mode instead%
+  \begin{latexonly} (\urlprfgen)\end{latexonly}.
 \end{itemize}
 \item[\textsf{Provers} tab]
-  Here you can select or deselect which of the installed provers you want to see
-  as buttons in the left toolbar
-\item[\textsf{Uninstalled Provers} tab] Here are shown all the
-  decision previously taken for uninstalled provers, as described in
+  allows to select which of the installed provers one wants to see
+  as buttons in the left toolbar.
+\item[\textsf{Uninstalled Provers} tab] presents all the
+  decision previously taken for missing provers, as described in
   Section~\ref{sec:uninstalledprovers}. You can remove any recorded
   decision by clicking on it.
 \end{description}
@@ -888,19 +892,18 @@ Specific options for this command are as follows.
 
 \subsection{Commands modifying the proof attempts}
 
-The subcommands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
+The commands \texttt{mod}, \texttt{copy}, \texttt{copy-archive},
 and \texttt{rm}, share the same set of options for selecting the proof
 attempts to work on:
 \begin{description}
 \item[\texttt{-{}-filter-prover \textsl{<prover>}}] selects only the proof attempt with
-  the given prover. This option can be specified multiple times to
-  allow to select all the proofs that corresponds to one of the given
-  provers. If this option is not specified, the proof are simply not
-  filtered by there corresponding prover.
-\item[\texttt{-{}-filter-verified yes}] restricts the selection to
-  the proofs that are valid and not obsolete. On contrary the option
-  \verb|--filter-verified no| select the ones that are not verified.
-  \verb|--filter-verified all|, the default, does not select on this property.
+  the given prover. This option can be specified multiple times in order
+  to select all the proofs that corresponds to any of the given
+  provers.
+\item[\texttt{-{}-filter-verified yes}] selects only
+  the proofs that are valid and not obsolete, while option
+  \verb|--filter-verified no| selects the ones that are not verified.
+  \verb|--filter-verified all|, the default, does not perform such a selection.
 \item[\texttt{-{}-filter-verified-goal yes}] restricts the selection
   to the proofs of verified goals (that does not mean that the proof is
   verified). Same for the other cases \verb|no| and \verb|all|.
@@ -911,11 +914,11 @@ attempts to work on:
 \end{description}
 
 \noindent
-The subcommand \texttt{mod}, \texttt{copy} and \texttt{copy-archive}
-share the same set of option to specify the modification. The
-subcommand \texttt{mod} modify directly the proof attempt,
-\texttt{copy} copy the proof attempt before doing the modification,
-\texttt{copy-archive} mark the original proof attempt as
+The commands \texttt{mod}, \texttt{copy}, and \texttt{copy-archive},
+share the same set of options to specify the modification. The
+command \texttt{mod} modifies directly the proof attempt,
+\texttt{copy} copies the proof attempt before doing the modification,
+\texttt{copy-archive} marks the original proof attempt as
 archived.
 The options are:
 \begin{description}
@@ -926,7 +929,7 @@ The options are:
   from the selected proofs.
 \item[\texttt{-{}-to-prover \textsl{<prover>}}] modifies the prover, for example
   \texttt{-{}-to-prover Alt-Ergo,0.94}. A conflict arises if a proof
-  with this prover already exists. In this case you can choose between four
+  with this prover already exists. In this case, you can choose between four
   behaviors:
 \begin{itemize}
 \item replace the proof (\verb|-f|, \verb|--force|);
@@ -937,17 +940,16 @@ The options are:
 \end{itemize}
 \end{description}
 
-
-The subcommand \texttt{rm} removes the selected proof
-attempts. The options \verb|-i, --interactive|, \verb|-f, --force| and
-\verb|-c, --conservative| can also be used to respectively ask before
-each suppression, suppress all the selected proof (default) and remove
-only the proof that are not verified. The macro option \verb|--clean|
+The command \texttt{rm} removes the selected proof
+attempts. The options \verb|--interactive|, \verb|--force|, and
+\verb|--conservative|, can also be used to respectively ask before
+each suppression, suppress all the selected proofs (default), and remove
+only the proofs that are not verified. The macro option \verb|--clean|
 corresponds to \verb|--filter-verified-goal --conservative| and
 removes the proof attempts that are not verified but which correspond
 to verified goals.
 
-The subcommands of this section don't accept by default to modify an
+The commands of this section do not accept by default to modify an
 obsolete session (as defined in \ref{sec:idref:session}). You need to
 add the option \verb|-F| to force this behavior.
 
