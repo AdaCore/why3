@@ -72,6 +72,10 @@ Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
 Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
   a) := (mk_array (length a1) (set (elts a1) i v)).
 
+(* Why3 assumption *)
+Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
+  (mk_array n (const v:(map Z a))).
+
 Parameter n: Z.
 
 Axiom n_nonneg : (0%Z < n)%Z.
@@ -99,21 +103,21 @@ Theorem WP_parameter_distance : (0%Z <= n)%Z -> ((((0%Z < 0%Z)%Z \/
   (0%Z = 0%Z)) /\ (0%Z < n)%Z) -> forall (g:(map Z Z)),
   (g = (set (const 0%Z:(map Z Z)) 0%Z (-1%Z)%Z)) -> ((0%Z <= n)%Z ->
   (((1%Z < (n - 1%Z)%Z)%Z \/ (1%Z = (n - 1%Z)%Z)) -> forall (count:Z) (d:(map
-  Z Z)) (g1:(map Z Z)), (((get d 0%Z) = 0%Z) /\ (((get g1 0%Z) = (-1%Z)%Z) /\
-  ((((count + (get d
+  Z Z)) (g1:(map Z Z)), (((((get d 0%Z) = 0%Z) /\ (((get g1
+  0%Z) = (-1%Z)%Z) /\ (((count + (get d
   (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z < (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)%Z \/
   ((count + (get d
-  (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z = (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)) /\
-  ((forall (k:Z), ((0%Z < k)%Z /\ (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) ->
-  (((((get g1 (get g1 k)) < (f k))%Z /\ (((f k) < (get g1 k))%Z \/
-  ((f k) = (get g1 k)))) /\ ((get g1 k) < k)%Z) /\ ((((0%Z < (get d k))%Z \/
-  (0%Z = (get d k))) /\ ((get d k) = ((get d (get g1 k)) + 1%Z)%Z)) /\
-  forall (k':Z), (((get g1 k) < k')%Z /\ (k' < k)%Z) -> ((get d (get g1
-  k)) < (get d k'))%Z))) /\ forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
-  (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (path (get d k) k))))) ->
-  ((count < n)%Z -> forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
-  (k < n)%Z) -> forall (d':Z), (path d' k) -> ((get d k) <= d')%Z)))).
-intros h1 (h2,h3) g h4 h5 h6 count d g1 (h7,(h8,(h9,(h10,h11)))) h12 k
+  (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z = (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)))) /\
+  forall (k:Z), ((0%Z < k)%Z /\ (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (((((get g1
+  (get g1 k)) < (f k))%Z /\ (((f k) < (get g1 k))%Z \/ ((f k) = (get g1
+  k)))) /\ ((get g1 k) < k)%Z) /\ (((0%Z < (get d k))%Z /\ ((get d
+  k) = ((get d (get g1 k)) + 1%Z)%Z)) /\ forall (k':Z), (((get g1
+  k) < k')%Z /\ (k' < k)%Z) -> ((get d (get g1 k)) < (get d k'))%Z))) /\
+  forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
+  (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (path (get d k) k)) -> ((count < n)%Z ->
+  forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\ (k < n)%Z) -> forall (d':Z),
+  (path d' k) -> ((get d k) <= d')%Z)))).
+intros h1 (h2,h3) g h4 h5 h6 count d g1 (((h7,(h8,h9)),h10),h11) h12 k
 (h13,h14) d' h15.
 clear h1 h2.
 clear h5 h6.
