@@ -28,7 +28,7 @@ lemma mident_decide :
   forall m1 m2: mident. m1 = m2 \/ m1 <> m2
 
 (** ident for immutable variables *)
-type ident = {| ident_index : int |}
+type ident = { ident_index : int }
 
 lemma ident_decide :
   forall m1 m2: ident. m1 = m2 \/ m1 <> m2
