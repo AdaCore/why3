@@ -132,7 +132,8 @@ let print_results fmt provers proofs =
       try
         let pr = S.PHprover.find proofs p in
         let s = pr.S.proof_state in
-        match s with
+        begin
+          match s with
 	  | S.Done res ->
 	    begin
 	      match res.Call_provers.pr_answer with
@@ -141,9 +142,11 @@ let print_results fmt provers proofs =
 		| Call_provers.Invalid ->
                   fprintf fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
-                  fprintf fmt "FF8000\">Timeout"
+                  fprintf fmt "FF8000\">Timeout (%ds)"
+                    pr.S.proof_timelimit
 		| Call_provers.OutOfMemory ->
-                  fprintf fmt "FF8000\">Out Of Memory"
+                  fprintf fmt "FF8000\">Out Of Memory (%dM)"
+                    pr.S.proof_memlimit
 		| Call_provers.Unknown _ ->
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
 		| Call_provers.Failure _ ->
@@ -151,8 +154,13 @@ let print_results fmt provers proofs =
 		| Call_provers.HighFailure ->
                   fprintf fmt "FF8000\">High Failure"
 	    end
-	  | S.Undone _ -> fprintf fmt "E0E0E0\">Undone"
 	  | S.InternalFailure _ -> fprintf fmt "E0E0E0\">Internal Failure"
+          | S.Interrupted -> fprintf fmt "E0E0E0\">Not yet run"
+          | S.Unedited -> fprintf fmt "E0E0E0\">Not yet edited"
+          | S.Scheduled | S.Running
+          | S.JustEdited -> assert false
+        end;
+        if pr.S.proof_obsolete then fprintf fmt " (obsolete)"
       with Not_found -> fprintf fmt "E0E0E0\">---"
     end;
     fprintf fmt "</td>") provers
@@ -259,10 +267,12 @@ struct
   let print_prover = Whyconf.print_prover
 
   let print_proof_status fmt = function
-    | Undone _ -> fprintf fmt "Undone"
-    | Done pr -> fprintf fmt "Done : %a" Call_provers.print_prover_result pr
+    | Interrupted -> fprintf fmt "Not yet run"
+    | Unedited -> fprintf fmt "Not yet edited"
+    | JustEdited | Scheduled | Running -> assert false
+    | Done pr -> fprintf fmt "Done: %a" Call_provers.print_prover_result pr
     | InternalFailure exn ->
-      fprintf fmt "Failure : %a"Exn_printer.exn_printer exn
+      fprintf fmt "Failure: %a"Exn_printer.exn_printer exn
 
   let print_proof_attempt fmt pa =
     fprintf fmt "<li>%a : %a</li>"
@@ -329,11 +339,13 @@ struct
   let print_prover = Whyconf.print_prover
 
   let print_proof_status fmt = function
-    | Undone _ -> fprintf fmt "<span class='notverified'>Undone</span>"
-    | Done pr -> fprintf fmt "<span class='verified'>Done : %a</span>"
+    | Interrupted -> fprintf fmt "<span class='notverified'>Not yet run</span>"
+    | Unedited -> fprintf fmt "<span class='notverified'>Not yet edited</span>"
+    | JustEdited | Scheduled | Running -> assert false
+    | Done pr -> fprintf fmt "<span class='verified'>Done: %a</span>"
       Call_provers.print_prover_result pr
     | InternalFailure exn ->
-      fprintf fmt "<span class='notverified'>Failure : %a</span>"
+      fprintf fmt "<span class='notverified'>Failure: %a</span>"
         Exn_printer.exn_printer exn
 
   let cmd_regexp = Str.regexp "%\\(.\\)"

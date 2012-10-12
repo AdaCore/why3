@@ -26,7 +26,7 @@ discussed later.
 
 \begin{figure}
 \centering
-\begin{why3}
+\begin{whycode}
 theory List
   type list 'a = Nil | Cons 'a (list 'a)
 end
@@ -57,7 +57,7 @@ theory Sorted
         forall x y : int, l : list int.
         x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 end
-\end{why3}
+\end{whycode}
 \caption{Example of Why3 text.}
 \label{fig:tutorial1}
 \end{figure}
@@ -97,11 +97,11 @@ an inductive predicate. Every such definition is a list of clauses:
 universally closed implications where the consequent is an instance
 of the defined predicate. Moreover, the defined predicate may only
 occur in positive positions in the antecedent. For example, a clause:
-\begin{why3}
+\begin{whycode}
   | Sorted_Bad :
       forall x y : int, l : list int.
       (sorted (Cons y l) -> y > x) -> sorted (Cons x (Cons y l))
-\end{why3}
+\end{whycode}
 would not be allowed. This positivity condition assures the logical
 soundness of an inductive definition.
 
@@ -120,7 +120,7 @@ abstract (\emph{i.e.}~declared but not defined) symbols.
 
 \begin{figure}
 \centering
-\begin{why3}
+\begin{whycode}
 theory Order
   type t
   predicate (<=) t t
@@ -148,7 +148,7 @@ theory SortedIntList
   use import int.Int
   clone SortedGen with type O.t = int, predicate O.(<=) = (<=)
 end
-\end{why3}
+\end{whycode}
 \caption{Example of Why3 text (continued).}
 \label{fig:tutorial2}
 \end{figure}
@@ -228,7 +228,7 @@ we can launch the following command:
 > why3 lists.why -T SortedIntList
 \end{verbatim}
 to see the resulting theory \texttt{SortedIntList}:
-\begin{why3}
+\begin{whycode}
 theory SortedIntList
   (* use BuiltIn *)
   (* use Int *)
@@ -255,7 +255,7 @@ theory SortedIntList
     prop Le_trans2 = Le_trans, prop Le_asym2 = Le_asym,
     prop Le_refl2 = Le_refl *)
 end
-\end{why3}
+\end{whycode}
 
 In conclusion, let us briefly explain the concept of namespaces
 in \why. Both \texttt{use} and \texttt{clone} instructions can
@@ -286,11 +286,11 @@ would be \texttt{T.$s$}.
 \why allows to open new namespaces explicitly in the text. In particular,
 the instruction ``\texttt{clone import Order as O}'' can be equivalently
 written as:
-\begin{why3}
-    namespace import O
-      clone export Order
-    end
-\end{why3}
+\begin{whycode}
+namespace import O
+  clone export Order
+end
+\end{whycode}
 However, since \why favours short theories over long and complex ones,
 this feature is rarely used.
 
@@ -343,7 +343,7 @@ We start by introducing a general-purpose theory defining the notion
 of \emph{bijection}, as two abstract types together with two functions from
 one to the other and two axioms stating that these functions are
 inverse of each other.
-\begin{why3}
+\begin{whycode}
 theory Bijection
   type t
   type u
@@ -354,45 +354,45 @@ theory Bijection
   axiom To_of : forall x : t. to (of x) = x
   axiom Of_to : forall y : u. of (to y) = y
 end
-\end{why3}
+\end{whycode}
 
 We now start a new theory, \texttt{Einstein}, which will contain all
 the individuals of the problem.
-\begin{why3}
+\begin{whycode}
 theory Einstein "Einstein's problem"
-\end{why3}
+\end{whycode}
 First we introduce enumeration types for houses, colors, persons,
 drinks, cigars and pets.
-\begin{why3}
+\begin{whycode}
   type house  = H1 | H2 | H3 | H4 | H5
   type color  = Blue | Green | Red | White | Yellow
   type person = Dane | Englishman | German | Norwegian | Swede
   type drink  = Beer | Coffee | Milk | Tea | Water
   type cigar  = Blend | BlueMaster | Dunhill | PallMall | Prince
   type pet    = Birds | Cats | Dogs | Fish | Horse
-\end{why3}
+\end{whycode}
 We now express that each house is associated bijectively to a color,
 by cloning the \texttt{Bijection} theory appropriately.
-\begin{why3}
+\begin{whycode}
   clone Bijection as Color with type t = house, type u = color
-\end{why3}
+\end{whycode}
 It introduces two functions, namely \texttt{Color.of} and
 \texttt{Color.to}, from houses to colors and colors to houses,
 respectively, and the two axioms relating them.
 Similarly, we express that each house is associated bijectively to a
 person
-\begin{why3}
+\begin{whycode}
   clone Bijection as Owner with type t = house, type u = person
-\end{why3}
+\end{whycode}
 and that drinks, cigars and pets are all associated bijectively to persons:
-\begin{why3}
+\begin{whycode}
   clone Bijection as Drink with type t = person, type u = drink
   clone Bijection as Cigar with type t = person, type u = cigar
   clone Bijection as Pet   with type t = person, type u = pet
-\end{why3}
+\end{whycode}
 Next we need a way to state that a person lives next to another. We
 first define a predicate \texttt{leftof} over two houses.
-\begin{why3}
+\begin{whycode}
   predicate leftof (h1 h2 : house) =
     match h1, h2 with
     | H1, H2
@@ -401,49 +401,49 @@ first define a predicate \texttt{leftof} over two houses.
     | H4, H5 -> true
     | _      -> false
     end
-\end{why3}
+\end{whycode}
 Note how we advantageously used pattern matching, with an or-pattern
 for the four positive cases and a universal pattern for the remaining
 21 cases. It is then immediate to define a \texttt{neighbour}
 predicate over two houses, which completes theory \texttt{Einstein}.
-\begin{why3}
+\begin{whycode}
   predicate rightof (h1 h2 : house) =
     leftof h2 h1
   predicate neighbour (h1 h2 : house) =
     leftof h1 h2 \/ rightof h1 h2
 end
-\end{why3}
+\end{whycode}
 
 The next theory contains the 15 hypotheses. It starts by importing
 theory \texttt{Einstein}.
-\begin{why3}
+\begin{whycode}
 theory EinsteinHints "Hints"
   use import Einstein
-\end{why3}
+\end{whycode}
 Then each hypothesis is stated in terms of \texttt{to} and \texttt{of}
 functions. For instance, the hypothesis ``The Englishman lives in a
 red house'' is declared as the following axiom.
-\begin{why3}
+\begin{whycode}
   axiom Hint1: Color.of (Owner.to Englishman) = Red
-\end{why3}
+\end{whycode}
 And so on for all other hypotheses, up to
 ``The man who smokes Blends has a neighbour who drinks water'', which completes
 this theory.
-\begin{why3}
+\begin{whycode}
   ...
   axiom Hint15:
     neighbour (Owner.to (Cigar.to Blend)) (Owner.to (Drink.to Water))
 end
-\end{why3}
+\end{whycode}
 Finally, we declare the goal in the fourth theory:
-\begin{why3}
+\begin{whycode}
 theory Problem "Goal of Einstein's problem"
   use import Einstein
   use import EinsteinHints
 
   goal G: Pet.to Fish = German
 end
-\end{why3}
+\end{whycode}
 and we are ready to use \why to discharge this goal with any prover
 of our choice.
 

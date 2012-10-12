@@ -180,7 +180,6 @@ val merge_known : known_map -> known_map -> known_map
 exception KnownIdent of ident
 exception UnknownIdent of ident
 exception RedeclaredIdent of ident
-exception NonExhaustiveCase of pattern list * term
 exception NonFoundedTypeDecl of tysymbol
 
 val find_constructors : known_map -> tysymbol -> constructor list

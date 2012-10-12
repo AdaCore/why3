@@ -27,7 +27,6 @@ open Ty
 open Term
 open Decl
 open Theory
-open Task
 open Printer
 
 let ident_printer =
@@ -235,7 +234,7 @@ and print_triggers info fmt = function
     (print_list space (print_trigger info)) a
     (print_triggers info) l
 
-let print_logic_binder info fmt v =
+let _print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name
     (print_type info) v.vs_ty
 

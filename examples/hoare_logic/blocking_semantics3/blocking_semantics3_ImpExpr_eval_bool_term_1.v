@@ -68,6 +68,9 @@ Axiom mident : Type.
 Parameter mident_WhyType : WhyType mident.
 Existing Instance mident_WhyType.
 
+Axiom mident_decide : forall (m1:mident) (m2:mident), (m1 = m2) \/
+  ~ (m1 = m2).
+
 (* Why3 assumption *)
 Inductive ident  :=
   | mk_ident : Z -> ident .

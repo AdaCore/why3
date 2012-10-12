@@ -212,7 +212,8 @@ and doc fmt block headings = parse
   | '}'    { let brace r =
                if not block then pp_print_string fmt "<p>";
                fprintf fmt "}";
-               doc fmt true r lexbuf in
+               doc fmt true r lexbuf 
+             in
              match headings with
               | [] -> brace headings
               | n :: r ->

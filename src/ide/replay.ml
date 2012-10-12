@@ -30,6 +30,7 @@ let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
 let opt_bench = ref false
+let opt_verbose = ref true
 
 (** {2 Smoke detector} *)
 
@@ -83,6 +84,9 @@ let spec = Arg.align [
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
+  ("-q",
+   Arg.Clear opt_verbose,
+   " run quietly") ;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
@@ -301,7 +305,7 @@ let same_result r1 r2 =
 let add_to_check_no_smoke config found_obs env_session sched =
   let session = env_session.S.session in
   let callback report =
-    eprintf "@.";
+    if !opt_verbose then eprintf "@.";
     let files,n,m =
       S.PHstr.fold file_statistics
         session.S.session_files ([],0,0)
@@ -329,12 +333,12 @@ session NOT updated)@." n m
         else
           printf " %d/%d@." n m ;
         if !opt_stats && n<m then print_statistics files;
-        eprintf "Everything replayed OK.@.";
+        if !opt_verbose then eprintf "Everything replayed OK.@.";
         if found_obs && (n=m || !opt_force) then
           begin
-            eprintf "Saving session...@?";
+            if !opt_verbose then eprintf "Saving session...@?";
             S.save_session config session;
-            eprintf " done@."
+            if !opt_verbose then eprintf " done@."
           end;
         exit 0
       end
@@ -351,7 +355,7 @@ session NOT updated)@." n m
 
 let add_to_check_smoke env_session sched =
   let callback report =
-    eprintf "@.";
+    if !opt_verbose then eprintf "@.";
     let report =
       List.filter
         (function
@@ -362,7 +366,7 @@ let add_to_check_smoke env_session sched =
           | _ -> false) report
     in
     if report = [] then begin
-      eprintf "No smoke detected.@.";
+      if !opt_verbose then eprintf "No smoke detected.@.";
       exit 0
     end
     else begin
@@ -417,15 +421,16 @@ let run_as_bench env_session =
 
 let () =
   try
-    eprintf "Opening session...@?";
+    if !opt_verbose then eprintf "Opening session...@?";
+    O.verbose := !opt_verbose;
     let env_session,found_obs =
       let session = S.read_session project_dir in
       M.update_session ~allow_obsolete:true session env config
     in
-    eprintf " done.@.";
+    if !opt_verbose then eprintf " done.@.";
     if !opt_obsolete_only && not found_obs then
       begin
-        eprintf "Session is not obsolete, hence no replayed@.";
+        eprintf "Session is not obsolete, hence not replayed@.";
         printf "@.";
         exit 0
       end;

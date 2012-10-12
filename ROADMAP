@@ -114,35 +114,74 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
 * (JCF) reject global "val"s in typing environment for logic decls.
 
+* sessions
+** mettre la dtd sur le web et changer l'entête des sessions pour qu'elles
+   pointent dessus
+** utiliser des chemins plus raisonnables pour indiquer la position des buts
+   dans les fichiers (e.g. relativement au fichier session ?)
+
 ==================== Roadmap for release 0.74 ========================
 
-scheduled on Sep 2012
+scheduled on Oct 2012
 
 == New Features to announce ==
 
-New features:
-  o
+Programs:
+  o new API for programs
+  o new concrete syntax for programs
+  o type invariants
+  o ghost code
 
-Bug fix:
-  o
+Transformations:
+  o transformations for induction
+
+Provers support:
+  o Support for Coq 8.4
+  o dropped support for Coq 8.2
+  o new scheme for Coq realizations using type classes
+  o Support for PVS 6.0, including realizations
+  o support for iProver and Zenon
+
+Misc:
+  o improved output of "why3session latex"
+    (incompatible changes in LaTeX macos)
+  o [replayer] new option -q for running quietly
+  o a warning is emitted for unused bound logic variables in "forall",
+    "exists" and "let"
+  o a warning is emitted for any occurrence of a formula of the form
+    "exists x, P -> Q". Formulas of this form are usually a user
+    mistake. If this is intended, one can write "exists x, not P \/ Q"
+    instead
+
+Bug fixes:
+  o fixed bug on merging config files which prevented the use
+    of Why3 back-end of the Frama-C/Jessie plugin when Coq is
+    not installed. (Bug 14672 of the Bug Tracking System)
+  o fixed bugs 13503 and 13375 of the Bug Tracking System
 
 == Final preparation ==
 
+* faire une passe sur le BTS
+* do "make update-coq" and "make", fix Coq realizations if needed
 * check that nightly bench is OK
 * check that "make xml-validate" is OK
+  (see below : copy the dtd on the web)
 * put 0.74 in file Version
 * check headers
-* check the file CHANGES
+* check the file CHANGES, add the release date
 * manual in PDF: check that macro \todo is commented out
     in ./macros.tex, and then "make doc"
+* manual in HTML: "make doc/html/index.html"
 * do "make distrib"
-* test the distrib why3-0.73.tar.gz
+* test the distrib why3-0.74.tar.gz
 * make a last commit:
  - add tag 0.74 to the git repository 
  - do not forget to push it using git push --tags
 
 * put on the web page
  - why3-0.74.tar.gz
+ - the HTML version of the manual (content of doc/html)
+ - why3session.dtd
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    (make stdlibdoc ;
     cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.74;
@@ -157,17 +196,21 @@ Bug fix:
  - update the main HTML page (sources are in why3-papers/www)
 
 * produce the Why3 part of ProVal gallery 
-  -> add also a ZIP file of it
+  -> add also a tar.gz and a ZIP file of it
 * Announce the distrib
  - What to put in the announcement: see New Features above
 * The next commit : add +git to the version in file Version
 
 == TODOs ==
 
+
+* faire le menage dans les transformations d'induction : _int _ty
+  _ty_lex, et DOCUMENTER
+
 * Sortie PVS
 ** avec mecanisme de realization
 
-* Yices 2 ? interesserait Cesar
+* support de Yices 2 ? interesserait Cesar
 
 * mettre au propre les loc des fichiers de sessions, en particulier
   les noms de fichiers doivent etre relatifs au fichier de session
@@ -183,14 +226,14 @@ Bug fix:
  - (CLAUDE) complete api.tex: explain how to build theories, apply
    transformations, write new functions on terms (A)
 
-* PRIORITAIRE Coq output
+* DONE (PRIORITAIRE) Coq output
  - corriger l'incoherence, comprendre si on veut vraiment accepter
 
   function x : 'a
   (cf: en caml cela ne marche pas)
  Solution proposee: utiliser des types classes, en particulier Inhabited
 
-* PRIORITAIRE, JCF et ANDREI, clone de module
+* DONE ? PRIORITAIRE, JCF et ANDREI, clone de module
  - demarche: ecrire une API avec smart constructors garantissant
    le bon typage, et clone sera en premier lieu un de ces constructors
  - cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single

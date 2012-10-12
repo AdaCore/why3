@@ -131,22 +131,22 @@ let wp_label e f =
   t_label ?loc lab f
 
 let expl_pre       = Ident.create_label "expl:precondition"
-let expl_post      = Ident.create_label "expl:normal postcondition"
+let expl_post      = Ident.create_label "expl:postcondition"
 let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
+let expl_assume    = Ident.create_label "expl:assumption"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
-let expl_inv       = Ident.create_label "expl:type invariant"
-let expl_variant   = Ident.create_label "expl:variant decreases"
+let expl_type_inv  = Ident.create_label "expl:type invariant"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
-let expl_loop_var  = Ident.create_label "expl:loop variant decreases"
-(* FIXME? couldn't we just reuse "loop invariant" explanations? *)
-let expl_for_init  = Ident.create_label "expl:for loop initialization"
-let expl_for_keep  = Ident.create_label "expl:for loop preservation"
+let expl_loopvar   = Ident.create_label "expl:loop variant decrease"
+let expl_variant   = Ident.create_label "expl:variant decrease"
 
-let wp_expl l f =
-  let lab = Slab.add Split_goal.stop_split f.t_label in
-  t_label ?loc:f.t_loc (Slab.add l lab) f
+let rec wp_expl l f = match f.t_node with
+  | _ when Slab.mem Split_goal.stop_split f.t_label -> t_label_add l f
+  | Tbinop (Tand,f1,f2) -> t_label_copy f (t_and (wp_expl l f1) (wp_expl l f2))
+  | Teps _ -> t_label_add l f (* post-condition, push down later *)
+  | _ -> f
 
 let wp_and ~sym f1 f2 =
   if sym then t_and_simp f1 f2 else t_and_asym_simp f1 f2
@@ -197,7 +197,7 @@ let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let open_post q =
   let v, f = open_post q in
-  v, t_label_copy q f
+  v, Slab.fold wp_expl q.t_label f
 
 let open_unit_post q =
   let v, q = open_post q in
@@ -252,7 +252,7 @@ let decrease_rel ?loc env old_t t = function
         (ps_app env.ps_int_lt [t; old_t])
   | None -> decrease_alg ?loc env old_t t
 
-let decrease ?loc env olds varl =
+let decrease loc lab env olds varl =
   let rec decr pr olds varl = match olds, varl with
     | [], [] -> (* empty variant *)
         t_true
@@ -266,56 +266,33 @@ let decrease ?loc env olds varl =
         t_or_simp dt (decr pr olds varl)
     | _ -> assert false
   in
-  decr t_true olds varl
+  t_label ?loc lab (decr t_true olds varl)
+
+let expl_variant = Slab.add Split_goal.stop_split (Slab.singleton expl_variant)
+let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
-let find_constructors lkm km sts ity = match ity.ity_node with
-  | Itypur (ts,_) ->
-      let base = ity_pur ts (List.map ity_var ts.ts_args) in
-      let sbs = ity_match ity_subst_empty base ity in
-      let csl = Decl.find_constructors lkm ts in
-      if csl = [] || Sts.mem ts sts then Loc.errorm
-        "Cannot update values of type %a" Mlw_pretty.print_ity base;
-      let subst ty = ity_full_inst sbs (ity_of_ty ty), None in
-      let cnstr (cs,_) = cs, List.map subst cs.ls_args in
-      Sts.add ts sts, List.map cnstr csl
-  | Ityapp (its,_,_) ->
-      let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
-      let sbs = ity_match ity_subst_empty base ity in
-      let csl = Mlw_decl.find_constructors km its in
-      if csl = [] || Sts.mem its.its_pure sts then Loc.errorm
-        "Cannot update values of type %a" Mlw_pretty.print_ity base;
-      let subst vtv =
-        ity_full_inst sbs vtv.vtv_ity,
-        Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
-      let cnstr (cs,_) = cs.pl_ls, List.map subst cs.pl_args in
-      Sts.add its.its_pure sts, List.map cnstr csl
-  | Ityvar _ -> assert false
-
-let analyze_var fn_down fn_join lkm km sts vs ity =
-  let sts, csl = find_constructors lkm km sts ity in
-  let branch (cs,ityl) =
-    let mk_var (ity,_) = create_vsymbol (id_fresh "y") (ty_of_ity ity) in
-    let vars = List.map mk_var ityl in
-    let mk_arg vs (ity, mut) = fn_down sts vs ity mut in
-    let t = fn_join cs (List.map2 mk_arg vars ityl) vs.vs_ty in
+let analyze_var fn_down fn_join lkm km vs ity =
+  let branch (cs,vtvl) =
+    let mk_var vtv = create_vsymbol (id_fresh "y") (ty_of_ity vtv.vtv_ity) in
+    let vars = List.map mk_var vtvl in
+    let t = fn_join cs (List.map2 fn_down vars vtvl) vs.vs_ty in
     let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
     t_close_branch pat t in
-  t_case (t_var vs) (List.map branch csl)
+  t_case (t_var vs) (List.map branch (Mlw_decl.inst_constructors lkm km ity))
 
 let update_var env mreg vs =
-  let rec update sts vs ity mut =
+  let rec update vs { vtv_ity = ity; vtv_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
     let vs = Util.option_apply vs get_vs mut in
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
-    else analyze_var update fs_app env.pure_known env.prog_known sts vs ity
+    else analyze_var update fs_app env.pure_known env.prog_known vs ity
   in
-  let vtv = vtv_of_vs vs in
-  update Sts.empty vs vtv.vtv_ity vtv.vtv_mut
+  update vs (vtv_of_vs vs)
 
 (* substitute the updated values in the "contemporary" variables *)
 let rec subst_at_now now m t = match t.t_node with
@@ -398,13 +375,13 @@ let get_invariant km t =
     | _ -> assert false in
   let sbs = Ty.ty_match Mtv.empty (t_type inv) ty in
   let u, p = open_post (t_ty_subst sbs Mvs.empty inv) in
-  wp_expl expl_inv (t_subst_single u t p)
+  wp_expl expl_type_inv (t_subst_single u t p)
 
 let ps_inv = Term.create_psymbol (id_fresh "inv")
   [ty_var (create_tvsymbol (id_fresh "a"))]
 
 let full_invariant lkm km vs ity =
-  let rec update sts vs ity _ =
+  let rec update vs { vtv_ity = ity } =
     if not (ity_inv ity) then t_true else
     (* what is our current invariant? *)
     let f = match ity.ity_node with
@@ -415,11 +392,11 @@ let full_invariant lkm km vs ity =
       | _ -> t_true in
     (* what are our sub-invariants? *)
     let join _ fl _ = wp_ands ~sym:true fl in
-    let g = analyze_var update join lkm km sts vs ity in
+    let g = analyze_var update join lkm km vs ity in
     (* put everything together *)
     wp_and ~sym:true f g
   in
-  update Sts.empty vs ity None
+  update vs (vty_value ity)
 
 (** Value tracking *)
 
@@ -658,8 +635,8 @@ and wp_desc env e q xq = match e.e_node with
       let w = wp_expr env e2 q xq in
       let q = create_unit_post w in
       wp_label e (wp_expr env e1 q xq)
-  | Erec (rdl, e1) ->
-      let fr = wp_rec_defn env rdl in
+  | Erec (fdl, e1) ->
+      let fr = wp_rec_defn env fdl in
       let fe = wp_expr env e1 q xq in
       let fr = wp_ands ~sym:true fr in
       wp_label e (wp_and ~sym:true fr fe)
@@ -726,6 +703,7 @@ and wp_desc env e q xq = match e.e_node with
       wp_and ~sym:true (wp_label e f) q
   | Eassert (Aassume, f) ->
       let q = open_unit_post q in
+      let f = wp_expl expl_assume f in
       wp_implies (wp_label e f) q
   | Eabsurd ->
       wp_label e t_absurd
@@ -734,24 +712,25 @@ and wp_desc env e q xq = match e.e_node with
       let p = t_label ?loc:e.e_loc p.t_label p in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
-      wp_and ~sym:false p w (* FIXME? do we need pre? *)
+      wp_and ~sym:false p w
   | Eapp (e1,_,spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
-      let d = if spec.c_letrec = 0 then t_true else
+      let d =
+        if spec.c_letrec = 0 || spec.c_variant = [] then t_true else
         let olds = Mint.find_def [] spec.c_letrec env.letrec_var in
         if olds = [] then t_true (* we are out of letrec *) else
-        let d = decrease ?loc:e.e_loc env olds spec.c_variant in
-        wp_expl expl_variant (t_label ?loc:e.e_loc d.t_label d) in
+        decrease e.e_loc expl_variant env olds spec.c_variant in
       (* TODO: propagate call labels into tyc.c_post *)
       let w = wp_abstract env spec.c_effect spec.c_post spec.c_xpost q xq in
-      let w = wp_and ~sym:false (wp_and ~sym:true d p) w in (* FIXME? ~sym? *)
+      let w = wp_and ~sym:true d (wp_and ~sym:false p w) in
       let q = create_unit_post w in
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
-  | Eabstr (e1, c_q, c_xq) ->
-      let w1 = backstep (wp_expr env e1) c_q c_xq in
-      let w2 = wp_abstract env e1.e_effect c_q c_xq q xq in
-      wp_and ~sym:true (wp_label e w1) w2
+  | Eabstr (e1, spec) ->
+      let p = wp_label e (wp_expl expl_pre spec.c_pre) in
+      let w1 = backstep (wp_expr env e1) spec.c_post spec.c_xpost in
+      let w2 = wp_abstract env e1.e_effect spec.c_post spec.c_xpost q xq in
+      wp_and ~sym:false p (wp_and ~sym:true (wp_label e w1) w2)
   | Eassign (e1, reg, pv) ->
       let rec get_term d = match d.e_node with
         | Elogic t -> t
@@ -770,8 +749,7 @@ and wp_desc env e q xq = match e.e_node with
       (* TODO: what do we do about well-foundness? *)
       let i = wp_expl expl_loop_keep inv in
       let olds = List.map (fun (t,_) -> t_at_old t) varl in
-      let d = decrease ?loc:e.e_loc env olds varl in
-      let d = wp_expl expl_loop_var d in
+      let d = decrease e.e_loc expl_loopvar env olds varl in
       let q = create_unit_post (wp_and ~sym:true i d) in
       let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
@@ -792,11 +770,11 @@ and wp_desc env e q xq = match e.e_node with
       let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
       let q = open_unit_post q in
       let wp_init =
-        wp_expl expl_for_init (t_subst_single x (t_var v1) inv) in
+        wp_expl expl_loop_init (t_subst_single x (t_var v1) inv) in
       let wp_step =
-        let nextx = fs_app env.fs_int_pl [t_var x; incr] ty_int in
-        let post = create_unit_post (t_subst_single x nextx inv) in
-        wp_expr env e1 post xq in
+        let next = fs_app env.fs_int_pl [t_var x; incr] ty_int in
+        let post = wp_expl expl_loop_keep (t_subst_single x next inv) in
+        wp_expr env e1 (create_unit_post post) xq in
       let wp_last =
         let v2pl1 = fs_app env.fs_int_pl [t_var v2; incr] ty_int in
         wp_implies (t_subst_single x v2pl1 inv) q in
@@ -804,10 +782,10 @@ and wp_desc env e q xq = match e.e_node with
         wp_init
         (quantify env (regs_of_writes e1.e_effect)
            (wp_and ~sym:true
-              (wp_expl expl_for_keep (wp_forall [x] (wp_implies
+              (wp_forall [x] (wp_implies
                 (wp_and ~sym:true (ps_app le [t_var v1; t_var x])
                                   (ps_app le [t_var x;  t_var v2]))
-                (wp_implies inv wp_step))))
+                (wp_implies inv wp_step)))
               wp_last))
       in
       let wp_full = wp_and ~sym:true
@@ -841,26 +819,26 @@ and wp_abstract env c_eff c_q c_xq q xq =
   in
   backstep proceed c_q c_xq
 
-and wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
-  let lab = fresh_mark () in
+and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
+  let lab = fresh_mark () and c = l.l_spec in
   let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env = if lr = 0 || l.l_variant = [] then env else
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
     let lab = t_var lab in
     let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
-    let tl = List.map t_at_lab l.l_variant in
-    { env with letrec_var = Mint.add lr tl env.letrec_var }
-  in
-  let q = old_mark lab (wp_expl expl_post l.l_post) in
+    let tl = List.map t_at_lab c.c_variant in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
+  let q = old_mark lab (wp_expl expl_post c.c_post) in
   let conv p = old_mark lab (wp_expl expl_xpost p) in
-  let f = wp_expr env l.l_expr q (Mexn.map conv l.l_xpost) in
-  let f = wp_implies l.l_pre (erase_mark lab f) in
+  let f = wp_expr env l.l_expr q (Mexn.map conv c.c_xpost) in
+  let f = wp_implies c.c_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
-and wp_rec_defn env { rec_defn = rdl; rec_letrec = lr } =
-  List.map (wp_fun_defn env lr) rdl
+and wp_rec_defn env fdl = List.map (wp_fun_defn env) fdl
 
 (***
 let bool_to_prop env f =
@@ -961,16 +939,16 @@ let wp_let env km th { let_sym = lv; let_expr = e } =
     | LetA ps -> ps.ps_name in
   add_wp_decl km id f th
 
-let wp_rec env km th rdl =
+let wp_rec env km th fdl =
   let env = mk_env env km th in
-  let fl = wp_rec_defn env rdl in
+  let fl = wp_rec_defn env fdl in
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
     let f = wp_forall (Mvs.keys f.t_vars) f in
     add_wp_decl km d.fun_ps.ps_name f th
   in
-  List.fold_left2 add_one th rdl.rec_defn fl
+  List.fold_left2 add_one th fdl fl
 
 let wp_val _env _km th _lv = th
 
@@ -1074,7 +1052,7 @@ and fast_wp_desc env s r e =
       let ok = if kind = Aassume then t_true else f in
       let ne = if kind = Acheck then t_true else f in
       ok, ((ne, s), Mexn.empty)
-  | Eabstr (_, _, _) -> assert false (*TODO*)
+  | Eabstr (_, _) -> assert false (*TODO*)
   | Etry (_, _) -> assert false (*TODO*)
   | Eraise (_, _) -> assert false (*TODO*)
   | Efor (_, _, _, _) -> assert false (*TODO*)
@@ -1101,33 +1079,33 @@ and fast_wp_desc env s r e =
   | Evalue _ -> assert false (*TODO*)
   | Eabsurd -> assert false (*TODO*)
 
-and fast_wp_fun_defn env lr { fun_ps = ps ; fun_lambda = l } =
+and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
      NE: true *)
-  let lab = fresh_mark () in
+  let lab = fresh_mark () and c = l.l_spec in
   let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env = if lr = 0 || l.l_variant = [] then env else
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
     let lab = t_var lab in
     let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
-    let tl = List.map t_at_lab l.l_variant in
-    { env with letrec_var = Mint.add lr tl env.letrec_var }
-  in
-  let q = old_mark lab (wp_expl expl_post l.l_post) in
+    let tl = List.map t_at_lab c.c_variant in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
+  let q = old_mark lab (wp_expl expl_post c.c_post) in
   let result, _ as q = open_post q in
   let conv p = old_mark lab (wp_expl expl_xpost p) in
-  let xq = Mexn.map conv l.l_xpost in
+  let xq = Mexn.map conv c.c_xpost in
   let xq = Mexn.map open_post xq in
   let xresult = Mexn.map fst xq in
   let ok, n = fast_wp_expr env Subst.empty (result, xresult) l.l_expr in
   let f = wp_and ~sym:true ok (wp_nimplies n (q, xq)) in
-  let f = wp_implies l.l_pre (erase_mark lab f) in
+  let f = wp_implies c.c_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
-and fast_wp_rec_defn env { rec_defn = rdl; rec_letrec = lr } =
-  List.map (fast_wp_fun_defn env lr) rdl
+and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
 let fast_wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in
@@ -1138,15 +1116,15 @@ let fast_wp_let env km th { let_sym = lv; let_expr = e } =
     | LetA ps -> ps.ps_name in
   add_wp_decl km id f th
 
-let fast_wp_rec env km th rdl =
+let fast_wp_rec env km th fdl =
   let env = mk_env env km th in
-  let fl = fast_wp_rec_defn env rdl in
+  let fl = fast_wp_rec_defn env fdl in
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
     let f = wp_forall (Mvs.keys f.t_vars) f in
     add_wp_decl km d.fun_ps.ps_name f th
   in
-  List.fold_left2 add_one th rdl.rec_defn fl
+  List.fold_left2 add_one th fdl fl
 
 let fast_wp_val _env _km th _lv = th

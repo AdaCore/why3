@@ -104,8 +104,61 @@ module TestHashtbl
 
 end
 
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/hashtbl"
-End:
-*)
+module HashtblImpl
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import list.List
+  use import list.Mem
+  use import array.Array
+
+  type key
+
+  function hash key : int
+
+  axiom hash_nonneg: forall k: key. 0 <= hash k
+
+  function bucket (k: key) (n: int) : int = mod (hash k) n
+
+  lemma bucket_bounds:
+    forall n: int. 0 < n ->
+    forall k: key. 0 <= bucket k n < n
+
+  type t 'a = {| mutable size: int; (* total number of elements *)
+                 mutable data: array (list (key, 'a)); |}
+    invariant { let n = Array.length data in
+                0 < n /\
+                forall i: int. 0 <= i < n ->
+                forall k: key, v: 'a. mem (k, v) data[i] -> bucket k n = i }
+
+  function extract (k: key) (l: list (key, 'a)) : list 'a = match l with
+    | Nil -> Nil
+    | Cons (k', v) r -> if k = k' then Cons v (extract k r) else extract k r
+  end
+
+  function ([]) (t: t 'a) (k: key): list 'a =
+    extract k (Array.get t.data (bucket k (length t.data)))
+
+  let create (n:int) : t 'a =
+    { 1 <= n }
+    {| size = 0; data = Array.make n Nil |}
+    { forall k: key. result[k] = Nil }
+
+  let clear (h: t 'a) =
+    {}
+    h.size <- 0;
+    Array.fill h.data 0 (Array.length h.data) Nil
+    { forall k: key. h[k] = Nil }
+
+  lemma extract_neq:
+    forall k k': key, v: 'a, l: list (key, 'a).
+    k <> k' -> extract k' l = extract k' (Cons (k, v) l)
+
+  let add (h: t 'a) (k: key) (v: 'a) =
+    {}
+    let b = bucket k (Array.length h.data) in
+    h.data[b] <- Cons (k, v) (Array.([]) h.data b)
+    { h[k] = Cons v (old h)[k] /\
+      forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+
+end

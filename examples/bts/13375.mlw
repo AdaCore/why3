@@ -1,0 +1,58 @@
+theory Signed
+  use import int.Int
+
+  type signed_type
+
+  function first : int
+
+  function last : int
+
+  predicate in_range (x : int) =
+   (first <= x <= last)
+
+  function to_int (n : signed_type) : int
+
+  function from_int (n : int) : signed_type
+
+  predicate eq (left : signed_type) (right : signed_type) =
+   (to_int left) = (to_int right)
+
+  axiom range :
+   forall x : signed_type.
+    in_range (to_int x)
+
+  axiom coerce :
+   forall x : int [(in_range x), (from_int x)].
+    (in_range x) -> ((to_int (from_int x)) = x)
+
+  axiom unicity :
+   forall x y : signed_type.
+    (to_int x) = (to_int y) -> x = y
+end
+
+
+module Spec
+ use import int.Int
+
+ type my_type
+
+ clone Signed as My_Type_T
+   with type signed_type = my_type
+ axiom axiom_first :
+  My_Type_T.first = 1
+
+ axiom axiom_last :
+  My_Type_T.last = 100
+
+ val my_type_t_from___int_ :
+  n : int ->
+   { (My_Type_T.in_range n) }
+    my_type
+   { (My_Type_T.to_int result) = n }
+
+ let to_int_ (x : my_type) =
+  { true }
+   (My_Type_T.to_int x)
+  { true }
+
+end

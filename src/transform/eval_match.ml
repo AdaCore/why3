@@ -18,12 +18,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
 open Ident
 open Ty
 open Term
 open Decl
-open Pretty
 
 type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 

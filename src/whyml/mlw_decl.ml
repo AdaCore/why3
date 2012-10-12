@@ -34,7 +34,7 @@ type data_decl = itysymbol * constructor list * post
 
 type pdecl = {
   pd_node : pdecl_node;
-(*   pd_syms : Sid.t;         (* idents used in declaration *) *)
+  pd_syms : Sid.t;         (* idents used in declaration *)
   pd_news : Sid.t;         (* idents introduced in declaration *)
   pd_tag  : int;           (* unique tag *)
 }
@@ -44,16 +44,16 @@ and pdecl_node =
   | PDdata of data_decl list
   | PDval  of let_sym
   | PDlet  of let_defn
-  | PDrec  of rec_defn
+  | PDrec  of fun_defn list
   | PDexn  of xsymbol
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
 let mk_decl =
   let r = ref 0 in
-  fun node (*syms*) news ->
+  fun node syms news ->
     incr r;
-    { pd_node = node; (*pd_syms = syms;*) pd_news = news; pd_tag = !r; }
+    { pd_node = node; pd_syms = syms; pd_news = news; pd_tag = !r; }
 
 let news_id s id = Sid.add_new (Decl.ClashIdent id) id s
 
@@ -116,7 +116,7 @@ let syms_expr s _e = s (* TODO *)
 let create_ty_decl its =
 (*   let syms = Util.option_fold syms_ity Sid.empty its.its_def in *)
   let news = Sid.singleton its.its_pure.ts_name in
-  mk_decl (PDtype its) (*syms*) news
+  mk_decl (PDtype its) Sid.empty news
 
 type pre_constructor = preid * (pvsymbol * bool) list
 
@@ -173,7 +173,7 @@ let create_data_decl tdl =
     its, List.map (build_constructor its) cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
-  mk_decl (PDdata tdl) (*!syms*) !news
+  mk_decl (PDdata tdl) Sid.empty !news
 
 let add_invariant pd its p =
   if not its.its_inv then invalid_arg "Mlw_decl.add_invariant";
@@ -191,7 +191,7 @@ let add_invariant pd its p =
     | [] -> raise Not_found
   in
   match pd.pd_node with
-    | PDdata tdl -> mk_decl (PDdata (add tdl)) (*pd.pd_syms*) pd.pd_news
+    | PDdata tdl -> mk_decl (PDdata (add tdl)) pd.pd_syms pd.pd_news
     | _ -> invalid_arg "Mlw_decl.add_invariant"
 
 let check_vars vars =
@@ -215,20 +215,22 @@ let create_let_decl ld =
   let news = match ld.let_sym with
     | LetA ps -> new_regs vars news ps.ps_vars
     | LetV pv -> new_regs vars news pv.pv_vars in
+  let syms = Mid.map (fun _ -> ()) ld.let_expr.e_varm in
 (*
   let syms = syms_varmap Sid.empty ld.let_expr.e_vars in
   let syms = syms_effect syms ld.let_expr.e_effect in
   let syms = syms_vty syms ld.let_expr.e_vty in
   let syms = syms_expr syms ld.let_expr in
 *)
-  mk_decl (PDlet ld) (*syms*) news
+  mk_decl (PDlet ld) syms news
 
-let create_rec_decl ({ rec_defn = rdl } as d) =
-  let add_rd s { fun_ps = p } =
+let create_rec_decl fdl =
+  let add_fd s { fun_ps = p } =
     check_vars p.ps_vars; news_id s p.ps_name in
-  let news = List.fold_left add_rd Sid.empty rdl in
+  let news = List.fold_left add_fd Sid.empty fdl in
+  let syms = Mid.map (fun _ -> ()) (rec_varmap Mid.empty fdl) in
 (*
-  let add_rd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
+  let add_fd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
     let syms = syms_varmap syms vm in
     let syms = syms_vta syms ps.ps_vta in
     let syms = syms_term syms l.l_pre in
@@ -238,29 +240,29 @@ let create_rec_decl ({ rec_defn = rdl } as d) =
       Util.option_fold syms_ls (syms_term s t) ls in
     let syms = List.fold_left addv syms l.l_variant in
     syms_expr syms l.l_expr in
-  let syms = List.fold_left add_rd Sid.empty rdl in
+  let syms = List.fold_left add_fd Sid.empty fdl in
 *)
-  mk_decl (PDrec d) (*syms*) news
+  mk_decl (PDrec fdl) syms news
 
 let create_val_decl lv =
   let news = letvar_news lv in
-  let news = match lv with
+  let news, syms = match lv with
     | LetV { pv_vtv = { vtv_mut = Some _ }} ->
         Loc.errorm "abstract parameters cannot be mutable"
-    | LetV pv -> new_regs vars_empty news pv.pv_vars
-    | LetA _ -> news in
+    | LetV pv -> new_regs vars_empty news pv.pv_vars, Sid.empty
+    | LetA ps -> news, Mid.map (fun _ -> ()) ps.ps_varm in
 (*
   let syms = syms_type_v Sid.empty vd.val_spec in
   let syms = syms_varmap syms vd.val_vars in
 *)
-  mk_decl (PDval lv) (*syms*) news
+  mk_decl (PDval lv) syms news
 
 let create_exn_decl xs =
   let news = Sid.singleton xs.xs_name in
 (*
   let syms = syms_ity Sid.empty xs.xs_ity in
 *)
-  mk_decl (PDexn xs) (*syms*) news
+  mk_decl (PDexn xs) Sid.empty news
 
 (** {2 Cloning} *)
 
@@ -281,7 +283,7 @@ let clone_data_decl sm pd = match pd.pd_node with
         news := news_id !news its.its_pure.ts_name;
         its, List.map add_cs csl, inv in
       let tdl = List.map add_td tdl in
-      mk_decl (PDdata tdl) (*!syms*) !news
+      mk_decl (PDdata tdl) Sid.empty !news
   | _ -> invalid_arg "Mlw_decl.clone_data_decl"
 
 (** {2 Known identifiers} *)
@@ -298,30 +300,17 @@ let merge_known kn1 kn2 =
   in
   Mid.union check_known kn1 kn2
 
-let pd_vars pd = match pd.pd_node with
-  | PDval (LetV _) -> Sid.empty
-  | PDval (LetA ps) -> Mid.map (fun _ -> ()) ps.ps_varm
-  | PDlet ld -> Mid.map (fun _ -> ()) ld.let_expr.e_varm
-  | PDrec rd ->
-      let add_rd s fd = Mid.set_union s fd.fun_ps.ps_varm in
-      let varm = List.fold_left add_rd Mid.empty rd.rec_defn in
-      Mid.map (fun _ -> ()) varm
-  | PDtype _ | PDdata _ | PDexn _ -> Sid.empty
-
-let known_add_decl lkn0 kn0 decl =
-  let kn = Mid.map (const decl) decl.pd_news in
+let known_add_decl lkn0 kn0 d =
+  let kn = Mid.map (const d) d.pd_news in
   let check id decl0 _ =
-    if pd_equal decl0 decl
+    if pd_equal decl0 d
     then raise (KnownIdent id)
-    else raise (RedeclaredIdent id)
-  in
+    else raise (RedeclaredIdent id) in
   let kn = Mid.union check kn0 kn in
-  let unk = Mid.set_diff (pd_vars decl) kn in
+  let unk = Mid.set_diff d.pd_syms kn in
   let unk = Mid.set_diff unk lkn0 in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
-
-(* TODO: known_add_decl must check pattern matches for exhaustiveness *)
 
 let rec find_td its1 = function
   | (its2,csl,inv) :: _ when its_equal its1 its2 -> csl,inv
@@ -339,3 +328,90 @@ let find_invariant kn its =
   | PDtype _ -> null_invariant its
   | PDdata tdl -> snd (find_td its tdl)
   | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
+
+let check_match lkn _kn d =
+  let rec checkE () e = match e.e_node with
+    | Ecase (e1,bl) ->
+        let typ = ty_of_ity (vtv_of_expr e1).vtv_ity in
+        let tye = ty_of_ity (vtv_of_expr e).vtv_ity in
+        let t_p = t_var (create_vsymbol (id_fresh "x") typ) in
+        let t_e = t_var (create_vsymbol (id_fresh "y") tye) in
+        let bl = List.map (fun (pp,_) -> [pp.ppat_pattern], t_e) bl in
+        let try3 f = match e.e_loc with Some l -> Loc.try3 l f | None -> f in
+        let find ts = List.map fst (Decl.find_constructors lkn ts) in
+        ignore (try3 Pattern.CompileTerm.compile find [t_p] bl);
+        e_fold checkE () e
+    | _ -> e_fold checkE () e
+  in
+  match d.pd_node with
+  | PDrec fdl -> List.iter (fun fd -> checkE () fd.fun_lambda.l_expr) fdl
+  | PDlet { let_expr = e } -> checkE () e
+  | PDval _ | PDtype _ | PDdata _ | PDexn _ -> ()
+
+exception NonupdatableType of ity
+
+let inst_constructors lkn kn ity = match ity.ity_node with
+  | Itypur (ts,_) ->
+      let csl = Decl.find_constructors lkn ts in
+      let d = Mid.find ts.ts_name lkn in
+      let is_rec = Mid.mem ts.ts_name d.Decl.d_syms in
+      if csl = [] || is_rec then raise (NonupdatableType ity);
+      let base = ity_pur ts (List.map ity_var ts.ts_args) in
+      let sbs = ity_match ity_subst_empty base ity in
+      let subst ty = vty_value (ity_full_inst sbs (ity_of_ty ty)) in
+      List.map (fun (cs,_) -> cs, List.map subst cs.ls_args) csl
+  | Ityapp (its,_,_) ->
+      let csl = find_constructors kn its in
+      let d = Mid.find its.its_pure.ts_name lkn in
+      let is_rec = Mid.mem its.its_pure.ts_name d.Decl.d_syms in
+      if csl = [] || is_rec then raise (NonupdatableType ity);
+      let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
+      let sbs = ity_match ity_subst_empty base ity in
+      let subst vtv =
+        let ghost = vtv.vtv_ghost in
+        let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
+        vty_value ~ghost ?mut (ity_full_inst sbs vtv.vtv_ity) in
+      List.map (fun (cs,_) -> cs.pl_ls, List.map subst cs.pl_args) csl
+  | Ityvar _ ->
+      invalid_arg "Mlw_decl.inst_constructors"
+
+let check_ghost lkn kn d =
+  let rec access regs ity =
+    let check vtv = match vtv.vtv_mut with
+      | _ when vtv.vtv_ghost -> ()
+      | Some r when Sreg.mem r regs -> raise (GhostWrite (e_void, r))
+      | _ -> access regs vtv.vtv_ity in
+    let check (_cs,vtvl) = List.iter check vtvl in
+    let occurs r = reg_occurs r ity.ity_vars in
+    if not (Sreg.exists occurs regs) then () else
+    List.iter check (inst_constructors lkn kn ity)
+  in
+  let rec check pvs vta =
+    let eff = vta.vta_spec.c_effect in
+    if not (Sexn.is_empty eff.eff_ghostx) then
+      raise (GhostRaise (e_void, Sexn.choose eff.eff_ghostx));
+    let pvs = List.fold_right Spv.add vta.vta_args pvs in
+    let test pv =
+      if pv.pv_vtv.vtv_ghost then () else
+      access eff.eff_ghostw pv.pv_vtv.vtv_ity
+    in
+    Spv.iter test pvs;
+    match vta.vta_result with
+    | VTarrow vta -> check pvs vta
+    | VTvalue _ -> ()
+  in
+  let check ps =
+    if ps.ps_vta.vta_ghost then () else
+    check (ps_pvset Spv.empty ps) ps.ps_vta
+  in
+  match d.pd_node with
+  | PDrec fdl -> List.iter (fun fd -> check fd.fun_ps) fdl
+  | PDval (LetA ps) | PDlet { let_sym = LetA ps } -> check ps
+  | PDval _ | PDlet _ | PDtype _ | PDdata _ | PDexn _ -> ()
+
+let known_add_decl lkn kn d =
+  let kn = known_add_decl lkn kn d in
+  check_ghost lkn kn d;
+  check_match lkn kn d;
+  kn
+

@@ -3,19 +3,11 @@
 printer "tptp-fof"
 filename "%f-%t-%g.p"
 
-valid   "Proof found"
-invalid "Completion found"
-invalid "SZS status CounterSatisfiable"
-timeout "Ran out of time"
-(* timeout "Resource limit exceeded" *)
-timeout "CPU time limit exceeded"
-outofmemory "Out of Memory"
-unknown "No Proof Found"            ""
-fail    "Failure.*"                   "\"\\0\""
+valid   "PROOF-FOUND"
+timeout "Zenon error: could not find a proof within the time limit"
+outofmemory "Zenon error: could not find a proof within the memory size limit"
+unknown "NO-PROOF" "no proof found"
 time "why3cpulimit time : %s s"
-(* time    "%h:%m:%s on the problem" *)
-(* time    "Total time[ ]*: %s s" *)
-
 
 (* to be improved *)
 

@@ -134,18 +134,27 @@ let print_result_prov proofs prov fmt=
 	| Session.Done res ->
 	    begin
 	      match res.Call_provers.pr_answer with
-		  Call_provers.Valid ->
-                    fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
-		| Call_provers.Invalid -> fprintf fmt "& \\invalid "
-		| Call_provers.Timeout -> fprintf fmt "& \\timeout "
-		| Call_provers.OutOfMemory -> fprintf fmt "& \\outofmemory "
-		| Call_provers.Unknown _ -> fprintf fmt "& \\unknown "
-		| Call_provers.Failure _ -> fprintf fmt "& \\failure "
-		| Call_provers.HighFailure -> fprintf fmt "& \\highfailure "
+		| Call_provers.Valid ->
+                  fprintf fmt "& \\valid{%.2f} " res.Call_provers.pr_time
+		| Call_provers.Invalid ->
+                  fprintf fmt "& \\invalid{%.2f} " res.Call_provers.pr_time
+		| Call_provers.Timeout ->
+                  fprintf fmt "& \\timeout{%ds} " pr.S.proof_timelimit
+		| Call_provers.OutOfMemory ->
+                  fprintf fmt "& \\outofmemory{%dM} " pr.S.proof_memlimit
+		| Call_provers.Unknown _ ->
+                  fprintf fmt "& \\unknown{%.2f} " res.Call_provers.pr_time
+		| Call_provers.Failure _ ->
+                  fprintf fmt "& \\failure "
+		| Call_provers.HighFailure ->
+                  fprintf fmt "& \\highfailure "
 
 	    end
 	| Session.InternalFailure _ -> fprintf fmt "& Internal Failure"
-	| Session.Undone _ -> fprintf fmt "& Undone"
+	| Session.Interrupted -> fprintf fmt "& Not yet run"
+	| Session.Unedited -> fprintf fmt "& Not yet edited"
+	| Session.Scheduled | Session.Running
+	| Session.JustEdited -> assert false
   with Not_found -> fprintf fmt "& \\noresult") prov;
   fprintf fmt "\\\\ @."
 
@@ -165,31 +174,29 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	  begin
 	    if(depth < depth_max)  then
 	      for _i = 1 to depth do
-                fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+                fprintf fmt " & "
               done
 	    else
 	      for _i = 1 to depth - 1 do
-                fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+                fprintf fmt " & "
               done
 	  end
 	else
 	  if(depth < depth_max) then
 	    if depth > 0 then
-              fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+              fprintf fmt " & "
       end
     else
       begin
 	if subgoal > 0  then
-	  for _i = 1 to depth  do
-	    fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " " done
+	  for _i = 1 to depth do fprintf fmt " & " done
 	else
-	  if depth > 0 then
-	    fprintf fmt "\\explanation{%s}& \\explanation{%s}" " " " "
+	  if depth > 0 then fprintf fmt " & "
       end;
     if (depth <= 1) then
       fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
     else
-      fprintf fmt "\\explanation{%s}"  " ";
+      fprintf fmt " " ;
     let proofs = g.S.goal_external_proofs in
       if (S.PHprover.length proofs) > 0 then
 	begin
@@ -197,18 +204,18 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	    begin
 	      if depth > 0 then
 		for _i = depth to (depth_max - depth) do
-                  fprintf fmt "& \\explanation{%s}" " " done
+                  fprintf fmt "& " done
 	      else
 		for _i = depth to (depth_max - depth - 1) do
-                  fprintf fmt "& \\explanation{%s}" " " done
+                  fprintf fmt "& " done
 	    end
 	  else
 	    if depth > 0 then
 	      for _i = depth to (depth_max - depth - 1) do
-		fprintf fmt "& \\explanation{%s}" " " done
+		fprintf fmt "& " done
 	    else
 	      for _i = depth to (depth_max - depth - 2) do
-		fprintf fmt "& \\explanation{%s}" " " done;
+		fprintf fmt "& " done;
 	  print_result_prov proofs prov fmt;
 	end;
       let tr = g.S.goal_transformations in
@@ -223,37 +230,50 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	    () ) tr
 
 
-let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
+let style_2_row fmt ?(transf=false) depth prov subgoal expl=
   let column = column 2 depth prov in
-  if depth > 0 then
+  if depth > 0 || transf then
     fprintf fmt "\\cline{%d-%d} @." 2 column
   else
     fprintf fmt "\\hline @.";
   for _i = 1 to depth do fprintf fmt "\\quad" done;
-  if (depth <= 1) then
-    fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
+  let macro = if transf then "transformation" else "explanation" in
+  if depth = 0 || transf then
+    fprintf fmt "\\%s{%s} " macro expl
   else
-    fprintf fmt "\\explanation{%d} " (subgoal + 1);
+    fprintf fmt "\\subgoal{%s}{%d} " expl (subgoal + 1)
+
+let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
   let proofs = g.S.goal_external_proofs in
-  if (S.PHprover.length proofs) > 0 then
-    print_result_prov proofs prov fmt;
+  if S.PHprover.length proofs > 0 then
+    begin
+      style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
+      print_result_prov proofs prov fmt
+    end
+ else
+    if depth = 0 then
+      begin
+        style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
+	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
+          (List.length prov)
+      end;
   let tr = g.S.goal_transformations in
   if S.PHstr.length tr > 0 then
     begin
-      if (S.PHprover.length proofs == 0) then
+      S.PHstr.iter (fun _st tr ->
+        style_2_row fmt ~transf:true (depth+1) prov subgoal 
+          (protect tr.S.transf_name);
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
           (List.length prov);
-      S.PHstr.iter (fun _st tr ->
 	let goals = tr.S.transf_goals in
 	let _ = List.fold_left (fun subgoal g ->
 	  goal_latex2_stat fmt prov (depth + 1) depth_max (subgoal) g;
 	  subgoal + 1) 0 goals in
 	() ) tr
     end
-  else
-    if (S.PHprover.length proofs) == 0 then
+ else
+    if (S.PHprover.length proofs) == 0 && depth <> 0 then
       fprintf fmt "\\\\ @."
-
 
 let latex_tabular_goal n fmt depth provers g =
   print_tabular_head n depth provers fmt;

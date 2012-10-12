@@ -260,14 +260,12 @@ let dexception uc qid =
 let no_ghost gh =
   if gh then errorm "ghost types are not supported in this version of WhyML"
 
-let eff_no_ghost l = List.map (fun (gh,x) -> no_ghost gh; x) l
-
 let dueffect env e =
-  { du_reads  = eff_no_ghost e.Ptree.pe_reads;
-    du_writes = eff_no_ghost e.Ptree.pe_writes;
-    du_raises =
-      List.map (fun id -> let ls,_,_ = dexception env.uc id in ls)
-        (eff_no_ghost e.Ptree.pe_raises); }
+  { du_reads  = e.Ptree.pe_reads;
+    du_writes = e.Ptree.pe_writes;
+    du_raises = List.map
+      (fun id -> let ls,_,_ = dexception env.uc id in ls)
+        e.Ptree.pe_raises; }
 
 let dpost uc (q, ql) =
   let dexn (id, l) = let s, _, _ = dexception uc id in s, l in
@@ -307,6 +305,31 @@ let rec dtype ~user env = function
       let ts = ts_tuple (List.length tyl) in
       tyapp ts (List.map (dtype ~user env) tyl)
 
+let rec lexpr_conj = function
+  | [] -> { pp_desc = PPtrue; pp_loc = Loc.dummy_position }
+  | [l] -> l
+  | l :: ll -> { l with pp_desc = PPbinop (l, PPand, lexpr_conj ll) }
+
+let get_post l =
+  let conv = function
+    | _, [{pat_desc = PPpvar { id = "result" }}, le] -> le
+    | loc, _ -> Loc.errorm ~loc "Patterns in postconditions \
+        are not supported in this version of WhyML" in
+  lexpr_conj (List.map conv l)
+
+let get_xpost = function
+  | [] -> []
+  | [loc, l] ->
+      let conv (xs, p, le) = match p.pat_desc with
+        | PPpvar { id = "result" } -> xs, le
+        | _ -> Loc.errorm ~loc "Patterns in postconditions \
+              are not supported in this version of WhyML" in
+      List.map conv l
+  | _ :: _ -> Loc.errorm "Multiple exceptional postconditions \
+      are not supported in this version of WhyML"
+
+let dpost uc sp = dpost uc (get_post sp.sp_post, get_xpost sp.sp_xpost)
+
 let rec dutype_v env = function
   | Ptree.Tpure pt ->
       DUTpure (dtype ~user:true env pt)
@@ -315,12 +338,11 @@ let rec dutype_v env = function
       let c = dutype_c env c in
       DUTarrow (bl, c)
 
-and dutype_c env c =
-  let ty = dutype_v env c.Ptree.pc_result_type in
-  { duc_result_type = ty;
-    duc_effect      = dueffect env c.Ptree.pc_effect;
-    duc_pre         = c.Ptree.pc_pre;
-    duc_post        = dpost env.uc c.Ptree.pc_post;
+and dutype_c env (ty,sp) =
+  { duc_result_type = dutype_v env ty;
+    duc_effect      = dueffect env sp.Ptree.sp_effect;
+    duc_pre         = lexpr_conj sp.Ptree.sp_pre;
+    duc_post        = dpost env.uc sp;
   }
 
 and dubinder env ({id=x; id_loc=loc} as id, gh, v) =
@@ -356,8 +378,12 @@ let dvariants env = function
   | [v] -> Some (dvariant env v)
   | _ -> errorm "multiple variants are not supported"
 
+let lexpr_conj_opt = function
+  | [] -> None
+  | ll -> Some (lexpr_conj ll)
+
 let dloop_annotation env a =
-  { dloop_invariant = a.Ptree.loop_invariant;
+  { dloop_invariant = lexpr_conj_opt a.Ptree.loop_invariant;
     dloop_variant   = dvariants env a.Ptree.loop_variant; }
 
 (***
@@ -496,7 +522,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       DEapply (e1, e2), ty
   | Ptree.Efun (bl, t) ->
       let env, bl = map_fold_left dubinder env bl in
-      let (_,e,_) as t = dtriple ~ghost ~userloc env t in
+      let _, ((_,e,_) as t) = dtriple ~ghost ~userloc env t in
       let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
       DEfun (bl, t), ty
@@ -716,7 +742,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let env = add_local env x.id dty_int in
       let e3 = dexpr ~ghost ~userloc env e3 in
       expected_type e3 dty_unit;
-      DEfor (x, e1, d, e2, inv, e3), dty_unit
+      DEfor (x, e1, d, e2, lexpr_conj_opt inv, e3), dty_unit
   | Ptree.Eassert (k, le) ->
       DEassert (k, le), dty_unit
   | Ptree.Emark ({id=s}, e1) ->
@@ -745,18 +771,17 @@ and dexpr_desc ~ghost ~userloc env loc = function
 
 and dletrec ~ghost ~userloc env dl =
   (* add all functions into environment *)
-  let add_one env (_loc, id, gh, bl, var, t) =
+  let add_one env (_loc, id, gh, bl, t) =
     no_ghost gh;
     let ty = create_type_var id.id_loc in
     let env = add_local_top env id.id ty in
-    env, ((id, ty), bl, var, t)
+    env, ((id, ty), bl, t)
   in
   let env, dl = map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
-  let type_one ((id, tyres), bl, v, t) =
+  let type_one ((id, tyres), bl, t) =
     let env, bl = map_fold_left dubinder env bl in
-    let v = dvariants env v in
-    let (_,e,_) as t = dtriple ~ghost ~userloc env t in
+    let v, ((_,e,_) as t) = dtriple ~ghost ~userloc env t in
     let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
     if not (Denv.unify ty tyres) then
@@ -767,10 +792,11 @@ and dletrec ~ghost ~userloc env dl =
   in
   env, List.map type_one dl
 
-and dtriple ~ghost ~userloc env (p, e, q) =
+and dtriple ~ghost ~userloc env (e, sp) =
+  let v = dvariants env sp.sp_variant in
   let e = dexpr ~ghost ~userloc env e in
-  let q = dpost env.uc q in
-  (p, e, q)
+  let q = dpost env.uc sp in
+  v, (lexpr_conj sp.sp_pre, e, q)
 
 (*** regions tables ********************************************************)
 
@@ -2059,7 +2085,7 @@ let check_type_vars ~loc vars ty =
 let make_immutable_type td =
   if td.td_vis = Private then errorm ~loc:td.td_loc
     "private types are not supported in this version of WhyML";
-  if td.td_inv <> None then errorm ~loc:td.td_loc
+  if td.td_inv <> [] then errorm ~loc:td.td_loc
     "type invariants are not supported in this version of WhyML";
   let td = { td with td_model = false; td_vis = Public } in
   let make_immutable_field f = { f with f_mutable = false; f_ghost = false } in

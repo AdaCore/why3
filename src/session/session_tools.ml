@@ -80,7 +80,7 @@ let transform_proof_attempt ?notify ~keygen env_session tr_name =
     let add_pa sg =
       if not (PHprover.mem sg.goal_external_proofs pr.proof_prover) then
         ignore (copy_external_proof ~keygen ~goal:sg
-                  ~attempt_status:(Undone Interrupted) pr) 
+                  ~attempt_status:Interrupted pr)
     in
     List.iter add_pa tr.transf_goals in
   let proofs = all_proof_attempts env_session.session in

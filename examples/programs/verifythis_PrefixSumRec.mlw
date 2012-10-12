@@ -1,7 +1,8 @@
-(*
- VerifyThis @ FM2012: Problem 2
+(**
 
-  http://fm2012.verifythis.org/challenges
+ {1 The VerifyThis competition at FM2012: Problem 2}
+
+  see {h <a href="http://fm2012.verifythis.org/challenges">this web page</a>}
 
 *)
 
@@ -14,22 +15,7 @@ module PrefixSumRec
    use import array.Array
    use import array.ArraySum
 
-  (** Shortcuts *)
-  function go_left (left right:int) : int =
-    let space = right - left in left - div space 2
-
-  lemma go_left_bounds:
-    forall left right:int.
-      0 <= left /\ left + 1 < right /\ right - left <= left ->
-        0 <= go_left left right < left
-
-  function go_right (left right:int) : int =
-    let space = right - left in right - div space 2
-
-  lemma go_right_bounds:
-    forall left right:int.
-      0 <= left /\ left + 1 < right /\ right - left <= left ->
-        left <= go_right left right < right
+(** {2 Preliminary lemmas on division by 2 and power of 2} *)
 
   (** Needed for the proof of phase1_frame and phase1_frame2 *)
   lemma Div_mod_2:
@@ -38,12 +24,29 @@ module PrefixSumRec
   (** The step must be a power of 2 *)
   predicate is_power_of_2 (x:int) = exists k:int. (k >= 0 /\ x = power 2 k)
 
+  (* needed *)
   lemma is_power_of_2_1:
     forall x:int. is_power_of_2 x -> x > 1 -> 2 * div x 2 = x
 
- (** Describe the result of the first function.
-     The second function traverses the array in the same way
-     than the first function so it can use the inductive. *)
+(**
+
+{2 Modeling the "upsweep" phase }
+
+*)
+
+  (** Shortcuts *)
+  function go_left (left right:int) : int =
+    let space = right - left in left - div space 2
+
+  function go_right (left right:int) : int =
+    let space = right - left in right - div space 2
+
+(**
+   Description in a purely logic way the effect of the first phase
+     "upsweep" of the algorithm.  The second phase "downsweep" then
+     traverses the array in the same way than the first phase. Hence,
+     the inductive nature of this definition is not an issue. *)
+
   inductive phase1 (left:int) (right:int) (a0: array int) (a: array int) =
     | Leaf : forall left right:int, a0 a : array int.
        right = left + 1 ->
@@ -56,21 +59,34 @@ module PrefixSumRec
        a[left] = sum a0 (left-(right-left)+1) (left+1) ->
        phase1 left right a0 a
 
-  (** Frame properties of the inductive *)
-  lemma phase1_frame: (** forward *)
+  (** Frame properties of the "phase1" inductive *)
+
+  (** frame lemma for "phase1" on fourth argument.
+     needed to prove both upsweep, downsweep and compute_sums
+   *)
+  lemma phase1_frame:
     forall left right:int, a0 a a' : array int.
     (forall i:int. left-(right-left) < i < right ->
        a[i] = a'[i]) ->
     phase1 left right a0 a -> phase1 left right a0 a'
 
-  lemma phase1_frame2: (** backward *)
+
+  (** frame lemma for "phase1" on third argument.
+     needed to prove upsweep and compute_sums
+   *)
+  lemma phase1_frame2:
     forall left right:int, a0 a0' a : array int.
     (forall i:int. left-(right-left) < i < right ->
        a0[i] = a0'[i]) ->
     phase1 left right a0 a -> phase1 left right a0' a
 
-   (** First function: modify partially the table and compute some
-       intermediate partial sums *)
+(** {2 The upsweep phase} 
+
+  First function: modify partially the table and compute some
+      intermediate partial sums 
+
+*)
+
   let rec upsweep (left right: int) (a: array int) =
     { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
       is_power_of_2 (right - left) }
@@ -95,7 +111,9 @@ module PrefixSumRec
       (forall i: int. i <= left-space -> a[i] = (old a)[i]) /\
       (forall i: int. i > right -> a[i] = (old a)[i]) }
 
-  (** What we really want to prove *)
+(** {2 The downsweep phase} *)
+
+  (** The property we ultimately want to prove *)
   predicate partial_sum (left:int) (right:int) (a0 a : array int) =
     forall i : int. (left-(right-left)) < i <= right -> a[i] = sum a0 0 i
 
@@ -126,16 +144,34 @@ module PrefixSumRec
       (forall i: int. i <= left-(right-left) -> a[i] = (old a)[i]) /\
       (forall i: int. i > right -> a[i] = (old a)[i]) }
 
-  let main () =
-    let a = make 8 0 in
-    'Init:
-    a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0; a[4] <- 4; a[5] <- 1;
-    a[6] <- 6; a[7] <- 3;
+(** {2 The main procedure} *)
+
+  let compute_sums a =
+    { a.length >= 2 && is_power_of_2 a.length }
     let a0 = ghost (copy a) in
-    assert { power 2 2 = 4 }; (** for is_power_of_2 existential *)
-    upsweep 3 7 a;
-    a[7] <- 0;
-    downsweep 3 7 a0 a;
+    let l = a.length in
+    let left = div l 2 - 1 in
+    let right = l - 1 in
+    upsweep left right a;
+    (* needed for the precondition of downsweep *)
+    assert { phase1 left right a0 a };
+    a[right] <- 0;
+    downsweep left right a0 a;
+    (* needed to prove the post-condition *)
+    assert { forall i : int.
+      left-(right-left) < i <= right -> a[i] = sum a0 0 i }
+    { forall i : int. 0 <= i < a.length -> a[i] = sum (old a) 0 i }
+
+
+(** {2 A simple test} *)
+
+  let test_harness () =
+    let a = make 8 0 in
+    (* needed for the precondition of compute_sums *)
+    assert { power 2 3 = a.length };
+    a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0;
+    a[4] <- 4; a[5] <- 1; a[6] <- 6; a[7] <- 3;
+    compute_sums a;
     assert { a[0] = 0 };
     assert { a[1] = 3 };
     assert { a[2] = 4 };
@@ -146,3 +182,10 @@ module PrefixSumRec
     assert { a[7] = 22 }
 
 end
+
+(***
+Local Variables:
+compile-command: "why3ide verifythis_PrefixSumRec.mlw"
+End:
+*)
+

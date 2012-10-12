@@ -675,18 +675,17 @@ let find_prop_decl kn pr =
   | Dprop (k,_,f) -> k,f
   | Dtype _ | Ddata _ | Dparam _ | Dlogic _ -> assert false
 
-exception NonExhaustiveCase of pattern list * term
-
-let rec check_matchT kn () t = match t.t_node with
-  | Tcase (t1,bl) ->
-      let bl = List.map (fun b -> let p,t = t_open_branch b in [p],t) bl in
-      let find_constructors kn ts = List.map fst (find_constructors kn ts) in
-      ignore (try Pattern.CompileTerm.compile (find_constructors kn) [t1] bl
-      with Pattern.NonExhaustive p -> raise (NonExhaustiveCase (p,t)));
-      t_fold (check_matchT kn) () t
-  | _ -> t_fold (check_matchT kn) () t
-
-let check_match kn d = decl_fold (check_matchT kn) () d
+let check_match kn d =
+  let rec check () t = match t.t_node with
+    | Tcase (t1,bl) ->
+        let find ts = List.map fst (find_constructors kn ts) in
+        let bl = List.map (fun b -> let p,t = t_open_branch b in [p],t) bl in
+        let try3 f = match t.t_loc with Some l -> Loc.try3 l f | None -> f in
+        ignore (try3 Pattern.CompileTerm.compile find [t1] bl);
+        t_fold check () t
+    | _ -> t_fold check () t
+  in
+  decl_fold check () d
 
 exception NonFoundedTypeDecl of tysymbol
 

@@ -37,17 +37,23 @@ exception DuplicateShortcut of string
 
 val read_config : string option -> config
 (** [read_config conf_file] :
-    - If conf_file is given and the file doesn't exist Rc.CannotOpen is
-    raised.
-    - If "$WHY3CONFIG" is given and the file doesn't exist Rc.CannotOpen
-    is raised
-    - otherwise we try reading "$HOME/.why3.conf" (or
-    "$USERPROFILE/.why3.conf" under Windows) and, if not present, we return
-    the built-in default_config with default configuration filename *)
+    - If conf_file is given, then
+      - if it is an empty string, an empty config is loaded,
+      - if the file doesn't exist, Rc.CannotOpen is raised,
+      - otherwise the content of the file is parsed and returned.
+    - If conf_file is None and the WHY3CONFIG environment
+      variable exists, then the above steps are executed with
+      the content of the variable (possibly empty).
+    - If neither conf_file nor WHY3CONFIG are present, the file
+      "$HOME/.why3.conf" (or "$USERPROFILE/.why3.conf" under
+      Windows) is checked for existence:
+      - if present, the content is parsed and returned,
+      - otherwise, we return the built-in default_config with a
+        default configuration filename. *)
 
 val merge_config : config -> string -> config
 (** [merge_config config filename] merge the content of [filename]
-    into [config]( *)
+    into [config] *)
 
 val save_config : config -> unit
 (** [save_config config] save the configuration *)

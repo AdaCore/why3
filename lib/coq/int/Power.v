@@ -39,6 +39,15 @@ easy.
 Qed.
 
 (* Why3 goal *)
+Lemma Power_s_alt : forall (x:Z) (n:Z), (0%Z < n)%Z -> ((power x
+  n) = (x * (power x (n - 1%Z)%Z))%Z).
+intros x n h1.
+rewrite <- Power_s.
+f_equal; auto with zarith.
+omega.
+Qed.
+
+(* Why3 goal *)
 Lemma Power_1 : forall (x:Z), ((power x 1%Z) = x).
 Proof.
 exact Zmult_1_r.

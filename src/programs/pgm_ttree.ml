@@ -42,7 +42,7 @@ type for_direction = Ptree.for_direction
 
 (* user type_v *)
 
-type dpre = Ptree.pre
+type dpre = Ptree.lexpr
 type dpost_fmla = Ptree.lexpr
 type dexn_post_fmla = Ptree.lexpr
 type dpost = dpost_fmla * (Term.lsymbol * dexn_post_fmla) list

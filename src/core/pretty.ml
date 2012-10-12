@@ -539,8 +539,8 @@ let () = Exn_printer.register
       fprintf fmt "The symbol %a is not a constructor"
         print_ls ls
   | Pattern.NonExhaustive pl ->
-      fprintf fmt "Non-exhaustive pattern list:@\n@[<hov 2>%a@]"
-        (print_list newline print_pat) pl
+      fprintf fmt "Pattern not covered by a match:@\n  @[%a@]"
+        print_pat (List.hd pl)
   | Decl.BadConstructor ls ->
       fprintf fmt "Bad constructor symbol: %a" print_ls ls
   | Decl.BadRecordField ls ->
@@ -588,9 +588,6 @@ let () = Exn_printer.register
         id.id_string
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove the termination of %a" print_ls ls
-  | Decl.NonExhaustiveCase (pl, e) ->
-      fprintf fmt "Pattern @[%a@] is not covered in expression:@\n  @[%a@]"
-        (print_list comma print_pat) pl print_term e
   | _ -> raise exn
   end
 

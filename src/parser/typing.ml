@@ -922,7 +922,7 @@ let prepare_typedef td =
     errorm ~loc:td.td_loc "model types are not allowed in the logic";
   if td.td_vis <> Public then
     errorm ~loc:td.td_loc "logic types cannot be abstract or private";
-  if td.td_inv <> None then
+  if td.td_inv <> [] then
     errorm ~loc:td.td_loc "logic types cannot have invariants";
   match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->

@@ -12,7 +12,7 @@ documentation automatically generated from the actual sources,
 available at \url{http://why3.lri.fr/stdlib/}.
 
 
-\section{Standard Theories}
+\section{Theories}
 \label{sec:stdlib}
 
 We present the most important theories here, see the URL above for the
@@ -21,6 +21,8 @@ others.
 Notice there is an alternative way to explore the contents of a
 library, using the \verb|why3| command with option 
 \verb|-T| and a qualified theory name, for example:
+\index{theory@\verb+--theory+}
+
 \begin{verbatim}
 > why3 -T bool.Ite
 theory Ite
@@ -45,6 +47,9 @@ defined in it.
 
 \item[Bool] provides the Boolean data type \verb|bool| with
   constructors \verb|True| and \verb|False|; and operations \verb|andb|, \verb|orb|, \verb|xorb|, \verb|notb|.
+\indextt{bool}
+\indextt{True}
+\indextt{False}
 
 \item[Ite] provides the polymorphic if-then-else operator written as \verb|ite|.
 
@@ -132,6 +137,8 @@ such as the sorted predicate, permutation, etc.
 
 This library provides the classical ML option type with constructors
 \verb|None| and \verb|Some|.
+\indextt{None}
+\indextt{Some}
 
 \subsection{Library \texttt{list}}
 
@@ -139,7 +146,7 @@ This library provides the classical ML type of polymorphic lists, with
 constructors \verb|Nil| and \verb|Cons|. Most of the classical list
 operators are provided in separate theories.
 
-\section{Standard ML Modules}
+\section{Modules}
 \label{sec:mllibrary}
 
 The standard ML modules provided allow to write imperative
@@ -156,6 +163,9 @@ and the one providing arrays.
 \item[Refint] provides additional functions \texttt{incr},
   \texttt{decr} and a few others, over integer references.
 \end{description}
+\indextt{ref}
+\index{"!@\texttt{"!}}
+\indextt{:=}
 
 \subsection{Library \texttt{array}}
 

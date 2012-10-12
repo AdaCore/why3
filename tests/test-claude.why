@@ -219,4 +219,12 @@ inductive p (x:int) =
   | C2 : let x=0 in p x
 end
 
+theory TestWarnings
 
+  type t
+
+  lemma L1 : forall x:t. true
+
+  lemma L2 : exists x:t. x=x -> false
+
+end

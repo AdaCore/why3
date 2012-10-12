@@ -9,6 +9,7 @@ use import int.Int
 use import int.MinMax
 use import bool.Bool
 use export list.List
+use export list.Append
 use map.Map as IdMap
 
 (** types and values *)
@@ -23,56 +24,45 @@ type operator = Oplus | Ominus | Omult | Ole
 (** ident for mutable variables *)
 type mident
 
+lemma mident_decide :
+  forall m1 m2: mident. m1 = m2 \/ m1 <> m2
+
 (** ident for immutable variables *)
 type ident = {| ident_index : int |}
 
+lemma ident_decide :
+  forall m1 m2: ident. m1 = m2 \/ m1 <> m2
+
 (** Terms *)
-type term_node =
+type term =
   | Tvalue value
   | Tvar ident
   | Tderef mident
   | Tbin term operator term
 
-with term = {| term_node : term_node;
-               term_maxvar : int;
-             |}
 
 predicate var_occurs_in_term (x:ident) (t:term) =
   match t with
-  | {| term_node = Tvalue _ |} -> false
-  | {| term_node = Tvar i |} -> x=i
-  | {| term_node = Tderef _ |} -> false
-  | {| term_node = Tbin t1 _ t2 |} -> var_occurs_in_term x t1 \/ var_occurs_in_term x t2
+  | Tvalue _  -> false
+  |  Tvar i  -> x=i
+  |  Tderef _  -> false
+  |  Tbin t1 _ t2 -> var_occurs_in_term x t1 \/ var_occurs_in_term x t2
   end
 
-predicate term_inv (t:term) =
-  forall x:ident. var_occurs_in_term x t -> x.ident_index <= t.term_maxvar
+(* predicate term_inv (t:term) = *)
+(*   forall x:ident. var_occurs_in_term x t -> x.ident_index <= t.term_maxvar *)
 
 function mk_tvalue (v:value) : term =
-   {| term_node = Tvalue v; term_maxvar = -1 |}
-
-lemma mk_tvalue_inv :
-   forall v:value. term_inv (mk_tvalue v)
+   Tvalue v
 
 function mk_tvar (i:ident) : term =
-   {| term_node = Tvar i; term_maxvar = i.ident_index |}
-
-lemma mk_tvar_inv :
-   forall i:ident. term_inv (mk_tvar i)
+   Tvar i
 
 function mk_tderef (r:mident) : term =
-   {| term_node = Tderef r; term_maxvar = -1 |}
-
-lemma mk_tderef_inv :
-   forall r:mident. term_inv (mk_tderef r)
+   Tderef r
 
 function mk_tbin (t1:term) (o:operator) (t2:term) : term =
-   {| term_node = Tbin t1 o t2;
-      term_maxvar = max t1.term_maxvar t2.term_maxvar |}
-
-lemma mk_tbin_inv :
-   forall t1 t2:term, o:operator. term_inv t1 /\ term_inv t2 ->
-     term_inv (mk_tbin t1 o t2)
+    Tbin t1 o t2
 
 
 (** Formulas *)
@@ -118,28 +108,29 @@ function get_vartype (i:ident) (pi:type_stack) : datatype =
   | Cons (x,ty) r -> if x=i then ty else get_vartype i r
   end
 
+
 type type_env = IdMap.map mident datatype  (* map global mutable variables to their type *)
 function get_reftype (i:mident) (e:type_env) : datatype = IdMap.get e i
 
 inductive type_term type_env type_stack term datatype =
   | Type_value :
-      forall sigma: type_env, pi:type_stack, v:value, m:int.
-	type_term sigma pi {| term_node = Tvalue v; term_maxvar = m |} (type_value v)
+      forall sigma: type_env, pi:type_stack, v:value.
+	type_term sigma pi  (Tvalue v) (type_value v)
   | Type_var :
-      forall sigma: type_env, pi:type_stack, v: ident, m:int, ty:datatype.
+      forall sigma: type_env, pi:type_stack, v: ident, ty:datatype.
         (get_vartype v pi = ty) ->
-        type_term sigma pi {| term_node = Tvar v ; term_maxvar = m |} ty
+        type_term sigma pi (Tvar v) ty
   | Type_deref :
-      forall sigma: type_env, pi:type_stack, v: mident, m:int, ty:datatype.
+      forall sigma: type_env, pi:type_stack, v: mident, ty:datatype.
         (get_reftype v sigma = ty) ->
-        type_term sigma pi {| term_node = Tderef v; term_maxvar = m |} ty
+        type_term sigma pi (Tderef v) ty
   | Type_bin :
       forall sigma: type_env, pi:type_stack, t1 t2 : term, op:operator,
-        m:int, ty1 ty2 ty:datatype.
+        ty1 ty2 ty:datatype.
         type_term sigma pi t1 ty1 ->
 	type_term sigma pi t2 ty2 ->
 	type_operator op ty1 ty2 ty ->
-        type_term sigma pi {| term_node = Tbin t1 op t2; term_maxvar = m |} ty
+        type_term sigma pi (Tbin t1 op t2) ty
 
 inductive type_fmla type_env type_stack fmla =
   | Type_term :
@@ -207,7 +198,7 @@ inductive type_stmt type_env type_stack stmt =
 	type_fmla sigma pi inv ->
         type_term sigma pi guard TYbool ->
         type_stmt sigma pi body ->
-        type_stmt sigma pi (Swhile guard inv body) 
+        type_stmt sigma pi (Swhile guard inv body)
 
 (** Operational semantic *)
 type env = IdMap.map mident value  (* map global mutable variables to their value *)
@@ -244,20 +235,37 @@ function eval_bin (x:value) (op:operator) (y:value) : value =
 
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
-  | {| term_node = Tvalue v |} -> v
-  | {| term_node = Tvar id |} -> get_stack id pi
-  | {| term_node = Tderef id |} -> get_env id sigma
-  | {| term_node = Tbin t1 op t2 |} ->
+  | Tvalue v -> v
+  |  Tvar id  -> get_stack id pi
+  |  Tderef id  -> get_env id sigma
+  |  Tbin t1 op t2  ->
      eval_bin (eval_term sigma pi t1) op (eval_term sigma pi t2)
-  end
+end
 
+inductive compatible datatype value =
+    | Compatible_bool :
+	forall b: bool. compatible TYbool (Vbool b)
+    | Compatible_int :
+	forall n: int. compatible TYint (Vint n)
+    | Compatible_void :
+	compatible TYunit Vvoid
 
-lemma eval_bool_term:
-  forall sigma:env, pi:stack, sigmat:type_env, pit:type_stack, t:term.
-    type_term sigmat pit t TYbool ->
-    (* TODO: compatibility sigma, sigmat and pi,pit *)
-    exists b:bool.
-      eval_term sigma pi t = Vbool b
+predicate existe_compatible (ty:datatype) (v:value) =
+   match ty with
+    | TYbool -> exists b: bool. v = Vbool b
+    | TYint -> exists n: int. v = Vint n
+    | TYunit -> v = Vvoid
+end
+
+predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) =
+ (forall id: mident. compatible (get_reftype id sigmat) (IdMap.get sigma id)) /\
+   (forall id: ident. compatible (get_vartype id pit) (get_stack id pi))
+
+lemma eval_type_term:
+  forall t:term, sigma:env, pi:stack, sigmat:type_env, pit:type_stack, ty:datatype.
+    compatible_env sigma sigmat pi pit ->
+    type_term sigmat pit t ty -> existe_compatible ty (eval_term sigma pi t)
+
 
 
 predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
@@ -281,41 +289,35 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
 
 function msubst_term (t:term) (r:mident) (v:ident) : term =
   match t with
-  | {| term_node = Tvalue _ | Tvar _ |} -> t
-  | {| term_node = Tderef x |} -> if r = x then mk_tvar v else t
-  | {| term_node = Tbin t1 op t2 |} ->
-      mk_tbin (msubst_term t1 r v) op (msubst_term t2 r v) 
+  | Tvalue _ | Tvar _  -> t
+  | Tderef x -> if r = x then mk_tvar v else t
+  | Tbin t1 op t2  ->
+      mk_tbin (msubst_term t1 r v) op (msubst_term t2 r v)
   end
 
 function subst_term (t:term) (r:ident) (v:ident) : term =
   match t with
-  | {| term_node = Tvalue _ | Tderef _ |} -> t
-  | {| term_node = Tvar x |} ->
+  | Tvalue _ | Tderef _  -> t
+  | Tvar x  ->
       if r = x then mk_tvar v else t
-  | {| term_node = Tbin t1 op t2 |} ->
+  | Tbin t1 op t2  ->
      mk_tbin (subst_term t1 r v) op (subst_term t2 r v)
   end
 
 (** [fresh_in_term id t] is true when [id] does not occur in [t] *)
 predicate fresh_in_term (id:ident) (t:term) =
-  id.ident_index > t.term_maxvar
+    not (var_occurs_in_term id t)
 
-lemma eval_msubst_term:
-  forall sigma:env, pi:stack, e:term, x:mident, v:ident.
-    fresh_in_term v e ->
-    eval_term sigma pi (msubst_term e x v) =
-    eval_term (IdMap.set sigma x (get_stack v pi)) pi e
+lemma fresh_in_binop:
+  forall t t':term, op:operator, v:ident.
+    fresh_in_term v (mk_tbin t op t') ->
+      fresh_in_term v t  /\ fresh_in_term v t'
 
-lemma eval_subst_term:
-  forall sigma:env, pi:stack, e:term, x:ident, v:ident.
-    fresh_in_term v e ->
-    eval_term sigma pi (subst_term e x v) =
-    eval_term sigma (Cons (x, (get_stack v pi)) pi) e
-
-lemma eval_term_change_free :
-  forall t:term, sigma:env, pi:stack, id:ident, v:value.
-    fresh_in_term id t ->
-    eval_term sigma (Cons (id,v) pi) t = eval_term sigma pi t
+(* lemma eval_subst_term: *)
+(*   forall sigma:env, pi:stack, e:term, x:ident, v:ident. *)
+(*     fresh_in_term v e -> *)
+(*     eval_term sigma pi (subst_term e x v) = *)
+(*     eval_term sigma (Cons (x, (get_stack v pi)) pi) e *)
 
 predicate fresh_in_fmla (id:ident) (f:fmla) =
   match f with
@@ -347,65 +349,99 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
   | Fforall y ty f -> Fforall y ty (msubst f x v)
   end
 
+lemma subst_fresh_term :
+  forall t:term, x:ident, v:ident.
+   fresh_in_term x t -> subst_term t x v = t
+
 lemma subst_fresh :
   forall f:fmla, x:ident, v:ident.
    fresh_in_fmla x f -> subst f x v = f
 
-lemma let_subst:
-    forall t:term, f:fmla, x id':ident, id :mident.
-    msubst (Flet x t f) id id' = Flet x (msubst_term t id id') (msubst f id id')
+(* Not needed *)
+(* lemma let_subst: *)
+(*     forall t:term, f:fmla, x id':ident, id :mident. *)
+(*     msubst (Flet x t f) id id' = Flet x (msubst_term t id id') (msubst f id id') *)
 
+lemma eval_msubst_term:
+  forall e:term, sigma:env, pi:stack, x:mident, v:ident.
+    fresh_in_term v e ->
+    eval_term sigma pi (msubst_term e x v) =
+    eval_term (IdMap.set sigma x (get_stack v pi)) pi e
+
+(* Need it for monotonicity and wp_reduction *)
 lemma eval_msubst:
   forall f:fmla, sigma:env, pi:stack, x:mident, v:ident.
     fresh_in_fmla v f ->
     (eval_fmla sigma pi (msubst f x v) <->
      eval_fmla (IdMap.set sigma x (get_stack v pi)) pi f)
 
-lemma eval_subst:
-  forall f:fmla, sigma:env, pi:stack, x:ident, v:ident.
-    fresh_in_fmla v f ->
-    (eval_fmla sigma pi (subst f x v) <->
-     eval_fmla sigma (Cons(x, (get_stack v pi)) pi) f)
+(* lemma eval_subst: *)
+(*   forall f:fmla, sigma:env, pi:stack, x:ident, v:ident. *)
+(*     fresh_in_fmla v f -> *)
+(*     (eval_fmla sigma pi (subst f x v) <-> *)
+(*      eval_fmla sigma (Cons(x, (get_stack v pi)) pi) f) *)
+
+lemma eval_swap_term:
+forall t:term, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
+id1 <> id2 ->
+(eval_term sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) t =
+eval_term sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) t)
+
+lemma eval_swap_term_2:
+  forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
+    id1 <> id2 ->
+    (eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t =
+    eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t)
 
 lemma eval_swap:
-  forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
+  forall f:fmla, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->
+    (eval_fmla sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) f <->
+    eval_fmla sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) f)
+
+lemma eval_swap_2:
+  forall f:fmla, id1 id2:ident, v1 v2:value.
+    id1 <> id2 ->
+      forall sigma:env, pi:stack.
     (eval_fmla sigma (Cons (id1,v1) (Cons (id2,v2) pi)) f <->
     eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f)
 
-lemma eval_same_var:
-  forall f:fmla, sigma:env, pi:stack, id:ident, v1 v2:value.
-    eval_fmla sigma (Cons (id,v1) (Cons (id,v2) pi)) f <->
-    eval_fmla sigma (Cons (id,v1) pi) f
+lemma eval_term_change_free :
+  forall t:term, sigma:env, pi:stack, id:ident, v:value.
+    fresh_in_term id t ->
+    eval_term sigma (Cons (id,v) pi) t = eval_term sigma pi t
 
+ (* Need it for monotonicity*)
 lemma eval_change_free :
-  forall f:fmla, sigma:env, pi:stack, id:ident, v:value.
+  forall f:fmla, id:ident, v:value.
     fresh_in_fmla id f ->
+      forall sigma:env, pi:stack.
     (eval_fmla sigma (Cons (id,v) pi) f <-> eval_fmla sigma pi f)
 
-
-  (** [valid_fmla f] is true when [f] is valid in any environment *)
+(** [valid_fmla f] is true when [f] is valid in any environment *)
   predicate valid_fmla (p:fmla) = forall sigma:env, pi:stack. eval_fmla sigma pi p
 
+(* Not needed *)
+(* axiom msubst_implies : *)
+(* forall p q:fmla. *)
+(*   valid_fmla (Fimplies p q) -> *)
+(*   forall sigma:env, pi:stack, x:mident, id:ident. *)
+(*     fresh_in_fmla id (Fand p q) ->  *)
+(*     eval_fmla sigma (Cons (id, (get_env x sigma)) pi) (Fimplies (msubst p x id) (msubst q x id))  *)
+
 (** let id' = t in f[id <- id'] <=> let id = t in f*)
-lemma let_equiv :
-  forall id:ident, id':ident, t:term, f:fmla.
-    forall sigma:env, pi:stack.
-      fresh_in_fmla id' f ->
-	(eval_fmla sigma pi (Flet id' t (subst f id id'))
-	 -> eval_fmla sigma pi (Flet id t f))
+(* Not needed *)
+(* lemma let_equiv : *)
+(*   forall id:ident, id':ident, t:term, f:fmla. *)
+(*     forall sigma:env, pi:stack. *)
+(*       fresh_in_fmla id' f -> *)
+(* 	eval_fmla sigma pi (Flet id' t (subst f id id')) *)
+(* 	 -> eval_fmla sigma pi (Flet id t f) *)
 
-lemma let_equiv2 :
-  forall id:ident, id':ident, t:term, f:fmla.
-    forall sigma:env, pi:stack.
-      fresh_in_fmla id' f ->
-	eval_fmla sigma pi (Flet id' t (subst f id id'))
-	 -> eval_fmla sigma pi (Flet id t f)
-
-lemma let_implies :
-  forall id:ident, t:term, p q:fmla.
-    valid_fmla (Fimplies p q) ->
-    valid_fmla (Fimplies (Flet id t p) (Flet id t q))
+(* lemma let_implies : *)
+(*   forall id:ident, t:term, p q:fmla. *)
+(*     valid_fmla (Fimplies p q) -> *)
+(*     valid_fmla (Fimplies (Flet id t p) (Flet id t q)) *)
 
 predicate fresh_in_stmt (id:ident) (s:stmt) =
   match s with
@@ -478,10 +514,11 @@ inductive one_step env stack stmt env stack stmt =
        many_steps sigma2 pi2 s2 sigma3 pi3 s3 n ->
        many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n+1)
 
-  lemma steps_non_neg:
-    forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int.
-      many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
+lemma steps_non_neg:
+  forall sigma1 sigma2:env, pi1 pi2:stack, s1 s2:stmt, n:int.
+    many_steps sigma1 pi1 s1 sigma2 pi2 s2 n -> n >= 0
 
+(* Used by Hoare_logic/seq_rule*)
   lemma many_steps_seq:
     forall sigma1 sigma3:env, pi1 pi3:stack, s1 s2:stmt, n:int.
       many_steps sigma1 pi1 (Sseq s1 s2) sigma3 pi3 Sskip n ->
@@ -490,11 +527,24 @@ inductive one_step env stack stmt env stack stmt =
         many_steps sigma2 pi2 s2 sigma3 pi3 Sskip n2 /\
         n = 1 + n1 + n2
 
- lemma one_step_change_free :
-  forall s s':stmt, sigma sigma':env, pi pi':stack, id:ident, v:value.
-    fresh_in_stmt id s ->
-    one_step sigma (Cons (id,v) pi) s sigma' pi' s' ->
-    one_step sigma pi s sigma' pi' s'
+ (* lemma one_step_change_free : *)
+ (*  forall s s':stmt, sigma sigma':env, pi pi':stack, id:ident, v:value. *)
+ (*    fresh_in_stmt id s -> *)
+ (*    one_step sigma (Cons (id,v) pi) s sigma' pi' s' -> *)
+ (*    one_step sigma pi s sigma' pi' s' *)
+
+
+
+
+
+lemma type_preservation :
+  forall s1 s2:stmt, sigma1 sigma2:env, pi1 pi2:stack,
+         sigmat:type_env, pit:type_stack.
+     type_stmt sigmat pit s1 /\
+     compatible_env sigma1 sigmat pi1 pit /\
+     one_step sigma1 pi1 s1 sigma2 pi2 s2 ->
+     type_stmt sigmat pit s2 /\
+     compatible_env sigma2 sigmat pi2 pit
 
 
 
@@ -658,25 +708,60 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
   | Swhile _ _ body -> stmt_writes body w
   end
 
-  function fresh_from (f:fmla) (s:stmt) : ident
+  function fresh_from (f:fmla) : ident
 
-  axiom fresh_from_fmla: forall s:stmt, f:fmla.
-     fresh_in_fmla (fresh_from f s) f
+  (* Need it for monotonicity*)
+  axiom fresh_from_fmla: forall f:fmla.
+     fresh_in_fmla (fresh_from f) f
 
-  axiom fresh_from_stmt: forall s:stmt, f:fmla.
-     fresh_in_stmt (fresh_from f s) s
-
+  (* intention:
+       abstract_effects s f = "forall w. f"
+     avec w = writes(s)
+  *)
   function abstract_effects (s:stmt) (f:fmla) : fmla
 
+  (* hypothese 1: si
+       sigma, pi |= forall w. f
+     alors
+       sigma, pi |= f
+  *)
   axiom abstract_effects_generalize :
      forall sigma:env, pi:stack, s:stmt, f:fmla.
         eval_fmla sigma pi (abstract_effects s f) ->
         eval_fmla sigma pi f
 
+  (* hypothese 2: si
+       sigma, pi |= (forall w, p) /\ (forall w, q)
+     alors
+       sigma, pi |= forall w, (f /\ q)
+  *)
+  axiom abstract_effects_distrib_conj :
+     forall s:stmt, p q:fmla, sigma:env, pi:stack.
+       eval_fmla sigma pi (abstract_effects s p) /\
+       eval_fmla sigma pi (abstract_effects s q) ->
+         eval_fmla sigma pi (abstract_effects s (Fand p q))
+
+  (* hypothese 3: si
+       |= p -> q
+     alors
+       |= (forall w, p) -> (forall w, q)
+
+     remarque : il est essentiel de parler de validité dans tous les etats:
+     on n'a pas
+       sigma,pi |= p -> q
+     implique
+       sigma,pi |= (forall w, p) -> (forall w, q)
+
+     contre-exemple: sigma(x) = 42 alors true -> x=42
+        mais on n'a
+             (forall x, true) -> (forall  x, x=42)
+  *)
   axiom abstract_effects_monotonic :
-     forall s:stmt, f:fmla.
-        valid_fmla f ->
-        valid_fmla (abstract_effects s f)
+     forall s:stmt, p q:fmla.
+        valid_fmla (Fimplies p q) ->
+        forall sigma:env, pi:stack.
+           eval_fmla sigma pi (abstract_effects s p) ->
+           eval_fmla sigma pi (abstract_effects s q)
 
   function wp (s:stmt) (q:fmla) : fmla =
     match s with
@@ -686,7 +771,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
         Fand f (Fimplies f q)
     | Sseq s1 s2 -> wp s1 (wp s2 q)
     | Sassign x t ->
-        let id = fresh_from q s in
+        let id = fresh_from q in
         Flet id t (msubst q x id)
     | Sif t s1 s2 ->
         Fand (Fimplies (Fterm t) (wp s1 q))
@@ -700,27 +785,38 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
     end
 
+  (* hypothese 4: invariance de la formule "forall w. f"
+     par les effets de s si w = writes s
+  *)
   axiom abstract_effects_writes :
      forall sigma:env, pi:stack, s:stmt, q:fmla.
         eval_fmla sigma pi (abstract_effects s q) ->
         eval_fmla sigma pi (wp s (abstract_effects s q))
 
 
-  (* lemma wp_subst: *)
-  (*   forall e:expr, q:fmla, id :mident, id':ident. *)
-  (*   fresh_in_stmt id e -> *)
-  (*     subst (wp e q) id id' = wp e (subst q id id') *)
-
+(* ce lemme sert pour prouver distrib_conj, dans le cas de la sequence (et c'est tout !) *)
   lemma monotonicity:
     forall s:stmt, p q:fmla.
       valid_fmla (Fimplies p q)
      ->	valid_fmla (Fimplies (wp s p) (wp s q) )
 
+  (* remarque l'ordre des quantifications est essentiel, on n'a pas
+       sigma,pi |= p -> q
+     implique
+       sigma,pi |= (wp s p) -> (wp s q)
+
+     meme contre-exemple: sigma(x) = 42 alors true -> x=42
+        mais 
+          wp (x := 7) true = true
+          wp (x := 7) x=42 = 7=42
+  *)
+
+(* ce lemme sert pour wp_reduction dans le cas du while (et c'est tout !) *)
   lemma distrib_conj:
     forall s:stmt, sigma:env, pi:stack, p q:fmla.
      (eval_fmla sigma pi (wp s p)) /\
      (eval_fmla sigma pi (wp s q)) ->
-     eval_fmla sigma pi (wp s (Fand p q)) 
+     eval_fmla sigma pi (wp s (Fand p q))
 
   lemma wp_reduction:
     forall sigma sigma':env, pi pi':stack, s s':stmt.
@@ -731,15 +827,39 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
 
   lemma progress:
     forall s:stmt, sigma:env, pi:stack,
-      sigmat: type_env, pit: type_stack, q:fmla.
+           sigmat: type_env, pit: type_stack, q:fmla.
+      compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->
-(* useful ?
-      type_fmla sigmat pit q ->
-*)
-      eval_fmla sigma pi (wp s q) -> 
+      eval_fmla sigma pi (wp s q) ->
       s <> Sskip ->
       exists sigma':env, pi':stack, s':stmt.
       one_step sigma pi s sigma' pi' s'
+
+
+
+  predicate reducible (sigma:env) (pi:stack) (s:stmt) =
+    exists sigma':env, pi':stack, s':stmt.
+      one_step sigma pi s sigma' pi' s'
+
+  lemma progress2:
+    forall s:stmt, sigma:env, pi:stack,
+           sigmat: type_env, pit: type_stack, q:fmla.
+      compatible_env sigma sigmat pi pit ->
+      type_stmt sigmat pit s ->
+      eval_fmla sigma pi (wp s q) ->
+      s <> Sskip -> reducible sigma pi s
+
+  (** {3 main soundness result} *)
+
+  lemma wp_soundness:
+    forall n :int, sigma sigma':env, pi pi':stack, s s':stmt,
+           sigmat: type_env, pit: type_stack, q:fmla.
+      compatible_env sigma sigmat pi pit ->
+      type_stmt sigmat pit s ->
+      many_steps sigma pi s sigma' pi' s' n /\
+      not (reducible sigma' pi' s') /\
+      eval_fmla sigma pi (wp s q) ->
+      s' = Sskip /\ eval_fmla sigma' pi' q
 
 end
 
@@ -749,4 +869,3 @@ Local Variables:
 compile-command: "why3ide blocking_semantics3.mlw"
 End:
 *)
-

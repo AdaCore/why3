@@ -89,15 +89,20 @@ end
   let () = Exn_printer.register
     (fun fmt exn -> match exn with
       | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
-      | _ -> raise exn
-    )
+      | _ -> raise exn)
 
   let mk_expr d = { expr_loc = floc (); expr_desc = d }
   let mk_expr_i i d = { expr_loc = floc_i i; expr_desc = d }
 
-  let cast_body c ((p,e,q) as t) = match c with
+  let cast_body c ((e,sp) as t) = match c with
     | None -> t
-    | Some pt -> p, { e with expr_desc = Ecast (e, pt) }, q
+    | Some pt -> { e with expr_desc = Ecast (e, pt) }, sp
+
+  let add_variant vl ((e,sp) as t) = match vl with
+    | [] -> t
+    | _ when sp.sp_variant <> [] ->
+        Loc.errorm "variant is specified twice"
+    | vl -> e, { sp with sp_variant = vl }
 
   let rec mk_apply f = function
     | [] ->
@@ -109,10 +114,7 @@ end
         mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
 
   let mk_apply_id id =
-    let e =
-      { expr_desc = Eident (Qident id); expr_loc = id.id_loc }
-    in
-    mk_apply e
+    mk_apply { expr_desc = Eident (Qident id); expr_loc = id.id_loc }
 
   let mk_mixfix2 op e1 e2 =
     let id = mk_id (mixfix op) (floc_i 2) in
@@ -145,13 +147,13 @@ end
     let { pe_reads = r2; pe_writes = w2; pe_raises = x2 } = e2 in
     { pe_reads = r1 @ r2; pe_writes = w1 @ w2; pe_raises = x1 @ x2 }
 
-  let effect_exprs ghost l = List.map (fun x -> (ghost, x)) l
-
-  let type_c p ty ef q =
-    { pc_result_type = ty;
-      pc_effect      = ef;
-      pc_pre         = p;
-      pc_post        = q; }
+  let spec p (q,xq) ef vl = {
+    sp_pre     = p;
+    sp_post    = q;
+    sp_xpost   = xq;
+    sp_effect  = ef;
+    sp_variant = vl;
+  }
 
 (* dead code
   let add_init_mark e =
@@ -417,7 +419,7 @@ type_args:
 
 typedefn:
 | /* epsilon */
-    { false, Public, TDabstract, None }
+    { false, Public, TDabstract, [] }
 | equal_model visibility typecases invariant
     { $1, $2, TDalgebraic $3, $4 }
 | equal_model visibility BAR typecases invariant
@@ -427,7 +429,7 @@ typedefn:
 /* abstract/private is not allowed for alias type */
 | equal_model visibility primitive_type
     { if $2 <> Public then Loc.error ~loc:(floc_i 2) Parsing.Parse_error;
-      $1, Public, TDalias $3, None }
+      $1, Public, TDalias $3, [] }
 ;
 
 visibility:
@@ -895,6 +897,7 @@ lident_op:
 | OPPREF                { prefix $1 }
 | LEFTSQ RIGHTSQ        { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
+| LEFTSQ RIGHTSQ LARROW { mixfix "[]<-" }
 ;
 
 prefix_op:
@@ -1007,29 +1010,22 @@ use_module:
 ;
 
 pdecl:
-| LET ghost lident_rich_pgm labels list1_type_v_binder opt_cast EQUAL triple
+| LET ghost lident_rich labels list1_type_v_binder opt_cast EQUAL triple
     { Dlet (add_lab $3 $4, $2, mk_expr_i 8 (Efun ($5, cast_body $6 $8))) }
-| LET ghost lident_rich_pgm labels EQUAL FUN list1_type_v_binder ARROW triple
+| LET ghost lident_rich labels EQUAL FUN list1_type_v_binder ARROW triple
     { Dlet (add_lab $3 $4, $2, mk_expr_i 9 (Efun ($7, $9))) }
 | LET ghost lident_rich_pgm labels EQUAL qualid
     { Dlet (add_lab $3 $4, $2, mk_expr_i 5 (Eident $6)) }
 | LET REC list1_recfun_sep_and
     { Dletrec $3 }
-| VAL ghost lident_rich_pgm labels COLON type_v
+| VAL ghost lident_rich labels COLON type_v
     { Dparam (add_lab $3 $4, $2, $6) }
-| VAL ghost lident_rich_pgm labels list1_type_v_param COLON type_c
+| VAL ghost lident_rich labels list1_type_v_param COLON type_c
     { Dparam (add_lab $3 $4, $2, Tarrow ($5, $7)) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, None) }
 | EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, Some $4) }
-;
-
-lident_rich_pgm:
-| lident_rich
-    { $1 }
-| LEFTPAR LEFTSQ RIGHTSQ LARROW RIGHTPAR
-    { mk_id (mixfix "[]<-") (floc ()) }
 ;
 
 opt_semicolon:
@@ -1043,9 +1039,9 @@ list1_recfun_sep_and:
 ;
 
 recfun:
-| ghost lident_rich_pgm labels list1_type_v_binder
+| ghost lident_rich labels list1_type_v_binder
      opt_cast opt_variant EQUAL triple
-   { floc (), add_lab $2 $3, $1, $4, $6, cast_body $5 $8 }
+   { floc (), add_lab $2 $3, $1, $4, add_variant $6 (cast_body $5 $8) }
 ;
 
 expr:
@@ -1144,16 +1140,17 @@ expr:
 | GHOST expr
    { mk_expr (Eghost $2) }
 | ABSTRACT expr post
-   { mk_expr (Eabstract($2, $3)) }
+   { mk_expr (Eabstract($2, spec [] $3 empty_effect [])) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
 ;
 
 triple:
 | pre expr post
-  { $1, (* add_init_label *) $2, $3 }
+  { (* add_init_label *) $2, spec $1 $3 empty_effect [] }
 | expr %prec prec_triple
-  { mk_pp PPtrue, (* add_init_label *) $1, (mk_pp PPtrue, []) }
+  { (* add_init_label *) $1,
+    spec [] ([], []) empty_effect [] }
 ;
 
 expr_arg:
@@ -1247,8 +1244,8 @@ loop_annotation:
 ;
 
 invariant:
-| INVARIANT annotation { Some $2 }
-| /* epsilon */        { None    }
+| INVARIANT annotation { [$2] }
+| /* epsilon */        { [] }
 ;
 
 list1_type_v_binder:
@@ -1308,17 +1305,17 @@ simple_type_v:
 
 type_c:
 | type_v
-    { type_c (mk_pp PPtrue) $1 empty_effect (mk_pp PPtrue, []) }
+    { $1, spec [] ([], []) empty_effect [] }
 | pre type_v effects post
-    { type_c $1 $2 $3 $4 }
+    { $2, spec $1 $4 $3 [] }
 ;
 
 /* for ANY */
 simple_type_c:
 | simple_type_v
-    { type_c (mk_pp PPtrue) $1 empty_effect (mk_pp PPtrue, []) }
+    { $1, spec [] ([], []) empty_effect [] }
 | pre type_v effects post
-    { type_c $1 $2 $3 $4 }
+    { $2, spec $1 $4 $3 [] }
 ;
 
 annotation:
@@ -1327,11 +1324,16 @@ annotation:
 ;
 
 pre:
-| annotation { $1 }
+| annotation { [$1] }
 ;
 
 post:
-| annotation list0_post_exn { $1, $2 }
+| normal_post list0_post_exn { [floc_i 1, [$1]], [floc_i 2, $2] }
+;
+
+normal_post:
+| annotation
+    { mk_pat (PPpvar (mk_id "result" (floc ()))), $1 }
 ;
 
 list0_post_exn:
@@ -1345,7 +1347,8 @@ list1_post_exn:
 ;
 
 post_exn:
-| BAR uqualid ARROW annotation { $2, $4 }
+| BAR uqualid ARROW annotation
+    { $2, mk_pat (PPpvar (mk_id "result" (floc_i 2))), $4 }
 ;
 
 effects:
@@ -1354,18 +1357,9 @@ effects:
 ;
 
 effect:
-| READS list1_lexpr_arg
-    { { pe_reads = effect_exprs false $2; pe_writes = []; pe_raises = [] } }
-| WRITES list1_lexpr_arg
-    { { pe_writes = effect_exprs false $2; pe_reads = []; pe_raises = [] } }
-| RAISES list1_uqualid
-    { { pe_raises = effect_exprs false $2; pe_writes = []; pe_reads = [] } }
-| GHOST READS list1_lexpr_arg
-    { { pe_reads = effect_exprs true $3; pe_writes = []; pe_raises = [] } }
-| GHOST WRITES list1_lexpr_arg
-    { { pe_writes = effect_exprs true $3; pe_reads = []; pe_raises = [] } }
-| GHOST RAISES list1_uqualid
-    { { pe_raises = effect_exprs true $3; pe_writes = []; pe_reads = [] } }
+| READS list1_lexpr_arg { { pe_reads = $2; pe_writes = []; pe_raises = [] } }
+| WRITES list1_lexpr_arg { { pe_writes = $2; pe_reads = []; pe_raises = [] } }
+| RAISES list1_uqualid { { pe_raises = $2; pe_writes = []; pe_reads = [] } }
 ;
 
 opt_variant:

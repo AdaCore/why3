@@ -432,11 +432,11 @@ let clear model = model#clear ()
 
 let image_of_result ~obsolete result =
   match result with
-    | Session.Undone Session.Interrupted -> !image_undone
-    | Session.Undone Session.Unedited
-    | Session.Undone Session.JustEdited -> !image_unknown
-    | Session.Undone Session.Scheduled -> !image_scheduled
-    | Session.Undone Session.Running -> !image_running
+    | Session.Interrupted -> !image_undone
+    | Session.Unedited -> !image_editor
+    | Session.JustEdited -> !image_unknown
+    | Session.Scheduled -> !image_scheduled
+    | Session.Running -> !image_running
     | Session.InternalFailure _ -> !image_failure
     | Session.Done r -> match r.Call_provers.pr_answer with
         | Call_provers.Valid ->
@@ -486,11 +486,11 @@ let set_proof_state a =
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
-    | S.Undone S.Unedited -> "(not yet edited)"
-    | S.Undone S.JustEdited -> "(edited)"
+    | S.Unedited -> "(not yet edited)"
+    | S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
-    | S.Undone S.Interrupted -> "(interrupted)"
-    | S.Undone (S.Scheduled | S.Running) ->
+    | S.Interrupted -> "(interrupted)"
+    | S.Scheduled | S.Running ->
         Format.sprintf "[limit=%d sec., %d M]"
           a.S.proof_timelimit a.S.proof_memlimit
   in
@@ -549,52 +549,55 @@ let env_session () =
     | None -> assert false
     | Some e -> e
 
-let display_task t =
-  let task_text = Pp.string_of Pretty.print_task t in
-  task_view#source_buffer#set_text task_text;
-  task_view#scroll_to_mark `INSERT
+let task_text t = Pp.string_of Pretty.print_task t 
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
 let update_task_view a =
+  let text = 
   match a with
     | S.Goal g ->
       if (Gconfig.config ()).intro_premises then
         let trans =
           Trans.lookup_transform intro_transformation (env_session()).S.env
         in
-        display_task (try Trans.apply trans (S.goal_task g) with
+        task_text (try Trans.apply trans (S.goal_task g) with
           e -> eprintf "@.%a@." Exn_printer.exn_printer e; raise e)
       else
-        display_task (S.goal_task g)
-    | S.Theory _th ->
-        task_view#source_buffer#set_text ""
-    | S.File _file ->
-        task_view#source_buffer#set_text ""
+        task_text (S.goal_task g)
+    | S.Theory th -> "Theory " ^ th.S.theory_name.Ident.id_string
+    | S.File file -> "File " ^ file.S.file_name
     | S.Proof_attempt a ->
-        let o =
+        begin
           match a.S.proof_state with
-            | S.Undone S.Interrupted ->
-              "proof not yet scheduled for running"
-            | S.Undone S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
-            | S.Undone S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Interrupted -> "proof not yet scheduled for running"
+            | S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
+            | S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
             | S.Done ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
-            | S.Done r -> r.Call_provers.pr_output
-            | S.Undone S.Scheduled-> "proof scheduled but not running yet"
-            | S.Undone S.Running -> "prover currently running"
+            | S.Done r -> 
+              let out = r.Call_provers.pr_output in
+              begin
+                let env = env_session () in
+                match S.get_edited_as_abs env.S.session a with
+                | None -> out
+                | Some f -> (source_text f) ^
+                  "\n----------------------------------------------\n\n"
+                  ^ out
+              end
+            | S.Scheduled-> "proof scheduled but not running yet"
+            | S.Running -> "prover currently running"
             | S.InternalFailure e ->
               let b = Buffer.create 37 in
               bprintf b "%a" Exn_printer.exn_printer e;
               Buffer.contents b
-        in
-        task_view#source_buffer#set_text o
-    | S.Transf _tr ->
-        task_view#source_buffer#set_text ""
+        end
+    | S.Transf tr ->
+        "transformation \"" ^ tr.S.transf_name ^ "\""
    | S.Metas m ->
      let print_meta_args =
        Pp.hov 2 (Pp.print_list Pp.space Pretty.print_meta_arg) in
@@ -603,8 +606,10 @@ let update_task_view a =
          (Pp.indent 2
             (Pp.print_iter1 S.Smeta_args.iter Pp.newline print_meta_args))
      in
-     task_view#source_buffer#set_text
-       (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+     (Pp.string_of (Pp.hov 2 print) m.S.metas_added)
+ in
+ task_view#source_buffer#set_text text;
+ task_view#scroll_to_mark `INSERT
 
 
 
@@ -651,13 +656,14 @@ module MA = struct
 
 let notify any =
   session_needs_saving := true;
-  let row,exp =
+  let row,expanded =
     match any with
       | S.Goal g -> g.S.goal_key, g.S.goal_expanded
       | S.Theory t -> t.S.theory_key, t.S.theory_expanded
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
-      | S.Transf tr -> tr.S.transf_key,tr.S.transf_expanded
+      | S.Transf tr ->
+        tr.S.transf_key,tr.S.transf_expanded
       | S.Metas m -> m.S.metas_key,m.S.metas_expanded
   in
   (* name is set by notify since upgrade policy may update the prover name *)
@@ -679,7 +685,7 @@ let notify any =
         update_task_view any
       | _ -> ()
   end;
-  if exp then goals_view#expand_to_path row#path else
+  if expanded then goals_view#expand_to_path row#path else
     goals_view#collapse_row row#path;
   match any with
     | S.Goal g ->
@@ -798,24 +804,33 @@ let info_window ?(callback=(fun () -> ())) mt s =
 let file_info = GMisc.label ~text:""
   ~packing:(right_hb#pack ~fill:true) ()
 
-let warning_window ?loc msg =
-  begin
-    match loc with
-    | None ->
-      Format.fprintf Format.str_formatter "%s" msg
-    | Some l ->
-      (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-      Format.fprintf Format.str_formatter "%a: %s"
-        Loc.gen_report_position l msg
-  end;
-  let msg =
-    Format.flush_str_formatter ()
-  in
-  file_info#set_text msg;
-  info_window `WARNING msg
+let warnings = Queue.create ()
 
-let () = Warning.set_hook warning_window
+let record_warning ?loc msg = Queue.push (loc,msg) warnings
 
+let () = Warning.set_hook record_warning
+
+
+let display_warnings () =
+  if Queue.is_empty warnings then () else
+    begin
+      Queue.iter 
+        (fun (loc,msg) ->
+          match loc with
+            | None ->
+              Format.fprintf Format.str_formatter "%s@\n" msg
+            | Some l ->
+            (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+              Format.fprintf Format.str_formatter "%a: %s@\n"
+                Loc.gen_report_position l msg)
+        warnings;
+      Queue.clear warnings;
+      let msg =
+        Format.flush_str_formatter ()
+      in
+  (* file_info#set_text msg; *)
+      info_window `WARNING msg
+    end  
 
 (* check if provers are present *)
 let () =
@@ -842,8 +857,7 @@ let sched =
         gconfig.Gconfig.config
     in
     Debug.dprintf debug "@]@\n[Info] Opening session: update done@.  @[<hov 2>";
-    let sched = M.init (Whyconf.running_provers_max
-                          (Whyconf.get_main gconfig.config))
+    let sched = M.init (gconfig.session_nb_processes)
     in
     Debug.dprintf debug "@]@\n[Info] Opening session: done@.";
     session_needs_saving := false;
@@ -868,7 +882,8 @@ let () =
         else
           try
             Debug.dprintf debug "[Info] adding file %s in database@." fn;
-            ignore (M.add_file (env_session()) ?format:!opt_parser fn)
+            ignore (M.add_file (env_session()) ?format:!opt_parser fn);
+            display_warnings ()
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -880,9 +895,8 @@ let () =
 (*****************************************************)
 
 let prover_on_selected_goals pr =
-  let main = Whyconf.get_main gconfig.config in
-  let timelimit = Whyconf.timelimit main in
-  let memlimit = Whyconf.memlimit main in
+  let timelimit = gconfig.session_time_limit in
+  let memlimit = gconfig.session_mem_limit in
   List.iter
     (fun row ->
       try
@@ -956,10 +970,10 @@ let bisect_proof_attempt pa =
   let set_timelimit res =
     timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
   let rec callback lp pa c = function
-    | S.Undone (S.Running | S.Scheduled) -> ()
-    | S.Undone S.Interrupted ->
+    | S.Running | S.Scheduled -> ()
+    | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
-    | S.Undone (S.Unedited | S.JustEdited) -> assert false
+    | S.Unedited | S.JustEdited -> assert false
     | S.InternalFailure exn ->
       (** Perhaps the test can be considered false in this case? *)
       dprintf debug "Bisecting interrupted by an error %a.@."
@@ -971,20 +985,15 @@ let bisect_proof_attempt pa =
       if b then set_timelimit res;
       let r = c b in
       match r with
-      | Task.BSdone t2 ->
+      | Eliminate_definition.BSdone [] ->
+        dprintf debug "Bisecting doesn't reduced the task.@."
+      | Eliminate_definition.BSdone reml ->
         dprintf debug "Bisecting done.@.";
-        let t1 = S.goal_task pa.S.proof_parent in
-        if Task.task_equal t2 t1 then
-          dprintf debug "But doesn't reduced the task.@."
-        else
         begin try
         let keygen = MA.keygen in
         let notify = MA.notify in
-        let diff =
-          Trans.apply (Trans.apply Eliminate_definition.compute_diff t1) t2 in
-        (* we know that this metas are registered *)
-        let diff = List.map (fun (m,l) -> m.Theory.meta_name,l) diff in
-        let metas = S.add_registered_metas ~keygen eS diff pa.S.proof_parent in
+        let reml = List.map (fun (m,l) -> m.Theory.meta_name,l) reml in
+        let metas = S.add_registered_metas ~keygen eS reml pa.S.proof_parent in
         let trans = S.add_registered_transformation ~keygen
           eS "eliminate_builtin" metas.S.metas_goal in
         let goal = List.hd trans.S.transf_goals in (* only one *)
@@ -995,11 +1004,13 @@ let bisect_proof_attempt pa =
         with e ->
           dprintf debug "Bisecting error:@\n%a@."
             Exn_printer.exn_printer e end
-      | Task.BSstep (t,c) ->
+      | Eliminate_definition.BSstep (t,c) ->
+        assert (not lp.S.prover_config.C.in_place); (* TODO do this case *)
         M.schedule_proof_attempt
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
           ?old:(S.get_edited_as_abs eS.S.session pa)
+          (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
           ~command:(C.get_complete_command lp.S.prover_config)
           ~driver:lp.S.prover_driver
@@ -1009,10 +1020,10 @@ let bisect_proof_attempt pa =
         update the proof attempt *)
   let first_callback pa = function
     (** this pa can be different than the first pa *)
-    | S.Undone (S.Running | S.Scheduled) -> ()
-    | S.Undone S.Interrupted ->
+    | S.Running | S.Scheduled -> ()
+    | S.Interrupted ->
       dprintf debug "Bisecting interrupted.@."
-    | S.Undone (S.Unedited | S.JustEdited) -> assert false
+    | S.Unedited | S.JustEdited -> assert false
     | S.InternalFailure exn ->
         dprintf debug "proof of the initial task interrupted by an error %a.@."
           Exn_printer.exn_printer exn
@@ -1021,12 +1032,12 @@ let bisect_proof_attempt pa =
       then dprintf debug "Initial task can't be proved.@."
       else
         let t = S.goal_task pa.S.proof_parent in
-        let r = Task.bisect_step t in
+        let r = Eliminate_definition.bisect_step t in
         match r with
-        | Task.BSdone res ->
-          assert (Task.task_equal res t);
+        | Eliminate_definition.BSdone res ->
+          assert (res = []);
           dprintf debug "Task can't be reduced.@."
-        | Task.BSstep (t,c) ->
+        | Eliminate_definition.BSstep (t,c) ->
           set_timelimit res;
           match S.load_prover eS pa.S.proof_prover with
           | None -> (* No prover so we do nothing *)
@@ -1127,7 +1138,8 @@ let select_file () =
               let f = Sysutil.relativize_filename project_dir f in
               Debug.dprintf debug "Adding file '%s'@." f;
               try
-                ignore (M.add_file (env_session()) f)
+                ignore (M.add_file (env_session()) f);
+                display_warnings ()
               with e ->
                 fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -1177,7 +1189,7 @@ let (_ : GMenu.image_menu_item) =
             pi.editor)
         (Whyconf.get_provers gconfig.config);
 *)
-      let nb = Whyconf.running_provers_max (Whyconf.get_main gconfig.config) in
+      let nb = gconfig.session_nb_processes in
       M.set_maximum_running_proofs nb sched)
     ()
 

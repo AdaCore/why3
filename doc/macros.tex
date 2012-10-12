@@ -1,10 +1,12 @@
 
-% \newcommand{\todo}[1]{{\Huge\bfseries TODO: #1}}
+\newcommand{\todo}[1]{{\Huge\bfseries TODO: #1}}
 
 \newcommand{\why}{\textsf{Why3}\xspace}
 \newcommand{\whyml}{\textsf{WhyML}\xspace}
 \newcommand{\eg}{\emph{e.g.}\xspace}
 \newcommand{\ie}{\emph{i.e.}\xspace}
+
+\newcommand{\emptyitem}{\begin{latexonly}~\end{latexonly}}
 
 % BNF grammar
 \newcommand{\keyword}[1]{\texttt{#1}}
@@ -13,12 +15,12 @@
 \newif\ifspace
 \newif\ifnewentry
 \newcommand{\addspace}{\ifspace ~ \spacefalse \fi}
-\newcommand{\term}[2]{\addspace\hbox{\lstinline|#1|%
+\newcommand{\term}[2]{\addspace\mbox{\lstinline|#1|%
 \ifthenelse{\equal{#2}{}}{}{\indexttbase{#2}{#1}}}\spacetrue}
 \newcommand{\nonterm}[2]{%
   \ifthenelse{\equal{#2}{}}%
-             {\addspace\hbox{\textsl{#1}\ifnewentry\index{#1@\textsl{#1}}\fi}\spacetrue}%
-             {\addspace\hbox{\textsl{#1}\footnote{#2}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}}
+             {\addspace\mbox{\textsl{#1}\ifnewentry\index{#1@\textsl{#1}}\fi}\spacetrue}%
+             {\addspace\mbox{\textsl{#1}\footnote{#2}\ifnewentry\index{grammar entries!\textsl{#1}}\fi}\spacetrue}}
 \newcommand{\repetstar}{$^*$\spacetrue}
 \newcommand{\repetplus}{$^+$\spacetrue}
 \newcommand{\repetone}{$^?$\spacetrue}
@@ -28,7 +30,7 @@
 \newcommand{\sep}{ \\[2mm] \spacefalse\newentrytrue}
 \newcommand{\newl}{ \\ & & \spacefalse}
 \newcommand{\alt}{ \\ & $\mid$ & \spacefalse}
-\newcommand{\is}{ & $::=$ & \newentryfalse}
+\newcommand{\is}{ & $::=$ & \spacefalse\newentryfalse}
 \newenvironment{syntax}{\begin{tabular}{@{}rrll@{}}\spacefalse\newentrytrue}{\end{tabular}}
 \newcommand{\synt}[1]{$\spacefalse#1$}
 \newcommand{\emptystring}{$\epsilon$}
@@ -39,25 +41,30 @@
 \RequirePackage{listings}
 \RequirePackage{amssymb}
 
-\lstset{basicstyle={\ttfamily},framesep=2pt,frame=single}
+\lstset{
+  basicstyle={\ttfamily},
+  framesep=2pt,
+  frame=single,
+  keywordstyle={\color{blue}},
+  stringstyle=\itshape,
+  commentstyle=\itshape,
+  columns=[l]fullflexible,
+  showstringspaces=false,
+}
 
 \lstdefinelanguage{why3}
 {
-morekeywords=[1]{namespace,predicate,function,inductive,type,use,clone,%
-import,export,theory,end,in,with,%
+morekeywords={namespace,predicate,function,inductive,type,use,clone,%
+import,export,theory,module,end,in,with,%
+let,rec,for,to,do,done,match,if,then,else,while,try,invariant,variant,%
+absurd,raise,assert,exception,%
 goal,axiom,lemma,forall},%
-keywordstyle=[1]{\color{blue}},%
-otherkeywords={},%
 string=[b]",%
-showstringspaces=false,%
-stringstyle=\itshape,%
-commentstyle=\itshape,%
-columns=[l]fullflexible,%
 sensitive=true,%
 morecomment=[s]{(*}{*)},%
-escapeinside={*?}{?*},%
 keepspaces=true,
-literate=%
+}
+%literate=%
 %{'a}{$\alpha$}{1}%
 %{'b}{$\beta$}{1}%
 %{<}{$<$}{1}%
@@ -76,14 +83,9 @@ literate=%
 % %{-->}{$\longrightarrow$}{2}%
 % {->}{$\rightarrow$}{2}%
 % {<->}{$\leftrightarrow$}{2}%
-%
-%
-}
 
-% default language is Why3
-\lstset{language=why3}
-
-\lstnewenvironment{why3}{\lstset{language=why3}}{}
+\lstnewenvironment{whycode}{\lstset{language=why3}}{}
+\lstnewenvironment{ocamlcode}{\lstset{language={[Objective]Caml}}}{}
 
 %%% Local Variables:
 %%% mode: latex

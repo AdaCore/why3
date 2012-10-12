@@ -220,6 +220,10 @@ let print_list_next sep print fmt = function
   | x :: r -> print true fmt x; sep fmt ();
       print_list sep (print false) fmt r
 
+let is_letrec = function
+  | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
+  | _ -> true
+
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
 and print_lexpr pri fmt e =
@@ -277,11 +281,10 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         print_lv lv (print_lexpr 4) e1 print_expr e2;
       forget_lv lv
-  | Erec ({ rec_defn = rdl; rec_letrec = lr }, e) ->
+  | Erec (fdl, e) ->
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
-        (print_list_next newline (print_rec lr)) rdl print_expr e;
-      let forget_rd rd = forget_ps rd.fun_ps in
-      List.iter forget_rd rdl
+        (print_list_next newline (print_rec (is_letrec fdl))) fdl print_expr e;
+      List.iter (fun fd -> forget_ps fd.fun_ps) fdl
   | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_expr e0 print_expr e1 print_expr e2
@@ -308,9 +311,9 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "absurd"
   | Eassert (ak,f) ->
       fprintf fmt "%a { %a }" print_ak ak print_term f
-  | Eabstr (e,q,_xq) ->
-    (* TODO: print_xpost *)
-      fprintf fmt "abstract %a@ { %a }" print_expr e print_post q
+  | Eabstr (e,spec) ->
+    (* TODO: print_spec *)
+      fprintf fmt "abstract %a@ { %a }" print_expr e print_post spec.c_post
   | Eghost e ->
       fprintf fmt "ghost@ %a" print_expr e
   | Eany spec ->
@@ -327,14 +330,14 @@ and print_xbranch fmt (xs, pv, e) =
 and print_rec lr fst fmt { fun_ps = ps ; fun_lambda = lam } =
   let print_arg fmt pv = fprintf fmt "@[(%a)@]" print_pvty pv in
   fprintf fmt "@[<hov 2>%s (%a)@ %a =@\n{ %a }@\n%a%a@\n{ %a }@]"
-    (if fst then if lr > 0 then "let rec" else "let" else "with")
+    (if fst then if lr then "let rec" else "let" else "with")
     print_psty ps
     (print_list space print_arg) lam.l_args
-    print_term lam.l_pre
-    print_variant lam.l_variant
+    print_term lam.l_spec.c_pre
+    print_variant lam.l_spec.c_variant
     print_expr lam.l_expr
-    print_post lam.l_post
-    (* TODO: print_xpost *)
+    print_post lam.l_spec.c_post
+    (* TODO: print_spec *)
 
 (*
 and print_tl fmt tl =
@@ -407,8 +410,8 @@ let print_let_decl fmt { let_sym = lv ; let_expr = e } =
   (* FIXME: don't forget global regions *)
   forget_tvs_regs ()
 
-let print_rec_decl lr fst fmt rd =
-  print_rec lr fst fmt rd;
+let print_rec_decl lr fst fmt fd =
+  print_rec lr fst fmt fd;
   forget_tvs_regs ()
 
 let print_exn_decl fmt xs =
@@ -422,8 +425,8 @@ let print_pdecl fmt d = match d.pd_node with
   | PDdata tl -> print_list_next newline print_data_decl fmt tl
   | PDval  vd -> print_val_decl fmt vd
   | PDlet  ld -> print_let_decl fmt ld
-  | PDrec { rec_defn = rdl; rec_letrec = lr } ->
-      print_list_next newline (print_rec_decl lr) fmt rdl
+  | PDrec fdl ->
+      print_list_next newline (print_rec_decl (is_letrec fdl)) fmt fdl
   | PDexn  xs -> print_exn_decl fmt xs
 
 (* Print exceptions *)
@@ -463,10 +466,11 @@ let () = Exn_printer.register
       fprintf fmt "'%a' is a constructor/field of an abstract type \
       and cannot be used in a program" print_ls ls;
   | Mlw_expr.GhostWrite (_e, _reg) ->
-      fprintf fmt "This expression stores a ghost value in a non-ghost location"
+      fprintf fmt
+        "This expression performs a ghost write in a non-ghost location"
   | Mlw_expr.GhostRaise (_e, xs) ->
-      fprintf fmt "This expression raises a ghost exception %a \
-        catched by a non-ghost code" print_xs xs
+      fprintf fmt "This expression raises an escaping ghost exception %a"
+        print_xs xs
   | Mlw_expr.StaleRegion (_e, id) ->
       fprintf fmt "This expression prohibits further \
         usage of variable %s" id.id_string
@@ -476,5 +480,7 @@ let () = Exn_printer.register
       fprintf fmt "This expression is not a function and cannot be applied"
   | Mlw_expr.Immutable _e ->
       fprintf fmt "Mutable expression expected"
+  | Mlw_decl.NonupdatableType ity ->
+      fprintf fmt "Cannot update values of type @[%a@]" print_ity ity
   | _ -> raise exn
   end

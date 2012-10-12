@@ -882,7 +882,7 @@ let ty_of_vty = function
 
 let spec_check spec vty = spec_check spec (ty_of_vty vty)
 
-let vty_arrow_unsafe argl ~spec ~ghost vty = {
+let vty_arrow_unsafe argl spec ghost vty = {
   vta_args   = argl;
   vta_result = vty;
   vta_spec   = spec;
@@ -906,7 +906,10 @@ let vty_arrow argl ?spec ?(ghost=false) vty =
   let spec = match spec with
     | Some spec -> spec_check spec vty; spec
     | None -> spec_empty (ty_of_vty vty) in
-  vty_arrow_unsafe argl ~spec ~ghost vty
+  (* we admit non-empty variant list even for null letrec,
+     so that we can store there external variables from
+     user-written effects to save them from spec_filter *)
+  vty_arrow_unsafe argl spec ghost vty
 
 (* this only compares the types of arguments and results, and ignores
    the spec. In other words, only the type variables and regions
@@ -944,7 +947,7 @@ let vta_full_inst sbs vta =
     let vty = match vta.vta_result with
       | VTarrow vta -> VTarrow (vta_inst vsm vta)
       | VTvalue vtv -> VTvalue (vtv_inst vtv) in
-    vty_arrow_unsafe args ~ghost:vta.vta_ghost ~spec vty
+    vty_arrow_unsafe args spec vta.vta_ghost vty
   in
   vta_inst Mvs.empty vta
 
@@ -975,7 +978,7 @@ let rec vta_filter varm vars vta =
         let eff = reg_fold on_reg v.vtv_ity.ity_vars spec.c_effect in
         { spec with c_effect = eff }
     | VTarrow _ -> spec in
-  vty_arrow_unsafe vta.vta_args ~ghost:vta.vta_ghost ~spec vty
+  vty_arrow_unsafe vta.vta_args spec vta.vta_ghost vty
 
 let vta_filter varm vta =
   vta_filter varm (vars_merge varm vars_empty) vta
@@ -997,12 +1000,13 @@ let vta_app vta pv =
     | VTarrow a when not (List.exists (pv_equal arg) a.vta_args) ->
         let result = vty_subst a.vta_result in
         let spec = spec_subst sbs a.vta_spec in
-        VTarrow (vty_arrow_unsafe a.vta_args ~ghost:a.vta_ghost ~spec result)
+        VTarrow (vty_arrow_unsafe a.vta_args spec a.vta_ghost result)
     | vty -> vty in
   let result = vty_subst vta.vta_result in
   let spec = spec_subst sbs vta.vta_spec in
   if not vtv.vtv_ghost && arg.pv_vtv.vtv_ghost then
     Loc.errorm "non-ghost value passed as a ghost argument";
-  let ghost = vta.vta_ghost || (vtv.vtv_ghost && not arg.pv_vtv.vtv_ghost) in
+  let ghost =
+    vta.vta_ghost || (vtv.vtv_ghost && not arg.pv_vtv.vtv_ghost) in
   if rest = [] then spec, (if ghost then vty_ghostify result else result)
-  else spec_empty ty_unit, VTarrow (vty_arrow_unsafe rest ~ghost ~spec result)
+  else spec_empty ty_unit, VTarrow (vty_arrow_unsafe rest spec ghost result)

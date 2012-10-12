@@ -19,7 +19,7 @@ the source distribution as \url{examples/use_api.ml}.
 The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
 a piece of OCaml code for building the formula $true \lor false$.
-\begin{verbatim}
+\begin{ocamlcode}
 (* opening the Why3 library *)
 open Why3
 
@@ -27,10 +27,10 @@ open Why3
 let fmla_true : Term.term = Term.t_true
 let fmla_false : Term.term = Term.t_false
 let fmla1 : Term.term = Term.t_or fmla_true fmla_false
-\end{verbatim}
+\end{ocamlcode}
 The library uses the common type \texttt{term} both for terms
-(i.e.~expressions that produce a value of some particular type)
-and formulas (i.e.~boolean-valued expressions).
+(\ie expressions that produce a value of some particular type)
+and formulas (\ie boolean-valued expressions).
 % To distinguish terms from formulas, one can look at the
 % \texttt{t_ty} field of the \texttt{term} record: in formulas,
 % this field has the value \texttt{None}, and in terms,
@@ -38,11 +38,11 @@ and formulas (i.e.~boolean-valued expressions).
 
 Such a formula can be printed using the module \texttt{Pretty}
 providing pretty-printers.
-\begin{verbatim}
+\begin{ocamlcode}
 (* printing it *)
 open Format
 let () = printf "@[formula 1 is:@ %a@]@." Pretty.print_term fmla1
-\end{verbatim}
+\end{ocamlcode}
 
 Assuming the lines above are written in a file \texttt{f.ml}, it can
 be compiled using
@@ -58,23 +58,23 @@ formula 1 is: true \/ false
 Let's now build a formula with propositional variables: $A \land B
 \rightarrow A$. Propositional variables must be declared first before
 using them in formulas. This is done as follows.
-\begin{verbatim}
+\begin{ocamlcode}
 let prop_var_A : Term.lsymbol =
   Term.create_psymbol (Ident.id_fresh "A") []
 let prop_var_B : Term.lsymbol =
   Term.create_psymbol (Ident.id_fresh "B") []
-\end{verbatim}
+\end{ocamlcode}
 The type \texttt{lsymbol} is the type of function and predicate symbols (which
 we call logic symbols for brevity). Then the atoms $A$ and $B$ must be built
 by the general function for applying a predicate symbol to a list of terms.
 Here we just need the empty list of arguments.
-\begin{verbatim}
+\begin{ocamlcode}
 let atom_A : Term.term = Term.ps_app prop_var_A []
 let atom_B : Term.term = Term.ps_app prop_var_B []
 let fmla2 : Term.term =
   Term.t_implies (Term.t_and atom_A atom_B) atom_A
 let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
-\end{verbatim}
+\end{ocamlcode}
 
 As expected, the output is as follows.
 \begin{verbatim}
@@ -93,13 +93,13 @@ tasks from our formulas. Task can be build incrementally from an empty
 task by adding declaration to it, using the functions
 \texttt{add\_*\_decl} of module \texttt{Task}. For the formula $true \lor
 false$ above, this is done as follows.
-\begin{verbatim}
+\begin{ocamlcode}
 let task1 : Task.task = None (* empty task *)
 let goal_id1 : Decl.prsymbol =
   Decl.create_prsymbol (Ident.id_fresh "goal1")
 let task1 : Task.task =
   Task.add_prop_decl task1 Decl.Pgoal goal_id1 fmla1
-\end{verbatim}
+\end{ocamlcode}
 To make the formula a goal, we must give a name to it, here "goal1". A
 goal name has type \texttt{prsymbol}, for identifiers denoting
 propositions in a theory or a task. Notice again that the concrete
@@ -112,15 +112,15 @@ and can only be used in theories).
 
 
 Once a task is built, it can be printed.
-\begin{verbatim}
+\begin{ocamlcode}
 (* printing the task *)
 let () = printf "@[task 1 is:@\n%a@]@." Pretty.print_task task1
-\end{verbatim}
+\end{ocamlcode}
 
 The task for our second formula is a bit more complex to build, because
-the variables A and B must be added as abstract (i.e.~not defined)
+the variables A and B must be added as abstract (\ie not defined)
 propositional symbols in the task.
-\begin{verbatim}
+\begin{ocamlcode}
 (* task for formula 2 *)
 let task2 = None
 let task2 = Task.add_param_decl task2 prop_var_A
@@ -128,7 +128,7 @@ let task2 = Task.add_param_decl task2 prop_var_B
 let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
 let () = printf "@[task 2 is:@\n%a@]@." Pretty.print_task task2
-\end{verbatim}
+\end{ocamlcode}
 
 Execution of our OCaml program now outputs:
 \begin{verbatim}
@@ -154,7 +154,7 @@ file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
 configuration file.
-\begin{verbatim}
+\begin{ocamlcode}
 (* reads the config file *)
 let config : Whyconf.config = Whyconf.read_config None
 (* the [main] section of the config file *)
@@ -162,24 +162,24 @@ let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
-\end{verbatim}
+\end{ocamlcode}
 The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
 provers is a record with a name, a version and an alternative description
 (if someone want to compare different command line options of the same
 provers for example). It's definition is in the module
 \texttt{Whyconf} :
-\begin{verbatim}
+\begin{ocamlcode}
 type prover =
     { prover_name : string; (* "Alt-Ergo" *)
       prover_version : string; (* "2.95" *)
       prover_altern : string; (* "special" *)
     }
-\end{verbatim}
+\end{ocamlcode}
 The map \texttt{provers} provides the set of existing provers.
 In the following, we directly
 attempt to access the prover Alt-Ergo, which is known to be identified
 with id \texttt{"alt-ergo"}.
-\begin{verbatim}
+\begin{ocamlcode}
 (* the [prover alt-ergo] section of the config file *)
 let alt_ergo : Whyconf.config_prover =
   try
@@ -187,9 +187,9 @@ let alt_ergo : Whyconf.config_prover =
   with Whyconf.ProverNotFound _ ->
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
-\end{verbatim}
+\end{ocamlcode}
 We could also get a specific version with :
-\begin{verbatim}
+\begin{ocamlcode}
 let alt_ergo : Whyconf.config_prover =
   try
     let prover = {Whyconf.prover_name = "Alt-Ergo";
@@ -199,12 +199,12 @@ let alt_ergo : Whyconf.config_prover =
   with Not_found ->
     eprintf "Prover alt-ergo not installed or not configured@.";
     exit 0
-\end{verbatim}
+\end{ocamlcode}
 
 The next step is to obtain the driver associated to this prover. A
 driver typically depends on the standard theories so these should be
 loaded first.
-\begin{verbatim}
+\begin{ocamlcode}
 (* builds the environment from the [loadpath] *)
 let env : Env.env =
   Env.create_env (Whyconf.loadpath main)
@@ -216,12 +216,12 @@ let alt_ergo_driver : Driver.driver =
     eprintf "Failed to load driver for alt-ergo: %a@."
       Exn_printer.exn_printer e;
     exit 1
-\end{verbatim}
+\end{ocamlcode}
 
 We are now ready to call the prover on the tasks. This is done by a
 function call that launches the external executable and waits for its
 termination. Here is a simple way to proceed:
-\begin{verbatim}
+\begin{ocamlcode}
 (* calls Alt-Ergo *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
@@ -230,7 +230,7 @@ let result1 : Call_provers.prover_result =
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, alt-ergo answers %a@]@."
   Call_provers.print_prover_result result1
-\end{verbatim}
+\end{ocamlcode}
 This way to call a prover is in general too naive, since it may never
 return if the prover runs without time limit. The function
 \texttt{prove\_task} has two optional parameters: \texttt{timelimit}
@@ -239,7 +239,7 @@ is the maximum allowed memory in megabytes.  The type
 \texttt{prover\_result} is a record with three fields:
 \begin{itemize}
 \item \texttt{pr\_answer}: the prover answer, explained below;
-\item \texttt{pr\_output}: the output of the prover, i.e. both
+\item \texttt{pr\_output}: the output of the prover, \ie both
   standard output and the standard error of the process
   (a redirection in \texttt{why3.conf} is required);
 \item \texttt{pr\_time} : the time taken by the prover, in seconds.
@@ -252,16 +252,16 @@ A \texttt{pr\_answer} is a sum of several kind of answers:
 \item \texttt{Unknown} $msg$: the prover can't determine if the task
   is valid; the string parameter $msg$ indicates some extra
   information.
-\item \texttt{Failure} $msg$: the prover reports a failure, i.e.~it
+\item \texttt{Failure} $msg$: the prover reports a failure, \ie it
   was unable to read correctly its input task.
 \item \texttt{HighFailure}: an error occurred while trying to call the
-  prover, or the prover answer was not understood (i.e.~none of the
+  prover, or the prover answer was not understood (\ie none of the
   given regular expressions in the driver file matches the output
   of the prover).
 \end{itemize}
 Here is thus another way of calling the Alt-Ergo prover, on our second
 task.
-\begin{verbatim}
+\begin{ocamlcode}
 let result2 : Call_provers.prover_result =
    Call_provers.wait_on_call
     (Driver.prove_task ~command:alt_ergo.Whyconf.command
@@ -273,7 +273,7 @@ let () =
     Call_provers.print_prover_answer
     result1.Call_provers.pr_answer
     result1.Call_provers.pr_time
-\end{verbatim}
+\end{ocamlcode}
 The output of our program is now as follows.
 \begin{verbatim}
 On task 1, alt-ergo answers Valid (0.01s)
@@ -290,7 +290,7 @@ Here is the way we build the formula $2+2=4$. The main difficulty is to
 access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{chap:library}).
-\begin{verbatim}
+\begin{ocamlcode}
 let two : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "2"))
 let four : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "4"))
 let int_theory : Theory.theory =
@@ -300,52 +300,52 @@ let plus_symbol : Term.lsymbol =
 let two_plus_two : Term.term =
   Term.t_app_infer plus_symbol [two;two]
 let fmla3 : Term.term = Term.t_equ two_plus_two four
-\end{verbatim}
+\end{ocamlcode}
 An important point to notice as that when building the application of
 $+$ to the arguments, it is checked that the types are correct. Indeed
 the constructor \texttt{t\_app\_infer} infers the type of the resulting
 term. One could also provide the expected type as follows.
-\begin{verbatim}
+\begin{ocamlcode}
 let two_plus_two : Term.term =
   Term.fs_app plus_symbol [two;two] Ty.ty_int
-\end{verbatim}
+\end{ocamlcode}
 
 When building a task with this formula, we need to declare that we use
 theory \texttt{Int}:
-\begin{verbatim}
+\begin{ocamlcode}
 let task3 = None
 let task3 = Task.use_export task3 int_theory
 let goal_id3 = Decl.create_prsymbol (Ident.id_fresh "goal3")
 let task3 = Task.add_prop_decl task3 Decl.Pgoal goal_id3 fmla3
-\end{verbatim}
+\end{ocamlcode}
 
 \section{Building Quantified Formulas}
 
 To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
-\begin{verbatim}
+\begin{ocamlcode}
 let zero : Term.term = Term.t_const (Term.ConstInt "0")
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
 let ge_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
-\end{verbatim}
+\end{ocamlcode}
 The next step is to introduce the variable $x$ with the type int.
-\begin{verbatim}
+\begin{ocamlcode}
 let var_x : Term.vsymbol =
   Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
-\end{verbatim}
+\end{ocamlcode}
 The formula $x*x \geq 0$ is obtained as in the previous example.
-\begin{verbatim}
+\begin{ocamlcode}
 let x : Term.term = Term.t_var var_x
 let x_times_x : Term.term = Term.t_app_infer mult_symbol [x;x]
 let fmla4_aux : Term.term = Term.ps_app ge_symbol [x_times_x;zero]
-\end{verbatim}
+\end{ocamlcode}
 To quantify on $x$, we use the appropriate smart constructor as follows.
-\begin{verbatim}
+\begin{ocamlcode}
 let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
-\end{verbatim}
+\end{ocamlcode}
 
 \section{Building Theories}
 

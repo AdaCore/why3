@@ -43,9 +43,6 @@ let debug =
 
 let config =
   try
-    let _ = Sys.getenv "WHY3NOCONFIG" in
-    Whyconf.default_config ""
-  with Not_found -> try
     Whyconf.read_config None
   with Whyconf.ConfigFailure(file, msg) ->
     error (file ^ ": " ^ msg)

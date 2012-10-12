@@ -318,7 +318,7 @@ let pdecl_vc env km th d = match d.pd_node with
   | PDtype _ | PDdata _ | PDexn _ -> th
   | PDval lv -> wp_val env km th lv
   | PDlet ld -> wp_let env km th ld
-  | PDrec rdl ->wp_rec env km th rdl
+  | PDrec rd -> wp_rec env km th rd
 
 let add_pdecl ~wp uc d =
   let uc = { uc with
@@ -344,8 +344,8 @@ let add_pdecl ~wp uc d =
       add_to_theory Theory.add_data_decl uc dl
   | PDval lv | PDlet { let_sym = lv } ->
       add_let uc lv
-  | PDrec rdl ->
-      List.fold_left add_rec uc rdl.rec_defn
+  | PDrec fdl ->
+      List.fold_left add_rec uc fdl
   | PDexn xs ->
       add_exn uc xs
 
@@ -451,12 +451,13 @@ let clone_export uc m inst =
     Mreg.fold conv eff.eff_resets e in
   let conv_term mv t = t_gen_map (ty_s_map conv_ts) conv_ls mv t in
   let addx mv xs t q = Mexn.add (conv_xs xs) (conv_term mv t) q in
+  let conv_vari mv (t,r) = conv_term mv t, Util.option_map conv_ls r in
   let conv_spec mv c = {
     c_pre     = conv_term mv c.c_pre;
     c_post    = conv_term mv c.c_post;
     c_xpost   = Mexn.fold (addx mv) c.c_xpost Mexn.empty;
     c_effect  = conv_eff c.c_effect;
-    c_variant = [];
+    c_variant = List.map (conv_vari mv) c.c_variant;
     c_letrec  = 0; } in
   let rec conv_vta mv a =
     let args = List.map conv_pv a.vta_args in
@@ -467,7 +468,7 @@ let clone_export uc m inst =
       | VTarrow a -> VTarrow (conv_vta mv a)
       | VTvalue v -> VTvalue (conv_vtv v) in
     vty_arrow args ~spec ~ghost:a.vta_ghost vty in
-  let mvs = ref Mvs.empty in
+  let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
@@ -497,7 +498,7 @@ let clone_export uc m inst =
         let nps = create_psymbol (id_clone ps.ps_name) vta in
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
-    | PDrec { rec_defn = rdl } ->
+    | PDrec fdl ->
         let add_id id _ (pvs,pss) =
           try match Hid.find psh id with
             | PV pv -> Spv.add pv pvs, pss
@@ -510,15 +511,15 @@ let clone_export uc m inst =
                   Spv.add pv pvs, pss
               | PDval (LetA ps) | PDlet { let_sym = LetA ps } ->
                   pvs, Sps.add ps pss
-              | PDrec { rec_defn = rdl } ->
+              | PDrec fdl ->
                   let rec down = function
                     | { fun_ps = ps }::_ when id_equal ps.ps_name id -> ps
-                    | _::rdl -> down rdl
+                    | _::fdl -> down fdl
                     | [] -> assert false in
-                  pvs, Sps.add (down rdl) pss
+                  pvs, Sps.add (down fdl) pss
               | PDtype _ | PDdata _ | PDexn _ -> assert false
             end in
-        let conv_rd uc { fun_ps = ps } =
+        let conv_fd uc { fun_ps = ps } =
           let id = id_clone ps.ps_name in
           let vta = conv_vta !mvs ps.ps_vta in
           (* we must retrieve all pvsymbols and psymbols in ps.ps_varm *)
@@ -526,7 +527,7 @@ let clone_export uc m inst =
           let nps = create_psymbol_extra id vta pvs pss in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
-        List.fold_left conv_rd uc rdl
+        List.fold_left conv_fd uc fdl
   in
   let uc = { uc with
     muc_known = merge_known uc.muc_known extras;

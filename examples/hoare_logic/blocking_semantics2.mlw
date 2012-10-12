@@ -152,7 +152,7 @@ inductive type_expr type_env type_stack expr datatype =
 	type_expr sigma pi e2 ty2 ->
 	type_operator op ty1 ty2 ty -> type_expr sigma pi (Ebin e1 op e2) ty
   | Type_eseq :
-      forall sigma: type_env, pi:type_stack, e1 e2:expr, op:operator, ty:datatype.
+      forall sigma: type_env, pi:type_stack, e1 e2:expr, ty:datatype.
         type_expr sigma pi e1 TYunit ->
 	type_expr sigma pi e2 ty ->
 	type_expr sigma pi (Eseq e1 e2) ty
@@ -162,7 +162,7 @@ inductive type_expr type_env type_stack expr datatype =
         type_expr sigma pi e ty ->
         type_expr sigma pi (Eassign x e) TYunit
   | Type_elet :
-      forall sigma: type_env, pi:type_stack, x:ident, e1 e2:expr, ty1 ty2 ty:datatype.
+      forall sigma: type_env, pi:type_stack, x:ident, e1 e2:expr, ty1 ty2:datatype.
 	type_expr sigma pi e1 ty1 ->
         type_expr sigma (Cons (x,ty2) pi) e2 ty2 ->
 	type_expr sigma pi (Elet x e1 e2) ty2
@@ -173,11 +173,11 @@ inductive type_expr type_env type_stack expr datatype =
 	type_expr sigma pi e3 ty ->
     	type_expr sigma pi (Eif e1 e2 e3) ty 
   | Type_eassert :
-      forall sigma: type_env, pi:type_stack, p:fmla, ty:datatype.
+      forall sigma: type_env, pi:type_stack, p:fmla.
 	type_fmla sigma pi p ->
     	type_expr sigma pi (Eassert p) TYbool
   | Type_ewhile :
-      forall sigma: type_env, pi:type_stack, guard body:expr, inv:fmla, ty:datatype.
+      forall sigma: type_env, pi:type_stack, guard body:expr, inv:fmla.
 	type_fmla sigma pi inv ->
         type_expr sigma pi guard TYbool ->
         type_expr sigma pi body TYunit ->
@@ -424,7 +424,7 @@ inductive one_step env stack expr env stack expr =
                  sigma' pi' (Eassign x e')
 
   | one_step_assign_value:
-      forall sigma:env, pi:stack, x:mident, v:value, e:term.
+      forall sigma:env, pi:stack, x:mident, v:value.
         one_step sigma pi (Eassign x (Evalue v))
                  (IdMap.set sigma x v) pi void
 
@@ -434,7 +434,7 @@ inductive one_step env stack expr env stack expr =
           one_step sigma pi (Eseq e1 e2) sigma' pi' (Eseq e1' e2)
 
   | one_step_seq_value:
-      forall sigma:env, pi:stack, id:ident, e:expr.
+      forall sigma:env, pi:stack, e:expr.
         one_step sigma pi (Eseq void e) sigma pi e
 
   | one_step_let_ctxt:
@@ -447,16 +447,16 @@ inductive one_step env stack expr env stack expr =
         one_step sigma pi (Elet id (Evalue v) e) sigma (Cons (id,v) pi) e
 
   | one_step_if_ctxt:
-      forall sigma sigma':env, pi pi':stack, id:ident, e1 e1' e2 e3:expr.
+      forall sigma sigma':env, pi pi':stack, e1 e1' e2 e3:expr.
         one_step sigma pi e1 sigma' pi' e1' ->
           one_step sigma pi (Eif e1 e2 e3) sigma' pi' (Eif e1' e2 e3)
 
   | one_step_if_true:
-      forall sigma:env, pi:stack, e:term, e1 e2:expr.
+      forall sigma:env, pi:stack, e1 e2:expr.
         one_step sigma pi (Eif (Evalue (Vbool True)) e1 e2) sigma pi e1
 
   | one_step_if_false:
-      forall sigma:env, pi:stack, e:term, e1 e2:expr.
+      forall sigma:env, pi:stack, e1 e2:expr.
         one_step sigma pi (Eif (Evalue (Vbool False)) e1 e2) sigma pi e2
 
   | one_step_assert:

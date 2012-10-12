@@ -524,7 +524,7 @@ let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
 let read_old_script ch =
   let chunks = ref [] in
   let contents = ref [] in
-  let rec read_line () =
+  let read_line () =
     let s = input_line ch in
     clean_line s
   in

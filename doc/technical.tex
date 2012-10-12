@@ -7,18 +7,18 @@ The proof session state is stored in an XML file named
 \texttt{\textsl{<dir>}/why3session.xml}, where \texttt{\textsl{<dir>}}
 is the directory of the project.
 The XML file follows the DTD given in \texttt{share/why3session.dtd} and reproduced below.
-\verbatiminput{../share/why3session.dtd}
+\lstinputlisting{../share/why3session.dtd}
 
 
 \section{Provers detection data}
 \label{sec:proverdetecttiondata}
 
-All the necessary data configuration for the autoamtic detection of
+All the necessary data configuration for the automatic detection of
 installed provers is stored in the file
 \texttt{provers-detection-data.conf} typically located in directory
 \verb|/usr/local/share/why3| after installation. The contents of this
 file is reproduced below.
-{\footnotesize\verbatiminput{../share/provers-detection-data.conf}}
+{\footnotesize\lstinputlisting{../share/provers-detection-data.conf}}
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
@@ -27,22 +27,22 @@ file is reproduced below.
 \begin{figure}[p]
 {\footnotesize
 \begin{verbatim}
-[main ]
+[main]
 loadpath = "/usr/local/share/why3/theories"
 loadpath = "/usr/local/share/why3/modules"
-magic = 12
+magic = 14
 memlimit = 0
 plugin = "/usr/local/lib/why3/plugins/tptp"
 plugin = "/usr/local/lib/why3/plugins/genequlin"
-plugin = "/usr/local/lib/why3/plugins/tptpfof"
 plugin = "/usr/local/lib/why3/plugins/hypothesis_selection"
 running_provers_max = 4
 timelimit = 2
 
-[ide ]
+[ide]
 default_editor = "editor %f"
 error_color = "orange"
 goal_color = "gold"
+iconset = "boomy"
 intro_premises = true
 premise_color = "chartreuse"
 print_labels = false
@@ -55,21 +55,30 @@ verbose = 0
 window_height = 1173
 window_width = 1024
 
-[prover coq]
-command = "why3-cpulimit 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
+[prover]
+command = "'why3-cpulimit' 0 %m -s coqtop -batch -I %l/coq-tactic -R %l/coq Why3 -l %f"
 driver = "/usr/local/share/why3/drivers/coq.drv"
 editor = "coqide"
+in_place = false
 interactive = true
 name = "Coq"
-version = "8.3pl3"
+shortcut = "coq"
+version = "8.3pl4"
 
-[prover alt-ergo]
-command = "why3-cpulimit %t %m -s alt-ergo %f"
+[prover]
+command = "'why3-cpulimit' %t %m -s alt-ergo %f"
 driver = "/usr/local/share/why3/drivers/alt_ergo_0.93.drv"
 editor = ""
+in_place = false
 interactive = false
 name = "Alt-Ergo"
-version = "0.93"
+shortcut = "altergo"
+shortcut = "alt-ergo"
+version = "0.93.1"
+
+[editor coqide]
+command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
+name = "CoqIDE"
 \end{verbatim}
 }
   \caption{Sample why3.conf file}
@@ -134,21 +143,21 @@ why3 --list-transforms
 
 \begin{description}
 
-\item[eliminate\_algebraic] Replaces algebraic data types by first-order
-definitions~\cite{paskevich09rr}
+\item[eliminate\_algebraic] replaces algebraic data types by first-order
+definitions~\cite{paskevich09rr}.
 
-\item[eliminate\_builtin] Suppress definitions of symbols which are
+\item[eliminate\_builtin] removes definitions of symbols that are
   declared as builtin in the driver, \ie with a ``syntax'' rule.
 \item[eliminate\_definition\_func]
-  Replaces all function definitions with axioms.
+  replaces all function definitions with axioms.
 \item[eliminate\_definition\_pred]
-  Replaces all predicate definitions with axioms.
+  replaces all predicate definitions with axioms.
 \item[eliminate\_definition]
-  Apply both transformations above.
+  applies both transformations above.
 \item[eliminate\_mutual\_recursion]
-  Replaces mutually recursive definitions with axioms.
+  replaces mutually recursive definitions with axioms.
 \item[eliminate\_recursion]
-  Replaces all recursive definitions with axioms.
+  replaces all recursive definitions with axioms.
 
 \item[eliminate\_if\_term] replaces terms of the form \texttt{if
     formula then t2 else t3} by lifting them at the level of formulas.
@@ -159,30 +168,30 @@ definitions~\cite{paskevich09rr}
   connectives.
 
 \item[eliminate\_if]
-  Apply both transformations above.
+  applies both transformations above.
 
 \item[eliminate\_inductive] replaces inductive predicates by
   (incomplete) axiomatic definitions, \ie construction axioms and
   an inversion axiom.
 
 \item[eliminate\_let\_fmla]
-  Eliminates \texttt{let} by substitution, at the predicate level.
+  eliminates \texttt{let} by substitution, at the predicate level.
 
 \item[eliminate\_let\_term]
-  Eliminates \texttt{let} by substitution, at the term level.
+  eliminates \texttt{let} by substitution, at the term level.
 
 \item[eliminate\_let]
-  Apply both transformations above.
+  applies both transformations above.
 
 % \item[encoding\_decorate\_mono]
 
 % \item[encoding\_enumeration]
 
 \item[encoding\_smt]
-  Encode polymorphic types into monomorphic type~\cite{conchon08smt}.
+  encodes polymorphic types into monomorphic type~\cite{conchon08smt}.
 
 \item[encoding\_tptp]
-  Encode theories into unsorted logic. %~\cite{cruanes10}.
+  encodes theories into unsorted logic. %~\cite{cruanes10}.
 
 % \item[filter\_trigger] *)
 
@@ -196,18 +205,18 @@ definitions~\cite{paskevich09rr}
 \item[inline\_all]
   expands all non-recursive definitions.
 
-\item[inline\_goal] Expands all outermost symbols of the goal that
+\item[inline\_goal] expands all outermost symbols of the goal that
   have a non-recursive definition.
 
 \item[inline\_trivial]
   removes definitions of the form
 
-\begin{verbatim}
-function  f x_1 .. x_n = (g e_1 .. e_k)
-predicate p x_1 .. x_n = (q e_1 .. e_k)
-\end{verbatim}
+\begin{whycode}
+function  f x_1 ... x_n = (g e_1 ... e_k)
+predicate p x_1 ... x_n = (q e_1 ... e_k)
+\end{whycode}
 when each $e_i$ is either a ground term or one of the $x_j$, and
-each $x_1$ .. $x_n$ occur at most once in the $e_i$
+each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
 
 \item[introduce\_premises] moves antecedents of implications and
   universal quantifications of the goal into the premises of the task.
@@ -215,46 +224,44 @@ each $x_1$ .. $x_n$ occur at most once in the $e_i$
 % \item[remove\_triggers] *)
 %   removes the triggers in all quantifications. *)
 
-\item[simplify\_array] Automatically rewrites the task using the lemma
+\item[simplify\_array] automatically rewrites the task using the lemma
   \verb|Select_eq| of theory \verb|array.Array|.
 
 \item[simplify\_formula] reduces trivial equalities $t=t$ to true and
-  then simplifies propositional structure: removes true, false, ``f
-  and f'' to ``f'', etc.
+  then simplifies propositional structure: removes true, false, simplifies
+  $f \land f$ to $f$, etc.
 
 \item[simplify\_recursive\_definition] reduces mutually recursive
   definitions if they are not really mutually recursive, \eg
-\begin{verbatim}
+\begin{whycode}
 function f : ... = .... g ...
-
-with g : .. = e
-\end{verbatim}
+with g : ... = e
+\end{whycode}
 becomes
-\begin{verbatim}
-function g : .. = e
-function f : ... = .... g ...
-\end{verbatim}
-if f does not occur in e
+\begin{whycode}
+function g : ... = e
+function f : ... = ... g ...
+\end{whycode}
+if $f$ does not occur in $e$.
 
 \item[simplify\_trivial\_quantification]
   simplifies quantifications of the form
 \begin{verbatim}
-  forall x, x=t -> P(x)
+forall x, x=t -> P(x)
 \end{verbatim}
 or
 \begin{verbatim}
-  forall x, t=x -> P(x)
+forall x, t=x -> P(x)
 \end{verbatim}
-  when x does not occur in t
-  into
+when $x$ does not occur in $t$ into
 \begin{verbatim}
 P(t)
 \end{verbatim}
-  More generally, it applies this simplification whenever x=t appear
+  More generally, it applies this simplification whenever $x=t$ appears
   in a negative position.
 
 \item[simplify\_trivial\_quantification\_in\_goal]
-  same as above but applies only in the goal.
+  is the same as above but it applies only in the goal.
 
 \item[split\_premise]
   splits conjunctive premises.
@@ -266,24 +273,24 @@ P(t)
 \begin{description}
 
 \item[full\_split\_all]
-  composition of \texttt{split\_premise} and \texttt{full\_split\_goal}.
+  performs both \texttt{split\_premise} and \texttt{full\_split\_goal}.
 
 \item[full\_split\_goal] puts the goal in a conjunctive form,
   returns the corresponding set of subgoals. The number of subgoals
   generated may be exponential in the size of the initial goal.
 
-\item[simplify\_formula\_and\_task] same as \texttt{simplify\_formula}
-  but also removes the goal if it is equivalent to true.
+\item[simplify\_formula\_and\_task] is the same as \texttt{simplify\_formula}
+  but it also removes the goal if it is equivalent to true.
 
 \item[split\_all]
-  composition of \texttt{split\_premise} and \texttt{split\_goal}.
+  performs both \texttt{split\_premise} and \texttt{split\_goal}.
 
 \item[split\_goal] if the goal is a conjunction of goals, returns the
   corresponding set of subgoals. The number of subgoals generated is linear in
   the size of the initial goal.
 
 \item[split\_intro]
-  when a goal is an implication, moves the antecedents into the premises.
+  moves the antecedents into the premises when a goal is an implication.
 
 \end{description}
 

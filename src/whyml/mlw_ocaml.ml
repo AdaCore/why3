@@ -152,7 +152,9 @@ let print_path = print_list dot pp_print_string
 
 let print_qident ~sanitizer info fmt id =
   try
-    let lp, t, p = Theory.restore_path id in
+    let lp, t, p =
+      try Mlw_module.restore_path id
+      with Not_found -> Theory.restore_path id in
     let s = String.concat "__" p in
     let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
     let s = sanitizer s in
@@ -687,6 +689,10 @@ and print_vty info fmt = function
   | VTvalue vtv -> print_vtv info fmt vtv
   | VTarrow vta -> print_vta info fmt vta
 
+let is_letrec = function
+  | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
+  | _ -> true
+
 let ity_mark = ity_pur Mlw_wp.ts_mark []
 
 let rec print_expr info fmt e = print_lexpr 0 info fmt e
@@ -745,7 +751,7 @@ and print_lexpr pri info fmt e =
   | Etry (e,bl) ->
       fprintf fmt "@[(try %a with@\n@[<hov>%a@])@]"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
-  | Eabstr (e,_,_) ->
+  | Eabstr (e,_) ->
       print_lexpr pri info fmt e
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
@@ -759,24 +765,24 @@ and print_lexpr pri info fmt e =
   | Ecase (e1, bl) ->
       fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
         (print_expr info) e1 (print_list newline (print_ebranch info)) bl
-  | Erec ({ rec_defn = rdl; rec_letrec = lr }, e) ->
+  | Erec (fdl, e) ->
       (* print non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
         Pervasives.compare ps1.ps_vta.vta_ghost ps2.ps_vta.vta_ghost in
-      let rdl = List.sort cmp rdl in
+      let fdl = List.sort cmp fdl in
       fprintf fmt "@[<v>%a@\nin@\n%a@]"
-        (print_list_next newline (print_rec_decl lr info)) rdl
+        (print_list_next newline (print_rec_decl (is_letrec fdl) info)) fdl
         (print_expr info) e
 
 and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
   if ps.ps_vta.vta_ghost then
     fprintf fmt "(* %s %a *)"
-      (if fst then if lr > 0 then "let rec" else "let" else "with")
+      (if fst then if lr then "let rec" else "let" else "with")
       (print_ps info) ps
   else
     let print_arg fmt pv = fprintf fmt "@[%a@]" (print_pvty info) pv in
     fprintf fmt "@[<hov 2>%s %a %a =@ %a@]"
-      (if fst then if lr > 0 then "let rec" else "let" else "and")
+      (if fst then if lr then "let rec" else "let" else "and")
       (print_ps info) ps (print_list space print_arg) lam.l_args
       (print_expr info) lam.l_expr
 
@@ -796,16 +802,16 @@ and print_xbranch info fmt (xs, pv, e) =
   end;
   forget_pv pv
 
-and print_rec_decl lr info fst fmt rd =
-  print_rec lr info fst fmt rd;
+and print_rec_decl lr info fst fmt fd =
+  print_rec lr info fst fmt fd;
   forget_tvs ()
 
-let print_rec_decl lr info fst fmt rd =
-  let id = rd.fun_ps.ps_name in
+let print_rec_decl lr info fst fmt fd =
+  let id = fd.fun_ps.ps_name in
   if has_syntax info id then
     fprintf fmt "(* symbol %a is overridden by driver *)" (print_lident info) id
   else
-    print_rec_decl lr info fst fmt rd
+    print_rec_decl lr info fst fmt fd
 
 let print_let_decl info fmt { let_sym = lv ; let_expr = e } =
   fprintf fmt "@[<hov 2>let %a =@ %a@]" (print_lv info) lv (print_expr info) e;
@@ -968,14 +974,14 @@ let pdecl info fmt pd = match pd.pd_node with
       fprintf fmt "@\n@\n"
   | PDlet ld ->
       print_let_decl info fmt ld
-  | PDrec { rec_defn = rdl; rec_letrec = lr } ->
+  | PDrec fdl ->
       (* print defined, non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
         Pervasives.compare
           (ps1.ps_vta.vta_ghost || has_syntax info ps1.ps_name)
           (ps2.ps_vta.vta_ghost || has_syntax info ps2.ps_name) in
-      let rdl = List.sort cmp rdl in
-      print_list_next newline (print_rec_decl lr info) fmt rdl;
+      let fdl = List.sort cmp fdl in
+      print_list_next newline (print_rec_decl (is_letrec fdl) info) fmt fdl;
       fprintf fmt "@\n@\n"
   | PDexn xs ->
       print_exn_decl info fmt xs

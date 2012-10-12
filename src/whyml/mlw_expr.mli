@@ -121,6 +121,7 @@ val create_psymbol : preid -> vty_arrow -> psymbol
 val create_psymbol_extra : preid -> vty_arrow -> Spv.t -> Sps.t -> psymbol
 
 val spec_pvset : Spv.t -> spec -> Spv.t
+val ps_pvset : Spv.t -> psymbol -> Spv.t
 
 (** program expressions *)
 
@@ -151,7 +152,7 @@ and expr_node = private
   | Earrow  of psymbol
   | Eapp    of expr * pvsymbol * spec
   | Elet    of let_defn * expr
-  | Erec    of rec_defn * expr
+  | Erec    of fun_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
   | Eassign of expr * region * pvsymbol
@@ -161,7 +162,7 @@ and expr_node = private
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Eraise  of xsymbol * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
-  | Eabstr  of expr * post * xpost
+  | Eabstr  of expr * spec
   | Eassert of assertion_kind * term
   | Eabsurd
 
@@ -170,28 +171,20 @@ and let_defn = private {
   let_expr : expr;
 }
 
-and rec_defn = private {
-  rec_defn   : fun_defn list;
-  rec_letrec : int;
-}
-
 and fun_defn = private {
   fun_ps     : psymbol;
   fun_lambda : lambda;
+  fun_varm   : varmap;
 }
 
 and lambda = {
-  l_args    : pvsymbol list;
-  l_variant : variant list; (* lexicographic order *)
-  l_pre     : pre;
-  l_expr    : expr;
-  l_post    : post;
-  l_xpost   : xpost;
+  l_args : pvsymbol list;
+  l_expr : expr;
+  l_spec : spec;
 }
 
 val e_pvset : Spv.t -> expr -> Spv.t
 val l_pvset : Spv.t -> lambda -> Spv.t
-val abstr_pvset : Spv.t -> expr -> post -> xpost -> Spv.t
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
@@ -215,14 +208,16 @@ val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
 
 val create_let_defn : preid -> expr -> let_defn
-val create_fun_defn : preid -> lambda -> rec_defn
-val create_rec_defn : (psymbol * lambda) list -> rec_defn
+val create_fun_defn : preid -> lambda -> fun_defn
+val create_rec_defn : (psymbol * lambda) list -> fun_defn list
+
+val rec_varmap : varmap -> fun_defn list -> varmap
 
 exception StaleRegion of expr * ident
 (* freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr
-val e_rec : rec_defn -> expr -> expr
+val e_rec : fun_defn list -> expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
 val e_case : expr -> (ppattern * expr) list -> expr
@@ -251,10 +246,12 @@ val e_for :
   pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
 val e_any : spec -> vty -> expr
-val e_abstract : expr -> post -> xpost -> expr
+val e_abstract : expr -> spec -> expr
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
 
 (** expression traversal *)
 
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
+
+val e_purify : expr -> term option

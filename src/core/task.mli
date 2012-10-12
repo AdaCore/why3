@@ -93,19 +93,6 @@ val split_theory : theory -> Spr.t option -> task -> task list
       that end by one of [s]. They are in the opposite order than
       in the theory *)
 
-val bisect : (task -> bool) -> task -> task
-   (** [bisect test task] return a task included in [task] which is at
-       the limit of truthness of the function test. The returned task is
-       included in [task] and if any declarations are removed from it the
-       task doesn't verify test anymore *)
-
-type bisect_step =
- | BSdone of task
- | BSstep of task * (bool -> bisect_step)
-
-val bisect_step : task -> bisect_step
-(** Same as before but doing it step by step *)
-
 (** {2 realization utilities} *)
 
 val used_theories : task -> theory Mid.t

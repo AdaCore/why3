@@ -26,8 +26,6 @@ open Ident
 open Ty
 open Term
 open Decl
-open Theory
-open Task
 open Printer
 
 let ident_printer =
@@ -161,10 +159,10 @@ and print_fmla info fmt f = match f.t_node with
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
-and print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
+and _print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
 
 
-let print_logic_binder info fmt v =
+let _print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type info) v.vs_ty
 
 let print_type_decl info fmt ts =

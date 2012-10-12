@@ -295,9 +295,15 @@ AC_CHECK_PROG(RUBBER,rubber,rubber,no)
 if test "$enable_doc" = yes ; then
 if test "$RUBBER" = no ; then
     enable_doc=no
-    AC_MSG_WARN(cannot find rubber, documentation building disabled.)
+    AC_MSG_WARN([cannot find rubber, documentation building disabled.])
 fi
 fi
+
+# checking for hevea
+AC_CHECK_PROG(HEVEA,hevea,hevea,no)
+
+# checking for hacha
+AC_CHECK_PROG(HACHA,hacha,hacha,no)
 
 # checking for lablgtk2
 if test "$enable_ide" = yes ; then
@@ -310,7 +316,7 @@ if test "$enable_ide" = yes ; then
       LABLGTK2LIB="+lablgtk2"
       AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtk.cma,,enable_ide=no)
       if test "$enable_ide" = no; then
-         AC_MSG_WARN(Lib lablgtk2 not found, IDE disabled.)
+         AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
          reason_ide=" (lablgtk2 not found)"
       fi
    fi
@@ -326,7 +332,7 @@ if test "$enable_ide" = yes ; then
    else
       AC_CHECK_FILE($OCAMLLIB/lablgtk2/lablgtksourceview2.cma,,enable_ide=no)
       if test "$enable_ide" = no; then
-         AC_MSG_WARN(Lib lablgtksourceview2 not found, IDE disabled.)
+         AC_MSG_WARN([Lib lablgtksourceview2 not found, IDE disabled.])
          reason_ide=" (lablgtksourceview2 not found)"
       fi
    fi
@@ -360,7 +366,7 @@ if test "$enable_bench" = yes ; then
       SQLITE3LIB="+sqlite3"
       AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_bench=no)
       if test "$enable_bench" = no; then
-        AC_MSG_WARN(Lib sqlite3 not found, why3bench disabled.)
+        AC_MSG_WARN([Lib sqlite3 not found, why3bench disabled.])
       fi
    fi
 fi
@@ -394,7 +400,7 @@ else
                 cp -f src/coq-tactic/coqCompat.8.3.ml src/coq-tactic/coqCompat.ml
                 AC_MSG_RESULT($COQVERSION)
                 ;;
-          8.*|trunk)
+          8.4*|trunk)
 	        enable_coq_support=yes
                 cp -f src/coq-tactic/coqCompat.8.4.ml src/coq-tactic/coqCompat.ml
                 AC_MSG_RESULT($COQVERSION)
@@ -402,7 +408,7 @@ else
           *)
                 enable_coq_support=no
 	        AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
-                reason_coq_support=" (need version 8.3 or later)"
+                reason_coq_support=" (version is $COQVERSION but need version 8.3 or higher)"
                 ;;
         esac
     fi
@@ -513,7 +519,7 @@ if test "$enable_hypothesis_selection" = yes; then
      OCAMLGRAPHLIB="+ocamlgraph"
      AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
      if test "$enable_hypothesis_selection" = no; then
-       AC_MSG_WARN(Lib ocamlgraph not found, hypothesis selection disabled.)
+       AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
      fi
    fi
 fi

@@ -19,6 +19,9 @@ theory SetGen
   (** inclusion *)
   predicate subset (s1 s2: set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
+  lemma subset_refl:
+    forall s: set 'a. subset s s
+
   lemma subset_trans:
     forall s1 s2 s3: set 'a. subset s1 s2 -> subset s2 s3 -> subset s1 s3
 
@@ -150,6 +153,13 @@ theory Fset
     forall s: set 'a. cardinal s = 1 ->
     forall x: 'a. mem x s -> x = choose s
 
+end
+
+theory FsetNth
+
+  use import int.Int
+  use import Fset
+
   function nth (i: int) (s: set 'a) : 'a
 
   axiom nth_injective:
@@ -158,7 +168,7 @@ theory Fset
 
   axiom nth_surjective:
     forall s: set 'a, x: 'a. mem x s ->
-    exists i: int. 0 <= i < cardinal s -> x = nth i s
+    exists i: int. 0 <= i < cardinal s /\ x = nth i s
 
 end
 

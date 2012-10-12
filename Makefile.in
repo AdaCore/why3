@@ -65,6 +65,8 @@ DEPFLAGS += -native
 endif
 
 RUBBER = @RUBBER@
+HEVEA = @HEVEA@
+HACHA = @HACHA@
 
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
@@ -211,8 +213,13 @@ clean::
 # installation
 ###############
 
+clean_old_install:
+	rm -f $(BINDIR)/why3*
+	rm -rf $(DATADIR)/why3
+
 install_no_local::
 	mkdir -p $(BINDIR)
+	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/images/boomy
 	mkdir -p $(DATADIR)/why3/images/fatcow
@@ -236,6 +243,7 @@ install_no_local::
 #	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
 
 install_no_local_lib::
+	rm -rf $(OCAMLLIB)/why3
 	mkdir -p $(OCAMLLIB)/why3
 	cp -f src/why3.cm* $(OCAMLLIB)/why3
 	cp -f META $(OCAMLLIB)/why3
@@ -247,7 +255,7 @@ install install-lib:
 	@echo "Why is configured in local installation mode."
 	@echo "To install Why, run ./configure --disable-local ; make ; make install"
 else
-install: install_no_local
+install: clean_old_install install_no_local
 install-lib: install_no_local_lib
 endif
 
@@ -359,6 +367,7 @@ clean::
 	rm -f lib/plugins/*
 
 install_no_local::
+	rm -rf $(LIBDIR)/why3/plugins
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
@@ -876,12 +885,12 @@ src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
 
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3NOCONFIG=42 $(COQC) -byte -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -byte -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
 src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3NOCONFIG=42 $(COQC) -opt -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -opt -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
 test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
@@ -928,13 +937,20 @@ COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime
 COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 
+COQLIBS_SET_FILES = Set
+COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
+
+COQLIBS_SETTHEORY_FILES = Interval PowerSet Relation Identity Image \
+	InverseDomRan Function 
+COQLIBS_SETTHEORY = $(addprefix lib/coq/settheory/, $(COQLIBS_SETTHEORY_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_SETTHEORY) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -958,6 +974,10 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_NUMBER_FILES); do \
 	echo 'theory number.'"$$f"' meta "realized" "number.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_SET_FILES); do \
+	echo 'theory set.'"$$f"' meta "realized" "set.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_SETTHEORY_FILES); do \
+	echo 'theory settheory.'"$$f"' meta "realized" "settheory.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -973,6 +993,10 @@ install_no_local::
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
 	mkdir -p $(LIBDIR)/why3/coq/number
 	cp $(addsuffix .vo, $(COQLIBS_NUMBER)) $(LIBDIR)/why3/coq/number/
+	mkdir -p $(LIBDIR)/why3/coq/set
+	cp $(addsuffix .vo, $(COQLIBS_SET)) $(LIBDIR)/why3/coq/set/
+	mkdir -p $(LIBDIR)/why3/coq/settheory
+	cp $(addsuffix .vo, $(COQLIBS_SETTHEORY)) $(LIBDIR)/why3/coq/settheory/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
@@ -993,10 +1017,12 @@ clean::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
 update-coq: bin/why3 drivers/coq-realizations.aux
-	for f in $(COQLIBS_INT_ALL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
-	for f in $(COQLIBS_REAL_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
-	for f in $(COQLIBS_NUMBER_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
-	for f in $(COQLIBS_FP_FILES); do bin/why3 --realize -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
+	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
+	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
+	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T set.$$f -o lib/coq/set/; done
+	for f in $(COQLIBS_SETTHEORY_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T settheory.$$f -o lib/coq/settheory/; done
+	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
 else
 
@@ -1262,11 +1288,17 @@ DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
-# doc/manual.html: doc/manual.tex doc/version.tex
-# 	$(MAKE) -C doc manual.html
+# the dependency on the pdf ensures the bbl was built
+doc/html/manual.html: doc/manual.pdf doc/fix.hva
+	cd doc; rm -rf html; mkdir -p html
+	cp doc/manual.bbl doc/html/
+	cd doc; $(HEVEA) -o html/manual.html -fix -O fix.hva makeidx.hva manual.tex
+
+doc/html/index.html: doc/html/manual.html
+	cd doc; $(HACHA) -tocbis -o html/index.html html/manual.html
 
 clean::
-	cd doc; $(RUBBER) --pdf --clean manual.tex
+	cd doc; rm -rf html; $(RUBBER) --pdf --clean manual.tex
 
 else
 
@@ -1331,7 +1363,8 @@ STDLIBS = algebra \
 	option \
 	real \
 	relations \
-	set
+	set \
+	settheory
 # function ? sum ? tptp ?
 
 STDMODS = arith array hashtbl impset pqueue queue random ref stack string
@@ -1342,7 +1375,7 @@ STDMODFILES = $(addsuffix .mlw, $(addprefix modules/, $(STDMODS)))
 stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc.@OCAMLBEST@
 	mkdir -p doc/stdlibdoc
 	rm -f doc/stdlibdoc/style.css
-	WHY3LOADPATH=theories bin/why3doc.@OCAMLBEST@ -L modules \
+	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ -L theories -L modules \
           -o doc/stdlibdoc --title "Why3 Standard Library" \
 	  $(STDLIBFILES) $(STDMODFILES)
 

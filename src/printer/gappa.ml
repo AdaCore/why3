@@ -24,7 +24,6 @@ open Format
 open Pp
 open Printer
 open Ident
-open Ty
 open Term
 open Decl
 open Theory

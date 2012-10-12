@@ -126,7 +126,7 @@ type type_def =
 
 type visibility = Public | Private | Abstract
 
-type invariant = lexpr option
+type invariant = lexpr list
 
 type type_decl = {
   td_loc    : loc;
@@ -191,14 +191,22 @@ type for_direction = To | Downto
 type ghost = bool
 
 type effect = {
-  pe_reads  : (ghost * lexpr) list;
-  pe_writes : (ghost * lexpr) list;
-  pe_raises : (ghost * qualid) list;
+  pe_reads  : lexpr list;
+  pe_writes : lexpr list;
+  pe_raises : qualid list;
 }
 
 type pre = lexpr
+type post = loc * (pattern * lexpr) list
+type xpost = loc * (qualid * pattern * lexpr) list
 
-type post = lexpr * (qualid * lexpr) list
+type spec = {
+  sp_pre     : pre list;
+  sp_post    : post list;
+  sp_xpost   : xpost list;
+  sp_effect  : effect;
+  sp_variant : variant list;
+}
 
 type binder = ident * ghost * pty option
 
@@ -206,12 +214,7 @@ type type_v =
   | Tpure of pty
   | Tarrow of binder list * type_c
 
-and type_c = {
-  pc_result_type : type_v;
-  pc_effect      : effect;
-  pc_pre         : pre;
-  pc_post        : post;
-}
+and type_c = type_v * spec
 
 type expr = {
   expr_desc : expr_desc;
@@ -247,12 +250,12 @@ and expr_desc =
   | Ecast of expr * pty
   | Eany of type_c
   | Eghost of expr
-  | Eabstract of expr * post
+  | Eabstract of triple
   | Enamed of label * expr
 
-and letrec = loc * ident * ghost * binder list * variant list * triple
+and letrec = loc * ident * ghost * binder list * triple
 
-and triple = pre * expr * post
+and triple = expr * spec
 
 type pdecl =
   | Dlet of ident * ghost * expr

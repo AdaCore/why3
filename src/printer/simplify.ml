@@ -23,10 +23,8 @@
 open Format
 open Pp
 open Ident
-open Ty
 open Term
 open Decl
-open Task
 open Printer
 
 let ident_printer =

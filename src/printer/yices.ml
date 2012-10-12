@@ -27,7 +27,6 @@ open Ty
 open Term
 open Decl
 open Theory
-open Task
 open Printer
 
 let ident_printer =

@@ -1,0 +1,40 @@
+
+\RequirePackage{listings}
+\RequirePackage{amssymb}
+
+\lstdefinelanguage{Why3}
+{
+morekeywords=[1]{predicate,function,goal,type,use,import,theory,end,in,%
+axiom,lemma,export,forall,match,with,not,inductive},%
+%keywordstyle=[1]{\color{red}},%
+morekeywords=[2]{true,false},%
+%keywordstyle=[2]{\color{blue}},%
+otherkeywords={},%
+commentstyle=\itshape,%
+columns=[l]fullflexible,%
+sensitive=true,%
+morecomment=[s]{(*}{*)},%
+escapeinside={*?}{?*},%
+keepspaces=true,
+literate=%
+{'a}{$\alpha$}{1}%
+{'b}{$\beta$}{1}%
+{<}{$<$}{1}%
+{>}{$>$}{1}%
+{<=}{$\le$}{1}%
+{>=}{$\ge$}{1}%
+{<>}{$\ne$}{1}%
+{/\\}{$\land$}{1}%
+{\\/}{ $\lor$ }{3}%
+{\ or(}{ $\lor$(}{3}%
+% {not\ }{$\lnot$ }{1}%
+% {not(}{$\lnot$(}{1}%
+{+->}{\texttt{+->}}{2}%
+% {+->}{$\mapsto$}{2}%
+{-->}{\texttt{-\relax->}}{2}%
+%{-->}{$\longrightarrow$}{2}%
+{->}{$\rightarrow$}{2}%
+{<->}{$\leftrightarrow$}{2}%
+%
+%
+}

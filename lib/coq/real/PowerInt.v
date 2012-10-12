@@ -5,6 +5,7 @@ Require Import Rfunctions.
 Require BuiltIn.
 Require int.Int.
 Require real.Real.
+Require real.RealInfix.
 
 Require Import Exponentiation.
 
@@ -42,6 +43,15 @@ now apply Power_s.
 Qed.
 
 (* Why3 goal *)
+Lemma Power_s_alt : forall (x:R) (n:Z), (0%Z < n)%Z -> ((power x
+  n) = (x * (power x (n - 1%Z)%Z))%R).
+intros x n h1.
+rewrite <- Power_s.
+f_equal; omega.
+omega.
+Qed.
+
+(* Why3 goal *)
 Lemma Power_1 : forall (x:R), ((power x 1%Z) = x).
 Proof.
 exact Rmult_1_r.
@@ -72,6 +82,24 @@ Proof.
 intros x y n h1.
 rewrite 3!power_is_exponentiation by auto with zarith.
 apply Power_mult2 ; auto with real.
+Qed.
+
+(* Why3 goal *)
+Lemma Pow_ge_one : forall (x:R) (n:Z), ((0%Z <= n)%Z /\ (1%R <= x)%R) ->
+  (1%R <= (power x n))%R.
+intros x n (h1,h2).
+generalize h1.
+pattern n; apply Z_lt_induction; auto.
+clear n h1; intros n Hind h1.
+assert (h: (n = 0 \/ 0 < n)%Z) by omega.
+destruct h.
+subst n; rewrite Power_0; auto with *.
+replace n with ((n-1)+1)%Z by omega.
+rewrite Power_s; auto with zarith.
+assert (h : (1 <= power x (n-1))%R).
+apply Hind; omega.
+replace 1%R with (1*1)%R by auto with real.
+apply Rmult_le_compat; auto with real.
 Qed.
 
 

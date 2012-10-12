@@ -12,7 +12,7 @@ small set of goals.
 
 Any declaration must occur
 inside a theory, which is in that example called HelloProof and
-labelled with a comment inside double quotes. It contains three goals
+labeled with a comment inside double quotes. It contains three goals
 named $G_1,G_2,G_3$. The first two are basic propositional goals,
 whereas the third involves some integer arithmetic, and thus it
 requires to import the theory of integer arithmetic from the \why
@@ -34,6 +34,7 @@ friendly way. This section presents the basic use of this GUI. Please
 refer to Section~\ref{sec:ideref} for a more complete description.
 
 \begin{figure}[tbp]
+%HEVEA\centering
   \includegraphics[width=\textwidth]{gui-0-70-1.png}
   \caption{The GUI when started the very first time}
   \label{fig:gui1}
@@ -61,10 +62,11 @@ allows to browse inside the theories.
 %   all} or its shortcut \textsf{Ctrl-E}. This will result is something
 % like the screenshot of Figure~\ref{fig:gui2}.
 In this tree view, we have a structured view of the file: this file
-contains one theory, itself containg three goals.
+contains one theory, itself containing three goals.
 
 
 \begin{figure}[tbp]
+%HEVEA\centering
  \includegraphics[width=\textwidth]{gui-0-70-2.png}
   \caption{The GUI with goal G1 selected}
   \label{fig:gui2}
@@ -87,6 +89,7 @@ click on the \textsf{Simplify} button. After a short time, you should
 get the display of Figure~\ref{fig:gui3}.
 
 \begin{figure}[tbp]
+%HEVEA\centering
 \includegraphics[width=\textwidth]{gui-0-70-3.png}
   \caption{The GUI after Simplify prover is run on each goal}
   \label{fig:gui3}
@@ -112,6 +115,7 @@ Simplify. We already have a lot of goals and proof attempts, so it is a good ide
 You should see now what is displayed on Figure~\ref{fig:gui4}.
 
 \begin{figure}[tbp]
+%HEVEA\centering
  \includegraphics[width=\textwidth]{gui-0-70-4.png}
   \caption{The GUI after splitting goal $G_2$ and collapsing proved goals}
   \label{fig:gui4}
@@ -133,6 +137,7 @@ part you modify, in order to regenerate the file if the goal is
 changed.
 
 \begin{figure}[tbp]
+%HEVEA\centering
   \includegraphics[width=\textwidth]{coqide-0-70.png}
   \caption{CoqIDE on subgoal 1 of $G_2$}
   \label{fig:coqide}
@@ -148,12 +153,13 @@ Currently, the GUI does not allow to modify the input file. You must
 edit the file external by some editor of your choice. Let's assume we
 change the goal $G_2$ by replacing the first occurrence of true by
 false, \eg
-\begin{why3}
+\begin{whycode}
   goal G2 : (false -> false) /\ (true \/ false)
-\end{why3}
+\end{whycode}
 We can reload the modified file in the IDE using menu \textsf{File/Reload}, or the shortcut ``Ctrl-R''. We get the tree view shown on Figure~\ref{fig:gui5}.
 
 \begin{figure}[tbp]
+%HEVEA\centering
   \includegraphics[width=\textwidth]{gui-0-70-5.png}
   \caption{File reloaded after modifying goal $G_2$}
   \label{fig:gui5}
@@ -183,7 +189,7 @@ Notice that replaying can be done in batch mode, using the
 \texttt{why3replayer} tool (see Section~\ref{sec:why3replayer}) For
 example, running the replayer on the \texttt{hello\_proof} example is
 as follows (assuming $G_2$ still is
-\lstinline{(true -> false) /\ (true \/ false)}).
+\lstinline|(true -> false) /\ (true \/ false)|).
 \begin{verbatim}
 $ why3replayer hello_proof
 Info: found directory 'hello_proof' for the project

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
 <why3session
- name="programs/zeros/why3session.xml" shape_version="2">
+ name="examples/programs/zeros/why3session.xml" shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,19 +17,19 @@
  <file
   name="../zeros.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="SetZeros"
-   locfile="programs/zeros/../zeros.mlw"
+   locfile="examples/programs/zeros/../zeros.mlw"
    loclnum="2" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter set_zeros"
-    locfile="programs/zeros/../zeros.mlw"
+    locfile="examples/programs/zeros/../zeros.mlw"
     loclnum="7" loccnumb="6" loccnume="15"
     expl="parameter set_zeros"
-    sum="5f5eb72f46f855228cc2b2fd6f6ac268"
+    sum="10339103798b22d29155e95a5803ba3a"
     proved="true"
     expanded="true"
     shape="ainfix =agetV2V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix =agetV2V4c0Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FAainfix =agetV6V7c0Iainfix &lt;V7ainfix +V5c1Aainfix &lt;=c0V7FIainfix =V6asetV2V5c0FAainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV2V8c0Iainfix &lt;V8V5Aainfix &lt;=c0V8FIainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c0V5FFAainfix =agetV1V9c0Iainfix &lt;V9c0Aainfix &lt;=c0V9FIainfix &lt;=c0ainfix -V0c1Aainfix =agetV1V10c0Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;c0ainfix -V0c1FF">
@@ -41,33 +41,13 @@
      expanded="true">
      <goal
       name="WP_parameter set_zeros.1"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="examples/programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
-      expl="normal postcondition"
-      sum="610c03a3673ca9e21717901af28ed392"
+      expl="postcondition"
+      sum="640aba1c337fda249828bbd29152b2d7"
       proved="true"
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2FIainfix &gt;c0ainfix -V0c1FF">
-      <label
-       name="expl:parameter set_zeros"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter set_zeros.2"
-      locfile="programs/zeros/../zeros.mlw"
-      loclnum="7" loccnumb="6" loccnume="15"
-      expl="for loop initialization"
-      sum="75454ca55e7f0705ac159610aded367e"
-      proved="true"
-      expanded="true"
-      shape="ainfix =agetV1V2c0Iainfix &lt;V2c0Aainfix &lt;=c0V2FIainfix &lt;=c0ainfix -V0c1FF">
       <label
        name="expl:parameter set_zeros"/>
       <proof
@@ -80,14 +60,54 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter set_zeros.3"
-      locfile="programs/zeros/../zeros.mlw"
+      name="WP_parameter set_zeros.2"
+      locfile="examples/programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
-      expl="for loop preservation"
-      sum="92b685d8299769a36f5b659af3332079"
+      expl="loop invariant init"
+      sum="6c2a2433a220089b551d09580fc3abf1"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV4V5c0Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FIainfix =V4asetV2V3c0FAainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =agetV2V6c0Iainfix &lt;V6V3Aainfix &lt;=c0V6FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1FF">
+      shape="ainfix =agetV1V2c0Iainfix &lt;V2c0Aainfix &lt;=c0V2FIainfix &lt;=c0ainfix -V0c1FF">
+      <label
+       name="expl:parameter set_zeros"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.3"
+      locfile="examples/programs/zeros/../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="precondition"
+      sum="9fcfb903ed93a3883564577eb0e6f855"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =agetV2V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1FF">
+      <label
+       name="expl:parameter set_zeros"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.4"
+      locfile="examples/programs/zeros/../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="loop invariant preservation"
+      sum="9202dee311b48c7f4580651f8aaf196e"
+      proved="true"
+      expanded="true"
+      shape="ainfix =agetV4V5c0Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FIainfix =V4asetV2V3c0FIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =agetV2V6c0Iainfix &lt;V6V3Aainfix &lt;=c0V6FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1FF">
       <label
        name="expl:parameter set_zeros"/>
       <proof
@@ -108,11 +128,11 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter set_zeros.4"
-      locfile="programs/zeros/../zeros.mlw"
+      name="WP_parameter set_zeros.5"
+      locfile="examples/programs/zeros/../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
-      expl="normal postcondition"
-      sum="c714ce360bc7fc9f789d9a99ac23e499"
+      expl="postcondition"
+      sum="6bc83e91df34a0369e8b3dc733c157d0"
       proved="true"
       expanded="true"
       shape="ainfix =agetV2V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix =agetV2V4c0Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1FF">
@@ -131,10 +151,10 @@
    </goal>
    <goal
     name="WP_parameter harness"
-    locfile="programs/zeros/../zeros.mlw"
+    locfile="examples/programs/zeros/../zeros.mlw"
     loclnum="15" loccnumb="6" loccnume="13"
     expl="parameter harness"
-    sum="3d30a5f9c368a14dda98d9ec5b38d3f0"
+    sum="b26459b4d1956c18d388b63ec6a8f8cf"
     proved="true"
     expanded="true"
     shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FFAainfix &gt;=c42c0">
@@ -146,10 +166,10 @@
      expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="examples/programs/zeros/../zeros.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="precondition"
-      sum="87d60c9926890c8ab00c69a28cc18f56"
+      sum="11c01fadb9e3d05d3893a660db3c922d"
       proved="true"
       expanded="true"
       shape="ainfix &gt;=c42c0">
@@ -161,15 +181,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="examples/programs/zeros/../zeros.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="032bb0fdb144036cb11bd45fab19d79a"
+      sum="1bf852f78cf331561550a126e3e6541f"
       proved="true"
       expanded="true"
       shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FFIainfix &gt;=c42c0">
@@ -181,15 +201,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter harness.3"
-      locfile="programs/zeros/../zeros.mlw"
+      locfile="examples/programs/zeros/../zeros.mlw"
       loclnum="15" loccnumb="6" loccnume="13"
       expl="assertion"
-      sum="cf1db3c52beb32db2f8c51395373d287"
+      sum="545678615c42afff472466a06f7ff664"
       proved="true"
       expanded="true"
       shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FFIainfix &gt;=c42c0">

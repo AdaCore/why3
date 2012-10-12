@@ -28,7 +28,6 @@ open Ident
 open Ty
 open Term
 open Decl
-open Task
 
 let rec intros pr f = match f.t_node with
   | Tbinop (Timplies,f1,f2) ->

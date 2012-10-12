@@ -27,7 +27,7 @@
         "\\lstinline$%s$" keyword
     else
       Printf.printf "\\texttt{%s}" (escape_keyword keyword);
-    if index <> "" then
+    if String.length index > 1 then
       Printf.printf "\\indextt%s{%s}"
         (if keyword.[0] = '\\' then "bs" else "") index;
     print_string "\\spacetrue";
