@@ -202,14 +202,14 @@ Inductive one_step : (map mident value) -> (list (ident* value)%type) -> stmt
       value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:term) (inv:fmla) (body:stmt), (eval_fmla sigma pi
-      inv) -> (((eval_term sigma pi cond) = (Vbool true)) -> (one_step sigma
-      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body))))
+      value)%type)) (cond:term) (inv:fmla) (body:stmt), ((eval_fmla sigma pi
+      inv) /\ ((eval_term sigma pi cond) = (Vbool true))) -> (one_step sigma
+      pi (Swhile cond inv body) sigma pi (Sseq body (Swhile cond inv body)))
   | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
       (ident* value)%type)) (cond:term) (inv:fmla) (body:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      cond) = (Vbool false)) -> (one_step sigma pi (Swhile cond inv body)
-      sigma pi Sskip)).
+      ((eval_fmla sigma pi inv) /\ ((eval_term sigma pi
+      cond) = (Vbool false))) -> (one_step sigma pi (Swhile cond inv body)
+      sigma pi Sskip).
 
 (* Why3 assumption *)
 Inductive many_steps : (map mident value) -> (list (ident* value)%type)
@@ -230,7 +230,7 @@ Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
   (0%Z <= n)%Z.
 
 (* Why3 assumption *)
-Definition reducible(sigma:(map mident value)) (pi:(list (ident*
+Definition reductible(sigma:(map mident value)) (pi:(list (ident*
   value)%type)) (s:stmt): Prop := exists sigma':(map mident value),
   exists pi':(list (ident* value)%type), exists s':stmt, (one_step sigma pi s
   sigma' pi' s').
@@ -282,13 +282,35 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
 
+Parameter msubst_term: term -> mident -> ident -> term.
+
+Axiom msubst_term_def : forall (t:term) (x:mident) (v:ident),
+  match t with
+  | ((Tvalue _)|(Tvar _)) => ((msubst_term t x v) = t)
+  | (Tderef y) => ((x = y) -> ((msubst_term t x v) = (Tvar v))) /\
+      ((~ (x = y)) -> ((msubst_term t x v) = t))
+  | (Tbin t1 op t2) => ((msubst_term t x v) = (Tbin (msubst_term t1 x v) op
+      (msubst_term t2 x v)))
+  end.
+
 (* Why3 assumption *)
-Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
+Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
+  match f with
+  | (Fterm e) => (Fterm (msubst_term e x v))
+  | (Fand f1 f2) => (Fand (msubst f1 x v) (msubst f2 x v))
+  | (Fnot f1) => (Fnot (msubst f1 x v))
+  | (Fimplies f1 f2) => (Fimplies (msubst f1 x v) (msubst f2 x v))
+  | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
+  | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
+  end.
+
+(* Why3 assumption *)
+Fixpoint fresh_in_term(id:ident) (t:term) {struct t}: Prop :=
   match t with
   | (Tvalue _) => True
-  | (Tvar i) => ~ (x = i)
+  | (Tvar i) => ~ (id = i)
   | (Tderef _) => True
-  | (Tbin t1 _ t2) => (fresh_in_term x t1) /\ (fresh_in_term x t2)
+  | (Tbin t1 _ t2) => (fresh_in_term id t1) /\ (fresh_in_term id t2)
   end.
 
 (* Why3 assumption *)
@@ -301,28 +323,6 @@ Fixpoint fresh_in_fmla(id:ident) (f:fmla) {struct f}: Prop :=
   | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\
       (fresh_in_fmla id f1))
   | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
-  end.
-
-Parameter msubst_term: term -> mident -> ident -> term.
-
-Axiom msubst_term_def : forall (t:term) (r:mident) (v:ident),
-  match t with
-  | ((Tvalue _)|(Tvar _)) => ((msubst_term t r v) = t)
-  | (Tderef x) => ((r = x) -> ((msubst_term t r v) = (Tvar v))) /\
-      ((~ (r = x)) -> ((msubst_term t r v) = t))
-  | (Tbin t1 op t2) => ((msubst_term t r v) = (Tbin (msubst_term t1 r v) op
-      (msubst_term t2 r v)))
-  end.
-
-(* Why3 assumption *)
-Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
-  match f with
-  | (Fterm e) => (Fterm (msubst_term e x v))
-  | (Fand f1 f2) => (Fand (msubst f1 x v) (msubst f2 x v))
-  | (Fnot f1) => (Fnot (msubst f1 x v))
-  | (Fimplies f1 f2) => (Fimplies (msubst f1 x v) (msubst f2 x v))
-  | (Flet y t f1) => (Flet y (msubst_term t x v) (msubst f1 x v))
-  | (Fforall y ty f1) => (Fforall y ty (msubst f1 x v))
   end.
 
 Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
@@ -367,27 +367,16 @@ Theorem eval_swap : forall (f:fmla),
   end.
 destruct f; auto.
 intros.
-simpl in *.
 assert (h: forall (l1 l2 : list (ident*value)) (a : (ident*value)), 
-   (Cons a (infix_plpl l1 l2)) = (infix_plpl (Cons a l1) l2)).
-intros.
-induction l1.
-simpl; auto.
-simpl; auto.
-destruct d; auto.
+   (Cons a (infix_plpl l1 l2)) = (infix_plpl (Cons a l1) l2))
+  by (simpl; auto).
+destruct d; simpl.
 (* Void *)
 ae.
-(*rewrite h.
-rewrite h in H1.
-apply H; auto.*)
 (* Int *)
-intros.
-rewrite h.
-ae.
+intros; rewrite h; ae.
 (* Bool *)
-intros.
-rewrite h.
-ae.
+intros; rewrite h; ae.
 Qed.
 
 
