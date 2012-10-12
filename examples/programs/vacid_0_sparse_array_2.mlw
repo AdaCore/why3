@@ -21,15 +21,15 @@ back   +-+-+-+-------------------+
 *)
 
   use import int.Int
-  use import module array.Array as A
+  use import array.Array as A
 
   constant maxlen : int = 1000
 
-  type sparse_array 'a = {| values : array 'a;
-                            index  : array int;
-                            back   : array int;
-                    mutable card   : int;
-                            def    : 'a; |}
+  type sparse_array 'a = { values : array 'a;
+                           index  : array int;
+                           back   : array int;
+                   mutable card   : int;
+                           def    : 'a; }
   invariant {
     0 <= card <= A.length values <= maxlen /\
     A.length values = A.length index = A.length back /\
@@ -51,31 +51,31 @@ back   +-+-+-+-------------------+
 
   (* creation *)
 
-  val malloc : n:int -> {} array 'a { A.length result = n }
+  val malloc (n:int) : array 'a ensures { A.length result = n }
 
-  let create (sz: int) (d: 'a) =
-    { 0 <= sz <= maxlen }
-    {| values = malloc sz;
-       index  = malloc sz;
-       back   = malloc sz;
-       card   = 0;
-       def    = d |}
-    { result.card = 0 /\ result.def = d /\ length result = sz }
+  let create (sz: int) (d: 'a)
+    requires { 0 <= sz <= maxlen }
+    ensures { result.card = 0 /\ result.def = d /\ length result = sz }
+  = { values = malloc sz;
+      index  = malloc sz;
+      back   = malloc sz;
+      card   = 0;
+      def    = d }
 
   (* access *)
 
-  let test (a: sparse_array 'a) i =
-    { 0 <= i < length a }
-    0 <= a.index[i] && a.index[i] < a.card && a.back[a.index[i]] = i
-    { result=True <-> is_elt a i }
+  let test (a: sparse_array 'a) i
+    requires { 0 <= i < length a }
+    ensures { result=True <-> is_elt a i }
+  = 0 <= a.index[i] && a.index[i] < a.card && a.back[a.index[i]] = i
 
-  let get (a: sparse_array 'a) i =
-    { 0 <= i < length a }
-    if test a i then
+  let get (a: sparse_array 'a) i
+    requires { 0 <= i < length a }
+    ensures { result = value a i }
+  = if test a i then
       a.values[i]
     else
       a.def
-    { result = value a i }
 
   (* assignment *)
 
@@ -93,23 +93,23 @@ back   +-+-+-+-------------------+
     a.card = a.length ->
     forall i: int. 0 <= i < a.length -> is_elt a i
 
-  let set (a: sparse_array 'a) i v =
-    { 0 <= i < length a }
-    a.values[i] <- v;
+  let set (a: sparse_array 'a) i v
+    requires { 0 <= i < length a }
+    ensures { value a i = v /\
+      forall j:int. j <> i -> value a j = value (old a) j }
+  = a.values[i] <- v;
     if not (test a i) then begin
       assert { a.card < length a };
       a.index[i] <- a.card;
       a.back[a.card] <- i;
       a.card <- a.card + 1
     end
-    { value a i = v /\
-      forall j:int. j <> i -> value a j = value (old a) j }
 
 end
 
 module Harness
 
-  use import module SparseArray
+  use import SparseArray
 
   type elt
   constant default : elt
@@ -133,9 +133,3 @@ module Harness
     ()
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_sparse_array.gui"
-End:
-*)

@@ -1,26 +1,21 @@
 module M
 
-  use import module ref.Ref
+  use import ref.Ref
 
   predicate q1 int int int
 
   val r : ref int
 
-  val f1 : y:int ->
-             {} unit writes r { q1 !r (old !r) y }
+  val f1 (y:int) : unit writes {r} ensures { q1 !r (old !r) y }
 
-  let g1 () = {} f1 !r { q1 !r (old !r) (old !r) }
+  let g1 () ensures { q1 !r (old !r) (old !r) } = f1 !r
 
   function foo int : int
   predicate q int int int
 
-  val f : t:ref int -> x:int ->
-             {} unit writes t { q !t (old !t) x }
+  val f (t:ref int) (x:int) : unit writes {t} ensures { q !t (old !t) x }
 
-  let g (t:ref int) =
-    {}
-    f t (foo !t)
-    { q !t (old !t) (foo (old !t)) }
+  let g (t:ref int) ensures { q !t (old !t) (foo (old !t)) } = f t (foo !t)
 
 end
 

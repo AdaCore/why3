@@ -260,12 +260,11 @@ let dexception uc qid =
 let no_ghost gh =
   if gh then errorm "ghost types are not supported in this version of WhyML"
 
-let dueffect env e =
-  { du_reads  = e.Ptree.pe_reads;
-    du_writes = e.Ptree.pe_writes;
-    du_raises = List.map
-      (fun id -> let ls,_,_ = dexception env.uc id in ls)
-        e.Ptree.pe_raises; }
+let dueffect env sp =
+  { du_reads  = sp.Ptree.sp_reads;
+    du_writes = sp.Ptree.sp_writes;
+    du_raises = List.concat (List.map (fun (_,l) -> List.map (fun (id,_,_) ->
+        let ls,_,_ = dexception env.uc id in ls) l) sp.Ptree.sp_xpost) }
 
 let dpost uc (q, ql) =
   let dexn (id, l) = let s, _, _ = dexception uc id in s, l in
@@ -312,6 +311,8 @@ let rec lexpr_conj = function
 
 let get_post l =
   let conv = function
+    | _, [{pat_desc = PPpwild}, le]
+    | _, [{pat_desc = PPptuple []}, le]
     | _, [{pat_desc = PPpvar { id = "result" }}, le] -> le
     | loc, _ -> Loc.errorm ~loc "Patterns in postconditions \
         are not supported in this version of WhyML" in
@@ -321,7 +322,7 @@ let get_xpost = function
   | [] -> []
   | [loc, l] ->
       let conv (xs, p, le) = match p.pat_desc with
-        | PPpvar { id = "result" } -> xs, le
+        | PPpwild | PPptuple [] | PPpvar { id = "result" } -> xs, le
         | _ -> Loc.errorm ~loc "Patterns in postconditions \
               are not supported in this version of WhyML" in
       List.map conv l
@@ -340,7 +341,7 @@ let rec dutype_v env = function
 
 and dutype_c env (ty,sp) =
   { duc_result_type = dutype_v env ty;
-    duc_effect      = dueffect env sp.Ptree.sp_effect;
+    duc_effect      = dueffect env sp;
     duc_pre         = lexpr_conj sp.Ptree.sp_pre;
     duc_post        = dpost env.uc sp;
   }
@@ -697,10 +698,8 @@ and dexpr_desc ~ghost ~userloc env loc = function
   | Ptree.Eraise (qid, e) ->
       let ls, tyl, _ = dexception env.uc qid in
       let e = match e, tyl with
-        | None, [] ->
+        | None, [ty] when Denv.unify ty dty_unit ->
             None
-        | Some _, [] ->
-            errorm ~loc "expection %a has no argument" print_qualid qid
         | None, [ty] ->
             errorm ~loc "exception %a is expecting an argument of type %a"
               print_qualid qid print_dty ty;
@@ -717,17 +716,18 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let handler (id, x, h) =
         let ls, tyl, _ = dexception env.uc id in
         let x, env = match x, tyl with
-          | Some _, [] ->
-              errorm ~loc "expection %a has no argument" print_qualid id
-          | None, [] ->
-              None, env
-          | None, [ty] ->
-              errorm ~loc "exception %a is expecting an argument of type %a"
-                print_qualid id print_dty ty;
-          | Some x, [ty] ->
+          | { pat_desc = PPpvar x }, [ty] ->
               Some x.id, add_local env x.id ty
+          | { pat_desc = PPptuple [] }, [ty] ->
+              if not (Denv.unify dty_unit ty) then errorm ~loc
+                "exception %a expects an argument of type %a"
+                print_qualid id print_dty ty;
+              None, env
+          | { pat_desc = PPpwild }, _ ->
+              None, env
           | _ ->
-              assert false
+              errorm ~loc "patterns in try-with are not supported \
+                in this version of WhyML"
         in
         let h = dexpr ~ghost ~userloc env h in
         expected_type h e1.dexpr_type;
@@ -2360,7 +2360,6 @@ type program_decl =
   | PDdecl of Ptree.decl
   | PDpdecl of Ptree.pdecl
   | PDuseclone of Ptree.use_clone
-  | PDuse of Ptree.use
   | PDnamespace of string * bool * (Ptree.loc * program_decl) list
 
 (* env  = to retrieve theories and modules from the loadpath
@@ -2436,28 +2435,28 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
       in
       add_decl (Dparam ps) uc (* TODO: is it really needed? *)
   | PDpdecl (Ptree.Dexn (id, ty)) ->
-      let ty = option_map (type_type uc) ty in
+      let ty = Some (type_type uc ty) in
       add_exception id.id_loc id.id ty uc
   (* modules *)
-  | PDuse { use_theory = qid; use_imp_exp = imp_exp; use_as = use_as } ->
-      let loc = Typing.qloc qid in
-      let q, id = Typing.split_qualid qid in
-      let m =
-        try
-          find_module env lmod q id
-        with Not_found ->
-          errorm ~loc "@[unbound module %a@]" print_qualid qid
-      in
-      begin try match imp_exp with
-        | Some imp ->
-            (* use T = namespace T use_export T end *)
-            let uc = open_namespace uc use_as in
-            let uc = use_export uc m in
-            close_namespace uc imp
-        | None ->
-            use_export uc m
-      with ClashSymbol s ->
-        errorm ~loc "clash with previous symbol %s" s
+  | PDuseclone
+    ({ use_theory = qid; use_imp_exp = imp_exp; use_as = use_as }, sub as d) ->
+      begin try
+        let q, id = Typing.split_qualid qid in
+        let m = find_module env lmod q id in
+        if sub <> None then errorm ~loc
+          "cannot clone modules in this version of WhyML";
+        try match imp_exp with
+          | Some imp ->
+              (* use T = namespace T use_export T end *)
+              let uc = open_namespace uc use_as in
+              let uc = use_export uc m in
+              close_namespace uc imp
+          | None ->
+              use_export uc m
+        with ClashSymbol s ->
+          errorm ~loc "clash with previous symbol %s" s
+      with Not_found ->
+        Pgm_module.add_use_clone env ltm loc d uc
       end
   | PDnamespace (id, import, dl) ->
       let uc = open_namespace uc id in
@@ -2470,8 +2469,6 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
       add_logics loc uc d
   | PDdecl (Ptree.PropDecl _ | Ptree.Meta _ as d) ->
       Pgm_module.add_pure_pdecl loc d uc
-  | PDuseclone d ->
-      Pgm_module.add_use_clone env ltm loc d uc
 
 (*
 Local Variables:

@@ -1,7 +1,7 @@
 module M
 
 use import int.Int
-use import module ref.Ref
+use import ref.Ref
 
 (* Side effect in expressions (Bart Jacobs' tricky example) *)
 
@@ -9,17 +9,17 @@ val b  : ref int
 val b1 : ref int
 val b2 : ref int
 
-let f () =
-  {} b := 1 - !b; !b { result = !b /\ !b = 1 - old !b }
+let f ()
+  ensures { result = !b /\ !b = 1 - old !b }
+= b := 1 - !b; !b
 
-let k () =
-  {}
-  begin
+let k ()
+  ensures { !b1 = 0 /\ !b2 = 1 }
+= begin
     b := 1; (* b := 0 for the left-to-right evaluation *)
     b1 := (1 - (f ())) + (f ());
     b2 := (f ()) * (1 - (f ()))
   end
-  { !b1 = 0 /\ !b2 = 1 }
 
 end
 

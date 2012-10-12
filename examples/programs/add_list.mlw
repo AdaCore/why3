@@ -1,4 +1,3 @@
-
 theory SumList
 
 use export int.Int
@@ -31,7 +30,7 @@ module AddListRec
 use import SumList
 
 let rec sum (l: list or_integer_float) : (int, real) =
-  { true }
+    returns { si, sf -> si = add_int l /\ sf = add_real l }
   match l with
   | Nil -> (0, 0.0)
   | Cons h t ->
@@ -41,7 +40,6 @@ let rec sum (l: list or_integer_float) : (int, real) =
       | Real x -> (a,x +. b)
       end
   end
-  { let (si, sf) = result in si = add_int l /\ sf = add_real l }
 
 let main () =
   let l =
@@ -58,12 +56,12 @@ end
 module AddListImp
 
 use import SumList
-use import module ref.Ref
+use import ref.Ref
 
 exception Break
 
 let sum (l: list or_integer_float) : (int, real) =
-  { true }
+    returns { si, sf -> si = add_int l /\ sf = add_real l }
   let si = ref 0 in
   let sf = ref 0.0 in
   let ll = ref l in
@@ -83,7 +81,6 @@ let sum (l: list or_integer_float) : (int, real) =
    absurd
   with Break -> (!si, !sf)
   end
-  { let (si, sf) = result in si = add_int l /\ sf = add_real l }
 
 
 let main () =
@@ -96,4 +93,3 @@ let main () =
   assert { f = 4.7 }
 
 end
-

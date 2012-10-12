@@ -703,7 +703,9 @@ let e_plapp pls el ity =
 
 let e_lapp ls el ity = e_plapp (fake_pls ls) el ity
 
-let e_void = e_lapp (fs_tuple 0) [] ity_unit
+let fs_void = fs_tuple 0
+let t_void = fs_app fs_void [] ty_unit
+let e_void = e_lapp fs_void [] ity_unit
 
 (* if and match *)
 
@@ -1141,8 +1143,6 @@ let e_fold fn acc e = match e.e_node with
   | Eabstr (e,_) -> fn acc e
   | Elogic _ | Evalue _ | Earrow _
   | Eany _ | Eassert _ | Eabsurd -> acc
-
-let t_void = fs_app (fs_tuple 0) [] ty_unit
 
 let spec_purify sp =
   let vs, f = Mlw_ty.open_post sp.c_post in

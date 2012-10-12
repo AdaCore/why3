@@ -60,7 +60,7 @@ let add_theory env path lenv m =
       let th = Theory.open_namespace th name in
       let th = List.fold_left add_decl th dl in
       Typing.close_namespace loc import th
-    | Pgm_typing.PDpdecl _ | Pgm_typing.PDuse _ -> assert false
+    | Pgm_typing.PDpdecl _ -> assert false
   in
   let th = List.fold_left add_decl th m.pth_decl in
   close_theory lenv th
@@ -114,8 +114,6 @@ let open_file, close_file =
       Stack.push ((loc, PDpdecl d) :: Stack.pop muc) muc in
     let use_clone loc use =
       Stack.push ((loc, PDuseclone use) :: Stack.pop muc) muc in
-    let use_module loc use =
-      Stack.push ((loc, PDuse use) :: Stack.pop muc) muc in
     { open_theory = open_theory;
       close_theory = close_theory;
       open_module = open_module;
@@ -124,8 +122,7 @@ let open_file, close_file =
       close_namespace = close_namespace;
       new_decl = new_decl;
       new_pdecl = new_pdecl;
-      use_clone = use_clone;
-      use_module = use_module; }
+      use_clone = use_clone; }
   in
   let close_file () = List.rev (Stack.pop lenv) in
   open_file, close_file

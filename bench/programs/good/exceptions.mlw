@@ -1,13 +1,12 @@
 module M
 
 use import int.Int
-use import module ref.Ref
+use import ref.Ref
 
 exception Break
 
-let f (n : int) : int  =
-  { true }
-  let i = ref n in
+let f (n : int) : int ensures { result <= 10 }
+= let i = ref n in
   try
     while (!i > 0) do
       invariant { true }
@@ -18,7 +17,6 @@ let f (n : int) : int  =
   with Break -> ()
   end;
   !i
-  { result <= 10 }
 
 end
 

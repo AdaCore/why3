@@ -48,7 +48,6 @@ module InPlaceRev
       p <> null /\ list_seg (get next p) next l q ->
          list_seg p next (Cons p l) q
 
-
   lemma list_seg_frame:
     forall next1 next2:map loc loc, p q v: loc, pM:list loc.
       list_seg p next1 pM null /\ next2 = set next1 q v /\
@@ -67,24 +66,23 @@ module InPlaceRev
     forall next:map loc loc, pM:list loc, p: loc.
       list_seg p next pM null -> no_repet pM
 
-  use import module ref.Ref
+  use import ref.Ref
 
   val next : ref (map loc loc)
 
-  let in_place_reverse (l:loc) (lM:list loc) : loc =
-    { list_seg l !next lM null }
-    'Init:
+  let in_place_reverse (l:loc) (lM:list loc) : loc
+    requires { list_seg l !next lM null }
+    ensures  { list_seg result !next (reverse lM) null }
+  = 'Init:
     let p = ref l in
     let pM = ref lM in
     let r = ref null in
     let rM = ref (Nil : list loc) in
     while !p <> null do
-      invariant {
-         list_seg !p !next !pM null /\
-         list_seg !r !next !rM null /\
-         disjoint !pM !rM /\
-         (reverse !pM) ++ !rM = reverse lM
-        }
+      invariant { list_seg !p !next !pM null }
+      invariant { list_seg !r !next !rM null }
+      invariant { disjoint !pM !rM }
+      invariant { (reverse !pM) ++ !rM = reverse lM }
         let n = get !next !p in
         next := set !next !p !r;
         assert { list_seg !r !next !rM null };
@@ -94,13 +92,5 @@ module InPlaceRev
         pM := tail !pM
     done;
     !r
-    { list_seg result !next (reverse lM) null }
 
 end
-
-
-(*
-Local Variables:
-compile-command: "why3ide linked_list_rev.mlw"
-End:
-*)

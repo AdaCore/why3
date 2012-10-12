@@ -7,11 +7,10 @@
 module CheckingALargeRoutine
 
   use import int.Fact
-  use import module ref.Ref
+  use import ref.Ref
 
   (* using 'while' loops, to keep close to Turing's flowchart *)
-  let routine (n: int) =
-    { n >= 0 }
+  let routine (n: int) requires { n >= 0 } ensures { result = fact n } =
     let r = ref 0 in
     let u = ref 1 in
     while !r < n do
@@ -28,11 +27,9 @@ module CheckingALargeRoutine
       r := !r + 1
     done;
     !u
-    { result = fact n }
 
   (* using 'for' loops, for clearer code and annotations *)
-  let routine2 (n: int) =
-    { n >= 0 }
+  let routine2 (n: int) requires { n >= 0 } ensures { result = fact n } =
     let u = ref 1 in
     for r = 0 to n-1 do invariant { !u = fact r }
       let v = !u in
@@ -41,13 +38,5 @@ module CheckingALargeRoutine
       done
     done;
     !u
-    { result = fact n }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/checking_a_large_routine.gui"
-End:
-*)
-

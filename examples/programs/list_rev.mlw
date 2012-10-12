@@ -2,7 +2,7 @@
 module M
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
   use import map.Map
 
   (** Memory model and definition of is_list *)
@@ -112,19 +112,19 @@ module M
   goal consistent : forall next : next, p: pointer, q: pointer.
     is_list next p -> is_list next q -> false
 
-  let list_rev (p : ref pointer) =
-    { is_list !next !p }
-    let q = ref null in
+  let list_rev (p : ref pointer)
+    requires { is_list !next !p }
+    ensures { is_list !next !result }
+  = let q = ref null in
     while !p <> null do
-      invariant
-        { is_list !next !p /\ is_list !next !q /\ sep_list_list !next !p !q }
+      invariant { is_list !next !p /\ is_list !next !q }
+      invariant { sep_list_list !next !p !q }
       let tmp = !next[!p] in
       next := !next[!p <- !q];
       q := !p;
       p:= tmp
     done;
     q
-    { is_list !next !result }
 
   (** behavior *)
 
@@ -153,16 +153,18 @@ module M
     (not in_ft q (list_ft next p))
     -> model next p = model next[q <- v] p
 
-  let list_rev_behv (p : ref pointer) =
-    { is_list !next !p }
-    let old_next = !next in
+  let list_rev_behv (p : ref pointer)
+    requires { is_list !next !p }
+    ensures  { is_list !next !result }
+    ensures  { reverse (model (old !next) (old !p)) = model !next !result }
+  = let old_next = !next in
     let old_p = !p in
     let q = ref null in
     while !p <> null do
-      invariant { is_list !next !p /\ is_list !next !q
-                  /\ sep_list_list !next !p !q /\
-      reverse (model (old_next) (old_p)) =
-       (reverse (model !next !p)) ++ (model !next !q)}
+      invariant { is_list !next !p /\ is_list !next !q }
+      invariant { sep_list_list !next !p !q }
+      invariant { reverse (model (old_next) (old_p)) =
+        reverse (model !next !p) ++ model !next !q }
       let tmp = !next[!p] in
       let bak_next = !next in
       next := !next[!p <- !q];
@@ -172,9 +174,6 @@ module M
       p:= tmp
     done;
     q
-    { is_list !next !result /\ reverse (model (old !next) (old !p)) =
-        model !next !result}
-
 
 end
 
@@ -182,7 +181,7 @@ end
 module M2
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
   use import map.Map
 
   (** Memory model and definition of is_list *)
@@ -282,18 +281,18 @@ module M2
     is_list next p -> is_list next q -> false
 
   let list_rev (p : ref pointer) =
-    { is_list !next !p }
+    requires { is_list !next !p }
+    ensures  { is_list !next !result }
     let q = ref null in
     while !p <> null do
-      invariant
-        { is_list !next !p /\ is_list !next !q /\ sep_list_list !next !p !q }
+      invariant { is_list !next !p /\ is_list !next !q }
+      invariant { sep_list_list !next !p !q }
       let tmp = !next[!p] in
       next := !next[!p <- !q];
       q := !p;
       p:= tmp
     done;
     q
-    { is_list !next !result }
 
   (** behavior *)
 
@@ -325,17 +324,19 @@ module M2
   goal consistent_behv : forall next : next, p: pointer, q: pointer.
     is_list next p -> is_list next q -> false
 
-  let list_rev_behv (p : ref pointer) =
-    { is_list !next !p }
-    let old_next = !next in
+  let list_rev_behv (p : ref pointer)
+    requires { is_list !next !p }
+    ensures  { is_list !next !result }
+    ensures  { reverse (model (old !next) (old !p)) = model !next !result }
+  = let old_next = !next in
     let old_p = !p in
     let q = ref null in
 'Init:
     while !p <> null do
-      invariant { is_list !next !p /\ is_list !next !q
-                  /\ sep_list_list !next !p !q /\
-      reverse (model (at !next 'Init) (old_p)) =
-       (reverse (model !next !p)) ++ (model !next !q)}
+      invariant { is_list !next !p /\ is_list !next !q }
+      invariant { sep_list_list !next !p !q }
+      invariant { reverse (model (at !next 'Init) (old_p)) =
+        reverse (model !next !p) ++ model !next !q }
       let tmp = !next[!p] in
       let bak_next = !next in
       next := !next[!p <- !q];
@@ -345,13 +346,5 @@ module M2
       p:= tmp
     done;
     q
-    { is_list !next !result /\ reverse (model (old !next) (old !p)) =
-        model !next !result}
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/list_rev.gui"
-End:
-*)

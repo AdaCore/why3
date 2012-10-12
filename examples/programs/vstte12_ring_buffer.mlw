@@ -10,13 +10,13 @@ module RingBuffer
   use import int.Int
   use import list.List
   use import list.Append
-  use import module array.Array
+  use import array.Array
 
-  type buffer 'a = {|
+  type buffer 'a = {
     mutable first: int;
     mutable len  : int;
             data : array 'a;
-  |}
+  }
 
   (* total capacity of the buffer *)
   function size (b: buffer 'a) : int = Array.length b.data
@@ -40,24 +40,24 @@ module RingBuffer
     forall b: buffer 'a. buffer_invariant b ->
     b.len > 0 -> b.first+1 < size b ->
     sequence b = Cons b.data[b.first]
-                 (sequence {| b with first = b.first+1; len = b.len-1 |})
+                 (sequence { b with first = b.first+1; len = b.len-1 })
 
   axiom sequence_def_3:
     forall b: buffer 'a. buffer_invariant b ->
     b.len > 0 -> b.first+1 = size b ->
     sequence b = Cons b.data[b.first]
-                 (sequence {| b with first = 0; len = b.len-1 |})
+                 (sequence { b with first = 0; len = b.len-1 })
 
   lemma sequence_ind_1:
     forall b: buffer 'a. buffer_invariant b ->
     b.len > 0 -> b.first+b.len-1 < size b ->
-    sequence b = sequence {| b with first = b.first; len = b.len-1 |} ++
+    sequence b = sequence { b with first = b.first; len = b.len-1 } ++
                  Cons b.data[b.first+b.len-1] Nil
 
   lemma sequence_ind_2:
     forall b: buffer 'a. buffer_invariant b ->
     b.len > 0 -> b.first+b.len-1 >= size b ->
-    sequence b = sequence {| b with first = b.first; len = b.len-1 |} ++
+    sequence b = sequence { b with first = b.first; len = b.len-1 } ++
                  Cons b.data[b.first+b.len-1 - size b] Nil
 
   lemma sequence_invariance:
@@ -71,52 +71,53 @@ module RingBuffer
 
   (* code *)
 
-  let create (n: int) (dummy: 'a) =
-    { n > 0 }
-    {| first = 0; len = 0; data = make n dummy; |}
-    { buffer_invariant result /\ size result = n /\ sequence result = Nil }
+  let create (n: int) (dummy: 'a)
+    requires { n > 0 }
+    ensures { buffer_invariant result /\
+      size result = n /\ sequence result = Nil }
+  = { first = 0; len = 0; data = make n dummy; }
 
-  let length (b: buffer 'a) =
-    { buffer_invariant b }
-    b.len
-    { result = length b }
+  let length (b: buffer 'a)
+    requires { buffer_invariant b }
+    ensures { result = length b }
+  = b.len
 
-  let clear (b: buffer 'a) =
-    { buffer_invariant b }
-    b.len <- 0
-    { buffer_invariant b /\ length b = 0 /\ sequence b = Nil }
+  let clear (b: buffer 'a)
+    requires { buffer_invariant b }
+    ensures { buffer_invariant b /\ length b = 0 /\ sequence b = Nil }
+  = b.len <- 0
 
-  let push (b: buffer 'a) (x: 'a) =
-    { length b < size b /\ buffer_invariant b }
-    let i = b.first + b.len in
+  let push (b: buffer 'a) (x: 'a)
+    requires { length b < size b /\ buffer_invariant b }
+    ensures { buffer_invariant b /\ length b = (old (length b)) + 1 /\
+      sequence b = (old (sequence b)) ++ Cons x Nil }
+  = let i = b.first + b.len in
     let n = Array.length b.data in
     b.data[if i >= n then i - n else i] <- x;
     b.len <- b.len + 1
-    { buffer_invariant b /\ length b = (old (length b)) + 1 /\
-      sequence b = (old (sequence b)) ++ Cons x Nil }
 
-  let head (b: buffer 'a) =
-    { length b > 0 /\ buffer_invariant b }
-    b.data[b.first]
-    { match sequence b with Nil -> false | Cons x _ -> result = x end }
+  let head (b: buffer 'a)
+    requires { length b > 0 /\ buffer_invariant b }
+    ensures { match sequence b with Nil -> false | Cons x _ -> result = x end }
+  = b.data[b.first]
 
-  let pop (b: buffer 'a) =
-    { length b > 0 /\ buffer_invariant b }
-    let r = b.data[b.first] in
+  let pop (b: buffer 'a)
+    requires { length b > 0 /\ buffer_invariant b }
+    ensures { buffer_invariant b /\ length b = (old (length b)) - 1 /\
+      match old (sequence b) with
+      | Nil -> false
+      | Cons x l -> result = x /\ sequence b = l end }
+  = let r = b.data[b.first] in
     b.len <- b.len - 1;
     let n = Array.length b.data in
     b.first <- b.first + 1;
     if b.first = n then b.first <- 0;
     r
-    { buffer_invariant b /\ length b = (old (length b)) - 1 /\
-      match old (sequence b) with
-      | Nil -> false
-      | Cons x l -> result = x /\ sequence b = l end }
 end
 
 module Harness
 
-  use import module RingBuffer
+  use import RingBuffer
   use import list.List
 
   let harness () =
@@ -163,9 +164,3 @@ module Harness
     let h = pop b in assert { h = z }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide vstte12_ring_buffer.mlw"
-End:
-*)

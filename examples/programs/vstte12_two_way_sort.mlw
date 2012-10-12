@@ -9,25 +9,25 @@ module TwoWaySort
 
   use import int.Int
   use import bool.Bool
-  use import module ref.Refint
-  use import module array.Array
-  use import module array.ArrayPermut
+  use import ref.Refint
+  use import array.Array
+  use import array.ArrayPermut
 
   predicate le (x y: bool) = x = False \/ y = True
 
   predicate sorted (a: array bool) =
     forall i1 i2: int. 0 <= i1 <= i2 < a.length -> le a[i1] a[i2]
 
-  let swap (a: array bool) (i: int) (j: int) =
-    { 0 <= i < length a /\ 0 <= j < length a }
-    let v = a[i] in
+  let swap (a: array bool) (i: int) (j: int)
+    requires { 0 <= i < length a /\ 0 <= j < length a }
+    ensures { exchange (old a) a i j }
+  = let v = a[i] in
     a[i] <- a[j];
     a[j] <- v
-    { exchange (old a) a i j }
 
-  let two_way_sort (a: array bool) =
-    { }
-    'Init:
+  let two_way_sort (a: array bool)
+    ensures { sorted a /\ permut (old a) a }
+  = 'Init:
     let i = ref 0 in
     let j = ref (length a - 1) in
     while !i < !j do
@@ -40,12 +40,5 @@ module TwoWaySort
       else if a[!j] then decr j
       else begin swap a !i !j; incr i; decr j end
     done
-    { sorted a /\ permut (old a) a }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide vstte12_two_way_sort.mlw"
-End:
-*)

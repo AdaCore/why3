@@ -26,7 +26,6 @@ type program_decl =
   | PDdecl of Ptree.decl
   | PDpdecl of Ptree.pdecl
   | PDuseclone of Ptree.use_clone
-  | PDuse of Ptree.use
   | PDnamespace of string * bool * (Ptree.loc * program_decl) list
 
 val decl :

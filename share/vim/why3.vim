@@ -27,7 +27,6 @@ syn match    whyKeyChar    "|"
 syn match    whyBraceErr   "}"
 syn match    whyBrackErr   "\]"
 syn match    whyParenErr   ")"
-syn match    whyRecorErr   "|}"
 
 syn match    whyCommentErr "\(^\|[^(]\)\*)"
 
@@ -42,7 +41,7 @@ syn match    whyModuleErr  "\<module\>"
 syn match    whyEndErr     "\<end\>"
 
 " Some convenient clusters
-syn cluster  whyAllErrs contains=whyBraceErr,whyBrackErr,whyParenErr,whyRecorErr,whyCommentErr,whyCountErr,whyDoErr,whyDoneErr,whyEndErr,whyThenErr,whyTheoryErr,whyModuleErr
+syn cluster  whyAllErrs contains=whyBraceErr,whyBrackErr,whyParenErr,whyCommentErr,whyCountErr,whyDoErr,whyDoneErr,whyEndErr,whyThenErr,whyTheoryErr,whyModuleErr
 
 syn cluster  whyContained contains=whyTodo,whyImport,whyExport,whyTheoryContents,whyModuleContents,whyNamespaceContents,whyModuleKeyword
 " ,whyPreDef,whyModParam,whyModParam1,whyPreMPRestr,whyMPRestr,whyMPRestr1,whyMPRestr2,whyMPRestr3,whyModRHS,whyFuncWith,whyFuncStruct,whyModTypeRestr,whyModTRWith,whyWith,whyWithRest,whyModType,whyFullMod,whyVal
@@ -51,7 +50,6 @@ syn cluster  whyContained contains=whyTodo,whyImport,whyExport,whyTheoryContents
 syn region   whyEncl transparent matchgroup=whyKeyword start="(" matchgroup=whyKeyword end=")" contains=ALLBUT,@whyContained,whyParenErr
 syn region   whyEncl transparent matchgroup=whyKeyword start="{" matchgroup=whyKeyword end="}"  contains=ALLBUT,@whyContained,whyBraceErr
 syn region   whyEncl transparent matchgroup=whyKeyword start="\[" matchgroup=whyKeyword end="\]" contains=ALLBUT,@whyContained,whyBrackErr
-syn region   whyEncl transparent matchgroup=whyKeyword start="{|" matchgroup=whyKeyword end="|}" contains=ALLBUT,@whyContained,whyRecorErr
 
 " Comments
 syn region   whyComment start="(\*\([^)]\|$\)" end="\(^\|[^(]\)\*)" contains=whyComment,whyTodo
@@ -86,20 +84,24 @@ syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\|prop\)
 
 syn keyword  whyKeyword  as constant
 syn keyword  whyKeyword  else epsilon exists
-syn keyword  whyKeyword  false forall function
+syn keyword  whyKeyword  forall function
 syn keyword  whyKeyword  if in inductive coinductive
 syn keyword  whyKeyword  let meta
 syn keyword  whyKeyword  not predicate
-syn keyword  whyKeyword  then true type with
+syn keyword  whyKeyword  then type with
 
-syn keyword  whyKeyword  abstract absurd any assert assume
-syn keyword  whyKeyword  check exception fun ghost
-syn keyword  whyKeyword  invariant model mutable
-syn keyword  whyKeyword  private raise raises reads rec
-syn keyword  whyKeyword  val variant while writes
+syn keyword  whyKeyword  abstract any
+syn keyword  whyKeyword  exception fun ghost
+syn keyword  whyKeyword  model mutable private
+syn keyword  whyKeyword  raise rec val while
+
+syn keyword  whyBoolean  true false
 
 syn keyword  whyType     bool int list map option real
 syn keyword  whyType     array ref unit
+
+syn keyword  whySpec     absurd assert assume check ensures invariant
+syn keyword  whySpec     raises reads requires returns variant writes
 
 syn match    whyConstructor  "(\s*)"
 syn match    whyConstructor  "\u\(\w\|'\)*\>"
@@ -113,7 +115,7 @@ syn match    whyOperator     "/\\"
 syn match    whyOperator     "\\/"
 syn match    whyOperator     "&&"
 syn match    whyOperator     "<>"
-syn match    whyKeyChar      "|[^}]"me=e-1
+syn match    whyKeyChar      "|"
 syn match    whyKeyChar      "?"
 syn match    whyKeyChar      "!"
 syn match    whyKeyChar      ";"
@@ -166,7 +168,6 @@ if version >= 508 || !exists("did_why_syntax_inits")
   HiLink whyBraceErr	   Error
   HiLink whyBrackErr	   Error
   HiLink whyParenErr	   Error
-  HiLink whyRecorErr	   Error
   HiLink whyCommentErr     Error
   HiLink whyCountErr	   Error
   HiLink whyDoErr	   Error
@@ -190,10 +191,12 @@ if version >= 508 || !exists("did_why_syntax_inits")
   HiLink whyKeyChar	   Keyword
   HiLink whyAnyVar	   Keyword
   HiLink whyOperator	   Keyword
+  HiLink whySpec	   Identifier
 
   HiLink whyNumber	   Number
   HiLink whyFloat	   Float
   HiLink whyString	   String
+  HiLink whyBoolean	   Boolean
 
   HiLink whyType	   Type
 

@@ -13,27 +13,23 @@ module HashTable
   use import int.Int
   use import map.Map
 
-  type t 'a 'b model {| mutable contents: map 'a (option 'b) |}
+  type t 'a 'b model { mutable contents: map 'a (option 'b) }
 
   function ([]) (h: t 'a 'b) (k: 'a) : option 'b = Map.get h.contents k
 
-  val create (n:int) :
-    { 0 < n } t 'a 'b { forall k: 'a. result[k] = None }
+  val create (n:int) : t 'a 'b
+    requires { 0 < n } ensures { forall k: 'a. result[k] = None }
 
-  val clear (h: t 'a 'b) :
-    {} unit writes h { forall k: 'a. h[k] = None }
+  val clear (h: t 'a 'b) : unit writes {h}
+    ensures { forall k: 'a. h[k] = None }
 
-  val add (h: t 'a 'b) (k: 'a) (v: 'b) :
-    {}
-    unit writes h
-    { h[k] = Some v /\ forall k': 'a. k' <> k -> h[k'] = (old h)[k'] }
+  val add (h: t 'a 'b) (k: 'a) (v: 'b) : unit writes {h}
+    ensures { h[k] = Some v /\ forall k': 'a. k' <> k -> h[k'] = (old h)[k'] }
 
   exception Not_found
 
-  val find (h: t 'a 'b) (k: 'a) :
-    {}
-    'b reads h raises Not_found
-    { h[k] = Some result } | Not_found -> { h[k] = None }
+  val find (h: t 'a 'b) (k: 'a) : 'b reads {h}
+    ensures { h[k] = Some result } raises { Not_found -> h[k] = None }
 
 end
 
@@ -47,10 +43,11 @@ module HashTableImpl
   use import map.Map
   use import list.List
   use import list.Mem
-  use import module array.Array
+  use import array.Array
 
-  type t 'a 'b = {| mutable contents: map 'a (option 'b);
-                    data: array (list ('a, 'b)) |}
+  type t 'a 'b = { mutable contents: map 'a (option 'b);
+                   data: array (list ('a, 'b)) }
+                 invariant { length data > 0 }
 
   function get (h: t 'a 'b) (k: 'a) : option 'b = Map.get h.contents k
 
@@ -58,6 +55,10 @@ module HashTableImpl
 
   function idx (h: t 'a 'b) (k: 'a) : int =
     mod (abs (hash k)) (length h.data)
+
+  lemma idx_bounds:
+    forall h: t 'a 'b, k: 'a.
+      0 < length h.data -> 0 <= idx h k < length h.data
 
   (* [(k,v)] is the first pair in [l] with key [k] *)
   predicate occurs_first (k: 'a) (v: 'b) (l: list ('a, 'b)) = match l with
@@ -73,65 +74,50 @@ module HashTableImpl
     forall k1: 'a, v1: 'b, l: list ('a, 'b). occurs_first k1 v1 l ->
     forall k: 'a, v: 'b. k <> k1 -> occurs_first k1 v1 (Cons (k,v) l)
 
-  predicate valid (h: t 'a 'b) =
-    length h.data > 0 /\
+  type t 'c 'b
     (* h[k]=v iff (k,v) is the first pair for k in the bucket for k *)
-    (forall k: 'a, v: 'b.
-       get h k = Some v <-> occurs_first k v h.data[idx h k]) /\
+    invariant { forall k: 'c, v: 'b.
+       get result k = Some v <-> occurs_first k v data[idx result k] }
     (* a pair (k,v) is always stored in the right bucket *)
-    (forall k: 'a, v: 'b.
-     forall i: int. 0 <= i < length h.data ->
-       mem (k,v) h.data[i] -> i = idx h k)
+    invariant { forall k: 'c, v: 'b.
+       forall i: int. 0 <= i < length data ->
+         mem (k,v) data[i] -> i = idx result k }
 
-  lemma idx_bounds:
-    forall h: t 'a 'b. valid h -> forall k: 'a. 0 <= idx h k < length h.data
+  let create (n:int)
+    requires { 0 < n }
+    ensures  { forall k: 'a. get result k = None }
+  = { contents = const None; data = make n (Nil: list ('a, 'b)) }
 
-  let create (n:int) =
-    { 0 < n }
-    {| contents = const None;
-       data = make n (Nil: list ('a, 'b)) |}
-    { valid result /\ forall k: 'a. get result k = None }
-
-  let clear (h: t 'a 'b) =
-    { valid h }
-    fill h.data 0 (length h.data) Nil;
+  let clear (h: t 'a 'b)
+    ensures { forall k: 'a. get h k = None }
+  = fill h.data 0 (length h.data) Nil;
     h.contents <- const None
-    { valid h /\ forall k: 'a. get h k = None }
 
-  let idx (h: t 'a 'b) (k: 'a) =
-    { }
-    mod (abs (hash k)) (length h.data)
-    { result = idx h k }
+  let idx (h: t 'a 'b) (k: 'a)
+    ensures { result = idx h k }
+  = mod (abs (hash k)) (length h.data)
 
-  let add (h: t 'a 'b) (k: 'a) (v: 'b) =
-    { valid h }
-    let i = idx h k in
+  let add (h: t 'a 'b) (k: 'a) (v: 'b)
+    ensures { get h k = Some v }
+    ensures { forall k': 'a. k' <> k -> get h k' = get (old h) k' }
+  = let i = idx h k in
     h.data[i] <- Cons (k,v) h.data[i];
     h.contents <- Map.set h.contents k (Some v)
-    { valid h &&
-      get h k = Some v /\ forall k': 'a. k' <> k -> get h k' = get (old h) k' }
 
   exception Not_found
 
-  let rec lookup (k: 'a) (l: list ('a, 'b)) : 'b =
-    {}
-    match l with
+  let rec lookup (k: 'a) (l: list ('a, 'b)) : 'b
+    ensures { occurs_first k result l }
+    raises  { Not_found -> forall v: 'b. not (mem (k, v) l) }
+  = match l with
     | Nil -> raise Not_found
     | Cons (k', v) r -> if k = k' then v else lookup k r
     end
-    { occurs_first k result l }
-    | Not_found -> { forall v: 'b. not (mem (k, v) l) }
 
-  let find (h: t 'a 'b) (k: 'a) =
-    { valid h }
-    let i = idx h k in
+  let find (h: t 'a 'b) (k: 'a)
+    ensures { get h k = Some result }
+    raises  { Not_found -> get h k = None }
+  = let i = idx h k in
     lookup k h.data[i]
-    { get h k = Some result } | Not_found -> { get h k = None }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/hash_tables.gui"
-End:
-*)

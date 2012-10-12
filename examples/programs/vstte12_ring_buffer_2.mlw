@@ -11,14 +11,14 @@ module RingBuffer
 
   use import int.Int
   use import list.NthLengthAppend as L
-  use import module array.Array
+  use import array.Array
 
-  type buffer 'a = {|
+  type buffer 'a = {
     mutable first: int;
     mutable len  : int;
             data : array 'a;
     ghost mutable sequence: list 'a;
-  |}
+  }
   invariant {
     let size = Array.length data in
     0 <= first <  size /\
@@ -39,55 +39,53 @@ module RingBuffer
 
   (* code *)
 
-  let create (n: int) (dummy: 'a) =
-    { n > 0 }
-    {| first = 0; len = 0; data = make n dummy; sequence = Nil |}
-    { size result = n /\ result.sequence = Nil }
+  let create (n: int) (dummy: 'a)
+    requires { n > 0 }
+    ensures { size result = n /\ result.sequence = Nil }
+  = { first = 0; len = 0; data = make n dummy; sequence = Nil }
 
-  let length (b: buffer 'a) =
-    { }
-    b.len
-    { result = length b }
+  let length (b: buffer 'a)
+    ensures { result = length b }
+  = b.len
 
-  let clear (b: buffer 'a) =
-    { }
-    ghost b.sequence <- Nil;
+  let clear (b: buffer 'a)
+    ensures { length b = 0 /\ b.sequence = Nil }
+  = ghost b.sequence <- Nil;
     b.len <- 0
-    { length b = 0 /\ b.sequence = Nil }
 
-  let push (b: buffer 'a) (x: 'a) =
-    { length b < size b }
-    ghost b.sequence <- b.sequence ++ Cons x Nil;
+  let push (b: buffer 'a) (x: 'a)
+    requires { length b < size b }
+    ensures { length b = (old (length b)) + 1 /\
+      b.sequence = (old b.sequence) ++ Cons x Nil }
+  = ghost b.sequence <- b.sequence ++ Cons x Nil;
     let i = b.first + b.len in
     let n = Array.length b.data in
     b.data[if i >= n then i - n else i] <- x;
     b.len <- b.len + 1
-    { length b = (old (length b)) + 1 /\
-      b.sequence = (old b.sequence) ++ Cons x Nil }
 
-  let head (b: buffer 'a) =
-    { length b > 0 }
-    b.data[b.first]
-    { match b.sequence with Nil -> false | Cons x _ -> result = x end }
+  let head (b: buffer 'a)
+    requires { length b > 0 }
+    ensures { match b.sequence with Nil -> false | Cons x _ -> result = x end }
+  = b.data[b.first]
 
-  let pop (b: buffer 'a) =
-    { length b > 0 }
-    ghost match b.sequence with Nil -> absurd | Cons _ s -> b.sequence <- s end;
+  let pop (b: buffer 'a)
+    requires { length b > 0 }
+    ensures { length b = (old (length b)) - 1 /\
+      match old b.sequence with
+      | Nil -> false
+      | Cons x l -> result = x /\ b.sequence = l end }
+  = ghost match b.sequence with Nil -> absurd | Cons _ s -> b.sequence <- s end;
     let r = b.data[b.first] in
     b.len <- b.len - 1;
     let n = Array.length b.data in
     b.first <- b.first + 1;
     if b.first = n then b.first <- 0;
     r
-    { length b = (old (length b)) - 1 /\
-      match old b.sequence with
-      | Nil -> false
-      | Cons x l -> result = x /\ b.sequence = l end }
 end
 
 module Harness
 
-  use import module RingBuffer
+  use import RingBuffer
   use import list.List
 
   let harness () =
@@ -134,9 +132,3 @@ module Harness
     let h = pop b in assert { h = z }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide vstte12_ring_buffer_2.mlw"
-End:
-*)

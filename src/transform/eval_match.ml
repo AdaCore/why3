@@ -138,6 +138,9 @@ let eval_match ~inline kn t =
         let_map eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
+        let make_flat_case = match t.t_loc with
+          | Some loc -> Loc.try3 loc make_flat_case
+          | None -> make_flat_case in
         let fn env t = eval env (make_flat_case kn t bl1) in
         begin try dive_to_constructor kn fn env t1
         with Exit -> branch_map eval env t1 bl1 end

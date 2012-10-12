@@ -8,8 +8,8 @@ module M
 *)
 
   use import int.Int
-  use import module ref.Ref
-  use import module array.Array
+  use import ref.Ref
+  use import array.Array
 
   constant n : int
   axiom N_non_negative : n >= 0
@@ -30,9 +30,3 @@ module M
     assert { 0 <= !t <= n }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/wcet_hull.gui"
-End:
-*)

@@ -4,13 +4,12 @@ module M
   use import list.List
   use import list.Length
 
-  let rec append (l1 : list 'a) (l2 : list 'a) variant { length l1 } =
-    { }
-    match l1 with
+  let rec append (l1 : list 'a) (l2 : list 'a) variant { length l1 }
+    ensures { length result = length l1 + length l2 }
+  = match l1 with
     | Nil -> l2
     | Cons x r -> Cons x (append r l2)
     end
-    { length result = length l1 + length l2 }
 
 end
 

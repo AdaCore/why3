@@ -67,11 +67,12 @@ end
 module GilbreathCardTrick
 
   use import GilbreathCardTrickPure
-  use import module stack.Stack
+  use import stack.Stack
 
-  let shuffle (a b: t int) =
-    {}
-    'Init:
+  let shuffle (a b: t int)
+    ensures { a.elts = Nil /\ b.elts = Nil /\
+      shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
+  = 'Init:
     let c = create () in
     while not (is_empty a && is_empty b) do
       invariant {
@@ -87,15 +88,14 @@ module GilbreathCardTrick
         push (pop b) c
     done;
     c
-    { a.elts = Nil /\ b.elts = Nil /\
-      shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
 
-  let card_trick (a: t int) =
-    { length a = n*m /\ suit_ordered a.elts }
-    'Init:
+  let card_trick (a: t int)
+    requires { length a = n*m /\ suit_ordered a.elts }
+    ensures { length result = n*m && suit_sorted result.elts }
+  = 'Init:
     (* cut a into c;d and reverse d in d_ *)
     let d_ = create () in
-    let cut = any {} int { 0 <= result <= n*m } in
+    let cut = any int ensures { 0 <= result <= n*m } in
     for i = 1 to cut do
       invariant { length a = n*m-i+1 /\ length d_ = i-1 /\
                   at a.elts 'Init = reverse d_.elts ++ a.elts }
@@ -104,12 +104,5 @@ module GilbreathCardTrick
     assert { at a.elts 'Init = reverse d_.elts ++ a.elts };
     (* then suffle c (that is a) and d_ to get b *)
     shuffle a d_
-    { length result = n*m && suit_sorted result.elts }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/unraveling_a_card_trick.gui"
-End:
-*)

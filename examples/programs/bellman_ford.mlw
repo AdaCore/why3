@@ -123,8 +123,8 @@ module BellmanFord
   use import Graph
   use int.IntInf as D
 
-  use import module ref.Ref
-  use module impset.Impset as S
+  use import ref.Ref
+  use impset.Impset as S
 
   type distmap = map vertex D.t
 
@@ -174,18 +174,26 @@ module BellmanFord
      forall v: vertex. not (negative_cycle v)
 
   let relax (m: ref distmap) (u v: vertex) (pass: int)
-            (via: set (vertex, vertex)) =
-    { 1 <= pass /\ mem (u, v) edges /\ not (mem (u, v) via) /\
-      inv1 !m pass via }
-    let n = D.add !m[u] (D.Finite (weight u v)) in
+            (via: set (vertex, vertex))
+    requires { 1 <= pass /\ mem (u, v) edges /\ not (mem (u, v) via) }
+    requires { inv1 !m pass via }
+    ensures  { inv1 !m pass (add (u, v) via) }
+  = let n = D.add !m[u] (D.Finite (weight u v)) in
     if D.lt n !m[v] then m := !m[v <- n]
-    { inv1 !m pass (add (u, v) via) }
 
   exception NegativeCycle
 
-  let bellman_ford () =
-    { }
-    let m = ref (initialize_single_source s) in
+  let bellman_ford ()
+    ensures { forall v: vertex. mem v vertices ->
+      match result[v] with
+        | D.Finite n ->
+            (exists l: list vertex. path s l v /\ path_weight l v = n) /\
+            (forall l: list vertex. path s l v -> path_weight l v >= n)
+        | D.Infinite ->
+            (forall l: list vertex. not (path s l v))
+      end }
+    raises { NegativeCycle -> exists v: vertex. negative_cycle v }
+  = let m = ref (initialize_single_source s) in
     for i = 1 to cardinal vertices - 1 do
       invariant { inv1 !m i empty }
       let es = S.create edges in
@@ -210,21 +218,5 @@ module BellmanFord
     done;
     assert { inv2 !m edges };
     !m
-    { forall v: vertex. mem v vertices ->
-      match result[v] with
-        | D.Finite n ->
-            (exists l: list vertex. path s l v /\ path_weight l v = n) /\
-            (forall l: list vertex. path s l v -> path_weight l v >= n)
-        | D.Infinite ->
-            (forall l: list vertex. not (path s l v))
-      end }
-    | NegativeCycle ->
-      { exists v: vertex. negative_cycle v }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide bellman_ford.mlw"
-End:
-*)

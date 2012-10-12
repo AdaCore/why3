@@ -1,7 +1,7 @@
 module M
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
 
   (* preliminaries *)
 
@@ -30,11 +30,8 @@ module M
 
 val alloc : ref first_free_addr
 
-val new_pointer : tt:unit ->
-  { }
-  pointer
-  writes alloc
-  { !alloc = old !alloc + 1 /\ result = old !alloc }
+val new_pointer (tt:unit) : pointer writes { alloc }
+  ensures { !alloc = old !alloc + 1 /\ result = old !alloc }
 
 (*
 record Student =
@@ -125,15 +122,14 @@ fun CreateCourse(R:[Course]): [R]
   c
 *)
 
-let createCourse (r: (ref (region course))) : pointer =
-  { }
-    let c = new_pointer () in
+let createCourse (r: (ref (region course))) : pointer
+  ensures { valid !alloc result }
+  = let c = new_pointer () in
     let (rStud,student,count,sum) = !r[c] in
     let newc = (rStud,student,0,0) in
     r := !r[c <- newc];
     assert { invCourse !alloc newc };
     c
-  { valid !alloc result }
 
 (*
 fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
@@ -151,16 +147,16 @@ fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
 *)
 
 let registerStudent
-    (r: (ref (region course))) (c:pointer) (name:string) : pointer =
-{ valid !alloc c /\ invCourse !alloc !r[c] }
-  let s = new_pointer () in
+    (r: (ref (region course))) (c:pointer) (name:string) : pointer
+requires { valid !alloc c /\ invCourse !alloc !r[c] }
+ensures  { valid !alloc result }
+= let s = new_pointer () in
   let (rStud,student,count,sum) = !r[c] in
   let newstud = (name,0) in
   let newc = (rStud[s <- newstud],student[count <- s],count+1,sum) in
   r := !r[c <- newc];
   assert { invCourse !alloc newc };
   s
-{ valid !alloc result }
 
 (*
 
@@ -180,9 +176,3 @@ fun SetMark(R:Course, c:[R], s: [c.Rstud], mark: int) : unit
 *)
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/course"
-End:
-*)

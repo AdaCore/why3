@@ -66,9 +66,9 @@ module Combinators
 
   (* task 1: implement CBV reduction *)
 
-  let rec reduction (t: term) : term =
-    {}
-    match t with
+  let rec reduction (t: term) : term
+    ensures { t -->* result /\ is_value result }
+  = match t with
     | S -> S
     | K -> K
     | App t1 t2 -> match reduction t1 with
@@ -81,7 +81,6 @@ module Combinators
       | _ -> absurd
       end
     end
-    { t-->*result /\ is_value result }
 
   (* an irreducible term is a value *)
 
@@ -114,9 +113,10 @@ module Combinators
 
   lemma size_nonneg: forall t: term. size t >= 0
 
-  let rec reduction2 (t: term) : term variant { size t } =
-    { only_K t }
-    match t with
+  let rec reduction2 (t: term) : term variant { t }
+    requires { only_K t }
+    ensures { only_K result /\ is_value result }
+  = match t with
     | S -> S
     | K -> K
     | App t1 t2 -> match reduction2 t1 with
@@ -129,7 +129,6 @@ module Combinators
       | _ -> absurd
       end
     end
-    { only_K result /\ is_value result }
 
   (* task 3 *)
 
@@ -150,9 +149,12 @@ module Combinators
 
   use import int.Div2
 
-  let rec reduction3 (t: term) : term =
-    { exists n: int. n >= 0 /\ t = ks n }
-    match t with
+  let rec reduction3 (t: term) : term
+    requires { exists n: int. n >= 0 /\ t = ks n }
+    ensures { is_value result /\
+      forall n: int. n >= 0 -> (t = ks (2*n)   -> result = K)
+                            /\ (t = ks (2*n+1) -> result = App K K) }
+  = match t with
     | S -> S
     | K -> K
     | App t1 t2 -> match reduction3 t1 with
@@ -165,9 +167,6 @@ module Combinators
       | _ -> absurd
       end
     end
-    { is_value result /\
-      forall n: int. n >= 0 -> (t = ks (2*n)   -> result = K)
-                            /\ (t = ks (2*n+1) -> result = App K K) }
 
    lemma ks_value:
      forall n: int. 0 <= n -> is_value (ks n) -> 0 <= n <= 1
@@ -177,9 +176,3 @@ module Combinators
                           /\ ks (2*n+1) -->* App K K
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide vstte12_combinators.mlw"
-End:
-*)

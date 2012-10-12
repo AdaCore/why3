@@ -68,27 +68,23 @@ module HashTable
   use import int.Int
   use import map.Map
 
-  type t 'a 'b model {| mutable contents: map 'a (option 'b) |}
+  type t 'a 'b model { mutable contents: map 'a (option 'b) }
 
   function ([]) (h: t 'a 'b) (k: 'a) : option 'b = Map.get h.contents k
 
-  val create (n:int) :
-    { 0 < n } t 'a 'b { forall k: 'a. result[k] = None }
+  val create (n:int) : t 'a 'b
+    requires { 0 < n } ensures { forall k: 'a. result[k] = None }
 
-  val clear (h: t 'a 'b) :
-    {} unit writes h { forall k: 'a. h[k] = None }
+  val clear (h: t 'a 'b) : unit writes {h}
+    ensures { forall k: 'a. h[k] = None }
 
-  val add (h: t 'a 'b) (k: 'a) (v: 'b) :
-    {}
-    unit writes h
-    { h[k] = Some v /\ forall k': 'a. k' <> k -> h[k'] = (old h)[k'] }
+  val add (h: t 'a 'b) (k: 'a) (v: 'b) : unit writes {h}
+    ensures { h[k] = Some v /\ forall k': 'a. k' <> k -> h[k'] = (old h)[k'] }
 
   exception Not_found
 
-  val find (h: t 'a 'b) (k: 'a) :
-    {}
-    'b reads h raises Not_found
-    { h[k] = Some result } | Not_found -> { h[k] = None }
+  val find (h: t 'a 'b) (k: 'a) : 'b reads {h}
+    ensures { h[k] = Some result } raises { Not_found -> h[k] = None }
 
 end
 
@@ -97,7 +93,7 @@ module MaxMatrixMemo
   use import int.Int
   use import int.MinMax
   use import map.Map
-  use import module ref.Ref
+  use import ref.Ref
 
   constant n : int
   axiom n_nonneg: 0 <= n
@@ -123,7 +119,7 @@ module MaxMatrixMemo
     forall s: map int int. sum s[i <- j] i n = m[i][j] + sum s (i+1) n
 
   use import option.Option
-  use module HashTable as H
+  use HashTable as H
 
   type key = (int, set)
   type value = (int, mapii)
@@ -149,9 +145,10 @@ module MaxMatrixMemo
   predicate inv (t: table) =
     forall k: key, v: value. H.([]) t k = Some v -> post k v
 
-  let rec maximum (i:int) (c: set) : (int, map int int) variant {2*n-2*i} =
-    { pre (i, c) /\ inv table }
-    if i = n then
+  let rec maximum (i:int) (c: set) : (int, map int int) variant {2*n-2*i}
+    requires { pre (i, c) /\ inv table }
+    ensures { post (i,c) result /\ inv table }
+  = if i = n then
       (0, const 0)
     else begin
       let r = ref (-1) in
@@ -176,26 +173,18 @@ module MaxMatrixMemo
       assert { 0 <= !r };
       (!r, !sol)
     end
-    { post (i,c) result /\ inv table }
 
-  with memo (i:int) (c: set) : (int, map int int) variant {2*n-2*i+1} =
-    { pre (i,c) /\ inv table }
-    try  H.find table (i,c)
+  with memo (i:int) (c: set) : (int, map int int) variant {2*n-2*i+1}
+    requires { pre (i,c) /\ inv table }
+    ensures { post (i,c) result /\ inv table }
+  = try  H.find table (i,c)
     with H.Not_found -> let r = maximum i c in H.add table (i,c) r; r end
-    { post (i,c) result /\ inv table }
 
-  let maxmat () =
-    { }
-    H.clear table;
+  let maxmat ()
+    ensures { exists s: map int int. permutation s /\ result =  sum s 0 n }
+    ensures { forall s: map int int. permutation s -> result >= sum s 0 n }
+  = H.clear table;
     assert { inv table };
     let (r, _) = maximum 0 (below n) in r
-    { (exists s: map int int. permutation s /\ result =  sum s 0 n) /\
-      (forall s: map int int. permutation s -> result >= sum s 0 n) }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/max_matrix.gui"
-End:
-*)

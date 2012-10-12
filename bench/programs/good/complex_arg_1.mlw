@@ -2,21 +2,13 @@ module M
 
 exception Exception
 
-val f0 : tt:unit ->
-   { }
-   unit
-   { true }
+val f0 (tt:unit) : unit
 
-val f1 : tt:unit ->
-  { }
-  unit
-  raises Exception
-  { true } | Exception -> { true }
+val f1 (tt:unit) : unit raises { Exception }
 
-let f () =
-  { }
-  f0 (f1 ())
-  { true } | Exception -> { true }
+let f ()
+  raises { Exception -> true }
+  = f0 (f1 ())
 
 end
 

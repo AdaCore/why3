@@ -37,27 +37,20 @@ module Relabel
         same_shape (Node l1 r1) (Node l2 r2)
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
 
   val r : ref int
 
-  let fresh () =
-    {} r := !r + 1; !r { !r = old !r + 1 /\ result = !r }
+  let fresh () ensures { !r = old !r + 1 /\ result = !r } =
+    r := !r + 1; !r
 
-  let rec relabel (t : tree 'a) : tree int =
-    {}
-    match t with
+  let rec relabel (t : tree 'a) : tree int
+    ensures { same_shape t result /\ distinct (labels result) /\
+      old !r <= !r /\
+      (forall x:int. mem x (labels result) -> old !r < x <= !r) }
+  = match t with
     | Leaf _   -> Leaf (fresh ())
     | Node l r -> Node (relabel l) (relabel r)
     end
-    { same_shape t result /\ distinct (labels result) /\
-      old !r <= !r /\
-      (forall x:int. mem x (labels result) -> old !r < x <= !r) }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/relabel.gui"
-End:
-*)

@@ -190,12 +190,6 @@ type for_direction = To | Downto
 
 type ghost = bool
 
-type effect = {
-  pe_reads  : lexpr list;
-  pe_writes : lexpr list;
-  pe_raises : qualid list;
-}
-
 type pre = lexpr
 type post = loc * (pattern * lexpr) list
 type xpost = loc * (qualid * pattern * lexpr) list
@@ -204,7 +198,8 @@ type spec = {
   sp_pre     : pre list;
   sp_post    : post list;
   sp_xpost   : xpost list;
-  sp_effect  : effect;
+  sp_reads   : lexpr list;
+  sp_writes  : lexpr list;
   sp_variant : variant list;
 }
 
@@ -242,7 +237,7 @@ and expr_desc =
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
   | Eraise of qualid * expr option
-  | Etry of expr * (qualid * ident option * expr) list
+  | Etry of expr * (qualid * pattern * expr) list
   | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
@@ -261,7 +256,7 @@ type pdecl =
   | Dlet of ident * ghost * expr
   | Dletrec of letrec list
   | Dparam of ident * ghost * type_v
-  | Dexn of ident * pty option
+  | Dexn of ident * pty
 
 (* incremental parsing *)
 
@@ -275,6 +270,4 @@ type incremental = {
   new_decl        : loc -> decl -> unit;
   new_pdecl       : loc -> pdecl -> unit;
   use_clone       : loc -> use_clone -> unit;
-  (* TODO: remove this once the new whyml becomes default *)
-  use_module      : loc -> use -> unit;
 }

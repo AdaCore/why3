@@ -15,7 +15,7 @@ module GenerateAllTrees
   use import list.Mem
   use import list.Append
   use import list.Distinct
-  use import module array.Array
+  use import array.Array
   use import list.Length
 
   type tree = Empty | Node tree tree
@@ -43,58 +43,50 @@ module GenerateAllTrees
 
   (* combines two lists of trees l1 and l2 into the list of trees
      with a left sub-tree from l1 and a right sub-tree from l2 *)
-  let combine (i1: int) (l1: list tree) (i2: int) (l2: list tree) =
-    { 0 <= i1 /\ all_trees i1 l1 /\ 0 <= i2 /\ all_trees i2 l2 }
-    let rec loop1 (l1: list tree) : list tree variant { length l1 } =
-      { distinct l1 }
-      match l1 with
+  let combine (i1: int) (l1: list tree) (i2: int) (l2: list tree)
+    requires { 0 <= i1 /\ all_trees i1 l1 /\ 0 <= i2 /\ all_trees i2 l2 }
+    ensures  { distinct result }
+    ensures  { forall t:tree. mem t result <->
+      (exists l r: tree. t = Node l r /\ size l = i1 /\ size r = i2) }
+  = let rec loop1 (l1: list tree) : list tree variant { l1 }
+      requires { distinct l1 }
+      ensures  { distinct result }
+      ensures  { forall t:tree. mem t result <->
+        (exists l r: tree. t = Node l r /\ mem l l1 /\ mem r l2) }
+    = match l1 with
       | Nil -> Nil
       | Cons t1 l1 ->
-          let rec loop2 (l2: list tree) : list tree  variant { length l2 } =
-            { distinct l2 }
-            match l2 with
+          let rec loop2 (l2: list tree) : list tree variant { l2 }
+            requires { distinct l2 }
+            ensures  { distinct result }
+            ensures  { forall t:tree. mem t result <->
+              (exists r: tree. t = Node t1 r /\ mem r l2) }
+          = match l2 with
             | Nil -> Nil
             | Cons t2 l2 -> Cons (Node t1 t2) (loop2 l2)
             end
-            { distinct result /\
-              forall t:tree. mem t result <->
-              (exists r: tree. t = Node t1 r /\ mem r l2) }
          in
          loop2 l2 ++ loop1 l1
       end
-      { distinct result /\
-        forall t:tree. mem t result <->
-        (exists l r: tree. t = Node l r /\ mem l l1 /\ mem r l2) }
     in
     loop1 l1
-    { distinct result /\
-      forall t:tree. mem t result <->
-      (exists l r: tree. t = Node l r /\ size l = i1 /\ size r = i2) }
 
-  let all_trees (n: int) =
-    { n >= 0 }
-    let a = make (n+1) Nil in
+  let all_trees (n: int)
+    requires { n >= 0 }
+    ensures { forall i: int. 0 <= i <= n -> all_trees i result[i] }
+  = let a = make (n+1) Nil in
     a[0] <- Cons Empty Nil;
     for i = 1 to n do
-      invariant { (forall k: int. 0 <= k < i -> all_trees k a[k]) }
+      invariant { forall k: int. 0 <= k < i -> all_trees k a[k] }
       a[i] <- Nil;
       for j = 0 to i-1 do
-        invariant {
-          (forall k: int. 0 <= k < i -> all_trees k a[k]) /\
-          distinct a[i] /\
-          (forall t: tree. mem t a[i] <->
-           exists l r: tree. t = Node l r /\ size t = i /\ size l < j) }
+        invariant { forall k: int. 0 <= k < i -> all_trees k a[k] }
+        invariant { distinct a[i] }
+        invariant { forall t: tree. mem t a[i] <->
+          (exists l r: tree. t = Node l r /\ size t = i /\ size l < j) }
         a[i] <- (combine j a[j] (i-1-j) a[i-1-j]) ++ a[i]
       done
     done;
     a
-    { forall i: int. 0 <= i <= n -> all_trees i result[i] }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/generate_all_trees.gui"
-End:
-*)
-

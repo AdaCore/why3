@@ -15,7 +15,7 @@
 
 module M
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
   use import int.EuclideanDivision
   use import int.Power
 
@@ -60,16 +60,16 @@ module M
 
   use import int.ComputerDivision
 
-  let rec sd n =
-    { n >= 0 }
-    if n = 0 then 0 else sd (div n 10) + mod n 10
-    { result = sum_digits n }
+  let rec sd n
+    requires { n >= 0 } ensures { result = sum_digits n }
+  = if n = 0 then 0 else sd (div n 10) + mod n 10
 
   (* f(m,a,b) = the number of 0 <= n < 10^m such that
      digitsum(137n+a) + b = digitsum(n). *)
-  let rec f m a b =
-    { 0 <= m /\ 0 <= a }
-    if m = 0 then begin
+  let rec f m a b
+    requires { 0 <= m /\ 0 <= a }
+    ensures { result = solution a b m }
+  = if m = 0 then begin
       (* only n = 0 is possible *)
       if sd a + b = 0 then 1 else 0
     end else begin
@@ -86,12 +86,5 @@ module M
       done;
       !sum
     end
-    { result = solution a b m }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/talk290"
-End:
-*)

@@ -14,20 +14,19 @@ lemma Is_heap_min:
   forall a:map, n :int. n > 0 ->
     is_heap_array a 0 n -> a[0] = min_bag (model (a, n))
 
-use import module ref.Ref
+use import ref.Ref
 
 (* implementation of heaps *)
-let create () : ref logic_heap =
-  { true }
-    let x = (A.const 0, 0) in ref x
-  { is_heap !result /\
-    model !result = empty_bag }
+let create () : ref logic_heap
+  ensures { is_heap !result /\ model !result = empty_bag }
+  = let x = (A.const 0, 0) in ref x
 
 exception Break
 
-let insert (this : ref logic_heap) (e : int) : unit  =
-{ is_heap !this }
-  let (a, n) = !this in
+let insert (this : ref logic_heap) (e : int) : unit
+  requires { is_heap !this }
+  ensures { is_heap !this /\ model !this = add e (model (old !this)) }
+= let (a, n) = !this in
   let arr = ref a in
   let i = ref n in
   try
@@ -54,13 +53,14 @@ let insert (this : ref logic_heap) (e : int) : unit  =
   arr := !arr[!i<-e];
   this := (!arr, n + 1);
   assert { 0 < !i < n -> is_heap !this };
-  assert { !i < n -> model !this = add e (model (a,n)) } 
-{ is_heap !this /\
-    model !this = add e (model (old !this)) }
+  assert { !i < n -> model !this = add e (model (a,n)) }
 
-let extractMin (this : ref logic_heap) : int =
-{ model !this <> empty_bag /\ is_heap !this }
-  let (a, n) = !this in
+let extractMin (this : ref logic_heap) : int
+requires { model !this <> empty_bag /\ is_heap !this }
+ensures { is_heap !this /\
+  result = min_bag (model (old !this)) /\
+  model (old !this) = add result (model !this) }
+= let (a, n) = !this in
   assert {n > 0};
   let min = a[0] in
   let n' = n-1 in
@@ -107,15 +107,13 @@ let extractMin (this : ref logic_heap) : int =
     end;
   this := (!arr, n');
   min
-{ is_heap !this /\
-  result = min_bag (model (old !this)) /\
-  model (old !this) = add result (model !this) }
 
 (*
 
-let extractMin0 (this : ref logic_heap) : int =
-{ model !this <> empty_bag }
-  let (a, n) = !this in
+let extractMin0 (this : ref logic_heap) : int
+requires { model !this <> empty_bag }
+ensures  { model !this = diff (model (old !this)) (singleton result) }
+= let (a, n) = !this in
   assert {n > 0};
   let min = a[0] in
   let n' = n-1 in
@@ -159,13 +157,6 @@ let extractMin0 (this : ref logic_heap) : int =
     end;
   this := (!arr, n');
   min
-{ model !this = diff (model (old !this)) (singleton result) }
 *)
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide -I . heap_implem.mlw"
-End:
-*)

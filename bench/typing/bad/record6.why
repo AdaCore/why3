@@ -1,4 +1,4 @@
 theory Records
-  type t = {| a:int |}
-  goal g1 : let t = {| a = 1; a = 2 |} in true
+  type t = { a:int }
+  goal g1 : let t = { a = 1; a = 2 } in true
 end

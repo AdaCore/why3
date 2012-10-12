@@ -24,21 +24,15 @@ module MaximumTree
     | Node l v r -> mem x l \/ x = v \/ mem x r
   end
 
-  let rec maximum (t: tree) : int variant { size t } =
-    { t <> Empty }
-    match t with
+  let rec maximum (t: tree) : int variant { size t }
+    requires { t <> Empty }
+    ensures { mem result t /\ forall x: int. mem x t -> x <= result }
+  = match t with
       | Empty              -> absurd
       | Node Empty v Empty -> v
       | Node Empty v s
       | Node s     v Empty -> max (maximum s) v
       | Node l     v r     -> max (maximum l) (max v (maximum r))
     end
-    { mem result t /\ forall x: int. mem x t -> x <= result }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/foveoos11_challenge2.gui"
-End:
-*)

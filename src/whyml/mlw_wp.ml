@@ -114,9 +114,6 @@ let backstep fn q xq =
 
 (** WP utilities *)
 
-let fs_void = fs_tuple 0
-let t_void = fs_app fs_void [] ty_unit
-
 let default_exn_post xs _ =
   let vs = create_vsymbol (id_fresh "result") (ty_of_ity xs.xs_ity) in
   create_post vs t_true

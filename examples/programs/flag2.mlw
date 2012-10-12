@@ -8,7 +8,7 @@ module Flag
 
   use import int.Int
   use import map.Map
-  use import module ref.Ref
+  use import ref.Ref
 
   type color = Blue | White | Red
 
@@ -63,50 +63,42 @@ module Flag
        nb_occ (set a k c') i j c = nb_occ a i j c
 
 
- let swap(a:ref (map int color)) (i:int) (j:int) : unit =
-   { }
-   let ai = get !a i in
+ let swap (a:ref (map int color)) (i:int) (j:int) : unit
+   ensures { get !a i = get (old !a) j }
+   ensures { get !a j = get (old !a) i }
+   ensures { forall k:int. k <> i /\ k <> j -> get !a k = get (old !a) k }
+   ensures { forall k1 k2:int, c:color. k1 <= i < k2 /\ k1 <= j < k2 ->
+        nb_occ !a k1 k2 c = nb_occ (old !a) k1 k2 c }
+ = let ai = get !a i in
    let aj = get !a j in
    a := set !a i aj;
    a := set !a j ai
-   { get !a i = get (old !a) j /\
-     get !a j = get (old !a) i /\
-     (forall k:int. k <> i /\ k <> j -> get !a k = get (old !a) k) /\
-     (forall k1 k2:int, c:color. k1 <= i < k2 /\ k1 <= j < k2 ->
-        nb_occ !a k1 k2 c = nb_occ (old !a) k1 k2 c)
-   }
 
 
  let dutch_flag (a:ref (map int color)) (n:int) =
-  { 0 <= n }
+    requires { 0 <= n }
+    ensures { (exists b:int. exists r:int.
+        monochrome !a 0 b Blue /\
+        monochrome !a b r White /\
+        monochrome !a r n Red) }
+    ensures { forall c:color. nb_occ !a 0 n c = nb_occ (old !a) 0 n c }
   let b = ref 0 in
   let i = ref 0 in
   let r = ref n in
   'Init:
   while !i < !r do
-       invariant {
-         0 <= !b <= !i <= !r <= n /\
-         monochrome !a 0 !b Blue /\
-         monochrome !a !b !i White /\
-         monochrome !a !r n  Red /\
-         forall c:color. nb_occ !a 0 n c = nb_occ (at !a 'Init) 0 n c }
-       variant { !r - !i }
-       match get !a !i with
-       | Blue -> swap a !b !i; b := !b + 1; i := !i + 1
-       | White -> i := !i + 1
-       | Red -> r := !r - 1; swap a !r !i
-       end
-    done
-    { (exists b:int. exists r:int.
-        monochrome !a 0 b Blue /\
-        monochrome !a b r White /\
-        monochrome !a r n Red)
-      /\ forall c:color. nb_occ !a 0 n c = nb_occ (old !a) 0 n c }
+    invariant { 0 <= !b <= !i <= !r <= n }
+    invariant { monochrome !a 0 !b Blue }
+    invariant { monochrome !a !b !i White }
+    invariant { monochrome !a !r n  Red }
+    invariant {
+      forall c:color. nb_occ !a 0 n c = nb_occ (at !a 'Init) 0 n c }
+    variant { !r - !i }
+    match get !a !i with
+    | Blue -> swap a !b !i; b := !b + 1; i := !i + 1
+    | White -> i := !i + 1
+    | Red -> r := !r - 1; swap a !r !i
+    end
+  done
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/flag2.gui"
-End:
-*)

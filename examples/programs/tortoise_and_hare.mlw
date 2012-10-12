@@ -51,7 +51,7 @@ module TortoiseAndHare
      The challenge is to prove termination.
      Actually, we even prove that the code runs in time O(lambda + mu). *)
 
-  use import module ref.Ref
+  use import ref.Ref
 
   (* the minimal distance between x i and x j *)
   function dist int int : int
@@ -74,7 +74,7 @@ module TortoiseAndHare
         exists t: int.
         1 <= t <= mu+lambda /\ !tortoise = x t /\ !hare = x (2 * t) /\
         forall i: int. 1 <= i < t -> x i <> x (2*i) }
-      variant { !tortoise } with rel
+      variant { !tortoise with rel }
       tortoise := f !tortoise;
       hare     := f (f !hare)
     done
@@ -82,9 +82,3 @@ module TortoiseAndHare
   (* TODO: code to find out lambda and mu. See wikipedia.  *)
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/tortoise_and_hare.gui"
-End:
-*)

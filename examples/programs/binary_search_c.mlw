@@ -21,7 +21,7 @@ module M1
 
   use import int.Int
   use import int.ComputerDivision
-  use import module ref.Ref
+  use import ref.Ref
 
   type pointer
   type memory
@@ -31,15 +31,18 @@ module M1
 
   exception Return int
 
-  let binary_search (t : pointer) (n : int) (v : int) =
-    { forall k1 k2:int.
+  let binary_search (t : pointer) (n : int) (v : int)
+    requires { forall k1 k2:int.
         0 <= k1 <= k2 <= n-1 -> get !mem t k1 <= get !mem t k2 }
-    try
+    ensures  { (result >= 0 /\ get !mem t result = v) \/
+      (result = -1 /\ forall k:int. 0<=k<n -> get !mem t k <> v) }
+  = try
       let l = ref 0 in
       let u = ref (n-1) in
       while !l <= !u do
-        invariant { 0 <= !l /\ !u <= n-1 /\
-            forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
+        invariant { 0 <= !l /\ !u <= n-1 }
+        invariant {
+          forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
         variant { !u - !l }
         let m = div (!l + !u) 2 in
         if get !mem t m < v then l := m + 1
@@ -50,8 +53,6 @@ module M1
     with Return r ->
       r
     end
-    { (result >= 0 /\ get !mem t result = v) \/
-      (result = -1 /\ forall k:int. 0<=k<n -> get !mem t k <> v) }
 
 end
 
@@ -67,7 +68,7 @@ module M2
 
   use import int.Int
   use import int.ComputerDivision
-  use import module ref.Ref
+  use import ref.Ref
 
   type pointer
   type memory
@@ -77,23 +78,25 @@ module M2
 
   function block_size memory pointer : int
 
-  val get_ :p : pointer -> ofs : int ->
-    { 0 <= ofs < block_size !mem p }
-    int reads mem
-    { result = get !mem p ofs }
+  val get_ (p : pointer) (ofs : int) : int reads { mem }
+    requires { 0 <= ofs < block_size !mem p }
+    ensures  { result = get !mem p ofs }
 
   exception Return int
 
-  let binary_search (t : pointer) (n : int) (v : int) =
-    { n <= block_size !mem t /\
-      forall k1 k2:int.
+  let binary_search (t : pointer) (n : int) (v : int)
+    requires { n <= block_size !mem t }
+    requires { forall k1 k2:int.
         0 <= k1 <= k2 <= n-1 -> get !mem t k1 <= get !mem t k2 }
-    try
+    ensures { (result >= 0 /\ get !mem t result = v) \/
+      (result = -1 /\ forall k:int. 0<=k<n -> get !mem t k <> v) }
+  = try
       let l = ref 0 in
       let u = ref (n-1) in
       while !l <= !u do
-        invariant { 0 <= !l /\ !u <= n-1 /\
-            forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
+        invariant { 0 <= !l /\ !u <= n-1 }
+        invariant {
+          forall k:int. 0 <= k < n -> get !mem t k = v -> !l <= k <= !u }
         variant { !u - !l }
         let m = div (!l + !u) 2 in
         if get_ t m < v then l := m + 1
@@ -104,8 +107,6 @@ module M2
     with Return r ->
       r
     end
-    { (result >= 0 /\ get !mem t result = v) \/
-      (result = -1 /\ forall k:int. 0<=k<n -> get !mem t k <> v) }
 end
 
 (* Finally, let us prove the absence of arithmetic overflow
@@ -115,15 +116,16 @@ module M3
 
   use import int.Int
   use import int.ComputerDivision
-  use import module ref.Ref
+  use import ref.Ref
 
   type int32
   function to_int int32 : int
 
   axiom int32_domain : forall x:int32. -2147483648 <= to_int x <= 2147483647
 
-  val of_int :
-    x:int -> { -2147483648 <= x <= 2147483647 } int32 { to_int result = x }
+  val of_int (x:int) : int32
+    requires { -2147483648 <= x <= 2147483647 }
+    ensures  { to_int result = x }
 
   type pointer
   type memory
@@ -133,25 +135,29 @@ module M3
 
   function block_size memory pointer : int
 
-  val get_ : p:pointer -> ofs:int32 ->
-    { 0 <= to_int ofs < block_size !mem p }
-    int32 reads mem
-    { result = get !mem p (to_int ofs) }
+  val get_ (p:pointer) (ofs:int32) : int32 reads { mem }
+    requires { 0 <= to_int ofs < block_size !mem p }
+    ensures  { result = get !mem p (to_int ofs) }
 
   exception Return int32
 
-  let binary_search (t : pointer) (n : int32) (v : int32) =
-    { 0 <= to_int n <= block_size !mem t /\
-      forall k1 k2:int.
+  let binary_search (t : pointer) (n : int32) (v : int32)
+    requires { 0 <= to_int n <= block_size !mem t }
+    requires { forall k1 k2:int.
         0 <= k1 <= k2 <= to_int n - 1 ->
         to_int (get !mem t k1) <= to_int (get !mem t k2) }
-    try
+    ensures  { (to_int result >= 0 /\
+       to_int (get !mem t (to_int result)) = to_int v)
+      \/
+      (to_int result = -1 /\
+       forall k:int. 0<=k<to_int n -> to_int (get !mem t k) <> to_int v) }
+  = try
       let l = ref (of_int 0) in
       let u = ref (of_int (to_int n - to_int (of_int 1))) in
       while to_int !l <= to_int !u do
-        invariant { 0 <= to_int !l /\ to_int !u <= to_int n - 1 /\
-            forall k:int. 0 <= k < to_int n ->
-              to_int (get !mem t k) = to_int v -> to_int !l <= k <= to_int !u }
+        invariant { 0 <= to_int !l /\ to_int !u <= to_int n - 1 }
+        invariant { forall k:int. 0 <= k < to_int n ->
+          to_int (get !mem t k) = to_int v -> to_int !l <= k <= to_int !u }
         variant { to_int !u - to_int !l }
         let m = of_int (to_int !l
                         +
@@ -168,17 +174,4 @@ module M3
     with Return r ->
       r
     end
-    { (to_int result >= 0 /\
-       to_int (get !mem t (to_int result)) = to_int v)
-      \/
-      (to_int result = -1 /\
-       forall k:int. 0<=k<to_int n -> to_int (get !mem t k) <> to_int v) }
 end
-
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/binary_search_c.gui"
-End:
-*)
-

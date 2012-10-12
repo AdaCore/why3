@@ -107,19 +107,23 @@ module AlphaBeta
   use set.Fset
 
   let rec move_value_alpha_beta alpha beta pos depth move =
-    { depth >= 1 }
-    let pos' = G.do_move pos move in
-    let s = negabeta (-beta) (-alpha) pos' (depth-1)
-    in -s
-    { let pos' = G.do_move pos move in
+    requires { depth >= 1 }
+    ensures  {
+      let pos' = G.do_move pos move in
       let m = G.minmax pos' (depth-1) in
       if - beta < m < - alpha then result = - m
       else if m <= - beta then result >= beta
-      else result <= alpha
-    }
+      else result <= alpha }
+    let pos' = G.do_move pos move in
+    let s = negabeta (-beta) (-alpha) pos' (depth-1)
+    in -s
 
   with negabeta alpha beta pos depth =
-    { depth >= 0 }
+    requires { depth >= 0 }
+    ensures  {
+      if alpha < G.minmax pos depth < beta then result = G.minmax pos depth else
+      if G.minmax pos depth <= alpha then result <= alpha else
+      result >= beta }
     if depth = 0 then G.position_value pos else
     let l = G.legal_moves pos in
     match l with
@@ -131,13 +135,16 @@ module AlphaBeta
 	  if best >= beta then best else
 	    negabeta_rec (max best alpha) beta pos depth best l
     end
-    { if alpha < G.minmax pos depth < beta then result = G.minmax pos depth else
-      if G.minmax pos depth <= alpha then result <= alpha else
-      result >= beta
-    }
 
   with negabeta_rec alpha beta pos depth best l =
-    { depth >= 1 }
+    requires { depth >= 1 }
+    ensures {
+      let moves = Elements.elements l in
+      if Fset.is_empty moves then result = best else
+      let m = G.MinMaxRec.min (pos,depth) moves in
+      if alpha < m < beta then result = m
+      else if m <= alpha then result <= alpha else
+      result >= beta }
     match l with
       |	Nil -> best
       | Cons c l ->
@@ -148,20 +155,13 @@ module AlphaBeta
 	  if new_best >= beta then new_best else
    	    negabeta_rec (max new_best alpha) beta pos depth new_best l
     end
-    { let moves = Elements.elements l in
-      if Fset.is_empty moves then result = best else
-      let m = G.MinMaxRec.min (pos,depth) moves in
-      if alpha < m < beta then result = m
-      else if m <= alpha then result <= alpha else
-      result >= beta
-    }
 
 (* alpha-beta at a given depth *)
 
 let alpha_beta pos depth =
-  { depth >= 0 }
+  requires { depth >= 0 }
+  ensures  { result = G.minmax pos depth }
   negabeta (-G.infinity) G.infinity pos depth
-  { result = G.minmax pos depth }
 
 (* iterative deepening *)
 
@@ -204,10 +204,3 @@ let alpha_beta pos depth =
 *)
 
 end
-
-
-(*
-Local Variables:
-compile-command: "../../bin/why3ide.byte alphaBeta.mlw"
-End:
-*)

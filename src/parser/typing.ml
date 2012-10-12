@@ -1025,7 +1025,7 @@ let add_logics dl th =
   th
 
 let type_term uc denv env t =
-  let t = dterm uc denv t in
+  let t = dterm ~localize:(Some None) uc denv t in
   term env t
 
 let type_fmla uc denv env f =
@@ -1237,8 +1237,7 @@ let open_file, close_file =
       use_clone = use_clone;
       open_module = (fun _ -> assert false);
       close_module = (fun _ -> assert false);
-      new_pdecl = (fun _ -> assert false);
-      use_module = (fun _ _ -> assert false); }
+      new_pdecl = (fun _ -> assert false); }
   in
   let close_file () = Stack.pop lenv in
   open_file, close_file

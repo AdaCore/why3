@@ -11,54 +11,43 @@ module AmortizedQueue
   use import int.Int
   use export list.ListRich
 
-  type queue 'a = {| front: list 'a; lenf: int;
-                     rear : list 'a; lenr: int; |}
-
-  predicate inv (q: queue 'a) =
-    length q.front = q.lenf >= length q.rear = q.lenr
+  type queue 'a = { front: list 'a; lenf: int;
+                    rear : list 'a; lenr: int; }
+    invariant { length front = lenf >= length rear = lenr }
 
   function sequence (q: queue 'a) : list 'a =
     q.front ++ reverse q.rear
 
-  let empty () =
-    {}
-    {| front = Nil; lenf = 0; rear = Nil; lenr = 0 |} : queue 'a
-    { inv result /\ sequence result = Nil }
+  let empty () ensures { sequence result = Nil }
+  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 } : queue 'a
 
-  let head (q: queue 'a) =
-    { inv q /\ sequence q <> Nil }
-    match q.front with
+  let head (q: queue 'a)
+    requires { sequence q <> Nil }
+    ensures { hd (sequence q) = Some result }
+  = match q.front with
       | Nil      -> absurd
       | Cons x _ -> x
     end
-    { hd (sequence q) = Some result }
 
-  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) =
-    { lf = length f /\ lr = length r }
-    if lf >= lr then
-      {| front = f; lenf = lf; rear = r; lenr = lr |}
+  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int)
+    requires { lf = length f /\ lr = length r }
+    ensures { sequence result = f ++ reverse r }
+  = if lf >= lr then
+      { front = f; lenf = lf; rear = r; lenr = lr }
     else
       let f = f ++ reverse r in
-      {| front = f; lenf = lf + lr; rear = Nil; lenr = 0 |}
-    { inv result /\ sequence result = f ++ reverse r }
+      { front = f; lenf = lf + lr; rear = Nil; lenr = 0 }
 
-  let tail (q: queue 'a) =
-    { inv q /\ sequence q <> Nil }
-    match q.front with
+  let tail (q: queue 'a)
+    requires { sequence q <> Nil }
+    ensures { tl (sequence q) = Some (sequence result) }
+  = match q.front with
       | Nil      -> absurd
       | Cons _ r -> create r (q.lenf - 1) q.rear q.lenr
     end
-    { inv result /\ tl (sequence q) = Some (sequence result) }
 
-  let enqueue (x: 'a) (q: queue 'a) =
-    { inv q }
-    create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
-    { inv result /\ sequence result = sequence q ++ Cons x Nil }
+  let enqueue (x: 'a) (q: queue 'a)
+    ensures { sequence result = sequence q ++ Cons x Nil }
+  = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_aqueue.gui"
-End:
-*)

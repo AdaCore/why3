@@ -3,23 +3,18 @@
 module M
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
   use set.Fset as S
   use import map.Map as M
 
   (* iteration on a set *)
 
-  val set_has_next :
-    s:ref (S.set 'a) ->
-      {}
-      bool reads s
-      { if result=True then S.is_empty !s else not S.is_empty !s }
+  val set_has_next (s: ref (S.set 'a)) : bool reads {s}
+    ensures { result = True <-> not (S.is_empty !s) }
 
-  val set_next :
-    s:ref (S.set 'a) ->
-      { not S.is_empty !s }
-      'a writes s
-      { S.mem result (old !s) /\ !s = S.remove result (old !s) }
+  val set_next (s: ref (S.set 'a)) : 'a writes {s}
+    requires { not S.is_empty !s }
+    ensures  { S.mem result (old !s) /\ !s = S.remove result (old !s) }
 
   (* the graph *)
 
@@ -36,15 +31,15 @@ module M
 
   axiom Weight_nonneg : forall x y:vertex. weight x y >= 0
 
-  val eq_vertex :
-    x:vertex -> y:vertex -> {} bool { if result=True then x=y else x<>y }
+  val eq_vertex (x:vertex) (y:vertex) : bool
+    ensures { result = True <-> x = y }
 
   (* visited vertices *)
 
   val visited : ref (S.set vertex)
 
-  val visited_add :
-    x:vertex -> {} unit writes visited { !visited = S.add x (old !visited) }
+  val visited_add (x:vertex) : unit writes {visited}
+    ensures { !visited = S.add x (old !visited) }
 
   (* current distances *)
 
@@ -54,31 +49,17 @@ module M
 
   val q : ref (S.set vertex)
 
-  val q_is_empty :
-    unit ->
-      {}
-      bool reads q
-      { if result=True then S.is_empty !q else not S.is_empty !q }
+  val q_is_empty () : bool reads {q}
+    ensures { result = True <-> S.is_empty !q }
 
-  val init :
-    src:vertex ->
-      {}
-      unit writes visited q d
-      { S.is_empty !visited /\
-        !q = S.add src S.empty /\
-        !d = (old !d)[src <- 0] }
+  val init (src:vertex) : unit writes { visited, q, d }
+    ensures { S.is_empty !visited }
+    ensures { !q = S.add src S.empty }
+    ensures { !d = (old !d)[src <- 0] }
 
-  let relax u v =
-    {}
-    if not (S.mem v !visited) then
-      let x = !d[u] + weight u v in
-      if S.mem v !q then begin
-        if x < !d[v] then d := !d[v <- x]
-      end else begin
-        q := S.add v !q;
-        d := !d[v <- x]
-      end
-    { (S.mem v !visited /\ !q = old !q /\ !d = old !d)
+  let relax u v
+    ensures {
+      (S.mem v !visited /\ !q = old !q /\ !d = old !d)
       \/
       (S.mem v !q /\ !d[u] + weight u v >= !d[v] /\
           !q = old !q /\ !d = old !d)
@@ -88,16 +69,22 @@ module M
       \/
       (not S.mem v !visited /\ not S.mem v (old !q) /\ !q = S.add v (old !q) /\
           !d = (old !d)[v <- (old !d)[u] + weight u v]) }
+  = if not (S.mem v !visited) then
+      let x = !d[u] + weight u v in
+      if S.mem v !q then begin
+        if x < !d[v] then d := !d[v <- x]
+      end else begin
+        q := S.add v !q;
+        d := !d[v <- x]
+      end
 
   predicate min (m:vertex) (q:S.set vertex) (d:M.map vertex int) =
     S.mem m q /\
     forall x:vertex. S.mem x q -> d[m] <= d[x]
 
-  val q_extract_min :
-    unit ->
-      { not S.is_empty !q }
-      vertex reads d writes q
-      { min result (old !q) !d /\ !q = S.remove result (old !q) }
+  val q_extract_min () : vertex reads {d} writes {q}
+    requires { not S.is_empty !q }
+    ensures  { min result (old !q) !d /\ !q = S.remove result (old !q) }
 
   (* paths and shortest paths
      path x y d =
@@ -183,9 +170,13 @@ module M
 
   (* code *)
 
-  let shortest_path_code (src:vertex) (dst:vertex) =
-    { S.mem src v /\ S.mem dst v }
-    init src;
+  let shortest_path_code (src:vertex) (dst:vertex)
+    requires { S.mem src v /\ S.mem dst v }
+    ensures  { (forall v:vertex.
+      S.mem v !visited -> shortest_path src v !d[v]) }
+    ensures  { (forall v:vertex.
+      not S.mem v !visited -> forall dv:int. not path src v dv) }
+  = init src;
     while not (q_is_empty ()) do
       invariant { inv src !visited !q !d /\ inv_succ src !visited !q }
       variant   { S.cardinal v - S.cardinal !visited }
@@ -194,24 +185,12 @@ module M
       visited_add u;
       let su = ref (g_succ u) in
       while not (set_has_next su) do
-        invariant
-        {  S.subset !su (g_succ u) /\
+        invariant{ S.subset !su (g_succ u) /\
            inv src !visited !q !d /\ inv_succ2 src !visited !q u !su }
         variant { S.cardinal !su }
         let v = set_next su in
         relax u v
       done
     done
-    { (forall v:vertex.
-         S.mem v !visited -> shortest_path src v !d[v])
-      /\
-      (forall v:vertex.
-         not S.mem v !visited -> forall dv:int. not path src v dv) }
 
   end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/dijkstra"
-End:
-*)

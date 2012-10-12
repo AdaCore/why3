@@ -227,6 +227,8 @@ exception Immutable of expr
 val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
 
+val fs_void : lsymbol
+val t_void : term
 val e_void : expr
 
 val e_const : constant -> expr

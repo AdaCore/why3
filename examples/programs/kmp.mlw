@@ -10,8 +10,8 @@
 module KnuthMorrisPratt
 
   use import int.Int
-  use import module ref.Ref
-  use import module array.Array
+  use import ref.Ref
+  use import array.Array
 
   type char
 
@@ -84,37 +84,34 @@ module KnuthMorrisPratt
   lemma next_1_0:
     forall p: array char. 1 <= length p -> is_next p 1 0
 
-  use import int.Lex2
+  (* We first compute a table next with the procedure initnext.
+   * That table only depends on the pattern. *)
 
-  (* The pattern *)
-
-  val p : array char
-
-  (* We first compute a global table next with the procedure initnext.
-   * That table only depends on p. *)
-
-  val next : array int
-
-  let initnext () =
-    { 1 <= length next = length p }
-    let m = length p in
+  let initnext (p: array char)
+    requires { 1 <= length p }
+    ensures  { length result = length p &&
+      forall j:int. 0 < j < p.length -> is_next p j result[j] }
+  = let m = length p in
+    let next = make m 0 in
     if 1 < m then begin
       next[1] <- 0;
       let i = ref 1 in
       let j = ref 0 in
       while !i < m - 1 do
-        invariant { 0 <= !j < !i <= m
-         /\ matches p (!i - !j) p 0 !j
-         /\ (forall z:int. !j+1 < z < !i+1 -> not matches p (!i + 1 - z) p 0 z)
-         /\ (forall k:int. 0 < k <= !i -> is_next p k next[k]) }
-        variant { (m - !i, !j) } with lex
+        invariant { 0 <= !j < !i <= m }
+        invariant { matches p (!i - !j) p 0 !j }
+        invariant { forall z:int.
+          !j+1 < z < !i+1 -> not matches p (!i + 1 - z) p 0 z }
+        invariant { forall k:int. 0 < k <= !i -> is_next p k next[k] }
+        variant { m - !i, !j }
         if p[!i] = p[!j] then begin
           i := !i + 1; j := !j + 1; next[!i] <- !j
         end else
           if !j = 0 then begin i := !i + 1; next[!i] <- 0 end else j := next[!j]
       done
-    end
-   { forall j:int. 0 < j < p.length -> is_next p j next[j] }
+    end;
+    next
+
 
   (* The algorithm looks for an occurrence of the pattern p in a text a
    * which is an array of length N.
@@ -125,32 +122,24 @@ module KnuthMorrisPratt
     (0 <= r < length a -> matches a r p 0 (length p)) /\
     (forall k: int. 0 <= k < r -> not (matches a k p 0 (length p)))
 
-  let kmp (a: array char) =
-    { 1 <= length next = length p /\ 0 <= length a }
-    let m = length p in
+  let kmp (p a: array char)
+    requires { 1 <= length p /\ 0 <= length a }
+    ensures  { first_occur p a result }
+  = let m = length p in
     let n = length a in
     let i = ref 0 in
     let j = ref 0 in
-    initnext ();
+    let next = initnext p in
     while !j < m && !i < n do
-      invariant { 0 <= !j <= m /\ !j <= !i <= n
-           /\ matches a (!i - !j) p 0 !j
-           /\ forall k:int. 0 <= k < !i - !j -> not (matches a k p 0 m) }
-      variant { (n - !i, !j) } with lex
+      invariant { 0 <= !j <= m /\ !j <= !i <= n }
+      invariant { matches a (!i - !j) p 0 !j }
+      invariant { forall k:int. 0 <= k < !i - !j -> not (matches a k p 0 m) }
+      variant { n - !i, !j }
       if a[!i] = p[!j] then begin
         i := !i+1; j := !j+1
       end else
         if !j = 0 then i := !i+1 else j := next[!j]
     done;
     if !j = m then !i - m else !i
-    { first_occur p a result }
 
 end
-
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/kmp.gui"
-End:
-*)
-

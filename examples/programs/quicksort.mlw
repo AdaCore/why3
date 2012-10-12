@@ -8,22 +8,23 @@
 module Quicksort
 
   use import int.Int
-  use import module ref.Ref
-  use import module array.Array
-  use import module array.ArraySorted
-  use import module array.ArrayPermut
-  use import module array.ArrayEq
+  use import ref.Ref
+  use import array.Array
+  use import array.ArraySorted
+  use import array.ArrayPermut
+  use import array.ArrayEq
 
-  let swap (t:array int) (i:int) (j:int) =
-    { 0 <= i < length t /\ 0 <= j < length t }
-    let v = t[i] in
+  let swap (t:array int) (i:int) (j:int)
+    requires { 0 <= i < length t /\ 0 <= j < length t }
+    ensures { exchange (old t) t i j }
+  = let v = t[i] in
     t[i] <- t[j];
     t[j] <- v
-    { exchange (old t) t i j }
 
-  let rec quick_rec (t:array int) (l:int) (r:int) : unit variant { 1+r-l } =
-    { 0 <= l /\ r < length t }
-    if l < r then begin
+  let rec quick_rec (t:array int) (l:int) (r:int) : unit variant { 1+r-l }
+    requires { 0 <= l /\ r < length t }
+    ensures { sorted_sub t l (r+1) /\ permut_sub (old t) t l (r+1) }
+  = if l < r then begin
       let v = t[l] in
       let m = ref l in
 'L:   for i = l + 1 to r do
@@ -37,18 +38,9 @@ module Quicksort
       quick_rec t l (!m - 1);
       quick_rec t (!m + 1) r
     end
-    { sorted_sub t l (r+1) /\ permut_sub (old t) t l (r+1) }
 
   let quicksort (t : array int) =
-    { }
+    ensures { sorted t /\ permut (old t) t }
     quick_rec t 0 (length t - 1)
-    { sorted t /\ permut (old t) t }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/quicksort.gui"
-End:
-*)
-

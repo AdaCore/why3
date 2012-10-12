@@ -3,7 +3,7 @@
 
 DONE alt-ergo devrait tenir que de certains labels, i.e.
 pour les termes et les propositions, un label qui matche "model:.*", et
-pour les variables "model:[0-9]+" 
+pour les variables "model:[0-9]+"
 
 DONE: modele donné apres timeout
 
@@ -13,29 +13,19 @@ module M1
 
   use import int.Int
 
-  let f (x "model:0":int) : int =
-    { }
-    if ("model:cond" x >= 42) then x + 3 else 0
-    { "model:post" result <= 50 }
+  let f (x "model:0":int) : int
+    ensures { "model:post" result <= 50 }
+  = if ("model:cond" x >= 42) then x + 3 else 0
 
-  let f_no_lab (x:int) : int =
-    { }
-    if x >= 42 then x + 3 else 0
-    { result <= 50 }
+  let f_no_lab (x:int) : int
+    ensures { result <= 50 }
+  = if x >= 42 then x + 3 else 0
 
-  use import module ref.Ref
+  use import ref.Ref
 
-  let g (x : ref int) : int =
-    { }
-    x := !x + 1;
+  let g (x : ref int) : int
+    ensures { result <= 50 }
+  = x := !x + 1;
     if (!x >= 42) then !x + 3 else 0
-    { result <= 50 }
 
 end
-
-
-(*
-Local Variables: 
-compile-command: "../../bin/why3ide alt-ergo-models.mlw"
-End: 
-*)

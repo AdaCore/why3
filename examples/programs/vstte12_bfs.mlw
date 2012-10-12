@@ -50,8 +50,8 @@ module BFS
 
   use import int.Int
   use import Graph
-  use module impset.Impset as B
-  use import module ref.Refint
+  use impset.Impset as B
+  use import ref.Refint
 
   exception Found int
 
@@ -79,11 +79,14 @@ module BFS
     forall y: vertex. mem y (succ x) -> mem y visited
 
   (* function fill_next fills set next with the unvisited successors of v *)
-  let fill_next (s t v: vertex) (visited current next: B.t vertex) (d:ref int) =
-    { inv s t !visited !current !next !d /\
+  let fill_next (s t v: vertex) (visited current next: B.t vertex) (d:ref int)
+    requires { inv s t !visited !current !next !d /\
       shortest_path s v !d /\
       (forall x: vertex. x<> v -> closure !visited !current !next x) }
-    let acc = ref (succ v) in
+    ensures { inv s t !visited !current !next !d /\
+      subset (succ v) !visited  /\
+      (forall x: vertex. closure !visited !current !next x) }
+  = let acc = ref (succ v) in
     while not (B.is_empty acc) do
       invariant {
         inv s t !visited !current !next !d /\
@@ -97,13 +100,11 @@ module BFS
         B.push w next
       end
     done
-    { inv s t !visited !current !next !d /\
-      subset (succ v) !visited  /\
-      (forall x: vertex. closure !visited !current !next x) }
 
-  let bfs (s: vertex) (t: vertex) =
-    {}
-    let visited = ref (singleton s) in
+  let bfs (s: vertex) (t: vertex)
+    ensures { forall d: int. not (path s t d) }
+    raises { Found r -> shortest_path s t r }
+  = let visited = ref (singleton s) in
     let current = ref (singleton s) in
     let next    = ref empty in
     let d = ref 0 in
@@ -124,13 +125,5 @@ module BFS
       end
     done;
     assert { not (mem t !visited) }
-    { forall d: int. not (path s t d) }
-    | Found -> { shortest_path s t result }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide vstte12_bfs.mlw"
-End:
-*)

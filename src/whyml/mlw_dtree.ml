@@ -29,22 +29,18 @@ type ident = Ptree.ident
 type ghost = bool
 
 type dpre = Ptree.lexpr list
-type dpost = (string * Ptree.lexpr) list
+type dpost = (Ptree.pattern * Ptree.lexpr) list
 type dxpost = dpost Mexn.t
+type deffect = Ptree.lexpr list
 type dvariant = Ptree.lexpr * Term.lsymbol option
 type dinvariant = Ptree.lexpr list
-
-type deffect = {
-  deff_reads  : Ptree.lexpr list;
-  deff_writes : Ptree.lexpr list;
-  deff_raises : xsymbol list;
-}
 
 type dspec = {
   ds_pre     : dpre;
   ds_post    : dpost;
   ds_xpost   : dxpost;
-  ds_effect  : deffect;
+  ds_reads   : deffect;
+  ds_writes  : deffect;
   ds_variant : dvariant list;
 }
 
@@ -82,7 +78,7 @@ and dexpr_desc =
   | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
   | DEraise of xsymbol * dexpr
-  | DEtry of dexpr * (xsymbol * ident * dexpr) list
+  | DEtry of dexpr * (xsymbol * pre_ppattern * dexpr) list
   | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
   | DEassert of Ptree.assertion_kind * Ptree.lexpr
   | DEabstract of dtriple

@@ -64,6 +64,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "Type parameter %s is used twice" s
   | DuplicateProgVar s ->
       Format.fprintf fmt "Parameter %s is used twice" s
+  | TooLateInvariant ->
+      Format.fprintf fmt
+        "Cannot add a type invariant after another program declaration"
 (*
   | PredicateExpected ->
       Format.fprintf fmt "syntax error: predicate expected"
@@ -367,19 +370,13 @@ let dbinders denv bl =
   in
   List.fold_right dbinder bl (denv,[],[])
 
-let deff_of_peff uc pe =
-  { deff_reads  = pe.pe_reads;
-    deff_writes = pe.pe_writes;
-    deff_raises = List.map (find_xsymbol uc) pe.pe_raises; }
-
 let mk_dpost loc = function
-  | [] -> assert false
-  | [{ pat_desc = PPpvar { id = x }}, f] -> x, f
+  | [{ pat_desc = PPpwild | PPptuple [] | PPpvar _ }, _ as p] -> p
   | l ->
-      let x = "result" in
-      let v = { id = x; id_loc = loc; id_lab = [] } in
-      let v = { pp_desc = Ptree.PPvar (Qident v); pp_loc = loc } in
-      x, { pp_desc = PPmatch (v,l); pp_loc = loc }
+      let i = { id = "(null)"; id_loc = loc; id_lab = [] } in
+      let p = { pat_desc = Ptree.PPpvar i; pat_loc = loc } in
+      let v = { pp_desc = Ptree.PPvar (Qident i); pp_loc = loc } in
+      p, { pp_desc = PPmatch (v,l); pp_loc = loc }
 
 let dpost ql = List.map (fun (loc, ql) -> mk_dpost loc ql) ql
 
@@ -403,7 +400,8 @@ let dspec uc sp = {
   ds_pre     = sp.sp_pre;
   ds_post    = dpost sp.sp_post;
   ds_xpost   = dxpost uc sp.sp_xpost;
-  ds_effect  = deff_of_peff uc sp.sp_effect;
+  ds_reads   = sp.sp_reads;
+  ds_writes  = sp.sp_writes;
   ds_variant = dvariant uc sp.sp_variant;
 }
 
@@ -422,7 +420,7 @@ and dtype_v denv = function
 
 (* expressions *)
 
-let de_unit ~loc = hidden_ls ~loc (Term.fs_tuple 0)
+let de_unit ~loc = hidden_ls ~loc Mlw_expr.fs_void
 
 let de_app _loc e el =
   let argl, res = e.de_type in
@@ -594,16 +592,14 @@ and de_desc denv loc = function
       let res = create_type_variable () in
       let e1 = dexpr denv e1 in
       expected_type e1 res;
-      let branch (q, id, e) =
+      let branch (q, pp, e) =
         let xs = find_xsymbol denv.uc q in
-        let dity = specialize_xsymbol xs in
-        let id, denv = match id with
-          | Some id -> id, add_var id dity denv
-          | None -> mk_id "void" loc, denv in
+        let ety = specialize_xsymbol xs in
+        let ppat, dity, denv = dpattern denv pp in
+        unify_loc unify pp.pat_loc ety dity;
         let e = dexpr denv e in
         expected_type e res;
-        xs, id, e
-      in
+        xs, ppat, e in
       let cl = List.map branch cl in
       DEtry (e1, cl), e1.de_type
   | Ptree.Eabsurd ->
@@ -793,9 +789,17 @@ let create_assert lenv f =
 
 let create_pre lenv fs = t_and_simp_l (List.map (create_assert lenv) fs)
 
-let create_post lenv res dty x f =
-  let log_vars = Mstr.add x res lenv.log_vars in
-  let log_denv = Typing.add_var x dty lenv.log_denv in
+let create_post lenv res dty pat f =
+  let log_vars, log_denv = match pat.pat_desc with
+    | Ptree.PPpvar { id = x } ->
+        Mstr.add x res lenv.log_vars,
+        Typing.add_var x dty lenv.log_denv
+    | Ptree.PPptuple [] ->
+        Loc.try2 pat.pat_loc Ty.ty_equal_check res.vs_ty ty_unit;
+        lenv.log_vars, lenv.log_denv
+    | Ptree.PPpwild ->
+        lenv.log_vars, lenv.log_denv
+    | _ -> assert false in
   let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
   let f = t_label_add Split_goal.stop_split f in
   let f = remove_old f in
@@ -805,9 +809,13 @@ let create_post lenv res dty x f =
 
 let create_post lenv ty fs =
   let dty = dty_of_ty ty in
-  let x = match fs with (x,_)::_ -> x | [] -> "result" in
-  let res = create_vsymbol (id_fresh x) ty in
-  let post (x,f) = create_post lenv res dty x f in
+  let rec get_name = function
+    | ({ pat_desc = Ptree.PPpvar { id = "(null)" }},_)::l -> get_name l
+    | ({ pat_desc = Ptree.PPpvar { id = x        }},_)::_ -> x
+    | _::l -> get_name l
+    | [] -> "result" in
+  let res = create_vsymbol (id_fresh (get_name fs)) ty in
+  let post (pat,f) = create_post lenv res dty pat f in
   let f = t_and_simp_l (List.map post fs) in
   Mlw_ty.create_post res f
 
@@ -909,13 +917,14 @@ let get_eff_regs lenv fn (eff,svs) le =
   | _ ->
       errorm ~loc:le.pp_loc "mutable expression expected"
 
-let eff_of_deff lenv deff =
+let eff_of_deff lenv dsp =
   let acc = eff_empty, Svs.empty in
   let add_read acc e = get_eff_regs lenv eff_read acc e in
-  let acc = List.fold_left add_read acc deff.deff_reads in
+  let acc = List.fold_left add_read acc dsp.ds_reads in
   let add_write acc e = get_eff_regs lenv eff_write acc e in
-  let eff, svs = List.fold_left add_write acc deff.deff_writes in
-  List.fold_left (eff_raise ~ghost:false) eff deff.deff_raises, svs
+  let eff, svs = List.fold_left add_write acc dsp.ds_writes in
+  let add_raise xs _ eff = eff_raise eff xs in
+  Mexn.fold add_raise dsp.ds_xpost eff, svs
 
 let check_user_effect lenv e dsp =
   let acc = eff_empty, Svs.empty in
@@ -926,7 +935,7 @@ let check_user_effect lenv e dsp =
     then eff else Loc.errorm ~loc:le.pp_loc
       "this read effect never happens in the expression" in
   let check_read e = ignore (get_eff_regs lenv (read e) acc e) in
-  List.iter check_read dsp.ds_effect.deff_reads;
+  List.iter check_read dsp.ds_reads;
   let write le eff ?(ghost=false) reg =
     ignore ghost;
     if Sreg.mem reg e.e_effect.eff_writes ||
@@ -934,13 +943,13 @@ let check_user_effect lenv e dsp =
     then eff else Loc.errorm ~loc:le.pp_loc
       "this write effect never happens in the expression" in
   let check_write e = ignore (get_eff_regs lenv (write e) acc e) in
-  List.iter check_write dsp.ds_effect.deff_writes;
-  let check_raise xs =
+  List.iter check_write dsp.ds_writes;
+  let check_raise xs _ =
     if Sexn.mem xs e.e_effect.eff_raises ||
        Sexn.mem xs e.e_effect.eff_ghostx
     then () else Loc.errorm
       "this expression does not raise exception %a" print_xs xs in
-  List.iter check_raise dsp.ds_effect.deff_raises
+  Mexn.iter check_raise dsp.ds_xpost
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
@@ -953,7 +962,7 @@ let spec_of_dspec lenv eff vty dsp = {
 
 let rec type_c lenv gh pvs vars (dtyv, dsp) =
   let vty = type_v lenv gh pvs vars dtyv in
-  let eff, esvs = eff_of_deff lenv dsp.ds_effect in
+  let eff, esvs = eff_of_deff lenv dsp in
   (* reset every new region in the result *)
   let eff = match vty with
     | VTvalue v ->
@@ -1149,12 +1158,37 @@ and expr_desc lenv loc de = match de.de_desc with
       e_raise xs (expr lenv de1) (ity_of_dity (snd de.de_type))
   | DEtry (de1, bl) ->
       let e1 = expr lenv de1 in
-      let branch (xs,id,de) =
-        let vtv = vty_value xs.xs_ity in
-        let pv = create_pvsymbol (Denv.create_user_id id) vtv in
-        let lenv = add_local id.id (LetV pv) lenv in
-        xs, pv, expr lenv de in
-      e_try e1 (List.map branch bl)
+      let add_branch (m,l) (xs,pp,de) =
+        let vm, pp = make_ppattern pp (vty_value xs.xs_ity) in
+        let lenv = Mstr.fold (fun s pv -> add_local s (LetV pv)) vm lenv in
+        let e = expr lenv de in
+        try Mexn.add xs ((pp,e) :: Mexn.find xs m) m, l
+        with Not_found -> Mexn.add xs [pp,e] m, (xs::l) in
+      let xsm, xsl = List.fold_left add_branch (Mexn.empty,[]) bl in
+      let mk_branch xs = match Mexn.find xs xsm with
+        | [{ ppat_pattern = { pat_node = Pvar vs }}, e] ->
+            xs, Mlw_ty.restore_pv vs, e
+        | [{ ppat_pattern = { pat_node = Pwild }} as p, e] ->
+            xs, create_pvsymbol (id_fresh "wild") p.ppat_vtv, e
+        | [{ ppat_pattern = { pat_node = Papp (fs,[]) }} as p, e]
+          when ls_equal fs Mlw_expr.fs_void ->
+            xs, create_pvsymbol (id_fresh "void") p.ppat_vtv, e
+        | bl ->
+            let pv = create_pvsymbol (id_fresh "res") (vty_value xs.xs_ity) in
+            let pl = List.rev_map (fun (p,_) -> [p.ppat_pattern],t_void) bl in
+            let lkn = Theory.get_known (get_theory lenv.mod_uc) in
+            let find ts = List.map fst (Decl.find_constructors lkn ts) in
+            let bl = try
+              ignore (Pattern.CompileTerm.compile find [t_var pv.pv_vs] pl);
+              bl
+            with Pattern.NonExhaustive _ ->
+              let ity = ity_of_dity (snd de.de_type) in
+              let _, pp = make_ppattern PPwild pv.pv_vtv in
+              (pp, e_raise xs (e_value pv) ity) :: bl
+            in
+            xs, pv, e_case (e_value pv) (List.rev bl)
+      in
+      e_try e1 (List.rev_map mk_branch xsl)
   (* We push ghost down in order to safely capture even non-ghost
      raises of the inner expression in "ghost try e1 with ..." *)
   | DEghost ({ de_desc = DEtry (de2, bl) } as de1) ->
@@ -1235,6 +1269,52 @@ and expr_lam lenv gh pvl (de, dsp) =
   { l_args = pvl; l_expr = e; l_spec = spec }
 
 (** Type declaration *)
+
+let add_type_invariant loc uc id params inv =
+  let x = "result" in
+  let its = match uc_find_ts uc (Qident id) with
+    | PT its when its.its_inv -> its
+    | _ -> errorm ~loc "type %s does not have an invariant" id.id in
+  let add_tv acc { id = id; id_loc = loc } =
+    let e = Loc.Located (loc, DuplicateTypeVar id) in
+    Sstr.add_new e id acc, Typing.create_user_tv id in
+  let _, tvl = Util.map_fold_left add_tv Sstr.empty params in
+  let ty = ty_app its.its_pure (List.map ty_var tvl) in
+  let res = create_vsymbol (id_fresh x) ty in
+  let vars = Mstr.singleton x res in
+  let denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
+  (* invariants on records may use field names as variables *)
+  let fields = try match find_constructors (get_known uc) its with
+    | [cs, pjl] -> Some (cs, List.map Util.of_option pjl)
+    | _ -> None with _ -> None in
+  let inv = match fields with
+    | None ->
+        let mk_inv f =
+          let f = Typing.type_fmla (get_theory uc) denv vars f in
+          t_label_add Split_goal.stop_split f in
+        List.map mk_inv inv
+    | Some (cs, pjl) ->
+        let idl = List.map (fun pj -> PPvar (id_clone pj.pl_ls.ls_name)) pjl in
+        let ppp = PPlapp (cs.pl_ls, idl) and vty = vty_value (ity_of_ty ty) in
+        let mpv, { ppat_pattern = pat } = Mlw_expr.make_ppattern ppp vty in
+        let vars = Mstr.set_union (Mstr.map (fun v -> v.pv_vs) mpv) vars in
+        let denv = Mstr.fold (fun x pv denv ->
+          Typing.add_var x (dty_of_ty pv.pv_vs.vs_ty) denv) mpv denv in
+        let mk_inv f =
+          let f = Typing.type_fmla (get_theory uc) denv vars f in
+          let f = t_label_add Split_goal.stop_split f in
+          match f.t_node with
+            | Ttrue | Tfalse -> f
+            | _ -> t_case (t_var res) [t_close_branch pat f]
+        in
+        List.map mk_inv inv in
+  let q = Mlw_ty.create_post res (t_and_simp_l inv) in
+  let q = if List.for_all2 tv_equal its.its_args tvl then q else
+    let add mtv u v = Mtv.add u (ty_var v) mtv in
+    let mtv = List.fold_left2 add Mtv.empty tvl its.its_args in
+    t_ty_subst mtv Mvs.empty q in
+  let uc = (count_term_tuples q; flush_tuples uc) in
+  Mlw_module.add_invariant uc its q
 
 let look_for_loc tdl s =
   let look_id loc id = if id.id = s then Some id.id_loc else loc in
@@ -1533,31 +1613,9 @@ let add_types ~wp uc tdl =
     else
       add_decl_with_tuples uc (Decl.create_ty_decl ts.its_pure)
   in
-  let add_invariant d uc f =
-    let ts = Util.of_option (Hashtbl.find tysymbols d.td_ident.id) in
-    let ty = ty_app ts.its_pure (List.map ty_var ts.its_pure.ts_args) in
-    let x = "result" in
-    let f = match d.td_def with
-      | TDrecord fl ->
-          let loc = f.pp_loc in
-          let field { f_loc = loc; f_ident = id } =
-            Qident id, { pat_loc = loc; pat_desc = PPpvar id } in
-          let pat = PPprec (List.map field fl) in
-          let pat = { pat_loc = loc; pat_desc = pat } in
-          let id = { id = x; id_lab = []; id_loc = loc } in
-          let id = { pp_loc = loc; pp_desc = Ptree.PPvar (Qident id) } in
-          { pp_loc = loc; pp_desc = Ptree.PPmatch (id, [pat, f]) }
-      | TDabstract | TDalias _ | TDalgebraic _ -> f
-    in
-    let res = create_vsymbol (id_fresh x) ty in
-    let log_vars = Mstr.singleton x res in
-    let log_denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
-    let f = Typing.type_fmla (get_theory uc) log_denv log_vars f in
-    let f = t_label_add Split_goal.stop_split f in
-    let uc = (count_term_tuples f; flush_tuples uc) in
-    Mlw_module.add_invariant uc ts (Mlw_ty.create_post res f)
+  let add_invariant uc d = if d.td_inv = [] then uc else
+    add_type_invariant d.td_loc uc d.td_ident d.td_params d.td_inv
   in
-  let add_invariant uc d = List.fold_left (add_invariant d) uc d.td_inv in
   try
     let uc = List.fold_left add_type_decl uc abstr in
     let uc = if algeb = [] then uc else
@@ -1580,6 +1638,16 @@ let add_types ~wp uc tdl =
     | DuplicateVar { vs_name = { id_string = s }} ->
         errorm ?loc:(look_for_loc tdl s)
           "Field %s is used twice in the same constructor" s
+
+let add_types ~wp uc tdl = match tdl with
+  (* a single abstract type with an invariant is a late invariant
+     declaration which adds an invariant to a recently declared
+     program type (which must already have an invariant, e.g. true).
+     Otherwise, we trust the parser to not produce abstract or alias
+     type declarations with invariants. *)
+  | [{ td_def = TDabstract; td_inv = _::_  as inv} as d] ->
+      add_type_invariant d.td_loc uc d.td_ident d.td_params inv
+  | _ -> add_types ~wp uc tdl
 
 (** Use/Clone of theories and modules *)
 
@@ -1699,10 +1767,7 @@ let add_pdecl ~wp loc uc = function
       let pd = create_rec_decl fdl in
       add_pdecl_with_tuples ~wp uc pd
   | Dexn (id, pty) ->
-      let ity = match pty with
-        | Some pty ->
-            ity_of_dity (dity_of_pty (create_denv uc) pty)
-        | None -> ity_unit in
+      let ity = ity_of_dity (dity_of_pty (create_denv uc) pty) in
       let xs = create_xsymbol (Denv.create_user_id id) ity in
       let pd = create_exn_decl xs in
       add_pdecl_with_tuples ~wp uc pd
@@ -1769,27 +1834,6 @@ let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
   Loc.try3 loc (use_clone lib mmd mth) uc loc use
 
-let use_module lib mmd mth uc loc use =
-  if Debug.test_flag Typing.debug_parse_only then uc else
-  let path, s = Typing.split_qualid use.use_theory in
-  let mth = find_module loc lib mmd mth path s in
-  (* open namespace, if any *)
-  let uc = if use.use_imp_exp = None then uc
-  else open_namespace uc use.use_as in
-  (* use or clone *)
-  let uc = match mth with
-    | Theory _ ->
-        errorm ~loc "Module not found: %a" print_qualid (use.use_theory)
-    | Module m -> use_export uc m in
-  (* close namespace, if any *)
-  match use.use_imp_exp with
-    | None -> uc
-    | Some imp -> close_namespace uc imp
-
-let use_module lib mmd mth uc loc use =
-  if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (use_module lib mmd mth) uc loc use
-
 let close_theory (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
   let th = Theory.close_theory uc in
@@ -1839,8 +1883,6 @@ let open_file, close_file =
     let use_clone loc use = let (mmd,mth) = Stack.top lenv in if Stack.top inm
       then Stack.push (use_clone lib mmd mth (Stack.pop muc) loc use) muc
       else Stack.push (use_clone_pure lib mth (Stack.pop tuc) loc use) tuc in
-    let use_module loc use = let (mmd,mth) = Stack.top lenv in
-      Stack.push (use_module lib mmd mth (Stack.pop muc) loc use) muc in
     { open_theory = open_theory;
       close_theory = close_theory;
       open_module = open_module;
@@ -1849,8 +1891,7 @@ let open_file, close_file =
       close_namespace = (fun loc -> Loc.try1 loc close_namespace);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
-      use_clone = use_clone;
-      use_module = use_module; }
+      use_clone = use_clone; }
   in
   let close_file () = Stack.pop lenv in
   open_file, close_file

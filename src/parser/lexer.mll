@@ -84,6 +84,7 @@
         "do", DO;
         "done", DONE;
         "downto", DOWNTO;
+        "ensures", ENSURES;
         "exception", EXCEPTION;
         "for", FOR;
         "fun", FUN;
@@ -98,6 +99,8 @@
         "raises", RAISES;
         "reads", READS;
         "rec", REC;
+        "requires", REQUIRES;
+        "returns", RETURNS;
         "to", TO;
         "try", TRY;
         "val", VAL;
@@ -222,10 +225,6 @@ rule token = parse
       { LEFTBRC }
   | "}"
       { RIGHTBRC }
-  | "{|"
-      { LEFTREC }
-  | "|}"
-      { RIGHTREC }
   | ":"
       { COLON }
   | ";"

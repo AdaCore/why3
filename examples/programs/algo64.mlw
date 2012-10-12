@@ -1,4 +1,3 @@
-
 (***
 
 Algorithm 64
@@ -15,18 +14,19 @@ Pages: 321 - 322
 module Algo64
 
   use import int.Int
-  use import module ref.Ref
-  use import module array.Array
-  use import module array.ArrayPermut
-  use import module array.ArraySorted
+  use import ref.Ref
+  use import array.Array
+  use import array.ArrayPermut
+  use import array.ArraySorted
 
   (* Algorithm 63 *)
 
-  val partition :
-    a:array int -> m:int -> n:int -> i:ref int -> j:ref int ->
-    { 0 <= m < n < length a }
-    unit writes a i j
-    { m <= !j < !i <= n /\ permut_sub (old a) a m (n+1) /\
+  val partition (a:array int) (m:int) (n:int) (i:ref int) (j:ref int) : unit
+    requires { 0 <= m < n < length a }
+    writes {a,i,j}
+    ensures { m <= !j < !i <= n }
+    ensures { permut_sub (old a) a m (n+1) }
+    ensures {
       exists x:int.
         (forall r:int. m <= r <= !j -> a[r] <= x) /\
         (forall r:int. !j < r < !i -> a[r] = x) /\
@@ -35,7 +35,9 @@ module Algo64
   (* Algorithm 64 *)
 
   let rec quicksort (a:array int) (m:int) (n:int) : unit variant { n-m } =
-    { 0 <= m <= n < length a }
+    requires { 0 <= m <= n < length a }
+    ensures  { permut_sub (old a) a m (n+1) }
+    ensures  { sorted_sub a m (n+1) }
 'Init:
     if m < n then begin
       let i = ref 0 in
@@ -46,14 +48,5 @@ module Algo64
 'L2:  quicksort a !i n;
       assert { permut_sub (at a 'L2) a m (n+1) }
     end
-    { permut_sub (old a) a m (n+1) /\ sorted_sub a m (n+1) }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/algo64.gui"
-End:
-*)
-
-

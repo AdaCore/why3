@@ -8,8 +8,8 @@
 module Muller
 
   use import int.Int
-  use import module ref.Refint
-  use import module array.Array
+  use import ref.Refint
+  use import array.Array
 
   type param = array int
   predicate pr (a: param) (n: int) = a[n] <> 0
@@ -29,9 +29,3 @@ module Muller
     done
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/muller.gui"
-End:
-*)
