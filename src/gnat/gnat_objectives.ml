@@ -445,7 +445,28 @@ let display_progress () =
       !nb_goals_done !total_nb_goals (!nb_goals_done * 100 / !total_nb_goals)
    end
 
-let iter_subps = iter_main_goals
+exception Found of string
+
+let extract_sloc main_goal =
+   let task = Session.goal_task main_goal in
+   let goal_ident = (Task.task_goal task).Decl.pr_name in
+   let label_set = goal_ident.Ident.id_label in
+   try
+      Ident.Slab.iter (fun lab ->
+         let s = lab.Ident.lab_string in
+         if Util.starts_with s "GP_Subp:" then raise (Found s)) label_set;
+      assert false
+   with Found s -> s
+
+let compare_by_sloc g1 g2 =
+   Pervasives.compare (extract_sloc g1) (extract_sloc g2)
+
+let iter_subps f =
+   let acc = ref [] in
+   iter_main_goals (fun g -> acc := g :: !acc);
+   let subps = List.sort compare_by_sloc !acc in
+   List.iter f subps
+
 
 let matches_subp_filter subp =
    match Gnat_config.limit_subp with
