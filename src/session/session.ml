@@ -502,12 +502,11 @@ let opt lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "%s=\"%a\"@ " lab save_string s
 
-let save_proof_attempt provers fmt _key a =
+let save_proof_attempt fmt (id,a) =
   fprintf fmt
     "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ \
 memlimit=\"%d\"@ %aobsolete=\"%b\"@ archived=\"%b\">"
-    (Mprover.find a.proof_prover provers) a.proof_timelimit
-    a.proof_memlimit
+    id a.proof_timelimit a.proof_memlimit
     (opt "edited") a.proof_edited_as a.proof_obsolete
     a.proof_archived;
   save_status fmt a.proof_state;
@@ -537,12 +536,18 @@ expanded=\"%b\"@ shape=\"%a\">"
     g.goal_verified  g.goal_expanded
     save_string (Tc.string_of_shape g.goal_shape);
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
-  PHprover.iter (save_proof_attempt provers fmt) g.goal_external_proofs;
-  PHstr.iter (save_trans provers fmt) g.goal_transformations;
+  let l = PHprover.fold
+    (fun _ a acc -> (Mprover.find a.proof_prover provers, a) :: acc)
+    g.goal_external_proofs [] in
+  let l = List.sort (fun (i1,_) (i2,_) -> compare i1 i2) l in
+  List.iter (save_proof_attempt fmt) l;
+  let l = PHstr.fold (fun _ t acc -> t :: acc) g.goal_transformations [] in
+  let l = List.sort (fun t1 t2 -> compare t1.transf_name t2.transf_name) l in
+  List.iter (save_trans provers fmt) l;
   Mmetas_args.iter (save_metas provers fmt) g.goal_metas;
   fprintf fmt "@]@\n</goal>"
 
-and save_trans provers fmt _ t =
+and save_trans provers fmt t =
   fprintf fmt "@\n@[<v 1><transf@ name=\"%a\"@ proved=\"%b\"@ expanded=\"%b\">"
     save_string t.transf_name t.transf_verified t.transf_expanded;
   List.iter (save_goal provers fmt) t.transf_goals;
