@@ -143,13 +143,15 @@ Provers support:
   o support for iProver and Zenon
 
 Misc:
-  o [replayer] new option -q
+  o improved output of "why3session latex"
+    (incompatible changes in LaTeX macos)
+  o [replayer] new option -q for running quietly
   o a warning is emitted for unused bound logic variables in "forall",
     "exists" and "let"
   o a warning is emitted for any occurrence of a formula of the form
     "exists x, P -> Q". Formulas of this form are usually a user
     mistake. If this is intended, one can write "exists x, not P \/ Q"
-   instead
+    instead
 
 Bug fixes:
   o fixed bug on merging config files which prevented the use

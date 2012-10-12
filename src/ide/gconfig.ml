@@ -698,7 +698,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   in
   let showtimelimit =
     GButton.check_button
-      ~label:"show time limit for each proof"
+      ~label:"show time and memory limits for each proof"
       ~packing:display_options_box#add ()
       ~active:c.show_time_limit
   in
