@@ -393,6 +393,23 @@ let prepare info defs ((eqs,hyps,goal) as acc) d =
         unsupportedDecl d
           "gappa: lemmas are not supported"
 
+let find_used_equations eqs hyps goal =
+  let used = Hid.create 17 in
+  let mark_used f =
+    t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace used ls.ls_name ()) () f in
+  begin match goal with
+  | Goal_good (_,f) -> mark_used f;
+  | _ -> ()
+  end;
+  List.iter (fun (_,f) -> mark_used f) hyps;
+  List.fold_left (fun acc ((_, v, t) as eq) ->
+    let v = match v.t_node with Tapp (l,[]) -> l.ls_name | _ -> assert false in
+    if Hid.mem used v then begin
+      mark_used t;
+      eq :: acc
+    end else acc
+  ) [] eqs
+
 let print_equation info fmt (pr,t1,t2) =
   fprintf fmt "# equation '%a'@\n" print_ident pr.pr_name;
   fprintf fmt "%a = %a ;@\n" (print_term info) t1 (print_term info) t2
@@ -421,7 +438,7 @@ let print_task env pr thpr _blacklist ?old:_ fmt task =
   let equations,hyps,goal =
     List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
   in
-  List.iter (print_equation info fmt) (List.rev equations);
+  List.iter (print_equation info fmt) (find_used_equations equations hyps goal);
   fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) (List.rev hyps)
     (print_goal info) goal
 (*
