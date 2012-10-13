@@ -792,7 +792,7 @@ endif
 # Coq plugin
 ##############
 
-ifeq (@enable_coq_plugin@,yes)
+ifeq (@enable_coq_tactic@,yes)
 
 COQPGENERATED = src/coq-tactic/coqCompat.ml src/coq-tactic/g_why3tac.ml
 
@@ -805,24 +805,20 @@ COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
-COQPINCLUDES = -I src/coq-tactic $(addprefix -I @COQLIB@/, $(COQPTREES))
+COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES))
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
+$(COQPCMO) $(COQPCMX): BFLAGS += -rectypes
+$(COQPCMX): OFLAGS += -rectypes
 
 $(COQPDEP): $(COQPGENERATED)
 
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
-src/coq-tactic/coqCompat.cmi: BFLAGS+=-rectypes 
-src/coq-tactic/coqCompat.cmo: BFLAGS+=-rectypes 
-src/coq-tactic/coqCompat.cmx: OFLAGS+=-rectypes 
-src/coq-tactic/why3tac.cmi: BFLAGS+=-rectypes -I +camlp5
-src/coq-tactic/why3tac.cmo: BFLAGS+=-rectypes -I +camlp5
-src/coq-tactic/why3tac.cmx: OFLAGS+=-rectypes -I +camlp5
-lib/coq-tactic/why3tac.cma: BFLAGS+=-rectypes -I +camlp5
-lib/coq-tactic/why3tac.cmxs: OFLAGS+=-rectypes -I +camlp5
+src/coq-tactic/coqCompat.ml: src/coq-tactic/coqCompat@coq_compat_version@.ml
+	cp -f $< $@
 
 lib/coq-tactic/why3tac.cmxs: src/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -894,7 +890,7 @@ COQLIBS_SET_FILES = Set
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
 COQLIBS_SETTHEORY_FILES = Interval PowerSet Relation Identity Image \
-	InverseDomRan Function 
+	InverseDomRan Function
 COQLIBS_SETTHEORY = $(addprefix lib/coq/settheory/, $(COQLIBS_SETTHEORY_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
@@ -1150,7 +1146,7 @@ install_local: bin/why3doc
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api.@OCAMLBEST@
 	sh bench/bench "bin/why3.@OCAMLBEST@"
-	@if test "@enable_coq_plugin@" = "yes"; then \
+	@if test "@enable_coq_tactic@" = "yes"; then \
 	   echo "=== checking the Coq tactic ==="; \
 	   $(MAKE) test-coq-tactic.@OCAMLBEST@; fi
 
@@ -1470,7 +1466,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
 	rm -f $(DISTRIB_DIR)/src/config.ml
 	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
-          $(COQGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
+          $(COQPGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 # distrib export: source export-doc export-www export-examples export-examples-c linux

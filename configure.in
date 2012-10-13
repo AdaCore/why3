@@ -90,11 +90,11 @@ AC_ARG_ENABLE(bench,
     [  --enable-bench          enable Why3 benchmarking tool],,
     enable_bench=yes)
 
-# Coq plugin and libraries
+# Coq tactic and libraries
 
-AC_ARG_ENABLE(coq-plugin,
-    [  --enable-coq-plugin     enable Coq plugin],,
-    enable_coq_plugin=yes)
+AC_ARG_ENABLE(coq-tactic,
+    [  --enable-coq-tactic     enable Coq "why3" tactic],,
+    enable_coq_tactic=yes)
 
 AC_ARG_ENABLE(coq-libs,
     [  --enable-coq-libs       enable Coq realizations],,
@@ -379,7 +379,9 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 enable_coq_fp_libs=yes
 
-if test "$enable_coq_plugins" = no -a "$enable_coq_libs" = no; then
+coq_compat_version=
+
+if test "$enable_coq_tactic" = no -a "$enable_coq_libs" = no; then
     enable_coq_support=no
     AC_MSG_WARN(coq support disabled)
     reason_coq_support=" (disabled by user)"
@@ -397,12 +399,12 @@ else
         case $COQVERSION in
           8.3*)
 	        enable_coq_support=yes
-                cp -f src/coq-tactic/coqCompat.8.3.ml src/coq-tactic/coqCompat.ml
+                coq_compat_version=".8.3"
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           8.4*|trunk)
 	        enable_coq_support=yes
-                cp -f src/coq-tactic/coqCompat.8.4.ml src/coq-tactic/coqCompat.ml
+                coq_compat_version=".8.4"
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           *)
@@ -415,25 +417,25 @@ else
 fi
 
 if test "$enable_coq_support" = no; then
-   enable_coq_plugin=no
+   enable_coq_tactic=no
    enable_coq_libs=no
 fi
 
-if test "$enable_coq_plugin" = yes; then
-   AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_plugin=no)
-   if test "$enable_coq_plugin" = no; then
-      reason_coq_plugin=" ($COQLIB/kernel/term.cmi not found)"
+if test "$enable_coq_tactic" = yes; then
+   AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_tactic=no)
+   if test "$enable_coq_tactic" = no; then
+      reason_coq_tactic=" ($COQLIB/kernel/term.cmi not found)"
    fi
 fi
 
-if test "$enable_coq_plugin" = yes -a "$CAMLP5O" = no; then
-   enable_coq_plugin=no
-   reason_coq_plugin=" (camlp5o not found)"
+if test "$enable_coq_tactic" = yes -a "$CAMLP5O" = no; then
+   enable_coq_tactic=no
+   reason_coq_tactic=" (camlp5o not found)"
 fi
 
-# coq-plugin currently disabled
-dnl enable_coq_plugin=no
-dnl reason_coq_plugin=" (not yet implemented)"
+# coq-tactic currently disabled
+dnl enable_coq_tactic=no
+dnl reason_coq_tactic=" (not yet implemented)"
 
 if test "$enable_coq_libs" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
@@ -582,9 +584,10 @@ AC_SUBST(SQLITE3LIB)
 AC_SUBST(enable_bench)
 AC_SUBST(META_OCAMLGRAPH)
 
-AC_SUBST(enable_coq_plugin)
+AC_SUBST(enable_coq_tactic)
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
+AC_SUBST(coq_compat_version)
 
 AC_SUBST(COQC)
 AC_SUBST(COQDEP)
@@ -638,7 +641,7 @@ echo "Coq support             : $enable_coq_support $reason_coq_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
    echo "    Lib                 : $COQLIB"
-   echo "    Plugin support      : $enable_coq_plugin $reason_coq_plugin"
+   echo "    \"why3\" tactic       : $enable_coq_tactic $reason_coq_tactic"
    echo "    Realization support : $enable_coq_libs $reason_coq_libs"
    if test "$enable_coq_libs" = "yes" ; then
       echo "        FP arithmetic   : $enable_coq_fp_libs $reason_coq_fp_libs"
