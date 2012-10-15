@@ -539,7 +539,7 @@ Theorem distrib_conj : forall (s:stmt),
   | (Swhile t f s1) => True
   end.
 destruct s; auto.
-unfold valid_fmla; simpl; ae.
+simpl; ae.
 (*
 intros sigma pi p q.
 intros.

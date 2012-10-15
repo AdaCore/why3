@@ -282,6 +282,13 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
 
+Axiom Cons_append : forall {a:Type} {a_WT:WhyType a}, forall (a1:a) (l1:(list
+  a)) (l2:(list a)), ((Cons a1 (infix_plpl l1 l2)) = (infix_plpl (Cons a1 l1)
+  l2)).
+
+Axiom Append_l_nil1 : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
+  ((infix_plpl l (Nil :(list a))) = l).
+
 Parameter msubst_term: term -> mident -> ident -> term.
 
 Axiom msubst_term_def : forall (t:term) (x:mident) (v:ident),
@@ -367,16 +374,13 @@ Theorem eval_swap : forall (f:fmla),
   end.
 destruct f; auto.
 intros.
-assert (h: forall (l1 l2 : list (ident*value)) (a : (ident*value)), 
-   (Cons a (infix_plpl l1 l2)) = (infix_plpl (Cons a l1) l2))
-  by (simpl; auto).
 destruct d; simpl.
 (* Void *)
 ae.
 (* Int *)
-intros; rewrite h; ae.
+intro; rewrite Cons_append; ae.
 (* Bool *)
-intros; rewrite h; ae.
+intro; rewrite Cons_append; ae.
 Qed.
 
 

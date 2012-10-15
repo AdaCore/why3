@@ -282,15 +282,22 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
 
+Axiom Cons_append : forall {a:Type} {a_WT:WhyType a}, forall (a1:a) (l1:(list
+  a)) (l2:(list a)), ((Cons a1 (infix_plpl l1 l2)) = (infix_plpl (Cons a1 l1)
+  l2)).
+
+Axiom Append_nil_l : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
+  ((infix_plpl (Nil :(list a)) l) = l).
+
 Parameter msubst_term: term -> mident -> ident -> term.
 
-Axiom msubst_term_def : forall (t:term) (r:mident) (v:ident),
+Axiom msubst_term_def : forall (t:term) (x:mident) (v:ident),
   match t with
-  | ((Tvalue _)|(Tvar _)) => ((msubst_term t r v) = t)
-  | (Tderef x) => ((r = x) -> ((msubst_term t r v) = (Tvar v))) /\
-      ((~ (r = x)) -> ((msubst_term t r v) = t))
-  | (Tbin t1 op t2) => ((msubst_term t r v) = (Tbin (msubst_term t1 r v) op
-      (msubst_term t2 r v)))
+  | ((Tvalue _)|(Tvar _)) => ((msubst_term t x v) = t)
+  | (Tderef y) => ((x = y) -> ((msubst_term t x v) = (Tvar v))) /\
+      ((~ (x = y)) -> ((msubst_term t x v) = t))
+  | (Tbin t1 op t2) => ((msubst_term t x v) = (Tbin (msubst_term t1 x v) op
+      (msubst_term t2 x v)))
   end.
 
 (* Why3 assumption *)
@@ -305,12 +312,12 @@ Fixpoint msubst(f:fmla) (x:mident) (v:ident) {struct f}: fmla :=
   end.
 
 (* Why3 assumption *)
-Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
+Fixpoint fresh_in_term(id:ident) (t:term) {struct t}: Prop :=
   match t with
   | (Tvalue _) => True
-  | (Tvar i) => ~ (x = i)
+  | (Tvar i) => ~ (id = i)
   | (Tderef _) => True
-  | (Tbin t1 _ t2) => (fresh_in_term x t1) /\ (fresh_in_term x t2)
+  | (Tbin t1 _ t2) => (fresh_in_term id t1) /\ (fresh_in_term id t2)
   end.
 
 (* Why3 assumption *)
@@ -370,14 +377,9 @@ Theorem eval_change_free : forall (f:fmla),
   | (Fforall i d f1) => True
   end.
 destruct f; auto.
-simpl; intros H sigma pi id v (h1 & h2 & h3).
+simpl; intros H sigma pi id v (h1 & h2 & h3) h.
 rewrite eval_term_change_free; auto.
-assert (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
-       (Cons (i, eval_term sigma pi t) (Cons (id, v) pi))) f =
-       eval_fmla sigma 
-       (Cons (i, eval_term sigma pi t) (Cons (id, v) pi)) f);
-auto.
-rewrite <- H0; clear H0.
+pattern (Cons (i, eval_term sigma pi t) (Cons (id, v) pi)); rewrite <- Append_nil_l.
 rewrite eval_swap; auto.
 apply H; auto.
 Qed.

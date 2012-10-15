@@ -408,6 +408,12 @@ theory FreshVariables
 use import SemOp
 use import list.Append
 
+lemma Cons_append: forall a: 'a, l1 l2: list 'a.
+  Cons a (l1 ++ l2) = (Cons a l1) ++ l2
+
+lemma Append_nil_l:
+  forall l: list 'a. Nil ++ l = l
+
 (** substitution of a reference [x] by a logic variable [v]
    warning: proper behavior only guaranted if [v] is fresh *)
 
@@ -605,7 +611,7 @@ fresh_in_fmla (fresh_from f) f
      alors
        sigma, pi |= f
   *)
-  axiom abstract_effects_generalize :
+  axiom abstract_effects_specialize :
      forall sigma:env, pi:stack, s:stmt, f:fmla.
         eval_fmla sigma pi (abstract_effects s f) ->
         eval_fmla sigma pi f
