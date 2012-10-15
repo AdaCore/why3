@@ -358,6 +358,10 @@ Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
   t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
 
+
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
 (* Why3 goal *)
 Theorem eval_change_free : forall (f:fmla),
   match f with
@@ -376,7 +380,8 @@ Theorem eval_change_free : forall (f:fmla),
 destruct f; auto.
 simpl; intros H sigma pi id v (h1 & h2 & h3).
 rewrite eval_term_change_free; auto.
-pattern (Cons (i, eval_term sigma pi t) (Cons (id, v) pi)); rewrite <- Append_nil_l.
+pattern (Cons (i, eval_term sigma pi t) (Cons (id, v) pi)).
+rewrite <- Append_nil_l.
 rewrite eval_swap; auto.
 apply H; auto.
 Qed.

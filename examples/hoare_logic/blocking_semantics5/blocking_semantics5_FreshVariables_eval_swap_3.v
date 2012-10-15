@@ -354,67 +354,13 @@ Axiom eval_swap_gen : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
   (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
 
-Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
+(* Why3 goal *)
+Theorem eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
   (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2) pi))
   f) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f)).
-
-Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
-  t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
-
-
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
-
-(* Why3 goal *)
-Theorem eval_change_free : forall (f:fmla),
-  match f with
-  | (Fterm t) => True
-  | (Fand f1 f2) => True
-  | (Fnot f1) => True
-  | (Fimplies f1 f2) => True
-  | (Flet i t f1) => True
-  | (Fforall i d f1) => (forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id:ident) (v:value), (fresh_in_fmla id f1) ->
-      ((eval_fmla sigma (Cons (id, v) pi) f1) <-> (eval_fmla sigma pi
-      f1))) -> forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id:ident) (v:value), (fresh_in_fmla id f) ->
-      ((eval_fmla sigma pi f) -> (eval_fmla sigma (Cons (id, v) pi) f))
-  end.
-destruct f; auto.
-ae.
-(*
-simpl.
-intros H sigma pi id v (H1 & H2) H3.
-destruct d.
-
-(* TYunit*)
-assert 
- (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
-                  (Cons (i, Vvoid) (Cons (id, v) pi))) f =
- eval_fmla sigma (Cons (i, Vvoid) (Cons (id, v) pi)) f); auto.
-rewrite <- H0.
-rewrite eval_swap; auto.
-simpl; apply H; auto.
-
-(* TYint*)
-intro n.
-assert (h: eval_fmla sigma (Cons (i, Vint n) (Cons (id, v) pi)) f); auto.
-assert 
- (eval_fmla sigma (infix_plpl (Nil : (list (ident*value)))
-                  (Cons (i, Vint n) (Cons (id, v) pi))) f =
- eval_fmla sigma (Cons (i, Vint n) (Cons (id, v) pi)) f); auto.
-rewrite <- H0.
-rewrite eval_swap; auto.
-simpl; apply H; auto.
-
-(* TYbool*)
-intro b.
-pattern (Cons (i, Vbool b) (Cons (id, v) pi)); rewrite <- Append_nil_l.
-rewrite eval_swap; auto.
-simpl; apply H; auto.
-*)
+intros f sigma pi id1 id2 v1 v2 h1.
+apply eval_swap_gen with (l:=Nil); auto.
 Qed.
 
 

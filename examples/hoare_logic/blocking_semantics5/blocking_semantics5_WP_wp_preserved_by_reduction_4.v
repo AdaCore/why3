@@ -406,6 +406,13 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
 
+Axiom Cons_append : forall {a:Type} {a_WT:WhyType a}, forall (a1:a) (l1:(list
+  a)) (l2:(list a)), ((Cons a1 (infix_plpl l1 l2)) = (infix_plpl (Cons a1 l1)
+  l2)).
+
+Axiom Append_nil_l : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
+  ((infix_plpl (Nil :(list a)) l) = l).
+
 Parameter msubst_term: term -> mident -> ident -> term.
 
 Axiom msubst_term_def : forall (t:term) (x:mident) (v:ident),
@@ -471,6 +478,16 @@ Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
   (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
   (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
 
+Axiom eval_swap_term_2 : forall (t:term) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
+  (~ (id1 = id2)) -> ((eval_term sigma (Cons (id1, v1) (Cons (id2, v2) pi))
+  t) = (eval_term sigma (Cons (id2, v2) (Cons (id1, v1) pi)) t)).
+
+Axiom eval_swap_2 : forall (f:fmla) (sigma:(map mident value)) (pi:(list
+  (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
+  (~ (id1 = id2)) -> ((eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2) pi))
+  f) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f)).
+
 Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
   t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
@@ -485,7 +502,7 @@ Axiom fresh_from_fmla : forall (f:fmla), (fresh_in_fmla (fresh_from f) f).
 
 Parameter abstract_effects: stmt -> fmla -> fmla.
 
-Axiom abstract_effects_generalize : forall (sigma:(map mident value))
+Axiom abstract_effects_specialize : forall (sigma:(map mident value))
   (pi:(list (ident* value)%type)) (s:stmt) (f:fmla), (eval_fmla sigma pi
   (abstract_effects s f)) -> (eval_fmla sigma pi f).
 
@@ -541,10 +558,10 @@ induction h1; try (simpl; intro; ae).
 simpl; intros q (_ & h).
 (* need to keep a copy of h *)
 generalize h; intro h'.
-apply abstract_effects_generalize in h'; simpl in h'; ae.
+apply abstract_effects_specialize in h'; simpl in h'; ae.
 (* case while false do ... *)
 simpl; intros q (_ & h).
-apply abstract_effects_generalize in h; simpl in h; ae.
+apply abstract_effects_specialize in h; simpl in h; ae.
 Qed.
 
 

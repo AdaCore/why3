@@ -286,8 +286,8 @@ Axiom Cons_append : forall {a:Type} {a_WT:WhyType a}, forall (a1:a) (l1:(list
   a)) (l2:(list a)), ((Cons a1 (infix_plpl l1 l2)) = (infix_plpl (Cons a1 l1)
   l2)).
 
-Axiom Append_l_nil1 : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
+Axiom Append_nil_l : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
+  ((infix_plpl (Nil :(list a)) l) = l).
 
 Parameter msubst_term: term -> mident -> ident -> term.
 
@@ -373,14 +373,8 @@ Theorem eval_swap : forall (f:fmla),
       f))
   end.
 destruct f; auto.
-intros.
-destruct d; simpl.
-(* Void *)
-ae.
-(* Int *)
-intro; rewrite Cons_append; ae.
-(* Bool *)
-intro; rewrite Cons_append; ae.
+simpl; intros.
+destruct d; intros; rewrite Cons_append; ae.
 Qed.
 
 
