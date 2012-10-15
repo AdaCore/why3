@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/home/jc/why3/share/why3session.dtd">
 <why3session
  name="examples/programs/kmp/why3session.xml" shape_version="2">
  <prover
@@ -18,18 +18,6 @@
   id="3"
   name="Coq"
   version="8.3pl4"/>
- <prover
-  id="4"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="5"
-  name="Z3"
-  version="3.2"/>
- <prover
-  id="6"
-  name="Z3"
-  version="4.0"/>
  <file
   name="../kmp.mlw"
   verified="true"
@@ -494,58 +482,112 @@
       expl="loop invariant preservation"
       sum="891d0254cf7d64677dc24bcf537cfd43"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ais_nextV2V10agetV9V10Iainfix &lt;=V10V7Aainfix &lt;c0V10FIainfix =V9asetV6V7V8FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =V8ainfix +V4c1FIainfix =V7ainfix +V5c1FIainfix =agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V5ainfix -V0c1Iais_nextV2V11agetV6V11Iainfix &lt;=V11V5Aainfix &lt;c0V11FAamatchesV2ainfix -ainfix +V5c1V12V2c0V12NIainfix &lt;V12ainfix +V5c1Aainfix &lt;ainfix +V4c1V12FAamatchesV2ainfix -V5V4V2c0V4Aainfix &lt;=V5V0Aainfix &lt;V4V5Aainfix &lt;=c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c1V0Iainfix &gt;=V0c0Iainfix &lt;=c1V0Lamk arrayV0V1FF">
       <label
        name="expl:parameter initnext"/>
-      <proof
-       prover="4"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.17"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="7.08"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.49"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="outofmemory" time="11.36"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.46"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.46"/>
-      </proof>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter initnext.13.0"
+        locfile="examples/programs/kmp/../kmp.mlw"
+        loclnum="90" loccnumb="6" loccnume="14"
+        expl="loop invariant preservation"
+        sum="9b743358d437d6b87be9990a467e36ac"
+        proved="true"
+        expanded="false"
+        shape="amatchesV2ainfix -V10V11V2c0V11NIainfix &lt;V11V10Aainfix &lt;agetV9V10V11FAamatchesV2ainfix -V10agetV9V10V2c0agetV9V10Aainfix &lt;agetV9V10V10Aainfix &lt;=c0agetV9V10Iainfix =V10V7Oainfix &lt;V10V7Aainfix &lt;c0V10FIainfix =V9asetV6V7V8FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V8ainfix +V4c1FIainfix =V7ainfix +V5c1FIainfix =agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V12V13V2c0V13NIainfix &lt;V13V12Aainfix &lt;agetV6V12V13FAamatchesV2ainfix -V12agetV6V12V2c0agetV6V12Aainfix &lt;agetV6V12V12Aainfix &lt;=c0agetV6V12Iainfix =V12V5Oainfix &lt;V12V5Aainfix &lt;c0V12FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V14V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V14Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V14Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V14ainfix -alengthV2V14Aainfix &lt;=c0ainfix -ainfix +V5c1V14NIainfix &lt;V14ainfix +V5c1Aainfix &lt;ainfix +V4c1V14FAainfix =amixfix []V2ainfix +ainfix -V5V4V16amixfix []V2ainfix +c0V16Iainfix &lt;V16V4Aainfix &lt;=c0V16FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+        <label
+         name="expl:parameter initnext"/>
+        <transf
+         name="split_goal_wp"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter initnext.13.0.0"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="6ca0277bf97f3e53ff344d117afe8d6a"
+          proved="true"
+          expanded="false"
+          shape="ainfix &lt;=c0agetV9V10Iainfix =V10V7Oainfix &lt;V10V7Aainfix &lt;c0V10FIainfix =V9asetV6V7V8FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V8ainfix +V4c1FIainfix =V7ainfix +V5c1FIainfix =agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V11V12V2c0V12NIainfix &lt;V12V11Aainfix &lt;agetV6V11V12FAamatchesV2ainfix -V11agetV6V11V2c0agetV6V11Aainfix &lt;agetV6V11V11Aainfix &lt;=c0agetV6V11Iainfix =V11V5Oainfix &lt;V11V5Aainfix &lt;c0V11FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V13V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V13Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V13ainfix -alengthV2V13Aainfix &lt;=c0ainfix -ainfix +V5c1V13NIainfix &lt;V13ainfix +V5c1Aainfix &lt;ainfix +V4c1V13FAainfix =amixfix []V2ainfix +ainfix -V5V4V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.07"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter initnext.13.0.1"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="dd6609e4cf979c2409198a5b292e5232"
+          proved="true"
+          expanded="false"
+          shape="ainfix &lt;agetV9V10V10Iainfix =V10V7Oainfix &lt;V10V7Aainfix &lt;c0V10FIainfix =V9asetV6V7V8FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V8ainfix +V4c1FIainfix =V7ainfix +V5c1FIainfix =agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V11V12V2c0V12NIainfix &lt;V12V11Aainfix &lt;agetV6V11V12FAamatchesV2ainfix -V11agetV6V11V2c0agetV6V11Aainfix &lt;agetV6V11V11Aainfix &lt;=c0agetV6V11Iainfix =V11V5Oainfix &lt;V11V5Aainfix &lt;c0V11FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V13V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V13Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V13ainfix -alengthV2V13Aainfix &lt;=c0ainfix -ainfix +V5c1V13NIainfix &lt;V13ainfix +V5c1Aainfix &lt;ainfix +V4c1V13FAainfix =amixfix []V2ainfix +ainfix -V5V4V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.05"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter initnext.13.0.2"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="6ce24e350cfe3b2c52e437dcf80584e0"
+          proved="true"
+          expanded="false"
+          shape="amatchesV2ainfix -V10agetV9V10V2c0agetV9V10Iainfix =V10V7Oainfix &lt;V10V7Aainfix &lt;c0V10FIainfix =V9asetV6V7V8FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V8ainfix +V4c1FIainfix =V7ainfix +V5c1FIainfix =agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V11V12V2c0V12NIainfix &lt;V12V11Aainfix &lt;agetV6V11V12FAamatchesV2ainfix -V11agetV6V11V2c0agetV6V11Aainfix &lt;agetV6V11V11Aainfix &lt;=c0agetV6V11Iainfix =V11V5Oainfix &lt;V11V5Aainfix &lt;c0V11FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V13V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V13Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V13ainfix -alengthV2V13Aainfix &lt;=c0ainfix -ainfix +V5c1V13NIainfix &lt;V13ainfix +V5c1Aainfix &lt;ainfix +V4c1V13FAainfix =amixfix []V2ainfix +ainfix -V5V4V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.36"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter initnext.13.0.3"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="7851ca5105f4aa11fc4491adab5cf3e3"
+          proved="true"
+          expanded="false"
+          shape="amatchesV2ainfix -V10V11V2c0V11NIainfix &lt;V11V10Aainfix &lt;agetV9V10V11FIainfix =V10V7Oainfix &lt;V10V7Aainfix &lt;c0V10FIainfix =V9asetV6V7V8FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V8ainfix +V4c1FIainfix =V7ainfix +V5c1FIainfix =agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V12V13V2c0V13NIainfix &lt;V13V12Aainfix &lt;agetV6V12V13FAamatchesV2ainfix -V12agetV6V12V2c0agetV6V12Aainfix &lt;agetV6V12V12Aainfix &lt;=c0agetV6V12Iainfix =V12V5Oainfix &lt;V12V5Aainfix &lt;c0V12FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V14V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V14Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V14Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V14ainfix -alengthV2V14Aainfix &lt;=c0ainfix -ainfix +V5c1V14NIainfix &lt;V14ainfix +V5c1Aainfix &lt;ainfix +V4c1V14FAainfix =amixfix []V2ainfix +ainfix -V5V4V16amixfix []V2ainfix +c0V16Iainfix &lt;V16V4Aainfix &lt;=c0V16FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="2.38"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
      </goal>
      <goal
       name="WP_parameter initnext.14"
@@ -655,58 +697,112 @@
       expl="loop invariant preservation"
       sum="79cb09efa2d169d51028877d7020e209"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ais_nextV2V9agetV8V9Iainfix &lt;=V9V7Aainfix &lt;c0V9FIainfix =V8asetV6V7c0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =V7ainfix +V5c1FIainfix =V4c0Iainfix =agetV1V5agetV1V4NIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V5ainfix -V0c1Iais_nextV2V10agetV6V10Iainfix &lt;=V10V5Aainfix &lt;c0V10FAamatchesV2ainfix -ainfix +V5c1V11V2c0V11NIainfix &lt;V11ainfix +V5c1Aainfix &lt;ainfix +V4c1V11FAamatchesV2ainfix -V5V4V2c0V4Aainfix &lt;=V5V0Aainfix &lt;V4V5Aainfix &lt;=c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c1V0Iainfix &gt;=V0c0Iainfix &lt;=c1V0Lamk arrayV0V1FF">
       <label
        name="expl:parameter initnext"/>
-      <proof
-       prover="4"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="2.18"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.10"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.57"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.86"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.39"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="7"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="17.30"/>
-      </proof>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter initnext.19.0"
+        locfile="examples/programs/kmp/../kmp.mlw"
+        loclnum="90" loccnumb="6" loccnume="14"
+        expl="loop invariant preservation"
+        sum="2291e49f24c739b4905ac0a4b53fea1b"
+        proved="true"
+        expanded="false"
+        shape="amatchesV2ainfix -V9V10V2c0V10NIainfix &lt;V10V9Aainfix &lt;agetV8V9V10FAamatchesV2ainfix -V9agetV8V9V2c0agetV8V9Aainfix &lt;agetV8V9V9Aainfix &lt;=c0agetV8V9Iainfix =V9V7Oainfix &lt;V9V7Aainfix &lt;c0V9FIainfix =V8asetV6V7c0FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V7ainfix +V5c1FIainfix =V4c0Iainfix =agetV1V5agetV1V4NIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V11V12V2c0V12NIainfix &lt;V12V11Aainfix &lt;agetV6V11V12FAamatchesV2ainfix -V11agetV6V11V2c0agetV6V11Aainfix &lt;agetV6V11V11Aainfix &lt;=c0agetV6V11Iainfix =V11V5Oainfix &lt;V11V5Aainfix &lt;c0V11FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V13V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V13Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V13ainfix -alengthV2V13Aainfix &lt;=c0ainfix -ainfix +V5c1V13NIainfix &lt;V13ainfix +V5c1Aainfix &lt;ainfix +V4c1V13FAainfix =amixfix []V2ainfix +ainfix -V5V4V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+        <label
+         name="expl:parameter initnext"/>
+        <transf
+         name="split_goal_wp"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter initnext.19.0.0"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="12244fee7036fb142e60d6d80c0814db"
+          proved="true"
+          expanded="false"
+          shape="ainfix &lt;=c0agetV8V9Iainfix =V9V7Oainfix &lt;V9V7Aainfix &lt;c0V9FIainfix =V8asetV6V7c0FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V7ainfix +V5c1FIainfix =V4c0Iainfix =agetV1V5agetV1V4NIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V10V11V2c0V11NIainfix &lt;V11V10Aainfix &lt;agetV6V10V11FAamatchesV2ainfix -V10agetV6V10V2c0agetV6V10Aainfix &lt;agetV6V10V10Aainfix &lt;=c0agetV6V10Iainfix =V10V5Oainfix &lt;V10V5Aainfix &lt;c0V10FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V12V13amixfix []V2ainfix +c0V13Iainfix &lt;V13V12Aainfix &lt;=c0V13FAainfix &lt;=c0ainfix -alengthV2V12Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V12ainfix -alengthV2V12Aainfix &lt;=c0ainfix -ainfix +V5c1V12NIainfix &lt;V12ainfix +V5c1Aainfix &lt;ainfix +V4c1V12FAainfix =amixfix []V2ainfix +ainfix -V5V4V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V4Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter initnext.19.0.1"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="9eb7c95ddcac0e72cc397bd21b70438e"
+          proved="true"
+          expanded="false"
+          shape="ainfix &lt;agetV8V9V9Iainfix =V9V7Oainfix &lt;V9V7Aainfix &lt;c0V9FIainfix =V8asetV6V7c0FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V7ainfix +V5c1FIainfix =V4c0Iainfix =agetV1V5agetV1V4NIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V10V11V2c0V11NIainfix &lt;V11V10Aainfix &lt;agetV6V10V11FAamatchesV2ainfix -V10agetV6V10V2c0agetV6V10Aainfix &lt;agetV6V10V10Aainfix &lt;=c0agetV6V10Iainfix =V10V5Oainfix &lt;V10V5Aainfix &lt;c0V10FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V12V13amixfix []V2ainfix +c0V13Iainfix &lt;V13V12Aainfix &lt;=c0V13FAainfix &lt;=c0ainfix -alengthV2V12Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V12ainfix -alengthV2V12Aainfix &lt;=c0ainfix -ainfix +V5c1V12NIainfix &lt;V12ainfix +V5c1Aainfix &lt;ainfix +V4c1V12FAainfix =amixfix []V2ainfix +ainfix -V5V4V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V4Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.02"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter initnext.19.0.2"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="19a2597f4f3d0d65f057104a4fe42647"
+          proved="true"
+          expanded="false"
+          shape="amatchesV2ainfix -V9agetV8V9V2c0agetV8V9Iainfix =V9V7Oainfix &lt;V9V7Aainfix &lt;c0V9FIainfix =V8asetV6V7c0FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V7ainfix +V5c1FIainfix =V4c0Iainfix =agetV1V5agetV1V4NIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V10V11V2c0V11NIainfix &lt;V11V10Aainfix &lt;agetV6V10V11FAamatchesV2ainfix -V10agetV6V10V2c0agetV6V10Aainfix &lt;agetV6V10V10Aainfix &lt;=c0agetV6V10Iainfix =V10V5Oainfix &lt;V10V5Aainfix &lt;c0V10FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V12V13amixfix []V2ainfix +c0V13Iainfix &lt;V13V12Aainfix &lt;=c0V13FAainfix &lt;=c0ainfix -alengthV2V12Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V12ainfix -alengthV2V12Aainfix &lt;=c0ainfix -ainfix +V5c1V12NIainfix &lt;V12ainfix +V5c1Aainfix &lt;ainfix +V4c1V12FAainfix =amixfix []V2ainfix +ainfix -V5V4V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V4Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.11"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter initnext.19.0.3"
+          locfile="examples/programs/kmp/../kmp.mlw"
+          loclnum="90" loccnumb="6" loccnume="14"
+          expl="loop invariant preservation"
+          sum="3bc0dd73c492ebbd5a702ad6ec5d5e4f"
+          proved="true"
+          expanded="false"
+          shape="amatchesV2ainfix -V9V10V2c0V10NIainfix &lt;V10V9Aainfix &lt;agetV8V9V10FIainfix =V9V7Oainfix &lt;V9V7Aainfix &lt;c0V9FIainfix =V8asetV6V7c0FIainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Iainfix =V7ainfix +V5c1FIainfix =V4c0Iainfix =agetV1V5agetV1V4NIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V4V0Aainfix =c0V4Oainfix &lt;c0V4Iainfix &lt;V5ainfix -V0c1IamatchesV2ainfix -V11V12V2c0V12NIainfix &lt;V12V11Aainfix &lt;agetV6V11V12FAamatchesV2ainfix -V11agetV6V11V2c0agetV6V11Aainfix &lt;agetV6V11V11Aainfix &lt;=c0agetV6V11Iainfix =V11V5Oainfix &lt;V11V5Aainfix &lt;c0V11FAainfix =amixfix []V2ainfix +ainfix -ainfix +V5c1V13V14amixfix []V2ainfix +c0V14Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix &lt;=c0ainfix -alengthV2V13Aainfix &lt;=c0c0Aainfix &lt;=ainfix -ainfix +V5c1V13ainfix -alengthV2V13Aainfix &lt;=c0ainfix -ainfix +V5c1V13NIainfix &lt;V13ainfix +V5c1Aainfix &lt;ainfix +V4c1V13FAainfix =amixfix []V2ainfix +ainfix -V5V4V15amixfix []V2ainfix +c0V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix &lt;=c0ainfix -alengthV2V4Aainfix &lt;=c0c0Aainfix &lt;=ainfix -V5V4ainfix -alengthV2V4Aainfix &lt;=c0ainfix -V5V4Aainfix =V5V0Oainfix &lt;V5V0Aainfix &lt;V4V5Aainfix =c0V4Oainfix &lt;c0V4FIainfix =V3asetaconstc0c1c0FIainfix &lt;c1V0Aainfix =c0c1Oainfix &lt;c0c1Iainfix &lt;c1V0Iainfix &lt;=c0V0Iainfix =c1V0Oainfix &lt;c1V0Lamk arrayV0V1FF">
+          <label
+           name="expl:parameter initnext"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="1.67"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
      </goal>
      <goal
       name="WP_parameter initnext.20"
