@@ -1181,6 +1181,7 @@ install_local: bin/why3doc
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api.@OCAMLBEST@
+	$(MAKE) test-runstrat.@OCAMLBEST@
 	sh bench/bench "bin/why3.@OCAMLBEST@"
 	@if test "@enable_coq_tactic@" = "yes"; then \
 	   echo "=== checking the Coq tactic ==="; \
@@ -1240,6 +1241,16 @@ test-api.opt: examples/use_api.ml src/why3.cmxa
 test-shape: src/why3.cma
 	ocaml -I src/ $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
+#only test the compilation of runstrat
+test-runstrat.byte: $(LOCALWHY3LIB)/why3.cmxa $(LOCALWHY3LIB)/why3ml.cmxa $(LOCALWHY3LIB)/META
+	OCAMLPATH=$(PWD)/lib-ocaml $(MAKE) -C examples/runstrat clean
+	OCAMLPATH=$(PWD)/lib-ocaml $(MAKE) -C examples/runstrat byte
+
+test-runstrat.opt: $(LOCALWHY3LIB)/why3.cmxa $(LOCALWHY3LIB)/why3ml.cmxa $(LOCALWHY3LIB)/META
+	OCAMLPATH=$(PWD)/lib-ocaml $(MAKE) -C examples/runstrat clean
+	OCAMLPATH=$(PWD)/lib-ocaml $(MAKE) -C examples/runstrat opt
+
+test-runstrat: test-runstrat.$(OCAMLBEST)
 
 ################
 # documentation
