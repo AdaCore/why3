@@ -483,14 +483,6 @@ lemma eval_swap_gen:
     (eval_fmla sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) f <->
     eval_fmla sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) f)
 
-(*
-lemma eval_swap_term_2:
-forall t:term, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
-id1 <> id2 ->
-(eval_term sigma (Cons (id1,v1) (Cons (id2,v2) pi)) t =
-eval_term sigma (Cons (id2,v2) (Cons (id1,v1) pi)) t)
-*)
-
 lemma eval_swap:
   forall f:fmla, sigma:env, pi:stack, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->

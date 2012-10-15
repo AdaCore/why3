@@ -348,6 +348,9 @@ Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
   (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) t) = (eval_term sigma
   (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) t)).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
 (* Why3 goal *)
 Theorem eval_swap_gen : forall (f:fmla),
   match f with
@@ -368,18 +371,8 @@ Theorem eval_swap_gen : forall (f:fmla),
       (eval_fmla sigma (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi)))
       f))
   end.
-intros f.
-
-Qed.
-
-
-Require Import Why3.
-
-Ltac ae := why3 "alt-ergo" timelimit 3.
-
-(* Unused content named eval_swap
 destruct f; auto.
 simpl; intros.
 destruct d; intros; rewrite Cons_append; ae.
 Qed.
- *)
+
