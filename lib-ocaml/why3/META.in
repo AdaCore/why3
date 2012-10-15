@@ -1,0 +1,13 @@
+description = "The Why3 Ocaml library"
+version = "@VERSION@"
+archive(byte) = "why3.cma"
+archive(native) = "why3.cmxa"
+requires = "str unix num dynlink"
+
+package "ml" (
+  description = "The Why3ML Ocaml library"
+  version = "@VERSION@"
+  archive(byte) = "why3ml.cma"
+  archive(native) = "why3ml.cmxa"
+  requires = "str unix num dynlink why3"
+)

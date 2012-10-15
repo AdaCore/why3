@@ -76,6 +76,8 @@ BFLAGS = -w Aer-29 -dtypes -g -I src $(INCLUDES)
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
 
+LIBOPT =
+
 ifeq (@enable_debug@,yes)
 OFLAGS += -g
 endif
@@ -167,9 +169,25 @@ $(LIBCMX): OFLAGS += -for-pack Why3
 $(LIBDEP): $(LIBGENERATED)
 
 # build targets
+LOCALOCAMLLIB=lib-ocaml
+LOCALWHY3LIB=$(LOCALOCAMLLIB)/why3
 
-byte: src/why3.cma
-opt:  src/why3.cmxa
+byte:$(LOCALWHY3LIB)/why3.cma
+opt:$(LOCALWHY3LIB)/why3.cmxa
+
+$(LOCALWHY3LIB)/%.cma: src/%.cma
+	@ln -sf ../../src/$*.cma $(LOCALWHY3LIB)
+	@if test -f src/$*.cmi; then ln -sf ../../src/$*.cmi $(LOCALWHY3LIB); fi
+	@if test -f src/$*.o; then ln -sf ../../src/$*.o $(LOCALWHY3LIB); fi
+
+
+$(LOCALWHY3LIB)/%.cmxa: src/%.cmxa
+	@ln -sf ../../src/$*.cmxa $(LOCALWHY3LIB)
+	@if test -f src/$*.cmi; then ln -sf ../../src/$*.cmi $(LOCALWHY3LIB); fi
+	@if test -f src/$*.a; then ln -sf ../../src/$*.a $(LOCALWHY3LIB); fi
+
+clean::
+	rm -f $(LOCALWHY3LIB)/why3*
 
 src/why3.cma: src/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -244,10 +262,9 @@ install_no_local::
 install_no_local_lib::
 	rm -rf $(OCAMLLIB)/why3
 	mkdir -p $(OCAMLLIB)/why3
-	cp -f src/why3.cm* $(OCAMLLIB)/why3
-	cp -f META $(OCAMLLIB)/why3
-	if test -f src/why3.a; then cp -f src/why3.a $(OCAMLLIB)/why3; fi
-	if test -f src/why3.o; then cp -f src/why3.o $(OCAMLLIB)/why3; fi
+	cp -f -L $(LOCALWHY3LIB)/why3* $(OCAMLLIB)/why3
+	cp -f $(LOCALWHY3LIB)/META $(OCAMLLIB)/why3
+
 
 ifeq (@enable_local@,yes)
 install install-lib:
@@ -426,6 +443,25 @@ depend: $(MLWDEP)
 clean::
 	rm -f src/whyml/*.cm[iox] src/whyml/*.o
 	rm -f src/whyml/*.annot src/whyml/*.dep src/whyml/*~
+
+## Whyml Library ###
+#Should we separate the program library and the why3ml format?
+#One should use linkall (just the module that register whyml)
+#The others don't have to
+
+#Currently a pack is not done but the cmi are not distributed
+#So you can only link with why3ml in order to have the format .mlw
+
+src/why3ml.cma src/why3ml.cmxa: LIBOPT += -linkall
+src/why3ml.cma: $(PGMCMO) $(MLWCMO)
+src/why3ml.cmxa: $(PGMCMX) $(MLWCMX)
+
+opt:$(LOCALWHY3LIB)/why3ml.cmxa
+byte:$(LOCALWHY3LIB)/why3ml.cma
+
+clean::
+	rm -f src/why3ml.cm[ai] src/why3ml.[ao] src/why3ml.cmxa
+
 
 ######
 # Why3
@@ -1342,6 +1378,12 @@ clean::
 %.cmx: %.ml
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) $<
 
+%.cma:
+	$(if $(QUIET),@echo 'Ocamlc -a $@ $^' &&) $(OCAMLC) $(LIBOPT) -a -o $@ $^
+
+%.cmxa:
+	$(if $(QUIET),@echo 'Ocamlopt -a $@ $^' &&) $(OCAMLOPT) $(LIBOPT) -a -o $@ $^
+
 %.cmxs: %.ml
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -shared $(OFLAGS) -o $@ $<
 
@@ -1408,7 +1450,7 @@ NAME = why3-$(VERSION)
 DISTRIB_DIR = distrib/$(NAME)
 DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 
-DISTRIB_FILES = Version Makefile.in configure.in META.in configure \
+DISTRIB_FILES = Version Makefile.in configure.in $(LOCALWHY3LIB)/META.in configure \
       README CHANGES INSTALL OCAML-LICENSE LICENSE src/config.sh.in \
       src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
       plugins/printer/.keepme plugins/*/*.ml* plugins/*/*.dep \
@@ -1571,9 +1613,9 @@ Makefile : share/provers-detection-data.conf
 config.status: configure Version
 	./config.status --recheck
 
-opt byte : META share/provers-detection-data.conf
+opt byte : $(LOCALWHY3LIB)/META share/provers-detection-data.conf
 
-META: META.in config.status
+$(LOCALWHY3LIB)/META: $(LOCALWHY3LIB)/META.in config.status
 	./config.status chmod --file $@
 
 configure: configure.in
