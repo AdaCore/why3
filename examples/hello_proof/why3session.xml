@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
+<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
 <why3session
- name="./hello_proof/why3session.xml" shape_version="2">
+ shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -9,7 +9,7 @@
  <prover
   id="1"
   name="Coq"
-  version="8.3pl4"/>
+  version="8.3pl3"/>
  <prover
   id="2"
   name="Simplify"
@@ -17,10 +17,10 @@
  <file
   name="../hello_proof.why"
   verified="false"
-  expanded="false">
+  expanded="true">
   <theory
    name="HelloProof"
-   locfile="./hello_proof/../hello_proof.why"
+   locfile="../hello_proof.why"
    loclnum="1" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
@@ -28,7 +28,7 @@
     name="My very first Why3 theory"/>
    <goal
     name="G1"
-    locfile="./hello_proof/../hello_proof.why"
+    locfile="../hello_proof.why"
     loclnum="3" loccnumb="7" loccnume="9"
     sum="4daf9675e70ee6481b1153fe95f7c750"
     proved="true"
@@ -45,7 +45,7 @@
    </goal>
    <goal
     name="G2"
-    locfile="./hello_proof/../hello_proof.why"
+    locfile="../hello_proof.why"
     loclnum="5" loccnumb="7" loccnume="9"
     sum="b16d2c9608c416dc0059ba3e95264abe"
     proved="false"
@@ -73,7 +73,7 @@
      expanded="true">
      <goal
       name="G2.1"
-      locfile="./hello_proof/../hello_proof.why"
+      locfile="../hello_proof.why"
       loclnum="5" loccnumb="7" loccnume="9"
       sum="b84cad55140412a1b6f988cba7a0ebd1"
       proved="false"
@@ -88,6 +88,15 @@
        <result status="unknown" time="0.00"/>
       </proof>
       <proof
+       prover="1"
+       timelimit="4"
+       memlimit="0"
+       edited="hello_proof_HelloProof_G2_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.76"/>
+      </proof>
+      <proof
        prover="2"
        timelimit="4"
        memlimit="0"
@@ -95,19 +104,10 @@
        archived="false">
        <result status="unknown" time="0.00"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="4"
-       memlimit="0"
-       edited="hello_proof_HelloProof_G2_1.v"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.49"/>
-      </proof>
      </goal>
      <goal
       name="G2.2"
-      locfile="./hello_proof/../hello_proof.why"
+      locfile="../hello_proof.why"
       loclnum="5" loccnumb="7" loccnume="9"
       sum="fdf75c799e5829c6e57c69e76f88886a"
       proved="true"
@@ -134,7 +134,7 @@
    </goal>
    <goal
     name="G3"
-    locfile="./hello_proof/../hello_proof.why"
+    locfile="../hello_proof.why"
     loclnum="9" loccnumb="7" loccnume="9"
     sum="e2296194dcf5f95896f599f6da2c8adf"
     proved="true"

@@ -461,6 +461,7 @@ let goal_expl g = Util.def_option g.goal_name.Ident.id_string g.goal_expl
 open Format
 
 let db_filename = "why3session.xml"
+let session_dir_for_save = ref "."
 
 let save_string fmt s =
   for i=0 to String.length s - 1 do
@@ -518,6 +519,7 @@ let save_ident fmt id =
     | None -> ()
     | Some loc ->
       let file,lnum,cnumb,cnume = Loc.get loc in
+      let file = Sysutil.relativize_filename !session_dir_for_save file in
       fprintf fmt
         "@ locfile=\"%a\"@ loclnum=\"%i\" loccnumb=\"%i\" loccnume=\"%i\""
         save_string file lnum cnumb cnume
@@ -650,8 +652,13 @@ let save fname config session =
   fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
     save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config))
                    "why3session.dtd");
+(*
+  let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
   fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
-    save_string fname session.session_shape_version;
+    save_string rel_file session.session_shape_version;
+*)
+  fprintf fmt "@[<v 1><why3session shape_version=\"%d\">"
+    session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
@@ -662,6 +669,7 @@ let save fname config session =
 let save_session config session =
   let f = Filename.concat session.session_dir db_filename in
   Sysutil.backup_file f;
+  session_dir_for_save := session.session_dir;
   save f config session
 
 (*******************************)
