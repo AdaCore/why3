@@ -19,7 +19,7 @@
 (**************************************************************************)
 
 open Format
-open Why3
+
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr

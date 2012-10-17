@@ -19,8 +19,8 @@
 (**************************************************************************)
 
 open Format
-open Why3
 open Pp
+
 open Util
 open Ident
 open Ty

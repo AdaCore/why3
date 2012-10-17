@@ -28,7 +28,7 @@ makejob: makejob.opt
 	@rm -f makejob
 	ln -s makejob.opt makejob
 
-runstrat.opt runstrat.byte: PACKAGES += why3 why3.ml
+runstrat.opt runstrat.byte: PACKAGES += why3
 runstrat.opt: makeproto.cmx runstrat.ml
 runstrat.byte: makeproto.cmo runstrat.ml
 

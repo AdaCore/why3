@@ -20,7 +20,6 @@
 
 (* destructive types for program type inference *)
 
-open Why3
 open Ident
 open Ty
 open Term

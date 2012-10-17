@@ -78,27 +78,14 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 
 (* One prover named Alt-Ergo in the config file *)
 let alt_ergo : Whyconf.config_prover =
-  try
-    let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-    (** all the prover that have the name "Alt-Ergo" *)
-    let provers = Whyconf.filter_provers config fp in
-    snd (Whyconf.Mprover.choose provers)
-  with Whyconf.ProverNotFound _ ->
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  (** all provers that have the name "Alt-Ergo" *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
     exit 0
-
-(*
-(* the [prover alt-ergo] section of the config file *)
-let alt_ergo : Whyconf.config_prover =
-  try
-    let prover = {Whyconf.prover_name = "Alt-Ergo";
-                  prover_version = "0.92.3";
-                  prover_altern = ""} in
-    Whyconf.Mprover.find prover provers
-  with Not_found ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
-*)
+  end else
+    snd (Whyconf.Mprover.choose provers)
 
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)

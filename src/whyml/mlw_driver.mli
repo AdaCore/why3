@@ -18,8 +18,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Why3
-
 type driver = private {
   drv_lib         : Mlw_typing.mlw_library;
   drv_printer     : string option;

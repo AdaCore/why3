@@ -20,8 +20,6 @@
 
 (* OCaml program extraction *)
 
-open Why3
-
 val debug: Debug.flag
 
 val extract_filename: ?fname:string -> Theory.theory -> string

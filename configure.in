@@ -616,10 +616,10 @@ dnl AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
 AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
-AC_CONFIG_FILES(share/provers-detection-data.conf lib-ocaml/why3/META)
+AC_CONFIG_FILES(share/provers-detection-data.conf lib/why3/META)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
-chmod a-w share/provers-detection-data.conf lib-ocaml/why3/META;
+chmod a-w share/provers-detection-data.conf lib/why3/META;
 chmod u+x src/config.sh)
 
 AC_OUTPUT

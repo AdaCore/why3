@@ -18,4 +18,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* This file is a stub for ocamldep. Do not delete it. *)
+val read_channel : Mlw_module.modul Util.Mstr.t Env.read_format
+
+val library_of_env : Env.env -> Mlw_module.modul Util.Mstr.t Env.library
