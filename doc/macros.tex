@@ -6,7 +6,11 @@
 \newcommand{\eg}{\emph{e.g.}\xspace}
 \newcommand{\ie}{\emph{i.e.}\xspace}
 
-\newcommand{\emptyitem}{\begin{latexonly}~\end{latexonly}}
+\newcommand{\emptyitem}{%
+%BEGIN LATEX
+~
+%ENDLATEX
+}
 
 % BNF grammar
 \newcommand{\keyword}[1]{\texttt{#1}}

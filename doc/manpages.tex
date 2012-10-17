@@ -228,7 +228,8 @@ contains the time taken and the state of the proof:
 \item \texttt{Valid}: the task is valid according to the prover. The
   goal is considered proved.
 \item \texttt{Invalid}: the task is invalid.
-\item \texttt{Timeout}: the prover exceeds the time or memory limit.
+\item \texttt{Timeout}: the prover exceeded the time limit.
+\item \texttt{OufOfMemory}: the prover exceeded the memory limit.
 \item \texttt{Unknown}: the prover can't determine if the task
   is valid; Some additional information can be provided.
 \item \texttt{Failure}: the prover reports a failure.
@@ -239,14 +240,16 @@ contains the time taken and the state of the proof:
 Additionally a proof attempt can have the following attribute:
 
 \begin{itemize}
-\item obsolete:\index{obsolete!proof attempt} the proof attempt has not been run in
-  its current state. You'll need to replay the proof attempt, ie run
-  the prover with the current state of the proof attempt, in order to
-  update the answer of the prover and remove this attribute.
+\item obsolete:\index{obsolete!proof attempt} the prover associated to
+  that proof attempt has not been run on the current task, but on a
+  earlier version of that task. You need to replay the proof
+  attempt, \emph{i.e.} run the prover with the current task of the proof
+  attempt, in order to update the answer of the prover and remove this
+  attribute.
 \item archived:\index{archived!proof attempt} the proof attempt is not useful
   anymore it is kept for history, no why3 tools will select it by
   default. The section \ref{sec:uninstalledprovers} shows an example
-  of its utilization.
+  of its usage.
 \end{itemize}
 
 Generally proof attempt are marked obsolete just after
@@ -280,9 +283,12 @@ changed are marked obsolete.
   button starts the corresponding prover on the selected goal(s).
 
 \item[Split] splits the current goal into subgoals if it is a
-  conjunction of two or more goals.
+  conjunction of two or more goals. It corresponds to the
+  \verb|split_goal_wp| transformation.
 
-\item[Inline] replaces the head predicate symbol of the goal with its definition.
+\item[Inline] replaces the head predicate symbol of the goal with its
+  definition. It corresponds to the
+  \verb|inline_goal| transformation.
 
 \item[Edit] starts an editor on the selected task.
 
@@ -338,6 +344,11 @@ A copy of the tools already available in the left toolbar, plus:
 \item[Mark as obsolete] marks all the proof as
   obsolete.
   This allows to replay every proofs.
+\item[Apply non-splitting transformation] apply one of the available
+  transformations, as listed in Section~\ref{sec:transformations}
+\item[Apply non-splitting transformation]. Same as above, but for
+  splitting transformations, \emph{i.e.} those that can generated
+  several sub-goals. 
 \end{description}
 
 \item[Menu \textsf{Help}]
@@ -359,6 +370,9 @@ are groups together under several tabs
   \item the memory given to provers, in megabytes
   \item the maximal number of simultaneous provers allowed to run in parallel
   \end{itemize}
+  By default, modification of any of these settings has effect only
+  for the current run of the GUI. a checkbox allows you to save these
+  settings also for future sessions.
 \item a few display settings:
   \begin{itemize}
   \item introduce premises: if selected, the goal of the task shown in
@@ -396,8 +410,9 @@ are groups together under several tabs
   the editor to use will be set to ``CoqIDE'' by default, and this
   \urldef{\urlprfgen}{\url}{http://proofgeneral.inf.ed.ac.uk/}
   dialog allows you to select the Emacs editor and its
-  \ahref{\urlprfgen}{Proof General} mode instead%
-  \begin{latexonly} (\urlprfgen)\end{latexonly}.
+\todo{uncomment the following}
+%  \ahref{\urlprfgen}{Proof General} mode instead%
+%  \begin{latexonly} (\urlprfgen)\end{latexonly}.
 \end{itemize}
 \item[\textsf{Provers} tab]
   allows to select which of the installed provers one wants to see
@@ -791,9 +806,9 @@ output.
   cela soit coherent avec la sortie HTML ci-dessous}
 \begin{figure}[t]
 \begin{center}
-\begin{toimage}
+%HEVEA\begin{toimage}
 \input{HelloProof.tex}
-\end{toimage}
+%HEVEA\end{toimage}
 %HEVEA\imageflush
 \end{center}
 \caption{LaTeX table produced for the HelloProof example (style 1)}
@@ -802,9 +817,9 @@ output.
 
 \begin{figure}[t]
 \begin{center}
-\begin{toimage}
+%HEVEA\begin{toimage}
 \input{HelloProof-style2.tex}
-\end{toimage}
+%HEVEA\end{toimage}
 %HEVEA\imageflush
 \end{center}
 \caption{LaTeX table produced for the HelloProof example (style 2)}
@@ -824,21 +839,22 @@ There are three styles of output: `table', `simpletree', and
 
 \begin{figure}[t]
 \begin{center}
-\begin{latexonly}
+%BEGIN LATEX
 \fbox{\includegraphics[width=0.9\textwidth]{hello_proof.png}}
-\end{latexonly}
-\begin{htmlonly}
-\begin{rawhtml}
-<table border="1"><tr><td colspan="2">Obligations</td><td text-rotation="90">Alt-Ergo (0.94)</td><td text-rotation="90">Coq (8.3pl4)</td><td text-rotation="90">Simplify (1.5.4)</td></td></tr>
-<td bgcolor="#C0FFC0" colspan="2">G1</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
-<td bgcolor="#FF0000" colspan="2">G2</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
-<tr><td bgcolor="#FF0000" colspan="2">split_goal</td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td></tr>
-<td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">G2.1</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.49</td><td bgcolor="#FF8000">0.00</td></tr>
-<tr><td bgcolor="#C0FFC0" colspan="1">G2.2</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
-<td bgcolor="#C0FFC0" colspan="2">G3</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
-</table>
-\end{rawhtml}
-\end{htmlonly}
+%END LATEX
+\todo{uncomment the following}
+% \begin{htmlonly}
+% \begin{rawhtml}
+% <table border="1"><tr><td colspan="2">Obligations</td><td text-rotation="90">Alt-Ergo (0.94)</td><td text-rotation="90">Coq (8.3pl4)</td><td text-rotation="90">Simplify (1.5.4)</td></td></tr>
+% <td bgcolor="#C0FFC0" colspan="2">G1</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
+% <td bgcolor="#FF0000" colspan="2">G2</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
+% <tr><td bgcolor="#FF0000" colspan="2">split_goal</td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td></tr>
+% <td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">G2.1</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.49</td><td bgcolor="#FF8000">0.00</td></tr>
+% <tr><td bgcolor="#C0FFC0" colspan="1">G2.2</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
+% <td bgcolor="#C0FFC0" colspan="2">G3</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
+% </table>
+% \end{rawhtml}
+% \end{htmlonly}
 \end{center}
 \caption{HTML table produced for the HelloProof example}
 \label{fig:html}

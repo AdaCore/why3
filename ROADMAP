@@ -74,6 +74,8 @@
 ** porter multirounding a jessie->Why3. Completer le mode full et faire passer
    interval_arith.c. Completer la galerie
 ** preuve sur l'assembleur
+** support de Yices 2 ? interesserait Cesar
+
 
 * extraction vers Caml
  - PRIORITAIRE, JCF, ANDREI
@@ -112,13 +114,9 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
    (but they are in the top-right window)
    NEED FEEDBACK which ones ???
 
-* (JCF) reject global "val"s in typing environment for logic decls.
-
 * sessions
 ** mettre la dtd sur le web et changer l'entête des sessions pour qu'elles
    pointent dessus
-** utiliser des chemins plus raisonnables pour indiquer la position des buts
-   dans les fichiers (e.g. relativement au fichier session ?)
 
 ==================== Roadmap for release 0.80 ========================
 
@@ -207,6 +205,9 @@ Bug fixes:
 
 == TODOs ==
 
+* (JCF) reject global "val"s in typing environment for logic decls.
+
+* appliquer les changements de syntaxe des programmes dans la doc : aussi bien dans le tutorial que dans la BNF des manpages 
 
 * faire le menage dans les transformations d'induction : _int _ty
   _ty_lex, et DOCUMENTER
@@ -214,9 +215,7 @@ Bug fixes:
 * Sortie PVS
 ** avec mecanisme de realization
 
-* support de Yices 2 ? interesserait Cesar
-
-* mettre au propre les loc des fichiers de sessions, en particulier
+* DONE mettre au propre les loc des fichiers de sessions, en particulier
   les noms de fichiers doivent etre relatifs au fichier de session
   lui-meme. Utiliser Sysutil.relativize_filename a bon escient.
 

@@ -13,10 +13,15 @@
 \usepackage{lmodern}
 %\usepackage{url}
 \usepackage[pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
+
+%BEGIN LATEX
 \usepackage{graphicx}
+%END LATEX
+%HEVEA \newcommand{\includegraphics}[2][2]{\imgsrc{#2}}
+
 \usepackage{listings}
 \usepackage{xspace}
-\usepackage{hevea}
+%\usepackage{hevea}
 
 %BEGIN LATEX
 \setulmarginsandblock{30mm}{30mm}{*}
@@ -71,12 +76,12 @@
 
 \vfill
 
-\begin{latexonly}
-{\fontsize{40}{40pt}\selectfont\bfseries\sffamily The Why3 platform}
-\end{latexonly}
-\begin{htmlonly}
-{\Huge\bfseries\sffamily The Why3 platform}
-\end{htmlonly}
+{
+%BEGIN LATEX
+\fontsize{40}{40pt}\selectfont
+%END LATEX
+%HEVEA \Huge
+\bfseries\sffamily The Why3 platform}
 
 \vfill
 
@@ -120,20 +125,21 @@ $^1$ LRI, CNRS, Univ Paris-Sud, Orsay, F-91405 \\
 $^2$ Inria Saclay -- \^Ile-de-France, Toccata, Palaiseau, F-91120
 \end{tabular}
 
-\begin{latexonly}
+%BEGIN LATEX
 \bigskip
-\end{latexonly}
+%END LATEX
 
   \textcopyright 2010-2012 Univ Paris-Sud, CNRS, Inria
 
 \urldef{\urlutcat}{\url}{http://frama-c.cea.fr/u3cat}
 \urldef{\urlhilite}{\url}{http://www.open-do.org/projects/hi-lite/}
 
-  This work has been partly supported by the `\ahref{\urlutcat}{U3CAT}'
-  national ANR project (ANR-08-SEGI-021-08\begin{latexonly},
-  \urlutcat\end{latexonly}) and by the `\ahref{\urlhilite}{Hi-Lite}'
-  \begin{latexonly}(\urlhilite)\end{latexonly} FUI project of the
-  System@tic competitivity cluster.
+\todo{uncomment the following}
+  % This work has been partly supported by the `\ahref{\urlutcat}{U3CAT}'
+  % national ANR project (ANR-08-SEGI-021-08\begin{latexonly},
+  % \urlutcat\end{latexonly}) and by the `\ahref{\urlhilite}{Hi-Lite}'
+  % \begin{latexonly}(\urlhilite)\end{latexonly} FUI project of the
+  % System@tic competitivity cluster.
 
 \end{flushleft}
 \end{center}
@@ -238,9 +244,9 @@ are the following.
 
 \cleardoublepage
 
-\begin{latexonly}
+%BEGIN LATEX
 \tableofcontents
-\end{latexonly}
+%END LATEX
 
 %\input{intro.tex}
 
