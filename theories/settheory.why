@@ -78,30 +78,23 @@ theory Relation
 
 end
 
-(** {2 Image}
+(** {2 Composition}
 
-Image by a relation
+Composition of relations
 
 *)
 
-theory Image
+theory Composition
 
-  use export Relation
+  use import Relation
 
-  function image (r : rel 'a 'b) (dom : set 'a) : set 'b
+  function semicolon (rel 'a 'b) (rel 'b 'c) : (rel 'a 'c)
 
-  axiom mem_image:
-    forall r : rel 'a 'b, dom : set 'a, y : 'b [mem y (image r dom)].
-    mem y (image r dom) <-> exists x: 'a. mem x dom /\ mem (x,y) r
+  axiom semicolon_def:
+    forall x:'a, z:'c, p:rel 'a 'b, q:rel 'b 'c.
+    mem (x,z) (semicolon p q) <->
+      exists y:'b. mem (x,y) p /\ mem (y,z) q
 
-  lemma image_union:
-    forall r : rel 'a 'b, s t: set 'a.
-    image r (union s t) = union (image r s) (image r t)
-
-  lemma image_add:
-    forall r : rel 'a 'b, dom : set 'a, x:'a.
-    image r (add x dom) = union (image r (singleton x))
-                                        (image r dom)
 end
 
 (** {2 Domain, Range, Inverse} 
@@ -132,7 +125,43 @@ theory InverseDomRan
     forall r : rel 'a 'b. forall y : 'b.
       mem y (ran r) <-> exists x : 'a. mem (x,y) r
 
+  lemma dom_empty:
+    dom (empty : rel 'a 'b) = (empty : set 'a)
+
+  lemma dom_add:
+    forall f:rel 'a 'b, x:'a, y:'b.
+      dom (add (x,y) f) = add x (dom f) 
+
 end
+
+(** {2 Image}
+
+Image by a relation
+
+*)
+
+theory Image
+
+  use export Relation
+
+  function image (r : rel 'a 'b) (dom : set 'a) : set 'b
+
+  axiom mem_image:
+    forall r : rel 'a 'b, dom : set 'a, y : 'b [mem y (image r dom)].
+    mem y (image r dom) <-> exists x: 'a. mem x dom /\ mem (x,y) r
+
+  lemma image_union:
+    forall r : rel 'a 'b, s t: set 'a.
+    image r (union s t) = union (image r s) (image r t)
+
+  lemma image_add:
+    forall r : rel 'a 'b, dom : set 'a, x:'a.
+    image r (add x dom) = union (image r (singleton x))
+                                        (image r dom)
+end
+
+
+
 
 (** {2 Functions}
 
@@ -183,21 +212,29 @@ theory Function
 
   axiom mem_total_functions:
     forall f:rel 'a 'b, s:set 'a, t:set 'b.
-      mem f (s --> t) <-> mem f (s +-> t) /\ dom f == s
+      mem f (s --> t) <-> mem f (s +-> t) /\ dom f = s
 
   lemma total_function_is_function:
     forall f:rel 'a 'b, s:set 'a, t:set 'b.
       mem f (s --> t) -> mem f (s +-> t)
 
+  lemma singleton_is_function :
+    forall x:'a, y:'b [singleton (x,y)].
+      mem (singleton (x,y)) ((singleton x) --> (singleton y))
+  
   function apply (rel 'a 'b) 'a : 'b
+
+  axiom apply_def0:
+     forall f:rel 'a 'b, s:set 'a, t:set 'b, a:'a.
+       mem f (s +-> t) /\ mem a (dom f) -> mem (a, apply f a) f
 
   axiom apply_def1:
      forall f:rel 'a 'b, s:set 'a, t:set 'b, a:'a.
-       mem a s /\ mem f (s --> t) -> mem (a, apply f a) f
+       mem f (s --> t) /\ mem a s -> mem (a, apply f a) f
 
   axiom apply_def2:
      forall f:rel 'a 'b, s:set 'a, t:set 'b, a:'a, b:'b.
-       mem f (s --> t) /\ mem (a,b) f -> b = apply f a
+       mem f (s +-> t) /\ mem (a,b) f ->  apply f a = b
 
   lemma injection:
      forall f:rel 'a 'b, s:set 'a, t:set 'b. forall x y:'a.
@@ -206,7 +243,67 @@ theory Function
        mem x s -> mem y s ->
        (apply f x) = (apply f y) -> x=y
 
+  lemma apply_singleton :
+   forall x:'a, y:'b.
+     apply (singleton (x,y)) x = y
+
+  use import Composition
+
+  lemma semicolon_is_function:
+    forall f:rel 'a 'b, g:rel 'b 'c, s:set 'a, t:set 'b, u:set 'c.
+    mem f (s +-> t) /\ mem g (t +-> u) -> mem (semicolon f g) (s +-> u)
+
+  lemma apply_compose :
+   forall x:'a, f:rel 'a 'b, g:rel 'b 'c, s:set 'a, t:set 'b, u:set 'c.
+     mem f (s +-> t) /\  mem g (t +-> u) /\
+     mem x (dom f) /\ mem (apply f x) (dom g) ->
+     apply (semicolon f g) x = apply g (apply f x)
+
+
 end
+
+(** {2 restriction}
+
+
+*)
+
+theory Restriction
+
+end
+
+(** {2 overriding}
+
+operator <+
+
+Bbook: Section 2.4.2
+
+*)
+
+theory Overriding
+
+use import Relation
+use import InverseDomRan
+
+function (<+) (rel 'a 'b) (rel 'a 'b) : (rel 'a 'b)
+
+axiom overriding_def:
+  forall x:'a, y:'b, q r : rel 'a 'b.
+    mem (x,y) (q <+ r) <-> 
+      (if mem x (dom r) then mem (x,y) r else mem (x,y) q)
+
+use import Function
+
+lemma apply_overriding_1 :
+   forall f g:rel 'a 'b, x:'a.
+   mem x (dom g) -> apply (f <+ g) x = apply g x
+
+lemma apply_overriding_2 :
+   forall f g:rel 'a 'b, x:'a.
+   not (mem x (dom g)) -> apply (f <+ g) x = apply f x
+
+end
+
+
 
 
 (** {2 Identity}
@@ -311,9 +408,9 @@ theory IsFinite
 
   axiom finite_inversion:
      forall s1 s2:set 'a. mem s1 (finite_subsets s2) ->
-        s1 == empty \/
+        s1 = empty \/
         exists x:'a, s3:set 'a.
-          s1 == add x s3 /\ mem s3 (finite_subsets s2)
+          s1 = add x s3 /\ mem s3 (finite_subsets s2)
 
 end
 

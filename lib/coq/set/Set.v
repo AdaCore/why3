@@ -83,6 +83,13 @@ unfold is_empty; intuition.
 Qed.
 
 (* Why3 goal *)
+Lemma mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
+  (empty :(set a))).
+intros a a_WT x.
+auto.
+Qed.
+
+(* Why3 goal *)
 Definition add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 intros a a_WT x s.
 exact (fun y => x = y \/ s y).

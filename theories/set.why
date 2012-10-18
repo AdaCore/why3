@@ -32,6 +32,8 @@ theory SetGen
 
   axiom empty_def1: is_empty (empty : set 'a)
 
+  lemma mem_empty: forall x:'a. mem x empty <-> false
+
   (** addition *)
   function add 'a (set 'a) : set 'a
 

@@ -932,12 +932,24 @@ depend: $(COQVD)
 clean::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
-update-coq: bin/why3 drivers/coq-realizations.aux
+update-coq: update-coq-int update-coq-real update-coq-number update-coq-set update-coq-settheory update-coq-fp
+
+update-coq-int: bin/why3 drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+
+update-coq-real: bin/why3 drivers/coq-realizations.aux theories/real.why
 	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
+
+update-coq-number: bin/why3 drivers/coq-realizations.aux theories/number.why
 	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
+
+update-coq-set: bin/why3 drivers/coq-realizations.aux theories/set.why
 	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T set.$$f -o lib/coq/set/; done
+
+update-coq-settheory: bin/why3 drivers/coq-realizations.aux theories/settheory.why
 	for f in $(COQLIBS_SETTHEORY_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T settheory.$$f -o lib/coq/settheory/; done
+
+update-coq-fp: bin/why3 drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
 else
