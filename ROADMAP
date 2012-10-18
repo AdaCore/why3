@@ -166,39 +166,40 @@ Bug fixes:
 * check that nightly bench is OK
 * check that "make xml-validate" is OK
   (see below : copy the dtd on the web)
-* put 0.74 in file Version
+* put 0.80 in file Version
 * check headers
 * check the file CHANGES, add the release date
 * manual in PDF: check that macro \todo is commented out
     in ./macros.tex, and then "make doc"
 * manual in HTML: "make doc/html/index.html"
 * do "make distrib"
-* test the distrib why3-0.74.tar.gz
+* test the distrib why3-0.80.tar.gz
 * make a last commit:
- - add tag 0.74 to the git repository
+ - add tag 0.80 to the git repository
  - do not forget to push it using git push --tags
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
   ~filliatr/ARCHIVE/www/why)
 * put on the web page
- - why3-0.74.tar.gz
+ - why3-0.80.tar.gz
  - the HTML version of the manual (content of doc/html)
  - why3session.dtd
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    (make stdlibdoc ;
-    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.74;
-    ln -s /users/www-perso/projets/why3/stdlib-0.74 \
+    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.80;
+    ln -s /users/www-perso/projets/why3/stdlib-0.80 \
             /users/www-perso/projets/why3/stdlib)
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     Note: check that URL of API doc is correct in doc/api.tex line 9.
      (make apidoc ;
-    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.74;
-    ln -s /users/www-perso/projets/why3/api-0.74 \
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.80;
+    ln -s /users/www-perso/projets/why3/api-0.80 \
             /users/www-perso/projets/why3/api    )
  - update the main HTML page (sources are in why3-papers/www)
 
 * produce the Why3 part of ProVal gallery
-  -> add also a tar.gz and a ZIP file of it
+  -> add also a tar.gz and a ZIP file of it (this is done by doing 
+  "make gallery-files" in the sources of the web pages)
 * Announce the distrib
  - What to put in the announcement: see New Features above
 * The next commit : add +git to the version in file Version
