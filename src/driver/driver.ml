@@ -178,7 +178,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
     let th =
       try Env.read_theory ~format:"why" env f id
-      with e -> raise (Loc.Located (loc,e))
+      with e when not (Debug.test_flag Debug.stack_trace) -> 
+        raise (Loc.Located (loc,e))
     in
     qualid := q;
     List.iter (add_local th) trl

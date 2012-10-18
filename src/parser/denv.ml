@@ -52,8 +52,12 @@ let tyapp ts tyl = match ts.ts_def with
       Tyapp (ts, tyl)
   | Some ty ->
       let add m v t = Mtv.add v t m in
-      let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
-      type_inst s ty
+      try
+        let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
+        type_inst s ty
+      with Invalid_argument _ ->
+        Loc.errorm "this type expects %d parameters" (List.length ts.ts_args)
+
 
 type dty = dty_view
 
