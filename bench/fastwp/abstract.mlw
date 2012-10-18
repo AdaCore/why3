@@ -1,0 +1,21 @@
+module Abstr
+   use import int.Int
+   use import ref.Ref
+
+   let f (x : ref int) =
+      { !x = 1 }
+      abstract
+         x := !x + 1;
+         x := !x - 1
+         { !x > 0 }
+      { !x = 1 }
+
+   let g (x : ref int) =
+      { !x = 1 }
+      abstract
+         x := !x + 1;
+         x := !x - 1
+         { !x > 0 }
+      { !x > 1 }
+
+end

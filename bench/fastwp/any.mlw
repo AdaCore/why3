@@ -1,0 +1,15 @@
+module An
+   use import int.Int
+   use import ref.Ref
+
+   let f (x : int) =
+      { }
+         any { true } int { result = x }
+      { x = result }
+
+   let g (x : int) =
+      { }
+         any {true } int {result > 0 }
+      { result = 0 }
+
+end
