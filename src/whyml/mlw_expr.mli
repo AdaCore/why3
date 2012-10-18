@@ -166,6 +166,13 @@ and expr_node = private
   | Eassert of assertion_kind * term
   | Eabsurd
 
+(*
+   Earrow - variables of function type
+   Eapp (e,v,s) -
+     represents application (e v), s contains the pre/post/effects
+      of the call
+*)
+
 and let_defn = private {
   let_sym  : let_sym;
   let_expr : expr;
