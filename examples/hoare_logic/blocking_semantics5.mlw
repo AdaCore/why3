@@ -372,7 +372,7 @@ inductive compatible datatype value =
 *)
 
 predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_stack) =
-  (forall id: mident. type_value (IdMap.get sigma id) = get_reftype id sigmat) /\
+  (forall id: mident. type_value (get_env id sigma) = get_reftype id sigmat) /\
   (forall id: ident. type_value (get_stack id pi) = get_vartype id pit)
 
 lemma type_inversion : forall v "induction":value.
@@ -439,9 +439,8 @@ function msubst (f:fmla) (x:mident) (v:ident) : fmla =
 (** [fresh_in_term id t] is true when [id] does not occur in [t] *)
 predicate fresh_in_term (id:ident) (t:term) =
   match t with
-  | Tvalue _  -> true
+  | Tvalue _ | Tderef _  -> true
   | Tvar i  -> id <> i
-  | Tderef _  -> true
   | Tbin t1 _ t2 -> fresh_in_term id t1 /\ fresh_in_term id t2
   end
 
