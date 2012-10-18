@@ -85,8 +85,9 @@ let t_absurd  = ps_app ls_absurd []
 let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
 
-(* any vs in post/xpost is either a pvsymbol or a fresh mark *)
-let vtv_of_vs vs =
+let vtv_of_vs (vs : vsymbol) =
+   (* return the type value of the program variable that corresponds to [vs] *)
+  (* any vs in post/xpost is either a pvsymbol or a fresh mark *)
   try (restore_pv vs).pv_vtv with Not_found -> vtv_mark
 
 (* replace every occurrence of [old(t)] with [at(t,'old)] *)
@@ -106,7 +107,7 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
 let erase_mark lab t = t_subst_single lab t_now t
 
-(* retreat to the point of the current postcondition's ['old] *)
+(* replace ['old] by a fresh label in q and xq, and call the argument *)
 let backstep fn q xq =
   let lab = fresh_mark () in
   let f = fn (old_mark lab q) (Mexn.map (old_mark lab) xq) in
@@ -282,7 +283,9 @@ let analyze_var fn_down fn_join lkm km vs ity =
     t_close_branch pat t in
   t_case (t_var vs) (List.map branch (Mlw_decl.inst_constructors lkm km ity))
 
-let update_var env mreg vs =
+let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
+   (* return a fresh term for [vs] if the program variable of [vs] appears in
+      [mreg], otherwise return the term [vs] *)
   let rec update vs { vtv_ity = ity; vtv_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
@@ -294,8 +297,10 @@ let update_var env mreg vs =
   in
   update vs (vtv_of_vs vs)
 
-(* substitute the updated values in the "contemporary" variables *)
-let rec subst_at_now now m t = match t.t_node with
+let rec subst_at_now now (m : vsymbol Mvs.t) (t : term) =
+   (* apply the substitution to the term, but do not substitute variables that
+      are protected by labels. *)
+   match t.t_node with
   | Tvar vs when now ->
       begin try t_var (Mvs.find vs m) with Not_found -> t end
   | Tapp (ls, _) when ls_equal ls fs_old -> assert false
@@ -313,37 +318,28 @@ let rec subst_at_now now m t = match t.t_node with
   | _ ->
       t_map (subst_at_now now m) t
 
-(* quantify over all references in eff
-   eff : effect
-   f   : formula
-
-   let eff = { rho1, ..., rhon }
-   we collect in vars all variables involving these regions
-   let vars = { v1, ..., vm }
-
-     forall r1:ty(rho1). ... forall rn:ty(rhon).
-     let v'1 = update v1 r1...rn in
-     ...
-     let v'm = update vm r1...rn in
-     f[vi <- v'i]
-*)
-
 let model1_lab = Slab.singleton (create_label "model:1")
 let model2_lab = Slab.singleton (create_label "model:quantify(2)")
 let model3_lab = Slab.singleton (create_label "model:cond")
 
 let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
 
-let quantify env regs f =
-  (* mreg : updated region -> vs *)
+let quantify env (regs : Sreg.t) (f : term) =
+   (* quantify formula [f] over all variables in the regions [regs] *)
   let get_var reg () =
-    let test vs _ id = match vtv_of_vs vs with
+     (* for each free variable in [f], compare its region with [reg];
+        if it matches, return the variable as the one that corresponds to the
+        region *)
+    let test vs _ id =
+       (* this does the actual comparison *)
+      match vtv_of_vs vs with
       | { vtv_ity = { ity_node = Ityapp (_,_,[r]) }}
       | { vtv_mut = Some r } when reg_equal r reg -> vs.vs_name
       | _ -> id in
     let id = Mvs.fold test f.t_vars reg.reg_name in
     mk_var id model1_lab (ty_of_ity reg.reg_ity)
   in
+  (* mreg : updated region -> vs *)
   let mreg = Mreg.mapi get_var regs in
   (* update all program variables involving these regions *)
   let update_var vs _ = match update_var env mreg vs with
@@ -978,19 +974,21 @@ let wp_val _env _km th _lv = th
 let fast_wp = Debug.register_flag "fast_wp"
   ~desc:"Efficient Weakest Preconditions."
 
-module Subst = struct
+module Subst : sig
 
-(* dead code
-  type t = unit
-*)
+   type t
 
-  let empty = ()
+   val empty : t
+
+   val term : t -> term -> term
+
+end = struct
+
+  type t = vsymbol Mreg.t
+
+  let empty = Mreg.empty
 
   let term _s t = t
-
-(* dead code
-  let frame _ef s = s
-*)
 
 end
 
