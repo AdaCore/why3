@@ -325,7 +325,10 @@ fi
 # checking for lablgtksourceview2
 if test "$enable_ide" = yes ; then
    if test "$USEOCAMLFIND" = yes; then
-      LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+      LABLGTKSV2LIB=$(ocamlfind query lablgtk2.sourceview2)
+      if test -z "$LABLGTKSV2LIB"; then
+         LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+      fi
    fi
    if test -n "$LABLGTKSV2LIB";then
       echo "ocamlfind found lablgtksourceview2 in $LABLGTKSV2LIB"
