@@ -247,8 +247,8 @@ install_no_local::
 install_no_local_lib::
 	rm -rf $(OCAMLLIB)/why3
 	mkdir -p $(OCAMLLIB)/why3
-	cp -f lib/why3/why3.cm* $(OCAMLLIB)/why3
-	cp -f lib/why3/META $(OCAMLLIB)/why3
+	cp -f lib/why3/why3.cm* lib/why3/why3.[ao] \
+		lib/why3/META $(OCAMLLIB)/why3
 
 ifeq (@enable_local@,yes)
 install install-lib:
