@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Why3
@@ -39,7 +30,7 @@ let print_usage () =
   let maxl = Array.fold_left
     (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
   eprintf "%s <command> [options] <session directories>@\n@\navailable commands:@.@[<hov>%a@]@\n@."
-    exec_name 
+    exec_name
     (Pp.print_iter1 Array.iter Pp.newline
        (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
          (Util.padd_string ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
@@ -51,7 +42,7 @@ let () =
   if Array.length Sys.argv < 2 then print_usage ();
   let cmd_name = Sys.argv.(1) in
   begin
-    match cmd_name with 
+    match cmd_name with
       | "-h" | "--help" -> print_usage ()
       | "-v" | "--version" -> print_version (); exit 0
       | _ -> ()

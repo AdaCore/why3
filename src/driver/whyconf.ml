@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Util
@@ -313,7 +304,7 @@ let set_prover_upgrade_policy prover policy (i, family) =
   let section = set_string section "alternative" prover.prover_altern in
   let section =
     match policy with
-      | CPU_keep -> 
+      | CPU_keep ->
         set_string section "policy" "keep"
       | CPU_upgrade p ->
         let section = set_string section "target_name" p.prover_name in
@@ -419,7 +410,7 @@ let load_policy provers acc (_,section) =
         in
         let _target = Mprover.find target provers in
         Mprover.add source (CPU_upgrade target) acc
-      | "duplicate" -> 
+      | "duplicate" ->
         let target =
           { prover_name = get_string section "target_name";
             prover_version = get_string section "target_version";
@@ -595,7 +586,7 @@ let merge_config config filename =
       let name = get_string section "name" in
       let version = get_stringo section "version" in
       let altern = get_stringo section "alternative" in
-      mk_filter_prover ?version ?altern name 
+      mk_filter_prover ?version ?altern name
     with MissingField s ->
       eprintf "[Warning] sec prover_modifiers is missing a '%s' field@." s;
       mk_filter_prover "none"
@@ -682,7 +673,7 @@ let set_prover_upgrade_policy config prover target =
     provers_upgrade_policy = m;
   }
 
-let set_policies config policies = 
+let set_policies config policies =
   { config with
     config = set_policies config.config policies;
     provers_upgrade_policy = policies }

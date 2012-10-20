@@ -2,12 +2,12 @@
 | "META.in" -> no
 | "stdlib.ml[i]?" -> no
 # Objective Caml source
-| ".*\\.ml[il4]?" -> frame open:"(*" line:"*" close:"*)"
-| ".*\\.ml[il4]?\\.in" -> frame open:"(*" line:"*" close:"*)"
-| ".*\\.mly"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\\.ml[il4]?" -> frame width:62 open:"(*" line:"*" close:"*)"
+| ".*\\.ml[il4]?\\.in" -> frame width:62 open:"(*" line:"*" close:"*)"
+| ".*\\.mly"      -> frame width:62 open:"/*" line:"*" close:"*/"
 # C source
-| ".*\\.c"      -> frame open:"/*" line:"*" close:"*/"
+| ".*\\.c"      -> frame width:62 open:"/*" line:"*" close:"*/"
 # Misc
-| "configure.in" -> frame open:"#"  line:"#" close:"#"
-| "Makefile.in" -> frame open:"#"  line:"#" close:"#"
-| "README"   -> frame open:"#"  line:"#" close:"#"
+| "configure.in" -> frame width:62 open:"#"  line:"#" close:"#"
+| "Makefile.in" -> frame width:62 open:"#"  line:"#" close:"#"
+| "README"   -> frame width:62 open:"#"  line:"#" close:"#"

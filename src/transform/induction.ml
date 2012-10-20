@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ident
 open Ty
@@ -393,9 +384,9 @@ let () =
 (***************************   WITH LEX. ORDER   ***************************)
 (***************************************************************************)
 
-(* induction_int_lex :   induction tactic for ordered int tuples. 
-No heuristic is provided. Use labels. Generalized variables inside 
-the induction hypothesis are the variables on the right of the rightmost 
+(* induction_int_lex :   induction tactic for ordered int tuples.
+No heuristic is provided. Use labels. Generalized variables inside
+the induction hypothesis are the variables on the right of the rightmost
 induction variable.*)
 
 (* separate prenex universal quantification from the body of the formula*)

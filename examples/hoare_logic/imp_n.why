@@ -174,7 +174,7 @@ predicate eval_fmla (s:state) (f:fmla) =
   | Fimplies f1 f2 ->  eval_fmla s f1 -> eval_fmla s f2
   end
 
-(* substitution *) 
+(* substitution *)
 
 function subst_expr (e:expr) (x:ident) (t:expr) : expr =
   match e with

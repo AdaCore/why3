@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (**************************************************************************)
 (* Specific source code for computing statistics is a contribution by     *)
@@ -179,7 +170,7 @@ type 'a goal_stat =
   | No of ('a transf * ('a goal * 'a goal_stat) list) list
   | Yes of (prover * float) list * ('a transf * ('a goal * 'a goal_stat) list) list
 
-let rec stats2_of_goal ~nb_proofs g : notask goal_stat = 
+let rec stats2_of_goal ~nb_proofs g : notask goal_stat =
   let proof_list =
     PHprover.fold
       (fun prover proof_attempt acc ->
@@ -221,7 +212,7 @@ and stats2_of_transf ~nb_proofs tr : (notask goal * notask goal_stat) list =
 
 let print_res fmt (p,t) = fprintf fmt "%a (%.2f)" print_prover p t
 
-let rec print_goal_stats depth (g,l) = 
+let rec print_goal_stats depth (g,l) =
   for _i=1 to depth do printf "  " done;
   printf "+-- goal %s" g.goal_name.Ident.id_string;
   match l with

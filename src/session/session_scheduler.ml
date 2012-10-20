@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Session
@@ -210,7 +201,7 @@ let schedule_any_timeout t callback =
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
-(* dead code 
+(* dead code
 let add_a_check t callback =
   dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
@@ -368,14 +359,14 @@ let find_prover eS a =
                 Session.change_prover a new_p;
                 match load_prover eS new_p with
                   | Some p -> Some (new_p,p,a)
-                  | None -> 
+                  | None ->
                     (* should never happen because at loading, config
                        ignores uninstalled prover targets.
                        Nevertheless, we can safely return None.
                     *)
                     None
             end
-          | Whyconf.CPU_duplicate new_p -> 
+          | Whyconf.CPU_duplicate new_p ->
             (* does a proof using new_p already exists ? *)
             let g = a.proof_parent in
             begin
@@ -386,12 +377,12 @@ let find_prover eS a =
               with Not_found ->
                 (* we duplicate the proof_attempt *)
                 let new_a = copy_external_proof
-                  ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a 
+                  ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
                 in
                 O.init new_a.proof_key (Proof_attempt new_a);
                 match load_prover eS new_p with
                   | Some p -> Some (new_p,p,new_a)
-                  | None -> 
+                  | None ->
                     (* should never happen because at loading, config
                        ignores uninstalled prover targets.
                        Nevertheless, we can safely return None.
@@ -402,7 +393,7 @@ let find_prover eS a =
 
 let adapt_timelimit a =
   match a.proof_state with
-    | Done { Call_provers.pr_answer = 
+    | Done { Call_provers.pr_answer =
         (Call_provers.Valid | Call_provers.Unknown _ | Call_provers.Invalid);
              Call_provers.pr_time = t } ->
       let t = truncate (1.0 +. 2.0 *. t) in
@@ -505,7 +496,7 @@ let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
       a
     with Not_found ->
       let ep = add_external_proof ~keygen:O.create ~obsolete:false
-        ~archived:false ~timelimit ~memlimit 
+        ~archived:false ~timelimit ~memlimit
         ~edit:None g p Interrupted in
       O.init ep.proof_key (Proof_attempt ep);
       ep
@@ -821,7 +812,7 @@ let edit_proof eS sched ~default_editor a =
   else
       match find_prover eS a with
         | None ->
-          (* nothing to do 
+          (* nothing to do
              TODO: report an non replayable proof if some option is set
           *)
           ()
@@ -914,9 +905,9 @@ let rec clean = function
     iter_goal
       (fun _ -> ())
       (fun t ->
-        (* NO !!! 
+        (* NO !!!
            if not t.transf_verified then remove_transformation t
-        else 
+        else
         *)
         transf_iter clean t)
       (fun m ->

@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 
 open Format
@@ -549,14 +540,14 @@ let env_session () =
     | None -> assert false
     | Some e -> e
 
-let task_text t = Pp.string_of Pretty.print_task t 
+let task_text t = Pp.string_of Pretty.print_task t
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
 let update_task_view a =
-  let text = 
+  let text =
   match a with
     | S.Goal g ->
       if (Gconfig.config ()).intro_premises then
@@ -579,7 +570,7 @@ let update_task_view a =
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
-            | S.Done r -> 
+            | S.Done r ->
               let out = r.Call_provers.pr_output in
               begin
                 let env = env_session () in
@@ -814,7 +805,7 @@ let () = Warning.set_hook record_warning
 let display_warnings () =
   if Queue.is_empty warnings then () else
     begin
-      Queue.iter 
+      Queue.iter
         (fun (loc,msg) ->
           match loc with
             | None ->
@@ -830,7 +821,7 @@ let display_warnings () =
       in
   (* file_info#set_text msg; *)
       info_window `WARNING msg
-    end  
+    end
 
 (* check if provers are present *)
 let () =

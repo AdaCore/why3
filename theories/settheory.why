@@ -1,6 +1,6 @@
 
 
-(** {1 A library for Set theory} 
+(** {1 A library for Set theory}
 
 this library provides a few Why3 theories that formalize the set
 theory as it is defined in the B-book.
@@ -97,7 +97,7 @@ theory Composition
 
 end
 
-(** {2 Domain, Range, Inverse} 
+(** {2 Domain, Range, Inverse}
 
 Domain, Range and inverse of a relation
 
@@ -130,7 +130,7 @@ theory InverseDomRan
 
   lemma dom_add:
     forall f:rel 'a 'b, x:'a, y:'b.
-      dom (add (x,y) f) = add x (dom f) 
+      dom (add (x,y) f) = add x (dom f)
 
 end
 
@@ -169,7 +169,7 @@ Partial functions as relations
 
 *)
 
-theory Function 
+theory Function
 
   use export Relation
 
@@ -221,7 +221,7 @@ theory Function
   lemma singleton_is_function :
     forall x:'a, y:'b [singleton (x,y)].
       mem (singleton (x,y)) ((singleton x) --> (singleton y))
-  
+
   function apply (rel 'a 'b) 'a : 'b
 
   axiom apply_def0:
@@ -288,7 +288,7 @@ function (<+) (rel 'a 'b) (rel 'a 'b) : (rel 'a 'b)
 
 axiom overriding_def:
   forall x:'a, y:'b, q r : rel 'a 'b.
-    mem (x,y) (q <+ r) <-> 
+    mem (x,y) (q <+ r) <->
       (if mem x (dom r) then mem (x,y) r else mem (x,y) q)
 
 use import Function

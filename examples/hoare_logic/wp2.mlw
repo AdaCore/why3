@@ -443,7 +443,7 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
           (abstract_effects i
             (Fand
                 (Fimplies (Fand (Fterm e) inv) (wp i inv))
-                (Fimplies (Fand (Fnot (Fterm e)) inv) q))) 
+                (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
 
     end
 

@@ -5,10 +5,10 @@ theory T
 
   goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
 
-  goal g_lab0 : forall x "model:0":int. ("model:cond" x >= 42) -> 
+  goal g_lab0 : forall x "model:0":int. ("model:cond" x >= 42) ->
     ("model:concl" x + 3 <= 50)
 
-  goal g_lab1 : forall x "model:1":int. ("model:cond" x >= 42) -> 
+  goal g_lab1 : forall x "model:1":int. ("model:cond" x >= 42) ->
     ("model:concl" x + 3 <= 50)
 
   constant g : int
@@ -46,11 +46,11 @@ goal test_overflow_int16:
 
 goal test_overflow_int16_alt:
   forall x "model:0" y "model:0" :  int.
-      -65536 <= x <= 65535 /\ -65536 <= y <= 65535 -> -65536 <= x+y <= 65535 
+      -65536 <= x <= 65535 /\ -65536 <= y <= 65535 -> -65536 <= x+y <= 65535
 
 goal test_overflow_int16_bis:
   forall x "model:0" y "model:0" :  int.
-     is_int16 x /\ is_int16 y /\ 
+     is_int16 x /\ is_int16 y /\
      ("model:cond1" 0 <= x) /\ (x <= y) -> is_int16 (x + y)
 
 predicate is_int32 (x:int) = -2147483648 <= x <= 2147483647
@@ -83,7 +83,7 @@ theory ModelArray
 
 use import map.Map
 
-goal t1 : forall t "model:0" :map int int, i "model:0" : int. 
+goal t1 : forall t "model:0" :map int int, i "model:0" : int.
    get (set t 0 42) i = get t i
 
 end

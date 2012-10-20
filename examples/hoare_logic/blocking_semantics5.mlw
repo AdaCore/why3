@@ -181,7 +181,7 @@ inductive one_step env stack stmt env stack stmt =
  (** many steps of execution *)
 
 inductive many_steps env stack stmt env stack stmt int =
-  | many_steps_refl: forall sigma:env, pi:stack, s:stmt. 
+  | many_steps_refl: forall sigma:env, pi:stack, s:stmt.
       many_steps sigma pi s sigma pi s 0
   | many_steps_trans: forall sigma1 sigma2 sigma3:env, pi1 pi2 pi3:stack, s1 s2 s3:stmt, n:int.
       one_step sigma1 pi1 s1 sigma2 pi2 s2 ->

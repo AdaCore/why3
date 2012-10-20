@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Why3
@@ -203,7 +194,7 @@ let load_altern alterns (_,section) =
 *)
 
 let load_config config original_config =
-  let main = get_main config in 
+  let main = get_main config in
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
@@ -558,16 +549,29 @@ let show_legend_window () =
 let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
-      ~name:"Why3"
+      ~name:"The Why3 Verification Platform "
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
                 "Claude Marché";
-                "Andrei Paskevich"
+                "Guillaume Melquiond";
+                "Andrei Paskevich";
+                "";
+                "with contributions of";
+                "";
+                "Sylvie Boldo";
+                "Simon Cruanes";
+                "Leon Gondelman";
+                "Johannes Kanig";
+                "David Mentré";
+                "Benjamin Monate";
+                "Thi-Minh-Tuyen Nguyen";
+                "Simão Melo de Sousa";
+                "Asma Tafat-Bouzid";
                ]
-      ~copyright:"Copyright 2010-2011 Univ Paris-Sud, CNRS, INRIA"
-      ~license:"GNU Lesser General Public License"
-      ~website:"https://gforge.inria.fr/projects/why3"
-      ~website_label:"Project web site"
+      ~copyright:"Copyright 2010-2012    INRIA, CNRS, Paris-Sud University"
+      ~license:"GNU Lesser General Public License version 2.1"
+      ~website:"http://why3.lri.fr"
+      ~website_label:"http://why3.lri.fr"
       ~version:Config.version
       ()
   in

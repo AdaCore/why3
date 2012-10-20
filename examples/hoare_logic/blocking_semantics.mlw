@@ -18,9 +18,9 @@ type value = Vvoid | Vint int | Vbool bool
 type operator = Oplus | Ominus | Omult | Ole
 
 (** ident for imutable variable*)
-type ident 
+type ident
 
-constant result : ident 
+constant result : ident
 
 type term =
   | Tvalue value
@@ -86,13 +86,13 @@ predicate eval_fmla (sigma:env) (pi:stack) (f:fmla) =
   | Fand f1 f2 -> eval_fmla sigma pi f1 /\ eval_fmla sigma pi f2
   | Fnot f -> not (eval_fmla sigma pi f)
   | Fimplies f1 f2 -> eval_fmla sigma pi f1 -> eval_fmla sigma pi f2
-  | Flet x t f -> 
+  | Flet x t f ->
       eval_fmla sigma (Cons (x,eval_term sigma pi t) pi) f
-  | Fforall x TYint f -> 
+  | Fforall x TYint f ->
      forall n:int. eval_fmla sigma (Cons (x,Vint n) pi) f
   | Fforall x TYbool f ->
      forall b:bool. eval_fmla sigma (Cons (x,Vbool b) pi) f
-  | Fforall x TYunit f ->  eval_fmla sigma (Cons (x,Vvoid) pi) f 
+  | Fforall x TYunit f ->  eval_fmla sigma (Cons (x,Vvoid) pi) f
   end
 
 (** substitution of a reference [r] by a logic variable [v]

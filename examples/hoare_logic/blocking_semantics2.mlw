@@ -171,7 +171,7 @@ inductive type_expr type_env type_stack expr datatype =
 	type_expr sigma pi e1 TYbool ->
 	type_expr sigma pi e2 ty ->
 	type_expr sigma pi e3 ty ->
-    	type_expr sigma pi (Eif e1 e2 e3) ty 
+    	type_expr sigma pi (Eif e1 e2 e3) ty
   | Type_eassert :
       forall sigma: type_env, pi:type_stack, p:fmla.
 	type_fmla sigma pi p ->
@@ -372,7 +372,7 @@ lemma let_implies :
   forall id:ident, t:term, p q:fmla.
     valid_fmla (Fimplies p q) ->
     valid_fmla (Fimplies (Flet id t p) (Flet id t q))
-	  
+
 predicate fresh_in_expr (id:ident) (e:expr) =
   match e with
   | Evalue _ -> true
@@ -652,12 +652,12 @@ end
 
 theory Simpl_tautology
 
-  predicate p 
+  predicate p
   predicate q
-  
-  lemma simpl_tautology : 
+
+  lemma simpl_tautology :
     (p -> q) <-> (p /\ q <-> p)
-	 
+
 end
 
 (** {2 WP calculus} *)
@@ -792,17 +792,17 @@ predicate expr_writes (e:expr) (w:Set.set mident) =
     forall e:expr. not (is_value e) \/ exists v:value. e = Evalue v
 
   lemma bool_value:
-    forall v:value, sigmat: type_env, pit:type_stack.  
+    forall v:value, sigmat: type_env, pit:type_stack.
       type_expr sigmat pit (Evalue v) TYbool ->
           (v = Vbool False) \/ (v = Vbool True)
 
   lemma unit_value:
-    forall v:value, sigmat: type_env, pit:type_stack.  
-      type_expr sigmat pit (Evalue v) TYunit -> v = Vvoid 
+    forall v:value, sigmat: type_env, pit:type_stack.
+      type_expr sigmat pit (Evalue v) TYunit -> v = Vvoid
 
   lemma progress:
     forall e:expr, sigma:env, pi:stack, sigmat: type_env, pit: type_stack, ty: datatype, q:fmla.
-      type_expr sigmat pit e ty -> 
+      type_expr sigmat pit e ty ->
       type_fmla sigmat (Cons(result, ty) pit) q ->
     eval_fmla sigma pi (wp e q) -> not is_value e ->
     exists sigma':env, pi':stack, e':expr.

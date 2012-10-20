@@ -806,7 +806,7 @@ predicate stmt_writes (s:stmt) (w:Set.set mident) =
        sigma,pi |= (wp s p) -> (wp s q)
 
      meme contre-exemple: sigma(x) = 42 alors true -> x=42
-        mais 
+        mais
           wp (x := 7) true = true
           wp (x := 7) x=42 = 7=42
   *)
