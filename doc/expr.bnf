@@ -22,15 +22,15 @@
        | "raise" uqualid                          ; exception raising
        | "raise" "(" uqualid expr ")"             ;
        | "try" expr "with" ("|" handler)+ "end"   ; exception catching
-       | "any" type-c                             ; 
+       | "any" type-c                             ;
        | "let" pattern "=" expr "in" expr         ; local binding
        | "match" expr ("," expr)* "with"          ; pattern matching
          ("|" expr-case)+ "end"                   ;
        | "(" expr ("," expr)+ ")"                 ; tuple
-       | "{|" field-value+ "|}"                   ; record
+       | "{" field-value+ "}"                     ; record
        | expr "." lqualid                         ; field access
        | expr "." lqualid "<-" expr               ; field assignment
-       | "{|" expr "with" field-value+ "|}"       ; field update
+       | "{" expr "with" field-value+ "}"         ; field update
        | expr ":" type 	                          ; cast
        | label expr 	                          ; label
        | "'" uident ":" expr                      ; code mark

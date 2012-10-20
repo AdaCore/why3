@@ -18,8 +18,8 @@
   mtype-defn ::=                                    ; abstract type
     | "=" type                                      ; alias type
     | "=" "|"? type-case ("|" type-case)*           ; algebraic type
-    | "=" "{|" mrecord-field                        ; record type
-          (";" mrecord-field)* "|}"                 ;
+    | "=" "{" mrecord-field                         ; record type
+          (";" mrecord-field)* "}"                  ;
   \
   mrecord-field ::= "mutable"? lident label* ":" type
   \

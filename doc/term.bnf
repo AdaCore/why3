@@ -10,23 +10,23 @@
        | lqualid term+ 		  ; function application
        | "if" formula "then" term ;
          "else" term              ; conditional
-       | "let" pattern "=" term "in" term 
+       | "let" pattern "=" term "in" term
                                   ; local binding
        | "match" term ("," term)* "with" ;
          ("|" term-case)+ "end"          ; pattern matching
        | "(" term ("," term)+ ")" ; tuple
-       | "{|" field-value+ "|}"   ; record
+       | "{" field-value+ "}"     ; record
        | term "." lqualid         ; field access
-       | "{|" term "with" field-value+ "|}"    ; field update
+       | "{" term "with" field-value+ "}"      ; field update
        | term ":" type 	          ; cast
        | label term 	      	  ; label
        | "'" uident    	      	  ; code mark
        | "(" term ")" 	      	  ; parentheses
   \
-  term-case ::= pattern "->" term ; 
+  term-case ::= pattern "->" term ;
   \
   pattern ::= pattern "|" pattern ; or pattern
-            | pattern "," pattern ; tuple 
+            | pattern "," pattern ; tuple
 	    | "_"                 ; catch-all
 	    | lident              ; variable
 	    | uident pattern*     ; constructor
