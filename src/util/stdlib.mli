@@ -11,7 +11,11 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: map.mli 10483 2010-05-31 12:48:13Z doligez $ *)
+(* This file originates from the OCaml v 3.12 Standard Library.
+   It was extended and modified for the needs of the Why3 project
+   by François Bobot and Andrei Paskevich. It is distributed under
+   the terms of its initial license, which is provided in file
+   OCAML-LICENSE. *)
 
 module Map : sig
 
