@@ -1229,7 +1229,7 @@ doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 # the dependency on the pdf ensures the bbl was built
 doc/html/manual.html: doc/manual.pdf doc/fix.hva
 	cd doc; rm -rf html; mkdir -p html
-	cp doc/manual.bbl doc/html/
+	cp doc/*.png doc/manual.bbl doc/html/
 	cd doc; $(HEVEA) -o html/manual.html -fix -O fix.hva makeidx.hva manual.tex
 
 doc/html/index.html: doc/html/manual.html
