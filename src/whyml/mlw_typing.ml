@@ -1301,11 +1301,10 @@ let add_type_invariant loc uc id params inv =
           Typing.add_var x (dty_of_ty pv.pv_vs.vs_ty) denv) mpv denv in
         let mk_inv f =
           let f = Typing.type_fmla (get_theory uc) denv vars f in
-          let f = t_label_add Split_goal.stop_split f in
-          match f.t_node with
+          let f = match f.t_node with
             | Ttrue | Tfalse -> f
-            | _ -> t_case (t_var res) [t_close_branch pat f]
-        in
+            | _ -> t_case (t_var res) [t_close_branch pat f] in
+          t_label_add Split_goal.stop_split f in
         List.map mk_inv inv in
   let q = Mlw_ty.create_post res (t_and_simp_l inv) in
   let q = if List.for_all2 tv_equal its.its_args tvl then q else
@@ -1790,7 +1789,6 @@ let add_pdecl ~wp loc uc d =
   Loc.try3 loc (add_pdecl ~wp) loc uc d
 
 let use_clone_pure lib mth uc loc (use,inst) =
-  if Debug.test_flag Typing.debug_parse_only then uc else
   let path, s = Typing.split_qualid use.use_theory in
   let th = find_theory loc lib mth path s in
   (* open namespace, if any *)
@@ -1810,7 +1808,6 @@ let use_clone_pure lib mth uc loc use =
   Loc.try3 loc (use_clone_pure lib mth) uc loc use
 
 let use_clone lib mmd mth uc loc (use,inst) =
-  if Debug.test_flag Typing.debug_parse_only then uc else
   let path, s = Typing.split_qualid use.use_theory in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
