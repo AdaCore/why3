@@ -466,10 +466,9 @@ let add_prover_binary config id path =
     (* Is a prover with this name and version already in config? *)
     let prover_id =
       if not (Mprover.mem p.prover provers) then p.prover else
-        let alt = get_altern id path in
-        let prover_id = { p.prover with
-          Wc.prover_altern =
-            Util.concat_non_empty " " [p.prover.Wc.prover_altern;alt] } in
+        let alt = match p.prover.Wc.prover_altern, get_altern id path with
+          | "", s -> s | s, "" -> s | s1, s2 -> s1 ^ " " ^ s2 in
+        let prover_id = { p.prover with Wc.prover_altern = alt } in
         find_prover_altern provers prover_id in
     let p = {p with prover = prover_id} in
     add_prover_with_uniq_id p provers in

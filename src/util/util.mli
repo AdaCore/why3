@@ -48,24 +48,6 @@ val ffalse : 'a -> bool
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
 
-(* useful function on string *)
-val split_string_rev : string -> char -> string list
-
-val ends_with : string -> string -> bool
-(** test if a string ends with another *)
-
-val padd_string : char -> string -> int -> string
-(** extract or padd the given string in order to have the given length *)
-
-val concat_non_empty : string -> string list -> string
-
-(* useful function on char *)
-val is_uppercase : char -> bool
-
-(* useful function on int *)
-val count : int -> ('a -> int)
-(** return the consecutie number from the first given *)
-
 (* Set and Map on ints and strings *)
 
 module Mint : Map.S with type key = int

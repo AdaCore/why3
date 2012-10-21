@@ -45,46 +45,6 @@ let any_fn pr _ t = pr t && raise FoldSkip
 let ttrue _ = true
 let ffalse _ = false
 
-(* useful function on string *)
-let split_string_rev s c =
-  let rec aux acc i =
-    try
-      let j = String.index_from s i c in
-      aux ((String.sub s i (j-i))::acc) (j + 1)
-    with Not_found -> (String.sub s i (String.length s - i))::acc
-      | Invalid_argument _ -> ""::acc in
-  aux [] 0
-
-let ends_with s suf =
-  let rec aux s suf suflen offset i =
-    i >= suflen || (s.[i + offset] = suf.[i]
-                   && aux s suf suflen offset (i+1)) in
-  let slen = String.length s in
-  let suflen = String.length suf in
-  slen >= suflen && aux s suf suflen (slen - suflen) 0
-
-let padd_string c s i =
-  let sl = String.length s in
-  if sl < i then
-    let p = String.create i in
-    String.blit s 0 p 0 sl;
-    String.fill p sl (i-sl) c;
-    p
-  else if sl > i
-  then String.sub s 0 i
-  else s
-
-(** useful function on char *)
-let is_uppercase c = 'A' <= c && c <= 'Z'
-
-let concat_non_empty sep l =
-  String.concat sep (List.filter (fun s -> s <> "") l)
-
-(** useful function on char *)
-let count n =
-  let r = ref (n-1) in
-  fun _ -> incr r; !r
-
 (* Set and Map on ints and strings *)
 
 module Int  = struct

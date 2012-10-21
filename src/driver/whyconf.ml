@@ -528,7 +528,7 @@ exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t
 exception ParseFilterProver of string
 
 let parse_filter_prover s =
-  let sl = Util.split_string_rev s ',' in
+  let sl = Strings.rev_split s ',' in
   (* reverse order *)
   match sl with
   | [name] -> mk_filter_prover name

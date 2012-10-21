@@ -359,7 +359,7 @@ struct
     let basename = Filename.basename edited in
     try
       let suff,(cmd,suff_out) =
-        List.find (fun (s,_) -> ends_with basename s) !opt_pp in
+        List.find (fun (s,_) -> Strings.ends_with basename s) !opt_pp in
       let base =
         String.sub basename 0 (String.length basename - String.length suff) in
       let base_dst = (base^suff_out) in

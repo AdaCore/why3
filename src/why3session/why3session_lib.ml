@@ -94,7 +94,7 @@ let filter_prover = Stack.create ()
 
 let read_opt_prover s =
   try
-    let l = Util.split_string_rev s ',' in
+    let l = Strings.rev_split s ',' in
     match l with
     | [altern;version;name] when List.for_all (fun s -> s.[0] <> '^') l ->
       Prover {Whyconf.prover_name = name;

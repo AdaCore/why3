@@ -825,7 +825,8 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
       match args with
       | [Theory.MAstr s1; Theory.MAstr s2] ->
         let f,id =
-          let l = split_string_rev s1 '.' in List.rev (List.tl l),List.hd l in
+          let l = Strings.rev_split s1 '.' in
+          List.rev (List.tl l), List.hd l in
         let th = Env.find_theory env f id in
         Mid.add th.Theory.th_name
           (th, (f, if s2 = "" then String.concat "." f else s2)) mid

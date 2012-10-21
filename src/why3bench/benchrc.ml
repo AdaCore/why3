@@ -56,7 +56,7 @@ let read_tools absf wc map (name,section) =
   (* use *)
   let use = get_stringl ~default:[] section "use" in
   let load_use s =
-    let file,th = match Util.split_string_rev s '.' with
+    let file,th = match Strings.rev_split s '.' with
       | [] | [_] -> eprintf "Bad theory qualifier %s" s; exit 1
       | a::l -> List.rev l,a in
     Env.find_theory env file th,
