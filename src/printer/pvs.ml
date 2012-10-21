@@ -735,7 +735,7 @@ let print_ind_decl info fmt (ps,al) =
   let _, _, all_ty_params = ls_ty_vars ps in
   let vl = List.map (create_vsymbol (id_fresh "z")) ps.ls_args in
   let tl = List.map t_var vl in
-  let dj = Util.map_join_left (Eliminate_inductive.exi tl) t_or al in
+  let dj = Lists.map_join_left (Eliminate_inductive.exi tl) t_or al in
   print_name fmt ps.ls_name;
   fprintf fmt "@[<hov 2>%a%a%a: INDUCTIVE bool =@ @[<hov>%a@]@]@\n"
     print_ls ps print_params all_ty_params (print_arguments info) vl

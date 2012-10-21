@@ -227,7 +227,7 @@ let decrease_alg ?loc env old_t t =
       t_or_simp acc (t_equ (t_var vs) t), pat_var vs
     else acc, pat_wild fty in
   let add_cs (cs,_) =
-    let f, pl = Util.map_fold_left add_arg t_false cs.ls_args in
+    let f, pl = Lists.map_fold_left add_arg t_false cs.ls_args in
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
@@ -559,7 +559,7 @@ let rec track_values state names lesson cond f = match f.t_node with
         let l = if learn then m else l in
         l, cb pat f1
       in
-      let l, bl = Util.map_fold_left branch lesson bl in
+      let l, bl = Lists.map_fold_left branch lesson bl in
       l, t_label_copy f (t_case t1 bl)
   | Tlet (t1, bf) ->
       let p1 = point_of_term state names t1 in

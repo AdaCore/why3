@@ -121,7 +121,7 @@ let load rc =
   let atps = get_family rc "ATP" in
   let atps = List.rev_map (load_prover ATP) atps in
   let itps = get_family rc "ITP" in
-  let tps = List.fold_left (cons (load_prover ITP)) atps itps in
+  let tps = List.fold_left (Lists.cons (load_prover ITP)) atps itps in
   tps
 
 let load_prover_shortcut acc (_, section) =

@@ -428,7 +428,7 @@ end = struct
     | Tpure ty ->
         Tpure (ty_inst ts ty)
     | Tarrow (bl, c) ->
-        let s, bl = Util.map_fold_left (subst_binder ts) s bl in
+        let s, bl = Lists.map_fold_left (subst_binder ts) s bl in
         Tarrow (bl, subst_type_c ts s c)
 
   and subst_binder ts s pv =
@@ -458,7 +458,7 @@ end = struct
           let s' = Mvs.add v.pv_pure (t_var pure) s in
           s', v'
         in
-        let s, bl' = Util.map_fold_left rename Mvs.empty bl in
+        let s, bl' = Lists.map_fold_left rename Mvs.empty bl in
         Tarrow (bl', subst_type_c Mtv.empty s c)
 
   let v_result ty = create_vsymbol (id_fresh "result") ty

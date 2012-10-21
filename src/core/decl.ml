@@ -68,7 +68,7 @@ let open_ls_defn_cb ld =
   let ls,_,_ = ld in
   let vl,t = open_ls_defn ld in
   let close ls' vl' t' =
-    if t_equal t t' && list_all2 vs_equal vl vl' && ls_equal ls ls'
+    if t_equal t t' && Lists.equal vs_equal vl vl' && ls_equal ls ls'
     then ls,ld else make_ls_defn ls' vl' t'
   in
   vl,t,close
@@ -316,10 +316,10 @@ module Hsdecl = Hashcons.Make (struct
   type t = decl
 
   let cs_equal (cs1,pl1) (cs2,pl2) =
-    ls_equal cs1 cs2 && list_all2 (Opt.equal ls_equal) pl1 pl2
+    ls_equal cs1 cs2 && Lists.equal (Opt.equal ls_equal) pl1 pl2
 
   let eq_td (ts1,td1) (ts2,td2) =
-    ts_equal ts1 ts2 && list_all2 cs_equal td1 td2
+    ts_equal ts1 ts2 && Lists.equal cs_equal td1 td2
 
   let eq_ld (ls1,(_,f1,_)) (ls2,(_,f2,_)) =
     ls_equal ls1 ls2 && t_equal f1 f2
@@ -328,14 +328,14 @@ module Hsdecl = Hashcons.Make (struct
     pr_equal pr1 pr2 && t_equal fr1 fr2
 
   let eq_ind (ps1,al1) (ps2,al2) =
-    ls_equal ps1 ps2 && list_all2 eq_iax al1 al2
+    ls_equal ps1 ps2 && Lists.equal eq_iax al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
     | Dtype  s1, Dtype  s2 -> ts_equal s1 s2
-    | Ddata  l1, Ddata  l2 -> list_all2 eq_td l1 l2
+    | Ddata  l1, Ddata  l2 -> Lists.equal eq_td l1 l2
     | Dparam s1, Dparam s2 -> ls_equal s1 s2
-    | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
-    | Dind   (s1,l1), Dind (s2,l2) -> s1 = s2 && list_all2 eq_ind l1 l2
+    | Dlogic l1, Dlogic l2 -> Lists.equal eq_ld l1 l2
+    | Dind   (s1,l1), Dind (s2,l2) -> s1 = s2 && Lists.equal eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
         k1 = k2 && pr_equal pr1 pr2 && t_equal f1 f2
     | _,_ -> false
@@ -577,7 +577,7 @@ let decl_fold fn acc d = match d.d_node with
 let list_rpair_map_fold fn =
   let fn acc (x1,x2) =
     let acc,x2 = fn acc x2 in acc,(x1,x2) in
-  Util.map_fold_left fn
+  Lists.map_fold_left fn
 
 let decl_map_fold fn acc d = match d.d_node with
   | Dtype _ | Ddata _ | Dparam _ -> acc, d
@@ -587,7 +587,7 @@ let decl_map_fold fn acc d = match d.d_node with
         let acc,e = fn acc e in
         acc, close ls vl e
       in
-      let acc,l = Util.map_fold_left fn acc l in
+      let acc,l = Lists.map_fold_left fn acc l in
       acc, create_logic_decl l
   | Dind (s, l) ->
       let acc, l = list_rpair_map_fold (list_rpair_map_fold fn) acc l in

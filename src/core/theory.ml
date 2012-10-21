@@ -202,7 +202,7 @@ module Hstdecl = Hashcons.Make (struct
     | Clone (th1,sm1), Clone (th2,sm2) ->
         id_equal th1.th_name th2.th_name && eq_smap sm1 sm2
     | Meta (t1,al1), Meta (t2,al2) ->
-        t1 = t2 && list_all2 eq_marg al1 al2
+        t1 = t2 && Lists.equal eq_marg al1 al2
     | _,_ -> false
 
   let hs_cl_ts _ ts acc = Hashcons.combine acc (ts_hash ts)

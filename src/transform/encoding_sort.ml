@@ -105,7 +105,7 @@ and rewrite_fmla tenv ud vm f =
   | Tquant (q,b) ->
       let vl, tl, f1, close = t_open_quant_cb b in
       let add m v = let v' = conv_vs tenv ud v in Mvs.add v (t_var v') m, v' in
-      let vm', vl' = Util.map_fold_left add vm vl in
+      let vm', vl' = Lists.map_fold_left add vm vl in
       let tl' = TermTF.tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
       t_quant q (close vl' tl' f1')

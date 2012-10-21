@@ -76,11 +76,11 @@ let rec ity_inst_fresh mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
       mr, ts_app_real s tl
   | Ityapp (s,tl,rl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
-      let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,rl = Lists.map_fold_left (reg_refresh mv) mr rl in
       mr, its_app_real s tl rl
 
 and reg_refresh mv mr r = match Mreg.find_opt r mr with
@@ -102,7 +102,7 @@ let its_app s tl =
       snd (ity_inst_fresh mv Mreg.empty ity)
   | None ->
       let _, rl =
-        Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+        Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
       its_app_real s tl rl
 
 let ts_app ts dl = match ts.ts_def with

@@ -412,7 +412,7 @@ let () =
   let benchs =
     List.map (fun b -> List.map snd (Mstr.bindings b.Benchrc.benchs))
       !benchs in
-  let bl = B.run_benchs_tools ~callback (list_flatten_rev benchs) in
+  let bl = B.run_benchs_tools ~callback (Lists.flatten_rev benchs) in
   let print_tool fmt tool_id = fprintf fmt "%s.%s"
     tool_id.B.tool_name tool_id.B.prover_name in
   let print_prob fmt prob_id = fprintf fmt "%s.%s.%s"

@@ -326,7 +326,7 @@ let rec dutype_v env = function
   | Ptree.Tpure pt ->
       DUTpure (dtype ~user:true env pt)
   | Ptree.Tarrow (bl, c) ->
-      let env, bl = map_fold_left dubinder env bl in
+      let env, bl = Lists.map_fold_left dubinder env bl in
       let c = dutype_c env c in
       DUTarrow (bl, c)
 
@@ -513,7 +513,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       expected_type e2 ty2;
       DEapply (e1, e2), ty
   | Ptree.Efun (bl, t) ->
-      let env, bl = map_fold_left dubinder env bl in
+      let env, bl = Lists.map_fold_left dubinder env bl in
       let _, ((_,e,_) as t) = dtriple ~ghost ~userloc env t in
       let tyl = List.map (fun (_,ty) -> ty) bl in
       let ty = dcurrying tyl e.dexpr_type in
@@ -768,10 +768,10 @@ and dletrec ~ghost ~userloc env dl =
     let env = add_local_top env id.id ty in
     env, ((id, ty), bl, t)
   in
-  let env, dl = map_fold_left add_one env dl in
+  let env, dl = Lists.map_fold_left add_one env dl in
   (* then type-check all of them and unify *)
   let type_one ((id, tyres), bl, t) =
-    let env, bl = map_fold_left dubinder env bl in
+    let env, bl = Lists.map_fold_left dubinder env bl in
     let v, ((_,e,_) as t) = dtriple ~ghost ~userloc env t in
     let tyl = List.map (fun (_,ty) -> ty) bl in
     let ty = dcurrying tyl e.dexpr_type in
@@ -1062,7 +1062,7 @@ let rec iutype_v env = function
   | DUTpure ty ->
       ITpure (Denv.ty_of_dty ty)
   | DUTarrow (bl, c) ->
-      let env, bl = map_fold_left iubinder env bl in
+      let env, bl = Lists.map_fold_left iubinder env bl in
       ITarrow (bl, iutype_c env c)
 
 and iutype_c env c =
@@ -1169,7 +1169,7 @@ let ipattern env p =
     | Term.Pwild ->
         env, IPwild
     | Term.Papp (ls, pl) ->
-        let env, pl = map_fold_left ipattern env pl in
+        let env, pl = Lists.map_fold_left ipattern env pl in
         env, IPapp (ls, pl)
     | Term.Por (p1, p2) ->
         let env, p1 = ipattern env p1 in
@@ -1286,7 +1286,7 @@ and iexpr_desc env loc ty = function
             e.iexpr_desc
       end
   | DEfun (bl, e1) ->
-      let env, bl = map_fold_left iubinder env bl in
+      let env, bl = Lists.map_fold_left iubinder env bl in
       IEfun (bl, itriple env e1)
   | DElet (x, e1, e2) ->
       let e1 = iexpr env e1 in
@@ -1412,10 +1412,10 @@ and iletrec env dl =
     let env, v = iadd_local env (id_user x.id x.id_loc) ty in
     env, (v, bl, var, t)
   in
-  let env, dl = map_fold_left step1 env dl in
+  let env, dl = Lists.map_fold_left step1 env dl in
   (* then translate variants and bodies *)
   let step2 (v, bl, var, (_,_,_ as t)) =
-    let env, bl = map_fold_left iubinder env bl in
+    let env, bl = Lists.map_fold_left iubinder env bl in
     let var = Opt.map (ivariant env) var in
     let t = itriple env t in
     let var, t = match var with
@@ -1501,7 +1501,7 @@ let post_effect ef ((v, q), ql) =
     let ef, q = term_effect ef q in ef, (e, (x, q))
   in
   let ef, q = term_effect ef q in
-  let ef, ql = map_fold_left exn_effect ef ql in
+  let ef, ql = Lists.map_fold_left exn_effect ef ql in
   ef, ((v, q), ql)
 
 let effect e =
@@ -1548,7 +1548,7 @@ and type_c env c =
     c_post        = q; }
 
 and add_binders env bl =
-  map_fold_left add_binder env bl
+  Lists.map_fold_left add_binder env bl
 
 and add_binder env (i, ty) =
   let v = tpure ty in
@@ -1567,7 +1567,7 @@ and pattern_node env ty p =
       env, (pat_wild ty, Pwild)
   | IPapp (ls, pl) ->
       let ls = (get_psymbol ls).ps_pure in (* impure -> pure *)
-      let env, pl = map_fold_left pattern env pl in
+      let env, pl = Lists.map_fold_left pattern env pl in
       let lpl = List.map (fun p -> p.ppat_pat) pl in
       env, (pat_app ls lpl ty, Papp (ls, pl))
   | IPor (p1, p2) ->
@@ -1798,7 +1798,7 @@ and expr_desc gl env loc ty = function
         let ef = E.union ef e.expr_effect in
         ef, (p, e)
       in
-      let ef, bl = map_fold_left branch E.empty bl in
+      let ef, bl = Lists.map_fold_left branch E.empty bl in
       Ematch (v, bl), tpure ty, ef
   | IEabsurd ->
       Eabsurd, tpure ty, E.empty
@@ -1911,7 +1911,7 @@ and letrec gl env dl = (* : env * recfun list *)
       in
       Mvs.add i.i_impure c m, (v, bl, var, t)
     in
-    map_fold_left type1 Mvs.empty dl
+    Lists.map_fold_left type1 Mvs.empty dl
   in
   let rec fixpoint m =
     (* printf "fixpoint...@\n"; *)
@@ -2392,7 +2392,7 @@ let rec decl ~wp env ltm lmod uc (loc,dcl) = match dcl with
         in
         uc, (ps, d)
       in
-      let uc, dl = map_fold_left one uc dl in
+      let uc, dl = Lists.map_fold_left one uc dl in
       let d = Dletrec dl in
       let uc = add_decl d uc in
       if wp then Pgm_wp.decl uc d else uc

@@ -324,11 +324,11 @@ let vs_check v t = ty_equal_check v.vs_ty (t_type t)
 
 (* trigger equality and traversal *)
 
-let tr_equal = list_all2 (list_all2 t_equal)
+let tr_equal = Lists.equal (Lists.equal t_equal)
 
 let tr_map fn = List.map (List.map fn)
 let tr_fold fn = List.fold_left (List.fold_left fn)
-let tr_map_fold fn = Util.map_fold_left (Util.map_fold_left fn)
+let tr_map_fold fn = Lists.map_fold_left (Lists.map_fold_left fn)
 
 (* bind_info equality, hash, and traversal *)
 
@@ -365,7 +365,7 @@ module Hsterm = Hashcons.Make (struct
     pat_equal p1 p2 && bnd_equal b1 b2 && t_equal t1 t2
 
   let t_eq_quant (vl1,b1,tl1,f1) (vl2,b2,tl2,f2) =
-    t_equal f1 f2 && list_all2 vs_equal vl1 vl2 &&
+    t_equal f1 f2 && Lists.equal vs_equal vl1 vl2 &&
     bnd_equal b1 b2 && tr_equal tl1 tl2
 
   let t_equal_node t1 t2 = match t1,t2 with
@@ -378,7 +378,7 @@ module Hsterm = Hashcons.Make (struct
     | Tlet (t1,b1), Tlet (t2,b2) ->
         t_equal t1 t2 && t_eq_bound b1 b2
     | Tcase (t1,bl1), Tcase (t2,bl2) ->
-        t_equal t1 t2 && list_all2 t_eq_branch bl1 bl2
+        t_equal t1 t2 && Lists.equal t_eq_branch bl1 bl2
     | Teps f1, Teps f2 -> t_eq_bound f1 f2
     | Tquant (q1,b1), Tquant (q2,b2) ->
         q1 = q2 && t_eq_quant b1 b2
@@ -548,7 +548,7 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
   | Tvar _ | Tconst _ ->
       acc, t
   | Tapp (f,tl) ->
-      let acc,sl = map_fold_left fn acc tl in
+      let acc,sl = Lists.map_fold_left fn acc tl in
       if List.for_all2 t_equal sl tl then acc,t else
       acc, t_label_copy t (t_app f sl t.t_ty)
   | Tif (f,t1,t2) ->
@@ -563,7 +563,7 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
       acc, t_label_copy t (t_let e b t.t_ty)
   | Tcase (e,bl) ->
       let acc, e = fn acc e in
-      let acc, bl = map_fold_left (bound_map_fold fn) acc bl in
+      let acc, bl = Lists.map_fold_left (bound_map_fold fn) acc bl in
       acc, t_label_copy t (t_case e bl t.t_ty)
   | Teps b ->
       let acc, b = bound_map_fold fn acc b in
@@ -656,7 +656,7 @@ let vs_rename h v =
   Mvs.add v (t_var u) h, u
 
 let vl_rename h vl =
-  Util.map_fold_left vs_rename h vl
+  Lists.map_fold_left vs_rename h vl
 
 let pat_rename h p =
   let add_vs v () = fresh_vsymbol v in
@@ -696,7 +696,7 @@ let t_open_branch_cb tbr =
 let t_open_quant_cb fq =
   let vl, tl, f = t_open_quant fq in
   let close vl' tl' f' =
-    if t_equal f f' && tr_equal tl tl' && list_all2 vs_equal vl vl'
+    if t_equal f f' && tr_equal tl tl' && Lists.equal vs_equal vl vl'
     then fq else t_close_quant vl' tl' f'
   in
   vl, tl, f, close
@@ -853,7 +853,7 @@ let gen_vs_rename fnT h v =
   Mvs.add v u h, u
 
 let gen_vl_rename fnT h vl =
-  Util.map_fold_left (gen_vs_rename fnT) h vl
+  Lists.map_fold_left (gen_vs_rename fnT) h vl
 
 let gen_pat_rename fnT fnL h p =
   let add_vs v () = gen_fresh_vsymbol fnT v in
@@ -1035,7 +1035,7 @@ let t_map_fold fn acc t = match t.t_node with
       let brn acc b =
         let p,t,close = t_open_branch_cb b in
         let acc,t = fn acc t in acc, close p t in
-      let acc, bl = map_fold_left brn acc bl in
+      let acc, bl = Lists.map_fold_left brn acc bl in
       acc, t_label_copy t (t_case e bl)
   | Teps b ->
       let u,t1,close = t_open_bound_cb b in
@@ -1207,7 +1207,7 @@ let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
           let m2 = pat_rename_alpha c2 m2 p2 in
           t_equal_alpha c1 c2 m1 m2 e1 e2
         in
-        list_all2 br_eq bl1 bl2
+        Lists.equal br_eq bl1 bl2
     | Teps b1, Teps b2 ->
         let u1,e1 = t_open_bound b1 in
         let u2,e2 = t_open_bound b2 in
@@ -1216,7 +1216,7 @@ let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
         t_equal_alpha c1 c2 m1 m2 e1 e2
     | Tquant (q1,((vl1,_,_,_) as b1)), Tquant (q2,((vl2,_,_,_) as b2)) ->
         q1 = q2 &&
-        list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
+        Lists.equal (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
         let vl1,_,e1 = t_open_quant b1 in
         let vl2,_,e2 = t_open_quant b2 in
         let m1 = vl_rename_alpha c1 m1 vl1 in

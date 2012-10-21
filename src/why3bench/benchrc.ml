@@ -153,7 +153,7 @@ let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
           {prob_name = prob_name;prob_file = file_name; prob_theory = th_name;
            prob_db = goal_id}, task in
         List.rev_map map tasks in
-      list_flatten_rev (List.rev_map map theories)
+      Lists.flatten_rev (List.rev_map map theories)
     with exn -> eprintf "%a@." Exn_printer.exn_printer exn; exit 1
 
 let read_probs absf map (name,section) =
@@ -186,24 +186,24 @@ let read_bench absf mtools mprobs map (name,section) =
     try Mstr.find s mtools
     with Not_found -> eprintf "Undefined tools %s@." s;
       exit 1 in
-  let tools = list_flatten_rev (List.map lookup tools) in
+  let tools = Lists.flatten_rev (List.map lookup tools) in
   let probs = get_stringl section "probs" in
   let lookup s =
     try Mstr.find s mprobs
     with Not_found -> eprintf "Undefined probs %s@." s;
       exit 1 in
-  let probs = list_flatten_rev (List.map lookup probs) in
+  let probs = Lists.flatten_rev (List.map lookup probs) in
   let averages = get_stringl ~default:[] section "average" in
   let outputs = List.fold_left
-    (cons (fun s -> Average (absf s)))
+    (Lists.cons (fun s -> Average (absf s)))
     [] averages in
   let timelines = get_stringl ~default:[] section "timeline" in
   let outputs = List.fold_left
-    (cons (fun s -> Timeline (absf s)))
+    (Lists.cons (fun s -> Timeline (absf s)))
     outputs timelines in
   let csvs = get_stringl ~default:[] section "csv" in
   let outputs = List.fold_left
-    (cons (fun s -> Csv (absf s)))
+    (Lists.cons (fun s -> Csv (absf s)))
     outputs csvs in
   Mstr.add name
     { bname = name; btools = tools; bprobs = probs; boutputs = outputs} map

@@ -632,7 +632,7 @@ and dletrec denv fdl =
     let tvars = add_dvty denv.tvars dvty in
     let locals = Mstr.add id.id (tvars, dvty) denv.locals in
     { denv with locals = locals; tvars = tvars }, dvty in
-  let denv, dvtyl = Util.map_fold_left add_one denv fdl in
+  let denv, dvtyl = Lists.map_fold_left add_one denv fdl in
   (* then unify the binders *)
   let bind_one (_,_,_,bl,_) (argl,res) =
     let denv,bl,tyl = dbinders denv bl in
@@ -1215,7 +1215,7 @@ and expr_rec lenv dfdl =
     let vta = vty_arrow pvl ~ghost:gh (vty_of_dvty de.de_type) in
     let ps = create_psymbol (Denv.create_user_id id) vta in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
-  let lenv, fdl = Util.map_fold_left step1 lenv dfdl in
+  let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
   let fdl = List.map step2 fdl in
   let rd_pvset pvs (_, lam) = l_pvset pvs lam in
@@ -1268,7 +1268,7 @@ let add_type_invariant loc uc id params inv =
   let add_tv acc { id = id; id_loc = loc } =
     let e = Loc.Located (loc, DuplicateTypeVar id) in
     Sstr.add_new e id acc, Typing.create_user_tv id in
-  let _, tvl = Util.map_fold_left add_tv Sstr.empty params in
+  let _, tvl = Lists.map_fold_left add_tv Sstr.empty params in
   let ty = ty_app its.its_pure (List.map ty_var tvl) in
   let res = create_vsymbol (id_fresh x) ty in
   let vars = Mstr.singleton x res in
@@ -1458,11 +1458,11 @@ let add_types ~wp uc tdl =
                       (Sreg.union regs ity.ity_vars.vars_reg, inv), (pv, true)
             in
             let mk_constr s (_loc,cid,pjl) =
-              let s,pjl = Util.map_fold_left mk_proj s pjl in
+              let s,pjl = Lists.map_fold_left mk_proj s pjl in
               s, (Denv.create_user_id cid, pjl)
             in
             let init = (Sreg.empty, d.td_inv <> []) in
-            let (regs,inv),def = Util.map_fold_left mk_constr init csl in
+            let (regs,inv),def = Lists.map_fold_left mk_constr init csl in
             Hashtbl.replace predefs x def;
             create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None
         | TDrecord fl when Hashtbl.find mutables x ->
@@ -1481,7 +1481,7 @@ let add_types ~wp uc tdl =
               (regs, inv), (create_pvsymbol fid vtv, true)
             in
             let init = (Sreg.empty, d.td_inv <> []) in
-            let (regs,inv),pjl = Util.map_fold_left mk_field init fl in
+            let (regs,inv),pjl = Lists.map_fold_left mk_field init fl in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
             Hashtbl.replace predefs x [Denv.create_user_id cid, pjl];
             create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None

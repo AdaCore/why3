@@ -1063,7 +1063,7 @@ and create_rec_defn defl =
     let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
     if ps_compat ps fd.fun_ps then m, { fd with fun_ps = ps }
     else Mid.add ps.ps_name fd.fun_ps m, fd in
-  let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  let m, fdl = Lists.map_fold_left conv Mid.empty defl in
   if Mid.is_empty m then fdl else subst_fd m fdl
 
 and subst_fd psm fdl =
@@ -1106,7 +1106,7 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
         let lam = { lam with l_spec = spec } in
         let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
         Mid.add ps.ps_name fd.fun_ps m, fd in
-  let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  let m, fdl = Lists.map_fold_left conv Mid.empty defl in
   incr letrec;
   subst_fd m fdl
 

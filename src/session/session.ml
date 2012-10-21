@@ -56,11 +56,11 @@ let print_ident_path fmt ip =
     (Pp.print_list Pp.dot Pp.string) ip.ip_qualid
 
 let compare_ident_path x y =
-  let c = list_compare String.compare x.ip_library y.ip_library in
+  let c = Lists.compare String.compare x.ip_library y.ip_library in
   if c <> 0 then -c else (* in order to be bottom up *)
   let c = String.compare x.ip_theory y.ip_theory in
   if c <> 0 then c else
-  let c = list_compare String.compare x.ip_qualid y.ip_qualid in
+  let c = Lists.compare String.compare x.ip_qualid y.ip_qualid in
   c
 
 module Pos = struct
@@ -98,7 +98,7 @@ module Mmeta_args = Map.Make(struct
     | MAint x, MAint y -> compare x y
     | _ -> compare (meta_arg_id x) (meta_arg_id y)
 
-  let compare = list_compare compare_meta_arg
+  let compare = Lists.compare compare_meta_arg
 end)
 module Smeta_args = Mmeta_args.Set
 

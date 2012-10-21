@@ -75,7 +75,7 @@ module VsList =
 struct
   type t = vsymbol list
   let hash = Hashcons.combine_list vs_hash 3
-  let equal = Util.list_all2 vs_equal
+  let equal = Lists.equal vs_equal
   let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs2) (vs_hash vs1)
   let compare t1 t2 =
     let rec aux t1 t2 = match t1,t2 with

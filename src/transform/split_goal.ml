@@ -17,7 +17,7 @@ let apply_append fn acc l =
   List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
 
 let apply_append2 fn acc l1 l2 =
-  Util.list_fold_product (fun l e1 e2 -> fn e1 e2 :: l)
+  Lists.fold_product (fun l e1 e2 -> fn e1 e2 :: l)
     acc (List.rev l1) (List.rev l2)
 
 let split_case forig spl c acc tl bl =

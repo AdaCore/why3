@@ -528,7 +528,7 @@ and dterm_node ~localize loc uc env = function
         in
         add_var id.id ty env, (id,ty)
       in
-      let env, uqu = map_fold_left uquant env uqu in
+      let env, uqu = Lists.map_fold_left uquant env uqu in
       let trigger e =
         try
           TRterm (dterm ~localize uc env e)
@@ -647,7 +647,7 @@ and dfmla_node ~localize loc uc env = function
         in
         add_var id.id ty env, (id,ty)
       in
-      let env, uqu = map_fold_left uquant env uqu in
+      let env, uqu = Lists.map_fold_left uquant env uqu in
       let trigger e =
         try
           TRterm (dterm ~localize uc env e)

@@ -170,7 +170,7 @@ and rewriteF kn state av sign f = match f.t_node with
         | _ -> Printer.unsupportedTerm f uncompiled
       in
       let op = if sign then t_and_simp else t_or_simp in
-      map_join_left find op (find_constructors kn ts)
+      Lists.map_join_left find op (find_constructors kn ts)
   | Tquant (q, bf) when (q = Tforall && sign) || (q = Texists && not sign) ->
       let vl, tr, f1, close = t_open_quant_cb bf in
       let tr = TermTF.tr_map (rewriteT kn state)
@@ -315,7 +315,7 @@ let add_inversion (state,task) ts ty csl =
     let pjl = Mls.find cs state.pj_map in
     let app pj = t_app_infer pj [ax_hd] in
     t_equ ax_hd (fs_app cs (List.map app pjl) ty) in
-  let ax_f = map_join_left mk_cs t_or csl in
+  let ax_f = Lists.map_join_left mk_cs t_or csl in
   let ax_f = t_forall_close [ax_vs] [] ax_f in
   state, add_prop_decl task Paxiom ax_pr ax_f
 

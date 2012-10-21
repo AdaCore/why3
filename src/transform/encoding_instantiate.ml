@@ -306,7 +306,7 @@ and rewrite_fmla menv tvar vsvar f =
       ps_app p tl'
     | Tquant(q, b) ->
       let vl, tl, f1, cb = t_open_quant_cb b in
-      let vsvar,vl = map_fold_left (conv_vs menv tvar) vsvar vl in
+      let vsvar,vl = Lists.map_fold_left (conv_vs menv tvar) vsvar vl in
 
       let f1 = fnF vsvar f1 in
       (* Ici un trigger qui ne match pas assez de variables

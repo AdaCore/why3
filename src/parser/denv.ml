@@ -260,7 +260,7 @@ and fmla env = function
         let v = create_user_vs id (ty_of_dty ty) in
         Mstr.add id.id v env, v
       in
-      let env, vl = map_fold_left uquant env uqu in
+      let env, vl = Lists.map_fold_left uquant env uqu in
       let trigger = function
         | TRterm t -> term env t
         | TRfmla f -> fmla env f

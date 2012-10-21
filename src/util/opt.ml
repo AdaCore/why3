@@ -39,6 +39,12 @@ let equal eq a b = match a,b with
   | None, _ | _, None -> false
   | Some x, Some y -> eq x y
 
+let compare cmp a b = match a,b with
+  | None, None -> 0
+  | None, Some _ -> -1
+  | Some _, None -> 1
+  | Some x, Some y -> cmp x y
+
 let map_fold f acc x = match x with
   | None -> acc, None
   | Some x -> let acc, x = f acc x in acc, Some x

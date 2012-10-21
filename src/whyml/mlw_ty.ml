@@ -363,11 +363,11 @@ let rec ity_inst_fresh mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
       mr, ity_pur_unsafe s tl
   | Ityapp (s,tl,rl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
-      let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,rl = Lists.map_fold_left (reg_refresh mv) mr rl in
       mr, ity_app_unsafe s tl rl
 
 and reg_refresh mv mr r = match Mreg.find_opt r mr with
@@ -386,7 +386,7 @@ let ity_app_fresh s tl =
     with Invalid_argument _ ->
       raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
   (* refresh regions *)
-  let mr,rl = Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+  let mr,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
   (* every top region in def is guaranteed to be in mr *)
   match s.its_def with
   | Some ity -> ity_subst_unsafe mv mr ity
@@ -932,7 +932,7 @@ let vta_full_inst sbs vta =
     let nv = pv_inst pv in
     Mvs.add pv.pv_vs (t_var nv.pv_vs) vsm, nv in
   let rec vta_inst vsm vta =
-    let vsm, args = Util.map_fold_left add_arg vsm vta.vta_args in
+    let vsm, args = Lists.map_fold_left add_arg vsm vta.vta_args in
     let spec = spec_full_inst sbs tvm vsm vta.vta_spec in
     let vty = match vta.vta_result with
       | VTarrow vta -> VTarrow (vta_inst vsm vta)

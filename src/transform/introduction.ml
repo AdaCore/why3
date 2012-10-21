@@ -38,7 +38,7 @@ let rec intros pr f = match f.t_node with
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
-      let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in
+      let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
       let f = t_subst subst f in
       dl @ intros pr f
   | Tlet (t,fb) ->

@@ -38,11 +38,11 @@ let conv_res c f x = c (f x)
 
 let singleton f x = [f x]
 
-let compose   f g x =            g (f x)
-let compose_l f g x = list_apply g (f x)
+let compose   f g x =             g (f x)
+let compose_l f g x = Lists.apply g (f x)
 
 let seq l x = List.fold_left (|>) x l
-let seq_l l x = List.fold_left (fun x f -> list_apply f x) [x] l
+let seq_l l x = List.fold_left (fun x f -> Lists.apply f x) [x] l
 
 module Wtask = Hashweak.Make (struct
   type t = task_hd
@@ -78,7 +78,7 @@ let fold fn v =
   in
   accum []
 
-let fold_l fn v = fold (fun task -> list_apply (fn task)) [v]
+let fold_l fn v = fold (fun task -> Lists.apply (fn task)) [v]
 
 let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
 let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))
