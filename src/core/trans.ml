@@ -44,7 +44,7 @@ let compose_l f g x = Lists.apply g (f x)
 let seq l x = List.fold_left (|>) x l
 let seq_l l x = List.fold_left (fun x f -> Lists.apply f x) [x] l
 
-module Wtask = Hashweak.Make (struct
+module Wtask = Weakhtbl.Make (struct
   type t = task_hd
   let tag t = t.task_tag
 end)
@@ -139,7 +139,7 @@ let add_tdecls = gen_add_decl add_tdecl
 
 (** dependent transformations *)
 
-module Wtds = Hashweak.Make (struct
+module Wtds = Weakhtbl.Make (struct
   type t = tdecl_set
   let tag s = s.tds_tag
 end)
@@ -235,7 +235,7 @@ let print_meta f m task =
 
 open Env
 
-module Wenv = Hashweak.Make (struct
+module Wenv = Weakhtbl.Make (struct
   type t = env
   let tag = env_tag
 end)

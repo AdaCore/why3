@@ -49,7 +49,7 @@ type ident = {
   id_string : string;               (* non-unique name *)
   id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
-  id_tag    : Hashweak.tag;         (* unique magical tag *)
+  id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
 
 module Id = WeakStructMake (struct
@@ -66,18 +66,18 @@ type preid = ident
 
 let id_equal : ident -> ident -> bool = (==)
 
-let id_hash id = Hashweak.tag_hash id.id_tag
+let id_hash id = Weakhtbl.tag_hash id.id_tag
 
 (* constructors *)
 
 let id_register = let r = ref 0 in fun id ->
-  { id with id_tag = (incr r; Hashweak.create_tag !r) }
+  { id with id_tag = (incr r; Weakhtbl.create_tag !r) }
 
 let create_ident name labels loc = {
   id_string = name;
   id_label  = labels;
   id_loc    = loc;
-  id_tag    = Hashweak.dummy_tag;
+  id_tag    = Weakhtbl.dummy_tag;
 }
 
 let id_fresh ?(label = Slab.empty) ?loc nm =

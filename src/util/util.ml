@@ -109,19 +109,19 @@ struct
   module H = Hashtbl.Make(T)
 end
 
-module MakeTagged (X : Hashweak.Weakey) =
+module MakeTagged (X : Weakhtbl.Weakey) =
 struct
   type t = X.t
-  let tag t = Hashweak.tag_hash (X.tag t)
+  let tag t = Weakhtbl.tag_hash (X.tag t)
 end
 
-module WeakStructMake (X : Hashweak.Weakey) =
+module WeakStructMake (X : Weakhtbl.Weakey) =
 struct
   module T = OrderedHash(MakeTagged(X))
   module M = Map.Make(T)
   module S = M.Set
   module H = Hashtbl.Make(T)
-  module W = Hashweak.Make(X)
+  module W = Weakhtbl.Make(X)
 end
 
 module type PrivateHashtbl = sig

@@ -25,7 +25,7 @@ type vsymbol = private {
 module Mvs : Map.S with type key = vsymbol
 module Svs : Mvs.Set
 module Hvs : Hashtbl.S with type key = vsymbol
-module Wvs : Hashweak.S with type key = vsymbol
+module Wvs : Weakhtbl.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
 val vs_hash : vsymbol -> int
@@ -43,7 +43,7 @@ type lsymbol = private {
 module Mls : Map.S with type key = lsymbol
 module Sls : Mls.Set
 module Hls : Hashtbl.S with type key = lsymbol
-module Wls : Hashweak.S with type key = lsymbol
+module Wls : Weakhtbl.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int

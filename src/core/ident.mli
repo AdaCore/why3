@@ -34,13 +34,13 @@ type ident = private {
   id_string : string;               (* non-unique name *)
   id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
-  id_tag    : Hashweak.tag;         (* unique magical tag *)
+  id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
 
 module Mid : Map.S with type key = ident
 module Sid : Mid.Set
 module Hid : Hashtbl.S with type key = ident
-module Wid : Hashweak.S with type key = ident
+module Wid : Weakhtbl.S with type key = ident
 
 val id_equal : ident -> ident -> bool
 

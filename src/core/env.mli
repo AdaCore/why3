@@ -30,9 +30,9 @@ exception TheoryNotFound of pathname * string
 
 type env
 
-val env_tag : env -> Hashweak.tag
+val env_tag : env -> Weakhtbl.tag
 
-module Wenv : Hashweak.S with type key = env
+module Wenv : Weakhtbl.S with type key = env
 
 val create_env : filename list -> env
 (** creates an environment from a "loadpath", a list of directories

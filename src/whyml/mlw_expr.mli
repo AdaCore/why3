@@ -102,7 +102,7 @@ type psymbol = private {
 module Mps : Map.S with type key = psymbol
 module Sps : Mps.Set
 module Hps : Hashtbl.S with type key = psymbol
-module Wps : Hashweak.S with type key = psymbol
+module Wps : Weakhtbl.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 

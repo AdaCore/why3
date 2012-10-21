@@ -31,18 +31,18 @@ exception AmbiguousPath of filename * filename
 
 type env = {
   env_path : Sstr.t;
-  env_tag  : Hashweak.tag;
+  env_tag  : Weakhtbl.tag;
 }
 
 let env_tag env = env.env_tag
 
-module Wenv = Hashweak.Make(struct type t = env let tag = env_tag end)
+module Wenv = Weakhtbl.Make(struct type t = env let tag = env_tag end)
 
 (** Environment construction and utilisation *)
 
 let create_env = let c = ref (-1) in fun lp -> {
   env_path = List.fold_right Sstr.add lp Sstr.empty;
-  env_tag  = (incr c; Hashweak.create_tag !c)
+  env_tag  = (incr c; Weakhtbl.create_tag !c)
 }
 
 let get_loadpath env = Sstr.elements env.env_path

@@ -84,12 +84,12 @@ sig
   module H : Hashtbl.S with type key = X.t
 end
 
-module WeakStructMake (X : Hashweak.Weakey) :
+module WeakStructMake (X : Weakhtbl.Weakey) :
 sig
   module M : Map.S with type key = X.t
   module S : M.Set
   module H : Hashtbl.S with type key = X.t
-  module W : Hashweak.S with type key = X.t
+  module W : Weakhtbl.S with type key = X.t
 end
 
 module type PrivateHashtbl = sig

@@ -298,7 +298,7 @@ type decl = {
   d_node : decl_node;
   d_syms : Sid.t;         (* idents used in declaration *)
   d_news : Sid.t;         (* idents introduced in declaration *)
-  d_tag  : Hashweak.tag;  (* unique magical tag *)
+  d_tag  : Weakhtbl.tag;  (* unique magical tag *)
 }
 
 and decl_node =
@@ -362,7 +362,7 @@ module Hsdecl = Hashcons.Make (struct
     | Dind (_,l) -> Hashcons.combine_list hs_ind 7 l
     | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
 
-  let tag n d = { d with d_tag = Hashweak.create_tag n }
+  let tag n d = { d with d_tag = Weakhtbl.create_tag n }
 
 end)
 
@@ -378,7 +378,7 @@ module Hdecl = Decl.H
 
 let d_equal : decl -> decl -> bool = (==)
 
-let d_hash d = Hashweak.tag_hash d.d_tag
+let d_hash d = Weakhtbl.tag_hash d.d_tag
 
 (** Declaration constructors *)
 
@@ -386,7 +386,7 @@ let mk_decl node syms news = Hsdecl.hashcons {
   d_node = node;
   d_syms = syms;
   d_news = news;
-  d_tag  = Hashweak.dummy_tag;
+  d_tag  = Weakhtbl.dummy_tag;
 }
 
 exception IllegalTypeAlias of tysymbol

@@ -39,7 +39,7 @@ module rec T : sig
   and ity = {
     ity_node : ity_node;
     ity_vars : varset;
-    ity_tag  : Hashweak.tag;
+    ity_tag  : Weakhtbl.tag;
   }
 
   and ity_node =
@@ -74,7 +74,7 @@ end = struct
   and ity = {
     ity_node : ity_node;
     ity_vars : varset;
-    ity_tag  : Hashweak.tag;
+    ity_tag  : Weakhtbl.tag;
   }
 
   and ity_node =
@@ -93,7 +93,7 @@ and Reg : sig
   module M : Map.S with type key = T.region
   module S : M.Set
   module H : Hashtbl.S with type key = T.region
-  module W : Hashweak.S with type key = T.region
+  module W : Weakhtbl.S with type key = T.region
 end = WeakStructMake (struct
   type t = T.region
   let tag r = r.T.reg_name.id_tag
@@ -145,7 +145,7 @@ let its_equal : itysymbol -> itysymbol -> bool = (==)
 let ity_equal : ity       -> ity       -> bool = (==)
 
 let its_hash its = id_hash its.its_pure.ts_name
-let ity_hash ity = Hashweak.tag_hash ity.ity_tag
+let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
 
 module Hsity = Hashcons.Make (struct
   type t = ity
@@ -181,7 +181,7 @@ module Hsity = Hashcons.Make (struct
 
   let tag n ity = { ity with
     ity_vars = vars vars_empty ity;
-    ity_tag  = Hashweak.create_tag n }
+    ity_tag  = Weakhtbl.create_tag n }
 
 end)
 
@@ -198,7 +198,7 @@ module Wity = Ity.W
 let mk_ity n = {
   ity_node = n;
   ity_vars = vars_empty;
-  ity_tag  = Hashweak.dummy_tag;
+  ity_tag  = Weakhtbl.dummy_tag;
 }
 
 let ity_var n = Hsity.hashcons (mk_ity (Ityvar n))
@@ -536,7 +536,7 @@ let create_xsymbol id ity =
 
 module Exn = StructMake (struct
   type t = xsymbol
-  let tag xs = Hashweak.tag_hash xs.xs_name.id_tag
+  let tag xs = Weakhtbl.tag_hash xs.xs_name.id_tag
 end)
 
 module Sexn = Exn.S

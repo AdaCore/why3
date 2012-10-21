@@ -43,7 +43,7 @@ type tysymbol = {
 
 and ty = {
   ty_node : ty_node;
-  ty_tag  : Hashweak.tag;
+  ty_tag  : Weakhtbl.tag;
 }
 
 and ty_node =
@@ -64,7 +64,7 @@ let ts_equal : tysymbol -> tysymbol -> bool = (==)
 let ty_equal : ty       -> ty       -> bool = (==)
 
 let ts_hash ts = id_hash ts.ts_name
-let ty_hash ty = Hashweak.tag_hash ty.ty_tag
+let ty_hash ty = Weakhtbl.tag_hash ty.ty_tag
 
 let mk_ts name args def = {
   ts_name = id_register name;
@@ -85,7 +85,7 @@ module Hsty = Hashcons.Make (struct
     | Tyvar v -> tv_hash v
     | Tyapp (s,tl) -> Hashcons.combine_list ty_hash (ts_hash s) tl
 
-  let tag n ty = { ty with ty_tag = Hashweak.create_tag n }
+  let tag n ty = { ty with ty_tag = Weakhtbl.create_tag n }
 end)
 
 module Ty = WeakStructMake (struct
@@ -100,7 +100,7 @@ module Wty = Ty.W
 
 let mk_ty n = {
   ty_node = n;
-  ty_tag  = Hashweak.dummy_tag;
+  ty_tag  = Weakhtbl.dummy_tag;
 }
 
 let ty_var n = Hsty.hashcons (mk_ty (Tyvar n))

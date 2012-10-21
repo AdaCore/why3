@@ -62,7 +62,7 @@ type prsymbol = private {
 module Mpr : Map.S with type key = prsymbol
 module Spr : Mpr.Set
 module Hpr : Hashtbl.S with type key = prsymbol
-module Wpr : Hashweak.S with type key = prsymbol
+module Wpr : Weakhtbl.S with type key = prsymbol
 
 val create_prsymbol : preid -> prsymbol
 
@@ -92,7 +92,7 @@ type decl = private {
   d_node : decl_node;
   d_syms : Sid.t;         (* idents used in declaration *)
   d_news : Sid.t;         (* idents introduced in declaration *)
-  d_tag  : Hashweak.tag;  (* unique magical tag *)
+  d_tag  : Weakhtbl.tag;  (* unique magical tag *)
 }
 
 and decl_node =
@@ -105,7 +105,7 @@ and decl_node =
 
 module Mdecl : Map.S with type key = decl
 module Sdecl : Mdecl.Set
-module Wdecl : Hashweak.S with type key = decl
+module Wdecl : Weakhtbl.S with type key = decl
 module Hdecl : Hashtbl.S  with type key = decl
 
 val d_equal : decl -> decl -> bool

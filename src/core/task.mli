@@ -20,7 +20,7 @@ open Theory
 
 type tdecl_set = private {
   tds_set : Stdecl.t;
-  tds_tag : Hashweak.tag;
+  tds_tag : Weakhtbl.tag;
 }
 
 val tds_equal : tdecl_set -> tdecl_set -> bool
@@ -43,7 +43,7 @@ and task_hd = private {
   task_known : known_map;    (* known identifiers *)
   task_clone : clone_map;    (* cloning history *)
   task_meta  : meta_map;     (* meta properties *)
-  task_tag   : Hashweak.tag; (* unique magical tag *)
+  task_tag   : Weakhtbl.tag; (* unique magical tag *)
 }
 
 val task_equal : task -> task -> bool

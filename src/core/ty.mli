@@ -38,7 +38,7 @@ type tysymbol = private {
 
 and ty = private {
   ty_node : ty_node;
-  ty_tag  : Hashweak.tag;
+  ty_tag  : Weakhtbl.tag;
 }
 
 and ty_node = private
@@ -48,12 +48,12 @@ and ty_node = private
 module Mts : Map.S with type key = tysymbol
 module Sts : Mts.Set
 module Hts : Hashtbl.S with type key = tysymbol
-module Wts : Hashweak.S with type key = tysymbol
+module Wts : Weakhtbl.S with type key = tysymbol
 
 module Mty : Map.S with type key = ty
 module Sty : Mty.Set
 module Hty : Hashtbl.S with type key = ty
-module Wty : Hashweak.S with type key = ty
+module Wty : Weakhtbl.S with type key = ty
 
 val ts_equal : tysymbol -> tysymbol -> bool
 val ty_equal : ty -> ty -> bool
