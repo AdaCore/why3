@@ -37,8 +37,8 @@ let read_simple_spec () =
   if !opt_version then begin
     print_version (); exit 0
   end;
-  Debug.Opt.set_flags_selected ();
-  Debug.Opt.option_list ()
+  Debug.Args.set_flags_selected ();
+  Debug.Args.option_list ()
 
 
 
@@ -58,9 +58,9 @@ let common_options = [
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> same as -L";
   "-v", Arg.Set opt_version, " prints version information" ;
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
 ]
 
 (* dead code

@@ -335,7 +335,7 @@ let detect_exec env main data acc exec_name =
         known_version env exec_name;
         eprintf "Found prover %s version %s%s@."
           data.prover_name ver
-          (def_option
+          (Opt.get_def
              ". This version of the prover is known to have problems."
              data.message);
         acc
@@ -362,7 +362,7 @@ let detect_exec env main data acc exec_name =
     if good || old then begin
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
-        (def_option (if old then
+        (Opt.get_def (if old then
             " (it is an old version that is less tested than \
              the current one)." else ", Ok.")
            data.message);

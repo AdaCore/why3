@@ -134,7 +134,7 @@ let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
              Db.add_file file_db)
         else None in
       let map (th_name,th) =
-        let theory_id = option_map (fun file_id ->
+        let theory_id = Opt.map (fun file_id ->
           try Mstr.find th_name (Db.theories file_id)
           with Not_found ->
             Db.add_theory file_id th_name
@@ -142,7 +142,7 @@ let gen_from_file ~format ~prob_name ~file_path ~file_name env lth =
         (* TODO make DB aware of the env *)
         let tasks = Task.split_theory th None None in
         let map task =
-          let goal_id = option_map (fun theory_id ->
+          let goal_id = Opt.map (fun theory_id ->
             let name = (Task.task_goal task).Decl.pr_name.Ident.id_string in
             try Mstr.find name (Db.goals theory_id)
             with Not_found ->

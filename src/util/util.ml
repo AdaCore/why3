@@ -26,40 +26,6 @@ let flip f x y = f y x
 
 let cons f acc x = (f x)::acc
 
-(* useful option combinators *)
-
-let of_option = function None -> assert false | Some x -> x
-
-let exn_option exn = function None -> raise exn | Some x -> x
-
-let def_option d = function None -> d | Some x -> x
-
-let option_map f = function None -> None | Some x -> Some (f x)
-
-let option_apply d f = function None -> d | Some x -> f x
-
-let apply_option d f x = match f with None -> d | Some f -> f x
-
-let apply_option2 d f x y = match f with None -> d | Some f -> f x y
-
-let option_fold f d = function None -> d | Some x -> f d x
-
-let option_iter f = function None -> () | Some x -> f x
-
-let option_map2 f x y = match x,y with
-  | None, None -> None
-  | Some x, Some y -> Some (f x y)
-  | _ -> failwith "option_map2 : None and Some at the same time"
-
-let option_eq eq a b = match a,b with
-  | None, None -> true
-  | None, _ | _, None -> false
-  | Some x, Some y -> eq x y
-
-let option_map_fold f acc x = match x with
-  | None -> acc, None
-  | Some x -> let acc, x = f acc x in acc, Some x
-
 (* useful iterator on int *)
 let rec foldi f acc min max =
   if min > max then acc else foldi f (f acc min) (succ min) max

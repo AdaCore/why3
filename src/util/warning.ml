@@ -10,10 +10,9 @@
 (********************************************************************)
 
 open Format
-open Util
 
 let default_hook ?loc s =
-  option_iter (Loc.report_position err_formatter) loc;
+  Opt.iter (Loc.report_position err_formatter) loc;
   eprintf "warning: %s@." s
 
 let hook = ref default_hook

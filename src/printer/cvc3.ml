@@ -236,7 +236,7 @@ let print_param_decl info fmt ls =
     | l ->  fprintf fmt "(%a) -> "
       (print_list comma (print_type info)) l in
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
-  Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
+  Opt.iter (iter_complex_type info fmt ()) ls.ls_value;
   fprintf fmt "@[<hov 2>%a: %a%a;@]@\n"
     print_ident ls.ls_name
     (print_lsargs info) ls.ls_args
@@ -252,7 +252,7 @@ let print_logic_decl info fmt (ls,def) =
     | l ->  fprintf fmt "(%a) -> "
       (print_list comma (print_type info)) l in
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
-  Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
+  Opt.iter (iter_complex_type info fmt ()) ls.ls_value;
   let vsl,expr = Decl.open_ls_defn def in
   find_complex_type_expr info fmt expr;
   fprintf fmt "@[<hov 2>%a: %a%a = LAMBDA (%a): %a;@]@\n"

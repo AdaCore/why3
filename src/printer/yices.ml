@@ -252,7 +252,7 @@ let print_data_decl info fmt (ts, _ as d) =
 
 let print_param_decl info fmt ls =
   List.iter (iter_complex_type info fmt ()) ls.ls_args;
-  Util.option_iter (iter_complex_type info fmt ()) ls.ls_value;
+  Opt.iter (iter_complex_type info fmt ()) ls.ls_value;
   match ls.ls_args with
   | [] ->
     fprintf fmt "@[<hov 2>(define %a::%a)@]@\n"

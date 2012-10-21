@@ -26,35 +26,6 @@ val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
 
 val cons : ('a -> 'b) -> 'b list -> 'a -> 'b list
 
-(* useful option combinators *)
-
-val of_option : 'a option -> 'a
-
-val exn_option : exn -> 'a option -> 'a
-
-val def_option : 'a -> 'a option -> 'a
-
-val option_map : ('a -> 'b) -> 'a option -> 'b option
-
-val option_iter : ('a -> unit) -> 'a option -> unit
-
-val option_apply : 'b -> ('a -> 'b) -> 'a option -> 'b
-
-val apply_option : 'b -> ('a -> 'b) option -> 'a -> 'b
-
-val apply_option2 : 'c -> ('a -> 'b -> 'c) option -> 'a -> 'b -> 'c
-
-val option_fold : ('b -> 'a -> 'b) -> 'b -> 'a option -> 'b
-(** [option_fold f d o] returns [d] if [o] is [None], and
-    [f d x] if [o] is [Some x] *)
-
-val option_map2 : ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
-
-val option_eq : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
-
-val option_map_fold :
-  ('a -> 'b -> 'a * 'b) -> 'a -> 'b option -> 'a * 'b option
-
 (* useful int iterator *)
 val foldi : ('a -> int -> 'a) -> 'a -> int -> int -> 'a
 val mapi : (int -> 'a) -> int -> int -> 'a list

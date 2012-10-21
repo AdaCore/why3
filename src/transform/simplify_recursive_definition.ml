@@ -100,7 +100,7 @@ let elt d =
              let s =
                    List.fold_left
                      (fun acc ({ls_args = tyl; ls_value = ty},_) ->
-                        let ty = of_option ty in
+                        let ty = Opt.get ty in
                         List.fold_left
                           (fun acc ty -> ty_s_fold tyoccurences acc ty)
                           acc (ty::tyl)

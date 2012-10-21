@@ -85,7 +85,7 @@ let task_equal t1 t2 = match t1, t2 with
   | None, None -> true
   | _ -> false
 
-let task_hash t = option_apply 0 (fun t -> task_hd_hash t + 1) t
+let task_hash t = Opt.fold (fun _ t -> task_hd_hash t + 1) 0 t
 
 module Hstask = Hashcons.Make (struct
   type t = task_hd
@@ -107,9 +107,9 @@ let mk_task decl prev known clone meta = Some (Hstask.hashcons {
   task_tag   = Hashweak.dummy_tag;
 })
 
-let task_known = option_apply Mid.empty (fun t -> t.task_known)
-let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
-let task_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
+let task_known = Opt.fold (fun _ t -> t.task_known) Mid.empty
+let task_clone = Opt.fold (fun _ t -> t.task_clone) Mid.empty
+let task_meta  = Opt.fold (fun _ t -> t.task_meta) Mmeta.empty
 
 let find_clone_tds task (th : theory) = cm_find (task_clone task) th
 let find_meta_tds task (t : meta) = mm_find (task_meta task) t
@@ -202,7 +202,7 @@ let add_meta task t al = new_meta task t (create_meta t al)
 
 let split_tdecl names (res,task) td = match td.td_node with
   | Decl { d_node = Dprop ((Pgoal|Plemma),pr,f) }
-    when option_apply true (Spr.mem pr) names ->
+    when Opt.fold (fun _ -> Spr.mem pr) true names ->
       let res = add_prop_decl task Pgoal pr f :: res in
       res, flat_tdecl task td
   | _ ->

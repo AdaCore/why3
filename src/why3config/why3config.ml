@@ -67,9 +67,9 @@ let option_list = Arg.align [
   "<file> Install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
   " Do not modify the config file";
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
   "--version", Arg.Set opt_version,
   " Print version information"
 ]
@@ -131,7 +131,7 @@ let main () =
   end;
 
   (** Debug flag *)
-  Debug.Opt.set_flags_selected ();
+  Debug.Args.set_flags_selected ();
 
   if !opt_list_prover_ids then begin
     opt_list := true;
@@ -140,7 +140,7 @@ let main () =
       (List.sort String.compare (Autodetection.list_prover_ids ()))
   end;
 
-  opt_list :=  Debug.Opt.option_list () || !opt_list;
+  opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   (** Main *)
@@ -156,9 +156,9 @@ let main () =
          default_config f
   in
   let main = get_main config in
-  (* let main = option_apply main (fun d -> {main with libdir = d})
+  (* let main = Opt.fold main (fun d -> {main with libdir = d})
      !libdir in *)
-  (* let main = option_apply main (fun d -> {main with datadir = d})
+  (* let main = Opt.fold main (fun d -> {main with datadir = d})
      !datadir in *)
   let main = try Queue.fold install_plugin main plugins with Exit -> exit 1 in
   let config = set_main config main in

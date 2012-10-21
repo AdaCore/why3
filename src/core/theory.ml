@@ -460,7 +460,7 @@ let rec cl_find_ts cl ts =
   if not (Sid.mem ts.ts_name cl.cl_local) then ts
   else try Mts.find ts cl.ts_table
   with Not_found ->
-    let td' = option_map (cl_trans_ty cl) ts.ts_def in
+    let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
     let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
     cl.ts_table <- Mts.add ts ts' cl.ts_table;
     ts'
@@ -472,7 +472,7 @@ let cl_find_ls cl ls =
   else try Mls.find ls cl.ls_table
   with Not_found ->
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
-    let vt' = option_map (cl_trans_ty cl) ls.ls_value in
+    let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
     let ls' = create_lsymbol (id_clone ls.ls_name) ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
@@ -542,7 +542,7 @@ let cl_data cl inst tdl =
     cl_find_ls cl ls
   in
   let add_constr (ls,pl) =
-    add_ls ls, List.map (option_map add_ls) pl
+    add_ls ls, List.map (Opt.map add_ls) pl
   in
   let add_type (ts,csl) =
     if Mts.mem ts inst.inst_ts then
@@ -632,7 +632,7 @@ let clone_theory cl add_td acc th inst =
       try  Some (mk_tdecl (cl_tdecl cl inst td))
       with EmptyDecl -> None
     in
-    option_apply acc (add_td acc) td
+    Opt.fold add_td acc td
   in
   let acc = List.fold_left add acc th.th_decls in
   let sm = {
@@ -738,7 +738,7 @@ let clone_meta tdt sm = match tdt.td_node with
 (** access to meta *)
 
 (*
-let theory_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
+let theory_meta = Opt.fold (fun _ t -> t.task_meta) Mmeta.empty
 
 let find_meta_tds th (t : meta) = mm_find (theory_meta th) t
 

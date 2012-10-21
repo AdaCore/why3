@@ -783,7 +783,7 @@ let transform_goal eS sched ?(keep_dumb_transformation=false)
   schedule_delayed_action sched
     (fun () -> let ntr = transformation_on_goal_aux eS tr
                  keep_dumb_transformation g in
-               Util.apply_option () callback ntr)
+               Opt.apply () callback ntr)
 
 
 let transform_goal_or_children ~context_unproved_goals_only eS sched ?callback

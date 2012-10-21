@@ -365,7 +365,7 @@ and dpat_node loc uc env = function
             { dp_node = Pwild; dp_ty = ty }
       in
       let al = List.map2 get_val pjl tyl in
-      !renv, Papp (cs, al), Util.of_option ty
+      !renv, Papp (cs, al), Opt.get ty
   | PPptuple pl ->
       let n = List.length pl in
       let s = fs_tuple n in
@@ -410,7 +410,7 @@ let check_quant_linearity uqu =
   let check id =
     s := Loc.try3 id.id_loc Sstr.add_new (DuplicateVar id.id) id.id !s
   in
-  List.iter (fun (idl, _) -> Util.option_iter check idl) uqu
+  List.iter (fun (idl, _) -> Opt.iter check idl) uqu
 
 let check_highord uc env x tl = match x with
   | Qident { id = x } when Mstr.mem x env.dvars -> true
@@ -441,7 +441,7 @@ and dterm_node ~localize loc uc env = function
       let ty = Mstr.find x env.dvars in
       Tvar x, ty
   | PPvar x when env.gvars x <> None ->
-      let vs = Util.of_option (env.gvars x) in
+      let vs = Opt.get (env.gvars x) in
       assert (ty_closed vs.vs_ty);
       let ty = specialize_ty ~loc (Htv.create 0) vs.vs_ty in
       Tgvar vs, ty
@@ -455,7 +455,7 @@ and dterm_node ~localize loc uc env = function
       let tl = apply_highord loc x tl in
       let atyl, aty = Denv.specialize_lsymbol ~loc fs_func_app in
       let tl = dtype_args ~localize fs_func_app loc uc env atyl tl in
-      Tapp (fs_func_app, tl), Util.of_option aty
+      Tapp (fs_func_app, tl), Opt.get aty
   | PPapp (x, tl) ->
       let s, tyl, ty = specialize_fsymbol x uc in
       let tl = dtype_args ~localize s loc uc env tyl tl in
@@ -589,7 +589,7 @@ and dterm_node ~localize loc uc env = function
         | None -> error ~loc (RecordFieldMissing (cs,pj))
       in
       let al = List.map2 get_val pjl tyl in
-      Tapp (cs,al), Util.of_option ty
+      Tapp (cs,al), Opt.get ty
   | PPupdate (e,fl) ->
       let e = dterm ~localize uc env e in
       let fl = List.map (fun (q,e) -> find_lsymbol q uc,e) fl in
@@ -603,13 +603,13 @@ and dterm_node ~localize loc uc env = function
             e
         | None ->
             let ptyl,pty = Denv.specialize_lsymbol ~loc pj in
-            unify_raise ~loc (of_option pty) ty;
+            unify_raise ~loc (Opt.get pty) ty;
             unify_raise ~loc (List.hd ptyl) e.dt_ty;
             (* FIXME? if e is a complex expression, use let *)
             { dt_node = Tapp (pj,[e]) ; dt_ty = ty }
       in
       let al = List.map2 get_val pjl tyl in
-      Tapp (cs,al), Util.of_option ty
+      Tapp (cs,al), Opt.get ty
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -874,7 +874,7 @@ let add_types dl th =
             | Some id ->
                 try
                   let pj = Hashtbl.find ht id.id in
-                  let ty = of_option pj.ls_value in
+                  let ty = Opt.get pj.ls_value in
                   ignore (Loc.try2 id.id_loc ty_equal_check ty fty);
                   Some pj
                 with Not_found ->
@@ -1028,7 +1028,7 @@ let add_prop k loc s f th =
   let f = type_fmla th denv_empty Mstr.empty f in
   Loc.try4 loc add_prop_decl th k pr f
 
-let loc_of_id id = of_option id.Ident.id_loc
+let loc_of_id id = Opt.get id.Ident.id_loc
 
 let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
@@ -1133,8 +1133,8 @@ let type_inst th t s =
   let add_inst s = function
     | CSns (loc,p,q) ->
       let find ns x = find_namespace_ns x ns in
-      let ns1 = option_fold find t.th_export p in
-      let ns2 = option_fold find (get_namespace th) q in
+      let ns1 = Opt.fold find t.th_export p in
+      let ns2 = Opt.fold find (get_namespace th) q in
       clone_ns loc t.th_local ns2 ns1 s
     | CStsym (loc,p,q) ->
       let ts1 = find_tysymbol_ns p t.th_export in

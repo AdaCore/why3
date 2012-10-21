@@ -512,8 +512,8 @@ let mk_filter_prover ?version ?altern name =
   | Some "" -> invalid_arg "mk_filter_prover: version can't be an empty string"
   | _ -> () end;
   { filter_name    = mk_regexp name;
-    filter_version = option_map mk_regexp version;
-    filter_altern  = option_map mk_regexp altern;
+    filter_version = Opt.map mk_regexp version;
+    filter_altern  = Opt.map mk_regexp altern;
   }
 
 let print_filter_prover fmt fp =
@@ -540,8 +540,8 @@ let parse_filter_prover s =
 let filter_prover fp p =
   let check s schema = Str.string_match schema.reg s 0 in
   check p.prover_name fp.filter_name
-  && option_apply true (check p.prover_version) fp.filter_version
-  && option_apply true (check p.prover_altern) fp.filter_altern
+  && Opt.fold (fun _ -> check p.prover_version) true fp.filter_version
+  && Opt.fold (fun _ -> check p.prover_altern) true fp.filter_altern
 
 let filter_provers whyconf fp =
   try
@@ -647,7 +647,7 @@ let set_main config main =
   }
 
 let set_provers config ?shortcuts provers =
-  let shortcuts = def_option config.prover_shortcuts shortcuts in
+  let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
   {config with
     config = set_provers_shortcuts config.config shortcuts provers;
     provers = provers;

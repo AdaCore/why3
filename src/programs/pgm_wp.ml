@@ -236,7 +236,7 @@ let quantify env rm sreg f =
       in
       let id = Spv.fold test vars None in
       let label = Slab.singleton (create_label "model:1") in
-      let id = id_clone ~label (def_option r.R.r_tv.tv_name id) in
+      let id = id_clone ~label (Opt.get_def r.R.r_tv.tv_name id) in
       let r' = create_vsymbol id (purify r.R.r_ty) in
       Mtv.add r.R.r_tv r' m
     in
@@ -557,7 +557,7 @@ and wp_desc env rm e q = match e.expr_desc with
         List.map
           (fun (x, v, h) ->
              let w = wp_expr env rm h (filter_post h.expr_effect q) in
-             let v = option_map (fun v -> v.pv_pure) v in
+             let v = Opt.map (fun v -> v.pv_pure) v in
              x, (v, w))
           hl
       in

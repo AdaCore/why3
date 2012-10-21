@@ -117,7 +117,7 @@ let rec rewriteT kn state t = match t.t_node with
         | _ -> Printer.unsupportedTerm t uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
-      let find (cs,_) = try Mls.find cs m with Not_found -> of_option w in
+      let find (cs,_) = try Mls.find cs m with Not_found -> Opt.get w in
       let ts = match t1.t_ty with
         | Some { ty_node = Tyapp (ts,_) } -> ts
         | _ -> Printer.unsupportedTerm t uncompiled
@@ -152,7 +152,7 @@ and rewriteF kn state av sign f = match f.t_node with
         let vl,e = try Mls.find cs m with Not_found ->
           let var = create_vsymbol (id_fresh "w") in
           let get_var pj = var (t_type (t_app_infer pj [t1])) in
-          List.map get_var (Mls.find cs state.pj_map), of_option w
+          List.map get_var (Mls.find cs state.pj_map), Opt.get w
         in
         let hd = t_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
@@ -205,7 +205,7 @@ let add_selector (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = fs_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
+    let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
     let hd = fs_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
     let ax = t_forall_close vl [] (t_equ hd t) in
@@ -230,7 +230,7 @@ let add_indexer (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = fs_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
+    let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
     let ix = t_const (ConstInt (IConstDecimal(string_of_int !index))) in
     let ax = t_equ (fs_app mt_ls [hd] ty_int) ix in
     let ax = t_forall_close (List.rev vl) [[hd]] ax in
@@ -278,7 +278,7 @@ let add_projections (state,task) _ts _ty csl =
     let id = cs.ls_name.id_string ^ "_proj_" in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let tl = List.rev_map t_var vl in
-    let hd = fs_app cs tl (of_option cs.ls_value) in
+    let hd = fs_app cs tl (Opt.get cs.ls_value) in
     let c = ref 0 in
     let add (pjl,tsk) t pj =
       let ls = incr c; match pj with
@@ -286,7 +286,7 @@ let add_projections (state,task) _ts _ty csl =
         | None ->
             let cn = string_of_int !c in
             let id = id_derive (id ^ cn) cs.ls_name in
-            create_lsymbol id [of_option cs.ls_value] t.t_ty
+            create_lsymbol id [Opt.get cs.ls_value] t.t_ty
       in
       let tsk = add_param_decl tsk ls in
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
@@ -417,7 +417,7 @@ let comp t (state,task) = match t.task_decl.td_node with
   | Decl d ->
       let rstate,rtask = ref state, ref task in
       let add _ d () =
-        let t = Util.of_option (add_decl None d) in
+        let t = Opt.get (add_decl None d) in
         let state,task = comp t (!rstate,!rtask) in
         rstate := state ; rtask := task ; None
       in
@@ -476,7 +476,7 @@ let elim d = match d.d_node with
       in
       let add acc (_,csl) =
         let (cs,pjl) = List.hd csl in
-        let ty = of_option cs.ls_value in
+        let ty = Opt.get cs.ls_value in
         let vs = create_vsymbol (id_fresh "v") ty in
         let get l = function Some p -> p::l | _ -> l in
         let pjl = List.fold_left get [] pjl in

@@ -90,9 +90,9 @@ let option_list = Arg.align [
       " same as -m";
   "-j", Arg.Int (fun i -> opt_j := Some i),
   "<int> Set the number of worker to use (default:1)";
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
 ]
 
 type runnable_prover =
@@ -109,12 +109,12 @@ let env,provers = try
   let main = get_main config in
   Whyconf.load_plugins main;
 
-  Debug.Opt.set_flags_selected ();
+  Debug.Args.set_flags_selected ();
 
   (** listings*)
 
   let opt_list = ref false in
-  opt_list :=  Debug.Opt.option_list () || !opt_list;
+  opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   if Queue.is_empty opt_queue then begin

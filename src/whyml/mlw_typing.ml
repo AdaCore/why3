@@ -213,7 +213,7 @@ let parse_record uc fll =
     | [{ vtv_ity = { ity_node = Ityapp (its,_,_) }}] -> its
     | _ -> raise (BadRecordField pl.pl_ls) in
   let cs, pjl = match find_constructors (get_known uc) its with
-    | [cs,pjl] -> cs, List.map (exn_option (BadRecordField pl.pl_ls)) pjl
+    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField pl.pl_ls)) pjl
     | _ -> raise (BadRecordField pl.pl_ls) in
   let pjs = List.fold_left (fun s pj -> Sls.add pj.pl_ls s) Sls.empty pjl in
   let flm = List.fold_left (fun m (pj,v) -> let pj = pj.pl_ls in
@@ -262,7 +262,7 @@ let mk_dexpr desc dvty loc labs =
 
 let mk_let ~loc ~uloc e (desc,dvty) =
   if test_var e then desc, dvty else
-  let loc = def_option loc uloc in
+  let loc = Opt.get_def loc uloc in
   let e1 = mk_dexpr desc dvty loc Slab.empty in
   DElet (mk_id "q" e.de_loc, false, e, e1), dvty
 
@@ -384,7 +384,7 @@ let dxpost uc ql =
   List.fold_right add_map ql Mexn.empty
 
 let dvariant uc var =
-  List.map (fun (le,q) -> le, Util.option_map (find_variant_ls uc) q) var
+  List.map (fun (le,q) -> le, Opt.map (find_variant_ls uc) q) var
 
 let dspec uc sp = {
   ds_pre     = sp.sp_pre;
@@ -432,7 +432,7 @@ let rec dexpr denv e =
   let labs, uloc, d = extract_labels Slab.empty denv.uloc e in
   let denv = { denv with uloc = uloc } in
   let d, ty = de_desc denv loc d in
-  let loc = def_option loc uloc in
+  let loc = Opt.get_def loc uloc in
   mk_dexpr d ty loc labs
 
 and de_desc denv loc = function
@@ -876,7 +876,7 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
         try Mls.find (uc_find_ls lenv.mod_uc p) pjm with Not_found ->
           errorm ~loc:(qloc p) "'%a' must be a field name" print_qualid p in
       let sbs = unify_loc (ity_match ity_subst_empty) loc itya vtv.vtv_ity in
-      let mut = Util.option_map (reg_full_inst sbs) vtvv.vtv_mut in
+      let mut = Opt.map (reg_full_inst sbs) vtvv.vtv_mut in
       let ghost = vtv.vtv_ghost || vtvv.vtv_ghost in
       vs, vty_value ~ghost ?mut (ity_full_inst sbs vtvv.vtv_ity)
   | Ptree.PPcast (e,_) | Ptree.PPnamed (_,e) ->
@@ -1275,7 +1275,7 @@ let add_type_invariant loc uc id params inv =
   let denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
   (* invariants on records may use field names as variables *)
   let fields = try match find_constructors (get_known uc) its with
-    | [cs, pjl] -> Some (cs, List.map Util.of_option pjl)
+    | [cs, pjl] -> Some (cs, List.map Opt.get pjl)
     | _ -> None with _ -> None in
   let inv = match fields with
     | None ->
@@ -1307,7 +1307,7 @@ let add_type_invariant loc uc id params inv =
 
 let look_for_loc tdl s =
   let look_id loc id = if id.id = s then Some id.id_loc else loc in
-  let look_pj loc (id,_) = option_fold look_id loc id in
+  let look_pj loc (id,_) = Opt.fold look_id loc id in
   let look_cs loc (csloc,id,pjl) =
     let loc = if id.id = s then Some csloc else loc in
     List.fold_left look_pj loc pjl in
@@ -1497,12 +1497,12 @@ let add_types ~wp uc tdl =
 
   let def_visit d (abstr,algeb,alias) =
     let x = d.td_ident.id in
-    let ts = Util.of_option (Hashtbl.find tysymbols x) in
+    let ts = Opt.get (Hashtbl.find tysymbols x) in
     let add_tv s x v = Mstr.add x.id v s in
     let vars = List.fold_left2 add_tv Mstr.empty d.td_params ts.its_args in
     let get_ts = function
       | Qident { id = x } when Mstr.mem x def ->
-          PT (Util.of_option (Hashtbl.find tysymbols x))
+          PT (Opt.get (Hashtbl.find tysymbols x))
       | q -> uc_find_ts uc q
     in
     let rec parse = function
@@ -1568,7 +1568,7 @@ let add_types ~wp uc tdl =
   let check ity = ity_s_any check Util.ffalse ity in
   let is_impure_type ts =
     ts.its_abst || ts.its_priv || ts.its_inv || ts.its_regs <> [] ||
-    option_apply false check ts.its_def
+    Opt.fold (fun _ -> check) false ts.its_def
   in
   let check (pv,_) =
     let vtv = pv.pv_vtv in

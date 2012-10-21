@@ -441,10 +441,10 @@ let get_used_provers session =
 
 exception NoTask
 
-let goal_task g = Util.exn_option NoTask g.goal_task
+let goal_task g = Opt.get_exn NoTask g.goal_task
 let goal_task_option g = g.goal_task
 
-let goal_expl g = Util.def_option g.goal_name.Ident.id_string g.goal_expl
+let goal_expl g = Opt.get_def g.goal_name.Ident.id_string g.goal_expl
 
 (************************)
 (* saving state on disk *)
@@ -839,7 +839,7 @@ let set_obsolete ?(notify=notify) a =
 let set_archived a b = a.proof_archived <- b
 
 let get_edited_as_abs session pr =
-  option_map (Filename.concat session.session_dir) pr.proof_edited_as
+  Opt.map (Filename.concat session.session_dir) pr.proof_edited_as
 
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
@@ -1684,12 +1684,12 @@ let copy_external_proof
   let session = match env_session with
     | Some eS -> Some eS.session
     | _ -> session in
-  let obsolete = def_option a.proof_obsolete obsolete in
-  let archived = def_option a.proof_archived archived in
-  let timelimit = def_option a.proof_timelimit timelimit in
-  let memlimit = def_option a.proof_memlimit memlimit in
-  let pas = def_option a.proof_state attempt_status in
-  let ngoal = def_option a.proof_parent goal in
+  let obsolete = Opt.get_def a.proof_obsolete obsolete in
+  let archived = Opt.get_def a.proof_archived archived in
+  let timelimit = Opt.get_def a.proof_timelimit timelimit in
+  let memlimit = Opt.get_def a.proof_memlimit memlimit in
+  let pas = Opt.get_def a.proof_state attempt_status in
+  let ngoal = Opt.get_def a.proof_parent goal in
   let nprover = match prover with
     | None -> a.proof_prover
     | Some prover -> prover in
@@ -1776,7 +1776,7 @@ let update_edit_external_proof env_session a =
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
   Driver.print_task ?old driver fmt goal;
-  Util.option_iter close_in old;
+  Opt.iter close_in old;
   close_out ch;
   file
 

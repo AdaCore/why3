@@ -132,7 +132,7 @@ let create_user_id { id = x ; id_lab = ll ; id_loc = loc } =
     | Lpos p -> ll, Some p
   in
   let label,p = List.fold_left get_labels (Slab.empty,None) ll in
-  id_user ~label x (def_option loc p)
+  id_user ~label x (Opt.get_def loc p)
 
 let create_user_vs id ty = create_vsymbol (create_user_id id) ty
 
@@ -314,5 +314,5 @@ let specialize_lsymbol ~loc s =
   let tl = s.ls_args in
   let t = s.ls_value in
   let env = Htv.create 17 in
-  List.map (specialize_ty ~loc env) tl, option_map (specialize_ty ~loc env) t
+  List.map (specialize_ty ~loc env) tl, Opt.map (specialize_ty ~loc env) t
 

@@ -304,9 +304,9 @@ let prove_task_prepared
   ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  let old_channel = option_map open_in old in
+  let old_channel = Opt.map open_in old in
   print_task_prepared ?old:old_channel drv fmt task; pp_print_flush fmt ();
-  option_iter close_in old_channel;
+  Opt.iter close_in old_channel;
   let filename = match old, inplace with
     | Some fn, Some true -> fn
     | _ ->

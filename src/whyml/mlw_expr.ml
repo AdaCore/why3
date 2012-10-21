@@ -49,12 +49,12 @@ let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
   let eff_read e r = eff_read e ~ghost:value.vtv_ghost r in
-  let effect = Util.option_fold eff_read eff_empty value.vtv_mut in
-  let arg_reset acc a = Util.option_fold eff_reset acc a.vtv_mut in
+  let effect = Opt.fold eff_read eff_empty value.vtv_mut in
+  let arg_reset acc a = Opt.fold eff_reset acc a.vtv_mut in
   let effect = List.fold_left arg_reset effect args in
   create_plsymbol_unsafe ls args value effect ~hidden ~rdonly
 
-let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
+let ity_of_ty_opt ty = ity_of_ty (Opt.get_def ty_bool ty)
 
 let fake_pls = Wls.memoize 17 (fun ls ->
   { pl_ls     = ls;
@@ -254,10 +254,10 @@ let make_ppattern pp vtv =
           let ity = ity_full_inst sbs arg.vtv_ity in
           let ghost = vtv.vtv_ghost || arg.vtv_ghost in
           let arg_mut = if pls.pl_rdonly then None else arg.vtv_mut in
-          let mut = Util.option_map (reg_full_inst sbs) arg_mut in
+          let mut = Opt.map (reg_full_inst sbs) arg_mut in
           let pp = make (vty_value ~ghost ?mut ity) pp in
           if ppat_is_wild pp then pp.ppat_effect, pp else
-          Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
+          Opt.fold (eff_read ~ghost) pp.ppat_effect mut, pp
         in
         let ppl = try List.map2 mtch pls.pl_args ppl with
           | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
@@ -379,7 +379,7 @@ let rec vta_varmap vta =
 let eff_check vars result e =
   let check vars r = if not (reg_occurs r vars) then
     Loc.errorm "every external effect must be mentioned in specification" in
-  let reset vars r u = check vars r; Util.option_iter (check vars) u in
+  let reset vars r u = check vars r; Opt.iter (check vars) u in
   let check = check vars in
   Sreg.iter check e.eff_reads;
   Sreg.iter check e.eff_writes;
@@ -654,7 +654,7 @@ let e_plapp pls el ity =
             (* if our sole argument is a private type, then we are immutable *)
             | [{vtv_ity = {ity_node = Ityapp ({its_priv = true},_,_)}}] -> None
             | _ -> vtv.vtv_mut in
-          let mut = Util.option_map (reg_full_inst sbs) mut in
+          let mut = Opt.map (reg_full_inst sbs) mut in
           let vty = VTvalue (vty_value ~ghost ?mut ity) in
           let eff = eff_union eff (eff_full_inst sbs pls.pl_effect) in
           let t = match pls.pl_ls.ls_value with
@@ -993,12 +993,12 @@ let eff_equal eff1 eff2 =
   Sreg.equal eff1.eff_ghostr eff2.eff_ghostr &&
   Sreg.equal eff1.eff_ghostw eff2.eff_ghostw &&
   Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
-  Mreg.equal (Util.option_eq reg_equal) eff1.eff_resets eff2.eff_resets
+  Mreg.equal (Opt.equal reg_equal) eff1.eff_resets eff2.eff_resets
 
 let vtv_equal vtv1 vtv2 =
   vtv1.vtv_ghost = vtv2.vtv_ghost &&
   ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
-  option_eq reg_equal vtv1.vtv_mut vtv2.vtv_mut
+  Opt.equal reg_equal vtv1.vtv_mut vtv2.vtv_mut
 
 let rec vta_compat a1 a2 =
   assert (List.for_all2 pv_equal a1.vta_args a2.vta_args);
@@ -1087,7 +1087,7 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
     let res = try List.for_all2 (fun (_,r1) (_,r2) ->
-        Util.option_eq ls_equal r1 r2) vl variant1
+        Opt.equal ls_equal r1 r2) vl variant1
       with Invalid_argument _ -> false in
     if not res then Loc.errorm
       "All functions in a recursive definition \

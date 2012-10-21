@@ -560,7 +560,7 @@ and tr_global_ts dep env r =
           (* Format.printf "decl = %a@." Pretty.print_decl decl; *)
           List.iter (add_new_decl dep !dep') tl;
           List.iter (add_dep dep') tl;
-          Util.option_iter (add_new_decl dep !dep') decl;
+          Opt.iter (add_new_decl dep !dep') decl;
           lookup_table global_ts r
 
 (* the function/predicate symbol for r *)
@@ -599,14 +599,14 @@ and tr_global_ls dep env r =
           let pl, d = decompose_definition dep' env c in
           List.iter (add_new_decl dep !dep') pl;
           List.iter (add_dep dep') pl;
-          Util.option_iter (add_new_decl dep !dep') d;
+          Opt.iter (add_new_decl dep !dep') d;
           lookup_table global_ls r
       | IndRef i ->
           assert (is_Prop t);
           let pl, d = decompose_inductive dep' env i in
           List.iter (add_new_decl dep !dep') pl;
           List.iter (add_dep dep') pl;
-          Util.option_iter (add_new_decl dep !dep') d;
+          Opt.iter (add_new_decl dep !dep') d;
           lookup_table global_ls r
       | VarRef _ ->
           make_one_ls dep' env r;

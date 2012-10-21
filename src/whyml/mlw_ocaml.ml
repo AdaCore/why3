@@ -116,7 +116,7 @@ let get_record info ls =
         let rec lookup = function
         | [] -> []
         | (_, [cs, pjl]) :: _ when ls_equal cs ls ->
-          (try List.map Util.of_option pjl with _ -> [])
+          (try List.map Opt.get pjl with _ -> [])
         | _ :: dl -> lookup dl
         in
         lookup dl
@@ -249,7 +249,7 @@ let print_data_decl info fst fmt (ts,csl) =
   let print_default () = print_list newline (print_constr info) fmt csl in
   let print_field fmt ls =
     fprintf fmt "%a: %a"
-      (print_ls info) ls (print_ty info) (Util.of_option ls.ls_value) in
+      (print_ls info) ls (print_ty info) (Opt.get ls.ls_value) in
   let print_defn fmt = function
     | [cs, _] ->
         let pjl = get_record info cs in
@@ -274,7 +274,7 @@ let is_record = function
 
 let print_projections info fmt (_, csl) =
   let pjl = List.filter ((<>) None) (snd (List.hd csl)) in
-  let pjl = List.map Util.of_option pjl in
+  let pjl = List.map Opt.get pjl in
   let print ls =
     let print_branch fmt (cs, pjl) =
       let print_arg fmt = function
@@ -366,7 +366,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  option_apply true inspect fs.ls_value
+  Opt.fold (fun _ -> inspect) true fs.ls_value
 
 (** Patterns, terms, and formulas *)
 
@@ -592,7 +592,7 @@ let extract_theory drv ?old ?fname fmt th =
     current_theory = th;
     th_known_map = th.th_known;
     mo_known_map = Mid.empty;
-    fname = Util.option_map clean_fname fname; } in
+    fname = Opt.map clean_fname fname; } in
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     print_theory_name th;
@@ -932,7 +932,7 @@ let is_record = function
 
 let print_pprojections info fmt (_, csl, _) =
   let pjl = List.filter ((<>) None) (snd (List.hd csl)) in
-  let pjl = List.map Util.of_option pjl in
+  let pjl = List.map Opt.get pjl in
   let print ls =
     let print_branch fmt (cs, pjl) =
       let print_arg fmt = function
@@ -988,7 +988,7 @@ let extract_module drv ?old ?fname fmt m =
     current_theory = th;
     th_known_map = th.th_known;
     mo_known_map = m.mod_known;
-    fname = Util.option_map clean_fname fname; } in
+    fname = Opt.map clean_fname fname; } in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     print_module_name m;

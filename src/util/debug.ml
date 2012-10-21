@@ -76,9 +76,9 @@ let dprintf flag s =
   else Format.ifprintf !formatter s
 
 
-(*** Options ****)
+(*** Command-line arguments ****)
 
-module Opt = struct
+module Args = struct
   type spec = (Arg.key * Arg.spec * Arg.doc)
 
   let desc_debug_list, option_list =

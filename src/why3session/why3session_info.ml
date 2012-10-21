@@ -320,7 +320,7 @@ let run_one fname =
   if !opt_print_edited then
     session_iter_proof_attempt
       (fun pr ->
-        Util.option_iter (fun s -> printf "%s%a" s sep ())
+        Opt.iter (fun s -> printf "%s%a" s sep ())
           (get_edited_as_abs session pr))
       session;
   if !opt_tree_print then

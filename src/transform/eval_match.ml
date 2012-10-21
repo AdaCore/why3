@@ -62,7 +62,7 @@ let rec add_quant kn (vl,tl,f) v =
   in
   match cl with
     | [ls,_] ->
-        let s = ty_match Mtv.empty (Util.of_option ls.ls_value) ty in
+        let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
         let nvl = List.map mk_v ls.ls_args in
         let t = fs_app ls (List.map t_var nvl) ty in

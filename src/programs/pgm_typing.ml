@@ -84,7 +84,7 @@ let create_denv uc =
     locals = Mstr.empty;
     denv = Typing.denv_empty; }
 
-let loc_of_id id = Util.of_option id.Ident.id_loc
+let loc_of_id id = Opt.get id.Ident.id_loc
 
 (* dead code
 let loc_of_ls ls = ls.ls_name.Ident.id_loc
@@ -182,7 +182,7 @@ let rec specialize_type_v ?(policy=Region_var) ~loc htv = function
 
 let specialize_lsymbol ?(policy=Region_var) ~loc htv s =
   List.map (specialize_ty ~policy ~loc htv) s.ls_args,
-  option_map (specialize_ty ~policy:Region_ret ~loc htv) s.ls_value
+  Opt.map (specialize_ty ~policy:Region_ret ~loc htv) s.ls_value
 
 let parameter x = "parameter " ^ x
 let rec parameter_q = function
@@ -363,7 +363,7 @@ let dvariant env (l, p) =
           errorm ~loc "predicate %s should be a binary relation"
             s.ls_name.id_string
   in
-  l, option_map relation p
+  l, Opt.map relation p
 
 let dvariants env = function
   | [] -> None
@@ -427,7 +427,7 @@ let rec dexpr ~ghost ~userloc env e =
   let loc = e.Ptree.expr_loc in
   let labs, userloc, d = extract_labels [] userloc e in
   let d, ty = dexpr_desc ~ghost ~userloc env loc d in
-  let loc = def_option loc userloc in
+  let loc = Opt.get_def loc userloc in
   let e = {
     dexpr_desc = d; dexpr_loc = loc; dexpr_lab = labs; dexpr_type = ty; }
   in
@@ -534,7 +534,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let s = fs_tuple n in
       let tyl = List.map (fun _ -> create_type_var loc) el in
       let ty = tyapp (ts_tuple n) tyl in
-      let uloc = def_option loc userloc in
+      let uloc = Opt.get_def loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = [] } in
       let apply e1 e2 ty2 =
@@ -551,8 +551,8 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let cs, fl = list_fields (impure_uc env.uc) fl in
       new_regions_vars ();
       let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
-      let ty = of_option ty in
-      let uloc = def_option loc userloc in
+      let ty = Opt.get ty in
+      let uloc = Opt.get_def loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = [] } in
       let constructor d f tyf = match f with
@@ -575,7 +575,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       let e1 = dexpr ~ghost ~userloc env e1 in
       let cs, fl = list_fields (impure_uc env.uc) fl in
       let tyl, ty = Denv.specialize_lsymbol ~loc cs in
-      let ty = of_option ty in
+      let ty = Opt.get ty in
       expected_type e1 ty;
       let n = ref (-1) in
       let q = Queue.create () in
@@ -593,7 +593,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
       (* prepare the result *)
       new_regions_vars ();
       let tyl, ty = specialize_lsymbol ~loc (Htv.create 17) cs in
-      let ty = of_option ty in
+      let ty = Opt.get ty in
       (* unify pattern variable types with expected types *)
       let set_pat_var_ty f tyf = match f with
         | Some _ ->
@@ -604,7 +604,7 @@ and dexpr_desc ~ghost ~userloc env loc = function
             Queue.push v q
       in
       List.iter2 set_pat_var_ty fl tyl;
-      let uloc = def_option loc userloc in
+      let uloc = Opt.get_def loc userloc in
       let create d ty = { dexpr_desc = d; dexpr_type = ty;
                           dexpr_loc = uloc; dexpr_lab = [] } in
       let apply t f tyf = match f with
@@ -835,7 +835,7 @@ let check_at_fmla ?(old=false) loc f0 =
         t_all check f
   in
   if not (check f0) then
-    errorm ~loc "locally bound variable %a under `at'" print_vs (of_option !v)
+    errorm ~loc "locally bound variable %a under `at'" print_vs (Opt.get !v)
 
 let dterm env l = Typing.dterm ~localize:(Some None) env l
 let dfmla env l = Typing.dfmla ~localize:(Some None) env l
@@ -885,7 +885,7 @@ let type_effect_term env t =
       let x = Typing.string_list_of_qualid [] q in
       begin try
         let ls = ns_find_ls (get_namespace (effect_uc env.i_uc)) x in
-        of_option ls.ls_value
+        Opt.get ls.ls_value
       with Not_found ->
         errorm ~loc "unbound symbol %a" print_qualid q
       end
@@ -1332,9 +1332,9 @@ and iexpr_desc env loc ty = function
   | DEloop (la, e1) ->
       let la =
         { loop_invariant =
-            option_map (ifmla env) la.dloop_invariant;
+            Opt.map (ifmla env) la.dloop_invariant;
           loop_variant   =
-            option_map (ivariant env) la.dloop_variant; }
+            Opt.map (ivariant env) la.dloop_variant; }
       in
       IEloop (la, iexpr env e1)
   | DElazy (op, e1, e2) ->
@@ -1355,7 +1355,7 @@ and iexpr_desc env loc ty = function
   | DEabsurd ->
       IEabsurd
   | DEraise (ls, e) ->
-      IEraise (ls, option_map (iexpr env) e)
+      IEraise (ls, Opt.map (iexpr env) e)
   | DEtry (e, hl) ->
       let handler (ls, x, h) =
         let x, env = match x with
@@ -1375,7 +1375,7 @@ and iexpr_desc env loc ty = function
       let e1 = iexpr env e1 in
       let e2 = iexpr env e2 in
       let env, vx = iadd_local env (id_user x.id x.id_loc) e1.iexpr_type in
-      let inv = option_map (ifmla env) inv in
+      let inv = Opt.map (ifmla env) inv in
       let e3 = iexpr env e3 in
       let v1 = create_ivsymbol (id_user "for_start" loc) e1.iexpr_type in
       let v2 = create_ivsymbol (id_user "for_end" loc)   e2.iexpr_type in
@@ -1416,7 +1416,7 @@ and iletrec env dl =
   (* then translate variants and bodies *)
   let step2 (v, bl, var, (_,_,_ as t)) =
     let env, bl = map_fold_left iubinder env bl in
-    let var = option_map (ivariant env) var in
+    let var = Opt.map (ivariant env) var in
     let t = itriple env t in
     let var, t = match var with
       | None ->
@@ -1751,7 +1751,7 @@ and expr_desc gl env loc ty = function
   | IEloop (a, e1) ->
       let e1 = expr gl env e1 in
       let ef = e1.expr_effect in
-      let ef, inv = option_map_fold term_effect ef a.loop_invariant in
+      let ef, inv = Opt.map_fold term_effect ef a.loop_invariant in
       let ef, var = match a.loop_variant with
         | Some (t, ls) ->
             let ef, t = term_effect ef t in ef, Some (t, ls)
@@ -1803,7 +1803,7 @@ and expr_desc gl env loc ty = function
   | IEabsurd ->
       Eabsurd, tpure ty, E.empty
   | IEraise (x, e1) ->
-      let e1 = option_map (expr gl env) e1 in
+      let e1 = Opt.map (expr gl env) e1 in
       let ef = match e1 with Some e1 -> e1.expr_effect | None -> E.empty in
       let ef = E.add_raise x ef in
       Eraise (x, e1), tpure ty, ef
@@ -1834,7 +1834,7 @@ and expr_desc gl env loc ty = function
       let env, x = add_local env x (tpure v1.pv_pure.vs_ty) in
       let e3 = expr gl env e3 in
       let ef = e3.expr_effect in
-      let ef, inv = option_map_fold term_effect ef inv in
+      let ef, inv = Opt.map_fold term_effect ef inv in
       Efor (x, v1, d, v2, inv, e3), type_v_unit gl, ef
   | IEassert (k, f) ->
       let ef, f = term_effect E.empty f in
@@ -1877,7 +1877,7 @@ and letrec gl env dl = (* : env * recfun list *)
          ~effect:i.i_effect ~pure:i.i_pure
          (tpure i.i_impure.vs_ty), t, ls)
     in
-    (i, bl, env, option_map variant var, t)
+    (i, bl, env, Opt.map variant var, t)
   in
   let dl = List.map binders dl in
   (* effects are computed as a least fixpoint
@@ -1903,7 +1903,7 @@ and letrec gl env dl = (* : env * recfun list *)
   in
   let one_step ?(sat_exn=false) m0 =
     let type1 m (i, bl, env, var, t) =
-      let decvar = option_map (fun (v,_,_) -> v.pv_pure) var in
+      let decvar = Opt.map (fun (v,_,_) -> v.pv_pure) var in
       let env = make_env env ?decvar m0 in
       let t, c = triple ~sat_exn gl env t in
       let v = create_pvsymbol (id_clone i.i_impure.vs_name) (tarrow bl c)
@@ -2170,7 +2170,7 @@ let add_types loc uc dl =
   (* 3. build new type declarations with regions for program/effect types *)
   let add_regions ~effect d =
     let x = d.td_ident.id in
-    let n = of_option (Hashtbl.find nregions x) in
+    let n = Opt.get (Hashtbl.find nregions x) in
     let loc = d.td_loc in
     let regions =
       Array.init n
@@ -2200,7 +2200,7 @@ let add_types loc uc dl =
           TDalias (add_regions_to_type ty)
       | TDalgebraic cl ->
           let add (x, ty) =
-            option_iter add_projection x;
+            Opt.iter add_projection x;
             x, add_regions_to_type ty
           in
           let constructor (loc, id, pl) = (loc, id, List.map add pl) in
@@ -2244,7 +2244,7 @@ let add_types loc uc dl =
       Hashtbl.add visited x ();
       if is_debug () then
         eprintf "@[type %s: %d regions@\n" x
-          (of_option (Hashtbl.find nregions x));
+          (Opt.get (Hashtbl.find nregions x));
       let ts = ns_find_ts (get_namespace th) [x] in
       Hashtbl.iter
         (fun (y, i) j -> if y = x then begin
@@ -2320,7 +2320,7 @@ let add_logics loc uc d =
   let add_regions d =
     { d with
         ld_params = List.map add_param d.ld_params;
-        ld_type   = option_map add_regions_to_type d.ld_type;
+        ld_type   = Opt.map add_regions_to_type d.ld_type;
         ld_def    = None; }
   in
   let add uc d0 =

@@ -180,9 +180,9 @@ let option_list = Arg.align [
       " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " List known metas";
-    Debug.Opt.desc_debug_list;
-    Debug.Opt.desc_debug_all;
-    Debug.Opt.desc_debug;
+    Debug.Args.desc_debug_list;
+    Debug.Args.desc_debug_all;
+    Debug.Args.desc_debug;
   "--quiet", Arg.Set opt_quiet,
       " Print only what asked";
   "--version", Arg.Set opt_version,
@@ -199,7 +199,7 @@ let () =
 
   (** Configuration *)
   let config = try read_config !opt_config with Not_found ->
-    option_iter (eprintf "Config file '%s' not found.@.") !opt_config;
+    Opt.iter (eprintf "Config file '%s' not found.@.") !opt_config;
     exit 1;
   in
 
@@ -207,7 +207,7 @@ let () =
   Whyconf.load_plugins main;
   Bench.BenchUtil.maximum_running_proofs := Whyconf.running_provers_max main;
 
-  Debug.Opt.set_flags_selected ();
+  Debug.Args.set_flags_selected ();
 
   (** listings*)
 
@@ -261,7 +261,7 @@ let () =
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline print) (List.sort cmp (Theory.list_metas ()))
   end;
-  opt_list := Debug.Opt.option_list () || !opt_list;
+  opt_list := Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   (* Someting else using rc file intead of driver will be added later *)
@@ -341,8 +341,8 @@ let () =
       tcommand = prover.command;
       tenv     = env;
       tuse     = [opt_theo,None];
-      ttime    = of_option !opt_timelimit;
-      tmem     = of_option !opt_memlimit;
+      ttime    = Opt.get !opt_timelimit;
+      tmem     = Opt.get !opt_memlimit;
     } in
   Debug.dprintf debug "Load provers@.";
   tools := List.map map_prover !opt_prover;

@@ -273,7 +273,7 @@ let update_var env mreg vs =
   let rec update vs { vtv_ity = ity; vtv_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
-    let vs = Util.option_apply vs get_vs mut in
+    let vs = Opt.fold (fun _ -> get_vs) vs mut in
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
@@ -471,9 +471,9 @@ let rec point_of_term state names t = match t.t_node with
       (* we treat here the case of a value update: the value
          of each branch must be a distinct constructor *)
       let p = next_point state in
-      let ty = of_option t.t_ty in
+      let ty = Opt.get t.t_ty in
       let p1 = point_of_term state names t1 in
-      let value = match_point state (of_option t1.t_ty) p1 in
+      let value = match_point state (Opt.get t1.t_ty) p1 in
       let branch acc br =
         let pat, t2 = t_open_branch br in
         let ls = match t2.t_node with
@@ -495,13 +495,13 @@ let rec point_of_term state names t = match t.t_node with
 and point_of_constructor state names ls tl =
   let p = next_point state in
   let pl = List.map (point_of_term state names) tl in
-  let value = make_value state (of_option ls.ls_value) in
+  let value = make_value state (Opt.get ls.ls_value) in
   let value = Mls.add ls pl value in
   Hashtbl.replace state.st_mem p value;
   p
 
 and point_of_projection state names ls t1 =
-  let ty = of_option t1.t_ty in
+  let ty = Opt.get t1.t_ty in
   let csl = match ty.ty_node with
     | Tyapp (ts,_) -> Decl.find_constructors state.st_lkm ts
     | _ -> assert false in
@@ -542,7 +542,7 @@ let rec track_values state names lesson cond f = match f.t_node with
       lesson, t_label_copy f (t_if_simp fc f1 f2)
   | Tcase (t1, bl) ->
       let p1 = point_of_term state names t1 in
-      let value = match_point state (of_option t1.t_ty) p1 in
+      let value = match_point state (Opt.get t1.t_ty) p1 in
       let is_pat_var = function
         | { pat_node = Pvar _ } -> true | _ -> false in
       let branch l br =
@@ -609,7 +609,7 @@ and wp_desc env e q xq = match e.e_node with
       let q = open_unit_post q in
       (* wp_label e *) q (* FIXME? *)
   | Elet ({ let_sym = LetV v; let_expr = e1 }, e2)
-    when Util.option_eq Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc ->
+    when Opt.equal Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc ->
     (* we push the label down, past the implicitly inserted "let" *)
       let w = wp_expr env (e_label_copy e e2) q xq in
       let q = create_post v.pv_vs w in

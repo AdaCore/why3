@@ -130,8 +130,8 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
   let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
   let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let ty_arg = List.map neg ls.ls_args in
-  let ty_res = Util.option_map pos ls.ls_value in
-  if Util.option_eq ty_equal ty_res ls.ls_value &&
+  let ty_res = Opt.map pos ls.ls_value in
+  if Opt.equal ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
 

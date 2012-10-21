@@ -225,7 +225,7 @@ let print_data_decl info fmt = function
       let pjl = Mls.find cs info.info_csm in
       let print_field fmt ls =
         fprintf fmt "%a@ :@ %a" print_ident ls.ls_name
-          (print_type info) (Util.of_option ls.ls_value) in
+          (print_type info) (Opt.get ls.ls_value) in
       fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" print_type_decl ts
         (print_list semi print_field) pjl
   | _, _ -> unsupported
@@ -255,7 +255,7 @@ let print_logic_decl info fmt ls ld =
         fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n@\n"
           print_ident ls.ls_name
           (print_list comma (print_logic_binder info)) vl
-          (print_type info) (Util.of_option ls.ls_value)
+          (print_type info) (Opt.get ls.ls_value)
           (print_term info) e
     | None ->
         fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]@\n@\n"

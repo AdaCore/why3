@@ -190,14 +190,14 @@ let option_list = Arg.align [
       " List known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " List known metas";
-  Debug.Opt.desc_debug_list;
+  Debug.Args.desc_debug_list;
   "--token-count", Arg.Set opt_token_count,
       " Only lexing, and give numbers of tokens in spec vs in program";
-  Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
-  Debug.Opt.desc_shortcut
+  Debug.Args.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+  Debug.Args.desc_shortcut
     "type_only" "--type-only" " Stop after type checking";
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
   "--print-libdir", Arg.Set opt_print_libdir,
       " Print location of binary components (plugins, etc)";
   "--print-datadir", Arg.Set opt_print_datadir,
@@ -227,7 +227,7 @@ let () = try
   let main = get_main config in
   Whyconf.load_plugins main;
 
-  Debug.Opt.set_flags_selected ();
+  Debug.Args.set_flags_selected ();
 
   (** listings*)
 
@@ -280,7 +280,7 @@ let () = try
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
   end;
-  opt_list :=  Debug.Opt.option_list () || !opt_list;
+  opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   if Queue.is_empty opt_queue then begin
@@ -480,7 +480,7 @@ let do_theory env drv fname tname th glist =
       eprintf "Cannot realize individual goals.@.";
       exit 1
     end else begin
-      let drv = Util.of_option drv in
+      let drv = Opt.get drv in
       let task = Task.use_export None th in
       do_tasks env drv fname tname th task
     end
@@ -492,7 +492,7 @@ let do_theory env drv fname tname th glist =
       in
       Decl.Spr.add pr acc
     in
-    let drv = Util.of_option drv in
+    let drv = Opt.get drv in
     let prs = Queue.fold add Decl.Spr.empty glist in
     let sel = if Decl.Spr.is_empty prs then None else Some prs in
     let tasks = List.rev (split_theory th sel !opt_task) in
@@ -500,7 +500,7 @@ let do_theory env drv fname tname th glist =
   end
 
 let do_global_theory env drv (tname,p,t,glist) =
-  let format = Util.def_option "why" !opt_parser in
+  let format = Opt.get_def "why" !opt_parser in
   let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
     eprintf "Theory '%s' not found.@." tname;
     exit 1
@@ -517,7 +517,7 @@ let do_local_theory env drv fname m (tname,_,t,glist) =
 (* program extraction *)
 
 let extract_to ?fname th extract =
-  let dir = Util.of_option !opt_output in
+  let dir = Opt.get !opt_output in
   let file = Filename.concat dir (Mlw_ocaml.extract_filename ?fname th) in
   let old =
     if Sys.file_exists file then begin
@@ -554,7 +554,7 @@ let do_global_extract edrv (tname,p,t,_) =
       let th = Mstr.find t thm in
       do_extract_theory edrv tname th
   with Env.LibFileNotFound _ | Not_found -> try
-    let format = Util.def_option "why" !opt_parser in
+    let format = Opt.get_def "why" !opt_parser in
     let env = Env.env_of_library lib in
     let th = Env.read_theory ~format env p t in
     do_extract_theory edrv tname th
@@ -607,7 +607,7 @@ let do_input env drv edrv = function
   | None, _ when !opt_parse_only || !opt_type_only ->
       ()
   | None, tlist when edrv <> None ->
-      Queue.iter (do_global_extract (Util.of_option edrv)) tlist
+      Queue.iter (do_global_extract (Opt.get edrv)) tlist
   | None, tlist ->
       Queue.iter (do_global_theory env drv) tlist
   | Some f, tlist ->
@@ -630,7 +630,7 @@ let do_input env drv edrv = function
           Format.printf "File %s: %d tokens in programs@." f p
         end
       end else if edrv <> None then begin
-        do_local_extract (Util.of_option edrv) fname cin tlist;
+        do_local_extract (Opt.get edrv) fname cin tlist;
         close_in cin
       end else begin
         let m = Env.read_channel ?format:!opt_parser env fname cin in
@@ -665,8 +665,8 @@ let load_driver_extract env s =
 let () =
   try
     let env = Env.create_env !opt_loadpath in
-    let drv = Util.option_map (load_driver env) !opt_driver in
-    let edrv = Util.option_map (load_driver_extract env) !opt_extract in
+    let drv = Opt.map (load_driver env) !opt_driver in
+    let edrv = Opt.map (load_driver_extract env) !opt_extract in
     Queue.iter (do_input env drv edrv) opt_queue;
     if !opt_token_count then
       Format.printf "Total: %d annot/%d programs, ratio = %.3f@."

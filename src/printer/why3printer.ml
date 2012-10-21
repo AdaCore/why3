@@ -109,7 +109,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  option_apply true inspect fs.ls_value
+  Opt.fold (fun _ -> inspect) true fs.ls_value
 
 (** Patterns, terms, and formulas *)
 

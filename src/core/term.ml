@@ -392,7 +392,7 @@ module Hsterm = Hashcons.Make (struct
     oty_equal t1.t_ty t2.t_ty &&
     t_equal_node t1.t_node t2.t_node &&
     Slab.equal t1.t_label t2.t_label &&
-    option_eq Loc.equal t1.t_loc t2.t_loc
+    Opt.equal Loc.equal t1.t_loc t2.t_loc
 
   let t_hash_bound (v,b,t) =
     Hashcons.combine (vs_hash v) (bnd_hash b (t_hash t))
@@ -881,7 +881,7 @@ let rec t_gen_map fnT fnL m t =
     | Tconst _ ->
         t
     | Tapp (fs, tl) ->
-        t_app (fnL fs) (List.map fn tl) (option_map fnT t.t_ty)
+        t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
         t_if (fn f) (fn t1) (fn t2)
     | Tlet (t1, (u,b,t2)) ->
@@ -933,7 +933,7 @@ let t_ty_subst mapT mapV t =
 
 let rec t_gen_fold fnT fnL acc t =
   let fn = t_gen_fold fnT fnL in
-  let acc = option_fold fnT acc t.t_ty in
+  let acc = Opt.fold fnT acc t.t_ty in
   match t.t_node with
   | Tconst _ | Tvar _ -> acc
   | Tapp (f, tl) -> List.fold_left fn (fnL acc f) tl

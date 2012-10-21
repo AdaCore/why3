@@ -104,7 +104,7 @@ module Compile (X : Action) = struct
           with NonExhaustive pl ->
             let find_cs cs =
               if Mls.mem cs types then () else
-              let tm = ty_match Mtv.empty (of_option cs.ls_value) ty in
+              let tm = ty_match Mtv.empty (Opt.get cs.ls_value) ty in
               let wild ty = pat_wild (ty_inst tm ty) in
               let pw = pat_app cs (List.map wild cs.ls_args) ty in
               raise (NonExhaustive (pw :: pl))

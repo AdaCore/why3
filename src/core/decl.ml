@@ -316,7 +316,7 @@ module Hsdecl = Hashcons.Make (struct
   type t = decl
 
   let cs_equal (cs1,pl1) (cs2,pl2) =
-    ls_equal cs1 cs2 && list_all2 (option_eq ls_equal) pl1 pl2
+    ls_equal cs1 cs2 && list_all2 (Opt.equal ls_equal) pl1 pl2
 
   let eq_td (ts1,td1) (ts2,td2) =
     ts_equal ts1 ts2 && list_all2 cs_equal td1 td2
@@ -413,7 +413,7 @@ let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ty syms_ls s t
 
 let create_ty_decl ts =
-  let syms = Util.option_fold syms_ty Sid.empty ts.ts_def in
+  let syms = Opt.fold syms_ty Sid.empty ts.ts_def in
   let news = Sid.singleton ts.ts_name in
   mk_decl (Dtype ts) syms news
 
@@ -430,7 +430,7 @@ let create_data_decl tdl =
     | Some ls -> raise (BadRecordField ls)
   in
   let check_constr tys ty pjs (syms,news) (fs,pl) =
-    ty_equal_check ty (exn_option (BadConstructor fs) fs.ls_value);
+    ty_equal_check ty (Opt.get_exn (BadConstructor fs) fs.ls_value);
     let fs_pjs =
       try List.fold_left2 (check_proj fs ty) Sls.empty fs.ls_args pl
       with Invalid_argument _ -> raise (BadConstructor fs) in
@@ -455,7 +455,7 @@ let create_data_decl tdl =
     if ts.ts_def <> None then raise (IllegalTypeAlias ts);
     let news = news_id news ts.ts_name in
     let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
-      (option_fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
+      (Opt.fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
     let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
     List.fold_left (check_constr ts ty pjs) (syms,news) cl
@@ -464,7 +464,7 @@ let create_data_decl tdl =
   mk_decl (Ddata tdl) syms news
 
 let create_param_decl ls =
-  let syms = Util.option_fold syms_ty Sid.empty ls.ls_value in
+  let syms = Opt.fold syms_ty Sid.empty ls.ls_value in
   let syms = List.fold_left syms_ty syms ls.ls_args in
   let news = Sid.singleton ls.ls_name in
   mk_decl (Dparam ls) syms news
@@ -494,9 +494,9 @@ let rec f_pos_ps sps pol f = match f.t_node, pol with
   | Tbinop (Tiff, f, g), _ ->
       f_pos_ps sps None f && f_pos_ps sps None g
   | Tbinop (Timplies, f, g), _ ->
-      f_pos_ps sps (option_map not pol) f && f_pos_ps sps pol g
+      f_pos_ps sps (Opt.map not pol) f && f_pos_ps sps pol g
   | Tnot f, _ ->
-      f_pos_ps sps (option_map not pol) f
+      f_pos_ps sps (Opt.map not pol) f
   | Tif (f,g,h), _ ->
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
   | _ -> TermTF.t_all (t_pos_ps sps) (f_pos_ps sps pol) f
@@ -775,7 +775,7 @@ let parse_record kn fll =
     | [{ ty_node = Tyapp (ts,_) }] -> ts
     | _ -> raise (BadRecordField fs) in
   let cs, pjl = match find_constructors kn ts with
-    | [cs,pjl] -> cs, List.map (exn_option (BadRecordField fs)) pjl
+    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField fs)) pjl
     | _ -> raise (BadRecordField fs) in
   let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
   let flm = List.fold_left (fun m (pj,v) ->
@@ -797,10 +797,10 @@ let make_record_update kn t fll ty =
 
 let make_record_pattern kn fll ty =
   let cs,pjl,flm = parse_record kn fll in
-  let s = ty_match Mtv.empty (of_option cs.ls_value) ty in
+  let s = ty_match Mtv.empty (Opt.get cs.ls_value) ty in
   let get_arg pj = match Mls.find_opt pj flm with
     | Some v -> v
-    | None -> pat_wild (ty_inst s (of_option pj.ls_value))
+    | None -> pat_wild (ty_inst s (Opt.get pj.ls_value))
   in
   pat_app cs (List.map get_arg pjl) ty
 

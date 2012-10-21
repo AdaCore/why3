@@ -152,7 +152,7 @@ let create_tysymbol name args def =
   let add s v = Stv.add_new (DuplicateTypeVar v) v s in
   let s = List.fold_left add Stv.empty args in
   let check v = Stv.mem v s || raise (UnboundTypeVar v) in
-  ignore (option_map (ty_v_all check) def);
+  ignore (Opt.map (ty_v_all check) def);
   mk_ts name args def
 
 let ty_app s tl =
@@ -251,17 +251,17 @@ exception UnexpectedProp
 
 let oty_type = function Some ty -> ty | None -> raise UnexpectedProp
 
-let oty_equal = Util.option_eq ty_equal
-let oty_hash = Util.option_apply 1 ty_hash
+let oty_equal = Opt.equal ty_equal
+let oty_hash = Opt.fold (fun _ -> ty_hash) 1
 
 let oty_match m o1 o2 = match o1,o2 with
   | Some ty1, Some ty2 -> ty_match m ty1 ty2
   | None, None -> m
   | _ -> raise UnexpectedProp
 
-let oty_inst m = Util.option_map (ty_inst m)
-let oty_freevars = Util.option_fold ty_freevars
-let oty_cons = Util.option_fold (fun tl t -> t::tl)
+let oty_inst m = Opt.map (ty_inst m)
+let oty_freevars = Opt.fold ty_freevars
+let oty_cons = Opt.fold (fun tl t -> t::tl)
 
 let ty_equal_check ty1 ty2 =
   if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))

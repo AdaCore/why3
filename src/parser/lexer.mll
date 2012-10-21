@@ -194,7 +194,7 @@ rule token = parse
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-      { FLOAT (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
+      { FLOAT (RConstDecimal (i, f, Opt.map remove_leading_plus e)) }
   | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f)
                   |(hexadigit+ as i) '.' (hexadigit* as f)
                   |(hexadigit+ as i) ("" as f))

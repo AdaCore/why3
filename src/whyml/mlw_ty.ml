@@ -436,7 +436,7 @@ let create_itysymbol_unsafe, restore_its =
 
 let create_itysymbol
       name ?(abst=false) ?(priv=false) ?(inv=false) args regs def =
-  let puredef = option_map ty_of_ity def in
+  let puredef = Opt.map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
   let add s v = Sreg.add_new (DuplicateRegion v) v s in
@@ -450,7 +450,7 @@ let create_itysymbol
   (* all regions in [def] must be in [regs] *)
   let check dregs = if not (Sreg.subset dregs sregs) then
     raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs))) in
-  Util.option_iter (fun d -> check d.ity_vars.vars_reg) def;
+  Opt.iter (fun d -> check d.ity_vars.vars_reg) def;
   (* if a type is an alias then it cannot be abstract or private *)
   if abst && def <> None then Loc.errorm "Type aliases cannot be abstract";
   if priv && def <> None then Loc.errorm "Type aliases cannot be private";
@@ -480,7 +480,7 @@ let its_clone sm =
       let priv = oits.its_priv in
       let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
-      let def = Util.option_map conv_ity oits.its_def in
+      let def = Opt.map conv_ity oits.its_def in
       create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
     in
     Hits.replace itsh oits nits;
@@ -667,7 +667,7 @@ let eff_full_inst s e =
   (* calculate instantiated effect *)
   let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
   let add_mreg r v acc =
-    Mreg.add (Mreg.find r s) (option_map (fun v -> Mreg.find v s) v) acc in
+    Mreg.add (Mreg.find r s) (Opt.map (fun v -> Mreg.find v s) v) acc in
   { e with
     eff_reads  = Sreg.fold add_sreg e.eff_reads  Sreg.empty;
     eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
@@ -791,7 +791,7 @@ type vty_value = {
 }
 
 let vty_value ?(ghost=false) ?mut ity =
-  Util.option_iter (fun r -> ity_equal_check ity r.reg_ity) mut;
+  Opt.iter (fun r -> ity_equal_check ity r.reg_ity) mut;
   { vtv_ity   = ity;
     vtv_ghost = ghost;
     vtv_mut   = mut }

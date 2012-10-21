@@ -300,5 +300,5 @@ let dity_of_ty htv hreg vars ty =
 let specialize_lsymbol ls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv ty = dity_of_ty htv hreg vars_empty ty in
-  let ty = Util.def_option ty_bool ls.ls_value in
+  let ty = Opt.get_def ty_bool ls.ls_value in
   List.map conv ls.ls_args, conv ty

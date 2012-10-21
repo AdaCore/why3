@@ -146,7 +146,7 @@ let is_protected_vs kept vs =
   is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
 
 let is_protected_ls kept ls =
-  is_protected_id ls.ls_name && Sty.mem (of_option ls.ls_value) kept
+  is_protected_id ls.ls_name && Sty.mem (Opt.get ls.ls_value) kept
 
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 

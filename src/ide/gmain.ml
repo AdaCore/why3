@@ -60,9 +60,9 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<f> add file f to the project (ignored if it is already there)") ;
 *)
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
@@ -94,8 +94,8 @@ let () = Gconfig.read_config !opt_config !opt_extra
 let () = C.load_plugins (get_main ())
 
 let () =
-  Debug.Opt.set_flags_selected ();
-  if Debug.Opt.option_list () then exit 0
+  Debug.Args.set_flags_selected ();
+  if Debug.Args.option_list () then exit 0
 
 let () =
   if !opt_list_formats then begin
@@ -1668,7 +1668,7 @@ let color_loc ~color loc =
 
 let rec color_locs ~color f =
   let b = ref false in
-  Util.option_iter (fun loc -> color_loc ~color loc; b := true) f.Term.t_loc;
+  Opt.iter (fun loc -> color_loc ~color loc; b := true) f.Term.t_loc;
   Term.t_fold (fun b loc -> color_locs ~color loc || b) !b f
 
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
@@ -1698,7 +1698,7 @@ let scroll_to_source_goal g =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
         if not (color_t_locs f) then
-          Util.option_iter (color_loc ~color:goal_tag) id.Ident.id_loc
+          Opt.iter (color_loc ~color:goal_tag) id.Ident.id_loc
     | _ ->
         assert false
 

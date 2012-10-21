@@ -53,7 +53,7 @@ val stack_trace : flag
 (** stack_trace flag *)
 
 (** Command line arguments *)
-module Opt : sig
+module Args : sig
   type spec = (Arg.key * Arg.spec * Arg.doc)
 
   val desc_debug_list : spec

@@ -85,12 +85,12 @@ let spec = Arg.align [
   "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
   " try to find compatible provers for all unknown provers";
 *)
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
-  Debug.Opt.desc_shortcut
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+  Debug.Args.desc_shortcut
     "type_only" "--type-only" " Stop after type checking";
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
 
 ]
 
@@ -140,8 +140,8 @@ let env = Env.create_env loadpath
 let () = Whyconf.load_plugins (Whyconf.get_main config)
 
 let () =
-  Debug.Opt.set_flags_selected ();
-  if Debug.Opt.option_list () then exit 0
+  Debug.Args.set_flags_selected ();
+  if Debug.Args.option_list () then exit 0
 
 module O =
   struct

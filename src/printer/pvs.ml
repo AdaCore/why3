@@ -218,7 +218,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (of_option fs.ls_value)
+  inspect (Opt.get fs.ls_value)
 
 (** Patterns, terms, and formulas *)
 
@@ -486,7 +486,7 @@ let print_constr info _ts fmt (cs,_) =
 
 let ls_ty_vars ls =
   let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
-  let ty_vars_value = option_fold Ty.ty_freevars Stv.empty ls.ls_value in
+  let ty_vars_value = Opt.fold Ty.ty_freevars Stv.empty ls.ls_value in
   (ty_vars_args, ty_vars_value, Stv.union ty_vars_args ty_vars_value)
 
 (*
