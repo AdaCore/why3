@@ -134,7 +134,11 @@ let load_prover_shortcut acc (_, section) =
     (fp,shortcut)::acc
   ) acc shortcuts
 
-module Hstr2 = Hashtbl.Make_Poly(struct type t = string * string end)
+module Hstr2 = Hashtbl.Make(struct
+  type t = string * string
+  let hash = Hashtbl.hash
+  let equal = (=)
+end)
 
 type env =
   {
@@ -296,7 +300,7 @@ let add_prover_shortcuts env prover =
   env.possible_prover_shortcuts <- aux env.possible_prover_shortcuts
 
 let add_id_prover_shortcut env id prover priority =
-  match Hstr.find_option env.prover_shortcuts id with
+  match Hstr.find_opt env.prover_shortcuts id with
   | Some (p,_) when p >= priority -> ()
   | _ -> Hstr.replace env.prover_shortcuts id (priority,prover)
 

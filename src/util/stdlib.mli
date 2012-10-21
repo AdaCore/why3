@@ -468,35 +468,4 @@ module Make (Ord : OrderedType) : S with type key = Ord.t
 
 end
 
-module Hashtbl : sig
-
-  val hash : 'a -> int
-
-  module type S = sig
-    include Hashtbl.S
-    val is_empty : 'a t -> bool
-    (** test if the hashtbl is empty *)
-
-    val memo : int -> (key -> 'a) -> key -> 'a
-    (** convenience function, memoize a function *)
-
-    exception Key_not_found of key
-    val find' : 'a t -> key -> 'a
-    (** return the first binding or raise Key_not_found with the given
-      key as argument *)
-
-  (** hashtbl used as hashset *)
-    val set : unit t -> key -> unit
-    (** Add a binding that can be tested by mem *)
-
-    val map : ('a -> 'b) -> 'a t -> 'b t
-  (** just a shortcut not as efficient as doable *)
-
-    val find_option : 'a t -> key -> 'a option
-      (** version of find without exception *)
-
-  end
-  module Make (X:Hashtbl.HashedType) : S with type key = X.t
-
-  module Make_Poly (X:sig type t end) : S with type key = X.t
-end
+module Hashtbl : Exthtbl.Hashtbl

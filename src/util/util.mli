@@ -91,33 +91,3 @@ sig
   module H : Hashtbl.S with type key = X.t
   module W : Weakhtbl.S with type key = X.t
 end
-
-module type PrivateHashtbl = sig
-  (** Private Hashtbl *)
-  type 'a t
-  type key
-
-  val find : 'a t -> key -> 'a
-    (** Same as {!Hashtbl.find} *)
-  val iter : (key -> 'a -> unit) -> 'a t -> unit
-    (** Same as {!Hashtbl.iter} *)
-  val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
-    (** Same as {!Hashtbl.fold} *)
-  val mem : 'a t -> key -> bool
-    (** Same as {!Hashtbl.mem} *)
-  val length : 'a t -> int
-    (** Same as {!Hashtbl.length} *)
-
-end
-
-module type PrivateArray = sig
-  (** Private Array *)
-  type 'a t
-
-  val get : 'a t -> int -> 'a
-  val iter : ('a -> unit) -> 'a t -> unit
-    (** Same as {!Array.iter} *)
-  val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
-    (** Same as {!Array.fold} *)
-
-end

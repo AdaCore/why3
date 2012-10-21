@@ -69,7 +69,7 @@ let compute_diff t1 t2 =
   Mid.fold_left (fun acc _ decl ->
     if Hdecl.mem hdone decl then acc
     else begin
-      Hdecl.set hdone decl;
+      Hdecl.replace hdone decl ();
       match decl.d_node with
       | Dtype ts -> remove_ts acc ts
       | Ddata l -> List.fold_left (fun acc (ts,_) -> remove_ts acc ts) acc l

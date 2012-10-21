@@ -1871,6 +1871,10 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
 exception MalformedMetas of ident_path
 *)
 
+exception Ts_not_found of tysymbol
+exception Ls_not_found of lsymbol
+exception Pr_not_found of prsymbol
+
 (** ~theories is the current theory library path empty : [] *)
 let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =
   set_goal_expanded to_goal from_goal.goal_expanded;
@@ -1993,11 +1997,14 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
 
   (** Now convert the metas to the new symbol *)
   let add_meta ((metas,task) as acc) meta_name meta_args =
+    let conv_ts ts = Hts.find_exn hts (Ts_not_found ts) ts in
+    let conv_ls ls = Hls.find_exn hls (Ls_not_found ls) ls in
+    let conv_pr pr = Hpr.find_exn hpr (Pr_not_found pr) pr in
     let map = function
-      | MAty ty -> MAty (Ty.ty_s_map (Hts.find' hts) ty)
-      | MAts ts -> MAts (Hts.find' hts ts)
-      | MAls ls -> MAls (Hls.find' hls ls)
-      | MApr pr -> MApr (Hpr.find' hpr pr)
+      | MAty ty -> MAty (Ty.ty_s_map conv_ts ty)
+      | MAts ts -> MAts (conv_ts ts)
+      | MAls ls -> MAls (conv_ls ls)
+      | MApr pr -> MApr (conv_pr pr)
       | (MAstr _ | MAint _) as m -> m
     in
     try
@@ -2009,7 +2016,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
             Smeta_args.add meta_args smeta_args,
             Task.add_meta task meta meta_args
           with
-          | Hts.Key_not_found ts ->
+          | Ts_not_found ts ->
             obsolete := true;
             let pos = Mts.find ts from_metas.metas_idpos.idpos_ts in
             dprintf debug
@@ -2018,7 +2025,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
               print_meta (meta_name,meta_args)
               print_ident_path pos;
             acc
-          | Hls.Key_not_found ls ->
+          | Ls_not_found ls ->
             obsolete := true;
             let pos = Mls.find ls from_metas.metas_idpos.idpos_ls in
             dprintf debug
@@ -2027,7 +2034,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
               print_meta (meta_name,meta_args)
               print_ident_path pos;
             acc
-          | Hpr.Key_not_found pr ->
+          | Pr_not_found pr ->
             obsolete := true;
             let pos = Mpr.find pr from_metas.metas_idpos.idpos_pr in
             dprintf debug
