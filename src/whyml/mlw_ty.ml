@@ -91,7 +91,7 @@ end
 and Reg : sig
   module M : Map.S with type key = T.region
   module S : M.Set
-  module H : Hashtbl.S with type key = T.region
+  module H : XHashtbl.S with type key = T.region
   module W : Weakhtbl.S with type key = T.region
 end = MakeMSHW (struct
   type t = T.region

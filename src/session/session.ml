@@ -72,7 +72,7 @@ end
 
 module Mpos = Map.Make(Pos)
 module Spos = Mpos.Set
-module Hpos = Hashtbl.Make(Pos)
+module Hpos = XHashtbl.Make(Pos)
 
 type meta_args = meta_arg list
 
@@ -102,7 +102,8 @@ module Mmeta_args = Map.Make(struct
 end)
 module Smeta_args = Mmeta_args.Set
 
-type metas_args =  Smeta_args.t Mstr.t
+type metas_args = Smeta_args.t Mstr.t
+
 module Mmetas_args = Map.Make(struct
   type t = metas_args
   let compare = Mstr.compare Smeta_args.compare

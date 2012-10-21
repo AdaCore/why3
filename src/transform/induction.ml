@@ -71,25 +71,10 @@ type vlex =
 
   This definitions and methods using them are without use if some induction tags
   are provided in the goal by user.*)
-module VsList =
-struct
-  type t = vsymbol list
-  let hash = Hashcons.combine_list vs_hash 3
-  let equal = Lists.equal vs_equal
-  let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs2) (vs_hash vs1)
-  let compare t1 t2 =
-    let rec aux t1 t2 = match t1,t2 with
-      | [],[] -> 0
-      | v1 :: q1, v2 :: q2 ->
-	if vs_equal v1 v2
-	then aux q1 q2
-	else cmp_vs v1 v2
-      | _ -> assert false;
-    in
-    if List.length t1 < List.length t2 then -1
-    else if List.length t1 > List.length t2 then 1
-    else aux t1 t2
-end
+module VsList = Stdlib.OrderedHashedList(struct
+  type t = vsymbol
+  let tag = vs_hash
+end)
 module Mvsl = Stdlib.Map.Make(VsList)
 module Svsl = Mvsl.Set
 

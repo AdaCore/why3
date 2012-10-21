@@ -60,7 +60,7 @@ val print_meta_desc : Pp.formatter -> meta -> unit
 
 module Mmeta : Map.S with type key = meta
 module Smeta : Mmeta.Set
-module Hmeta : Hashtbl.S with type key = meta
+module Hmeta : XHashtbl.S with type key = meta
 
 val meta_equal : meta -> meta -> bool
 val meta_hash : meta -> int
@@ -107,7 +107,7 @@ and symbol_map = private {
 
 module Mtdecl : Map.S with type key = tdecl
 module Stdecl : Mtdecl.Set
-module Htdecl : Hashtbl.S with type key = tdecl
+module Htdecl : XHashtbl.S with type key = tdecl
 
 val td_equal : tdecl -> tdecl -> bool
 val td_hash : tdecl -> int

@@ -24,7 +24,7 @@ type vsymbol = private {
 
 module Mvs : Map.S with type key = vsymbol
 module Svs : Mvs.Set
-module Hvs : Hashtbl.S with type key = vsymbol
+module Hvs : XHashtbl.S with type key = vsymbol
 module Wvs : Weakhtbl.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
@@ -42,7 +42,7 @@ type lsymbol = private {
 
 module Mls : Map.S with type key = lsymbol
 module Sls : Mls.Set
-module Hls : Hashtbl.S with type key = lsymbol
+module Hls : XHashtbl.S with type key = lsymbol
 module Wls : Weakhtbl.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
@@ -154,7 +154,7 @@ and trigger = term list list
 
 module Mterm : Map.S with type key = term
 module Sterm : Mterm.Set
-module Hterm : Hashtbl.S with type key = term
+module Hterm : XHashtbl.S with type key = term
 
 val t_equal : term -> term -> bool
 val t_hash : term -> int
@@ -421,7 +421,7 @@ val t_app_fold :
 
 val t_equal_alpha : term -> term -> bool
 
-module Hterm_alpha : Hashtbl.S with type key = term
+module Hterm_alpha : XHashtbl.S with type key = term
 
 (** Subterm occurrence check and replacement *)
 

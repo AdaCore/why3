@@ -101,7 +101,7 @@ val print_prover_parsable_format : Format.formatter -> prover -> unit
 module Prover   : OrderedHashedType with type t = prover
 module Mprover  : Map.S with type key = prover
 module Sprover  : Mprover.Set
-module Hprover  : Hashtbl.S with type key = prover
+module Hprover  : XHashtbl.S with type key = prover
 
 (** {3 Prover configuration} *)
 

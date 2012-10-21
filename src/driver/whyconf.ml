@@ -91,7 +91,7 @@ end
 
 module Mprover = Map.Make(Prover)
 module Sprover = Mprover.Set
-module Hprover = Hashtbl.Make(Prover)
+module Hprover = XHashtbl.Make(Prover)
 
 module Editor = struct
   type t = string

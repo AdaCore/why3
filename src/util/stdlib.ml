@@ -10,7 +10,7 @@
 (********************************************************************)
 
 module Map = Extmap.Map
-module Hashtbl = Exthtbl.Hashtbl
+module XHashtbl = Exthtbl.Hashtbl
 
 (* Set, Map, Hashtbl on ints and strings *)
 
@@ -23,11 +23,11 @@ module Int = struct
 
 module Mint = Map.Make(Int)
 module Sint = Mint.Set
-module Hint = Hashtbl.Make(Int)
+module Hint = XHashtbl.Make(Int)
 
 module Mstr = Map.Make(String)
 module Sstr = Mstr.Set
-module Hstr = Hashtbl.Make
+module Hstr = XHashtbl.Make
   (struct
     type t = String.t
     let hash    = (Hashtbl.hash : string -> int)
@@ -73,7 +73,7 @@ struct
   module T = OrderedHashed(X)
   module M = Map.Make(T)
   module S = M.Set
-  module H = Hashtbl.Make(T)
+  module H = XHashtbl.Make(T)
 end
 
 module MakeTagged (X : Weakhtbl.Weakey) =
@@ -87,6 +87,6 @@ struct
   module T = OrderedHashed(MakeTagged(X))
   module M = Map.Make(T)
   module S = M.Set
-  module H = Hashtbl.Make(T)
+  module H = XHashtbl.Make(T)
   module W = Weakhtbl.Make(X)
 end

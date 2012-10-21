@@ -58,16 +58,16 @@ open T
 
 module Mits : Map.S with type key = itysymbol
 module Sits : Mits.Set
-module Hits : Hashtbl.S with type key = itysymbol
+module Hits : XHashtbl.S with type key = itysymbol
 module Wits : Weakhtbl.S with type key = itysymbol
 
 module Mity : Map.S with type key = ity
 module Sity : Mity.Set
-module Hity : Hashtbl.S with type key = ity
+module Hity : XHashtbl.S with type key = ity
 module Wity : Weakhtbl.S with type key = ity
 
 module Sreg : Mreg.Set
-module Hreg : Hashtbl.S with type key = region
+module Hreg : XHashtbl.S with type key = region
 module Wreg : Weakhtbl.S with type key = region
 
 val its_equal : itysymbol -> itysymbol -> bool
@@ -269,7 +269,7 @@ type pvsymbol = private {
 
 module Mpv : Map.S with type key = pvsymbol
 module Spv : Mpv.Set
-module Hpv : Hashtbl.S with type key = pvsymbol
+module Hpv : XHashtbl.S with type key = pvsymbol
 module Wpv : Weakhtbl.S with type key = pvsymbol
 
 val pv_equal : pvsymbol -> pvsymbol -> bool

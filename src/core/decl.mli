@@ -61,7 +61,7 @@ type prsymbol = private {
 
 module Mpr : Map.S with type key = prsymbol
 module Spr : Mpr.Set
-module Hpr : Hashtbl.S with type key = prsymbol
+module Hpr : XHashtbl.S with type key = prsymbol
 module Wpr : Weakhtbl.S with type key = prsymbol
 
 val create_prsymbol : preid -> prsymbol
@@ -106,7 +106,7 @@ and decl_node =
 module Mdecl : Map.S with type key = decl
 module Sdecl : Mdecl.Set
 module Wdecl : Weakhtbl.S with type key = decl
-module Hdecl : Hashtbl.S  with type key = decl
+module Hdecl : XHashtbl.S with type key = decl
 
 val d_equal : decl -> decl -> bool
 val d_hash : decl -> int

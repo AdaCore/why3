@@ -21,8 +21,8 @@ open Stdlib
 val debug : Debug.flag
 (** The debug flag "session" *)
 
-module PHstr : Hashtbl.Private with type key = string
-module PHprover : Hashtbl.Private with type key = Whyconf.prover
+module PHstr : XHashtbl.Private with type key = string
+module PHprover : XHashtbl.Private with type key = Whyconf.prover
 
 (** {2 Proof attempts} *)
 

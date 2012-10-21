@@ -20,7 +20,7 @@ type tvsymbol = private {
 
 module Mtv : Map.S with type key = tvsymbol
 module Stv : Mtv.Set
-module Htv : Hashtbl.S with type key = tvsymbol
+module Htv : XHashtbl.S with type key = tvsymbol
 
 val tv_equal : tvsymbol -> tvsymbol -> bool
 
@@ -47,12 +47,12 @@ and ty_node = private
 
 module Mts : Map.S with type key = tysymbol
 module Sts : Mts.Set
-module Hts : Hashtbl.S with type key = tysymbol
+module Hts : XHashtbl.S with type key = tysymbol
 module Wts : Weakhtbl.S with type key = tysymbol
 
 module Mty : Map.S with type key = ty
 module Sty : Mty.Set
-module Hty : Hashtbl.S with type key = ty
+module Hty : XHashtbl.S with type key = ty
 module Wty : Weakhtbl.S with type key = ty
 
 val ts_equal : tysymbol -> tysymbol -> bool
