@@ -15,7 +15,7 @@ open Format
 open Why3
 open Whyconf
 open Gconfig
-open Util
+open Stdlib
 open Debug
 module C = Whyconf
 
@@ -490,12 +490,12 @@ let set_proof_state a =
   let t = if a.S.proof_archived then t ^ " (archived)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
 
-let model_index = Hashtbl.create 17
+let model_index = Hint.create 17
 
 let get_any_from_iter row =
   try
     let idx = goals_model#get ~row ~column:index_column in
-    Hashtbl.find model_index idx
+    Hint.find model_index idx
   with Not_found -> invalid_arg "Gmain.get_any_from_iter"
 
 (*
@@ -699,12 +699,12 @@ let init =
     if ind < 0 then
       begin
         incr cpt;
-        Hashtbl.add model_index !cpt any;
+        Hint.add model_index !cpt any;
         goals_model#set ~row:row#iter ~column:index_column !cpt
       end
     else
       begin
-        Hashtbl.replace model_index ind any;
+        Hint.replace model_index ind any;
       end;
     (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
@@ -1312,7 +1312,7 @@ let rec hide_proved_in_goal g =
 *)
     end
   else
-    Hashtbl.iter
+    Hstr.iter
       (fun _ t -> List.iter hide_proved_in_goal t.M.subgoals)
       g.M.transformations
 
@@ -1346,7 +1346,7 @@ let rec show_all_in_goal g =
     goals_view#collapse_row (goals_model#get_path row)
   else
     goals_view#expand_row (goals_model#get_path row);
-  Hashtbl.iter
+  Hstr.iter
     (fun _ t -> List.iter show_all_in_goal t.M.subgoals)
     g.M.transformations
 

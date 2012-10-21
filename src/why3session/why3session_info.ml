@@ -19,7 +19,7 @@ open Why3session_lib
 open Whyconf
 open Format
 open Session
-open Util
+open Stdlib
 
 let opt_print_provers = ref false
 let opt_print_edited = ref false

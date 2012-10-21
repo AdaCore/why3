@@ -12,7 +12,7 @@
 open Format
 open Bench
 open Why3
-open Util
+open Stdlib
 open Theory
 
 

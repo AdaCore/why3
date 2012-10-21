@@ -10,9 +10,8 @@
 (********************************************************************)
 
 open Format
-open Util
-open Rc
 open Stdlib
+open Rc
 
 (* magicnumber for the configuration :
   - 0 before the magic number
@@ -562,9 +561,9 @@ let filter_one_prover whyconf fp =
   if Mprover.is_num_elt 1 provers then
     snd (Mprover.choose provers)
   else if Mprover.is_empty provers then
-    raise $ ProverNotFound (whyconf,fp)
+    raise (ProverNotFound (whyconf,fp))
   else
-    raise $ ProverAmbiguity (whyconf,fp,provers)
+    raise (ProverAmbiguity (whyconf,fp,provers))
 
 (** merge config *)
 

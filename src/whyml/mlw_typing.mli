@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Theory
 open Env
 open Ptree

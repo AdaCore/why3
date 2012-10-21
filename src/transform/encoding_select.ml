@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ty
 open Term
 open Decl
@@ -18,7 +18,7 @@ open Task
 open Encoding
 open Discriminate
 
-let register pr l = List.iter (fun (n,f) -> Hstr.replace pr n (const f)) l
+let register pr l = List.iter (fun (n,f) -> Hstr.replace pr n (Util.const f)) l
 
 let register pr none goal all =
   register pr ["none",none; "goal",goal; "all",all]

@@ -9,12 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
-
 (* useful combinators *)
-
-let ($) f x = f x
-let (|>) x f = f x
 
 let const f _ = f
 
@@ -45,81 +40,3 @@ let any_fn pr _ t = pr t && raise FoldSkip
 let ttrue _ = true
 let ffalse _ = false
 
-(* Set and Map on ints and strings *)
-
-module Int  = struct
-  type t = int
-  let compare = Pervasives.compare
-  let equal x y = x = y
-  let hash x = x
- end
-
-module Mint = Map.Make(Int)
-module Sint = Mint.Set
-module Hint = Hashtbl.Make(Int)
-
-module Mstr = Map.Make(String)
-module Sstr = Mstr.Set
-module Hstr = Hashtbl.Make
-  (struct
-    type t = String.t
-    let hash    = (Hashtbl.hash : string -> int)
-    let equal   = ((=) : string -> string -> bool)
-  end)
-
-(* Set, Map, Hashtbl on structures with a unique tag *)
-
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
-
-module type OrderedHash =
-sig
-  type t
-  val hash : t -> int
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-end
-
-module OrderedHash (X : Tagged) =
-struct
-  type t = X.t
-  let hash = X.tag
-  let equal ts1 ts2 = X.tag ts1 == X.tag ts2
-  let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
-end
-
-module OrderedHashList (X : Tagged) =
-struct
-  type t = X.t list
-  let hash = Hashcons.combine_list X.tag 3
-  let equ_ts ts1 ts2 = X.tag ts1 == X.tag ts2
-  let equal = Lists.equal equ_ts
-  let cmp_ts ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
-  let compare = Lists.compare cmp_ts
-end
-
-module StructMake (X : Tagged) =
-struct
-  module T = OrderedHash(X)
-  module M = Map.Make(T)
-  module S = M.Set
-  module H = Hashtbl.Make(T)
-end
-
-module MakeTagged (X : Weakhtbl.Weakey) =
-struct
-  type t = X.t
-  let tag t = Weakhtbl.tag_hash (X.tag t)
-end
-
-module WeakStructMake (X : Weakhtbl.Weakey) =
-struct
-  module T = OrderedHash(MakeTagged(X))
-  module M = Map.Make(T)
-  module S = M.Set
-  module H = Hashtbl.Make(T)
-  module W = Weakhtbl.Make(X)
-end

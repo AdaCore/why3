@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -43,7 +43,7 @@ let d_ts_type = create_ty_decl ts_type
 
 (* function symbol mapping ty_type^n to ty_type *)
 let ls_of_ts = Wts.memoize 63 (fun ts ->
-  let args = List.map (const ty_type) ts.ts_args in
+  let args = List.map (Util.const ty_type) ts.ts_args in
   create_fsymbol (id_clone ts.ts_name) args ty_type)
 
 (* function symbol selecting ty_type from ty_type^n *)

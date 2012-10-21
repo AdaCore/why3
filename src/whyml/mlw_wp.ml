@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -393,7 +393,7 @@ type value = point list Mls.t (* constructor -> field list *)
 type state = {
   st_km   : Mlw_decl.known_map;
   st_lkm  : Decl.known_map;
-  st_mem  : (point, value) Hashtbl.t;
+  st_mem  : value Hint.t;
   st_next : point ref;
 }
 
@@ -406,7 +406,7 @@ type lesson = condition list Mint.t (* point -> conditions for invariant *)
 let empty_state lkm km = {
   st_km   = km;
   st_lkm  = lkm;
-  st_mem  = Hashtbl.create 5;
+  st_mem  = Hint.create 5;
   st_next = ref 0;
 }
 
@@ -423,10 +423,10 @@ let make_value state ty =
   List.fold_left add_cs Mls.empty csl
 
 let match_point state ty p =
-  try Hashtbl.find state.st_mem p with Not_found ->
+  try Hint.find state.st_mem p with Not_found ->
   let value = make_value state ty in
   if not (Mls.is_empty value) then
-    Hashtbl.replace state.st_mem p value;
+    Hint.replace state.st_mem p value;
   value
 
 let rec open_pattern state names value p pat = match pat.pat_node with
@@ -486,7 +486,7 @@ let rec point_of_term state names t = match t.t_node with
       begin try
         let value = List.fold_left branch Mls.empty bl in
         let value = Mls.set_union value (make_value state ty) in
-        Hashtbl.replace state.st_mem p value
+        Hint.replace state.st_mem p value
       with Exit -> () end;
       p
   | Tconst _ | Tif _ | Teps _ -> next_point state
@@ -497,7 +497,7 @@ and point_of_constructor state names ls tl =
   let pl = List.map (point_of_term state names) tl in
   let value = make_value state (Opt.get ls.ls_value) in
   let value = Mls.add ls pl value in
-  Hashtbl.replace state.st_mem p value;
+  Hint.replace state.st_mem p value;
   p
 
 and point_of_projection state names ls t1 =

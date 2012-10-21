@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Stdlib
-open Util
 
 (** Labels *)
 
@@ -19,7 +18,7 @@ type label = {
   lab_tag    : int;
 }
 
-module Lab = StructMake (struct
+module Lab = MakeMSH (struct
   type t = label
   let tag lab = lab.lab_tag
 end)
@@ -52,7 +51,7 @@ type ident = {
   id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
 
-module Id = WeakStructMake (struct
+module Id = MakeMSHW (struct
   type t = ident
   let tag id = id.id_tag
 end)

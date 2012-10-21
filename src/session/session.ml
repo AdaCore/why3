@@ -11,7 +11,7 @@
 
 open Stdlib
 open Debug
-open Util
+open Stdlib
 open Ty
 open Ident
 open Decl
@@ -30,7 +30,7 @@ let debug = Debug.register_info_flag "session"
 
 (** {2 Type definitions} *)
 
-module PHstr = Util.Hstr
+module PHstr = Hstr
 
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)
@@ -1084,7 +1084,7 @@ and load_proof_or_transf ~old_provers mg a =
         let prover = string_attribute "prover" a in
         let p =
           try
-            let p = Util.Mstr.find prover old_provers in
+            let p = Mstr.find prover old_provers in
             p
           with Not_found ->
             eprintf "[Error] prover not listing in header '%s'@." prover;
@@ -1162,7 +1162,7 @@ and load_metas ~old_provers mg a =
         let idpos = begin match a.Xml.name with
           | "ts_pos" ->
             let arity = int_attribute "arity" a in
-            let tvs = foldi (fun l _ ->
+            let tvs = Util.foldi (fun l _ ->
               (create_tvsymbol (Ident.id_fresh "a"))::l)
               [] 0 arity in
             let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs None in
@@ -1292,12 +1292,12 @@ let load_file session old_provers f =
         let p = {C.prover_name = name;
                    prover_version = version;
                    prover_altern = altern} in
-        Util.Mstr.add id p old_provers
+        Mstr.add id p old_provers
     | s ->
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
 
-let old_provers = ref Util.Mstr.empty
+let old_provers = ref Mstr.empty
 (* dead code
 let get_old_provers () = !old_provers
 *)
@@ -1310,7 +1310,7 @@ let load_session session xml =
       dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
       old_provers :=
-        List.fold_left (load_file session) Util.Mstr.empty xml.Xml.elements;
+        List.fold_left (load_file session) Mstr.empty xml.Xml.elements;
       dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
@@ -1439,7 +1439,7 @@ end)
 let read_file env ?format fn =
   let theories = Env.read_file env ?format fn in
   let ltheories =
-    Util.Mstr.fold
+    Mstr.fold
       (fun name th acc ->
         (** Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
         let th_name =
@@ -2082,14 +2082,14 @@ let merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
-      Util.Mstr.add g.goal_name.Ident.id_string g from_goals)
-    Util.Mstr.empty from_th.theory_goals
+      Mstr.add g.goal_name.Ident.id_string g from_goals)
+    Mstr.empty from_th.theory_goals
   in
   List.iter
     (fun to_goal ->
       try
         let from_goal =
-          Util.Mstr.find to_goal.goal_name.Ident.id_string from_goals in
+          Mstr.find to_goal.goal_name.Ident.id_string from_goals in
         let goal_obsolete = to_goal.goal_checksum <> from_goal.goal_checksum in
         if goal_obsolete then
           begin
@@ -2110,17 +2110,17 @@ let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
-    (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
-    Util.Mstr.empty from_f.file_theories
+    (fun acc t -> Mstr.add t.theory_name.Ident.id_string t acc)
+    Mstr.empty from_f.file_theories
   in
   List.iter
     (fun to_th ->
       try
         let from_th =
           let name = to_th.theory_name.Ident.id_string in
-          try Util.Mstr.find name from_theories
+          try Mstr.find name from_theories
           (* TODO: remove this later when all sessions are updated *)
-          with Not_found -> Util.Mstr.find ("WP "^name) from_theories
+          with Not_found -> Mstr.find ("WP "^name) from_theories
         in
         merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th
       with

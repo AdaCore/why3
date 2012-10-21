@@ -11,7 +11,7 @@
 
 open Format
 open Why3
-open Util
+open Stdlib
 open Theory
 
 let () = Debug.set_flag Glob.flag

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -312,7 +312,7 @@ type psymbol = {
   ps_subst : ity_subst;
 }
 
-module Psym = WeakStructMake (struct
+module Psym = MakeMSHW (struct
   type t = psymbol
   let tag ps = ps.ps_name.id_tag
 end)

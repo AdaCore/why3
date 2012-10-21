@@ -13,7 +13,7 @@ open Why3
 open Why3session_lib
 open Format
 
-
+module Hprover = Whyconf.Hprover
 module S = Session
 
 let opt_style = ref 1
@@ -62,15 +62,15 @@ let file_depth f =
 
 let provers_latex_stats_goal provers goal =
   S.goal_iter_proof_attempt (fun a ->
-    Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) goal
+    Hprover.replace provers a.S.proof_prover a.S.proof_prover) goal
 
 let provers_latex_stats provers theory =
   S.theory_iter_proof_attempt (fun a ->
-    Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
+    Hprover.replace provers a.S.proof_prover a.S.proof_prover) theory
 
 let provers_latex_stats_file provers file =
   S.file_iter_proof_attempt (fun a ->
-    Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) file
+    Hprover.replace provers a.S.proof_prover a.S.proof_prover) file
 
 let protect s =
   let b = Buffer.create 7 in
@@ -320,9 +320,9 @@ let latex_longtable n fmt depth name provers t=
 
 
 let theory_latex_stat n table dir t =
-  let provers = Hashtbl.create 9 in
+  let provers = Hprover.create 9 in
   provers_latex_stats provers t;
-  let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
+  let provers = Hprover.fold (fun _ pr acc -> pr :: acc)
     provers [] in
   let provers = List.sort Whyconf.Prover.compare provers in
   let depth = theory_depth  t in
@@ -341,9 +341,9 @@ let file_latex_stat n table  dir f =
    List.iter (theory_latex_stat n table dir) f.S.file_theories
 
 let standalone_goal_latex_stat n _table dir g =
-  let provers = Hashtbl.create 9 in
+  let provers = Hprover.create 9 in
   provers_latex_stats_goal provers g;
-  let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
+  let provers = Hprover.fold (fun _ pr acc -> pr :: acc)
     provers [] in
   let provers = List.sort Whyconf.Prover.compare provers in
   let depth = goal_depth g in
@@ -362,9 +362,9 @@ let standalone_goal_latex_stat n _table dir g =
 close_out ch
 
 let file_latex_stat_all n _table dir f =
-  let provers = Hashtbl.create 9 in
+  let provers = Hprover.create 9 in
   provers_latex_stats_file provers f;
-  let provers = Hashtbl.fold (fun _ pr acc -> pr :: acc)
+  let provers = Hprover.fold (fun _ pr acc -> pr :: acc)
     provers [] in
   let provers = List.sort Whyconf.Prover.compare provers in
   let depth = file_depth f in

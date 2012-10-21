@@ -51,7 +51,7 @@ csv = "prgbench.csv"
 
 open Bench
 open Why3
-open Util
+open Stdlib
 
 
 type benchrc = { tools : tool list Mstr.t;

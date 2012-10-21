@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -111,4 +111,4 @@ let decl tenv d =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun s ->
   Trans.decl (decl (Mty.mapi make_pont s)) None)
 
-let () = Hstr.replace Encoding.ft_enco_kept "twin" (const t)
+let () = Hstr.replace Encoding.ft_enco_kept "twin" (Util.const t)

@@ -11,7 +11,7 @@
 
 (** Typing environments *)
 
-open Util
+open Stdlib
 open Ty
 open Term
 open Theory

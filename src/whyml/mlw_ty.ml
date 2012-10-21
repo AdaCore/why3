@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Stdlib
-open Util
 open Ident
 open Ty
 open Term
@@ -94,7 +93,7 @@ and Reg : sig
   module S : M.Set
   module H : Hashtbl.S with type key = T.region
   module W : Weakhtbl.S with type key = T.region
-end = WeakStructMake (struct
+end = MakeMSHW (struct
   type t = T.region
   let tag r = r.T.reg_name.id_tag
 end)
@@ -131,7 +130,7 @@ let create_varset tvs regs = {
 
 (* value type symbols *)
 
-module Itsym = WeakStructMake (struct
+module Itsym = MakeMSHW (struct
   type t = itysymbol
   let tag its = its.its_pure.ts_name.id_tag
 end)
@@ -185,7 +184,7 @@ module Hsity = Hashcons.Make (struct
 
 end)
 
-module Ity = WeakStructMake (struct
+module Ity = MakeMSHW (struct
   type t = ity
   let tag ity = ity.ity_tag
 end)
@@ -218,10 +217,10 @@ let ity_fold fn acc ity = match ity.ity_node with
   | Ityapp (_,tl,_) -> List.fold_left fn acc tl
 
 let ity_all pr ity =
-  try ity_fold (all_fn pr) true ity with FoldSkip -> false
+  try ity_fold (Util.all_fn pr) true ity with Util.FoldSkip -> false
 
 let ity_any pr ity =
-  try ity_fold (any_fn pr) false ity with FoldSkip -> true
+  try ity_fold (Util.any_fn pr) false ity with Util.FoldSkip -> true
 
 (* symbol-wise map/fold *)
 
@@ -233,10 +232,12 @@ let rec ity_s_fold fn fts acc ity = match ity.ity_node with
       List.fold_left (fun acc r -> ity_s_fold fn fts acc r.reg_ity) acc rl
 
 let ity_s_all pr pts ity =
-  try ity_s_fold (all_fn pr) (all_fn pts) true ity with FoldSkip -> false
+  try ity_s_fold (Util.all_fn pr) (Util.all_fn pts) true ity
+  with Util.FoldSkip -> false
 
 let ity_s_any pr pts ity =
-  try ity_s_fold (any_fn pr) (any_fn pts) false ity with FoldSkip -> true
+  try ity_s_fold (Util.any_fn pr) (Util.any_fn pts) false ity
+  with Util.FoldSkip -> true
 
 (* traversal functions on type variables and regions *)
 
@@ -534,7 +535,7 @@ let create_xsymbol id ity =
   if not (ity_pure ity) then raise (MutableException (id, ity));
   { xs_name = id; xs_ity = ity; }
 
-module Exn = StructMake (struct
+module Exn = MakeMSH (struct
   type t = xsymbol
   let tag xs = Weakhtbl.tag_hash xs.xs_name.id_tag
 end)
@@ -810,7 +811,7 @@ type pvsymbol = {
   pv_vars : varset;
 }
 
-module PVsym = WeakStructMake (struct
+module PVsym = MakeMSHW (struct
   type t = pvsymbol
   let tag pv = pv.pv_vs.vs_name.id_tag
 end)

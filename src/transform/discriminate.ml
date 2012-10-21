@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -60,12 +60,12 @@ let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
   - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
 @]"
 
-module OHTy = OrderedHash(struct
+module OHTy = OrderedHashed(struct
   type t = ty
   let tag = ty_hash
 end)
 
-module OHTyl = OrderedHashList(struct
+module OHTyl = OrderedHashedList(struct
   type t = ty
   let tag = ty_hash
 end)

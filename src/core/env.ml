@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Theory
 
@@ -47,16 +47,16 @@ let create_env = let c = ref (-1) in fun lp -> {
 
 let get_loadpath env = Sstr.elements env.env_path
 
-let read_format_table = Hashtbl.create 17 (* format name -> read_format *)
-let extensions_table  = Hashtbl.create 17 (* suffix -> format name *)
+let read_format_table = Hstr.create 17 (* format name -> read_format *)
+let extensions_table  = Hstr.create 17 (* suffix -> format name *)
 
 let lookup_format name =
-  try Hashtbl.find read_format_table name
+  try Hstr.find read_format_table name
   with Not_found -> raise (UnknownFormat name)
 
 let list_formats () =
   let add n (_,_,l,desc) acc = (n,l,desc)::acc in
-  Hashtbl.fold add read_format_table []
+  Hstr.fold add read_format_table []
 
 let get_extension file =
   let s = try Filename.chop_extension file
@@ -66,7 +66,7 @@ let get_extension file =
 
 let get_format file =
   let ext = get_extension file in
-  try Hashtbl.find extensions_table ext
+  try Hstr.find extensions_table ext
   with Not_found -> raise (UnknownExtension ext)
 
 let read_channel ?format env file ic =
@@ -118,11 +118,17 @@ exception CircularDependency of pathname
 
 type 'a contents = 'a * theory Mstr.t
 
+module Hpath = Hashtbl.Make(struct
+  type t = pathname
+  let hash = Hashtbl.hash
+  let equal = (=)
+end)
+
 type 'a library = {
   lib_env  : env;
   lib_read : 'a read_format;
   lib_exts : extension list;
-  lib_memo : (pathname, 'a contents option) Hashtbl.t;
+  lib_memo : ('a contents option) Hpath.t;
 }
 
 and 'a read_format =
@@ -132,7 +138,7 @@ let mk_library read exts env = {
   lib_env  = env;
   lib_read = read;
   lib_exts = exts;
-  lib_memo = Hashtbl.create 17;
+  lib_memo = Hpath.create 17;
 }
 
 let env_of_library lib = lib.lib_env
@@ -141,18 +147,18 @@ let read_lib_file lib path =
   let file = locate_lib_file lib.lib_env path lib.lib_exts in
   let ic = open_in file in
   try
-    Hashtbl.replace lib.lib_memo path None;
+    Hpath.replace lib.lib_memo path None;
     let res = lib.lib_read lib path file ic in
-    Hashtbl.replace lib.lib_memo path (Some res);
+    Hpath.replace lib.lib_memo path (Some res);
     close_in ic;
     res
   with e ->
-    Hashtbl.remove lib.lib_memo path;
+    Hpath.remove lib.lib_memo path;
     close_in ic;
     raise e
 
 let read_lib_file lib path =
-  try match Hashtbl.find lib.lib_memo path with
+  try match Hpath.find lib.lib_memo path with
     | Some res -> res
     | None -> raise (CircularDependency path)
   with Not_found -> read_lib_file lib path
@@ -172,12 +178,12 @@ let read_lib_theory lib path th =
   raise (TheoryNotFound (path,th))
 
 let register_format ~(desc:Pp.formatted) name exts read =
-  if Hashtbl.mem read_format_table name then raise (KnownFormat name);
+  if Hstr.mem read_format_table name then raise (KnownFormat name);
   let getlib = Wenv.memoize 5 (mk_library read exts) in
   let rc env file ic = snd (read (getlib env) [] file ic) in
   let rl env path th = read_lib_theory (getlib env) path th in
-  Hashtbl.add read_format_table name (rc,rl,exts,desc);
-  List.iter (fun s -> Hashtbl.replace extensions_table s name) exts;
+  Hstr.add read_format_table name (rc,rl,exts,desc);
+  List.iter (fun s -> Hstr.replace extensions_table s name) exts;
   getlib
 
 let locate_lib_file env format path =

@@ -56,7 +56,8 @@ type ident_path =
 type meta_args = Theory.meta_arg list
 module Mmeta_args : Map.S with type key = meta_args
 module Smeta_args : Mmeta_args.Set
-type metas_args =  Smeta_args.t Util.Mstr.t
+
+type metas_args =  Smeta_args.t Mstr.t
 module Mmetas_args : Map.S with type key = metas_args
 
 type idpos = {

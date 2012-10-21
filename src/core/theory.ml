@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -101,7 +101,7 @@ let print_meta_desc fmt m =
   fprintf fmt "@[%s@\n  @[%a@]@]"
     m.meta_name Pp.formatted m.meta_desc
 
-module SMmeta = StructMake(struct type t = meta let tag m = m.meta_tag end)
+module SMmeta = MakeMSH(struct type t = meta let tag m = m.meta_tag end)
 
 module Smeta = SMmeta.S
 module Mmeta = SMmeta.M
@@ -116,7 +116,7 @@ exception UnknownMeta of string
 exception BadMetaArity of meta * int * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
-let meta_table = Hashtbl.create 17
+let meta_table = Hstr.create 17
 
 let mk_meta =
   let c = ref (-1) in
@@ -130,22 +130,20 @@ let mk_meta =
 
 let register_meta ~desc s al excl =
   try
-    let m = Hashtbl.find meta_table s in
+    let m = Hstr.find meta_table s in
     if al = m.meta_type && excl = m.meta_excl then m
     else raise (KnownMeta m)
   with Not_found ->
     let m = mk_meta desc s al excl in
-    Hashtbl.add meta_table s m;
+    Hstr.add meta_table s m;
     m
 
 let register_meta_excl ~desc s al = register_meta ~desc s al true
 let register_meta      ~desc s al = register_meta ~desc s al false
 
-let lookup_meta s =
-  try Hashtbl.find meta_table s
-  with Not_found -> raise (UnknownMeta s)
+let lookup_meta s = Hstr.find_exn meta_table (UnknownMeta s) s
 
-let list_metas () = Hashtbl.fold (fun _ v acc -> v::acc) meta_table []
+let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
 
 (** Theory *)
 
@@ -234,7 +232,7 @@ end)
 
 let mk_tdecl n = Hstdecl.hashcons { td_node = n ; td_tag = -1 }
 
-module Tdecl = StructMake (struct
+module Tdecl = MakeMSH (struct
   type t = tdecl
   let tag td = td.td_tag
 end)
@@ -788,7 +786,7 @@ let highord_theory =
   let uc = add_param_decl uc ps_pred_app in
   close_theory uc
 
-let tuple_theory = Util.Hint.memo 17 (fun n ->
+let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in

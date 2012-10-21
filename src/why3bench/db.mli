@@ -97,12 +97,12 @@ val parent_goal : transf -> goal
 (*
 val transf_id : transf -> transf_id
 *)
-val subgoals : transf -> goal Util.Mstr.t
+val subgoals : transf -> goal Stdlib.Mstr.t
 (** key are md5sum *)
 
 (** theory accessors *)
 val theory_name : theory -> string
-val goals : theory -> goal Util.Mstr.t
+val goals : theory -> goal Stdlib.Mstr.t
 (** keys are goal name *)
 (*
 val verified : theory -> bool
@@ -112,7 +112,7 @@ val verified : theory -> bool
 (*
 val file_name : file -> string
 *)
-val theories : file -> theory Util.Mstr.t
+val theories : file -> theory Stdlib.Mstr.t
 
 (** {2 The persistent database} *)
 

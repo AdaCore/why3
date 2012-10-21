@@ -9,12 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
-
 (** Useful functions *)
-
-val ($) : ('a -> 'b) -> 'a -> 'b
-val (|>) : 'a -> ('a -> 'b) -> 'b
 
 val const : 'a -> 'b -> 'a
 
@@ -24,11 +19,10 @@ val const3 : 'a -> 'b -> 'c -> 'd -> 'a
 
 val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
 
-(* useful int iterator *)
 val foldi : ('a -> int -> 'a) -> 'a -> int -> int -> 'a
+
 val mapi : (int -> 'a) -> int -> int -> 'a list
 
-(* useful float iterator *)
 val iterf : (float -> unit) -> float -> float -> float -> unit
 (** [iterf f min max step] *)
 
@@ -47,47 +41,3 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
-
-(* Set and Map on ints and strings *)
-
-module Mint : Map.S with type key = int
-module Sint : Mint.Set
-module Hint : Hashtbl.S with type key = int
-
-module Mstr : Map.S with type key = string
-module Sstr : Mstr.Set
-module Hstr : Hashtbl.S with type key = string
-
-(* Set, Map, Hashtbl on structures with a unique tag *)
-
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
-
-module type OrderedHash =
-sig
-  type t
-  val hash : t -> int
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-end
-
-module OrderedHash (X : Tagged) : OrderedHash with type t = X.t
-module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
-
-module StructMake (X : Tagged) :
-sig
-  module M : Map.S with type key = X.t
-  module S : M.Set
-  module H : Hashtbl.S with type key = X.t
-end
-
-module WeakStructMake (X : Weakhtbl.Weakey) :
-sig
-  module M : Map.S with type key = X.t
-  module S : M.Set
-  module H : Hashtbl.S with type key = X.t
-  module W : Weakhtbl.S with type key = X.t
-end

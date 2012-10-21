@@ -11,7 +11,7 @@
 
 open Thread
 open Why3
-open Util
+open Stdlib
 open Env
 open Theory
 open Task

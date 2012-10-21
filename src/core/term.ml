@@ -9,10 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
-open Stdlib
 
 (** Variable symbols *)
 
@@ -21,7 +20,7 @@ type vsymbol = {
   vs_ty   : ty;
 }
 
-module Vsym = WeakStructMake (struct
+module Vsym = MakeMSHW (struct
   type t = vsymbol
   let tag vs = vs.vs_name.id_tag
 end)
@@ -48,7 +47,7 @@ type lsymbol = {
   ls_value  : ty option;
 }
 
-module Lsym = WeakStructMake (struct
+module Lsym = MakeMSHW (struct
   type t = lsymbol
   let tag ls = ls.ls_name.id_tag
 end)
@@ -124,7 +123,7 @@ module Hspat = Hashcons.Make (struct
   let tag n p = { p with pat_tag = n }
 end)
 
-module Pat = StructMake (struct
+module Pat = MakeMSH (struct
   type t = pattern
   let tag pat = pat.pat_tag
 end)
@@ -181,8 +180,11 @@ let pat_fold fn acc pat = match pat.pat_node with
   | Pas (p, _) -> fn acc p
   | Por (p, q) -> fn (fn acc p) q
 
-let pat_all pr pat = try pat_fold (all_fn pr) true pat with FoldSkip -> false
-let pat_any pr pat = try pat_fold (any_fn pr) false pat with FoldSkip -> true
+let pat_all pr pat =
+  try pat_fold (Util.all_fn pr) true pat with Util.FoldSkip -> false
+
+let pat_any pr pat =
+  try pat_fold (Util.any_fn pr) false pat with Util.FoldSkip -> true
 
 (* smart constructors for patterns *)
 
@@ -443,7 +445,7 @@ module Hsterm = Hashcons.Make (struct
 
 end)
 
-module Term = StructMake (struct
+module Term = MakeMSH (struct
   type t = term
   let tag term = term.t_tag
 end)
@@ -804,7 +806,7 @@ let t_bool_false = fs_app fs_bool_false [] ty_bool
 
 let fs_tuple_ids = Hid.create 17
 
-let fs_tuple = Util.Hint.memo 17 (fun n ->
+let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
@@ -955,10 +957,12 @@ let rec t_gen_fold fnT fnL acc t =
 let t_s_fold = t_gen_fold
 
 let t_s_all prT prL t =
-  try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
+  try t_s_fold (Util.all_fn prT) (Util.all_fn prL) true t
+  with Util.FoldSkip -> false
 
 let t_s_any prT prL t =
-  try t_s_fold (any_fn prT) (any_fn prL) false t with FoldSkip -> true
+  try t_s_fold (Util.any_fn prT) (Util.any_fn prL) false t
+  with Util.FoldSkip -> true
 
 (* map/fold over types in terms and formulas *)
 
@@ -1019,8 +1023,8 @@ let t_fold fn acc t = match t.t_node with
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
 
-let t_all pr t = try t_fold (all_fn pr) true t with FoldSkip -> false
-let t_any pr t = try t_fold (any_fn pr) false t with FoldSkip -> true
+let t_all pr t = try t_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
+let t_any pr t = try t_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
 
 (* safe opening map_fold *)
 

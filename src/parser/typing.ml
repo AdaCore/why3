@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Format
 open Pp
 open Ident
@@ -103,10 +103,10 @@ let unify_raise ~loc ty1 ty2 =
     It is only local to this module and created with [create_denv] below. *)
 
 let create_user_tv =
-  let hs = Hashtbl.create 17 in
-  fun s -> try Hashtbl.find hs s with Not_found ->
+  let hs = Hstr.create 17 in
+  fun s -> try Hstr.find hs s with Not_found ->
   let tv = create_tvsymbol (id_fresh s) in
-  Hashtbl.add hs s tv;
+  Hstr.add hs s tv;
   tv
 
 (* TODO: shouldn't we localize this ident? *)
@@ -796,21 +796,21 @@ let add_types dl th =
       Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d def)
     Mstr.empty dl
   in
-  let tysymbols = Hashtbl.create 17 in
+  let tysymbols = Hstr.create 17 in
   let rec visit x =
     let d = Mstr.find x def in
     try
-      match Hashtbl.find tysymbols x with
+      match Hstr.find tysymbols x with
         | None -> errorm ~loc:d.td_loc "Cyclic type definition"
         | Some ts -> ts
     with Not_found ->
-      Hashtbl.add tysymbols x None;
-      let vars = Hashtbl.create 17 in
+      Hstr.add tysymbols x None;
+      let vars = Hstr.create 17 in
       let vl = List.map (fun id ->
-        if Hashtbl.mem vars id.id then
+        if Hstr.mem vars id.id then
           error ~loc:id.id_loc (DuplicateTypeVar id.id);
         let i = create_user_tv id.id in
-        Hashtbl.add vars id.id i;
+        Hstr.add vars id.id i;
         i) d.td_params
       in
       let id = create_user_id d.td_ident in
@@ -819,7 +819,7 @@ let add_types dl th =
             let rec apply = function
               | PPTtyvar v ->
                   begin
-                    try ty_var (Hashtbl.find vars v.id)
+                    try ty_var (Hstr.find vars v.id)
                     with Not_found -> error ~loc:v.id_loc (UnboundTypeVar v.id)
                   end
               | PPTtyapp (tyl, q) ->
@@ -840,7 +840,7 @@ let add_types dl th =
         | TDrecord _ ->
             assert false
       in
-      Hashtbl.add tysymbols x (Some ts);
+      Hstr.add tysymbols x (Some ts);
       ts
   in
   let th' =
@@ -854,9 +854,9 @@ let add_types dl th =
       th
     with ClashSymbol s -> error ~loc:(Mstr.find s def).td_loc (ClashSymbol s)
   in
-  let csymbols = Hashtbl.create 17 in
+  let csymbols = Hstr.create 17 in
   let decl d (abstr,algeb,alias) =
-    let ts = match Hashtbl.find tysymbols d.td_ident.id with
+    let ts = match Hstr.find tysymbols d.td_ident.id with
       | None ->
           assert false
       | Some ts ->
@@ -866,28 +866,28 @@ let add_types dl th =
       | TDabstract -> ts::abstr, algeb, alias
       | TDalias _ -> abstr, algeb, ts::alias
       | TDalgebraic cl ->
-          let ht = Hashtbl.create 17 in
+          let ht = Hstr.create 17 in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let param (_,t) = ty_of_dty (dty th' t) in
           let projection (id,_) fty = match id with
             | None -> None
             | Some id ->
                 try
-                  let pj = Hashtbl.find ht id.id in
+                  let pj = Hstr.find ht id.id in
                   let ty = Opt.get pj.ls_value in
                   ignore (Loc.try2 id.id_loc ty_equal_check ty fty);
                   Some pj
                 with Not_found ->
                   let fn = create_user_id id in
                   let pj = create_fsymbol fn [ty] fty in
-                  Hashtbl.replace csymbols id.id id.id_loc;
-                  Hashtbl.replace ht id.id pj;
+                  Hstr.replace csymbols id.id id.id_loc;
+                  Hstr.replace ht id.id pj;
                   Some pj
           in
           let constructor (loc, id, pl) =
             let tyl = List.map param pl in
             let pjl = List.map2 projection pl tyl in
-            Hashtbl.replace csymbols id.id loc;
+            Hstr.replace csymbols id.id loc;
             create_fsymbol (create_user_id id) tyl ty, pjl
           in
           abstr, (ts, List.map constructor cl) :: algeb, alias
@@ -902,11 +902,11 @@ let add_types dl th =
     th
   with
     | ClashSymbol s ->
-        error ~loc:(Hashtbl.find csymbols s) (ClashSymbol s)
+        error ~loc:(Hstr.find csymbols s) (ClashSymbol s)
     | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
-        error ~loc:(Hashtbl.find csymbols s) (RecordFieldMissing (cs,ls))
+        error ~loc:(Hstr.find csymbols s) (RecordFieldMissing (cs,ls))
     | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
-        error ~loc:(Hashtbl.find csymbols s) (DuplicateRecordField (cs,ls))
+        error ~loc:(Hstr.find csymbols s) (DuplicateRecordField (cs,ls))
 
 let prepare_typedef td =
   if td.td_model then
@@ -936,26 +936,26 @@ let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl
 
 let add_logics dl th =
-  let fsymbols = Hashtbl.create 17 in
-  let psymbols = Hashtbl.create 17 in
-  let denvs = Hashtbl.create 17 in
+  let fsymbols = Hstr.create 17 in
+  let psymbols = Hstr.create 17 in
+  let denvs = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
     let denv = denv_empty in
-    Hashtbl.add denvs id denv;
+    Hstr.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.ld_params in
     let add d = match d.ld_type with
       | None -> (* predicate *)
           let ps = create_psymbol v pl in
-          Hashtbl.add psymbols id ps;
+          Hstr.add psymbols id ps;
           add_param_decl th ps
       | Some t -> (* function *)
           let t = type_ty (None, t) in
           let fs = create_fsymbol v pl t in
-          Hashtbl.add fsymbols id fs;
+          Hstr.add fsymbols id fs;
           add_param_decl th fs
     in
     Loc.try1 d.ld_loc add d
@@ -969,7 +969,7 @@ let add_logics dl th =
       | None -> denv
       | Some id -> add_var id.id (dty th' ty) denv
     in
-    let denv = Hashtbl.find denvs id in
+    let denv = Hstr.find denvs id in
     let denv = List.fold_left dadd_var denv d.ld_params in
     let create_var (x, _) ty =
       let id = match x with
@@ -981,7 +981,7 @@ let add_logics dl th =
     let mk_vlist = List.map2 create_var d.ld_params in
     match d.ld_type with
     | None -> (* predicate *)
-        let ps = Hashtbl.find psymbols id in
+        let ps = Hstr.find psymbols id in
         begin match d.ld_def with
           | None -> ps :: abst, defn
           | Some f ->
@@ -994,7 +994,7 @@ let add_logics dl th =
               abst, make_ls_defn ps vl (fmla env f) :: defn
         end
     | Some ty -> (* function *)
-        let fs = Hashtbl.find fsymbols id in
+        let fs = Hstr.find fsymbols id in
         begin match d.ld_def with
           | None -> fs :: abst, defn
           | Some t ->
@@ -1033,24 +1033,24 @@ let loc_of_id id = Opt.get id.Ident.id_loc
 let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let denv = denv_empty in
-  let psymbols = Hashtbl.create 17 in
+  let psymbols = Hstr.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
     let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
-    Hashtbl.add psymbols id ps;
+    Hstr.add psymbols id ps;
     Loc.try2 d.in_loc add_param_decl th ps
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
-  let propsyms = Hashtbl.create 17 in
+  let propsyms = Hstr.create 17 in
   let type_decl d =
     let id = d.in_ident.id in
-    let ps = Hashtbl.find psymbols id in
+    let ps = Hstr.find psymbols id in
     let clause (loc, id, f) =
-      Hashtbl.replace propsyms id.id loc;
+      Hstr.replace propsyms id.id loc;
       let f = type_fmla th' denv Mstr.empty f in
       create_prsymbol (create_user_id id), f
     in
@@ -1059,7 +1059,7 @@ let add_inductives s dl th =
   try add_ind_decl th s (List.map type_decl dl)
   with
   | ClashSymbol s ->
-      error ~loc:(Hashtbl.find propsyms s) (ClashSymbol s)
+      error ~loc:(Hstr.find propsyms s) (ClashSymbol s)
   | InvalidIndDecl (ls,pr) ->
       error ~loc:(loc_of_id pr.pr_name) (InvalidIndDecl (ls,pr))
   | NonPositiveIndDecl (ls,pr,s) ->

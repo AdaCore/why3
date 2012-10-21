@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -353,7 +353,7 @@ let add_invariant uc its p =
         let d = Mlw_decl.add_invariant d its p in d, d :: dl
     | _ -> raise TooLateInvariant in
   let decl, decls = add uc.muc_decls in
-  let kn = Mid.map (const decl) decl.pd_news in
+  let kn = Mid.map (Util.const decl) decl.pd_news in
   let kn = Mid.set_union kn uc.muc_known in
   { uc with muc_decls = decls; muc_known = kn }
 

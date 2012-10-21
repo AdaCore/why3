@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Util
+open Stdlib
 open Ident
 open Term
 open Decl
@@ -264,12 +264,12 @@ let update_task drv task =
   add_tdecl task goal
 
 let update_task =
-  let h = Hashtbl.create 5 in
+  let h = Hint.create 5 in
   fun drv ->
-    let update = try Hashtbl.find h drv.drv_tag with
+    let update = try Hint.find h drv.drv_tag with
       | Not_found ->
           let upd = Trans.store (update_task drv) in
-          Hashtbl.add h drv.drv_tag upd;
+          Hint.add h drv.drv_tag upd;
           upd
     in
     Trans.apply update

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -260,7 +260,7 @@ type prsymbol = {
   pr_name : ident;
 }
 
-module Prop = WeakStructMake (struct
+module Prop = MakeMSHW (struct
   type t = prsymbol
   let tag pr = pr.pr_name.id_tag
 end)
@@ -366,7 +366,7 @@ module Hsdecl = Hashcons.Make (struct
 
 end)
 
-module Decl = WeakStructMake (struct
+module Decl = MakeMSHW (struct
   type t = decl
   let tag d = d.d_tag
 end)
@@ -621,7 +621,7 @@ let merge_known kn1 kn2 =
   Mid.union check_known kn1 kn2
 
 let known_add_decl kn0 decl =
-  let kn = Mid.map (const decl) decl.d_news in
+  let kn = Mid.map (Util.const decl) decl.d_news in
   let check id decl0 _ =
     if d_equal decl0 decl
     then raise (KnownIdent id)

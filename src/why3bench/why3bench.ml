@@ -11,7 +11,7 @@
 
 open Format
 open Why3
-open Util
+open Stdlib
 open Whyconf
 open Theory
 open Task

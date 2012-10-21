@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 
 (** Types *)
@@ -18,7 +18,7 @@ type tvsymbol = {
   tv_name : ident;
 }
 
-module Tvar = WeakStructMake (struct
+module Tvar = Stdlib.MakeMSHW (struct
   type t = tvsymbol
   let tag tv = tv.tv_name.id_tag
 end)
@@ -50,7 +50,7 @@ and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Tsym = WeakStructMake (struct
+module Tsym = Stdlib.MakeMSHW (struct
   type t = tysymbol
   let tag ts = ts.ts_name.id_tag
 end)
@@ -88,7 +88,7 @@ module Hsty = Hashcons.Make (struct
   let tag n ty = { ty with ty_tag = Weakhtbl.create_tag n }
 end)
 
-module Ty = WeakStructMake (struct
+module Ty = MakeMSHW (struct
   type t = ty
   let tag ty = ty.ty_tag
 end)
@@ -117,10 +117,10 @@ let ty_fold fn acc ty = match ty.ty_node with
   | Tyapp (_, tl) -> List.fold_left fn acc tl
 
 let ty_all pr ty =
-  try ty_fold (all_fn pr) true ty with FoldSkip -> false
+  try ty_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
 
 let ty_any pr ty =
-  try ty_fold (any_fn pr) false ty with FoldSkip -> true
+  try ty_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
 
 (* traversal functions on type variables *)
 
@@ -133,10 +133,10 @@ let rec ty_v_fold fn acc ty = match ty.ty_node with
   | Tyapp (_, tl) -> List.fold_left (ty_v_fold fn) acc tl
 
 let ty_v_all pr ty =
-  try ty_v_fold (all_fn pr) true ty with FoldSkip -> false
+  try ty_v_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
 
 let ty_v_any pr ty =
-  try ty_v_fold (any_fn pr) false ty with FoldSkip -> true
+  try ty_v_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
 
 let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
 let ty_freevars s ty = ty_v_fold (fun s v -> Stv.add v s) s ty
@@ -178,10 +178,10 @@ let rec ty_s_fold fn acc ty = match ty.ty_node with
   | Tyapp (f, tl) -> List.fold_left (ty_s_fold fn) (fn acc f) tl
 
 let ty_s_all pr ty =
-  try ty_s_fold (all_fn pr) true ty with FoldSkip -> false
+  try ty_s_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
 
 let ty_s_any pr ty =
-  try ty_s_fold (any_fn pr) false ty with FoldSkip -> true
+  try ty_s_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
 
 (* type matching *)
 
@@ -231,7 +231,7 @@ let ty_pred ty_a = ty_app ts_pred [ty_a]
 
 let ts_tuple_ids = Hid.create 17
 
-let ts_tuple = Util.Hint.memo 17 (fun n ->
+let ts_tuple = Hint.memo 17 (fun n ->
   let vl = ref [] in
   for _i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
   let ts = create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None in

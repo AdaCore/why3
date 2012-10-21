@@ -145,6 +145,6 @@ let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
 (* This encoding method is unsound in presence of finite types. *)
 
 (*
-let () = Hashtbl.replace Encoding.ft_enco_poly "explicit"
+let () = Hstr.replace Encoding.ft_enco_poly "explicit"
     (fun _ -> Trans.compose explicit monomorph)
 *)

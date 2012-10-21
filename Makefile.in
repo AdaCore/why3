@@ -108,8 +108,8 @@ LIBGENERATED = src/util/config.ml src/util/rc.ml src/parser/lexer.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml src/session/xml.ml
 
-LIB_UTIL = config opt lists strings extmap exthtbl stdlib \
-	   exn_printer pp debug loc print_tree \
+LIB_UTIL = config util opt lists strings extmap exthtbl weakhtbl \
+	   hashcons stdlib exn_printer pp debug loc print_tree \
 	   cmdline weakhtbl hashcons util warning sysutil rc plugin
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer

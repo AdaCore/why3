@@ -723,8 +723,8 @@ module Goal = struct
       (fun stmt acc ->
          let g = stmt_column_INT stmt 0 "Goal.of_theory" in
          let n = stmt_column_string stmt 1 "Goal.of_theory" in
-         Util.Mstr.add n g acc)
-      Util.Mstr.empty
+         Stdlib.Mstr.add n g acc)
+      Stdlib.Mstr.empty
 
   let of_transf db tr =
     let sql="SELECT goal_id,task_checksum FROM goals \
@@ -735,8 +735,8 @@ module Goal = struct
       (fun stmt acc ->
          let g = stmt_column_INT stmt 0 "Goal.of_transf" in
          let sum = stmt_column_string stmt 1 "Goal.of_transf" in
-         Util.Mstr.add sum g acc)
-      Util.Mstr.empty
+         Stdlib.Mstr.add sum g acc)
+      Stdlib.Mstr.empty
 
 end
 
@@ -845,8 +845,8 @@ module Theory = struct
       (fun stmt acc ->
          let name = stmt_column_string stmt 0 "Theory.of_file" in
          let th = stmt_column_INT stmt 1 "Theory.of_file" in
-         Util.Mstr.add name th acc)
-      Util.Mstr.empty
+         Stdlib.Mstr.add name th acc)
+      Stdlib.Mstr.empty
 
   let add db file name =
     transaction db

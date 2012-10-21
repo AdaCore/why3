@@ -13,7 +13,7 @@
 
 open Format
 open Why3
-open Util
+open Stdlib
 open Typing
 open Ptree
 open Pgm_module

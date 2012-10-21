@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Stdlib
-open Util
 open Ident
 open Ty
 open Term
@@ -36,7 +35,7 @@ let ty_dumb = ty_var tv_dumb
    instantié. Un tag sur un logique polymorphe doit être un tag sur toute
    la famille de fonctions *)
 
-module OHTyl = OrderedHashList(struct
+module OHTyl = OrderedHashedList(struct
   type t = ty
   let tag = ty_hash
 end)
@@ -519,10 +518,10 @@ let encoding_instantiate complete =
     create_trans_complete kept complete))
 
 let () = Hstr.replace Encoding.ft_enco_kept "instantiate"
-  (const (encoding_instantiate Incomplete))
+  (Util.const (encoding_instantiate Incomplete))
 
 let () = Hstr.replace Encoding.ft_enco_kept "instantiate_complete"
-  (const (encoding_instantiate Complete))
+  (Util.const (encoding_instantiate Complete))
 
 (*
 Local Variables:

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -163,5 +163,5 @@ let mono kept =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.compose (deco kept) (mono kept))
 
-let () = Hstr.replace Encoding.ft_enco_poly "decoexp" (const t)
+let () = Hstr.replace Encoding.ft_enco_poly "decoexp" (Util.const t)
 

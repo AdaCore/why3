@@ -12,7 +12,7 @@
 open Format
 open Pp
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -44,16 +44,6 @@ let modulename path t =
   String.capitalize
     (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t)
 
-(** Driver *)
-
-(* dead code
-
-(* (path,id) -> string Hid *)
-let stdlib = Hashtbl.create 17
-let is_stdlib path id = Hashtbl.mem stdlib (path, id)
-
-*)
-
 (** Printers *)
 
 let ocaml_keywords =
@@ -68,9 +58,9 @@ let ocaml_keywords =
    "raise";]
 
 let is_ocaml_keyword =
-  let h = Hashtbl.create 17 in
-  List.iter (fun s -> Hashtbl.add h s ()) ocaml_keywords;
-  Hashtbl.mem h
+  let h = Hstr.create 17 in
+  List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
+  Hstr.mem h
 
 let iprinter,aprinter,_tprinter,_pprinter =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in

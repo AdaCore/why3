@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -179,14 +179,14 @@ and rewriteF kn state av sign f = match f.t_node with
       let f1 = rewriteF kn state av sign f1 in
       t_quant_simp q (close vl tr f1)
   | Tbinop (o, _, _) when (o = Tand && sign) || (o = Tor && not sign) ->
-      TermTF.t_map_sign (const (rewriteT kn state))
+      TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f
   | Tlet (t1, _) ->
       let av = Mvs.set_diff av t1.t_vars in
-      TermTF.t_map_sign (const (rewriteT kn state))
+      TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f
   | _ ->
-      TermTF.t_map_sign (const (rewriteT kn state))
+      TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state Svs.empty) sign f
 
 let add_selector (state,task) ts ty csl =

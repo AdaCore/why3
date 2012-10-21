@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -291,7 +291,7 @@ let merge_known kn1 kn2 =
   Mid.union check_known kn1 kn2
 
 let known_add_decl lkn0 kn0 d =
-  let kn = Mid.map (const d) d.pd_news in
+  let kn = Mid.map (Util.const d) d.pd_news in
   let check id decl0 _ =
     if pd_equal decl0 d
     then raise (KnownIdent id)

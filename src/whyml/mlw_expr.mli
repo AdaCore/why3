@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Stdlib
-open Util
 open Ident
 open Ty
 open Term

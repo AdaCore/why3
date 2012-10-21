@@ -13,7 +13,7 @@
 logic must not have finite support types. *)
 
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term

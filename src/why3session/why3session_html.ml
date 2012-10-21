@@ -13,6 +13,7 @@ open Format
 open Why3
 open Why3session_lib
 
+module Hprover = Whyconf.Hprover
 module S = Session
 
 let output_dir = ref ""
@@ -62,7 +63,7 @@ let spec =
   common_options
 
 open Session
-open Util
+open Stdlib
 
 type context =
     (string ->
@@ -106,7 +107,7 @@ struct
 
   let provers_stats provers theory =
     S.theory_iter_proof_attempt (fun a ->
-      Hashtbl.replace provers a.S.proof_prover a.S.proof_prover) theory
+      Hprover.replace provers a.S.proof_prover a.S.proof_prover) theory
 
   let print_prover = Whyconf.print_prover
 
@@ -200,10 +201,10 @@ let rec num_lines acc tr =
   let print_theory fmt th =
     let depth = theory_depth th in
     if depth > 0 then
-    let provers = Hashtbl.create 9 in
+    let provers = Hprover.create 9 in
     provers_stats provers th;
     let provers =
-      Hashtbl.fold (fun _ pr acc -> pr :: acc) provers []
+      Hprover.fold (fun _ pr acc -> pr :: acc) provers []
     in
     let provers = List.sort Whyconf.Prover.compare provers in
     let name = th.S.theory_name.Ident.id_string in

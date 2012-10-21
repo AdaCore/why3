@@ -45,7 +45,7 @@ open Why3
 
 open Theory
 open Term
-open Util
+open Stdlib
 
 open Ident
 
@@ -80,10 +80,10 @@ let read_channel env path filename cin =
 
   (** create a set of constraints *)
   let create_fmla nvar m k =
-    let lvar = mapi (fun _ -> create_vsymbol (id_fresh "x") Ty.ty_int)
+    let lvar = Util.mapi (fun _ -> create_vsymbol (id_fresh "x") Ty.ty_int)
       1 nvar in
     let lt = List.map t_var lvar in
-    let lits = foldi (create_lit lt k) t_true 1 m in
+    let lits = Util.foldi (create_lit lt k) t_true 1 m in
     t_forall_close lvar [] (t_implies_simp lits t_false) in
 
   (** read the first line *)

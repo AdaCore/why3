@@ -13,7 +13,7 @@
 
 open Format
 open Why3
-open Util
+open Stdlib
 module BenchUtil = Bench.BenchUtil
 
 let load_driver = Env.Wenv.memoize 2 (fun env ->
@@ -146,7 +146,7 @@ let file whyconf env (dbf,wf) =
         "Error : No sketch of proof for the theory %s of file %s.@."
         thname wf
   in
-  Util.Mstr.iter iter wths
+  Stdlib.Mstr.iter iter wths
 
 
 let db whyconf env =

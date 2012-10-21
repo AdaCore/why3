@@ -11,7 +11,7 @@
 
 open Format
 open Pp
-open Util
+open Stdlib
 open Ident
 open Ptree
 open Ty

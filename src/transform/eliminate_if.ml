@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
 open Ident
 open Term
 open Decl
@@ -18,7 +17,7 @@ open Decl
 
 let rec has_if t = match t.t_node with
   | Tif _ -> true
-  | _ -> TermTF.t_any has_if ffalse t
+  | _ -> TermTF.t_any has_if Util.ffalse t
 
 let rec elim_t contT t =
   let contTl e = contT (t_label_copy t e) in
@@ -98,7 +97,7 @@ and elim_f sign f = match f.t_node with
       if sign then t_and (t_implies f1n f2) (t_implies (t_not f1p) f3)
               else t_or (t_and f1p f2) (t_and (t_not f1n) f3)
   | _ ->
-      TermTF.t_map_sign (const elim_t) elim_f sign f
+      TermTF.t_map_sign (Util.const elim_t) elim_f sign f
 
 let eliminate_if_fmla = Trans.rewriteTF elim_t (elim_f true) None
 

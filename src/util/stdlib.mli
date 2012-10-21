@@ -11,3 +11,50 @@
 
 module Map : Extmap.Map
 module Hashtbl : Exthtbl.Hashtbl
+
+(* Set, Map, Hashtbl on ints and strings *)
+
+module Mint : Map.S with type key = int
+module Sint : Mint.Set
+module Hint : Hashtbl.S with type key = int
+
+module Mstr : Map.S with type key = string
+module Sstr : Mstr.Set
+module Hstr : Hashtbl.S with type key = string
+
+(* Set, Map, Hashtbl on structures with a unique tag *)
+
+module type TaggedType =
+sig
+  type t
+  val tag : t -> int
+end
+
+module type OrderedHashedType =
+sig
+  type t
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+module OrderedHashed (X : TaggedType) :
+  OrderedHashedType with type t = X.t
+
+module OrderedHashedList (X : TaggedType) :
+  OrderedHashedType with type t = X.t list
+
+module MakeMSH (X : TaggedType) :
+sig
+  module M : Map.S with type key = X.t
+  module S : M.Set
+  module H : Hashtbl.S with type key = X.t
+end
+
+module MakeMSHW (X : Weakhtbl.Weakey) :
+sig
+  module M : Map.S with type key = X.t
+  module S : M.Set
+  module H : Hashtbl.S with type key = X.t
+  module W : Weakhtbl.S with type key = X.t
+end

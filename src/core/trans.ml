@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -41,7 +41,7 @@ let singleton f x = [f x]
 let compose   f g x =             g (f x)
 let compose_l f g x = Lists.apply g (f x)
 
-let seq l x = List.fold_left (|>) x l
+let seq l x   = List.fold_left (fun x f -> f x) x l
 let seq_l l x = List.fold_left (fun x f -> Lists.apply f x) [x] l
 
 module Wtask = Weakhtbl.Make (struct

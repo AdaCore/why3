@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Util
+open Stdlib
 open Ty
 open Term
 open Decl
@@ -62,7 +62,7 @@ let fold in_goal notdeft notdeff notls d (env, task) =
         let vl,e = open_ls_defn ld in
         let inline =
           not (TermTF.t_select notdeft notdeff e
-            || t_s_any ffalse (ls_equal ls) e) in
+            || t_s_any Util.ffalse (ls_equal ls) e) in
         let env = if inline then Mls.add ls (vl,e) env else env in
         let task = if inline && not in_goal then task else add_decl task d in
         env, task
@@ -92,10 +92,10 @@ let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
     trans notls
 
 let all = t ~use_meta:true ~in_goal:false
-  ~notdeft:ffalse ~notdeff:ffalse ~notls:ffalse
+  ~notdeft:Util.ffalse ~notdeff:Util.ffalse ~notls:Util.ffalse
 
 let goal = t ~use_meta:true ~in_goal:true
-  ~notdeft:ffalse ~notdeff:ffalse ~notls:ffalse
+  ~notdeft:Util.ffalse ~notdeff:Util.ffalse ~notls:Util.ffalse
 
 (* inline_trivial *)
 
@@ -116,7 +116,7 @@ let notdeft t = match t.t_node with
   | _ -> true
 
 let trivial = t ~use_meta:true ~in_goal:false
-  ~notdeft:notdeft ~notdeff:notdeft ~notls:ffalse
+  ~notdeft:notdeft ~notdeff:notdeft ~notls:Util.ffalse
 
 let () =
   let register ~desc name t =

@@ -40,9 +40,8 @@ The regexp must start with ^.
 *)
 
 open Format
-open Util
-open Whyconf
 open Stdlib
+open Whyconf
 module Wc = Whyconf
 open Rc
 
@@ -88,9 +87,9 @@ let load_prover kind (id,section) =
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
     version_regexp = get_string section ~default:"" "version_regexp";
-    versions_ok = reg_map $ get_stringl section ~default:[] "version_ok";
-    versions_old = reg_map $ get_stringl section ~default:[] "version_old";
-    versions_bad = reg_map $ get_stringl section ~default:[] "version_bad";
+    versions_ok = reg_map (get_stringl section ~default:[] "version_ok");
+    versions_old = reg_map (get_stringl section ~default:[] "version_old");
+    versions_bad = reg_map (get_stringl section ~default:[] "version_bad");
     prover_command = get_stringo section "command";
     prover_driver = get_string section ~default:""  "driver";
     prover_editor = get_string section ~default:"" "editor";
