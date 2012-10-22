@@ -37,22 +37,30 @@ let env,config =
   with e ->
     Self.fatal "Exception raised in Why3 env:@ %a" Exn_printer.exn_printer e
 
+let find th s = Theory.ns_find_ls th.Theory.th_export [s]
+
 (* int.Int theory *)
 let int_type : Ty.ty = Ty.ty_int
 let int_theory : Theory.theory = Env.find_theory env ["int"] "Int"
-let find_int_theory s = Theory.ns_find_ls int_theory.Theory.th_export [s]
-let add_int : Term.lsymbol = find_int_theory "infix +"
-let mul_int : Term.lsymbol = find_int_theory "infix *"
-let ge_int : Term.lsymbol = find_int_theory "infix >="
+let add_int : Term.lsymbol = find int_theory "infix +"
+let sub_int : Term.lsymbol = find int_theory "infix -"
+let minus_int : Term.lsymbol = find int_theory "prefix -"
+let mul_int : Term.lsymbol = find int_theory "infix *"
+let ge_int : Term.lsymbol = find int_theory "infix >="
 
+(* real.Real theory *)
+let real_type : Ty.ty = Ty.ty_real
+let real_theory : Theory.theory = Env.find_theory env ["real"] "Real"
+let mul_real : Term.lsymbol = find real_theory "infix *"
+let ge_real : Term.lsymbol = find real_theory "infix >="
 
 let logic_type ty =
   match ty with
     | Linteger -> int_type
+    | Lreal -> real_type
     | Ctype _
     | Ltype (_, _)
     | Lvar _
-    | Lreal
     | Larrow (_, _) ->
         Self.not_yet_implemented "logic_type"
 
@@ -61,18 +69,29 @@ let constant c =
     | Integer(_value,Some s) -> Term.ConstInt (Term.IConstDecimal s)
     | Integer(_value,None) ->
       Self.not_yet_implemented "constant Integer None"
-    | (LStr _|LWStr _|LChr _|LReal (_, _)|LEnum _) ->
+    | LReal(_value,s) -> Term.ConstReal (Term.RConstDecimal (s,"",None))
+    | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "constant"
 
 let bin (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
     | PlusA,Linteger,Linteger -> Term.t_app_infer add_int [t1;t2]
+    | MinusA,Linteger,Linteger -> Term.t_app_infer sub_int [t1;t2]
     | Mult,Linteger,Linteger -> Term.t_app_infer mul_int [t1;t2]
+    | Mult,Lreal,Lreal -> Term.t_app_infer mul_real [t1;t2]
     | PlusA,_,_ -> Self.not_yet_implemented "bin PlusA"
+    | MinusA,_,_ -> Self.not_yet_implemented "bin PlusA"
     | Mult,_,_ -> Self.not_yet_implemented "bin Mult"
-    | ((PlusPI|IndexPI|MinusA|MinusPI|MinusPP|Div|Mod|Shiftlt|Shiftrt|Lt|Gt|
+    | ((PlusPI|IndexPI|MinusPI|MinusPP|Div|Mod|Shiftlt|Shiftrt|Lt|Gt|
  Le|Ge|Eq|Ne|BAnd|BXor|BOr|LAnd|LOr),_, _)
       -> Self.not_yet_implemented "bin"
+
+let unary op (ty,t) =
+  match op,ty with
+    | Neg,Linteger -> Term.t_app_infer minus_int [t]
+    | Neg,_ -> Self.not_yet_implemented "unary Neg,_"
+    | BNot,_ -> Self.not_yet_implemented "unary BNot"
+    | LNot,_ -> Self.not_yet_implemented "unary LNot"
 
 let bound_vars = Hashtbl.create 257
 
@@ -95,7 +114,7 @@ let rec term_node t =
     | TConst cst -> Term.t_const (constant cst)
     | TLval lv -> tlval lv
     | TBinOp (op, t1, t2) -> bin (term t1) op (term t2)
-    | TUnOp (_, _) -> Self.not_yet_implemented "term_node TUnOp"
+    | TUnOp (op, t) -> unary op (term t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | TSizeOf _
     | TSizeOfE _
@@ -132,6 +151,7 @@ let rel (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
     | Req,_,_ -> Term.t_equ t1 t2
     | Rge,Linteger,Linteger -> Term.t_app_infer ge_int [t1;t2]
+    | Rge,Lreal,Lreal -> Term.t_app_infer ge_real [t1;t2]
     | Rge,_,_ ->
       Self.not_yet_implemented "rel Rge"
     | (Rlt|Rgt|Rle|Rneq),_,_ ->
@@ -261,11 +281,22 @@ let global g acc =
     | GType (_, _)  ->
       Self.not_yet_implemented "global: GType"
 
+let use th1 th2 =
+  let name = th2.Theory.th_name in
+  Theory.close_namespace 
+    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
+    true
+
 let prog p =
-  let lemmas = Theory.create_theory (Ident.id_fresh "Lemmas") in
-  let lemmas = Theory.use_export lemmas int_theory in
-  let lemmas, _functions =
-    List.fold_right global p.globals (lemmas,[])
-  in
-  let lemmas = Theory.close_theory lemmas in
-  lemmas
+  try
+    let lemmas = Theory.create_theory (Ident.id_fresh "Lemmas") in
+    let lemmas = use lemmas int_theory in
+    let lemmas = use lemmas real_theory in
+    let lemmas, _functions =
+      List.fold_right global p.globals (lemmas,[])
+    in
+    let lemmas = Theory.close_theory lemmas in
+    lemmas
+  with
+      Decl.UnknownIdent(s) ->
+        Self.fatal "unknown identifier %s" s.Ident.id_string
