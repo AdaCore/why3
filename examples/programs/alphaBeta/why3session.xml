@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/alphaBeta/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -44,15 +43,15 @@
   expanded="true">
   <theory
    name="TwoPlayerGame"
-   locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+   locfile="../alphaBeta.mlw"
    loclnum="2" loccnumb="7" loccnume="20"
    verified="true"
    expanded="false">
    <goal
     name="Test"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="76" loccnumb="7" loccnume="11"
-    sum="5a090932a31ec1b1207f5e1f9a4b78f5"
+    sum="610608283a85bf303ebe1a84cfcfc086"
     proved="true"
     expanded="false"
     shape="ainfix &lt;=aprefix -aposition_valueado_moveV0V1aminmaxV0c1IamemV1V2Lalegal_movesV0F">
@@ -84,9 +83,9 @@
    </goal>
    <goal
     name="minmax_bound"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="82" loccnumb="8" loccnume="20"
-    sum="854562e6024ee5671d836dd65bb41265"
+    sum="09da0270a2e52b38705869d9ac120b60"
     proved="true"
     expanded="false"
     shape="ainfix &lt;aminmaxV0V1ainfinityAainfix &lt;aprefix -ainfinityaminmaxV0V1Iainfix &gt;=V1c0F">
@@ -102,9 +101,9 @@
    </goal>
    <goal
     name="minmax_nomove"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="86" loccnumb="8" loccnume="21"
-    sum="4479f9caabc0235ea9e30dca6db09d05"
+    sum="31d04b93aaada3edf39c7cebc00b7339"
     proved="true"
     expanded="false"
     shape="ainfix =aminmaxV0V1aposition_valueV0Iainfix =alegal_movesV0aNilAainfix &gt;=V1c0F">
@@ -176,16 +175,16 @@
   </theory>
   <theory
    name="AlphaBeta"
-   locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+   locfile="../alphaBeta.mlw"
    loclnum="99" loccnumb="7" loccnume="16"
    verified="false"
    expanded="true">
    <goal
     name="WP_parameter move_value_alpha_beta"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="109" loccnumb="10" loccnume="31"
     expl="parameter move_value_alpha_beta"
-    sum="4b336999e03530776848914d6a2e8af9"
+    sum="f2b2c50e29db1fb27fd1056697ca29b4"
     proved="true"
     expanded="false"
     shape="iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6ainfix =aprefix -V5aprefix -V6iainfix &lt;=V6aprefix -V1ainfix &gt;=aprefix -V5V1ainfix &lt;=aprefix -V5V0Laminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FAainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
@@ -197,10 +196,10 @@
      expanded="false">
      <goal
       name="WP_parameter move_value_alpha_beta.1"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="109" loccnumb="10" loccnume="31"
       expl="precondition"
-      sum="eeb5a974014b7d7d6b993b76149033c8"
+      sum="a2e31407b2d98a26cdc1eecfe67f4a18"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
@@ -273,10 +272,10 @@
      </goal>
      <goal
       name="WP_parameter move_value_alpha_beta.2"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="109" loccnumb="10" loccnume="31"
       expl="postcondition"
-      sum="9c52653fd676897e03b1c51d1ffafcb9"
+      sum="f7d37657adac949f80acee2dacdbf903"
       proved="true"
       expanded="false"
       shape="iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6ainfix =aprefix -V5aprefix -V6iainfix &lt;=V6aprefix -V1ainfix &gt;=aprefix -V5V1ainfix &lt;=aprefix -V5V0Laminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
@@ -288,10 +287,10 @@
        expanded="false">
        <goal
         name="WP_parameter move_value_alpha_beta.2.1"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="109" loccnumb="10" loccnume="31"
         expl="postcondition"
-        sum="621badca9850a33aed20f605781199a3"
+        sum="3fe99f92c30fc7fdd5b8fa12275d56ad"
         proved="true"
         expanded="false"
         shape="ainfix =aprefix -V5aprefix -V6Iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6Laminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
@@ -308,10 +307,10 @@
        </goal>
        <goal
         name="WP_parameter move_value_alpha_beta.2.2"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="109" loccnumb="10" loccnume="31"
         expl="postcondition"
-        sum="5397719394aa372abe40ac343bd54032"
+        sum="bce92f52b1606bc59d69750f380be885"
         proved="true"
         expanded="false"
         shape="ainfix &gt;=aprefix -V5V1Iainfix &lt;=V6aprefix -V1Iainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6NLaminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
@@ -328,10 +327,10 @@
        </goal>
        <goal
         name="WP_parameter move_value_alpha_beta.2.3"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="109" loccnumb="10" loccnume="31"
         expl="postcondition"
-        sum="b77bd164cdcb4c16f5345cef2293106e"
+        sum="8375fb15569dcaa7d79665539ccccad9"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=aprefix -V5V0Iainfix &lt;=V6aprefix -V1NIainfix &lt;V6aprefix -V0Aainfix &lt;aprefix -V1V6NLaminmaxado_moveV2V4ainfix -V3c1Iiainfix &lt;aminmaxado_moveV2V4ainfix -V3c1aprefix -V0Aainfix &lt;aprefix -V1aminmaxado_moveV2V4ainfix -V3c1ainfix =V5aminmaxado_moveV2V4ainfix -V3c1iainfix &lt;=aminmaxado_moveV2V4ainfix -V3c1aprefix -V1ainfix &lt;=V5aprefix -V1ainfix &gt;=V5aprefix -V0FIainfix &gt;=ainfix -V3c1c0Iainfix &gt;=V3c1F">
@@ -352,10 +351,10 @@
    </goal>
    <goal
     name="WP_parameter negabeta"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="121" loccnumb="7" loccnume="15"
     expl="parameter negabeta"
-    sum="e3e4cf03bf565f55a66abae9f6482b89"
+    sum="ff6c1977755082f26b247e1c0923a90b"
     proved="false"
     expanded="true"
     shape="iainfix =V3c0iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1Calegal_movesV2aNiliainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1aConsVViainfix &gt;=V6V1iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V6aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V6V0ainfix &gt;=V6V1iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V7aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V7V0ainfix &gt;=V7V1Iiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FAainfix &gt;=V3c1Iiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FAainfix &gt;=V3c1Iainfix &gt;=V3c0F">
@@ -367,10 +366,10 @@
      expanded="true">
      <goal
       name="WP_parameter negabeta.1"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
       expl="postcondition"
-      sum="a1967aa71794b94a6a6cdf55a3f041b9"
+      sum="489e7cf3b79dacf889b72955ef519dc9"
       proved="true"
       expanded="false"
       shape="iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1Iainfix =V3c0Iainfix &gt;=V3c0F">
@@ -390,10 +389,10 @@
        expanded="false">
        <goal
         name="WP_parameter negabeta.1.1"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
         expl="postcondition"
-        sum="9183e44c5ea7153046c81e84ebd30ad5"
+        sum="465d551152bfe083b4fee0dc11e95459"
         proved="true"
         expanded="false"
         shape="ainfix =aposition_valueV2aminmaxV2V3Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3Iainfix =V3c0Iainfix &gt;=V3c0F">
@@ -418,10 +417,10 @@
        </goal>
        <goal
         name="WP_parameter negabeta.1.2"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
         expl="postcondition"
-        sum="9ce23df25b9fda3007e2ab86e983ac45"
+        sum="1a4f137de291c168e659e30634529c12"
         proved="true"
         expanded="false"
         shape="ainfix &lt;=aposition_valueV2V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix =V3c0Iainfix &gt;=V3c0F">
@@ -446,10 +445,10 @@
        </goal>
        <goal
         name="WP_parameter negabeta.1.3"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
         expl="postcondition"
-        sum="f92e21601b3e39a709717cc78dec5a9a"
+        sum="cccb5a149375a7097ef1ba22c3735228"
         proved="true"
         expanded="false"
         shape="ainfix &gt;=aposition_valueV2V1Iainfix &lt;=aminmaxV2V3V0NIainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NIainfix =V3c0Iainfix &gt;=V3c0F">
@@ -476,10 +475,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta.2"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
       expl="postcondition"
-      sum="20ae207f8e475810b8d8c8ab2a606c9d"
+      sum="da287b2b7c6c3f3b5b73c7588c08aec6"
       proved="true"
       expanded="false"
       shape="Calegal_movesV2aNiliainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =aposition_valueV2aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=aposition_valueV2V0ainfix &gt;=aposition_valueV2V1aConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
@@ -491,10 +490,10 @@
        expanded="false">
        <goal
         name="WP_parameter negabeta.2.1"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
         expl="postcondition"
-        sum="b5ec68786af90c40fd3c6ca7d9a80d3e"
+        sum="2d95f57ac8728f253948d1306cc076a2"
         proved="true"
         expanded="false"
         shape="Calegal_movesV2aNilainfix =aposition_valueV2aminmaxV2V3Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3aConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
@@ -527,10 +526,10 @@
        </goal>
        <goal
         name="WP_parameter negabeta.2.2"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
         expl="postcondition"
-        sum="ffe39a0705cea025b1183db6092d8e05"
+        sum="c2f4b25fea42605fc28196e65f9ebe76"
         proved="true"
         expanded="false"
         shape="Calegal_movesV2aNilainfix &lt;=aposition_valueV2V0Iainfix &lt;=aminmaxV2V3V0Iainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NaConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
@@ -563,10 +562,10 @@
        </goal>
        <goal
         name="WP_parameter negabeta.2.3"
-        locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+        locfile="../alphaBeta.mlw"
         loclnum="121" loccnumb="7" loccnume="15"
         expl="postcondition"
-        sum="b40a8cb8f2f0a328b9f5cb797d30cbb6"
+        sum="a099e861a7b3c5ed07db90da336b1b54"
         proved="true"
         expanded="false"
         shape="Calegal_movesV2aNilainfix &gt;=aposition_valueV2V1Iainfix &lt;=aminmaxV2V3V0NIainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3NaConsVVtIainfix =V3c0NIainfix &gt;=V3c0F">
@@ -601,10 +600,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta.3"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
       expl="precondition"
-      sum="46a3bb0bbd85261da9ac452487b49020"
+      sum="cedb45baa8d038288ccd7521e119ddda"
       proved="true"
       expanded="false"
       shape="Calegal_movesV2aNiltaConsVVainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
@@ -637,10 +636,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta.4"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
       expl="postcondition"
-      sum="89f09febe9b359f7e11731fdc8743303"
+      sum="1e253830c031164ea76fdf61b7900f7c"
       proved="false"
       expanded="true"
       shape="Calegal_movesV2aNiltaConsVViainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V6aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V6V0ainfix &gt;=V6V1Iainfix &gt;=V6V1Iiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
@@ -649,10 +648,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta.5"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
       expl="precondition"
-      sum="500ca5769932a7242df95924731a90e8"
+      sum="563184465ddec553604aa3248df427b9"
       proved="true"
       expanded="false"
       shape="Calegal_movesV2aNiltaConsVVainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V7aprefix -V0Aainfix &lt;aprefix -V1V7ainfix =V6aprefix -V7iainfix &lt;=V7aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
@@ -685,10 +684,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta.6"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="121" loccnumb="7" loccnume="15"
       expl="postcondition"
-      sum="0c62fb57af952b3cf01548ae12f520fb"
+      sum="900c7b124ed942878c44afd849dadcf0"
       proved="false"
       expanded="true"
       shape="Calegal_movesV2aNiltaConsVViainfix &lt;aminmaxV2V3V1Aainfix &lt;V0aminmaxV2V3ainfix =V7aminmaxV2V3iainfix &lt;=aminmaxV2V3V0ainfix &lt;=V7V0ainfix &gt;=V7V1Iiais_emptyV8ainfix =V7V6iainfix &lt;V9V1Aainfix &lt;amaxV6V0V9ainfix =V7V9iainfix &lt;=V9amaxV6V0ainfix &lt;=V7amaxV6V0ainfix &gt;=V7V1LaminaTuple2V2V3V8LaelementsV5FIainfix &gt;=V3c1Iainfix &gt;=V6V1NIiainfix &lt;V10aprefix -V0Aainfix &lt;aprefix -V1V10ainfix =V6aprefix -V10iainfix &lt;=V10aprefix -V1ainfix &gt;=V6V1ainfix &lt;=V6V0Laminmaxado_moveV2V4ainfix -V3c1FIainfix &gt;=V3c1Iainfix =V3c0NIainfix &gt;=V3c0F">
@@ -699,10 +698,10 @@
    </goal>
    <goal
     name="WP_parameter negabeta_rec"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="139" loccnumb="7" loccnume="19"
     expl="parameter negabeta_rec"
-    sum="c66a01f6b299603d0259e9d1c2fbfdfa"
+    sum="0c0b2dedce3f81e08a8ab69099ccd44d"
     proved="false"
     expanded="true"
     shape="CV5aNiliainfix &lt;V7V1Aainfix &lt;V0V7ainfix =V4V7iainfix &lt;=V7V0ainfix &lt;=V4V0ainfix &gt;=V4V1LaminaTuple2V2V3V6Iais_emptyV6NLaelementsV5aConsVViainfix &gt;=amaxV10V4V1iais_emptyV11ainfix =amaxV10V4V4iainfix &lt;V12V1Aainfix &lt;V0V12ainfix =amaxV10V4V12iainfix &lt;=V12V0ainfix &lt;=amaxV10V4V0ainfix &gt;=amaxV10V4V1LaminaTuple2V2V3V11LaelementsV5iais_emptyV14ainfix =V13V4iainfix &lt;V15V1Aainfix &lt;V0V15ainfix =V13V15iainfix &lt;=V15V0ainfix &lt;=V13V0ainfix &gt;=V13V1LaminaTuple2V2V3V14LaelementsV5Iiais_emptyV16ainfix =V13amaxV10V4iainfix &lt;V17V1Aainfix &lt;amaxamaxV10V4V0V17ainfix =V13V17iainfix &lt;=V17amaxamaxV10V4V0ainfix &lt;=V13amaxamaxV10V4V0ainfix &gt;=V13V1LaminaTuple2V2V3V16LaelementsV9FAainfix &gt;=V3c1Iiainfix &lt;V18aprefix -V0Aainfix &lt;aprefix -V1V18ainfix =V10aprefix -V18iainfix &lt;=V18aprefix -V1ainfix &gt;=V10V1ainfix &lt;=V10V0Laminmaxado_moveV2V8ainfix -V3c1FAainfix &gt;=V3c1Iainfix &gt;=V3c1F">
@@ -714,10 +713,10 @@
      expanded="true">
      <goal
       name="WP_parameter negabeta_rec.1"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
       expl="postcondition"
-      sum="a72723d0bf2dfef176587784dd8affcc"
+      sum="3588b2a391a2c2a894f03d0e0094ab00"
       proved="true"
       expanded="false"
       shape="CV5aNiliainfix &lt;V7V1Aainfix &lt;V0V7ainfix =V4V7iainfix &lt;=V7V0ainfix &lt;=V4V0ainfix &gt;=V4V1LaminaTuple2V2V3V6Iais_emptyV6NLaelementsV5aConsVVtIainfix &gt;=V3c1F">
@@ -734,10 +733,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.2"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
       expl="precondition"
-      sum="9cd99ff522ee31d63052332211a779ea"
+      sum="2340cb631a5af087712eb69afbc6a0ba"
       proved="true"
       expanded="false"
       shape="CV5aNiltaConsVVainfix &gt;=V3c1Iainfix &gt;=V3c1F">
@@ -754,10 +753,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.3"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
       expl="postcondition"
-      sum="10b8f31325e9daa35b3d3e2b5cbf8a28"
+      sum="d35c091cedb5878157356798f59ed4db"
       proved="false"
       expanded="true"
       shape="CV5aNiltaConsVViais_emptyV9ainfix =amaxV8V4V4iainfix &lt;V10V1Aainfix &lt;V0V10ainfix =amaxV8V4V10iainfix &lt;=V10V0ainfix &lt;=amaxV8V4V0ainfix &gt;=amaxV8V4V1LaminaTuple2V2V3V9LaelementsV5Iainfix &gt;=amaxV8V4V1Iiainfix &lt;V11aprefix -V0Aainfix &lt;aprefix -V1V11ainfix =V8aprefix -V11iainfix &lt;=V11aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
@@ -766,10 +765,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.4"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
       expl="precondition"
-      sum="4329f1e96a2efe475056016c3f6199fa"
+      sum="526d7164221d72a60befa04964995fdb"
       proved="true"
       expanded="false"
       shape="CV5aNiltaConsVVainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V9aprefix -V0Aainfix &lt;aprefix -V1V9ainfix =V8aprefix -V9iainfix &lt;=V9aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
@@ -786,10 +785,10 @@
      </goal>
      <goal
       name="WP_parameter negabeta_rec.5"
-      locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+      locfile="../alphaBeta.mlw"
       loclnum="139" loccnumb="7" loccnume="19"
       expl="postcondition"
-      sum="f3ca8402c3c7812cc64e0c47a83dcb95"
+      sum="acc9956fd01105206f0bacf4e92622bb"
       proved="false"
       expanded="true"
       shape="CV5aNiltaConsVViais_emptyV10ainfix =V9V4iainfix &lt;V11V1Aainfix &lt;V0V11ainfix =V9V11iainfix &lt;=V11V0ainfix &lt;=V9V0ainfix &gt;=V9V1LaminaTuple2V2V3V10LaelementsV5Iiais_emptyV12ainfix =V9amaxV8V4iainfix &lt;V13V1Aainfix &lt;amaxamaxV8V4V0V13ainfix =V9V13iainfix &lt;=V13amaxamaxV8V4V0ainfix &lt;=V9amaxamaxV8V4V0ainfix &gt;=V9V1LaminaTuple2V2V3V12LaelementsV7FIainfix &gt;=V3c1Iainfix &gt;=amaxV8V4V1NIiainfix &lt;V14aprefix -V0Aainfix &lt;aprefix -V1V14ainfix =V8aprefix -V14iainfix &lt;=V14aprefix -V1ainfix &gt;=V8V1ainfix &lt;=V8V0Laminmaxado_moveV2V6ainfix -V3c1FIainfix &gt;=V3c1Iainfix &gt;=V3c1F">
@@ -800,10 +799,10 @@
    </goal>
    <goal
     name="WP_parameter alpha_beta"
-    locfile="examples/programs/alphaBeta/../alphaBeta.mlw"
+    locfile="../alphaBeta.mlw"
     loclnum="161" loccnumb="4" loccnume="14"
     expl="parameter alpha_beta"
-    sum="0aea44b26fbd3a7027d1d89dd329af75"
+    sum="5de2d33dad45be2736115fc2f77016e7"
     proved="true"
     expanded="false"
     shape="ainfix =V2aminmaxV0V1Iiainfix &lt;aminmaxV0V1ainfinityAainfix &lt;aprefix -ainfinityaminmaxV0V1ainfix =V2aminmaxV0V1iainfix &lt;=aminmaxV0V1aprefix -ainfinityainfix &lt;=V2aprefix -ainfinityainfix &gt;=V2ainfinityFAainfix &gt;=V1c0Iainfix &gt;=V1c0F">

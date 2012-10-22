@@ -133,6 +133,15 @@ driver = "drivers/gappa.drv"
 
 [ATP gappa]
 name = "Gappa"
+exec = "gappa-0.16.0"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.16.0"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa]
+name = "Gappa"
 exec = "gappa-0.15.1"
 version_switch = "--version"
 version_regexp = "Gappa \\([^ \n]*\\)"
