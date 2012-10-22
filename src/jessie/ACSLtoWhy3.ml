@@ -249,7 +249,20 @@ let add_decls_as_theory theories id decls =
 
 let rec annot ~in_axiomatic a _loc (theories,decls) =
   match a with
-    | Dtype (_, _) -> Self.not_yet_implemented "annot Dtype"
+    | Dtype (lt, loc) -> 
+      let targs = 
+        List.map (fun s -> Ty.create_tvsymbol (Ident.id_fresh s)) lt.lt_params 
+      in
+      let tdef = match lt.lt_def with
+          | None -> None
+          | Some _ -> Self.not_yet_implemented "annot Dtype non abstract"
+      in
+      let ts = 
+        Ty.create_tysymbol 
+          (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef 
+      in
+      let d = Decl.create_ty_decl ts in
+      (theories,d::decls)
     | Dfun_or_pred (_, _) -> Self.not_yet_implemented "annot Dfun_or_pred"
     | Dlemma(name,is_axiom,labels,vars,p,loc) ->
       begin
