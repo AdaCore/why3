@@ -1,4 +1,3 @@
-
 let help = "Checks ACSL contracts using Why3"
 
 module Self =
@@ -51,6 +50,9 @@ let ge_int : Term.lsymbol = find int_theory "infix >="
 (* real.Real theory *)
 let real_type : Ty.ty = Ty.ty_real
 let real_theory : Theory.theory = Env.find_theory env ["real"] "Real"
+let add_real : Term.lsymbol = find real_theory "infix +"
+let sub_real : Term.lsymbol = find real_theory "infix -"
+let minus_real : Term.lsymbol = find real_theory "prefix -"
 let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
 
@@ -69,18 +71,30 @@ let constant c =
     | Integer(_value,Some s) -> Term.ConstInt (Term.IConstDecimal s)
     | Integer(_value,None) ->
       Self.not_yet_implemented "constant Integer None"
-    | LReal(_value,s) -> Term.ConstReal (Term.RConstDecimal (s,"",None))
+    | LReal(_value,s) -> 
+      (* FIXME *)
+      if s = "0.0" then
+        Term.ConstReal (Term.RConstDecimal ("0","0",None))
+      else
+        Self.not_yet_implemented "constant LReal"
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "constant"
 
 let bin (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
+
     | PlusA,Linteger,Linteger -> Term.t_app_infer add_int [t1;t2]
+    | PlusA,Lreal,Lreal -> Term.t_app_infer add_real [t1;t2]
+
     | MinusA,Linteger,Linteger -> Term.t_app_infer sub_int [t1;t2]
+    | MinusA,Lreal,Lreal -> Term.t_app_infer sub_real [t1;t2]
+
     | Mult,Linteger,Linteger -> Term.t_app_infer mul_int [t1;t2]
     | Mult,Lreal,Lreal -> Term.t_app_infer mul_real [t1;t2]
-    | PlusA,_,_ -> Self.not_yet_implemented "bin PlusA"
-    | MinusA,_,_ -> Self.not_yet_implemented "bin PlusA"
+
+    | PlusA,ty1,ty2 -> Self.not_yet_implemented "bin PlusA(%a,%a)" 
+      Cil.d_logic_type ty1 Cil.d_logic_type ty2
+    | MinusA,_,_ -> Self.not_yet_implemented "bin MinusA"
     | Mult,_,_ -> Self.not_yet_implemented "bin Mult"
     | ((PlusPI|IndexPI|MinusPI|MinusPP|Div|Mod|Shiftlt|Shiftrt|Lt|Gt|
  Le|Ge|Eq|Ne|BAnd|BXor|BOr|LAnd|LOr),_, _)
@@ -89,6 +103,7 @@ let bin (ty1,t1) op (ty2,t2) =
 let unary op (ty,t) =
   match op,ty with
     | Neg,Linteger -> Term.t_app_infer minus_int [t]
+    | Neg,Lreal -> Term.t_app_infer minus_real [t]
     | Neg,_ -> Self.not_yet_implemented "unary Neg,_"
     | BNot,_ -> Self.not_yet_implemented "unary BNot"
     | LNot,_ -> Self.not_yet_implemented "unary LNot"
@@ -160,7 +175,9 @@ let rel (ty1,t1) op (ty2,t2) =
 let bind_var v =
   let id = Ident.id_fresh v.lv_name in
   let vs = Term.create_vsymbol id (logic_type v.lv_type) in
+(*
   Self.result "binding variable %d" v.lv_id;
+*)
   Hashtbl.add bound_vars v.lv_id vs;
   vs
 
@@ -195,37 +212,65 @@ let rec predicate p =
 
 and predicate_named p = predicate p.content
 
-let decl annot =
-  match annot with
+let use th1 th2 =
+  let name = th2.Theory.th_name in
+  Theory.close_namespace 
+    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
+    true
+
+let add_decls_as_theory theories id decls =
+  match decls with
+    | [] -> theories
+    | _ ->
+      let th = Theory.create_theory id in
+      let th = use th int_theory in
+      let th = use th real_theory in
+      let th = 
+        List.fold_right (fun d th -> Theory.add_decl th d) decls th 
+      in
+      let th = Theory.close_theory th in
+      th :: theories
+
+let rec annot ~in_axiomatic a _loc (theories,decls,functions) =
+  match a with
+    | Dtype (_, _) -> Self.not_yet_implemented "annot Dtype"
+    | Dfun_or_pred (_, _) -> Self.not_yet_implemented "annot Dfun_or_pred"
     | Dlemma(name,is_axiom,labels,vars,p,loc) ->
       begin
-        if is_axiom then None else
-          match labels,vars with
-            | [],[] ->
+        match labels,vars with
+          | [],[] ->
+            assert (in_axiomatic || not is_axiom);
+            let d =
               let pr = Decl.create_prsymbol 
                 (Ident.id_user name (Loc.extract loc)) 
               in
-              Some (Decl.create_prop_decl Decl.Plemma pr (predicate_named p))
-            | _ ->
-              Self.not_yet_implemented "lemma with labels or vars: not yet implemented"
+              Decl.create_prop_decl 
+                (if is_axiom then Decl.Paxiom else Decl.Plemma) 
+                pr (predicate_named p)
+            in
+            (theories,d::decls,functions)
+          | _ ->
+            Self.not_yet_implemented "lemma with labels or vars: not yet implemented"
       end
-    | Dfun_or_pred (_, _)
+    | Daxiomatic (name, decls', loc) ->      
+      let theories = add_decls_as_theory theories (Ident.id_fresh "Decls") decls in
+      let (t,decls'',f) = 
+        List.fold_left
+          (fun acc d -> annot ~in_axiomatic:true d loc acc)
+          ([],[],[]) 
+          decls'
+      in
+      assert (t = [] && f = []);
+      let theories =
+        add_decls_as_theory theories (Ident.id_user name (Loc.extract loc)) decls''
+      in
+      (theories,[],functions)      
     | Dvolatile (_, _, _, _)
-    | Daxiomatic (_, _, _)
-    | Dtype (_, _)
     | Dinvariant (_, _)
     | Dtype_annot (_, _)
     | Dmodel_annot (_, _)
     | Dcustom_annot (_, _, _)
         -> Self.not_yet_implemented "annot"
-
-let annot annot _loc (lemmas,functions) =
-  let lemmas =
-    match decl annot with
-      | None -> lemmas
-      | Some d -> Theory.add_decl lemmas d
-  in
-  (lemmas, functions)
 
 let global g acc =
   match g with
@@ -262,8 +307,7 @@ let global g acc =
     | GVarDecl(_funspec,vi,_location) ->
       Self.error "WARNING: Variable %s not translated" vi.vname;
       acc
-    | GAnnot (a, b) ->
-      annot a b acc
+    | GAnnot (a, loc) -> annot ~in_axiomatic:false a loc acc
     | GText _ ->
       Self.not_yet_implemented "global: GText"
     | GPragma (_, _) ->
@@ -281,22 +325,18 @@ let global g acc =
     | GType (_, _)  ->
       Self.not_yet_implemented "global: GType"
 
-let use th1 th2 =
-  let name = th2.Theory.th_name in
-  Theory.close_namespace 
-    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
-    true
 
 let prog p =
   try
-    let lemmas = Theory.create_theory (Ident.id_fresh "Lemmas") in
-    let lemmas = use lemmas int_theory in
-    let lemmas = use lemmas real_theory in
-    let lemmas, _functions =
-      List.fold_right global p.globals (lemmas,[])
+    let theories,decls,_functions = 
+      List.fold_right global p.globals ([],[],[])
     in
-    let lemmas = Theory.close_theory lemmas in
-    lemmas
+    Self.result "found %d decls" (List.length decls);
+    let theories = 
+      add_decls_as_theory theories (Ident.id_fresh "Decls") decls 
+    in
+    Self.result "made %d theories" (List.length theories);
+    theories
   with
       Decl.UnknownIdent(s) ->
         Self.fatal "unknown identifier %s" s.Ident.id_string

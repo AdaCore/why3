@@ -48,22 +48,26 @@ let get_prover config env acc name =
 let process () =
   let prog = Ast.get () in
   (* File.pretty_ast (); *)
-  let theory = ACSLtoWhy3.prog prog in
-  let tasks = Task.split_theory theory None None in
-try
-  let provers = List.fold_left (get_prover ACSLtoWhy3.config ACSLtoWhy3.env) []
-    [ "Alt-Ergo,0.94";
-      "Z3,3.2"; "Z3,4.0";
-      "CVC3,2.2"; "CVC3,2.4.1"] 
+  let provers = 
+    List.fold_left (get_prover ACSLtoWhy3.config ACSLtoWhy3.env) []
+      [ "Alt-Ergo,0.94";
+        "Z3,3.2"; "Z3,4.0";
+        "CVC3,2.2"; "CVC3,2.4.1"] 
   in
-  let _ =
-    List.fold_left (fun n t ->
-      ACSLtoWhy3.Self.result "Dealing with task %d" n;
-      List.iter (fun (p,d) -> run_on_task p d t) provers;
-      n+1) 1 tasks
-  in ()
-with e ->
-    ACSLtoWhy3.Self.fatal "Exception raised in run_provers:@ %a" Exn_printer.exn_printer e
+  let theories = ACSLtoWhy3.prog prog in
+  try
+    List.iter (fun th ->
+      ACSLtoWhy3.Self.result "running theory 1";
+      let tasks = Task.split_theory th None None in
+      let _ =
+        List.fold_left (fun n t ->
+          ACSLtoWhy3.Self.result "Dealing with task %d" n;
+          List.iter (fun (p,d) -> run_on_task p d t) provers;
+          n+1) 1 tasks
+      in ())
+    theories
+  with e ->
+    ACSLtoWhy3.Self.fatal "Exception raised when running provers:@ %a" Exn_printer.exn_printer e
 
 
 let (_unused : (unit -> unit) -> unit -> unit) =
