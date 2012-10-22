@@ -3,7 +3,28 @@
 [jessie3] user error: WARNING: Variable Frama_C_bzero not translated
 [jessie3] found 7 decls
 [jessie3] made 1 theories
-[jessie3] running theory 1
+[jessie3] running theory 1:
+[jessie3] theory Decls
+            (* use BuiltIn *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            lemma test1 : (2 + 2) = 4
+            
+            lemma test2 : forall x:int. (x * x) >= 0
+            
+            lemma test2r : forall x:real. (x * x) >= 0.0
+            
+            lemma test3 : forall x:int, y:int. (x + y) = (y + x)
+            
+            lemma test3r : forall x:real, y:real. (x + y) = (y + x)
+            
+            lemma test4 : forall x:int, y:int. (x - y) = (- (y - x))
+            
+            lemma test4r : forall x:real, y:real. (x - y) = (- (y - x))
+            end
 [jessie3] Dealing with task 1
 [jessie3] Status with CVC3 2.4.1: Valid
 [jessie3] Status with CVC3 2.2: Valid
@@ -17,8 +38,8 @@
 [jessie3] Status with Z3 3.2: Valid
 [jessie3] Status with Alt-Ergo 0.94: Valid
 [jessie3] Dealing with task 3
-[jessie3] Status with CVC3 2.4.1: Unknown
-[jessie3] Status with CVC3 2.2: Unknown
+[jessie3] Status with CVC3 2.4.1: Valid
+[jessie3] Status with CVC3 2.2: Valid
 [jessie3] Status with Z3 4.0: Valid
 [jessie3] Status with Z3 3.2: Valid
 [jessie3] Status with Alt-Ergo 0.94: Valid
@@ -29,8 +50,8 @@
 [jessie3] Status with Z3 3.2: Valid
 [jessie3] Status with Alt-Ergo 0.94: Valid
 [jessie3] Dealing with task 5
-[jessie3] Status with CVC3 2.4.1: Valid
-[jessie3] Status with CVC3 2.2: Valid
+[jessie3] Status with CVC3 2.4.1: Unknown
+[jessie3] Status with CVC3 2.2: Unknown
 [jessie3] Status with Z3 4.0: Valid
 [jessie3] Status with Z3 3.2: Valid
 [jessie3] Status with Alt-Ergo 0.94: Valid

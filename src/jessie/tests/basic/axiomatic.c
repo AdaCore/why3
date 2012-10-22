@@ -3,13 +3,17 @@
 */
 
 
+//@ lemma l1: 6*7 == 42;
+
 /*@ axiomatic Bag {
-  @   type bag;
-  @ //  logic bag my_union(bag b1,bag b2);
+  @   type bag<X>;
+  @ //  logic bag<X> bag_union(bag<X> b1,bag<X> b2);
   @ //  axiom union_comm: \forall bag b1,b2;
-  @ //     my_union(b1,b2) == my_union(b2,b1);
+  @ //     bag_union(b1,b2) == bag_union(b2,b1);
   @ }
   @*/
+
+//@ lemma l2: 6+7 == 13;
 
 
 

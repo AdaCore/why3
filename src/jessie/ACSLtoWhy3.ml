@@ -241,9 +241,7 @@ let add_decls_as_theory theories id decls =
       let th = Theory.create_theory id in
       let th = use th int_theory in
       let th = use th real_theory in
-      let th =
-        List.fold_right (fun d th -> Theory.add_decl th d) decls th
-      in
+      let th = List.fold_left Theory.add_decl th decls in
       let th = Theory.close_theory th in
       th :: theories
 

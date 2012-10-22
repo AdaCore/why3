@@ -57,7 +57,8 @@ let process () =
   let theories = ACSLtoWhy3.prog prog in
   try
     List.iter (fun th ->
-      ACSLtoWhy3.Self.result "running theory 1";
+      ACSLtoWhy3.Self.result "running theory 1:";
+      ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
       let tasks = Task.split_theory th None None in
       let _ =
         List.fold_left (fun n t ->
