@@ -54,25 +54,25 @@ let logic_type ty =
     | Lvar _
     | Lreal
     | Larrow (_, _) ->
-        Self.fatal "logic_type : not yet implemented"
+        Self.not_yet_implemented "logic_type"
 
 let constant c =
   match c with
     | Integer(_value,Some s) -> Term.ConstInt (Term.IConstDecimal s)
     | Integer(_value,None) ->
-      Self.fatal "constant Integer None : not yet implemented"
+      Self.not_yet_implemented "constant Integer None"
     | (LStr _|LWStr _|LChr _|LReal (_, _)|LEnum _) ->
-      Self.fatal "constant : not yet implemented"
+      Self.not_yet_implemented "constant"
 
 let bin (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
     | PlusA,Linteger,Linteger -> Term.t_app_infer add_int [t1;t2]
     | Mult,Linteger,Linteger -> Term.t_app_infer mul_int [t1;t2]
-    | PlusA,_,_ -> Self.fatal "bin PlusA : not yet implemented"
-    | Mult,_,_ -> Self.fatal "bin Mult : not yet implemented"
+    | PlusA,_,_ -> Self.not_yet_implemented "bin PlusA"
+    | Mult,_,_ -> Self.not_yet_implemented "bin Mult"
     | ((PlusPI|IndexPI|MinusA|MinusPI|MinusPP|Div|Mod|Shiftlt|Shiftrt|Lt|Gt|
  Le|Ge|Eq|Ne|BAnd|BXor|BOr|LAnd|LOr),_, _)
-      -> Self.fatal "bin : not yet implemented"
+      -> Self.not_yet_implemented "bin"
 
 let bound_vars = Hashtbl.create 257
 
@@ -86,17 +86,17 @@ let tlval (host,offset) =
           Self.fatal "variable %d not found" lv.lv_id
       end
     | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
-      Self.fatal "tlval TVar : not yet implemented"
+      Self.not_yet_implemented "tlval TVar"
     | ((TResult _|TMem _), _) ->
-      Self.fatal "tlval : not yet implemented"
+      Self.not_yet_implemented "tlval"
 
 let rec term_node t =
   match t with
     | TConst cst -> Term.t_const (constant cst)
     | TLval lv -> tlval lv
     | TBinOp (op, t1, t2) -> bin (term t1) op (term t2)
-    | TUnOp (_, _) -> Self.fatal "term_node TUnOp : not yet implemented"
-    | TCastE (_, _) -> Self.fatal "term_node TCastE : not yet implemented"
+    | TUnOp (_, _) -> Self.not_yet_implemented "term_node TUnOp"
+    | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | TSizeOf _
     | TSizeOfE _
     | TSizeOfStr _
@@ -124,7 +124,7 @@ let rec term_node t =
     | Tcomprehension (_, _, _)
     | Trange (_, _)
     | Tlet (_, _) ->
-      Self.fatal "term_node : not yet implemented"
+      Self.not_yet_implemented "term_node"
 
 and term t = (t.term_type, term_node t.term_node)
 
@@ -133,9 +133,9 @@ let rel (ty1,t1) op (ty2,t2) =
     | Req,_,_ -> Term.t_equ t1 t2
     | Rge,Linteger,Linteger -> Term.t_app_infer ge_int [t1;t2]
     | Rge,_,_ ->
-      Self.fatal "rel Rge : not yet implemented"
+      Self.not_yet_implemented "rel Rge"
     | (Rlt|Rgt|Rle|Rneq),_,_ ->
-      Self.fatal "rel : not yet implemented"
+      Self.not_yet_implemented "rel"
 
 let bind_var v =
   let id = Ident.id_fresh v.lv_name in
@@ -171,7 +171,7 @@ let rec predicate p =
     | Pfreeable (_, _)
     | Pfresh (_, _, _, _)
     | Psubtype (_, _) ->
-        Self.fatal "predicate : not yet implemented"
+        Self.not_yet_implemented "predicate"
 
 and predicate_named p = predicate p.content
 
@@ -187,7 +187,7 @@ let decl annot =
               in
               Some (Decl.create_prop_decl Decl.Plemma pr (predicate_named p))
             | _ ->
-              Self.fatal "lemma with labels or vars: not yet implemented"
+              Self.not_yet_implemented "lemma with labels or vars: not yet implemented"
       end
     | Dfun_or_pred (_, _)
     | Dvolatile (_, _, _, _)
@@ -197,7 +197,7 @@ let decl annot =
     | Dtype_annot (_, _)
     | Dmodel_annot (_, _)
     | Dcustom_annot (_, _, _)
-        -> Self.fatal "annot : not yet implemented"
+        -> Self.not_yet_implemented "annot"
 
 let annot annot _loc (lemmas,functions) =
   let lemmas =
@@ -219,7 +219,7 @@ let global g acc =
         with Unsupported msg->
 *)
         let msg = "not yet implemented" in
-        Self.fatal "Function %s not translated (%s)" fdec.svar.vname msg
+        Self.not_yet_implemented "Function %s not translated (%s)" fdec.svar.vname msg
       end
    | GVar (vi, _init, _loc) ->
 (*
@@ -237,7 +237,7 @@ let global g acc =
         { acc with AST.prog_vars =
           (intern_string vi.vname, g)::acc.AST.prog_vars }
 *)
-     Self.fatal "WARNING: Variable %s not translated" vi.vname
+     Self.not_yet_implemented "WARNING: Variable %s not translated" vi.vname
 
     | GVarDecl(_funspec,vi,_location) ->
       Self.error "WARNING: Variable %s not translated" vi.vname;
@@ -245,21 +245,21 @@ let global g acc =
     | GAnnot (a, b) ->
       annot a b acc
     | GText _ ->
-      Self.fatal "global: GText"
+      Self.not_yet_implemented "global: GText"
     | GPragma (_, _) ->
-      Self.fatal "global: GPragma"
+      Self.not_yet_implemented "global: GPragma"
     | GAsm (_, _) ->
-      Self.fatal "global: GAsm"
+      Self.not_yet_implemented "global: GAsm"
     | GEnumTagDecl (_, _) ->
-      Self.fatal "global: GEnumTagDecl"
+      Self.not_yet_implemented "global: GEnumTagDecl"
     | GEnumTag (_, _) ->
-      Self.fatal "global: GEnumTag"
+      Self.not_yet_implemented "global: GEnumTag"
     | GCompTagDecl (_, _) ->
-      Self.fatal "global: GCompTagDecl"
+      Self.not_yet_implemented "global: GCompTagDecl"
     | GCompTag (_, _) ->
-      Self.fatal "global: GCompTag"
+      Self.not_yet_implemented "global: GCompTag"
     | GType (_, _)  ->
-      Self.fatal "global: GType"
+      Self.not_yet_implemented "global: GType"
 
 let prog p =
   let lemmas = Theory.create_theory (Ident.id_fresh "Lemmas") in
