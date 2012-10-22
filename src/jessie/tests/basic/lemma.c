@@ -1,3 +1,6 @@
+/* run.config
+   OPT: -journal-disable -jessie3
+*/
 
 
 /*@ lemma test1 : 2+2 == 4;

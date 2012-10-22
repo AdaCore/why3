@@ -6,8 +6,8 @@ PLUGIN_CMO      := ACSLtoWhy3 register
 
 SHELL := /bin/bash
 
-PLUGIN_EXTRA_BYTE:= /usr/lib/ocaml/why3/why3.cma 
-PLUGIN_EXTRA_OPT:= /usr/lib/ocaml/why3/why3.cmxa
+PLUGIN_EXTRA_BYTE:= @OCAMLLIB@/why3/why3.cma 
+PLUGIN_EXTRA_OPT:= @OCAMLLIB@/why3/why3.cmxa
 PLUGIN_BFLAGS:= -I +why3 
 PLUGIN_OFLAGS:= -I +why3 
 PLUGIN_LINK_BFLAGS:= -I +why3 

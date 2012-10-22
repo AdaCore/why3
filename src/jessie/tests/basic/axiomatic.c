@@ -1,4 +1,6 @@
-
+/* run.config
+   OPT: -journal-disable -jessie3
+*/
 
 
 /*@ axiomatic Bag {

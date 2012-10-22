@@ -56,6 +56,22 @@ let minus_real : Term.lsymbol = find real_theory "prefix -"
 let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
 
+let unit_type = Ty.ty_tuple []
+
+let ctype ty =
+  match ty with
+    | TVoid _attr -> unit_type
+    | TInt (_, _)
+    | TFloat (_, _)
+    | TPtr (_, _)
+    | TArray (_, _, _, _)
+    | TFun (_, _, _, _)
+    | TNamed (_, _)
+    | TComp (_, _, _)
+    | TEnum (_, _)
+    | TBuiltin_va_list _
+    -> Self.not_yet_implemented "ctype"
+
 let logic_type ty =
   match ty with
     | Linteger -> int_type
@@ -71,7 +87,7 @@ let constant c =
     | Integer(_value,Some s) -> Term.ConstInt (Term.IConstDecimal s)
     | Integer(_value,None) ->
       Self.not_yet_implemented "constant Integer None"
-    | LReal(_value,s) -> 
+    | LReal(_value,s) ->
       (* FIXME *)
       if s = "0.0" then
         Term.ConstReal (Term.RConstDecimal ("0","0",None))
@@ -92,7 +108,7 @@ let bin (ty1,t1) op (ty2,t2) =
     | Mult,Linteger,Linteger -> Term.t_app_infer mul_int [t1;t2]
     | Mult,Lreal,Lreal -> Term.t_app_infer mul_real [t1;t2]
 
-    | PlusA,ty1,ty2 -> Self.not_yet_implemented "bin PlusA(%a,%a)" 
+    | PlusA,ty1,ty2 -> Self.not_yet_implemented "bin PlusA(%a,%a)"
       Cil.d_logic_type ty1 Cil.d_logic_type ty2
     | MinusA,_,_ -> Self.not_yet_implemented "bin MinusA"
     | Mult,_,_ -> Self.not_yet_implemented "bin Mult"
@@ -214,7 +230,7 @@ and predicate_named p = predicate p.content
 
 let use th1 th2 =
   let name = th2.Theory.th_name in
-  Theory.close_namespace 
+  Theory.close_namespace
     (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
     true
 
@@ -225,13 +241,13 @@ let add_decls_as_theory theories id decls =
       let th = Theory.create_theory id in
       let th = use th int_theory in
       let th = use th real_theory in
-      let th = 
-        List.fold_right (fun d th -> Theory.add_decl th d) decls th 
+      let th =
+        List.fold_right (fun d th -> Theory.add_decl th d) decls th
       in
       let th = Theory.close_theory th in
       th :: theories
 
-let rec annot ~in_axiomatic a _loc (theories,decls,functions) =
+let rec annot ~in_axiomatic a _loc (theories,decls) =
   match a with
     | Dtype (_, _) -> Self.not_yet_implemented "annot Dtype"
     | Dfun_or_pred (_, _) -> Self.not_yet_implemented "annot Dfun_or_pred"
@@ -241,30 +257,30 @@ let rec annot ~in_axiomatic a _loc (theories,decls,functions) =
           | [],[] ->
             assert (in_axiomatic || not is_axiom);
             let d =
-              let pr = Decl.create_prsymbol 
-                (Ident.id_user name (Loc.extract loc)) 
+              let pr = Decl.create_prsymbol
+                (Ident.id_user name (Loc.extract loc))
               in
-              Decl.create_prop_decl 
-                (if is_axiom then Decl.Paxiom else Decl.Plemma) 
+              Decl.create_prop_decl
+                (if is_axiom then Decl.Paxiom else Decl.Plemma)
                 pr (predicate_named p)
             in
-            (theories,d::decls,functions)
+            (theories,d::decls)
           | _ ->
             Self.not_yet_implemented "lemma with labels or vars: not yet implemented"
       end
-    | Daxiomatic (name, decls', loc) ->      
+    | Daxiomatic (name, decls', loc) ->
       let theories = add_decls_as_theory theories (Ident.id_fresh "Decls") decls in
-      let (t,decls'',f) = 
+      let (t,decls'') =
         List.fold_left
           (fun acc d -> annot ~in_axiomatic:true d loc acc)
-          ([],[],[]) 
+          ([],[])
           decls'
       in
-      assert (t = [] && f = []);
+      assert (t = []);
       let theories =
         add_decls_as_theory theories (Ident.id_user name (Loc.extract loc)) decls''
       in
-      (theories,[],functions)      
+      (theories,[])
     | Dvolatile (_, _, _, _)
     | Dinvariant (_, _)
     | Dtype_annot (_, _)
@@ -272,20 +288,68 @@ let rec annot ~in_axiomatic a _loc (theories,decls,functions) =
     | Dcustom_annot (_, _, _)
         -> Self.not_yet_implemented "annot"
 
-let global g acc =
+let identified_proposition p =
+  { name = p.ip_name; loc = p.ip_loc; content = p.ip_content }
+
+let extract_simple_contract c =
+  let pre,post,ass = List.fold_left
+    (fun (pre,post,ass) b ->
+      if not (Cil.is_default_behavior b) then 
+        Self.not_yet_implemented "named behaviors";
+      if b.b_assumes <> [] then 
+        Self.not_yet_implemented "assumes clause";
+      let pre = 
+        List.fold_left
+          (fun acc f -> (identified_proposition f) :: acc)
+          pre b.b_requires
+      in
+      let post =
+        List.fold_left
+          (fun acc (k,f) ->
+            if k <> Normal then 
+              Self.not_yet_implemented "abnormal termination post-condition";
+            (identified_proposition f) :: acc)
+          post b.b_post_cond
+      in
+      let ass =
+        match b.b_assigns with
+        | WritesAny -> ass
+        | Writes l ->
+          let l = List.map (fun (t,_) -> 
+            term (* ~in_contract:true Logic_const.here_label *) t.it_content) l in
+          match ass with
+          | None -> Some l
+          | Some l' -> Some (l@l')
+      in
+      (pre,post, ass))
+    ([],[],None) c.spec_behavior
+  in
+  (Logic_const.pands pre, Logic_const.pands post, ass)
+
+let fundecl fdec =
+  let fun_id = fdec.svar in
+  let kf = Globals.Functions.get fun_id in
+  Self.log "processing function %a" Kernel_function.pretty kf;
+  let _formals = List.map
+      (fun v -> (v.vname, ctype v.vtype))
+      (Kernel_function.get_formals kf)
+  in
+  let body = fdec.sbody in
+  let _vars = List.map
+      (fun v -> (v.vname, ctype v.vtype)) 
+      (Kernel_function.get_locals kf)
+  in
+  let contract = Annotations.funspec kf in
+  let _pre,_post,_ass = extract_simple_contract contract in
+  let _ret_type = ctype (Kernel_function.get_return_type kf) in
+  let _body = body.bstmts in
+  ()
+
+let global g (theories,lemmas,functions) =
   match g with
     | GFun (fdec,_) ->
-      begin
-(*
-        try
-          { acc with AST.prog_funct =
-              (intern_string fdec.svar.vname, Internal (translate_fundec fdec))
-                ::acc.AST.prog_funct }
-        with Unsupported msg->
-*)
-        let msg = "not yet implemented" in
-        Self.not_yet_implemented "Function %s not translated (%s)" fdec.svar.vname msg
-      end
+      let f = fundecl fdec in
+      (theories,lemmas,f::functions)
    | GVar (vi, _init, _loc) ->
 (*
         let ty = translate_type vi.vtype in
@@ -306,8 +370,10 @@ let global g acc =
 
     | GVarDecl(_funspec,vi,_location) ->
       Self.error "WARNING: Variable %s not translated" vi.vname;
-      acc
-    | GAnnot (a, loc) -> annot ~in_axiomatic:false a loc acc
+      (theories,lemmas,functions)
+    | GAnnot (a, loc) ->
+      let (t,l) = annot ~in_axiomatic:false a loc (theories,lemmas) in
+      (t,l,functions)
     | GText _ ->
       Self.not_yet_implemented "global: GText"
     | GPragma (_, _) ->
@@ -328,12 +394,12 @@ let global g acc =
 
 let prog p =
   try
-    let theories,decls,_functions = 
+    let theories,decls,_functions =
       List.fold_right global p.globals ([],[],[])
     in
     Self.result "found %d decls" (List.length decls);
-    let theories = 
-      add_decls_as_theory theories (Ident.id_fresh "Decls") decls 
+    let theories =
+      add_decls_as_theory theories (Ident.id_fresh "Decls") decls
     in
     Self.result "made %d theories" (List.length theories);
     theories

@@ -1,3 +1,7 @@
+/* run.config
+   OPT: -journal-disable -jessie3
+*/
+
 
 //@ logic integer sqr(integer x) = x * x;
 
