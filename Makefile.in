@@ -1200,7 +1200,7 @@ doc: doc/manual.pdf
 # doc/manual.html
 
 BNF = qualid label constant operator term type formula theory theory2 \
-	why_file typev expr expr2 module whyml_file
+	why_file spec expr expr2 module whyml_file
 BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
 
 doc/%_bnf.tex: doc/%.bnf doc/bnf

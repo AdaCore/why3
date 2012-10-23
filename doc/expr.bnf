@@ -8,38 +8,40 @@
        | expr "[" expr "]" "<-" expr              ; brackets assignment
        | expr "[" expr infix-op-1 expr "]" 	  ; ternary brackets
        | expr expr+ 		                  ; function application
-       | "fun" type-v-param+ "->" triple          ; lambda abstraction
-       | "let" "rec" recfun ("with" recfun)*      ; recursive functions
+       | "fun" binder+ spec* "->" spec* expr ; lambda abstraction
+       | "let" "rec" rec-defn "in" expr ; recursive functions
+       | "let" fun-defn "in" expr                 ; local function
        | "if" expr "then" expr ("else" expr)?     ; conditional
        | expr ";" expr                            ; sequence
-       | "loop" loop-annot "end"                  ; infinite loop
+       | "loop" invariant* variant? expr "end"    ; infinite loop
        | "while" expr                             ; while loop
-         "do" loop-annot expr "done"              ;
+         "do" invariant* variant? expr "done"     ;
        | "for" lident "=" expr to-downto expr     ; for loop
-         "do" loop-inv expr "done"                ;
-       | assert annotation                        ; assertion
-       | "absurd"                                 ;
+         "do" invariant* expr "done"                ;
+       | assertion                                ; assertion
        | "raise" uqualid                          ; exception raising
        | "raise" "(" uqualid expr ")"             ;
        | "try" expr "with" ("|" handler)+ "end"   ; exception catching
-       | "any" type-c                             ;
+       | "any" type spec*                         ;
+       | "abstract" expr spec*                    ; blackbox
        | "let" pattern "=" expr "in" expr         ; local binding
        | "match" expr ("," expr)* "with"          ; pattern matching
-         ("|" expr-case)+ "end"                   ;
+         "|"? expr-case ("|" expr-case)* "end"    ;
        | "(" expr ("," expr)+ ")"                 ; tuple
-       | "{" field-value+ "}"                     ; record
+       | "{" expr-field+ "}"                     ; record
        | expr "." lqualid                         ; field access
        | expr "." lqualid "<-" expr               ; field assignment
-       | "{" expr "with" field-value+ "}"         ; field update
+       | "{" expr "with" expr-field+ "}"         ; field update
        | expr ":" type 	                          ; cast
+       | "ghost" expr 	                          ; ghost expression
        | label expr 	                          ; label
        | "'" uident ":" expr                      ; code mark
        | "(" expr ")" 	      	                  ; parentheses
   \
   expr-case ::= pattern "->" expr                 ;
   \
-  field-value ::= lqualid "=" expr ";"            ;
+  expr-field ::= lqualid "=" expr ";"            ;
   \
-  triple ::= expr                                 ;
-    | pre expr post                               ; Hoare triple
+  handler ::= uqualid pattern? "->" expr
+  \
 \end{syntax}

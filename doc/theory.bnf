@@ -10,9 +10,9 @@
     | "axiom" ident ":" formula 	   ;
     | "lemma" ident ":" formula 	   ;
     | "goal"  ident ":" formula 	   ;
-    | "use" imp-exp tqualid ("as" uident-opt)?     ;
-    | "clone" imp-exp tqualid ("as" uident-opt)? subst? ;
-    | "namespace" "import"? uident-opt decl* "end" ;
+    | "use" imp-exp tqualid ("as" uident)?     ;
+    | "clone" imp-exp tqualid ("as" uident)? subst? ;
+    | "namespace" "import"? uident decl* "end" ;
   \
   logic-decl ::= function-decl ;
     | predicate-decl
@@ -32,8 +32,6 @@
   ind-case ::= ident label* ":" formula ;
   \
   imp-exp ::= ("import" | "export")?
-  \
-  uident-opt ::= uident | "_"
   \
   subst ::= "with" ("," subst-elt)+
   \
