@@ -325,7 +325,7 @@ session NOT updated)@." n m
           printf " %d/%d@." n m ;
         if !opt_stats && n<m then print_statistics files;
         if !opt_verbose then eprintf "Everything replayed OK.@.";
-        if found_obs && (n=m || !opt_force) then
+        if (found_obs && n=m) || !opt_force then
           begin
             if !opt_verbose then eprintf "Saving session...@?";
             S.save_session config session;

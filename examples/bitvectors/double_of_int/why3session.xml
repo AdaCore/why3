@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="bitvectors/double_of_int/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -25,7 +24,7 @@
  <prover
   id="5"
   name="Gappa"
-  version="0.16.0"/>
+  version="0.16.1"/>
  <prover
   id="6"
   name="Z3"
@@ -40,13 +39,13 @@
   expanded="true">
   <theory
    name="DoubleOfInt"
-   locfile="bitvectors/double_of_int/../double_of_int.why"
+   locfile="../double_of_int.why"
    loclnum="3" loccnumb="7" loccnume="18"
    verified="true"
    expanded="true">
    <goal
     name="jp0_30"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="25" loccnumb="8" loccnume="14"
     sum="842bc987782a685a12fd36113c0e63a5"
     proved="true"
@@ -71,7 +70,7 @@
    </goal>
    <goal
     name="nth_const1"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="41" loccnumb="8" loccnume="18"
     sum="daeea5ea737b3241595fcfb708e70f5a"
     proved="true"
@@ -88,7 +87,7 @@
    </goal>
    <goal
     name="nth_const2"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="42" loccnumb="8" loccnume="18"
     sum="0f6469715ada51e26147ae146acb1d71"
     proved="true"
@@ -113,7 +112,7 @@
    </goal>
    <goal
     name="nth_const3"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="43" loccnumb="8" loccnume="18"
     sum="ddb41e35ebfdd7220dc9a4043bc6199d"
     proved="true"
@@ -130,7 +129,7 @@
    </goal>
    <goal
     name="nth_const4"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="44" loccnumb="8" loccnume="18"
     sum="cbbaae448dc933d9e751383ed6756170"
     proved="true"
@@ -147,7 +146,7 @@
    </goal>
    <goal
     name="nth_const5"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="45" loccnumb="8" loccnume="18"
     sum="855bcf07099a9c606761e92a2c43129b"
     proved="true"
@@ -164,7 +163,7 @@
    </goal>
    <goal
     name="nth_const6"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="46" loccnumb="8" loccnume="18"
     sum="f90f27ea4b8352949efa686898579ba5"
     proved="true"
@@ -181,7 +180,7 @@
    </goal>
    <goal
     name="nth_const7"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="47" loccnumb="8" loccnume="18"
     sum="33ddded6ac63f36505881e2f6f7daf52"
     proved="true"
@@ -198,7 +197,7 @@
    </goal>
    <goal
     name="nth_const8"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="48" loccnumb="8" loccnume="18"
     sum="ebbfe86d1919d9c00eedf03bd41df821"
     proved="true"
@@ -223,7 +222,7 @@
    </goal>
    <goal
     name="nth_const9"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="49" loccnumb="8" loccnume="18"
     sum="0ac5bc0333128c22f732472517683d73"
     proved="true"
@@ -240,19 +239,27 @@
    </goal>
    <goal
     name="sign_const"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="51" loccnumb="8" loccnume="18"
     sum="d2875e93d825f79a8a6b236ed396cef0"
     proved="true"
     expanded="false"
     shape="ainfix =asignaconstaFalse">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="2"
@@ -261,14 +268,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="3"
@@ -287,6 +286,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="5"
      memlimit="1000"
@@ -294,18 +301,10 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
    </goal>
    <goal
     name="exp_const"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="53" loccnumb="8" loccnume="17"
     sum="76fbb0c9625c75a23b73b65a724de5f0"
     proved="true"
@@ -323,19 +322,27 @@
    </goal>
    <goal
     name="to_nat_mantissa_1"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="55" loccnumb="8" loccnume="25"
     sum="706bd004ab4c53be3e4da3035cbea3fe"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconstc30c0c0">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.73"/>
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="2"
@@ -346,20 +353,20 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.18"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.73"/>
     </proof>
     <proof
      prover="7"
@@ -369,30 +376,30 @@
      archived="false">
      <result status="valid" time="3.18"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
    </goal>
    <goal
     name="mantissa_const_nth2"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="57" loccnumb="8" loccnume="27"
     sum="71d3c2020fa5fefb1fffa125a483bdb4"
     proved="true"
     expanded="false"
     shape="ainfix =anthaconstV0aFalseIainfix &lt;=V0c51Aainfix &lt;=c32V0F">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="2"
@@ -403,20 +410,20 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="7"
@@ -426,31 +433,15 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
    </goal>
    <goal
     name="mantissa_const_to_nat51"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="60" loccnumb="8" loccnume="31"
     sum="766a89ace17c4afaac2d1c2a568754d0"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconstc51c0ato_nat_subaconstc31c0">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.95"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -460,14 +451,6 @@
      <result status="valid" time="0.16"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="11"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.43"/>
-    </proof>
-    <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
@@ -475,23 +458,31 @@
      archived="false">
      <result status="valid" time="0.14"/>
     </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.95"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="11"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.43"/>
+    </proof>
    </goal>
    <goal
     name="mantissa_const"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="63" loccnumb="8" loccnume="22"
     sum="f990d76a46e71daafc0a8a8277aa1b39"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaaconstapow2c31">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -501,14 +492,6 @@
      <result status="valid" time="0.59"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
@@ -516,23 +499,31 @@
      archived="false">
      <result status="valid" time="0.48"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
    </goal>
    <goal
     name="real1075m1023"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="65" loccnumb="8" loccnume="21"
     sum="039dede7984a3f0d0313375512356486"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intainfix -c1075c1023c52.0">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
     <proof
      prover="2"
      timelimit="5"
@@ -551,6 +542,14 @@
     </proof>
     <proof
      prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -568,19 +567,27 @@
    </goal>
    <goal
     name="real1075m1023_2"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="67" loccnumb="8" loccnume="23"
     sum="49fd502d2bebe2b9c4846ae78b6a926a"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix -.c1075.0c1023.0c52.0">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="2"
@@ -589,14 +596,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="3"
@@ -615,7 +614,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -623,17 +622,17 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
+     prover="7"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="real52_a_m52"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="69" loccnumb="8" loccnume="20"
     sum="c7b4390dfc2380dabdf5352f51e02ec0"
     proved="true"
@@ -658,20 +657,12 @@
    </goal>
    <goal
     name="const_value0"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="71" loccnumb="8" loccnume="20"
     sum="31c88f8a47ee230f4d53940e389fa0e1"
     proved="true"
     expanded="false"
     shape="ainfix =aconst_as_doubleainfix *.ainfix *.c1.0apow2ainfix -c1075c1023ainfix +.c1.0ainfix *.apow2c31apow2aprefix -c52">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -681,14 +672,6 @@
      <result status="valid" time="0.28"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.27"/>
-    </proof>
-    <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
@@ -696,22 +679,46 @@
      archived="false">
      <result status="valid" time="0.32"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.27"/>
+    </proof>
    </goal>
    <goal
     name="const_value"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="74" loccnumb="8" loccnume="19"
     sum="b79141081d304415a5a6f193ec5e2409"
     proved="true"
     expanded="false"
     shape="ainfix =aconst_as_doubleainfix +.apow2c52apow2c31">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.13"/>
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="2"
@@ -722,20 +729,20 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.13"/>
     </proof>
     <proof
      prover="7"
@@ -745,23 +752,23 @@
      archived="false">
      <result status="valid" time="3.13"/>
     </proof>
+   </goal>
+   <goal
+    name="nth_0_30"
+    locfile="../double_of_int.why"
+    loclnum="100" loccnumb="8" loccnume="16"
+    sum="fce99fa866c4c099d0fbc8e9fd411ceb"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anthabw_xoraj&apos;afrom_int2cV0V1anthafrom_int2cV0V1Iainfix &lt;=V1c30Aainfix &lt;=c0V1Aais_int32V0FF">
     <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.74"/>
     </proof>
-   </goal>
-   <goal
-    name="nth_0_30"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
-    loclnum="100" loccnumb="8" loccnume="16"
-    sum="fce99fa866c4c099d0fbc8e9fd411ceb"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthabw_xoraj&apos;afrom_int2cV0V1anthafrom_int2cV0V1Iainfix &lt;=V1c30Aainfix &lt;=c0V1Aais_int32V0FF">
     <proof
      prover="2"
      timelimit="5"
@@ -778,31 +785,15 @@
      archived="false">
      <result status="valid" time="0.50"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.74"/>
-    </proof>
    </goal>
    <goal
     name="nth_jpxor_0_30"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="102" loccnumb="8" loccnume="22"
     sum="aa7c1f0ee3657926c6f1bf3a50a8723b"
     proved="true"
     expanded="false"
     shape="ainfix =anthajpxorV0V1anthafrom_int2cV0V1Iainfix &lt;=V1c30Aainfix &lt;=c0V1Aais_int32V0FF">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -812,14 +803,6 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
@@ -827,10 +810,26 @@
      archived="false">
      <result status="valid" time="0.09"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
    </goal>
    <goal
     name="nth_var31"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="104" loccnumb="8" loccnume="17"
     sum="109e12c433b338d4b5fb32afe99ce518"
     proved="true"
@@ -855,20 +854,12 @@
    </goal>
    <goal
     name="to_nat_sub_0_30"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="107" loccnumb="8" loccnume="23"
     sum="1eab69b8b2fd31f062ecdb30c968a910"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subabw_xoraj&apos;afrom_int2cV0c30c0ato_nat_subafrom_int2cV0c30c0Iais_int32V0F">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.78"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -876,6 +867,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.15"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.23"/>
     </proof>
     <proof
      prover="3"
@@ -886,6 +885,14 @@
      <result status="valid" time="0.48"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.78"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="10"
      memlimit="1000"
@@ -893,30 +900,30 @@
      archived="false">
      <result status="valid" time="3.60"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.23"/>
-    </proof>
    </goal>
    <goal
     name="jpxorx_pos"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="114" loccnumb="8" loccnume="18"
     sum="b712dbf5ea7714f3791cd53a7bc539a0"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xoraj&apos;afrom_int2cV0c31aTrueIainfix &gt;=V0c0F">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.13"/>
+     <result status="valid" time="0.20"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
     </proof>
     <proof
      prover="2"
@@ -927,20 +934,20 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.20"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.13"/>
     </proof>
     <proof
      prover="7"
@@ -950,18 +957,10 @@
      archived="false">
      <result status="valid" time="0.12"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.21"/>
-    </proof>
    </goal>
    <goal
     name="from_int2c_to_nat_sub_pos"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="116" loccnumb="8" loccnume="33"
     sum="a356cd0765bf864bb8d78e6e1dfb64ed"
     proved="true"
@@ -979,7 +978,7 @@
    </goal>
    <goal
     name="lemma1_pos"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="121" loccnumb="8" loccnume="18"
     sum="23fc01cc5106e5be76a19ed81795fabb"
     proved="true"
@@ -997,20 +996,12 @@
    </goal>
    <goal
     name="jpxorx_neg"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="126" loccnumb="8" loccnume="18"
     sum="95b4cc9a17c66ba1c34133c89d6f2114"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xoraj&apos;afrom_int2cV0c31aFalseIainfix &lt;V0c0F">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.13"/>
-    </proof>
     <proof
      prover="2"
      timelimit="5"
@@ -1028,6 +1019,14 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.13"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="5"
      memlimit="1000"
@@ -1038,7 +1037,7 @@
    </goal>
    <goal
     name="from_int2c_to_nat_sub_neg"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="129" loccnumb="8" loccnume="33"
     sum="d55bb1a3e530a6f337888f11668b877b"
     proved="true"
@@ -1056,7 +1055,7 @@
    </goal>
    <goal
     name="lemma1_neg"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="134" loccnumb="8" loccnume="18"
     sum="b65a1a26f40171208a6b1954a625efff"
     proved="true"
@@ -1074,19 +1073,27 @@
    </goal>
    <goal
     name="lemma1"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="172" loccnumb="8" loccnume="14"
     sum="371a969461c3f47d85cb7a5e3e2eb0f3"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subajpxorV0c31c0ainfix +apow2c31V0Iais_int32V0F">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="2"
@@ -1097,20 +1104,20 @@
      <result status="valid" time="0.16"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.35"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
     </proof>
     <proof
      prover="7"
@@ -1120,18 +1127,10 @@
      archived="false">
      <result status="valid" time="0.13"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
    </goal>
    <goal
     name="nth_var_0_31"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="180" loccnumb="8" loccnume="20"
     sum="3c5a5efc58958e4c712aecd47078e31e"
     proved="true"
@@ -1156,7 +1155,7 @@
    </goal>
    <goal
     name="to_nat_bv32_bv64_aux"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="182" loccnumb="8" loccnume="28"
     sum="19ac2beffed77c44bd682f3f2265df8b"
     proved="true"
@@ -1174,19 +1173,27 @@
    </goal>
    <goal
     name="to_nat_bv32_bv64"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="183" loccnumb="8" loccnume="24"
     sum="7b9b40e0aa8d2bac83f9d399e8a8eea3"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subaconcatV0V1c31c0ato_nat_subV1c31c0FF">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="2"
@@ -1197,20 +1204,20 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
     </proof>
     <proof
      prover="7"
@@ -1220,18 +1227,10 @@
      archived="false">
      <result status="valid" time="0.12"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
    </goal>
    <goal
     name="to_nat_var_0_31"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="185" loccnumb="8" loccnume="23"
     sum="adade365f747d79bde7d15c25552693e"
     proved="true"
@@ -1256,7 +1255,7 @@
    </goal>
    <goal
     name="nth_var32to63"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="187" loccnumb="8" loccnume="21"
     sum="70aa3b43deda3588319a94879e50aaea"
     proved="true"
@@ -1276,12 +1275,12 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.20"/>
+     <result status="valid" time="0.96"/>
     </proof>
    </goal>
    <goal
     name="nth_var3"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="190" loccnumb="8" loccnume="16"
     sum="30dd70862616ede77486898cb83c016f"
     proved="true"
@@ -1298,7 +1297,7 @@
    </goal>
    <goal
     name="lemma2"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="192" loccnumb="8" loccnume="14"
     sum="185cadccc8ce7b951615e2779f5a24fd"
     proved="true"
@@ -1316,7 +1315,7 @@
    </goal>
    <goal
     name="nth_var4"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="198" loccnumb="8" loccnume="16"
     sum="638b8e3885d0439d703f9bda8e22222e"
     proved="true"
@@ -1333,7 +1332,7 @@
    </goal>
    <goal
     name="nth_var5"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="199" loccnumb="8" loccnume="16"
     sum="14388e74f36176ffbd91f3cf89c3d28d"
     proved="true"
@@ -1350,7 +1349,7 @@
    </goal>
    <goal
     name="nth_var6"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="200" loccnumb="8" loccnume="16"
     sum="c5674c241034e37fa247b577f2403a9f"
     proved="true"
@@ -1367,7 +1366,7 @@
    </goal>
    <goal
     name="nth_var7"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="201" loccnumb="8" loccnume="16"
     sum="2aafe99e1c9185fecf36cb92cd961b06"
     proved="true"
@@ -1384,19 +1383,27 @@
    </goal>
    <goal
     name="nth_var8"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="202" loccnumb="8" loccnume="16"
     sum="9afc3382e62e1cf9435d9728c88e4814"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0c62aTrueF">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.41"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.26"/>
     </proof>
     <proof
      prover="2"
@@ -1407,20 +1414,20 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.41"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.08"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
     </proof>
     <proof
      prover="7"
@@ -1430,18 +1437,10 @@
      archived="false">
      <result status="valid" time="0.13"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.26"/>
-    </proof>
    </goal>
    <goal
     name="lemma3"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="204" loccnumb="8" loccnume="14"
     sum="650711dba316915e727af370743918be"
     proved="true"
@@ -1459,19 +1458,27 @@
    </goal>
    <goal
     name="nth_var9"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="210" loccnumb="8" loccnume="16"
     sum="a654eb762a2fa084a442e162be231786"
     proved="true"
     expanded="false"
     shape="ainfix =anthavarV0c63aFalseF">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.14"/>
+     <result status="valid" time="0.98"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.46"/>
     </proof>
     <proof
      prover="2"
@@ -1480,14 +1487,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.07"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.98"/>
     </proof>
     <proof
      prover="3"
@@ -1498,6 +1497,14 @@
      <result status="valid" time="0.08"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="5"
      memlimit="1000"
@@ -1505,39 +1512,15 @@
      archived="false">
      <result status="valid" time="0.13"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.46"/>
-    </proof>
    </goal>
    <goal
     name="lemma4"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="212" loccnumb="7" loccnume="13"
     sum="8e85203b703761e427e1a4f9ec4329ac"
     proved="true"
     expanded="false"
     shape="ainfix =asignavarV0aFalseF">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -1545,22 +1528,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="1"
@@ -1570,33 +1537,8 @@
      archived="false">
      <result status="valid" time="0.05"/>
     </proof>
-   </goal>
-   <goal
-    name="sign_var"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
-    loclnum="217" loccnumb="8" loccnume="16"
-    sum="7552c0800da1b53f716173704b380c9c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =asignavarV0aFalseF">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
     <proof
      prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1612,12 +1554,37 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="sign_var"
+    locfile="../double_of_int.why"
+    loclnum="217" loccnumb="8" loccnume="16"
+    sum="7552c0800da1b53f716173704b380c9c"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asignavarV0aFalseF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
      prover="1"
@@ -1627,10 +1594,42 @@
      archived="false">
      <result status="valid" time="0.06"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="var_value0"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="219" loccnumb="8" loccnume="18"
     sum="3dd6ebab56b0c79395cee6a71cd3ba08"
     proved="true"
@@ -1648,22 +1647,14 @@
    </goal>
    <goal
     name="from_int_sum"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="223" loccnumb="8" loccnume="20"
     sum="9e5af4feed8fce4e11d4dec7822826bf"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intainfix +apow2c31V0ainfix +.afrom_intapow2c31afrom_intV0Iais_int32V0F">
     <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.14"/>
-    </proof>
-    <proof
-     prover="2"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1671,7 +1662,15 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="0"
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1687,6 +1686,14 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="5"
      memlimit="1000"
@@ -1694,18 +1701,10 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
    </goal>
    <goal
     name="var_value3"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="226" loccnumb="8" loccnume="18"
     sum="95cbf5f9e7830320a2349234ea9ba701"
     proved="true"
@@ -1738,7 +1737,7 @@
    </goal>
    <goal
     name="distr_pow52"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="230" loccnumb="8" loccnume="19"
     sum="0fa0e071873930b2e1b145bf8bf4a899"
     proved="true"
@@ -1763,7 +1762,7 @@
    </goal>
    <goal
     name="var_value4"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="233" loccnumb="8" loccnume="18"
     sum="dc00dd104bfac871f38f3732851c35ef"
     proved="true"
@@ -1788,20 +1787,12 @@
    </goal>
    <goal
     name="pow31"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="236" loccnumb="8" loccnume="13"
     sum="3a65541f9013ae1940a6cb66c3660acc"
     proved="true"
     expanded="false"
     shape="ainfix =afrom_intapow2c31apow2c31">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -1811,14 +1802,6 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.21"/>
-    </proof>
-    <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
@@ -1826,22 +1809,46 @@
      archived="false">
      <result status="valid" time="0.05"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
+    </proof>
    </goal>
    <goal
     name="lemma5"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="238" loccnumb="8" loccnume="14"
     sum="4b9a0b82983619845ad17b0d1c3ebd67"
     proved="true"
     expanded="false"
     shape="ainfix =avar_as_doubleV0ainfix +.ainfix +.apow2c52apow2c31afrom_intV0Iais_int32V0F">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.76"/>
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="2"
@@ -1852,20 +1859,20 @@
      <result status="valid" time="0.11"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.26"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.76"/>
     </proof>
     <proof
      prover="7"
@@ -1875,30 +1882,30 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
    </goal>
    <goal
     name="MainResult"
-    locfile="bitvectors/double_of_int/../double_of_int.why"
+    locfile="../double_of_int.why"
     loclnum="248" loccnumb="8" loccnume="18"
     sum="f6666a49092f0629c7d231a1a4ad3d17"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_int32V0afrom_intV0Iais_int32V0F">
     <proof
-     prover="6"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.21"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.26"/>
     </proof>
     <proof
      prover="2"
@@ -1909,14 +1916,6 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.21"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="1000"
@@ -1925,20 +1924,20 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.77"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="11"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="3.16"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.26"/>
     </proof>
    </goal>
   </theory>
