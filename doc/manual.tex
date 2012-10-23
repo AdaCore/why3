@@ -145,10 +145,23 @@ $^2$ Inria Saclay -- \^Ile-de-France, Toccata, Palaiseau, F-91120
 
 \chapter*{Foreword}
 
-This is the manual for the Why platform version 3, or \why for
-short. \why is a complete reimplementation~\cite{boogie11why3} of the former Why
-platform~\cite{filliatre07cav} for program
-verification. Among the new features are: numerous
+%This is the manual for the Why platform version 3, or \why for
+%short.
+\why is a platform for deductive program verification. It provides
+a rich language for specification and programming, called \whyml, and
+relies on external theorem provers, both automated and interactive,
+to discharge verification conditions. \why comes with a standard
+library of logical theories (integer and real arithmetic, Boolean
+operations, sets and maps, etc.) and basic programming data structures
+(arrays, queues, hash tables, etc.). A user can write \whyml programs
+directly and get correct-by-construction OCaml programs through an
+automated extraction mechanism. \whyml is also used as an intermediate
+language for the verification of C, Java, or Ada programs.
+
+\why is a complete reimplementation %~\cite{boogie11why3}
+of the former Why platform~\cite{filliatre07cav}.
+%for program verification.
+Among the new features are: numerous
 extensions to the input language, a new architecture for calling
 external provers, and a well-designed API, allowing to use \why as a
 software library.  An important emphasis is put on modularity and
