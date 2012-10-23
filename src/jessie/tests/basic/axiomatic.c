@@ -7,8 +7,8 @@
 
 /*@ axiomatic Bag {
   @   type bag<X>;
-  @ //  logic bag<X> bag_union(bag<X> b1,bag<X> b2);
-  @ //  axiom union_comm: \forall bag b1,b2;
+  @ //  logic bag<X> bag_union<X>(bag<X> b1,bag<X> b2);
+  @ //  axiom union_comm<X>: \forall bag<X> b1,b2;
   @ //     bag_union(b1,b2) == bag_union(b2,b1);
   @ }
   @*/
