@@ -196,15 +196,34 @@ We gratefully thank the people who contributed to \why, directly or
 indirectly: Romain Bardou, Simon Cruanes, Leon Gondelman, Johannes Kanig,
 St\'ephane Lescuyer, Sim\~ao Melo de Sousa, Benjamin Monate, Asma Tafat.
 
-\subsection*{Release Notes for version 0.80: Syntax Changes w.r.t. 0.73}
+\subsection*{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
-The syntax of \texttt{mlw} programms changed in release 0.80, with respect to release 0.73. The table of Figure~\ref{fig:syntax080} summaries these changes.
+The syntax of \whyml programs changed in release 0.80. 
+The table in Figure~\ref{fig:syntax080} summarizes the changes.
 
 \begin{figure}[t]
   \centering
 \begin{tabular}{|l|l|}
 \hline
-version 0.73 & version 0.80 \\
+\textbf{version 0.73} & \textbf{version 0.80} \\
+\hline
+\begin{minipage}[t]{0.45\textwidth}\ttfamily
+type t = \{| field~:~int |\} \\
+\end{minipage}
+&
+\begin{minipage}[t]{0.45\textwidth}\ttfamily
+type t = \{ field~:~int \} \\
+\end{minipage}
+\\
+\hline
+\begin{minipage}[t]{0.45\textwidth}\ttfamily
+\hspace*{3ex} \{| field = 5 |\} \\
+\end{minipage}
+&
+\begin{minipage}[t]{0.45\textwidth}\ttfamily
+\hspace*{3ex} \{ field = 5 \} \\
+\end{minipage}
+\\
 \hline
 \begin{minipage}[t]{0.45\textwidth}\ttfamily
 use import module M \\
@@ -216,37 +235,63 @@ use import M \\
 \\
 \hline
 \begin{minipage}[t]{0.45\textwidth}\ttfamily
-let f (x:int) (y:int) : t = \\
+let rec f (x:int) (y:int)~:~t 
+\hspace*{3ex} variant \{ t \} with rel = \\
 \hspace*{3ex} \{ P \} \\
 \hspace*{3ex} e \\
 \hspace*{3ex} \{ Q \} \\
-\hspace*{3ex} | Exc -> \{ R \} \\
+\hspace*{3ex} | Exc1 -> \{ R1 \} \\
+\hspace*{3ex} | Exc2 n -> \{ R2 \} \\
 \end{minipage}
 &
 \begin{minipage}[t]{0.45\textwidth}\ttfamily
-let f (x:int) (y:int) : t \\
+let rec f (x:int) (y:int)~:~t \\
+\hspace*{3ex} variant \{ t with rel \}
 \hspace*{3ex} requires \{ P \} \\
 \hspace*{3ex} ensures \{ Q \} \\
-\hspace*{3ex} raises \{ Exc -> R \} \\
+\hspace*{3ex} raises \{ Exc1 -> R1 \\
+\hspace*{3ex}~~~~~~~~| Exc2 n -> R2 \} \\
 \hspace*{3ex} = e \\
 \end{minipage}
 \\
 \hline
 \begin{minipage}[t]{0.45\textwidth}\ttfamily
-val f (x:int) (y:int) : \\
+val f (x:int) (y:int)~:\\
 \hspace*{3ex} \{ P \} \\
 \hspace*{3ex} t \\
 \hspace*{3ex} writes a b \\
 \hspace*{3ex} \{ Q \} \\
-\hspace*{3ex} | Exc -> \{ R \} \\
+\hspace*{3ex} | Exc1 -> \{ R1 \} \\
+\hspace*{3ex} | Exc2 n -> \{ R2 \} \\
 \end{minipage}
 &
 \begin{minipage}[t]{0.45\textwidth}\ttfamily
-val f (x:int) (y:int) : t \\
+val f (x:int) (y:int)~:~t \\
 \hspace*{3ex} requires \{ P \} \\
 \hspace*{3ex} writes \{ a, b \} \\
 \hspace*{3ex} ensures \{ Q \} \\
-\hspace*{3ex} raises \{ Exc -> R \} \\
+\hspace*{3ex} raises \{ Exc1 -> R1 \\
+\hspace*{3ex}~~~~~~~~| Exc2 n -> R2 \} \\
+\end{minipage}
+\\
+\hline
+\begin{minipage}[t]{0.45\textwidth}\ttfamily
+val f~:~x:int -> y:int ->\\
+\hspace*{3ex} \{ P \} \\
+\hspace*{3ex} t \\
+\hspace*{3ex} writes a b \\
+\hspace*{3ex} \{ Q \} \\
+\hspace*{3ex} | Exc1 -> \{ R1 \} \\
+\hspace*{3ex} | Exc2 n -> \{ R2 \} \\
+\end{minipage}
+&
+\begin{minipage}[t]{0.45\textwidth}\ttfamily
+val f (x y:int)~:~t \\
+\hspace*{3ex} requires \{ P \} \\
+\hspace*{3ex} writes \{ a, b \} \\
+\hspace*{3ex} ensures \{ Q \} \\
+\hspace*{3ex} raises \{ Exc1 -> R1 \\
+\hspace*{3ex}~~~~~~~~| Exc2 n -> R2 \} \\
 \end{minipage}
 \\
 \hline
