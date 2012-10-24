@@ -126,15 +126,42 @@ let unary op (ty,t) =
 
 let bound_vars = Hashtbl.create 257
 
+let create_lvar v =
+  let id = Ident.id_fresh v.lv_name in
+  let vs = Term.create_vsymbol id (logic_type v.lv_type) in
+(*
+  Self.result "binding variable %d" v.lv_id;
+*)
+  Hashtbl.add bound_vars v.lv_id vs;
+  vs
+
+let get_lvar lv =
+  try
+    Hashtbl.find bound_vars lv.lv_id
+  with Not_found ->
+    Self.fatal "variable %d not found" lv.lv_id
+
+let logic_symbols = Hashtbl.create 257
+
+let create_lsymbol li =
+  let id = Ident.id_fresh li.l_var_info.lv_name in
+  let vs = Term.create_lsymbol id (logic_type v.lv_type) in
+(* val create_lsymbol : preid -> ty list -> ty option -> lsymbol *)
+(*
+  Self.result "binding variable %d" v.lv_id;
+*)
+  Hashtbl.add bound_vars v.lv_id vs;
+  vs
+
+let get_lsymbol li =
+  try
+    Hashtbl.find logic_symbols li.l_var_info.lv_id
+  with
+      Not_found -> Self.fatal "logic symbol %s not found" li.l_var_info.lv_name
+
 let tlval (host,offset) =
   match host,offset with
-    | TVar lv, TNoOffset ->
-      begin
-        try
-          Term.t_var (Hashtbl.find bound_vars lv.lv_id)
-        with Not_found ->
-          Self.fatal "variable %d not found" lv.lv_id
-      end
+    | TVar lv, TNoOffset -> Term.t_var (get_lvar lv)
     | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
       Self.not_yet_implemented "tlval TVar"
     | ((TResult _|TMem _), _) ->
@@ -147,6 +174,15 @@ let rec term_node t =
     | TBinOp (op, t1, t2) -> bin (term t1) op (term t2)
     | TUnOp (op, t) -> unary op (term t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
+    | Tapp (li, labels, args) ->
+      begin
+        match labels with
+          | [] ->
+            let ls = get_lsymbol li in
+            let args = List.map (fun x -> snd(term x)) args in
+            Term.t_app_infer ls args
+          | _ -> Self.not_yet_implemented "term_node Tapp with labels"
+      end
     | TSizeOf _
     | TSizeOfE _
     | TSizeOfStr _
@@ -154,7 +190,6 @@ let rec term_node t =
     | TAlignOfE _
     | TAddrOf _
     | TStartOf _
-    | Tapp (_, _, _)
     | Tlambda (_, _)
     | TDataCons (_, _)
     | Tif (_, _, _)
@@ -188,22 +223,13 @@ let rel (ty1,t1) op (ty2,t2) =
     | (Rlt|Rgt|Rle|Rneq),_,_ ->
       Self.not_yet_implemented "rel"
 
-let bind_var v =
-  let id = Ident.id_fresh v.lv_name in
-  let vs = Term.create_vsymbol id (logic_type v.lv_type) in
-(*
-  Self.result "binding variable %d" v.lv_id;
-*)
-  Hashtbl.add bound_vars v.lv_id vs;
-  vs
-
 let rec predicate p =
   match p with
     | Pfalse -> Term.t_false
     | Ptrue -> Term.t_true
     | Prel (op, t1, t2) -> rel (term t1) op (term t2)
     | Pforall (lv, p) ->
-      let l = List.map bind_var lv in
+      let l = List.map create_lvar lv in
       Term.t_forall_close l [] (predicate_named p)
     | Papp (_, _, _)
     | Pseparated _
@@ -261,7 +287,19 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
       in
       let d = Decl.create_ty_decl ts in
       (theories,d::decls)
-    | Dfun_or_pred (_, _) -> Self.not_yet_implemented "annot Dfun_or_pred"
+    | Dfun_or_pred (li, _loc) -> 
+      begin
+        match li.l_labels, li.l_tparams,li.l_body with
+          | [],[],None ->
+            Self.not_yet_implemented "Dfun_or_pred without body"
+            (* create_param_decl : lsymbol -> decl *)
+          | [],[],Some d ->
+            (* make_ls_defn : lsymbol -> vsymbol list -> term -> logic_decl *)
+            (* create_logic_decl : logic_decl list -> decl *)
+          | _ ->
+            Self.not_yet_implemented "Dfun_or_pred with labels or vars"
+
+      end
     | Dlemma(name,is_axiom,labels,vars,p,loc) ->
       begin
         match labels,vars with
@@ -277,7 +315,7 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
             in
             (theories,d::decls)
           | _ ->
-            Self.not_yet_implemented "lemma with labels or vars: not yet implemented"
+            Self.not_yet_implemented "Dlemma with labels or vars"
       end
     | Daxiomatic (name, decls', loc) ->
       let theories = add_decls_as_theory theories (Ident.id_fresh "Decls") decls in
@@ -356,7 +394,7 @@ let fundecl fdec =
   let _body = body.bstmts in
   ()
 
-let global g (theories,lemmas,functions) =
+let global (theories,lemmas,functions) g =
   match g with
     | GFun (fdec,_) ->
       let f = fundecl fdec in
@@ -406,7 +444,7 @@ let global g (theories,lemmas,functions) =
 let prog p =
   try
     let theories,decls,_functions =
-      List.fold_right global p.globals ([],[],[])
+      List.fold_left global ([],[],[]) p.globals 
     in
     Self.result "found %d decls" (List.length decls);
     let theories =
