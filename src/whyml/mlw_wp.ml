@@ -108,7 +108,7 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 let erase_mark lab t = t_subst_single lab t_now t
 
 (* replace ['old] by a fresh label in q and xq, and call the argument *)
-let backstep fn q xq =
+let backstep fn (q : term) xq =
   let lab = fresh_mark () in
   let f = fn (old_mark lab q) (Mexn.map (old_mark lab) xq) in
   erase_mark lab f
@@ -1002,13 +1002,6 @@ let is_vty_unit = function
 
 let map_exns e f = Mexn.mapi (fun xs _ -> f xs) e.e_effect.eff_raises
 
-let wp_nimplies ((n, _), xn) ((result, q), xq) =
-  let f = wp_forall [result] (wp_implies n q) in
-  assert (Mexn.cardinal xn = Mexn.cardinal xq);
-  let x_implies _xs (n, _) (xresult, q) f =
-    wp_forall [xresult] (wp_and ~sym:true f (wp_implies n q)) in
-  Mexn.fold2_inter x_implies xn xq f
-
 (* Input
    - a state s: Subst.t
    - names r = (result: vsymbol, xresult: vsymbol Mexn.t)
@@ -1025,39 +1018,131 @@ let wp_nimplies ((n, _), xn) ((result, q), xq) =
      ``e raises exception x, with final state sw and value xresult(x) in x''
 *)
 
-let rec fast_wp_expr env s r e =
-  let ok, _ as res = fast_wp_desc env s r e in
+type fast_wp_exn =
+   { fwpe_post  : term;
+     fwpe_state : Subst.t }
+
+type fast_wp_result =
+   { fwp_ok    : term;
+     fwp_ne    : term;
+     fwp_state : Subst.t;
+     fwp_exn   : fast_wp_exn Mexn.t }
+
+let wp_nimplies (n : term) (xn : fast_wp_exn Mexn.t) ((result, q), xq) =
+  let f = wp_forall [result] (wp_implies n q) in
+  assert (Mexn.cardinal xn = Mexn.cardinal xq);
+  let x_implies _xs { fwpe_post = n } (xresult, q) f =
+    wp_forall [xresult] (wp_and ~sym:true f (wp_implies n q)) in
+  Mexn.fold2_inter x_implies xn xq f
+
+type res_type = vsymbol * vsymbol Mexn.t
+
+let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
+             : fast_wp_result =
+  let res = fast_wp_desc env s r e in
   if Debug.test_flag debug then begin
     Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
-    Format.eprintf "@[<hov 2>OK = %a@]@\n" Pretty.print_term ok;
+    Format.eprintf "@[<hov 2>OK = %a@]@\n" Pretty.print_term res.fwp_ok;
   end;
   res
 
-and fast_wp_desc env s r e =
+and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
+   fast_wp_result =
   let result, xresult = r in
   match e.e_node with
   | Elogic t ->
       (* OK: true
 	 NE: result=t *)
+        Format.printf "Elogic@.";
       let t = wp_label e t in
       let t = Subst.term s (to_term t) in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
-      t_true, ((ne, s), Mexn.empty)
+      { fwp_ok = t_true;
+        fwp_ne = ne;
+        fwp_state = s;
+        fwp_exn = Mexn.empty }
   | Eassert (kind, f) ->
+        Format.printf "Eassert@.";
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
       let ok = if kind = Aassume then t_true else f in
       let ne = if kind = Acheck then t_true else f in
-      ok, ((ne, s), Mexn.empty)
+      { fwp_ok = ok;
+        fwp_ne = ne;
+        fwp_state = s;
+        fwp_exn = Mexn.empty }
+  | Evalue v ->
+        Format.printf "Evalue@.";
+        (* OK : True *)
+        (* NE : result = v *)
+        let va = (t_var v.pv_vs) in
+        Format.printf "va: %a@." Pretty.print_term va;
+        let ne = t_equ (t_var result) va in
+      { fwp_ok = t_true;
+        fwp_ne = ne;
+        fwp_state = s;
+        fwp_exn = Mexn.empty }
+  | Eany spec ->
+        Format.printf "Eany@.";
+        (* OK = pre *)
+        (* NE = post *)
+         let ok = wp_label e (wp_expl expl_pre spec.c_pre) in
+         let ok = t_label ?loc:e.e_loc ok.t_label ok in
+         let ne = quantify env (regs_of_writes spec.c_effect) spec.c_post in
+         { fwp_ok = ok;
+           fwp_ne = ne;
+           fwp_state = s;
+           fwp_exn = Mexn.empty }
+         (*TODO exceptional case *)
+  | Eapp (e1, _, spec) ->
+        Format.printf "Eapp@.";
+        let call_res, post = open_post spec.c_post in
+        let post = t_subst_single call_res (t_var result) post in
+        let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
+        let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
+        let ok =
+           wp_and ~sym:true wp1.fwp_ok (wp_implies wp1.fwp_ne spec.c_pre) in
+        let ne = wp_and ~sym:true wp1.fwp_ne post in
+         { fwp_ok = ok;
+           fwp_ne = ne;
+           fwp_state = wp1.fwp_state;
+           fwp_exn = Mexn.empty }
+
+         (*TODO exceptional case *)
+  | Eassign (e1, reg, pv) ->
+        assert false;
+      let rec get_term d = match d.e_node with
+        | Elogic t -> t
+        | Evalue v -> t_var v.pv_vs
+        | Eghost e | Elet (_,e) | Erec (_,e) -> get_term e
+        | _ -> Loc.errorm ?loc:e.e_loc
+            "Cannot compute the WP for this assignment"
+      in
+      let dummy_symbol = create_vsymbol (id_fresh "void") ty_unit in
+      let wp1 = fast_wp_expr env s (dummy_symbol, xresult) e1 in
+      let ok = wp1.fwp_ok in
+      let f = t_equ (get_term e1) (t_var pv.pv_vs) in
+      let f = quantify env (Sreg.singleton reg) f in
+      let ne = wp_and ~sym:true wp1.fwp_ne f in
+      { fwp_ok = ok;
+        fwp_ne = ne;
+        fwp_state = s;
+        fwp_exn = Mexn.empty }
+  | Earrow _ ->
+        Format.printf "Earrow@.";
+        let ok = t_true in
+        (* ??? do we need to set NE *)
+         { fwp_ok = ok;
+           fwp_ne = ok;
+           fwp_state = s;
+           fwp_exn = Mexn.empty }
   | Eabstr (_, _) -> assert false (*TODO*)
   | Etry (_, _) -> assert false (*TODO*)
   | Eraise (_, _) -> assert false (*TODO*)
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eloop (_, _, _) -> assert false (*TODO*)
-  | Eany _ -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
-  | Eassign (_, _, _) -> assert false (*TODO*)
   | Ecase (_, _) -> assert false (*TODO*)
   | Eif (_, _, _) -> assert false (*TODO*)
   | Erec (_, _) -> assert false (*TODO*)
@@ -1065,16 +1150,18 @@ and fast_wp_desc env s r e =
       (* OK: ok(e1) /\ (ne(e1) => ok(e2))
          NE: ne(e1) /\ ne(e2)
          Ex: *)
-      let ok1, ((ne1,s1),_ee1) = fast_wp_expr env s (v.pv_vs, xresult) e1 in
-      let ok2, ((ne2,s2),_ee2) = fast_wp_expr env s1 r e2 in
-      let ok = wp_and ~sym:true ok1 (wp_implies ne1 ok2) in
-      let ne = wp_and ~sym:true ne1 ne2 in
-      let ee _xs = t_true, s2 (*TODO*) in
-      ok, ((ne, s2), map_exns e ee)
+      let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in
+      let wp2 = fast_wp_expr env wp1.fwp_state r e2 in
+      let ok = wp_and ~sym:true wp1.fwp_ok (wp_implies wp1.fwp_ne wp2.fwp_ok) in
+      let ne = wp_and ~sym:true wp1.fwp_ne wp2.fwp_ne in
+      let ee _xs =
+         { fwpe_post  = t_true;
+           fwpe_state = wp2.fwp_state } in
+      { fwp_ok = ok;
+        fwp_ne = ne;
+        fwp_state = wp2.fwp_state;
+        fwp_exn = map_exns e ee }
   | Elet (_, _) -> assert false (*TODO*)
-  | Eapp (_, _, _) -> assert false (*TODO*)
-  | Earrow _ -> assert false (*TODO*)
-  | Evalue _ -> assert false (*TODO*)
   | Eabsurd -> assert false (*TODO*)
 
 and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
@@ -1098,8 +1185,9 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let xq = Mexn.map conv c.c_xpost in
   let xq = Mexn.map open_post xq in
   let xresult = Mexn.map fst xq in
-  let ok, n = fast_wp_expr env Subst.empty (result, xresult) l.l_expr in
-  let f = wp_and ~sym:true ok (wp_nimplies n (q, xq)) in
+  let res = fast_wp_expr env Subst.empty (result, xresult) l.l_expr in
+  let f =
+     wp_and ~sym:true res.fwp_ok (wp_nimplies res.fwp_ne res.fwp_exn (q, xq)) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
   wp_forall args (quantify env regs f)
 
@@ -1107,8 +1195,8 @@ and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
 let fast_wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in
-  let ok, _ = fast_wp_expr env Subst.empty (result e) e in
-  let f = wp_forall (Mvs.keys ok.t_vars) ok in
+  let res = fast_wp_expr env Subst.empty (result e) e in
+  let f = wp_forall (Mvs.keys res.fwp_ok.t_vars) res.fwp_ok in
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
     | LetA ps -> ps.ps_name in
