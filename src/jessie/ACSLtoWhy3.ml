@@ -130,7 +130,7 @@ let create_lvar v =
   let id = Ident.id_fresh v.lv_name in
   let vs = Term.create_vsymbol id (logic_type v.lv_type) in
 (*
-  Self.result "binding variable %d" v.lv_id;
+  Self.result "create logic variable %d" v.lv_id;
 *)
   Hashtbl.add bound_vars v.lv_id vs;
   vs
@@ -144,14 +144,15 @@ let get_lvar lv =
 let logic_symbols = Hashtbl.create 257
 
 let create_lsymbol li =
-  let id = Ident.id_fresh li.l_var_info.lv_name in
-  let vs = Term.create_lsymbol id (logic_type v.lv_type) in
-(* val create_lsymbol : preid -> ty list -> ty option -> lsymbol *)
-(*
-  Self.result "binding variable %d" v.lv_id;
-*)
-  Hashtbl.add bound_vars v.lv_id vs;
-  vs
+  let name = li.l_var_info.lv_name in
+  let id = Ident.id_fresh name in
+  let args = List.map create_lvar li.l_profile in
+  let targs = List.map (fun v -> v.Term.vs_ty) args in
+  let ret_ty = Opt.map logic_type li.l_type in
+  let vs = Term.create_lsymbol id targs ret_ty in
+  Self.result "creating logic symbol %d (%s)" li.l_var_info.lv_id name;
+  Hashtbl.add logic_symbols li.l_var_info.lv_id vs;
+  vs,args
 
 let get_lsymbol li =
   try
@@ -290,12 +291,14 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
     | Dfun_or_pred (li, _loc) -> 
       begin
         match li.l_labels, li.l_tparams,li.l_body with
-          | [],[],None ->
+          | [],[],LBnone ->
             Self.not_yet_implemented "Dfun_or_pred without body"
             (* create_param_decl : lsymbol -> decl *)
-          | [],[],Some d ->
-            (* make_ls_defn : lsymbol -> vsymbol list -> term -> logic_decl *)
-            (* create_logic_decl : logic_decl list -> decl *)
+          | [],[],LBterm d ->
+            let ls,args = create_lsymbol li in
+            let (_ty,d) = term d in
+            let def = Decl.make_ls_defn ls args d in
+            (theories,Decl.create_logic_decl [def] :: decls)
           | _ ->
             Self.not_yet_implemented "Dfun_or_pred with labels or vars"
 
