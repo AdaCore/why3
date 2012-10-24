@@ -72,13 +72,21 @@ let ctype ty =
     | TBuiltin_va_list _
     -> Self.not_yet_implemented "ctype"
 
-let logic_type ty =
+let logic_types = Hashtbl.create 257
+
+let rec logic_type ty =
   match ty with
     | Linteger -> int_type
     | Lreal -> real_type
-    | Ctype _
-    | Ltype (_, _)
+    | Ltype (lt, args) ->
+      begin
+        try
+          let ts = Hashtbl.find logic_types lt.lt_name in
+          Ty.ty_app ts (List.map logic_type args)
+        with Not_found -> Self.fatal "logic type %s not found" lt.lt_name
+      end
     | Lvar _
+    | Ctype _
     | Larrow (_, _) ->
         Self.not_yet_implemented "logic_type"
 
@@ -217,11 +225,12 @@ and term t = (t.term_type, term_node t.term_node)
 let rel (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
     | Req,_,_ -> Term.t_equ t1 t2
+    | Rneq,_,_ -> Term.t_neq t1 t2
     | Rge,Linteger,Linteger -> Term.t_app_infer ge_int [t1;t2]
     | Rge,Lreal,Lreal -> Term.t_app_infer ge_real [t1;t2]
     | Rge,_,_ ->
       Self.not_yet_implemented "rel Rge"
-    | (Rlt|Rgt|Rle|Rneq),_,_ ->
+    | (Rlt|Rgt|Rle),_,_ ->
       Self.not_yet_implemented "rel"
 
 let rec predicate p =
@@ -232,12 +241,13 @@ let rec predicate p =
     | Pforall (lv, p) ->
       let l = List.map create_lvar lv in
       Term.t_forall_close l [] (predicate_named p)
+    | Pimplies (p1, p2) ->
+      Term.t_implies (predicate_named p1) (predicate_named p2)
     | Papp (_, _, _)
     | Pseparated _
     | Pand (_, _)
     | Por (_, _)
     | Pxor (_, _)
-    | Pimplies (_, _)
     | Piff (_, _)
     | Pnot _
     | Pif (_, _, _)
@@ -268,7 +278,8 @@ let add_decls_as_theory theories id decls =
       let th = Theory.create_theory id in
       let th = use th int_theory in
       let th = use th real_theory in
-      let th = List.fold_left Theory.add_decl th decls in
+      let th = List.fold_left use th theories in
+      let th = List.fold_left Theory.add_decl th (List.rev decls) in
       let th = Theory.close_theory th in
       th :: theories
 
@@ -286,14 +297,15 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
         Ty.create_tysymbol 
           (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef 
       in
+      Hashtbl.add logic_types lt.lt_name ts;
       let d = Decl.create_ty_decl ts in
       (theories,d::decls)
     | Dfun_or_pred (li, _loc) -> 
       begin
         match li.l_labels, li.l_tparams,li.l_body with
           | [],[],LBnone ->
-            Self.not_yet_implemented "Dfun_or_pred without body"
-            (* create_param_decl : lsymbol -> decl *)
+            let ls,_ = create_lsymbol li in
+            (theories,Decl.create_param_decl ls :: decls)
           | [],[],LBterm d ->
             let ls,args = create_lsymbol li in
             let (_ty,d) = term d in
@@ -321,7 +333,7 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
     | Daxiomatic (name, decls', loc) ->
-      let theories = add_decls_as_theory theories (Ident.id_fresh "Decls") decls in
+      let theories = add_decls_as_theory theories (Ident.id_fresh "Top") decls in
       let (t,decls'') =
         List.fold_left
           (fun acc d -> annot ~in_axiomatic:true d loc acc)
@@ -451,10 +463,10 @@ let prog p =
     in
     Self.result "found %d decls" (List.length decls);
     let theories =
-      add_decls_as_theory theories (Ident.id_fresh "Decls") decls
+      add_decls_as_theory theories (Ident.id_fresh "Top") decls
     in
     Self.result "made %d theories" (List.length theories);
-    theories
+    List.rev theories
   with
       Decl.UnknownIdent(s) ->
         Self.fatal "unknown identifier %s" s.Ident.id_string
