@@ -15,8 +15,7 @@ type reason =
    | VC_Loop_Invariant_Preserv
    | VC_Assert
 
-type expl = { loc : loc ; reason : reason ; subp : loc }
-(* The subp field should not differentiate two otherwise equal explanations *)
+type expl = { loc : loc ; reason : reason }
 
 let expl_compare e1 e2 =
    let c = Pervasives.compare e1.loc e2.loc in
@@ -29,8 +28,8 @@ let expl_equal e1 e2 =
 let expl_hash e =
    Hashcons.combine (Hashtbl.hash e.loc) (Hashtbl.hash e.reason)
 
-let mk_expl reason sloc subp_sloc =
-   { reason = reason; loc = sloc; subp = subp_sloc }
+let mk_expl reason sloc =
+   { reason = reason; loc = sloc }
 
 let reason_from_string s =
    match s with
@@ -62,7 +61,6 @@ let string_of_reason s =
    | VC_Assert                    -> "assertion"
 
 let get_loc e = e.loc
-let get_subp_loc e = e.subp
 
 let to_filename expl =
    let s = String.copy (string_of_reason expl.reason) in
@@ -80,7 +78,6 @@ let print_reason fmt r =
 type my_expl =
    { mutable expl_loc : Gnat_loc.loc option ;
      mutable expl_reason : reason option ;
-     mutable expl_subp : Gnat_loc.loc option;
      mutable expl_msg : string option
    }
 (* The type that is used to extract information from a VC, is filled up field
@@ -95,7 +92,6 @@ type node_info =
 let read_labels s =
    let b = { expl_loc    = None;
              expl_reason = None;
-             expl_subp   = None ;
              expl_msg    = None } in
    Ident.Slab.iter
      (fun x ->
@@ -106,14 +102,6 @@ let read_labels s =
                  b.expl_reason <- Some (reason_from_string reason)
            | ["GP_Pretty_Ada"; msg] ->
                  b.expl_msg <- Some msg
-           | ["GP_Subp"; file; line] ->
-                 begin try
-                    b.expl_subp <-
-                       Some (Gnat_loc.mk_loc_line file (int_of_string line))
-                 with Failure "int_of_string" ->
-                    Format.printf "GP_Subp: cannot parse string: %s" s;
-                    Gnat_util.abort_with_message ""
-                 end
            | "GP_Sloc" :: rest ->
                  begin try
                     b.expl_loc <- Some (Gnat_loc.parse_loc rest)
@@ -146,12 +134,10 @@ let extract_explanation s =
       otherwise we return "No_Info" *)
      match read_labels s with
      | { expl_loc = Some sloc ;
-         expl_reason = Some reason;
-         expl_subp = Some subp } ->
-           Expl (mk_expl reason sloc subp)
+         expl_reason = Some reason } ->
+           Expl (mk_expl reason sloc)
      | { expl_loc = Some sloc ;
          expl_reason = _;
-         expl_subp = _ ;
          expl_msg = None } ->
            Sloc sloc
      | _ ->
