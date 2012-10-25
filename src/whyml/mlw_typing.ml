@@ -708,7 +708,7 @@ let post_invariant lenv rvs inv ity q =
   let kn = get_known lenv.mod_uc in
   let lkn = Theory.get_known (get_theory lenv.mod_uc) in
   let res_inv = Mlw_wp.full_invariant lkn kn vs ity in
-  let q = t_and_asym_simp q (t_and_simp res_inv inv) in
+  let q = t_and_asym_simp (t_and_simp res_inv inv) q in
   Mlw_ty.create_post vs q
 
 let ity_or_unit = function
@@ -741,7 +741,7 @@ let spec_invariant lenv pvs vty spec =
   let pinv,qinv = env_invariant lenv spec.c_effect pvs in
   let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
-  { spec with c_pre   = t_and_simp spec.c_pre pinv;
+  { spec with c_pre   = t_and_asym_simp pinv spec.c_pre;
               c_post  = post_inv ity spec.c_post;
               c_xpost = Mexn.mapi xpost_inv xpost }
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/snapshotable_trees/why3session.xml" shape_version="2">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,20 +11,20 @@
   expanded="true">
   <theory
    name="Tree"
-   locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+   locfile="../snapshotable_trees.mlw"
    loclnum="12" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="Enum"
-   locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+   locfile="../snapshotable_trees.mlw"
    loclnum="39" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter enum"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="52" loccnumb="10" loccnume="14"
     expl="parameter enum"
     sum="2dbd9bad190db50115826d2520aec25c"
@@ -40,7 +39,7 @@
      expanded="true">
      <goal
       name="WP_parameter enum.1"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="52" loccnumb="10" loccnume="14"
       expl="postcondition"
       sum="44e5ef80dea96bd3d6cb23302863a0cf"
@@ -60,7 +59,7 @@
      </goal>
      <goal
       name="WP_parameter enum.2"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="52" loccnumb="10" loccnume="14"
       expl="variant decrease"
       sum="58034422b45ca21cf28ae5ff8210fe28"
@@ -80,7 +79,7 @@
      </goal>
      <goal
       name="WP_parameter enum.3"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="52" loccnumb="10" loccnume="14"
       expl="postcondition"
       sum="9ea3990ea7741a0711cad3198c8c497b"
@@ -103,13 +102,13 @@
   </theory>
   <theory
    name="Iterator"
-   locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+   locfile="../snapshotable_trees.mlw"
    loclnum="63" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter create_iterator"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="72" loccnumb="6" loccnume="21"
     expl="postcondition"
     sum="f3c7559f0c9b1008dafcaa2d430844f4"
@@ -129,7 +128,7 @@
    </goal>
    <goal
     name="WP_parameter hasNext"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="78" loccnumb="6" loccnume="13"
     expl="postcondition"
     sum="69b11db99413186099c6f67c6d56c3b7"
@@ -149,7 +148,7 @@
    </goal>
    <goal
     name="WP_parameter next"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="82" loccnumb="6" loccnume="10"
     expl="postcondition"
     sum="0508818e14d859af825ea510d22fac43"
@@ -170,13 +169,13 @@
   </theory>
   <theory
    name="BSTree"
-   locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+   locfile="../snapshotable_trees.mlw"
    loclnum="94" loccnumb="7" loccnume="13"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter bst_mem"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="110" loccnumb="10" loccnume="17"
     expl="parameter bst_mem"
     sum="4215efc8a5d4ba195327f1bda2c46d55"
@@ -196,7 +195,7 @@
    </goal>
    <goal
     name="WP_parameter bst_add"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="122" loccnumb="10" loccnume="17"
     expl="parameter bst_add"
     sum="47136d9ae8af6efbff6bab090ec142c5"
@@ -217,15 +216,15 @@
   </theory>
   <theory
    name="ITree"
-   locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+   locfile="../snapshotable_trees.mlw"
    loclnum="139" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter create"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="146" loccnumb="6" loccnume="12"
-    expl="parameter create"
+    expl="type invariant"
     sum="2444daba9b26ada7e2a9b95a41e7d201"
     proved="true"
     expanded="false"
@@ -243,7 +242,7 @@
    </goal>
    <goal
     name="WP_parameter contains"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="148" loccnumb="6" loccnume="14"
     expl="parameter contains"
     sum="ad98fec5d7d76c6128eb33b1f8e755de"
@@ -263,13 +262,13 @@
    </goal>
    <goal
     name="WP_parameter add"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="152" loccnumb="6" loccnume="9"
     expl="parameter add"
-    sum="36a8581790072f77678b86d50a6b0309"
+    sum="fd234b73c1502987fe6c13c3f7fd18de"
     proved="true"
     expanded="true"
-    shape="amemV2V1Oainfix =V2V0qamemV2V1FAamemV0V1IamemV0V1AabstV4AamemV5V1Oainfix =V5V0qamemV5V4FAamemV0V1NIainfix =V4V3FIamemV6V1Oainfix =V6V0qamemV6V3FAamemV0V1NAabstV3FAabstV1IabstV1FF">
+    shape="amemV2V1Oainfix =V2V0qamemV2V1FAamemV0V1IamemV0V1AamemV5V1Oainfix =V5V0qamemV5V4FAamemV0V1NAabstV4Iainfix =V4V3FIamemV6V1Oainfix =V6V0qamemV6V3FAamemV0V1NAabstV3FAabstV1IabstV1FF">
     <label
      name="expl:parameter add"/>
     <transf
@@ -278,7 +277,7 @@
      expanded="true">
      <goal
       name="WP_parameter add.1"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="152" loccnumb="6" loccnume="9"
       expl="precondition"
       sum="e1078f5b5f76132b9e4a20ee139f6b64"
@@ -298,13 +297,33 @@
      </goal>
      <goal
       name="WP_parameter add.2"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
+      loclnum="152" loccnumb="6" loccnume="9"
+      expl="type invariant"
+      sum="cab7cccf83b765efac3692b019af5f37"
+      proved="true"
+      expanded="false"
+      shape="abstV3Iainfix =V3V2FIamemV4V1Oainfix =V4V0qamemV4V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
+      <label
+       name="expl:parameter add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.3"
+      locfile="../snapshotable_trees.mlw"
       loclnum="152" loccnumb="6" loccnume="9"
       expl="postcondition"
-      sum="458c41cad7ff20cc12b59313f43380d8"
+      sum="706cf62f20084419e98aeb7afb6c7ea0"
       proved="true"
       expanded="true"
-      shape="amemV4V1Oainfix =V4V0qamemV4V3FAamemV0V1NIainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
+      shape="amemV4V1Oainfix =V4V0qamemV4V3FAamemV0V1NIabstV3Iainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
       <label
        name="expl:parameter add"/>
       <transf
@@ -312,14 +331,14 @@
        proved="true"
        expanded="true">
        <goal
-        name="WP_parameter add.2.1"
-        locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+        name="WP_parameter add.3.1"
+        locfile="../snapshotable_trees.mlw"
         loclnum="152" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="444ee3aee0698c0be2a476b57ce439a1"
+        sum="19d5d68a2bbab6648702f7af65147434"
         proved="true"
         expanded="false"
-        shape="amemV0V1NIainfix =V3V2FIamemV4V1Oainfix =V4V0qamemV4V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
+        shape="amemV0V1NIabstV3Iainfix =V3V2FIamemV4V1Oainfix =V4V0qamemV4V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
         <label
          name="expl:parameter add"/>
         <proof
@@ -332,14 +351,14 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter add.2.2"
-        locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+        name="WP_parameter add.3.2"
+        locfile="../snapshotable_trees.mlw"
         loclnum="152" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="1c3ae76f64eaa630c0957c6de54563fb"
+        sum="3b409a0d7ff68275696405e58c4f0aea"
         proved="true"
         expanded="false"
-        shape="amemV4V1Oainfix =V4V0IamemV4V3FIainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
+        shape="amemV4V1Oainfix =V4V0IamemV4V3FIabstV3Iainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
         <label
          name="expl:parameter add"/>
         <proof
@@ -352,14 +371,14 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter add.2.3"
-        locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+        name="WP_parameter add.3.3"
+        locfile="../snapshotable_trees.mlw"
         loclnum="152" loccnumb="6" loccnume="9"
         expl="parameter add"
-        sum="efe7503f342404978c0247472962abfa"
+        sum="7734023e3305a15124a154607cf324ac"
         proved="true"
         expanded="false"
-        shape="amemV4V3IamemV4V1Oainfix =V4V0FIainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
+        shape="amemV4V3IamemV4V1Oainfix =V4V0FIabstV3Iainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
         <label
          name="expl:parameter add"/>
         <proof
@@ -374,28 +393,8 @@
       </transf>
      </goal>
      <goal
-      name="WP_parameter add.3"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
-      loclnum="152" loccnumb="6" loccnume="9"
-      expl="parameter add"
-      sum="6b4f1d1a3de78d3808362dddd7bf222c"
-      proved="true"
-      expanded="false"
-      shape="abstV3IamemV4V1Oainfix =V4V0qamemV4V3FAamemV0V1NIainfix =V3V2FIamemV5V1Oainfix =V5V0qamemV5V2FAamemV0V1NAabstV2FIabstV1IabstV1FF">
-      <label
-       name="expl:parameter add"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
       name="WP_parameter add.4"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="152" loccnumb="6" loccnume="9"
       expl="postcondition"
       sum="79c457d6cee2fba977e937f2e0edf9f5"
@@ -417,9 +416,9 @@
    </goal>
    <goal
     name="WP_parameter snapshot"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="157" loccnumb="6" loccnume="14"
-    expl="parameter snapshot"
+    expl="type invariant"
     sum="8d8112f215fcb392403ede56f480046c"
     proved="true"
     expanded="false"
@@ -437,7 +436,7 @@
    </goal>
    <goal
     name="WP_parameter iterator"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="159" loccnumb="6" loccnume="14"
     expl="postcondition"
     sum="816e971a1cd366c57f641ea0cba45d6b"
@@ -458,19 +457,19 @@
   </theory>
   <theory
    name="Harness"
-   locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+   locfile="../snapshotable_trees.mlw"
    loclnum="165" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter test"
-    locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+    locfile="../snapshotable_trees.mlw"
     loclnum="169" loccnumb="6" loccnume="10"
     expl="parameter test"
-    sum="67cf168d216cd321980d53c0933a4d63"
+    sum="3f586bb80ffb0313a94456a0d7d9fa03"
     proved="true"
     expanded="true"
-    shape="ainfix &lt;alengthaenum_elementsV12alengthaenum_elementsV9Aainfix &lt;=c0alengthaenum_elementsV9AabstV14IabstV14AamemV16V10Oainfix =V16ainfix *V13c3qamemV16V14FAamemainfix *V13c3V10qainfix =V15aFalseFFAabstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFAainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FAabstV5Iainfix =aenum_elementsV8atree_elementsV7FIabstV7FAamemc2V5IabstV5AamemV17V3Oainfix =V17c3qamemV17V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV18V1Oainfix =V18c2qamemV18V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV19V0Oainfix =V19c1qamemV19V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+    shape="ainfix &lt;alengthaenum_elementsV12alengthaenum_elementsV9Aainfix &lt;=c0alengthaenum_elementsV9AabstV14IamemV16V10Oainfix =V16ainfix *V13c3qamemV16V14FAamemainfix *V13c3V10qainfix =V15aFalseAabstV14FFAabstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFAainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FAabstV5Iainfix =aenum_elementsV8atree_elementsV7FIabstV7FAamemc2V5IamemV17V3Oainfix =V17c3qamemV17V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV18V1Oainfix =V18c2qamemV18V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV19V0Oainfix =V19c1qamemV19V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
     <label
      name="expl:parameter test"/>
     <transf
@@ -479,13 +478,13 @@
      expanded="true">
      <goal
       name="WP_parameter test.1"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="169" loccnumb="6" loccnume="10"
       expl="assertion"
-      sum="217f0f1cc62f3c8f65fbe79790b0583a"
+      sum="280fe1379db6d59ef74ddb9fb577fa2f"
       proved="true"
       expanded="false"
-      shape="amemc2V5IabstV5AamemV7V3Oainfix =V7c3qamemV7V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV8V1Oainfix =V8c2qamemV8V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV9V0Oainfix =V9c1qamemV9V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+      shape="amemc2V5IamemV7V3Oainfix =V7c3qamemV7V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV8V1Oainfix =V8c2qamemV8V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV9V0Oainfix =V9c1qamemV9V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
       <label
        name="expl:parameter test"/>
       <proof
@@ -499,13 +498,13 @@
      </goal>
      <goal
       name="WP_parameter test.2"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="169" loccnumb="6" loccnume="10"
       expl="loop invariant init"
-      sum="3b2acdbadfc5d37b1b86a6c9040e1d6b"
+      sum="662f19bbf5defaf7127c319ebbfd64d7"
       proved="true"
       expanded="false"
-      shape="abstV5Iainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IabstV5AamemV9V3Oainfix =V9c3qamemV9V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV10V1Oainfix =V10c2qamemV10V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV11V0Oainfix =V11c1qamemV11V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+      shape="abstV5Iainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV9V3Oainfix =V9c3qamemV9V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV10V1Oainfix =V10c2qamemV10V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV11V0Oainfix =V11c1qamemV11V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
       <label
        name="expl:parameter test"/>
       <proof
@@ -519,13 +518,13 @@
      </goal>
      <goal
       name="WP_parameter test.3"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="169" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="4b07769f2b9370be7905730a5b89113d"
+      sum="8ee2c24acef3a6c69c76ab25637e4e4f"
       proved="true"
       expanded="false"
-      shape="ainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IabstV5AamemV12V3Oainfix =V12c3qamemV12V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV13V1Oainfix =V13c2qamemV13V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV14V0Oainfix =V14c1qamemV14V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+      shape="ainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV12V3Oainfix =V12c3qamemV12V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV13V1Oainfix =V13c2qamemV13V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV14V0Oainfix =V14c1qamemV14V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
       <label
        name="expl:parameter test"/>
       <proof
@@ -539,13 +538,13 @@
      </goal>
      <goal
       name="WP_parameter test.4"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="169" loccnumb="6" loccnume="10"
-      expl="parameter test"
-      sum="3aad964ee1789afdcb8e88633524d166"
+      expl="type invariant"
+      sum="f4d1707ee9316a1cb120bf2b4be49429"
       proved="true"
       expanded="false"
-      shape="abstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFIainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IabstV5AamemV14V3Oainfix =V14c3qamemV14V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV15V1Oainfix =V15c2qamemV15V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV16V0Oainfix =V16c1qamemV16V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+      shape="abstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFIainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV14V3Oainfix =V14c3qamemV14V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV15V1Oainfix =V15c2qamemV15V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV16V0Oainfix =V16c1qamemV16V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
       <label
        name="expl:parameter test"/>
       <proof
@@ -559,13 +558,13 @@
      </goal>
      <goal
       name="WP_parameter test.5"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="169" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
-      sum="79c4dab9741fbdc4bf6d04589c2502a3"
+      sum="f3e3359225d639b81c8d7541467d5e14"
       proved="true"
       expanded="false"
-      shape="abstV14IabstV14AamemV16V10Oainfix =V16ainfix *V13c3qamemV16V14FAamemainfix *V13c3V10qainfix =V15aFalseFFIabstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFIainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IabstV5AamemV17V3Oainfix =V17c3qamemV17V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV18V1Oainfix =V18c2qamemV18V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV19V0Oainfix =V19c1qamemV19V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+      shape="abstV14IamemV16V10Oainfix =V16ainfix *V13c3qamemV16V14FAamemainfix *V13c3V10qainfix =V15aFalseAabstV14FFIabstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFIainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV17V3Oainfix =V17c3qamemV17V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV18V1Oainfix =V18c2qamemV18V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV19V0Oainfix =V19c1qamemV19V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
       <label
        name="expl:parameter test"/>
       <proof
@@ -579,13 +578,13 @@
      </goal>
      <goal
       name="WP_parameter test.6"
-      locfile="examples/programs/snapshotable_trees/../snapshotable_trees.mlw"
+      locfile="../snapshotable_trees.mlw"
       loclnum="169" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
-      sum="bf34d47835342615f7db424b33c809c4"
+      sum="4d5e4a81ab7b7e3528251400106001df"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;alengthaenum_elementsV12alengthaenum_elementsV9Aainfix &lt;=c0alengthaenum_elementsV9IabstV14AamemV16V10Oainfix =V16ainfix *V13c3qamemV16V14FAamemainfix *V13c3V10qainfix =V15aFalseFFIabstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFIainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IabstV5AamemV17V3Oainfix =V17c3qamemV17V5FAamemc3V3qainfix =V6aFalseFFIabstV3AamemV18V1Oainfix =V18c2qamemV18V3FAamemc2V1qainfix =V4aFalseFFIabstV1AamemV19V0Oainfix =V19c1qamemV19V1FAamemc1V0qainfix =V2aFalseFFIabstV0F">
+      shape="ainfix &lt;alengthaenum_elementsV12alengthaenum_elementsV9Aainfix &lt;=c0alengthaenum_elementsV9IamemV16V10Oainfix =V16ainfix *V13c3qamemV16V14FAamemainfix *V13c3V10qainfix =V15aFalseAabstV14FFIabstV10Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFIainfix =V9aDoneNIainfix =V11aTrueIainfix =V9aDoneNqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV17V3Oainfix =V17c3qamemV17V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV18V1Oainfix =V18c2qamemV18V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV19V0Oainfix =V19c1qamemV19V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
       <label
        name="expl:parameter test"/>
       <proof

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/vstte10_aqueue/why3session.xml" shape_version="2">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,19 +11,19 @@
   expanded="false">
   <theory
    name="AmortizedQueue"
-   locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+   locfile="../vstte10_aqueue.mlw"
    loclnum="9" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter empty"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="../vstte10_aqueue.mlw"
     loclnum="21" loccnumb="6" loccnume="11"
     expl="parameter empty"
-    sum="e7190a3f05a3e5728d5182b6f3ff1850"
+    sum="f148b224bef0491026c5971839eb52c1"
     proved="true"
     expanded="false"
-    shape="ainfix =alengthV0c0Aainfix &gt;=c0alengthV0Aainfix =alengthaNilc0LaNilAainfix =ainfix ++aNilareverseaNilaNil">
+    shape="ainfix =ainfix ++aNilareverseaNilaNilAainfix =alengthV0c0Aainfix &gt;=c0alengthV0Aainfix =alengthaNilc0LaNil">
     <label
      name="expl:parameter empty"/>
     <proof
@@ -38,13 +37,13 @@
    </goal>
    <goal
     name="WP_parameter head"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="../vstte10_aqueue.mlw"
     loclnum="24" loccnumb="6" loccnume="10"
     expl="postcondition"
-    sum="731d618ab885e13a385f070505c96178"
+    sum="436664d3d5a243b8e8053c7805a09a8f"
     proved="true"
     expanded="false"
-    shape="CV0aNilfaConsVwCainfix ++V0areverseV2aNilfaConsVwainfix =V4V5Iainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1Aainfix =ainfix ++V0areverseV2aNilNF">
+    shape="CV0aNilfaConsVwCainfix ++V0areverseV2aNilfaConsVwainfix =V4V5Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
     <label
      name="expl:parameter head"/>
     <proof
@@ -58,13 +57,13 @@
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="../vstte10_aqueue.mlw"
     loclnum="32" loccnumb="6" loccnume="12"
     expl="parameter create"
-    sum="e4493530dbb94b33806eb2a0070fdeca"
+    sum="105c38020da8b68175e86c584c7b3c0c"
     proved="true"
     expanded="false"
-    shape="iainfix &gt;=V1V3ainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1Aainfix =ainfix ++V0areverseV2ainfix ++V0areverseV2ainfix =alengthV5c0Aainfix &gt;=V4alengthV5Aainfix =alengthainfix ++V0areverseV2V4LaNilLainfix +V1V3Aainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Iainfix =V3alengthV2Aainfix =V1alengthV0F">
+    shape="iainfix &gt;=V1V3ainfix =ainfix ++V0areverseV2ainfix ++V0areverseV2Aainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1ainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Aainfix =alengthV5c0Aainfix &gt;=V4alengthV5Aainfix =alengthainfix ++V0areverseV2V4LaNilLainfix +V1V3Iainfix =V3alengthV2Aainfix =V1alengthV0F">
     <label
      name="expl:parameter create"/>
     <proof
@@ -78,13 +77,13 @@
    </goal>
    <goal
     name="WP_parameter tail"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="../vstte10_aqueue.mlw"
     loclnum="41" loccnumb="6" loccnume="10"
     expl="parameter tail"
-    sum="a6440f8070a3a8534544700cdd6e4204"
+    sum="69d2fa37a97df558d6f6a1ea0a8d177c"
     proved="true"
     expanded="false"
-    shape="CV0aNilfaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V9Iainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6Aainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2FAainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1Aainfix =ainfix ++V0areverseV2aNilNF">
+    shape="CV0aNilfaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V9Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FAainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
     <label
      name="expl:parameter tail"/>
     <transf
@@ -93,13 +92,13 @@
      expanded="true">
      <goal
       name="WP_parameter tail.1"
-      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+      locfile="../vstte10_aqueue.mlw"
       loclnum="41" loccnumb="6" loccnume="10"
       expl="parameter tail"
-      sum="010e43c61197c54d2ae7e9eaaeebe781"
+      sum="2f2dc95d9acd449cd338c2386b3a2e3b"
       proved="true"
       expanded="false"
-      shape="CV0aNilfaConswVtIainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1Aainfix =ainfix ++V0areverseV2aNilNF">
+      shape="CV0aNilfaConswVtIainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
       <label
        name="expl:parameter tail"/>
       <proof
@@ -113,13 +112,13 @@
      </goal>
      <goal
       name="WP_parameter tail.2"
-      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+      locfile="../vstte10_aqueue.mlw"
       loclnum="41" loccnumb="6" loccnume="10"
       expl="precondition"
-      sum="a193f4ad19553331fdb67d308fbb399e"
+      sum="4461409ec1feafc0250e6711212337cb"
       proved="true"
       expanded="false"
-      shape="CV0aNiltaConswVainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1Aainfix =ainfix ++V0areverseV2aNilNF">
+      shape="CV0aNiltaConswVainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
       <label
        name="expl:parameter tail"/>
       <proof
@@ -133,13 +132,13 @@
      </goal>
      <goal
       name="WP_parameter tail.3"
-      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+      locfile="../vstte10_aqueue.mlw"
       loclnum="41" loccnumb="6" loccnume="10"
       expl="postcondition"
-      sum="f1c01d477137a0eeb89dd49b58ab0d01"
+      sum="1e31605f819ec67974424062e4da9d75"
       proved="true"
       expanded="false"
-      shape="CV0aNiltaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V9Iainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6Aainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2FIainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1Aainfix =ainfix ++V0areverseV2aNilNF">
+      shape="CV0aNiltaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V9Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FIainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
       <label
        name="expl:parameter tail"/>
       <proof
@@ -155,13 +154,13 @@
    </goal>
    <goal
     name="WP_parameter enqueue"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+    locfile="../vstte10_aqueue.mlw"
     loclnum="49" loccnumb="6" loccnume="13"
     expl="parameter enqueue"
-    sum="a5041cec8b908b9416f27b032df60668"
+    sum="34eb486749bdc14a6a35a9c85acb53dd"
     proved="true"
     expanded="false"
-    shape="ainfix =ainfix ++V5areverseV7ainfix ++ainfix ++V1areverseV3aConsV0aNilIainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6Aainfix =ainfix ++V5areverseV7ainfix ++V1areverseaConsV0V3FAainfix =ainfix +V4c1alengthaConsV0V3Aainfix =V2alengthV1Iainfix =alengthV3V4Aainfix &gt;=V2alengthV3Aainfix =alengthV1V2F">
+    shape="ainfix =ainfix ++V5areverseV7ainfix ++ainfix ++V1areverseV3aConsV0aNilIainfix =ainfix ++V5areverseV7ainfix ++V1areverseaConsV0V3Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FAainfix =ainfix +V4c1alengthaConsV0V3Aainfix =V2alengthV1Iainfix =alengthV3V4Aainfix &gt;=V2alengthV3Aainfix =alengthV1V2F">
     <label
      name="expl:parameter enqueue"/>
     <proof
