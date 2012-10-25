@@ -801,7 +801,6 @@ let record_warning ?loc msg = Queue.push (loc,msg) warnings
 
 let () = Warning.set_hook record_warning
 
-
 let display_warnings () =
   if Queue.is_empty warnings then () else
     begin
@@ -874,7 +873,6 @@ let () =
           try
             Debug.dprintf debug "[Info] adding file %s in database@." fn;
             ignore (M.add_file (env_session()) ?format:!opt_parser fn);
-            display_warnings ()
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -1129,8 +1127,7 @@ let select_file () =
               let f = Sysutil.relativize_filename project_dir f in
               Debug.dprintf debug "Adding file '%s'@." f;
               try
-                ignore (M.add_file (env_session()) f);
-                display_warnings ()
+                ignore (M.add_file (env_session()) f)
               with e ->
                 fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -2029,6 +2026,8 @@ let (_ : GtkSignal.id) =
 (*
 let () = Debug.set_flag (Debug.lookup_flag "transform")
 *)
+
+let () = display_warnings ()
 
 let () = GMain.main ()
 
