@@ -53,7 +53,7 @@ theory CauchySchwarzInequality
   lemma p_val_part:
     forall x1 x2 y1 y2:real.
       norm2 y1 y2 > 0.0 ->
-        p x1 x2 y1 y2 (- dot x1 x2 y1 y2 / norm2 y1 y2) =
+        p x1 x2 y1 y2 (- (dot x1 x2 y1 y2 / norm2 y1 y2)) =
         norm2 x1 x2 - sqr (dot x1 x2 y1 y2) / norm2 y1 y2
 
   lemma p_val_part_pos:
