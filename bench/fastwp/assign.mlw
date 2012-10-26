@@ -5,17 +5,17 @@ module Assign
    use import ref.Ref
 
    val glob : ref int
-
+(*
    let f (x : ref int) =
       { }
       x := 0
       { ! x = 0 }
-
+*)
    let g (x : ref int) =
       { }
       x := !x + 1
       { ! x = old !x + 1 }
-
+(*
    let h (x : ref int) =
       { }
       x := !glob
@@ -30,4 +30,5 @@ module Assign
       { }
       glob := !glob + 1
       { ! x = !glob }
+*)
 end

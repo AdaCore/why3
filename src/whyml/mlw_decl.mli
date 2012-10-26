@@ -92,3 +92,4 @@ exception NonupdatableType of ity
 
 val inst_constructors :
   Decl.known_map -> known_map -> ity -> (lsymbol * vty_value list) list
+(* for a given type, return its constructors *)

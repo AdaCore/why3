@@ -32,33 +32,38 @@ module rec T : sig
     vars_tv  : Stv.t;
     vars_reg : Mreg.Set.t;
   }
+  (* the set of variables, e.g. of an individual type. An individual program
+     type can contain type and region variables *)
 
   type varmap = varset Mid.t
 
-  type itysymbol = private {
-    its_pure : tysymbol;
-    its_args : tvsymbol list;
-    its_regs : region list;
-    its_def  : ity option;
-    its_inv  : bool;
-    its_abst : bool;
-    its_priv : bool;
+  type itysymbol = private {     (* the type of a type symbol *)
+    its_pure : tysymbol;         (* the corresponding pure type *)
+    its_args : tvsymbol list;    (* the set of bound variables *)
+    its_regs : region list;      (* the set of regions *)
+    its_def  : ity option;       (* the definition of the type symbol *)
+    its_inv  : bool;             (* does the type have an invariant? *)
+    its_abst : bool;             (* is the type abstract = does it have a model
+                                    view? *)
+    its_priv : bool;             (* is the type private? *)
   }
 
-  and ity = private {
-    ity_node : ity_node;
-    ity_vars : varset;
+  and ity = private {            (* the actual type structure *)
+    ity_node : ity_node;         (* the kind of the type *)
+    ity_vars : varset;           (* the variables bound by the type *)
     ity_tag  : Hashweak.tag;
   }
 
   and ity_node = private
-    | Ityvar of tvsymbol
-    | Itypur of tysymbol * ity list
+    | Ityvar of tvsymbol                           (* simply a type variable *)
+    | Itypur of tysymbol * ity list                (* a pure type *)
     | Ityapp of itysymbol * ity list * region list
+                           (* a regular type application, with type and region
+                              arguments *)
 
   and region = private {
-    reg_name  : ident;
-    reg_ity   : ity;
+    reg_name  : ident;               (* the name of the region *)
+    reg_ity   : ity;                 (* the type of the region *)
   }
 
 end
@@ -261,20 +266,21 @@ type spec = {
 
 (** program variables *)
 
-type vty_value = private {
-  vtv_ity   : ity;
-  vtv_ghost : bool;
-  vtv_mut   : region option;
+type vty_value = private {         (* the type of a program variable *)
+  vtv_ity   : ity;                 (* the underlying program type *)
+  vtv_ghost : bool;                (* am I a ghost variable? *)
+  vtv_mut   : region option;       (* the region of the variable *)
 }
 
 val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
 
 val vtv_unmut : vty_value -> vty_value (* remove mutability *)
 
-type pvsymbol = private {
-  pv_vs   : vsymbol;
-  pv_vtv  : vty_value;
+type pvsymbol = private { (* a program variable *)
+  pv_vs   : vsymbol;      (* the variable symbol *)
+  pv_vtv  : vty_value;    (* the program type *)
   pv_vars : varset;
+       (* ??? the free(?) type and region variables of the variable type *)
 }
 
 module Mpv : Map.S with type key = pvsymbol

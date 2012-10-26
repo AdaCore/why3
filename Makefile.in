@@ -1450,6 +1450,11 @@ otags-vi:
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
 
+# rule for ocp
+
+ocp:
+	 $(MAKE) all OCAMLC=ocp-ocamlc.opt OCAMLOPT=ocp-ocamlopt.opt
+
 #dep: depend
 #	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
 #	$(PDFVIEWER) dep.pdf

@@ -290,6 +290,8 @@ let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
     let vs = Util.option_apply vs get_vs mut in
+    (* at this point, vs is either itself (when it's not in the map, or we
+     * don't have a mutable type), or the vsymbol in the map mreg *)
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
@@ -322,7 +324,7 @@ let model1_lab = Slab.singleton (create_label "model:1")
 let model2_lab = Slab.singleton (create_label "model:quantify(2)")
 let model3_lab = Slab.singleton (create_label "model:cond")
 
-let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
+let mk_var id label ty : vsymbol = create_vsymbol (id_clone ~label id) ty
 
 let quantify env (regs : Sreg.t) (f : term) =
    (* quantify formula [f] over all variables in the regions [regs] *)
@@ -975,20 +977,73 @@ let fast_wp = Debug.register_flag "fast_wp"
   ~desc:"Efficient Weakest Preconditions."
 
 module Subst : sig
+   (* A substitution, or state, represents the state at a given point in the
+      program. It maps each region to the name that should be used to refer to
+      the value of the region in the current state.
+      *)
 
    type t
+   (* the type of substitutions *)
 
    val empty : t
+   (* the empty state *)
+
+   val refresh : Sreg.t -> t -> t
+   (* refresh the state, ie, generate new names for all variables in the region
+      set *)
 
    val term : t -> term -> term
+   (* in the term, substitute the variables that refer to the current state by
+      the symbols that stand for the value of these variables at this point of
+      time
+   *)
 
 end = struct
 
-  type t = vsymbol Mreg.t
+  type t = int Mreg.t
 
   let empty = Mreg.empty
 
-  let term _s t = t
+  let refresh regset s =
+     Sreg.fold (fun reg acc ->
+        Format.printf "refreshing one@.";
+       let cnt =
+         try Mreg.find reg acc + 1
+         with Not_found -> 0
+       in
+       Mreg.add reg cnt acc) regset s
+
+  let get_region v =
+    match vtv_of_vs v with
+      | {vtv_ity = {ity_node = Ityapp (_,_,[r]) }}
+      | { vtv_mut = Some r} -> Some r
+      | _ -> None
+
+  let h = Hashtbl.create 17
+
+  let hashed_var v r_count =
+    try Hashtbl.find h (v, r_count)
+    with Not_found ->
+      let result = mk_var v.vs_name Slab.empty v.vs_ty in
+      Format.printf "creating new variable: %a@." Pretty.print_vs result;
+      Hashtbl.add h (v, r_count) result;
+      result
+
+  let get_term sub v =
+    match get_region v with
+      | Some r ->
+          let r_count =
+            try Mreg.find r sub
+            with Not_found -> 0
+          in
+          hashed_var v r_count
+      | None -> v
+
+  let term sub t =
+    let vars = t.t_vars in
+    let map = Mvs.mapi (fun k _ -> get_term sub k) vars in
+    let t = subst_at_now true map t in
+    t
 
 end
 
@@ -1032,10 +1087,13 @@ let wp_nimplies (n : term) (xn : fast_wp_exn Mexn.t) ((result, q), xq) =
   let f = wp_forall [result] (wp_implies n q) in
   assert (Mexn.cardinal xn = Mexn.cardinal xq);
   let x_implies _xs { fwpe_post = n } (xresult, q) f =
-    wp_forall [xresult] (wp_and ~sym:true f (wp_implies n q)) in
+    wp_forall [xresult] (t_and_simp f (wp_implies n q)) in
   Mexn.fold2_inter x_implies xn xq f
 
 type res_type = vsymbol * vsymbol Mexn.t
+
+let label_logic = Ident.create_label "fast_logic"
+let label_value = Ident.create_label "fast_value"
 
 let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
              : fast_wp_result =
@@ -1053,16 +1111,15 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
   | Elogic t ->
       (* OK: true
 	 NE: result=t *)
-        Format.printf "Elogic@.";
       let t = wp_label e t in
       let t = Subst.term s (to_term t) in
+      let t = t_label_add label_logic t in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { fwp_ok = t_true;
         fwp_ne = ne;
         fwp_state = s;
         fwp_exn = Mexn.empty }
   | Eassert (kind, f) ->
-        Format.printf "Eassert@.";
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
@@ -1073,18 +1130,17 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         fwp_state = s;
         fwp_exn = Mexn.empty }
   | Evalue v ->
-        Format.printf "Evalue@.";
         (* OK : True *)
         (* NE : result = v *)
         let va = (t_var v.pv_vs) in
         Format.printf "va: %a@." Pretty.print_term va;
-        let ne = t_equ (t_var result) va in
+        let ne =
+           t_label_add label_value (Subst.term s (t_equ (t_var result) va)) in
       { fwp_ok = t_true;
         fwp_ne = ne;
         fwp_state = s;
         fwp_exn = Mexn.empty }
   | Eany spec ->
-        Format.printf "Eany@.";
         (* OK = pre *)
         (* NE = post *)
          let ok = wp_label e (wp_expl expl_pre spec.c_pre) in
@@ -1096,22 +1152,32 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
            fwp_exn = Mexn.empty }
          (*TODO exceptional case *)
   | Eapp (e1, _, spec) ->
-        Format.printf "Eapp@.";
         let call_res, post = open_post spec.c_post in
         let post = t_subst_single call_res (t_var result) post in
         let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
         let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
-        let ok =
-           wp_and ~sym:true wp1.fwp_ok (wp_implies wp1.fwp_ne spec.c_pre) in
-        let ne = wp_and ~sym:true wp1.fwp_ne post in
+        let pre = Subst.term s spec.c_pre in
+        let expr_str = Pp.sprintf "%a" Mlw_pretty.print_expr e1 in
+        let ok_label =
+            Ident.create_label (Pp.sprintf "ok for call %s" expr_str) in
+        let ok = t_label_add ok_label
+          (t_and_simp wp1.fwp_ok (wp_implies wp1.fwp_ne pre)) in
+        let state_after_call = Subst.refresh (regs_of_writes spec.c_effect) s in
+        let post = Subst.term state_after_call post in
+        let ne_label =
+           Ident.create_label (Format.sprintf "ne for call %s" expr_str) in
+        let ne =
+           t_label_add
+             ne_label
+             (t_and_simp (Subst.term s wp1.fwp_ne) post) in
          { fwp_ok = ok;
            fwp_ne = ne;
            fwp_state = wp1.fwp_state;
            fwp_exn = Mexn.empty }
 
          (*TODO exceptional case *)
+(*
   | Eassign (e1, reg, pv) ->
-        assert false;
       let rec get_term d = match d.e_node with
         | Elogic t -> t
         | Evalue v -> t_var v.pv_vs
@@ -1129,6 +1195,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         fwp_ne = ne;
         fwp_state = s;
         fwp_exn = Mexn.empty }
+*)
   | Earrow _ ->
         Format.printf "Earrow@.";
         let ok = t_true in
@@ -1137,6 +1204,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
            fwp_ne = ok;
            fwp_state = s;
            fwp_exn = Mexn.empty }
+  | Eassign _ -> assert false
   | Eabstr (_, _) -> assert false (*TODO*)
   | Etry (_, _) -> assert false (*TODO*)
   | Eraise (_, _) -> assert false (*TODO*)
@@ -1152,8 +1220,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
          Ex: *)
       let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.fwp_state r e2 in
-      let ok = wp_and ~sym:true wp1.fwp_ok (wp_implies wp1.fwp_ne wp2.fwp_ok) in
-      let ne = wp_and ~sym:true wp1.fwp_ne wp2.fwp_ne in
+      let ok = t_and_simp wp1.fwp_ok (wp_implies wp1.fwp_ne wp2.fwp_ok) in
+      let ne = t_and_simp wp1.fwp_ne wp2.fwp_ne in
       let ee _xs =
          { fwpe_post  = t_true;
            fwpe_state = wp2.fwp_state } in
@@ -1179,16 +1247,20 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
     let tl = List.map t_at_lab c.c_variant in
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
+  let subst = Subst.empty in
   let q = old_mark lab (wp_expl expl_post c.c_post) in
-  let result, _ as q = open_post q in
+  let result, q_f  = open_post q in
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let xq = Mexn.map conv c.c_xpost in
   let xq = Mexn.map open_post xq in
   let xresult = Mexn.map fst xq in
-  let res = fast_wp_expr env Subst.empty (result, xresult) l.l_expr in
+  let res = fast_wp_expr env subst (result, xresult) l.l_expr in
+  let q_f = Subst.term res.fwp_state q_f in
   let f =
-     wp_and ~sym:true res.fwp_ok (wp_nimplies res.fwp_ne res.fwp_exn (q, xq)) in
+     t_and_simp res.fwp_ok
+     (wp_nimplies res.fwp_ne res.fwp_exn ((result, q_f), xq)) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
+  Format.printf "computed formula: %a@." Pretty.print_term f;
   wp_forall args (quantify env regs f)
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
