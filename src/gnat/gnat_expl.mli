@@ -28,10 +28,9 @@ val print_skipped : Format.formatter -> expl -> unit
 val to_filename : expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
-val mk_expl : reason -> loc -> loc -> expl
+val mk_expl : reason -> loc -> expl
 
 val get_loc : expl -> loc
-val get_subp_loc : expl -> loc
 
 module MExpl : Stdlib.Map.S with type key = expl
 module HExpl : Hashtbl.S with type key = expl
