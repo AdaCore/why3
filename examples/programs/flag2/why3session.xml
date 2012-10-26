@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/flag2/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,13 +31,13 @@
   expanded="true">
   <theory
    name="Flag"
-   locfile="examples/programs/flag2/../flag2.mlw"
+   locfile="../flag2.mlw"
    loclnum="7" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="nb_occ_split"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="32" loccnumb="8" loccnume="20"
     sum="9435ac655e57881157f09b7e3ae6aa09"
     proved="true"
@@ -56,7 +55,7 @@
    </goal>
    <goal
     name="nb_occ_store_outside_up"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="37" loccnumb="8" loccnume="31"
     sum="185f951d602cc9c27a863442733f7212"
     proved="true"
@@ -74,7 +73,7 @@
    </goal>
    <goal
     name="nb_occ_store_outside_down"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="41" loccnumb="8" loccnume="33"
     sum="8f978542f2d2e7062b83ce3f5995d3bd"
     proved="true"
@@ -92,20 +91,12 @@
    </goal>
    <goal
     name="nb_occ_store_eq_eq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="45" loccnumb="8" loccnume="26"
     sum="9d045eb2aa1f51786ded4516ccb8294c"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
     <proof
      prover="1"
      timelimit="5"
@@ -123,6 +114,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="5"
      memlimit="1000"
@@ -133,7 +132,7 @@
    </goal>
    <goal
     name="nb_occ_store_eq_neq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="50" loccnumb="8" loccnume="27"
     sum="e15290d9fe7466a560105f7d85aa4d8f"
     proved="true"
@@ -151,7 +150,7 @@
    </goal>
    <goal
     name="nb_occ_store_neq_eq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="55" loccnumb="8" loccnume="27"
     sum="b533513b6c20f85df84a47d0d24ab015"
     proved="true"
@@ -168,7 +167,7 @@
    </goal>
    <goal
     name="nb_occ_store_neq_neq"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="60" loccnumb="8" loccnume="28"
     sum="ae79a40934c4ef4f65c29eb98a33226c"
     proved="true"
@@ -185,7 +184,7 @@
    </goal>
    <goal
     name="WP_parameter swap"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="66" loccnumb="5" loccnume="9"
     expl="parameter swap"
     sum="390a88c7c0c6cf14daf45666c089ed7c"
@@ -200,7 +199,7 @@
      expanded="true">
      <goal
       name="WP_parameter swap.1"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="postcondition"
       sum="fcba58e84d39cc83b54bb5d0712383c6"
@@ -220,7 +219,7 @@
      </goal>
      <goal
       name="WP_parameter swap.2"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="postcondition"
       sum="5dbee10962ea03cb92521e6c91b2f23b"
@@ -240,7 +239,7 @@
      </goal>
      <goal
       name="WP_parameter swap.3"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="postcondition"
       sum="7f859af660f5f7b92db1e3de2ad489c9"
@@ -260,7 +259,7 @@
      </goal>
      <goal
       name="WP_parameter swap.4"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="postcondition"
       sum="3a9cc716cd05e9e16c89c8f259b6628e"
@@ -290,7 +289,7 @@
    </goal>
    <goal
     name="WP_parameter dutch_flag"
-    locfile="examples/programs/flag2/../flag2.mlw"
+    locfile="../flag2.mlw"
     loclnum="78" loccnumb="5" loccnume="15"
     expl="parameter dutch_flag"
     sum="b7dcb47ce774ee5e1055532102f218a2"
@@ -305,7 +304,7 @@
      expanded="true">
      <goal
       name="WP_parameter dutch_flag.1"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant init"
       sum="c488d783e388233d463804f2860a78e9"
@@ -341,7 +340,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.2"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant init"
       sum="69f766eceec0db6737278e271cd5851c"
@@ -377,7 +376,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.3"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant init"
       sum="579fecd563d452dda19cd1ce2a8f2a20"
@@ -413,7 +412,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.4"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant init"
       sum="e313a7740b3b0565fc63a705457b51ed"
@@ -449,7 +448,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.5"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant init"
       sum="d6c4ed638c5a9e4100a838880a099fc7"
@@ -459,15 +458,7 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -475,7 +466,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="1"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -491,6 +482,14 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
        prover="5"
        timelimit="5"
        memlimit="1000"
@@ -501,7 +500,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.6"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="0e8ae76f33ae4f6de1d596ab1a8c552c"
@@ -537,7 +536,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.7"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="33b61eb226b37cd97b3430ef347b380d"
@@ -573,7 +572,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.8"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="9e5c78901142046305064acc681cd7a1"
@@ -609,7 +608,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.9"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="7e6a67df3882d3be6e6f8c4c2c225237"
@@ -645,7 +644,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.10"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="99e94152c58bc1c12b281ed5877a1c6e"
@@ -655,12 +654,12 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="1"
@@ -671,15 +670,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -697,7 +696,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.11"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop variant decrease"
       sum="61e3dd6586427e36823eaeeb4f5d4fcd"
@@ -707,12 +706,12 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -723,7 +722,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -731,12 +730,12 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="5"
@@ -749,7 +748,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.12"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="60ec95e3f4ac5393dae27b7389bfa29e"
@@ -785,7 +784,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.13"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="d090bfbecba9a1bdcf8cc61aee45919f"
@@ -821,7 +820,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.14"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="37557749d750e39f4a32bf3ddb40bffc"
@@ -857,7 +856,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.15"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="a9b096cf335ef7f0f28a23b2d948237d"
@@ -893,7 +892,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.16"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="9e8e0e3202849b3fd85c5fb9dae92dc0"
@@ -903,7 +902,7 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -919,20 +918,20 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="5"
@@ -945,7 +944,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.17"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop variant decrease"
       sum="89995ab9e567323efb2c4fb4ac15653e"
@@ -955,12 +954,12 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -971,15 +970,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -997,7 +996,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.18"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="221426b3466a15ca831ac68b27835f60"
@@ -1033,7 +1032,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.19"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="6b34fd4d8f63a175c3fbe6f41d1e4ef4"
@@ -1069,7 +1068,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.20"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="ca06ed223e339bf8ba2637e53b798a53"
@@ -1105,7 +1104,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.21"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="a78ac09a7ee5b03a4eb403123aa591c1"
@@ -1141,7 +1140,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.22"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop invariant preservation"
       sum="8694360b139df5b5934d0968f282364b"
@@ -1151,7 +1150,7 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1167,7 +1166,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1175,7 +1174,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1193,7 +1192,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.23"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="loop variant decrease"
       sum="ebf38071e7986f3dfbd03048d27a878e"
@@ -1203,15 +1202,7 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1219,7 +1210,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="1"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1235,6 +1226,14 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
        prover="5"
        timelimit="5"
        memlimit="1000"
@@ -1245,7 +1244,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.24"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="postcondition"
       sum="0d945e2b66a0c5c6b00c89eaa25093af"
@@ -1281,7 +1280,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.25"
-      locfile="examples/programs/flag2/../flag2.mlw"
+      locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="postcondition"
       sum="b1f6c3f7ea579053bd64fa7fd83e2c06"
@@ -1291,20 +1290,20 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
        prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="2"

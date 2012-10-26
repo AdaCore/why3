@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/zeros/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -20,13 +19,13 @@
   expanded="true">
   <theory
    name="SetZeros"
-   locfile="examples/programs/zeros/../zeros.mlw"
+   locfile="../zeros.mlw"
    loclnum="2" loccnumb="7" loccnume="15"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter set_zeros"
-    locfile="examples/programs/zeros/../zeros.mlw"
+    locfile="../zeros.mlw"
     loclnum="7" loccnumb="6" loccnume="15"
     expl="parameter set_zeros"
     sum="10339103798b22d29155e95a5803ba3a"
@@ -41,7 +40,7 @@
      expanded="true">
      <goal
       name="WP_parameter set_zeros.1"
-      locfile="examples/programs/zeros/../zeros.mlw"
+      locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="postcondition"
       sum="640aba1c337fda249828bbd29152b2d7"
@@ -61,7 +60,7 @@
      </goal>
      <goal
       name="WP_parameter set_zeros.2"
-      locfile="examples/programs/zeros/../zeros.mlw"
+      locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="loop invariant init"
       sum="6c2a2433a220089b551d09580fc3abf1"
@@ -81,7 +80,7 @@
      </goal>
      <goal
       name="WP_parameter set_zeros.3"
-      locfile="examples/programs/zeros/../zeros.mlw"
+      locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="precondition"
       sum="9fcfb903ed93a3883564577eb0e6f855"
@@ -101,7 +100,7 @@
      </goal>
      <goal
       name="WP_parameter set_zeros.4"
-      locfile="examples/programs/zeros/../zeros.mlw"
+      locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="loop invariant preservation"
       sum="9202dee311b48c7f4580651f8aaf196e"
@@ -111,14 +110,6 @@
       <label
        name="expl:parameter set_zeros"/>
       <proof
-       prover="2"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
        prover="1"
        timelimit="10"
        memlimit="0"
@@ -126,10 +117,18 @@
        archived="false">
        <result status="valid" time="0.00"/>
       </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter set_zeros.5"
-      locfile="examples/programs/zeros/../zeros.mlw"
+      locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="postcondition"
       sum="6bc83e91df34a0369e8b3dc733c157d0"
@@ -151,8 +150,8 @@
    </goal>
    <goal
     name="WP_parameter harness"
-    locfile="examples/programs/zeros/../zeros.mlw"
-    loclnum="15" loccnumb="6" loccnume="13"
+    locfile="../zeros.mlw"
+    loclnum="14" loccnumb="6" loccnume="13"
     expl="parameter harness"
     sum="b26459b4d1956c18d388b63ec6a8f8cf"
     proved="true"
@@ -166,8 +165,8 @@
      expanded="true">
      <goal
       name="WP_parameter harness.1"
-      locfile="examples/programs/zeros/../zeros.mlw"
-      loclnum="15" loccnumb="6" loccnume="13"
+      locfile="../zeros.mlw"
+      loclnum="14" loccnumb="6" loccnume="13"
       expl="precondition"
       sum="11c01fadb9e3d05d3893a660db3c922d"
       proved="true"
@@ -186,8 +185,8 @@
      </goal>
      <goal
       name="WP_parameter harness.2"
-      locfile="examples/programs/zeros/../zeros.mlw"
-      loclnum="15" loccnumb="6" loccnume="13"
+      locfile="../zeros.mlw"
+      loclnum="14" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="1bf852f78cf331561550a126e3e6541f"
       proved="true"
@@ -206,8 +205,8 @@
      </goal>
      <goal
       name="WP_parameter harness.3"
-      locfile="examples/programs/zeros/../zeros.mlw"
-      loclnum="15" loccnumb="6" loccnume="13"
+      locfile="../zeros.mlw"
+      loclnum="14" loccnumb="6" loccnume="13"
       expl="assertion"
       sum="545678615c42afff472466a06f7ff664"
       proved="true"

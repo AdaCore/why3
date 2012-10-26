@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/binary_search/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,13 +15,13 @@
   expanded="false">
   <theory
    name="BinarySearch"
-   locfile="programs/binary_search/../binary_search.mlw"
+   locfile="../binary_search.mlw"
    loclnum="5" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter binary_search"
-    locfile="programs/binary_search/../binary_search.mlw"
+    locfile="../binary_search.mlw"
     loclnum="17" loccnumb="6" loccnume="19"
     expl="parameter binary_search"
     sum="9f60cf065e425aed250128303946138f"
@@ -32,14 +31,6 @@
     <label
      name="expl:parameter binary_search"/>
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
      prover="0"
      timelimit="10"
      memlimit="0"
@@ -47,18 +38,26 @@
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
+    <proof
+     prover="1"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
   </theory>
   <theory
    name="BinarySearchAnyMidPoint"
-   locfile="programs/binary_search/../binary_search.mlw"
+   locfile="../binary_search.mlw"
    loclnum="48" loccnumb="7" loccnume="30"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter binary_search"
-    locfile="programs/binary_search/../binary_search.mlw"
-    loclnum="59" loccnumb="6" loccnume="19"
+    locfile="../binary_search.mlw"
+    loclnum="60" loccnumb="6" loccnume="19"
     expl="parameter binary_search"
     sum="16ce454ae5e4d3346ff4a9dd4f84fba0"
     proved="true"
@@ -78,14 +77,14 @@
   </theory>
   <theory
    name="BinarySearchInt32"
-   locfile="programs/binary_search/../binary_search.mlw"
-   loclnum="88" loccnumb="7" loccnume="24"
+   locfile="../binary_search.mlw"
+   loclnum="89" loccnumb="7" loccnume="24"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter binary_search"
-    locfile="programs/binary_search/../binary_search.mlw"
-    loclnum="99" loccnumb="6" loccnume="19"
+    locfile="../binary_search.mlw"
+    loclnum="100" loccnumb="6" loccnume="19"
     expl="parameter binary_search"
     sum="5f760c6ff02952c3cb4e9c6699b517ad"
     proved="true"

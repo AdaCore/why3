@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
-<why3session
- name="hoare_logic/wp4/why3session.xml" shape_version="2">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,13 +31,13 @@
   expanded="true">
   <theory
    name="ImpExpr"
-   locfile="hoare_logic/wp4/../wp4.mlw"
+   locfile="../wp4.mlw"
    loclnum="6" loccnumb="7" loccnume="14"
    verified="false"
    expanded="true">
    <goal
     name="eq_refident_dec"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="23" loccnumb="6" loccnume="21"
     sum="365005cb01a97b0cadbb84e859094a3c"
     proved="true"
@@ -55,35 +54,19 @@
    </goal>
    <goal
     name="get_stack_eq"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="69" loccnumb="6" loccnume="18"
     sum="58913f8cace7285bce9314f9c021ec40"
     proved="true"
     expanded="false"
     shape="ainfix =aget_stackV0aConsaTuple2V0V1V2V1F">
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="1"
@@ -93,17 +76,33 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
    <goal
     name="get_stack_neq"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="73" loccnumb="6" loccnume="19"
     sum="11151b62b6bf0a4d38b631befc70c63a"
     proved="true"
     expanded="false"
     shape="ainfix =aget_stackV1aConsaTuple2V0V2V3aget_stackV1V3Iainfix =V0V1NF">
     <proof
-     prover="2"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -111,7 +110,15 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -126,18 +133,10 @@
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
    </goal>
    <goal
     name="eval_subst_term"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="125" loccnumb="6" loccnume="21"
     sum="994aa07ca7e545ae3672e51970109c43"
     proved="true"
@@ -155,7 +154,7 @@
    </goal>
    <goal
     name="eval_vsubst_term"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="131" loccnumb="6" loccnume="22"
     sum="45296e0dbe197b3ddef8a37c472a9eb6"
     proved="true"
@@ -173,7 +172,7 @@
    </goal>
    <goal
     name="eval_term_change_free"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="136" loccnumb="6" loccnume="27"
     sum="c5cd6715d5f718dbab5bd86aa35e2945"
     proved="true"
@@ -191,7 +190,7 @@
    </goal>
    <goal
     name="eval_subst"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="173" loccnumb="6" loccnume="16"
     sum="a2136a45382983d41e676ee0534298bf"
     proved="true"
@@ -209,7 +208,7 @@
    </goal>
    <goal
     name="eval_vsubst"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="179" loccnumb="6" loccnume="17"
     sum="d03156e5f619b5991ad8896b9f8f03f7"
     proved="false"
@@ -218,7 +217,7 @@
    </goal>
    <goal
     name="eval_swap"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="184" loccnumb="6" loccnume="15"
     sum="4a4325bcbf43a6d5cb140d23753ebc53"
     proved="false"
@@ -236,7 +235,7 @@
    </goal>
    <goal
     name="eval_change_free"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="190" loccnumb="6" loccnume="22"
     sum="a7f4b4de0cd8395b2ecbc71225d98640"
     proved="true"
@@ -254,7 +253,7 @@
    </goal>
    <goal
     name="steps_non_neg"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="300" loccnumb="6" loccnume="19"
     sum="8fa04f018ac42628468449e9ca325a2c"
     proved="true"
@@ -272,7 +271,7 @@
    </goal>
    <goal
     name="many_steps_seq"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="304" loccnumb="6" loccnume="20"
     sum="698549f26818f5c450df8f6a0b19b9f0"
     proved="true"
@@ -290,7 +289,7 @@
    </goal>
    <goal
     name="many_steps_let"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="312" loccnumb="6" loccnume="20"
     sum="a1ecd01277cbfdd7e3c8ffa355f1e646"
     proved="true"
@@ -309,13 +308,13 @@
   </theory>
   <theory
    name="TestSemantics"
-   locfile="hoare_logic/wp4/../wp4.mlw"
+   locfile="../wp4.mlw"
    loclnum="344" loccnumb="7" loccnume="20"
    verified="false"
    expanded="true">
    <goal
     name="Test13"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="352" loccnumb="5" loccnume="11"
     sum="5891d81b42ce600571c19206fa78c2d4"
     proved="true"
@@ -340,7 +339,7 @@
    </goal>
    <goal
     name="Test13expr"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="355" loccnumb="5" loccnume="15"
     sum="270d4f99b8af32416a77e72023d1a209"
     proved="true"
@@ -373,7 +372,7 @@
    </goal>
    <goal
     name="Test42"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="358" loccnumb="5" loccnume="11"
     sum="d491dfe5755a2eabed28a703cd08f078"
     proved="true"
@@ -398,7 +397,7 @@
    </goal>
    <goal
     name="Test42expr"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="361" loccnumb="5" loccnume="15"
     sum="bb3fd96b87d903afc469d555012900ee"
     proved="true"
@@ -416,7 +415,7 @@
    </goal>
    <goal
     name="Test0"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="364" loccnumb="5" loccnume="10"
     sum="1b56f14c7d30a1c9456a83a837a741a3"
     proved="true"
@@ -441,7 +440,7 @@
    </goal>
    <goal
     name="Test0expr"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="367" loccnumb="5" loccnume="14"
     sum="1987d0a56a7855c8b5b0c391e9f37e01"
     proved="false"
@@ -474,7 +473,7 @@
    </goal>
    <goal
     name="Test55"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="370" loccnumb="5" loccnume="11"
     sum="dab6d20103458281928e29bf9599dd6a"
     proved="false"
@@ -507,7 +506,7 @@
    </goal>
    <goal
     name="Test55expr"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="373" loccnumb="5" loccnume="15"
     sum="0d6027f801d58abc87a5346bf1fcf679"
     proved="false"
@@ -540,7 +539,7 @@
    </goal>
    <goal
     name="Ass42"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="376" loccnumb="5" loccnume="10"
     sum="93b9826de74d0291f25a2da62ad5ced4"
     proved="true"
@@ -573,7 +572,7 @@
    </goal>
    <goal
     name="If42"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="381" loccnumb="5" loccnume="9"
     sum="a07718ec5a7a4b75d724fa2aca94bbef"
     proved="true"
@@ -599,13 +598,13 @@
   </theory>
   <theory
    name="HoareLogic"
-   locfile="hoare_logic/wp4/../wp4.mlw"
+   locfile="../wp4.mlw"
    loclnum="395" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
    <goal
     name="consequence_rule"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="402" loccnumb="6" loccnume="22"
     sum="7095d958c3eb2a0c31863b6b7e24313e"
     proved="true"
@@ -623,7 +622,7 @@
    </goal>
    <goal
     name="value_rule"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="409" loccnumb="6" loccnume="16"
     sum="6e0739524aa40a0cc32fbac6d9f3f2fd"
     proved="true"
@@ -641,7 +640,7 @@
    </goal>
    <goal
     name="assign_rule"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="413" loccnumb="6" loccnume="17"
     sum="60535f9c3282937d7d0440392bff4601"
     proved="false"
@@ -650,7 +649,7 @@
    </goal>
    <goal
     name="seq_rule"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="418" loccnumb="6" loccnume="14"
     sum="f9ae6b8af2e4ed9a250ed14a5b23b0db"
     proved="false"
@@ -659,7 +658,7 @@
    </goal>
    <goal
     name="let_rule"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="423" loccnumb="6" loccnume="14"
     sum="076a5c02a6d04bee0764bfd9361a87ad"
     proved="true"
@@ -677,7 +676,7 @@
    </goal>
    <goal
     name="assert_rule"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="437" loccnumb="6" loccnume="17"
     sum="8f5537074adf8e0fa45f57dd383e0016"
     proved="false"
@@ -686,7 +685,7 @@
    </goal>
    <goal
     name="assert_rule_ext"
-    locfile="hoare_logic/wp4/../wp4.mlw"
+    locfile="../wp4.mlw"
     loclnum="441" loccnumb="6" loccnume="21"
     sum="df4db6704fff281d22ea2194c046afde"
     proved="false"

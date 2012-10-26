@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/flag/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +23,13 @@
   expanded="true">
   <theory
    name="Flag"
-   locfile="examples/programs/flag/../flag.mlw"
+   locfile="../flag.mlw"
    loclnum="3" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter swap"
-    locfile="examples/programs/flag/../flag.mlw"
+    locfile="../flag.mlw"
     loclnum="15" loccnumb="6" loccnume="10"
     expl="parameter swap"
     sum="f8309806995c23e0411a87500911c5fc"
@@ -40,14 +39,6 @@
     <label
      name="expl:parameter swap"/>
     <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
      prover="0"
      timelimit="10"
      memlimit="0"
@@ -55,10 +46,18 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter dutch_flag"
-    locfile="examples/programs/flag/../flag.mlw"
+    locfile="../flag.mlw"
     loclnum="24" loccnumb="6" loccnume="16"
     expl="parameter dutch_flag"
     sum="5ae146277eb89e5420ff6dd5da54f10f"
@@ -73,7 +72,7 @@
      expanded="true">
      <goal
       name="WP_parameter dutch_flag.1"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="d1a657d49930c65578430bfca9eaec6d"
@@ -93,7 +92,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.2"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="60c49b52aa952f5ad8f2cc8ebaf5e940"
@@ -113,7 +112,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.3"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="600f13fe995c9fa18690f3b5fbdf99b3"
@@ -133,7 +132,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.4"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="4908a7ca332703dbc3e93ddaf1273068"
@@ -153,7 +152,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.5"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="d95ce012ec5eab914d34fb90f8e13d61"
@@ -173,7 +172,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.6"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant init"
       sum="f7cb15e482c7dad1f8c9732a69bd5481"
@@ -193,7 +192,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.7"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="precondition"
       sum="2c72f24129cde85d10df285ebb28968d"
@@ -213,7 +212,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.8"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="precondition"
       sum="af049d27d376d45225225634d10919c9"
@@ -223,12 +222,12 @@
       <label
        name="expl:parameter dutch_flag"/>
       <proof
-       prover="3"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -239,17 +238,17 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="0"
+       prover="3"
        timelimit="10"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter dutch_flag.9"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="0657b0f6faddf3df44557be3bf2f7ddb"
@@ -269,7 +268,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.10"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="7593fd042a5b211b7e1c236cef12acc7"
@@ -290,7 +289,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.11"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="23f53b92827b703ebe1fc0cd80649695"
@@ -311,7 +310,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.12"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="cacdebae799771db6234243898930231"
@@ -331,7 +330,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.13"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="6a64f49d60b2f2ac1cb24832adc1e30e"
@@ -351,7 +350,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.14"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="033516e53b31886e83df1755549b8cc5"
@@ -371,7 +370,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.15"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop variant decrease"
       sum="5bcef5d37280672dee15b4480e144c35"
@@ -391,7 +390,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.16"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="1544b6e827d29a6854e6b758a707acda"
@@ -411,7 +410,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.17"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="61256c450d2873918ed358799e055d14"
@@ -431,7 +430,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.18"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="c847fa95bb7b834d85fcec004cf5eed6"
@@ -451,7 +450,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.19"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="60d5b7aae43debe55ebdb37c4eb22db9"
@@ -471,7 +470,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.20"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="174213324b547d6f318516a0c799b42b"
@@ -491,7 +490,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.21"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="21066d148a0d31374c0bb247f59bf538"
@@ -511,7 +510,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.22"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop variant decrease"
       sum="77b0dd8e82b2aa50827e64fae6bac7dd"
@@ -531,7 +530,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.23"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="precondition"
       sum="a88eb7559ec50873874e71857f06d919"
@@ -551,7 +550,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.24"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="7f191d496b9bf579e736b0ee668fd3fe"
@@ -571,7 +570,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.25"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="c6e2b98ed3259712610485a9ed5c5b1a"
@@ -591,7 +590,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.26"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="873b89028a331695f76353e5e5a1fa39"
@@ -611,7 +610,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.27"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="8b4dabe7942ce4ed0e164d15bc002e39"
@@ -631,7 +630,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.28"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="0af70edc9ee11fa99a88ca3aac26ee1c"
@@ -651,7 +650,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.29"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop invariant preservation"
       sum="99bef21228fe186dc80e6b5f1c93b971"
@@ -671,7 +670,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.30"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="loop variant decrease"
       sum="e969d35ed6cc51271379485651208795"
@@ -691,7 +690,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.31"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="postcondition"
       sum="66bc19d0ba588dd2ff0e5413b36093cb"
@@ -711,7 +710,7 @@
      </goal>
      <goal
       name="WP_parameter dutch_flag.32"
-      locfile="examples/programs/flag/../flag.mlw"
+      locfile="../flag.mlw"
       loclnum="24" loccnumb="6" loccnume="16"
       expl="postcondition"
       sum="e982feef64a35c17c4161814cc92a90e"

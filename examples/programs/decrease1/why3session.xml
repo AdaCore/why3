@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/decrease1/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -36,13 +35,13 @@
   expanded="true">
   <theory
    name="Decrease1"
-   locfile="examples/programs/decrease1/../decrease1.mlw"
+   locfile="../decrease1.mlw"
    loclnum="8" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <goal
     name="decrease1_induction"
-    locfile="examples/programs/decrease1/../decrease1.mlw"
+    locfile="../decrease1.mlw"
     loclnum="17" loccnumb="8" loccnume="27"
     sum="f34773a88a837bf790c403ca5ed17df8"
     proved="true"
@@ -60,7 +59,7 @@
    </goal>
    <goal
     name="WP_parameter search"
-    locfile="examples/programs/decrease1/../decrease1.mlw"
+    locfile="../decrease1.mlw"
     loclnum="23" loccnumb="6" loccnume="12"
     expl="parameter search"
     sum="f86811479ea2dce13b5d781eb5993997"
@@ -75,7 +74,7 @@
      expanded="true">
      <goal
       name="WP_parameter search.1"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop invariant init"
       sum="7f05ea98072cf8924771e334028afd25"
@@ -101,7 +100,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -109,7 +108,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -119,7 +118,7 @@
      </goal>
      <goal
       name="WP_parameter search.2"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop invariant init"
       sum="b3f6c5d00d47982c8160b0f2eb22a639"
@@ -129,9 +128,9 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -145,14 +144,6 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -161,7 +152,15 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -169,7 +168,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -179,7 +178,7 @@
      </goal>
      <goal
       name="WP_parameter search.3"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="precondition"
       sum="4cfec00e4a7541682e7958741463eba5"
@@ -189,9 +188,9 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -205,14 +204,6 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -221,12 +212,12 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="5"
@@ -236,10 +227,18 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter search.4"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="postcondition"
       sum="1af5e07e25775e0f6d6dd6d23a61366b"
@@ -249,25 +248,17 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -281,7 +272,15 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -289,7 +288,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -299,7 +298,7 @@
      </goal>
      <goal
       name="WP_parameter search.5"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="precondition"
       sum="c741da82d3124f9be97eaa677ab6e51d"
@@ -309,25 +308,17 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -341,7 +332,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -349,7 +348,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -359,7 +358,7 @@
      </goal>
      <goal
       name="WP_parameter search.6"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="precondition"
       sum="3dc53ede82801e554033c41a237b82dc"
@@ -369,25 +368,17 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -401,9 +392,9 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -416,10 +407,18 @@
        archived="false">
        <result status="valid" time="0.00"/>
       </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter search.7"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop invariant preservation"
       sum="42a60b5da3058b73dd5b25b902c12eb7"
@@ -445,14 +444,6 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
        prover="5"
        timelimit="5"
        memlimit="1000"
@@ -460,10 +451,18 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter search.8"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop invariant preservation"
       sum="331aee6b50e5edfa1f549276d93528bf"
@@ -481,14 +480,6 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-      <proof
        prover="5"
        timelimit="5"
        memlimit="1000"
@@ -496,10 +487,18 @@
        archived="false">
        <result status="valid" time="0.09"/>
       </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter search.9"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop variant decrease"
       sum="2e9b752a9d72482fca727bb4799a7b50"
@@ -509,12 +508,12 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="1"
@@ -525,15 +524,23 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -548,18 +555,10 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter search.10"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop invariant preservation"
       sum="5cffd5638787eaeb06e43852a4c93bd3"
@@ -585,7 +584,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -593,7 +592,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -603,7 +602,7 @@
      </goal>
      <goal
       name="WP_parameter search.11"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop invariant preservation"
       sum="f9e668569105221cf93316d66d8b0aad"
@@ -629,7 +628,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -637,7 +636,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -647,7 +646,7 @@
      </goal>
      <goal
       name="WP_parameter search.12"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="loop variant decrease"
       sum="c915f2fc75f398840c00a3242e95bac2"
@@ -657,25 +656,17 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -687,6 +678,22 @@
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="6"
@@ -696,18 +703,10 @@
        archived="false">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter search.13"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="23" loccnumb="6" loccnume="12"
       expl="postcondition"
       sum="6a3acc17c7a38e5b920df79544af159a"
@@ -717,12 +716,12 @@
       <label
        name="expl:parameter search"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="1"
@@ -733,14 +732,6 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -749,7 +740,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -757,7 +756,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -769,7 +768,7 @@
    </goal>
    <goal
     name="WP_parameter search_rec"
-    locfile="examples/programs/decrease1/../decrease1.mlw"
+    locfile="../decrease1.mlw"
     loclnum="43" loccnumb="10" loccnume="20"
     expl="parameter search_rec"
     sum="1ceddd4ef1a35e07f4a248711ab45c3e"
@@ -784,7 +783,7 @@
      expanded="true">
      <goal
       name="WP_parameter search_rec.1"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="precondition"
       sum="7dbbc24211ddf80de8930b751d9c3ae3"
@@ -794,25 +793,17 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -826,7 +817,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -834,7 +833,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -844,7 +843,7 @@
      </goal>
      <goal
       name="WP_parameter search_rec.2"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="postcondition"
       sum="8458344b1ca4a7440968c002e85a02c5"
@@ -854,12 +853,12 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
       <proof
        prover="1"
@@ -870,14 +869,6 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -886,7 +877,15 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -894,7 +893,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -904,7 +903,7 @@
      </goal>
      <goal
       name="WP_parameter search_rec.3"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="precondition"
       sum="c74a870a4108b432155e20487fb2bdec"
@@ -914,9 +913,9 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -930,14 +929,6 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -946,7 +937,15 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -954,7 +953,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -964,7 +963,7 @@
      </goal>
      <goal
       name="WP_parameter search_rec.4"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="precondition"
       sum="19fbc34622cd395dce58668a06ee6aa0"
@@ -974,12 +973,12 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -990,14 +989,6 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -1006,7 +997,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1014,7 +1013,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1024,7 +1023,7 @@
      </goal>
      <goal
       name="WP_parameter search_rec.5"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="precondition"
       sum="592e7afae3763e27994d67df229966dc"
@@ -1034,25 +1033,17 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1066,12 +1057,12 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="5"
@@ -1081,10 +1072,18 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter search_rec.6"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="postcondition"
       sum="5cfb4b9f1c56f9c65540be0755be5a42"
@@ -1094,12 +1093,13 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
+       prover="3"
+       timelimit="10"
+       memlimit="0"
+       edited="decrease1_WP_Decrease1_WP_parameter_search_rec_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.31"/>
+       <result status="valid" time="1.43"/>
       </proof>
       <proof
        prover="5"
@@ -1110,18 +1110,17 @@
        <result status="valid" time="0.16"/>
       </proof>
       <proof
-       prover="3"
-       timelimit="10"
-       memlimit="0"
-       edited="decrease1_WP_Decrease1_WP_parameter_search_rec_1.v"
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.43"/>
+       <result status="valid" time="0.31"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter search_rec.7"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="precondition"
       sum="8565c01b099874f6140e38c09bfafd17"
@@ -1131,25 +1130,17 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1163,12 +1154,12 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="5"
@@ -1178,10 +1169,18 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter search_rec.8"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="postcondition"
       sum="26cbce3141bce3f6715ee349732f8a05"
@@ -1191,12 +1190,12 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -1207,14 +1206,6 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="5"
        memlimit="1000"
@@ -1223,7 +1214,15 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1231,7 +1230,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1241,7 +1240,7 @@
      </goal>
      <goal
       name="WP_parameter search_rec.9"
-      locfile="examples/programs/decrease1/../decrease1.mlw"
+      locfile="../decrease1.mlw"
       loclnum="43" loccnumb="10" loccnume="20"
       expl="postcondition"
       sum="45ef5756ed03d4119ac4c72de7cbcac2"
@@ -1251,25 +1250,17 @@
       <label
        name="expl:parameter search_rec"/>
       <proof
-       prover="4"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
+       prover="1"
+       timelimit="10"
+       memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -1283,7 +1274,15 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
+       prover="4"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1291,7 +1290,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"

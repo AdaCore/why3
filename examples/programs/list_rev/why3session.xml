@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/list_rev/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -28,25 +27,25 @@
   expanded="true">
   <theory
    name="M"
-   locfile="examples/programs/list_rev/../list_rev.mlw"
+   locfile="../list_rev.mlw"
    loclnum="2" loccnumb="7" loccnume="8"
    verified="false"
    expanded="true">
    <goal
     name="acyclic_list"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="109" loccnumb="8" loccnume="20"
     sum="c582d66421efa4c8c1fa0751a607276b"
     proved="false"
     expanded="true"
     shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.05"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -57,29 +56,29 @@
      <result status="unknown" time="2.20"/>
     </proof>
     <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.01"/>
+     <result status="timeout" time="10.05"/>
     </proof>
    </goal>
    <goal
     name="consistent"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="112" loccnumb="7" loccnume="17"
     sum="4b207f3e6c8ab31e80e9ab412daebe80"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.03"/>
+     <result status="timeout" time="10.01"/>
     </proof>
     <proof
      prover="1"
@@ -90,17 +89,17 @@
      <result status="unknown" time="0.15"/>
     </proof>
     <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.01"/>
+     <result status="unknown" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter list_rev"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="115" loccnumb="6" loccnume="14"
     expl="parameter list_rev"
     sum="13592b1c84c778d77586cbf3aa5f42aa"
@@ -120,7 +119,7 @@
    </goal>
    <goal
     name="reverse_append"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="145" loccnumb="8" loccnume="22"
     sum="a347b9e0b4ffb3f5d04fd1e338e8a6f4"
     proved="true"
@@ -137,7 +136,7 @@
    </goal>
    <goal
     name="WP_parameter list_rev_behv"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="156" loccnumb="6" loccnume="19"
     expl="parameter list_rev_behv"
     sum="1a1b135eb95701a3f1f5f6eaf618482a"
@@ -147,12 +146,12 @@
     <label
      name="expl:parameter list_rev_behv"/>
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.01"/>
+     <result status="timeout" time="10.03"/>
     </proof>
     <proof
      prover="1"
@@ -163,24 +162,24 @@
      <result status="timeout" time="10.11"/>
     </proof>
     <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.03"/>
+     <result status="timeout" time="10.01"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="M2"
-   locfile="examples/programs/list_rev/../list_rev.mlw"
+   locfile="../list_rev.mlw"
    loclnum="181" loccnumb="7" loccnume="9"
    verified="false"
    expanded="true">
    <goal
     name="is_list_disjoint_case"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="206" loccnumb="7" loccnume="28"
     sum="91fd8603268b3f50cf4d1f9586cc7a17"
     proved="true"
@@ -197,7 +196,7 @@
    </goal>
    <goal
     name="frame_list"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="252" loccnumb="8" loccnume="18"
     sum="4682ab00a165c4d4300fcae022d22b87"
     proved="true"
@@ -215,7 +214,7 @@
    </goal>
    <goal
     name="frame_list_ft"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="263" loccnumb="8" loccnume="21"
     sum="ac934b6706d24ed5dd24ebe1724fd460"
     proved="true"
@@ -233,19 +232,19 @@
    </goal>
    <goal
     name="acyclic_list"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="277" loccnumb="8" loccnume="20"
     sum="f1e451547703c7035f3e6821949ae200"
     proved="false"
     expanded="true"
     shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1Iainfix =V1anullNF">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -256,29 +255,29 @@
      <result status="unknown" time="1.99"/>
     </proof>
     <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.01"/>
+     <result status="unknown" time="0.02"/>
     </proof>
    </goal>
    <goal
     name="consistent"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="280" loccnumb="7" loccnume="17"
     sum="010c3e1998fa36267e2ff223f4ca35f3"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.01"/>
+     <result status="unknown" time="0.09"/>
     </proof>
     <proof
      prover="3"
@@ -289,17 +288,17 @@
      <result status="timeout" time="10.25"/>
     </proof>
     <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.09"/>
+     <result status="unknown" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter list_rev"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="283" loccnumb="6" loccnume="14"
     expl="parameter list_rev"
     sum="3f50c6d5db25c4153521d2385a2a485e"
@@ -319,7 +318,7 @@
    </goal>
    <goal
     name="frame_model"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="317" loccnumb="8" loccnume="19"
     sum="3c9551a133d05343b883d6508da7e135"
     proved="true"
@@ -337,19 +336,19 @@
    </goal>
    <goal
     name="consistent_behv"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="324" loccnumb="7" loccnume="22"
     sum="d0f358e183245bc07dcb0767cd75ff04"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.14"/>
+     <result status="unknown" time="0.10"/>
     </proof>
     <proof
      prover="3"
@@ -360,17 +359,17 @@
      <result status="timeout" time="10.42"/>
     </proof>
     <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.10"/>
+     <result status="timeout" time="10.14"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter list_rev_behv"
-    locfile="examples/programs/list_rev/../list_rev.mlw"
+    locfile="../list_rev.mlw"
     loclnum="327" loccnumb="6" loccnume="19"
     expl="parameter list_rev_behv"
     sum="fd17422e7e18ac48cf85d4e677d301a5"

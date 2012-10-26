@@ -391,30 +391,53 @@ let find_prover eS a =
             end
 
 
-let adapt_timelimit a =
+(* to avoid corner cases when prover results are obtained very closely
+   to the time or mem limits, we adapt these limits when we replay a
+   proof *)
+let adapt_limits a =
   match a.proof_state with
-    | Done { Call_provers.pr_answer =
-        (Call_provers.Valid | Call_provers.Unknown _ | Call_provers.Invalid);
-             Call_provers.pr_time = t } ->
+  | Done { Call_provers.pr_answer = r;
+           Call_provers.pr_time = t } ->
+    (* increased time limit is 1 + twice the previous running time,
+       but enforced to remain inside the interval [l,2l] where l is
+       the previous time limit *)
+    let increased_time =
       let t = truncate (1.0 +. 2.0 *. t) in
       max a.proof_timelimit (min t (2 * a.proof_timelimit))
-    | _ -> a.proof_timelimit
+    in
+    (* increased mem limit is just 1.5 times the previous mem limit *)
+    let increased_mem = 3 * a.proof_memlimit / 2 in
+    begin
+      match r with
+      | Call_provers.OutOfMemory -> increased_time, a.proof_memlimit
+      | Call_provers.Timeout -> a.proof_timelimit, increased_mem
+      | Call_provers.Valid
+      | Call_provers.Unknown _
+      | Call_provers.Invalid -> increased_time, increased_mem
+      | Call_provers.Failure _
+      | Call_provers.HighFailure ->
+        (* correct ? failures are supposed to appear quickly anyway... *)
+        a.proof_timelimit, a.proof_memlimit
+    end
+  | _ -> a.proof_timelimit, a.proof_memlimit
+
 
 type run_external_status =
-  | Starting
-  | MissingProver
-  | MissingFile of string
-  | StatusChange of proof_attempt_status
+| Starting
+| MissingProver
+| MissingFile of string
+| StatusChange of proof_attempt_status
 
 exception NoFile of string
 
-(* do not modify the proof duration if it changed by less than
-   10% or 0.1s, so as to avoid diff noise in session files *)
+(* do not modify the proof duration stored in proof sessions if it
+   changed by less than 10% or 0.1s, so as to avoid diff noise in
+   session files *)
 let fuzzy_proof_time nres ores =
   match ores, nres with
   | Done { Call_provers.pr_time = told },
     Done ({ Call_provers.pr_time = tnew } as res')
-    when tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1 ->
+  when tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1 ->
     Done { res' with Call_provers.pr_time = told }
   | _, _ -> nres
 
@@ -433,8 +456,7 @@ let run_external_proof_v2 eS eT a callback =
       callback a ap 0 None (MissingFile "unedited")
     end else begin
       let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
-      let timelimit = adapt_timelimit a in
-      let memlimit = a.proof_memlimit in
+      let timelimit, memlimit = adapt_limits a in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in
       let cb result =

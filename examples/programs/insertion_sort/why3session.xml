@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/insertion_sort/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +23,13 @@
   expanded="true">
   <theory
    name="InsertionSort"
-   locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+   locfile="../insertion_sort.mlw"
    loclnum="4" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter insertion_sort"
-    locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+    locfile="../insertion_sort.mlw"
     loclnum="13" loccnumb="6" loccnume="20"
     expl="parameter insertion_sort"
     sum="0cbfa0be2a879cf891ac4488c2ca009b"
@@ -45,7 +44,7 @@
      expanded="true">
      <goal
       name="WP_parameter insertion_sort.1"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="postcondition"
       sum="dcb0952c2d312bb6c2cc1675a9b16edf"
@@ -55,14 +54,6 @@
       <label
        name="expl:parameter insertion_sort"/>
       <proof
-       prover="3"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
        prover="0"
        timelimit="5"
        memlimit="1000"
@@ -70,10 +61,18 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter insertion_sort.2"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant init"
       sum="e0c1a8dc028883291d624009488a500f"
@@ -93,7 +92,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.3"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="precondition"
       sum="84e7e07145f2f81fec8a1df271b33b1d"
@@ -113,7 +112,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.4"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant init"
       sum="ab31ebd382f613c6633982d7a64bd689"
@@ -133,7 +132,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.5"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant init"
       sum="ec511efc335975d03695e947e1b85028"
@@ -161,7 +160,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.6"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant init"
       sum="13846e9950f09132cf19b7a37330a25d"
@@ -181,7 +180,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.7"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant init"
       sum="9553f8bc4e6834448fe67718fb89282b"
@@ -209,7 +208,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.8"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="precondition"
       sum="fe91aa0d5359bed9f974324c9d121c95"
@@ -229,7 +228,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.9"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="precondition"
       sum="a27aa9cf8cd8c20657a10a1dc0accd17"
@@ -249,7 +248,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.10"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="precondition"
       sum="28a4813d2f173235e57b92daa544cf05"
@@ -269,7 +268,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.11"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="assertion"
       sum="d0dd665b053b4f0c21796749efedaa05"
@@ -289,7 +288,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.12"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant preservation"
       sum="1689a15d25355db54407ec02cbd7d26b"
@@ -309,7 +308,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.13"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant preservation"
       sum="f0d780089504db0858d133e4231f017e"
@@ -330,7 +329,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.14"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant preservation"
       sum="ca1d4f9977e30561a8ec05f3960385b9"
@@ -350,7 +349,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.15"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant preservation"
       sum="42185d86d541856e19c99c82bd06ff3b"
@@ -378,7 +377,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.16"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop variant decrease"
       sum="a6b99df863da51ce101e3ad1a1603832"
@@ -398,7 +397,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.17"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="assertion"
       sum="b07990f48136b0a7ba5a39ad3b88d27d"
@@ -418,7 +417,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.18"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="precondition"
       sum="dc9f35006cfd730069f66484336d3e62"
@@ -438,7 +437,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.19"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant preservation"
       sum="dd5e1160349af2d7dc6f50687f90d6fc"
@@ -458,7 +457,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.20"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="assertion"
       sum="bdb19ffbc9047fde425a941a596d05e1"
@@ -478,7 +477,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.21"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="precondition"
       sum="853728823e97656d8cbc1c7b9a22c9c1"
@@ -498,7 +497,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.22"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="loop invariant preservation"
       sum="bb563c5ed5571626192b690a446a6478"
@@ -518,7 +517,7 @@
      </goal>
      <goal
       name="WP_parameter insertion_sort.23"
-      locfile="examples/programs/insertion_sort/../insertion_sort.mlw"
+      locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="postcondition"
       sum="526151322846a28447afd38db176193f"
@@ -528,20 +527,20 @@
       <label
        name="expl:parameter insertion_sort"/>
       <proof
-       prover="3"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
        prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
     </transf>

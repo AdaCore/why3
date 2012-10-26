@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="check-builtin/euclideandivision/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -28,42 +27,18 @@
   expanded="true">
   <theory
    name="Test"
-   locfile="check-builtin/euclideandivision/../euclideandivision.why"
+   locfile="../euclideandivision.why"
    loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    locfile="check-builtin/euclideandivision/../euclideandivision.why"
+    locfile="../euclideandivision.why"
     loclnum="3" loccnumb="12" loccnume="14"
     sum="5b1ad7dfa71a095a49fe7eefd285d02a"
     proved="true"
     expanded="true"
     shape="ainfix =amodc10c3c1">
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.57"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
     <proof
      prover="0"
      timelimit="3"
@@ -80,17 +55,57 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="10.57"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="G2"
-    locfile="check-builtin/euclideandivision/../euclideandivision.why"
+    locfile="../euclideandivision.why"
     loclnum="4" loccnumb="12" loccnume="14"
     sum="a5683429d73e76f0beb1819e6121cd60"
     proved="true"
     expanded="true"
     shape="ainfix =adivc10c3c3">
     <proof
-     prover="4"
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -106,25 +121,9 @@
      <result status="timeout" time="10.68"/>
     </proof>
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>

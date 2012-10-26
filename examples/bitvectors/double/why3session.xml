@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="bitvectors/double/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,20 +31,20 @@
   expanded="false">
   <theory
    name="BV_double"
-   locfile="bitvectors/double/../double.why"
+   locfile="../double.why"
    loclnum="1" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="TestDouble"
-   locfile="bitvectors/double/../double.why"
+   locfile="../double.why"
    loclnum="65" loccnumb="7" loccnume="17"
    verified="true"
    expanded="false">
    <goal
     name="nth_one1"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="73" loccnumb="8" loccnume="16"
     sum="68b26f6bd21633cb2cb9250019b673f2"
     proved="true"
@@ -62,7 +61,7 @@
    </goal>
    <goal
     name="nth_one2"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="74" loccnumb="8" loccnume="16"
     sum="f08cb866a3ab9529aea096452c0c2aba"
     proved="true"
@@ -79,7 +78,7 @@
    </goal>
    <goal
     name="nth_one3"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="75" loccnumb="8" loccnume="16"
     sum="45f916af66fcd9ac376a27c68412cbea"
     proved="true"
@@ -96,19 +95,19 @@
    </goal>
    <goal
     name="sign_one"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="77" loccnumb="8" loccnume="16"
     sum="ae26ebd49d4971fd05324b0e13322dd7"
     proved="true"
     expanded="false"
     shape="ainfix =asignaoneaFalse">
     <proof
-     prover="4"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="1"
@@ -119,7 +118,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -127,12 +126,12 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.11"/>
     </proof>
     <proof
      prover="5"
@@ -145,7 +144,7 @@
    </goal>
    <goal
     name="exp_one"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="78" loccnumb="8" loccnume="15"
     sum="df76b3cb3a441260a89d05f9f45d59fb"
     proved="true"
@@ -171,20 +170,12 @@
    </goal>
    <goal
     name="mantissa_one"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="79" loccnumb="8" loccnume="20"
     sum="fea308f93f031eb47ac1cca53b50bafd"
     proved="true"
     expanded="false"
     shape="ainfix =amantissaaonec0">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.69"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -192,6 +183,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.09"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.69"/>
     </proof>
     <proof
      prover="5"
@@ -204,20 +203,12 @@
    </goal>
    <goal
     name="double_value_of_1"
-    locfile="bitvectors/double/../double.why"
+    locfile="../double.why"
     loclnum="81" loccnumb="8" loccnume="25"
     sum="5c567bd886a7249af1b84ee36fa83a02"
     proved="true"
     expanded="false"
     shape="ainfix =adouble_of_bv64aonec1.0">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -225,6 +216,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="2"

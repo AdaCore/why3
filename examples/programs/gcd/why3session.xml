@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/gcd/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -28,13 +27,13 @@
   expanded="true">
   <theory
    name="EuclideanAlgorithm"
-   locfile="programs/gcd/../gcd.mlw"
+   locfile="../gcd.mlw"
    loclnum="4" loccnumb="7" loccnume="25"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter gcd"
-    locfile="programs/gcd/../gcd.mlw"
+    locfile="../gcd.mlw"
     loclnum="10" loccnumb="10" loccnume="13"
     expl="parameter gcd"
     sum="56380e19c2b5b0c876cbe75f8f68d59a"
@@ -49,9 +48,9 @@
      expanded="true">
      <goal
       name="WP_parameter gcd.1"
-      locfile="programs/gcd/../gcd.mlw"
+      locfile="../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
-      expl="normal postcondition"
+      expl="postcondition"
       sum="aff67e94d75b8c6f0e60f082ef4fb444"
       proved="true"
       expanded="true"
@@ -59,12 +58,12 @@
       <label
        name="expl:parameter gcd"/>
       <proof
-       prover="4"
-       timelimit="10"
+       prover="0"
+       timelimit="2"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -75,19 +74,19 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="2"
+       prover="4"
+       timelimit="10"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter gcd.2"
-      locfile="programs/gcd/../gcd.mlw"
+      locfile="../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
-      expl="variant decreases"
+      expl="variant decrease"
       sum="4b4c39ee1875678b00e9c7b278a9c92b"
       proved="true"
       expanded="true"
@@ -113,7 +112,7 @@
      </goal>
      <goal
       name="WP_parameter gcd.3"
-      locfile="programs/gcd/../gcd.mlw"
+      locfile="../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
       expl="precondition"
       sum="71ef822c09945728e72bb556c54c079b"
@@ -123,7 +122,7 @@
       <label
        name="expl:parameter gcd"/>
       <proof
-       prover="4"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -139,7 +138,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="0"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -149,9 +148,9 @@
      </goal>
      <goal
       name="WP_parameter gcd.4"
-      locfile="programs/gcd/../gcd.mlw"
+      locfile="../gcd.mlw"
       loclnum="10" loccnumb="10" loccnume="13"
-      expl="normal postcondition"
+      expl="postcondition"
       sum="10b988e8ea93877fe03afeaeedba84b1"
       proved="true"
       expanded="true"

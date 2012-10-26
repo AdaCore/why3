@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/find/why3session.xml" shape_version="2">
+<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +23,13 @@
   expanded="true">
   <theory
    name="FIND"
-   locfile="examples/programs/find/../find.mlw"
+   locfile="../find.mlw"
    loclnum="8" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter find"
-    locfile="examples/programs/find/../find.mlw"
+    locfile="../find.mlw"
     loclnum="40" loccnumb="6" loccnume="10"
     expl="parameter find"
     sum="942669e7e8da525f7ad64d670d6c9374"
@@ -45,7 +44,7 @@
      expanded="true">
      <goal
       name="WP_parameter find.1"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant init"
       sum="37f5012a5b47dc7134af0781c45a741b"
@@ -65,7 +64,7 @@
      </goal>
      <goal
       name="WP_parameter find.2"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="87bc412e2454484ca604fe3be109fcc0"
@@ -85,7 +84,7 @@
      </goal>
      <goal
       name="WP_parameter find.3"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant init"
       sum="952452dc65d201ef10f89f5a881ebbfc"
@@ -105,7 +104,7 @@
      </goal>
      <goal
       name="WP_parameter find.4"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant init"
       sum="5573c88cb697e0ccde8e2e5d3485f879"
@@ -125,7 +124,7 @@
      </goal>
      <goal
       name="WP_parameter find.5"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="01fd2095ffb105e70ceb185fab1badab"
@@ -148,7 +147,7 @@
        expanded="true">
        <goal
         name="WP_parameter find.5.1"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="e50824048bc3eeedfc7d338261302eca"
@@ -168,7 +167,7 @@
        </goal>
        <goal
         name="WP_parameter find.5.2"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="9aab35888f3c05ed1f60fc064d7f4b9f"
@@ -178,12 +177,12 @@
         <label
          name="expl:parameter find"/>
         <proof
-         prover="3"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="1"
@@ -194,19 +193,19 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="0"
+         prover="3"
          timelimit="10"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.01"/>
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
       name="WP_parameter find.6"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="d5cf9df95e6f201f063bbcc78375e3e1"
@@ -221,7 +220,7 @@
        expanded="true">
        <goal
         name="WP_parameter find.6.1"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="0d44e4cc81545c2330c2328f64c49227"
@@ -231,14 +230,6 @@
         <label
          name="expl:parameter find"/>
         <proof
-         prover="1"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.06"/>
-        </proof>
-        <proof
          prover="0"
          timelimit="10"
          memlimit="0"
@@ -246,10 +237,18 @@
          archived="false">
          <result status="valid" time="1.34"/>
         </proof>
+        <proof
+         prover="1"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter find.6.2"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="1b528d031afdf897a46fba97ee6a98c9"
@@ -269,7 +268,7 @@
        </goal>
        <goal
         name="WP_parameter find.6.3"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="8f4ac8c54f485e181f3418fc5d4edf58"
@@ -289,7 +288,7 @@
        </goal>
        <goal
         name="WP_parameter find.6.4"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="72596a4cbb8976fcec2434a5c149d9a2"
@@ -311,7 +310,7 @@
      </goal>
      <goal
       name="WP_parameter find.7"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="fba5fcf04c69d002c5cd165430841aff"
@@ -331,7 +330,7 @@
      </goal>
      <goal
       name="WP_parameter find.8"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant init"
       sum="cda31b3d2f279f3ec02c5c37a229a859"
@@ -351,7 +350,7 @@
      </goal>
      <goal
       name="WP_parameter find.9"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="d72c4fce025b742be3fd5ea38282d87a"
@@ -371,7 +370,7 @@
      </goal>
      <goal
       name="WP_parameter find.10"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="2f963dab2e75fc94750811802dbc17ea"
@@ -386,7 +385,7 @@
        expanded="true">
        <goal
         name="WP_parameter find.10.1"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="b77bd4d23ad3b2b4b78ee596dbb83b3d"
@@ -406,7 +405,7 @@
        </goal>
        <goal
         name="WP_parameter find.10.2"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="defd931f9c01b506680a0b8b8925b51b"
@@ -426,7 +425,7 @@
        </goal>
        <goal
         name="WP_parameter find.10.3"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="a854c6f851d489e06aea9b175f307095"
@@ -446,7 +445,7 @@
        </goal>
        <goal
         name="WP_parameter find.10.4"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="32457d897b4cb1250573c8c449d83810"
@@ -468,7 +467,7 @@
      </goal>
      <goal
       name="WP_parameter find.11"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="e467f567a3fe26177619a55410637084"
@@ -488,7 +487,7 @@
      </goal>
      <goal
       name="WP_parameter find.12"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="a68eab6e9a5e31698f16d2199cab5775"
@@ -508,7 +507,7 @@
      </goal>
      <goal
       name="WP_parameter find.13"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="d46b627ac18f229ddcacd66d1e99900b"
@@ -528,7 +527,7 @@
      </goal>
      <goal
       name="WP_parameter find.14"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="4fb956c378bfe4cc37ee366c746928ec"
@@ -548,7 +547,7 @@
      </goal>
      <goal
       name="WP_parameter find.15"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="ab867bff5532aaa1fb034ab246f0820d"
@@ -568,7 +567,7 @@
      </goal>
      <goal
       name="WP_parameter find.16"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="precondition"
       sum="b726ce23ff0797cb9fab405ea5cdf2f4"
@@ -588,7 +587,7 @@
      </goal>
      <goal
       name="WP_parameter find.17"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="72c955d9a50209574f93d78ff7c4e126"
@@ -608,7 +607,7 @@
      </goal>
      <goal
       name="WP_parameter find.18"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="b3c51018634ff4af16b89134d89053a9"
@@ -628,7 +627,7 @@
      </goal>
      <goal
       name="WP_parameter find.19"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="7460db7b287ec7c86194793e515fb1bf"
@@ -648,7 +647,7 @@
      </goal>
      <goal
       name="WP_parameter find.20"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="e7284775401cbe00c476feab6d8e4f8e"
@@ -669,7 +668,7 @@
      </goal>
      <goal
       name="WP_parameter find.21"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="318e6863e8aeda732c06b56bf65de4ae"
@@ -689,7 +688,7 @@
      </goal>
      <goal
       name="WP_parameter find.22"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="4239869b171332af60959ab457af6f47"
@@ -709,7 +708,7 @@
      </goal>
      <goal
       name="WP_parameter find.23"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="aaa02313b2b5267425cae452ff651e90"
@@ -729,7 +728,7 @@
      </goal>
      <goal
       name="WP_parameter find.24"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="assertion"
       sum="d3388f65269a4ca1bcd42e36c663567b"
@@ -749,7 +748,7 @@
      </goal>
      <goal
       name="WP_parameter find.25"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="9383a829852e706bf910648b7cb71e67"
@@ -769,7 +768,7 @@
      </goal>
      <goal
       name="WP_parameter find.26"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="83d650add7ccaf8df9aa89ee6307d28c"
@@ -789,7 +788,7 @@
      </goal>
      <goal
       name="WP_parameter find.27"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="1074654bbe6db387493aef2a22431766"
@@ -804,7 +803,7 @@
        expanded="true">
        <goal
         name="WP_parameter find.27.1"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="4ee0fae057c85386e076d758420ae0fb"
@@ -824,7 +823,7 @@
        </goal>
        <goal
         name="WP_parameter find.27.2"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="e7cef3192d8dc9c3af5d30ad3d4de780"
@@ -844,7 +843,7 @@
        </goal>
        <goal
         name="WP_parameter find.27.3"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="ebbd63d6180b829127b615fe78c2b1ea"
@@ -864,7 +863,7 @@
        </goal>
        <goal
         name="WP_parameter find.27.4"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="a8d632fe97af865087cfa2baac6a5e44"
@@ -884,7 +883,7 @@
        </goal>
        <goal
         name="WP_parameter find.27.5"
-        locfile="examples/programs/find/../find.mlw"
+        locfile="../find.mlw"
         loclnum="40" loccnumb="6" loccnume="10"
         expl="parameter find"
         sum="854e3c428bcea5329af41a0599cc50fb"
@@ -906,7 +905,7 @@
      </goal>
      <goal
       name="WP_parameter find.28"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="841fd448903a3da6a1bbcc26e594c244"
@@ -926,7 +925,7 @@
      </goal>
      <goal
       name="WP_parameter find.29"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop invariant preservation"
       sum="57df7f46a9307e65c90e4a188933c67d"
@@ -946,7 +945,7 @@
      </goal>
      <goal
       name="WP_parameter find.30"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="loop variant decrease"
       sum="e7cf231e41f47e687d2b99b6c3dae29d"
@@ -966,7 +965,7 @@
      </goal>
      <goal
       name="WP_parameter find.31"
-      locfile="examples/programs/find/../find.mlw"
+      locfile="../find.mlw"
       loclnum="40" loccnumb="6" loccnume="10"
       expl="postcondition"
       sum="3480d69dd6a92c05d0493f1a8b84a6d5"
