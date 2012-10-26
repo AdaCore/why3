@@ -74,6 +74,24 @@ let ctype ty =
 
 let logic_types = Hashtbl.create 257
 
+let type_vars = ref []
+
+let find_type_var v =
+  try
+    List.assoc v !type_vars 
+  with Not_found -> Self.fatal "type variable %s not found" v
+
+let push_type_var v =
+  let tv = Ty.create_tvsymbol (Ident.id_fresh v) in
+  type_vars := (v,tv) :: !type_vars
+  
+let pop_type_var v =
+  match !type_vars with
+    | (w,_) :: r ->
+      if v=w then type_vars := r
+      else Self.fatal "pop_type_var: %s expected,found %s" v w
+    | [] -> Self.fatal "pop_type_var: empty"
+
 let rec logic_type ty =
   match ty with
     | Linteger -> int_type
@@ -85,7 +103,7 @@ let rec logic_type ty =
           Ty.ty_app ts (List.map logic_type args)
         with Not_found -> Self.fatal "logic type %s not found" lt.lt_name
       end
-    | Lvar _
+    | Lvar v -> Ty.ty_var (find_type_var v)
     | Ctype _
     | Larrow (_, _) ->
         Self.not_yet_implemented "logic_type"
@@ -302,18 +320,27 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
       (theories,d::decls)
     | Dfun_or_pred (li, _loc) -> 
       begin
-        match li.l_labels, li.l_tparams,li.l_body with
-          | [],[],LBnone ->
-            let ls,_ = create_lsymbol li in
-            (theories,Decl.create_param_decl ls :: decls)
-          | [],[],LBterm d ->
-            let ls,args = create_lsymbol li in
-            let (_ty,d) = term d in
-            let def = Decl.make_ls_defn ls args d in
-            (theories,Decl.create_logic_decl [def] :: decls)
+        match li.l_labels with
+          | [] ->
+            List.iter push_type_var li.l_tparams;
+            let d =
+              match li.l_body with
+                | LBnone ->
+                  let ls,_ = create_lsymbol li in
+                  Decl.create_param_decl ls
+                | LBterm d ->
+                  let ls,args = create_lsymbol li in
+                  let (_ty,d) = term d in
+                  let def = Decl.make_ls_defn ls args d in
+                  Decl.create_logic_decl [def]
+                | _ ->
+                  Self.not_yet_implemented "Dfun_or_pred, other bodies"
+            in
+            List.iter pop_type_var (List.rev li.l_tparams);
+            (theories,d :: decls)
+            
           | _ ->
-            Self.not_yet_implemented "Dfun_or_pred with labels or vars"
-
+            Self.not_yet_implemented "Dfun_or_pred with labels"
       end
     | Dlemma(name,is_axiom,labels,vars,p,loc) ->
       begin
