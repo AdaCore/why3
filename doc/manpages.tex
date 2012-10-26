@@ -260,11 +260,11 @@ session. If you modify the original file (.why, .mlw) or if the
 transformations have changed (new version of why3) why3 will detect
 that. The provers will perhaps answer differently on this new
 problems. So the proof attempts that corresponds to a goal that
-changed are marked obsolete. 
+changed are marked obsolete.
 
-% non 
+% non
 % We say that a session is obsolete if new
-% goals are made obsolete by this method during start-up. 
+% goals are made obsolete by this method during start-up.
 
 % Claude: Alors la je ne vois pas pourquoi
 % A session can
@@ -348,7 +348,7 @@ A copy of the tools already available in the left toolbar, plus:
   transformations, as listed in Section~\ref{sec:transformations}
 \item[Apply non-splitting transformation]. Same as above, but for
   splitting transformations, \emph{i.e.} those that can generated
-  several sub-goals. 
+  several sub-goals.
 \end{description}
 
 \item[Menu \textsf{Help}]
@@ -531,7 +531,7 @@ file is fully proved, the subtree is not shown.
 When some proof attempts stored in the session file are
 obsolete\index{obsolete!proof attempt},
 the replay is run anyway, as with the replay button in the IDE. Then, the session
-file will be updated if both 
+file will be updated if both
 \begin{itemize}
 \item all the replayed proof attempts give the same result as what
   is stored in the session
@@ -695,15 +695,15 @@ For example, here are the session tree produced on the ``hello
 proof'' example of Section~\ref{chap:starting}.
 {\scriptsize
 \begin{verbatim}
-hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Alt-Ergo (0.93)
-                                                |    `-Simplify (1.5.4)?
-                                                |-G2?-+-split_goal?-+-G2.1-+-Alt-Ergo (0.93)
-                                                |     |             |      `-Simplify (1.5.4)
-                                                |     |             `-G2.0?-+-Alt-Ergo (0.93)?
+hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Simplify (1.5.4)?
+                                                |    `-Alt-Ergo (0.94)
+                                                |-G2?-+-split_goal?-+-G2.2-+-Simplify (1.5.4)
+                                                |     |             |      `-Alt-Ergo (0.94)
+                                                |     |             `-G2.1?-+-Coq (8.3pl4)?
                                                 |     |                     |-Simplify (1.5.4)?
-                                                |     |                     `-Coq (8.3pl3)?
-                                                |     |-Alt-Ergo (0.93)?
-                                                |     `-Simplify (1.5.4)?
+                                                |     |                     `-Alt-Ergo (0.94)?
+                                                |     |-Simplify (1.5.4)?
+                                                |     `-Alt-Ergo (0.94)?
                                                 `-G1---Simplify (1.5.4)
 \end{verbatim}
 }
@@ -740,17 +740,18 @@ proof'' example of Section~\ref{chap:starting}.
     +-- theory HelloProof
       +-- goal G2
         +-- transformation split_goal
-          +-- goal G2.0
+          +-- goal G2.1
 
 == Goals proved by only one prover ==
   +-- file ../hello_proof.why
     +-- theory HelloProof
-      +-- goal G1: Simplify (1.5.4) (0.01)
-      +-- goal G3: Alt-Ergo (0.93) (0.02)
+      +-- goal G1: Simplify (1.5.4) (0.00)
+      +-- goal G3: Alt-Ergo (0.94) (0.00)
 
 == Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==
-  Alt-Ergo (0.93)      :   2   0.02   0.02   0.02
-  Simplify (1.5.4)     :   2   0.01   0.01   0.01
+  Alt-Ergo (0.94)      :   2   0.00   0.00   0.00
+  Simplify (1.5.4)     :   2   0.00   0.00   0.00
+
 \end{verbatim}
 }
 
@@ -801,8 +802,6 @@ output.
 \label{fig:custom-latex}
 \end{figure}
 
-\todo{rejouer HelloProofs, pour eviter tout ces 0.00, et qu'en plus
-  cela soit coherent avec la sortie HTML ci-dessous}
 \begin{figure}[t]
 \begin{center}
 %HEVEA\begin{toimage}
@@ -837,23 +836,25 @@ There are three styles of output: `table', `simpletree', and
 `jstree'. The default is `table'.
 
 \begin{figure}[t]
-\begin{center}
 %BEGIN LATEX
+\begin{center}
 \fbox{\includegraphics[width=0.9\textwidth]{hello_proof.png}}
+\end{center}
 %END LATEX
 \begin{htmlonly}
 \begin{rawhtml}
+<h1>Why3 Proof Results for Project "hello_proof"</h1>
+<h2><font color="#FF0000">Theory "HelloProof": not fully verified</font></h2>
 <table border="1"><tr><td colspan="2">Obligations</td><td text-rotation="90">Alt-Ergo (0.94)</td><td text-rotation="90">Coq (8.3pl4)</td><td text-rotation="90">Simplify (1.5.4)</td></td></tr>
 <td bgcolor="#C0FFC0" colspan="2">G1</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
 <td bgcolor="#FF0000" colspan="2">G2</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
 <tr><td bgcolor="#FF0000" colspan="2">split_goal</td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td></tr>
-<td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">G2.1</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.49</td><td bgcolor="#FF8000">0.00</td></tr>
+<td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">G2.1</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.43</td><td bgcolor="#FF8000">0.00</td></tr>
 <tr><td bgcolor="#C0FFC0" colspan="1">G2.2</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
 <td bgcolor="#C0FFC0" colspan="2">G3</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
 </table>
 \end{rawhtml}
 \end{htmlonly}
-\end{center}
 \caption{HTML table produced for the HelloProof example}
 \label{fig:html}
 \end{figure}
