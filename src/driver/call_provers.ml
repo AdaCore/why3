@@ -118,9 +118,12 @@ let debug = Debug.register_info_flag "call_prover"
 type res_waitpid = int * Unix.process_status
 
 type post_prover_call = unit -> prover_result
-type prover_call =
-  { call: ?res_waitpid:res_waitpid -> Unix.wait_flag list -> post_prover_call;
-    pid: int}
+
+type prover_call = {
+  call : Unix.process_status -> post_prover_call;
+  pid  : int
+}
+
 type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
@@ -168,13 +171,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     Unix.close fd_in;
     close_out cout;
 
-    let call = fun ?res_waitpid wait_flags ->
-      (* TODO? check that we haven't given the result earlier *)
-      let res,ret =
-        match res_waitpid with
-        | Some ((res,_) as res_waitpid) when pid = res -> res_waitpid
-        | _ -> Unix.waitpid wait_flags pid in
-      if res = 0 then raise Exit;
+    let call = fun ret ->
       let time = Unix.gettimeofday () -. time in
       let cout = open_in fout in
       let out = Sysutil.channel_contents cout in
@@ -207,8 +204,9 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
         { pr_answer = ans;
           pr_status = ret;
           pr_output = out;
-          pr_time   = time } in
-    {call = call; pid = pid}
+          pr_time   = time }
+    in
+    { call = call; pid = pid }
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
                    ~regexps ~timeregexps ~exitcodes ~filename
@@ -224,17 +222,13 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
   call_on_file ~command ~timelimit ~memlimit
                ~regexps ~timeregexps ~exitcodes ~cleanup:true ~inplace fin
 
-let query_call ?res_waitpid call =
-  try Some (call.call ?res_waitpid [Unix.WNOHANG]) with Exit -> None
+let query_call pc =
+  let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
+  if pid = 0 then None else Some (pc.call ret)
 
-let wait_on_call ?res_waitpid call = call.call ?res_waitpid []
+let wait_on_call pc =
+  let _, ret = Unix.waitpid [] pc.pid in pc.call ret
 
-let query_wait_all wait_flags =
-  let res,_ as res_waitpid = Unix.waitpid wait_flags 0 in
-  if res = 0 then raise Exit;
-  res_waitpid
-
-let query_all () = try Some (query_wait_all [Unix.WNOHANG]) with Exit -> None
-let wait_all ()  = query_wait_all []
+let post_wait_call pc ret = pc.call ret
 
 let prover_call_pid pc = pc.pid

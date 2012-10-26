@@ -204,17 +204,14 @@ let wait_terminate_unix () =
   match jobserver with
   | Makeproto.Sequential -> ()
   | Makeproto.Parallel pipe ->
-    let rec reclaim_proc ((pid,_) as res_waitpid) =
-      let (cp,callback) = Hint.find called_provers pid in
+    let rec reclaim_proc (pid,ret) =
+      let (pc,callback) = Hint.find called_provers pid in
       Hint.remove called_provers pid;
-      begin match Call_provers.query_call ~res_waitpid cp with
-      | None -> assert false
-      | Some res -> callback (res ()) end;
-      if not (Hint.is_empty called_provers)
-      then wait ()
+      callback (Call_provers.post_wait_call pc ret ());
+      if not (Hint.is_empty called_provers) then wait ()
     and wait () =
       Makeproto.release_worker pipe;
-      let res_waitpid = Call_provers.wait_all () in
+      let res_waitpid = Unix.wait () in
       Makeproto.wait_worker pipe;
       reclaim_proc res_waitpid
     in

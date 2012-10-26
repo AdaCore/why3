@@ -59,9 +59,6 @@ val timeregexp : string -> timeregexp
 (** Converts a regular expression with special markers '%h','%m',
     '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
-type res_waitpid = int * Unix.process_status
-(** pid of a process that stopped and its status *)
-
 type prover_call
 (** Type that represents a single prover run *)
 
@@ -115,24 +112,16 @@ val call_on_buffer :
     @param filename : the suffix of the proof task's file, if the prover
     doesn't accept stdin. *)
 
-val query_call :
-  ?res_waitpid:res_waitpid -> prover_call -> post_prover_call option
+val query_call : prover_call -> post_prover_call option
 (** Thread-safe non-blocking function that checks if the prover
     has finished. *)
 
-val wait_on_call :
-  ?res_waitpid:res_waitpid -> prover_call -> post_prover_call
+val wait_on_call : prover_call -> post_prover_call
 (** Thread-safe blocking function that waits until the prover finishes. *)
 
-val query_all : unit -> res_waitpid option
-(** Just a wrapper around Unix.wait_pid with the same flag than query_call
-    Don't work on Win32
- *)
-
-val wait_all : unit -> res_waitpid
-(** Just a wrapper around Unix.wait_pid with the same flag than wait_on_call
-    Don't work on Win32
- *)
+val post_wait_call : prover_call -> Unix.process_status -> post_prover_call
+(** Thread-safe non-blocking function that should be called when the
+    prover's exit status was obtained from a prior call of Unix.waitpid *)
 
 val prover_call_pid : prover_call -> int
-(** return the pid of the prover *)
+(** Return the pid of the prover *)
