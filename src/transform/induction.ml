@@ -22,10 +22,11 @@ open Task
 (** TODO use this label in the following function *)
 let label_induction = create_label "induction"
 
+(*
 let desc_labels = [label_induction,
                    ("Make the induction on the labeled variables." :
                        Pp.formatted)]
-
+*)
 
 (*********************************************************)
 (*******      Data type induction principle      *********)
@@ -361,7 +362,7 @@ let induction_ty_lex = function
 
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
-    ~desc_labels ~desc:"TODO: induction on type with lexicographic order"
+    ~desc:"TODO: induction on type with lexicographic order"
 
 
 (***************************************************************************)
@@ -484,7 +485,7 @@ let () =
     (fun env ->
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
-    ~desc_labels ~desc:"TODO: induction on integers"
+    ~desc:"TODO: induction on integers"
 
 
 

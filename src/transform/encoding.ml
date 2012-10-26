@@ -83,14 +83,7 @@ let encoding_tptp env = Trans.seq [
   Protect_finite.protect_finite]
 
 let () = register_env_transform "encoding_smt" encoding_smt
-  ~desc_metas:[meta_select_kept, Pp.empty_formatted;
-               meta_enco_kept, Pp.empty_formatted;
-               meta_enco_poly, Pp.empty_formatted]
-  ~desc:"encode@ polymorphism@ with@ default@ configuration@ choosed@ for@ \
-         smt@ solver"
+  ~desc:"encode@ polymorphism@ for@ provers@ with@ sorts"
+
 let () = register_env_transform "encoding_tptp" encoding_tptp
-  ~desc_metas:[meta_select_kept, Pp.empty_formatted;
-               meta_enco_kept, Pp.empty_formatted;
-               meta_enco_poly, Pp.empty_formatted]
-  ~desc:"encode@ polymorphism@ with@ default@ configuration@ choosed@ for@ \
-         tptp@ solver"
+  ~desc:"encode@ polymorphism@ for@ provers@ without@ sorts"

@@ -31,7 +31,6 @@ let syntactic_transform transf =
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
     (syntactic_transform Abstraction.abstraction)
-    ~desc_metas:[meta_syntax_logic,Pp.empty_formatted]
     ~desc:"Abstract@ application@ of@ non-built-in@ symbols@ with@ constants.";
   Trans.register_transform "simplify_unknown_lsymbols"
     (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
@@ -46,7 +45,6 @@ let () =
           | Tapp(ls,_) -> not (check_ls ls)
           | _ -> true) f)
       ])))
-    ~desc_metas:[meta_syntax_logic,("" : Pp.formatted)]
     ~desc:"In the goal substitute equality on application of unknown symbols.";
 
 

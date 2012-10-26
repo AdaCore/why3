@@ -249,85 +249,40 @@ let named s f (x : task) =
   if Debug.test_flag Debug.stack_trace then f x
   else try f x with e -> raise (TransFailure (s,e))
 
-type desc_labels = (label * Pp.formatted) list
-type desc_metas  = (meta  * Pp.formatted) list
-
-type reg_desc =
- {
-   reg_desc_labels : desc_labels;
-   reg_desc_metas  : desc_metas;
-   reg_desc        : Pp.formatted;
- }
-
-let print_reg_desc fmt r =
-  let print_meta fmt (m,f) =
-    fprintf fmt "@[%s@\n  @[%a%a@]@]"
-      m.meta_name Pp.formatted m.meta_desc Pp.formatted f in
-  let print_label fmt (l,f) =
-    fprintf fmt "@[%s@\n  @[%a@]@]"
-      l.lab_string Pp.formatted f in
-  fprintf fmt "@[@[%a@]%a%a@]"
-    Pp.formatted r.reg_desc
-    (Pp.print_list_delim
-       ~start:(Pp.constant_formatted "@\nlabels:@\n  @[")
-       ~stop:(Pp.constant_formatted "@]")
-       ~sep:Pp.newline
-       print_label) r.reg_desc_labels
-    (Pp.print_list_delim
-       ~start:(Pp.constant_formatted "@\nmetas:@\n  @[")
-       ~stop:(Pp.constant_formatted "@]")
-       ~sep:Pp.newline
-       print_meta) r.reg_desc_metas
-
-let print_trans_desc fmt (x,r) =
-  fprintf fmt "@[%s@\n  @[%a@]@]" x print_reg_desc r
-
-type 'a reg_trans = (env -> 'a trans) * reg_desc
-
-let mk_reg_trans ?(desc_labels=[]) ?(desc_metas=[]) ~desc f =
-  f, { reg_desc_labels = desc_labels;
-       reg_desc_metas  = desc_metas;
-       reg_desc        = desc}
-
+type 'a reg_trans = Pp.formatted * (env -> 'a trans)
 
 let transforms   : (task reg_trans) Hstr.t = Hstr.create 17
 let transforms_l : (task list reg_trans) Hstr.t = Hstr.create 17
 
-let register_transform ?desc_labels ?desc_metas ~desc s p =
+let register_transform ~desc s p =
   if Hstr.mem transforms s then raise (KnownTrans s);
-  Hstr.replace transforms s
-    (mk_reg_trans ?desc_labels ?desc_metas ~desc (fun _ -> named s p))
+  Hstr.replace transforms s (desc, fun _ -> named s p)
 
-let register_transform_l ?desc_labels ?desc_metas ~desc s p =
+let register_transform_l ~desc s p =
   if Hstr.mem transforms_l s then raise (KnownTrans s);
-  Hstr.replace transforms_l s
-    (mk_reg_trans ?desc_labels ?desc_metas ~desc (fun _ -> named s p))
+  Hstr.replace transforms_l s (desc, fun _ -> named s p)
 
-let register_env_transform ?desc_labels ?desc_metas ~desc s p =
+let register_env_transform ~desc s p =
   if Hstr.mem transforms s then raise (KnownTrans s);
-  Hstr.replace transforms s
-    (mk_reg_trans ?desc_labels ?desc_metas ~desc
-       (Wenv.memoize 3 (fun e -> named s (p e))))
+  Hstr.replace transforms s (desc, Wenv.memoize 3 (fun e -> named s (p e)))
 
-let register_env_transform_l ?desc_labels ?desc_metas ~desc s p =
+let register_env_transform_l ~desc s p =
   if Hstr.mem transforms_l s then raise (KnownTrans s);
-  Hstr.replace transforms_l s
-    (mk_reg_trans ?desc_labels ?desc_metas ~desc
-       (Wenv.memoize 3 (fun e -> named s (p e))))
+  Hstr.replace transforms_l s (desc, Wenv.memoize 3 (fun e -> named s (p e)))
 
 let lookup_transform s =
-  try fst (Hstr.find transforms s)
+  try snd (Hstr.find transforms s)
   with Not_found -> raise (UnknownTrans s)
 
 let lookup_transform_l s =
-  try fst (Hstr.find transforms_l s)
+  try snd (Hstr.find transforms_l s)
   with Not_found -> raise (UnknownTrans s)
 
-let list_transforms ()   = Hstr.fold (fun k r acc ->
-  (k,snd r)::acc) transforms []
+let list_transforms () =
+  Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms []
 
-let list_transforms_l ()   = Hstr.fold
-  (fun k r acc -> (k,snd r)::acc) transforms_l []
+let list_transforms_l () =
+  Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_l []
 
 (** fast transform *)
 type gentrans =
@@ -369,7 +324,6 @@ let on_flag m ft def arg =
     let tr_name = Printf.sprintf "%s : %s" m.meta_name s in
     named tr_name (t arg))
 
-
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownTrans s ->
       Format.fprintf fmt "Transformation '%s' is already registered" s
@@ -385,4 +339,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Failure in transformation %s@\n%a" s
         Exn_printer.exn_printer e
   | e -> raise e)
-

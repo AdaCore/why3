@@ -435,7 +435,11 @@ let eliminate_match =
   Trans.compose compile_match (Trans.fold_map comp empty_state init_task)
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
-  ~desc:"specify@ how@ the@ algebraic@ must@ be@ eliminated."
+  ~desc:"@[<hov 2>configure the 'eliminate_algebraic' transformation:@\n\
+    \"keep_types\" : @[keep algebraic type definitions@]@\n\
+    \"keep_enums\" : @[keep monomorphic enumeration types@]@\n\
+    \"keep_recs\"  : @[keep non-recursive records@]@\n\
+    \"no_index\"   : @[do not generate indexing funcitons@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
@@ -490,17 +494,10 @@ let eliminate_projections = Trans.decl elim None
 let () =
   Trans.register_transform "compile_match" compile_match
     ~desc:"Transform@ pattern-matching@ with@ nested@ pattern@ \
-         into@ nested@ pattern-matching@ with@ simple@ patterns.";
+      into@ nested@ pattern-matching@ with@ flat@ patterns.";
   Trans.register_transform "eliminate_match" eliminate_match
     ~desc:"TODO";
   Trans.register_transform "eliminate_algebraic" eliminate_algebraic
-    ~desc_metas:[meta_elim,
-("@\n  \
-@[- keep_types : @[keep algebraic type definitions@]@\n\
-  - keep_enums : @[keep monomorphic enumeration types@]@\n\
-  - keep_recs  : @[keep non-recursive records@]@\n\
-  - no_index   : @[do not generate indexing funcitons@]\
-@]" : Pp.formatted)]
-    ~desc:"Replaces@ algebraic@ data@ types@ by@ first-order@ definitions.";
+    ~desc:"Replace@ algebraic@ data@ types@ by@ first-order@ definitions.";
   Trans.register_transform "eliminate_projections" eliminate_projections
     ~desc:"TODO"

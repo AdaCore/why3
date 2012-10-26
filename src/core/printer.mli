@@ -25,14 +25,13 @@ type blacklist = string list
 type 'a pp = Format.formatter -> 'a -> unit
 
 type printer =
-    Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
+  Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 
 val lookup_printer : string -> printer
 
 val list_printers : unit -> (string * Pp.formatted) list
-val print_printer_desc : Pp.formatter -> (string * Pp.formatted) -> unit
 
 (** {2 use printers} *)
 

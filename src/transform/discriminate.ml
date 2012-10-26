@@ -297,16 +297,7 @@ let discriminate env = Trans.seq [
   lsymbol_distinction;
 ]
 
-let empty_formatted : Pp.formatted = ""
-
 let () = Trans.register_env_transform "discriminate" discriminate
-  ~desc_metas:[meta_select_inst  , empty_formatted;
-               meta_select_lskept, empty_formatted;
-               meta_select_lsinst, empty_formatted;
-               meta_inst         , empty_formatted;
-               meta_lskept       , empty_formatted;
-               meta_lsinst       , empty_formatted]
   ~desc:"Discriminate@ polymorphic@ function@ and@ predicate@ symbols.@ \
          Allow@ to@ keep@ some@ instantiations@ from@ being@ touched@ by@ \
          following@ polymorphism@ encodings."
-

@@ -11,6 +11,8 @@
 
 open Format
 open Pp
+
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -29,30 +31,23 @@ type 'a pp = formatter -> 'a -> unit
 type printer =
   Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
-type reg_printer =
-  { reg_desc    : formatted;
-    reg_printer : printer;
-  }
+type reg_printer = Pp.formatted * printer
 
-let printers : (string, reg_printer) Hashtbl.t = Hashtbl.create 17
+let printers : reg_printer Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
 let register_printer ~desc s p =
-  if Hashtbl.mem printers s then raise (KnownPrinter s);
-  Hashtbl.replace printers s {reg_desc = desc; reg_printer = p}
+  if Hstr.mem printers s then raise (KnownPrinter s);
+  Hstr.replace printers s (desc, p)
 
 let lookup_printer s =
-  try (Hashtbl.find printers s).reg_printer
+  try snd (Hstr.find printers s)
   with Not_found -> raise (UnknownPrinter s)
 
-let list_printers ()  = Hashtbl.fold (fun k p acc ->
-  (k,p.reg_desc)::acc) printers []
-
-let print_printer_desc fmt (s,f) =
-  fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]"
-    s Pp.formatted f
+let list_printers () =
+  Hstr.fold (fun k (desc,_) acc -> (k,desc)::acc) printers []
 
 let () = register_printer ~desc:"Print nothing" "(null)"
   (fun _ _ _ _ ?old:_ _ _ -> ())

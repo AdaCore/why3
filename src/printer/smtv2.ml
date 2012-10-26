@@ -319,6 +319,7 @@ let () = register_printer "smtv2"
      print_task_old pr thpr blacklist fmt task)
   ~desc:"Printer for the smtlib version 2 format."
 
+(*
 let print_decls =
   let add_ls sm acc = function
     | [MAls ls; MAls lsdis] ->
@@ -344,3 +345,4 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
 
 let () = register_printer "smtv2new" print_task
   ~desc:"New (TODO: in which sense?) printer for the smtlib version 2 format."
+*)

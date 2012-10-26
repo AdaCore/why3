@@ -48,13 +48,9 @@ let eliminate_builtin =
     Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ts) None))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
-  ~desc_metas:[Printer.meta_syntax_logic,
-               ("@ Remove@ their@ definitions@ since@ they@ are@ considered@ \
-                 builtin."
-                   : Pp.formatted);
-               Printer.meta_remove_prop, Pp.empty_formatted]
-  ~desc:"Eliminate@ facts@ which@ are@ builtin@ in@ the@ prover:@ symbol@ \
-         definitions@ or@ axiomatics."
+  ~desc:"Eliminate@ symbols@ and@ propositions@ that@ are@ builtin@ \
+    in@ the@ prover@ (see@ 'syntax'@ and@ 'remove'@ clauses@ in@ \
+    the@ prover's@ driver)."
 
 (** compute the meta_remove_* given two task one included in the other *)
 let compute_diff t1 t2 =
@@ -160,21 +156,17 @@ let () =
     ~desc:"Same@ as@ eliminate_definition_func/_pred@ at@ the@ same@ time.";
   Trans.register_transform "eliminate_recursion"
     eliminate_recursion
-    ~desc:"Same@ as@ eliminate_definition@ ,but@ only@ for@ recursive@ \
+    ~desc:"Same@ as@ eliminate_definition,@ but@ only@ for@ recursive@ \
            definition";
   Trans.register_transform "eliminate_non_struct_recursion"
     eliminate_non_struct_recursion
-    ~desc:"Same@ as@ eliminate_recursion@ ,but@ only@ for@ non@ structural@ \
+    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ non@ structural@ \
            recursive@ definition";
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
-    ~desc:"Same@ as@ eliminate_recursion@ ,but@ only@ for@ mutual@ \
+    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutual@ \
            recursive@ definition (at@ least@ two@ functions@ or@ \
            predicates@ defined@ at@ the@ same@ time)";
-
-
-
-
 
 (** Bisect *)
 open Task

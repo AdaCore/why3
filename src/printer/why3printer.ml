@@ -378,6 +378,7 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
+(*
 let print_task_old _env pr thpr _blacklist ?old:_ fmt task =
   forget_all ();
   print_prelude fmt pr;
@@ -385,6 +386,10 @@ let print_task_old _env pr thpr _blacklist ?old:_ fmt task =
   info := { info_syn = get_syntax_map task };
   fprintf fmt "theory Task@\n%a@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
+
+let () = register_printer "why3old" print_task_old
+  ~desc:"TODO"
+*)
 
 let print_tdecls =
   let print sm fmt td =
@@ -401,8 +406,6 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
     (print_list nothing string)
       (List.rev (Trans.apply print_tdecls task))
 
-let () = register_printer "why3old" print_task_old
-  ~desc:"TODO"
 let () = register_printer "why3" print_task
-  ~desc:"Printer@ for@ the@ logical@ format@ of@ why3.@ There@ is@ currently@ \
-         a@ lose@ of@ informations@ between@ the@ parser@ and@ the@ printer."
+  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3,@ \
+    used@ for@ debugging@ purposes."

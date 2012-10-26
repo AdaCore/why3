@@ -215,17 +215,21 @@ let () =
   let opt_list = ref false in
   if !opt_list_transforms then begin
     opt_list := true;
+    let print_trans_desc fmt (x,r) =
+      fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r in
     printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Trans.print_trans_desc)
+      (Pp.print_list Pp.newline2 print_trans_desc)
       (List.sort sort_pair (Trans.list_transforms ()));
     printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Trans.print_trans_desc)
+      (Pp.print_list Pp.newline2 print_trans_desc)
       (List.sort sort_pair (Trans.list_transforms_l ()))
   end;
   if !opt_list_printers then begin
     opt_list := true;
+    let print_printer_desc fmt (s,f) =
+      fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" s Pp.formatted f in
     printf "@[<hov 2>Known printers:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline Printer.print_printer_desc)
+      (Pp.print_list Pp.newline2 print_printer_desc)
       (List.sort sort_pair (Printer.list_printers ()))
   end;
   if !opt_list_formats then begin

@@ -1475,8 +1475,10 @@ let () =
       let callback () = apply_trans_on_selection name in
       let ii = non_splitting#add_image_item
         ~label:(sanitize_markup name) ~callback () in
+      let print_trans_desc fmt (x,r) =
+        fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r in
       ii#misc#set_tooltip_text
-        (Pp.string_of Trans.print_trans_desc desc) in
+        (Pp.string_of print_trans_desc desc) in
     let trans =
       if nonsplitting
       then Trans.list_transforms ()
