@@ -421,7 +421,7 @@ let fundecl fdec =
   let fun_id = fdec.svar in
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
-  let _formals = List.map
+  let formals = List.map
       (fun v -> (v.vname, ctype v.vtype))
       (Kernel_function.get_formals kf)
   in
@@ -434,7 +434,32 @@ let fundecl fdec =
   let _pre,_post,_ass = extract_simple_contract contract in
   let _ret_type = ctype (Kernel_function.get_return_type kf) in
   let _body = body.bstmts in
-  ()
+  let args =
+    match formals with
+      | [] -> [Mlw_ty.create_pvsymbol 
+                  (Ident.id_fresh "dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+      | _ -> Self.not_yet_implemented "formals"
+  in
+  let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
+  let spec = {
+    Mlw_ty.c_pre = Term.t_true;
+    c_post = Term.t_eps (Term.t_close_bound result Term.t_true);
+    c_xpost = Mlw_ty.Mexn.empty;
+    c_effect = Mlw_ty.eff_empty;
+    c_variant = [];
+    c_letrec  = 0;
+  }
+  in
+  let body = Mlw_expr.e_void (* expr body *) in
+  let lambda = { 
+    Mlw_expr.l_args = args;
+    l_expr = body;
+    l_spec = spec;
+  }
+  in
+  let def = Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda in
+  Mlw_decl.create_rec_decl [def]
+
 
 let global (theories,lemmas,functions) g =
   match g with
@@ -485,15 +510,22 @@ let global (theories,lemmas,functions) g =
 
 let prog p =
   try
-    let theories,decls,_functions =
+    let theories,decls,functions =
       List.fold_left global ([],[],[]) p.globals 
     in
-    Self.result "found %d decls" (List.length decls);
+    Self.result "found %d logic decl(s)" (List.length decls);
     let theories =
       add_decls_as_theory theories (Ident.id_fresh "Top") decls
     in
-    Self.result "made %d theories" (List.length theories);
-    List.rev theories
+    Self.result "made %d theory(ies)" (List.length theories);
+    let m = Mlw_module.create_module env (Ident.id_fresh "Program") in
+    let m =
+      List.fold_left (Mlw_module.add_pdecl ~wp:true)
+        m (List.rev functions)
+    in
+    Self.result "made %d function(s)" (List.length functions);
+    let m = Mlw_module.close_module m in
+    List.rev theories, m ;
   with
       Decl.UnknownIdent(s) ->
         Self.fatal "unknown identifier %s" s.Ident.id_string

@@ -54,7 +54,7 @@ let process () =
         "Z3,3.2"; "Z3,4.0";
         "CVC3,2.2"; "CVC3,2.4.1"] 
   in
-  let theories = ACSLtoWhy3.prog prog in
+  let theories,_modul = ACSLtoWhy3.prog prog in
   try
     List.iter (fun th ->
       ACSLtoWhy3.Self.result "running theory 1:";
