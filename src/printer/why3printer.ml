@@ -13,7 +13,6 @@
 
 open Format
 open Pp
-open Stdlib
 open Ident
 open Ty
 open Term
@@ -37,7 +36,7 @@ let iprinter,aprinter,tprinter,pprinter =
 let forget_tvs () =
   forget_all aprinter
 
-let forget_all () =
+let _forget_all () =
   forget_all iprinter;
   forget_all aprinter;
   forget_all tprinter;

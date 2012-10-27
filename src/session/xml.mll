@@ -12,9 +12,7 @@
 
 {
 
-  open Lexing
-
-  type element =
+   type element =
     { name : string;
       attributes : (string * string) list;
       elements : element list;

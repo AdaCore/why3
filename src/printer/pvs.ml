@@ -47,7 +47,6 @@ TODO
 
 open Format
 open Pp
-open Stdlib
 open Ident
 open Ty
 open Term

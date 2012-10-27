@@ -147,10 +147,10 @@ and print_fmla info fmt f = match f.t_node with
       "smtv1 : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
-and print_expr info fmt =
+and _print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
-and _print_triggers info fmt tl = print_list comma (print_expr info) fmt tl
+and _print_triggers info fmt tl = print_list comma (_print_expr info) fmt tl
 
 
 let _print_logic_binder info fmt v =

@@ -63,7 +63,6 @@ let spec =
   common_options
 
 open Session
-open Stdlib
 
 type context =
     (string ->

@@ -9,9 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
 open Stdlib
-open Ident
 open Ty
 open Term
 open Decl
