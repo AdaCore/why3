@@ -1,10 +1,11 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/lemma.c"
 [jessie3] user error: WARNING: Variable Frama_C_bzero not translated
 [jessie3] user error: WARNING: Variable Frama_C_copy_block not translated
-[jessie3] found 7 decls
-[jessie3] made 1 theories
+[jessie3] found 7 logic decl(s)
+[jessie3] made 1 theory(ies)
+[jessie3] made 0 function(s)
 [jessie3] running theory 1:
-[jessie3] theory Top
+[jessie3] theory Global_logic_declarations
             (* use BuiltIn *)
             
             (* use int.Int *)
@@ -67,3 +68,19 @@
 [jessie3] Status with Z3 4.0: Valid
 [jessie3] Status with Z3 3.2: Valid
 [jessie3] Status with Alt-Ergo 0.94: Valid
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use BuiltIn *)
+            
+            (* use Bool *)
+            
+            (* use Unit *)
+            
+            (* use Prelude *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            (* use Global_logic_declarations *)
+            end

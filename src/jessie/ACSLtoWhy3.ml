@@ -1,4 +1,12 @@
+
+
 let help = "Checks ACSL contracts using Why3"
+
+let global_logic_decls_theory_name = "Global logic declarations"
+
+let programs_module_name = "C Functions"
+
+
 
 module Self =
   Plugin.Register
@@ -413,7 +421,10 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
     | Daxiomatic (name, decls', loc) ->
-      let theories = add_decls_as_theory theories (Ident.id_fresh "Top") decls in
+      let theories = 
+        add_decls_as_theory theories 
+          (Ident.id_fresh global_logic_decls_theory_name) decls 
+      in
       let (t,decls'') =
         List.fold_left
           (fun acc d -> logic_decl ~in_axiomatic:true d loc acc)
@@ -452,14 +463,8 @@ let seq e1 e2 =
 let annot a e =
   match (Annotations.code_annotation_of_rooted a).annot_content with
   | AAssert ([],pred) ->
-(**)
-    Self.result "annot AAssert";
-(**)
     let p = predicate_named pred in
     let a = Mlw_expr.e_assert Mlw_expr.Aassert p in
-(**)
-    Self.result "annot AAssert, make seq";
-(**)
     seq a e
   | AAssert(_labels,_pred) ->
     Self.not_yet_implemented "annot AAssert"
@@ -493,7 +498,6 @@ let instr i =
 let stmt s =
   match s.skind with
     | Instr i ->
-      Self.result "annot AAssert, make seq";
       let annotations = Annotations.code_annot s in
       let e =
         List.fold_right annot annotations (instr i)
@@ -705,10 +709,13 @@ let prog p =
     in
     Self.result "found %d logic decl(s)" (List.length decls);
     let theories =
-      add_decls_as_theory theories (Ident.id_fresh "Jessie3 Top") decls
+      add_decls_as_theory theories 
+        (Ident.id_fresh global_logic_decls_theory_name) decls
     in
     Self.result "made %d theory(ies)" (List.length theories);
-    let m = Mlw_module.create_module env (Ident.id_fresh "Jessie3 Program") in
+    let m = Mlw_module.create_module env 
+      (Ident.id_fresh programs_module_name) 
+    in
     let m = use m int_theory in
     let m = use m real_theory in
     let m = List.fold_left use m theories in

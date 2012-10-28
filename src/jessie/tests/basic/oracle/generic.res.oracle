@@ -1,4 +1,41 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/generic.c"
-tests/basic/generic.c:15:[kernel] user error: unbound function f1 in annotation.
-[kernel] user error: skipping file "tests/basic/generic.c" that has errors.
-[kernel] Frama-C aborted: invalid user input.
+[jessie3] user error: WARNING: Variable Frama_C_bzero not translated
+[jessie3] user error: WARNING: Variable Frama_C_copy_block not translated
+[jessie3] creating logic symbol 740 (occ)
+[jessie3] creating logic symbol 742 (singleton)
+[jessie3] creating logic symbol 745 (bag_union)
+[jessie3] found 0 logic decl(s)
+[jessie3] made 1 theory(ies)
+[jessie3] made 0 function(s)
+[jessie3] running theory 1:
+[jessie3] theory Bag
+            (* use BuiltIn *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            type bag 'x
+            
+            function occ 'x (bag 'x) : int
+            
+            function singleton 'x : bag 'x
+            
+            function bag_union (bag 'x) (bag 'x) : bag 'x
+            end
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use BuiltIn *)
+            
+            (* use Bool *)
+            
+            (* use Unit *)
+            
+            (* use Prelude *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            (* use Bag *)
+            end
