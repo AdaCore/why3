@@ -3,7 +3,7 @@
 */
 
 void f(void) {
-  // assert 6*7 == 42;
+  //@ assert 6*7 == 42;
 }
 
 /*

@@ -88,6 +88,11 @@ val add_meta : module_uc -> meta -> meta_arg list -> module_uc
 (** Program decls *)
 
 val add_pdecl : wp:bool -> module_uc -> pdecl -> module_uc
+(** [add_pdecl ~wp m d] adds declaration [d] in module [m].
+    It may raise [Not_found] if [d] contains objects that are not visible
+    within the current module.
+    parameter [w] : TODO
+*)
 
 exception TooLateInvariant
 

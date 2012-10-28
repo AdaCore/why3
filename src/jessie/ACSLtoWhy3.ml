@@ -25,6 +25,11 @@ open Why3
 
 
 
+
+(***************)
+(* environment *)
+(***************)
+
 let env,config =
   try
     (* reads the Why3 config file *)
@@ -56,6 +61,15 @@ let minus_real : Term.lsymbol = find real_theory "prefix -"
 let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
 
+
+
+
+
+
+(*********)
+(* types *)
+(*********)
+
 let unit_type = Ty.ty_tuple []
 
 let ctype ty =
@@ -78,13 +92,13 @@ let type_vars = ref []
 
 let find_type_var v =
   try
-    List.assoc v !type_vars 
+    List.assoc v !type_vars
   with Not_found -> Self.fatal "type variable %s not found" v
 
 let push_type_var v =
   let tv = Ty.create_tvsymbol (Ident.id_fresh v) in
   type_vars := (v,tv) :: !type_vars
-  
+
 let pop_type_var v =
   match !type_vars with
     | (w,_) :: r ->
@@ -101,12 +115,22 @@ let rec logic_type ty =
         try
           let ts = Hashtbl.find logic_types lt.lt_name in
           Ty.ty_app ts (List.map logic_type args)
-        with Not_found -> Self.fatal "logic type %s not found" lt.lt_name
+        with 
+            Not_found -> Self.fatal "logic type %s not found" lt.lt_name
       end
     | Lvar v -> Ty.ty_var (find_type_var v)
     | Ctype _
     | Larrow (_, _) ->
         Self.not_yet_implemented "logic_type"
+
+
+
+
+
+
+(*********)
+(* terms *)
+(*********)
 
 let constant c =
   match c with
@@ -122,17 +146,24 @@ let constant c =
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "constant"
 
+let t_app ls args =
+  try
+    Term.t_app_infer ls args
+  with
+      Not_found ->
+        Self.fatal "lsymbol %s not found" ls.Term.ls_name.Ident.id_string
+
 let bin (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
 
-    | PlusA,Linteger,Linteger -> Term.t_app_infer add_int [t1;t2]
-    | PlusA,Lreal,Lreal -> Term.t_app_infer add_real [t1;t2]
+    | PlusA,Linteger,Linteger -> t_app add_int [t1;t2]
+    | PlusA,Lreal,Lreal -> t_app add_real [t1;t2]
 
-    | MinusA,Linteger,Linteger -> Term.t_app_infer sub_int [t1;t2]
-    | MinusA,Lreal,Lreal -> Term.t_app_infer sub_real [t1;t2]
+    | MinusA,Linteger,Linteger -> t_app sub_int [t1;t2]
+    | MinusA,Lreal,Lreal -> t_app sub_real [t1;t2]
 
-    | Mult,Linteger,Linteger -> Term.t_app_infer mul_int [t1;t2]
-    | Mult,Lreal,Lreal -> Term.t_app_infer mul_real [t1;t2]
+    | Mult,Linteger,Linteger -> t_app mul_int [t1;t2]
+    | Mult,Lreal,Lreal -> t_app mul_real [t1;t2]
 
     | PlusA,ty1,ty2 -> Self.not_yet_implemented "bin PlusA(%a,%a)"
       Cil.d_logic_type ty1 Cil.d_logic_type ty2
@@ -144,8 +175,8 @@ let bin (ty1,t1) op (ty2,t2) =
 
 let unary op (ty,t) =
   match op,ty with
-    | Neg,Linteger -> Term.t_app_infer minus_int [t]
-    | Neg,Lreal -> Term.t_app_infer minus_real [t]
+    | Neg,Linteger -> t_app minus_int [t]
+    | Neg,Lreal -> t_app minus_real [t]
     | Neg,_ -> Self.not_yet_implemented "unary Neg,_"
     | BNot,_ -> Self.not_yet_implemented "unary BNot"
     | LNot,_ -> Self.not_yet_implemented "unary LNot"
@@ -207,8 +238,9 @@ let rec term_node t =
           | [] ->
             let ls = get_lsymbol li in
             let args = List.map (fun x -> snd(term x)) args in
-            Term.t_app_infer ls args
-          | _ -> Self.not_yet_implemented "term_node Tapp with labels"
+            t_app ls args
+          | _ -> 
+            Self.not_yet_implemented "term_node Tapp with labels"
       end
     | TSizeOf _
     | TSizeOfE _
@@ -240,12 +272,18 @@ let rec term_node t =
 
 and term t = (t.term_type, term_node t.term_node)
 
+
+
+(****************)
+(* propositions *)
+(****************)
+
 let rel (ty1,t1) op (ty2,t2) =
   match op,ty1,ty2 with
     | Req,_,_ -> Term.t_equ t1 t2
     | Rneq,_,_ -> Term.t_neq t1 t2
-    | Rge,Linteger,Linteger -> Term.t_app_infer ge_int [t1;t2]
-    | Rge,Lreal,Lreal -> Term.t_app_infer ge_real [t1;t2]
+    | Rge,Linteger,Linteger -> t_app ge_int [t1;t2]
+    | Rge,Lreal,Lreal -> t_app ge_real [t1;t2]
     | Rge,_,_ ->
       Self.not_yet_implemented "rel Rge"
     | (Rlt|Rgt|Rle),_,_ ->
@@ -283,11 +321,26 @@ let rec predicate p =
 
 and predicate_named p = predicate p.content
 
+
+
+
+
+
+(**********************)
+(* logic declarations *)
+(**********************)
+
 let use th1 th2 =
   let name = th2.Theory.th_name in
   Theory.close_namespace
     (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
     true
+
+let add_decl th d =
+  try
+    Theory.add_decl th d
+  with
+      Not_found -> Self.fatal "add_decl"
 
 let add_decls_as_theory theories id decls =
   match decls with
@@ -297,28 +350,28 @@ let add_decls_as_theory theories id decls =
       let th = use th int_theory in
       let th = use th real_theory in
       let th = List.fold_left use th theories in
-      let th = List.fold_left Theory.add_decl th (List.rev decls) in
+      let th = List.fold_left add_decl th (List.rev decls) in
       let th = Theory.close_theory th in
       th :: theories
 
-let rec annot ~in_axiomatic a _loc (theories,decls) =
+let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
   match a with
-    | Dtype (lt, loc) -> 
-      let targs = 
-        List.map (fun s -> Ty.create_tvsymbol (Ident.id_fresh s)) lt.lt_params 
+    | Dtype (lt, loc) ->
+      let targs =
+        List.map (fun s -> Ty.create_tvsymbol (Ident.id_fresh s)) lt.lt_params
       in
       let tdef = match lt.lt_def with
           | None -> None
-          | Some _ -> Self.not_yet_implemented "annot Dtype non abstract"
+          | Some _ -> Self.not_yet_implemented "logic_decl Dtype non abstract"
       in
-      let ts = 
-        Ty.create_tysymbol 
-          (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef 
+      let ts =
+        Ty.create_tysymbol
+          (Ident.id_user lt.lt_name (Loc.extract loc)) targs tdef
       in
       Hashtbl.add logic_types lt.lt_name ts;
       let d = Decl.create_ty_decl ts in
       (theories,d::decls)
-    | Dfun_or_pred (li, _loc) -> 
+    | Dfun_or_pred (li, _loc) ->
       begin
         match li.l_labels with
           | [] ->
@@ -338,7 +391,7 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
             in
             List.iter pop_type_var (List.rev li.l_tparams);
             (theories,d :: decls)
-            
+
           | _ ->
             Self.not_yet_implemented "Dfun_or_pred with labels"
       end
@@ -363,7 +416,7 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
       let theories = add_decls_as_theory theories (Ident.id_fresh "Top") decls in
       let (t,decls'') =
         List.fold_left
-          (fun acc d -> annot ~in_axiomatic:true d loc acc)
+          (fun acc d -> logic_decl ~in_axiomatic:true d loc acc)
           ([],[])
           decls'
       in
@@ -377,19 +430,120 @@ let rec annot ~in_axiomatic a _loc (theories,decls) =
     | Dtype_annot (_, _)
     | Dmodel_annot (_, _)
     | Dcustom_annot (_, _, _)
-        -> Self.not_yet_implemented "annot"
+        -> Self.not_yet_implemented "logic_decl"
 
 let identified_proposition p =
   { name = p.ip_name; loc = p.ip_loc; content = p.ip_content }
 
+
+
+
+
+
+(**************)
+(* statements *)
+(**************)
+
+
+let seq e1 e2 =
+  let l = Mlw_expr.create_let_defn (Ident.id_fresh "_tmp") e1 in
+  Mlw_expr.e_let l e2
+
+let annot a e =
+  match (Annotations.code_annotation_of_rooted a).annot_content with
+  | AAssert ([],pred) ->
+(**)
+    Self.result "annot AAssert";
+(**)
+    let p = predicate_named pred in
+    let a = Mlw_expr.e_assert Mlw_expr.Aassert p in
+(**)
+    Self.result "annot AAssert, make seq";
+(**)
+    seq a e
+  | AAssert(_labels,_pred) ->
+    Self.not_yet_implemented "annot AAssert"
+  | AStmtSpec _ ->
+    Self.not_yet_implemented "annot AStmtSpec"
+  | AInvariant _ ->
+    Self.not_yet_implemented "annot AInvariant"
+  | AVariant _ ->
+    Self.not_yet_implemented "annot AVariant"
+  | AAssigns _ ->
+    Self.not_yet_implemented "annot AAssigns"
+  | AAllocation _ ->
+    Self.not_yet_implemented "annot AAllocation"
+  | APragma _ ->
+    Self.not_yet_implemented "annot APragma"
+
+
+let instr i =
+  match i with
+  | Set(_lv,_e,_loc) ->
+    Self.not_yet_implemented "instr Set"
+  | Call (_, _, _, _) ->
+    Self.not_yet_implemented "instr Call"
+  | Asm (_, _, _, _, _, _) ->
+    Self.not_yet_implemented "instr Asm"
+  | Skip _loc ->
+    Mlw_expr.e_void
+  | Code_annot (_, _) ->
+    Self.not_yet_implemented "instr Code_annot"
+
+let stmt s =
+  match s.skind with
+    | Instr i ->
+      Self.result "annot AAssert, make seq";
+      let annotations = Annotations.code_annot s in
+      let e =
+        List.fold_right annot annotations (instr i)
+      in e
+    | Block _ ->
+      Self.not_yet_implemented "stmt Block"
+    | Return (None, _loc) ->
+      Mlw_expr.e_void
+    | Return (Some _e, _loc) ->
+      Self.not_yet_implemented "stmt Return"
+    | Goto (_, _) ->
+      Self.not_yet_implemented "stmt Goto"
+    | Break _ ->
+      Self.not_yet_implemented "stmt Break"
+    | Continue _ ->
+      Self.not_yet_implemented "stmt Continue"
+    | If (_, _, _, _) ->
+      Self.not_yet_implemented "stmt If"
+    | Switch (_, _, _, _) ->
+      Self.not_yet_implemented "stmt Switch"
+    | Loop (_, _, _, _, _) ->
+      Self.not_yet_implemented "stmt Loop"
+    | UnspecifiedSequence _ ->
+      Self.not_yet_implemented "stmt UnspecifiedSequence"
+    | TryFinally (_, _, _) ->
+      Self.not_yet_implemented "stmt TryFinally"
+    | TryExcept (_, _, _, _) ->
+      Self.not_yet_implemented "stmt TryExcept"
+
+let block b =
+  List.fold_right (fun s e -> seq (stmt s) e) b.bstmts Mlw_expr.e_void
+
+
+
+
+
+
+
+(*************)
+(* contracts *)
+(*************)
+
 let extract_simple_contract c =
   let pre,post,ass = List.fold_left
     (fun (pre,post,ass) b ->
-      if not (Cil.is_default_behavior b) then 
+      if not (Cil.is_default_behavior b) then
         Self.not_yet_implemented "named behaviors";
-      if b.b_assumes <> [] then 
+      if b.b_assumes <> [] then
         Self.not_yet_implemented "assumes clause";
-      let pre = 
+      let pre =
         List.fold_left
           (fun acc f -> (identified_proposition f) :: acc)
           pre b.b_requires
@@ -397,7 +551,7 @@ let extract_simple_contract c =
       let post =
         List.fold_left
           (fun acc (k,f) ->
-            if k <> Normal then 
+            if k <> Normal then
               Self.not_yet_implemented "abnormal termination post-condition";
             (identified_proposition f) :: acc)
           post b.b_post_cond
@@ -406,7 +560,7 @@ let extract_simple_contract c =
         match b.b_assigns with
         | WritesAny -> ass
         | Writes l ->
-          let l = List.map (fun (t,_) -> 
+          let l = List.map (fun (t,_) ->
             term (* ~in_contract:true Logic_const.here_label *) t.it_content) l in
           match ass with
           | None -> Some l
@@ -416,6 +570,15 @@ let extract_simple_contract c =
     ([],[],None) c.spec_behavior
   in
   (Logic_const.pands pre, Logic_const.pands post, ass)
+
+
+
+
+
+
+(*************************)
+(* function declarations *)
+(*************************)
 
 let fundecl fdec =
   let fun_id = fdec.svar in
@@ -427,7 +590,7 @@ let fundecl fdec =
   in
   let body = fdec.sbody in
   let _vars = List.map
-      (fun v -> (v.vname, ctype v.vtype)) 
+      (fun v -> (v.vname, ctype v.vtype))
       (Kernel_function.get_locals kf)
   in
   let contract = Annotations.funspec kf in
@@ -436,7 +599,7 @@ let fundecl fdec =
   let _body = body.bstmts in
   let args =
     match formals with
-      | [] -> [Mlw_ty.create_pvsymbol 
+      | [] -> [Mlw_ty.create_pvsymbol
                   (Ident.id_fresh "dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
       | _ -> Self.not_yet_implemented "formals"
   in
@@ -450,8 +613,8 @@ let fundecl fdec =
     c_letrec  = 0;
   }
   in
-  let body = Mlw_expr.e_void (* expr body *) in
-  let lambda = { 
+  let body = block body in
+  let lambda = {
     Mlw_expr.l_args = args;
     l_expr = body;
     l_spec = spec;
@@ -459,6 +622,15 @@ let fundecl fdec =
   in
   let def = Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda in
   Mlw_decl.create_rec_decl [def]
+
+
+
+
+
+
+(***********************)
+(* global declarations *)
+(***********************)
 
 
 let global (theories,lemmas,functions) g =
@@ -488,7 +660,7 @@ let global (theories,lemmas,functions) g =
       Self.error "WARNING: Variable %s not translated" vi.vname;
       (theories,lemmas,functions)
     | GAnnot (a, loc) ->
-      let (t,l) = annot ~in_axiomatic:false a loc (theories,lemmas) in
+      let (t,l) = logic_decl ~in_axiomatic:false a loc (theories,lemmas) in
       (t,l,functions)
     | GText _ ->
       Self.not_yet_implemented "global: GText"
@@ -508,24 +680,42 @@ let global (theories,lemmas,functions) g =
       Self.not_yet_implemented "global: GType"
 
 
+let print_id fmt id = Format.fprintf fmt "%s" id.Ident.id_string
+
+let add_pdecl m d =
+  try
+    Mlw_module.add_pdecl ~wp:true m d
+  with
+      Not_found -> 
+        Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id)
+          (Ident.Sid.elements d.Mlw_decl.pd_news) 
+
+let use m th =
+  let name = th.Theory.th_name in
+  Mlw_module.close_namespace
+    (Mlw_module.use_export_theory
+       (Mlw_module.open_namespace m name.Ident.id_string) 
+       th)
+    true
+
 let prog p =
   try
     let theories,decls,functions =
-      List.fold_left global ([],[],[]) p.globals 
+      List.fold_left global ([],[],[]) p.globals
     in
     Self.result "found %d logic decl(s)" (List.length decls);
     let theories =
-      add_decls_as_theory theories (Ident.id_fresh "Top") decls
+      add_decls_as_theory theories (Ident.id_fresh "Jessie3 Top") decls
     in
     Self.result "made %d theory(ies)" (List.length theories);
-    let m = Mlw_module.create_module env (Ident.id_fresh "Program") in
-    let m =
-      List.fold_left (Mlw_module.add_pdecl ~wp:true)
-        m (List.rev functions)
-    in
+    let m = Mlw_module.create_module env (Ident.id_fresh "Jessie3 Program") in
+    let m = use m int_theory in
+    let m = use m real_theory in
+    let m = List.fold_left use m theories in
+    let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
-    List.rev theories, m ;
+    List.rev (m.Mlw_module.mod_theory :: theories) ;
   with
       Decl.UnknownIdent(s) ->
         Self.fatal "unknown identifier %s" s.Ident.id_string
