@@ -31,7 +31,7 @@ let syntactic_transform transf =
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
     (syntactic_transform Abstraction.abstraction)
-    ~desc:"Abstract@ application@ of@ non-built-in@ symbols@ with@ constants.";
+    ~desc:"Abstract@ applications@ of@ non-built-in@ symbols@ with@ constants.";
   Trans.register_transform "simplify_unknown_lsymbols"
     (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
       [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
@@ -45,7 +45,7 @@ let () =
           | Tapp(ls,_) -> not (check_ls ls)
           | _ -> true) f)
       ])))
-    ~desc:"In the goal substitute equality on application of unknown symbols.";
+    ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ of@ substituting@ quantified@ variables,@ substitute@ applications@ of@ non-buit-in@ symbols.";
 
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
