@@ -196,14 +196,59 @@ We gratefully thank the people who contributed to \why, directly or
 indirectly: Romain Bardou, Simon Cruanes, Leon Gondelman, Johannes Kanig,
 St\'ephane Lescuyer, Sim\~ao Melo de Sousa, Benjamin Monate, Asma Tafat.
 
-\section{Release Notes}
+\cleardoublepage
 
-\subsection{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
+%BEGIN LATEX
+\tableofcontents
+%END LATEX
+
+%\input{intro.tex}
+
+\part{Tutorial}
+
+\input{starting.tex}
+
+\input{syntax.tex}
+
+% \input{ide.tex}
+
+\input{whyml.tex}
+
+\input{api.tex}
+
+\part{Reference Manual}
+
+\input{install.tex}
+
+\input{manpages.tex}
+
+\input{syntaxref.tex}
+
+\input{library.tex}
+
+\input{realizations.tex}
+
+\input{coq_tactic.tex}
+
+% \chapter{Complete API documentation} *)
+% \label{chap:apidoc} *)
+
+% \input{./apidoc.tex} *)
+
+\input{technical.tex}
+
+\part{Appendix}
+
+\appendix
+
+\chapter{Release Notes}
+
+\section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
 The syntax of \whyml programs changed in release 0.80. 
 The table in Figure~\ref{fig:syntax080} summarizes the changes.
 
-\begin{figure}[t]
+\begin{figure}[thbp]
   \centering
 \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
 \hline
@@ -297,7 +342,7 @@ abstract e ensures \{ Q \}
 \label{fig:syntax080}
 \end{figure}
 
-\subsection{Summary of Changes w.r.t. Why 2}
+\section{Summary of Changes w.r.t. Why 2}
 
 The main new features with respect to Why 2.xx
 are the following.
@@ -354,49 +399,6 @@ are the following.
 % %   undocumented, since the syntax is likely to evolve significantly in *)
 % %   the future. Examples are available in \texttt{examples/programs}. *)
 % \end{itemize}
-
-\cleardoublepage
-
-%BEGIN LATEX
-\tableofcontents
-%END LATEX
-
-%\input{intro.tex}
-
-\part{Tutorial}
-
-\input{starting.tex}
-
-\input{syntax.tex}
-
-% \input{ide.tex}
-
-\input{whyml.tex}
-
-\input{api.tex}
-
-\part{Reference Manual}
-
-\input{install.tex}
-
-\input{manpages.tex}
-
-\input{syntaxref.tex}
-
-\input{library.tex}
-
-\input{realizations.tex}
-
-\input{coq_tactic.tex}
-
-% \chapter{Complete API documentation} *)
-% \label{chap:apidoc} *)
-
-% \input{./apidoc.tex} *)
-
-% \appendix
-
-\input{technical.tex}
 
 \bibliographystyle{abbrv}
 \bibliography{manual}
