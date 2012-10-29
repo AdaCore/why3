@@ -82,8 +82,8 @@ let unit_type = Ty.ty_tuple []
 
 let ctype ty =
   match ty with
-    | TVoid _attr -> unit_type
-    | TInt (_, _)
+    | TVoid _attr -> Mlw_ty.ity_unit
+    | TInt (_, _) -> Mlw_ty.ity_pur Ty.ts_int []
     | TFloat (_, _)
     | TPtr (_, _)
     | TArray (_, _, _, _)
@@ -455,6 +455,32 @@ let identified_proposition p =
 (* statements *)
 (**************)
 
+let program_vars = Hashtbl.create 257
+
+let create_var v =
+  let id = Ident.id_fresh v.vname in
+  let vs = Term.create_vsymbol id (ctype v.vtype) in
+(**)
+  Self.result "create program variable %s (%d)" v.vname v.vid;
+(**)
+  Hashtbl.add program_vars v.vid vs;
+  vs
+
+let get_var v =
+  try
+    Hashtbl.find program_vars v.vid
+  with Not_found ->
+    Self.fatal "program variable %s (%d) not found" v.vid
+
+
+let lval (host,offset) =
+  match host,offset with
+    | Var v, NoOffset -> Term.t_var (get_var v)
+    | Var _, (Field (_, _)|Index (_, _)) ->
+      Self.not_yet_implemented "lval Var"
+    | Mem _, _ ->
+      Self.not_yet_implemented "lval Mem"
+
 
 let seq e1 e2 =
   let l = Mlw_expr.create_let_defn (Ident.id_fresh "_tmp") e1 in
@@ -481,6 +507,14 @@ let annot a e =
   | APragma _ ->
     Self.not_yet_implemented "annot APragma"
 
+let expr e =
+  match e.enode with
+    | Const _c -> (* constant c *)
+      Self.not_yet_implemented "expr Const"
+    | Lval lv -> lval lv
+    | SizeOf _|SizeOfE _|SizeOfStr _|AlignOf _|AlignOfE _|UnOp (_, _, _)|
+BinOp (_, _, _, _)|CastE (_, _)|AddrOf _|StartOf _|Info (_, _)
+    -> Self.not_yet_implemented "expr"
 
 let instr i =
   match i with
@@ -506,8 +540,8 @@ let stmt s =
       Self.not_yet_implemented "stmt Block"
     | Return (None, _loc) ->
       Mlw_expr.e_void
-    | Return (Some _e, _loc) ->
-      Self.not_yet_implemented "stmt Return"
+    | Return (Some e, _loc) ->
+      expr e
     | Goto (_, _) ->
       Self.not_yet_implemented "stmt Goto"
     | Break _ ->
@@ -588,9 +622,10 @@ let fundecl fdec =
   let fun_id = fdec.svar in
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
-  let formals = List.map
-      (fun v -> (v.vname, ctype v.vtype))
-      (Kernel_function.get_formals kf)
+  let formals = 
+    match Kernel_function.get_formals kf with
+      | [] -> [ "_dummy", Mlw_ty.ity_unit ]
+      | l -> List.map (fun v -> (v.vname, ctype v.vtype)) l
   in
   let body = fdec.sbody in
   let _vars = List.map
@@ -602,10 +637,10 @@ let fundecl fdec =
   let _ret_type = ctype (Kernel_function.get_return_type kf) in
   let _body = body.bstmts in
   let args =
-    match formals with
-      | [] -> [Mlw_ty.create_pvsymbol
-                  (Ident.id_fresh "dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
-      | _ -> Self.not_yet_implemented "formals"
+    List.map 
+      (fun (id,ity) -> 
+        Mlw_ty.create_pvsymbol (Ident.id_fresh id) (Mlw_ty.vty_value ity))
+      formals
   in
   let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
   let spec = {
