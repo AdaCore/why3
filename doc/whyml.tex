@@ -753,7 +753,7 @@ to show that the invariant over lengths is maintained, and finally
   observes an abstract queue given by a sequence.
 \end{quote}
 In a new module, we import arithmetic and theory
-\texttt{list.ListRich}, a combo theory which imports all list
+\texttt{list.ListRich}, a combo theory that imports all list
 operations we will require: length, reversal, and concatenation.
 \begin{whycode}
 module AmortizedQueue
@@ -776,7 +776,7 @@ or modified in a program.
 
 For the purpose of the specification, it is convenient to introduce a function
 \texttt{sequence} which builds the sequence of elements of a queue, that
-is the front list concatenated to reversed rear list.
+is the front list concatenated to the reversed rear list.
 \begin{whycode}
   function sequence (q: queue 'a) : list 'a = q.front ++ reverse q.rear
 \end{whycode}
