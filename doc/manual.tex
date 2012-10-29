@@ -205,105 +205,91 @@ The table in Figure~\ref{fig:syntax080} summarizes the changes.
 
 \begin{figure}[t]
   \centering
-\begin{tabular}{|l|l|}
+\begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
 \hline
 \textbf{version 0.73} & \textbf{version 0.80} \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-type t = \{| field~:~int |\} \\
-\end{minipage}
+\ttfamily
+type t = \{| field~:~int |\}
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-type t = \{ field~:~int \} \\
-\end{minipage}
+\ttfamily
+type t = \{ field~:~int \}
 \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-\{| field = 5 |\} \\
-\end{minipage}
+\ttfamily
+\{| field = 5 |\}
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-\{ field = 5 \} \\
-\end{minipage}
+\ttfamily
+\{ field = 5 \}
 \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-use import module M \\
-\end{minipage}
+\ttfamily
+use import module M
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-use import M \\
-\end{minipage}
+\ttfamily
+use import M
 \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-let rec f (x:int) (y:int)~:~t 
-\hspace*{3ex} variant \{ t \} with rel = \\
-\hspace*{3ex} \{ P \} \\
-\hspace*{3ex} e \\
-\hspace*{3ex} \{ Q \} \\
-\hspace*{3ex} | Exc1 -> \{ R1 \} \\
-\hspace*{3ex} | Exc2 n -> \{ R2 \} \\
-\end{minipage}
+\ttfamily
+let rec f (x:int) (y:int)~:~t \newline
+\null~~~~variant \{ t \} with rel = \newline
+\null~~~~\{ P \} \newline
+\null~~~~e \newline
+\null~~~~\{ Q \} \newline
+\null~~~~| Exc1 -> \{ R1 \} \newline
+\null~~~~| Exc2 n -> \{ R2 \}
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-let rec f (x:int) (y:int)~:~t \\
-\hspace*{3ex} variant \{ t with rel \}
-\hspace*{3ex} requires \{ P \} \\
-\hspace*{3ex} ensures \{ Q \} \\
-\hspace*{3ex} raises \{ Exc1 -> R1 \\
-\hspace*{3ex}~~~~~~~~| Exc2 n -> R2 \} \\
-\hspace*{3ex} = e \\
-\end{minipage}
+\ttfamily
+let rec f (x:int) (y:int)~:~t \newline
+\null~~~~variant \{ t with rel \} \newline
+\null~~~~requires \{ P \} \newline
+\null~~~~ensures \{ Q \} \newline
+\null~~~~raises \{ Exc1 -> R1 \newline
+\null~~~~~~~~~~~| Exc2 n -> R2 \} \newline
+\null~~~~= e
 \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-val f (x:int) (y:int)~:\\
-\hspace*{3ex} \{ P \} \\
-\hspace*{3ex} t \\
-\hspace*{3ex} writes a b \\
-\hspace*{3ex} \{ Q \} \\
-\hspace*{3ex} | Exc1 -> \{ R1 \} \\
-\hspace*{3ex} | Exc2 n -> \{ R2 \} \\
-\end{minipage}
+\ttfamily
+val f (x:int) (y:int)~:\newline
+\null~~~~\{ P \} \newline
+\null~~~~t \newline
+\null~~~~writes a b \newline
+\null~~~~\{ Q \} \newline
+\null~~~~| Exc1 -> \{ R1 \} \newline
+\null~~~~| Exc2 n -> \{ R2 \}
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-val f (x:int) (y:int)~:~t \\
-\hspace*{3ex} requires \{ P \} \\
-\hspace*{3ex} writes \{ a, b \} \\
-\hspace*{3ex} ensures \{ Q \} \\
-\hspace*{3ex} raises \{ Exc1 -> R1 \\
-\hspace*{3ex}~~~~~~~~| Exc2 n -> R2 \} \\
-\end{minipage}
+\ttfamily
+val f (x:int) (y:int)~:~t \newline
+\null~~~~requires \{ P \} \newline
+\null~~~~writes \{ a, b \} \newline
+\null~~~~ensures \{ Q \} \newline
+\null~~~~raises \{ Exc1 -> R1 \newline
+\null~~~~~~~~~~~| Exc2 n -> R2 \}
 \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-val f~:~x:int -> y:int ->\\
-\hspace*{3ex} \{ P \} \\
-\hspace*{3ex} t \\
-\hspace*{3ex} writes a b \\
-\hspace*{3ex} \{ Q \} \\
-\hspace*{3ex} | Exc1 -> \{ R1 \} \\
-\hspace*{3ex} | Exc2 n -> \{ R2 \} \\
-\end{minipage}
+\ttfamily
+val f~:~x:int -> y:int ->\newline
+\null~~~~\{ P \} \newline
+\null~~~~t \newline
+\null~~~~writes a b \newline
+\null~~~~\{ Q \} \newline
+\null~~~~| Exc1 -> \{ R1 \} \newline
+\null~~~~| Exc2 n -> \{ R2 \}
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-val f (x y:int)~:~t \\
-\hspace*{3ex} requires \{ P \} \\
-\hspace*{3ex} writes \{ a, b \} \\
-\hspace*{3ex} ensures \{ Q \} \\
-\hspace*{3ex} raises \{ Exc1 -> R1 \\
-\hspace*{3ex}~~~~~~~~| Exc2 n -> R2 \} \\
-\end{minipage}
+\ttfamily
+val f (x y:int)~:~t \newline
+\null~~~~requires \{ P \} \newline
+\null~~~~writes \{ a, b \} \newline
+\null~~~~ensures \{ Q \} \newline
+\null~~~~raises \{ Exc1 -> R1 \newline
+\null~~~~~~~~~~~| Exc2 n -> R2 \}
 \\
 \hline
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-abstract e \{ Q \} \\
-\end{minipage}
+\ttfamily
+abstract e \{ Q \}
 &
-\begin{minipage}[t]{0.45\textwidth}\ttfamily
-abstract e ensures \{ Q \} \\
-\end{minipage}
+\ttfamily
+abstract e ensures \{ Q \}
 \\
 \hline
 \end{tabular}
