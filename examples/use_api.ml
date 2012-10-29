@@ -187,3 +187,64 @@ let () = printf "@[On task 4, alt-ergo answers %a@."
 (* build a theory with all these goals *)
 
 (* TODO *)
+
+
+
+
+
+(* build a whyml program *)
+
+let m = Mlw_module.create_module env (Ident.id_fresh "Program")
+
+let mul_int : Term.lsymbol =
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+
+let unit_type = Ty.ty_tuple []
+
+let d = 
+  let args =
+    [Mlw_ty.create_pvsymbol 
+        (Ident.id_fresh "_dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+  in
+  let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
+  let spec = {
+    Mlw_ty.c_pre = Term.t_true;
+    c_post = Term.t_eps (Term.t_close_bound result Term.t_true);
+    c_xpost = Mlw_ty.Mexn.empty;
+    c_effect = Mlw_ty.eff_empty;
+    c_variant = [];
+    c_letrec  = 0;
+  }
+  in
+  let body =
+    let c6 = Term.t_const (Term.ConstInt (Term.IConstDecimal "6")) in
+    let c7 = Term.t_const (Term.ConstInt (Term.IConstDecimal "7")) in
+    let c42 = Term.t_const (Term.ConstInt (Term.IConstDecimal "42")) in
+    let p = 
+      Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
+    in
+    Mlw_expr.e_assert Mlw_expr.Aassert p 
+  in
+  let lambda = {
+    Mlw_expr.l_args = args;
+    l_expr = body;
+    l_spec = spec;
+  }
+  in
+  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
+  Mlw_decl.create_rec_decl [def]
+
+
+(* TODO: continue *)
+
+(*
+let () = Printexc.record_backtrace true
+
+let () =
+  try
+    let _buggy : Mlw_module.module_uc = Mlw_module.add_pdecl ~wp:true m d in
+    ()
+  with Not_found ->
+    Printexc.print_backtrace stderr;
+    flush stderr
+*)
