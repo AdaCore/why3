@@ -289,7 +289,9 @@ exec = "iprover"
 version_switch = " | grep iProver"
 version_regexp = "iProver v\\([^ \n\t]+\\)"
 version_ok = "0.8.1"
-command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none --time_out_virtual %t --clausifier /usr/bin/env --clausifier_options \"eprover --cnf --tstp-format \" %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none \
+--time_out_virtual %t --clausifier /usr/bin/env --clausifier_options \
+\"eprover --cnf --tstp-format \" %f"
 driver = "drivers/iprover.drv"
 
 [ITP coq]
