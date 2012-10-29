@@ -10,7 +10,10 @@ They also provide extra features:
 \begin{itemize}
 \item
   In a record type declaration, some fields can be declared
-  \texttt{mutable}.
+  \texttt{mutable} and/or \texttt{ghost}.
+\item
+  In an algebraic type declaration (this includes record types), an
+  invariant can be specified.
 \item
   There are programming constructs with no counterpart in the logic:
   \begin{itemize}
@@ -19,6 +22,7 @@ They also provide extra features:
   \item loops;
   \item exceptions;
   \item local and anonymous functions;
+  \item ghost parameters and ghost code;
   \item annotations: pre- and postconditions, assertions, loop invariants.
   \end{itemize}
 \item
@@ -182,7 +186,7 @@ module MaxAndSum
 
 end
 \end{whycode}
-\vspace*{-2em}\hrulefill
+\vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 1.}
   \label{fig:MaxAndSum}
 \end{figure}
@@ -298,7 +302,7 @@ module InvertingAnInjection
 
 end
 \end{whycode}
-\vspace*{-2em}\hrulefill
+\vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 2.}
   \label{fig:Inverting}
 \end{figure}
@@ -417,7 +421,7 @@ module SearchingALinkedList
 
 end
 \end{whycode}
-\vspace*{-2em}\hrulefill
+\vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 3.}
   \label{fig:LinkedList}
 \end{figure}
@@ -582,7 +586,7 @@ module NQueens
       False
     end
 \end{whycode}
-\vspace*{-2em}\hrulefill
+\vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 4 (1/2).}
   \label{fig:NQueens1}
 \end{figure}
@@ -728,7 +732,7 @@ automatically, including the verification of the lemmas themselves.
 
 end
 \end{whycode}
-\vspace*{-2em}\hrulefill
+\vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 4 (2/2).}
   \label{fig:NQueens2}
 \end{figure}
@@ -855,7 +859,7 @@ a one line code.
 \end{whycode}
 The code is given Figure~\ref{fig:AQueue}. The verification conditions
 are all discharged automatically.
-\begin{figure}
+\begin{figure}[p]
   \centering
 \begin{whycode}
 module AmortizedQueue
@@ -901,7 +905,7 @@ module AmortizedQueue
   = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 end
 \end{whycode}
-\vspace*{-2em}\hrulefill
+\vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 5.}
   \label{fig:AQueue}
 \end{figure}
