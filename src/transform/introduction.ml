@@ -60,6 +60,7 @@ let intros pr f =
 let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. byte"

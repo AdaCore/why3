@@ -172,5 +172,4 @@ let t =
   Trans.fold (fold tenv) None
 
 let () = Trans.register_transform "encoding_sort" t
-  ~desc:"Remove@ each@ type@ application@ by@ discriminating@ it@ into@ one@ \
-         specific@ constant@ type."
+  ~desc:"Replace@ every@ closed@ type@ by@ a@ separate@ type@ constant."

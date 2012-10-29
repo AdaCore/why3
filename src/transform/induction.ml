@@ -82,15 +82,7 @@ module Svsl = Mvsl.Set
 (* DEBUGGING AND PRINTING *)
 
 let debug = Debug.register_info_flag "induction"
-  ~desc:"About@ the@ transformation@ of@ the@ goal@ using@ induction."
-
-let debug_verbose = Debug.register_info_flag "induction-verbose"
-  ~desc:"Same@ as@ induction, but@ print@ also@ the@ variables, the@ \
-         heuristics@ and@ the lexicographic@ order@ used."
-
-let debug_int = Debug.register_info_flag "induction_int_lex"
-  ~desc:"About@ the@ transformation@ of@ the@ goal@ using@ induction@ on@ \
-         the@ tuples@ of@ integers."
+  ~desc:"Print@ debugging@ messages@ of@ the@ 'induction'@ transformation."
 
 let print_ty_skm skm =
   List.iter
@@ -336,16 +328,11 @@ let induction_ty_lex km t0 =
     let lexl, rightmost_qvl = qsplit km vl qvl in
     let tcase = make_induction_lex lexl rightmost_qvl t in
 
-    if Debug.test_flag debug_verbose then
+    if Debug.test_flag debug then
       begin
 	print_vset vset;
 	print_heuristic_lex vl;
 	print_lex lexl;
-	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
-	Format.printf "New Task: %a \n@." Pretty.print_term tcase
-      end;
-    if Debug.test_flag debug then
-      begin
 	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
 	Format.printf "New Task: %a \n@." Pretty.print_term tcase
       end;
@@ -362,7 +349,7 @@ let induction_ty_lex = function
 
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
-    ~desc:"TODO: induction on type with lexicographic order"
+    ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ algebraic@ types."
 
 
 (***************************************************************************)
@@ -460,7 +447,7 @@ let induction_int_lex _km (le_int,lt_int) t0 =
     begin
       let t = int_strong_induction_lex (le_int,lt_int) ivl genl t in
       let t = t_forall_close lvl [] t in
-      if Debug.test_flag debug_int then
+      if Debug.test_flag debug then
 	(Format.printf "Old Task: %a \n@." Pretty.print_term t0;
 	 Format.printf "New Task: %a \n@." Pretty.print_term t);
       [t]
@@ -485,9 +472,7 @@ let () =
     (fun env ->
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
-    ~desc:"TODO: induction on integers"
-
-
+    ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ integers."
 
 (*
 Local Variables:

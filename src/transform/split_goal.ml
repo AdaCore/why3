@@ -177,30 +177,30 @@ let split_premise_right = Trans.decl (split_premise right_split) None
 let split_premise_wp    = Trans.decl (split_premise wp_split) None
 
 let () = Trans.register_transform_l "split_goal_full" split_goal_full
-  ~desc:"Puts@ the@ goal@ in@ a@ conjunctive@ form,@ \
+  ~desc:"Put@ the@ goal@ in@ a@ conjunctive@ form,@ \
   returns@ the@ corresponding@ set@ of@ subgoals.@ The@ number@ of@ subgoals@ \
   generated@ may@ be@ exponential@ in@ the@ size@ of@ the@ initial@ goal."
 let () = Trans.register_transform_l "split_all_full" split_all_full
-  ~desc:"Same@ as@ split_goal_full,@ but@ also@ splits@ premises."
+  ~desc:"Same@ as@ split_goal_full,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_full" split_premise_full
-  ~desc:"Same@ as@ split_all_full,@ but@ splits@ only@ premises."
+  ~desc:"Same@ as@ split_all_full,@ but@ split@ only@ premises."
 
 let () = Trans.register_transform_l "split_goal_right" split_goal_right
   ~desc:"@[<hov 2>Same@ as@ split_goal_full,@ but@ don't@ split:@,\
       - @[conjunctions under disjunctions@]@\n\
       - @[conjunctions on the left of implications.@]@]"
 let () = Trans.register_transform_l "split_all_right" split_all_right
-  ~desc:"Same@ as@ split_goal_right,@ but@ also@ splits@ premises."
+  ~desc:"Same@ as@ split_goal_right,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_right" split_premise_right
-  ~desc:"Same@ as@ split_all_right,@ but@ splits@ only@ premises."
+  ~desc:"Same@ as@ split_all_right,@ but@ split@ only@ premises."
 
 let () = Trans.register_transform_l "split_goal_wp" split_goal_wp
   ~desc:"Same@ as@ split_goal_right,@ but@ stops@ at@ \
     the@ `stop_split'@ label@ and@ removes@ the@ label."
 let () = Trans.register_transform_l "split_all_wp" split_all_wp
-  ~desc:"Same@ as@ split_goal_wp,@ but@ also@ splits@ premises."
+  ~desc:"Same@ as@ split_goal_wp,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_wp" split_premise_wp
-  ~desc:"Same@ as@ split_all_wp,@ but@ splits@ only@ premises."
+  ~desc:"Same@ as@ split_all_wp,@ but@ split@ only@ premises."
 
 let () = Trans.register_transform_l "split_goal" split_goal_wp
   ~desc:"The@ deprecated@ name@ of@ split_goal_wp,@ \

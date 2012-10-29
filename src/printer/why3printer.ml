@@ -386,8 +386,7 @@ let print_task_old _env pr thpr _blacklist ?old:_ fmt task =
   fprintf fmt "theory Task@\n%a@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
 
-let () = register_printer "why3old" print_task_old
-  ~desc:"TODO"
+let () = register_printer "why3old" print_task_old ~desc:""
 *)
 
 let print_tdecls =
@@ -406,5 +405,5 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
       (List.rev (Trans.apply print_tdecls task))
 
 let () = register_printer "why3" print_task
-  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3,@ \
-    used@ for@ debugging@ purposes."
+  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ \
+    Used@ for@ debugging."

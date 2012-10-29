@@ -70,5 +70,5 @@ let () =
   Trans.register_transform "instantiate_predicate"
     (Trans.on_tagged_pr meta (fun spr ->
       Trans.fold_map (trans spr) ([], Sterm.empty) None))
-    ~desc:"Look@ into@ all@ the@ task@ for@ terms@ that@ can@ instantiate@ \
-           proposition@ marked@ by@ the@ 'instantiate : auto'@ meta."
+    ~desc:"Instantiate@ proposition@ marked@ by@ 'instantiate : auto'.@ \
+           Used@ for@ Gappa."

@@ -12,7 +12,7 @@
 type plugin = string
 
 let debug = Debug.register_info_flag "load_plugin"
-  ~desc:"About plugins loading."
+  ~desc:"Print@ debugging@ messages@ about@ plugin@ loading."
 
 exception Plugin_Not_Found of plugin * string list
 

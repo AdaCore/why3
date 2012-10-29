@@ -21,7 +21,7 @@ module B = Bench
 module C = Call_provers
 
 let debug = Debug.register_info_flag "main"
-  ~desc:"About initialization of the bench"
+  ~desc:"Print@ debugging@ messages@ about@ initialization@ of@ the@ bench."
 
 let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]...\

@@ -215,7 +215,7 @@ let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
          Used@ in@ bisection."
 
 let meta_realized_theory = register_meta "realized_theory" [MTstring; MTstring]
-  ~desc:"Specify@ that@ a@ Why3@ theory@ is@ \"realized\"@ as@ a@ module@ \
+  ~desc:"Specify@ that@ a@ Why3@ theory@ is@ realized@ as@ a@ module@ \
          in@ an@ ITP."
 
 let check_syntax_type ts s = check_syntax s (List.length ts.ts_args)

@@ -14,8 +14,8 @@ open Session
 open Debug
 
 let debug = register_info_flag "scheduler"
-  ~desc:"About@ the@ session@ scheduler@ which@ schedules@ the@ application@ \
-          of@ transformtions@ or@ the@ call@ of@ provers."
+  ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
+         and@ transformtion@ applications."
 
 (***************************)
 (*     main functor        *)

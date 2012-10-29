@@ -78,7 +78,7 @@ let fold in_goal notdeft notdeff notls task_hd (env, task) =
 (* transformations *)
 
 let meta = Theory.register_meta "inline : no" [Theory.MTlsymbol]
-  ~desc:"Disallow@ the@ inlining@ of@ the@ given@ logic@ symbols."
+  ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
 let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
   let trans notls =
@@ -121,7 +121,7 @@ let () =
   Trans.register_transform "inline_all" all
     ~desc:"Inline@ non-recursive@ definitions.";
   Trans.register_transform "inline_goal" goal
-    ~desc:"Same@ as@ inline_all, but@ only@ inline in@ goals.";
+    ~desc:"Same@ as@ 'inline_all', but@ only@ inline in@ goals.";
   Trans.register_transform "inline_trivial" trivial
     ~desc:"Inline@ trivial@ definitions@ like@ @[f(x,y) = g(y,x,0)@]."
 

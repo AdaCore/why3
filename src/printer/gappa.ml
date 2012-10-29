@@ -31,7 +31,8 @@ let syntactic_transform transf =
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
     (syntactic_transform Abstraction.abstraction)
-    ~desc:"Abstract@ applications@ of@ non-built-in@ symbols@ with@ constants.";
+    ~desc:"Abstract@ applications@ of@ non-built-in@ symbols@ with@ \
+      constants.@ Used@ by@ the@ Gappa@ pretty-printer.";
   Trans.register_transform "simplify_unknown_lsymbols"
     (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
       [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
@@ -45,8 +46,9 @@ let () =
           | Tapp(ls,_) -> not (check_ls ls)
           | _ -> true) f)
       ])))
-    ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ of@ substituting@ quantified@ variables,@ substitute@ applications@ of@ non-buit-in@ symbols.";
-
+    ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ \
+      of@ substituting@ quantified@ variables,@ substitute@ applications@ \
+      of@ non-buit-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer."
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
 
@@ -91,13 +93,14 @@ let real_minus = ref ps_equ
 (** lsymbol, ""/"not ", op, rev_op *)
 let arith_meta = register_meta "gappa arith"
   [MTlsymbol;MTstring;MTstring;MTstring]
-  ~desc:"Specifies how to pretty-print symbols into gappa format:@\n  \
-@[\
- @[<hov 2>- first argument: which symbol@]@\n\
- @[<hov 2>- second argument: which prefix around the term@]@\n\
- @[<hov 2>- third argument: which operator to pretty-print@]@\n\
- @[<hov 2>- fourth argument: which is the inverse operator to pretty-print@]\
-@]"
+  ~desc:"Specify@ how@ to@ pretty-print@ arithmetic@ \
+          operations@ in@ the@ Gappa@ format:@\n  \
+    @[\
+     @[<hov 2>- first@ argument:@ the@ symbol@]@\n\
+     @[<hov 2>- second@ argument:@ the@ prefix@ to@ put@ before@ the@ term@]@\n\
+     @[<hov 2>- third@ argument:@ the@ operator@ to@ print@]@\n\
+     @[<hov 2>- fourth@ argument:@ the@ inverse@ operator@]\
+    @]"
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in

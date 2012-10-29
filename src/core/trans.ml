@@ -17,7 +17,8 @@ open Theory
 open Task
 
 let debug = Debug.register_info_flag "transform"
-  ~desc:"Be@ verbose@ about@ application@ of@ proof@ task@ transformations."
+  ~desc:"Print@ debugging@ messages@ about@ application@ \
+         of@ proof@ task@ transformations."
 
 (** Task transformation *)
 

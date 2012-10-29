@@ -115,4 +115,4 @@ let elt d =
 let t = Trans.decl elt None
 
 let () = Trans.register_transform "simplify_recursive_definition" t
-  ~desc:"Separate@ the@ definitions@ that@ are@ not@ really@ recursive."
+  ~desc:"Separate@ the@ definitions@ that@ are@ not@ mutually@ recursive."

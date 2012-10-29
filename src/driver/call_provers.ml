@@ -113,7 +113,8 @@ let rec grep out l = match l with
 
 
 let debug = Debug.register_info_flag "call_prover"
-  ~desc:"Be@ verbose@ about@ prover@ calls@ and@ keep@ temporary@ files."
+  ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
+         and@ keep@ temporary@ files."
 
 type post_prover_call = unit -> prover_result
 

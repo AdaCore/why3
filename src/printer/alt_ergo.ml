@@ -20,10 +20,11 @@ open Decl
 open Printer
 
 let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]
-  ~desc:"Specify that a symbol is associative and commutative."
+  ~desc:"Specify@ that@ a@ symbol@ is@ associative@ and@ commutative."
+
 let meta_printer_option =
   Theory.register_meta "printer_option" [Theory.MTstring]
-    ~desc:"Some paramters given to the printer."
+    ~desc:"Pass@ additional@ parameters@ to@ the@ pretty-printer."
 
 type info = {
   info_syn : syntax_map;
@@ -366,7 +367,7 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
     (List.rev (Trans.apply print_decls task))
 
 let () = register_printer "alt-ergo" print_task
-  ~desc:"Printer for the alt-ergo theorem provers"
+  ~desc:"Printer for the Alt-Ergo theorem prover."
 (*
 let print_goal info fmt (id, f, task) =
   print_task info fmt task;

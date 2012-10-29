@@ -78,6 +78,6 @@ let close_epsilon =
     if used then Trans.decl close None else Trans.identity)
 
 let () = Trans.register_transform "close_epsilon" close_epsilon
-  ~desc:"TODO"
+  ~desc:"Beta-abstract free variables out of lambda-terms."
 
 (* TODO variable abstraction *)

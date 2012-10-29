@@ -22,8 +22,8 @@ open Printer
 open Mlw_ty
 
 let debug =
-  Debug.register_info_flag
-    ~desc:"Print details on program extraction." "extraction"
+  Debug.register_info_flag "extraction"
+    ~desc:"Print@ details@ of@ program@ extraction."
 
 let clean_fname fname =
   let fname = Filename.basename fname in

@@ -22,6 +22,7 @@ open Task
 let meta_infinite = register_meta "infinite_type" [MTtysymbol]
   ~desc:"Specify@ that@ the@ given@ type@ has@ always@ an@ infinite@ \
          cardinality."
+
 let meta_material = register_meta "material_type_arg" [MTtysymbol;MTint]
   ~desc:"If@ the@ given@ type@ argument@ is@ instantiated@ by@ an@ infinite@ \
          type@ then@ the@ associated@ type@ constructor@ is@ infinite"
@@ -267,9 +268,9 @@ let add_indexer acc ts ty = function
 let meta_proj =
   (* projection symbol, constructor symbol, position, defining axiom *)
   register_meta "algtype projection" [MTlsymbol;MTlsymbol;MTint;MTprsymbol]
-    ~desc:"Specifies@ which@ projection@ symbol@ is@ used@ for@ the@ \
+    ~desc:"Specify@ which@ projection@ symbol@ is@ used@ for@ the@ \
            given@ constructor@ at@ the@ specified@ position.@ \
-           Internally@ used."
+           For@ internal@ use."
 
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
@@ -434,7 +435,7 @@ let eliminate_match =
   Trans.compose compile_match (Trans.fold_map comp empty_state init_task)
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
-  ~desc:"@[<hov 2>configure the 'eliminate_algebraic' transformation:@\n\
+  ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
     \"keep_types\" : @[keep algebraic type definitions@]@\n\
     \"keep_enums\" : @[keep monomorphic enumeration types@]@\n\
     \"keep_recs\"  : @[keep non-recursive records@]@\n\
@@ -492,11 +493,11 @@ let eliminate_projections = Trans.decl elim None
 
 let () =
   Trans.register_transform "compile_match" compile_match
-    ~desc:"Transform@ pattern-matching@ with@ nested@ pattern@ \
+    ~desc:"Transform@ pattern-matching@ with@ nested@ patterns@ \
       into@ nested@ pattern-matching@ with@ flat@ patterns.";
   Trans.register_transform "eliminate_match" eliminate_match
-    ~desc:"TODO";
+    ~desc:"Eliminate@ all@ pattern-matching@ expressions.";
   Trans.register_transform "eliminate_algebraic" eliminate_algebraic
     ~desc:"Replace@ algebraic@ data@ types@ by@ first-order@ definitions.";
   Trans.register_transform "eliminate_projections" eliminate_projections
-    ~desc:"TODO"
+    ~desc:"Define@ algebraic@ projection@ symbols@ separately."

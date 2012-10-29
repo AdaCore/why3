@@ -223,4 +223,4 @@ let () = register_printer "smtv1"
   (fun _env pr thpr blacklist ?old:_ fmt task ->
      forget_all ident_printer;
      print_task pr thpr blacklist fmt task)
-  ~desc:"Printer@ for@ the@ smtlib@ version@ 1@ format."
+  ~desc:"Printer@ for@ the@ SMTlib@ version@ 1@ format."

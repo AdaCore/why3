@@ -963,7 +963,8 @@ let wp_val _env _km th _lv = th
 *)
 
 let fast_wp = Debug.register_flag "fast_wp"
-  ~desc:"Efficient Weakest Preconditions."
+  ~desc:"Efficient@ Weakest@ Preconditions.@ \
+    Work@ in@ progress,@ not@ ready@ for@ use."
 
 module Subst = struct
 

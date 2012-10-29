@@ -57,7 +57,13 @@ let lift kind =
 let lift_epsilon kind = Trans.fold (lift kind) None
 
 let meta_epsilon = Theory.register_meta_excl "lift_epsilon" [MTstring]
-  ~desc:"TODO"
+  ~desc:"Specify@ whether@ the@ existence@ of@ a@ witness@ for@ the@ \
+    formula@ under@ epsilon@ is@ assumed:@;  \
+    @[\
+      - @[<hov 2>implicit:@ implicitly@ assume@ existence@]@\n\
+      - @[<hov 2>implied:@ @ do@ not@ assume@ the@ existence@ \
+          of@ a@ witness.@]\
+    @]"
 
 let lift_epsilon = Trans.on_meta_excl meta_epsilon
   (fun alo ->
@@ -69,4 +75,4 @@ let lift_epsilon = Trans.on_meta_excl meta_epsilon
     lift_epsilon kind)
 
 let () = Trans.register_transform "lift_epsilon" lift_epsilon
-  ~desc:"TODO"
+  ~desc:"Move@ epsilon-terms@ into@ separate@ function@ definitions."

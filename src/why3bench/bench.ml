@@ -75,9 +75,10 @@ type callback = tool_id -> prob_id ->
     task -> int ->  proof_attempt_status -> unit
 
 let debug_call = Debug.register_info_flag "call"
-  ~desc:"Show when call to provers are done"
+  ~desc:"Print@ debugging@ messages@ about@ prover@ calls."
+
 let debug = Debug.register_info_flag "bench_core"
-  ~desc:"About the scheduling"
+  ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls."
 
 
 module BenchUtil =

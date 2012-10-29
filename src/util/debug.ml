@@ -59,7 +59,7 @@ let stack_trace = register_info_flag "stack_trace"
   ~desc:"Avoid@ catching@ exceptions@ in@ order@ to@ get@ the@ stack@ trace."
 
 let timestamp = register_info_flag "timestamp"
-  ~desc:"Print@ a@ timestamp@ before@ debug@ messages."
+  ~desc:"Print@ a@ timestamp@ before@ debugging@ messages."
 
 let time_start = Unix.gettimeofday ()
 

@@ -29,9 +29,8 @@ let eliminate_let      = Trans.rewrite (elim_t true true  Mvs.empty) None
 
 let () =
   Trans.register_transform "eliminate_let_term" eliminate_let_term
-    ~desc:"Eliminates@ let@ by@ substitution,@ at@ the@ term@ level.";
+    ~desc:"Eliminate@ let-expressions@ in@ terms.";
   Trans.register_transform "eliminate_let_fmla" eliminate_let_fmla
-    ~desc:"Eliminates@ let@ by@ substitution,@ at@ the@ predicate@ level.";
+    ~desc:"Eliminate@ let-expressions@ in@ formulas.";
   Trans.register_transform "eliminate_let" eliminate_let
-    ~desc:"Apply@ both@ eliminate_let_term/fmla"
-
+    ~desc:"Eliminate@ all@ let-expressions.";

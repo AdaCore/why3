@@ -11,8 +11,8 @@
 
 open Ident
 
-let flag = Debug.register_flag "track_use"
-  ~desc:"Track@ use/clone@ instructions.@ Used@ by@ why3doc."
+let flag = Debug.register_flag "track_symbol_use"
+  ~desc:"Track@ symbol@ occurrences@ in@ source@ files.@ Used@ by@ why3doc."
 
 let () = Debug.unset_flag flag (* make sure it is unset by default *)
 

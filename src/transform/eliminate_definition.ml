@@ -48,9 +48,9 @@ let eliminate_builtin =
     Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ts) None))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
-  ~desc:"Eliminate@ symbols@ and@ propositions@ that@ are@ builtin@ \
-    in@ the@ prover@ (see@ 'syntax'@ and@ 'remove'@ clauses@ in@ \
-    the@ prover's@ driver)."
+  ~desc:"Eliminate@ propositions@ and@ definitions@ of@ symbols@ \
+    that@ are@ builtin@ in@ the@ prover@ (see@ 'syntax'@ and@ \
+    'remove'@ clauses@ in@ the@ prover's@ driver)."
 
 (** compute the meta_remove_* given two task one included in the other *)
 let compute_diff t1 t2 =
@@ -147,26 +147,25 @@ let eliminate_mutual_recursion = Trans.decl elim_mutual None
 let () =
   Trans.register_transform "eliminate_definition_func"
     eliminate_definition_func
-    ~desc:"Transform@ function@ definition@ into@ axioms.";
+    ~desc:"Transform@ function@ definitions@ into@ axioms.";
   Trans.register_transform "eliminate_definition_pred"
     eliminate_definition_pred
-    ~desc:"Transform@ predicate@ definition@ into@ axioms.";
+    ~desc:"Transform@ predicate@ definitions@ into@ axioms.";
   Trans.register_transform "eliminate_definition"
     eliminate_definition
-    ~desc:"Same@ as@ eliminate_definition_func/_pred@ at@ the@ same@ time.";
+    ~desc:"Transform@ function@ and@ predicate@ definitions@ into@ axioms.";
   Trans.register_transform "eliminate_recursion"
     eliminate_recursion
     ~desc:"Same@ as@ eliminate_definition,@ but@ only@ for@ recursive@ \
-           definition";
+           definitions.";
   Trans.register_transform "eliminate_non_struct_recursion"
     eliminate_non_struct_recursion
-    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ non@ structural@ \
-           recursive@ definition";
+    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ non-structural@ \
+           recursive@ definitions.";
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
-    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutual@ \
-           recursive@ definition (at@ least@ two@ functions@ or@ \
-           predicates@ defined@ at@ the@ same@ time)";
+    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutually@ \
+           recursive@ definitions."
 
 (** Bisect *)
 open Task
