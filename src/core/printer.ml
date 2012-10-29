@@ -49,7 +49,8 @@ let lookup_printer s =
 let list_printers () =
   Hstr.fold (fun k (desc,_) acc -> (k,desc)::acc) printers []
 
-let () = register_printer ~desc:"Print nothing" "(null)"
+let () = register_printer
+  ~desc:"Dummy@ printer@ with@ no@ output@ (used@ for@ debugging)." "(null)"
   (fun _ _ _ _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
@@ -191,27 +192,31 @@ let print_prelude_for_theory th fmt pm =
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
 
-let meta_syntax_type  = register_meta "syntax_type" [MTtysymbol; MTstring]
-  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ the@ type@ symbols.@ \
+let meta_syntax_type = register_meta "syntax_type" [MTtysymbol; MTstring]
+  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ type@ symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax type'@ rule."
 
 let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring]
-  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ the@ logic@ symbols.@ \
+  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ function/predicate@ \
+         symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax function'@ \
-         rule."
+         or@ 'syntax predicate'@ rules."
 
-let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
-  ~desc:"Specify@ the@ logical@ propositions@ to@ remove.@ \
-         Can@ be@ specified@ in@ the@ driver@ with@ the@ remove@ prop@ rule."
+let meta_remove_prop = register_meta "remove_prop" [MTprsymbol]
+  ~desc:"Remove@ a@ logical@ proposition@ from@ proof@ obligations.@ \
+         Can@ be@ specified@ in@ the@ driver@ with@ the@ 'remove prop'@ rule."
 
-let meta_remove_type_symbol  = register_meta "remove_type_symbol" [MTtysymbol]
-  ~desc:"Specify@ the@ type@ symbol@ to@ remove."
+let meta_remove_type = register_meta "remove_type" [MTtysymbol]
+  ~desc:"Remove@ a@ type@ symbol@ from@ proof@ obligations.@ \
+         Used@ in@ bisection."
 
-let meta_remove_logic  = register_meta "remove_logic" [MTlsymbol]
-  ~desc:"Specify@ the@ logic@ symbol@ propositions@ to@ remove."
+let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
+  ~desc:"Remove@ a@ function/predicate@ symbol@ from@ proof@ obligations.@ \
+         Used@ in@ bisection."
 
-let meta_realized     = register_meta "realized" [MTstring; MTstring]
-  ~desc:"TODO??"
+let meta_realized_theory = register_meta "realized_theory" [MTstring; MTstring]
+  ~desc:"Specify@ that@ a@ Why3@ theory@ is@ \"realized\"@ as@ a@ module@ \
+         in@ an@ ITP."
 
 let check_syntax_type ts s = check_syntax s (List.length ts.ts_args)
 

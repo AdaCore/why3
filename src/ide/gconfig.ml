@@ -15,7 +15,8 @@ open Rc
 open Whyconf
 
 let debug = Debug.register_info_flag "ide_info"
-  ~desc:"About why3ide."
+  ~desc:"Print@ why3ide@ debugging@ messages."
+
 let () = Debug.set_flag debug
 
 (** set the exception call back handler to the Exn_printer of why3 *)

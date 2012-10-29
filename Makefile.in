@@ -875,19 +875,19 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 drivers/coq-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
-	echo 'theory BuiltIn meta "realized" "BuiltIn", "" end'; \
+	echo 'theory BuiltIn meta "realized_theory" "BuiltIn", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
-	echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
+	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_REAL_FILES); do \
-	echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done; \
+	echo 'theory real.'"$$f"' meta "realized_theory" "real.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_NUMBER_FILES); do \
-	echo 'theory number.'"$$f"' meta "realized" "number.'"$$f"'", "" end'; done; \
+	echo 'theory number.'"$$f"' meta "realized_theory" "number.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_SET_FILES); do \
-	echo 'theory set.'"$$f"' meta "realized" "set.'"$$f"'", "" end'; done; \
+	echo 'theory set.'"$$f"' meta "realized_theory" "set.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_SETTHEORY_FILES); do \
-	echo 'theory settheory.'"$$f"' meta "realized" "settheory.'"$$f"'", "" end'; done; \
+	echo 'theory settheory.'"$$f"' meta "realized_theory" "settheory.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
-	echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done; \
+	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
 opt byte: $(COQVO)
@@ -990,15 +990,15 @@ drivers/pvs-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	(echo "(* generated automatically at compilation time *)"; \
 	for f in $(PVSLIBS_INT_FILES); do \
-	echo 'theory int.'"$$f"' meta "realized" "int.'"$$f"'", "" end'; done; \
+	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
 	for f in $(PVSLIBS_REAL_FILES); do \
-	echo 'theory real.'"$$f"' meta "realized" "real.'"$$f"'", "" end'; done; \
+	echo 'theory real.'"$$f"' meta "realized_theory" "real.'"$$f"'", "" end'; done; \
 	for f in $(PVSLIBS_LIST_FILES); do \
-	echo 'theory list.'"$$f"' meta "realized" "list.'"$$f"'", "" end'; done; \
+	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
 	for f in $(PVSLIBS_NUMBER_FILES); do \
-	echo 'theory number.'"$$f"' meta "realized" "number.'"$$f"'", "" end'; done; \
+	echo 'theory number.'"$$f"' meta "realized_theory" "number.'"$$f"'", "" end'; done; \
 	for f in $(PVSLIBS_FP_FILES); do \
-	echo 'theory floating_point.'"$$f"' meta "realized" "floating_point.'"$$f"'", "" end'; done; \
+	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
 
 install_no_local::

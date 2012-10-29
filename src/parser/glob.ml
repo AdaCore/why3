@@ -11,8 +11,8 @@
 
 open Ident
 
-let flag = Debug.register_info_flag "glob"
-  ~desc:"TODO, used in parsing?"
+let flag = Debug.register_flag "track_use"
+  ~desc:"Track@ use/clone@ instructions.@ Used@ by@ why3doc."
 
 let () = Debug.unset_flag flag (* make sure it is unset by default *)
 

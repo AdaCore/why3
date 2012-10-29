@@ -113,11 +113,7 @@ let rec grep out l = match l with
 
 
 let debug = Debug.register_info_flag "call_prover"
-  ~desc:"About@ external@ prover@ calls@ and@ results."
-
-(*
-type res_waitpid = int * Unix.process_status
-*)
+  ~desc:"Be@ verbose@ about@ prover@ calls@ and@ keep@ temporary@ files."
 
 type post_prover_call = unit -> prover_result
 

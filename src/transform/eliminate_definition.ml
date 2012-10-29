@@ -42,9 +42,9 @@ let elim_abstract undef_ls rem_pr rem_ls rem_ts d = match d.d_node with
 
 let eliminate_builtin =
   Trans.on_tagged_ls Printer.meta_syntax_logic (fun undef_ls ->
-  Trans.on_tagged_pr Printer.meta_remove_prop  (fun rem_pr ->
-  Trans.on_tagged_ls Printer.meta_remove_logic  (fun rem_ls ->
-  Trans.on_tagged_ts Printer.meta_remove_type_symbol  (fun rem_ts ->
+  Trans.on_tagged_pr Printer.meta_remove_prop (fun rem_pr ->
+  Trans.on_tagged_ls Printer.meta_remove_logic (fun rem_ls ->
+  Trans.on_tagged_ts Printer.meta_remove_type (fun rem_ts ->
     Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ts) None))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
@@ -57,7 +57,7 @@ let compute_diff t1 t2 =
   let km = Mid.set_diff (Task.task_known t1) (Task.task_known t2) in
   let hdone = Hdecl.create 10 in
   let remove_ts acc ts =
-    (Printer.meta_remove_type_symbol, [Theory.MAts ts])::acc in
+    (Printer.meta_remove_type, [Theory.MAts ts])::acc in
   let remove_ls acc ls =
     (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
   let remove_pr acc pr =
@@ -219,7 +219,7 @@ let _union_rem rem1 rem2 =
 
 let create_meta_rem_list rem =
   let remove_ts acc ts =
-    (Printer.meta_remove_type_symbol, [Theory.MAts ts])::acc in
+    (Printer.meta_remove_type, [Theory.MAts ts])::acc in
   let remove_ls acc ls =
     (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
   let remove_pr acc pr =

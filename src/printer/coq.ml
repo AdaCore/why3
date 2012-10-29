@@ -836,7 +836,7 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
   print_th_prelude task fmt thpr;
   (* find theories that are both used and realized from metas *)
   let realized_theories =
-    Task.on_meta meta_realized (fun mid args ->
+    Task.on_meta meta_realized_theory (fun mid args ->
       match args with
       | [Theory.MAstr s1; Theory.MAstr s2] ->
         (* TODO: do not split string; in fact, do not even use a string argument *)

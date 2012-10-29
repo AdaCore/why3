@@ -43,8 +43,8 @@ val meta_syntax_type : meta
 val meta_syntax_logic : meta
 val meta_remove_prop : meta
 val meta_remove_logic : meta
-val meta_remove_type_symbol : meta
-val meta_realized : meta
+val meta_remove_type : meta
+val meta_realized_theory : meta
 
 val syntax_type : tysymbol -> string -> tdecl
 val syntax_logic : lsymbol -> string -> tdecl

@@ -158,9 +158,6 @@ let forget_all printer =
 
 (** Sanitizers *)
 
-let unsanitizable = Debug.register_info_flag "unsanitizable"
-  ~desc:"About@ the@ sanitazing@ during@ the@ pretty-printing."
-
 let char_to_alpha c = match c with
   | 'a'..'z' | 'A'..'Z' -> String.make 1 c
   | ' ' -> "sp" | '_'  -> "us" | '#' -> "sh"
@@ -177,10 +174,7 @@ let char_to_alpha c = match c with
   | '0' -> "zr" | '1'  -> "un" | '2' -> "du"
   | '3' -> "tr" | '4'  -> "qr" | '5' -> "qn"
   | '6' -> "sx" | '7'  -> "st" | '8' -> "oc"
-  | '9' -> "nn" | '\n' -> "br"
-  | _ ->
-    Debug.dprintf unsanitizable "Unsanitizable : '%c' can't be sanitized@." c;
-    "zz"
+  | '9' -> "nn" | '\n' -> "br" |  _  -> "zz"
 
 let char_to_lalpha c = String.uncapitalize (char_to_alpha c)
 let char_to_ualpha c = String.capitalize (char_to_alpha c)
