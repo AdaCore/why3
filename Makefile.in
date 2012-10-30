@@ -61,15 +61,11 @@ HACHA = @HACHA@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-OFLAGS = -w Aer-29 -dtypes    -I lib/why3 $(INCLUDES)
+OFLAGS = -w Aer-29 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-29 -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
-
-ifeq (@enable_debug@,yes)
-OFLAGS += -g
-endif
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
@@ -1282,7 +1278,7 @@ STDLIBS = algebra \
 	option \
 	real \
 	relations \
-	set 
+	set
 # function ? sum ? tptp ?
 
 STDMODS = arith array hashtbl impset pqueue queue random ref stack string
