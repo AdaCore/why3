@@ -1,7 +1,14 @@
+(* Driver for Alt-Ergo 0.93.
+   Differences wrt 0.92 are
+   - enumeration types
+   - maps
+*)
+
 import "alt_ergo_bare.drv"
 
 theory BuiltIn
   meta "eliminate_algebraic" "keep_enums"
+  meta "printer_option"      "no_type_cast"
 end
 
 theory map.Map

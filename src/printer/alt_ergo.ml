@@ -30,6 +30,7 @@ type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
   info_show_labels : bool;
+  info_type_casts : bool;
   info_csm : lsymbol list Mls.t;
   info_pjs : Sls.t;
   info_axs : Spr.t;
@@ -85,6 +86,19 @@ and print_tyapp info fmt = function
   | [ty] -> fprintf fmt "%a " (print_type info) ty
   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl
 
+(* can the type of a value be derived from the type of the arguments? *)
+let unambig_fs fs =
+  let rec lookup v ty = match ty.ty_node with
+    | Tyvar u when tv_equal u v -> true
+    | _ -> ty_any (lookup v) ty
+  in
+  let lookup v = List.exists (lookup v) fs.ls_args in
+  let rec inspect ty = match ty.ty_node with
+    | Tyvar u when not (lookup u) -> false
+    | _ -> ty_all inspect ty
+  in
+  inspect (Opt.get fs.ls_value)
+
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
@@ -111,8 +125,11 @@ let rec print_term info fmt t = match t.t_node with
             (List.combine (Mls.find ls info.info_csm) tl)
       | None when Sls.mem ls info.info_pjs ->
           fprintf fmt "%a.%a" (print_tapp info) tl print_ident ls.ls_name
-      | None ->
+      | None when unambig_fs ls || not info.info_type_casts ->
           fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp info) tl
+      | None ->
+          fprintf fmt "(%a%a : %a)" print_ident ls.ls_name (print_tapp info) tl
+             (print_type info) (t_type t)
     end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo : you must eliminate let in term"
@@ -306,14 +323,15 @@ let add_projection (csm,pjs,axs) = function
       csm, Sls.add ls pjs, Spr.add pr axs
   | _ -> assert false
 
-let check_showlabels acc l =
-  match l with
-    | [Theory.MAstr s] ->
-      begin match s with
-        | "show_labels" -> true
-        | _ -> acc
-      end
-    | _ -> assert false
+let check_showlabels acc = function
+  | [Theory.MAstr "show_labels"] -> true
+  | [Theory.MAstr _] -> acc
+  | _ -> assert false
+
+let check_typecasts acc = function
+  | [Theory.MAstr "no_type_cast"] -> false
+  | [Theory.MAstr _] -> acc
+  | _ -> assert false
 
 (*
 let print_task_old pr thpr fmt task =
@@ -340,11 +358,12 @@ let () = register_printer "alt-ergo-old"
 *)
 
 let print_decls =
-  let print ac sl csm pjs axs sm fmt d =
+  let print ac sl tc csm pjs axs sm fmt d =
     let info = {
       info_syn = sm;
       info_ac  = ac;
       info_show_labels = sl;
+      info_type_casts = tc;
       info_csm = Mls.map Array.to_list csm;
       info_pjs = pjs;
       info_axs = axs;
@@ -353,10 +372,11 @@ let print_decls =
   Trans.on_tagged_ls meta_ac (fun ac ->
   Trans.on_meta meta_printer_option (fun args ->
     let sl = List.fold_left check_showlabels false args in
+    let tc = List.fold_left check_typecasts  true  args in
   Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
     let csm,pjs,axs = List.fold_left
       add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
-    Printer.sprint_decls (print ac sl csm pjs axs))))
+    Printer.sprint_decls (print ac sl tc csm pjs axs))))
 
 let print_task _env pr thpr _blacklist ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)

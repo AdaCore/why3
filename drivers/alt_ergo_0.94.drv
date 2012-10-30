@@ -1,0 +1,29 @@
+(* Driver for Alt-Ergo 0.94.
+   Differences wrt 0.93 are
+   - record types
+   - Euclidean division
+*)
+
+import "alt_ergo_0.93.drv"
+
+theory BuiltIn
+  meta "eliminate_algebraic" "keep_recs"
+end
+
+theory int.EuclideanDivision
+
+  (* workaround for the "-1 % 32 = -1" bug *)
+  prelude "logic safe_modulo: int, int -> int"
+  prelude "axiom safe_modulo_def: forall x, y:int. x >= 0 and y > 0 -> safe_modulo(x,y) = x % y"
+  syntax function div "(%1 / %2)"
+  syntax function mod "safe_modulo(%1,%2)"
+
+end
+
+
+(*
+Local Variables:
+mode: why
+compile-command: "make -C .. bench"
+End:
+*)

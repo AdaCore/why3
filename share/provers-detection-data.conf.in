@@ -1,12 +1,27 @@
 [ATP alt-ergo-model]
 name = "Alt-Ergo"
+alternative = "models"
 exec = "alt-ergo"
 exec = "alt-ergo-0.95-dev"
 version_switch = "-version"
 version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
+version_ok = "0.95"
 version_ok = "0.95-dev"
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t -model %f"
 driver = "drivers/alt_ergo_model.drv"
+editor = "altgr-ergo"
+
+[ATP alt-ergo]
+name = "Alt-Ergo"
+exec = "alt-ergo"
+exec = "alt-ergo-0.95"
+exec = "alt-ergo-0.95-dev"
+version_switch = "-version"
+version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
+version_ok = "0.95"
+version_ok = "0.95-dev"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t %f"
+driver = "drivers/alt_ergo.drv"
 editor = "altgr-ergo"
 
 [ATP alt-ergo]
@@ -17,7 +32,7 @@ version_switch = "-version"
 version_regexp = "\\([0-9.]+\\)"
 version_ok = "0.94"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
-driver = "drivers/alt_ergo.drv"
+driver = "drivers/alt_ergo_0.94.drv"
 editor = "altgr-ergo"
 
 [ATP alt-ergo]
@@ -51,7 +66,7 @@ version_old = "0.91"
 version_old = "0.9"
 version_old = "0.8"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
-driver = "drivers/alt_ergo_bare.drv"
+driver = "drivers/alt_ergo_0.92.drv"
 
 [ATP cvc3]
 name = "CVC3"

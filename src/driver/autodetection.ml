@@ -76,7 +76,7 @@ let prover_keys =
   List.fold_left add Sstr.empty
     ["name";"exec";"version_switch";"version_regexp";
      "version_ok";"version_old";"version_bad";"command";
-     "editor";"driver";"in_place";"message"]
+     "editor";"driver";"in_place";"message";"alternative";]
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
@@ -84,7 +84,7 @@ let load_prover kind (id,section) =
   let prover = { kind = kind;
     prover_id = id;
     prover_name = get_string section "name";
-    prover_altern = get_string section ~default:"" "altern";
+    prover_altern = get_string section ~default:"" "alternative";
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
     version_regexp = get_string section ~default:"" "version_regexp";
