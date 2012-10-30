@@ -86,7 +86,7 @@ let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
 
 let vtv_of_vs (vs : vsymbol) =
-   (* return the type value of the program variable that corresponds to [vs] *)
+  (* return the type of the program variable that corresponds to [vs] *)
   (* any vs in post/xpost is either a pvsymbol or a fresh mark *)
   try (restore_pv vs).pv_vtv with Not_found -> vtv_mark
 
@@ -275,23 +275,33 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 (** Reconstruct pure values after writes *)
 
 let analyze_var fn_down fn_join lkm km vs ity =
+   (* create a term of the form:
+        match vs with
+        (| Cons (x1 ... xn) -> fn_join x1' ... xn')*
+      where the x1' are obtained by a call to fn_down (supposedly a recursive
+      call) on x1 and its type *)
   let branch (cs,vtvl) =
     let mk_var vtv = create_vsymbol (id_fresh "y") (ty_of_ity vtv.vtv_ity) in
     let vars = List.map mk_var vtvl in
-    let t = fn_join cs (List.map2 fn_down vars vtvl) vs.vs_ty in
+     let args = List.map2 fn_down vars vtvl in
+    let t = fn_join cs args  vs.vs_ty in
     let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
     t_close_branch pat t in
-  t_case (t_var vs) (List.map branch (Mlw_decl.inst_constructors lkm km ity))
+  let constructors = Mlw_decl.inst_constructors lkm km ity in
+  t_case (t_var vs) (List.map branch constructors)
 
 let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
-   (* return a fresh term for [vs] if the program variable of [vs] appears in
-      [mreg], otherwise return the term [vs] *)
+   (* [mreg] is expected to contain fresh names for all to-be-updated regions.
+      this function does nothing (ie returns the term [vs]) when [vs]
+      corresponds to a program variable whose type does not contain any region
+      in [mreg]. In the other case, this function builds a new term, replacing
+      all touched regions by fresh variables. *)
   let rec update vs { vtv_ity = ity; vtv_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
     let vs = Util.option_apply vs get_vs mut in
-    (* at this point, vs is either itself (when it's not in the map, or we
-     * don't have a mutable type), or the vsymbol in the map mreg *)
+    (* at this point, vs is either itself (vtv_mut is None, or the contained
+     * region is not in the map), or the vsymbol in the map mreg *)
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
@@ -300,8 +310,8 @@ let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
   update vs (vtv_of_vs vs)
 
 let rec subst_at_now now (m : vsymbol Mvs.t) (t : term) =
-   (* apply the substitution to the term, but do not substitute variables that
-      are protected by labels. *)
+   (* if [now] is true, apply the substitution, except when they are protected
+      by labels other than [fs_now] *)
    match t.t_node with
   | Tvar vs when now ->
       begin try t_var (Mvs.find vs m) with Not_found -> t end
@@ -326,8 +336,49 @@ let model3_lab = Slab.singleton (create_label "model:cond")
 
 let mk_var id label ty : vsymbol = create_vsymbol (id_clone ~label id) ty
 
+let print_region_map mreg =
+   Format.printf "{ ";
+   Mreg.iter (fun k v ->
+      Format.printf "%a |-> %a (%a)@ ;"
+         Mlw_pretty.print_reg k
+         Pretty.print_vs v
+         Pretty.print_ty v.vs_ty) mreg;
+   Format.printf " }@."
+
+let mutable_substitute env (mreg : vsymbol Mreg.t) (f : term) =
+   (* replace every mutable variable by an appropriate "updating" term. The map
+      [mreg] must already contain fresh variables for all regions. *)
+  let update_var vs _ = match update_var env mreg vs with
+    | { t_node = Tvar nv } when vs_equal vs nv -> None
+    | t -> Some t in
+(*   print_region_map mreg; *)
+  let vars = Mvs.mapi_filter update_var f.t_vars in
+  (* [vars] now is a mapping from the relevant symbols of [f] to their
+     "update" (see [update_var]) *)
+  let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
+  let vv' = Mvs.mapi new_var vars in
+  (* [vv'] is now a mapping from the relevant symbols in f to fresh symbols *)
+  let update v t f = wp_let (Mvs.find v vv') t f in
+  Mvs.fold update vars (subst_at_now true vv' f)
+
+let get_var_of_region reg f =
+   (* If term [f] has a variable [v] that belongs to region [reg],
+      return [Some v], else return [None]
+   *)
+    let test vs _ acc =
+      if acc <> None then acc
+      else
+      (* this does the actual comparison *)
+         match vtv_of_vs vs with
+         | { vtv_ity = { ity_node = Ityapp (_,_,[r]) }}
+         | { vtv_mut = Some r } when reg_equal r reg -> Some vs
+         | _ -> acc
+    in
+    Mvs.fold test f.t_vars None
+
 let quantify env (regs : Sreg.t) (f : term) =
    (* quantify formula [f] over all variables in the regions [regs] *)
+   (* ??? refactor this first bit to use [get_var_of_region] *)
   let get_var reg () =
      (* for each free variable in [f], compare its region with [reg];
         if it matches, return the variable as the one that corresponds to the
@@ -341,19 +392,9 @@ let quantify env (regs : Sreg.t) (f : term) =
     let id = Mvs.fold test f.t_vars reg.reg_name in
     mk_var id model1_lab (ty_of_ity reg.reg_ity)
   in
-  (* mreg : updated region -> vs *)
   let mreg = Mreg.mapi get_var regs in
-  (* update all program variables involving these regions *)
-  let update_var vs _ = match update_var env mreg vs with
-    | { t_node = Tvar nv } when vs_equal vs nv -> None
-    | t -> Some t in
-  let vars = Mvs.mapi_filter update_var f.t_vars in
-  (* vv' : old vs -> new vs *)
-  let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
-  let vv' = Mvs.mapi new_var vars in
-  (* quantify *)
-  let update v t f = wp_let (Mvs.find v vv') t f in
-  let f = Mvs.fold update vars (subst_at_now true vv' f) in
+  (* [mreg] now maps each region to a fresh variable *)
+  let f = mutable_substitute env mreg f in
   wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Invariants *)
@@ -992,26 +1033,22 @@ module Subst : sig
    (* refresh the state, ie, generate new names for all variables in the region
       set *)
 
-   val term : t -> term -> term
+   val term : wp_env -> t -> term -> term
    (* in the term, substitute the variables that refer to the current state by
       the symbols that stand for the value of these variables at this point of
       time
    *)
 
+   val show_state : t -> unit
+
 end = struct
 
-  type t = int Mreg.t
+  type t = vsymbol option ref Mreg.t
 
   let empty = Mreg.empty
 
   let refresh regset s =
-     Sreg.fold (fun reg acc ->
-        Format.printf "refreshing one@.";
-       let cnt =
-         try Mreg.find reg acc + 1
-         with Not_found -> 0
-       in
-       Mreg.add reg cnt acc) regset s
+     Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
 
   let get_region v =
     match vtv_of_vs v with
@@ -1019,31 +1056,35 @@ end = struct
       | { vtv_mut = Some r} -> Some r
       | _ -> None
 
-  let h = Hashtbl.create 17
+  let fastwp_lab = Slab.singleton (create_label "fastwp_term")
 
-  let hashed_var v r_count =
-    try Hashtbl.find h (v, r_count)
-    with Not_found ->
-      let result = mk_var v.vs_name Slab.empty v.vs_ty in
-      Format.printf "creating new variable: %a@." Pretty.print_vs result;
-      Hashtbl.add h (v, r_count) result;
-      result
+  let term env sub t =
+     let mreg = Mreg.mapi_filter (fun reg vr ->
+        match !vr with
+        | Some _ -> !vr
+        | None ->
+              match get_var_of_region reg t with
+              | Some v ->
+                    let v' =
+                       mk_var v.vs_name fastwp_lab (ty_of_ity reg.reg_ity) in
+                    vr := Some v';
+                    !vr
+              | None -> None) sub in
+     let r = mutable_substitute env mreg t in
+     r
 
-  let get_term sub v =
-    match get_region v with
-      | Some r ->
-          let r_count =
-            try Mreg.find r sub
-            with Not_found -> 0
-          in
-          hashed_var v r_count
-      | None -> v
+  let show_state s =
+     Format.printf "{@.";
+     Mreg.iter (fun k rv ->
+        match !rv with
+        | Some v ->
+              Format.printf "  Region %a mapped to %a@."
+              Mlw_pretty.print_reg k Pretty.print_vs v;
 
-  let term sub t =
-    let vars = t.t_vars in
-    let map = Mvs.mapi (fun k _ -> get_term sub k) vars in
-    let t = subst_at_now true map t in
-    t
+        | None ->
+              Format.printf "  region %a has been touched"
+              Mlw_pretty.print_reg k) s;
+     Format.printf "}@."
 
 end
 
@@ -1112,7 +1153,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       (* OK: true
 	 NE: result=t *)
       let t = wp_label e t in
-      let t = Subst.term s (to_term t) in
+      let t = Subst.term env s (to_term t) in
       let t = t_label_add label_logic t in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { fwp_ok = t_true;
@@ -1135,7 +1176,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let va = (t_var v.pv_vs) in
         Format.printf "va: %a@." Pretty.print_term va;
         let ne =
-           t_label_add label_value (Subst.term s (t_equ (t_var result) va)) in
+           t_label_add label_value (Subst.term env s (t_equ (t_var result) va)) in
       { fwp_ok = t_true;
         fwp_ne = ne;
         fwp_state = s;
@@ -1156,23 +1197,23 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let post = t_subst_single call_res (t_var result) post in
         let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
         let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
-        let pre = Subst.term s spec.c_pre in
+        let pre = Subst.term env s spec.c_pre in
         let expr_str = Pp.sprintf "%a" Mlw_pretty.print_expr e1 in
         let ok_label =
             Ident.create_label (Pp.sprintf "ok for call %s" expr_str) in
         let ok = t_label_add ok_label
           (t_and_simp wp1.fwp_ok (wp_implies wp1.fwp_ne pre)) in
         let state_after_call = Subst.refresh (regs_of_writes spec.c_effect) s in
-        let post = Subst.term state_after_call post in
+        let post = Subst.term env state_after_call post in
         let ne_label =
            Ident.create_label (Format.sprintf "ne for call %s" expr_str) in
         let ne =
            t_label_add
              ne_label
-             (t_and_simp (Subst.term s wp1.fwp_ne) post) in
+             (t_and_simp (Subst.term env s wp1.fwp_ne) post) in
          { fwp_ok = ok;
            fwp_ne = ne;
-           fwp_state = wp1.fwp_state;
+           fwp_state = state_after_call;
            fwp_exn = Mexn.empty }
 
          (*TODO exceptional case *)
@@ -1197,7 +1238,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         fwp_exn = Mexn.empty }
 *)
   | Earrow _ ->
-        Format.printf "Earrow@.";
         let ok = t_true in
         (* ??? do we need to set NE *)
          { fwp_ok = ok;
@@ -1255,12 +1295,11 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let xq = Mexn.map open_post xq in
   let xresult = Mexn.map fst xq in
   let res = fast_wp_expr env subst (result, xresult) l.l_expr in
-  let q_f = Subst.term res.fwp_state q_f in
+  let q_f = Subst.term env res.fwp_state q_f in
   let f =
      t_and_simp res.fwp_ok
      (wp_nimplies res.fwp_ne res.fwp_exn ((result, q_f), xq)) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
-  Format.printf "computed formula: %a@." Pretty.print_term f;
   wp_forall args (quantify env regs f)
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl

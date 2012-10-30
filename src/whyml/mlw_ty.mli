@@ -269,7 +269,7 @@ type spec = {
 type vty_value = private {         (* the type of a program variable *)
   vtv_ity   : ity;                 (* the underlying program type *)
   vtv_ghost : bool;                (* am I a ghost variable? *)
-  vtv_mut   : region option;       (* the region of the variable *)
+  vtv_mut   : region option;       (* if this field is not None *)
 }
 
 val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
@@ -280,7 +280,8 @@ type pvsymbol = private { (* a program variable *)
   pv_vs   : vsymbol;      (* the variable symbol *)
   pv_vtv  : vty_value;    (* the program type *)
   pv_vars : varset;
-       (* ??? the free(?) type and region variables of the variable type *)
+       (* the type and region variables of the variable type. This is equal to
+          pv_vtv.vtv_ity.ity_vars plus the region in pv_vtv.vtv_mut. *)
 }
 
 module Mpv : Map.S with type key = pvsymbol
@@ -291,9 +292,13 @@ module Wpv : Hashweak.S with type key = pvsymbol
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
 val create_pvsymbol : preid -> vty_value -> pvsymbol
+(* from an id and a type, create a pvsymbol. Note that this also creates the
+   underlying vsymbol (see pvsymbol.pv_vs field), and an entry
+   vsymbol -> pvsymbol is created in a private map. *)
 
 val restore_pv : vsymbol -> pvsymbol
-  (* raises Not_found if the argument is not a pv_vs *)
+  (* return the program variable [pvs] such that pvs.pv_vs is equal to the
+     argument. raises Not_found if the argument is not a pv_vs *)
 
 val restore_pv_by_id : ident -> pvsymbol
   (* raises Not_found if the argument is not a pv_vs.vs_name *)
@@ -301,8 +306,8 @@ val restore_pv_by_id : ident -> pvsymbol
 (** program types *)
 
 type vty =
-  | VTvalue of vty_value
-  | VTarrow of vty_arrow
+  | VTvalue of vty_value      (* either an individual type *)
+  | VTarrow of vty_arrow      (* or an arrow type with a spec *)
 
 and vty_arrow = private {
   vta_args   : pvsymbol list;

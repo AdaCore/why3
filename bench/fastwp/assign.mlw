@@ -5,30 +5,31 @@ module Assign
    use import ref.Ref
 
    val glob : ref int
-(*
+(* Valid *)
    let f (x : ref int) =
       { }
       x := 0
       { ! x = 0 }
-*)
+(* Valid *)
    let g (x : ref int) =
       { }
       x := !x + 1
       { ! x = old !x + 1 }
-(*
+(* Valid *)
    let h (x : ref int) =
       { }
       x := !glob
       { ! x = !glob }
 
+(* Valid *)
    let i (x : ref int) =
       { }
       glob := !x
       { ! x = !glob }
 
+(* Unkown *)
    let k (x : ref int) =
       { }
       glob := !glob + 1
       { ! x = !glob }
-*)
 end
