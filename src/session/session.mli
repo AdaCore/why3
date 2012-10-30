@@ -389,11 +389,10 @@ val copy_external_proof :
 
 val add_transformation :
   keygen:'key keygen ->
-  goal:('goal -> Ident.ident * expl * Task.task) ->
   'key env_session ->
   string ->
   'key goal ->
-  'goal list ->
+  Task.task list ->
   'key transf
 (** Add a transformation by its subgoals *)
 
@@ -439,10 +438,7 @@ val add_file :
 val remove_file : 'key file -> unit
 (** Remove a file *)
 
-(** {2 Explanation} *)
 
-val get_explanation : Ident.ident -> Task.task -> expl
-val goal_expl_task : Task.task -> Ident.ident * expl * Task.task
 
 (** {2 Iterators} *)
 

@@ -134,10 +134,12 @@ let posid_of_idpos idpos =
   posid
 *)
 
+type expl = string option
+
 type 'a goal =
   { mutable goal_key  : 'a;
     goal_name : Ident.ident;
-    goal_expl : string option;
+    goal_expl : expl;
     goal_parent : 'a goal_parent;
     mutable goal_checksum : Tc.checksum;
     mutable goal_shape : Tc.shape;
@@ -693,12 +695,14 @@ let rec get_expl_fmla acc f =
 
 let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
 
-type expl = string option
-
-let get_explanation id task =
-  let fmla = Task.task_goal_fmla task in
-  let res = get_expl_fmla fmla in
-  if res <> None then res else check_expl id.Ident.id_label
+let goal_expl_task ~root task =
+  let gid = (Task.task_goal task).Decl.pr_name in
+  let info = 
+    let fmla = Task.task_goal_fmla task in
+    let res = get_expl_fmla fmla in
+    if res <> None || not root then res else check_expl gid.Ident.id_label
+  in
+  gid, info, task
 
 
 (*****************************)
@@ -1456,14 +1460,9 @@ let read_file env ?format fn =
     (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
     ltheories,theories
 
-let goal_expl_task task =
-  let gid = (Task.task_goal task).Decl.pr_name in
-  let info = get_explanation gid task in
-  gid, info, task
-
 let add_file_return_theories ~keygen env ?format filename =
   let x_keygen = keygen in
-  let x_goal = goal_expl_task in
+  let x_goal = goal_expl_task ~root:true in
   let x_fold_theory f acc th =
     let tasks = List.rev (Task.split_theory th None None) in
     List.fold_left f acc tasks in
@@ -1490,49 +1489,24 @@ let remove_file file =
 (*      transformations    *)
 (***************************)
 
-(*
-
-module AddTransf(X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * string option * Task.task
-
-  type transf
-  val fold_transf : ('a -> goal -> 'a) -> 'a -> Task.task -> transf -> 'a
-end) = (struct
-
-  let add_goal parent acc goal =
-    let name,expl,task = X.goal goal in
-    let g =
-      raw_add_task ~version:Termcode.current_shape_version
-        ~keygen:X.keygen ~expanded:true parent name expl task
-    in
-    g::acc
-
-  let add_transformation g name transf =
-    let task = goal_task g in
-    let rtransf =
-      raw_add_transformation ~keygen:X.keygen ~expanded:transf.transf_expanded g name
-    in
-    let parent = Parent_transf rtransf in
-    let goals = X.fold_transf (add_goal parent) [] task transf in
-    rtransf.transf_goals <- List.rev goals;
-    rtransf.transf_verified <- transf_verified rtransf;
-    rtransf
-
-end : sig
-  val add_transformation : X.key goal -> string -> X.transf -> X.key transf
-end)
-
-  *)
-
-let add_transformation ~keygen ~goal env_session transfn g goals =
+let add_transformation ~keygen env_session transfn g goals =
   let rtransf = raw_add_transformation ~keygen ~expanded:true g transfn in
   let parent = Parent_transf rtransf in
+  let i = ref 0 in 
+  let next_subgoal task = 
+    incr i;
+    let gid,expl,_ = goal_expl_task ~root:false task in
+    let expl = match expl with
+      | None -> string_of_int !i ^ "."
+      | Some e -> string_of_int !i ^ ". " ^ e
+    in
+    let expl = Some expl in
+    let goal_name = gid.Ident.id_string ^ "." ^ (string_of_int (!i)) in
+    let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
+    goal_name, expl, task
+  in
   let add_goal acc g =
-    let name,expl,task = goal g in
+    let name,expl,task = next_subgoal g in
     let g = raw_add_task ~version:env_session.session.session_shape_version
       ~keygen ~expanded:false parent name expl task
     in
@@ -1555,18 +1529,8 @@ let add_registered_transformation ~keygen env_session tr_name g =
     Hstr.find g.goal_transformations tr_name
   with Not_found ->
     let task = goal_task g in
-    let gname = g.goal_name in
     let subgoals = Trans.apply_transform tr_name env_session.env task in
-    let i = ref 1 in
-    let goal task =
-      let gid = (Task.task_goal task).Decl.pr_name in
-      let expl = get_explanation gid task in
-      let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (!i)) in
-      incr i;
-      let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
-      goal_name, expl, task
-    in
-    add_transformation ~keygen ~goal env_session tr_name g subgoals
+    add_transformation ~keygen env_session tr_name g subgoals
 
 (****************)
 (**    metas    *)

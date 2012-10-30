@@ -784,18 +784,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
       | _ -> true
   in
   if b then
-    let goal_name = g.goal_name.Ident.id_string in
-    let i = ref (-1) in
-    let ntr = add_transformation
-      ~keygen:O.create
-      ~goal:(fun subtask ->
-        incr i;
-        let gid,expl,task = goal_expl_task subtask in
-        let gid =
-          Ident.id_derive (goal_name ^ "." ^ (string_of_int (!i))) gid in
-        let gid = Ident.id_register gid in
-        gid,expl,task)
-      eS tr g subgoals in
+    let ntr = add_transformation ~keygen:O.create eS tr g subgoals in
     init_any (Transf ntr);
     Some ntr
   else None
