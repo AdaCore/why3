@@ -676,7 +676,9 @@ let check_expl lab acc =
   then Some (Str.matched_group 1 lab)
   else acc
 
-let check_expl lab = Ident.Slab.fold check_expl lab None
+let check_expl lab =
+  if Ident.Slab.mem Split_goal.stop_split lab then None
+  else Ident.Slab.fold check_expl lab None
 
 let rec get_expl_fmla acc f =
   if f.t_ty <> None then acc else
