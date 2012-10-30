@@ -127,7 +127,7 @@ module Args = struct
   let set_flags_selected () =
     if !opt_debug_all then
       List.iter
-        (fun (s,f,_,_) -> if not (is_info_flag s) then set_flag f)
+        (fun (s,f,_,_) -> if is_info_flag s then set_flag f)
         (list_flags ());
     Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
       opt_list_flags;
