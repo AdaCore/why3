@@ -459,7 +459,7 @@ let program_vars = Hashtbl.create 257
 
 let create_var v =
   let id = Ident.id_fresh v.vname in
-  let vs = Term.create_vsymbol id (ctype v.vtype) in
+  let vs = Mlw_ty.create_pvsymbol id (Mlw_ty.vty_value (ctype v.vtype)) in
 (**)
   Self.result "create program variable %s (%d)" v.vname v.vid;
 (**)
@@ -470,12 +470,12 @@ let get_var v =
   try
     Hashtbl.find program_vars v.vid
   with Not_found ->
-    Self.fatal "program variable %s (%d) not found" v.vid
+    Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
 
 let lval (host,offset) =
   match host,offset with
-    | Var v, NoOffset -> Term.t_var (get_var v)
+    | Var v, NoOffset -> Mlw_expr.e_value (get_var v)
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
     | Mem _, _ ->
