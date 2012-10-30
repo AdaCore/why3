@@ -1147,7 +1147,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     | Whyconf.ProverNotFound (_, fp) ->
         let pl =
           Mprover.fold (fun prover p l -> if not p.interactive
-            then (Pp.string_of_wnl Whyconf.print_prover prover) :: l
+            then ("\"" ^ Whyconf.prover_parseable_format prover ^ "\"") :: l
             else l)
           (get_provers config) [] in
         let msg = pr_str "No such prover `"
@@ -1158,7 +1158,8 @@ let why3tac ?(timelimit=timelimit) s gl =
         errorlabstrm "Whyconf.ProverNotFound" msg
     | Whyconf.ProverAmbiguity (_, fp,provers) ->
         let pl = Mprover.keys provers in
-        let pl = List.map (Pp.string_of_wnl Whyconf.print_prover) pl in
+        let pl = List.map (fun prover ->
+          "\"" ^ Whyconf.prover_parseable_format prover ^ "\"") pl in
         let msg = pr_str "More than one prover corresponding to `" ++
           pr_fp fp ++ pr_str "'." ++
           pr_spc () ++ pr_str "Corresponding provers are:" ++ pr_fnl () ++
@@ -1168,7 +1169,6 @@ let why3tac ?(timelimit=timelimit) s gl =
       let msg = pr_str "Syntax error prover identification '" ++
         pr_str s ++ pr_str "' :  name[,version[,alternative]|,,alternative]" in
       errorlabstrm "Whyconf.ParseFilterProver" msg
-
     | e ->
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;

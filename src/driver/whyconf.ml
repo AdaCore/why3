@@ -35,7 +35,9 @@ let magicnumber = 14
 exception WrongMagicNumber
 
 let why3_regexp_of_string s = (** define a regexp in why3 *)
-  if s.[0] = '^' then Str.regexp s else Str.regexp ("^"^Str.quote s^"$")
+  if s = "" then Str.regexp "^$" else
+  if s.[0] = '^' then Str.regexp s else
+  Str.regexp ("^" ^ Str.quote s ^ "$")
 
 (* lib and shared dirs *)
 

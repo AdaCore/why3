@@ -130,5 +130,6 @@ module Args = struct
         (fun (s,f,_,_) -> if not (is_info_flag s) then set_flag f)
         (list_flags ());
     Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
-      opt_list_flags
+      opt_list_flags;
+    if test_flag stack_trace then Printexc.record_backtrace true
 end
