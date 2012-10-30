@@ -4,23 +4,31 @@ import glob
 import os.path
 import tools
 
+def compute_expected_output(fn, outputfile):
+    test = open(fn, "r")
+    inp = test.readlines()
+    output = tools.grep ("\(\* (\w*) \*\)", inp)
+    tools.save_to_file (outputfile, output)
+
 def main():
     # list_of_files = glob.glob ("*.mlw")
-    list_of_files = [ "assign.mlw" ]
+    list_of_files = [ "assign.mlw", "app.mlw" ]
     for fn in list_of_files:
         basename = os.path.splitext(fn)
         basename = basename[0]
+        xoutfile = basename + ".xout"
+        exp_output = basename + ".out"
         output = tools.run_why (fn)
         pattern = fn + ".*: (.+) \(.*\)"
         output = tools.grep (pattern, output)
-        xoutfile = basename + ".xout"
         tools.save_to_file (xoutfile, output)
-        exp_output_file = basename + ".out"
-        if tools.diff (xoutfile, exp_output_file) == 0:
+        compute_expected_output(fn, exp_output)
+        if tools.diff (exp_output, xoutfile) == 0:
             print fn, " : OK"
         else:
             print fn, " : DIFF"
         os.remove (xoutfile)
+        os.remove (exp_output)
 
 if __name__ == "__main__":
     main()
