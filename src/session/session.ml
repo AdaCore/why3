@@ -1527,7 +1527,7 @@ end)
   *)
 
 let add_transformation ~keygen ~goal env_session transfn g goals =
-  let rtransf = raw_add_transformation ~keygen ~expanded:false g transfn in
+  let rtransf = raw_add_transformation ~keygen ~expanded:true g transfn in
   let parent = Parent_transf rtransf in
   let add_goal acc g =
     let name,expl,task = goal g in
