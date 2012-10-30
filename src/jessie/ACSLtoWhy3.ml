@@ -457,14 +457,21 @@ let identified_proposition p =
 
 let program_vars = Hashtbl.create 257
 
+let any _ty = Mlw_expr.e_int_const "0000" (* TODO : ref *)
+
 let create_var v =
   let id = Ident.id_fresh v.vname in
-  let vs = Mlw_ty.create_pvsymbol id (Mlw_ty.vty_value (ctype v.vtype)) in
-(**)
+  let ty = Mlw_ty.vty_value (ctype v.vtype) in
+  let let_defn = Mlw_expr.create_let_defn id (any ty) in
+  let vs = match let_defn.Mlw_expr.let_sym with
+    | Mlw_expr.LetV vs -> vs
+    | Mlw_expr.LetA _ -> assert false
+  in
+(*
   Self.result "create program variable %s (%d)" v.vname v.vid;
-(**)
+*)
   Hashtbl.add program_vars v.vid vs;
-  vs
+  let_defn
 
 let get_var v =
   try
@@ -512,9 +519,18 @@ let expr e =
     | Const _c -> (* constant c *)
       Self.not_yet_implemented "expr Const"
     | Lval lv -> lval lv
-    | SizeOf _|SizeOfE _|SizeOfStr _|AlignOf _|AlignOfE _|UnOp (_, _, _)|
-BinOp (_, _, _, _)|CastE (_, _)|AddrOf _|StartOf _|Info (_, _)
-    -> Self.not_yet_implemented "expr"
+    | SizeOf _
+    | SizeOfE _
+    | SizeOfStr _
+    | AlignOf _
+    | AlignOfE _
+    | UnOp (_, _, _)
+    | BinOp (_, _, _, _)
+    | CastE (_, _)
+    | AddrOf _
+    | StartOf _
+    | Info (_, _)
+      -> Self.not_yet_implemented "expr"
 
 let instr i =
   match i with
@@ -628,14 +644,9 @@ let fundecl fdec =
       | l -> List.map (fun v -> (v.vname, ctype v.vtype)) l
   in
   let body = fdec.sbody in
-  let _vars = List.map
-      (fun v -> (v.vname, ctype v.vtype))
-      (Kernel_function.get_locals kf)
-  in
   let contract = Annotations.funspec kf in
   let _pre,_post,_ass = extract_simple_contract contract in
   let _ret_type = ctype (Kernel_function.get_return_type kf) in
-  let _body = body.bstmts in
   let args =
     List.map 
       (fun (id,ity) -> 
@@ -643,6 +654,9 @@ let fundecl fdec =
       formals
   in
   let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
+  let locals =
+    List.map create_var (Kernel_function.get_locals kf)
+  in
   let spec = {
     Mlw_ty.c_pre = Term.t_true;
     c_post = Term.t_eps (Term.t_close_bound result Term.t_true);
@@ -653,9 +667,10 @@ let fundecl fdec =
   }
   in
   let body = block body in
+  let full_body = List.fold_right Mlw_expr.e_let locals body in
   let lambda = {
     Mlw_expr.l_args = args;
-    l_expr = body;
+    l_expr = full_body;
     l_spec = spec;
   }
   in
