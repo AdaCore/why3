@@ -31,11 +31,11 @@ back   +-+-+-+-------------------+
                    mutable card   : int;
                            def    : 'a; }
   invariant {
-    0 <= card <= A.length values <= maxlen /\
-    A.length values = A.length index = A.length back /\
+    0 <= self.card <= A.length self.values <= maxlen /\
+    A.length self.values = A.length self.index = A.length self.back /\
     forall i : int.
-      0 <= i < card ->
-      0 <= back[i] < A.length values /\ index[back[i]] = i
+      0 <= i < self.card ->
+      0 <= self.back[i] < A.length self.values /\ self.index[self.back[i]] = i
   }
 
   predicate is_elt (a: sparse_array 'a) (i: int) =

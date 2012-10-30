@@ -9,7 +9,7 @@ module ResizableArrayImplem
   constant dummy: elt
 
   type rarray = { mutable length: int; mutable data: A.array elt }
-    invariant { 0 <= length <= A.length data }
+    invariant { 0 <= self.length <= A.length self.data }
 
   function ([]) (r: rarray) (i: int) : elt = A.get r.data i
   function ([<-]) (r: rarray) (i: int) (v: elt) : rarray =

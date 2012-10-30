@@ -1261,7 +1261,7 @@ and expr_lam lenv gh pvl (de, dsp) =
 (** Type declaration *)
 
 let add_type_invariant loc uc id params inv =
-  let x = "result" in
+  let x = "self" in
   let its = match uc_find_ts uc (Qident id) with
     | PT its when its.its_inv -> its
     | _ -> errorm ~loc "type %s does not have an invariant" id.id in
@@ -1273,30 +1273,10 @@ let add_type_invariant loc uc id params inv =
   let res = create_vsymbol (id_fresh x) ty in
   let vars = Mstr.singleton x res in
   let denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
-  (* invariants on records may use field names as variables *)
-  let fields = try match find_constructors (get_known uc) its with
-    | [cs, pjl] -> Some (cs, List.map Opt.get pjl)
-    | _ -> None with _ -> None in
-  let inv = match fields with
-    | None ->
-        let mk_inv f =
-          let f = Typing.type_fmla (get_theory uc) denv vars f in
-          t_label_add Split_goal.stop_split f in
-        List.map mk_inv inv
-    | Some (cs, pjl) ->
-        let idl = List.map (fun pj -> PPvar (id_clone pj.pl_ls.ls_name)) pjl in
-        let ppp = PPlapp (cs.pl_ls, idl) and vty = vty_value (ity_of_ty ty) in
-        let mpv, { ppat_pattern = pat } = Mlw_expr.make_ppattern ppp vty in
-        let vars = Mstr.set_union (Mstr.map (fun v -> v.pv_vs) mpv) vars in
-        let denv = Mstr.fold (fun x pv denv ->
-          Typing.add_var x (dty_of_ty pv.pv_vs.vs_ty) denv) mpv denv in
-        let mk_inv f =
-          let f = Typing.type_fmla (get_theory uc) denv vars f in
-          let f = match f.t_node with
-            | Ttrue | Tfalse -> f
-            | _ -> t_case (t_var res) [t_close_branch pat f] in
-          t_label_add Split_goal.stop_split f in
-        List.map mk_inv inv in
+  let mk_inv f =
+    let f = Typing.type_fmla (get_theory uc) denv vars f in
+    t_label_add Split_goal.stop_split f in
+  let inv = List.map mk_inv inv in
   let q = Mlw_ty.create_post res (t_and_simp_l inv) in
   let q = if List.for_all2 tv_equal its.its_args tvl then q else
     let add mtv u v = Mtv.add u (ty_var v) mtv in

@@ -769,7 +769,8 @@ The two list lengths are explicitly stored, for better efficiency.
 \begin{whycode}
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
-    invariant { length front = lenf >= length rear = lenr }
+  invariant {
+    length self.front = self.lenf >= length self.rear = self.lenr }
 \end{whycode}
 The type definition is accompanied with an invariant ---
 a logical property imposed on any value of the type.
@@ -868,7 +869,8 @@ module AmortizedQueue
 
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
-    invariant { length front = lenf >= length rear = lenr }
+  invariant {
+    length self.front = self.lenf >= length self.rear = self.lenr }
 
   function sequence (q: queue 'a) : list 'a = q.front ++ reverse q.rear
 

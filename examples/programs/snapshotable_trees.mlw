@@ -141,7 +141,7 @@ module ITree
   use export BSTree
   use export Iterator
 
-  type itree = { mutable tree: tree } invariant { bst tree }
+  type itree = { mutable tree: tree } invariant { bst self.tree }
 
   let create () = { tree = Empty }
 

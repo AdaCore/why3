@@ -108,11 +108,11 @@ module HashtblImpl
     forall k: key. 0 <= bucket k n < n
 
   type t 'a = { mutable size: int; (* total number of elements *)
-                 mutable data: array (list (key, 'a)); }
-    invariant { let n = Array.length data in
+                mutable data: array (list (key, 'a)); }
+    invariant { let n = Array.length self.data in
                 0 < n /\
                 forall i: int. 0 <= i < n ->
-                forall k: key, v: 'a. mem (k, v) data[i] -> bucket k n = i }
+                forall k: key, v: 'a. mem (k,v) self.data[i] -> bucket k n = i }
 
   function extract (k: key) (l: list (key, 'a)) : list 'a = match l with
     | Nil -> Nil

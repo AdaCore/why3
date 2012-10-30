@@ -47,7 +47,7 @@ module HashTableImpl
 
   type t 'a 'b = { mutable contents: map 'a (option 'b);
                    data: array (list ('a, 'b)) }
-                 invariant { length data > 0 }
+                 invariant { length self.data > 0 }
 
   function get (h: t 'a 'b) (k: 'a) : option 'b = Map.get h.contents k
 
@@ -77,11 +77,11 @@ module HashTableImpl
   type t 'c 'b
     (* h[k]=v iff (k,v) is the first pair for k in the bucket for k *)
     invariant { forall k: 'c, v: 'b.
-       get result k = Some v <-> occurs_first k v data[idx result k] }
+       get self k = Some v <-> occurs_first k v self.data[idx self k] }
     (* a pair (k,v) is always stored in the right bucket *)
     invariant { forall k: 'c, v: 'b.
-       forall i: int. 0 <= i < length data ->
-         mem (k,v) data[i] -> i = idx result k }
+       forall i: int. 0 <= i < length self.data ->
+         mem (k,v) self.data[i] -> i = idx self k }
 
   let create (n:int)
     requires { 0 < n }
