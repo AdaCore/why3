@@ -1,0 +1,23 @@
+This is a very simple testsuite.
+
+1) How to run the testsuite
+
+  Run the following command:
+
+  $ ./run-tests.py
+
+2) How to write a test
+
+  Create a new .mlw file or add a new function to an existing one.
+  The function should be preceded by a comment of the form
+
+(* RESULT *)
+
+  where RESULT is one of "Valid" or "Unknown" (no quotes). There should be no
+  spaces at the beginning of the line, nor at the end.
+
+3) How to add the test to the testsuite
+
+  Edit "run-tests.py" and add the file to the variable "list_of_files" at the
+  beginning of the script.
+

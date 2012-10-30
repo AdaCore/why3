@@ -4,6 +4,9 @@ import glob
 import os.path
 import tools
 
+# list_of_files = glob.glob ("*.mlw")
+list_of_files = [ "assign.mlw", "app.mlw" ]
+
 def compute_expected_output(fn, outputfile):
     test = open(fn, "r")
     inp = test.readlines()
@@ -11,8 +14,6 @@ def compute_expected_output(fn, outputfile):
     tools.save_to_file (outputfile, output)
 
 def main():
-    # list_of_files = glob.glob ("*.mlw")
-    list_of_files = [ "assign.mlw", "app.mlw" ]
     for fn in list_of_files:
         basename = os.path.splitext(fn)
         basename = basename[0]
