@@ -45,7 +45,7 @@ corresponding theory section of the driver.
 
 \begin{verbatim}
 theory env_path.theory_name
-  meta "realized" "env_path.theory_name", "optional_naming"
+  meta "realized_theory" "env_path.theory_name", "optional_naming"
 end
 \end{verbatim}
 
@@ -53,7 +53,7 @@ The first parameter is the theory name for \why. The second
 parameter, if not empty, provides a name to be used inside generated
 scripts to point to the realization, in case the default name is not
 suitable for the interactive prover.
-\index{realized@\verb+realized+}
+\index{realized_theory@\verb+realized_theory+}
 
 \section{Generated/edited files}
 
@@ -107,7 +107,7 @@ use, it does not scale well when the realizations are to be shipped to
 other users. Instead, one should create two additional files: a
 configuration file that indicates how to modify paths, provers, and
 editors, and a driver file that contains only the needed
-\verb+meta "realized"+ declarations. The configuration file should be as
+\verb+meta "realized_theory"+ declarations. The configuration file should be as
 follows.
 \index{configuration file}
 
