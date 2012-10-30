@@ -32,11 +32,11 @@ goods () {
 bads () {
     for f in $1/*.why; do
 	echo -n "  "$f"... "
-	if $pgm $2 $f > /dev/null 2>&1; then 
+	if $pgm $2 $f > /dev/null 2>&1; then
 	    echo "$pgm $2 $f"
 	    echo "FAILED!"
-	    exit 1 
-        else 
+	    exit 1
+        else
 	    echo "ok"
 	fi
     done
@@ -59,13 +59,13 @@ drivers () {
 programs () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if ! $pgml -L modules $pgml_options $f $2 > /dev/null 2>&1; then 
-	    echo 
+	if ! $pgml -L modules $pgml_options $f $2 > /dev/null 2>&1; then
+	    echo
 	    echo "$pgml $pgml_options $f $2"
 	    $pgml -L modules $pgml_options $f $2
 	    echo "FAILED!"
-	    exit 1 
-        else 
+	    exit 1
+        else
 	    echo "ok"
 	fi
     done
@@ -74,12 +74,12 @@ programs () {
 bad_programs () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if $pgml -L modules $pgml_options $f > /dev/null 2>&1; then 
-	    echo 
+	if $pgml -L modules $pgml_options $f > /dev/null 2>&1; then
+	    echo
 	    echo "$pgml $pgml_options $f"
 	    echo "SHOULD FAIL!"
-	    exit 1 
-        else 
+	    exit 1
+        else
 	    echo "ok"
 	fi
     done
@@ -93,7 +93,7 @@ valid_goals () {
 	    echo "$pgml -P alt-ergo $f"
 	    $pgml -L modules -t 10 -P alt-ergo $f
 	    exit 1
-       else 
+       else
 	    echo "ok"
 	fi
     done
