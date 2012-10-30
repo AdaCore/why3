@@ -61,10 +61,12 @@ let print_prover fmt p =
     p.prover_name p.prover_version
     (if p.prover_altern = "" then "" else " ") p.prover_altern
 
-let print_prover_parsable_format fmt p =
-  Format.fprintf fmt "%s,%s,%s"
+let prover_parseable_format p =
+  Format.sprintf "%s,%s,%s"
     p.prover_name p.prover_version p.prover_altern
 
+let print_prover_parseable_format fmt p =
+  Format.pp_print_string fmt (prover_parseable_format p)
 
 module Prover = struct
   type t = prover

@@ -1405,8 +1405,7 @@ let () =
       C.Mprover.fold
         (fun k p acc ->
           let pr = p.prover in
-          if List.mem (pr.prover_name ^ " " ^ pr.prover_version)
-            gconfig.hidden_provers
+          if List.mem (C.prover_parseable_format pr) gconfig.hidden_provers
           then acc
           else C.Mprover.add k p acc)
         provers C.Mprover.empty

@@ -774,10 +774,10 @@ let provers_page c (notebook:GPack.notebook) =
   let hidden_provers = Hashtbl.create 7 in
   Mprover.iter
     (fun _ p ->
-      let p = p.prover in
-      let label = p.prover_name ^ " " ^ p.prover_version in
-      let hidden = ref (List.mem label c.hidden_provers) in
-      Hashtbl.add hidden_provers label hidden;
+      let name = prover_parseable_format p.prover in
+      let label = Pp.string_of_wnl print_prover p.prover in
+      let hidden = ref (List.mem name c.hidden_provers) in
+      Hashtbl.add hidden_provers name hidden;
       let b =
         GButton.check_button ~label ~packing:provers_box#add ()
           ~active:(not !hidden)
@@ -863,7 +863,7 @@ let editors_page c (notebook:GPack.notebook) =
   in
   let strings = "(default)" :: "--" :: (List.rev strings) in
   let add_prover p pi =
-    let text = p.prover_name ^ " " ^ p.prover_version in
+    let text = Pp.string_of_wnl Whyconf.print_prover p in
     let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
     let _ = GMisc.label ~width:150 ~xalign:0.0 ~text ~packing:(hb#pack ~expand:false) () in
     let (combo, ((_ : GTree.list_store), column)) =

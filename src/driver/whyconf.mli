@@ -95,7 +95,8 @@ type prover =
     (** record of necessary data for a given external prover *)
 
 val print_prover : Format.formatter -> prover -> unit
-val print_prover_parsable_format : Format.formatter -> prover -> unit
+val print_prover_parseable_format : Format.formatter -> prover -> unit
+val prover_parseable_format : prover -> string
 
 (** Printer for prover *)
 module Prover   : OrderedHashedType with type t = prover
