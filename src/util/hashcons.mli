@@ -9,20 +9,18 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Hash tables for hash consing *)
-
-(*s Hash tables for hash consing.
-
-    Hash consed values are of the
-    following type [hash_consed]. The field [tag] contains a unique
-    integer (for values hash consed with the same table). The field
-    [hkey] contains the hash key of the value (without modulo) for
-    possible use in other hash tables (and internally when hash
-    consing tables are resized). The field [node] contains the value
-    itself.
+(** Hash tables for hash consing
 
     Hash consing tables are using weak pointers, so that values that are no
-    more referenced from anywhere else can be erased by the GC. *)
+    more referenced from anywhere else can be erased by the GC.
+
+    Look in src/core/term.ml for usage examples. *)
+
+(** Values to be hash-consed must implement signature [HashedType] below.
+    Type [t] is the type of values to be hash-consed.
+    The user must provide an equality and a hash function over type [t],
+    as well as a function [tag] to build a new value of type [t] from
+    an old one and a unique integer tag. *)
 
 module type HashedType =
   sig
@@ -37,11 +35,10 @@ module type S =
     type t
 
     val hashcons : t -> t
-      (** [hashcons n f] hash-cons the value [n] using function [f] i.e. returns
+      (** [hashcons n] hash-cons the value [n] i.e. returns
           any existing value in the table equal to [n], if any;
-          otherwise, creates a new value with function [f], stores it
-          in the table and returns it. Function [f] is passed
-          the node [n] as first argument and the unique id as second argument.
+          otherwise, creates a new value with function [tag], stores it
+          in the table and returns it.
       *)
 
     val iter : (t -> unit) -> unit
