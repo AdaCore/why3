@@ -1,0 +1,54 @@
+module Call
+   use import int.Int
+   use import ref.Ref
+
+   val g : ref int
+
+   val f : x : ref int ->
+      { !g > !x }
+      unit reads g
+      writes x
+      { !g = !x }
+
+
+   val incr : x : ref int ->
+      { }
+      unit writes x
+      { !x = old !x + 1 }
+
+(* Valid *)
+let test0 (x : ref int) =
+   { }
+   incr x
+   { !x = old !x + 1 }
+
+(* Unknown *)
+let testx (x : ref int) =
+   { }
+   incr x
+   { !x = old !x }
+
+(* Unknown *)
+   let test3 (x : ref int) =
+      { }
+      incr x;
+      incr x
+      { !x = old !x + 1 }
+
+
+(* Valid *)
+   let test2 (x : ref int) =
+      { }
+      incr x;
+      incr x
+      { !x = old !x + 2 }
+
+(* Valid *)
+   let test1 (x : ref int) =
+      { !g > !x }
+      f x;
+      g := !x + 1;
+      f x
+      { !g = !x }
+
+end

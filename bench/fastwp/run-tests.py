@@ -5,7 +5,11 @@ import os.path
 import tools
 
 # list_of_files = glob.glob ("*.mlw")
-list_of_files = [ "assign.mlw", "app.mlw" ]
+list_of_files = [
+   "assign.mlw",
+   "app.mlw",
+   "call.mlw"
+   ]
 
 def compute_expected_output(fn, outputfile):
     test = open(fn, "r")
@@ -17,7 +21,7 @@ def main():
     for fn in list_of_files:
         basename = os.path.splitext(fn)
         basename = basename[0]
-        xoutfile = basename + ".xout"
+        xoutfile = basename + ".actout"
         exp_output = basename + ".out"
         output = tools.run_why (fn)
         pattern = fn + ".*: (.+) \(.*\)"
