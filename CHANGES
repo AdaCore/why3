@@ -6,7 +6,8 @@ version 0.80, Oct 31, 2012
     given in Appendix A of the manual
   o [whyml] support for type invariants and ghost code
   o [api] Ocaml interfaces for constructing program modules
-  o [transformation] support for induction on integers and on algebraic types
+  o [transformation] experimental support for induction on integers
+    and on algebraic types
   o [interface] new system of warnings, that includes:
      - form "exists x, P -> Q", likely an error
      - unused bound logic variables in "forall", "exists" and "let"
@@ -15,9 +16,10 @@ version 0.80, Oct 31, 2012
     more arguments
   o [prover] support for Coq 8.4
   * [prover] dropped support for Coq 8.2
-  o [prover] support for PVS 6.0, including realizations
+  o [prover] support for forthcoming PVS 6.0, including realizations
   o [prover] support for iProver and Zenon
-  o [prover] new scheme for Coq realizations, using type classes
+  o [prover] new output scheme for Coq using type classes, to ensures
+    types are inhabited
   * [driver] theory realizations now use meta "realized_theory" instead
     of "realized"
   * [config] modifiers in --extra-config are now called [prover_modifier]
