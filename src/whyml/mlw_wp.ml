@@ -1041,6 +1041,13 @@ module Subst : sig
 
    val show_state : t -> unit
 
+   val merge_states : t -> Sreg.t * t -> Sreg.t * t -> t * term * term
+   (* Given a base state and two branches (represented by an effect and a
+      state), return the state of the join point of the branches, and two
+      formulas. The first formula links the first branch state with the join
+      state, the second formula links the second branch state with the join
+      state. *)
+
 end = struct
 
   type t = vsymbol option ref Mreg.t
@@ -1085,6 +1092,29 @@ end = struct
               Format.printf "  region %a has been touched"
               Mlw_pretty.print_reg k) s;
      Format.printf "}@."
+
+  let region_name reg s =
+    match !(Mreg.find reg s) with
+    | Some x -> t_var x
+    | None -> assert false
+
+  let merge_states base (reg1,s1) (reg2,s2) =
+    let all_regs = Sreg.union reg1 reg2 in
+    Sreg.fold
+       (fun reg (s, f1, f2) ->
+         if Sreg.mem reg reg1 && Sreg.mem reg reg2 then
+           Mreg.add reg (Mreg.find reg s2) s,
+           t_and_simp f1 (t_equ (region_name reg s2) (region_name reg s1)),
+           f2
+         else if Sreg.mem reg reg2 then
+           Mreg.add reg (Mreg.find reg s2) s,
+           t_and_simp f1 (t_equ (region_name reg s2) (region_name reg base)),
+           f2
+         else
+           Mreg.add reg (Mreg.find reg s1) s,
+           f1,
+           t_and_simp f2 (t_equ (region_name reg s1) (region_name reg base))
+         ) all_regs (Mreg.empty, t_true, t_true)
 
 end
 
@@ -1245,6 +1275,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       (* The first thing that happens, before the call, is the evaluation of
          [e1]. This translates as a recursive call to the fast_wp *)
         let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
+        (* TODO xresult is wrong here *)
         let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
         (* next we have to deal with the call itself. *)
         let state_before_call = wp1.fwp_state in
@@ -1268,6 +1299,28 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
            fwp_ne = ne;
            fwp_state = state_after_call;
            fwp_exn = xne }
+  | Eif (e1, e2, e3) ->
+      (* First thing is the evaluation of e1 *)
+      let cond_res = create_vsymbol (id_fresh "c") (ty_of_vty e1.e_vty) in
+      (* TODO what about xresult here? *)
+      let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
+      let wp2 = fast_wp_expr env wp1.fwp_state r e2 in
+      let wp3 = fast_wp_expr env wp1.fwp_state r e3 in
+      let test = t_equ (t_var cond_res) t_bool_true in
+      let ok = t_and_simp wp1.fwp_ok (t_if test wp2.fwp_ok wp3.fwp_ok) in
+      let state, eq2, eq3 =
+        Subst.merge_states wp1.fwp_state
+           (regs_of_writes (e2.e_effect), wp2.fwp_state)
+           (regs_of_writes (e3.e_effect), wp3.fwp_state) in
+      let ne =
+        t_and_simp wp1.fwp_ne
+           (t_if test (t_and_simp wp2.fwp_ne eq2)
+                      (t_and_simp wp3.fwp_ne eq3)) in
+      { fwp_ok = ok;
+        fwp_ne = ne;
+        fwp_exn = Mexn.empty;
+        fwp_state = state}
+      (* TODO exceptional state *)
 (*
   | Eassign (e1, reg, pv) ->
       let rec get_term d = match d.e_node with
@@ -1290,7 +1343,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
 *)
   | Earrow _ ->
         let ok = t_true in
-        (* ??? do we need to set NE *)
          { fwp_ok = ok;
            fwp_ne = ok;
            fwp_state = s;
@@ -1303,7 +1355,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
   | Eloop (_, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
   | Ecase (_, _) -> assert false (*TODO*)
-  | Eif (_, _, _) -> assert false (*TODO*)
   | Erec (_, _) -> assert false (*TODO*)
   | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
       (* OK: ok(e1) /\ (ne(e1) => ok(e2))
@@ -1348,6 +1399,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let xresult = Mexn.map fst xq in
   let res = fast_wp_expr env subst (result, xresult) l.l_expr in
   let q_f = Subst.term env res.fwp_state q_f in
+  (* TODO apply the prestate to the precondition *)
   let f =
      t_and_simp res.fwp_ok
      (wp_nimplies res.fwp_ne res.fwp_exn ((result, q_f), xq)) in
