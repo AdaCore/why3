@@ -70,9 +70,15 @@ let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
 
 
+(* ref.Ref module *)
 
+let ref_modules, ref_theories = 
+  Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
 
+let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
+let ref_type : Mlw_module.type_symbol = 
+  Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
 
 (*********)
 (* types *)
