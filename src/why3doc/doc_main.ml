@@ -112,6 +112,7 @@ let () =
       let c = open_out fhtml in
       let fmt = formatter_of_out_channel c in
       if not !opt_body then Doc_html.print_header fmt ~title ~css ();
+      fprintf fmt "<span class=\"why3doc\">@\n";
       fprintf fmt "<h1>%s</h1>@\n" title;
       fprintf fmt "<ul>@\n";
       let add fn =
@@ -123,6 +124,7 @@ let () =
       in
       Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";
+      fprintf fmt "</span>@\n";
       if not !opt_body then Doc_html.print_footer fmt ();
       close_out c
     end
