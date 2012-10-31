@@ -898,6 +898,8 @@ let add_wp_decl km name f uc =
   let f = if Debug.test_flag no_track then f else track_values lkm km f in
   (* simplify f *)
   let f = if Debug.test_flag no_eval then f else
+    (* do preliminary checks on f to spare eval_match any surprises *)
+    let _lkm = Decl.known_add_decl lkm (create_prop_decl Pgoal pr f) in
     Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkm f in
   (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in

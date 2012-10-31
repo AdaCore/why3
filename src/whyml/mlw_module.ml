@@ -347,10 +347,10 @@ exception TooLateInvariant
 
 let add_invariant uc its p =
   let rec add = function
-    | { pd_node = PDtype _ } as d :: dl ->
-        let nd, dl = add dl in nd, d :: dl
     | d :: dl when Mid.mem its.its_pure.ts_name d.pd_news ->
         let d = Mlw_decl.add_invariant d its p in d, d :: dl
+    | { pd_node = PDtype _ } as d :: dl ->
+        let nd, dl = add dl in nd, d :: dl
     | _ -> raise TooLateInvariant in
   let decl, decls = add uc.muc_decls in
   let kn = Mid.map (Util.const decl) decl.pd_news in
