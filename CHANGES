@@ -1,29 +1,27 @@
 * marks an incompatible change
 
-version 0.80, Oct 30, 2012
+version 0.80, Oct 31, 2012
 ==========================
-  * Modified syntax for mlw programs. A summary of changes is given in
-    the manual, in Appendix A
-  o Programs support type invariants and ghost code
-  o Ocaml modules for constructing program modules are included in the
-    Why3 library and API
-  o New transformations for induction of integers or on algebraic
-    types
-  o New system of warnings, that includes:
+  * [whyml] modified syntax for mlw programs; a summary of changes is
+    given in Appendix A of the manual
+  o [whyml] support for type invariants and ghost code
+  o [api] Ocaml interfaces for constructing program modules
+  o [transformation] support for induction on integers and on algebraic types
+  o [interface] new system of warnings, that includes:
      - form "exists x, P -> Q", likely an error
      - unused bound logic variables in "forall", "exists" and "let"
   o [replayer] new option -q, for running quietly
-  o [Provers] support for Coq 8.4
-  * [Provers] dropped support for Coq 8.2
-  o [Provers] Support for PVS 6.0, including realizations
-  o [Provers] support for iProver and Zenon
-  * improved output of "why3session latex", LaTeX macros have more
-    arguments
-  o New scheme for Coq realizations, using type classes
-  * theory realizations now use meta "realized_theory" instead of
-    "realized"
-  * sections in --extra-config are called [prover_modifier] instead of
-    [prover]
+  * [session] improved output of "why3session latex"; LaTeX macros have
+    more arguments
+  o [prover] support for Coq 8.4
+  * [prover] dropped support for Coq 8.2
+  o [prover] support for PVS 6.0, including realizations
+  o [prover] support for iProver and Zenon
+  o [prover] new scheme for Coq realizations, using type classes
+  * [driver] theory realizations now use meta "realized_theory" instead
+    of "realized"
+  * [config] modifiers in --extra-config are now called [prover_modifier]
+    instead of just [prover]
 
 version 0.73, Jul 19, 2012
 ==========================
