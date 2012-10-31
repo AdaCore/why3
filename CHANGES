@@ -2,11 +2,28 @@
 
 version 0.80, Oct 30, 2012
 ==========================
-  o new warning: form exists x, P -> Q
-  o [replayer] new option -q
+  * Modified syntax for mlw programs. A summary of changes is given in
+    the manual, in Appendix A
+  o Programs support type invariants and ghost code
+  o Ocaml modules for constructing program modules are included in the
+    Why3 library and API
+  o New transformations for induction of integers or on algebraic
+    types
+  o New system of warnings, that includes:
+     - form "exists x, P -> Q", likely an error
+     - unused bound logic variables in "forall", "exists" and "let"
+  o [replayer] new option -q, for running quietly
   o [Provers] support for Coq 8.4
-  o new scheme for Coq realizations, using type classes
-  * theory realizations now use meta "realized_theory" instead of "realized"
+  * [Provers] dropped support for Coq 8.2
+  o [Provers] Support for PVS 6.0, including realizations
+  o [Provers] support for iProver and Zenon
+  * improved output of "why3session latex", LaTeX macros have more
+    arguments
+  o New scheme for Coq realizations, using type classes
+  * theory realizations now use meta "realized_theory" instead of
+    "realized"
+  * sections in --extra-config are called [prover_modifier] instead of
+    [prover]
 
 version 0.73, Jul 19, 2012
 ==========================

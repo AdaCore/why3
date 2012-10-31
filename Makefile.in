@@ -1441,6 +1441,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	ln -s ../modules $(DISTRIB_DIR)/share/modules
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
+	rm -rf $(DISTRIB_DIR)/examples/hoare_logic
 	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
           $(COQPGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
