@@ -639,13 +639,11 @@ name=\"%a\"@ version=\"%a\"%a/>@]"
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
-let save fname config session =
+let save fname _config session =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
-    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config))
-                   "why3session.dtd");
+  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v2//EN\" \"http://why3.lri.fr/why3session.dtd\">@\n";
 (*
   let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
   fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
