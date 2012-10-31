@@ -176,7 +176,7 @@ Bug fixes:
 * do "make distrib"
 * test the distrib why3-0.80.tar.gz
 * make a last commit:
- - add tag 0.80 to the git repository
+ - add tag 0.80 to the git repository, using git tag 0.80
  - do not forget to push it using git push --tags
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
@@ -186,20 +186,22 @@ Bug fixes:
  - the HTML version of the manual (content of doc/html)
  - why3session.dtd
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
-   (make stdlibdoc ;
-    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.80;
-    ln -s /users/www-perso/projets/why3/stdlib-0.80 \
-            /users/www-perso/projets/why3/stdlib)
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.80
+   rm /users/www-perso/projets/why3/stdlib)
+   ln -s /users/www-perso/projets/why3/stdlib-0.80 \
+            /users/www-perso/projets/why3/stdlib
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
-    Note: check that URL of API doc is correct in doc/api.tex line 9.
-     (make apidoc ;
-    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.80;
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.80
+    rm /users/www-perso/projets/why3/api
     ln -s /users/www-perso/projets/why3/api-0.80 \
-            /users/www-perso/projets/why3/api    )
+      /users/www-perso/projets/why3/api
+   PROBLEME avec style.css
  - update the main HTML page (sources are in why3-papers/www)
 
 * produce the Why3 part of ProVal gallery
-  -> add also a tar.gz and a ZIP file of it (this is done by doing 
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
   "make gallery-files" in the sources of the web pages)
 * Announce the distrib
  - What to put in the announcement: see New Features above
@@ -209,7 +211,7 @@ Bug fixes:
 
 * (JCF) reject global "val"s in typing environment for logic decls.
 
-* appliquer les changements de syntaxe des programmes dans la doc : aussi bien dans le tutorial que dans la BNF des manpages 
+* appliquer les changements de syntaxe des programmes dans la doc : aussi bien dans le tutorial que dans la BNF des manpages
 
 * faire le menage dans les transformations d'induction : _int _ty
   _ty_lex, et DOCUMENTER
