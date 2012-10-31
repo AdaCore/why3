@@ -8,7 +8,8 @@ import tools
 list_of_files = [
    "assign.mlw",
    "app.mlw",
-   "call.mlw"
+   "call.mlw",
+   "result.mlw"
    ]
 
 def compute_expected_output(fn, outputfile):
