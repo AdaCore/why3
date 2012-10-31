@@ -23,11 +23,20 @@ back   +-+-+-+-------------------+
   use import int.Int
   use import array.Array as A
 
+  constant maxlen : int = 1000
+
   type sparse_array 'a = { values : array 'a;
                            index  : array int;
                            back   : array int;
                    mutable card   : int;
                            def    : 'a; }
+  invariant {
+    0 <= self.card <= A.length self.values <= maxlen /\
+    A.length self.values = A.length self.index = A.length self.back /\
+    forall i : int.
+      0 <= i < self.card ->
+      0 <= self.back[i] < A.length self.values /\ self.index[self.back[i]] = i
+  }
 
   predicate is_elt (a: sparse_array 'a) (i: int) =
     0 <= a.index[i] < a.card /\ a.back[a.index[i]] = i
@@ -38,18 +47,7 @@ back   +-+-+-+-------------------+
     else
       a.def
 
-  (* invariant *)
-
-  constant maxlen : int = 1000
-
   function length (a: sparse_array 'a) : int = A.length a.values
-
-  predicate sa_inv (a: sparse_array 'a) =
-    0 <= a.card <= length a <= maxlen /\
-    A.length a.values = A.length a.index = A.length a.back /\
-    forall i : int.
-      0 <= i < a.card ->
-      0 <= a.back[i] < length a /\ a.index[a.back[i]] = i
 
   (* creation *)
 
@@ -57,8 +55,7 @@ back   +-+-+-+-------------------+
 
   let create (sz: int) (d: 'a)
     requires { 0 <= sz <= maxlen }
-    ensures { sa_inv result /\ result.card = 0 /\
-      result.def = d /\ length result = sz }
+    ensures { result.card = 0 /\ result.def = d /\ length result = sz }
   = { values = malloc sz;
       index  = malloc sz;
       back   = malloc sz;
@@ -68,12 +65,12 @@ back   +-+-+-+-------------------+
   (* access *)
 
   let test (a: sparse_array 'a) i
-    requires { 0 <= i < length a /\ sa_inv a }
+    requires { 0 <= i < length a }
     ensures { result=True <-> is_elt a i }
   = 0 <= a.index[i] && a.index[i] < a.card && a.back[a.index[i]] = i
 
   let get (a: sparse_array 'a) i
-    requires { 0 <= i < length a /\ sa_inv a }
+    requires { 0 <= i < length a }
     ensures { result = value a i }
   = if test a i then
       a.values[i]
@@ -85,14 +82,20 @@ back   +-+-+-+-------------------+
   use map.MapInjection as MI
 
   lemma permutation :
-    forall a: sparse_array 'a. sa_inv a ->
+    forall a: sparse_array 'a.
+    (* sparse_array invariant *)
+      (0 <= a.card <= A.length a.values <= maxlen /\
+      A.length a.values = A.length a.index = A.length a.back /\
+      forall i : int.
+        0 <= i < a.card ->
+        0 <= a.back[i] < A.length a.values /\ a.index[a.back[i]] = i) ->
+    (* sparse_array invariant *)
     a.card = a.length ->
     forall i: int. 0 <= i < a.length -> is_elt a i
 
   let set (a: sparse_array 'a) i v
-    requires { 0 <= i < length a /\ sa_inv a }
-    ensures { sa_inv a /\
-      value a i = v /\
+    requires { 0 <= i < length a }
+    ensures { value a i = v /\
       forall j:int. j <> i -> value a j = value (old a) j }
   = a.values[i] <- v;
     if not (test a i) then begin
