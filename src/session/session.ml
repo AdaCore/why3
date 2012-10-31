@@ -697,7 +697,7 @@ let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
 
 let goal_expl_task ~root task =
   let gid = (Task.task_goal task).Decl.pr_name in
-  let info = 
+  let info =
     let fmla = Task.task_goal_fmla task in
     let res = get_expl_fmla fmla in
     if res <> None || not root then res else check_expl gid.Ident.id_label
@@ -1492,8 +1492,9 @@ let remove_file file =
 let add_transformation ~keygen env_session transfn g goals =
   let rtransf = raw_add_transformation ~keygen ~expanded:true g transfn in
   let parent = Parent_transf rtransf in
-  let i = ref 0 in 
-  let next_subgoal task = 
+  let i = ref 0 in
+  let parent_goal_name = g.goal_name.Ident.id_string in
+  let next_subgoal task =
     incr i;
     let gid,expl,_ = goal_expl_task ~root:false task in
     let expl = match expl with
@@ -1501,12 +1502,15 @@ let add_transformation ~keygen env_session transfn g goals =
       | Some e -> string_of_int !i ^ ". " ^ e
     in
     let expl = Some expl in
-    let goal_name = gid.Ident.id_string ^ "." ^ (string_of_int (!i)) in
+    (* Format.eprintf "parent_goal_name = %s@." parent_goal_name; *)
+    let goal_name = parent_goal_name ^ "." ^ string_of_int !i in
     let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
+    (* Format.eprintf "goal_name = %s@." goal_name.Ident.id_string; *)
     goal_name, expl, task
   in
   let add_goal acc g =
     let name,expl,task = next_subgoal g in
+    (* Format.eprintf "call raw_add_task with name = %s@." name.Ident.id_string; *)
     let g = raw_add_task ~version:env_session.session.session_shape_version
       ~keygen ~expanded:false parent name expl task
     in
