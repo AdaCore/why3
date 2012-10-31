@@ -1133,6 +1133,52 @@ let wp_nimplies (n : term) (xn : fast_wp_exn Mexn.t) ((result, q), xq) =
 
 type res_type = vsymbol * vsymbol Mexn.t
 
+(* Take a single postcondition, and place it in the given context of prestate,
+   poststate and result *)
+let adapt_single_post_to_state_pair env prestate poststate result_var lab post =
+  (* get the result var of the post *)
+  let res, post = open_post post in
+  (* substitute for given result var, and replace 'old *)
+  let post = t_subst_single res (t_var result_var) (old_mark lab post) in
+  (* apply the poststate *)
+  let post = Subst.term env poststate post in
+  (* remove the label that protected "old" variables *)
+  let post = erase_mark lab post in
+  (* apply the prestate = replace previously "old" variables *)
+  Subst.term env prestate post
+
+(* place post + xpost in a given context of prestate/poststate and result *)
+let adapt_post_to_state_pair env prestate poststate result_vars post xpost =
+  let lab = fresh_mark () in
+  let result, xresult = result_vars in
+  let f = adapt_single_post_to_state_pair env prestate poststate in
+  f result lab post,
+  Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) lab post) xpost
+
+let fastwp_and (ne : term) (xn : fast_wp_exn Mexn.t)
+               (post : term) (xpost : term Mexn.t) post_state =
+  (* This corresponds to a "chaining" of normal and exceptional postconditions.
+     [ne] and [xn] are normal resp. exceptional postcondition of the first
+     expression, [post] and [xpost] of the second expression.
+     If an exception can be raised in only one of the expressions, then that
+     postcondition becomes the new one. If an exception is present in both, we
+     don't know anything about the resulting state.
+     (* TODO we should merge states *)
+     We can assume here that all the result/old/state substitutions are done
+     already in all given formulas. *)
+   let ne = t_and_simp ne post in
+   let xne =
+     Mexn.fold
+     (fun ex post acc ->
+       if Mexn.mem ex acc then
+         (* TODO we have to merge states here *)
+         Mexn.remove ex acc
+       else
+         Mexn.add ex
+           { fwpe_state = post_state;
+             fwpe_post = post} acc) xpost xn in
+   ne, xne
+
 let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
              : fast_wp_result =
   let res = fast_wp_desc env s r e in
@@ -1149,6 +1195,7 @@ let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
    result variable
    tracability
 *)
+
 
 and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
    fast_wp_result =
@@ -1195,25 +1242,32 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
            fwp_exn = Mexn.empty }
          (*TODO exceptional case *)
   | Eapp (e1, _, spec) ->
-        let lab = fresh_mark () in
-        let call_res, post = open_post spec.c_post in
-        let post = old_mark lab post in
-        let post = t_subst_single call_res (t_var result) post in
+      (* The first thing that happens, before the call, is the evaluation of
+         [e1]. This translates as a recursive call to the fast_wp *)
         let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
         let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
-        let pre = Subst.term env s spec.c_pre in
+        (* next we have to deal with the call itself. *)
+        let state_before_call = wp1.fwp_state in
+        let state_after_call =
+          Subst.refresh (regs_of_writes spec.c_effect) state_before_call in
+        let pre = Subst.term env state_before_call spec.c_pre in
+        (* TODO state after call is wrong; this should be established for each
+           exception separately instead of the same state for all *)
+        let post, xpost =
+          adapt_post_to_state_pair
+             env
+             state_before_call
+             state_after_call
+             r
+             spec.c_post
+             spec.c_xpost in
         let ok = t_and_simp wp1.fwp_ok (wp_implies wp1.fwp_ne pre) in
-        let state_after_call = Subst.refresh (regs_of_writes spec.c_effect) s in
-        let post = Subst.term env state_after_call post in
-        let post = erase_mark lab post in
-        let post = Subst.term env s post in
-        let ne = t_and_simp wp1.fwp_ne post in
+        let ne, xne =
+          fastwp_and wp1.fwp_ne wp1.fwp_exn post xpost state_after_call in
          { fwp_ok = ok;
            fwp_ne = ne;
            fwp_state = state_after_call;
-           fwp_exn = Mexn.empty }
-
-         (*TODO exceptional case *)
+           fwp_exn = xne }
 (*
   | Eassign (e1, reg, pv) ->
       let rec get_term d = match d.e_node with

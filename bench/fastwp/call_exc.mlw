@@ -25,6 +25,6 @@ module Call_Exc
     { }
     maybe_increase x
     { !x = old !x + 1}
-    | Test -> !x = old !x + 1
+    | Test -> { !x = old !x + 1 }
 
 end

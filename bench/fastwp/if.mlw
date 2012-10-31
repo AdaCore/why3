@@ -1,0 +1,47 @@
+module If
+  use import int.Int
+  use import ref.Ref
+
+(* Valid *)
+  let test1 (x : ref int) =
+    { }
+    if !x <> 0 then
+      x := 0
+    else ()
+    { !x = 0 }
+
+(* Unknown *)
+  let test2 (x : ref int) =
+    { }
+    if !x > 10 then
+      x := 0
+    else ()
+    { !x = 0 }
+
+(* Valid *)
+  let test3 (x : ref int) =
+    { !x >= 15 }
+    if !x > 10 then
+      x := 0
+    else ()
+    { !x = 0 }
+
+(* Valid *)
+  let test4 (x : ref int) =
+    { }
+    if !x > 15 then
+      x := !x + 1
+    else
+      ()
+    { if old !x > 15 then !x = old !x + 1 else !x = old !x }
+
+(* Unknown *)
+  let test4 (x : ref int) =
+    { }
+    if !x > 15 then
+      x := !x + 1
+    else
+      ()
+    { !x = old !x }
+
+end
