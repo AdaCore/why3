@@ -29,31 +29,30 @@ let style_css fname =
   let c = open_out fname in
   output_string c
 "
-why3doc a:visited {color : #416DFF; text-decoration : none; }
-why3doc a:link {color : #416DFF; text-decoration : none;}
-why3doc a:hover {color : Red; text-decoration : none; background-color: #5FFF88}
-why3doc a:active {color : Red; text-decoration : underline; }
-why3doc .comment { color : #990000 }
-why3doc .keyword1 { color : purple }
-why3doc .keyword2 { color : green }
-why3doc .superscript { font-size : 4 }
-why3doc .subscript { font-size : 4 }
-why3doc .warning { color : Red ; font-weight : bold }
-why3doc .info { margin-left : 3em; margin-right : 3em }
-why3doc .code { color : #465F91 ; }
-why3doc h1 { font-size : 20pt ; border: 1px solid #000000; margin-top: 10px; margin-bottom: 10px;text-align: center; background-color: #90BDFF ;padding: 10px; }
-why3doc h2 { font-size : 18pt ; border: 1px solid #000000; margin-top: 8px; margin-bottom: 8px;text-align: left; background-color: #90DDFF ;padding: 8px; }
-why3doc h3 { font-size : 16pt ; border: 1px solid #000000; margin-top: 6px; margin-bottom: 6px;text-align: left; background-color: #90EDFF ;padding: 6px; }
-why3doc h4 { font-size : 14pt ; border: 1px solid #000000; margin-top: 4px; margin-bottom: 4px;text-align: left; background-color: #90FDFF ;padding: 4px; }
-why3doc h5 { font-size : 12pt ; border: 1px solid #000000; margin-top: 2px; margin-bottom: 2px;text-align: left; background-color: #90BDFF ; padding: 2px; }
-why3doc h6 { font-size : 10pt ; border: 1px solid #000000; margin-top: 0px; margin-bottom: 0px;text-align: left; background-color: #90BDFF ; padding: 0px; }
-why3doc .typetable { border-style : hidden }
-why3doc .indextable { border-style : hidden }
-why3doc .paramstable { border-style : hidden ; padding: 5pt 5pt}
-why3doc body { background-color : White }
-why3doc tr { background-color : White }
-why3doc td.typefieldcomment { background-color : #FFFFFF }
-why3doc pre { margin-top: 1px ; margin-bottom: 2px; }
-why3doc div.sig_block {margin-left: 2em}";
+a:visited {color : #416DFF; text-decoration : none; }
+a:link {color : #416DFF; text-decoration : none;}
+a:hover {color : Red; text-decoration : none; background-color: #5FFF88}
+a:active {color : Red; text-decoration : underline; }
+.comment { color : #990000 }
+.keyword { color : purple; font-weight : bold }
+.superscript { font-size : 4 }
+.subscript { font-size : 4 }
+.warning { color : Red ; font-weight : bold }
+.info { margin-left : 3em; margin-right : 3em }
+.code { color : #465F91 ; }
+h1 { font-size : 20pt ; border: 1px solid #000000; margin-top: 10px; margin-bottom: 10px;text-align: center; background-color: #90BDFF ;padding: 10px; }
+h2 { font-size : 18pt ; border: 1px solid #000000; margin-top: 8px; margin-bottom: 8px;text-align: left; background-color: #90DDFF ;padding: 8px; }
+h3 { font-size : 16pt ; border: 1px solid #000000; margin-top: 6px; margin-bottom: 6px;text-align: left; background-color: #90EDFF ;padding: 6px; }
+h4 { font-size : 14pt ; border: 1px solid #000000; margin-top: 4px; margin-bottom: 4px;text-align: left; background-color: #90FDFF ;padding: 4px; }
+h5 { font-size : 12pt ; border: 1px solid #000000; margin-top: 2px; margin-bottom: 2px;text-align: left; background-color: #90BDFF ; padding: 2px; }
+h6 { font-size : 10pt ; border: 1px solid #000000; margin-top: 0px; margin-bottom: 0px;text-align: left; background-color: #90BDFF ; padding: 0px; }
+.typetable { border-style : hidden }
+.indextable { border-style : hidden }
+.paramstable { border-style : hidden ; padding: 5pt 5pt}
+body { background-color : White }
+tr { background-color : White }
+td.typefieldcomment { background-color : #FFFFFF }
+pre { margin-top: 1px ; margin-bottom: 2px; }
+div.sig_block {margin-left: 2em}";
   close_out c
 

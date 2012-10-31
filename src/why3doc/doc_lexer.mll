@@ -29,23 +29,17 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  let is_keyword1 = make_table
-    [ "theory"; "end"; "meta";
-      "type"; "constant"; "function"; "predicate"; "inductive";
-      "clone"; "use";
-      "import"; "export"; "axiom"; "goal"; "lemma"; ]
-
-  let is_keyword2 = make_table
-    [ "match"; "with"; "let"; "in"; "if"; "then"; "else";
-      "forall"; "exists";
-      (* programs *)
-      "as"; "assert"; "begin";
-      "do"; "done"; "downto"; "else";
-      "exception"; "val"; "for"; "fun";
-      "if"; "in";
-      "module"; "mutable";
-      "rec"; "then"; "to";
-      "try"; "while"; "invariant"; "variant"; "raise"; "label"; ]
+  let is_keyword = make_table [ "as"; "axiom"; "clone"; "coinductive";
+    "constant"; "else"; "end"; "epsilon"; "exists"; "export"; "false";
+    "forall"; "function"; "goal"; "if"; "import"; "in"; "inductive";
+    "lemma"; "let"; "match"; "meta"; "namespace"; "not"; "predicate";
+    "prop"; "then"; "theory"; "true"; "type"; "use"; "with";
+    (* programs *) "abstract"; "absurd"; "any"; "assert"; "assume";
+    "begin"; "check"; "do"; "done"; "downto"; "ensures"; "exception";
+    "for"; "fun"; "ghost"; "invariant"; "loop"; "model"; "module";
+    "mutable"; "private"; "raise"; "raises"; "reads"; "rec";
+    "requires"; "returns"; "to"; "try"; "val"; "variant"; "while";
+    "writes"; ]
 
   let get_loc lb =
     let p = Lexing.lexeme_start_p lb in
@@ -61,10 +55,8 @@
   let current_file = ref ""
 
   let print_ident fmt lexbuf s =
-    if is_keyword1 s then
-      fprintf fmt "<span class=\"keyword1\">%s</span>" s
-    else if is_keyword2 s then
-      fprintf fmt "<span class=\"keyword2\">%s</span>" s
+    if is_keyword s then
+      fprintf fmt "<span class=\"keyword\">%s</span>" s
     else begin
       let (* f,l,c as *) loc = get_loc lexbuf in
       (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
