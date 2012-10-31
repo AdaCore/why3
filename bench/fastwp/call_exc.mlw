@@ -1,0 +1,30 @@
+module Call_Exc
+   use import int.Int
+   use import ref.Ref
+
+  exception Test
+
+  val maybe_increase : x : ref int ->
+    { }
+    unit
+    writes x
+    raises Test
+    { !x = old !x + 1}
+    | Test -> { !x = old !x }
+
+(* Valid *)
+
+  let test1 (x : ref int) =
+    { }
+    maybe_increase x
+    { !x = old !x + 1}
+    | Test -> { !x = old !x }
+
+(* Unknown *)
+  let test2 (x : ref int) =
+    { }
+    maybe_increase x
+    { !x = old !x + 1}
+    | Test -> !x = old !x + 1
+
+end

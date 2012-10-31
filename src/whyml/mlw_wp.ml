@@ -1133,9 +1133,6 @@ let wp_nimplies (n : term) (xn : fast_wp_exn Mexn.t) ((result, q), xq) =
 
 type res_type = vsymbol * vsymbol Mexn.t
 
-let label_logic = Ident.create_label "fast_logic"
-let label_value = Ident.create_label "fast_value"
-
 let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
              : fast_wp_result =
   let res = fast_wp_desc env s r e in
@@ -1162,7 +1159,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
 	 NE: result=t *)
       let t = wp_label e t in
       let t = Subst.term env s (to_term t) in
-      let t = t_label_add label_logic t in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { fwp_ok = t_true;
         fwp_ne = ne;
@@ -1182,9 +1178,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         (* OK : True *)
         (* NE : result = v *)
         let va = (t_var v.pv_vs) in
-        Format.printf "va: %a@." Pretty.print_term va;
-        let ne =
-           t_label_add label_value (Subst.term env s (t_equ (t_var result) va)) in
+        let ne = Subst.term env s (t_equ (t_var result) va) in
       { fwp_ok = t_true;
         fwp_ne = ne;
         fwp_state = s;
@@ -1201,32 +1195,19 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
            fwp_exn = Mexn.empty }
          (*TODO exceptional case *)
   | Eapp (e1, _, spec) ->
-        Format.printf "app@.";
         let lab = fresh_mark () in
         let call_res, post = open_post spec.c_post in
-        Format.printf "  original post is %a@." Pretty.print_term post;
         let post = old_mark lab post in
-        Format.printf "  replaced old: %a@." Pretty.print_term post;
         let post = t_subst_single call_res (t_var result) post in
-        Format.printf "  subst result: %a@." Pretty.print_term post;
         let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
         let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
         let pre = Subst.term env s spec.c_pre in
-        let expr_str = Pp.sprintf "%a" Mlw_pretty.print_expr e1 in
-        let ok_label =
-            Ident.create_label (Pp.sprintf "ok for call %s" expr_str) in
-        let ok = t_label_add ok_label
-          (t_and_simp wp1.fwp_ok (wp_implies wp1.fwp_ne pre)) in
+        let ok = t_and_simp wp1.fwp_ok (wp_implies wp1.fwp_ne pre) in
         let state_after_call = Subst.refresh (regs_of_writes spec.c_effect) s in
         let post = Subst.term env state_after_call post in
-        Format.printf "  update post state: %a@." Pretty.print_term post;
         let post = erase_mark lab post in
         let post = Subst.term env s post in
-        Format.printf "  update pre state: %a@." Pretty.print_term post;
-        let ne_label =
-           Ident.create_label (Format.sprintf "ne for call %s" expr_str) in
-        let ne = t_label_add ne_label (t_and_simp wp1.fwp_ne post) in
-        Format.printf "  complete ne: %a@." Pretty.print_term ne;
+        let ne = t_and_simp wp1.fwp_ne post in
          { fwp_ok = ok;
            fwp_ne = ne;
            fwp_state = state_after_call;
@@ -1312,10 +1293,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let xq = Mexn.map open_post xq in
   let xresult = Mexn.map fst xq in
   let res = fast_wp_expr env subst (result, xresult) l.l_expr in
-   Format.printf "in entire fastwp@.";
-   Format.printf "  postcond: %a@." Pretty.print_term q_f;
   let q_f = Subst.term env res.fwp_state q_f in
-   Format.printf "  updated post: %a@." Pretty.print_term q_f;
   let f =
      t_and_simp res.fwp_ok
      (wp_nimplies res.fwp_ne res.fwp_exn ((result, q_f), xq)) in

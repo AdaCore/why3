@@ -9,7 +9,8 @@ list_of_files = [
    "assign.mlw",
    "app.mlw",
    "call.mlw",
-   "result.mlw"
+   "result.mlw",
+   "call_exc.mlw"
    ]
 
 def compute_expected_output(fn, outputfile):
