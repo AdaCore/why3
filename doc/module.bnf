@@ -25,6 +25,5 @@
     | "=" "fun" binder+ spec* "->" spec* expr ;
   \
   pgm-decl ::= ":" type                                  ; global variable
-    | param (spec* param)+ ":" type spec*  ; abstract function
-  \
+    | param (spec* param)+ ":" type spec*  ; abstract function%
 \end{syntax}
