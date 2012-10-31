@@ -1178,8 +1178,8 @@ let adapt_single_post_to_state_pair env prestate poststate result_var lab post =
   Subst.term env prestate post
 
 (* place post + xpost in a given context of prestate/poststate and result *)
-let adapt_post_to_state_pair env prestate poststate result_vars post xpost =
-  let lab = fresh_mark () in
+let adapt_post_to_state_pair ?lab env prestate poststate result_vars post xpost =
+  let lab = match lab with | None -> fresh_mark () | Some lab -> lab in
   let result, xresult = result_vars in
   let f = adapt_single_post_to_state_pair env prestate poststate in
   f result lab post,
@@ -1390,20 +1390,19 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
     let tl = List.map t_at_lab c.c_variant in
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
-  let subst = Subst.empty in
-  let q = old_mark lab (wp_expl expl_post c.c_post) in
-  let result, q_f  = open_post q in
-  let conv p = old_mark lab (wp_expl expl_xpost p) in
-  let xq = Mexn.map conv c.c_xpost in
-  let xq = Mexn.map open_post xq in
-  let xresult = Mexn.map fst xq in
-  let res = fast_wp_expr env subst (result, xresult) l.l_expr in
-  let q_f = Subst.term env res.fwp_state q_f in
-  (* TODO apply the prestate to the precondition *)
+  let prestate = Subst.empty in
+  let result, _  = open_post c.c_post in
+  let xresult = Mexn.map (fun x -> fst (open_post x)) c.c_xpost in
+  let res = fast_wp_expr env prestate (result, xresult) l.l_expr in
+  let q, xq = 
+    adapt_post_to_state_pair ~lab env
+      prestate res.fwp_state (result, xresult) c.c_post c.c_xpost in
+  let pre = Subst.term env prestate c.c_pre in
+  let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q) xq in
   let f =
      t_and_simp res.fwp_ok
-     (wp_nimplies res.fwp_ne res.fwp_exn ((result, q_f), xq)) in
-  let f = wp_implies c.c_pre (erase_mark lab f) in
+     (wp_nimplies res.fwp_ne res.fwp_exn ((result, q), xq)) in
+  let f = wp_implies pre f in
   wp_forall args (quantify env regs f)
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
