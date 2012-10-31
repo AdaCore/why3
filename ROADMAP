@@ -127,19 +127,19 @@ scheduled on Oct 2012
 == New Features to announce ==
 
 Programs:
-  o new API for programs
   o new concrete syntax for programs
+  o new API for programs
   o type invariants
   o ghost code
 
 Transformations:
-  o transformations for induction
+  o induction (experimental, undocumented)
+  o bisection (experimental, undocumented)
 
 Provers support:
-  o Support for Coq 8.4
+  o support for Coq 8.4
   o dropped support for Coq 8.2
-  o new scheme for Coq realizations using type classes
-  o Support for PVS 6.0, including realizations
+  o support for forthcoming PVS 6.0, including realizations
   o support for iProver and Zenon
 
 Misc:
@@ -154,6 +154,7 @@ Misc:
     instead
 
 Bug fixes:
+  o Coq output uses type classes to ensure Why3 types are inhabited
   o fixed bug on merging config files which prevented the use
     of Why3 back-end of the Frama-C/Jessie plugin when Coq is
     not installed. (Bug 14672 of the Bug Tracking System)
