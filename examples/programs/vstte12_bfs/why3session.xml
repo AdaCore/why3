@@ -19,8 +19,8 @@
   version="2.19"/>
  <file
   name="../vstte12_bfs.mlw"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="Graph"
    locfile="../vstte12_bfs.mlw"
@@ -86,7 +86,7 @@
    name="BFS"
    locfile="../vstte12_bfs.mlw"
    loclnum="49" loccnumb="7" loccnume="10"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter fill_next"
@@ -94,14 +94,14 @@
     loclnum="82" loccnumb="6" loccnume="15"
     expl="VC for fill_next"
     sum="d6ab5fc5eff1ee8f28e49a4fbfffc60f"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="iainfix =V10aTrueNiamemV12V9NaclosureV13V5V14V15Iainfix =V15V2NFAasubsetadiffasuccV2V11V13AasubsetV11asuccV2AainvV0V1V13V5V14V3Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FaclosureV9V5V8V16Iainfix =V16V2NFAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V5V8V3Iainfix =V11aremoveV12V7AamemV12V7FFAais_emptyV7NaclosureV9V5V8V17FAasubsetasuccV2V9AainvV0V1V9V5V8V3Iais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V18Iainfix =V18V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FAaclosureV6V5V4V19Iainfix =V19V2NFAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V5V4V3IaclosureV6V5V4V20Iainfix =V20V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
     <label
      name="expl:VC for fill_next"/>
     <transf
      name="split_goal"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter fill_next.1"
@@ -246,14 +246,14 @@
       loclnum="82" loccnumb="6" loccnume="15"
       expl="4. loop invariant preservation"
       sum="61e4f44bcbfdf07d7642add5d2a4917f"
-      proved="false"
+      proved="true"
       expanded="true"
       shape="aclosureV9V5V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V5V8V3IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V14Iainfix =V14V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V15Iainfix =V15V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
       <label
        name="expl:VC for fill_next"/>
       <transf
        name="split_goal"
-       proved="false"
+       proved="true"
        expanded="true">
        <goal
         name="WP_parameter fill_next.4.1"
@@ -281,11 +281,19 @@
         loclnum="82" loccnumb="6" loccnume="15"
         expl="2."
         sum="2f815b9d425c8c419ae2056a68c38544"
-        proved="false"
+        proved="true"
         expanded="false"
         shape="asubsetV11asuccV2IamemV12V9NNIainfix =V11aremoveV12V7AamemV12V7FFIais_emptyV7NIainfix =V10aTrueNIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13Iainfix =V13V2NFAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14Iainfix =V14V2NFAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter fill_next.4.3"
