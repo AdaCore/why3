@@ -1026,7 +1026,7 @@ module Subst : sig
    type t
    (* the type of substitutions *)
 
-   val empty : t
+   val init : effect -> t
    (* the empty state *)
 
    val refresh : Sreg.t -> t -> t
@@ -1042,17 +1042,25 @@ module Subst : sig
    val show_state : t -> unit
 
    val merge_states : t -> Sreg.t * t -> Sreg.t * t -> t * term * term
-   (* Given a base state and two branches (represented by an effect and a
-      state), return the state of the join point of the branches, and two
-      formulas. The first formula links the first branch state with the join
-      state, the second formula links the second branch state with the join
-      state. *)
+   (* Given a base state and two branches (represented by written regions in
+      each branch, and a state), return the state of the join point of the
+      branches, and two formulas. The first formula links the first branch
+      state with the join state, the second formula links the second branch
+      state with the join state. *)
 
 end = struct
 
   type t = vsymbol option ref Mreg.t
 
-  let empty = Mreg.empty
+  let fastwp_lab = Slab.singleton (create_label "fastwp_term")
+
+  let name_from_region ?id reg =
+    let id = match id with | None -> reg.reg_name | Some x -> x in
+    mk_var id fastwp_lab (ty_of_ity reg.reg_ity)
+
+  let init effect =
+    let all = effect.eff_writes in
+    Mreg.mapi (fun reg () -> ref (Some (name_from_region reg))) all
 
   let refresh regset s =
      Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
@@ -1063,8 +1071,6 @@ end = struct
       | { vtv_mut = Some r} -> Some r
       | _ -> None
 
-  let fastwp_lab = Slab.singleton (create_label "fastwp_term")
-
   let term env sub t =
      let mreg = Mreg.mapi_filter (fun reg vr ->
         match !vr with
@@ -1072,8 +1078,7 @@ end = struct
         | None ->
               match get_var_of_region reg t with
               | Some v ->
-                    let v' =
-                       mk_var v.vs_name fastwp_lab (ty_of_ity reg.reg_ity) in
+                    let v' = name_from_region ~id:v.vs_name reg in
                     vr := Some v';
                     !vr
               | None -> None) sub in
@@ -1094,27 +1099,31 @@ end = struct
      Format.printf "}@."
 
   let region_name reg s =
-    match !(Mreg.find reg s) with
+    let rv = Mreg.find reg s in
+    match !rv with
     | Some x -> t_var x
-    | None -> assert false
+    | None ->
+        let new_name = name_from_region reg in
+        rv := Some new_name;
+        t_var (new_name)
 
   let merge_states base (reg1,s1) (reg2,s2) =
     let all_regs = Sreg.union reg1 reg2 in
     Sreg.fold
        (fun reg (s, f1, f2) ->
-         if Sreg.mem reg reg1 && Sreg.mem reg reg2 then
+         if Sreg.mem reg reg1 && Sreg.mem reg reg2 then begin
            Mreg.add reg (Mreg.find reg s2) s,
            t_and_simp f1 (t_equ (region_name reg s2) (region_name reg s1)),
            f2
-         else if Sreg.mem reg reg2 then
+         end else if Sreg.mem reg reg2 then begin
            Mreg.add reg (Mreg.find reg s2) s,
            t_and_simp f1 (t_equ (region_name reg s2) (region_name reg base)),
            f2
-         else
+         end else begin
            Mreg.add reg (Mreg.find reg s1) s,
            f1,
            t_and_simp f2 (t_equ (region_name reg s1) (region_name reg base))
-         ) all_regs (Mreg.empty, t_true, t_true)
+         end) all_regs (Mreg.empty, t_true, t_true)
 
 end
 
@@ -1390,11 +1399,11 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
     let tl = List.map t_at_lab c.c_variant in
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
-  let prestate = Subst.empty in
+  let prestate = Subst.init c.c_effect in
   let result, _  = open_post c.c_post in
   let xresult = Mexn.map (fun x -> fst (open_post x)) c.c_xpost in
   let res = fast_wp_expr env prestate (result, xresult) l.l_expr in
-  let q, xq = 
+  let q, xq =
     adapt_post_to_state_pair ~lab env
       prestate res.fwp_state (result, xresult) c.c_post c.c_xpost in
   let pre = Subst.term env prestate c.c_pre in
@@ -1409,7 +1418,7 @@ and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
 let fast_wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in
-  let res = fast_wp_expr env Subst.empty (result e) e in
+  let res = fast_wp_expr env (Subst.init e.e_effect) (result e) e in
   let f = wp_forall (Mvs.keys res.fwp_ok.t_vars) res.fwp_ok in
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
