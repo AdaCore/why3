@@ -181,112 +181,19 @@ Axiom Path_shortest_path : forall (src:vertex) (v1:vertex), forall (d:Z),
   (path src v1 d) -> exists d':Z, (shortest_path src v1 d') /\ (d' <= d)%Z.
 
 Axiom Main_lemma : forall (src:vertex) (v1:vertex), forall (d:Z), (path src
-  v1 d) -> ((~ (shortest_path src v1 d)) -> (((v1 = src) /\ (0%Z < d)%Z) \/
-  exists v':vertex, exists d':Z, (shortest_path src v' d') /\ ((mem v1
-  (g_succ v')) /\ ((d' + (weight v' v1))%Z < d)%Z))).
-
-Axiom Completeness_lemma : forall (s:(set vertex)), (forall (v1:vertex),
-  (mem v1 s) -> forall (w:vertex), (mem w (g_succ v1)) -> (mem w s)) ->
-  forall (src:vertex), (mem src s) -> forall (dst:vertex), forall (d:Z),
-  (path src dst d) -> (mem dst s).
-
-(* Why3 assumption *)
-Definition inv_src(src:vertex) (s:(set vertex)) (q:(set vertex)): Prop :=
-  (mem src s) \/ (mem src q).
-
-(* Why3 assumption *)
-Definition inv(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map vertex
-  Z)): Prop := (inv_src src s q) /\ (((get d src) = 0%Z) /\ ((subset s v) /\
-  ((subset q v) /\ ((forall (v1:vertex), (mem v1 q) -> ~ (mem v1 s)) /\
-  ((forall (v1:vertex), (mem v1 s) -> (shortest_path src v1 (get d v1))) /\
-  forall (v1:vertex), (mem v1 q) -> (path src v1 (get d v1))))))).
-
-(* Why3 assumption *)
-Definition inv_succ(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
-  vertex Z)): Prop := forall (x:vertex), (mem x s) -> forall (y:vertex),
-  (mem y (g_succ x)) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
-  x) + (weight x y))%Z)%Z).
-
-(* Why3 assumption *)
-Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
-  vertex Z)) (u:vertex) (su:(set vertex)): Prop := forall (x:vertex), (mem x
-  s) -> forall (y:vertex), (mem y (g_succ x)) -> (((~ (x = u)) \/ ((x = u) /\
-  ~ (mem y su))) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
-  x) + (weight x y))%Z)%Z)).
+  v1 d) -> ((~ (shortest_path src v1 d)) -> exists v':vertex, exists d':Z,
+  (shortest_path src v' d') /\ ((mem v1 (g_succ v')) /\ ((d' + (weight v'
+  v1))%Z < d)%Z)).
 
 Require Import Why3. Ltac ae := why3 "alt-ergo".
 
 (* Why3 goal *)
-Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
-  forall (d:(map vertex Z)), ((mem src v) /\ (mem dst v)) -> forall (q:(set
-  vertex)) (d1:(map vertex Z)) (visited:(set vertex)), (((forall (x:vertex),
-  ~ (mem x visited)) /\ (q = (add src (empty :(set vertex))))) /\
-  (d1 = (set1 d src 0%Z))) -> forall (q1:(set vertex)) (d2:(map vertex Z))
-  (visited1:(set vertex)), ((((inv_src src visited1 q1) /\ (((get d2
-  src) = 0%Z) /\ ((subset visited1 v) /\ ((subset q1 v) /\
-  ((forall (v1:vertex), (mem v1 q1) -> ~ (mem v1 visited1)) /\
-  ((forall (v1:vertex), (mem v1 visited1) -> (shortest_path src v1 (get d2
-  v1))) /\ forall (v1:vertex), (mem v1 q1) -> (path src v1 (get d2
-  v1)))))))) /\ forall (x:vertex), (mem x visited1) -> forall (y:vertex),
-  (mem y (g_succ x)) -> (((mem y visited1) \/ (mem y q1)) /\ ((get d2
-  y) <= ((get d2 x) + (weight x y))%Z)%Z)) /\ forall (m:vertex), ((mem m
-  q1) /\ forall (x:vertex), (mem x q1) -> ((get d2 m) <= (get d2 x))%Z) ->
-  forall (x:vertex), forall (dx:Z), (path src x dx) -> ((dx < (get d2
-  m))%Z -> (mem x visited1))) -> forall (o:bool), ((o = true) <->
-  forall (x:vertex), ~ (mem x q1)) -> ((~ (o = true)) ->
-  ((~ forall (x:vertex), ~ (mem x q1)) -> forall (q2:(set vertex)),
-  forall (u:vertex), (((mem u q1) /\ forall (x:vertex), (mem x q1) ->
-  ((get d2 u) <= (get d2 x))%Z) /\ (q2 = (remove u q1))) -> (((path src u
-  (get d2 u)) /\ forall (d':Z), (path src u d') -> ((get d2 u) <= d')%Z) ->
-  forall (visited2:(set vertex)), (visited2 = (add u visited1)) ->
-  forall (su:(set vertex)) (q3:(set vertex)) (d3:(map vertex Z)),
-  (((forall (x:vertex), (mem x su) -> (mem x (g_succ u))) /\ ((inv_src src
-  visited2 q3) /\ (((get d3 src) = 0%Z) /\ ((subset visited2 v) /\
-  ((subset q3 v) /\ ((forall (v1:vertex), (mem v1 q3) -> ~ (mem v1
-  visited2)) /\ ((forall (v1:vertex), (mem v1 visited2) -> (shortest_path src
-  v1 (get d3 v1))) /\ forall (v1:vertex), (mem v1 q3) -> (path src v1 (get d3
-  v1))))))))) /\ forall (x:vertex), (mem x visited2) -> forall (y:vertex),
-  (mem y (g_succ x)) -> (((~ (x = u)) \/ ((x = u) /\ ~ (mem y su))) ->
-  (((mem y visited2) \/ (mem y q3)) /\ ((get d3 y) <= ((get d3 x) + (weight x
-  y))%Z)%Z))) -> forall (result:bool), ((result = true) <->
-  ~ forall (x:vertex), ~ (mem x su)) -> ((result = true) ->
-  ((~ forall (x:vertex), ~ (mem x su)) -> forall (su1:(set vertex)),
-  forall (v1:vertex), ((mem v1 su) /\ (su1 = (remove v1 su))) ->
-  forall (q4:(set vertex)) (d4:(map vertex Z)), (((mem v1 visited2) /\
-  ((q4 = q3) /\ (d4 = d3))) \/ (((mem v1 q4) /\ (((get d4 v1) <= ((get d4
-  u) + (weight u v1))%Z)%Z /\ ((q4 = q3) /\ (d4 = d3)))) \/ (((mem v1 q4) /\
-  ((((get d3 u) + (weight u v1))%Z < (get d3 v1))%Z /\ ((q4 = q3) /\
-  (d4 = (set1 d3 v1 ((get d3 u) + (weight u v1))%Z))))) \/ ((~ (mem v1
-  visited2)) /\ ((~ (mem v1 q3)) /\ ((q4 = (add v1 q3)) /\ (d4 = (set1 d3 v1
-  ((get d3 u) + (weight u v1))%Z)))))))) -> ((((get d4 v1) < ((get d4
-  u) + (weight u v1))%Z)%Z \/ ((get d4 v1) = ((get d4 u) + (weight u
-  v1))%Z)) -> forall (v2:vertex), (mem v2 q4) -> (path src v2 (get d4
-  v2)))))))).
-(*
-intros src dst d (h1,h2) q d1 visited ((h3,h4),h5) q1 d2 visited1
-((h6,(h7,(h8,(h9,(h10,(h11,h12)))))),h14) o h15 h16 h17 q2 u
-((h18,h19),h20) (h21,h22) visited2 h23 su q3 d3
-((h24,(h25,(h26,(h27,(h28,(h29,(h30,(h31,h32)))))))),h33) result h34 h35 h36
-su1 v1 (h37,h38) q4 d4 h39 v2 h40.
-*)
-intuition; try ae.
-
-assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
-subst v2 d4; rewrite Select_eq.
-apply Path_cons.
-why3 "z3".
- ae.
-trivial.
-subst d4; rewrite Select_neq.
-ae.
-ae.
-
-assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
-subst v2 d4; rewrite Select_eq.
-apply Path_cons.
-why3 "z3".
-ae.
-trivial.
+Theorem Completeness_lemma : forall (s:(set vertex)), (forall (v1:vertex),
+  (mem v1 s) -> forall (w:vertex), (mem w (g_succ v1)) -> (mem w s)) ->
+  forall (src:vertex), (mem src s) -> forall (dst:vertex), forall (d:Z),
+  (path src dst d) -> (mem dst s).
+intros s h1 src h2 dst d h3.
+induction h3; trivial.
 ae.
 Qed.
 

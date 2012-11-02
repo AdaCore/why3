@@ -215,79 +215,64 @@ Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
   x) + (weight x y))%Z)%Z)).
 
 Require Import Why3. Ltac ae := why3 "alt-ergo".
+Require Import Classical.
+
+Lemma inside_or_exit:
+  forall s src v d, mem src s -> path src v d ->
+  mem v s
+  \/
+  exists y, exists z, exists dy,
+    mem y s /\ not (mem z s) /\ mem z (g_succ y) /\ path src y dy /\ (dy + weight y z <= d)%Z.
+induction 2.
+auto.
+rename x into src.
+destruct (classic (mem z s)).
+auto.
+destruct (IHpath H).
+destruct (classic (mem z s)).
+auto.
+right.
+exists y; exists z.
+exists d; intuition.
+ae.
+Qed.
+
 
 (* Why3 goal *)
 Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
   forall (d:(map vertex Z)), ((mem src v) /\ (mem dst v)) -> forall (q:(set
-  vertex)) (d1:(map vertex Z)) (visited:(set vertex)), (((forall (x:vertex),
-  ~ (mem x visited)) /\ (q = (add src (empty :(set vertex))))) /\
+  vertex)) (d1:(map vertex Z)) (visited:(set vertex)),
+  (((is_empty visited) /\ (q = (add src (empty :(set vertex))))) /\
   (d1 = (set1 d src 0%Z))) -> forall (q1:(set vertex)) (d2:(map vertex Z))
-  (visited1:(set vertex)), ((((inv_src src visited1 q1) /\ (((get d2
-  src) = 0%Z) /\ ((subset visited1 v) /\ ((subset q1 v) /\
-  ((forall (v1:vertex), (mem v1 q1) -> ~ (mem v1 visited1)) /\
-  ((forall (v1:vertex), (mem v1 visited1) -> (shortest_path src v1 (get d2
-  v1))) /\ forall (v1:vertex), (mem v1 q1) -> (path src v1 (get d2
-  v1)))))))) /\ forall (x:vertex), (mem x visited1) -> forall (y:vertex),
-  (mem y (g_succ x)) -> (((mem y visited1) \/ (mem y q1)) /\ ((get d2
-  y) <= ((get d2 x) + (weight x y))%Z)%Z)) /\ forall (m:vertex), ((mem m
-  q1) /\ forall (x:vertex), (mem x q1) -> ((get d2 m) <= (get d2 x))%Z) ->
-  forall (x:vertex), forall (dx:Z), (path src x dx) -> ((dx < (get d2
-  m))%Z -> (mem x visited1))) -> forall (o:bool), ((o = true) <->
-  forall (x:vertex), ~ (mem x q1)) -> ((~ (o = true)) ->
-  ((~ forall (x:vertex), ~ (mem x q1)) -> forall (q2:(set vertex)),
-  forall (u:vertex), (((mem u q1) /\ forall (x:vertex), (mem x q1) ->
-  ((get d2 u) <= (get d2 x))%Z) /\ (q2 = (remove u q1))) -> (((path src u
-  (get d2 u)) /\ forall (d':Z), (path src u d') -> ((get d2 u) <= d')%Z) ->
-  forall (visited2:(set vertex)), (visited2 = (add u visited1)) ->
-  forall (su:(set vertex)) (q3:(set vertex)) (d3:(map vertex Z)),
-  (((forall (x:vertex), (mem x su) -> (mem x (g_succ u))) /\ ((inv_src src
-  visited2 q3) /\ (((get d3 src) = 0%Z) /\ ((subset visited2 v) /\
-  ((subset q3 v) /\ ((forall (v1:vertex), (mem v1 q3) -> ~ (mem v1
-  visited2)) /\ ((forall (v1:vertex), (mem v1 visited2) -> (shortest_path src
-  v1 (get d3 v1))) /\ forall (v1:vertex), (mem v1 q3) -> (path src v1 (get d3
-  v1))))))))) /\ forall (x:vertex), (mem x visited2) -> forall (y:vertex),
-  (mem y (g_succ x)) -> (((~ (x = u)) \/ ((x = u) /\ ~ (mem y su))) ->
-  (((mem y visited2) \/ (mem y q3)) /\ ((get d3 y) <= ((get d3 x) + (weight x
-  y))%Z)%Z))) -> forall (result:bool), ((result = true) <->
-  ~ forall (x:vertex), ~ (mem x su)) -> ((result = true) ->
-  ((~ forall (x:vertex), ~ (mem x su)) -> forall (su1:(set vertex)),
-  forall (v1:vertex), ((mem v1 su) /\ (su1 = (remove v1 su))) ->
-  forall (q4:(set vertex)) (d4:(map vertex Z)), (((mem v1 visited2) /\
-  ((q4 = q3) /\ (d4 = d3))) \/ (((mem v1 q4) /\ (((get d4 v1) <= ((get d4
-  u) + (weight u v1))%Z)%Z /\ ((q4 = q3) /\ (d4 = d3)))) \/ (((mem v1 q4) /\
-  ((((get d3 u) + (weight u v1))%Z < (get d3 v1))%Z /\ ((q4 = q3) /\
-  (d4 = (set1 d3 v1 ((get d3 u) + (weight u v1))%Z))))) \/ ((~ (mem v1
-  visited2)) /\ ((~ (mem v1 q3)) /\ ((q4 = (add v1 q3)) /\ (d4 = (set1 d3 v1
-  ((get d3 u) + (weight u v1))%Z)))))))) -> ((((get d4 v1) < ((get d4
-  u) + (weight u v1))%Z)%Z \/ ((get d4 v1) = ((get d4 u) + (weight u
-  v1))%Z)) -> forall (v2:vertex), (mem v2 q4) -> (path src v2 (get d4
-  v2)))))))).
-(*
+  (visited1:(set vertex)), (((inv src visited1 q1 d2) /\ (inv_succ src
+  visited1 q1 d2)) /\ forall (m:vertex), (min m q1 d2) -> forall (x:vertex),
+  forall (dx:Z), (path src x dx) -> ((dx < (get d2 m))%Z -> (mem x
+  visited1))) -> forall (o:bool), ((o = true) <-> (is_empty q1)) ->
+  ((~ (o = true)) -> ((~ (is_empty q1)) -> forall (q2:(set vertex)),
+  forall (u:vertex), ((min u q1 d2) /\ (q2 = (remove u q1))) ->
+  ((shortest_path src u (get d2 u)) -> forall (visited2:(set vertex)),
+  (visited2 = (add u visited1)) -> forall (su:(set vertex)) (q3:(set vertex))
+  (d3:(map vertex Z)), (((subset su (g_succ u)) /\ (inv src visited2 q3
+  d3)) /\ (inv_succ2 src visited2 q3 d3 u su)) -> forall (result:bool),
+  ((result = true) <-> ~ (is_empty su)) -> ((~ (result = true)) ->
+  forall (m:vertex), (min m q3 d3) -> forall (x:vertex), forall (dx:Z),
+  (path src x dx) -> ((dx < (get d3 m))%Z -> (mem x visited2)))))).
 intros src dst d (h1,h2) q d1 visited ((h3,h4),h5) q1 d2 visited1
-((h6,(h7,(h8,(h9,(h10,(h11,h12)))))),h14) o h15 h16 h17 q2 u
-((h18,h19),h20) (h21,h22) visited2 h23 su q3 d3
-((h24,(h25,(h26,(h27,(h28,(h29,(h30,(h31,h32)))))))),h33) result h34 h35 h36
-su1 v1 (h37,h38) q4 d4 h39 v2 h40.
-*)
-intuition; try ae.
+((h6,h7),h8) o h9 h10 h11 q2 u (h12,h13) h14 visited2 h15 su q3 d3
+((h16,h17),h18) result h19 h20 m h21 x dx h22 h23.
 
-assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
-subst v2 d4; rewrite Select_eq.
-apply Path_cons.
-why3 "z3".
- ae.
-trivial.
-subst d4; rewrite Select_neq.
-ae.
-ae.
+assert (is_empty su) by ae.
+clear  result h19 h20.
+assert (inv_succ src visited2 q3 d3) by why3 "z3".
+assert (mem src visited2) by ae.
 
-assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
-subst v2 d4; rewrite Select_eq.
-apply Path_cons.
+destruct (inside_or_exit visited2 src x dx); auto.
+destruct H2 as (y, (z, (dy, (a1, (a2, (a3, (a4, a5))))))).
+unfold min in h21.
+assert (mem z q3) by why3 "z3".
+assert (get d3 z <= get d3 y + weight y z)%Z by ae.
+assert (dy = get d3 y) by why3 "z3".
 why3 "z3".
-ae.
-trivial.
-ae.
 Qed.
 
 

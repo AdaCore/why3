@@ -123,7 +123,9 @@ module DijkstraShortestPath
 
   lemma Main_lemma:
     forall src v: vertex. forall d: int.
-    path src v d -> not shortest_path src v d ->
+    path src v d -> not (shortest_path src v d) ->
+    v = src /\ d > 0
+    \/
     exists v': vertex. exists d': int.
       shortest_path src v' d' /\ S.mem v (g_succ v') /\ d' + weight v' v < d
 
@@ -152,24 +154,22 @@ module DijkstraShortestPath
     (* we already found the shortest paths for vertices in S *)
     (forall v: vertex. S.mem v s -> shortest_path src v d[v]) /\
     (* there are paths for vertices in Q *)
-    (forall v: vertex. S.mem v q -> path src v d[v]) /\
-    (* vertices at distance < min(Q) are already in S *)
-    (forall m: vertex. min m q d ->
-       forall x: vertex. forall dx: int. (*shortest_*)path src x dx ->
-         dx < d[m] -> S.mem x s)
+    (forall v: vertex. S.mem v q -> path src v d[v])
 
-  predicate inv_succ (src: vertex) (s q: S.set vertex) =
+  predicate inv_succ (src: vertex) (s q: S.set vertex) (d: M.map vertex int) =
     (* successors of vertices in S are either in S or in Q *)
-    (forall x: vertex. S.mem x s ->
-       forall y: vertex. S.mem y (g_succ x) -> S.mem y s \/ S.mem y q)
+    forall x: vertex. S.mem x s ->
+    forall y: vertex. S.mem y (g_succ x) ->
+    (S.mem y s \/ S.mem y q) /\ d[y] <= d[x] + weight x y
 
-  predicate inv_succ2 (src: vertex) (s q: S.set vertex)
+  predicate inv_succ2 (src: vertex) (s q: S.set vertex) (d: M.map vertex int)
                       (u: vertex) (su: S.set vertex) =
     (* successors of vertices in S are either in S or in Q,
        unless they are successors of u still in su *)
-    (forall x: vertex. S.mem x s ->
-       forall y: vertex. S.mem y (g_succ x) ->
-         (x<>u \/ (x=u /\ not S.mem y su)) -> S.mem y s \/ S.mem y q)
+    forall x: vertex. S.mem x s ->
+    forall y: vertex. S.mem y (g_succ x) ->
+    (x<>u \/ (x=u /\ not (S.mem y su))) ->
+    (S.mem y s \/ S.mem y q) /\ d[y] <= d[x] + weight x y
 
   (* Iteration on a set *)
 
@@ -192,7 +192,11 @@ module DijkstraShortestPath
   = init src;
     while not (q_is_empty ()) do
       invariant { inv src !visited !q !d }
-      invariant { inv_succ src !visited !q }
+      invariant { inv_succ src !visited !q !d }
+      invariant { (* vertices at distance < min(Q) are already in S *)
+                  forall m: vertex. min m !q !d ->
+                  forall x: vertex. forall dx: int. path src x dx ->
+                  dx < !d[m] -> S.mem x !visited }
       variant   { S.cardinal v - S.cardinal !visited }
       let u = q_extract_min () in
       assert { shortest_path src u !d[u] };
@@ -201,10 +205,11 @@ module DijkstraShortestPath
       while set_has_next su do
         invariant { S.subset !su (g_succ u) }
         invariant { inv src !visited !q !d  }
-        invariant { inv_succ2 src !visited !q u !su }
+        invariant { inv_succ2 src !visited !q !d u !su }
         variant   { S.cardinal !su }
         let v = set_next su in
-        relax u v
+        relax u v;
+        assert { !d[v] <= !d[u] + weight u v }
       done
     done
 

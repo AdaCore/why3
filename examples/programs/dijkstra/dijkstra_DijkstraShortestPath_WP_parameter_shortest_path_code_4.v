@@ -214,8 +214,6 @@ Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
   ~ (mem y su))) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
   x) + (weight x y))%Z)%Z)).
 
-Require Import Why3. Ltac ae := why3 "alt-ergo".
-
 (* Why3 goal *)
 Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
   forall (d:(map vertex Z)), ((mem src v) /\ (mem dst v)) -> forall (q:(set
@@ -258,36 +256,16 @@ Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
   ((((get d3 u) + (weight u v1))%Z < (get d3 v1))%Z /\ ((q4 = q3) /\
   (d4 = (set1 d3 v1 ((get d3 u) + (weight u v1))%Z))))) \/ ((~ (mem v1
   visited2)) /\ ((~ (mem v1 q3)) /\ ((q4 = (add v1 q3)) /\ (d4 = (set1 d3 v1
-  ((get d3 u) + (weight u v1))%Z)))))))) -> ((((get d4 v1) < ((get d4
-  u) + (weight u v1))%Z)%Z \/ ((get d4 v1) = ((get d4 u) + (weight u
-  v1))%Z)) -> forall (v2:vertex), (mem v2 q4) -> (path src v2 (get d4
-  v2)))))))).
-(*
+  ((get d3 u) + (weight u v1))%Z)))))))) -> forall (x:vertex), (mem x
+  visited2) -> forall (y:vertex), (mem y (g_succ x)) -> (((~ (x = u)) \/
+  ((x = u) /\ ~ (mem y su1))) -> ((get d4 y) <= ((get d4 x) + (weight x
+  y))%Z)%Z)))))).
 intros src dst d (h1,h2) q d1 visited ((h3,h4),h5) q1 d2 visited1
-((h6,(h7,(h8,(h9,(h10,(h11,h12)))))),h14) o h15 h16 h17 q2 u
+(((h6,(h7,(h8,(h9,(h10,(h11,h12)))))),h13),h14) o h15 h16 h17 q2 u
 ((h18,h19),h20) (h21,h22) visited2 h23 su q3 d3
-((h24,(h25,(h26,(h27,(h28,(h29,(h30,(h31,h32)))))))),h33) result h34 h35 h36
-su1 v1 (h37,h38) q4 d4 h39 v2 h40.
-*)
-intuition; try ae.
+((h24,(h25,(h26,(h27,(h28,(h29,(h30,h31))))))),h32) result h33 h34 h35 su1 v1
+(h36,h37) q4 d4 h38 x h39 y h40 h41.
 
-assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
-subst v2 d4; rewrite Select_eq.
-apply Path_cons.
-why3 "z3".
- ae.
-trivial.
-subst d4; rewrite Select_neq.
-ae.
-ae.
-
-assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
-subst v2 d4; rewrite Select_eq.
-apply Path_cons.
-why3 "z3".
-ae.
-trivial.
-ae.
 Qed.
 
 

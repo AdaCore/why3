@@ -181,9 +181,9 @@ Axiom Path_shortest_path : forall (src:vertex) (v1:vertex), forall (d:Z),
   (path src v1 d) -> exists d':Z, (shortest_path src v1 d') /\ (d' <= d)%Z.
 
 Axiom Main_lemma : forall (src:vertex) (v1:vertex), forall (d:Z), (path src
-  v1 d) -> ((~ (shortest_path src v1 d)) -> exists v':vertex, exists d':Z,
-  (shortest_path src v' d') /\ ((mem v1 (g_succ v')) /\ ((d' + (weight v'
-  v1))%Z < d)%Z)).
+  v1 d) -> ((~ (shortest_path src v1 d)) -> (((v1 = src) /\ (0%Z < d)%Z) \/
+  exists v':vertex, exists d':Z, (shortest_path src v' d') /\ ((mem v1
+  (g_succ v')) /\ ((d' + (weight v' v1))%Z < d)%Z))).
 
 Axiom Completeness_lemma : forall (s:(set vertex)), (forall (v1:vertex),
   (mem v1 s) -> forall (w:vertex), (mem w (g_succ v1)) -> (mem w s)) ->
@@ -252,7 +252,6 @@ intros dx IH x pathx hdx.
 destruct (Path_inversion _ _ _ pathx).
 ae.
 
-ae.
 
 Qed.
 

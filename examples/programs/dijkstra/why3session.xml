@@ -15,21 +15,17 @@
   version="8.3pl3"/>
  <prover
   id="3"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="4"
   name="Z3"
   version="3.2"/>
  <file
   name="../dijkstra.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="DijkstraShortestPath"
    locfile="../dijkstra.mlw"
    loclnum="8" loccnumb="7" loccnume="27"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter relax"
@@ -185,66 +181,35 @@
     name="Main_lemma"
     locfile="../dijkstra.mlw"
     loclnum="124" loccnumb="8" loccnume="18"
-    sum="acbdb9884b0fd3ff6b2ee6fb3c6380e8"
-    proved="false"
+    sum="10b2fafab8280ebf6635322b8ce56da4"
+    proved="true"
     expanded="false"
-    shape="ainfix &lt;ainfix +V4aweightV3V1V2AamemV1ag_succV3Aashortest_pathV0V3V4EEIashortest_pathV0V1V2NIapathV0V1V2FF">
+    shape="ainfix &lt;ainfix +V4aweightV3V1V2AamemV1ag_succV3Aashortest_pathV0V3V4EEOainfix &gt;V2c0Aainfix =V1V0Iashortest_pathV0V1V2NIapathV0V1V2FF">
     <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.06"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
     name="Completeness_lemma"
     locfile="../dijkstra.mlw"
-    loclnum="130" loccnumb="8" loccnume="26"
-    sum="78cf9f5f9f39d2513fab68dbefa63d71"
-    proved="false"
+    loclnum="132" loccnumb="8" loccnume="26"
+    sum="3b208c82a67d602958ef94c016866c0e"
+    proved="true"
     expanded="false"
     shape="amemV2V0IapathV1V2V3FFIamemV1V0FIamemV5V0IamemV5ag_succV4FIamemV4V0FF">
     <proof
-     prover="0"
+     prover="2"
      timelimit="5"
      memlimit="1000"
+     edited="dijkstra_DijkstraShortestPath_Completeness_lemma_1.v"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.06"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
+     <result status="valid" time="1.22"/>
     </proof>
    </goal>
    <goal
@@ -252,45 +217,37 @@
     locfile="../dijkstra.mlw"
     loclnum="186" loccnumb="6" loccnume="24"
     expl="VC for shortest_path_code"
-    sum="a567969fd987b61f1617b52ddcac93c2"
-    proved="false"
+    sum="d971d44939b09229aa54e1ecc60e3025"
+    proved="true"
     expanded="true"
-    shape="iainfix =V9aTrueNiainfix =V16aTrueainfix &lt;acardinalV17acardinalV13Aainfix &lt;=c0acardinalV13Aainv_succ2V0V12V19V11V17AainvV0V12V19V20AasubsetV17ag_succV11Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFAais_emptyV13Nainfix &lt;ainfix -acardinalavacardinalV12ainfix -acardinalavacardinalV8Aainfix &lt;=c0ainfix -acardinalavacardinalV8Aainv_succV0V12V14AainvV0V12V14V15Iais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FAainv_succ2V0V12V10V11ag_succV11AainvV0V12V10V7Aasubsetag_succV11ag_succV11Iainfix =V12aaddV11V8FAashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFAais_emptyV6NapathV0V21V22NFIamemV21V8NFAashortest_pathV0V23amixfix []V7V23IamemV23V8FIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FAainv_succV0V5V3AainvV0V5V3V4Iainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+    shape="iainfix =V9aTrueNiainfix =V16aTrueainfix &lt;acardinalV17acardinalV13Aainfix &lt;=c0acardinalV13Aainv_succ2V0V12V19V20V11V17AainvV0V12V19V20AasubsetV17ag_succV11Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFAais_emptyV13Nainfix &lt;ainfix -acardinalavacardinalV12ainfix -acardinalavacardinalV8Aainfix &lt;=c0ainfix -acardinalavacardinalV8AamemV22V12Iainfix &lt;V23amixfix []V15V21IapathV0V22V23FFIaminV21V14V15FAainv_succV0V12V14V15AainvV0V12V14V15Iais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FAainv_succ2V0V12V10V7V11ag_succV11AainvV0V12V10V7Aasubsetag_succV11ag_succV11Iainfix =V12aaddV11V8FAashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFAais_emptyV6NapathV0V24V25NFIamemV24V8NFAashortest_pathV0V26amixfix []V7V26IamemV26V8FIais_emptyV6qainfix =V9aTrueFIamemV28V8Iainfix &lt;V29amixfix []V7V27IapathV0V28V29FFIaminV27V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FAamemV31V5Iainfix &lt;V32amixfix []V4V30IapathV0V31V32FFIaminV30V3V4FAainv_succV0V5V3V4AainvV0V5V3V4Iainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
     <label
      name="expl:VC for shortest_path_code"/>
     <transf
      name="split_goal_wp"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter shortest_path_code.1"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
       expl="1. loop invariant init"
-      sum="57e382c82e775a3d3c47300fb32713a4"
+      sum="509cd0da8fd735f5ca85a026e6b92e0d"
       proved="true"
       expanded="false"
       shape="ainvV0V5V3V4Iainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.02"/>
-      </proof>
-      <proof
        prover="1"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.85"/>
+       <result status="valid" time="0.81"/>
       </proof>
       <proof
-       prover="4"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -303,10 +260,10 @@
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
       expl="2. loop invariant init"
-      sum="16c471ae6acb658a526d2e8fb01979c3"
+      sum="390121b7e4b9dcb89b13a5de48699bcd"
       proved="true"
       expanded="false"
-      shape="ainv_succV0V5V3Iainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="ainv_succV0V5V3V4Iainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -326,7 +283,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="4"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -338,11 +295,31 @@
       name="WP_parameter shortest_path_code.3"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="3. precondition"
-      sum="bfa5e955025f1ef4351a13281ed3dbc4"
+      expl="3. loop invariant init"
+      sum="93bf4fd51feed93921f9ea9c13a70307"
       proved="true"
       expanded="false"
-      shape="ais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="amemV7V5Iainfix &lt;V8amixfix []V4V6IapathV0V7V8FFIaminV6V3V4FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.4"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="4. precondition"
+      sum="60a5207b102d9058d18a59ef7fd51876"
+      proved="true"
+      expanded="false"
+      shape="ais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV11V8Iainfix &lt;V12amixfix []V7V10IapathV0V11V12FFIaminV10V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -355,14 +332,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter shortest_path_code.4"
+      name="WP_parameter shortest_path_code.5"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="4. assertion"
-      sum="e6a9c287dc1172c1955196284aa95daa"
+      expl="5. assertion"
+      sum="434d0ca0e8a704f9ae73b6a84fcb0954"
       proved="true"
       expanded="false"
-      shape="ashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="ashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV13V8Iainfix &lt;V14amixfix []V7V12IapathV0V13V14FFIaminV12V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -374,23 +351,23 @@
        <result status="valid" time="0.07"/>
       </proof>
       <proof
-       prover="4"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.60"/>
+       <result status="valid" time="0.91"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter shortest_path_code.5"
+      name="WP_parameter shortest_path_code.6"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="5. loop invariant init"
-      sum="1a3e33c1c2bf9fbcdcfd504124dba435"
+      expl="6. loop invariant init"
+      sum="72047e349f387192746b2b8e25b17165"
       proved="true"
       expanded="false"
-      shape="asubsetag_succV11ag_succV11Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="asubsetag_succV11ag_succV11Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV14V8Iainfix &lt;V15amixfix []V7V13IapathV0V14V15FFIaminV13V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -403,44 +380,44 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter shortest_path_code.6"
+      name="WP_parameter shortest_path_code.7"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="6. loop invariant init"
-      sum="2cc1d15d7d2fb69f51edbf349d8dfbe4"
-      proved="false"
-      expanded="true"
-      shape="ainvV0V12V10V7Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      expl="7. loop invariant init"
+      sum="51cc95937806bf6d2161f58900fd5fda"
+      proved="true"
+      expanded="false"
+      shape="ainvV0V12V10V7Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV14V8Iainfix &lt;V15amixfix []V7V13IapathV0V14V15FFIaminV13V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <transf
        name="inline_goal"
-       proved="false"
-       expanded="true">
+       proved="true"
+       expanded="false">
        <goal
-        name="WP_parameter shortest_path_code.6.1"
+        name="WP_parameter shortest_path_code.7.1"
         locfile="../dijkstra.mlw"
         loclnum="186" loccnumb="6" loccnume="24"
         expl="1. loop invariant init"
-        sum="04708ef024faaaecfa57781b85946421"
-        proved="false"
-        expanded="true"
-        shape="amemV14V12Iainfix &lt;V15amixfix []V7V13IapathV0V14V15FFIaminV13V10V7FAapathV0V16amixfix []V7V16IamemV16V10FAashortest_pathV0V17amixfix []V7V17IamemV17V12FAfIamemV18V12IamemV18V10FAasubsetV10avAasubsetV12avAainfix =amixfix []V7V0c0Aainv_srcV0V12V10Iainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V19IapathV0V11V19FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V20IamemV20V6FAamemV11V6FFIamemV21V6NFNIainfix =V9aTrueNIamemV22V6NFqainfix =V9aTrueFIamemV24V6OamemV24V8IamemV24ag_succV23FIamemV23V8FAamemV26V8Iainfix &lt;V27amixfix []V7V25IapathV0V26V27FFIaminV25V6V7FAapathV0V28amixfix []V7V28IamemV28V6FAashortest_pathV0V29amixfix []V7V29IamemV29V8FAfIamemV30V8IamemV30V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV31V5NFFIamemV1avAamemV0avFF">
+        sum="f12a6df9553db877217030c61f181901"
+        proved="true"
+        expanded="false"
+        shape="apathV0V13amixfix []V7V13IamemV13V10FAashortest_pathV0V14amixfix []V7V14IamemV14V12FAfIamemV15V12IamemV15V10FAasubsetV10avAasubsetV12avAainfix =amixfix []V7V0c0Aainv_srcV0V12V10Iainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V16IapathV0V11V16FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V17IamemV17V6FAamemV11V6FFIamemV18V6NFNIainfix =V9aTrueNIamemV19V6NFqainfix =V9aTrueFIamemV21V8Iainfix &lt;V22amixfix []V7V20IapathV0V21V22FFIainfix &lt;=amixfix []V7V20amixfix []V7V23IamemV23V6FAamemV20V6FAainfix &lt;=amixfix []V7V25ainfix +amixfix []V7V24aweightV24V25AamemV25V6OamemV25V8IamemV25ag_succV24FIamemV24V8FAapathV0V26amixfix []V7V26IamemV26V6FAashortest_pathV0V27amixfix []V7V27IamemV27V8FAfIamemV28V8IamemV28V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV29V5NFFIamemV1avAamemV0avFF">
         <label
          name="expl:VC for shortest_path_code"/>
         <transf
          name="split_goal_wp"
-         proved="false"
-         expanded="true">
+         proved="true"
+         expanded="false">
          <goal
-          name="WP_parameter shortest_path_code.6.1.1"
+          name="WP_parameter shortest_path_code.7.1.1"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="1."
-          sum="909e5a073fc2971ed0f7c58cb21a623c"
+          sum="55493072ab20e9033f913840064591b5"
           proved="true"
           expanded="false"
-          shape="ainv_srcV0V12V10Iainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V6OamemV18V8IamemV18ag_succV17FIamemV17V8FAamemV20V8Iainfix &lt;V21amixfix []V7V19IapathV0V20V21FFIaminV19V6V7FAapathV0V22amixfix []V7V22IamemV22V6FAashortest_pathV0V23amixfix []V7V23IamemV23V8FAfIamemV24V8IamemV24V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV25V5NFFIamemV1avAamemV0avFF">
+          shape="ainv_srcV0V12V10Iainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIainfix &lt;=amixfix []V7V17amixfix []V7V20IamemV20V6FAamemV17V6FAainfix &lt;=amixfix []V7V22ainfix +amixfix []V7V21aweightV21V22AamemV22V6OamemV22V8IamemV22ag_succV21FIamemV21V8FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -453,14 +430,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter shortest_path_code.6.1.2"
+          name="WP_parameter shortest_path_code.7.1.2"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="2."
-          sum="9e96924d6b2fab6f80a926b7ccd68007"
+          sum="3aad1a70e5e0152a5e220cc6e5833b56"
           proved="true"
           expanded="false"
-          shape="ainfix =amixfix []V7V0c0Iainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V6OamemV18V8IamemV18ag_succV17FIamemV17V8FAamemV20V8Iainfix &lt;V21amixfix []V7V19IapathV0V20V21FFIaminV19V6V7FAapathV0V22amixfix []V7V22IamemV22V6FAashortest_pathV0V23amixfix []V7V23IamemV23V8FAfIamemV24V8IamemV24V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV25V5NFFIamemV1avAamemV0avFF">
+          shape="ainfix =amixfix []V7V0c0Iainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIainfix &lt;=amixfix []V7V17amixfix []V7V20IamemV20V6FAamemV17V6FAainfix &lt;=amixfix []V7V22ainfix +amixfix []V7V21aweightV21V22AamemV22V6OamemV22V8IamemV22ag_succV21FIamemV21V8FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -473,14 +450,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter shortest_path_code.6.1.3"
+          name="WP_parameter shortest_path_code.7.1.3"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="3."
-          sum="687b407d3d82d25a9fb294370d2ccd79"
+          sum="5e4c3e1702c45354bf109c47b93dc8e8"
           proved="true"
           expanded="false"
-          shape="asubsetV12avIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V6OamemV18V8IamemV18ag_succV17FIamemV17V8FAamemV20V8Iainfix &lt;V21amixfix []V7V19IapathV0V20V21FFIaminV19V6V7FAapathV0V22amixfix []V7V22IamemV22V6FAashortest_pathV0V23amixfix []V7V23IamemV23V8FAfIamemV24V8IamemV24V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV25V5NFFIamemV1avAamemV0avFF">
+          shape="asubsetV12avIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIainfix &lt;=amixfix []V7V17amixfix []V7V20IamemV20V6FAamemV17V6FAainfix &lt;=amixfix []V7V22ainfix +amixfix []V7V21aweightV21V22AamemV22V6OamemV22V8IamemV22ag_succV21FIamemV21V8FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -493,14 +470,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter shortest_path_code.6.1.4"
+          name="WP_parameter shortest_path_code.7.1.4"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="4."
-          sum="a42f0505b0e0cd8cbde724f81eb1b73b"
+          sum="c3dce4b591767c7cacff69501fc0aab1"
           proved="true"
           expanded="false"
-          shape="asubsetV10avIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V6OamemV18V8IamemV18ag_succV17FIamemV17V8FAamemV20V8Iainfix &lt;V21amixfix []V7V19IapathV0V20V21FFIaminV19V6V7FAapathV0V22amixfix []V7V22IamemV22V6FAashortest_pathV0V23amixfix []V7V23IamemV23V8FAfIamemV24V8IamemV24V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV25V5NFFIamemV1avAamemV0avFF">
+          shape="asubsetV10avIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V13IapathV0V11V13FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V14IamemV14V6FAamemV11V6FFIamemV15V6NFNIainfix =V9aTrueNIamemV16V6NFqainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIainfix &lt;=amixfix []V7V17amixfix []V7V20IamemV20V6FAamemV17V6FAainfix &lt;=amixfix []V7V22ainfix +amixfix []V7V21aweightV21V22AamemV22V6OamemV22V8IamemV22ag_succV21FIamemV21V8FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -513,14 +490,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter shortest_path_code.6.1.5"
+          name="WP_parameter shortest_path_code.7.1.5"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="5."
-          sum="bd72f6d7b91b51a876be0637e060bcdc"
+          sum="7511c15c3f914a61be284c46208dd5ab"
           proved="true"
           expanded="false"
-          shape="fIamemV13V12IamemV13V10FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V14IapathV0V11V14FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V15IamemV15V6FAamemV11V6FFIamemV16V6NFNIainfix =V9aTrueNIamemV17V6NFqainfix =V9aTrueFIamemV19V6OamemV19V8IamemV19ag_succV18FIamemV18V8FAamemV21V8Iainfix &lt;V22amixfix []V7V20IapathV0V21V22FFIaminV20V6V7FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
+          shape="fIamemV13V12IamemV13V10FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V14IapathV0V11V14FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V15IamemV15V6FAamemV11V6FFIamemV16V6NFNIainfix =V9aTrueNIamemV17V6NFqainfix =V9aTrueFIamemV19V8Iainfix &lt;V20amixfix []V7V18IapathV0V19V20FFIainfix &lt;=amixfix []V7V18amixfix []V7V21IamemV21V6FAamemV18V6FAainfix &lt;=amixfix []V7V23ainfix +amixfix []V7V22aweightV22V23AamemV23V6OamemV23V8IamemV23ag_succV22FIamemV22V8FAapathV0V24amixfix []V7V24IamemV24V6FAashortest_pathV0V25amixfix []V7V25IamemV25V8FAfIamemV26V8IamemV26V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV27V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -533,14 +510,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter shortest_path_code.6.1.6"
+          name="WP_parameter shortest_path_code.7.1.6"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="6."
-          sum="21eec1f39bd16db7514af42e82fe8c94"
+          sum="3bac98f37d8d5875c4521a906b05fa31"
           proved="true"
           expanded="false"
-          shape="ashortest_pathV0V13amixfix []V7V13IamemV13V12FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V14IapathV0V11V14FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V15IamemV15V6FAamemV11V6FFIamemV16V6NFNIainfix =V9aTrueNIamemV17V6NFqainfix =V9aTrueFIamemV19V6OamemV19V8IamemV19ag_succV18FIamemV18V8FAamemV21V8Iainfix &lt;V22amixfix []V7V20IapathV0V21V22FFIaminV20V6V7FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
+          shape="ashortest_pathV0V13amixfix []V7V13IamemV13V12FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V14IapathV0V11V14FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V15IamemV15V6FAamemV11V6FFIamemV16V6NFNIainfix =V9aTrueNIamemV17V6NFqainfix =V9aTrueFIamemV19V8Iainfix &lt;V20amixfix []V7V18IapathV0V19V20FFIainfix &lt;=amixfix []V7V18amixfix []V7V21IamemV21V6FAamemV18V6FAainfix &lt;=amixfix []V7V23ainfix +amixfix []V7V22aweightV22V23AamemV23V6OamemV23V8IamemV23ag_succV22FIamemV22V8FAapathV0V24amixfix []V7V24IamemV24V6FAashortest_pathV0V25amixfix []V7V25IamemV25V8FAfIamemV26V8IamemV26V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV27V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -553,14 +530,14 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter shortest_path_code.6.1.7"
+          name="WP_parameter shortest_path_code.7.1.7"
           locfile="../dijkstra.mlw"
           loclnum="186" loccnumb="6" loccnume="24"
           expl="7."
-          sum="ed72017354cae4683dd99d3a14e3f65c"
+          sum="49eaca9985d2fdb2b99259e8d7ca0fc2"
           proved="true"
           expanded="false"
-          shape="apathV0V13amixfix []V7V13IamemV13V10FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V14IapathV0V11V14FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V15IamemV15V6FAamemV11V6FFIamemV16V6NFNIainfix =V9aTrueNIamemV17V6NFqainfix =V9aTrueFIamemV19V6OamemV19V8IamemV19ag_succV18FIamemV18V8FAamemV21V8Iainfix &lt;V22amixfix []V7V20IapathV0V21V22FFIaminV20V6V7FAapathV0V23amixfix []V7V23IamemV23V6FAashortest_pathV0V24amixfix []V7V24IamemV24V8FAfIamemV25V8IamemV25V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV26V5NFFIamemV1avAamemV0avFF">
+          shape="apathV0V13amixfix []V7V13IamemV13V10FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V14IapathV0V11V14FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V15IamemV15V6FAamemV11V6FFIamemV16V6NFNIainfix =V9aTrueNIamemV17V6NFqainfix =V9aTrueFIamemV19V8Iainfix &lt;V20amixfix []V7V18IapathV0V19V20FFIainfix &lt;=amixfix []V7V18amixfix []V7V21IamemV21V6FAamemV18V6FAainfix &lt;=amixfix []V7V23ainfix +amixfix []V7V22aweightV22V23AamemV23V6OamemV23V8IamemV23ag_succV22FIamemV22V8FAapathV0V24amixfix []V7V24IamemV24V6FAashortest_pathV0V25amixfix []V7V25IamemV25V8FAfIamemV26V8IamemV26V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV27V5NFFIamemV1avAamemV0avFF">
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
@@ -572,64 +549,19 @@
            <result status="valid" time="0.08"/>
           </proof>
          </goal>
-         <goal
-          name="WP_parameter shortest_path_code.6.1.8"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="8."
-          sum="04f900a113263f08abe4839b0f0c03ab"
-          proved="false"
-          expanded="true"
-          shape="amemV14V12Iainfix &lt;V15amixfix []V7V13IapathV0V14V15FFIaminV13V10V7FIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V16IapathV0V11V16FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V17IamemV17V6FAamemV11V6FFIamemV18V6NFNIainfix =V9aTrueNIamemV19V6NFqainfix =V9aTrueFIamemV21V6OamemV21V8IamemV21ag_succV20FIamemV20V8FAamemV23V8Iainfix &lt;V24amixfix []V7V22IapathV0V23V24FFIaminV22V6V7FAapathV0V25amixfix []V7V25IamemV25V6FAashortest_pathV0V26amixfix []V7V26IamemV26V8FAfIamemV27V8IamemV27V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV28V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="5.00"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="5.04"/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="30"
-           memlimit="1000"
-           edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_1.v"
-           obsolete="true"
-           archived="false">
-           <undone/>
-          </proof>
-          <proof
-           prover="4"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="5.05"/>
-          </proof>
-         </goal>
         </transf>
        </goal>
       </transf>
      </goal>
      <goal
-      name="WP_parameter shortest_path_code.7"
+      name="WP_parameter shortest_path_code.8"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="7. loop invariant init"
-      sum="88eb4950ca3585dbd17b1b4468284df3"
+      expl="8. loop invariant init"
+      sum="db83ed277847de97eaf01eec57942092"
       proved="true"
       expanded="false"
-      shape="ainv_succ2V0V12V10V11ag_succV11Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="ainv_succ2V0V12V10V7V11ag_succV11Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV14V8Iainfix &lt;V15amixfix []V7V13IapathV0V14V15FFIaminV13V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <transf
@@ -637,14 +569,14 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter shortest_path_code.7.1"
+        name="WP_parameter shortest_path_code.8.1"
         locfile="../dijkstra.mlw"
         loclnum="186" loccnumb="6" loccnume="24"
         expl="1. loop invariant init"
-        sum="88eb4950ca3585dbd17b1b4468284df3"
+        sum="db83ed277847de97eaf01eec57942092"
         proved="true"
         expanded="false"
-        shape="ainv_succ2V0V12V10V11ag_succV11Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+        shape="ainv_succ2V0V12V10V7V11ag_succV11Iainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV14V8Iainfix &lt;V15amixfix []V7V13IapathV0V14V15FFIaminV13V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
         <label
          name="expl:VC for shortest_path_code"/>
         <proof
@@ -659,50 +591,14 @@
       </transf>
      </goal>
      <goal
-      name="WP_parameter shortest_path_code.8"
-      locfile="../dijkstra.mlw"
-      loclnum="186" loccnumb="6" loccnume="24"
-      expl="8. precondition"
-      sum="322ba0d09aa7c84cb139e9d47312092f"
-      proved="true"
-      expanded="false"
-      shape="ais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
-      <label
-       name="expl:VC for shortest_path_code"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.03"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.08"/>
-      </proof>
-     </goal>
-     <goal
       name="WP_parameter shortest_path_code.9"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="9. loop invariant preservation"
-      sum="b8643e3f7cdf334f454a09aa77f11501"
+      expl="9. precondition"
+      sum="7a93790ae6d6067ed7545449a5e7dc68"
       proved="true"
       expanded="false"
-      shape="asubsetV17ag_succV11Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="ais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIaminV17V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -718,311 +614,31 @@
       name="WP_parameter shortest_path_code.10"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="10. loop invariant preservation"
-      sum="c2b4238400b22a76a8132f7b73f8563c"
-      proved="false"
-      expanded="true"
-      shape="ainvV0V12V19V20Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      expl="10. assertion"
+      sum="9db6dd2da24f39ac2ee640a4f0201186"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV22V8Iainfix &lt;V23amixfix []V7V21IapathV0V22V23FFIaminV21V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
-      <transf
-       name="inline_goal"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter shortest_path_code.10.1"
-        locfile="../dijkstra.mlw"
-        loclnum="186" loccnumb="6" loccnume="24"
-        expl="1. loop invariant preservation"
-        sum="995d6cf8929f21ce401699478a914205"
-        proved="false"
-        expanded="true"
-        shape="amemV22V12Iainfix &lt;V23amixfix []V20V21IapathV0V22V23FFIaminV21V19V20FAapathV0V24amixfix []V20V24IamemV24V19FAashortest_pathV0V25amixfix []V20V25IamemV25V12FAfIamemV26V12IamemV26V19FAasubsetV19avAasubsetV12avAainfix =amixfix []V20V0c0Aainv_srcV0V12V19Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV27V13NFNIainfix =V16aTrueIamemV28V13NFNqainfix =V16aTrueFIamemV30V14OamemV30V12IamemV30V13NAainfix =V29V11Oainfix =V29V11NIamemV30ag_succV29FIamemV29V12FAamemV32V12Iainfix &lt;V33amixfix []V15V31IapathV0V32V33FFIaminV31V14V15FAapathV0V34amixfix []V15V34IamemV34V14FAashortest_pathV0V35amixfix []V15V35IamemV35V12FAfIamemV36V12IamemV36V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV37ag_succV11IamemV37V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V38IapathV0V11V38FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V39IamemV39V6FAamemV11V6FFIamemV40V6NFNIainfix =V9aTrueNIamemV41V6NFqainfix =V9aTrueFIamemV43V6OamemV43V8IamemV43ag_succV42FIamemV42V8FAamemV45V8Iainfix &lt;V46amixfix []V7V44IapathV0V45V46FFIaminV44V6V7FAapathV0V47amixfix []V7V47IamemV47V6FAashortest_pathV0V48amixfix []V7V48IamemV48V8FAfIamemV49V8IamemV49V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV50V5NFFIamemV1avAamemV0avFF">
-        <label
-         name="expl:VC for shortest_path_code"/>
-        <transf
-         name="split_goal_wp"
-         proved="false"
-         expanded="true">
-         <goal
-          name="WP_parameter shortest_path_code.10.1.1"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="1."
-          sum="abfd485b780cb3d2b793ab285f6e993c"
-          proved="true"
-          expanded="false"
-          shape="ainv_srcV0V12V19Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAamemV26V12Iainfix &lt;V27amixfix []V15V25IapathV0V26V27FFIaminV25V14V15FAapathV0V28amixfix []V15V28IamemV28V14FAashortest_pathV0V29amixfix []V15V29IamemV29V12FAfIamemV30V12IamemV30V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV31ag_succV11IamemV31V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V32IapathV0V11V32FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V33IamemV33V6FAamemV11V6FFIamemV34V6NFNIainfix =V9aTrueNIamemV35V6NFqainfix =V9aTrueFIamemV37V6OamemV37V8IamemV37ag_succV36FIamemV36V8FAamemV39V8Iainfix &lt;V40amixfix []V7V38IapathV0V39V40FFIaminV38V6V7FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.62"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.2"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="2."
-          sum="cea9d770b6cbfc85bf7b70f9d9fbf53b"
-          proved="true"
-          expanded="false"
-          shape="ainfix =amixfix []V20V0c0Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAamemV26V12Iainfix &lt;V27amixfix []V15V25IapathV0V26V27FFIaminV25V14V15FAapathV0V28amixfix []V15V28IamemV28V14FAashortest_pathV0V29amixfix []V15V29IamemV29V12FAfIamemV30V12IamemV30V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV31ag_succV11IamemV31V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V32IapathV0V11V32FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V33IamemV33V6FAamemV11V6FFIamemV34V6NFNIainfix =V9aTrueNIamemV35V6NFqainfix =V9aTrueFIamemV37V6OamemV37V8IamemV37ag_succV36FIamemV36V8FAamemV39V8Iainfix &lt;V40amixfix []V7V38IapathV0V39V40FFIaminV38V6V7FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="1"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.33"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.3"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="3."
-          sum="d2154802e97a53ab2aecada654209662"
-          proved="true"
-          expanded="false"
-          shape="asubsetV12avIainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAamemV26V12Iainfix &lt;V27amixfix []V15V25IapathV0V26V27FFIaminV25V14V15FAapathV0V28amixfix []V15V28IamemV28V14FAashortest_pathV0V29amixfix []V15V29IamemV29V12FAfIamemV30V12IamemV30V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV31ag_succV11IamemV31V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V32IapathV0V11V32FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V33IamemV33V6FAamemV11V6FFIamemV34V6NFNIainfix =V9aTrueNIamemV35V6NFqainfix =V9aTrueFIamemV37V6OamemV37V8IamemV37ag_succV36FIamemV36V8FAamemV39V8Iainfix &lt;V40amixfix []V7V38IapathV0V39V40FFIaminV38V6V7FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.4"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="4."
-          sum="7ab5a376077451f44e6b9447babae37a"
-          proved="true"
-          expanded="false"
-          shape="asubsetV19avIainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAamemV26V12Iainfix &lt;V27amixfix []V15V25IapathV0V26V27FFIaminV25V14V15FAapathV0V28amixfix []V15V28IamemV28V14FAashortest_pathV0V29amixfix []V15V29IamemV29V12FAfIamemV30V12IamemV30V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV31ag_succV11IamemV31V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V32IapathV0V11V32FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V33IamemV33V6FAamemV11V6FFIamemV34V6NFNIainfix =V9aTrueNIamemV35V6NFqainfix =V9aTrueFIamemV37V6OamemV37V8IamemV37ag_succV36FIamemV36V8FAamemV39V8Iainfix &lt;V40amixfix []V7V38IapathV0V39V40FFIaminV38V6V7FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="5.09"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="4.28"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.5"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="5."
-          sum="f6522648731c0a7df89de08c3ef54abf"
-          proved="true"
-          expanded="false"
-          shape="fIamemV21V12IamemV21V19FIainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV22V13NFNIainfix =V16aTrueIamemV23V13NFNqainfix =V16aTrueFIamemV25V14OamemV25V12IamemV25V13NAainfix =V24V11Oainfix =V24V11NIamemV25ag_succV24FIamemV24V12FAamemV27V12Iainfix &lt;V28amixfix []V15V26IapathV0V27V28FFIaminV26V14V15FAapathV0V29amixfix []V15V29IamemV29V14FAashortest_pathV0V30amixfix []V15V30IamemV30V12FAfIamemV31V12IamemV31V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV32ag_succV11IamemV32V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V33IapathV0V11V33FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V34IamemV34V6FAamemV11V6FFIamemV35V6NFNIainfix =V9aTrueNIamemV36V6NFqainfix =V9aTrueFIamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAamemV40V8Iainfix &lt;V41amixfix []V7V39IapathV0V40V41FFIaminV39V6V7FAapathV0V42amixfix []V7V42IamemV42V6FAashortest_pathV0V43amixfix []V7V43IamemV43V8FAfIamemV44V8IamemV44V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV45V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="2.25"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.6"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="6."
-          sum="7bfc69c4f1fe8ea5057f4620681b3629"
-          proved="true"
-          expanded="false"
-          shape="ashortest_pathV0V21amixfix []V20V21IamemV21V12FIainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV22V13NFNIainfix =V16aTrueIamemV23V13NFNqainfix =V16aTrueFIamemV25V14OamemV25V12IamemV25V13NAainfix =V24V11Oainfix =V24V11NIamemV25ag_succV24FIamemV24V12FAamemV27V12Iainfix &lt;V28amixfix []V15V26IapathV0V27V28FFIaminV26V14V15FAapathV0V29amixfix []V15V29IamemV29V14FAashortest_pathV0V30amixfix []V15V30IamemV30V12FAfIamemV31V12IamemV31V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV32ag_succV11IamemV32V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V33IapathV0V11V33FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V34IamemV34V6FAamemV11V6FFIamemV35V6NFNIainfix =V9aTrueNIamemV36V6NFqainfix =V9aTrueFIamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAamemV40V8Iainfix &lt;V41amixfix []V7V39IapathV0V40V41FFIaminV39V6V7FAapathV0V42amixfix []V7V42IamemV42V6FAashortest_pathV0V43amixfix []V7V43IamemV43V8FAfIamemV44V8IamemV44V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV45V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="1.93"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.7"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="7."
-          sum="787fb7afbf18f3e74bd58f8706e39b30"
-          proved="true"
-          expanded="false"
-          shape="apathV0V21amixfix []V20V21IamemV21V19FIainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV22V13NFNIainfix =V16aTrueIamemV23V13NFNqainfix =V16aTrueFIamemV25V14OamemV25V12IamemV25V13NAainfix =V24V11Oainfix =V24V11NIamemV25ag_succV24FIamemV24V12FAamemV27V12Iainfix &lt;V28amixfix []V15V26IapathV0V27V28FFIaminV26V14V15FAapathV0V29amixfix []V15V29IamemV29V14FAashortest_pathV0V30amixfix []V15V30IamemV30V12FAfIamemV31V12IamemV31V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV32ag_succV11IamemV32V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V33IapathV0V11V33FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V34IamemV34V6FAamemV11V6FFIamemV35V6NFNIainfix =V9aTrueNIamemV36V6NFqainfix =V9aTrueFIamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAamemV40V8Iainfix &lt;V41amixfix []V7V39IapathV0V40V41FFIaminV39V6V7FAapathV0V42amixfix []V7V42IamemV42V6FAashortest_pathV0V43amixfix []V7V43IamemV43V8FAfIamemV44V8IamemV44V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV45V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="2"
-           timelimit="30"
-           memlimit="1000"
-           edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="5.31"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter shortest_path_code.10.1.8"
-          locfile="../dijkstra.mlw"
-          loclnum="186" loccnumb="6" loccnume="24"
-          expl="8."
-          sum="d7e560edf7b6722a0aa356c961181201"
-          proved="false"
-          expanded="true"
-          shape="amemV22V12Iainfix &lt;V23amixfix []V20V21IapathV0V22V23FFIaminV21V19V20FIainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV24V13NFNIainfix =V16aTrueIamemV25V13NFNqainfix =V16aTrueFIamemV27V14OamemV27V12IamemV27V13NAainfix =V26V11Oainfix =V26V11NIamemV27ag_succV26FIamemV26V12FAamemV29V12Iainfix &lt;V30amixfix []V15V28IapathV0V29V30FFIaminV28V14V15FAapathV0V31amixfix []V15V31IamemV31V14FAashortest_pathV0V32amixfix []V15V32IamemV32V12FAfIamemV33V12IamemV33V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV34ag_succV11IamemV34V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V35IapathV0V11V35FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V36IamemV36V6FAamemV11V6FFIamemV37V6NFNIainfix =V9aTrueNIamemV38V6NFqainfix =V9aTrueFIamemV40V6OamemV40V8IamemV40ag_succV39FIamemV39V8FAamemV42V8Iainfix &lt;V43amixfix []V7V41IapathV0V42V43FFIaminV41V6V7FAapathV0V44amixfix []V7V44IamemV44V6FAashortest_pathV0V45amixfix []V7V45IamemV45V8FAfIamemV46V8IamemV46V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV47V5NFFIamemV1avAamemV0avFF">
-          <label
-           name="expl:VC for shortest_path_code"/>
-          <proof
-           prover="0"
-           timelimit="30"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="30.08"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="30"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="30.07"/>
-          </proof>
-          <proof
-           prover="3"
-           timelimit="30"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="30.77"/>
-          </proof>
-          <proof
-           prover="4"
-           timelimit="30"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="30.18"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.24"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter shortest_path_code.11"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
       expl="11. loop invariant preservation"
-      sum="5ae5945f91e3544a915ef36d42d84b77"
+      sum="3a4ee26741762b23411d4a6a65b34ba8"
       proved="true"
       expanded="false"
-      shape="ainv_succ2V0V12V19V11V17Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
-      <label
-       name="expl:VC for shortest_path_code"/>
-      <transf
-       name="split_goal_wp"
-       proved="true"
-       expanded="false">
-       <goal
-        name="WP_parameter shortest_path_code.11.1"
-        locfile="../dijkstra.mlw"
-        loclnum="186" loccnumb="6" loccnume="24"
-        expl="1. loop invariant preservation"
-        sum="5ae5945f91e3544a915ef36d42d84b77"
-        proved="true"
-        expanded="false"
-        shape="ainv_succ2V0V12V19V11V17Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
-        <label
-         name="expl:VC for shortest_path_code"/>
-        <proof
-         prover="0"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="true"
-         archived="false">
-         <result status="timeout" time="5.01"/>
-        </proof>
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.31"/>
-        </proof>
-        <proof
-         prover="4"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.91"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal
-      name="WP_parameter shortest_path_code.12"
-      locfile="../dijkstra.mlw"
-      loclnum="186" loccnumb="6" loccnume="24"
-      expl="12. loop variant decrease"
-      sum="8ed753e7326434353de73cd0dcdef7ee"
-      proved="true"
-      expanded="false"
-      shape="ainfix &lt;acardinalV17acardinalV13Aainfix &lt;=c0acardinalV13Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
-      <label
-       name="expl:VC for shortest_path_code"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter shortest_path_code.13"
-      locfile="../dijkstra.mlw"
-      loclnum="186" loccnumb="6" loccnume="24"
-      expl="13. loop invariant preservation"
-      sum="1c29c2e0b5c40a26ce004da432f72f26"
-      proved="true"
-      expanded="false"
-      shape="ainvV0V12V14V15Iainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="asubsetV17ag_succV11Iainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV22V8Iainfix &lt;V23amixfix []V7V21IapathV0V22V23FFIaminV21V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -1035,54 +651,288 @@
       </proof>
      </goal>
      <goal
+      name="WP_parameter shortest_path_code.12"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="12. loop invariant preservation"
+      sum="9df86ce604633def980e9c7bf5685f5e"
+      proved="true"
+      expanded="true"
+      shape="ainvV0V12V19V20Iainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV22V8Iainfix &lt;V23amixfix []V7V21IapathV0V22V23FFIaminV21V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter shortest_path_code.12.1"
+        locfile="../dijkstra.mlw"
+        loclnum="186" loccnumb="6" loccnume="24"
+        expl="1. loop invariant preservation"
+        sum="91a18e3ea666664a5d9e89bffd8241fb"
+        proved="true"
+        expanded="true"
+        shape="apathV0V21amixfix []V20V21IamemV21V19FAashortest_pathV0V22amixfix []V20V22IamemV22V12FAfIamemV23V12IamemV23V19FAasubsetV19avAasubsetV12avAainfix =amixfix []V20V0c0Aainv_srcV0V12V19Iainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV24V13NFNIainfix =V16aTrueIamemV25V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V27ainfix +amixfix []V15V26aweightV26V27AamemV27V14OamemV27V12IamemV27V13NAainfix =V26V11Oainfix =V26V11NIamemV27ag_succV26FIamemV26V12FAapathV0V28amixfix []V15V28IamemV28V14FAashortest_pathV0V29amixfix []V15V29IamemV29V12FAfIamemV30V12IamemV30V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV31ag_succV11IamemV31V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V32IapathV0V11V32FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V33IamemV33V6FAamemV11V6FFIamemV34V6NFNIainfix =V9aTrueNIamemV35V6NFqainfix =V9aTrueFIamemV37V8Iainfix &lt;V38amixfix []V7V36IapathV0V37V38FFIainfix &lt;=amixfix []V7V36amixfix []V7V39IamemV39V6FAamemV36V6FAainfix &lt;=amixfix []V7V41ainfix +amixfix []V7V40aweightV40V41AamemV41V6OamemV41V8IamemV41ag_succV40FIamemV40V8FAapathV0V42amixfix []V7V42IamemV42V6FAashortest_pathV0V43amixfix []V7V43IamemV43V8FAfIamemV44V8IamemV44V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV45V5NFFIamemV1avAamemV0avFF">
+        <label
+         name="expl:VC for shortest_path_code"/>
+        <transf
+         name="split_goal_wp"
+         proved="true"
+         expanded="true">
+         <goal
+          name="WP_parameter shortest_path_code.12.1.1"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="1."
+          sum="5695ed0bab6fc727d294f56d5de60738"
+          proved="true"
+          expanded="false"
+          shape="ainv_srcV0V12V19Iainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V24ainfix +amixfix []V15V23aweightV23V24AamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAapathV0V25amixfix []V15V25IamemV25V14FAashortest_pathV0V26amixfix []V15V26IamemV26V12FAfIamemV27V12IamemV27V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV28ag_succV11IamemV28V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V29IapathV0V11V29FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V30IamemV30V6FAamemV11V6FFIamemV31V6NFNIainfix =V9aTrueNIamemV32V6NFqainfix =V9aTrueFIamemV34V8Iainfix &lt;V35amixfix []V7V33IapathV0V34V35FFIainfix &lt;=amixfix []V7V33amixfix []V7V36IamemV36V6FAamemV33V6FAainfix &lt;=amixfix []V7V38ainfix +amixfix []V7V37aweightV37V38AamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAapathV0V39amixfix []V7V39IamemV39V6FAashortest_pathV0V40amixfix []V7V40IamemV40V8FAfIamemV41V8IamemV41V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV42V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.62"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter shortest_path_code.12.1.2"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="2."
+          sum="2f658824aa80ab0dca5b454fb2c46024"
+          proved="true"
+          expanded="false"
+          shape="ainfix =amixfix []V20V0c0Iainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V24ainfix +amixfix []V15V23aweightV23V24AamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAapathV0V25amixfix []V15V25IamemV25V14FAashortest_pathV0V26amixfix []V15V26IamemV26V12FAfIamemV27V12IamemV27V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV28ag_succV11IamemV28V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V29IapathV0V11V29FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V30IamemV30V6FAamemV11V6FFIamemV31V6NFNIainfix =V9aTrueNIamemV32V6NFqainfix =V9aTrueFIamemV34V8Iainfix &lt;V35amixfix []V7V33IapathV0V34V35FFIainfix &lt;=amixfix []V7V33amixfix []V7V36IamemV36V6FAamemV33V6FAainfix &lt;=amixfix []V7V38ainfix +amixfix []V7V37aweightV37V38AamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAapathV0V39amixfix []V7V39IamemV39V6FAashortest_pathV0V40amixfix []V7V40IamemV40V8FAfIamemV41V8IamemV41V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV42V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="1"
+           timelimit="10"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.47"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter shortest_path_code.12.1.3"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="3."
+          sum="0b66828029d510b75d4c721ac588e164"
+          proved="true"
+          expanded="false"
+          shape="asubsetV12avIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V24ainfix +amixfix []V15V23aweightV23V24AamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAapathV0V25amixfix []V15V25IamemV25V14FAashortest_pathV0V26amixfix []V15V26IamemV26V12FAfIamemV27V12IamemV27V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV28ag_succV11IamemV28V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V29IapathV0V11V29FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V30IamemV30V6FAamemV11V6FFIamemV31V6NFNIainfix =V9aTrueNIamemV32V6NFqainfix =V9aTrueFIamemV34V8Iainfix &lt;V35amixfix []V7V33IapathV0V34V35FFIainfix &lt;=amixfix []V7V33amixfix []V7V36IamemV36V6FAamemV33V6FAainfix &lt;=amixfix []V7V38ainfix +amixfix []V7V37aweightV37V38AamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAapathV0V39amixfix []V7V39IamemV39V6FAashortest_pathV0V40amixfix []V7V40IamemV40V8FAfIamemV41V8IamemV41V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV42V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.03"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter shortest_path_code.12.1.4"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="4."
+          sum="974711a00dea7edc02718519d523971a"
+          proved="true"
+          expanded="false"
+          shape="asubsetV19avIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV21V13NFNIainfix =V16aTrueIamemV22V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V24ainfix +amixfix []V15V23aweightV23V24AamemV24V14OamemV24V12IamemV24V13NAainfix =V23V11Oainfix =V23V11NIamemV24ag_succV23FIamemV23V12FAapathV0V25amixfix []V15V25IamemV25V14FAashortest_pathV0V26amixfix []V15V26IamemV26V12FAfIamemV27V12IamemV27V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV28ag_succV11IamemV28V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V29IapathV0V11V29FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V30IamemV30V6FAamemV11V6FFIamemV31V6NFNIainfix =V9aTrueNIamemV32V6NFqainfix =V9aTrueFIamemV34V8Iainfix &lt;V35amixfix []V7V33IapathV0V34V35FFIainfix &lt;=amixfix []V7V33amixfix []V7V36IamemV36V6FAamemV33V6FAainfix &lt;=amixfix []V7V38ainfix +amixfix []V7V37aweightV37V38AamemV38V6OamemV38V8IamemV38ag_succV37FIamemV37V8FAapathV0V39amixfix []V7V39IamemV39V6FAashortest_pathV0V40amixfix []V7V40IamemV40V8FAfIamemV41V8IamemV41V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV42V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="1"
+           timelimit="10"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="3.83"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter shortest_path_code.12.1.5"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="5."
+          sum="3fcbd9ecb5750c5019efea7d16342215"
+          proved="true"
+          expanded="false"
+          shape="fIamemV21V12IamemV21V19FIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV22V13NFNIainfix =V16aTrueIamemV23V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V25ainfix +amixfix []V15V24aweightV24V25AamemV25V14OamemV25V12IamemV25V13NAainfix =V24V11Oainfix =V24V11NIamemV25ag_succV24FIamemV24V12FAapathV0V26amixfix []V15V26IamemV26V14FAashortest_pathV0V27amixfix []V15V27IamemV27V12FAfIamemV28V12IamemV28V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV29ag_succV11IamemV29V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V30IapathV0V11V30FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V31IamemV31V6FAamemV11V6FFIamemV32V6NFNIainfix =V9aTrueNIamemV33V6NFqainfix =V9aTrueFIamemV35V8Iainfix &lt;V36amixfix []V7V34IapathV0V35V36FFIainfix &lt;=amixfix []V7V34amixfix []V7V37IamemV37V6FAamemV34V6FAainfix &lt;=amixfix []V7V39ainfix +amixfix []V7V38aweightV38V39AamemV39V6OamemV39V8IamemV39ag_succV38FIamemV38V8FAapathV0V40amixfix []V7V40IamemV40V6FAashortest_pathV0V41amixfix []V7V41IamemV41V8FAfIamemV42V8IamemV42V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV43V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="3.13"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter shortest_path_code.12.1.6"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="6."
+          sum="bf8d174109eb75eeffa7d60b29d619b8"
+          proved="true"
+          expanded="false"
+          shape="ashortest_pathV0V21amixfix []V20V21IamemV21V12FIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV22V13NFNIainfix =V16aTrueIamemV23V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V25ainfix +amixfix []V15V24aweightV24V25AamemV25V14OamemV25V12IamemV25V13NAainfix =V24V11Oainfix =V24V11NIamemV25ag_succV24FIamemV24V12FAapathV0V26amixfix []V15V26IamemV26V14FAashortest_pathV0V27amixfix []V15V27IamemV27V12FAfIamemV28V12IamemV28V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV29ag_succV11IamemV29V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V30IapathV0V11V30FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V31IamemV31V6FAamemV11V6FFIamemV32V6NFNIainfix =V9aTrueNIamemV33V6NFqainfix =V9aTrueFIamemV35V8Iainfix &lt;V36amixfix []V7V34IapathV0V35V36FFIainfix &lt;=amixfix []V7V34amixfix []V7V37IamemV37V6FAamemV34V6FAainfix &lt;=amixfix []V7V39ainfix +amixfix []V7V38aweightV38V39AamemV39V6OamemV39V8IamemV39ag_succV38FIamemV38V8FAapathV0V40amixfix []V7V40IamemV40V6FAashortest_pathV0V41amixfix []V7V41IamemV41V8FAfIamemV42V8IamemV42V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV43V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="1.55"/>
+          </proof>
+         </goal>
+         <goal
+          name="WP_parameter shortest_path_code.12.1.7"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="7."
+          sum="ea6ba303bf6006626f83d5e29420e7e1"
+          proved="true"
+          expanded="true"
+          shape="apathV0V21amixfix []V20V21IamemV21V19FIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV22V13NFNIainfix =V16aTrueIamemV23V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V25ainfix +amixfix []V15V24aweightV24V25AamemV25V14OamemV25V12IamemV25V13NAainfix =V24V11Oainfix =V24V11NIamemV25ag_succV24FIamemV24V12FAapathV0V26amixfix []V15V26IamemV26V14FAashortest_pathV0V27amixfix []V15V27IamemV27V12FAfIamemV28V12IamemV28V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV29ag_succV11IamemV29V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V30IapathV0V11V30FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V31IamemV31V6FAamemV11V6FFIamemV32V6NFNIainfix =V9aTrueNIamemV33V6NFqainfix =V9aTrueFIamemV35V8Iainfix &lt;V36amixfix []V7V34IapathV0V35V36FFIainfix &lt;=amixfix []V7V34amixfix []V7V37IamemV37V6FAamemV34V6FAainfix &lt;=amixfix []V7V39ainfix +amixfix []V7V38aweightV38V39AamemV39V6OamemV39V8IamemV39ag_succV38FIamemV38V8FAapathV0V40amixfix []V7V40IamemV40V6FAashortest_pathV0V41amixfix []V7V41IamemV41V8FAfIamemV42V8IamemV42V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV43V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <proof
+           prover="2"
+           timelimit="5"
+           memlimit="1000"
+           edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="19.28"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.13"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="13. loop invariant preservation"
+      sum="45ab7aa4b924cb57fc673a79e17c0052"
+      proved="true"
+      expanded="false"
+      shape="ainv_succ2V0V12V19V20V11V17Iainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV22V8Iainfix &lt;V23amixfix []V7V21IapathV0V22V23FFIaminV21V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter shortest_path_code.13.1"
+        locfile="../dijkstra.mlw"
+        loclnum="186" loccnumb="6" loccnume="24"
+        expl="1. loop invariant preservation"
+        sum="45ab7aa4b924cb57fc673a79e17c0052"
+        proved="true"
+        expanded="false"
+        shape="ainv_succ2V0V12V19V20V11V17Iainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV22V8Iainfix &lt;V23amixfix []V7V21IapathV0V22V23FFIaminV21V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+        <label
+         name="expl:VC for shortest_path_code"/>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter shortest_path_code.13.1.1"
+          locfile="../dijkstra.mlw"
+          loclnum="186" loccnumb="6" loccnume="24"
+          expl="1. loop invariant preservation"
+          sum="eb1fed9a029043793fc0e74170aab493"
+          proved="true"
+          expanded="false"
+          shape="ainfix &lt;=amixfix []V20V22ainfix +amixfix []V20V21aweightV21V22AamemV22V19OamemV22V12IamemV22V17NAainfix =V21V11Oainfix =V21V11NIamemV22ag_succV21FIamemV21V12FIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV23V13NFNIainfix =V16aTrueIamemV24V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V26ainfix +amixfix []V15V25aweightV25V26AamemV26V14OamemV26V12IamemV26V13NAainfix =V25V11Oainfix =V25V11NIamemV26ag_succV25FIamemV25V12FAapathV0V27amixfix []V15V27IamemV27V14FAashortest_pathV0V28amixfix []V15V28IamemV28V12FAfIamemV29V12IamemV29V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV30ag_succV11IamemV30V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V31IapathV0V11V31FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V32IamemV32V6FAamemV11V6FFIamemV33V6NFNIainfix =V9aTrueNIamemV34V6NFqainfix =V9aTrueFIamemV36V8Iainfix &lt;V37amixfix []V7V35IapathV0V36V37FFIainfix &lt;=amixfix []V7V35amixfix []V7V38IamemV38V6FAamemV35V6FAainfix &lt;=amixfix []V7V40ainfix +amixfix []V7V39aweightV39V40AamemV40V6OamemV40V8IamemV40ag_succV39FIamemV39V8FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
+          <label
+           name="expl:VC for shortest_path_code"/>
+          <transf
+           name="split_goal_wp"
+           proved="true"
+           expanded="false">
+           <goal
+            name="WP_parameter shortest_path_code.13.1.1.1"
+            locfile="../dijkstra.mlw"
+            loclnum="186" loccnumb="6" loccnume="24"
+            expl="1. loop invariant preservation"
+            sum="ceda63b6f4c7b25d1032394e7cfc68cc"
+            proved="true"
+            expanded="false"
+            shape="amemV22V19OamemV22V12IamemV22V17NAainfix =V21V11Oainfix =V21V11NIamemV22ag_succV21FIamemV21V12FIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV23V13NFNIainfix =V16aTrueIamemV24V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V26ainfix +amixfix []V15V25aweightV25V26AamemV26V14OamemV26V12IamemV26V13NAainfix =V25V11Oainfix =V25V11NIamemV26ag_succV25FIamemV25V12FAapathV0V27amixfix []V15V27IamemV27V14FAashortest_pathV0V28amixfix []V15V28IamemV28V12FAfIamemV29V12IamemV29V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV30ag_succV11IamemV30V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V31IapathV0V11V31FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V32IamemV32V6FAamemV11V6FFIamemV33V6NFNIainfix =V9aTrueNIamemV34V6NFqainfix =V9aTrueFIamemV36V8Iainfix &lt;V37amixfix []V7V35IapathV0V36V37FFIainfix &lt;=amixfix []V7V35amixfix []V7V38IamemV38V6FAamemV35V6FAainfix &lt;=amixfix []V7V40ainfix +amixfix []V7V39aweightV39V40AamemV40V6OamemV40V8IamemV40ag_succV39FIamemV39V8FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
+            <label
+             name="expl:VC for shortest_path_code"/>
+            <proof
+             prover="1"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.08"/>
+            </proof>
+            <proof
+             prover="3"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="3.78"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter shortest_path_code.13.1.1.2"
+            locfile="../dijkstra.mlw"
+            loclnum="186" loccnumb="6" loccnume="24"
+            expl="2. loop invariant preservation"
+            sum="1f144fdff3a6bc237d9c4a2db695e383"
+            proved="true"
+            expanded="false"
+            shape="ainfix &lt;=amixfix []V20V22ainfix +amixfix []V20V21aweightV21V22IamemV22V17NAainfix =V21V11Oainfix =V21V11NIamemV22ag_succV21FIamemV21V12FIainfix =amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Oainfix &lt;amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20asetV15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIamemV23V13NFNIainfix =V16aTrueIamemV24V13NFNqainfix =V16aTrueFIainfix &lt;=amixfix []V15V26ainfix +amixfix []V15V25aweightV25V26AamemV26V14OamemV26V12IamemV26V13NAainfix =V25V11Oainfix =V25V11NIamemV26ag_succV25FIamemV25V12FAapathV0V27amixfix []V15V27IamemV27V14FAashortest_pathV0V28amixfix []V15V28IamemV28V12FAfIamemV29V12IamemV29V14FAasubsetV14avAasubsetV12avAainfix =amixfix []V15V0c0Aainv_srcV0V12V14AamemV30ag_succV11IamemV30V13FFIainfix =V12aaddV11V8FIainfix &lt;=amixfix []V7V11V31IapathV0V11V31FAapathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6Aainfix &lt;=amixfix []V7V11amixfix []V7V32IamemV32V6FAamemV11V6FFIamemV33V6NFNIainfix =V9aTrueNIamemV34V6NFqainfix =V9aTrueFIamemV36V8Iainfix &lt;V37amixfix []V7V35IapathV0V36V37FFIainfix &lt;=amixfix []V7V35amixfix []V7V38IamemV38V6FAamemV35V6FAainfix &lt;=amixfix []V7V40ainfix +amixfix []V7V39aweightV39V40AamemV40V6OamemV40V8IamemV40ag_succV39FIamemV39V8FAapathV0V41amixfix []V7V41IamemV41V6FAashortest_pathV0V42amixfix []V7V42IamemV42V8FAfIamemV43V8IamemV43V6FAasubsetV6avAasubsetV8avAainfix =amixfix []V7V0c0Aainv_srcV0V8V6FIainfix =V4asetV2V0c0Aainfix =V3aaddV0aemptyAamemV44V5NFFIamemV1avAamemV0avFF">
+            <label
+             name="expl:VC for shortest_path_code"/>
+            <proof
+             prover="1"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="2.38"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
       name="WP_parameter shortest_path_code.14"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="14. loop invariant preservation"
-      sum="70b6ec646faea34e31734a2c1851f445"
+      expl="14. loop variant decrease"
+      sum="6f0397c12ad5ca2bfc19bcae5e51fbdb"
       proved="true"
       expanded="false"
-      shape="ainv_succV0V12V14Iainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
-      <label
-       name="expl:VC for shortest_path_code"/>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter shortest_path_code.15"
-      locfile="../dijkstra.mlw"
-      loclnum="186" loccnumb="6" loccnume="24"
-      expl="15. loop variant decrease"
-      sum="fa5db4dddb34fdcf27ff22e8f0cfbd9d"
-      proved="true"
-      expanded="false"
-      shape="ainfix &lt;ainfix -acardinalavacardinalV12ainfix -acardinalavacardinalV8Aainfix &lt;=c0ainfix -acardinalavacardinalV8Iainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
-      <label
-       name="expl:VC for shortest_path_code"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.33"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter shortest_path_code.16"
-      locfile="../dijkstra.mlw"
-      loclnum="186" loccnumb="6" loccnume="24"
-      expl="16. postcondition"
-      sum="956fff17f053d2298bb6eab02b690a2a"
-      proved="true"
-      expanded="false"
-      shape="ashortest_pathV0V10amixfix []V7V10IamemV10V8FIainfix =V9aTrueNNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="ainfix &lt;acardinalV17acardinalV13Aainfix &lt;=c0acardinalV13Iainfix &lt;=amixfix []V20V18ainfix +amixfix []V20V11aweightV11V18Iainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19aaddV18V14AamemV18V14NAamemV18V12NOainfix =V20amixfix [&lt;-]V15V18ainfix +amixfix []V15V11aweightV11V18Aainfix =V19V14Aainfix &lt;ainfix +amixfix []V15V11aweightV11V18amixfix []V15V18AamemV18V19Oainfix =V20V15Aainfix =V19V14Aainfix &gt;=ainfix +amixfix []V20V11aweightV11V18amixfix []V20V18AamemV18V19Oainfix =V20V15Aainfix =V19V14AamemV18V12FIainfix =V17aremoveV18V13AamemV18V13FFIais_emptyV13NIainfix =V16aTrueIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV22V8Iainfix &lt;V23amixfix []V7V21IapathV0V22V23FFIaminV21V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
@@ -1095,18 +945,119 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter shortest_path_code.17"
+      name="WP_parameter shortest_path_code.15"
       locfile="../dijkstra.mlw"
       loclnum="186" loccnumb="6" loccnume="24"
-      expl="17. postcondition"
-      sum="8d8e1360fe205fdc54a8767a8ed1a614"
+      expl="15. loop invariant preservation"
+      sum="120ee9c25bab8cd41adc9f12c5b82420"
       proved="true"
       expanded="false"
-      shape="apathV0V10V11NFIamemV10V8NFIainfix =V9aTrueNNIais_emptyV6qainfix =V9aTrueFIainv_succV0V8V6AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      shape="ainvV0V12V14V15Iainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIaminV17V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="4"
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.16"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="16. loop invariant preservation"
+      sum="53072995bb441562c3d946ff4a4b2448"
+      proved="true"
+      expanded="false"
+      shape="ainv_succV0V12V14V15Iainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIaminV17V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.17"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="17. loop invariant preservation"
+      sum="b3e2133fbfd60019bb154555b798e714"
+      proved="true"
+      expanded="false"
+      shape="amemV18V12Iainfix &lt;V19amixfix []V15V17IapathV0V18V19FFIaminV17V14V15FIainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV21V8Iainfix &lt;V22amixfix []V7V20IapathV0V21V22FFIaminV20V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="3.20"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.18"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="18. loop variant decrease"
+      sum="e797a26afe70619c422550cdfccd4746"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -acardinalavacardinalV12ainfix -acardinalavacardinalV8Aainfix &lt;=c0ainfix -acardinalavacardinalV8Iainfix =V16aTrueNIais_emptyV13Nqainfix =V16aTrueFIainv_succ2V0V12V14V15V11V13AainvV0V12V14V15AasubsetV13ag_succV11FIainfix =V12aaddV11V8FIashortest_pathV0V11amixfix []V7V11Iainfix =V10aremoveV11V6AaminV11V6V7FFIais_emptyV6NIainfix =V9aTrueNIais_emptyV6qainfix =V9aTrueFIamemV18V8Iainfix &lt;V19amixfix []V7V17IapathV0V18V19FFIaminV17V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.33"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.19"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="19. postcondition"
+      sum="d5b0d40bc9ed7efe9194311f1db33b43"
+      proved="true"
+      expanded="false"
+      shape="ashortest_pathV0V10amixfix []V7V10IamemV10V8FIainfix =V9aTrueNNIais_emptyV6qainfix =V9aTrueFIamemV12V8Iainfix &lt;V13amixfix []V7V11IapathV0V12V13FFIaminV11V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter shortest_path_code.20"
+      locfile="../dijkstra.mlw"
+      loclnum="186" loccnumb="6" loccnume="24"
+      expl="20. postcondition"
+      sum="161d08d2952840d08449e2a9e5ea9c69"
+      proved="true"
+      expanded="false"
+      shape="apathV0V10V11NFIamemV10V8NFIainfix =V9aTrueNNIais_emptyV6qainfix =V9aTrueFIamemV13V8Iainfix &lt;V14amixfix []V7V12IapathV0V13V14FFIaminV12V6V7FAainv_succV0V8V6V7AainvV0V8V6V7FIainfix =V4amixfix [&lt;-]V2V0c0Aainfix =V3aaddV0aemptyAais_emptyV5FIamemV1avAamemV0avFF">
+      <label
+       name="expl:VC for shortest_path_code"/>
+      <proof
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
