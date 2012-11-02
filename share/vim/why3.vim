@@ -112,14 +112,11 @@ syn region   whyString       start=+"+ skip=+\\\\\|\\"+ end=+"+
 syn match    whyOperator     "->"
 syn match    whyOperator     "<->\?"
 syn match    whyOperator     "/\\"
-syn match    whyOperator     "\\/"
+syn match    whyOperator     "\\[/!?]\?"
 syn match    whyOperator     "&&"
 syn match    whyOperator     "<>"
 syn match    whyKeyChar      "|"
-syn match    whyKeyChar      "?"
-syn match    whyKeyChar      "!"
 syn match    whyKeyChar      ";"
-syn match    whyKeyChar      "\\"
 " FIXME? is this too inefficient?
 syn match    whyOperator     "[^<>~=:+*/%$&@^.|#!?]=[^<>~=:+*/%$&@^.|#!?]"ms=s+1,me=e-1
 syn match    whyOperator                         "^=[^<>~=:+*/%$&@^.|#!?]"me=e-1
