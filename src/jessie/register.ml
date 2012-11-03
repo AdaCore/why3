@@ -22,7 +22,7 @@ module OutputFile =
 
 open Why3
 
-let run_on_task prover prover_driver t =
+let run_on_task fmt prover prover_driver t =
   let result =
     Call_provers.wait_on_call
       (Why3.Driver.prove_task 
@@ -30,12 +30,9 @@ let run_on_task prover prover_driver t =
          ~timelimit:3
          prover_driver t ()) ()
   in
-  let p = prover.Whyconf.prover in
-  ACSLtoWhy3.Self.result "Status with %s %s: %a" p.Whyconf.prover_name
-    p.Whyconf.prover_version
-    Call_provers.print_prover_answer result.Call_provers.pr_answer
+  Format.fprintf fmt "%a" Call_provers.print_prover_answer result.Call_provers.pr_answer
 
-let get_prover config env acc name =
+let get_prover config env acc (short, name) =
   let prover = 
     try
       let fp = Whyconf.parse_filter_prover name in
@@ -53,16 +50,21 @@ let get_prover config env acc name =
       ACSLtoWhy3.Self.fatal "Failed to load driver for %s: %a@." name
         Exn_printer.exn_printer e
   in
-  (prover,driver)::acc
+  (short,prover,driver)::acc
 
 let process () =
   let prog = Ast.get () in
   (* File.pretty_ast (); *)
   let provers = 
-    List.fold_left (get_prover ACSLtoWhy3.config ACSLtoWhy3.env) []
-      [ "Alt-Ergo,0.94";
-        "Z3,3.2"; "Z3,4.0";
-        "CVC3,2.2"; "CVC3,2.4.1"] 
+    List.fold_left 
+      (get_prover ACSLtoWhy3.config ACSLtoWhy3.env) 
+      []
+      [ "Z42", "Z3,4.2";
+        "Z32", "Z3,3.2"; 
+        "C24", "CVC3,2.4.1";
+        "C22", "CVC3,2.2"; 
+        "AlE", "Alt-Ergo,0.94";
+        ] 
   in
   let theories = ACSLtoWhy3.prog prog in
   try
@@ -70,10 +72,17 @@ let process () =
       ACSLtoWhy3.Self.result "running theory 1:";
       ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
       let tasks = Task.split_theory th None None in
+      ACSLtoWhy3.Self.result "@[<h 0>%a@]" 
+        (Pp.print_list Pp.comma 
+           (fun fmt (_n,p,_d) -> 
+             let p = p.Whyconf.prover in
+             Format.fprintf fmt "%s %s" p.Whyconf.prover_name p.Whyconf.prover_version)) 
+        provers;
       let _ =
         List.fold_left (fun n t ->
-          ACSLtoWhy3.Self.result "Dealing with task %d" n;
-          List.iter (fun (p,d) -> run_on_task p d t) provers;
+          ACSLtoWhy3.Self.result "@[<h 0>Task %d: %a@]" n 
+            (Pp.print_list Pp.comma (fun fmt (_n,p,d) -> run_on_task fmt p d t)) 
+            provers;
           n+1) 1 tasks
       in ())
     theories

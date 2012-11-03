@@ -1,7 +1,7 @@
-[kernel] preprocessing with "gcc -C -E -I.  tests/basic/lemma.c"
+[kernel] preprocessing with "gcc -C -E -I.  tests/basic/constants.c"
 [jessie3] user error: WARNING: Variable Frama_C_bzero not translated
 [jessie3] user error: WARNING: Variable Frama_C_copy_block not translated
-[jessie3] found 7 logic decl(s)
+[jessie3] found 5 logic decl(s)
 [jessie3] made 1 theory(ies)
 [jessie3] made 0 function(s)
 [jessie3] running theory 1:
@@ -12,28 +12,22 @@
             
             (* use real.Real *)
             
-            lemma test1 : (2 + 2) = 4
+            lemma test1 : (2 + 0xa) = 0xc
             
-            lemma test2 : forall x:int. (x * x) >= 0
+            lemma test_ofl : (0xffffffff + 1) = 0x100000000
             
-            lemma test2r : forall x:real. (x * x) >= 0.0
+            lemma test2 : (0.0 + 1.1) = 1.1
             
-            lemma test3 : forall x:int, y:int. (x + y) = (y + x)
+            lemma test3 : (10.0 * 0.1) = 1.0
             
-            lemma test3r : forall x:real, y:real. (x + y) = (y + x)
-            
-            lemma test4 : forall x:int, y:int. (x - y) = (- (y - x))
-            
-            lemma test4r : forall x:real, y:real. (x - y) = (- (y - x))
+            lemma test4 : 0x1.1p4 = 17.0
             end
 [jessie3] Alt-Ergo 0.94, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.2
 [jessie3] Task 1: Valid, Valid, Valid, Valid, Valid
 [jessie3] Task 2: Valid, Valid, Valid, Valid, Valid
 [jessie3] Task 3: Valid, Valid, Valid, Valid, Valid
 [jessie3] Task 4: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 5: Valid, Unknown, Unknown, Valid, Valid
-[jessie3] Task 6: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 7: Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 5: Valid, Valid, Valid, Valid, Valid
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
             (* use BuiltIn *)
