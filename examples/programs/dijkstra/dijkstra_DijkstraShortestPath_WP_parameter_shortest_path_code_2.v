@@ -214,7 +214,8 @@ Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
   ~ (mem y su))) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
   x) + (weight x y))%Z)%Z)).
 
-Require Import Why3. Ltac ae := why3 "alt-ergo".
+Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac z := why3 "z3" timelimit 3.
 
 (* Why3 goal *)
 Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
@@ -274,7 +275,7 @@ intuition; try ae.
 assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
 subst v2 d4; rewrite Select_eq.
 apply Path_cons.
-why3 "z3".
+z.
  ae.
 trivial.
 subst d4; rewrite Select_neq.
@@ -284,7 +285,7 @@ ae.
 assert (case: (v2 = v1 \/ v2 <> v1)) by ae. destruct case.
 subst v2 d4; rewrite Select_eq.
 apply Path_cons.
-why3 "z3".
+z.
 ae.
 trivial.
 ae.

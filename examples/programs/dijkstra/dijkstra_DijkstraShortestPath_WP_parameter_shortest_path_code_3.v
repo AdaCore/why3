@@ -214,7 +214,8 @@ Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
   ~ (mem y su))) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
   x) + (weight x y))%Z)%Z)).
 
-Require Import Why3. Ltac ae := why3 "alt-ergo".
+Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac z := why3 "z3" timelimit 3.
 Require Import Classical.
 
 Lemma inside_or_exit:
@@ -263,16 +264,17 @@ intros src dst d (h1,h2) q d1 visited ((h3,h4),h5) q1 d2 visited1
 
 assert (is_empty su) by ae.
 clear  result h19 h20.
-assert (inv_succ src visited2 q3 d3) by why3 "z3".
+assert (inv_succ src visited2 q3 d3).
+  unfold inv_succ. split; z.
 assert (mem src visited2) by ae.
 
 destruct (inside_or_exit visited2 src x dx); auto.
 destruct H2 as (y, (z, (dy, (a1, (a2, (a3, (a4, a5))))))).
 unfold min in h21.
-assert (mem z q3) by why3 "z3".
+assert (mem z q3) by z.
 assert (get d3 z <= get d3 y + weight y z)%Z by ae.
-assert (dy = get d3 y) by why3 "z3".
-why3 "z3".
+assert (dy = get d3 y) by z.
+z.
 Qed.
 
 
