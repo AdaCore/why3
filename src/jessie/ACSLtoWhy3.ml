@@ -94,6 +94,13 @@ let ref_type : Mlw_ty.T.itysymbol =
     | Mlw_module.PT itys -> itys
     | Mlw_module.TS _ -> assert false
 
+let ref_fun : Mlw_expr.psymbol = 
+  match
+    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
+  with
+    | Mlw_module.PS p -> p
+    | _ -> assert false
+
 
 (*********)
 (* types *)
@@ -163,15 +170,12 @@ let rec logic_type ty =
 
 let constant c =
   match c with
-    | Integer(_value,Some s) -> Term.ConstInt (Term.IConstDecimal s)
+    | Integer(_value,Some s) -> 
+      let c = Literals.integer s in Term.ConstInt c
     | Integer(_value,None) ->
       Self.not_yet_implemented "constant Integer None"
     | LReal(_value,s) ->
-      (* FIXME *)
-      if s = "0.0" then
-        Term.ConstReal (Term.RConstDecimal ("0","0",None))
-      else
-        Self.not_yet_implemented "constant LReal"
+      let c = Literals.floating_point s in Term.ConstReal c
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "constant"
 
@@ -483,7 +487,13 @@ let any _ty = Mlw_expr.e_int_const "0000" (* TODO : ref *)
 let create_var v =
   let id = Ident.id_fresh v.vname in
   let ty = Mlw_ty.vty_value (ctype v.vtype) in
-  let let_defn = Mlw_expr.create_let_defn id (any ty) in
+  let def = 
+    Mlw_expr.e_app 
+      (Mlw_expr.e_arrow ref_fun
+         (Mlw_ty.vty_arrow [] (Mlw_ty.VTvalue ty))) 
+      [any ty] 
+  in
+  let let_defn = Mlw_expr.create_let_defn id def in
   let vs = match let_defn.Mlw_expr.let_sym with
     | Mlw_expr.LetV vs -> vs
     | Mlw_expr.LetA _ -> assert false

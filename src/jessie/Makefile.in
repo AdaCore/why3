@@ -2,7 +2,7 @@
 FRAMAC_SHARE    :=$(shell frama-c -print-path)
 FRAMAC_LIBDIR   :=$(shell frama-c -print-libpath)
 PLUGIN_NAME     := Jessie3
-PLUGIN_CMO      := ACSLtoWhy3 register
+PLUGIN_CMO      := literals ACSLtoWhy3 register
 
 SHELL := /bin/bash
 
@@ -13,6 +13,9 @@ PLUGIN_OFLAGS:= -I +why3
 PLUGIN_LINK_BFLAGS:= -I +why3 
 PLUGIN_LINK_OFLAGS:= -I +why3 
 PLUGIN_TESTS_DIRS := basic
+
+literals.ml: literals.mll
+	ocamllex $<
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
