@@ -1,0 +1,17 @@
+module Raise
+  use import int.Int
+  use import ref.Ref
+
+  exception Test
+
+(* Valid *)
+  let test3 (x : ref int) =
+    { }
+    if !x = 0 then
+      raise Test
+      else
+        x := !x + 1
+    { !x = old !x + 1 }
+    | Test -> { !x = 0 /\ !x = old !x }
+
+end
