@@ -1043,8 +1043,6 @@ module Subst : sig
       time
    *)
 
-   val show_state : t -> unit
-
    val merge_states : t -> Sreg.t * t -> Sreg.t * t -> t * term * term
    (* Given a base state and two branches (represented by written regions in
       each branch, and a state), return the state of the join point of the
@@ -1118,18 +1116,18 @@ end = struct
      let r = mutable_substitute env mreg t in
      r
 
-  let show_state s =
-     Format.printf "{@.";
+  let show_state fmt s =
+     Format.fprintf fmt "{ ";
      Mreg.iter (fun k rv ->
         match !rv with
         | Some v ->
-              Format.printf "  Region %a mapped to %a@."
+            Format.fprintf fmt " %a |-> %a; @ "
               Mlw_pretty.print_reg k Pretty.print_vs v;
 
         | None ->
-              Format.printf "  region %a has been touched"
+            Format.fprintf fmt " %a |-> _; @  "
               Mlw_pretty.print_reg k) s;
-     Format.printf "}@."
+     Format.fprintf fmt "}"
 
   let region_name ?hint reg s =
     let rv = Mreg.find reg s in
@@ -1158,7 +1156,7 @@ end = struct
            f1,
            t_and_simp f2 (t_equ (region_name reg s1)
                                 (region_name ~hint:s1 reg base))
-         end) all_regs (Mreg.empty, t_true, t_true)
+         end) all_regs (base, t_true, t_true)
 
 end
 
@@ -1414,13 +1412,13 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let s', q1, q23 =
             Subst.merge_states s (e1_regs, post1.s)
                                  (Sreg.union e2_regs e3_regs, s23) in
-          { ne =
-            t_or_simp_l
-              [ t_and_simp q1 post1.ne;
-                t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2];
-                t_and_simp_l [wp2.post.ne; t_not test; post3.ne; q23; r3]
-              ];
-          s = s' }) in
+          let first_case = t_and_simp q1 post1.ne in
+          let second_case =
+            t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2] in
+          let third_case =
+                t_and_simp_l [wp2.post.ne; t_not test; post3.ne; q23; r3] in
+          let ne = t_or_simp_l [ first_case; second_case; third_case ] in
+          { ne = ne; s = s' }) in
       { ok = ok;
         post = {ne = ne; s = state};
         exn = xne }
@@ -1452,12 +1450,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let p = get_exn e1_regs  ex wp1.exn in
         let s, r1, r2 =
           Subst.merge_states s (e1_regs, p.s)
-                               (Sreg.empty, p.s) in
-        { s = s;
-          ne =
+                               (Sreg.empty, wp1.post.s) in
+        let ne =
             t_or_simp (t_and_simp p.ne r1)
-                      (t_and_simp wp1.post.ne r2)
-        }) in
+                      (t_and_simp wp1.post.ne r2) in
+        { s = s; ne = ne }) in
        { ok = wp1.ok;
          post = {ne = t_false; s = wp1.post.s};
          exn = xne }
@@ -1498,7 +1495,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let xresult = Mexn.map (fun x -> fst (open_post x)) c.c_xpost in
   let res = fast_wp_expr env prestate (result, xresult) l.l_expr in
   let xq =
-    Mexn.map (fun q -> {ne = q; s = res.post.s}) c.c_xpost in
+    Mexn.mapi (fun ex q -> {ne = q; s = (Mexn.find ex res.exn).s }) c.c_xpost in
   let q, xq =
     adapt_post_to_state_pair ~lab env
       prestate res.post.s (result, xresult) c.c_post xq in
