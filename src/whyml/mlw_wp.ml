@@ -1205,34 +1205,34 @@ let wp_nimplies (n : term) (xn : fast_wp_exn_map) ((result, q), xq) =
 
 type res_type = vsymbol * vsymbol Mexn.t
 
-(* Take a single postcondition, and place it in the given context of prestate,
-   poststate and result *)
-let adapt_single_post_to_state_pair env prestate poststate result_var lab post =
-  (* get the result var of the post *)
-  let res, post = open_post post in
-  (* substitute for given result var, and replace 'old *)
-  let post = t_subst_single res (t_var result_var) (old_mark lab post) in
-  (* apply the poststate *)
-  let post = Subst.term env poststate post in
-  (* remove the label that protected "old" variables *)
-  let post = erase_mark lab post in
-  (* apply the prestate = replace previously "old" variables *)
-  Subst.term env prestate post
-
-(* place post + xpost in a given context of prestate/poststate and result *)
-let adapt_post_to_state_pair ?lab
-   env prestate poststate result_vars post (xpost : fast_wp_exn_map)
-   : term * fast_wp_exn_map =
+(* Take a [post], and place the postcondition [post.ne] in the
+   prestate/poststate pair defined by ([prestate], [post.s]). Also, open the
+   postcondition and replace the result variable by [result_var]. Internally, a
+   label is used to deal with 'old; if "lab" is given, use that label instead
+   of creating one. *)
+let adapt_single_post_to_state_pair ?lab env prestate result_var post =
   let lab = match lab with | None -> fresh_mark () | Some lab -> lab in
+  (* get the result var of the post *)
+  let res, ne = open_post post.ne in
+  (* substitute for given result var, and replace 'old *)
+  let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
+  (* apply the poststate *)
+  let ne = Subst.term env post.s ne in
+  (* remove the label that protected "old" variables *)
+  let ne = erase_mark lab ne in
+  (* apply the prestate = replace previously "old" variables *)
+  { post with ne = Subst.term env prestate ne }
+
+(* Given normal and exceptional [post,xpost], each with its
+   own poststate, place all [(x)post.ne] in the prestate/poststate pair defined
+   by [prestate] and [(x)post.s].*)
+let adapt_post_to_state_pair ?lab
+   env prestate result_vars post (xpost : fast_wp_exn_map)
+   : fwp_post * fast_wp_exn_map =
   let result, xresult = result_vars in
-  adapt_single_post_to_state_pair env prestate poststate result lab post,
-  Mexn.mapi (fun ex post ->
-    { s = post.s;
-      ne =
-        adapt_single_post_to_state_pair env prestate
-           post.s (Mexn.find ex xresult)
-           lab post.ne}
-           ) xpost
+  let f = adapt_single_post_to_state_pair ?lab env prestate in
+  f result post,
+  Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost
 
 let either_state base (reg1, s1, f1) (reg2, s2, f2) =
   (* Starting from a base state, and two branches identified by their
@@ -1334,16 +1334,16 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let xpost = Mexn.map (fun p ->
           { s = state_after_call;
             ne  = p}) spec.c_xpost in
+        let call_post = {s = state_after_call; ne = spec.c_post } in
         let post, xpost =
           adapt_post_to_state_pair
              env
              wp1.post.s
-             state_after_call
              r
-             spec.c_post
+             call_post
              xpost in
         let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
-        let ne = t_and_simp wp1.post.ne post in
+        let ne = t_and_simp wp1.post.ne post.ne in
         let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
           let p1 = get_exn e1_regs ex wp1.exn in
           let p2 = get_exn call_regs ex xpost in
@@ -1463,9 +1463,43 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
          { ok = ok;
            post = { ne = ok; s = s };
            exn = Mexn.empty }
+  | Etry (e1, handlers) ->
+      let handlers =
+        List.fold_left (fun acc (ex,pv,expr) -> Mexn.add ex (pv,expr) acc)
+           Mexn.empty handlers in
+      let result, xresult = r in
+      let xresult' = Mexn.mapi (fun ex v ->
+        try let pv,_ = Mexn.find ex handlers in pv.pv_vs
+        with Not_found -> v) xresult in
+      let wp1 = fast_wp_expr env s (result,xresult') e1 in
+      let e1_regs = regs_of_writes e1.e_effect in
+      Mexn.fold (fun ex post acc ->
+        try
+          let _, e2 = Mexn.find ex handlers in
+          let wp2 = fast_wp_expr env wp1.post.s r e2 in
+          let e2_regs = regs_of_writes e2.e_effect in
+          let s,f1,f2 =
+            Subst.merge_states wp1.post.s (e1_regs, wp1.post.s)
+                                          (e2_regs, wp2.post.s) in
+          { ok = t_and_simp acc.ok (t_implies_simp post.ne wp2.ok);
+            post = { s  = s;
+                     ne =
+                       t_or_simp
+                         (t_and_simp acc.post.ne f1)
+                         (t_and_simp_l [post.ne; wp2.post.ne; f2]); };
+            exn =
+              Mexn.fold Mexn.add wp2.exn acc.exn
+          }
+        with Not_found ->
+          { acc with exn = Mexn.add ex post acc.exn }
+         )
+        wp1.exn
+        { ok = wp1.ok;
+          post = wp1.post;
+          exn = Mexn.empty
+        }
   | Eassign _ -> assert false
   | Eabstr (_, _) -> assert false (*TODO*)
-  | Etry (_, _) -> assert false (*TODO*)
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eloop (_, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
@@ -1496,14 +1530,14 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let res = fast_wp_expr env prestate (result, xresult) l.l_expr in
   let xq =
     Mexn.mapi (fun ex q -> {ne = q; s = (Mexn.find ex res.exn).s }) c.c_xpost in
+  let fun_post = { s = res.post.s ; ne = c.c_post } in
   let q, xq =
-    adapt_post_to_state_pair ~lab env
-      prestate res.post.s (result, xresult) c.c_post xq in
+    adapt_post_to_state_pair ~lab env prestate (result, xresult) fun_post xq in
   let pre = Subst.term env prestate c.c_pre in
   let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xq in
   let f =
      t_and_simp res.ok
-     (wp_nimplies res.post.ne res.exn ((result, q), xq)) in
+     (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
   let f = wp_implies pre f in
   wp_forall args (quantify env regs f)
 
