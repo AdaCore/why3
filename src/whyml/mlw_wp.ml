@@ -1476,11 +1476,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       Mexn.fold (fun ex post acc ->
         try
           let _, e2 = Mexn.find ex handlers in
-          let wp2 = fast_wp_expr env wp1.post.s r e2 in
+          let wp2 = fast_wp_expr env post.s r e2 in
           let e2_regs = regs_of_writes e2.e_effect in
           let s,f1,f2 =
-            Subst.merge_states wp1.post.s (e1_regs, wp1.post.s)
-                                          (e2_regs, wp2.post.s) in
+            Subst.merge_states s (e1_regs, wp1.post.s)
+                                 (e2_regs, wp2.post.s) in
           { ok = t_and_simp acc.ok (t_implies_simp post.ne wp2.ok);
             post = { s  = s;
                      ne =

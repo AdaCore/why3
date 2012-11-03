@@ -6,6 +6,7 @@ import tools
 
 # list_of_files = glob.glob ("*.mlw")
 list_of_files = [
+   "try.mlw",
    "assign.mlw",
    "app.mlw",
    "call.mlw",
