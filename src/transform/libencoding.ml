@@ -62,10 +62,10 @@ let ls_selects_def_of_ts acc ts =
   in
   let tvars = List.map t_var vars in
   (** type to int *)
-  let id = string_of_int (id_hash ts.ts_name) in
+  let id = id_hash ts.ts_name in
   let acc =
     let t = fs_app ls tvars ty_type in
-    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_int_const id) in
+    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_nat_const id) in
     let f = t_forall_close vars [[t]] f in
     let prsymbol = create_prsymbol (id_clone ts.ts_name) in
     create_prop_decl Paxiom prsymbol f :: acc

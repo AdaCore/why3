@@ -120,6 +120,10 @@ val int_const_decimal : string -> integer_constant
 val int_const_hexa : string -> integer_constant
 val int_const_octal : string -> integer_constant
 val int_const_binary : string -> integer_constant
+(** these four functions construct integer constant terms from some
+    string [s] of digits in the corresponding base. Exception
+    InvalidConstantLiteral(base,s) is raised if [s] contains invalid
+    characters for the given base. *)
 
 type real_constant = 
   | RConstDecimal of string * string * string option (* int / frac / exp *)
@@ -217,8 +221,10 @@ val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
 val t_var : vsymbol -> term
 val t_const : constant -> term
-val t_int_const : string -> term
-val t_real_const : real_constant -> term
+val t_nat_const : int -> term
+(** [t_nat_const n] builds the constant integer term [n],
+    n must be non-negative *)
+  val t_real_const : real_constant -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term

@@ -208,6 +208,7 @@ type wp_env = {
   ps_int_lt  : Term.lsymbol;
   ps_int_gt  : Term.lsymbol;
   fs_int_pl  : Term.lsymbol;
+  fs_int_mn  : Term.lsymbol;
   letrec_var : term list Mint.t;
 }
 
@@ -235,7 +236,7 @@ let decrease_rel ?loc env old_t t = function
   | Some ls -> ps_app ls [t; old_t]
   | None when ty_equal (t_type t) ty_int ->
       t_and
-        (ps_app env.ps_int_le [t_int_const "0"; old_t])
+        (ps_app env.ps_int_le [t_nat_const 0; old_t])
         (ps_app env.ps_int_lt [t; old_t])
   | None -> decrease_alg ?loc env old_t t
 
@@ -751,19 +752,21 @@ and wp_desc env e q xq = match e.e_node with
                                                  I(i) -> wp(e1, I(i+1), R)
                                        and I(v2+1) -> Q *)
       let gt, le, incr = match d with
-        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, t_int_const "1"
-        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, t_int_const "-1" in
+        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
+        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn
+      in
+      let one = t_nat_const 1 in
       let v1_gt_v2 = ps_app gt [t_var v1; t_var v2] in
       let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
       let q = open_unit_post q in
       let wp_init =
         wp_expl expl_loop_init (t_subst_single x (t_var v1) inv) in
       let wp_step =
-        let next = fs_app env.fs_int_pl [t_var x; incr] ty_int in
+        let next = fs_app incr [t_var x; one] ty_int in
         let post = wp_expl expl_loop_keep (t_subst_single x next inv) in
         wp_expr env e1 (create_unit_post post) xq in
       let wp_last =
-        let v2pl1 = fs_app env.fs_int_pl [t_var v2; incr] ty_int in
+        let v2pl1 = fs_app incr [t_var v2; one] ty_int in
         wp_implies (t_subst_single x v2pl1 inv) q in
       let wp_good = wp_and ~sym:true
         wp_init
@@ -915,6 +918,7 @@ let mk_env env km th =
     ps_int_lt  = Theory.ns_find_ls th_int.th_export ["infix <"];
     ps_int_gt  = Theory.ns_find_ls th_int.th_export ["infix >"];
     fs_int_pl  = Theory.ns_find_ls th_int.th_export ["infix +"];
+    fs_int_mn  = Theory.ns_find_ls th_int.th_export ["infix -"];
     letrec_var = Mint.empty;
   }
 

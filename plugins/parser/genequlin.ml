@@ -64,18 +64,23 @@ let read_channel env path filename cin =
   let th_int = Env.find_theory (Env.env_of_library env) ["int"] "Int" in
   let leq = ns_find_ls th_int.th_export ["infix <"] in
   let plus_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix +"] in
+  let neg_symbol = Theory.ns_find_ls th_int.Theory.th_export ["prefix -"] in
   let mult_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix *"] in
 
-  let zero = t_int_const "0" in
+  let zero = t_nat_const 0 in
+  let t_int_const n =
+    if n >= 0 then t_nat_const n else
+      t_app_infer neg_symbol [t_nat_const (-n)]
+  in
 
   (** create a contraint : polynome <= constant *)
   let create_lit lvar k lits _ =
     let left = List.fold_left (fun acc e ->
-      let const = string_of_int ((Random.int k) - (k/2)) in
+      let const = (Random.int k) - (k/2) in
       let monome = t_app mult_symbol [e;t_int_const const]
         (Some Ty.ty_int) in
       t_app plus_symbol [acc;monome] (Some Ty.ty_int)) zero lvar in
-    let rconst = string_of_int ((Random.int k) - (k/2)) in
+    let rconst = (Random.int k) - (k/2) in
     t_and_simp lits (t_app leq [left;t_int_const rconst] None) in
 
   (** create a set of constraints *)

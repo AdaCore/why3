@@ -404,7 +404,7 @@ let lex_order_ivl (le_int,lt_int) ivl rvl  =
       | v :: tl, v':: tl' -> ((List.map create_v rvl), (v, v', tl, tl'))
       | _ -> assert false in
   let nonneg_ivl' =
-    let positive v = ps_app le_int [t_int_const "0"; t_var v] in
+    let positive v = ps_app le_int [t_nat_const 0; t_var v] in
     List.fold_left (fun t v -> t_and t (positive v)) (positive hd') tl' in
   let lt_lex =
     let lt_hd = ps_app lt_int [t_var hd'; t_var hd] in

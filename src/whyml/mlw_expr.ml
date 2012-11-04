@@ -791,8 +791,10 @@ let e_const t =
   let vtv = vty_value (ity_of_ty_opt t.t_ty) in
   mk_expr (Elogic t) (VTvalue vtv) eff_empty Mid.empty
 
+(*
 let e_int_const s = e_const (t_int_const s)
 let e_real_const rc = e_const (t_real_const rc)
+*)
 let e_const c = e_const (t_const c)
 
 (* boolean expressions *)
