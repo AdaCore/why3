@@ -62,6 +62,7 @@ exception UncoveredVar of vsymbol
 exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
+exception InvalidConstantLiteral of int * string
 
 (** {2 Patterns} *)
 
@@ -109,13 +110,18 @@ type binop =
   | Timplies
   | Tiff
 
-type integer_constant =
+type integer_constant = private
   | IConstDecimal of string
   | IConstHexa of string
   | IConstOctal of string
   | IConstBinary of string
 
-type real_constant =
+val int_const_decimal : string -> integer_constant
+val int_const_hexa : string -> integer_constant
+val int_const_octal : string -> integer_constant
+val int_const_binary : string -> integer_constant
+
+type real_constant = 
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string
 

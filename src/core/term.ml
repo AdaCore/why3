@@ -257,6 +257,37 @@ type integer_constant =
   | IConstOctal of string
   | IConstBinary of string
 
+exception InvalidConstantLiteral of int * string
+let invalid_constant_literal n s = raise (InvalidConstantLiteral(n,s))
+
+let check_integer_literal n f s =
+  let l = String.length s in
+  if l = 0 then invalid_constant_literal n s;
+  for i=0 to l-1 do
+    if not (f s.[i]) then invalid_constant_literal n s;
+  done
+
+let int_const_decimal s =
+  check_integer_literal 10 
+    (function '0'..'9' -> true | _ -> false) s;
+  IConstDecimal s
+
+let int_const_hexa s =
+  check_integer_literal 16
+    (function '0'..'9' | 'A'..'F' | 'a'..'f' -> true | _ -> false) s;
+  IConstHexa s
+
+let int_const_octal s =
+  check_integer_literal 8
+    (function '0'..'7' -> true | _ -> false) s;
+  IConstOctal s
+
+let int_const_binary s =
+  check_integer_literal 8
+    (function '0'..'1' -> true | _ -> false) s;
+  IConstBinary s
+
+
 type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string

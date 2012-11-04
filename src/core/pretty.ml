@@ -518,6 +518,8 @@ let () = Exn_printer.register
       fprintf fmt "Variable %a is used twice" print_vsty vs
   | Term.UncoveredVar vs ->
       fprintf fmt "Variable %a uncovered in \"or\"-pattern" print_vsty vs
+  | Term.InvalidConstantLiteral(n,s) ->
+      fprintf fmt "Invalid constant literal in base %d: '%s'" n s
   | Term.FunctionSymbolExpected ls ->
       fprintf fmt "Not a function symbol: %a" print_ls ls
   | Term.PredicateSymbolExpected ls ->
