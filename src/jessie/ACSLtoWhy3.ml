@@ -483,15 +483,21 @@ let identified_proposition p =
 
 let program_vars = Hashtbl.create 257
 
-let any _ty = Mlw_expr.e_int_const "0000" (* TODO : ref *)
+let any _ty = 
+  Mlw_expr.e_const (Term.ConstInt (Term.int_const_decimal "0")) 
 
 let create_var v =
   let id = Ident.id_fresh v.vname in
   let ty = Mlw_ty.vty_value (ctype v.vtype) in
+  let specialize_ref = Mlw_dty.specialize_psymbol ref_fun in
+  let vty =
+    match Mlw_dty.vty_of_dvty specialize_ref with
+      | Mlw_ty.VTarrow vty -> vty
+      | Mlw_ty.VTvalue _ -> assert false
+  in
   let def = 
-    Mlw_expr.e_app 
-      (Mlw_expr.e_arrow ref_fun
-         (Mlw_ty.vty_arrow [] (Mlw_ty.VTvalue ty))) 
+    Mlw_expr.e_app
+      (Mlw_expr.e_arrow ref_fun vty)
       [any ty] 
   in
   let let_defn = Mlw_expr.create_let_defn id def in

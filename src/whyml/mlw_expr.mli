@@ -18,7 +18,7 @@ open Mlw_ty.T
 
 (** program/logic symbols *)
 
-(* plymbols represent algebraic type constructors and projections.
+(* plsymbols represent algebraic type constructors and projections.
    They must be fully applied and the result is equal to the application of
    the lsymbol. We need this kind of symbols to cover nullary constructors,
    such as Nil, which cannot be given a post-condition. They cannot be
@@ -181,6 +181,7 @@ val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
 val e_arrow : psymbol -> vty_arrow -> expr
+(** DOCUMENTATION NEEDED PLEASE *)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr

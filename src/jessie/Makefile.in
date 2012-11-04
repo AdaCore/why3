@@ -1,17 +1,23 @@
 
-FRAMAC_SHARE    :=$(shell frama-c -print-path)
-FRAMAC_LIBDIR   :=$(shell frama-c -print-libpath)
+FRAMAC_SHARE    := $(shell frama-c -print-path)
+FRAMAC_LIBDIR   := $(shell frama-c -print-libpath)
 PLUGIN_NAME     := Jessie3
 PLUGIN_CMO      := literals ACSLtoWhy3 register
 
 SHELL := /bin/bash
 
-PLUGIN_EXTRA_BYTE:= @OCAMLLIB@/why3/why3.cma 
-PLUGIN_EXTRA_OPT:= @OCAMLLIB@/why3/why3.cmxa
-PLUGIN_BFLAGS:= -I +why3 
-PLUGIN_OFLAGS:= -I +why3 
-PLUGIN_LINK_BFLAGS:= -I +why3 
-PLUGIN_LINK_OFLAGS:= -I +why3 
+ifeq (@enable_local@,yes)
+WHYLIB := ../../lib/why3
+else
+WHYLIB := @OCAMLLIB@/why3
+endif
+
+PLUGIN_EXTRA_BYTE:= $(WHYLIB)/why3.cma 
+PLUGIN_EXTRA_OPT:= $(WHYLIB)/why3.cmxa
+PLUGIN_BFLAGS:= -I $(WHYLIB)
+PLUGIN_OFLAGS:= -I $(WHYLIB)
+PLUGIN_LINK_BFLAGS:= -I $(WHYLIB) 
+PLUGIN_LINK_OFLAGS:= -I $(WHYLIB)
 PLUGIN_TESTS_DIRS := basic
 
 literals.ml: literals.mll
