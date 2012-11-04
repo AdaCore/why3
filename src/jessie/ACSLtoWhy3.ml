@@ -10,6 +10,7 @@
 (********************************************************************)
 
 
+
 let help = "Checks ACSL contracts using Why3"
 
 let global_logic_decls_theory_name = "Global logic declarations"
