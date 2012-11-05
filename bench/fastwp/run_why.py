@@ -4,8 +4,7 @@ import tools
 import sys
 
 def main():
-    args = [ "--debug" , "print_labels"]
-    tools.print_list (tools.run_why (sys.argv[1], args))
+    tools.print_list (tools.run_why (sys.argv[1], []))
 
 
 if __name__ == "__main__":

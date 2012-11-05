@@ -26,7 +26,7 @@ def grep(regex, strlist, invert=False):
                 res.append (m.group(0))
     return res
 
-def run_why (fn, args=["--prover", "Z3"]):
+def run_why (fn, args=["--prover", "Z3", "-t", "1"]):
     proc = [ why3, "--debug", "fast_wp" ]
     proc += args
     proc += [fn]

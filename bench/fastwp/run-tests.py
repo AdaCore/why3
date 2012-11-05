@@ -16,6 +16,7 @@ list_of_files = [
    "assert.mlw",
    "raise.mlw",
    "abstract.mlw",
+   "loop.mlw",
    "bug1.mlw"
    ]
 

@@ -1418,7 +1418,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let second_case =
             t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2] in
           let third_case =
-                t_and_simp_l [wp2.post.ne; t_not test; post3.ne; q23; r3] in
+             t_and_simp_l [wp1.post.ne; t_not test; post3.ne; q23; r3] in
           let ne = t_or_simp_l [ first_case; second_case; third_case ] in
           { ne = ne; s = s' }) in
       { ok = ok;
@@ -1526,9 +1526,26 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           post = post;
           exn = xpost;
         }
+  | Eloop (inv, _, e1) ->
+        let havoc_state = Subst.refresh (regs_of_writes e1.e_effect) s in
+        let init_inv = wp_expl expl_loop_init (Subst.term env s inv) in
+        let inv_hypo = Subst.term env havoc_state inv in
+        let wp1 = fast_wp_expr env havoc_state r e1 in
+        let post_inv = wp_expl expl_loop_keep (Subst.term env wp1.post.s inv) in
+        let preserv_inv =
+           t_implies_simp (t_and_simp inv_hypo wp1.post.ne)
+                          (t_and_simp wp1.ok post_inv) in
+        let exn =
+           Mexn.map (fun post ->
+              { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
+        let ok = t_and_simp_l [init_inv; preserv_inv] in
+        (* TODO variant proof *)
+        { ok = ok;
+          post = { s = wp1.post.s; ne = t_false };
+          exn = exn
+        }
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
-  | Eloop (_, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
   | Ecase (_, _) -> assert false (*TODO*)
   | Erec (_, _) -> assert false (*TODO*)
