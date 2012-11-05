@@ -14,7 +14,8 @@ list_of_files = [
    "call_exc.mlw",
    "if.mlw",
    "assert.mlw",
-   "raise.mlw"
+   "raise.mlw",
+   "abstract.mlw"
    ]
 
 def compute_expected_output(fn, outputfile):

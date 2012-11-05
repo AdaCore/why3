@@ -1292,6 +1292,24 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       { ok = t_true;
         post = { ne = ne; s = s};
         exn = Mexn.empty }
+  | Evalue v ->
+        (* OK : True *)
+        (* NE : result = v *)
+        let va = (t_var v.pv_vs) in
+        let ne = Subst.term env s (t_equ (t_var result) va) in
+      { ok = t_true;
+        post = {ne = ne; s = s };
+        exn = Mexn.empty }
+  | Earrow _ ->
+        let ok = t_true in
+         { ok = ok;
+           post = { ne = ok; s = s };
+           exn = Mexn.empty }
+  | Eabsurd ->
+        { ok = t_false;
+          post = { ne = t_false ; s = s };
+          exn = Mexn.empty
+        }
   | Eassert (kind, f) ->
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
@@ -1302,24 +1320,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       { ok = ok;
         post = { ne = ne; s = s };
         exn = Mexn.empty }
-  | Evalue v ->
-        (* OK : True *)
-        (* NE : result = v *)
-        let va = (t_var v.pv_vs) in
-        let ne = Subst.term env s (t_equ (t_var result) va) in
-      { ok = t_true;
-        post = {ne = ne; s = s };
-        exn = Mexn.empty }
-  | Eany spec ->
-        (* OK = pre *)
-        (* NE = post *)
-         let ok = wp_label e (wp_expl expl_pre spec.c_pre) in
-         let ok = t_label ?loc:e.e_loc ok.t_label ok in
-         let ne = quantify env (regs_of_writes spec.c_effect) spec.c_post in
-         { ok = ok;
-           post = {ne = ne; s = s};
-           exn = Mexn.empty }
-         (*TODO exceptional case *)
   | Eapp (e1, _, spec) ->
       (* The first thing that happens, before the call, is the evaluation of
          [e1]. This translates as a recursive call to the fast_wp *)
@@ -1351,7 +1351,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
             Subst.merge_states s (e1_regs, p1.s)
                                     (call_regs, p2.s) in
           { s = s;
-            ne = 
+            ne =
               t_or_simp (t_and_simp p1.ne r1)
                         (t_and_simp_l [p2.ne;r2;wp1.post.ne])
           }) in
@@ -1458,11 +1458,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
        { ok = wp1.ok;
          post = {ne = t_false; s = wp1.post.s};
          exn = xne }
-  | Earrow _ ->
-        let ok = t_true in
-         { ok = ok;
-           post = { ne = ok; s = s };
-           exn = Mexn.empty }
   | Etry (e1, handlers) ->
       let handlers =
         List.fold_left (fun acc (ex,pv,expr) -> Mexn.add ex (pv,expr) acc)
@@ -1498,8 +1493,26 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           post = wp1.post;
           exn = Mexn.empty
         }
+  | Eabstr (e1, spec) ->
+        let wp1 = fast_wp_expr env s r e1 in
+        let xpost = Mexn.map (fun p ->
+          { s = wp1.post.s;
+            ne  = p}) spec.c_xpost in
+        let abstr_post = { ne = spec.c_post; s = wp1.post.s } in
+        let post, xpost =
+           adapt_post_to_state_pair env s r abstr_post xpost in
+        let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
+        { ok = t_and_simp_l
+                 [wp1.ok;
+                  (Subst.term env s spec.c_pre);
+                  wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)];
+          post = post;
+          exn  = xpost
+        }
+  | Eany _ ->
+        (* TODO *)
+        assert false
   | Eassign _ -> assert false
-  | Eabstr (_, _) -> assert false (*TODO*)
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eloop (_, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
@@ -1507,7 +1520,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
   | Erec (_, _) -> assert false (*TODO*)
       (* TODO exceptional case *)
   | Elet (_, _) -> assert false (*TODO*)
-  | Eabsurd -> assert false (*TODO*)
 
 and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
