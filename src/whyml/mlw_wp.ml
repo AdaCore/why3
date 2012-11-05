@@ -1054,7 +1054,6 @@ end = struct
 
   type t = vsymbol option ref Mreg.t
 
-  let fastwp_lab = Slab.singleton (create_label "fastwp_term")
 
   let name_from_region ?hint ?id reg =
     let id =
@@ -1083,7 +1082,7 @@ end = struct
               end
           end
     in
-    mk_var id fastwp_lab (ty_of_ity reg.reg_ity)
+    mk_var id Slab.empty (ty_of_ity reg.reg_ity)
 
   let init_reg reg =
     Mreg.map (fun () -> ref None) reg
@@ -1295,7 +1294,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
   | Evalue v ->
         (* OK : True *)
         (* NE : result = v *)
-        let va = (t_var v.pv_vs) in
+        let va = wp_label e (t_var v.pv_vs) in
         let ne = Subst.term env s (t_equ (t_var result) va) in
       { ok = t_true;
         post = {ne = ne; s = s };
@@ -1314,7 +1313,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
-      let f = Subst.term env s f in
+      let f = wp_label e (Subst.term env s f) in
       let ok = if kind = Aassume then t_true else f in
       let ne = if kind = Acheck then t_true else f in
       { ok = ok;
@@ -1324,13 +1323,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       (* The first thing that happens, before the call, is the evaluation of
          [e1]. This translates as a recursive call to the fast_wp *)
         let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
-        (* TODO xresult is wrong here *)
         let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
         (* next we have to deal with the call itself. *)
         let e1_regs = regs_of_writes e1.e_effect in
         let call_regs = regs_of_writes spec.c_effect in
         let state_after_call = Subst.refresh call_regs wp1.post.s in
-        let pre = Subst.term env wp1.post.s spec.c_pre in
+        let pre = wp_label e (Subst.term env wp1.post.s spec.c_pre) in
         let xpost = Mexn.map (fun p ->
           { s = state_after_call;
             ne  = p}) spec.c_xpost in
@@ -1365,9 +1363,10 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne wp2.ok) in
+      let ok = wp_label e ok in
       let e1_regs = regs_of_writes e1.e_effect in
       let e2_regs = regs_of_writes e2.e_effect in
-      let ne = t_and_simp wp1.post.ne wp2.post.ne in
+      let ne = wp_label e (t_and_simp wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
         let p1 = get_exn e1_regs ex wp1.exn in
         let p2 = get_exn e2_regs ex wp2.exn in
@@ -1383,7 +1382,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
   | Eif (e1, e2, e3) ->
       (* First thing is the evaluation of e1 *)
       let cond_res = create_vsymbol (id_fresh "c") (ty_of_vty e1.e_vty) in
-      (* TODO what about xresult here? *)
       let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let wp3 = fast_wp_expr env wp1.post.s r e3 in
@@ -1395,12 +1393,14 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         t_and_simp wp1.ok
           (t_implies_simp wp1.post.ne
             (t_if_simp test wp2.ok wp3.ok)) in
+      let ok = wp_label e ok in
       let state, f1, f2 =
         either_state wp1.post.s
            (e2_regs, wp2.post.s, wp2.post.ne)
            (e3_regs, wp3.post.s, wp3.post.ne) in
       let ne =
         t_and_simp wp1.post.ne (t_if test f1 f2) in
+      let ne = wp_label e ne in
       let xne = iter_all_exns [wp1.exn; wp2.exn; wp3.exn]
         (fun ex ->
           let post2 = get_exn e2_regs ex wp2.exn in
@@ -1454,6 +1454,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let ne =
             t_or_simp (t_and_simp p.ne r1)
                       (t_and_simp wp1.post.ne r2) in
+        let ne = wp_label e ne in
         { s = s; ne = ne }) in
        { ok = wp1.ok;
          post = {ne = t_false; s = wp1.post.s};
@@ -1502,10 +1503,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let post, xpost =
            adapt_post_to_state_pair env s r abstr_post xpost in
         let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
-        { ok = t_and_simp_l
-                 [wp1.ok;
-                  (Subst.term env s spec.c_pre);
-                  wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)];
+        let ok =
+           t_and_simp_l
+              [wp1.ok; (Subst.term env s spec.c_pre);
+               wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
+        let ok = wp_label e ok in
+        { ok = ok ;
           post = post;
           exn  = xpost
         }
