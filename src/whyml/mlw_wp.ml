@@ -1347,7 +1347,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let p2 = get_exn call_regs ex xpost in
           let s, r1, r2 =
             Subst.merge_states s (e1_regs, p1.s)
-                                    (call_regs, p2.s) in
+                                 (Sreg.union e1_regs call_regs, p2.s) in
           { s = s;
             ne =
               t_or_simp (t_and_simp p1.ne r1)
@@ -1370,8 +1370,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
         let p1 = get_exn e1_regs ex wp1.exn in
         let p2 = get_exn e2_regs ex wp2.exn in
-        let s, r1, r2 = Subst.merge_states s (e1_regs, p1.s)
-                                                (e2_regs, p2.s) in
+        let s, r1, r2 =
+           Subst.merge_states s (e1_regs, p1.s)
+                                (Sreg.union e1_regs e2_regs, p2.s) in
         { s = s;
           ne =
             t_or_simp (t_and_simp p1.ne r1)
@@ -1407,11 +1408,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let post3 = get_exn e3_regs ex wp3.exn in
           let s23, r2, r3 =
             Subst.merge_states wp1.post.s (e2_regs, post2.s)
-                                             (e3_regs, post3.s) in
+                                          (e3_regs, post3.s) in
           let post1 = get_exn e1_regs ex wp1.exn in
           let s', q1, q23 =
-            Subst.merge_states s (e1_regs, post1.s)
-                                 (Sreg.union e2_regs e3_regs, s23) in
+            Subst.merge_states s
+              (e1_regs, post1.s)
+              (Sreg.union e1_regs (Sreg.union e2_regs e3_regs), s23) in
           let first_case = t_and_simp q1 post1.ne in
           let second_case =
             t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2] in
@@ -1450,7 +1452,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         let p = get_exn e1_regs  ex wp1.exn in
         let s, r1, r2 =
           Subst.merge_states s (e1_regs, p.s)
-                               (Sreg.empty, wp1.post.s) in
+                               (e1_regs, wp1.post.s) in
         let ne =
             t_or_simp (t_and_simp p.ne r1)
                       (t_and_simp wp1.post.ne r2) in
@@ -1476,13 +1478,13 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let e2_regs = regs_of_writes e2.e_effect in
           let s,f1,f2 =
             Subst.merge_states s (e1_regs, wp1.post.s)
-                                 (e2_regs, wp2.post.s) in
+                                 (Sreg.union e1_regs e2_regs, wp2.post.s) in
+          let ne =
+             t_or_simp
+                (t_and_simp acc.post.ne f1)
+                (t_and_simp_l [post.ne; wp2.post.ne; f2]) in
           { ok = t_and_simp acc.ok (t_implies_simp post.ne wp2.ok);
-            post = { s  = s;
-                     ne =
-                       t_or_simp
-                         (t_and_simp acc.post.ne f1)
-                         (t_and_simp_l [post.ne; wp2.post.ne; f2]); };
+            post = { s  = s; ne = ne ; };
             exn =
               Mexn.fold Mexn.add wp2.exn acc.exn
           }
@@ -1512,9 +1514,18 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           post = post;
           exn  = xpost
         }
-  | Eany _ ->
-        (* TODO *)
-        assert false
+  | Eany spec ->
+        let poststate = Subst.refresh (regs_of_writes spec.c_effect) s in
+        let post = { ne = spec.c_post; s = poststate } in
+        let xpost =
+           Mexn.map (fun p -> { s = poststate; ne = p}) spec.c_xpost in
+        let post, xpost =
+           adapt_post_to_state_pair env s r post xpost in
+        let pre = Subst.term env s spec.c_pre in
+        { ok = wp_label e pre;
+          post = post;
+          exn = xpost;
+        }
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eloop (_, _, _) -> assert false (*TODO*)
