@@ -231,8 +231,7 @@ let add_indexer (state,task) ts ty csl =
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
-    let ix = t_const (ConstInt (int_const_decimal (string_of_int !index))) in
-    let ax = t_equ (fs_app mt_ls [hd] ty_int) ix in
+    let ax = t_equ (fs_app mt_ls [hd] ty_int) (t_nat_const !index) in
     let ax = t_forall_close (List.rev vl) [[hd]] ax in
     add_prop_decl tsk Paxiom pr ax
   in

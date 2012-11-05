@@ -222,10 +222,6 @@ val t_void : term
 val e_void : expr
 
 val e_const : constant -> expr
-(*
-val e_int_const : string -> expr
-val e_real_const : real_constant -> expr
-*)
 val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr

@@ -125,7 +125,7 @@ val int_const_binary : string -> integer_constant
     InvalidConstantLiteral(base,s) is raised if [s] contains invalid
     characters for the given base. *)
 
-type real_constant = 
+type real_constant =
   | RConstDecimal of string * string * string option (* int / frac / exp *)
   | RConstHexa of string * string * string
 
@@ -221,10 +221,6 @@ val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
 val t_var : vsymbol -> term
 val t_const : constant -> term
-val t_nat_const : int -> term
-(** [t_nat_const n] builds the constant integer term [n],
-    n must be non-negative *)
-  val t_real_const : real_constant -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term
@@ -240,6 +236,10 @@ val t_iff : term -> term -> term
 val t_not : term -> term
 val t_true : term
 val t_false : term
+
+val t_nat_const : int -> term
+(** [t_nat_const n] builds the constant integer term [n],
+    n must be non-negative *)
 
 val asym_label : label
 val t_and_asym : term -> term -> term

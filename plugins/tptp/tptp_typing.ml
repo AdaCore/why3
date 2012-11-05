@@ -286,6 +286,7 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
 
 let t_int_const s = t_const (ConstInt (int_const_decimal s))
+let t_real_const r = t_const (ConstReal r)
 
 let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->

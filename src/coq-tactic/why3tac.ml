@@ -389,8 +389,8 @@ let rec tr_positive p = match kind_of_term p with
   | _ ->
       raise NotArithConstant
 
-let const_of_big_int b = 
-  Term.t_const 
+let const_of_big_int b =
+  Term.t_const
     (Term.ConstInt (Term.int_const_decimal (Big_int.string_of_big_int b)))
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
@@ -401,9 +401,9 @@ let rec tr_arith_constant t = match kind_of_term t with
   | App (f, [|a|]) when is_constant f coq_Zneg ->
       const_of_big_int (Big_int.minus_big_int (tr_positive a))
   | Const _ when is_constant t coq_R0 ->
-      Term.t_real_const (Term.RConstDecimal ("0", "0", None))
+      Term.t_const (Term.ConstReal (Term.RConstDecimal ("0", "0", None)))
   | Const _ when is_constant t coq_R1 ->
-      Term.t_real_const (Term.RConstDecimal ("1", "0", None))
+      Term.t_const (Term.ConstReal (Term.RConstDecimal ("1", "0", None)))
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)
 (*       let tb = tr_arith_constant b in *)

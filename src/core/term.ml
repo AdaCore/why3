@@ -268,7 +268,7 @@ let check_integer_literal n f s =
   done
 
 let int_const_decimal s =
-  check_integer_literal 10 
+  check_integer_literal 10
     (function '0'..'9' -> true | _ -> false) s;
   IConstDecimal s
 
@@ -498,10 +498,6 @@ let mk_term n ty = Hsterm.hashcons {
 
 let t_var v         = mk_term (Tvar v) (Some v.vs_ty)
 let t_const c ty    = mk_term (Tconst c) (Some ty)
-(*
-let t_int_const s   = mk_term (Tconst (ConstInt (int_const_decimal s))) (Some Ty.ty_int)
-*)
-let t_real_const r  = mk_term (Tconst (ConstReal r)) (Some Ty.ty_real)
 let t_app f tl ty   = mk_term (Tapp (f, tl)) ty
 let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty
 let t_let t1 bt ty  = mk_term (Tlet (t1, bt)) ty
@@ -765,7 +761,7 @@ let t_const c = match c with
   | ConstInt _  -> t_const c ty_int
   | ConstReal _ -> t_const c ty_real
 
-let t_nat_const n = 
+let t_nat_const n =
   t_const (ConstInt (int_const_decimal (string_of_int n)))
 
 let t_if f t1 t2 =
