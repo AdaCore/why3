@@ -227,6 +227,10 @@ Axiom suffix_length : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
 Definition min_suffix(a1:(array char)) (a2:(array char)) (i:Z) (j:Z)
   (n:Z): Prop := (min_dist (suffix a1 i) (suffix a2 j) n).
 
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+Open Scope Z_scope.
+
 (* Why3 goal *)
 Theorem WP_parameter_distance : forall (w1:Z) (w2:Z), forall (w21:(map Z
   char)) (w11:(map Z char)), let w22 := (mk_array w2 w21) in let w12 :=
@@ -239,51 +243,16 @@ Theorem WP_parameter_distance : forall (w1:Z) (w2:Z), forall (w21:(map Z
   (suffix w22 j) (get t1 j))) -> (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) ->
   (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= w2)%Z /\
   (w2 < (w2 + 1%Z)%Z)%Z) -> forall (t2:(map Z Z)), (t2 = (set t1 w2 ((get t1
-  w2) + 1%Z)%Z)) -> ((0%Z <= (w2 - 1%Z)%Z)%Z -> forall (oldt:Z) (t3:(map Z
-  Z)), forall (j:Z), ((j <= (w2 - 1%Z)%Z)%Z /\ (0%Z <= j)%Z) ->
-  ((((forall (k:Z), ((j < k)%Z /\ (k <= w2)%Z) -> (min_dist (suffix w12 i)
-  (suffix w22 k) (get t3 k))) /\ forall (k:Z), ((0%Z <= k)%Z /\
-  (k <= j)%Z) -> (min_dist (suffix w12 (i + 1%Z)%Z) (suffix w22 k) (get t3
-  k))) /\ (min_dist (suffix w12 (i + 1%Z)%Z) (suffix w22 (j + 1%Z)%Z)
-  oldt)) -> (((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> forall (oldt1:Z),
-  (oldt1 = (get t3 j)) -> (((0%Z <= j)%Z /\ (j < w2)%Z) -> (((0%Z <= i)%Z /\
-  (i < w1)%Z) -> ((~ ((get w11 i) = (get w21 j))) ->
-  (((0%Z <= (j + 1%Z)%Z)%Z /\ ((j + 1%Z)%Z < (w2 + 1%Z)%Z)%Z) ->
-  (((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= j)%Z /\
-  (j < (w2 + 1%Z)%Z)%Z) -> forall (t4:(map Z Z)), (t4 = (set t3 j
-  ((Zmin (get t3 j) (get t3 (j + 1%Z)%Z)) + 1%Z)%Z)) -> forall (k:Z),
-  (((j - 1%Z)%Z < k)%Z /\ (k <= w2)%Z) -> (min_dist (suffix w12 i)
-  (suffix w22 k) (get t4 k))))))))))))))))))).
-(* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-intuition.
-subst t4.
-unfold min_suffix.
-assert (k=j \/ j<k)%Z by omega. intuition.
-  (* j=k *)
-  subst j.
-  rewrite (suffix_cons _ i).
-  2: unfold length1; simpl; omega.
-  rewrite (suffix_cons _ k).
-  2: unfold length1; simpl; omega.
-  rewrite Select_eq; try omega.
-  apply min_dist_diff.
-  subst; auto.
-  rewrite <- (suffix_cons _ i).
-  2: unfold length1; simpl; omega.
-  subst.
-  assert (min_suffix (mk_array w1 w11) (mk_array w2 w21) i (k+1) (get t3 (k+1)))%Z; auto with *.
-  apply H18; auto with *.
-  rewrite <- (suffix_cons _ k).
-  subst.
-  assert (min_suffix (mk_array w1 w11) (mk_array w2 w21) (i + 1) k (get t3 k)); auto with *.
-  apply H23; auto with *.
-  unfold length1; simpl; omega.
-  (* j<k *)
-  subst.
-  rewrite Select_neq; try omega.
-  assert (min_suffix (mk_array w1 w11) (mk_array w2 w21) i k (get t3 k)); auto with *.
-  apply H18; auto with *.
+  w2) + 1%Z)%Z)) -> (((w2 - 1%Z)%Z < 0%Z)%Z -> forall (j:Z), ((0%Z <= j)%Z /\
+  (j <= w2)%Z) -> (min_dist (suffix w12 ((i - 1%Z)%Z + 1%Z)%Z) (suffix w22 j)
+  (get t2 j))))))))))).
+intros w1 w2 w21 w11 w22 w12 (h1,h2) h3 h4 t h5 h6 t1 i (h7,h8) h9 (h10,h11)
+(h12,h13) (h14,h15) t2 h16 h17 j (h18,h19).
+replace (i-1+1) with i by omega.
+rewrite suffix_cons.
+assert (h : length1 w22 = j) by ae.
+ae.
+ae.
 Qed.
 
 
