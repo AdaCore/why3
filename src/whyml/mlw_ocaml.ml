@@ -13,6 +13,7 @@ open Format
 open Pp
 
 open Stdlib
+open Number
 open Ident
 open Ty
 open Term
@@ -336,14 +337,15 @@ and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
 let print_const fmt = function
-  | ConstInt (IConstDecimal s) ->
+  | ConstInt (IConstDec s) ->
       fprintf fmt "(Why3__BuiltIn.int_constant \"%s\")" s
-  | ConstInt (IConstHexa s) -> fprintf fmt (tbi "0x%s") s
-  | ConstInt (IConstOctal s) -> fprintf fmt (tbi "0o%s") s
-  | ConstInt (IConstBinary s) -> fprintf fmt (tbi "0b%s") s
-  | ConstReal (RConstDecimal (i,f,None)) -> fprintf fmt (tbi "%s.%s") i f
-  | ConstReal (RConstDecimal (i,f,Some e)) -> fprintf fmt (tbi "%s.%se%s") i f e
-  | ConstReal (RConstHexa (i,f,e)) -> fprintf fmt (tbi "0x%s.%sp%s") i f e
+  | ConstInt (IConstHex s) -> fprintf fmt (tbi "0x%s") s
+  | ConstInt (IConstOct s) -> fprintf fmt (tbi "0o%s") s
+  | ConstInt (IConstBin s) -> fprintf fmt (tbi "0b%s") s
+  | ConstReal (RConstDec (i,f,None)) -> fprintf fmt (tbi "%s.%s") i f
+  | ConstReal (RConstDec (i,f,Some e)) -> fprintf fmt (tbi "%s.%se%s") i f e
+  | ConstReal (RConstHex (i,f,Some e)) -> fprintf fmt (tbi "0x%s.%sp%s") i f e
+  | ConstReal (RConstHex (i,f,None)) -> fprintf fmt (tbi "0x%s.%s") i f
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =

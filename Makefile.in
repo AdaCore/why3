@@ -106,7 +106,7 @@ LIBGENERATED = src/util/config.ml src/util/rc.ml src/parser/lexer.ml \
 
 LIB_UTIL = config util opt lists strings extmap exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp debug loc print_tree \
-	   cmdline warning sysutil rc plugin
+	   cmdline warning sysutil rc plugin number
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
 
@@ -127,7 +127,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate smoke_detector
 
-LIB_PRINTER = print_number alt_ergo why3printer smtv1 smtv2 coq pvs \
+LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs \
 		simplify gappa cvc3 yices
 
 LIB_SESSION = xml termcode session session_tools session_scheduler

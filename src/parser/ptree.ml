@@ -15,9 +15,9 @@ type loc = Loc.position
 
 (*s Logical expressions (for both terms and predicates) *)
 
-type integer_constant = Term.integer_constant
-type real_constant = Term.real_constant
-type constant = Term.constant
+type integer_constant = Number.integer_constant
+type real_constant = Number.real_constant
+type constant = Number.constant
 
 type label =
   | Lstr of Ident.label

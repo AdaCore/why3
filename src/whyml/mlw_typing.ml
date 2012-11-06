@@ -546,9 +546,9 @@ and de_desc denv loc = function
       expected_type e1 res;
       expected_type_weak e2 res;
       DEassign (e1, e2), ([], dity_unit)
-  | Ptree.Econstant (ConstInt _ as c) ->
+  | Ptree.Econstant (Number.ConstInt _ as c) ->
       DEconstant c, ([], dity_int)
-  | Ptree.Econstant (ConstReal _ as c) ->
+  | Ptree.Econstant (Number.ConstReal _ as c) ->
       DEconstant c, ([], dity_real)
   | Ptree.Enot e1 ->
       let e1 = dexpr denv e1 in

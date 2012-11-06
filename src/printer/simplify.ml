@@ -37,18 +37,18 @@ type info = {
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
-          Print_number.long_int_support = false;
-          Print_number.dec_int_support = Print_number.Number_default;
-          Print_number.hex_int_support = Print_number.Number_unsupported;
-          Print_number.oct_int_support = Print_number.Number_unsupported;
-          Print_number.bin_int_support = Print_number.Number_unsupported;
-          Print_number.def_int_support = Print_number.Number_custom "constant_too_large_%s";
-          Print_number.dec_real_support = Print_number.Number_unsupported;
-          Print_number.hex_real_support = Print_number.Number_unsupported;
-          Print_number.frac_real_support = Print_number.Number_unsupported;
-          Print_number.def_real_support = Print_number.Number_custom "real_constant_%s";
+          Number.long_int_support = false;
+          Number.dec_int_support = Number.Number_default;
+          Number.hex_int_support = Number.Number_unsupported;
+          Number.oct_int_support = Number.Number_unsupported;
+          Number.bin_int_support = Number.Number_unsupported;
+          Number.def_int_support = Number.Number_custom "constant_too_large_%s";
+          Number.dec_real_support = Number.Number_unsupported;
+          Number.hex_real_support = Number.Number_unsupported;
+          Number.frac_real_support = Number.Number_unsupported;
+          Number.def_real_support = Number.Number_custom "real_constant_%s";
         } in
-      Print_number.print number_format fmt c
+      Number.print number_format fmt c
   | Tvar v ->
       print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with

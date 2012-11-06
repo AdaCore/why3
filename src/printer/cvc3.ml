@@ -120,19 +120,19 @@ let print_var_list info fmt vsl =
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
-          Print_number.long_int_support = true;
-          Print_number.dec_int_support = Print_number.Number_default;
-          Print_number.hex_int_support = Print_number.Number_unsupported;
-          Print_number.oct_int_support = Print_number.Number_unsupported;
-          Print_number.bin_int_support = Print_number.Number_unsupported;
-          Print_number.def_int_support = Print_number.Number_unsupported;
-          Print_number.dec_real_support = Print_number.Number_unsupported;
-          Print_number.hex_real_support = Print_number.Number_unsupported;
-          Print_number.frac_real_support = Print_number.Number_custom
-            (Print_number.PrintFracReal ("%s", "(%s * %s)", "(%s / %s)"));
-          Print_number.def_real_support = Print_number.Number_unsupported;
+          Number.long_int_support = true;
+          Number.dec_int_support = Number.Number_default;
+          Number.hex_int_support = Number.Number_unsupported;
+          Number.oct_int_support = Number.Number_unsupported;
+          Number.bin_int_support = Number.Number_unsupported;
+          Number.def_int_support = Number.Number_unsupported;
+          Number.dec_real_support = Number.Number_unsupported;
+          Number.hex_real_support = Number.Number_unsupported;
+          Number.frac_real_support = Number.Number_custom
+            (Number.PrintFracReal ("%s", "(%s * %s)", "(%s / %s)"));
+          Number.def_real_support = Number.Number_unsupported;
         } in
-      Print_number.print number_format fmt c
+      Number.print number_format fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)

@@ -285,8 +285,8 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Elet _ | Eite _ | Eqnt _ | Ebin _
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
 
-let t_int_const s = t_const (ConstInt (int_const_decimal s))
-let t_real_const r = t_const (ConstReal r)
+let t_int_const s = t_const (Number.ConstInt (Number.int_const_dec s))
+let t_real_const r = t_const (Number.ConstReal r)
 
 let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
@@ -305,7 +305,8 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       find_dobj ~loc denv env impl s
   | Enum (Nint s) -> t_int_const s
   | Enum (Nreal (i,f,e)) ->
-      t_real_const (RConstDecimal (i,Opt.get_def "0" f,e))
+      t_const (Number.ConstReal
+        (Number.real_const_dec i (Opt.get_def "0" f) e))
   | Enum (Nrat (n,d)) ->
       let n = t_int_const n and d = t_int_const d in
       let frac = ns_find_ls denv.th_rat.th_export ["frac"] in

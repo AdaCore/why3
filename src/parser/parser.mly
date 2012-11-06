@@ -157,10 +157,10 @@ end
   let small_integer i =
     try
       match i with
-      | Term.IConstDecimal s -> int_of_string s
-      | Term.IConstHexa    s -> int_of_string ("0x"^s)
-      | Term.IConstOctal   s -> int_of_string ("0o"^s)
-      | Term.IConstBinary  s -> int_of_string ("0b"^s)
+      | Number.IConstDec s -> int_of_string s
+      | Number.IConstHex s -> int_of_string ("0x"^s)
+      | Number.IConstOct s -> int_of_string ("0o"^s)
+      | Number.IConstBin s -> int_of_string ("0b"^s)
     with Failure _ -> raise Parsing.Parse_error
 
   let qualid_last = function
@@ -670,8 +670,8 @@ list1_lexpr_arg:
 ;
 
 constant:
-| INTEGER   { Term.ConstInt $1 }
-| FLOAT     { Term.ConstReal $1 }
+| INTEGER   { Number.ConstInt $1 }
+| FLOAT     { Number.ConstReal $1 }
 ;
 
 lexpr_arg:

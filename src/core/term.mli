@@ -62,7 +62,6 @@ exception UncoveredVar of vsymbol
 exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
-exception InvalidConstantLiteral of int * string
 
 (** {2 Patterns} *)
 
@@ -110,29 +109,6 @@ type binop =
   | Timplies
   | Tiff
 
-type integer_constant = private
-  | IConstDecimal of string
-  | IConstHexa of string
-  | IConstOctal of string
-  | IConstBinary of string
-
-val int_const_decimal : string -> integer_constant
-val int_const_hexa : string -> integer_constant
-val int_const_octal : string -> integer_constant
-val int_const_binary : string -> integer_constant
-(** these four functions construct integer constant terms from some
-    string [s] of digits in the corresponding base. Exception
-    InvalidConstantLiteral(base,s) is raised if [s] contains invalid
-    characters for the given base. *)
-
-type real_constant =
-  | RConstDecimal of string * string * string option (* int / frac / exp *)
-  | RConstHexa of string * string * string
-
-type constant =
-  | ConstInt of integer_constant
-  | ConstReal of real_constant
-
 type term = private {
   t_node  : term_node;
   t_ty    : ty option;
@@ -144,7 +120,7 @@ type term = private {
 
 and term_node = private
   | Tvar of vsymbol
-  | Tconst of constant
+  | Tconst of Number.constant
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -220,7 +196,7 @@ val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
 val t_var : vsymbol -> term
-val t_const : constant -> term
+val t_const : Number.constant -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term

@@ -184,22 +184,23 @@ rule token = parse
   | uident as id
       { UIDENT id }
   | ['0'-'9'] ['0'-'9' '_']* as s
-      { INTEGER (int_const_decimal (remove_underscores s)) }
+      { INTEGER (Number.int_const_dec (remove_underscores s)) }
   | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
-      { INTEGER (int_const_hexa (remove_underscores s)) }
+      { INTEGER (Number.int_const_hex (remove_underscores s)) }
   | '0' ['o' 'O'] (['0'-'7'] ['0'-'7' '_']* as s)
-      { INTEGER (int_const_octal (remove_underscores s)) }
+      { INTEGER (Number.int_const_oct (remove_underscores s)) }
   | '0' ['b' 'B'] (['0'-'1'] ['0'-'1' '_']* as s)
-      { INTEGER (int_const_binary (remove_underscores s)) }
+      { INTEGER (Number.int_const_bin (remove_underscores s)) }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-      { FLOAT (RConstDecimal (i, f, Opt.map remove_leading_plus e)) }
-  | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f)
-                  |(hexadigit+ as i) '.' (hexadigit* as f)
-                  |(hexadigit+ as i) ("" as f))
-    ['p' 'P'] (['-' '+']? digit+ as e)
-      { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
+      { FLOAT (Number.real_const_dec i f (Opt.map remove_leading_plus e)) }
+  | '0' ['x' 'X'] (digit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
+  | '0' ['x' 'X'] (digit+ as i) '.' (digit* as f)
+        (['p' 'P'] (['-' '+']? digit+ as e))?
+  | '0' ['x' 'X'] (digit* as i) '.' (digit+ as f)
+        (['p' 'P'] (['-' '+']? digit+ as e))?
+      { FLOAT (Number.real_const_hex i f (Opt.map remove_leading_plus e)) }
   | "(*)"
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"

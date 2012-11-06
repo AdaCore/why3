@@ -50,7 +50,7 @@ type dexpr = {
 }
 
 and dexpr_desc =
-  | DEconstant of Term.constant
+  | DEconstant of Number.constant
   | DElocal of string
   | DEglobal_pv of pvsymbol
   | DEglobal_ps of psymbol

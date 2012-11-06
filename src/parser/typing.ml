@@ -471,9 +471,9 @@ and dterm_node ~localize loc uc env = function
       let s, tyl, ty = specialize_fsymbol (Qident x) uc in
       let tl = dtype_args ~localize s loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
-  | PPconst (ConstInt _ as c) ->
+  | PPconst (Number.ConstInt _ as c) ->
       Tconst c, tyapp Ty.ts_int []
-  | PPconst (ConstReal _ as c) ->
+  | PPconst (Number.ConstReal _ as c) ->
       Tconst c, tyapp Ty.ts_real []
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
