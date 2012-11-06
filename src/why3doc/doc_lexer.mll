@@ -55,6 +55,29 @@
       | '&' -> "&amp;"
       | _ -> assert false)
 
+  let html_escape s =
+    let len = ref 0 in
+    String.iter (function '<' | '>' -> len := !len + 4
+      | '&' -> len := !len + 5 | _ -> incr len) s;
+    let len' = !len in
+    let len = String.length s in
+    if len = len' then s else begin
+      let t = String.create len' in
+      let j = ref 0 in
+      let app u =
+        let l = String.length u in
+        String.blit u 0 t !j l;
+        j := !j + l in
+      for i = 0 to len - 1 do
+        match s.[i] with
+        | '<' -> app "&lt;"
+        | '>' -> app "&gt;"
+        | '&' -> app "&amp;"
+        | c -> t.[!j] <- c; incr j
+      done;
+      t
+    end
+
   let current_file = ref ""
 
   let print_ident fmt lexbuf s =
@@ -66,6 +89,7 @@
       let (* f,l,c as *) loc = get_loc lexbuf in
       (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
       (* is this a def point? *)
+      let s = html_escape s in
       try
         let t = Doc_def.is_def loc in
         fprintf fmt "<a name=\"%s\">%s</a>" t s
@@ -129,9 +153,6 @@ rule scan fmt = parse
   | ident as s
           { print_ident fmt lexbuf s;
             scan fmt lexbuf }
-  | special as c
-           { html_char fmt c;
-             scan fmt lexbuf }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
              scan fmt lexbuf }
@@ -153,9 +174,6 @@ and scan_embedded fmt depth = parse
   | ident as s
           { print_ident fmt lexbuf s;
             scan_embedded fmt depth lexbuf }
-  | special as c
-           { html_char fmt c;
-             scan_embedded fmt depth lexbuf }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
              scan_embedded fmt depth lexbuf }
