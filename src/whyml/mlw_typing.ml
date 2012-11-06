@@ -126,7 +126,7 @@ let count_term_tuples t =
 let flush_tuples uc =
   let kn = Theory.get_known (get_theory uc) in
   let add_tuple n _ uc =
-    if Mid.mem (ts_tuple n).ts_name kn then uc
+    if Mid.mem (Ty.ts_tuple n).ts_name kn then uc
     else use_export_theory uc (tuple_theory n) in
   let uc = Hint.fold add_tuple ht_tuple uc in
   Hint.clear ht_tuple;
@@ -143,6 +143,7 @@ let uc_find_ls uc p =
 let get_id_ts = function
   | PT pt -> pt.its_pure.ts_name
   | TS ts -> ts.ts_name
+
 let uc_find_ts uc p =
   Typing.find_ns get_id_ts ns_find_ts p (get_namespace uc)
 
@@ -152,6 +153,7 @@ let get_id_ps = function
   | PL pl -> pl.pl_ls.ls_name
   | XS xs -> xs.xs_name
   | LS ls -> ls.ls_name
+
 let uc_find_ps uc p =
   Typing.find_ns get_id_ps ns_find_ps p (get_namespace uc)
 
