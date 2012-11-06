@@ -56,7 +56,13 @@ let get_file fname =
     f
 
 let make_tag s l =
-  s ^ "_" ^ string_of_int l (* TODO: improve? *)
+  let t =
+    s ^ "_" ^ string_of_int l (* TODO: improve? *)
+  in
+  for i = 0 to String.length s - 1 do
+    if t.[i] = ' ' then t.[i] <- '_'
+  done;
+  t
 
 let add_ident id = match id.id_loc with
   | None ->
