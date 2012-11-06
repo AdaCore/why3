@@ -83,8 +83,29 @@
 
 }
 
+let op_char_1 = ['=' '<' '>' '~']
+let op_char_2 = ['+' '-']
+let op_char_3 = ['*' '/' '%']
+let op_char_4 = ['!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
+let op_char_34 = op_char_3 | op_char_4
+let op_char_234 = op_char_2 | op_char_34
+let op_char_1234 = op_char_1 | op_char_234
+let op_char_pref = ['!' '?']
+let prefix_op =
+    op_char_1234* op_char_1 op_char_1234*
+  | op_char_234*  op_char_2 op_char_234*
+  | op_char_34* op_char_3 op_char_34*
+  | op_char_4+
+let operator =
+    op_char_pref op_char_4*
+  | prefix_op
+  | prefix_op '_'
+  | "[]"
+  | "[<-]"
+  | "[]<-"
+
 let space = [' ' '\t']
-let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
+let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
 let special = ['<' '>' '&']
 
 rule scan fmt = parse

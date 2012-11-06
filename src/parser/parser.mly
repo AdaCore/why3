@@ -886,8 +886,9 @@ ident_rich:
 
 lident_rich:
 | lident                      { $1 }
-| LEFTPAR lident_op RIGHTPAR  { mk_id $2 (floc ()) }
+| LEFTPAR lident_op RIGHTPAR  { mk_id $2 (floc_i 2) }
 | LEFTPAR_STAR_RIGHTPAR       { mk_id (infix "*") (floc ()) }
+  /* FIXME: use location of operator star rather than left parenthesis */
 ;
 
 lident_op:
