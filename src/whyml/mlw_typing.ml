@@ -138,19 +138,22 @@ let add_decl_with_tuples uc d = add_decl (flush_tuples uc) d
 (** Namespace lookup *)
 
 let uc_find_ls uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try ns_find_ls (Theory.get_namespace (get_theory uc)) x
-  with Not_found -> error ~loc:(qloc p) (UnboundSymbol p)
+  Typing.find_lsymbol p (get_theory uc)
 
+let get_id_ts = function
+  | PT pt -> pt.its_pure.ts_name
+  | TS ts -> ts.ts_name
 let uc_find_ts uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try ns_find_ts (get_namespace uc) x
-  with Not_found -> error ~loc:(qloc p) (UnboundSymbol p)
+  Typing.find_ns get_id_ts ns_find_ts p (get_namespace uc)
 
+let get_id_ps = function
+  | PV pv -> pv.pv_vs.vs_name
+  | PS ps -> ps.ps_name
+  | PL pl -> pl.pl_ls.ls_name
+  | XS xs -> xs.xs_name
+  | LS ls -> ls.ls_name
 let uc_find_ps uc p =
-  let x = Typing.string_list_of_qualid [] p in
-  try ns_find_ps (get_namespace uc) x
-  with Not_found -> error ~loc:(qloc p) (UnboundSymbol p)
+  Typing.find_ns get_id_ps ns_find_ps p (get_namespace uc)
 
 (** Typing type expressions *)
 

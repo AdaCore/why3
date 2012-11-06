@@ -82,6 +82,9 @@ val print_qualid: Format.formatter -> Ptree.qualid -> unit
 val split_qualid : Ptree.qualid -> string list * string
 val string_list_of_qualid : string list -> Ptree.qualid -> string list
 val qloc : Ptree.qualid -> Loc.position
+val find_ns : ('a -> Ident.ident) ->
+  ('b -> string list -> 'a) -> Ptree.qualid -> 'b -> 'a
+val find_lsymbol : Ptree.qualid -> theory_uc -> lsymbol
 
 (*
 val is_projection : theory_uc -> lsymbol -> (tysymbol * lsymbol * int) option
