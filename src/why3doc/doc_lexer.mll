@@ -266,11 +266,11 @@ and skip_comment = parse
     lb.Lexing.lex_curr_p <-
       { lb.Lexing.lex_curr_p with Lexing.pos_fname = fname };
     (* output *)
-    fprintf fmt "<span class=\"why3doc\">@\n";
+    fprintf fmt "<div class=\"why3doc\">@\n";
     fprintf fmt "<pre>@\n";
     scan fmt lb;
     fprintf fmt "</pre>@\n";
-    fprintf fmt "</span>@\n";
+    fprintf fmt "</div>@\n";
     close_in cin
 
   let extract_header fname =
