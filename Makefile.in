@@ -359,35 +359,6 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
-
-########
-# Whyml (old API)
-########
-
-PGM_FILES = pgm_ttree pgm_types pgm_pretty \
-	    pgm_module pgm_wp pgm_typing pgm_main
-
-PGMMODULES = $(addprefix src/programs/, $(PGM_FILES))
-
-PGMDEP = $(addsuffix .dep, $(PGMMODULES))
-PGMCMO = $(addsuffix .cmo, $(PGMMODULES))
-PGMCMX = $(addsuffix .cmx, $(PGMMODULES))
-
-$(PGMDEP): DEPFLAGS += -I src/programs
-$(PGMCMO) $(PGMCMX): INCLUDES += -I src/programs
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(PGMDEP)
-endif
-
-depend: $(PGMDEP)
-
-clean::
-	rm -f src/programs/*.cm[iox] src/programs/*.o
-	rm -f src/programs/*.annot src/programs/*.dep src/programs/*~
-
 ######
 # Why3
 ######
