@@ -309,36 +309,29 @@ let add_to_check_no_smoke config found_obs env_session sched =
           | _ -> true)
         report
     in
+    let save () =
+      if !opt_verbose then eprintf "Saving session...@?";
+      S.save_session config session;
+      if !opt_verbose then eprintf " done@." in
+    printf " %d/%d " n m;
     if report = [] then
       begin
         if found_obs then
-          if n=m then
-            printf " %d/%d (replay OK, all proved: obsolete session \
-updated)@." n m
-          else
-            if !opt_force then
-              printf " %d/%d (replay OK, but not all proved: session going to be saved since -force was given)@." n m
-            else
-              printf " %d/%d (replay OK, but not all proved: obsolete \
-session NOT updated)@." n m
+          printf "(replay OK, obsolete session updated)@."
         else
-          printf " %d/%d@." n m ;
+          printf "(replay OK)@.";
         if !opt_stats && n<m then print_statistics files;
         if !opt_verbose then eprintf "Everything replayed OK.@.";
-        if (found_obs && n=m) || !opt_force then
-          begin
-            if !opt_verbose then eprintf "Saving session...@?";
-            S.save_session config session;
-            if !opt_verbose then eprintf " done@."
-          end;
+        if found_obs then save ();
         exit 0
       end
     else
       let report = List.rev report in
       begin
-        printf " %d/%d (replay failed)@." n m ;
+        printf "(replay failed)@.";
         List.iter print_report report;
         eprintf "Replay failed.@.";
+        if !opt_force then save ();
         exit 1
       end
   in
