@@ -195,10 +195,10 @@ rule token = parse
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
       { FLOAT (Number.real_const_dec i f (Opt.map remove_leading_plus e)) }
-  | '0' ['x' 'X'] (digit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
-  | '0' ['x' 'X'] (digit+ as i) '.' (digit* as f)
+  | '0' ['x' 'X'] (hexadigit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
+  | '0' ['x' 'X'] (hexadigit+ as i) '.' (hexadigit* as f)
         (['p' 'P'] (['-' '+']? digit+ as e))?
-  | '0' ['x' 'X'] (digit* as i) '.' (digit+ as f)
+  | '0' ['x' 'X'] (hexadigit* as i) '.' (hexadigit+ as f)
         (['p' 'P'] (['-' '+']? digit+ as e))?
       { FLOAT (Number.real_const_hex i f (Opt.map remove_leading_plus e)) }
   | "(*)"

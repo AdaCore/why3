@@ -291,8 +291,8 @@ access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{chap:library}).
 \begin{ocamlcode}
-let two : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "2"))
-let four : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "4"))
+let two : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
+let four : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
 let int_theory : Theory.theory =
   Env.find_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
@@ -325,7 +325,7 @@ To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
 \begin{ocamlcode}
-let zero : Term.term = Term.t_const (Term.ConstInt "0")
+let zero : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
 let ge_symbol : Term.lsymbol =
