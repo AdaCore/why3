@@ -134,7 +134,7 @@ type number_support = {
 let check_support support default do_it try_next v =
   match support with
   | Number_unsupported -> try_next v
-  | Number_default -> do_it (match default with Some d -> d | None -> assert false) v
+  | Number_default -> do_it (Opt.get default) v
   | Number_custom f -> do_it f v
 
 let force_support support do_it v =

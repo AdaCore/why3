@@ -170,8 +170,6 @@ val create_inst :
 
 val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 
-val create_clone : tdecl list -> theory -> th_inst -> tdecl list
-
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 
 val create_null_clone : theory -> tdecl

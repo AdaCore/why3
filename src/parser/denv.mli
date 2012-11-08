@@ -16,29 +16,19 @@ open Theory
 
 (** Destructive unification *)
 
-type type_var
-
-val find_type_var : loc:Ptree.loc -> type_var Htv.t -> tvsymbol -> type_var
-val create_ty_decl_var : ?loc:Ptree.loc -> tvsymbol -> type_var
-
 type dty
 
-val tyvar : type_var -> dty
-val tyuvar: tvsymbol -> dty
-val tyapp : tysymbol -> dty list -> dty
+val tyuvar : tvsymbol -> dty
+val tyapp  : tysymbol -> dty list -> dty
 
-type dty_view =
-  | Tyvar of type_var
-  | Tyuvar of tvsymbol
-  | Tyapp of tysymbol * dty list
-
-val view_dty : dty -> dty_view
+val fresh_type_var : Ptree.loc -> dty
 
 val unify : dty -> dty -> bool
 
 val print_dty : Format.formatter -> dty -> unit
 
 val ty_of_dty : dty -> ty
+val dty_of_ty : ty -> dty
 
 type ident = Ptree.ident
 
@@ -91,10 +81,4 @@ val fmla : vsymbol Mstr.t -> dfmla -> term
 
 (** Specialization *)
 
-val specialize_ty : loc:Ptree.loc -> type_var Htv.t -> ty -> dty
-
 val specialize_lsymbol : loc:Ptree.loc -> lsymbol -> dty list * dty option
-
-(** exported for programs *)
-
-val tvsymbol_of_type_var : type_var -> tvsymbol

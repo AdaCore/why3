@@ -138,11 +138,6 @@ let rec string_list_of_qualid acc = function
   | Qident id -> id.id :: acc
   | Qdot (p, id) -> string_list_of_qualid (id.id :: acc) p
 
-let specialize_tysymbol loc p uc =
-  let sl = string_list_of_qualid [] p in
-  try ns_find_ts (get_namespace uc) sl
-  with Not_found -> error ~loc (UnboundType sl)
-
 (* lazy declaration of tuples *)
 
 let add_ty_decl uc ts = add_decl_with_tuples uc (create_ty_decl ts)
@@ -151,18 +146,6 @@ let add_param_decl uc ls = add_decl_with_tuples uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl_with_tuples uc (create_logic_decl dl)
 let add_ind_decl uc s dl = add_decl_with_tuples uc (create_ind_decl s dl)
 let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
-
-let rec dty uc = function
-  | PPTtyvar {id=x} ->
-      create_user_type_var x
-  | PPTtyapp (p, x) ->
-      let loc = qloc x in
-      let ts = specialize_tysymbol loc x uc in
-      let tyl = List.map (dty uc) p in
-      Loc.try2 loc tyapp ts tyl
-  | PPTtuple tyl ->
-      let ts = ts_tuple (List.length tyl) in
-      tyapp ts (List.map (dty uc) tyl)
 
 let find_ns get_id find p ns =
   let loc = qloc p in
@@ -201,6 +184,17 @@ let find_namespace_ns = find_ns get_dummy_id ns_find_ns
 (* dead code
 let find_namespace q uc = find_namespace_ns q (get_namespace uc)
 *)
+
+let rec dty uc = function
+  | PPTtyvar {id=x} ->
+      create_user_type_var x
+  | PPTtyapp (p, x) ->
+      let ts = find_tysymbol x uc in
+      let tyl = List.map (dty uc) p in
+      Loc.try2 (qloc x) tyapp ts tyl
+  | PPTtuple tyl ->
+      let ts = ts_tuple (List.length tyl) in
+      tyapp ts (List.map (dty uc) tyl)
 
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
@@ -329,10 +323,6 @@ let check_pat_linearity p =
   in
   check p
 
-let fresh_type_var loc =
-  let tv = create_tvsymbol (id_user "a" loc) in
-  tyvar (create_ty_decl_var ~loc tv)
-
 let rec dpat uc env pat =
   let env, n, ty = dpat_node pat.pat_loc uc env pat.pat_desc in
   env, { dp_node = n; dp_ty = ty }
@@ -442,9 +432,7 @@ and dterm_node ~localize loc uc env = function
       Tvar x, ty
   | PPvar x when env.gvars x <> None ->
       let vs = Opt.get (env.gvars x) in
-      assert (ty_closed vs.vs_ty);
-      let ty = specialize_ty ~loc (Htv.create 0) vs.vs_ty in
-      Tgvar vs, ty
+      Tgvar vs, dty_of_ty vs.vs_ty
   | PPvar x ->
       (* 0-arity symbol (constant) *)
       let s, tyl, ty = specialize_fsymbol x uc in
@@ -1015,24 +1003,25 @@ let add_logics dl th =
   let th = if defn = [] then th else add_logic_decl th defn in
   th
 
-let type_term uc denv env t =
+let type_term uc gfn t =
+  let denv = denv_empty_with_globals gfn in
   let t = dterm ~localize:(Some None) uc denv t in
-  term env t
+  term Mstr.empty t
 
-let type_fmla uc denv env f =
+let type_fmla uc gfn f =
+  let denv = denv_empty_with_globals gfn in
   let f = dfmla ~localize:(Some None) uc denv f in
-  fmla env f
+  fmla Mstr.empty f
 
 let add_prop k loc s f th =
   let pr = create_prsymbol (create_user_id s) in
-  let f = type_fmla th denv_empty Mstr.empty f in
+  let f = type_fmla th (fun _ -> None) f in
   Loc.try4 loc add_prop_decl th k pr f
 
 let loc_of_id id = Opt.get id.Ident.id_loc
 
 let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
-  let denv = denv_empty in
   let psymbols = Hstr.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
@@ -1051,7 +1040,7 @@ let add_inductives s dl th =
     let ps = Hstr.find psymbols id in
     let clause (loc, id, f) =
       Hstr.replace propsyms id.id loc;
-      let f = type_fmla th' denv Mstr.empty f in
+      let f = type_fmla th' (fun _ -> None) f in
       create_prsymbol (create_user_id id), f
     in
     ps, List.map clause d.in_def

@@ -31,7 +31,6 @@ and type_var = {
   type_var_loc : loc option;
 }
 
-let tyvar v = Tyvar v
 let tyuvar tv = Tyuvar tv
 
 let rec type_inst s ty = match ty.ty_node with
@@ -49,10 +48,7 @@ let tyapp ts tyl = match ts.ts_def with
       with Invalid_argument _ ->
         Loc.errorm "this type expects %d parameters" (List.length ts.ts_args)
 
-
 type dty = dty_view
-
-let tvsymbol_of_type_var tv = tv.tvsymbol
 
 let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
@@ -67,15 +63,15 @@ let rec print_dty fmt = function
   | Tyapp (s, l) ->
       fprintf fmt "%s %a" s.ts_name.id_string (print_list space print_dty) l
 
-let rec view_dty = function
-  | Tyvar { type_val = Some dty } -> view_dty dty
-  | dty -> dty
-
 let create_ty_decl_var =
   let t = ref 0 in
   fun ?loc tv ->
     incr t;
     { tag = !t; tvsymbol = tv; type_val = None; type_var_loc = loc }
+
+let fresh_type_var loc =
+  let tv = create_tvsymbol (id_user "a" loc) in
+  Tyvar (create_ty_decl_var ~loc tv)
 
 let rec occurs v = function
   | Tyvar { type_val = Some t } -> occurs v t
@@ -114,6 +110,10 @@ let rec ty_of_dty = function
       ty_var tv
   | Tyapp (s, tl) ->
       ty_app s (List.map ty_of_dty tl)
+
+let rec dty_of_ty ty = match ty.ty_node with
+  | Ty.Tyvar tv -> Tyuvar tv
+  | Ty.Tyapp (ts,tl) -> Tyapp (ts, List.map dty_of_ty tl)
 
 type ident = Ptree.ident
 

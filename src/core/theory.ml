@@ -674,8 +674,6 @@ let clone_export uc th inst =
 let clone_theory add_td acc th inst =
   clone_theory (cl_init th inst) add_td acc th inst
 
-let create_clone = clone_theory (fun tdl td -> td :: tdl)
-
 let create_null_clone th =
   let sm = {
     sm_ts = Mts.empty;

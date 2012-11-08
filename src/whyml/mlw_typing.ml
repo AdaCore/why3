@@ -138,7 +138,8 @@ let add_decl_with_tuples uc d = add_decl (flush_tuples uc) d
 (** Namespace lookup *)
 
 let uc_find_ls uc p =
-  Typing.find_lsymbol p (get_theory uc)
+  let ns = Theory.get_namespace (get_theory uc) in
+  Typing.find_ns (fun ls -> ls.ls_name) Theory.ns_find_ls p ns
 
 let get_id_ts = function
   | PT pt -> pt.its_pure.ts_name
@@ -297,6 +298,12 @@ let find_global_vs uc p = try match uc_find_ps uc p with
   | PV pv -> Some pv.pv_vs
   | _ -> None
   with _ -> None
+
+let find_vs uc lvm p = match p with
+  | Qdot _ -> find_global_vs uc p
+  | Qident id ->
+      let ovs = Mstr.find_opt id.id lvm in
+      if ovs = None then find_global_vs uc p else ovs
 
 let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
   | Ptree.PPpwild ->
@@ -666,7 +673,6 @@ type lenv = {
   th_old   : Theory.theory_uc;
   let_vars : let_sym Mstr.t;
   log_vars : vsymbol Mstr.t;
-  log_denv : Typing.denv;
 }
 
 let create_lenv uc = {
@@ -675,7 +681,6 @@ let create_lenv uc = {
   th_old   = Theory.use_export (get_theory uc) Mlw_wp.th_mark_old;
   let_vars = Mstr.empty;
   log_vars = Mstr.empty;
-  log_denv = Typing.denv_empty_with_globals (find_global_vs uc);
 }
 
 (* invariant handling *)
@@ -770,13 +775,13 @@ let rec dty_of_ty ty = match ty.ty_node with
   | Ty.Tyvar v -> Denv.tyuvar v
 
 let create_variant lenv (t,r) =
-  let t = Typing.type_term lenv.th_at lenv.log_denv lenv.log_vars t in
+  let t = Typing.type_term lenv.th_at (find_vs lenv.mod_uc lenv.log_vars) t in
   count_term_tuples t;
   check_at t;
   t, r
 
 let create_assert lenv f =
-  let f = Typing.type_fmla lenv.th_at lenv.log_denv lenv.log_vars f in
+  let f = Typing.type_fmla lenv.th_at (find_vs lenv.mod_uc lenv.log_vars) f in
   let f = t_label_add Split_goal.stop_split f in
   count_term_tuples f;
   check_at f;
@@ -784,18 +789,17 @@ let create_assert lenv f =
 
 let create_pre lenv fs = t_and_simp_l (List.map (create_assert lenv) fs)
 
-let create_post lenv res dty pat f =
-  let log_vars, log_denv = match pat.pat_desc with
+let create_post lenv res pat f =
+  let log_vars = match pat.pat_desc with
     | Ptree.PPpvar { id = x } ->
-        Mstr.add x res lenv.log_vars,
-        Typing.add_var x dty lenv.log_denv
+        Mstr.add x res lenv.log_vars
     | Ptree.PPptuple [] ->
         Loc.try2 pat.pat_loc Ty.ty_equal_check res.vs_ty ty_unit;
-        lenv.log_vars, lenv.log_denv
+        lenv.log_vars
     | Ptree.PPpwild ->
-        lenv.log_vars, lenv.log_denv
+        lenv.log_vars
     | _ -> assert false in
-  let f = Typing.type_fmla lenv.th_old log_denv log_vars f in
+  let f = Typing.type_fmla lenv.th_old (find_vs lenv.mod_uc log_vars) f in
   let f = t_label_add Split_goal.stop_split f in
   let f = remove_old f in
   count_term_tuples f;
@@ -803,14 +807,13 @@ let create_post lenv res dty pat f =
   f
 
 let create_post lenv ty fs =
-  let dty = dty_of_ty ty in
   let rec get_name = function
     | ({ pat_desc = Ptree.PPpvar { id = "(null)" }},_)::l -> get_name l
     | ({ pat_desc = Ptree.PPpvar { id = x        }},_)::_ -> x
     | _::l -> get_name l
     | [] -> "result" in
   let res = create_vsymbol (id_fresh (get_name fs)) ty in
-  let post (pat,f) = create_post lenv res dty pat f in
+  let post (pat,f) = create_post lenv res pat f in
   let f = t_and_simp_l (List.map post fs) in
   Mlw_ty.create_post res f
 
@@ -824,11 +827,9 @@ let add_local x lv lenv = match lv with
   | LetA _ ->
       { lenv with let_vars = Mstr.add x lv lenv.let_vars }
   | LetV pv ->
-      let dty = dty_of_ty pv.pv_vs.vs_ty in
       { lenv with
         let_vars = Mstr.add x lv lenv.let_vars;
-        log_vars = Mstr.add x pv.pv_vs lenv.log_vars;
-        log_denv = Typing.add_var x dty lenv.log_denv }
+        log_vars = Mstr.add x pv.pv_vs lenv.log_vars }
 
 let binders bl =
   let binder (id, ghost, dity) =
@@ -1276,10 +1277,11 @@ let add_type_invariant loc uc id params inv =
   let _, tvl = Lists.map_fold_left add_tv Sstr.empty params in
   let ty = ty_app its.its_pure (List.map ty_var tvl) in
   let res = create_vsymbol (id_fresh x) ty in
-  let vars = Mstr.singleton x res in
-  let denv = Typing.add_var x (dty_of_ty ty) Typing.denv_empty in
+  let find = function
+    | Qident { id = id } when id = x -> Some res
+    | _ -> None in
   let mk_inv f =
-    let f = Typing.type_fmla (get_theory uc) denv vars f in
+    let f = Typing.type_fmla (get_theory uc) find f in
     t_label_add Split_goal.stop_split f in
   let inv = List.map mk_inv inv in
   let q = Mlw_ty.create_post res (t_and_simp_l inv) in
