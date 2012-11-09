@@ -186,7 +186,63 @@ let () = printf "@[On task 4, alt-ergo answers %a@."
 
 (* build a theory with all these goals *)
 
-(* TODO *)
+(* create a theory *)
+let () = printf "@[creating theory 'My_theory'@]@."
+
+let my_theory : Theory.theory_uc = 
+  Theory.create_theory (Ident.id_fresh "My_theory")
+
+(* add declarations of goals *)
+
+let () = printf "@[adding goal 1@]@."
+let decl_goal1 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal1
+
+let () = printf "@[adding goal 2@]@."
+let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_A
+let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_B
+let decl_goal2 : Decl.decl = 
+  Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
+
+(* helper function: [use th1 th2] insert the equivalent of a "use import th2"
+   in theory th1 under construction *)
+let use th1 th2 =
+  let name = th2.Theory.th_name in
+  Theory.close_namespace
+    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
+    true
+
+let () = printf "@[adding goal 3@]@."
+(* use import int.Int *)
+let my_theory : Theory.theory_uc = use my_theory int_theory
+let decl_goal3 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal3
+
+let () = printf "@[adding goal 4@]@."
+let decl_goal4 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal4
+
+(* closing the theory *)
+let my_theory : Theory.theory = Theory.close_theory my_theory
+
+(* printing the result *)
+
+let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
+
+(* getting set of task from a theory *)
+
+let my_tasks : Task.task list = 
+  List.rev (Task.split_theory my_theory None None)
+
+
+let () = 
+  printf "Tasks are:@.";
+  let _ =
+    List.fold_left
+      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
+      1 my_tasks
+  in ()
 
 
 

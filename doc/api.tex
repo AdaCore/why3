@@ -291,8 +291,10 @@ access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{chap:library}).
 \begin{ocamlcode}
-let two : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
-let four : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
+let two : Term.term = 
+  Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
+let four : Term.term = 
+  Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
 let int_theory : Theory.theory =
   Env.find_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
@@ -325,7 +327,8 @@ To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
 \begin{ocamlcode}
-let zero : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
+let zero : Term.term = 
+  Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
 let ge_symbol : Term.lsymbol =
@@ -349,7 +352,103 @@ let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 
 \section{Building Theories}
 
-[TO BE COMPLETED]
+We illustrate now how one can build theories. Building a theory must
+be done by a sequence of calls:
+\begin{itemize}
+\item creating a theory ``under construction'', of type \verb|Theory.theory_uc| ;
+\item adding declarations, one at a time ;
+\item closing the theory under construction, obtaining something of type \verb|Theory.theory|.
+\end{itemize}
+
+Creation of a theory named \verb|My_theory| is done by:
+\begin{ocamlcode}
+let my_theory : Theory.theory_uc = 
+  Theory.create_theory (Ident.id_fresh "My_theory")
+\end{ocamlcode}
+
+First let's add the formula 1 above as a goal:
+\begin{ocamlcode}
+let decl_goal1 : Decl.decl =
+  Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1 
+let my_theory : Theory.theory_uc =
+  Theory.add_decl my_theory decl_goal1
+\end{ocamlcode}
+Note that we reused the goal identifier \verb|goal_id1| that we
+already defined to create task 1 above.
+
+Adding formula 2 needs to add the declarations of predicate variables A
+and B first:
+\begin{ocamlcode}
+let my_theory : Theory.theory_uc = 
+  Theory.add_param_decl my_theory prop_var_A 
+let my_theory : Theory.theory_uc = 
+  Theory.add_param_decl my_theory prop_var_B 
+let decl_goal2 : Decl.decl =
+  Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2 
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
+\end{ocamlcode}
+
+Adding formula 3 is a bit more complex since it uses integers, thus it
+requires to ``use'' the theory \verb|int.Int|. Using a theory is
+indeed not a primitive operation in the API: it must be done by a
+combination of an ``export'' and the creation of a namespace. We
+provide a helper function for that:
+\begin{ocamlcode}
+(* [use th1 th2] insert the equivalent of a "use import th2" in
+  theory th1 under construction *) 
+let use th1 th2 = 
+  let name = th2.Theory.th_name in 
+  Theory.close_namespace 
+    (Theory.use_export 
+      (Theory.open_namespace th1 name.Ident.id_string) th2) true
+\end{ocamlcode}
+Addition of formula 3 is then
+\begin{ocamlcode}
+let my_theory : Theory.theory_uc = use my_theory int_theory
+let decl_goal3 : Decl.decl = 
+  Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
+let my_theory : Theory.theory_uc = 
+  Theory.add_decl my_theory decl_goal3  
+\end{ocamlcode}
+
+Addition of goal 4 is nothing more complex:
+\begin{ocamlcode}
+let decl_goal4 : Decl.decl = 
+  Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
+let my_theory : 
+  Theory.theory_uc = Theory.add_decl my_theory decl_goal4  
+\end{ocamlcode}
+
+Finally, we close our theory under construction as follows.
+\begin{ocamlcode}
+let my_theory : Theory.theory = Theory.close_theory my_theory  
+\end{ocamlcode}
+
+We can inspect what we did for example by printing that theory:
+\begin{ocamlcode}
+let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
+\end{ocamlcode}
+
+From a theory, one can compute at once all the proof tasks it contains
+as follows:
+\begin{ocamlcode}
+let my_tasks : Task.task list = 
+  List.rev (Task.split_theory my_theory None None)
+\end{ocamlcode}
+reversing the list is don because the tasks are returned in reverse order.
+
+We can check our generated tasks by printing them:
+\begin{ocamlcode}
+let () = 
+  printf "Tasks are:@.";
+  let _ =
+    List.fold_left
+      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
+      1 my_tasks
+  in ()
+\end{ocamlcode}
+
+One can run provers on those tasks exactly as we did above.
 
 \section{Applying transformations}
 
@@ -359,6 +458,11 @@ let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 
 [TO BE COMPLETED]
 % pattern-matching on terms, opening a quantifier
+
+\section{Proof sessions}
+
+See example \verb|examples/create_session.ml| for an example on how
+to manipulate proof sessions from an OCaml program.
 
 
 
