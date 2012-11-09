@@ -201,8 +201,7 @@ let print_dec_real support fmt =
 let print_hex_real support fmt =
   check_support support.hex_real_support
     (Some "0x%s.%sp%s")
-    (fun s i f e -> fprintf fmt s i f
-      (match e with None -> "0" | Some e -> remove_minus e))
+    (fun s i f e -> fprintf fmt s i f (Opt.get_def "0" e))
   (* TODO: add support for decay to decimal floats *)
   (check_support support.frac_real_support None
     (fun (PrintFracReal (exp_zero, exp_pos, exp_neg)) i f e ->
