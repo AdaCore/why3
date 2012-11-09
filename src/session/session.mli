@@ -166,7 +166,7 @@ val create_session : ?shape_version:int -> string -> 'key session
     directory of the program if you give a relative path *)
 
 val get_project_dir : string -> string
-(** find the session which correspond to the given file or return
+(** find the session which corresponds to the given file or return
     directly the given directory;
     return {Not_found} if the file or the directory doesn't exists
 *)

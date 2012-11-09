@@ -1071,6 +1071,7 @@ install_local: bin/why3doc
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api.@OCAMLBEST@
+	$(MAKE) test-session.@OCAMLBEST@
 	# desactivé car requiert findlib
 	# if test -d examples/runstrat ; then \
 	#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
@@ -1132,6 +1133,21 @@ test-api.opt: examples/use_api.ml lib/why3/why3.cmxa
 
 test-shape: lib/why3/why3.cma
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
+
+test-session.byte: examples/create_session.ml lib/why3/why3.cma
+	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
+	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	|| (printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
+	@rm -f why3session.xml
+
+test-session.opt: examples/create_session.ml lib/why3/why3.cmxa
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
+	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	&& ./test-session.opt) \
+	|| (printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
+	@rm -f test-session.opt why3session.xml
+
+
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
