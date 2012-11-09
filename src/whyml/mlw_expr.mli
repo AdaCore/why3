@@ -62,13 +62,6 @@ type ppattern = private {
   ppat_effect  : effect;
 }
 
-val ppat_wild : vty_value -> ppattern
-val ppat_var : pvsymbol -> ppattern
-val ppat_plapp : plsymbol -> ppattern list -> vty_value -> ppattern
-val ppat_lapp : lsymbol -> ppattern list -> vty_value -> ppattern
-val ppat_or : ppattern -> ppattern -> ppattern
-val ppat_as : ppattern -> pvsymbol -> ppattern
-
 type pre_ppattern =
   | PPwild
   | PPvar  of preid
