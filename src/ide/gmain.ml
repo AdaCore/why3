@@ -1642,7 +1642,12 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
-      source_view#source_buffer#set_language (any_lang f);
+      let lang =
+        if Filename.check_suffix f ".why" || 
+          Filename.check_suffix f ".mlw"
+        then why_lang else any_lang f
+      in
+      source_view#source_buffer#set_language lang;
       source_view#source_buffer#set_text (source_text f);
       set_current_file f;
     end;
