@@ -346,12 +346,13 @@ let print_region_map mreg =
    Format.printf " }@."
 
 let mutable_substitute env (mreg : vsymbol Mreg.t) (f : term) =
-   (* replace every mutable variable by an appropriate "updating" term. The map
-      [mreg] must already contain fresh variables for all regions. *)
+  (* Replace every occurrence of a mutable variable in [f] by an appropriate
+     "updating" term. The map [mreg] must already contain fresh variables for
+     all regions. *)
   let update_var vs _ = match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
     | t -> Some t in
-(*   print_region_map mreg; *)
+  (*   print_region_map mreg; *)
   let vars = Mvs.mapi_filter update_var f.t_vars in
   (* [vars] now is a mapping from the relevant symbols of [f] to their
      "update" (see [update_var]) *)
@@ -1020,28 +1021,28 @@ let fast_wp = Debug.register_flag "fast_wp"
 module Subst : sig
    (* A substitution, or state, represents the state at a given point in the
       program. It maps each region to the name that should be used to refer to
-      the value of the region in the current state.
-      *)
+      the value of the region in the current state. *)
 
    type t
    (* the type of substitutions *)
 
    val init : effect -> t
-   (* the empty state *)
+   (* the initial substitution for a program with given effects *)
 
    val init_reg : Sreg.t -> t
+   (* the initial substitution given a set of regions *)
 
    val empty : t
+   (* the empty substitution *)
 
    val refresh : Sreg.t -> t -> t
    (* refresh the state, ie, generate new names for all variables in the region
       set *)
 
    val term : wp_env -> t -> term -> term
-   (* in the term, substitute the variables that refer to the current state by
-      the symbols that stand for the value of these variables at this point of
-      time
-   *)
+   (* In the given term, substitute the variables that refer to the current
+      state by the symbols that stand for the value of these variables at this
+      point in execution, as recorded in subtitution [t]. *)
 
    val merge_states : t -> Sreg.t * t -> Sreg.t * t -> t * term * term
    (* Given a base state and two branches (represented by written regions in
@@ -1053,33 +1054,38 @@ module Subst : sig
 end = struct
 
   type t = vsymbol option ref Mreg.t
-
+  (* Each region is mapped to a reference, which represents the name of the
+     region. At beginning, this reference points to [None], meaning that the
+     name of the region is not yet decided. When needed, the value under the
+     reference is changed to [Some v], with [v] a fresh variable symbol, to fix
+     the name of the region. This delayed choice of name allows getting better
+     names for regions, so a region for variable [x] ends up called something
+     like [x1] instead of the generic [rho1]. *)
 
   let name_from_region ?hint ?id reg =
-    let id =
-      match id with
+    let id = match id with
       | Some x ->
           (* an id was provided, take it *)
           x
       | None ->
           (* none was provided, maybe there was a hint state *)
           begin match hint with
-          | None ->
-              (* no hint, return default *)
-              reg.reg_name
-          | Some s ->
-              begin try match !(Mreg.find reg s) with
-              | None ->
-                  (* the hint state also contains no id, return default *)
-                  reg.reg_name
-              | Some x ->
-                  (* the hint state contains something, take it *)
-                  x.vs_name
-              with Not_found ->
-                  (* the hint state has no entry for that region,
-                     return default *)
+            | None ->
+                (* no hint, return default *)
                 reg.reg_name
-              end
+            | Some s ->
+                begin try match !(Mreg.find reg s) with
+                  | None ->
+                      (* the hint state also contains no id, return default *)
+                      reg.reg_name
+                  | Some x ->
+                      (* the hint state contains something, take it *)
+                      x.vs_name
+                  with Not_found ->
+                    (* the hint state has no entry for that region,
+                       return default *)
+                    reg.reg_name
+                end
           end
     in
     mk_var id Slab.empty (ty_of_ity reg.reg_ity)
@@ -1128,19 +1134,25 @@ end = struct
               Mlw_pretty.print_reg k) s;
      Format.fprintf fmt "}"
 
+  (* Update the name of region [reg] in substitution [s], possibly based on
+     the provided [hint], and return a variable of that name. *)
   let region_name ?hint reg s =
     let rv = Mreg.find reg s in
     match !rv with
-    | Some x -> t_var x
-    | None ->
-        let new_name = name_from_region ?hint reg in
-        rv := Some new_name;
-        t_var (new_name)
+      | Some x -> t_var x
+      | None ->
+          let new_name = name_from_region ?hint reg in
+          rv := Some new_name;
+          t_var (new_name)
 
   let merge_states base (reg1,s1) (reg2,s2) =
     let all_regs = Sreg.union reg1 reg2 in
     Sreg.fold
-       (fun reg (s, f1, f2) ->
+      (fun reg (s, f1, f2) ->
+         (* If both branches modify region [reg], pick the name from [s2], and
+            add the necessary equations to [f1]. Otherwise, pick the name from
+            the branch that modifies [reg], and add the necessary equations to
+            the formula for the other branch.*)
          if Sreg.mem reg reg1 && Sreg.mem reg reg2 then begin
            Mreg.add reg (Mreg.find reg s2) s,
            t_and_simp f1 (t_equ (region_name reg s2) (region_name reg s1)),
@@ -1148,13 +1160,13 @@ end = struct
          end else if Sreg.mem reg reg2 then begin
            Mreg.add reg (Mreg.find reg s2) s,
            t_and_simp f1 (t_equ (region_name reg s2)
-                                (region_name ~hint:s2 reg base)),
+                            (region_name ~hint:s2 reg base)),
            f2
          end else begin
            Mreg.add reg (Mreg.find reg s1) s,
            f1,
            t_and_simp f2 (t_equ (region_name reg s1)
-                                (region_name ~hint:s1 reg base))
+                            (region_name ~hint:s1 reg base))
          end) all_regs (base, t_true, t_true)
 
 end
@@ -1169,27 +1181,26 @@ let is_vty_unit = function
 
 let map_exns e f = Mexn.mapi (fun xs _ -> f xs) e.e_effect.eff_raises
 
-(* Input
-   - a state s: Subst.t
-   - names r = (result: vsymbol, xresult: vsymbol Mexn.t)
-   - an expression e
-   with: dom(xresult) = XS, the set of exceptions possibly raised
-                            by a, that is e.e_effect.eff_raises
-
-   Output is a triple (OK, ((NE, s), EX)) where
-   - formula OK means ``e evaluates without any fault''
-     (whatever the execution flow is)
-   - formula NE means
-     ``e terminates normally with final state s and output result''
-   - for each exception x, EX(x) = (fx,sx), where formula fx means
-     ``e raises exception x, with final state sw and value xresult(x) in x''
-*)
-
+(* The type for postconditions of expressions is the pair of the actual
+   formula [ne], and a substitution [s] to be applied to [ne] to get the final
+   postcondition. This allows delayed choice of names. *)
 type fwp_post =
   { ne : term; s : Subst.t }
 
+(* The type for postconditions in case of exceptions maps every exception to
+   its postcondition. *)
 type fast_wp_exn_map = fwp_post Mexn.t
 
+(* The type for the result of fast weakest preconditions over expression e
+   is a triple where
+   - formula [ok] means ``e evaluates without any fault''
+     (whatever the execution flow is)
+   - postcondition [post] relates the input state and the output state, and
+     it contains the output state.
+   - exceptional postconditions [exn] relate relates the input state and
+     the output state, and contain the output state, in case an exception is
+     raised.
+*)
 type fast_wp_result =
    { ok   : term;
      post : fwp_post;
@@ -1260,8 +1271,23 @@ let iter_exns exns f =
 let iter_all_exns xmap_list f =
   iter_exns (all_exns xmap_list) f
 
+(* Input
+   - a state s: Subst.t
+   - names r = (result: vsymbol, xresult: vsymbol Mexn.t)
+   - an expression e
+   with: dom(xresult) = XS, the set of exceptions possibly raised
+   by a, that is e.e_effect.eff_raises
+
+   Output is a triple (OK, ((NE, s), EX)) where
+   - formula OK means ``e evaluates without any fault''
+   (whatever the execution flow is)
+   - formula NE means
+   ``e terminates normally with final state s and output result''
+   - for each exception x, EX(x) = (fx,sx), where formula fx means
+   ``e raises exception x, with final state sw and value xresult(x) in x''
+*)
 let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
-             : fast_wp_result =
+    : fast_wp_result =
   let res = fast_wp_desc env s r e in
   if Debug.test_flag debug then begin
     Format.eprintf "@[--------@\n@[<hov 2>e = %a@]@\n" Mlw_pretty.print_expr e;
@@ -1277,38 +1303,43 @@ let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
    tracability
 *)
 
+(* TODO: Should we make sure the label of [e] is always propagated to the
+   result of fast wp? In that case, should it be put on [ok], on [ne], on
+   both? *)
 
-and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
-   fast_wp_result =
+and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
+    : fast_wp_result =
   let result, xresult = r in
   match e.e_node with
-  | Elogic t ->
-      (* OK: true
-	 NE: result=t *)
+    | Elogic t ->
+      (* OK: true *)
+      (* NE: result = t *)
       let t = wp_label e t in
       let t = Subst.term env s (to_term t) in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { ok = t_true;
-        post = { ne = ne; s = s};
+        post = { ne = ne; s = s };
         exn = Mexn.empty }
   | Evalue v ->
-        (* OK : True *)
-        (* NE : result = v *)
-        let va = wp_label e (t_var v.pv_vs) in
-        let ne = Subst.term env s (t_equ (t_var result) va) in
+      (* OK: true *)
+      (* NE: result = v *)
+      let va = wp_label e (t_var v.pv_vs) in
+      let ne = Subst.term env s (t_equ (t_var result) va) in
       { ok = t_true;
-        post = {ne = ne; s = s };
+        post = { ne = ne; s = s };
         exn = Mexn.empty }
   | Earrow _ ->
-        let ok = t_true in
-         { ok = ok;
-           post = { ne = ok; s = s };
-           exn = Mexn.empty }
+      (* OK: true *)
+      (* NE: true *)
+      { ok = t_true;
+        post = { ne = t_true; s = s };
+        exn = Mexn.empty }
   | Eabsurd ->
-        { ok = t_false;
-          post = { ne = t_false ; s = s };
-          exn = Mexn.empty
-        }
+      (* OK: false *)
+      (* NE: false *)
+      { ok = t_false;
+        post = { ne = t_false ; s = s };
+        exn = Mexn.empty }
   | Eassert (kind, f) ->
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
@@ -1320,26 +1351,29 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         post = { ne = ne; s = s };
         exn = Mexn.empty }
   | Eapp (e1, _, spec) ->
+      (* OK: ok(e1) /\ (ne(e1) => spec.pre) *)
+      (* NE: ne(e1) /\ spec.post *)
+      (* EX(x): ex(e1)(x) \/ (ne(e1) /\ spec.ex(x)) *)
       (* The first thing that happens, before the call, is the evaluation of
-         [e1]. This translates as a recursive call to the fast_wp *)
-        let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
-        let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
-        (* next we have to deal with the call itself. *)
-        let e1_regs = regs_of_writes e1.e_effect in
-        let call_regs = regs_of_writes spec.c_effect in
-        let state_after_call = Subst.refresh call_regs wp1.post.s in
-        let pre = wp_label e (Subst.term env wp1.post.s spec.c_pre) in
-        let xpost = Mexn.map (fun p ->
-          { s = state_after_call;
-            ne  = p}) spec.c_xpost in
-        let call_post = {s = state_after_call; ne = spec.c_post } in
-        let post, xpost =
-          adapt_post_to_state_pair
-             env
-             wp1.post.s
-             r
-             call_post
-             xpost in
+         [e1]. This translates as a recursive call to the fast_wp. *)
+      let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
+      let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
+      (* Next we have to deal with the call itself. *)
+      let e1_regs = regs_of_writes e1.e_effect in
+      let call_regs = regs_of_writes spec.c_effect in
+      let state_after_call = Subst.refresh call_regs wp1.post.s in
+      let pre = wp_label e (Subst.term env wp1.post.s spec.c_pre) in
+      let xpost = Mexn.map (fun p ->
+        { s = state_after_call;
+          ne = p }) spec.c_xpost in
+      let call_post = { s = state_after_call; ne = spec.c_post } in
+      let post, xpost =
+        adapt_post_to_state_pair
+          env
+          wp1.post.s
+          r
+          call_post
+          xpost in
         let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
         let ne = t_and_simp wp1.post.ne post.ne in
         let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
@@ -1347,19 +1381,19 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let p2 = get_exn call_regs ex xpost in
           let s, r1, r2 =
             Subst.merge_states s (e1_regs, p1.s)
-                                 (Sreg.union e1_regs call_regs, p2.s) in
+              (Sreg.union e1_regs call_regs, p2.s) in
           { s = s;
             ne =
               t_or_simp (t_and_simp p1.ne r1)
-                        (t_and_simp_l [p2.ne;r2;wp1.post.ne])
+                (t_and_simp_l [p2.ne; r2; wp1.post.ne])
           }) in
-         { ok = ok;
-           post = { ne = ne; s = state_after_call };
-           exn = xne }
+        { ok = ok;
+          post = { ne = ne; s = state_after_call };
+          exn = xne }
   | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
-      (* OK: ok(e1) /\ (ne(e1) => ok(e2))
-         NE: ne(e1) /\ ne(e2)
-         Ex: *)
+      (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
+      (* NE: ne(e1) /\ ne(e2) *)
+      (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
       let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne wp2.ok) in
@@ -1376,11 +1410,16 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
         { s = s;
           ne =
             t_or_simp (t_and_simp p1.ne r1)
-                      (t_and_simp_l [p2.ne; r2; wp1.post.ne])}) in
+                      (t_and_simp_l [p2.ne; r2; wp1.post.ne])
+        }) in
       { ok = ok;
-        post = {ne = ne; s = wp2.post.s };
+        post = { ne = ne; s = wp2.post.s };
         exn = xne }
   | Eif (e1, e2, e3) ->
+      (* OK: ok(e1) /\ ne(e1) => (if e1=True then ok(e2) else ok(e3)) *)
+      (* NE: ne(e1) /\ (if e1=True then ne(e2) else ne(e3)) *)
+      (* EX(x): ex(e1)(x) \/ (ne(e1) /\ e1=True /\ ex(e2)(x))
+                          \/ (ne(e1) /\ e1=False /\ ex(e3)(x)) *)
       (* First thing is the evaluation of e1 *)
       let cond_res = create_vsymbol (id_fresh "c") (ty_of_vty e1.e_vty) in
       let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
@@ -1418,50 +1457,38 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr) :
           let second_case =
             t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2] in
           let third_case =
-             t_and_simp_l [wp1.post.ne; t_not test; post3.ne; q23; r3] in
-          let ne = t_or_simp_l [ first_case; second_case; third_case ] in
+            t_and_simp_l [wp1.post.ne; t_not test; post3.ne; q23; r3] in
+          let ne = t_or_simp_l [first_case; second_case; third_case] in
           { ne = ne; s = s' }) in
       { ok = ok;
-        post = {ne = ne; s = state};
+        post = { ne = ne; s = state };
         exn = xne }
-(*
-  | Eassign (e1, reg, pv) ->
-      let rec get_term d = match d.e_node with
-        | Elogic t -> t
-        | Evalue v -> t_var v.pv_vs
-        | Eghost e | Elet (_,e) | Erec (_,e) -> get_term e
-        | _ -> Loc.errorm ?loc:e.e_loc
-            "Cannot compute the WP for this assignment"
-      in
-      let dummy_symbol = create_vsymbol (id_fresh "void") ty_unit in
-      let wp1 = fast_wp_expr env s (dummy_symbol, xresult) e1 in
-      let ok = wp1.ok in
-      let f = t_equ (get_term e1) (t_var pv.pv_vs) in
-      let f = quantify env (Sreg.singleton reg) f in
-      let ne = wp_and ~sym:true wp1.post.ne f in
-      { ok = ok;
-        post.ne = ne;
-        post.s = s;
-        exn = Mexn.empty }
-*)
   | Eraise (ex, e1) ->
-      let wp1 = fast_wp_expr env s r e1 in
+      (* OK: ok(e1) *)
+      (* NE: false *)
+      (* EX(ex): (ne(e1) /\ xresult=e1) \/ ex(e1)(ex) *)
+      (* EX(x): ex(e1)(x) *)
+      let ex_res = create_vsymbol (id_fresh "x") (ty_of_vty e1.e_vty) in
+      let wp1 = fast_wp_expr env s (ex_res, xresult) e1 in
       let e1_regs = regs_of_writes e1.e_effect in
-      let exns = Sexn.add ex (Mexn.map (fun _ -> ()) wp1.exn) in
-      let xne = iter_exns exns (fun ex ->
-        let p = get_exn e1_regs  ex wp1.exn in
-        let s, r1, r2 =
-          Subst.merge_states s (e1_regs, p.s)
-                               (e1_regs, wp1.post.s) in
-        let ne =
-            t_or_simp (t_and_simp p.ne r1)
-                      (t_and_simp wp1.post.ne r2) in
-        let ne = wp_label e ne in
-        { s = s; ne = ne }) in
-       { ok = wp1.ok;
-         post = {ne = t_false; s = wp1.post.s};
-         exn = xne }
+      let p = get_exn e1_regs ex wp1.exn in
+      let s, r1, r2 =
+        Subst.merge_states s (e1_regs, p.s)
+          (e1_regs, wp1.post.s) in
+      let r3 = t_equ (t_var ex_res) (t_var (Mexn.find ex xresult)) in
+      let ne =
+        t_or_simp (t_and_simp p.ne r1)
+          (t_and_simp_l [wp1.post.ne; r2; r3]) in
+      let ne = wp_label e ne in
+      let xpost = { s = s; ne = ne } in
+      let xne = Mexn.add ex xpost wp1.exn in
+      { ok = wp1.ok;
+        post = { ne = t_false; s = wp1.post.s }; (* Should s be Subst.empty??? *)
+        exn = xne }
   | Etry (e1, handlers) ->
+      (* OK: ok(e1) /\ (forall x. ex(e1)(x) => ok(handlers(x))) *)
+      (* NE: ne(e1) \/ (bigor x. ex(e1)(x) /\ ne(handlers(x))) *)
+      (* EX(x): *)
       let handlers =
         List.fold_left (fun acc (ex,pv,expr) -> Mexn.add ex (pv,expr) acc)
            Mexn.empty handlers in

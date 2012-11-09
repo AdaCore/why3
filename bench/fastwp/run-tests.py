@@ -21,6 +21,11 @@ list_of_files = [
    ]
 
 def compute_expected_output(fn, outputfile):
+    """
+    Find in file fn all occurrences of an expected result, which takes the form
+    of a line "(* Valid *)" or "(* Unknown *)", and print the corresponding
+    result ("Valid" or "Unknown" without the quotes) in file outputfile.
+    """
     test = open(fn, "r")
     inp = test.readlines()
     output = tools.grep ("\(\* (\w*) \*\)", inp)
@@ -32,11 +37,15 @@ def main():
         basename = basename[0]
         xoutfile = basename + ".actout"
         exp_output = basename + ".out"
+        # Run why on fn and extract the actual output
         output = tools.run_why (fn)
         pattern = fn + ".*: (.+) \(.*\)"
         output = tools.grep (pattern, output)
         tools.save_to_file (xoutfile, output)
+        # Extract the expected output from fn
         compute_expected_output(fn, exp_output)
+        # Issue a message "OK" if actual and expected output coincide, and a
+        # message "DIFF" otherwise.
         if tools.diff (exp_output, xoutfile) == 0:
             print fn, " : OK"
         else:
