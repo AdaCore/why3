@@ -428,6 +428,27 @@ We can inspect what we did for example by printing that theory:
 \begin{ocamlcode}
 let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
 \end{ocamlcode}
+which outputs
+\begin{verbatim}
+theory is:
+theory My_theory
+  (* use BuiltIn *)
+  
+  goal goal1 : true \/ false
+  
+  predicate A
+  
+  predicate B
+  
+  goal goal2 : A /\ B -> A
+  
+  (* use int.Int *)
+  
+  goal goal3 : (2 + 2) = 4
+  
+  goal goal4 : forall x:int. (x * x) >= 0
+end
+\end{verbatim}
 
 From a theory, one can compute at once all the proof tasks it contains
 as follows:
@@ -435,7 +456,8 @@ as follows:
 let my_tasks : Task.task list = 
   List.rev (Task.split_theory my_theory None None)
 \end{ocamlcode}
-reversing the list is don because the tasks are returned in reverse order.
+Note that the tasks are returned in reverse order, so we reverse the
+list above.
 
 We can check our generated tasks by printing them:
 \begin{ocamlcode}
@@ -461,8 +483,8 @@ One can run provers on those tasks exactly as we did above.
 
 \section{Proof sessions}
 
-See example \verb|examples/create_session.ml| for an example on how
-to manipulate proof sessions from an OCaml program.
+See the example \url{examples/create_session.ml} of the distribution for
+an illustration on how to manipulate proof sessions from an OCaml program.
 
 
 
