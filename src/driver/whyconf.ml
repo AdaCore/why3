@@ -457,8 +457,11 @@ let read_config_rc conf_file =
 
 exception ConfigFailure of string (* filename *) * string
 
+let get_dirname filename =
+  Filename.dirname (absolute_filename (Sys.getcwd ()) filename)
+
 let get_config (filename,rc) =
-  let dirname = Filename.dirname filename in
+  let dirname = get_dirname filename in
   let rc, main =
     match get_section rc "main" with
       | None      -> raise (ConfigFailure (filename, "no main section"))
@@ -572,7 +575,7 @@ let filter_one_prover whyconf fp =
 (** merge config *)
 
 let merge_config config filename =
-  let dirname = Filename.dirname filename in
+  let dirname = get_dirname filename in
   let rc = Rc.from_file filename in
   (** modify main *)
   let main = match get_section rc "main" with

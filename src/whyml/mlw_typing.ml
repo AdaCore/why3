@@ -770,10 +770,6 @@ let lambda_invariant lenv pvs eff lam =
 
 (* specification handling *)
 
-let rec dty_of_ty ty = match ty.ty_node with
-  | Ty.Tyapp (ts, tyl) -> Denv.tyapp ts (List.map dty_of_ty tyl)
-  | Ty.Tyvar v -> Denv.tyuvar v
-
 let create_variant lenv (t,r) =
   let t = Typing.type_term lenv.th_at (find_vs lenv.mod_uc lenv.log_vars) t in
   count_term_tuples t;

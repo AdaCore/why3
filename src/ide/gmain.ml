@@ -1643,7 +1643,7 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
   if f <> !current_file then
     begin
       let lang =
-        if Filename.check_suffix f ".why" || 
+        if Filename.check_suffix f ".why" ||
           Filename.check_suffix f ".mlw"
         then why_lang else any_lang f
       in
