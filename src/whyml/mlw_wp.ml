@@ -1394,6 +1394,10 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
       (* NE: ne(e1) /\ ne(e2) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
+      let e2 =
+         if Util.option_eq Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc then
+            e_label_copy e e2
+         else e2 in
       let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne wp2.ok) in
@@ -1493,9 +1497,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         List.fold_left (fun acc (ex,pv,expr) -> Mexn.add ex (pv,expr) acc)
            Mexn.empty handlers in
       let result, xresult = r in
-      let xresult' = Mexn.mapi (fun ex v ->
-        try let pv,_ = Mexn.find ex handlers in pv.pv_vs
-        with Not_found -> v) xresult in
+      let xresult' =
+         Mexn.fold (fun ex (pv,_) acc ->
+            Mexn.add ex pv.pv_vs acc) handlers xresult in
       let wp1 = fast_wp_expr env s (result,xresult') e1 in
       let e1_regs = regs_of_writes e1.e_effect in
       Mexn.fold (fun ex post acc ->
@@ -1555,10 +1559,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         }
   | Eloop (inv, _, e1) ->
         let havoc_state = Subst.refresh (regs_of_writes e1.e_effect) s in
-        let init_inv = wp_expl expl_loop_init (Subst.term env s inv) in
+        let init_inv = t_label_add expl_loop_init (Subst.term env s inv) in
         let inv_hypo = Subst.term env havoc_state inv in
         let wp1 = fast_wp_expr env havoc_state r e1 in
-        let post_inv = wp_expl expl_loop_keep (Subst.term env wp1.post.s inv) in
+        let post_inv =
+           t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
         let preserv_inv =
            t_implies_simp (t_and_simp inv_hypo wp1.post.ne)
                           (t_and_simp wp1.ok post_inv) in
