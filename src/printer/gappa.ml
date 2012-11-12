@@ -143,20 +143,21 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let constant_value =
-  let number_format = {
-      Number.long_int_support = true;
-      Number.dec_int_support = Number.Number_default;
-      Number.hex_int_support = Number.Number_default;
-      Number.oct_int_support = Number.Number_unsupported;
-      Number.bin_int_support = Number.Number_unsupported;
-      Number.def_int_support = Number.Number_unsupported;
-      Number.dec_real_support = Number.Number_default;
-      Number.hex_real_support = Number.Number_default;
-      Number.frac_real_support = Number.Number_unsupported;
-      Number.def_real_support = Number.Number_unsupported;
-    } in
-  fun t -> match t.t_node with
+let number_format = {
+    Number.long_int_support = true;
+    Number.dec_int_support = Number.Number_default;
+    Number.hex_int_support = Number.Number_default;
+    Number.oct_int_support = Number.Number_unsupported;
+    Number.bin_int_support = Number.Number_unsupported;
+    Number.def_int_support = Number.Number_unsupported;
+    Number.dec_real_support = Number.Number_default;
+    Number.hex_real_support = Number.Number_default;
+    Number.frac_real_support = Number.Number_unsupported;
+    Number.def_real_support = Number.Number_unsupported;
+  }
+
+let constant_value t =
+  match t.t_node with
     | Tconst c ->
         fprintf str_formatter "%a" (Number.print number_format) c;
         flush_str_formatter ()
@@ -172,7 +173,7 @@ let rec print_term info fmt t =
   let term = print_term info in
   match t.t_node with
   | Tconst c ->
-      Pretty.print_const fmt c
+      fprintf fmt "%a" (Number.print number_format) c
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp ( { ls_name = id } ,[] ) ->
