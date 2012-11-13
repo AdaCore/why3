@@ -74,9 +74,13 @@ let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
 
 
+type sloc_options =
+   | VC_Sloc of Gnat_loc.loc
+   | Reg_Sloc of Gnat_loc.loc
+   | No_Sloc
 
 type my_expl =
-   { mutable expl_loc : Gnat_loc.loc option ;
+   { mutable expl_loc : sloc_options ;
      mutable expl_reason : reason option ;
      mutable expl_msg : string option
    }
@@ -90,7 +94,7 @@ type node_info =
 (* The information that has been found in a node *)
 
 let read_labels s =
-   let b = { expl_loc    = None;
+   let b = { expl_loc    = No_Sloc;
              expl_reason = None;
              expl_msg    = None } in
    Ident.Slab.iter
@@ -103,8 +107,21 @@ let read_labels s =
            | ["GP_Pretty_Ada"; msg] ->
                  b.expl_msg <- Some msg
            | "GP_Sloc" :: rest ->
+                 (* We only use a "normal" sloc information if the same node
+                    does not have have a VC sloc info already. *)
+                 begin
+                    match b.expl_loc with
+                    | VC_Sloc _ -> ()
+                    | _ ->
+                          try
+                             b.expl_loc <- Reg_Sloc (Gnat_loc.parse_loc rest)
+                    with Failure "int_of_string" ->
+                       Format.printf "GP_Sloc: cannot parse string: %s" s;
+                       Gnat_util.abort_with_message ""
+                 end
+           | "GP_Sloc_VC" :: rest ->
                  begin try
-                    b.expl_loc <- Some (Gnat_loc.parse_loc rest)
+                    b.expl_loc <- VC_Sloc (Gnat_loc.parse_loc rest)
                  with Failure "int_of_string" ->
                     Format.printf "GP_Sloc: cannot parse string: %s" s;
                     Gnat_util.abort_with_message ""
@@ -133,10 +150,10 @@ let extract_explanation s =
       "Expl"; if there was at least a location, we return a "Sloc";
       otherwise we return "No_Info" *)
      match read_labels s with
-     | { expl_loc = Some sloc ;
+     | { expl_loc = VC_Sloc sloc ;
          expl_reason = Some reason } ->
            Expl (mk_expl reason sloc)
-     | { expl_loc = Some sloc ;
+     | { expl_loc = Reg_Sloc sloc ;
          expl_reason = _;
          expl_msg = None } ->
            Sloc sloc
@@ -173,8 +190,8 @@ let print_expl proven task fmt p =
             let info = extract_msg g in
             let sloc =
                match info.expl_loc with
-               | None -> primary
-               | Some s -> List.hd s in
+               | No_Sloc -> primary
+               | VC_Sloc s | Reg_Sloc s -> List.hd s in
             Format.fprintf fmt "%a: %a not proved"
             simple_print_loc sloc print_reason p.reason;
             match info.expl_msg with
