@@ -45,7 +45,7 @@ let flag_desc s =
   try thd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
 let test_flag s = !s
-let nottest_flag s = not !s
+let test_noflag s = not !s
 
 let set_flag s = s := true
 let unset_flag s = s := false

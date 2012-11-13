@@ -93,7 +93,7 @@ let rec print_ity_node inn fmt ity = match ity.ity_node with
       (print_list space (print_ity_node true)) tl
 
 and print_regty fmt reg =
-  if Debug.nottest_flag debug_print_reg_types then print_reg fmt reg else
+  if Debug.test_noflag debug_print_reg_types then print_reg fmt reg else
   fprintf fmt "@[%a:@,%a@]" print_reg reg (print_ity_node false) reg.reg_ity
 
 let print_ity = print_ity_node false

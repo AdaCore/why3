@@ -190,7 +190,7 @@ let unify_loc unify_fn loc x1 x2 = try unify_fn x1 x2 with
   | DTypeMismatch (dity1,dity2) -> errorm ~loc
       "This expression has type %a,@ but is expected to have type %a"
       Mlw_dty.print_dity dity2 Mlw_dty.print_dity dity1
-  | exn when Debug.nottest_flag Debug.stack_trace -> error ~loc exn
+  | exn when Debug.test_noflag Debug.stack_trace -> error ~loc exn
 
 let expected_type { de_loc = loc ; de_type = (argl,res) } dity =
   if argl <> [] then errorm ~loc "This expression is not a first-order value";
@@ -1240,7 +1240,7 @@ and expr_fun lenv x gh bl (_, dsp as tr) =
     "variants are not allowed in a non-recursive definition";
   check_user_effect lenv lam.l_expr dsp;
   let lam =
-    if Debug.nottest_flag implicit_post || dsp.ds_post <> [] ||
+    if Debug.test_noflag implicit_post || dsp.ds_post <> [] ||
        oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
     else match e_purify lam.l_expr with
     | None -> lam
@@ -1832,7 +1832,7 @@ let open_file, close_file =
   let lenv = Stack.create () in
   let open_file lib path =
     let env = Env.env_of_library lib in
-    let wp = path = [] && Debug.nottest_flag Typing.debug_type_only in
+    let wp = path = [] && Debug.test_noflag Typing.debug_type_only in
     Stack.push (Mstr.empty,Mstr.empty) lenv;
     let open_theory id = Stack.push false inm;
       Stack.push (Theory.create_theory ~path (Denv.create_user_id id)) tuc in
