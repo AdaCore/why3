@@ -255,9 +255,9 @@ let ity_subst_unsafe mv mr ity =
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
 let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
 
-let rec ity_inv ity = match ity.ity_node with
-  | Ityapp (its,_,_) -> its.its_inv || ity_any ity_inv ity
-  | _ -> ity_any ity_inv ity
+let rec ity_has_inv ity = match ity.ity_node with
+  | Ityapp (its,_,_) -> its.its_inv || ity_any ity_has_inv ity
+  | _ -> ity_any ity_has_inv ity
 
 let rec reg_fold fn vars acc =
   let on_reg r acc = reg_fold fn r.reg_ity.ity_vars (fn r acc) in

@@ -121,7 +121,7 @@ val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
 val ity_closed  : ity -> bool
 val ity_pure    : ity -> bool
-val ity_inv : ity -> bool
+val ity_has_inv : ity -> bool
 
 (* these functions attend the sub-regions *)
 

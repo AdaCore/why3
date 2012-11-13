@@ -370,7 +370,7 @@ let ps_inv = Term.create_psymbol (id_fresh "inv")
 
 let full_invariant lkm km vs ity =
   let rec update vs { vtv_ity = ity } =
-    if not (ity_inv ity) then t_true else
+    if not (ity_has_inv ity) then t_true else
     (* what is our current invariant? *)
     let f = match ity.ity_node with
       | Ityapp (its,_,_) when its.its_inv ->

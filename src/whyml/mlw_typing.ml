@@ -1425,7 +1425,7 @@ let add_types ~wp uc tdl =
             let mk_proj (regs,inv) (id,pty) =
               let ity = parse pty in
               let vtv = vty_value ity in
-              let inv = inv || ity_inv ity in
+              let inv = inv || ity_has_inv ity in
               match id with
                 | None ->
                     let pv = create_pvsymbol (id_fresh "pj") vtv in
@@ -1455,7 +1455,7 @@ let add_types ~wp uc tdl =
             let mk_field (regs,inv) f =
               let ghost = f.f_ghost in
               let ity = parse f.f_pty in
-              let inv = inv || ity_inv ity in
+              let inv = inv || ity_has_inv ity in
               let fid = Denv.create_user_id f.f_ident in
               let regs,mut = if f.f_mutable then
                 let r = create_region fid ity in
