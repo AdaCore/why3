@@ -72,7 +72,7 @@ lemma get_stack_eq:
 
 lemma get_stack_neq:
   forall x i:ident, v:value, r:stack.
-    x <> i -> get_stack i (Cons (x,v) r) = get_stack i r 
+    x <> i -> get_stack i (Cons (x,v) r) = get_stack i r
 
 function eval_term (sigma:env) (pi:stack) (t:term) : value =
   match t with
@@ -407,7 +407,7 @@ lemma consequence_rule:
   valid_triple p' e q'
 
 lemma value_rule:
-  forall q:fmla, v:value. 
+  forall q:fmla, v:value.
   valid_triple (vsubst q result (Tvalue v)) (Evalue v) q
 
 lemma assign_rule:

@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ident
 open Ty
 open Term
@@ -29,7 +19,7 @@ open Theory
 
 type tdecl_set = {
   tds_set : Stdecl.t;
-  tds_tag : Hashweak.tag;
+  tds_tag : Weakhtbl.tag;
 }
 
 module Hstds = Hashcons.Make (struct
@@ -37,12 +27,12 @@ module Hstds = Hashcons.Make (struct
   let equal s1 s2 = Stdecl.equal s1.tds_set s2.tds_set
   let hs_td td acc = Hashcons.combine acc (td_hash td)
   let hash s = Stdecl.fold hs_td s.tds_set 0
-  let tag n s = { s with tds_tag = Hashweak.create_tag n }
+  let tag n s = { s with tds_tag = Weakhtbl.create_tag n }
 end)
 
 let mk_tds s = Hstds.hashcons {
   tds_set = s;
-  tds_tag = Hashweak.dummy_tag;
+  tds_tag = Weakhtbl.dummy_tag;
 }
 
 let tds_empty = mk_tds Stdecl.empty
@@ -50,9 +40,9 @@ let tds_add td s = mk_tds (Stdecl.add td s.tds_set)
 let tds_singleton td = mk_tds (Stdecl.singleton td)
 
 let tds_equal : tdecl_set -> tdecl_set -> bool = (==)
-let tds_hash tds = Hashweak.tag_hash tds.tds_tag
+let tds_hash tds = Weakhtbl.tag_hash tds.tds_tag
 let tds_compare tds1 tds2 = compare
-  (Hashweak.tag_hash tds1.tds_tag) (Hashweak.tag_hash tds2.tds_tag)
+  (Weakhtbl.tag_hash tds1.tds_tag) (Weakhtbl.tag_hash tds2.tds_tag)
 
 type clone_map = tdecl_set Mid.t
 type meta_map = tdecl_set Mmeta.t
@@ -82,19 +72,19 @@ and task_hd = {
   task_known : known_map;    (* known identifiers *)
   task_clone : clone_map;    (* cloning history *)
   task_meta  : meta_map;     (* meta properties *)
-  task_tag   : Hashweak.tag; (* unique magical tag *)
+  task_tag   : Weakhtbl.tag; (* unique magical tag *)
 }
 
 let task_hd_equal : task_hd -> task_hd -> bool = (==)
 
-let task_hd_hash t = Hashweak.tag_hash t.task_tag
+let task_hd_hash t = Weakhtbl.tag_hash t.task_tag
 
 let task_equal t1 t2 = match t1, t2 with
   | Some t1, Some t2 -> task_hd_equal t1 t2
   | None, None -> true
   | _ -> false
 
-let task_hash t = option_apply 0 (fun t -> task_hd_hash t + 1) t
+let task_hash t = Opt.fold (fun _ t -> task_hd_hash t + 1) 0 t
 
 module Hstask = Hashcons.Make (struct
   type t = task_hd
@@ -104,7 +94,7 @@ module Hstask = Hashcons.Make (struct
 
   let hash t = Hashcons.combine (td_hash t.task_decl) (task_hash t.task_prev)
 
-  let tag i task = { task with task_tag = Hashweak.create_tag i }
+  let tag i task = { task with task_tag = Weakhtbl.create_tag i }
 end)
 
 let mk_task decl prev known clone meta = Some (Hstask.hashcons {
@@ -113,12 +103,12 @@ let mk_task decl prev known clone meta = Some (Hstask.hashcons {
   task_known = known;
   task_clone = clone;
   task_meta  = meta;
-  task_tag   = Hashweak.dummy_tag;
+  task_tag   = Weakhtbl.dummy_tag;
 })
 
-let task_known = option_apply Mid.empty (fun t -> t.task_known)
-let task_clone = option_apply Mid.empty (fun t -> t.task_clone)
-let task_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
+let task_known = Opt.fold (fun _ t -> t.task_known) Mid.empty
+let task_clone = Opt.fold (fun _ t -> t.task_clone) Mid.empty
+let task_meta  = Opt.fold (fun _ t -> t.task_meta) Mmeta.empty
 
 let find_clone_tds task (th : theory) = cm_find (task_clone task) th
 let find_meta_tds task (t : meta) = mm_find (task_meta task) t
@@ -211,7 +201,7 @@ let add_meta task t al = new_meta task t (create_meta t al)
 
 let split_tdecl names (res,task) td = match td.td_node with
   | Decl { d_node = Dprop ((Pgoal|Plemma),pr,f) }
-    when option_apply true (Spr.mem pr) names ->
+    when Opt.fold (fun _ -> Spr.mem pr) true names ->
       let res = add_prop_decl task Pgoal pr f :: res in
       res, flat_tdecl task td
   | _ ->

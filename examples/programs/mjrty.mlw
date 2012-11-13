@@ -35,9 +35,12 @@ module Mjrty
   clone import array.NumOfParam
     with type elt = candidate, type param = candidate, predicate pr = pr
 
-  let mjrty (a: array candidate) =
-    { 1 <= length a }
-    let n = length a in
+  let mjrty (a: array candidate)
+    requires { 1 <= length a }
+    ensures  { 2 * numof a result 0 (length a) > length a }
+    raises   { Not_found ->
+      forall c: candidate. 2 * numof a c 0 (length a) <= length a }
+  = let n = length a in
     let cand = ref a[0] in
     let k = ref 0 in
     for i = 0 to n-1 do (* could start at 1 with k initialized to 1 *)
@@ -70,14 +73,5 @@ module Mjrty
     with Found ->
       !cand
     end
-    { 2 * numof a result 0 (length a) > length a }
-    | Not_found ->
-    { forall c: candidate. 2 * numof a c 0 (length a) <= length a }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide mjrty.mlw"
-End:
-*)

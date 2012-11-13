@@ -1,11 +1,11 @@
 module M
 
-  use import module ref.Ref
+  use import ref.Ref
 
   (* reference would escape its scope *)
 
   let test () =
     let x = ref 0 in
-    fun y -> { } x := y; !x { result = !x }
+    fun y -> ensures { result = !x } x := y; !x
 
 end

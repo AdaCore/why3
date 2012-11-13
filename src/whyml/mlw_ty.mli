@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
 open Stdlib
 open Ident
 open Ty
@@ -51,7 +41,7 @@ module rec T : sig
   and ity = private {            (* the actual type structure *)
     ity_node : ity_node;         (* the kind of the type *)
     ity_vars : varset;           (* the variables bound by the type *)
-    ity_tag  : Hashweak.tag;
+    ity_tag  : Weakhtbl.tag;
   }
 
   and ity_node = private
@@ -73,17 +63,17 @@ open T
 
 module Mits : Map.S with type key = itysymbol
 module Sits : Mits.Set
-module Hits : Hashtbl.S with type key = itysymbol
-module Wits : Hashweak.S with type key = itysymbol
+module Hits : XHashtbl.S with type key = itysymbol
+module Wits : Weakhtbl.S with type key = itysymbol
 
 module Mity : Map.S with type key = ity
 module Sity : Mity.Set
-module Hity : Hashtbl.S with type key = ity
-module Wity : Hashweak.S with type key = ity
+module Hity : XHashtbl.S with type key = ity
+module Wity : Weakhtbl.S with type key = ity
 
 module Sreg : Mreg.Set
-module Hreg : Hashtbl.S with type key = region
-module Wreg : Hashweak.S with type key = region
+module Hreg : XHashtbl.S with type key = region
+module Wreg : Weakhtbl.S with type key = region
 
 val its_equal : itysymbol -> itysymbol -> bool
 val ity_equal : ity -> ity -> bool
@@ -286,8 +276,8 @@ type pvsymbol = private { (* a program variable *)
 
 module Mpv : Map.S with type key = pvsymbol
 module Spv : Mpv.Set
-module Hpv : Hashtbl.S with type key = pvsymbol
-module Wpv : Hashweak.S with type key = pvsymbol
+module Hpv : XHashtbl.S with type key = pvsymbol
+module Wpv : Weakhtbl.S with type key = pvsymbol
 
 val pv_equal : pvsymbol -> pvsymbol -> bool
 

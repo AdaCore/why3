@@ -8,41 +8,26 @@ An imperative set is simply a reference containing a finite set.
 module Impset
 
   use export set.Fset
-  use export module ref.Ref
+  use export ref.Ref
 
   type t 'a = ref (set 'a)
 
-  let empty () =
-    {}
-    ref (empty : set 'a)
-    { is_empty !result }
+  let empty () ensures { is_empty !result } = ref (empty : set 'a)
 
-  let create (s: set 'a) =
-    {}
-    ref s
-    { !result = s }
+  let create (s: set 'a) ensures { !result = s } = ref s
 
-  let is_empty (b: t 'a) =
-    {}
-    is_empty !b
-    { result = True <-> is_empty !b }
+  let is_empty (b: t 'a) ensures { result = True <-> is_empty !b }
+  = is_empty !b
 
-  let push (x: 'a) (b: t 'a) =
-    {}
-    b := add x !b
-    { !b = add x (old !b) }
+  let push (x: 'a) (b: t 'a) ensures { !b = add x (old !b) }
+  = b := add x !b
 
-  let pop (b: t 'a) =
-    { not (is_empty !b) }
-    let x = choose !b in
+  let pop (b: t 'a)
+    requires { not (is_empty !b) }
+    ensures  { mem result (old !b) }
+    ensures  { !b = remove result (old !b) }
+  = let x = choose !b in
     b := remove x !b;
     x
-    { mem result (old !b) /\ !b = remove result (old !b) }
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/impset"
-End:
-*)

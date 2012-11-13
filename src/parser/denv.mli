@@ -1,53 +1,34 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ty
 open Term
 open Theory
 
 (** Destructive unification *)
 
-type type_var
-
-val find_type_var : loc:Ptree.loc -> type_var Htv.t -> tvsymbol -> type_var
-val create_ty_decl_var : ?loc:Ptree.loc -> tvsymbol -> type_var
-
 type dty
 
-val tyvar : type_var -> dty
-val tyuvar: tvsymbol -> dty
-val tyapp : tysymbol -> dty list -> dty
+val tyuvar : tvsymbol -> dty
+val tyapp  : tysymbol -> dty list -> dty
 
-type dty_view =
-  | Tyvar of type_var
-  | Tyuvar of tvsymbol
-  | Tyapp of tysymbol * dty list
-
-val view_dty : dty -> dty_view
+val fresh_type_var : Ptree.loc -> dty
 
 val unify : dty -> dty -> bool
 
 val print_dty : Format.formatter -> dty -> unit
 
 val ty_of_dty : dty -> ty
+val dty_of_ty : ty -> dty
 
 type ident = Ptree.ident
 
@@ -69,7 +50,7 @@ type dterm = { dt_node : dterm_node; dt_ty : dty }
 and dterm_node =
   | Tvar of string
   | Tgvar of vsymbol
-  | Tconst of constant
+  | Tconst of Number.constant
   | Tapp of lsymbol * dterm list
   | Tif of dfmla * dterm * dterm
   | Tlet of dterm * ident * dterm
@@ -100,10 +81,4 @@ val fmla : vsymbol Mstr.t -> dfmla -> term
 
 (** Specialization *)
 
-val specialize_ty : loc:Ptree.loc -> type_var Htv.t -> ty -> dty
-
 val specialize_lsymbol : loc:Ptree.loc -> lsymbol -> dty list * dty option
-
-(** exported for programs *)
-
-val tvsymbol_of_type_var : type_var -> tvsymbol

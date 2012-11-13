@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ident
 open Ty
@@ -31,10 +22,11 @@ open Task
 (** TODO use this label in the following function *)
 let label_induction = create_label "induction"
 
+(*
 let desc_labels = [label_induction,
                    ("Make the induction on the labeled variables." :
                        Pp.formatted)]
-
+*)
 
 (*********************************************************)
 (*******      Data type induction principle      *********)
@@ -80,40 +72,17 @@ type vlex =
 
   This definitions and methods using them are without use if some induction tags
   are provided in the goal by user.*)
-module VsList =
-struct
-  type t = vsymbol list
-  let hash = Hashcons.combine_list vs_hash 3
-  let equal = Util.list_all2 vs_equal
-  let cmp_vs vs1 vs2 = Pervasives.compare (vs_hash vs2) (vs_hash vs1)
-  let compare t1 t2 =
-    let rec aux t1 t2 = match t1,t2 with
-      | [],[] -> 0
-      | v1 :: q1, v2 :: q2 ->
-	if vs_equal v1 v2
-	then aux q1 q2
-	else cmp_vs v1 v2
-      | _ -> assert false;
-    in
-    if List.length t1 < List.length t2 then -1
-    else if List.length t1 > List.length t2 then 1
-    else aux t1 t2
-end
+module VsList = Stdlib.OrderedHashedList(struct
+  type t = vsymbol
+  let tag = vs_hash
+end)
 module Mvsl = Stdlib.Map.Make(VsList)
 module Svsl = Mvsl.Set
 
 (* DEBUGGING AND PRINTING *)
 
 let debug = Debug.register_info_flag "induction"
-  ~desc:"About@ the@ transformation@ of@ the@ goal@ using@ induction."
-
-let debug_verbose = Debug.register_info_flag "induction-verbose"
-  ~desc:"Same@ as@ induction, but@ print@ also@ the@ variables, the@ \
-         heuristics@ and@ the lexicographic@ order@ used."
-
-let debug_int = Debug.register_info_flag "induction_int_lex"
-  ~desc:"About@ the@ transformation@ of@ the@ goal@ using@ induction@ on@ \
-         the@ tuples@ of@ integers."
+  ~desc:"Print@ debugging@ messages@ of@ the@ 'induction'@ transformation."
 
 let print_ty_skm skm =
   List.iter
@@ -359,16 +328,11 @@ let induction_ty_lex km t0 =
     let lexl, rightmost_qvl = qsplit km vl qvl in
     let tcase = make_induction_lex lexl rightmost_qvl t in
 
-    if Debug.test_flag debug_verbose then
+    if Debug.test_flag debug then
       begin
 	print_vset vset;
 	print_heuristic_lex vl;
 	print_lex lexl;
-	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
-	Format.printf "New Task: %a \n@." Pretty.print_term tcase
-      end;
-    if Debug.test_flag debug then
-      begin
 	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
 	Format.printf "New Task: %a \n@." Pretty.print_term tcase
       end;
@@ -385,7 +349,7 @@ let induction_ty_lex = function
 
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
-    ~desc_labels ~desc:"TODO: induction on type with lexicographic order"
+    ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ algebraic@ types."
 
 
 (***************************************************************************)
@@ -393,9 +357,9 @@ let () =
 (***************************   WITH LEX. ORDER   ***************************)
 (***************************************************************************)
 
-(* induction_int_lex :   induction tactic for ordered int tuples. 
-No heuristic is provided. Use labels. Generalized variables inside 
-the induction hypothesis are the variables on the right of the rightmost 
+(* induction_int_lex :   induction tactic for ordered int tuples.
+No heuristic is provided. Use labels. Generalized variables inside
+the induction hypothesis are the variables on the right of the rightmost
 induction variable.*)
 
 (* separate prenex universal quantification from the body of the formula*)
@@ -440,7 +404,7 @@ let lex_order_ivl (le_int,lt_int) ivl rvl  =
       | v :: tl, v':: tl' -> ((List.map create_v rvl), (v, v', tl, tl'))
       | _ -> assert false in
   let nonneg_ivl' =
-    let positive v = ps_app le_int [t_int_const "0"; t_var v] in
+    let positive v = ps_app le_int [t_nat_const 0; t_var v] in
     List.fold_left (fun t v -> t_and t (positive v)) (positive hd') tl' in
   let lt_lex =
     let lt_hd = ps_app lt_int [t_var hd'; t_var hd] in
@@ -483,7 +447,7 @@ let induction_int_lex _km (le_int,lt_int) t0 =
     begin
       let t = int_strong_induction_lex (le_int,lt_int) ivl genl t in
       let t = t_forall_close lvl [] t in
-      if Debug.test_flag debug_int then
+      if Debug.test_flag debug then
 	(Format.printf "Old Task: %a \n@." Pretty.print_term t0;
 	 Format.printf "New Task: %a \n@." Pretty.print_term t);
       [t]
@@ -508,9 +472,7 @@ let () =
     (fun env ->
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
-    ~desc_labels ~desc:"TODO: induction on integers"
-
-
+    ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ integers."
 
 (*
 Local Variables:

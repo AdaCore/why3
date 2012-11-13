@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/my_cosine/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Coq"
@@ -9,43 +8,43 @@
  <prover
   id="1"
   name="Gappa"
-  version="0.16.0"/>
+  version="0.16.1"/>
  <file
   name="../my_cosine.mlw"
   verified="true"
   expanded="true">
   <theory
    name="M"
-   locfile="programs/my_cosine/../my_cosine.mlw"
+   locfile="../my_cosine.mlw"
    loclnum="1" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter my_cosine"
-    locfile="programs/my_cosine/../my_cosine.mlw"
-    loclnum="30" loccnumb="4" loccnume="13"
-    expl="parameter my_cosine"
+    locfile="../my_cosine.mlw"
+    loclnum="24" loccnumb="4" loccnume="13"
+    expl="VC for my_cosine"
     sum="8b0681efea48f15da85321bb703e7cb8"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=.aabsainfix -.avalueV5acosavalueV0c0x1.p-23Iainfix =avalueV5aroundaNearestTiesToEvenainfix -.avalueV4avalueV3FAainfix &lt;=aabsaroundaNearestTiesToEvenainfix -.avalueV4avalueV3amax_singleIainfix =avalueV4c1.0FIainfix =avalueV3aroundaNearestTiesToEvenainfix *.avalueV2avalueV1FAainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV1amax_singleIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FAainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c0.5FAainfix &lt;=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix &lt;=.aabsavalueV0c0x1.p-5F">
     <label
-     name="expl:parameter my_cosine"/>
+     name="expl:VC for my_cosine"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter my_cosine.1"
-      locfile="programs/my_cosine/../my_cosine.mlw"
-      loclnum="30" loccnumb="4" loccnume="13"
-      expl="assertion"
+      locfile="../my_cosine.mlw"
+      loclnum="24" loccnumb="4" loccnume="13"
+      expl="1. assertion"
       sum="8d50c0297750726687ad4579d882c8fc"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix &lt;=.aabsavalueV0c0x1.p-5F">
       <label
-       name="expl:parameter my_cosine"/>
+       name="expl:VC for my_cosine"/>
       <proof
        prover="0"
        timelimit="8"
@@ -58,15 +57,15 @@
      </goal>
      <goal
       name="WP_parameter my_cosine.2"
-      locfile="programs/my_cosine/../my_cosine.mlw"
-      loclnum="30" loccnumb="4" loccnume="13"
-      expl="precondition"
+      locfile="../my_cosine.mlw"
+      loclnum="24" loccnumb="4" loccnume="13"
+      expl="2. precondition"
       sum="b0d7e22bf95fcb3086a5f1064a15e89e"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c0.5FIainfix &lt;=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix &lt;=.aabsavalueV0c0x1.p-5F">
       <label
-       name="expl:parameter my_cosine"/>
+       name="expl:VC for my_cosine"/>
       <proof
        prover="1"
        timelimit="2"
@@ -78,15 +77,15 @@
      </goal>
      <goal
       name="WP_parameter my_cosine.3"
-      locfile="programs/my_cosine/../my_cosine.mlw"
-      loclnum="30" loccnumb="4" loccnume="13"
-      expl="precondition"
+      locfile="../my_cosine.mlw"
+      loclnum="24" loccnumb="4" loccnume="13"
+      expl="3. precondition"
       sum="363946af0a9bcacf9b4e53faa8015d5e"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV1amax_singleIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c0.5FIainfix &lt;=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix &lt;=.aabsavalueV0c0x1.p-5F">
       <label
-       name="expl:parameter my_cosine"/>
+       name="expl:VC for my_cosine"/>
       <proof
        prover="1"
        timelimit="2"
@@ -98,15 +97,15 @@
      </goal>
      <goal
       name="WP_parameter my_cosine.4"
-      locfile="programs/my_cosine/../my_cosine.mlw"
-      loclnum="30" loccnumb="4" loccnume="13"
-      expl="precondition"
+      locfile="../my_cosine.mlw"
+      loclnum="24" loccnumb="4" loccnume="13"
+      expl="4. precondition"
       sum="2617330726d179c543aa3cd1adf1f5c5"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=aabsaroundaNearestTiesToEvenainfix -.avalueV4avalueV3amax_singleIainfix =avalueV4c1.0FIainfix =avalueV3aroundaNearestTiesToEvenainfix *.avalueV2avalueV1FIainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV1amax_singleIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c0.5FIainfix &lt;=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix &lt;=.aabsavalueV0c0x1.p-5F">
       <label
-       name="expl:parameter my_cosine"/>
+       name="expl:VC for my_cosine"/>
       <proof
        prover="1"
        timelimit="2"
@@ -118,15 +117,15 @@
      </goal>
      <goal
       name="WP_parameter my_cosine.5"
-      locfile="programs/my_cosine/../my_cosine.mlw"
-      loclnum="30" loccnumb="4" loccnume="13"
-      expl="normal postcondition"
+      locfile="../my_cosine.mlw"
+      loclnum="24" loccnumb="4" loccnume="13"
+      expl="5. postcondition"
       sum="0f8090f73737a9ed6b03696129e87549"
       proved="true"
       expanded="true"
       shape="ainfix &lt;=.aabsainfix -.avalueV5acosavalueV0c0x1.p-23Iainfix =avalueV5aroundaNearestTiesToEvenainfix -.avalueV4avalueV3FIainfix &lt;=aabsaroundaNearestTiesToEvenainfix -.avalueV4avalueV3amax_singleIainfix =avalueV4c1.0FIainfix =avalueV3aroundaNearestTiesToEvenainfix *.avalueV2avalueV1FIainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV2avalueV1amax_singleIainfix =avalueV2aroundaNearestTiesToEvenainfix *.avalueV0avalueV0FIainfix &lt;=aabsaroundaNearestTiesToEvenainfix *.avalueV0avalueV0amax_singleIainfix =avalueV1c0.5FIainfix &lt;=.aabsainfix -.ainfix -.c1.0ainfix *.ainfix *.avalueV0avalueV0c0.5acosavalueV0c0x1.p-24Iainfix &lt;=.aabsavalueV0c0x1.p-5F">
       <label
-       name="expl:parameter my_cosine"/>
+       name="expl:VC for my_cosine"/>
       <proof
        prover="1"
        timelimit="2"

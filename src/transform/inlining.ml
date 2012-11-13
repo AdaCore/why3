@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ty
 open Term
 open Decl
@@ -71,7 +61,7 @@ let fold in_goal notdeft notdeff notls d (env, task) =
         let vl,e = open_ls_defn ld in
         let inline =
           not (TermTF.t_select notdeft notdeff e
-            || t_s_any ffalse (ls_equal ls) e) in
+            || t_s_any Util.ffalse (ls_equal ls) e) in
         let env = if inline then Mls.add ls (vl,e) env else env in
         let task = if inline && not in_goal then task else add_decl task d in
         env, task
@@ -90,7 +80,7 @@ let fold in_goal notdeft notdeff notls task_hd (env, task) =
 let inline_label = Ident.create_label "inline"
 
 let meta = Theory.register_meta "inline : no" [Theory.MTlsymbol]
-  ~desc:"Disallow@ the@ inlining@ of@ the@ given@ logic@ symbols."
+  ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
 let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
   let trans notls =
@@ -103,10 +93,10 @@ let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
     trans notls
 
 let all = t ~use_meta:true ~in_goal:false
-  ~notdeft:ffalse ~notdeff:ffalse ~notls:ffalse
+  ~notdeft:Util.ffalse ~notdeff:Util.ffalse ~notls:Util.ffalse
 
 let goal = t ~use_meta:true ~in_goal:true
-  ~notdeft:ffalse ~notdeff:ffalse ~notls:ffalse
+  ~notdeft:Util.ffalse ~notdeff:Util.ffalse ~notls:Util.ffalse
 
 (* inline_trivial *)
 
@@ -127,7 +117,7 @@ let notdeft t = match t.t_node with
   | _ -> true
 
 let trivial = t ~use_meta:true ~in_goal:false
-  ~notdeft:notdeft ~notdeff:notdeft ~notls:ffalse
+  ~notdeft:notdeft ~notdeff:notdeft ~notls:Util.ffalse
 
 (* inline_tagged *)
 
@@ -139,20 +129,11 @@ let tagged =
      ~notdeft:notdef ~notdeff:notdef ~notls:notls
 
 let () =
-  let register ~desc name t =
-    Trans.register_transform ~desc name t
-      ~desc_metas:[meta, Pp.empty_formatted]
-  in
-  register "inline_all" all
-    ~desc:"Inline@ all@ the@ non-recursive@ defined@ symbols.";
-  register "inline_goal" goal
-    ~desc:"Same@ as@ inline_all, but@ only@ in@ goals.";
-  register "inline_tagged" tagged
+  Trans.register_transform "inline_all" all
+    ~desc:"Inline@ non-recursive@ definitions.";
+  Trans.register_transform "inline_goal" goal
+    ~desc:"Same@ as@ 'inline_all', but@ only@ inline in@ goals.";
+  Trans.register_transform "inline_trivial" trivial
+    ~desc:"Inline@ trivial@ definitions@ like@ @[f(x,y) = g(y,x,0)@].";
+  Trans.register_transform "inline_tagged" tagged
     ~desc:"Inline everywhere all symbols with the 'inline' tag";
-  register "inline_trivial" trivial
-    ~desc:"Inline@ only@ the@ non-recursive@ symbols@ that@ have@ a@ trivial@ \
-           definition:\
-@[<hov>\
-  - just@ a@ constant,@\n\
-  - all the variables appear at most once.@]"
-

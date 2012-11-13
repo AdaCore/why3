@@ -38,7 +38,7 @@ type env = IdMap.map ident value
 type var_env = env
 type ref_env = env
 
-type state = {| var_env : var_env; ref_env: ref_env |}
+type state = { var_env : var_env; ref_env: ref_env }
 
 (* semantics of formulas *)
 
@@ -66,8 +66,8 @@ function eval_term (s:state) (t:term) : value =
   end
 
 function my_state :state =
-    {| var_env = IdMap.const (Vint 42);
-       ref_env = IdMap.const (Vint 0) |}
+    { var_env = IdMap.const (Vint 42);
+      ref_env = IdMap.const (Vint 0) }
 
 goal Test13 :
   eval_term my_state (Tconst 13) = Vint 13
@@ -89,20 +89,20 @@ predicate eval_fmla (s:state) (f:fmla) =
   | Fimplies f1 f2 -> eval_fmla s f1 -> eval_fmla s f2
   | Flet x t f ->
       eval_fmla
-        {| var_env = IdMap.set s.var_env x (eval_term s t) ;
-           ref_env = s.ref_env |}
+        { var_env = IdMap.set s.var_env x (eval_term s t) ;
+          ref_env = s.ref_env }
         f
   | Fforall x Tint f ->
      forall n:int.
         eval_fmla
-          {| var_env = IdMap.set s.var_env x (Vint n);
-             ref_env = s.ref_env |}
+          { var_env = IdMap.set s.var_env x (Vint n);
+            ref_env = s.ref_env }
           f
   | Fforall x Tbool f ->
      forall b:bool.
         eval_fmla
-          {| var_env = IdMap.set s.var_env x (Vbool b);
-             ref_env = s.ref_env |}
+          { var_env = IdMap.set s.var_env x (Vbool b);
+            ref_env = s.ref_env }
           f
   end
 
@@ -119,8 +119,8 @@ function subst_term (e:term) (x:ident) (t:term) : term =
 lemma eval_subst_term:
   forall s:state, e:term, x:ident, t:term.
     eval_term s (subst_term e x t) =
-    eval_term {| var_env = s.var_env;
-                 ref_env = (IdMap.set s.ref_env x (eval_term s t)) |}
+    eval_term { var_env = s.var_env;
+                ref_env = (IdMap.set s.ref_env x (eval_term s t)) }
               e
 
 function subst (f:fmla) (x:ident) (t:term) : fmla =
@@ -137,8 +137,8 @@ function subst (f:fmla) (x:ident) (t:term) : fmla =
 lemma eval_subst:
   forall f:fmla, s:state, x:ident, t:term.
     eval_fmla s (subst f x t) <->
-    eval_fmla {| var_env = s.var_env;
-                 ref_env = (IdMap.set s.ref_env x (eval_term s t)) |}
+    eval_fmla { var_env = s.var_env;
+                ref_env = (IdMap.set s.ref_env x (eval_term s t)) }
               f
 
 (* statements *)
@@ -161,8 +161,8 @@ inductive one_step state stmt state stmt =
   | one_step_assign:
       forall s:state, x:ident, e:term.
         one_step s (Sassign x e)
-                 {| var_env = s.var_env;
-                    ref_env = (IdMap.set s.ref_env x (eval_term s e)) |}
+                 { var_env = s.var_env;
+                   ref_env = (IdMap.set s.ref_env x (eval_term s e)) }
                  Sskip
 
   | one_step_seq:
@@ -340,9 +340,9 @@ module WP
 
   use import Imp
 
-  let rec wp (i:stmt) (q:fmla) =
-    { true }
-    match i with
+  let rec wp (i:stmt) (q:fmla)
+    ensures { valid_triple result i q }
+  = match i with
     | Sskip -> q
     | Sseq i1 i2 -> wp i1 (wp i2 q)
     | Sassign x e ->
@@ -360,10 +360,9 @@ module WP
         Fand inv
           ((*Fforall*) (Fand
                      (Fimplies (Fand (Fterm e) inv) (wp i inv))
-                     (Fimplies (Fand (Fnot (Fterm e)) inv) q))) 
+                     (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
 
     end
-    { valid_triple result i q }
 
 end
 

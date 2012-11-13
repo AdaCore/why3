@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
-<why3session
- name="hoare_logic/wp2/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,13 +31,13 @@
   expanded="true">
   <theory
    name="Imp"
-   locfile="hoare_logic/wp2/../wp2.mlw"
+   locfile="../wp2.mlw"
    loclnum="6" loccnumb="7" loccnume="10"
    verified="true"
    expanded="false">
    <goal
     name="eval_subst_term"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="99" loccnumb="6" loccnume="21"
     sum="f4982c4be9c52b03218196c41ba032b2"
     proved="true"
@@ -56,7 +55,7 @@
    </goal>
    <goal
     name="eval_term_change_free"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="105" loccnumb="6" loccnume="27"
     sum="5bc3329792d80dd09d6247c93d0bf59a"
     proved="true"
@@ -74,7 +73,7 @@
    </goal>
    <goal
     name="eval_subst"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="131" loccnumb="6" loccnume="16"
     sum="e7b8769dc931485e4198f755dbdb181f"
     proved="true"
@@ -92,7 +91,7 @@
    </goal>
    <goal
     name="eval_swap"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="137" loccnumb="6" loccnume="15"
     sum="e1fd1bebe66e7f1e6bee6e2bb874d93a"
     proved="true"
@@ -117,7 +116,7 @@
    </goal>
    <goal
     name="eval_change_free"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="143" loccnumb="6" loccnume="22"
     sum="813342d547f875499bf9e11ba77b755f"
     proved="true"
@@ -135,19 +134,19 @@
    </goal>
    <goal
     name="check_skip"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="158" loccnumb="6" loccnume="16"
     sum="71c8c73ad3d69fb84084c2622f316ecc"
     proved="true"
     expanded="false"
     shape="ainfix =V0aSskipNOainfix =V0aSskipF">
     <proof
-     prover="4"
+     prover="0"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -158,20 +157,20 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="2"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="5"
@@ -184,7 +183,7 @@
    </goal>
    <goal
     name="steps_non_neg"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="227" loccnumb="6" loccnume="19"
     sum="208f29af69c75d9b4c44b551c4290cda"
     proved="true"
@@ -202,7 +201,7 @@
    </goal>
    <goal
     name="many_steps_seq"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="231" loccnumb="6" loccnume="20"
     sum="8a15b9a44545218dd04fe822ad396c63"
     proved="true"
@@ -221,26 +220,18 @@
   </theory>
   <theory
    name="TestSemantics"
-   locfile="hoare_logic/wp2/../wp2.mlw"
+   locfile="../wp2.mlw"
    loclnum="262" loccnumb="7" loccnume="20"
    verified="true"
    expanded="false">
    <goal
     name="Test13"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="269" loccnumb="5" loccnume="11"
     sum="ee3a110c1db9874559b90431d213a6d0"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTconstc13aVintc13">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -248,6 +239,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="2"
@@ -260,20 +259,12 @@
    </goal>
    <goal
     name="Test42"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="272" loccnumb="5" loccnume="11"
     sum="59ec24df351adb775391eddf07e18736"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTvarc0aVintc42">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -281,6 +272,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
     </proof>
     <proof
      prover="2"
@@ -293,20 +292,12 @@
    </goal>
    <goal
     name="Test0"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="275" loccnumb="5" loccnume="10"
     sum="4a698061ff72b23e99f8948899866a86"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTderefc0aVintc0">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -314,6 +305,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="2"
@@ -326,7 +325,7 @@
    </goal>
    <goal
     name="Test55"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="278" loccnumb="5" loccnume="11"
     sum="7b18ea05061a213ba9ac73e26dafc281"
     proved="true"
@@ -344,14 +343,14 @@
    </goal>
    <goal
     name="Ass42"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="281" loccnumb="5" loccnume="10"
     sum="d75fb0e0f00b1fb23e926ee5eee8789e"
     proved="true"
     expanded="false"
     shape="ainfix =agetV1V0aVintc42Iaone_stepamy_sigmaamy_piaSassignV0aTconstc42V1V2aSskipFLc0">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -359,7 +358,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="0"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -377,7 +376,7 @@
    </goal>
    <goal
     name="If42"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="287" loccnumb="5" loccnume="9"
     sum="29c7f01e724e2740e55c0d7e1f7f80a1"
     proved="true"
@@ -396,13 +395,13 @@
   </theory>
   <theory
    name="HoareLogic"
-   locfile="hoare_logic/wp2/../wp2.mlw"
+   locfile="../wp2.mlw"
    loclnum="302" loccnumb="7" loccnume="17"
    verified="true"
    expanded="false">
    <goal
     name="consequence_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="309" loccnumb="6" loccnume="22"
     sum="b8b0c0191fe4f59eecbf1c4951ace373"
     proved="true"
@@ -427,7 +426,7 @@
    </goal>
    <goal
     name="skip_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="316" loccnumb="6" loccnume="15"
     sum="a85f4a9b9eeb442a8339d7aa6a794ce2"
     proved="true"
@@ -445,7 +444,7 @@
    </goal>
    <goal
     name="assign_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="319" loccnumb="6" loccnume="17"
     sum="f2c052865d533a32795e650362223694"
     proved="true"
@@ -463,7 +462,7 @@
    </goal>
    <goal
     name="seq_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="324" loccnumb="6" loccnume="14"
     sum="ff942ae14b7e67fe21f0bda5628b3d4e"
     proved="true"
@@ -488,7 +487,7 @@
    </goal>
    <goal
     name="if_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="329" loccnumb="6" loccnume="13"
     sum="cbc2bcaf7d8ab2ada1b2d60ecaa6da6a"
     proved="true"
@@ -506,7 +505,7 @@
    </goal>
    <goal
     name="assert_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="335" loccnumb="6" loccnume="17"
     sum="b61d48b91fb33341eaab46e20c597fb4"
     proved="true"
@@ -524,7 +523,7 @@
    </goal>
    <goal
     name="assert_rule_ext"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="339" loccnumb="6" loccnume="21"
     sum="a3ab72b50129b46bd829da3356248977"
     proved="true"
@@ -542,7 +541,7 @@
    </goal>
    <goal
     name="while_rule"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="343" loccnumb="6" loccnume="16"
     sum="9f18209e4cd86ef85ed460d715099de9"
     proved="true"
@@ -560,7 +559,7 @@
    </goal>
    <goal
     name="while_rule_ext"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="348" loccnumb="6" loccnume="20"
     sum="e7373b196e9c0aa974cc2b9f53821837"
     proved="true"
@@ -579,15 +578,15 @@
   </theory>
   <theory
    name="WP"
-   locfile="hoare_logic/wp2/../wp2.mlw"
+   locfile="../wp2.mlw"
    loclnum="360" loccnumb="7" loccnume="9"
    verified="true"
    expanded="false">
    <goal
     name="assigns_refl"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="370" loccnumb="6" loccnume="18"
-    sum="3a453b71d42918b4eca0e7e1235f64aa"
+    sum="73e1ca8fa7ad68396582336e43054710"
     proved="true"
     expanded="false"
     shape="aassignsV0V1V0F">
@@ -602,9 +601,9 @@
    </goal>
    <goal
     name="assigns_trans"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="373" loccnumb="6" loccnume="19"
-    sum="32507250af9d1d19b0cb06ada65edcf5"
+    sum="0087eb6f5bf9e0a86dd32d4bb2933abc"
     proved="true"
     expanded="false"
     shape="aassignsV0V3V2IaassignsV1V3V2AaassignsV0V3V1F">
@@ -619,9 +618,9 @@
    </goal>
    <goal
     name="assigns_union_left"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="378" loccnumb="6" loccnume="24"
-    sum="2155092c4e12d9974d095a4db0ef41e5"
+    sum="bab50ddb7c887866f049f1890ca165ac"
     proved="true"
     expanded="false"
     shape="aassignsV0aunionV2V3V1IaassignsV0V2V1F">
@@ -636,9 +635,9 @@
    </goal>
    <goal
     name="assigns_union_right"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="382" loccnumb="6" loccnume="25"
-    sum="5e2efc6b5e69fdf2d487c5b5e51e6d86"
+    sum="ff972cdd7fac38edee4b51cf8ddc5514"
     proved="true"
     expanded="false"
     shape="aassignsV0aunionV2V3V1IaassignsV0V3V1F">
@@ -653,30 +652,30 @@
    </goal>
    <goal
     name="WP_parameter compute_writes"
-    locfile="hoare_logic/wp2/../wp2.mlw"
+    locfile="../wp2.mlw"
     loclnum="396" loccnumb="10" loccnume="24"
-    expl="parameter compute_writes"
-    sum="dac1e953811b7b7a6d5b3fa4c9ea032c"
+    expl="VC for compute_writes"
+    sum="8c2444ab4823ee0a1abdbd5fb49c1f73"
     proved="true"
     expanded="false"
     shape="CV0aSskipaassignsV1aemptyV3Iamany_stepsV1V2V0V3V4aSskipV5FaSassignVwaassignsV7asingletonV6V9Iamany_stepsV7V8V0V9V10aSskipV11FaSseqVVaassignsV16aunionV15V14V18Iamany_stepsV16V17V0V18V19aSskipV20FIaassignsV21V15V23Iamany_stepsV21V22V12V23V24aSskipV25FFIaassignsV26V14V28Iamany_stepsV26V27V13V28V29aSskipV30FFaSifwVVaassignsV35aunionV34V33V37Iamany_stepsV35V36V0V37V38aSskipV39FIaassignsV40V34V42Iamany_stepsV40V41V31V42V43aSskipV44FFIaassignsV45V33V47Iamany_stepsV45V46V32V47V48aSskipV49FFaSwhilewwVaassignsV52V51V54Iamany_stepsV52V53V0V54V55aSskipV56FIaassignsV57V51V59Iamany_stepsV57V58V50V59V60aSskipV61FFaSassertwaassignsV62aemptyV64Iamany_stepsV62V63V0V64V65aSskipV66FF">
     <label
-     name="expl:parameter compute_writes"/>
+     name="expl:VC for compute_writes"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="false">
      <goal
       name="WP_parameter compute_writes.1"
-      locfile="hoare_logic/wp2/../wp2.mlw"
+      locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="parameter compute_writes"
-      sum="6c8ee025580c52ace90d1a4fc124e790"
+      expl="1. postcondition"
+      sum="cc9319762b0bc1611b7e16b341216c93"
       proved="true"
       expanded="false"
       shape="CV0aSskipaassignsV1aemptyV3Iamany_stepsV1V2V0V3V4aSskipV5FaSassignVwtaSseqVVtaSifwVVtaSwhilewwVtaSassertwtF">
       <label
-       name="expl:parameter compute_writes"/>
+       name="expl:VC for compute_writes"/>
       <proof
        prover="0"
        timelimit="3"
@@ -688,15 +687,15 @@
      </goal>
      <goal
       name="WP_parameter compute_writes.2"
-      locfile="hoare_logic/wp2/../wp2.mlw"
+      locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="parameter compute_writes"
-      sum="8b210b01c5a5ab873068e0db0fe7df78"
+      expl="2. postcondition"
+      sum="68b043510e407df3816d0ce7aac52594"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSassignVwaassignsV2asingletonV1V4Iamany_stepsV2V3V0V4V5aSskipV6FaSseqVVtaSifwVVtaSwhilewwVtaSassertwtF">
       <label
-       name="expl:parameter compute_writes"/>
+       name="expl:VC for compute_writes"/>
       <proof
        prover="3"
        timelimit="3"
@@ -709,15 +708,15 @@
      </goal>
      <goal
       name="WP_parameter compute_writes.3"
-      locfile="hoare_logic/wp2/../wp2.mlw"
+      locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="parameter compute_writes"
-      sum="066208d340701532d97dac8f7ee0d2f1"
+      expl="3. postcondition"
+      sum="e92018a3cd7629424f5e6f75703c93df"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSassignVwtaSseqVVaassignsV6aunionV5V4V8Iamany_stepsV6V7V0V8V9aSskipV10FIaassignsV11V5V13Iamany_stepsV11V12V2V13V14aSskipV15FFIaassignsV16V4V18Iamany_stepsV16V17V3V18V19aSskipV20FFaSifwVVtaSwhilewwVtaSassertwtF">
       <label
-       name="expl:parameter compute_writes"/>
+       name="expl:VC for compute_writes"/>
       <proof
        prover="4"
        timelimit="5"
@@ -737,15 +736,15 @@
      </goal>
      <goal
       name="WP_parameter compute_writes.4"
-      locfile="hoare_logic/wp2/../wp2.mlw"
+      locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="parameter compute_writes"
-      sum="7bfd99aacedde2d42aacbe57f6f00f2f"
+      expl="4. postcondition"
+      sum="04f02a5f3c9b30d1b8610eb3e4005a44"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSassignVwtaSseqVVtaSifwVVaassignsV8aunionV7V6V10Iamany_stepsV8V9V0V10V11aSskipV12FIaassignsV13V7V15Iamany_stepsV13V14V4V15V16aSskipV17FFIaassignsV18V6V20Iamany_stepsV18V19V5V20V21aSskipV22FFaSwhilewwVtaSassertwtF">
       <label
-       name="expl:parameter compute_writes"/>
+       name="expl:VC for compute_writes"/>
       <proof
        prover="3"
        timelimit="3"
@@ -758,15 +757,15 @@
      </goal>
      <goal
       name="WP_parameter compute_writes.5"
-      locfile="hoare_logic/wp2/../wp2.mlw"
+      locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="parameter compute_writes"
-      sum="6fb0a21db702465bf75f811ba397c288"
+      expl="5. postcondition"
+      sum="d5376a5e25db163dbf2aa636e75f2b7f"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSassignVwtaSseqVVtaSifwVVtaSwhilewwVaassignsV8V7V10Iamany_stepsV8V9V0V10V11aSskipV12FIaassignsV13V7V15Iamany_stepsV13V14V6V15V16aSskipV17FFaSassertwtF">
       <label
-       name="expl:parameter compute_writes"/>
+       name="expl:VC for compute_writes"/>
       <proof
        prover="3"
        timelimit="3"
@@ -779,15 +778,15 @@
      </goal>
      <goal
       name="WP_parameter compute_writes.6"
-      locfile="hoare_logic/wp2/../wp2.mlw"
+      locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="parameter compute_writes"
-      sum="7df7c33102c9e867c42451f4c07185f7"
+      expl="6. postcondition"
+      sum="68c0020cf62818bc3e3e3f5f7f8a9a71"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSassignVwtaSseqVVtaSifwVVtaSwhilewwVtaSassertwaassignsV7aemptyV9Iamany_stepsV7V8V0V9V10aSskipV11FF">
       <label
-       name="expl:parameter compute_writes"/>
+       name="expl:VC for compute_writes"/>
       <proof
        prover="3"
        timelimit="3"
@@ -802,37 +801,37 @@
    </goal>
    <goal
     name="WP_parameter wp"
-    locfile="hoare_logic/wp2/../wp2.mlw"
-    loclnum="432" loccnumb="10" loccnume="12"
-    expl="parameter wp"
-    sum="c77a0e6e3f2a76bb1ff3c29079de56df"
+    locfile="../wp2.mlw"
+    loclnum="428" loccnumb="10" loccnume="12"
+    expl="VC for wp"
+    sum="a5bb90ca75d988a5f3327a76aa664868"
     proved="true"
     expanded="false"
     shape="CV0aSskipavalid_tripleV1V0V1aSseqVVavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSassignVVavalid_tripleaFletV8V7asubstV1V6V8V0V1Iafresh_in_fmlaV8V1FaSifVVVavalid_tripleaFandaFimpliesaFtermV9V13aFimpliesaFnotaFtermV9V12V0V1Iavalid_tripleV13V10V1FIavalid_tripleV12V11V1FaSassertVavalid_tripleaFimpliesV14V1V0V1aSwhileVVVavalid_tripleaFandV16V19V0V1Iaeval_fmlaV22V23V19Iamany_stepsV20V21V17V22V23aSskipV24FAaeval_fmlaV20V21aFandaFimpliesaFandaFtermV15V16V18aFimpliesaFandaFnotaFtermV15V16V1Iaeval_fmlaV20V21V19FFIavalid_tripleV18V17V16FF">
     <label
-     name="expl:parameter wp"/>
+     name="expl:VC for wp"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="false">
      <goal
       name="WP_parameter wp.1"
-      locfile="hoare_logic/wp2/../wp2.mlw"
-      loclnum="432" loccnumb="10" loccnume="12"
-      expl="parameter wp"
-      sum="ae25875faa4c685088107a57591512cc"
+      locfile="../wp2.mlw"
+      loclnum="428" loccnumb="10" loccnume="12"
+      expl="1. postcondition"
+      sum="06925acf611bd4e387ea94906ab92a48"
       proved="true"
       expanded="false"
       shape="CV0aSskipavalid_tripleV1V0V1aSseqVVtaSassignVVtaSifVVVtaSassertVtaSwhileVVVtF">
       <label
-       name="expl:parameter wp"/>
+       name="expl:VC for wp"/>
       <proof
-       prover="4"
-       timelimit="5"
+       prover="0"
+       timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -843,20 +842,20 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="3"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="5"
@@ -869,22 +868,22 @@
      </goal>
      <goal
       name="WP_parameter wp.2"
-      locfile="hoare_logic/wp2/../wp2.mlw"
-      loclnum="432" loccnumb="10" loccnume="12"
-      expl="parameter wp"
-      sum="a9242fa6419b8a01e86b7fa88f6d86e6"
+      locfile="../wp2.mlw"
+      loclnum="428" loccnumb="10" loccnume="12"
+      expl="2. postcondition"
+      sum="b5906335979baf7b7b5f011fe549d714"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSseqVVavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSassignVVtaSifVVVtaSassertVtaSwhileVVVtF">
       <label
-       name="expl:parameter wp"/>
+       name="expl:VC for wp"/>
       <proof
-       prover="4"
-       timelimit="5"
+       prover="0"
+       timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -895,20 +894,20 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="3"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="5"
@@ -921,22 +920,22 @@
      </goal>
      <goal
       name="WP_parameter wp.3"
-      locfile="hoare_logic/wp2/../wp2.mlw"
-      loclnum="432" loccnumb="10" loccnume="12"
-      expl="parameter wp"
-      sum="e680f84c8a8a559be5b64dbf3b92da09"
+      locfile="../wp2.mlw"
+      loclnum="428" loccnumb="10" loccnume="12"
+      expl="3. postcondition"
+      sum="cdf49cc0d486ffe057613fda60d8aff8"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSseqVVtaSassignVVavalid_tripleaFletV6V5asubstV1V4V6V0V1Iafresh_in_fmlaV6V1FaSifVVVtaSassertVtaSwhileVVVtF">
       <label
-       name="expl:parameter wp"/>
+       name="expl:VC for wp"/>
       <proof
-       prover="4"
-       timelimit="5"
+       prover="0"
+       timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -947,20 +946,20 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="0"
-       timelimit="3"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="5"
@@ -973,15 +972,15 @@
      </goal>
      <goal
       name="WP_parameter wp.4"
-      locfile="hoare_logic/wp2/../wp2.mlw"
-      loclnum="432" loccnumb="10" loccnume="12"
-      expl="parameter wp"
-      sum="e2375c4e43614e78aeae5bad6dca3502"
+      locfile="../wp2.mlw"
+      loclnum="428" loccnumb="10" loccnume="12"
+      expl="4. postcondition"
+      sum="112e644b7c1359531a8228d027763854"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVavalid_tripleaFandaFimpliesaFtermV6V10aFimpliesaFnotaFtermV6V9V0V1Iavalid_tripleV10V7V1FIavalid_tripleV9V8V1FaSassertVtaSwhileVVVtF">
       <label
-       name="expl:parameter wp"/>
+       name="expl:VC for wp"/>
       <proof
        prover="3"
        timelimit="3"
@@ -994,22 +993,22 @@
      </goal>
      <goal
       name="WP_parameter wp.5"
-      locfile="hoare_logic/wp2/../wp2.mlw"
-      loclnum="432" loccnumb="10" loccnume="12"
-      expl="parameter wp"
-      sum="5a8187f71b5e2c78174d9ef10ed31832"
+      locfile="../wp2.mlw"
+      loclnum="428" loccnumb="10" loccnume="12"
+      expl="5. postcondition"
+      sum="c8d6341f72be51c765e727c4e2c4831d"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVtaSassertVavalid_tripleaFimpliesV9V1V0V1aSwhileVVVtF">
       <label
-       name="expl:parameter wp"/>
+       name="expl:VC for wp"/>
       <proof
-       prover="4"
-       timelimit="5"
+       prover="0"
+       timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -1020,16 +1019,16 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="0"
+       prover="2"
        timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="2"
-       timelimit="3"
+       prover="4"
+       timelimit="5"
        memlimit="0"
        obsolete="false"
        archived="false">
@@ -1046,15 +1045,15 @@
      </goal>
      <goal
       name="WP_parameter wp.6"
-      locfile="hoare_logic/wp2/../wp2.mlw"
-      loclnum="432" loccnumb="10" loccnume="12"
-      expl="parameter wp"
-      sum="cca9099d89a43efc509297aed7bfbf4c"
+      locfile="../wp2.mlw"
+      loclnum="428" loccnumb="10" loccnume="12"
+      expl="6. postcondition"
+      sum="99af72620f9b7802bed4ae76ef59eb99"
       proved="true"
       expanded="false"
       shape="CV0aSskiptaSseqVVtaSassignVVtaSifVVVtaSassertVtaSwhileVVVavalid_tripleaFandV11V14V0V1Iaeval_fmlaV17V18V14Iamany_stepsV15V16V12V17V18aSskipV19FAaeval_fmlaV15V16aFandaFimpliesaFandaFtermV10V11V13aFimpliesaFandaFnotaFtermV10V11V1Iaeval_fmlaV15V16V14FFIavalid_tripleV13V12V11FF">
       <label
-       name="expl:parameter wp"/>
+       name="expl:VC for wp"/>
       <proof
        prover="3"
        timelimit="5"

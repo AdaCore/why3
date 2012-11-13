@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (*s Parse trees. *)
 
@@ -24,9 +15,9 @@ type loc = Loc.position
 
 (*s Logical expressions (for both terms and predicates) *)
 
-type integer_constant = Term.integer_constant
-type real_constant = Term.real_constant
-type constant = Term.constant
+type integer_constant = Number.integer_constant
+type real_constant = Number.real_constant
+type constant = Number.constant
 
 type label =
   | Lstr of Ident.label
@@ -190,12 +181,6 @@ type for_direction = To | Downto
 
 type ghost = bool
 
-type effect = {
-  pe_reads  : lexpr list;
-  pe_writes : lexpr list;
-  pe_raises : qualid list;
-}
-
 type pre = lexpr
 type post = loc * (pattern * lexpr) list
 type xpost = loc * (qualid * pattern * lexpr) list
@@ -204,7 +189,8 @@ type spec = {
   sp_pre     : pre list;
   sp_post    : post list;
   sp_xpost   : xpost list;
-  sp_effect  : effect;
+  sp_reads   : lexpr list;
+  sp_writes  : lexpr list;
   sp_variant : variant list;
 }
 
@@ -242,7 +228,7 @@ and expr_desc =
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
   | Eraise of qualid * expr option
-  | Etry of expr * (qualid * ident option * expr) list
+  | Etry of expr * (qualid * pattern * expr) list
   | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
@@ -261,7 +247,7 @@ type pdecl =
   | Dlet of ident * ghost * expr
   | Dletrec of letrec list
   | Dparam of ident * ghost * type_v
-  | Dexn of ident * pty option
+  | Dexn of ident * pty
 
 (* incremental parsing *)
 
@@ -275,6 +261,4 @@ type incremental = {
   new_decl        : loc -> decl -> unit;
   new_pdecl       : loc -> pdecl -> unit;
   use_clone       : loc -> use_clone -> unit;
-  (* TODO: remove this once the new whyml becomes default *)
-  use_module      : loc -> use -> unit;
 }

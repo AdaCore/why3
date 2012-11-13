@@ -63,17 +63,75 @@
  - commentaires dans les sessions, attachés a chaque ligne
 
 
-=========== Middle-term roadmap ==========================================
-
-* replayer
-** deplacer option -bench dans une commande de why3session
-
 * Projets interessant Cesar ?
 ** Preuve de prog flottants avec Frama-C+WP+Why3+PVS
 ** Generation d'annotations
 ** porter multirounding a jessie->Why3. Completer le mode full et faire passer
    interval_arith.c. Completer la galerie
 ** preuve sur l'assembleur
+** support de Yices 2 ? interesserait Cesar
+
+
+==================== Roadmap for release 0.81 ========================
+
+scheduled on ? 2012
+
+== New Features to announce ==
+
+== Final preparation ==
+
+* faire une passe sur le BTS
+* do "make update-coq" and "make", fix Coq realizations if needed
+* check that nightly bench is OK
+* check that "make xml-validate" is OK
+  (see below : copy the dtd on the web)
+* put 0.80 in file Version
+* check headers
+* check the file CHANGES, add the release date
+* manual in PDF: check that macro \todo is commented out
+    in ./macros.tex, and then "make doc"
+* manual in HTML: "make doc/html/index.html"
+* do "make distrib"
+* test the distrib why3-0.81.tar.gz
+* make a last commit:
+ - add tag 0.81 to the git repository, using git tag 0.81
+ - do not forget to push it using git push --tags
+* install web page for why2 which includes an updated page for the
+  quick migration guide. (sources are in CVS repository
+  ~filliatr/ARCHIVE/www/why)
+* put on the web page
+ - why3-0.81.tar.gz
+ - the HTML version of the manual (content of doc/html)
+ - why3session.dtd
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.81
+   rm /users/www-perso/projets/why3/stdlib)
+   ln -s /users/www-perso/projets/why3/stdlib-0.81 \
+            /users/www-perso/projets/why3/stdlib
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.81
+    rm /users/www-perso/projets/why3/api
+    ln -s /users/www-perso/projets/why3/api-0.81 \
+      /users/www-perso/projets/why3/api
+   PROBLEME avec style.css
+ - update the main HTML page (sources are in why3-papers/www)
+* add a new version to the bugtracker:
+  https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
+
+* produce the Why3 part of ProVal gallery
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
+  "make gallery-files" in the sources of the web pages)
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+== TODOs ==
+
+* replayer
+** deplacer option -bench dans une commande de why3session
+
 
 * extraction vers Caml
  - PRIORITAIRE, JCF, ANDREI
@@ -110,41 +168,49 @@ https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 ** syntax highlighting bugs ?
    some keywords are not colored in the bottom-right window
    (but they are in the top-right window)
-   NEED FEEDBACK which ones ???
+   it is caused by the language file for alt-ergo superseding the one for why3
 
-* (JCF) reject global "val"s in typing environment for logic decls.
+* faire le menage dans les transformations d'induction : _int _ty
+  _ty_lex, et DOCUMENTER
 
-* sessions
-** mettre la dtd sur le web et changer l'entête des sessions pour qu'elles
-   pointent dessus
-** utiliser des chemins plus raisonnables pour indiquer la position des buts
-   dans les fichiers (e.g. relativement au fichier session ?)
+* Contre-exemples de Alt-Ergo
 
-==================== Roadmap for release 0.74 ========================
+* detect editors
+*** check if coqide and also emacs/proof-general is installed
+
+* Documentation
+ - (ANDREI) make the glossary available
+ - (CLAUDE) complete api.tex: explain how to build theories, apply
+   transformations, write new functions on terms (A)
+
+
+==================== Roadmap for release 0.80 ========================
+
+Change in programs' input syntax deserves incrementing version to 0.80
 
 scheduled on Oct 2012
 
 == New Features to announce ==
 
 Programs:
-  o new API for programs
   o new concrete syntax for programs
+  o new API for programs
   o type invariants
   o ghost code
 
 Transformations:
-  o transformations for induction
+  o induction (experimental, undocumented)
+  o bisection (experimental, undocumented)
 
 Provers support:
-  o Support for Coq 8.4
+  o support for Coq 8.4
   o dropped support for Coq 8.2
-  o new scheme for Coq realizations using type classes
-  o Support for PVS 6.0, including realizations
+  o support for forthcoming PVS 6.0, including realizations
   o support for iProver and Zenon
 
 Misc:
   o improved output of "why3session latex"
-    (incompatible changes in LaTeX macos)
+    (incompatible changes in LaTeX macros)
   o [replayer] new option -q for running quietly
   o a warning is emitted for unused bound logic variables in "forall",
     "exists" and "let"
@@ -154,6 +220,7 @@ Misc:
     instead
 
 Bug fixes:
+  o Coq output uses type classes to ensure Why3 types are inhabited
   o fixed bug on merging config files which prevented the use
     of Why3 back-end of the Frama-C/Jessie plugin when Coq is
     not installed. (Bug 14672 of the Bug Tracking System)
@@ -166,65 +233,62 @@ Bug fixes:
 * check that nightly bench is OK
 * check that "make xml-validate" is OK
   (see below : copy the dtd on the web)
-* put 0.74 in file Version
+* put 0.80 in file Version
 * check headers
 * check the file CHANGES, add the release date
 * manual in PDF: check that macro \todo is commented out
     in ./macros.tex, and then "make doc"
 * manual in HTML: "make doc/html/index.html"
 * do "make distrib"
-* test the distrib why3-0.74.tar.gz
+* test the distrib why3-0.80.tar.gz
 * make a last commit:
- - add tag 0.74 to the git repository 
+ - add tag 0.80 to the git repository, using git tag 0.80
  - do not forget to push it using git push --tags
-
+* install web page for why2 which includes an updated page for the
+  quick migration guide. (sources are in CVS repository
+  ~filliatr/ARCHIVE/www/why)
 * put on the web page
- - why3-0.74.tar.gz
+ - why3-0.80.tar.gz
  - the HTML version of the manual (content of doc/html)
  - why3session.dtd
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
-   (make stdlibdoc ;
-    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.74;
-    ln -s /users/www-perso/projets/why3/stdlib-0.74 \
-            /users/www-perso/projets/why3/stdlib)
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.80
+   rm /users/www-perso/projets/why3/stdlib)
+   ln -s /users/www-perso/projets/why3/stdlib-0.80 \
+            /users/www-perso/projets/why3/stdlib
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
-    Note: check that URL of API doc is correct in doc/api.tex line 9.
-     (make apidoc ;
-    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.74;
-    ln -s /users/www-perso/projets/why3/api-0.74 \
-            /users/www-perso/projets/why3/api    )
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.80
+    rm /users/www-perso/projets/why3/api
+    ln -s /users/www-perso/projets/why3/api-0.80 \
+      /users/www-perso/projets/why3/api
+   PROBLEME avec style.css
  - update the main HTML page (sources are in why3-papers/www)
 
-* produce the Why3 part of ProVal gallery 
-  -> add also a tar.gz and a ZIP file of it
+* produce the Why3 part of ProVal gallery
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
+  "make gallery-files" in the sources of the web pages)
 * Announce the distrib
  - What to put in the announcement: see New Features above
 * The next commit : add +git to the version in file Version
 
 == TODOs ==
 
+* DONE (JCF) reject global "val"s in typing environment for logic decls.
 
-* faire le menage dans les transformations d'induction : _int _ty
-  _ty_lex, et DOCUMENTER
+* DONE appliquer les changements de syntaxe des programmes dans la doc : aussi bien dans le tutorial que dans la BNF des manpages
 
-* Sortie PVS
-** avec mecanisme de realization
 
-* support de Yices 2 ? interesserait Cesar
+* DONE Sortie PVS, avec mecanisme de realization
 
-* mettre au propre les loc des fichiers de sessions, en particulier
+* DONE mettre au propre les loc des fichiers de sessions, en particulier
   les noms de fichiers doivent etre relatifs au fichier de session
   lui-meme. Utiliser Sysutil.relativize_filename a bon escient.
 
-* Contre-exemples de Alt-Ergo
+* DONE sessions: mettre la dtd sur le web et changer l'entête des sessions pour qu'elles
+   pointent dessus
 
-* detect editors
-*** check if coqide and also emacs/proof-general is installed
-
-* Documentation
- - (ANDREI) make the glossary available 
- - (CLAUDE) complete api.tex: explain how to build theories, apply
-   transformations, write new functions on terms (A)
 
 * DONE (PRIORITAIRE) Coq output
  - corriger l'incoherence, comprendre si on veut vraiment accepter
@@ -233,7 +297,7 @@ Bug fixes:
   (cf: en caml cela ne marche pas)
  Solution proposee: utiliser des types classes, en particulier Inhabited
 
-* DONE ? PRIORITAIRE, JCF et ANDREI, clone de module
+* DONE (PRIORITAIRE), JCF et ANDREI, clone de module
  - demarche: ecrire une API avec smart constructors garantissant
    le bon typage, et clone sera en premier lieu un de ces constructors
  - cas d'utilisation: range d'entiers de Jessie, Flottants -> double ou single
@@ -284,7 +348,7 @@ Bug fix:
 * do "make distrib"
 * test the distrib why3-0.73.tar.gz
 * make a last commit:
- - add tag 0.73 to the git repository 
+ - add tag 0.73 to the git repository
  - do not forget to push it using git push --tags
 
 * put on the web page

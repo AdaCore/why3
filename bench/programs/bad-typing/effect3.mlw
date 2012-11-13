@@ -1,10 +1,10 @@
 
 module M
 
-  use import module ref.Ref
+  use import ref.Ref
 
   val a : int
 
-  val f : x:int -> {} unit writes a.contents {}
+  val f (x:int) : unit writes { a.contents }
 
 end

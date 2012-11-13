@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 
@@ -122,10 +113,16 @@ let rec grep out l = match l with
 
 
 let debug = Debug.register_info_flag "call_prover"
-  ~desc:"About@ external@ prover@ calls@ and@ results."
+  ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
+         and@ keep@ temporary@ files."
 
 type post_prover_call = unit -> prover_result
-type prover_call = Unix.wait_flag list -> post_prover_call
+
+type prover_call = {
+  call : Unix.process_status -> post_prover_call;
+  pid  : int
+}
+
 type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
@@ -173,10 +170,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     Unix.close fd_in;
     close_out cout;
 
-    fun wait_flags ->
-      (* TODO? check that we haven't given the result earlier *)
-      let res,ret = Unix.waitpid wait_flags pid in
-      if res = 0 then raise Exit;
+    let call = fun ret ->
       let time = Unix.gettimeofday () -. time in
       let cout = open_in fout in
       let out = Sysutil.channel_contents cout in
@@ -200,7 +194,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
               (try List.assoc n exitcodes with Not_found -> grep out regexps)
         in
         Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-        let time = Util.def_option time (grep_time out timeregexps) in
+        let time = Opt.get_def time (grep_time out timeregexps) in
         let ans = match ans with
           | HighFailure when !on_timelimit && timelimit > 0
             && time >= (0.9 *. float timelimit) -> Timeout
@@ -210,6 +204,8 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
           pr_status = ret;
           pr_output = out;
           pr_time   = time }
+    in
+    { call = call; pid = pid }
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
                    ~regexps ~timeregexps ~exitcodes ~filename
@@ -225,7 +221,13 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
   call_on_file ~command ~timelimit ~memlimit
                ~regexps ~timeregexps ~exitcodes ~cleanup:true ~inplace fin
 
-let query_call call = try Some (call [Unix.WNOHANG]) with Exit -> None
+let query_call pc =
+  let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
+  if pid = 0 then None else Some (pc.call ret)
 
-let wait_on_call call = call []
+let wait_on_call pc =
+  let _, ret = Unix.waitpid [] pc.pid in pc.call ret
 
+let post_wait_call pc ret = pc.call ret
+
+let prover_call_pid pc = pc.pid

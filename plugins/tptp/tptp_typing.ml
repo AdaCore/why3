@@ -1,28 +1,19 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Tptp_ast
 
 open Why3
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -69,7 +60,7 @@ type symbol =
 (* dead code
 type env = symbol Mstr.t
 
-type implicit = (string,symbol) Hashtbl.t
+type implicit = symbol Hstr.t
 *)
 
 (** Defined symbols : arithmetic etc... *)
@@ -116,7 +107,7 @@ let make_denv lib =
 
 let add_theory env impl th =
   let s = "$th$" ^ th.th_name.id_string in
-  if not (Mstr.mem s env) then Hashtbl.replace impl s (Suse th)
+  if not (Mstr.mem s env) then Hstr.replace impl s (Suse th)
 
 let defined_ty ~loc denv env impl dw tyl =
   let ts = match dw with
@@ -217,9 +208,9 @@ let defined_expr ~loc is_fmla denv env impl dw tl = match dw, tl with
 
 let find_tv ~loc env impl s =
   let tv = try Mstr.find s env with Not_found ->
-    try Hashtbl.find impl s with Not_found ->
+    try Hstr.find impl s with Not_found ->
       let tv = STVar (create_tvsymbol (id_user s loc)) in
-      Hashtbl.add impl s tv;
+      Hstr.add impl s tv;
       tv in
   match tv with
     | STVar tv -> ty_var tv
@@ -228,9 +219,9 @@ let find_tv ~loc env impl s =
 
 let find_vs ~loc denv env impl s =
   let vs = try Mstr.find s env with Not_found ->
-    try Hashtbl.find impl s with Not_found ->
+    try Hstr.find impl s with Not_found ->
       let vs = SVar (create_vsymbol (id_user s loc) denv.ty_univ) in
-      Hashtbl.add impl s vs;
+      Hstr.add impl s vs;
       vs in
   match vs with
     | SVar vs -> t_var vs
@@ -238,11 +229,11 @@ let find_vs ~loc denv env impl s =
 
 let find_ts ~loc env impl s args =
   let ts = try Mstr.find s env with Not_found ->
-    try Hashtbl.find impl s with Not_found ->
+    try Hstr.find impl s with Not_found ->
       let args = List.map (fun _ -> create_tvsymbol (id_fresh "a")) args in
       let ss = if s = "int" || s = "real" then "_" ^ s else s in
       let ts = SType (create_tysymbol (id_user ss loc) args None) in
-      Hashtbl.add impl s ts;
+      Hstr.add impl s ts;
       ts in
   match ts with
     | SType ts -> ts
@@ -250,36 +241,36 @@ let find_ts ~loc env impl s args =
 
 let find_fs ~loc denv env impl s args =
   try Mstr.find s env with Not_found ->
-    try Hashtbl.find impl s with Not_found ->
+    try Hstr.find impl s with Not_found ->
       let args = List.map (fun _ -> denv.ty_univ) args in
       let fs = create_fsymbol (id_user s loc) args denv.ty_univ in
       let fs = SFunc ([],[],Stv.empty,fs) in
-      Hashtbl.add impl s fs;
+      Hstr.add impl s fs;
       fs
 
 let find_ps ~loc denv env impl s args =
   try Mstr.find s env with Not_found ->
-    try Hashtbl.find impl s with Not_found ->
+    try Hstr.find impl s with Not_found ->
       let args = List.map (fun _ -> denv.ty_univ) args in
       let ps = create_psymbol (id_user s loc) args in
       let ps = SPred ([],[],Stv.empty,ps) in
-      Hashtbl.add impl s ps;
+      Hstr.add impl s ps;
       ps
 
 let find_dobj ~loc denv env impl s =
   let ds = "$do$" ^ s in
   let fs = try Mstr.find ds env with Not_found ->
-    try Hashtbl.find impl ds with Not_found ->
+    try Hstr.find impl ds with Not_found ->
       let id = id_user ("do_" ^ s) loc in
       let fs = Sdobj (create_fsymbol id [] denv.ty_univ) in
-      Hashtbl.add impl ds fs;
+      Hstr.add impl ds fs;
       fs in
   match fs with
     | Sdobj fs -> fs_app fs [] denv.ty_univ
     | _ -> assert false (* impossible *)
 
 let ty_check loc s ty1 t =
-  Loc.try3 loc ty_match s ty1 (of_option t.t_ty)
+  Loc.try3 loc ty_match s ty1 (Opt.get t.t_ty)
 
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
@@ -293,6 +284,9 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
       find_tv ~loc env impl v
   | Elet _ | Eite _ | Eqnt _ | Ebin _
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
+
+let t_int_const s = t_const (Number.ConstInt (Number.int_const_dec s))
+let t_real_const r = t_const (Number.ConstReal r)
 
 let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
@@ -309,10 +303,10 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       find_vs ~loc denv env impl v
   | Edob s ->
       find_dobj ~loc denv env impl s
-  | Enum (Nint s) ->
-      t_int_const s
+  | Enum (Nint s) -> t_int_const s
   | Enum (Nreal (i,f,e)) ->
-      t_real_const (RConstDecimal (i,Util.def_option "0" f,e))
+      t_const (Number.ConstReal
+        (Number.real_const_dec i (Opt.get_def "0" f) e))
   | Enum (Nrat (n,d)) ->
       let n = t_int_const n and d = t_int_const d in
       let frac = ns_find_ls denv.th_rat.th_export ["frac"] in
@@ -323,7 +317,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       begin match Mstr.find s env with
         | SletF ([],_,[],t) ->
             let id = id_user s def.e_loc in
-            let vs = create_vsymbol id (of_option t.t_ty) in
+            let vs = create_vsymbol id (Opt.get t.t_ty) in
             let env = Mstr.add s (SVar vs) env in
             let t1 = term denv env impl e in
             t_let_close vs t t1
@@ -354,7 +348,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       begin match Mstr.find s env with
         | SletF ([],_,[],t) ->
             let id = id_user s def.e_loc in
-            let vs = create_vsymbol id (of_option t.t_ty) in
+            let vs = create_vsymbol id (Opt.get t.t_ty) in
             let env = Mstr.add s (SVar vs) env in
             let f,b = fmla denv env impl pol tvl e in
             t_let_close vs t f, b
@@ -378,7 +372,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
                 let sk = Format.sprintf "_%s_%d_%d" s ln cn in
                 let ts = create_tysymbol (id_user sk loc) tvl None in
                 let tv = ty_app ts (List.map ty_var tvl) in
-                Hashtbl.add impl sk (SType ts);
+                Hstr.add impl sk (SType ts);
                 Mstr.add s (STSko tv) env, pol, tvl, vl, true
         else
           let ty = ty denv env impl e in
@@ -403,8 +397,8 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f1,b1 = fmla denv env impl pol tvl e1 in
       let f2,b2 = fmla denv env impl pol tvl e2 in
       if b1 || b2 then
-        let g1,_ = fmla denv env impl (option_map not pol) tvl e1 in
-        let g2,_ = fmla denv env impl (option_map not pol) tvl e2 in
+        let g1,_ = fmla denv env impl (Opt.map not pol) tvl e1 in
+        let g2,_ = fmla denv env impl (Opt.map not pol) tvl e2 in
         t_and (t_implies g1 f2) (t_implies g2 f1), true
       else
         t_iff f1 f2, false
@@ -412,18 +406,18 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f1,b1 = fmla denv env impl pol tvl e1 in
       let f2,b2 = fmla denv env impl pol tvl e2 in
       if b1 || b2 then
-        let g1,_ = fmla denv env impl (option_map not pol) tvl e1 in
-        let g2,_ = fmla denv env impl (option_map not pol) tvl e2 in
+        let g1,_ = fmla denv env impl (Opt.map not pol) tvl e1 in
+        let g2,_ = fmla denv env impl (Opt.map not pol) tvl e2 in
         t_not (t_and (t_implies f1 g2) (t_implies f2 g1)), true
       else
         t_not (t_iff f1 f2), false
   | Ebin (BOimp,e1,e2) ->
-      let f1,b1 = fmla denv env impl (option_map not pol) tvl e1 in
+      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
       let f2,b2 = fmla denv env impl pol tvl e2 in
       t_implies f1 f2, b1 || b2
   | Ebin (BOpmi,e1,e2) ->
       let f1,b1 = fmla denv env impl pol tvl e1 in
-      let f2,b2 = fmla denv env impl (option_map not pol) tvl e2 in
+      let f2,b2 = fmla denv env impl (Opt.map not pol) tvl e2 in
       t_implies f2 f1, b1 || b2
   | Ebin (BOand,e1,e2) ->
       let f1,b1 = fmla denv env impl pol tvl e1 in
@@ -434,15 +428,15 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
       let f2,b2 = fmla denv env impl pol tvl e2 in
       t_or f1 f2, b1 || b2
   | Ebin (BOnand,e1,e2) ->
-      let f1,b1 = fmla denv env impl (option_map not pol) tvl e1 in
-      let f2,b2 = fmla denv env impl (option_map not pol) tvl e2 in
+      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
+      let f2,b2 = fmla denv env impl (Opt.map not pol) tvl e2 in
       t_not (t_and f1 f2), b1 || b2
   | Ebin (BOnor,e1,e2) ->
-      let f1,b1 = fmla denv env impl (option_map not pol) tvl e1 in
-      let f2,b2 = fmla denv env impl (option_map not pol) tvl e2 in
+      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
+      let f2,b2 = fmla denv env impl (Opt.map not pol) tvl e2 in
       t_not (t_or f1 f2), b1 || b2
   | Enot e1 ->
-      let f1,b1 = fmla denv env impl (option_map not pol) tvl e1 in
+      let f1,b1 = fmla denv env impl (Opt.map not pol) tvl e1 in
       t_not f1, b1
   | Eequ (e1,e2) ->
       let t1 = term denv env impl e1 in
@@ -508,7 +502,7 @@ and ls_args denv env impl loc fs tvl gl mvs al =
           fs_app denv.fs_ghost [] (ty_app denv.ts_ghost [Mtv.find v tvm]) in
         let tl = List.map ghost gl @ List.map (term denv env impl) al in
         let tvm = List.fold_left2 (ty_check loc) tvm fs.ls_args tl in
-        let ty = option_map (ty_inst tvm) fs.ls_value in
+        let ty = Opt.map (ty_inst tvm) fs.ls_value in
         t_app fs tl ty
     | _ -> error ~loc BadArity
   in
@@ -544,7 +538,7 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
     in
     let ss = if s = "int" || s = "real" then "_" ^ s else s in
     let ts = create_tysymbol (id_user ss loc) (List.map ntv el) None in
-    Hashtbl.add impl s (SType ts)
+    Hstr.add impl s (SType ts)
   else
     (* function/predicate symbol *)
     let ntv (s, { e_node = n ; e_loc = loc }) = match n with
@@ -567,7 +561,7 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
       let tyl = List.map ghost gvl @ tyl in
       let ls = create_psymbol (id_user s loc) tyl in
       if gvl <> [] then add_theory env impl denv.th_ghost;
-      Hashtbl.add impl s (SPred (tvl,gvl,mvs,ls))
+      Hstr.add impl s (SPred (tvl,gvl,mvs,ls))
     else
       let tyv = ty denv env impl e in
       let tvs = ty_freevars tvs tyv in
@@ -575,7 +569,7 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
       let tyl = List.map ghost gvl @ tyl in
       let ls = create_fsymbol (id_user s loc) tyl tyv in
       if gvl <> [] then add_theory env impl denv.th_ghost;
-      Hashtbl.add impl s (SFunc (tvl,gvl,mvs,ls))
+      Hstr.add impl s (SFunc (tvl,gvl,mvs,ls))
 
 let flush_impl ~strict env uc impl =
   let update_th _ e uc = match e with
@@ -612,16 +606,16 @@ let flush_impl ~strict env uc impl =
     (* none of these is possible in implicit *)
     | SletF _ | SletP _ | STSko _ -> assert false
   in
-  let uc = Hashtbl.fold update_th impl uc in
-  let res = Hashtbl.fold update impl (env,uc) in
-  Hashtbl.clear impl;
+  let uc = Hstr.fold update_th impl uc in
+  let res = Hstr.fold update impl (env,uc) in
+  Hstr.clear impl;
   res
 
 let typecheck lib path ast =
   (* initial environment *)
   let env  = Mstr.empty in
   let denv = make_denv lib in
-  let impl = Hashtbl.create 17 in
+  let impl = Hstr.create 17 in
   add_theory env impl denv.th_univ;
   (* parsing function *)
   let conj = ref false in

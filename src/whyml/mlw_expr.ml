@@ -1,25 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -59,12 +49,12 @@ let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
   let eff_read e r = eff_read e ~ghost:value.vtv_ghost r in
-  let effect = Util.option_fold eff_read eff_empty value.vtv_mut in
-  let arg_reset acc a = Util.option_fold eff_reset acc a.vtv_mut in
+  let effect = Opt.fold eff_read eff_empty value.vtv_mut in
+  let arg_reset acc a = Opt.fold eff_reset acc a.vtv_mut in
   let effect = List.fold_left arg_reset effect args in
   create_plsymbol_unsafe ls args value effect ~hidden ~rdonly
 
-let ity_of_ty_opt ty = ity_of_ty (Util.def_option ty_bool ty)
+let ity_of_ty_opt ty = ity_of_ty (Opt.get_def ty_bool ty)
 
 let fake_pls = Wls.memoize 17 (fun ls ->
   { pl_ls     = ls;
@@ -149,85 +139,6 @@ type ppattern = {
   ppat_effect  : effect;
 }
 
-let ppat_is_wild pp = match pp.ppat_pattern.pat_node with
-  | Pwild -> true
-  | _ -> false
-
-let ppat_wild vtv =
-  if vtv.vtv_mut <> None then Loc.errorm "Wildcard patterns are immutable";
-  { ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
-    ppat_vtv     = vtv;
-    ppat_effect  = eff_empty; }
-
-let ppat_var pv =
-  { ppat_pattern = pat_var pv.pv_vs;
-    ppat_vtv     = pv.pv_vtv;
-    ppat_effect  = eff_empty; }
-
-let ppat_plapp pls ppl vtv =
-  if vtv.vtv_mut <> None then
-    Loc.errorm "Only variable patterns can be mutable";
-  if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
-  let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
-  let mtch eff arg pp =
-    ignore (ity_match sbs arg.vtv_ity pp.ppat_vtv.vtv_ity);
-    let ghost = pp.ppat_vtv.vtv_ghost in
-    if ghost <> (vtv.vtv_ghost || arg.vtv_ghost) then
-      Loc.errorm "Ghost pattern in a non-ghost context";
-    let effect = eff_union eff pp.ppat_effect in
-    let arg_mut = if pls.pl_rdonly then None else arg.vtv_mut in
-    match arg_mut, pp.ppat_vtv.vtv_mut with
-    | _ when ppat_is_wild pp ->
-        effect
-    | Some r1, Some r2 ->
-        ignore (reg_match sbs r1 r2);
-        eff_read ~ghost effect (reg_full_inst sbs r1)
-    | Some r1, None ->
-        eff_read ~ghost effect (reg_full_inst sbs r1)
-    | None, None ->
-        effect
-    | None, Some _ ->
-        Loc.errorm "Mutable pattern in a non-mutable position"
-  in
-  let eff = try List.fold_left2 mtch eff_empty pls.pl_args ppl with
-    | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
-    | Invalid_argument _ -> raise (Term.BadArity
-        (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
-  let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
-  { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
-    ppat_vtv     = vtv;
-    ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
-
-let ppat_lapp ls ppl vtv = ppat_plapp (fake_pls ls) ppl vtv
-
-let ppat_or p1 p2 =
-  ity_equal_check p1.ppat_vtv.vtv_ity p2.ppat_vtv.vtv_ity;
-  if p1.ppat_vtv.vtv_ghost <> p2.ppat_vtv.vtv_ghost then
-    Loc.errorm "Ghost pattern in a non-ghost context";
-  if p1.ppat_vtv.vtv_mut <> None || p2.ppat_vtv.vtv_mut <> None then
-    Loc.errorm "Mutable patterns are not allowed under OR";
-  { ppat_pattern = pat_or p1.ppat_pattern p2.ppat_pattern;
-    ppat_vtv     = p1.ppat_vtv;
-    ppat_effect  = eff_union p1.ppat_effect p2.ppat_effect; }
-
-let ppat_as pp pv =
-  ity_equal_check pp.ppat_vtv.vtv_ity pv.pv_vtv.vtv_ity;
-  if pp.ppat_vtv.vtv_ghost <> pv.pv_vtv.vtv_ghost then
-    Loc.errorm "Ghost pattern in a non-ghost context";
-  let vtv = match pp.ppat_vtv.vtv_mut, pv.pv_vtv.vtv_mut with
-    | Some r1, Some r2 ->
-        if not (reg_equal r1 r2) then raise (RegionMismatch (r1,r2));
-        pp.ppat_vtv (* the two vtv's are identical *)
-    | Some _, None -> pp.ppat_vtv
-    | None, Some _ -> pv.pv_vtv
-    | None, None -> pv.pv_vtv
-  in
-  { ppat_pattern = pat_as pp.ppat_pattern pv.pv_vs;
-    ppat_vtv     = vtv;
-    ppat_effect  = pp.ppat_effect; }
-
-(* reconstruct a pattern from an untyped skeleton *)
-
 type pre_ppattern =
   | PPwild
   | PPvar  of preid
@@ -264,11 +175,11 @@ let make_ppattern pp vtv =
           let ity = ity_full_inst sbs arg.vtv_ity in
           let ghost = vtv.vtv_ghost || arg.vtv_ghost in
           let arg_mut = if pls.pl_rdonly then None else arg.vtv_mut in
-          let mut = Util.option_map (reg_full_inst sbs) arg_mut in
+          let mut = Opt.map (reg_full_inst sbs) arg_mut in
           let pp = make (vty_value ~ghost ?mut ity) pp in
-          if ppat_is_wild pp then pp.ppat_effect, pp else
-          Util.option_fold (eff_read ~ghost) pp.ppat_effect mut, pp
-        in
+          match pp.ppat_pattern.pat_node with
+          | Pwild -> pp.ppat_effect, pp
+          | _ -> Opt.fold (eff_read ~ghost) pp.ppat_effect mut, pp in
         let ppl = try List.map2 mtch pls.pl_args ppl with
           | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
@@ -322,7 +233,7 @@ type psymbol = {
   ps_subst : ity_subst;
 }
 
-module Psym = WeakStructMake (struct
+module Psym = MakeMSHW (struct
   type t = psymbol
   let tag ps = ps.ps_name.id_tag
 end)
@@ -389,7 +300,7 @@ let rec vta_varmap vta =
 let eff_check vars result e =
   let check vars r = if not (reg_occurs r vars) then
     Loc.errorm "every external effect must be mentioned in specification" in
-  let reset vars r u = check vars r; Util.option_iter (check vars) u in
+  let reset vars r u = check vars r; Opt.iter (check vars) u in
   let check = check vars in
   Sreg.iter check e.eff_reads;
   Sreg.iter check e.eff_writes;
@@ -664,7 +575,7 @@ let e_plapp pls el ity =
             (* if our sole argument is a private type, then we are immutable *)
             | [{vtv_ity = {ity_node = Ityapp ({its_priv = true},_,_)}}] -> None
             | _ -> vtv.vtv_mut in
-          let mut = Util.option_map (reg_full_inst sbs) mut in
+          let mut = Opt.map (reg_full_inst sbs) mut in
           let vty = VTvalue (vty_value ~ghost ?mut ity) in
           let eff = eff_union eff (eff_full_inst sbs pls.pl_effect) in
           let t = match pls.pl_ls.ls_value with
@@ -703,7 +614,9 @@ let e_plapp pls el ity =
 
 let e_lapp ls el ity = e_plapp (fake_pls ls) el ity
 
-let e_void = e_lapp (fs_tuple 0) [] ity_unit
+let fs_void = fs_tuple 0
+let t_void = fs_app fs_void [] ty_unit
+let e_void = e_lapp fs_void [] ity_unit
 
 (* if and match *)
 
@@ -799,8 +712,6 @@ let e_const t =
   let vtv = vty_value (ity_of_ty_opt t.t_ty) in
   mk_expr (Elogic t) (VTvalue vtv) eff_empty Mid.empty
 
-let e_int_const s = e_const (t_int_const s)
-let e_real_const rc = e_const (t_real_const rc)
 let e_const c = e_const (t_const c)
 
 (* boolean expressions *)
@@ -1001,12 +912,12 @@ let eff_equal eff1 eff2 =
   Sreg.equal eff1.eff_ghostr eff2.eff_ghostr &&
   Sreg.equal eff1.eff_ghostw eff2.eff_ghostw &&
   Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
-  Mreg.equal (Util.option_eq reg_equal) eff1.eff_resets eff2.eff_resets
+  Mreg.equal (Opt.equal reg_equal) eff1.eff_resets eff2.eff_resets
 
 let vtv_equal vtv1 vtv2 =
   vtv1.vtv_ghost = vtv2.vtv_ghost &&
   ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
-  option_eq reg_equal vtv1.vtv_mut vtv2.vtv_mut
+  Opt.equal reg_equal vtv1.vtv_mut vtv2.vtv_mut
 
 let rec vta_compat a1 a2 =
   assert (List.for_all2 pv_equal a1.vta_args a2.vta_args);
@@ -1071,7 +982,7 @@ and create_rec_defn defl =
     let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
     if ps_compat ps fd.fun_ps then m, { fd with fun_ps = ps }
     else Mid.add ps.ps_name fd.fun_ps m, fd in
-  let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  let m, fdl = Lists.map_fold_left conv Mid.empty defl in
   if Mid.is_empty m then fdl else subst_fd m fdl
 
 and subst_fd psm fdl =
@@ -1095,7 +1006,7 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
     let res = try List.for_all2 (fun (_,r1) (_,r2) ->
-        Util.option_eq ls_equal r1 r2) vl variant1
+        Opt.equal ls_equal r1 r2) vl variant1
       with Invalid_argument _ -> false in
     if not res then Loc.errorm
       "All functions in a recursive definition \
@@ -1114,7 +1025,7 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
         let lam = { lam with l_spec = spec } in
         let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
         Mid.add ps.ps_name fd.fun_ps m, fd in
-  let m, fdl = Util.map_fold_left conv Mid.empty defl in
+  let m, fdl = Lists.map_fold_left conv Mid.empty defl in
   incr letrec;
   subst_fd m fdl
 
@@ -1141,8 +1052,6 @@ let e_fold fn acc e = match e.e_node with
   | Eabstr (e,_) -> fn acc e
   | Elogic _ | Evalue _ | Earrow _
   | Eany _ | Eassert _ | Eabsurd -> acc
-
-let t_void = fs_app (fs_tuple 0) [] ty_unit
 
 let spec_purify sp =
   let vs, f = Mlw_ty.open_post sp.c_post in

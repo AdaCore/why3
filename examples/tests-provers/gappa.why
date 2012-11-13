@@ -95,3 +95,12 @@ theory GappaEq2
      value ("lab2" q) - value q1 * value q2 <= 0x1.p-52
 
 end
+
+theory GappaNumbers
+
+  use import int.Int
+
+  goal G1 : 0x1f - 0o37 = 0
+  goal G2 : 0b1001 - 9 = 0
+
+end

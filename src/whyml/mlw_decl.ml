@@ -1,25 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
-open Util
 open Ident
 open Ty
 open Term
@@ -114,7 +103,7 @@ let syms_expr s _e = s (* TODO *)
 (** {2 Declaration constructors} *)
 
 let create_ty_decl its =
-(*   let syms = Util.option_fold syms_ity Sid.empty its.its_def in *)
+(*   let syms = Opt.fold syms_ity Sid.empty its.its_def in *)
   let news = Sid.singleton its.its_pure.ts_name in
   mk_decl (PDtype its) Sid.empty news
 
@@ -237,7 +226,7 @@ let create_rec_decl fdl =
     let syms = syms_post syms l.l_post in
     let syms = syms_xpost syms l.l_xpost in
     let addv s { v_term = t; v_rel = ls } =
-      Util.option_fold syms_ls (syms_term s t) ls in
+      Opt.fold syms_ls (syms_term s t) ls in
     let syms = List.fold_left addv syms l.l_variant in
     syms_expr syms l.l_expr in
   let syms = List.fold_left add_fd Sid.empty fdl in
@@ -274,7 +263,7 @@ let clone_data_decl sm pd = match pd.pd_node with
         news := news_id !news pl.pl_ls.ls_name;
         pl in
       let add_cs (cs,pjl) =
-        add_pl cs, List.map (Util.option_map add_pl) pjl in
+        add_pl cs, List.map (Opt.map add_pl) pjl in
       let add_td (its,csl,inv) =
         let conv_ts ts = Mts.find_def ts ts sm.sm_pure.Theory.sm_ts in
         let conv_ls ls = Mls.find_def ls ls sm.sm_pure.Theory.sm_ls in
@@ -301,7 +290,7 @@ let merge_known kn1 kn2 =
   Mid.union check_known kn1 kn2
 
 let known_add_decl lkn0 kn0 d =
-  let kn = Mid.map (const d) d.pd_news in
+  let kn = Mid.map (Util.const d) d.pd_news in
   let check id decl0 _ =
     if pd_equal decl0 d
     then raise (KnownIdent id)
@@ -369,7 +358,7 @@ let inst_constructors lkn kn ity = match ity.ity_node with
       let sbs = ity_match ity_subst_empty base ity in
       let subst vtv =
         let ghost = vtv.vtv_ghost in
-        let mut = Util.option_map (reg_full_inst sbs) vtv.vtv_mut in
+        let mut = Opt.map (reg_full_inst sbs) vtv.vtv_mut in
         vty_value ~ghost ?mut (ity_full_inst sbs vtv.vtv_ity) in
       List.map (fun (cs,_) -> cs.pl_ls, List.map subst cs.pl_args) csl
   | Ityvar _ ->

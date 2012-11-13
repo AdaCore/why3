@@ -1,11 +1,9 @@
 module M
 
-let f (x:'a) = {} x { result=x }
+let f (x:'a) ensures { result=x } = x
 
-let p () =
-  {}
-  if f True then f 1 else f 2
-  { result = 1 }
+let p () ensures { result = 1 }
+  = if f True then f 1 else f 2
 
 end
 

@@ -1,25 +1,16 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
-open Util
+open Stdlib
 open Ident
 open Term
 open Decl
@@ -178,7 +169,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
     let th =
       try Env.read_theory ~format:"why" env f id
-      with e -> raise (Loc.Located (loc,e))
+      with e when not (Debug.test_flag Debug.stack_trace) ->
+        raise (Loc.Located (loc,e))
     in
     qualid := q;
     List.iter (add_local th) trl
@@ -272,12 +264,12 @@ let update_task drv task =
   add_tdecl task goal
 
 let update_task =
-  let h = Hashtbl.create 5 in
+  let h = Hint.create 5 in
   fun drv ->
-    let update = try Hashtbl.find h drv.drv_tag with
+    let update = try Hint.find h drv.drv_tag with
       | Not_found ->
           let upd = Trans.store (update_task drv) in
-          Hashtbl.add h drv.drv_tag upd;
+          Hint.add h drv.drv_tag upd;
           upd
     in
     Trans.apply update
@@ -312,9 +304,9 @@ let prove_task_prepared
   ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  let old_channel = option_map open_in old in
+  let old_channel = Opt.map open_in old in
   print_task_prepared ?old:old_channel drv fmt task; pp_print_flush fmt ();
-  option_iter close_in old_channel;
+  Opt.iter close_in old_channel;
   let filename = match old, inplace with
     | Some fn, Some true -> fn
     | _ ->

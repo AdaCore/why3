@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/sf/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,21 +23,21 @@
   expanded="false">
   <theory
    name="HoareLogic"
-   locfile="programs/sf/../sf.mlw"
+   locfile="../sf.mlw"
    loclnum="9" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter slow_subtraction"
-    locfile="programs/sf/../sf.mlw"
+    locfile="../sf.mlw"
     loclnum="16" loccnumb="6" loccnume="22"
-    expl="parameter slow_subtraction"
+    expl="VC for slow_subtraction"
     sum="522d8fea16db59bdc1e1c6827af42ad9"
     proved="true"
     expanded="true"
     shape="iainfix =V3c0Nainfix &lt;V5V3Aainfix &lt;=c0V3Aainfix =ainfix -V4V5ainfix -V0V1Aainfix &lt;=c0V5Iainfix =V5ainfix -V3c1FIainfix =V4ainfix -V2c1Fainfix =V2ainfix -V0V1Iainfix =ainfix -V2V3ainfix -V0V1Aainfix &lt;=c0V3FAainfix =ainfix -V0V1ainfix -V0V1Aainfix &lt;=c0V1Iainfix &gt;=V1c0F">
     <label
-     name="expl:parameter slow_subtraction"/>
+     name="expl:VC for slow_subtraction"/>
     <proof
      prover="0"
      timelimit="10"
@@ -50,15 +49,15 @@
    </goal>
    <goal
     name="WP_parameter reduce_to_zero"
-    locfile="programs/sf/../sf.mlw"
+    locfile="../sf.mlw"
     loclnum="28" loccnumb="6" loccnume="20"
-    expl="parameter reduce_to_zero"
+    expl="VC for reduce_to_zero"
     sum="6f368d90ec1d6a758617f428bf3bfb3f"
     proved="true"
     expanded="true"
     shape="iainfix =V1c0Nainfix &lt;V2V1Aainfix &lt;=c0V1Aainfix &gt;=V2c0Iainfix =V2ainfix -V1c1Fainfix =V1c0Iainfix &gt;=V1c0FAainfix &gt;=V0c0Iainfix &gt;=V0c0F">
     <label
-     name="expl:parameter reduce_to_zero"/>
+     name="expl:VC for reduce_to_zero"/>
     <proof
      prover="0"
      timelimit="10"
@@ -70,15 +69,15 @@
    </goal>
    <goal
     name="WP_parameter slow_addition"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="35" loccnumb="6" loccnume="19"
-    expl="parameter slow_addition"
+    locfile="../sf.mlw"
+    loclnum="34" loccnumb="6" loccnume="19"
+    expl="VC for slow_addition"
     sum="1205ea7611caab78dfb0d6922eb92303"
     proved="true"
     expanded="true"
     shape="iainfix =V3c0Nainfix &lt;V5V3Aainfix &lt;=c0V3Aainfix =ainfix +V4V5ainfix +V0V1Aainfix &lt;=c0V5Iainfix =V5ainfix -V3c1FIainfix =V4ainfix +V2c1Fainfix =V2ainfix +V0V1Iainfix =ainfix +V2V3ainfix +V0V1Aainfix &lt;=c0V3FAainfix =ainfix +V0V1ainfix +V0V1Aainfix &lt;=c0V1Iainfix &gt;=V1c0F">
     <label
-     name="expl:parameter slow_addition"/>
+     name="expl:VC for slow_addition"/>
     <proof
      prover="0"
      timelimit="10"
@@ -90,8 +89,8 @@
    </goal>
    <goal
     name="even_not_odd"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="51" loccnumb="8" loccnume="20"
+    locfile="../sf.mlw"
+    loclnum="49" loccnumb="8" loccnume="20"
     sum="4e6c14b147fdb4e01ed196b1edcdc185"
     proved="true"
     expanded="true"
@@ -108,15 +107,15 @@
    </goal>
    <goal
     name="WP_parameter parity"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="53" loccnumb="6" loccnume="12"
-    expl="parameter parity"
+    locfile="../sf.mlw"
+    loclnum="51" loccnumb="6" loccnume="12"
+    expl="VC for parity"
     sum="acbb72b6d3ec37edddb9346773255ba2"
     proved="true"
     expanded="true"
     shape="iainfix =V3c0Nainfix &lt;V5V3Aainfix &lt;=c0V3Aaevenainfix +ainfix -V0V5c1Aainfix =V4c1Oaevenainfix -V0V5Aainfix =V4c0Aainfix &lt;=c0V5Iainfix =V5ainfix -V3c1FIainfix =V4ainfix -c1V2FaevenV0qainfix =V2c0Iaevenainfix +ainfix -V0V3c1Aainfix =V2c1Oaevenainfix -V0V3Aainfix =V2c0Aainfix &lt;=c0V3FAaevenainfix +ainfix -V0V0c1Aainfix =V1c1Oaevenainfix -V0V0Aainfix =V1c0Aainfix &lt;=c0V0Iainfix =V1c0FIainfix &gt;=V0c0F">
     <label
-     name="expl:parameter parity"/>
+     name="expl:VC for parity"/>
     <proof
      prover="0"
      timelimit="10"
@@ -128,15 +127,15 @@
    </goal>
    <goal
     name="WP_parameter sqrt"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="68" loccnumb="6" loccnume="10"
-    expl="parameter sqrt"
+    locfile="../sf.mlw"
+    loclnum="65" loccnumb="6" loccnume="10"
+    expl="VC for sqrt"
     sum="4d1d6d0f7e7f06b557d80b916858d9fd"
     proved="true"
     expanded="true"
     shape="iainfix &lt;=ainfix *ainfix +V2c1ainfix +V2c1V0ainfix &lt;ainfix -V0ainfix *V3V3ainfix -V0ainfix *V2V2Aainfix &lt;=c0ainfix -V0ainfix *V2V2Aainfix &lt;=ainfix *V3V3V0Aainfix &lt;=c0V3Iainfix =V3ainfix +V2c1Fainfix &lt;V0ainfix *ainfix +V2c1ainfix +V2c1Aainfix &lt;=ainfix *V2V2V0Iainfix &lt;=ainfix *V2V2V0Aainfix &lt;=c0V2FAainfix &lt;=ainfix *V1V1V0Aainfix &lt;=c0V1Iainfix =V1c0FIainfix &gt;=V0c0F">
     <label
-     name="expl:parameter sqrt"/>
+     name="expl:VC for sqrt"/>
     <proof
      prover="3"
      timelimit="10"
@@ -148,15 +147,15 @@
    </goal>
    <goal
     name="WP_parameter factorial"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="83" loccnumb="6" loccnume="15"
-    expl="parameter factorial"
+    locfile="../sf.mlw"
+    loclnum="80" loccnumb="6" loccnume="15"
+    expl="VC for factorial"
     sum="76f29b53c8dac1719095a3029188288f"
     proved="true"
     expanded="true"
     shape="iainfix =V3c0Nainfix &lt;V6V3Aainfix &lt;=c0V3Aainfix =ainfix *V5afactV6afactV0Aainfix &lt;=c0V6Iainfix =V6ainfix -V3c1FIainfix =V5ainfix *V4V3Fainfix =V4afactV0Iainfix =ainfix *V4afactV3afactV0Aainfix &lt;=c0V3FAainfix =ainfix *V1afactV2afactV0Aainfix &lt;=c0V2Iainfix =V2V0FIainfix =V1c1FIainfix &gt;=V0c0F">
     <label
-     name="expl:parameter factorial"/>
+     name="expl:VC for factorial"/>
     <proof
      prover="0"
      timelimit="10"
@@ -169,21 +168,21 @@
   </theory>
   <theory
    name="MoreHoareLogic"
-   locfile="programs/sf/../sf.mlw"
-   loclnum="96" loccnumb="7" loccnume="21"
+   locfile="../sf.mlw"
+   loclnum="92" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter list_sum"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="112" loccnumb="6" loccnume="14"
-    expl="parameter list_sum"
-    sum="f6986d59229b013f6a9c8ced4d7e92d8"
+    locfile="../sf.mlw"
+    loclnum="111" loccnumb="6" loccnume="14"
+    expl="VC for list_sum"
+    sum="0b503f96a5ca85d26942a9245f4e488b"
     proved="true"
     expanded="true"
-    shape="iainfix =V3aNilNainfix &lt;alengthV7alengthV3Aainfix &lt;=c0alengthV3Aainfix =ainfix +V5asumV7asumV0Aainfix &lt;=alengthV7alengthV0Iainfix =V7V6FICV3aNilfaConswVainfix =V6V8FAainfix =V3aNilNIainfix =V5ainfix +V2V4FICV3aNilfaConsVwainfix =V4V9FAainfix =V3aNilNainfix =V2asumV0Iainfix =ainfix +V2asumV3asumV0Aainfix &lt;=alengthV3alengthV0FAainfix =ainfix +V1asumV0asumV0Aainfix &lt;=alengthV0alengthV0Iainfix =V1c0FF">
+    shape="iainfix =V3aNilNCV3aNilfaConswVainfix =V8V7Aainfix =ainfix +V5asumV7asumV0Aainfix &lt;=alengthV7alengthV0Iainfix =V7V6FICV3aNilfaConswVainfix =V6V9FAainfix =V3aNilNIainfix =V5ainfix +V2V4FICV3aNilfaConsVwainfix =V4V10FAainfix =V3aNilNainfix =V2asumV0Iainfix =ainfix +V2asumV3asumV0Aainfix &lt;=alengthV3alengthV0FAainfix =ainfix +V1asumV0asumV0Aainfix &lt;=alengthV0alengthV0Iainfix =V1c0FF">
     <label
-     name="expl:parameter list_sum"/>
+     name="expl:VC for list_sum"/>
     <proof
      prover="0"
      timelimit="10"
@@ -195,30 +194,30 @@
    </goal>
    <goal
     name="WP_parameter list_member"
-    locfile="programs/sf/../sf.mlw"
-    loclnum="129" loccnumb="6" loccnume="17"
-    expl="parameter list_member"
-    sum="fc84ce5d86af91915f250aa47d26bf92"
+    locfile="../sf.mlw"
+    loclnum="127" loccnumb="6" loccnume="17"
+    expl="VC for list_member"
+    sum="44eb6092d7febeba43a274decaac7e0e"
     proved="true"
     expanded="true"
-    shape="iainfix =V4aNilNiainfix =V0V5ainfix &lt;alengthV8alengthV4Aainfix &lt;=c0alengthV4AamemV0V8IamemV0V1Aainfix =V6c0OamemV0V1Aainfix =V6c1AamemV0V1IamemV0V8Aainfix &lt;=alengthV8alengthV1Iainfix =V8V7FICV4aNilfaConswVainfix =V7V9FAainfix =V4aNilNIainfix =V6c1Fainfix &lt;alengthV11alengthV4Aainfix &lt;=c0alengthV4AamemV0V11IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V11Aainfix &lt;=alengthV11alengthV1Iainfix =V11V10FICV4aNilfaConswVainfix =V10V12FAainfix =V4aNilNICV4aNilfaConsVwainfix =V5V13FAainfix =V4aNilNamemV0V1qainfix =V3c1IamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FAamemV0V1IamemV0V1Aainfix =V2c0OamemV0V1Aainfix =V2c1AamemV0V1IamemV0V1Aainfix &lt;=alengthV1alengthV1Iainfix =V2c0FFF">
+    shape="iainfix =V4aNilNiainfix =V0V5CV4aNilfaConswVainfix =V9V8AamemV0V8IamemV0V1Aainfix =V6c0OamemV0V1Aainfix =V6c1AamemV0V1IamemV0V8Aainfix &lt;=alengthV8alengthV1Iainfix =V8V7FICV4aNilfaConswVainfix =V7V10FAainfix =V4aNilNIainfix =V6c1FCV4aNilfaConswVainfix =V13V12AamemV0V12IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V12Aainfix &lt;=alengthV12alengthV1Iainfix =V12V11FICV4aNilfaConswVainfix =V11V14FAainfix =V4aNilNICV4aNilfaConsVwainfix =V5V15FAainfix =V4aNilNamemV0V1qainfix =V3c1IamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FAamemV0V1IamemV0V1Aainfix =V2c0OamemV0V1Aainfix =V2c1AamemV0V1IamemV0V1Aainfix &lt;=alengthV1alengthV1Iainfix =V2c0FFF">
     <label
-     name="expl:parameter list_member"/>
+     name="expl:VC for list_member"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter list_member.1"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="loop invariant init"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="1. loop invariant init"
       sum="d6d730455c255dfacca7bc41a2702392"
       proved="true"
       expanded="true"
       shape="amemV0V1IamemV0V1Aainfix =V2c0OamemV0V1Aainfix =V2c1AamemV0V1IamemV0V1Aainfix &lt;=alengthV1alengthV1Iainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
        prover="0"
        timelimit="10"
@@ -230,15 +229,15 @@
      </goal>
      <goal
       name="WP_parameter list_member.2"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="precondition"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="2. precondition"
       sum="04881c12c158b2ab53ea063e7c05c3e2"
       proved="true"
       expanded="true"
       shape="ainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
        prover="0"
        timelimit="10"
@@ -250,15 +249,15 @@
      </goal>
      <goal
       name="WP_parameter list_member.3"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="precondition"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="3. precondition"
       sum="db42e11d886429628e708b29b96b819b"
       proved="true"
       expanded="true"
       shape="ainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V7FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
        prover="0"
        timelimit="10"
@@ -270,30 +269,30 @@
      </goal>
      <goal
       name="WP_parameter list_member.4"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="loop invariant preservation"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="4. loop invariant preservation"
       sum="c3eb3677613f7faaeda2bc8dc0270211"
       proved="true"
       expanded="true"
       shape="amemV0V8IamemV0V1Aainfix =V6c0OamemV0V1Aainfix =V6c1AamemV0V1IamemV0V8Aainfix &lt;=alengthV8alengthV1Iainfix =V8V7FICV4aNilfaConswVainfix =V7V9FIainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V10FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter list_member.4.1"
-        locfile="programs/sf/../sf.mlw"
-        loclnum="129" loccnumb="6" loccnume="17"
-        expl="parameter list_member"
+        locfile="../sf.mlw"
+        loclnum="127" loccnumb="6" loccnume="17"
+        expl="1."
         sum="46be6cf76545a3c3be4ca3fe32f48b0c"
         proved="true"
         expanded="true"
         shape="ainfix &lt;=alengthV8alengthV1Iainfix =V8V7FICV4aNilfaConswVainfix =V7V9FIainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V10FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
         <label
-         name="expl:parameter list_member"/>
+         name="expl:VC for list_member"/>
         <proof
          prover="1"
          timelimit="10"
@@ -305,15 +304,15 @@
        </goal>
        <goal
         name="WP_parameter list_member.4.2"
-        locfile="programs/sf/../sf.mlw"
-        loclnum="129" loccnumb="6" loccnume="17"
-        expl="parameter list_member"
+        locfile="../sf.mlw"
+        loclnum="127" loccnumb="6" loccnume="17"
+        expl="2."
         sum="1eb545da7d3679710008c21e55a17c76"
         proved="true"
         expanded="true"
         shape="amemV0V1IamemV0V8Iainfix =V8V7FICV4aNilfaConswVainfix =V7V9FIainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V10FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
         <label
-         name="expl:parameter list_member"/>
+         name="expl:VC for list_member"/>
         <proof
          prover="1"
          timelimit="10"
@@ -325,15 +324,15 @@
        </goal>
        <goal
         name="WP_parameter list_member.4.3"
-        locfile="programs/sf/../sf.mlw"
-        loclnum="129" loccnumb="6" loccnume="17"
-        expl="parameter list_member"
+        locfile="../sf.mlw"
+        loclnum="127" loccnumb="6" loccnume="17"
+        expl="3."
         sum="06a3edc250676b000b1446a8ddd6ec68"
         proved="true"
         expanded="true"
         shape="amemV0V8IamemV0V1Aainfix =V6c0OamemV0V1Aainfix =V6c1Iainfix =V8V7FICV4aNilfaConswVainfix =V7V9FIainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V10FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
         <label
-         name="expl:parameter list_member"/>
+         name="expl:VC for list_member"/>
         <proof
          prover="3"
          timelimit="10"
@@ -347,17 +346,17 @@
      </goal>
      <goal
       name="WP_parameter list_member.5"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="loop variant decreases"
-      sum="fab48b193b4ac362096a1ed9ca51c19a"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="5. loop variant decrease"
+      sum="838fdcb80f93bceb519a9bb4cd748410"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;alengthV8alengthV4Aainfix &lt;=c0alengthV4Iainfix =V8V7FICV4aNilfaConswVainfix =V7V9FIainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V10FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
+      shape="CV4aNilfaConswVainfix =V9V8Iainfix =V8V7FICV4aNilfaConswVainfix =V7V10FIainfix =V4aNilNIainfix =V6c1FIainfix =V0V5ICV4aNilfaConsVwainfix =V5V11FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
-       prover="0"
+       prover="1"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -367,15 +366,15 @@
      </goal>
      <goal
       name="WP_parameter list_member.6"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="precondition"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="6. precondition"
       sum="4461b8085ad1e9401d1980a3514207d6"
       proved="true"
       expanded="true"
       shape="ainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V6FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
        prover="0"
        timelimit="10"
@@ -387,30 +386,30 @@
      </goal>
      <goal
       name="WP_parameter list_member.7"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="loop invariant preservation"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="7. loop invariant preservation"
       sum="f061f3e47daeeae067d79127583cf87b"
       proved="true"
       expanded="true"
       shape="amemV0V7IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V7Aainfix &lt;=alengthV7alengthV1Iainfix =V7V6FICV4aNilfaConswVainfix =V6V8FIainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V9FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <transf
        name="split_goal"
        proved="true"
        expanded="true">
        <goal
         name="WP_parameter list_member.7.1"
-        locfile="programs/sf/../sf.mlw"
-        loclnum="129" loccnumb="6" loccnume="17"
-        expl="parameter list_member"
+        locfile="../sf.mlw"
+        loclnum="127" loccnumb="6" loccnume="17"
+        expl="1."
         sum="2ceb0e51b746c578f577fc41d05f347f"
         proved="true"
         expanded="true"
         shape="ainfix &lt;=alengthV7alengthV1Iainfix =V7V6FICV4aNilfaConswVainfix =V6V8FIainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V9FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
         <label
-         name="expl:parameter list_member"/>
+         name="expl:VC for list_member"/>
         <proof
          prover="1"
          timelimit="10"
@@ -422,15 +421,15 @@
        </goal>
        <goal
         name="WP_parameter list_member.7.2"
-        locfile="programs/sf/../sf.mlw"
-        loclnum="129" loccnumb="6" loccnume="17"
-        expl="parameter list_member"
+        locfile="../sf.mlw"
+        loclnum="127" loccnumb="6" loccnume="17"
+        expl="2."
         sum="f27695d20368a6339cbbd56f90b3d85f"
         proved="true"
         expanded="true"
         shape="amemV0V1IamemV0V7Iainfix =V7V6FICV4aNilfaConswVainfix =V6V8FIainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V9FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
         <label
-         name="expl:parameter list_member"/>
+         name="expl:VC for list_member"/>
         <proof
          prover="1"
          timelimit="10"
@@ -442,15 +441,15 @@
        </goal>
        <goal
         name="WP_parameter list_member.7.3"
-        locfile="programs/sf/../sf.mlw"
-        loclnum="129" loccnumb="6" loccnume="17"
-        expl="parameter list_member"
+        locfile="../sf.mlw"
+        loclnum="127" loccnumb="6" loccnume="17"
+        expl="3."
         sum="96a1965e3dd2688634e8650ab7b24af1"
         proved="true"
         expanded="true"
         shape="amemV0V7IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1Iainfix =V7V6FICV4aNilfaConswVainfix =V6V8FIainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V9FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
         <label
-         name="expl:parameter list_member"/>
+         name="expl:VC for list_member"/>
         <proof
          prover="0"
          timelimit="10"
@@ -464,17 +463,17 @@
      </goal>
      <goal
       name="WP_parameter list_member.8"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="loop variant decreases"
-      sum="55064eda0411250c4761bcd55f80cf8f"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="8. loop variant decrease"
+      sum="87807dc0b3397c108154fd4acd2cd80d"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;alengthV7alengthV4Aainfix &lt;=c0alengthV4Iainfix =V7V6FICV4aNilfaConswVainfix =V6V8FIainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V9FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
+      shape="CV4aNilfaConswVainfix =V8V7Iainfix =V7V6FICV4aNilfaConswVainfix =V6V9FIainfix =V4aNilNIainfix =V0V5NICV4aNilfaConsVwainfix =V5V10FIainfix =V4aNilNIainfix =V4aNilNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -484,15 +483,15 @@
      </goal>
      <goal
       name="WP_parameter list_member.9"
-      locfile="programs/sf/../sf.mlw"
-      loclnum="129" loccnumb="6" loccnume="17"
-      expl="normal postcondition"
+      locfile="../sf.mlw"
+      loclnum="127" loccnumb="6" loccnume="17"
+      expl="9. postcondition"
       sum="6ea899bbf6a113318fba7df0b88896db"
       proved="true"
       expanded="true"
       shape="amemV0V1qainfix =V3c1Iainfix =V4aNilNNIamemV0V4IamemV0V1Aainfix =V3c0OamemV0V1Aainfix =V3c1AamemV0V1IamemV0V4Aainfix &lt;=alengthV4alengthV1FIainfix =V2c0FFF">
       <label
-       name="expl:parameter list_member"/>
+       name="expl:VC for list_member"/>
       <proof
        prover="0"
        timelimit="10"

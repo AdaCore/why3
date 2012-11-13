@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ident
 open Ty
 open Term
@@ -32,6 +22,7 @@ open Task
 let meta_infinite = register_meta "infinite_type" [MTtysymbol]
   ~desc:"Specify@ that@ the@ given@ type@ has@ always@ an@ infinite@ \
          cardinality."
+
 let meta_material = register_meta "material_type_arg" [MTtysymbol;MTint]
   ~desc:"If@ the@ given@ type@ argument@ is@ instantiated@ by@ an@ infinite@ \
          type@ then@ the@ associated@ type@ constructor@ is@ infinite"
@@ -126,7 +117,7 @@ let rec rewriteT kn state t = match t.t_node with
         | _ -> Printer.unsupportedTerm t uncompiled
       in
       let w,m = List.fold_left mk_br (None,Mls.empty) bl in
-      let find (cs,_) = try Mls.find cs m with Not_found -> of_option w in
+      let find (cs,_) = try Mls.find cs m with Not_found -> Opt.get w in
       let ts = match t1.t_ty with
         | Some { ty_node = Tyapp (ts,_) } -> ts
         | _ -> Printer.unsupportedTerm t uncompiled
@@ -161,7 +152,7 @@ and rewriteF kn state av sign f = match f.t_node with
         let vl,e = try Mls.find cs m with Not_found ->
           let var = create_vsymbol (id_fresh "w") in
           let get_var pj = var (t_type (t_app_infer pj [t1])) in
-          List.map get_var (Mls.find cs state.pj_map), of_option w
+          List.map get_var (Mls.find cs state.pj_map), Opt.get w
         in
         let hd = t_app cs (List.map t_var vl) t1.t_ty in
         match t1.t_node with
@@ -179,7 +170,7 @@ and rewriteF kn state av sign f = match f.t_node with
         | _ -> Printer.unsupportedTerm f uncompiled
       in
       let op = if sign then t_and_simp else t_or_simp in
-      map_join_left find op (find_constructors kn ts)
+      Lists.map_join_left find op (find_constructors kn ts)
   | Tquant (q, bf) when (q = Tforall && sign) || (q = Texists && not sign) ->
       let vl, tr, f1, close = t_open_quant_cb bf in
       let tr = TermTF.tr_map (rewriteT kn state)
@@ -188,14 +179,14 @@ and rewriteF kn state av sign f = match f.t_node with
       let f1 = rewriteF kn state av sign f1 in
       t_quant_simp q (close vl tr f1)
   | Tbinop (o, _, _) when (o = Tand && sign) || (o = Tor && not sign) ->
-      TermTF.t_map_sign (const (rewriteT kn state))
+      TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f
   | Tlet (t1, _) ->
       let av = Mvs.set_diff av t1.t_vars in
-      TermTF.t_map_sign (const (rewriteT kn state))
+      TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f
   | _ ->
-      TermTF.t_map_sign (const (rewriteT kn state))
+      TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state Svs.empty) sign f
 
 let add_selector (state,task) ts ty csl =
@@ -214,7 +205,7 @@ let add_selector (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = fs_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
+    let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
     let hd = fs_app mt_ls (hd::mt_tl) mt_ty in
     let vl = List.rev_append mt_vl (List.rev vl) in
     let ax = t_forall_close vl [] (t_equ hd t) in
@@ -239,9 +230,8 @@ let add_indexer (state,task) ts ty csl =
     let id = mt_ls.ls_name.id_string ^ "_" ^ cs.ls_name.id_string in
     let pr = create_prsymbol (id_derive id cs.ls_name) in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
-    let hd = fs_app cs (List.rev_map t_var vl) (of_option cs.ls_value) in
-    let ix = t_const (ConstInt (IConstDecimal(string_of_int !index))) in
-    let ax = t_equ (fs_app mt_ls [hd] ty_int) ix in
+    let hd = fs_app cs (List.rev_map t_var vl) (Opt.get cs.ls_value) in
+    let ax = t_equ (fs_app mt_ls [hd] ty_int) (t_nat_const !index) in
     let ax = t_forall_close (List.rev vl) [[hd]] ax in
     add_prop_decl tsk Paxiom pr ax
   in
@@ -277,9 +267,9 @@ let add_indexer acc ts ty = function
 let meta_proj =
   (* projection symbol, constructor symbol, position, defining axiom *)
   register_meta "algtype projection" [MTlsymbol;MTlsymbol;MTint;MTprsymbol]
-    ~desc:"Specifies@ which@ projection@ symbol@ is@ used@ for@ the@ \
+    ~desc:"Specify@ which@ projection@ symbol@ is@ used@ for@ the@ \
            given@ constructor@ at@ the@ specified@ position.@ \
-           Internally@ used."
+           For@ internal@ use."
 
 let add_projections (state,task) _ts _ty csl =
   (* declare and define the projection functions *)
@@ -287,7 +277,7 @@ let add_projections (state,task) _ts _ty csl =
     let id = cs.ls_name.id_string ^ "_proj_" in
     let vl = List.rev_map (create_vsymbol (id_fresh "u")) cs.ls_args in
     let tl = List.rev_map t_var vl in
-    let hd = fs_app cs tl (of_option cs.ls_value) in
+    let hd = fs_app cs tl (Opt.get cs.ls_value) in
     let c = ref 0 in
     let add (pjl,tsk) t pj =
       let ls = incr c; match pj with
@@ -295,7 +285,7 @@ let add_projections (state,task) _ts _ty csl =
         | None ->
             let cn = string_of_int !c in
             let id = id_derive (id ^ cn) cs.ls_name in
-            create_lsymbol id [of_option cs.ls_value] t.t_ty
+            create_lsymbol id [Opt.get cs.ls_value] t.t_ty
       in
       let tsk = add_param_decl tsk ls in
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
@@ -324,7 +314,7 @@ let add_inversion (state,task) ts ty csl =
     let pjl = Mls.find cs state.pj_map in
     let app pj = t_app_infer pj [ax_hd] in
     t_equ ax_hd (fs_app cs (List.map app pjl) ty) in
-  let ax_f = map_join_left mk_cs t_or csl in
+  let ax_f = Lists.map_join_left mk_cs t_or csl in
   let ax_f = t_forall_close [ax_vs] [] ax_f in
   state, add_prop_decl task Paxiom ax_pr ax_f
 
@@ -426,7 +416,7 @@ let comp t (state,task) = match t.task_decl.td_node with
   | Decl d ->
       let rstate,rtask = ref state, ref task in
       let add _ d () =
-        let t = Util.of_option (add_decl None d) in
+        let t = Opt.get (add_decl None d) in
         let state,task = comp t (!rstate,!rtask) in
         rstate := state ; rtask := task ; None
       in
@@ -444,7 +434,11 @@ let eliminate_match =
   Trans.compose compile_match (Trans.fold_map comp empty_state init_task)
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
-  ~desc:"specify@ how@ the@ algebraic@ must@ be@ eliminated."
+  ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
+    \"keep_types\" : @[keep algebraic type definitions@]@\n\
+    \"keep_enums\" : @[keep monomorphic enumeration types@]@\n\
+    \"keep_recs\"  : @[keep non-recursive records@]@\n\
+    \"no_index\"   : @[do not generate indexing funcitons@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
@@ -485,7 +479,7 @@ let elim d = match d.d_node with
       in
       let add acc (_,csl) =
         let (cs,pjl) = List.hd csl in
-        let ty = of_option cs.ls_value in
+        let ty = Opt.get cs.ls_value in
         let vs = create_vsymbol (id_fresh "v") ty in
         let get l = function Some p -> p::l | _ -> l in
         let pjl = List.fold_left get [] pjl in
@@ -498,18 +492,11 @@ let eliminate_projections = Trans.decl elim None
 
 let () =
   Trans.register_transform "compile_match" compile_match
-    ~desc:"Transform@ pattern-matching@ with@ nested@ pattern@ \
-         into@ nested@ pattern-matching@ with@ simple@ patterns.";
+    ~desc:"Transform@ pattern-matching@ with@ nested@ patterns@ \
+      into@ nested@ pattern-matching@ with@ flat@ patterns.";
   Trans.register_transform "eliminate_match" eliminate_match
-    ~desc:"TODO";
+    ~desc:"Eliminate@ all@ pattern-matching@ expressions.";
   Trans.register_transform "eliminate_algebraic" eliminate_algebraic
-    ~desc_metas:[meta_elim,
-("@\n  \
-@[- keep_types : @[keep algebraic type definitions@]@\n\
-  - keep_enums : @[keep monomorphic enumeration types@]@\n\
-  - keep_recs  : @[keep non-recursive records@]@\n\
-  - no_index   : @[do not generate indexing funcitons@]\
-@]" : Pp.formatted)]
-    ~desc:"Replaces@ algebraic@ data@ types@ by@ first-order@ definitions.";
+    ~desc:"Replace@ algebraic@ data@ types@ by@ first-order@ definitions.";
   Trans.register_transform "eliminate_projections" eliminate_projections
-    ~desc:"TODO"
+    ~desc:"Define@ algebraic@ projection@ symbols@ separately."

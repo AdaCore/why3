@@ -1,11 +1,11 @@
 module M
 
 use import int.Int
-use import module ref.Ref
+use import ref.Ref
 
 val x : ref int
 
-val f : unit -> { } unit writes x { !x = 1 - old !x }
+val f () : unit writes {x} ensures { !x = 1 - old !x }
 
 let p () =
 'Init:

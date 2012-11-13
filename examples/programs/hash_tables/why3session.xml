@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/hash_tables/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -36,22 +35,71 @@
   expanded="true">
   <theory
    name="HashTable"
-   locfile="programs/hash_tables/../hash_tables.mlw"
+   locfile="../hash_tables.mlw"
    loclnum="10" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="HashTableImpl"
-   locfile="programs/hash_tables/../hash_tables.mlw"
-   loclnum="41" loccnumb="7" loccnume="20"
+   locfile="../hash_tables.mlw"
+   loclnum="37" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
    <goal
+    name="idx_bounds"
+    locfile="../hash_tables.mlw"
+    loclnum="59" loccnumb="8" loccnume="18"
+    sum="0b464a6d43e7b0fd5875254da47afd58"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;aidxV0V1alengthadataV0Aainfix &lt;=c0aidxV0V1Iainfix &lt;c0alengthadataV0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
     name="mem_occurs_first"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="68" loccnumb="8" loccnume="24"
-    sum="d8146572c78f790d0c0088a4d7f637ef"
+    locfile="../hash_tables.mlw"
+    loclnum="69" loccnumb="8" loccnume="24"
+    sum="f186a9096cf6ed96f50b1fb8040242c0"
     proved="true"
     expanded="false"
     shape="amemaTuple2V0V1V2Iaoccurs_firstV0V1V2F">
@@ -62,48 +110,24 @@
      edited="hash_tables_WP_HashTableImpl_mem_occurs_first_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.59"/>
+     <result status="valid" time="0.57"/>
     </proof>
    </goal>
    <goal
     name="cons_occurs_first"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="72" loccnumb="8" loccnume="25"
-    sum="7f8a64d05639506a5780e6681466488f"
+    locfile="../hash_tables.mlw"
+    loclnum="73" loccnumb="8" loccnume="25"
+    sum="459ccbeca7f21de31c3c557e5adbcba7"
     proved="true"
     expanded="false"
     shape="aoccurs_firstV0V1aConsaTuple2V3V4V2Iainfix =V3V0NFIaoccurs_firstV0V1V2F">
     <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="1"
@@ -111,24 +135,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="idx_bounds"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="86" loccnumb="8" loccnume="18"
-    sum="7605ef0602040698c57c46b8f49f77b0"
-    proved="true"
-    expanded="false"
-    shape="ainfix &lt;aidxV0V1alengthadataV0Aainfix &lt;=c0aidxV0V1FIavalidV0F">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="2"
@@ -136,15 +143,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="3"
@@ -152,18 +151,10 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -173,22 +164,22 @@
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="89" loccnumb="6" loccnume="12"
-    expl="parameter create"
-    sum="0a4f0524c960fdd906b717587ed278ce"
+    locfile="../hash_tables.mlw"
+    loclnum="86" loccnumb="6" loccnume="12"
+    expl="VC for create"
+    sum="bbe7d77626aedb8ae40840244856cca9"
     proved="true"
     expanded="false"
-    shape="ainfix =agetaconstaNoneV1aNoneFAavalidamk taconstaNoneamk arrayV0aconstaNilAainfix &gt;=V0c0Iainfix &lt;c0V0F">
+    shape="ainfix =agetaconstaNoneV1aNoneFAainfix =V4amodaabsahashV2V0IamemaTuple2V2V3agetaconstaNilV4Iainfix &lt;V4V0Aainfix &lt;=c0V4FFAaoccurs_firstV5V6agetaconstaNilamodaabsahashV5V0qainfix =agetaconstaNoneV5aSomeV6FAainfix &gt;V0c0Aainfix &gt;=V0c0Iainfix &lt;c0V0F">
     <label
-     name="expl:parameter create"/>
+     name="expl:VC for create"/>
     <proof
      prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.05"/>
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="6"
@@ -196,53 +187,53 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter clear"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="95" loccnumb="6" loccnume="11"
-    expl="parameter clear"
-    sum="2ac70f6607168ecdf70d2d39be07240e"
+    locfile="../hash_tables.mlw"
+    loclnum="91" loccnumb="6" loccnume="11"
+    expl="VC for clear"
+    sum="366e47517dda0050e8a5511b7eb2e1fc"
     proved="true"
-    expanded="true"
-    shape="ainfix =agetV4V5aNoneFAavalidamk tV4amk arrayV0V3Iainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix &lt;=c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +c0V0V7Oainfix &lt;V7c0Aainfix &lt;=c0V7FFAainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FF">
+    expanded="false"
+    shape="ainfix =agetV4V5aNoneFAainfix =V8amodaabsahashV6V0IamemaTuple2V6V7agetV3V8Iainfix &lt;V8V0Aainfix &lt;=c0V8FFAaoccurs_firstV9V10agetV3amodaabsahashV9V0qainfix =agetV4V9aSomeV10FAainfix &gt;V0c0Iainfix =V4aconstaNoneFIainfix =agetV3V11aNilIainfix &lt;V11ainfix +c0V0Aainfix &lt;=c0V11FAainfix =agetV3V12agetV1V12Iainfix &lt;V12V0Aainfix &lt;=ainfix +c0V0V12Oainfix &lt;V12c0Aainfix &lt;=c0V12FFAainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V15amodaabsahashV13V0IamemaTuple2V13V14agetV1V15Iainfix &lt;V15V0Aainfix &lt;=c0V15FFAaoccurs_firstV16V17agetV1amodaabsahashV16V0qainfix =agetV2V16aSomeV17FAainfix &gt;V0c0FF">
     <label
-     name="expl:parameter clear"/>
+     name="expl:VC for clear"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter clear.1"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="95" loccnumb="6" loccnume="11"
-      expl="precondition"
-      sum="a6679628722c33e02664c0a6fd49f279"
+      locfile="../hash_tables.mlw"
+      loclnum="91" loccnumb="6" loccnume="11"
+      expl="1. precondition"
+      sum="12ac3d8dfe33bd8b4f0923137cae216f"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FF">
+      shape="ainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V5amodaabsahashV3V0IamemaTuple2V3V4agetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5FFAaoccurs_firstV6V7agetV1amodaabsahashV6V0qainfix =agetV2V6aSomeV7FAainfix &gt;V0c0FF">
       <label
-       name="expl:parameter clear"/>
+       name="expl:VC for clear"/>
       <proof
-       prover="5"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -258,7 +249,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -266,400 +257,114 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="1"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter clear.2"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="95" loccnumb="6" loccnume="11"
-      expl="postcondition"
-      sum="06143c1e70cc116a601e2642c5724b79"
+      locfile="../hash_tables.mlw"
+      loclnum="91" loccnumb="6" loccnume="11"
+      expl="2. type invariant"
+      sum="e40e11aae56e07930f917d151225be01"
       proved="true"
-      expanded="true"
-      shape="ainfix =agetV4V5aNoneFAavalidamk tV4amk arrayV0V3Iainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix &lt;=c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +c0V0V7Oainfix &lt;V7c0Aainfix &lt;=c0V7FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iavalidamk tV2amk arrayV0V1FF">
+      expanded="false"
+      shape="ainfix &gt;V0c0Iainfix =V4aconstaNoneFIainfix =agetV3V5aNilIainfix &lt;V5ainfix +c0V0Aainfix &lt;=c0V5FAainfix =agetV3V6agetV1V6Iainfix &lt;V6V0Aainfix &lt;=ainfix +c0V0V6Oainfix &lt;V6c0Aainfix &lt;=c0V6FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V9amodaabsahashV7V0IamemaTuple2V7V8agetV1V9Iainfix &lt;V9V0Aainfix &lt;=c0V9FFAaoccurs_firstV10V11agetV1amodaabsahashV10V0qainfix =agetV2V10aSomeV11FAainfix &gt;V0c0FF">
       <label
-       name="expl:parameter clear"/>
-      <transf
-       name="inline_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter clear.2.1"
-        locfile="programs/hash_tables/../hash_tables.mlw"
-        loclnum="95" loccnumb="6" loccnume="11"
-        expl="postcondition"
-        sum="cfce2e3e63b6b4f47b55d7c743bad6be"
-        proved="true"
-        expanded="true"
-        shape="ainfix =agetV4V5aNoneFAainfix =V8aidxamk tV4amk arrayV0V3V6IamemaTuple2V6V7amixfix []adataamk tV4amk arrayV0V3V8Iainfix &lt;V8alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V8FFAaoccurs_firstV9V10amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V9qainfix =agetamk tV4amk arrayV0V3V9aSomeV10FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0Iainfix =V4aconstaNoneFIainfix =agetV3V11aNilIainfix &lt;V11ainfix +c0V0Aainfix =c0V11Oainfix &lt;c0V11FAainfix =agetV3V12agetV1V12Iainfix &lt;V12V0Aainfix =ainfix +c0V0V12Oainfix &lt;ainfix +c0V0V12Oainfix &lt;V12c0Aainfix =c0V12Oainfix &lt;c0V12FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V15aidxamk tV2amk arrayV0V1V13IamemaTuple2V13V14amixfix []adataamk tV2amk arrayV0V1V15Iainfix &lt;V15alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V15FFAaoccurs_firstV16V17amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V16qainfix =agetamk tV2amk arrayV0V1V16aSomeV17FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
-        <label
-         name="expl:parameter clear"/>
-        <transf
-         name="split_goal"
-         proved="true"
-         expanded="true">
-         <goal
-          name="WP_parameter clear.2.1.1"
-          locfile="programs/hash_tables/../hash_tables.mlw"
-          loclnum="95" loccnumb="6" loccnume="11"
-          expl="parameter clear"
-          sum="dfa4f7af23cd302ce6296a63cb053815"
-          proved="true"
-          expanded="false"
-          shape="ainfix &gt;alengthadataamk tV4amk arrayV0V3c0Iainfix =V4aconstaNoneFIainfix =agetV3V5aNilIainfix &lt;V5ainfix +c0V0Aainfix =c0V5Oainfix &lt;c0V5FAainfix =agetV3V6agetV1V6Iainfix &lt;V6V0Aainfix =ainfix +c0V0V6Oainfix &lt;ainfix +c0V0V6Oainfix &lt;V6c0Aainfix =c0V6Oainfix &lt;c0V6FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V9aidxamk tV2amk arrayV0V1V7IamemaTuple2V7V8amixfix []adataamk tV2amk arrayV0V1V9Iainfix &lt;V9alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V9FFAaoccurs_firstV10V11amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V10qainfix =agetamk tV2amk arrayV0V1V10aSomeV11FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
-          <label
-           name="expl:parameter clear"/>
-          <proof
-           prover="5"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-          <proof
-           prover="3"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-          <proof
-           prover="6"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter clear.2.1.2"
-          locfile="programs/hash_tables/../hash_tables.mlw"
-          loclnum="95" loccnumb="6" loccnume="11"
-          expl="parameter clear"
-          sum="b30822246a790164853e1a3e3fbd3d79"
-          proved="true"
-          expanded="false"
-          shape="aoccurs_firstV5V6amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V5Iainfix =agetamk tV4amk arrayV0V3V5aSomeV6FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix =ainfix +c0V0V8Oainfix &lt;ainfix +c0V0V8Oainfix &lt;V8c0Aainfix =c0V8Oainfix &lt;c0V8FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V11aidxamk tV2amk arrayV0V1V9IamemaTuple2V9V10amixfix []adataamk tV2amk arrayV0V1V11Iainfix &lt;V11alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V11FFAaoccurs_firstV12V13amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V12qainfix =agetamk tV2amk arrayV0V1V12aSomeV13FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
-          <label
-           name="expl:parameter clear"/>
-          <proof
-           prover="5"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-          <proof
-           prover="0"
-           timelimit="6"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="2.53"/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-          <proof
-           prover="3"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.05"/>
-          </proof>
-          <proof
-           prover="6"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="6"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="2.39"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter clear.2.1.3"
-          locfile="programs/hash_tables/../hash_tables.mlw"
-          loclnum="95" loccnumb="6" loccnume="11"
-          expl="parameter clear"
-          sum="3878d78d444203924d1b1ec9dcc5636f"
-          proved="true"
-          expanded="false"
-          shape="ainfix =agetamk tV4amk arrayV0V3V5aSomeV6Iaoccurs_firstV5V6amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V5FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix =c0V7Oainfix &lt;c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix =ainfix +c0V0V8Oainfix &lt;ainfix +c0V0V8Oainfix &lt;V8c0Aainfix =c0V8Oainfix &lt;c0V8FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V11aidxamk tV2amk arrayV0V1V9IamemaTuple2V9V10amixfix []adataamk tV2amk arrayV0V1V11Iainfix &lt;V11alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V11FFAaoccurs_firstV12V13amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V12qainfix =agetamk tV2amk arrayV0V1V12aSomeV13FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
-          <label
-           name="expl:parameter clear"/>
-          <proof
-           prover="5"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.09"/>
-          </proof>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.72"/>
-          </proof>
-          <proof
-           prover="3"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.10"/>
-          </proof>
-          <proof
-           prover="6"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.66"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter clear.2.1.4"
-          locfile="programs/hash_tables/../hash_tables.mlw"
-          loclnum="95" loccnumb="6" loccnume="11"
-          expl="parameter clear"
-          sum="20fbd1f326a904210fc1f540e43e2a00"
-          proved="true"
-          expanded="false"
-          shape="ainfix =V7aidxamk tV4amk arrayV0V3V5IamemaTuple2V5V6amixfix []adataamk tV4amk arrayV0V3V7Iainfix &lt;V7alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V7FFIainfix =V4aconstaNoneFIainfix =agetV3V8aNilIainfix &lt;V8ainfix +c0V0Aainfix =c0V8Oainfix &lt;c0V8FAainfix =agetV3V9agetV1V9Iainfix &lt;V9V0Aainfix =ainfix +c0V0V9Oainfix &lt;ainfix +c0V0V9Oainfix &lt;V9c0Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V12aidxamk tV2amk arrayV0V1V10IamemaTuple2V10V11amixfix []adataamk tV2amk arrayV0V1V12Iainfix &lt;V12alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V13qainfix =agetamk tV2amk arrayV0V1V13aSomeV14FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
-          <label
-           name="expl:parameter clear"/>
-          <proof
-           prover="5"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.08"/>
-          </proof>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.76"/>
-          </proof>
-          <proof
-           prover="3"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.09"/>
-          </proof>
-          <proof
-           prover="6"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.75"/>
-          </proof>
-         </goal>
-         <goal
-          name="WP_parameter clear.2.1.5"
-          locfile="programs/hash_tables/../hash_tables.mlw"
-          loclnum="95" loccnumb="6" loccnume="11"
-          expl="parameter clear"
-          sum="cf95fdb644bd677ca812ac8318587f23"
-          proved="true"
-          expanded="false"
-          shape="ainfix =agetV4V5aNoneFIainfix =V4aconstaNoneFIainfix =agetV3V6aNilIainfix &lt;V6ainfix +c0V0Aainfix =c0V6Oainfix &lt;c0V6FAainfix =agetV3V7agetV1V7Iainfix &lt;V7V0Aainfix =ainfix +c0V0V7Oainfix &lt;ainfix +c0V0V7Oainfix &lt;V7c0Aainfix =c0V7Oainfix &lt;c0V7FFIainfix =ainfix +c0V0V0Oainfix &lt;ainfix +c0V0V0Aainfix =c0c0Oainfix &lt;c0c0Iainfix =V10aidxamk tV2amk arrayV0V1V8IamemaTuple2V8V9amixfix []adataamk tV2amk arrayV0V1V10Iainfix &lt;V10alengthadataamk tV2amk arrayV0V1Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV2amk arrayV0V1aidxamk tV2amk arrayV0V1V11qainfix =agetamk tV2amk arrayV0V1V11aSomeV12FAainfix &gt;alengthadataamk tV2amk arrayV0V1c0FF">
-          <label
-           name="expl:parameter clear"/>
-          <proof
-           prover="5"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.03"/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-          <proof
-           prover="0"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.00"/>
-          </proof>
-          <proof
-           prover="3"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.02"/>
-          </proof>
-          <proof
-           prover="6"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.04"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="5"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.01"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
+       name="expl:VC for clear"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter clear.3"
+      locfile="../hash_tables.mlw"
+      loclnum="91" loccnumb="6" loccnume="11"
+      expl="3. type invariant"
+      sum="61e38583ddce8f493fa309baf4f08743"
+      proved="true"
+      expanded="false"
+      shape="aoccurs_firstV5V6agetV3amodaabsahashV5V0qainfix =agetV4V5aSomeV6FIainfix =V4aconstaNoneFIainfix =agetV3V7aNilIainfix &lt;V7ainfix +c0V0Aainfix &lt;=c0V7FAainfix =agetV3V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=ainfix +c0V0V8Oainfix &lt;V8c0Aainfix &lt;=c0V8FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V11amodaabsahashV9V0IamemaTuple2V9V10agetV1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FFAaoccurs_firstV12V13agetV1amodaabsahashV12V0qainfix =agetV2V12aSomeV13FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for clear"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.35"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter clear.4"
+      locfile="../hash_tables.mlw"
+      loclnum="91" loccnumb="6" loccnume="11"
+      expl="4. type invariant"
+      sum="cf272346d8e6a78569a1ef52d1114377"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V7amodaabsahashV5V0IamemaTuple2V5V6agetV3V7Iainfix &lt;V7V0Aainfix &lt;=c0V7FFIainfix =V4aconstaNoneFIainfix =agetV3V8aNilIainfix &lt;V8ainfix +c0V0Aainfix &lt;=c0V8FAainfix =agetV3V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=ainfix +c0V0V9Oainfix &lt;V9c0Aainfix &lt;=c0V9FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V12amodaabsahashV10V0IamemaTuple2V10V11agetV1V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FFAaoccurs_firstV13V14agetV1amodaabsahashV13V0qainfix =agetV2V13aSomeV14FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for clear"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.24"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter clear.5"
+      locfile="../hash_tables.mlw"
+      loclnum="91" loccnumb="6" loccnume="11"
+      expl="5. postcondition"
+      sum="b43c25c80c790391c60851193b2164ee"
+      proved="true"
+      expanded="false"
+      shape="ainfix =agetV4V5aNoneFIainfix =V8amodaabsahashV6V0IamemaTuple2V6V7agetV3V8Iainfix &lt;V8V0Aainfix &lt;=c0V8FFAaoccurs_firstV9V10agetV3amodaabsahashV9V0qainfix =agetV4V9aSomeV10FAainfix &gt;V0c0Iainfix =V4aconstaNoneFIainfix =agetV3V11aNilIainfix &lt;V11ainfix +c0V0Aainfix &lt;=c0V11FAainfix =agetV3V12agetV1V12Iainfix &lt;V12V0Aainfix &lt;=ainfix +c0V0V12Oainfix &lt;V12c0Aainfix &lt;=c0V12FFIainfix &lt;=ainfix +c0V0V0Aainfix &lt;=c0c0Iainfix =V15amodaabsahashV13V0IamemaTuple2V13V14agetV1V15Iainfix &lt;V15V0Aainfix &lt;=c0V15FFAaoccurs_firstV16V17agetV1amodaabsahashV16V0qainfix =agetV2V16aSomeV17FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for clear"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter idx"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="101" loccnumb="6" loccnume="9"
-    expl="postcondition"
-    sum="1d8ca614f6ea9696d53ba59e34040d97"
+    locfile="../hash_tables.mlw"
+    loclnum="96" loccnumb="6" loccnume="9"
+    expl="VC for idx"
+    sum="b9c3058211eb551f2fe8d04d8790c772"
     proved="true"
     expanded="false"
-    shape="ainfix =amodaabsahashV1V0amodaabsahashV1V0F">
+    shape="ainfix =amodaabsahashV1V0amodaabsahashV1V0Iainfix =V6amodaabsahashV4V0IamemaTuple2V4V5agetV2V6Iainfix &lt;V6V0Aainfix &lt;=c0V6FFAaoccurs_firstV7V8agetV2amodaabsahashV7V0qainfix =agetV3V7aSomeV8FAainfix &gt;V0c0FF">
     <label
-     name="expl:parameter idx"/>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
+     name="expl:VC for idx"/>
     <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -669,463 +374,13 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
-   </goal>
-   <goal
-    name="WP_parameter add"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="106" loccnumb="6" loccnume="9"
-    expl="parameter add"
-    sum="a49b989c9d8f72897387453ccd70a1f9"
-    proved="true"
-    expanded="true"
-    shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-    <label
-     name="expl:parameter add"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter add.1"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="106" loccnumb="6" loccnume="9"
-      expl="precondition"
-      sum="93433531c16b9ead8b30e5420ebce506"
-      proved="true"
-      expanded="false"
-      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-      <label
-       name="expl:parameter add"/>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter add.2"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="106" loccnumb="6" loccnume="9"
-      expl="precondition"
-      sum="099b59d3618ab9929ea282a32383de42"
-      proved="true"
-      expanded="false"
-      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-      <label
-       name="expl:parameter add"/>
-      <proof
-       prover="5"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter add.3"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="106" loccnumb="6" loccnume="9"
-      expl="postcondition"
-      sum="67c19c341823ab7985b96dbe4e8e41ba"
-      proved="true"
-      expanded="true"
-      shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-      <label
-       name="expl:parameter add"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter add.3.1"
-        locfile="programs/hash_tables/../hash_tables.mlw"
-        loclnum="106" loccnumb="6" loccnume="9"
-        expl="parameter add"
-        sum="0cbeb8c01a56e3998fb2498d777177c0"
-        proved="true"
-        expanded="true"
-        shape="avalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-        <label
-         name="expl:parameter add"/>
-        <transf
-         name="inline_goal"
-         proved="true"
-         expanded="true">
-         <goal
-          name="WP_parameter add.3.1.1"
-          locfile="programs/hash_tables/../hash_tables.mlw"
-          loclnum="106" loccnumb="6" loccnume="9"
-          expl="parameter add"
-          sum="a0813d8a9246efb9e69ad207c8958799"
-          proved="true"
-          expanded="true"
-          shape="ainfix =V10aidxamk tV7amk arrayV0V6V8IamemaTuple2V8V9amixfix []adataamk tV7amk arrayV0V6V10Iainfix &lt;V10alengthadataamk tV7amk arrayV0V6Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V11qainfix =agetamk tV7amk arrayV0V6V11aSomeV12FAainfix &gt;alengthadataamk tV7amk arrayV0V6c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V15aidxamk tV4amk arrayV0V3V13IamemaTuple2V13V14amixfix []adataamk tV4amk arrayV0V3V15Iainfix &lt;V15alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V15FFAaoccurs_firstV16V17amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V16qainfix =agetamk tV4amk arrayV0V3V16aSomeV17FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
-          <label
-           name="expl:parameter add"/>
-          <transf
-           name="split_goal"
-           proved="true"
-           expanded="true">
-           <goal
-            name="WP_parameter add.3.1.1.1"
-            locfile="programs/hash_tables/../hash_tables.mlw"
-            loclnum="106" loccnumb="6" loccnume="9"
-            expl="parameter add"
-            sum="5ebe863dacc0c2cda28a1bf4005f4503"
-            proved="true"
-            expanded="false"
-            shape="ainfix &gt;alengthadataamk tV7amk arrayV0V6c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V10aidxamk tV4amk arrayV0V3V8IamemaTuple2V8V9amixfix []adataamk tV4amk arrayV0V3V10Iainfix &lt;V10alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V10FFAaoccurs_firstV11V12amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V11qainfix =agetamk tV4amk arrayV0V3V11aSomeV12FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
-            <label
-             name="expl:parameter add"/>
-            <proof
-             prover="5"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.03"/>
-            </proof>
-            <proof
-             prover="2"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.03"/>
-            </proof>
-            <proof
-             prover="0"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.01"/>
-            </proof>
-            <proof
-             prover="3"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.02"/>
-            </proof>
-            <proof
-             prover="6"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.03"/>
-            </proof>
-            <proof
-             prover="1"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.00"/>
-            </proof>
-           </goal>
-           <goal
-            name="WP_parameter add.3.1.1.2"
-            locfile="programs/hash_tables/../hash_tables.mlw"
-            loclnum="106" loccnumb="6" loccnume="9"
-            expl="parameter add"
-            sum="85690c9474ebd4815ac4379b2cf3b87d"
-            proved="true"
-            expanded="false"
-            shape="aoccurs_firstV8V9amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V8Iainfix =agetamk tV7amk arrayV0V6V8aSomeV9FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V12aidxamk tV4amk arrayV0V3V10IamemaTuple2V10V11amixfix []adataamk tV4amk arrayV0V3V12Iainfix &lt;V12alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V13qainfix =agetamk tV4amk arrayV0V3V13aSomeV14FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
-            <label
-             name="expl:parameter add"/>
-            <proof
-             prover="3"
-             timelimit="10"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="4.06"/>
-            </proof>
-            <proof
-             prover="4"
-             timelimit="15"
-             memlimit="1000"
-             edited="hash_tables_WP_HashTableImpl_WP_parameter_add_1.v"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.82"/>
-            </proof>
-           </goal>
-           <goal
-            name="WP_parameter add.3.1.1.3"
-            locfile="programs/hash_tables/../hash_tables.mlw"
-            loclnum="106" loccnumb="6" loccnume="9"
-            expl="parameter add"
-            sum="e22f481efa94e89868800b1ab3ab2720"
-            proved="true"
-            expanded="false"
-            shape="ainfix =agetamk tV7amk arrayV0V6V8aSomeV9Iaoccurs_firstV8V9amixfix []adataamk tV7amk arrayV0V6aidxamk tV7amk arrayV0V6V8FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V12aidxamk tV4amk arrayV0V3V10IamemaTuple2V10V11amixfix []adataamk tV4amk arrayV0V3V12Iainfix &lt;V12alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V12FFAaoccurs_firstV13V14amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V13qainfix =agetamk tV4amk arrayV0V3V13aSomeV14FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
-            <label
-             name="expl:parameter add"/>
-            <proof
-             prover="2"
-             timelimit="5"
-             memlimit="1000"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.82"/>
-            </proof>
-           </goal>
-           <goal
-            name="WP_parameter add.3.1.1.4"
-            locfile="programs/hash_tables/../hash_tables.mlw"
-            loclnum="106" loccnumb="6" loccnume="9"
-            expl="parameter add"
-            sum="d64f63e167ceb31b8cc5e817bfec14dd"
-            proved="true"
-            expanded="false"
-            shape="ainfix =V10aidxamk tV7amk arrayV0V6V8IamemaTuple2V8V9amixfix []adataamk tV7amk arrayV0V6V10Iainfix &lt;V10alengthadataamk tV7amk arrayV0V6Aainfix &lt;=c0V10FFIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5Iainfix &lt;V5V0Aainfix =c0V5Oainfix &lt;c0V5LamodaabsahashV1V0Iainfix =V13aidxamk tV4amk arrayV0V3V11IamemaTuple2V11V12amixfix []adataamk tV4amk arrayV0V3V13Iainfix &lt;V13alengthadataamk tV4amk arrayV0V3Aainfix &lt;=c0V13FFAaoccurs_firstV14V15amixfix []adataamk tV4amk arrayV0V3aidxamk tV4amk arrayV0V3V14qainfix =agetamk tV4amk arrayV0V3V14aSomeV15FAainfix &gt;alengthadataamk tV4amk arrayV0V3c0FF">
-            <label
-             name="expl:parameter add"/>
-            <proof
-             prover="4"
-             timelimit="15"
-             memlimit="1000"
-             edited="hash_tables_WP_HashTableImpl_WP_parameter_add_2.v"
-             obsolete="false"
-             archived="false">
-             <result status="valid" time="0.86"/>
-            </proof>
-           </goal>
-          </transf>
-         </goal>
-        </transf>
-       </goal>
-       <goal
-        name="WP_parameter add.3.2"
-        locfile="programs/hash_tables/../hash_tables.mlw"
-        loclnum="106" loccnumb="6" loccnume="9"
-        expl="parameter add"
-        sum="9e3ee126415341869fadec346c42460a"
-        proved="true"
-        expanded="false"
-        shape="ainfix =agetV7V1aSomeV2Iavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-        <label
-         name="expl:parameter add"/>
-        <proof
-         prover="5"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof
-         prover="0"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof
-         prover="3"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof
-         prover="6"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter add.3.3"
-        locfile="programs/hash_tables/../hash_tables.mlw"
-        loclnum="106" loccnumb="6" loccnume="9"
-        expl="parameter add"
-        sum="161dd2684826f35b2f70beb6ea65f5a2"
-        proved="true"
-        expanded="false"
-        shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFIavalidamk tV7amk arrayV0V6Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iavalidamk tV4amk arrayV0V3FF">
-        <label
-         name="expl:parameter add"/>
-        <proof
-         prover="5"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof
-         prover="0"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof
-         prover="3"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof
-         prover="6"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter lookup"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="116" loccnumb="10" loccnume="16"
-    expl="exceptional postcondition"
-    sum="3f733abb275f12c1762270f0270c42d8"
-    proved="true"
-    expanded="false"
-    shape="CV1aNilamemaTuple2V0V2V1NFaConsaTuple2VVViainfix =V0V3aoccurs_firstV0V4V1amemaTuple2V0V6V1NFIamemaTuple2V0V7V5NFAaoccurs_firstV0V8V1Iaoccurs_firstV0V8V5FF">
-    <label
-     name="expl:parameter lookup"/>
     <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="3"
@@ -1135,40 +390,64 @@
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
-    name="WP_parameter find"
-    locfile="programs/hash_tables/../hash_tables.mlw"
-    loclnum="125" loccnumb="6" loccnume="10"
-    expl="parameter find"
-    sum="6955f9a97747a6cb324fdff8676b7959"
+    name="WP_parameter add"
+    locfile="../hash_tables.mlw"
+    loclnum="100" loccnumb="6" loccnume="9"
+    expl="VC for add"
+    sum="bc3ca7c9f5685847391143fa072e6c6a"
     proved="true"
-    expanded="true"
-    shape="ainfix =agetV3V1aNoneIamemaTuple2V1V6V5NFAainfix =agetV3V1aSomeV7Iaoccurs_firstV1V7V5FLagetV2V4Aainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FF">
+    expanded="false"
+    shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFAainfix =agetV7V1aSomeV2Aainfix =V11amodaabsahashV9V0IamemaTuple2V9V10agetV6V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FFAaoccurs_firstV12V13agetV6amodaabsahashV12V0qainfix =agetV7V12aSomeV13FAainfix &gt;V0c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V16amodaabsahashV14V0IamemaTuple2V14V15agetV3V16Iainfix &lt;V16V0Aainfix &lt;=c0V16FFAaoccurs_firstV17V18agetV3amodaabsahashV17V0qainfix =agetV4V17aSomeV18FAainfix &gt;V0c0FF">
     <label
-     name="expl:parameter find"/>
+     name="expl:VC for add"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
-      name="WP_parameter find.1"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="125" loccnumb="6" loccnume="10"
-      expl="precondition"
-      sum="835939a3de94e526664746ed888cf567"
+      name="WP_parameter add.1"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="1. precondition"
+      sum="c0fd0e11af4f079c0dae935257f38010"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FF">
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V8amodaabsahashV6V0IamemaTuple2V6V7agetV3V8Iainfix &lt;V8V0Aainfix &lt;=c0V8FFAaoccurs_firstV9V10agetV3amodaabsahashV9V0qainfix =agetV4V9aSomeV10FAainfix &gt;V0c0FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for add"/>
       <proof
-       prover="5"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
       </proof>
       <proof
        prover="2"
@@ -1179,15 +458,15 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="0"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1202,26 +481,255 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.2"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="2. precondition"
+      sum="fe3023bff9ba035cd6f03f89969c9884"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V8amodaabsahashV6V0IamemaTuple2V6V7agetV3V8Iainfix &lt;V8V0Aainfix &lt;=c0V8FFAaoccurs_firstV9V10agetV3amodaabsahashV9V0qainfix =agetV4V9aSomeV10FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
       <proof
        prover="1"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter find.2"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="125" loccnumb="6" loccnume="10"
-      expl="postcondition"
-      sum="18c6c603da343e3a55ac38ce2aa1c13f"
+      name="WP_parameter add.3"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="3. type invariant"
+      sum="99608f17fde0388b0ca79c9cc51ab069"
       proved="true"
-      expanded="true"
-      shape="ainfix =agetV3V1aSomeV6Iaoccurs_firstV1V6V5FLagetV2V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FF">
+      expanded="false"
+      shape="ainfix &gt;V0c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V10amodaabsahashV8V0IamemaTuple2V8V9agetV3V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FFAaoccurs_firstV11V12agetV3amodaabsahashV11V0qainfix =agetV4V11aSomeV12FAainfix &gt;V0c0FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.4"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="4. type invariant"
+      sum="cd5d53f309a24d9f628a9b386ef06046"
+      proved="true"
+      expanded="false"
+      shape="aoccurs_firstV8V9agetV6amodaabsahashV8V0qainfix =agetV7V8aSomeV9FIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V12amodaabsahashV10V0IamemaTuple2V10V11agetV3V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FFAaoccurs_firstV13V14agetV3amodaabsahashV13V0qainfix =agetV4V13aSomeV14FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="3"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.5"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="5. type invariant"
+      sum="6c5e57799dde73067a16f42b6880a131"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V10amodaabsahashV8V0IamemaTuple2V8V9agetV6V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FFIainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V13amodaabsahashV11V0IamemaTuple2V11V12agetV3V13Iainfix &lt;V13V0Aainfix &lt;=c0V13FFAaoccurs_firstV14V15agetV3amodaabsahashV14V0qainfix =agetV4V14aSomeV15FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="3"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.53"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.6"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="6. postcondition"
+      sum="1a9b94709cd96fa316aecdb9cbde4305"
+      proved="true"
+      expanded="false"
+      shape="ainfix =agetV7V1aSomeV2Iainfix =V10amodaabsahashV8V0IamemaTuple2V8V9agetV6V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FFAaoccurs_firstV11V12agetV6amodaabsahashV11V0qainfix =agetV7V11aSomeV12FAainfix &gt;V0c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V15amodaabsahashV13V0IamemaTuple2V13V14agetV3V15Iainfix &lt;V15V0Aainfix &lt;=c0V15FFAaoccurs_firstV16V17agetV3amodaabsahashV16V0qainfix =agetV4V16aSomeV17FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.7"
+      locfile="../hash_tables.mlw"
+      loclnum="100" loccnumb="6" loccnume="9"
+      expl="7. postcondition"
+      sum="ae827acdde0c698ceb17072f203400bf"
+      proved="true"
+      expanded="false"
+      shape="ainfix =agetV7V8agetV4V8Iainfix =V8V1NFIainfix =V11amodaabsahashV9V0IamemaTuple2V9V10agetV6V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FFAaoccurs_firstV12V13agetV6amodaabsahashV12V0qainfix =agetV7V12aSomeV13FAainfix &gt;V0c0Iainfix =V7asetV4V1aSomeV2FIainfix =V6asetV3V5aConsaTuple2V1V2agetV3V5FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V5V0Aainfix &lt;=c0V5LamodaabsahashV1V0Iainfix =V16amodaabsahashV14V0IamemaTuple2V14V15agetV3V16Iainfix &lt;V16V0Aainfix &lt;=c0V16FFAaoccurs_firstV17V18agetV3amodaabsahashV17V0qainfix =agetV4V17aSomeV18FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter lookup"
+    locfile="../hash_tables.mlw"
+    loclnum="109" loccnumb="10" loccnume="16"
+    expl="VC for lookup"
+    sum="00c7ced43a5b9002b8d964c92c42ccd5"
+    proved="true"
+    expanded="false"
+    shape="CV1aNilamemaTuple2V0V2V1NFaConsaTuple2VVViainfix =V0V3aoccurs_firstV0V4V1amemaTuple2V0V6V1NFIamemaTuple2V0V7V5NFAaoccurs_firstV0V8V1Iaoccurs_firstV0V8V5FF">
+    <label
+     name="expl:VC for lookup"/>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter find"
+    locfile="../hash_tables.mlw"
+    loclnum="117" loccnumb="6" loccnume="10"
+    expl="VC for find"
+    sum="5224e2c5ac73a3187f091672db2b295b"
+    proved="true"
+    expanded="true"
+    shape="ainfix =agetV3V1aNoneIamemaTuple2V1V6V5NFAainfix =agetV3V1aSomeV7Iaoccurs_firstV1V7V5FLagetV2V4Aainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iainfix =V10amodaabsahashV8V0IamemaTuple2V8V9agetV2V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FFAaoccurs_firstV11V12agetV2amodaabsahashV11V0qainfix =agetV3V11aSomeV12FAainfix &gt;V0c0FF">
+    <label
+     name="expl:VC for find"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter find.1"
+      locfile="../hash_tables.mlw"
+      loclnum="117" loccnumb="6" loccnume="10"
+      expl="1. precondition"
+      sum="5ef39bf9f60c84352f027875e122bd90"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iainfix =V7amodaabsahashV5V0IamemaTuple2V5V6agetV2V7Iainfix &lt;V7V0Aainfix &lt;=c0V7FFAaoccurs_firstV8V9agetV2amodaabsahashV8V0qainfix =agetV3V8aSomeV9FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
       <proof
        prover="5"
        timelimit="5"
@@ -1240,19 +748,47 @@
       </proof>
      </goal>
      <goal
+      name="WP_parameter find.2"
+      locfile="../hash_tables.mlw"
+      loclnum="117" loccnumb="6" loccnume="10"
+      expl="2. postcondition"
+      sum="409842db39afa8755629f0dbb0e494be"
+      proved="true"
+      expanded="false"
+      shape="ainfix =agetV3V1aSomeV6Iaoccurs_firstV1V6V5FLagetV2V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iainfix =V9amodaabsahashV7V0IamemaTuple2V7V8agetV2V9Iainfix &lt;V9V0Aainfix &lt;=c0V9FFAaoccurs_firstV10V11agetV2amodaabsahashV10V0qainfix =agetV3V10aSomeV11FAainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
       name="WP_parameter find.3"
-      locfile="programs/hash_tables/../hash_tables.mlw"
-      loclnum="125" loccnumb="6" loccnume="10"
-      expl="exceptional postcondition"
-      sum="5c7c5fd39cf1ffd8171d534cf31be3dc"
+      locfile="../hash_tables.mlw"
+      loclnum="117" loccnumb="6" loccnume="10"
+      expl="3. exceptional postcondition"
+      sum="2627c5f585ce3502442170a2d4b88842"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV3V1aNoneIamemaTuple2V1V6V5NFLagetV2V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iavalidamk tV3amk arrayV0V2FF">
+      shape="ainfix =agetV3V1aNoneIamemaTuple2V1V6V5NFLagetV2V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LamodaabsahashV1V0Iainfix =V9amodaabsahashV7V0IamemaTuple2V7V8agetV2V9Iainfix &lt;V9V0Aainfix &lt;=c0V9FFAaoccurs_firstV10V11agetV2amodaabsahashV10V0qainfix =agetV3V10aSomeV11FAainfix &gt;V0c0FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="4"
-       timelimit="15"
+       timelimit="17"
        memlimit="1000"
        edited="hash_tables_WP_HashTableImpl_WP_parameter_find_1.v"
        obsolete="false"

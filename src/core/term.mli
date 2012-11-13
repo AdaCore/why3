@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Stdlib
 open Ident
@@ -33,8 +24,8 @@ type vsymbol = private {
 
 module Mvs : Map.S with type key = vsymbol
 module Svs : Mvs.Set
-module Hvs : Hashtbl.S with type key = vsymbol
-module Wvs : Hashweak.S with type key = vsymbol
+module Hvs : XHashtbl.S with type key = vsymbol
+module Wvs : Weakhtbl.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
 val vs_hash : vsymbol -> int
@@ -51,8 +42,8 @@ type lsymbol = private {
 
 module Mls : Map.S with type key = lsymbol
 module Sls : Mls.Set
-module Hls : Hashtbl.S with type key = lsymbol
-module Wls : Hashweak.S with type key = lsymbol
+module Hls : XHashtbl.S with type key = lsymbol
+module Wls : Weakhtbl.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
@@ -118,20 +109,6 @@ type binop =
   | Timplies
   | Tiff
 
-type integer_constant =
-  | IConstDecimal of string
-  | IConstHexa of string
-  | IConstOctal of string
-  | IConstBinary of string
-
-type real_constant =
-  | RConstDecimal of string * string * string option (* int / frac / exp *)
-  | RConstHexa of string * string * string
-
-type constant =
-  | ConstInt of integer_constant
-  | ConstReal of real_constant
-
 type term = private {
   t_node  : term_node;
   t_ty    : ty option;
@@ -143,7 +120,7 @@ type term = private {
 
 and term_node = private
   | Tvar of vsymbol
-  | Tconst of constant
+  | Tconst of Number.constant
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -163,7 +140,7 @@ and trigger = term list list
 
 module Mterm : Map.S with type key = term
 module Sterm : Mterm.Set
-module Hterm : Hashtbl.S with type key = term
+module Hterm : XHashtbl.S with type key = term
 
 val t_equal : term -> term -> bool
 val t_hash : term -> int
@@ -219,9 +196,7 @@ val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
 val t_var : vsymbol -> term
-val t_const : constant -> term
-val t_int_const : string -> term
-val t_real_const : real_constant -> term
+val t_const : Number.constant -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term
@@ -237,6 +212,10 @@ val t_iff : term -> term -> term
 val t_not : term -> term
 val t_true : term
 val t_false : term
+
+val t_nat_const : int -> term
+(** [t_nat_const n] builds the constant integer term [n],
+    n must be non-negative *)
 
 val asym_label : label
 val t_and_asym : term -> term -> term
@@ -430,7 +409,7 @@ val t_app_fold :
 
 val t_equal_alpha : term -> term -> bool
 
-module Hterm_alpha : Hashtbl.S with type key = term
+module Hterm_alpha : XHashtbl.S with type key = term
 
 (** Subterm occurrence check and replacement *)
 

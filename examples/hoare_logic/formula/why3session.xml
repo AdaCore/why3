@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
-<why3session
- name="hoare_logic/formula/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -20,33 +19,25 @@
   expanded="false">
   <theory
    name="Formula"
-   locfile="hoare_logic/formula/../formula.why"
+   locfile="../formula.why"
    loclnum="1" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="PropositionalCalculus"
-   locfile="hoare_logic/formula/../formula.why"
+   locfile="../formula.why"
    loclnum="21" loccnumb="7" loccnume="28"
    verified="true"
    expanded="true">
    <goal
     name="Test1"
-    locfile="hoare_logic/formula/../formula.why"
+    locfile="../formula.why"
     loclnum="47" loccnumb="7" loccnume="12"
     sum="ecd0baa86456fee2a4f497d193389d75"
     proved="true"
     expanded="true"
     shape="ainfix =aevalaForaFnotaFatomV0aFfalseV1aFalseLasetaconstaFalseV0aTrueLamk_identc0">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -54,6 +45,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"

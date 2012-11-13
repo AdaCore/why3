@@ -19,61 +19,47 @@ module SearchingALinkedList
   predicate no_zero (l: list int) =
     forall j:int. 0 <= j < length l -> nth j l <> Some 0
 
-  let rec search (i: int) (l: list int) variant { length l } =
-    {}
-    match l with
+  let rec search (i: int) (l: list int) variant {l}
+    ensures { (i <= result < i + length l /\ zero_at l (result - i)) \/
+              (result = i + length l /\ no_zero l) }
+  = match l with
     | Nil -> i
     | Cons x r -> if x = 0 then i else search (i+1) r
     end
-    { (i <= result < i + length l /\ zero_at l (result - i))
-      \/
-      (result = i + length l /\ no_zero l) }
 
-  let search_list (l: list int) =
-    { }
-    search 0 l
-    { (0 <= result < length l /\ zero_at l result)
-      \/
-      (result = length l /\ no_zero l) }
+  let search_list (l: list int)
+    ensures { (0 <= result < length l /\ zero_at l result) \/
+              (result = length l /\ no_zero l) }
+  = search 0 l
 
 
   (* imperative version, with a loop *)
 
-  use import module ref.Ref
+  use import ref.Ref
   use import list.HdTl
 
-  let head (l : list 'a) =
-    { l <> Nil }
-    match l with Nil -> absurd | Cons h _ -> h end
-    { hd l = Some result }
+  let head (l : list 'a)
+    requires { l <> Nil } ensures { hd l = Some result }
+  = match l with Nil -> absurd | Cons h _ -> h end
 
-  let tail (l : list 'a) =
-    { l <> Nil }
-    match l with Nil -> absurd | Cons _ t -> t end
-    { tl l = Some result }
+  let tail (l : list 'a)
+    requires { l <> Nil } ensures { tl l = Some result }
+  = match l with Nil -> absurd | Cons _ t -> t end
 
-  let search_loop l =
-    {}
-    let i = ref 0 in
+  let search_loop l
+    ensures { (0 <= result < length l /\ zero_at l result) \/
+              (result = length l /\ no_zero l) }
+  = let i = ref 0 in
     let s = ref l in
     while !s <> Nil && head !s <> 0 do
       invariant {
         0 <= !i /\ !i + length !s = length l /\
         (forall j:int. 0 <= j -> nth j !s = nth (!i + j) l) /\
         forall j:int. 0 <= j < !i -> nth j l <> Some 0 }
-      variant { length !s }
+      variant { !s }
       i := !i + 1;
       s := tail !s
     done;
     !i
-    { (0 <= result < length l /\ zero_at l result)
-      \/
-      (result = length l /\ no_zero l) }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_search_list.gui"
-End:
-*)

@@ -1,24 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -77,7 +68,7 @@ let open_ls_defn_cb ld =
   let ls,_,_ = ld in
   let vl,t = open_ls_defn ld in
   let close ls' vl' t' =
-    if t_equal t t' && list_all2 vs_equal vl vl' && ls_equal ls ls'
+    if t_equal t t' && Lists.equal vs_equal vl vl' && ls_equal ls ls'
     then ls,ld else make_ls_defn ls' vl' t'
   in
   vl,t,close
@@ -269,7 +260,7 @@ type prsymbol = {
   pr_name : ident;
 }
 
-module Prop = WeakStructMake (struct
+module Prop = MakeMSHW (struct
   type t = prsymbol
   let tag pr = pr.pr_name.id_tag
 end)
@@ -307,7 +298,7 @@ type decl = {
   d_node : decl_node;
   d_syms : Sid.t;         (* idents used in declaration *)
   d_news : Sid.t;         (* idents introduced in declaration *)
-  d_tag  : Hashweak.tag;  (* unique magical tag *)
+  d_tag  : Weakhtbl.tag;  (* unique magical tag *)
 }
 
 and decl_node =
@@ -325,10 +316,10 @@ module Hsdecl = Hashcons.Make (struct
   type t = decl
 
   let cs_equal (cs1,pl1) (cs2,pl2) =
-    ls_equal cs1 cs2 && list_all2 (option_eq ls_equal) pl1 pl2
+    ls_equal cs1 cs2 && Lists.equal (Opt.equal ls_equal) pl1 pl2
 
   let eq_td (ts1,td1) (ts2,td2) =
-    ts_equal ts1 ts2 && list_all2 cs_equal td1 td2
+    ts_equal ts1 ts2 && Lists.equal cs_equal td1 td2
 
   let eq_ld (ls1,(_,f1,_)) (ls2,(_,f2,_)) =
     ls_equal ls1 ls2 && t_equal f1 f2
@@ -337,14 +328,14 @@ module Hsdecl = Hashcons.Make (struct
     pr_equal pr1 pr2 && t_equal fr1 fr2
 
   let eq_ind (ps1,al1) (ps2,al2) =
-    ls_equal ps1 ps2 && list_all2 eq_iax al1 al2
+    ls_equal ps1 ps2 && Lists.equal eq_iax al1 al2
 
   let equal d1 d2 = match d1.d_node, d2.d_node with
     | Dtype  s1, Dtype  s2 -> ts_equal s1 s2
-    | Ddata  l1, Ddata  l2 -> list_all2 eq_td l1 l2
+    | Ddata  l1, Ddata  l2 -> Lists.equal eq_td l1 l2
     | Dparam s1, Dparam s2 -> ls_equal s1 s2
-    | Dlogic l1, Dlogic l2 -> list_all2 eq_ld l1 l2
-    | Dind   (s1,l1), Dind (s2,l2) -> s1 = s2 && list_all2 eq_ind l1 l2
+    | Dlogic l1, Dlogic l2 -> Lists.equal eq_ld l1 l2
+    | Dind   (s1,l1), Dind (s2,l2) -> s1 = s2 && Lists.equal eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
         k1 = k2 && pr_equal pr1 pr2 && t_equal f1 f2
     | _,_ -> false
@@ -371,11 +362,11 @@ module Hsdecl = Hashcons.Make (struct
     | Dind (_,l) -> Hashcons.combine_list hs_ind 7 l
     | Dprop (k,pr,f) -> Hashcons.combine (hs_kind k) (hs_prop (pr,f))
 
-  let tag n d = { d with d_tag = Hashweak.create_tag n }
+  let tag n d = { d with d_tag = Weakhtbl.create_tag n }
 
 end)
 
-module Decl = WeakStructMake (struct
+module Decl = MakeMSHW (struct
   type t = decl
   let tag d = d.d_tag
 end)
@@ -387,7 +378,7 @@ module Hdecl = Decl.H
 
 let d_equal : decl -> decl -> bool = (==)
 
-let d_hash d = Hashweak.tag_hash d.d_tag
+let d_hash d = Weakhtbl.tag_hash d.d_tag
 
 (** Declaration constructors *)
 
@@ -395,7 +386,7 @@ let mk_decl node syms news = Hsdecl.hashcons {
   d_node = node;
   d_syms = syms;
   d_news = news;
-  d_tag  = Hashweak.dummy_tag;
+  d_tag  = Weakhtbl.dummy_tag;
 }
 
 exception IllegalTypeAlias of tysymbol
@@ -422,7 +413,7 @@ let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ty syms_ls s t
 
 let create_ty_decl ts =
-  let syms = Util.option_fold syms_ty Sid.empty ts.ts_def in
+  let syms = Opt.fold syms_ty Sid.empty ts.ts_def in
   let news = Sid.singleton ts.ts_name in
   mk_decl (Dtype ts) syms news
 
@@ -439,7 +430,7 @@ let create_data_decl tdl =
     | Some ls -> raise (BadRecordField ls)
   in
   let check_constr tys ty pjs (syms,news) (fs,pl) =
-    ty_equal_check ty (exn_option (BadConstructor fs) fs.ls_value);
+    ty_equal_check ty (Opt.get_exn (BadConstructor fs) fs.ls_value);
     let fs_pjs =
       try List.fold_left2 (check_proj fs ty) Sls.empty fs.ls_args pl
       with Invalid_argument _ -> raise (BadConstructor fs) in
@@ -464,7 +455,7 @@ let create_data_decl tdl =
     if ts.ts_def <> None then raise (IllegalTypeAlias ts);
     let news = news_id news ts.ts_name in
     let pjs = List.fold_left (fun s (_,pl) -> List.fold_left
-      (option_fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
+      (Opt.fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
     let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
     List.fold_left (check_constr ts ty pjs) (syms,news) cl
@@ -473,7 +464,7 @@ let create_data_decl tdl =
   mk_decl (Ddata tdl) syms news
 
 let create_param_decl ls =
-  let syms = Util.option_fold syms_ty Sid.empty ls.ls_value in
+  let syms = Opt.fold syms_ty Sid.empty ls.ls_value in
   let syms = List.fold_left syms_ty syms ls.ls_args in
   let news = Sid.singleton ls.ls_name in
   mk_decl (Dparam ls) syms news
@@ -503,9 +494,9 @@ let rec f_pos_ps sps pol f = match f.t_node, pol with
   | Tbinop (Tiff, f, g), _ ->
       f_pos_ps sps None f && f_pos_ps sps None g
   | Tbinop (Timplies, f, g), _ ->
-      f_pos_ps sps (option_map not pol) f && f_pos_ps sps pol g
+      f_pos_ps sps (Opt.map not pol) f && f_pos_ps sps pol g
   | Tnot f, _ ->
-      f_pos_ps sps (option_map not pol) f
+      f_pos_ps sps (Opt.map not pol) f
   | Tif (f,g,h), _ ->
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
   | _ -> TermTF.t_all (t_pos_ps sps) (f_pos_ps sps pol) f
@@ -586,7 +577,7 @@ let decl_fold fn acc d = match d.d_node with
 let list_rpair_map_fold fn =
   let fn acc (x1,x2) =
     let acc,x2 = fn acc x2 in acc,(x1,x2) in
-  Util.map_fold_left fn
+  Lists.map_fold_left fn
 
 let decl_map_fold fn acc d = match d.d_node with
   | Dtype _ | Ddata _ | Dparam _ -> acc, d
@@ -596,7 +587,7 @@ let decl_map_fold fn acc d = match d.d_node with
         let acc,e = fn acc e in
         acc, close ls vl e
       in
-      let acc,l = Util.map_fold_left fn acc l in
+      let acc,l = Lists.map_fold_left fn acc l in
       acc, create_logic_decl l
   | Dind (s, l) ->
       let acc, l = list_rpair_map_fold (list_rpair_map_fold fn) acc l in
@@ -630,7 +621,7 @@ let merge_known kn1 kn2 =
   Mid.union check_known kn1 kn2
 
 let known_add_decl kn0 decl =
-  let kn = Mid.map (const decl) decl.d_news in
+  let kn = Mid.map (Util.const decl) decl.d_news in
   let check id decl0 _ =
     if d_equal decl0 decl
     then raise (KnownIdent id)
@@ -650,8 +641,8 @@ let find_constructors kn ts =
 let find_inductive_cases kn ps =
   match (Mid.find ps.ls_name kn).d_node with
   | Dind (_, dl) -> List.assq ps dl
-  | Dlogic _ | Ddata _ -> []
-  | Dtype _ | Dparam _ | Dprop _ -> assert false
+  | Dlogic _ | Dparam _ | Ddata _ -> []
+  | Dtype _ | Dprop _ -> assert false
 
 let find_logic_definition kn ls =
   match (Mid.find ls.ls_name kn).d_node with
@@ -784,7 +775,7 @@ let parse_record kn fll =
     | [{ ty_node = Tyapp (ts,_) }] -> ts
     | _ -> raise (BadRecordField fs) in
   let cs, pjl = match find_constructors kn ts with
-    | [cs,pjl] -> cs, List.map (exn_option (BadRecordField fs)) pjl
+    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField fs)) pjl
     | _ -> raise (BadRecordField fs) in
   let pjs = List.fold_left (fun s pj -> Sls.add pj s) Sls.empty pjl in
   let flm = List.fold_left (fun m (pj,v) ->
@@ -806,10 +797,10 @@ let make_record_update kn t fll ty =
 
 let make_record_pattern kn fll ty =
   let cs,pjl,flm = parse_record kn fll in
-  let s = ty_match Mtv.empty (of_option cs.ls_value) ty in
+  let s = ty_match Mtv.empty (Opt.get cs.ls_value) ty in
   let get_arg pj = match Mls.find_opt pj flm with
     | Some v -> v
-    | None -> pat_wild (ty_inst s (of_option pj.ls_value))
+    | None -> pat_wild (ty_inst s (Opt.get pj.ls_value))
   in
   pat_app cs (List.map get_arg pjl) ty
 

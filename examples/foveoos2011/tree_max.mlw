@@ -55,31 +55,22 @@ module TreeMax
   use int.MinMax
   use import BinTree
 
-  let rec max_aux (t:tree) (acc:int) =
-    { true }
-    match t with
+  let rec max_aux (t:tree) (acc:int) variant {t}
+    ensures { ge_tree result t /\ result >= acc /\
+      (result = acc \/ mem result t) }
+  = match t with
     | Null -> acc
     | Tree v l r ->
         max_aux l (max_aux r (MinMax.max v acc))
     end
-    { ge_tree result t /\ result >= acc /\
-      (result = acc \/ mem result t) }
 
-  let max (t: tree) =
-    { t <> Null }
-    match t with
+  let max (t: tree)
+    requires { t <> Null }
+    ensures  { ge_tree result t /\ mem result t }
+  = match t with
     | Null -> absurd
     | Tree v l r ->
         max_aux l (max_aux r v)
     end
-    { ge_tree result t /\ mem result t }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide tree_max.mlw"
-End:
-*)
-
-

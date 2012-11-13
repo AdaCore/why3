@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (*****
 1) For every block, for every executable call the prover using the
@@ -49,14 +40,14 @@ The regexp must start with ^.
 *)
 
 open Format
-open Util
-open Whyconf
 open Stdlib
+open Whyconf
 module Wc = Whyconf
 open Rc
 
 let debug = Debug.register_info_flag "autodetect"
-  ~desc:"About@ the@ autodetection@ of@ external@ provers."
+  ~desc:"Print@ debugging@ messages@ about@ auto-detection@ \
+         of@ external@ provers."
 
 (* auto-detection of provers *)
 
@@ -85,7 +76,7 @@ let prover_keys =
   List.fold_left add Sstr.empty
     ["name";"exec";"version_switch";"version_regexp";
      "version_ok";"version_old";"version_bad";"command";
-     "editor";"driver";"in_place";"message"]
+     "editor";"driver";"in_place";"message";"alternative";]
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
@@ -93,13 +84,13 @@ let load_prover kind (id,section) =
   let prover = { kind = kind;
     prover_id = id;
     prover_name = get_string section "name";
-    prover_altern = get_string section ~default:"" "altern";
+    prover_altern = get_string section ~default:"" "alternative";
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
     version_regexp = get_string section ~default:"" "version_regexp";
-    versions_ok = reg_map $ get_stringl section ~default:[] "version_ok";
-    versions_old = reg_map $ get_stringl section ~default:[] "version_old";
-    versions_bad = reg_map $ get_stringl section ~default:[] "version_bad";
+    versions_ok = reg_map (get_stringl section ~default:[] "version_ok");
+    versions_old = reg_map (get_stringl section ~default:[] "version_old");
+    versions_bad = reg_map (get_stringl section ~default:[] "version_bad");
     prover_command = get_stringo section "command";
     prover_driver = get_string section ~default:""  "driver";
     prover_editor = get_string section ~default:"" "editor";
@@ -130,7 +121,7 @@ let load rc =
   let atps = get_family rc "ATP" in
   let atps = List.rev_map (load_prover ATP) atps in
   let itps = get_family rc "ITP" in
-  let tps = List.fold_left (cons (load_prover ITP)) atps itps in
+  let tps = List.fold_left (Lists.cons (load_prover ITP)) atps itps in
   tps
 
 let load_prover_shortcut acc (_, section) =
@@ -143,7 +134,11 @@ let load_prover_shortcut acc (_, section) =
     (fp,shortcut)::acc
   ) acc shortcuts
 
-module Hstr2 = Hashtbl.Make_Poly(struct type t = string * string end)
+module Hstr2 = Hashtbl.Make(struct
+  type t = string * string
+  let hash = Hashtbl.hash
+  let equal = (=)
+end)
 
 type env =
   {
@@ -305,7 +300,7 @@ let add_prover_shortcuts env prover =
   env.possible_prover_shortcuts <- aux env.possible_prover_shortcuts
 
 let add_id_prover_shortcut env id prover priority =
-  match Hstr.find_option env.prover_shortcuts id with
+  match Hstr.find_opt env.prover_shortcuts id with
   | Some (p,_) when p >= priority -> ()
   | _ -> Hstr.replace env.prover_shortcuts id (priority,prover)
 
@@ -344,7 +339,7 @@ let detect_exec env main data acc exec_name =
         known_version env exec_name;
         eprintf "Found prover %s version %s%s@."
           data.prover_name ver
-          (def_option
+          (Opt.get_def
              ". This version of the prover is known to have problems."
              data.message);
         acc
@@ -371,7 +366,7 @@ let detect_exec env main data acc exec_name =
     if good || old then begin
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
-        (def_option (if old then
+        (Opt.get_def (if old then
             " (it is an old version that is less tested than \
              the current one)." else ", Ok.")
            data.message);
@@ -475,10 +470,9 @@ let add_prover_binary config id path =
     (* Is a prover with this name and version already in config? *)
     let prover_id =
       if not (Mprover.mem p.prover provers) then p.prover else
-        let alt = get_altern id path in
-        let prover_id = { p.prover with
-          Wc.prover_altern =
-            Util.concat_non_empty " " [p.prover.Wc.prover_altern;alt] } in
+        let alt = match p.prover.Wc.prover_altern, get_altern id path with
+          | "", s -> s | s, "" -> s | s1, s2 -> s1 ^ " " ^ s2 in
+        let prover_id = { p.prover with Wc.prover_altern = alt } in
         find_prover_altern provers prover_id in
     let p = {p with prover = prover_id} in
     add_prover_with_uniq_id p provers in

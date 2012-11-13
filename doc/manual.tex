@@ -13,7 +13,12 @@
 \usepackage{lmodern}
 %\usepackage{url}
 \usepackage[pdftex,colorlinks=true,urlcolor=blue,pdfstartview=FitH]{hyperref}
+
+%BEGIN LATEX
 \usepackage{graphicx}
+%END LATEX
+%HEVEA \newcommand{\includegraphics}[2][2]{\imgsrc{#2}}
+
 \usepackage{listings}
 \usepackage{xspace}
 \usepackage{hevea}
@@ -71,12 +76,12 @@
 
 \vfill
 
-\begin{latexonly}
-{\fontsize{40}{40pt}\selectfont\bfseries\sffamily The Why3 platform}
-\end{latexonly}
-\begin{htmlonly}
-{\Huge\bfseries\sffamily The Why3 platform}
-\end{htmlonly}
+{
+%BEGIN LATEX
+\fontsize{40}{40pt}\selectfont
+%END LATEX
+%HEVEA \Huge
+\bfseries\sffamily The Why3 platform}
 
 \vfill
 
@@ -86,7 +91,7 @@
 
 \vfill
 
-\todo{NE PAS DISTRIBUER TANT QU'IL RESTE DES TODOS}
+% \todo{NE PAS DISTRIBUER TANT QU'IL RESTE DES TODOS}
 
 %BEGIN LATEX
 \begin{LARGE}
@@ -116,17 +121,17 @@
 \begin{flushleft}
 
 \begin{tabular}{l}
-$^1$ LRI, CNRS, Univ Paris-Sud, Orsay, F-91405 \\
-$^2$ Inria Saclay -- \^Ile-de-France, Toccata, Palaiseau, F-91120
+$^1$ LRI, CNRS \& University Paris-Sud, Orsay, F-91405 \\
+$^2$ Inria Saclay -- \^Ile-de-France, Palaiseau, F-91120
 \end{tabular}
 
-\begin{latexonly}
+%BEGIN LATEX
 \bigskip
-\end{latexonly}
+%END LATEX
 
-  \textcopyright 2010-2012 Univ Paris-Sud, CNRS, Inria
+  \textcopyright 2010-2012 University Paris-Sud, CNRS, Inria
 
-\urldef{\urlutcat}{\url}{http://frama-c.cea.fr/u3cat}
+\urldef{\urlutcat}{\url}{http://frama-c.com/u3cat/}
 \urldef{\urlhilite}{\url}{http://www.open-do.org/projects/hi-lite/}
 
   This work has been partly supported by the `\ahref{\urlutcat}{U3CAT}'
@@ -140,10 +145,23 @@ $^2$ Inria Saclay -- \^Ile-de-France, Toccata, Palaiseau, F-91120
 
 \chapter*{Foreword}
 
-This is the manual for the Why platform version 3, or \why for
-short. \why is a complete reimplementation~\cite{boogie11why3} of the former Why
-platform~\cite{filliatre07cav} for program
-verification. Among the new features are: numerous
+%This is the manual for the Why platform version 3, or \why for
+%short.
+\why is a platform for deductive program verification. It provides
+a rich language for specification and programming, called \whyml, and
+relies on external theorem provers, both automated and interactive,
+to discharge verification conditions. \why comes with a standard
+library of logical theories (integer and real arithmetic, Boolean
+operations, sets and maps, etc.) and basic programming data structures
+(arrays, queues, hash tables, etc.). A user can write \whyml programs
+directly and get correct-by-construction OCaml programs through an
+automated extraction mechanism. \whyml is also used as an intermediate
+language for the verification of C, Java, or Ada programs.
+
+\why is a complete reimplementation %~\cite{boogie11why3}
+of the former Why platform~\cite{filliatre07cav}.
+%for program verification.
+Among the new features are: numerous
 extensions to the input language, a new architecture for calling
 external provers, and a well-designed API, allowing to use \why as a
 software library.  An important emphasis is put on modularity and
@@ -178,7 +196,153 @@ We gratefully thank the people who contributed to \why, directly or
 indirectly: Romain Bardou, Simon Cruanes, Leon Gondelman, Johannes Kanig,
 St\'ephane Lescuyer, Sim\~ao Melo de Sousa, Benjamin Monate, Asma Tafat.
 
-\subsection*{Summary of Changes w.r.t. Why 2}
+\cleardoublepage
+
+%BEGIN LATEX
+\tableofcontents
+%END LATEX
+
+%\input{intro.tex}
+
+\part{Tutorial}
+
+\input{starting.tex}
+
+\input{syntax.tex}
+
+% \input{ide.tex}
+
+\input{whyml.tex}
+
+\input{api.tex}
+
+\part{Reference Manual}
+
+\input{install.tex}
+
+\input{manpages.tex}
+
+\input{syntaxref.tex}
+
+\input{library.tex}
+
+\input{realizations.tex}
+
+\input{coq_tactic.tex}
+
+% \chapter{Complete API documentation} *)
+% \label{chap:apidoc} *)
+
+% \input{./apidoc.tex} *)
+
+\input{technical.tex}
+
+\part{Appendix}
+
+\appendix
+
+\chapter{Release Notes}
+
+\section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
+
+The syntax of \whyml programs changed in release 0.80. 
+The table in Figure~\ref{fig:syntax080} summarizes the changes.
+
+\begin{figure}[thbp]
+  \centering
+\begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{version 0.73} & \textbf{version 0.80} \\
+\hline
+\ttfamily
+type t = \{| field~:~int |\}
+&
+\ttfamily
+type t = \{ field~:~int \}
+\\
+\hline
+\ttfamily
+\{| field = 5 |\}
+&
+\ttfamily
+\{ field = 5 \}
+\\
+\hline
+\ttfamily
+use import module M
+&
+\ttfamily
+use import M
+\\
+\hline
+\ttfamily
+let rec f (x:int) (y:int)~:~t \newline
+\null~~~~variant \{ t \} with rel = \newline
+\null~~~~\{ P \} \newline
+\null~~~~e \newline
+\null~~~~\{ Q \} \newline
+\null~~~~| Exc1 -> \{ R1 \} \newline
+\null~~~~| Exc2 n -> \{ R2 \}
+&
+\ttfamily
+let rec f (x:int) (y:int)~:~t \newline
+\null~~~~variant \{ t with rel \} \newline
+\null~~~~requires \{ P \} \newline
+\null~~~~ensures \{ Q \} \newline
+\null~~~~raises \{ Exc1 -> R1 \newline
+\null~~~~~~~~~~~| Exc2 n -> R2 \} \newline
+\null~~~~= e
+\\
+\hline
+\ttfamily
+val f (x:int) (y:int)~:\newline
+\null~~~~\{ P \} \newline
+\null~~~~t \newline
+\null~~~~writes a b \newline
+\null~~~~\{ Q \} \newline
+\null~~~~| Exc1 -> \{ R1 \} \newline
+\null~~~~| Exc2 n -> \{ R2 \}
+&
+\ttfamily
+val f (x:int) (y:int)~:~t \newline
+\null~~~~requires \{ P \} \newline
+\null~~~~writes \{ a, b \} \newline
+\null~~~~ensures \{ Q \} \newline
+\null~~~~raises \{ Exc1 -> R1 \newline
+\null~~~~~~~~~~~| Exc2 n -> R2 \}
+\\
+\hline
+\ttfamily
+val f~:~x:int -> y:int ->\newline
+\null~~~~\{ P \} \newline
+\null~~~~t \newline
+\null~~~~writes a b \newline
+\null~~~~\{ Q \} \newline
+\null~~~~| Exc1 -> \{ R1 \} \newline
+\null~~~~| Exc2 n -> \{ R2 \}
+&
+\ttfamily
+val f (x y:int)~:~t \newline
+\null~~~~requires \{ P \} \newline
+\null~~~~writes \{ a, b \} \newline
+\null~~~~ensures \{ Q \} \newline
+\null~~~~raises \{ Exc1 -> R1 \newline
+\null~~~~~~~~~~~| Exc2 n -> R2 \}
+\\
+\hline
+\ttfamily
+abstract e \{ Q \}
+&
+\ttfamily
+abstract e ensures \{ Q \}
+\\
+\hline
+\end{tabular}
+\caption{Syntax changes from version 0.73 to version 0.80}
+\label{fig:syntax080}
+\end{figure}
+
+\section{Summary of Changes w.r.t. Why 2}
 
 The main new features with respect to Why 2.xx
 are the following.
@@ -235,49 +399,6 @@ are the following.
 % %   undocumented, since the syntax is likely to evolve significantly in *)
 % %   the future. Examples are available in \texttt{examples/programs}. *)
 % \end{itemize}
-
-\cleardoublepage
-
-\begin{latexonly}
-\tableofcontents
-\end{latexonly}
-
-%\input{intro.tex}
-
-\part{Tutorial}
-
-\input{starting.tex}
-
-\input{syntax.tex}
-
-% \input{ide.tex}
-
-\input{whyml.tex}
-
-\input{api.tex}
-
-\part{Reference Manual}
-
-\input{install.tex}
-
-\input{manpages.tex}
-
-\input{syntaxref.tex}
-
-\input{library.tex}
-
-\input{realizations.tex}
-
-\input{coq_tactic.tex}
-
-% \chapter{Complete API documentation} *)
-% \label{chap:apidoc} *)
-
-% \input{./apidoc.tex} *)
-
-% \appendix
-
-\input{technical.tex}
 
 \bibliographystyle{abbrv}
 \bibliography{manual}

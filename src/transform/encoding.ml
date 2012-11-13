@@ -1,59 +1,45 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ty
 open Theory
 open Task
 open Trans
 
 let meta_select_kept = register_meta_excl "select_kept" [MTstring]
-  ~desc:"@[Specify@ how@ to@ automatically@ choose@ the@ type@ that@ are@ \
-           kept@ (mark@ by@ 'encoding : kept')@ by@ the@ polymorphic@ \
-           encoding:@]@\n  \
-@[\
-  - none:@[ don't@ mark@ automatically@]@\n\
-  - goal:@[ mark@ all@ the@ closed@ type@ that@ appear@ has@ argument@ \
-            in@ the@ goal@]@\n\
-  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
-@]"
-let meta_enco_kept   = register_meta_excl "enco_kept"   [MTstring]
-  ~desc:"@[Specify@ how@ to@ keep@ type:@]@\n  \
-@[\
-  - @[<hov 2>twin: use@ conversion@ function@ between@ the@ kept@ types@ \
-              and@ the@ universal@ type (a complete encoding)@]@\n\
-  - @[<hov 2>instantiate: instantiate all the axioms with the kept types@]@\n\
-  - @[<hov 2>instantiate_complete: same@ as@ instantiate@ but@ keep@ a@ \
-    version@ not@ instantiated(a@ complete@ encoding).@]\
-@]"
+  ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding : kept':@;  \
+    @[\
+      - none: @[don't@ mark@ any@ type@ automatically@]@\n\
+      - goal: @[mark@ every@ closed@ type@ in@ the@ goal@]@\n\
+      - all:  @[mark@ every@ closed@ type@ in@ the@ task.@]\
+    @]"
+
+let meta_enco_kept = register_meta_excl "enco_kept" [MTstring]
+  ~desc:"Specify@ the@ type@ protection@ transformation:@;  \
+    @[\
+      - @[<hov 2>twin: use@ conversion@ functions@ between@ the@ kept@ types@ \
+            and@ the@ universal@ type@]@\n\
+      - @[<hov 2>instantiate: instantiate the axioms with the kept types@ \
+            and@ throw@ out@ polymorphic@ formulas@ (incomplete).@]@\n\
+      - @[<hov 2>instantiate_complete: same@ as@ 'instantiate'@ but@ keep@ \
+            polymorphic@ formulas.@]\
+    @]"
+
 let meta_enco_poly   = register_meta_excl "enco_poly"   [MTstring]
-  ~desc:"@[Specify@ how@ to@ keep@ encode@ polymorphism:@]@\n  \
-@[\
-  - @[<hov 2>decoexp: TODO @]@\n\
-  - @[<hov 2>decorate: add@ around@ all@ the@ terms@ a@ function@ which@ \
-             give@ the@ type@ of@ the@ terms@]@\n\
-  - @[<hov 2>guard: add@ guards@ (hypothesis)@ in@ all@ the@ axioms@ about@ \
-             the@ type@ of@ the@ variables@]@\n\
-  - @[<hov 2>explicit: add@ type@ argument@ to@ all@ the@ polymorphic@ \
-             functions@]\
-@]"
+  ~desc:"Specify@ the@ type@ encoding@ transformation:@;  \
+    @[\
+      - @[<hov 2>decorate: put@ type@ annotations@ on@ top@ of@ terms@]@\n\
+      - @[<hov 2>guard: add@ type@ conditions@ under@ quantifiers.@]\
+    @]"
 
 let def_enco_select_smt  = "none"
 let def_enco_kept_smt    = "twin"
@@ -92,14 +78,7 @@ let encoding_tptp env = Trans.seq [
   Protect_finite.protect_finite]
 
 let () = register_env_transform "encoding_smt" encoding_smt
-  ~desc_metas:[meta_select_kept, Pp.empty_formatted;
-               meta_enco_kept, Pp.empty_formatted;
-               meta_enco_poly, Pp.empty_formatted]
-  ~desc:"encode@ polymorphism@ with@ default@ configuration@ choosed@ for@ \
-         smt@ solver"
+  ~desc:"Encode@ polymorphic@ types@ for@ provers@ with@ sorts."
+
 let () = register_env_transform "encoding_tptp" encoding_tptp
-  ~desc_metas:[meta_select_kept, Pp.empty_formatted;
-               meta_enco_kept, Pp.empty_formatted;
-               meta_enco_poly, Pp.empty_formatted]
-  ~desc:"encode@ polymorphism@ with@ default@ configuration@ choosed@ for@ \
-         tptp@ solver"
+  ~desc:"Encode@ polymorphic@ types@ for@ provers@ without@ sorts."

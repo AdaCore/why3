@@ -1,29 +1,20 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ty
 open Term
 open Decl
 open Theory
 open Task
-open Util
+open Stdlib
 
 (** Task transformation *)
 
@@ -114,38 +105,20 @@ exception TransFailure of string * exn
 exception UnknownTrans of string
 exception KnownTrans of string
 
-type desc_labels = (Ident.label * Pp.formatted) list
-type desc_metas  = (meta * Pp.formatted) list
-
 val register_env_transform   :
-  ?desc_labels:desc_labels -> ?desc_metas:desc_metas -> desc:Pp.formatted ->
-  string -> (Env.env -> task trans) -> unit
-val register_env_transform_l :
-  ?desc_labels:desc_labels -> ?desc_metas:desc_metas -> desc:Pp.formatted ->
-  string -> (Env.env -> task tlist) -> unit
+  desc:Pp.formatted -> string -> (Env.env -> task trans) -> unit
 
-val register_transform   :
-  ?desc_labels:desc_labels -> ?desc_metas:desc_metas -> desc:Pp.formatted ->
-  string -> task trans -> unit
-val register_transform_l :
-  ?desc_labels:desc_labels -> ?desc_metas:desc_metas -> desc:Pp.formatted ->
-  string -> task tlist -> unit
+val register_env_transform_l :
+  desc:Pp.formatted -> string -> (Env.env -> task tlist) -> unit
+
+val register_transform   : desc:Pp.formatted -> string -> task trans -> unit
+val register_transform_l : desc:Pp.formatted -> string -> task tlist -> unit
 
 val lookup_transform   : string -> Env.env -> task trans
 val lookup_transform_l : string -> Env.env -> task tlist
 
-
-type reg_desc =
- { reg_desc_labels : desc_labels;
-   reg_desc_metas  : desc_metas;
-   reg_desc        : Pp.formatted;
- }
-
-val print_reg_desc   : Pp.formatter -> reg_desc -> unit
-val print_trans_desc : Pp.formatter -> string * reg_desc -> unit
-
-val list_transforms   : unit -> (string * reg_desc) list
-val list_transforms_l : unit -> (string * reg_desc) list
+val list_transforms   : unit -> (string * Pp.formatted) list
+val list_transforms_l : unit -> (string * Pp.formatted) list
 
 val named : string -> 'a trans -> 'a trans
 (** give transformation a name without registering *)

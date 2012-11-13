@@ -170,13 +170,14 @@ A \why input file is a (possibly empty) list of theories.
 \clearpage
 \section{WhyML Language}\label{sec:syntax:whyml}
 
-\subsection{Types}
+\subsection{Specification}
 
-The syntax for program types is given in Figure~\ref{fig:bnf:typev}.
+The syntax for specification clauses in programs 
+is given in Figure~\ref{fig:bnf:spec}.
 \begin{figure}
-  \begin{center}\framebox{\input{./typev_bnf.tex}}\end{center}
-  \caption{Syntax for program types.}
-\label{fig:bnf:typev}
+  \begin{center}\framebox{\input{./spec_bnf.tex}}\end{center}
+  \caption{Specification clauses in programs.}
+\label{fig:bnf:spec}
 \end{figure}
 
 \subsection{Expressions}
@@ -185,121 +186,152 @@ The syntax for program expressions is given in
 Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
 \begin{figure}
   \begin{center}\framebox{\input{./expr_bnf.tex}}\end{center}
-  \caption{Syntax for program expressions (part1).}
+  \caption{Syntax for program expressions (part 1).}
 \label{fig:bnf:expra}
 \end{figure}
 
 \begin{figure}
   \begin{center}\framebox{\input{./expr2_bnf.tex}}\end{center}
-  \caption{Syntax for program expressions (part2).}
+  \caption{Syntax for program expressions (part 2).}
 \label{fig:bnf:exprb}
 \end{figure}
 
-In the following we describe the informal semantics of each constructs, and provide the corresponding rule for computing the weakest precondition.
+% In the following we describe the informal semantics of each
+% constructs, and provide the corresponding rule for computing the
+% weakest precondition.
 
 
-\subsubsection{Constant expressions}
+% \subsubsection{Constant Expressions, Unary and Binary Operators}
 
-\todo{Integer and real constants are as in the logic language}
 
-\subsubsection{Unary and Binary Operators}
+% Integer and real constants are as in the logic language, as weel as the unary and binary operators.
 
-\todo{}
 
-\subsubsection{Array accesses and updates, fields access and updates}
+% \subsubsection{Array accesses and updates, fields access and updates}
 
-\todo{}
+% \todo{}
 
-\subsubsection{Let binding, sequences}
+% \subsubsection{Let binding, sequences}
 
-\todo{}
+% \todo{}
 
-\subsubsection{Function definition}
+% \subsubsection{Function definition}
 
-\todo{fun, let rec}
+% \todo{fun, let rec}
 
-\subsubsection{Function call}
+% \subsubsection{Function call}
 
-\todo{}
+% \todo{}
 
-\subsubsection{Exception throwing and catching}
+% \subsubsection{Exception throwing and catching}
 
-\todo{raise, try with end}
+% \todo{raise, try with end}
 
-\subsubsection{Conditional expression, pattern matching}
+% \subsubsection{Conditional expression, pattern matching}
 
-\todo{if then else. Discuss standard WP versus fast WP}
+% \todo{if then else. Discuss standard WP versus fast WP}
 
-\subsubsection{Loops}
+% \subsubsection{Iteration Expressions}
 
-\todo{while, loop, for}
+% There are three kind of expressions for iterating: bounded, unbounded and infinite.
 
-\subsubsection{Assertions, Code Contracts}
+% \begin{itemize}
+% \item A bounded iteration has the form
+% \begin{flushleft}\ttfamily
+%   for $i$=$a$ to $b$ do invariant \{ $I$ \} $e$ done
+% \end{flushleft}
+% Expressions $a$ and $b$ are evaluated first and only once, then expression $e$ si evaluated successively for $i$ from $a$ to $b$ included. Nothing is executed if $a > b$. The invariant $I$ must hold at each iteration including before entering the loop and when leaving it. The rule for computing WP is as follows:
+% \begin{eqnarray*}
+%   WP(\texttt{for} \ldots, Q) &=& I(a) \land \\
+% && \forall \vec{w} (\forall i, a \leq i \leq b \land I(i) \rightarrow WP(e,I(i+1))) \land (I(b+1) \rightarrow Q)
+% \end{eqnarray*}
+% where $\vec{w}$ is the set of references modified by $e$.
 
-There are several form of expressions for inserting annotations in the code.
-The first form of those are the \emph{assertions} which have the form
-\begin{flushleft}\ttfamily
-  \textsl{keyword} \{ \textsl{proposition} \}
-\end{flushleft}
-where \textsl{keyword} is either \texttt{assert}, \texttt{assume} or
-\texttt{check}. They all state that the given proposition holds at the given program point. The differences are:
-\begin{itemize}
-\item \texttt{assert} requires to prove that the proposition holds, and then make it available in the context of the remaining of the code
-\item \texttt{check} requires to prove that the proposition holds, but
-  does not make it visible in the remaining
-\item \texttt{assume} assumes that the proposition holds and make it
-  visible in the context of the remaining code, without requiring to
-  prove it. It acts like an axiom, but within a program.
-\end{itemize}
-The corresponding rules for computing WP are as follows:
-\begin{eqnarray*}
-  WP(\texttt{assert} \{ P \}, Q) &=& P \mathop{\&\&} Q = P \land (P \rightarrow Q)\\
-  WP(\texttt{check} \{ P \}, Q) &=& P \land Q \\
-  WP(\texttt{assume} \{ P \}, Q) &=& P \rightarrow Q
-\end{eqnarray*}
+% A downward bounded iteration is also available, under the form
+% \begin{flushleft}\ttfamily
+%   for $i$=$a$ downto $b$ do invariant \{ $I$ \} $e$ done
+% \end{flushleft}
 
-The other forms of code contracts allow to abstract a piece of code by specifications.
-\begin{itemize}
-\item $\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \}$ is a
-  non-deterministic expression that requires the precondition $P$ to
-  hold, then makes some side effects $\epsilon$, and returns any value
-  of type $\tau$ such that $Q$ holds. This construct acts as an axiom
-  in the sense that it does not check whether there exists any program
-  that can effectively establish the post-condition (similarly as the
-  introduction of a \texttt{val} at the global level).
-\item $\texttt{contract}~e~\{ Q \}$ evaluates the expression $e$ and
-  ensures that the post-condition $Q$ holds afterwards.
-\item $\texttt{abstract}~e~\{ Q \}$ makes sure that the evaluation of
-  expression $e$ establishes the post-condition $Q$, and then abstract
-  away the program state by the post-condition $Q$ (similarly to the
-  \texttt{any} construct).
-\end{itemize}
-The corresponding rules for computing WP are as follows:
-\[
-\begin{array}{l}
-  WP(\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \mid exn_i \Rightarrow R_i \} ,
-  Q'  exn_i \Rightarrow R'_i) = \\
-  \qquad\qquad P \mathop{\&\&} \forall result, \epsilon.
-  (Q \rightarrow Q') \land (R_i \rightarrow R'_i) \\
-  WP(\texttt{contract}~e~\{ Q \mid exn_i \Rightarrow R_i \} ,
-  Q' \mid exn_i \Rightarrow R'_i) = \\
-  \qquad\qquad WP(e,Q \land Q' \mid exn_i \Rightarrow R_i \land R'_i) \\
-  WP(\texttt{abstract}~e~\{ Q \mid exn_i \Rightarrow R_i \} ,
-  Q' \mid exn_i \Rightarrow R'_i) = \\
-  \qquad\qquad WP(e,Q \mid exn_i \Rightarrow R_i) \land
-  \forall result, \epsilon, Q \rightarrow Q' \land R_i \rightarrow R'_i
-\end{array}
-\]
+% \item An unbounded iteration has the form
+% \begin{flushleft}\ttfamily
+%   while $c$ do invariant \{ $I$ \} $e$ done
+% \end{flushleft}
+% it iterates the loop body $e$ until the condition $c$ becomes false. 
+% \begin{eqnarray*}
+%   WP(\texttt{while} \ldots, Q) &=& I \land \\
+% && \forall \vec{w} (c \land I \rightarrow WP(e,I)) \land (\neg c \land I \rightarrow Q)
+% \end{eqnarray*}
+% where $\vec{w}$ is the set of references modified by $e$.
 
-\todo{? sandbox:}
-\[
-WP(\texttt{sandbox}~e, Q) = WP(e,true) \land Q
-\]
-(side-effects in $e$ are "forgotten"...)
+% Additionally, such a loop can be given a variant $v$, a quantity that must decreases ar each iteration, so as to prove its termination.
 
-\subsubsection{Labels, old, at}
 
-\todo{}
+% \item An infinite iteration has the form
+% \begin{flushleft}\ttfamily
+%   loop invariant \{ $I$ \} $e$ end
+% \end{flushleft}
+% it iterates the loop forever, hence the only way to exit such a loop is to raise an exception.
+% \begin{eqnarray*}
+%   WP(\texttt{loop} \ldots, Q \mid Exc \Rightarrow R) &=& I \land \\
+% && \forall \vec{w} (I \rightarrow WP(e,I)) \land (I \rightarrow WP(e,Exc \Rightarrow R))
+% \end{eqnarray*}
+% \end{itemize}
+
+% \subsubsection{Assertions, Code Contracts}
+
+% There are several form of expressions for inserting annotations in the code.
+% The first form of those are the \emph{assertions} which have the form
+% \begin{flushleft}\ttfamily
+%   \textsl{keyword} \{ \textsl{proposition} \}
+% \end{flushleft}
+% where \textsl{keyword} is either \texttt{assert}, \texttt{assume} or
+% \texttt{check}. They all state that the given proposition holds at the given program point. The differences are:
+% \begin{itemize}
+% \item \texttt{assert} requires to prove that the proposition holds, and then make it available in the context of the remaining of the code
+% \item \texttt{check} requires to prove that the proposition holds, but
+%   does not make it visible in the remaining
+% \item \texttt{assume} assumes that the proposition holds and make it
+%   visible in the context of the remaining code, without requiring to
+%   prove it. It acts like an axiom, but within a program.
+% \end{itemize}
+% The corresponding rules for computing WP are as follows:
+% \begin{eqnarray*}
+%   WP(\texttt{assert} \{ P \}, Q) &=& P \mathop{\&\&} Q = P \land (P \rightarrow Q)\\
+%   WP(\texttt{check} \{ P \}, Q) &=& P \land Q \\
+%   WP(\texttt{assume} \{ P \}, Q) &=& P \rightarrow Q
+% \end{eqnarray*}
+
+% The other forms of code contracts allow to abstract a piece of code by specifications.
+% \begin{itemize}
+% \item $\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \}$ is a
+%   non-deterministic expression that requires the precondition $P$ to
+%   hold, then makes some side effects $\epsilon$, and returns any value
+%   of type $\tau$ such that $Q$ holds. This construct acts as an axiom
+%   in the sense that it does not check whether there exists any program
+%   that can effectively establish the post-condition (similarly as the
+%   introduction of a \texttt{val} at the global level).
+% \item $\texttt{abstract}~e~\{ Q \}$ makes sure that the evaluation of
+%   expression $e$ establishes the post-condition $Q$, and then abstract
+%   away the program state by the post-condition $Q$ (similarly to the
+%   \texttt{any} construct).
+% \end{itemize}
+% The corresponding rules for computing WP are as follows:
+% \[
+% \begin{array}{l}
+%   WP(\texttt{any}~\{ P \}~\tau~\epsilon~\{ Q \mid exn_i \Rightarrow R_i \} ,
+%   Q'  exn_i \Rightarrow R'_i) = \\
+%   \qquad\qquad P \mathop{\&\&} \forall result, \epsilon.
+%   (Q \rightarrow Q') \land (R_i \rightarrow R'_i) \\
+%   WP(\texttt{abstract}~e~\{ Q \mid exn_i \Rightarrow R_i \} ,
+%   Q' \mid exn_i \Rightarrow R'_i) = \\
+%   \qquad\qquad WP(e,Q \mid exn_i \Rightarrow R_i) \land
+%   \forall result, \epsilon, Q \rightarrow Q' \land R_i \rightarrow R'_i
+% \end{array}
+% \]
+
+% \subsubsection{Labels, Operators \texttt{old} and \texttt{at}}
+
+% \todo{Labels, old, at}
 
 \subsection{Modules}
 
@@ -321,6 +353,7 @@ A \whyml input file is a (possibly empty) list of theories and modules.
 A theory defined in a \whyml\ file can only be used within that
 file. If a theory is supposed to be reused from other files, be they
 \why\ or \whyml\ files, it should be defined in a \why\ file.
+
 
 %%% Local Variables:
 %%% mode: latex

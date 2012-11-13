@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** transformation from polymorphic logic to untyped logic. The polymorphic
 logic must not have finite support types. *)
@@ -24,8 +15,8 @@ logic must not have finite support types. *)
 (* dead code
 
 open Ident
-open Ty 
-open Term 
+open Ty
+open Term
 open Libencoding
 
 (** module with printing functions *)
@@ -139,8 +130,8 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
   let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
   let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let ty_arg = List.map neg ls.ls_args in
-  let ty_res = Util.option_map pos ls.ls_value in
-  if Util.option_eq ty_equal ty_res ls.ls_value &&
+  let ty_res = Opt.map pos ls.ls_value in
+  if Opt.equal ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
 
@@ -154,6 +145,6 @@ let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
 (* This encoding method is unsound in presence of finite types. *)
 
 (*
-let () = Hashtbl.replace Encoding.ft_enco_poly "explicit"
+let () = Hstr.replace Encoding.ft_enco_poly "explicit"
     (fun _ -> Trans.compose explicit monomorph)
 *)

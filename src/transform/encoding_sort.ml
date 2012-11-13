@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ident
 open Ty
 open Term
@@ -67,10 +57,10 @@ let conv_vs tenv ud vs =
 let conv_ls tenv ud ls =
   if ls_equal ls ps_equ then ls
   else try Hls.find tenv.trans_lsymbol ls with Not_found ->
-  let ty_res = Util.option_map (conv_ty tenv ud) ls.ls_value in
+  let ty_res = Opt.map (conv_ty tenv ud) ls.ls_value in
   let ty_arg = List.map (conv_ty tenv ud) ls.ls_args in
   let ls' =
-    if Util.option_eq ty_equal ty_res ls.ls_value &&
+    if Opt.equal ty_equal ty_res ls.ls_value &&
        List.for_all2 ty_equal ty_arg ls.ls_args then ls
     else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res
   in
@@ -88,7 +78,7 @@ let rec rewrite_term tenv ud vm t =
   | Tapp (fs,tl) ->
       let fs = conv_ls tenv ud fs in
       let tl = List.map (fnT vm) tl in
-      fs_app fs tl (of_option fs.ls_value)
+      fs_app fs tl (Opt.get fs.ls_value)
   | Tif (f, t1, t2) ->
       t_if (fnF vm f) (fnT vm t1) (fnT vm t2)
   | Tlet (t1, b) ->
@@ -114,7 +104,7 @@ and rewrite_fmla tenv ud vm f =
   | Tquant (q,b) ->
       let vl, tl, f1, close = t_open_quant_cb b in
       let add m v = let v' = conv_vs tenv ud v in Mvs.add v (t_var v') m, v' in
-      let vm', vl' = Util.map_fold_left add vm vl in
+      let vm', vl' = Lists.map_fold_left add vm vl in
       let tl' = TermTF.tr_map (fnT vm') (fnF vm') tl in
       let f1' = fnF vm' f1 in
       t_quant q (close vl' tl' f1')
@@ -182,5 +172,4 @@ let t =
   Trans.fold (fold tenv) None
 
 let () = Trans.register_transform "encoding_sort" t
-  ~desc:"Remove@ each@ type@ application@ by@ discriminating@ it@ into@ one@ \
-         specific@ constant@ type."
+  ~desc:"Replace@ every@ closed@ type@ by@ a@ separate@ type@ constant."

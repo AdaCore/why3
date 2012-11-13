@@ -24,7 +24,7 @@ end
 module NQueensSetsTermination
 
   use import S
-  use import module ref.Refint
+  use import ref.Refint
 
   let rec t (a b c : set int) variant { cardinal a } =
     if not (is_empty a) then begin
@@ -94,7 +94,7 @@ end
 module NQueensSets
 
   use import S
-  use import module ref.Refint
+  use import ref.Refint
   use import Solution
 
   val ghost col: ref solution  (* solution under construction *)
@@ -104,16 +104,24 @@ module NQueensSets
   val ghost s  : ref int       (* next slot for a solution
                                   = current number of solutions *)
 
-  let rec t3 (a b c : set int) variant { cardinal a } =
-    { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
+  let rec t3 (a b c : set int) variant { cardinal a }
+    requires { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
       (forall i: int. mem i a <->
         (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
       (forall i: int. i>=0 -> not (mem i b) <->
         (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
       (forall i: int. i>=0 -> not (mem i c) <->
         (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
-     partial_solution !k !col }
-    if not (is_empty a) then begin
+      partial_solution !k !col }
+    ensures { result = !s - old !s >= 0 /\ !k = old !k /\
+      sorted !sol (old !s) !s /\
+      (forall t: solution.
+         ((solution t /\ eq_prefix !col t !k) <->
+          (exists i: int. old !s <= i < !s /\ eq_sol t !sol[i]))) /\
+      (* assigns *)
+      eq_prefix (old !col) !col !k /\
+      eq_prefix (old !sol) !sol (old !s) }
+  = if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
       let f = ref 0 in
    'L:while not (is_empty !e) do
@@ -144,21 +152,13 @@ module NQueensSets
       ghost incr s;
       1
     end
-    { result = !s - old !s >= 0 /\ !k = old !k /\
-      sorted !sol (old !s) !s /\
-      (forall t: solution.
-         ((solution t /\ eq_prefix !col t !k) <->
-          (exists i: int. old !s <= i < !s /\ eq_sol t !sol[i]))) /\
-      (* assigns *)
-      eq_prefix (old !col) !col !k /\
-      eq_prefix (old !sol) !sol (old !s) }
 
-  let queens3 (q: int) =
-    { 0 <= q = n /\ !s = 0 /\ !k = 0 }
-    t3 (below q) empty empty
-    { result = !s /\ sorted !sol 0 !s /\
+  let queens3 (q: int)
+    requires { 0 <= q = n /\ !s = 0 /\ !k = 0 }
+    ensures { result = !s /\ sorted !sol 0 !s /\
       forall t: solution.
         solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
+  = t3 (below q) empty empty
 
 end
 
@@ -229,11 +229,12 @@ end
 module NQueensBits
 
   use import Bits
-  use import module arith.Int
-  use import module ref.Refint
+  use import arith.Int
+  use import ref.Refint
   use import Solution
 
-  val min_elt (x: int) : { x <> 0 } int { result = min_elt (bits x) }
+  val min_elt (x: int) : int
+    requires { x <> 0 } ensures { result = min_elt (bits x) }
 
   val col: ref solution  (* solution under construction *)
   val k  : ref int       (* current row in the current solution *)
@@ -242,15 +243,23 @@ module NQueensBits
   val s  : ref int       (* next slot for a solution = number of solutions *)
 
   let rec t (a b c: int) variant { cardinal (bits a) } =
-    { 0 <= !k /\ !k + cardinal (bits a) = n /\ !s >= 0 /\
+    requires { 0 <= !k /\ !k + cardinal (bits a) = n /\ !s >= 0 /\
       (forall i: int. mem i (bits a) <->
         (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
       (forall i: int. i>=0 -> not (mem i (bits b)) <->
         (forall j: int. 0 <= j < !k -> !col[j] <> i + j - !k)) /\
       (forall i: int. i>=0 -> not (mem i (bits c)) <->
         (forall j: int. 0 <= j < !k -> !col[j] <> i + !k - j)) /\
-     partial_solution !k !col }
-    if a <> 0 then begin
+      partial_solution !k !col }
+    ensures { result = !s - old !s >= 0 /\ !k = old !k /\
+      sorted !sol (old !s) !s /\
+      (forall u: solution.
+         ((solution u /\ eq_prefix !col u !k) <->
+          (exists i: int. old !s <= i < !s /\ eq_sol u !sol[i]))) /\
+      (* assigns *)
+      eq_prefix (old !col) !col !k /\
+      eq_prefix (old !sol) !sol (old !s) }
+  = if a <> 0 then begin
       let e = ref (a & ~b & ~c) in
       let f = ref 0 in
    'L:while !e <> 0 do
@@ -283,28 +292,14 @@ module NQueensBits
       ghost incr s;
       1
     end
-    { result = !s - old !s >= 0 /\ !k = old !k /\
-      sorted !sol (old !s) !s /\
-      (forall u: solution.
-         ((solution u /\ eq_prefix !col u !k) <->
-          (exists i: int. old !s <= i < !s /\ eq_sol u !sol[i]))) /\
-      (* assigns *)
-      eq_prefix (old !col) !col !k /\
-      eq_prefix (old !sol) !sol (old !s) }
 
-  let queens (q: int) =
-    { 0 <= q = n <= size /\ !s = 0 /\ !k = 0 }
-    t (~(~0 << q)) 0 0
-    { result = !s /\ sorted !sol 0 !s /\
+  let queens (q: int)
+    requires { 0 <= q = n <= size /\ !s = 0 /\ !k = 0 }
+    ensures { result = !s /\ sorted !sol 0 !s /\
       forall u: solution.
         solution u <-> (exists i: int. 0 <= i < result /\ eq_sol u !sol[i]) }
+  = t (~(~0 << q)) 0 0
 
 end
 
 ***)
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/queens.gui"
-End:
-*)

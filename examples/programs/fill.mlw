@@ -4,7 +4,7 @@
 module Fill
 
   use import int.Int
-  use import module array.Array
+  use import array.Array
 
   type elt
   type tree = Null | Node tree elt tree
@@ -23,10 +23,12 @@ module Fill
   lemma size_nonneg: forall t: tree. size t >= 0
 
   let rec fill (t: tree) (a: array elt) (start: int) : int
-    variant { size t }
-  =
-    { 0 <= start <= length a }
-    match t with
+    variant  { size t }
+    requires { 0 <= start <= length a }
+    ensures  { start <= result <= length a }
+    ensures  { forall i: int. 0 <= i < start -> a[i] = (old a)[i] }
+    ensures  { forall i: int. start <= i < result -> contains t a[i] }
+  = match t with
     | Null ->
         start
     | Node l x r ->
@@ -37,14 +39,5 @@ module Fill
         end else
           res
      end
-    { start <= result <= length a /\
-      (forall i: int. 0 <= i < start -> a[i] = (old a)[i]) /\
-      (forall i: int. start <= i < result -> contains t a[i]) }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/fill.gui"
-End:
-*)

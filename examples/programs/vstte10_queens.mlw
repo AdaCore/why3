@@ -9,7 +9,7 @@
 module NQueens
 
   use import int.Int
-  use import module array.Array
+  use import array.Array
 
   predicate eq_board (b1 b2: array int) (pos: int) =
     forall q:int. 0 <= q < pos -> b1[q] = b2[q]
@@ -49,9 +49,10 @@ module NQueens
 
   exception Inconsistent int
 
-  let check_is_consistent (board: array int) (pos: int) =
-    { 0 <= pos < length board }
-    try
+  let check_is_consistent (board: array int) (pos: int)
+    requires { 0 <= pos < length board }
+    ensures { result=True <-> is_consistent board pos }
+  = try
       for q = 0 to pos - 1 do
         invariant { forall j:int. 0 <= j < q -> consistent_row board pos j }
         let bq   = board[q]   in
@@ -65,7 +66,6 @@ module NQueens
       assert { not (consistent_row board pos q) };
       False
     end
-    { result=True <-> is_consistent board pos }
 
   predicate is_board (board: array int) (pos: int) =
     forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
@@ -80,9 +80,14 @@ module NQueens
 
   exception Solution
 
-  let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos } =
-    { length board = n /\ 0 <= pos <= n /\ solution board pos }
-'Init:
+  let rec bt_queens (board: array int) (n: int) (pos: int) variant { n - pos }
+    requires { length board = n /\ 0 <= pos <= n /\ solution board pos }
+    ensures { (* no solution *)
+      eq_board board (old board) pos /\
+      forall b:array int. length b = n -> is_board b n ->
+        eq_board board b pos -> not (solution b n) }
+    raises { Solution -> solution board n }
+  = 'Init:
     if pos = n then raise Solution;
     for i = 0 to n - 1 do
       invariant {
@@ -92,24 +97,11 @@ module NQueens
       board[pos] <- i;
       if check_is_consistent board pos then bt_queens board n (pos+1)
     done
-    { (* no solution *)
-      eq_board board (old board) pos /\
-      forall b:array int. length b = n -> is_board b n ->
-        eq_board board b pos -> not (solution b n) }
-    | Solution ->
-    { (* a solution *)
-      solution board n }
 
-  let queens (board: array int) (n: int) =
-    { 0 <= length board = n }
-    bt_queens board n 0
-    { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
-    | Solution -> { solution board n }
+  let queens (board: array int) (n: int)
+    requires { 0 <= length board = n }
+    ensures { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
+    raises { Solution -> solution board n }
+  = bt_queens board n 0
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_queens.gui"
-End:
-*)

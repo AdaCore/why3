@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (*
   This module was poorly designed by Claude Marché, with the
@@ -47,7 +38,7 @@ let rec intros pr f = match f.t_node with
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
-      let subst, dl = Util.map_fold_left intro_var Mvs.empty vsl in
+      let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
       let f = t_subst subst f in
       dl @ intros pr f
   | Tlet (t,fb) ->
@@ -69,6 +60,7 @@ let intros pr f =
 let () = Trans.register_transform "introduce_premises" (Trans.goal intros)
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
+
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. byte"

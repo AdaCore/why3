@@ -1,26 +1,17 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Why3
-open Util
+open Stdlib
 open Theory
 
 let () = Debug.set_flag Glob.flag
@@ -121,6 +112,7 @@ let () =
       let c = open_out fhtml in
       let fmt = formatter_of_out_channel c in
       if not !opt_body then Doc_html.print_header fmt ~title ~css ();
+      fprintf fmt "<div class=\"why3doc\">@\n";
       fprintf fmt "<h1>%s</h1>@\n" title;
       fprintf fmt "<ul>@\n";
       let add fn =
@@ -132,6 +124,7 @@ let () =
       in
       Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";
+      fprintf fmt "</div>@\n";
       if not !opt_body then Doc_html.print_footer fmt ();
       close_out c
     end

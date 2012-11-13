@@ -1,7 +1,7 @@
 module M
 
 use import int.Int
-use import module ref.Ref
+use import ref.Ref
 
 (* for loop with invariant *)
 let test1 () =
@@ -24,17 +24,16 @@ exception E
 
 (* the body raises an exception (for sure)
    subtle: the invariant is required *)
-let test3 () =
-  { }
-  for i = 1 to 10 do invariant { i >= 2 -> false }
+let test3 ()
+  ensures { false } raises { E -> true }
+= for i = 1 to 10 do invariant { i >= 2 -> false }
     raise E
   done
-  { false } | E -> { true }
 
 (* the body may raise an exception *)
-let test4 x =
-  { }
-  try
+let test4 x
+  ensures { result=True <-> 0 <= x <= 10 }
+= try
     for i = 0 to 10 do
       invariant { x < 0 \/ x >= i }
       if i = x then raise E
@@ -43,7 +42,6 @@ let test4 x =
   with E ->
     True
   end
-  { result=True <-> 0 <= x <= 10 }
 
 (* and now downto *)
 
@@ -62,16 +60,15 @@ let test2d () =
   done;
   assert { !x = 0 }
 
-let test3d () =
-  { }
-  for i = 10 downto 1 do invariant { i < 10 -> false }
+let test3d ()
+  ensures { false } raises { E -> true }
+= for i = 10 downto 1 do invariant { i < 10 -> false }
     raise E
   done
-  { false } | E -> { true }
 
-let test4d x =
-  { }
-  try
+let test4d x
+  ensures { result=True <-> 0 <= x <= 10 }
+= try
     for i = 10 downto 0 do
       invariant { x > 10 \/ x <= i }
       if i = x then raise E
@@ -80,7 +77,6 @@ let test4d x =
   with E ->
     True
   end
-  { result=True <-> 0 <= x <= 10 }
 
 end
 

@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Why3
 module S = Session
@@ -46,8 +37,8 @@ let read_simple_spec () =
   if !opt_version then begin
     print_version (); exit 0
   end;
-  Debug.Opt.set_flags_selected ();
-  Debug.Opt.option_list ()
+  Debug.Args.set_flags_selected ();
+  Debug.Args.option_list ()
 
 
 
@@ -67,13 +58,13 @@ let common_options = [
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> same as -L";
   "-v", Arg.Set opt_version, " prints version information" ;
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
 ]
 
 (* dead code
-let env_spec = common_options 
+let env_spec = common_options
 *)
 
 let read_env_spec () =
@@ -103,7 +94,7 @@ let filter_prover = Stack.create ()
 
 let read_opt_prover s =
   try
-    let l = Util.split_string_rev s ',' in
+    let l = Strings.rev_split s ',' in
     match l with
     | [altern;version;name] when List.for_all (fun s -> s.[0] <> '^') l ->
       Prover {Whyconf.prover_name = name;

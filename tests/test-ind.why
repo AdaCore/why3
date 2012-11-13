@@ -1,0 +1,17 @@
+
+theory T
+
+type list 'a = Nil | Cons 'a (list 'a)
+
+function app (l1:list 'a) (l2:list 'a) : (list 'a) =
+  match l1 with
+  | Nil -> l2
+  | Cons x r -> Cons x (app r l2) 
+  end
+
+lemma app_nil : forall l:list 'a. app l Nil = l
+
+type tree = Leaf int | Node tree tree
+
+end
+

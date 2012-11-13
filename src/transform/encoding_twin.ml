@@ -1,24 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -78,7 +69,7 @@ let conv_arg tenv t aty =
 
 let conv_app tenv fs tl tty =
   let t = fs_app fs tl tty in
-  let vty = Util.of_option fs.ls_value in
+  let vty = Opt.get fs.ls_value in
   if ty_equal tty vty then t else
   try
     let _,tb2t,_ = Mty.find tty tenv in
@@ -120,4 +111,4 @@ let decl tenv d =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun s ->
   Trans.decl (decl (Mty.mapi make_pont s)) None)
 
-let () = Hstr.replace Encoding.ft_enco_kept "twin" (const t)
+let () = Hstr.replace Encoding.ft_enco_kept "twin" (Util.const t)

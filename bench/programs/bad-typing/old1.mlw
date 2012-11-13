@@ -1,13 +1,13 @@
 module M
   use import int.Int
-  use import module ref.Ref
-  let test1 (x: ref int) =
-    { !x >= 0}
-    while !x > 0 do
+  use import ref.Ref
+  let test1 (x: ref int)
+    requires { !x >= 0 }
+    ensures  { !x >= old !x }
+  = while !x > 0 do
       invariant { !x >= old !x }
       x := !x - 1
     done
-    { !x >= old !x }
 end
 
 (*

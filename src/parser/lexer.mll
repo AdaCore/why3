@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 {
   open Format
@@ -84,6 +75,7 @@
         "do", DO;
         "done", DONE;
         "downto", DOWNTO;
+        "ensures", ENSURES;
         "exception", EXCEPTION;
         "for", FOR;
         "fun", FUN;
@@ -98,6 +90,8 @@
         "raises", RAISES;
         "reads", READS;
         "rec", REC;
+        "requires", REQUIRES;
+        "returns", RETURNS;
         "to", TO;
         "try", TRY;
         "val", VAL;
@@ -190,22 +184,23 @@ rule token = parse
   | uident as id
       { UIDENT id }
   | ['0'-'9'] ['0'-'9' '_']* as s
-      { INTEGER (IConstDecimal (remove_underscores s)) }
+      { INTEGER (Number.int_const_dec (remove_underscores s)) }
   | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
-      { INTEGER (IConstHexa (remove_underscores s)) }
+      { INTEGER (Number.int_const_hex (remove_underscores s)) }
   | '0' ['o' 'O'] (['0'-'7'] ['0'-'7' '_']* as s)
-      { INTEGER (IConstOctal (remove_underscores s)) }
+      { INTEGER (Number.int_const_oct (remove_underscores s)) }
   | '0' ['b' 'B'] (['0'-'1'] ['0'-'1' '_']* as s)
-      { INTEGER (IConstBinary (remove_underscores s)) }
+      { INTEGER (Number.int_const_bin (remove_underscores s)) }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-      { FLOAT (RConstDecimal (i, f, Util.option_map remove_leading_plus e)) }
-  | '0' ['x' 'X'] ((hexadigit* as i) '.' (hexadigit+ as f)
-                  |(hexadigit+ as i) '.' (hexadigit* as f)
-                  |(hexadigit+ as i) ("" as f))
-    ['p' 'P'] (['-' '+']? digit+ as e)
-      { FLOAT (RConstHexa (i, f, remove_leading_plus e)) }
+      { FLOAT (Number.real_const_dec i f (Opt.map remove_leading_plus e)) }
+  | '0' ['x' 'X'] (hexadigit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
+  | '0' ['x' 'X'] (hexadigit+ as i) '.' (hexadigit* as f)
+        (['p' 'P'] (['-' '+']? digit+ as e))?
+  | '0' ['x' 'X'] (hexadigit* as i) '.' (hexadigit+ as f)
+        (['p' 'P'] (['-' '+']? digit+ as e))?
+      { FLOAT (Number.real_const_hex i f (Opt.map remove_leading_plus e)) }
   | "(*)"
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
@@ -222,10 +217,6 @@ rule token = parse
       { LEFTBRC }
   | "}"
       { RIGHTBRC }
-  | "{|"
-      { LEFTREC }
-  | "|}"
-      { RIGHTREC }
   | ":"
       { COLON }
   | ";"

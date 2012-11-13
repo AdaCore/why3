@@ -49,27 +49,25 @@ module State
   use import int.Int
   use export Generator
 
-  type state model {| mutable state: generator |}
+  type state model { mutable state: generator }
 
-  val create (seed: int) :
-    {} state { result.state = create seed }
+  val create (seed: int) : state
+    ensures { result.state = create seed }
 
-  val init (s: state) (seed: int) :
-    {} unit writes s { s.state = create seed }
+  val init (s: state) (seed: int) : unit writes {s}
+    ensures { s.state = create seed }
 
-  val self_init (s: state) :
-    {} unit writes s {}
+  val self_init (s: state) : unit writes {s}
 
-  val random_bool (s: state) :
-    {}
-    bool writes s
-    { s.state = next (old s.state) /\ result = get_bool s.state }
+  val random_bool (s: state) : bool writes {s}
+    ensures { s.state = next (old s.state) }
+    ensures { result = get_bool s.state }
 
-  val random_int (s: state) (n: int) :
-    { 0 < n }
-    int writes s
-    { s.state = next (old s.state) /\ result = get_int s.state n /\
-      0 <= result < n }
+  val random_int (s: state) (n: int) : int writes {s}
+    requires { 0 < n }
+    ensures  { s.state = next (old s.state) }
+    ensures  { result = get_int s.state n }
+    ensures  { 0 <= result < n }
 
 end
 
@@ -78,32 +76,31 @@ end
 module Random
 
   use import int.Int
-  use import module State
+  use import State
 
   val s: state
 
-  let init (seed: int) =
-    {} init s seed { s.state = create seed }
+  let init (seed: int) ensures { s.state = create seed } = init s seed
 
-  let self_init () =
-    {} self_init s {}
+  let self_init () = self_init s
 
-  let random_bool () =
-    {}
-    random_bool s
-    { s.state = next (old s.state) /\ result = get_bool s.state }
+  let random_bool ()
+    ensures { s.state = next (old s.state) }
+    ensures { result = get_bool s.state }
+  = random_bool s
 
-  let random_int (n: int) =
-    { 0 < n }
-    random_int s n
-    { s.state = next (old s.state) /\ result = get_int s.state n /\
-      0 <= result < n }
+  let random_int (n: int)
+    requires { 0 < n }
+    ensures  { s.state = next (old s.state) }
+    ensures  { result = get_int s.state n }
+    ensures  { 0 <= result < n }
+  = random_int s n
 
 end
 
 module Test
 
-  use import module Random
+  use import Random
 
   let test1 () =
     init 42;
@@ -113,9 +110,3 @@ module Test
     assert { x = y }
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/random"
-End:
-*)

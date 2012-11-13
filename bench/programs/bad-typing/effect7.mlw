@@ -3,10 +3,10 @@ module Bad
   use import int.Int
   use import ref.Ref
 
-  let f (x y : ref int) : unit =
-  { !x = !y }
-    x := !x + 1
-  { !x = !y + 1 }
+  let f (x y : ref int) : unit
+    requires { !x = !y }
+    ensures  { !x = !y + 1 }
+  = x := !x + 1
 
   let g () : unit =
     let r = ref 0 in

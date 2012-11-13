@@ -1,24 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -158,8 +149,8 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
   let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
   let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let tyl = List.map neg ls.ls_args in
-  let tyr = Util.option_map pos ls.ls_value in
-  if Util.option_eq ty_equal tyr ls.ls_value
+  let tyr = Opt.map pos ls.ls_value in
+  if Opt.equal ty_equal tyr ls.ls_value
      && List.for_all2 ty_equal tyl ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) tyl tyr)
 
@@ -172,5 +163,5 @@ let mono kept =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.compose (deco kept) (mono kept))
 
-let () = Hstr.replace Encoding.ft_enco_poly "decoexp" (const t)
+let () = Hstr.replace Encoding.ft_enco_poly "decoexp" (Util.const t)
 

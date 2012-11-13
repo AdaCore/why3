@@ -29,8 +29,8 @@
    ;; Note: comment font-lock is guaranteed by suitable syntax entries
    '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
    '("{}\\|{[^|]\\([^}]*\\)}" . font-lock-type-face)
-   `(,(why-regexp-opt '("use" "clone" "namespace" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private" "reads" "writes" "raises")) . font-lock-builtin-face)
-   `(,(why-regexp-opt '("any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "for" "to" "downto" "do" "done" "label" "loop" "assert" "absurd" "assume" "check" "ghost" "try" "with" "theory" "uses" "module")) . font-lock-keyword-face)
+   `(,(why-regexp-opt '("use" "clone" "namespace" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private")) . font-lock-builtin-face)
+   `(,(why-regexp-opt '("any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "invariant" "variant" "for" "to" "downto" "do" "done" "label" "loop" "assert" "absurd" "assume" "check" "ghost" "try" "with" "theory" "uses" "module" "requires" "ensures" "returns" "raises" "reads" "writes")) . font-lock-keyword-face)
    ; `(,(why-regexp-opt '("unit" "bool" "int" "float" "prop" "array")) . font-lock-type-face)
    )
   "Minimal highlighting for Why mode")

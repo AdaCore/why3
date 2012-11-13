@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/cmarche/recherche/why3/share/why3session.dtd">
-<why3session
- name="bts/fsetint/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,18 +31,26 @@
   expanded="true">
   <theory
    name="Th1"
-   locfile="bts/fsetint/../fsetint.why"
+   locfile="../fsetint.why"
    loclnum="2" loccnumb="7" loccnume="10"
    verified="false"
    expanded="true">
    <goal
     name="l_false"
-    locfile="bts/fsetint/../fsetint.why"
+    locfile="../fsetint.why"
     loclnum="5" loccnumb="9" loccnume="16"
-    sum="d7f2aebfd2edd578b1a93cf604aec178"
+    sum="afc73ac42ff23ac54fabcbfd7365ed49"
     proved="false"
     expanded="true"
     shape="f">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
@@ -53,12 +60,12 @@
      <result status="unknown" time="0.01"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.02"/>
+     <result status="timeout" time="3.01"/>
     </proof>
     <proof
      prover="3"
@@ -70,14 +77,6 @@
     </proof>
     <proof
      prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -96,18 +95,26 @@
   </theory>
   <theory
    name="Th2"
-   locfile="bts/fsetint/../fsetint.why"
+   locfile="../fsetint.why"
    loclnum="9" loccnumb="7" loccnume="10"
    verified="false"
    expanded="true">
    <goal
     name="mem_integer"
-    locfile="bts/fsetint/../fsetint.why"
+    locfile="../fsetint.why"
     loclnum="13" loccnumb="8" loccnume="19"
-    sum="242bf143cc8b33512505c233039239e5"
+    sum="664aceb824fc9f6f281adb0810f90fee"
     proved="false"
     expanded="true"
     shape="amemV0aintegerF">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
@@ -117,12 +124,12 @@
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.00"/>
+     <result status="timeout" time="3.02"/>
     </proof>
     <proof
      prover="3"
@@ -139,14 +146,6 @@
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.02"/>
     </proof>
     <proof
      prover="5"
@@ -159,12 +158,20 @@
    </goal>
    <goal
     name="foo"
-    locfile="bts/fsetint/../fsetint.why"
+    locfile="../fsetint.why"
     loclnum="15" loccnumb="7" loccnume="10"
-    sum="80ba20b39cf0e3e682e5c0d84d596f36"
+    sum="92534a90d1bcb82eb39fd1f0d594cbe3"
     proved="false"
     expanded="true"
     shape="f">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
@@ -174,12 +181,12 @@
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.00"/>
+     <result status="timeout" time="3.11"/>
     </proof>
     <proof
      prover="3"
@@ -196,14 +203,6 @@
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.11"/>
     </proof>
     <proof
      prover="5"
@@ -217,18 +216,26 @@
   </theory>
   <theory
    name="Th3"
-   locfile="bts/fsetint/../fsetint.why"
+   locfile="../fsetint.why"
    loclnum="20" loccnumb="7" loccnume="10"
    verified="false"
    expanded="true">
    <goal
     name="foo"
-    locfile="bts/fsetint/../fsetint.why"
+    locfile="../fsetint.why"
     loclnum="30" loccnumb="7" loccnume="10"
     sum="ee9eb17e39034c473cffb6f065106935"
     proved="false"
     expanded="true"
     shape="f">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
@@ -238,7 +245,7 @@
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -260,14 +267,6 @@
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="5"

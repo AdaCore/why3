@@ -2,15 +2,14 @@
 module SetZeros
 
   use import int.Int
-  use import module array.Array
+  use import array.Array
 
   let set_zeros (a : array int) =
-    {}
+    ensures { forall j: int. 0 <= j < a.length -> a[j] = 0 }
     for i = 0 to a.length - 1 do
       invariant { forall j: int. 0 <= j < i -> a[j] = 0 }
       a[i] <- 0
     done
-    { forall j: int. 0 <= j < a.length -> a[j] = 0 }
 
   let harness () =
     let a0 = make 42 1 in
@@ -19,10 +18,3 @@ module SetZeros
     assert { a0[12] = 0 }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/zeros.gui"
-End:
-*)
-

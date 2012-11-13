@@ -1,25 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -114,9 +104,6 @@ let backstep fn (q : term) xq =
   erase_mark lab f
 
 (** WP utilities *)
-
-let fs_void = fs_tuple 0
-let t_void = fs_app fs_void [] ty_unit
 
 let default_exn_post xs _ =
   let vs = create_vsymbol (id_fresh "result") (ty_of_ity xs.xs_ity) in
@@ -222,6 +209,7 @@ type wp_env = {
   ps_int_lt  : Term.lsymbol;
   ps_int_gt  : Term.lsymbol;
   fs_int_pl  : Term.lsymbol;
+  fs_int_mn  : Term.lsymbol;
   letrec_var : term list Mint.t;
 }
 
@@ -241,7 +229,7 @@ let decrease_alg ?loc env old_t t =
       t_or_simp acc (t_equ (t_var vs) t), pat_var vs
     else acc, pat_wild fty in
   let add_cs (cs,_) =
-    let f, pl = Util.map_fold_left add_arg t_false cs.ls_args in
+    let f, pl = Lists.map_fold_left add_arg t_false cs.ls_args in
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
@@ -249,7 +237,7 @@ let decrease_rel ?loc env old_t t = function
   | Some ls -> ps_app ls [t; old_t]
   | None when ty_equal (t_type t) ty_int ->
       t_and
-        (ps_app env.ps_int_le [t_int_const "0"; old_t])
+        (ps_app env.ps_int_le [t_nat_const 0; old_t])
         (ps_app env.ps_int_lt [t; old_t])
   | None -> decrease_alg ?loc env old_t t
 
@@ -299,7 +287,7 @@ let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
   let rec update vs { vtv_ity = ity; vtv_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
-    let vs = Util.option_apply vs get_vs mut in
+    let vs = Opt.fold (fun _ -> get_vs) vs mut in
     (* at this point, vs is either itself (vtv_mut is None, or the contained
      * region is not in the map), or the vsymbol in the map mreg *)
     (* should we update our value further? *)
@@ -446,7 +434,7 @@ type value = point list Mls.t (* constructor -> field list *)
 type state = {
   st_km   : Mlw_decl.known_map;
   st_lkm  : Decl.known_map;
-  st_mem  : (point, value) Hashtbl.t;
+  st_mem  : value Hint.t;
   st_next : point ref;
 }
 
@@ -459,7 +447,7 @@ type lesson = condition list Mint.t (* point -> conditions for invariant *)
 let empty_state lkm km = {
   st_km   = km;
   st_lkm  = lkm;
-  st_mem  = Hashtbl.create 5;
+  st_mem  = Hint.create 5;
   st_next = ref 0;
 }
 
@@ -476,10 +464,10 @@ let make_value state ty =
   List.fold_left add_cs Mls.empty csl
 
 let match_point state ty p =
-  try Hashtbl.find state.st_mem p with Not_found ->
+  try Hint.find state.st_mem p with Not_found ->
   let value = make_value state ty in
   if not (Mls.is_empty value) then
-    Hashtbl.replace state.st_mem p value;
+    Hint.replace state.st_mem p value;
   value
 
 let rec open_pattern state names value p pat = match pat.pat_node with
@@ -524,9 +512,9 @@ let rec point_of_term state names t = match t.t_node with
       (* we treat here the case of a value update: the value
          of each branch must be a distinct constructor *)
       let p = next_point state in
-      let ty = of_option t.t_ty in
+      let ty = Opt.get t.t_ty in
       let p1 = point_of_term state names t1 in
-      let value = match_point state (of_option t1.t_ty) p1 in
+      let value = match_point state (Opt.get t1.t_ty) p1 in
       let branch acc br =
         let pat, t2 = t_open_branch br in
         let ls = match t2.t_node with
@@ -539,7 +527,7 @@ let rec point_of_term state names t = match t.t_node with
       begin try
         let value = List.fold_left branch Mls.empty bl in
         let value = Mls.set_union value (make_value state ty) in
-        Hashtbl.replace state.st_mem p value
+        Hint.replace state.st_mem p value
       with Exit -> () end;
       p
   | Tconst _ | Tif _ | Teps _ -> next_point state
@@ -548,13 +536,13 @@ let rec point_of_term state names t = match t.t_node with
 and point_of_constructor state names ls tl =
   let p = next_point state in
   let pl = List.map (point_of_term state names) tl in
-  let value = make_value state (of_option ls.ls_value) in
+  let value = make_value state (Opt.get ls.ls_value) in
   let value = Mls.add ls pl value in
-  Hashtbl.replace state.st_mem p value;
+  Hint.replace state.st_mem p value;
   p
 
 and point_of_projection state names ls t1 =
-  let ty = of_option t1.t_ty in
+  let ty = Opt.get t1.t_ty in
   let csl = match ty.ty_node with
     | Tyapp (ts,_) -> Decl.find_constructors state.st_lkm ts
     | _ -> assert false in
@@ -595,7 +583,7 @@ let rec track_values state names lesson cond f = match f.t_node with
       lesson, t_label_copy f (t_if_simp fc f1 f2)
   | Tcase (t1, bl) ->
       let p1 = point_of_term state names t1 in
-      let value = match_point state (of_option t1.t_ty) p1 in
+      let value = match_point state (Opt.get t1.t_ty) p1 in
       let is_pat_var = function
         | { pat_node = Pvar _ } -> true | _ -> false in
       let branch l br =
@@ -612,7 +600,7 @@ let rec track_values state names lesson cond f = match f.t_node with
         let l = if learn then m else l in
         l, cb pat f1
       in
-      let l, bl = Util.map_fold_left branch lesson bl in
+      let l, bl = Lists.map_fold_left branch lesson bl in
       l, t_label_copy f (t_case t1 bl)
   | Tlet (t1, bf) ->
       let p1 = point_of_term state names t1 in
@@ -662,7 +650,7 @@ and wp_desc env e q xq = match e.e_node with
       let q = open_unit_post q in
       (* wp_label e *) q (* FIXME? *)
   | Elet ({ let_sym = LetV v; let_expr = e1 }, e2)
-    when Util.option_eq Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc ->
+    when Opt.equal Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc ->
     (* we push the label down, past the implicitly inserted "let" *)
       let w = wp_expr env (e_label_copy e e2) q xq in
       let q = create_post v.pv_vs w in
@@ -804,19 +792,21 @@ and wp_desc env e q xq = match e.e_node with
                                                  I(i) -> wp(e1, I(i+1), R)
                                        and I(v2+1) -> Q *)
       let gt, le, incr = match d with
-        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, t_int_const "1"
-        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, t_int_const "-1" in
+        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
+        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn
+      in
+      let one = t_nat_const 1 in
       let v1_gt_v2 = ps_app gt [t_var v1; t_var v2] in
       let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
       let q = open_unit_post q in
       let wp_init =
         wp_expl expl_loop_init (t_subst_single x (t_var v1) inv) in
       let wp_step =
-        let next = fs_app env.fs_int_pl [t_var x; incr] ty_int in
+        let next = fs_app incr [t_var x; one] ty_int in
         let post = wp_expl expl_loop_keep (t_subst_single x next inv) in
         wp_expr env e1 (create_unit_post post) xq in
       let wp_last =
-        let v2pl1 = fs_app env.fs_int_pl [t_var v2; incr] ty_int in
+        let v2pl1 = fs_app incr [t_var v2; one] ty_int in
         wp_implies (t_subst_single x v2pl1 inv) q in
       let wp_good = wp_and ~sym:true
         wp_init
@@ -937,7 +927,7 @@ let rec unabsurd f = match f.t_node with
 let add_wp_decl km name f uc =
   (* prepare a proposition symbol *)
   let s = "WP_parameter " ^ name.id_string in
-  let lab = Ident.create_label ("expl:parameter " ^ name.id_string) in
+  let lab = Ident.create_label ("expl:VC for " ^ name.id_string) in
   let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
@@ -951,6 +941,8 @@ let add_wp_decl km name f uc =
   let f = if Debug.test_flag no_track then f else track_values lkm km f in
   (* simplify f *)
   let f = if Debug.test_flag no_eval then f else
+    (* do preliminary checks on f to spare eval_match any surprises *)
+    let _lkm = Decl.known_add_decl lkm (create_prop_decl Pgoal pr f) in
     Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkm f in
   (* printf "wp: f=%a@." print_term f; *)
   let d = create_prop_decl Pgoal pr f in
@@ -966,6 +958,7 @@ let mk_env env km th =
     ps_int_lt  = Theory.ns_find_ls th_int.th_export ["infix <"];
     ps_int_gt  = Theory.ns_find_ls th_int.th_export ["infix >"];
     fs_int_pl  = Theory.ns_find_ls th_int.th_export ["infix +"];
+    fs_int_mn  = Theory.ns_find_ls th_int.th_export ["infix -"];
     letrec_var = Mint.empty;
   }
 
@@ -1016,7 +1009,8 @@ let wp_val _env _km th _lv = th
 *)
 
 let fast_wp = Debug.register_flag "fast_wp"
-  ~desc:"Efficient Weakest Preconditions."
+  ~desc:"Efficient@ Weakest@ Preconditions.@ \
+    Work@ in@ progress,@ not@ ready@ for@ use."
 
 module Subst : sig
    (* A substitution, or state, represents the state at a given point in the
@@ -1395,7 +1389,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* NE: ne(e1) /\ ne(e2) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
       let e2 =
-         if Util.option_eq Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc then
+         if Opt.equal Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc then
             e_label_copy e e2
          else e2 in
       let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in

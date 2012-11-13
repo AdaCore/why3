@@ -1,25 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Stdlib
-open Util
 
 (** Theories and Namespaces *)
 
@@ -70,7 +60,7 @@ val print_meta_desc : Pp.formatter -> meta -> unit
 
 module Mmeta : Map.S with type key = meta
 module Smeta : Mmeta.Set
-module Hmeta : Hashtbl.S with type key = meta
+module Hmeta : XHashtbl.S with type key = meta
 
 val meta_equal : meta -> meta -> bool
 val meta_hash : meta -> int
@@ -117,7 +107,7 @@ and symbol_map = private {
 
 module Mtdecl : Map.S with type key = tdecl
 module Stdecl : Mtdecl.Set
-module Htdecl : Hashtbl.S with type key = tdecl
+module Htdecl : XHashtbl.S with type key = tdecl
 
 val td_equal : tdecl -> tdecl -> bool
 val td_hash : tdecl -> int
@@ -179,8 +169,6 @@ val create_inst :
   goal  : prsymbol list -> th_inst
 
 val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
-
-val create_clone : tdecl list -> theory -> th_inst -> tdecl list
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 

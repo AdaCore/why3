@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/bresenham/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,13 +23,13 @@
   expanded="false">
   <theory
    name="M"
-   locfile="programs/bresenham/../bresenham.mlw"
+   locfile="../bresenham.mlw"
    loclnum="3" loccnumb="7" loccnume="8"
    verified="true"
    expanded="true">
    <goal
     name="invariant_is_ok"
-    locfile="programs/bresenham/../bresenham.mlw"
+    locfile="../bresenham.mlw"
     loclnum="35" loccnumb="8" loccnume="23"
     sum="97347a1679a8bb7439c609adc382f081"
     proved="true"
@@ -48,46 +47,30 @@
    </goal>
    <goal
     name="WP_parameter bresenham"
-    locfile="programs/bresenham/../bresenham.mlw"
+    locfile="../bresenham.mlw"
     loclnum="37" loccnumb="6" loccnume="15"
-    expl="parameter bresenham"
+    expl="VC for bresenham"
     sum="442a4f4aa6e196292e60b7ca97904016"
     proved="true"
     expanded="true"
     shape="iainfix &lt;V0c0ainfix &lt;ainfix -ainfix +ax2c1V4ainfix -ainfix +ax2c1V2Aainfix &lt;=c0ainfix -ainfix +ax2c1V2Aainvariant_V4V1V3Aainfix &lt;=V4ainfix +ax2c1Aainfix &lt;=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2Fainfix &lt;ainfix -ainfix +ax2c1V7ainfix -ainfix +ax2c1V2Aainfix &lt;=c0ainfix -ainfix +ax2c1V2Aainvariant_V7V5V6Aainfix &lt;=V7ainfix +ax2c1Aainfix &lt;=c0V7Iainfix =V7ainfix +V2c1FIainfix =V6ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V5ainfix +V1c1FAabestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2FAainvariant_c0c0ainfix -ainfix *c2ay2ax2Aainfix &lt;=c0ainfix +ax2c1Aainfix &lt;=c0c0">
     <label
-     name="expl:parameter bresenham"/>
+     name="expl:VC for bresenham"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter bresenham.1"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
-      expl="loop invariant init"
+      expl="1. loop invariant init"
       sum="857df9f477c810421c3252f860aabab2"
       proved="true"
       expanded="true"
       shape="ainvariant_c0c0ainfix -ainfix *c2ay2ax2Aainfix &lt;=c0ainfix +ax2c1Aainfix &lt;=c0c0">
       <label
-       name="expl:parameter bresenham"/>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
+       name="expl:VC for bresenham"/>
       <proof
        prover="0"
        timelimit="10"
@@ -96,18 +79,6 @@
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
-     </goal>
-     <goal
-      name="WP_parameter bresenham.2"
-      locfile="programs/bresenham/../bresenham.mlw"
-      loclnum="37" loccnumb="6" loccnume="15"
-      expl="assertion"
-      sum="0bde7c5dd4887ae5beb05e5c497eb6d9"
-      proved="true"
-      expanded="true"
-      shape="abestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
-      <label
-       name="expl:parameter bresenham"/>
       <proof
        prover="1"
        timelimit="10"
@@ -116,6 +87,26 @@
        archived="false">
        <result status="valid" time="0.00"/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bresenham.2"
+      locfile="../bresenham.mlw"
+      loclnum="37" loccnumb="6" loccnume="15"
+      expl="2. assertion"
+      sum="0bde7c5dd4887ae5beb05e5c497eb6d9"
+      proved="true"
+      expanded="true"
+      shape="abestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
+      <label
+       name="expl:VC for bresenham"/>
       <proof
        prover="0"
        timelimit="10"
@@ -124,26 +115,26 @@
        archived="false">
        <result status="valid" time="0.12"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter bresenham.3"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
-      expl="loop invariant preservation"
+      expl="3. loop invariant preservation"
       sum="83dcbad4b5cdae92e168de3dd761b426"
       proved="true"
       expanded="true"
       shape="ainvariant_V4V1V3Aainfix &lt;=V4ainfix +ax2c1Aainfix &lt;=c0V4Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2FIainfix &lt;V0c0IabestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
       <label
-       name="expl:parameter bresenham"/>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
+       name="expl:VC for bresenham"/>
       <proof
        prover="1"
        timelimit="10"
@@ -152,34 +143,26 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter bresenham.4"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
-      expl="loop variant decreases"
+      expl="4. loop variant decrease"
       sum="61cfa9d9d2243a07b372c76939d3a648"
       proved="true"
       expanded="true"
       shape="ainfix &lt;ainfix -ainfix +ax2c1V4ainfix -ainfix +ax2c1V2Aainfix &lt;=c0ainfix -ainfix +ax2c1V2Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V0ainfix *c2ay2FIainfix &lt;V0c0IabestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
       <label
-       name="expl:parameter bresenham"/>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
+       name="expl:VC for bresenham"/>
       <proof
        prover="0"
        timelimit="10"
@@ -188,18 +171,14 @@
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
-     </goal>
-     <goal
-      name="WP_parameter bresenham.5"
-      locfile="programs/bresenham/../bresenham.mlw"
-      loclnum="37" loccnumb="6" loccnume="15"
-      expl="loop invariant preservation"
-      sum="867c93f7ca245f034a463c54fc3bbf3e"
-      proved="true"
-      expanded="true"
-      shape="ainvariant_V5V3V4Aainfix &lt;=V5ainfix +ax2c1Aainfix &lt;=c0V5Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix &lt;V0c0NIabestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
-      <label
-       name="expl:parameter bresenham"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
       <proof
        prover="3"
        timelimit="10"
@@ -208,8 +187,28 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter bresenham.5"
+      locfile="../bresenham.mlw"
+      loclnum="37" loccnumb="6" loccnume="15"
+      expl="5. loop invariant preservation"
+      sum="867c93f7ca245f034a463c54fc3bbf3e"
+      proved="true"
+      expanded="true"
+      shape="ainvariant_V5V3V4Aainfix &lt;=V5ainfix +ax2c1Aainfix &lt;=c0V5Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix &lt;V0c0NIabestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
+      <label
+       name="expl:VC for bresenham"/>
       <proof
        prover="1"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -219,17 +218,17 @@
      </goal>
      <goal
       name="WP_parameter bresenham.6"
-      locfile="programs/bresenham/../bresenham.mlw"
+      locfile="../bresenham.mlw"
       loclnum="37" loccnumb="6" loccnume="15"
-      expl="loop variant decreases"
+      expl="6. loop variant decrease"
       sum="9e221500074706762405ea28c5c38f4f"
       proved="true"
       expanded="true"
       shape="ainfix &lt;ainfix -ainfix +ax2c1V5ainfix -ainfix +ax2c1V2Aainfix &lt;=c0ainfix -ainfix +ax2c1V2Iainfix =V5ainfix +V2c1FIainfix =V4ainfix +V0ainfix *c2ainfix -ay2ax2FIainfix =V3ainfix +V1c1FIainfix &lt;V0c0NIabestV2V1Iainfix &lt;=V2ax2Iainvariant_V2V1V0Aainfix &lt;=V2ainfix +ax2c1Aainfix &lt;=c0V2F">
       <label
-       name="expl:parameter bresenham"/>
+       name="expl:VC for bresenham"/>
       <proof
-       prover="3"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -245,7 +244,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="0"
+       prover="3"
        timelimit="10"
        memlimit="0"
        obsolete="false"

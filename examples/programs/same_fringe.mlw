@@ -38,17 +38,16 @@ module SameFringe
 
   (* the enum of a tree [t], prepended to a given enum [e] *)
 
-  let rec enum t e variant { length (elements t) } =
-    { }
-    match t with
+  let rec enum t e variant { length (elements t) }
+    ensures { enum_elements result = elements t ++ enum_elements e }
+  = match t with
     | Empty -> e
     | Node l x r -> enum l (Next x r e)
     end
-    { enum_elements result = elements t ++ enum_elements e }
 
-  let rec eq_enum e1 e2 variant { length (enum_elements e1) } =
-    { }
-    match e1, e2 with
+  let rec eq_enum e1 e2 variant { length (enum_elements e1) }
+    ensures { result=True <-> enum_elements e1 = enum_elements e2 }
+  = match e1, e2 with
     | Done, Done ->
         True
     | Next x1 r1 e1, Next x2 r2 e2 ->
@@ -56,11 +55,9 @@ module SameFringe
     | _ ->
         False
     end
-    { result=True <-> enum_elements e1 = enum_elements e2 }
 
-  let same_fringe t1 t2 =
-    { }
-    eq_enum (enum t1 Done) (enum t2 Done)
-    { result=True <-> elements t1 = elements t2 }
+  let same_fringe t1 t2
+    ensures { result=True <-> elements t1 = elements t2 }
+  = eq_enum (enum t1 Done) (enum t2 Done)
 
 end

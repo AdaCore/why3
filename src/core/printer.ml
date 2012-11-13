@@ -1,25 +1,18 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Pp
+
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -38,32 +31,26 @@ type 'a pp = formatter -> 'a -> unit
 type printer =
   Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
-type reg_printer =
-  { reg_desc    : formatted;
-    reg_printer : printer;
-  }
+type reg_printer = Pp.formatted * printer
 
-let printers : (string, reg_printer) Hashtbl.t = Hashtbl.create 17
+let printers : reg_printer Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
 let register_printer ~desc s p =
-  if Hashtbl.mem printers s then raise (KnownPrinter s);
-  Hashtbl.replace printers s {reg_desc = desc; reg_printer = p}
+  if Hstr.mem printers s then raise (KnownPrinter s);
+  Hstr.replace printers s (desc, p)
 
 let lookup_printer s =
-  try (Hashtbl.find printers s).reg_printer
+  try snd (Hstr.find printers s)
   with Not_found -> raise (UnknownPrinter s)
 
-let list_printers ()  = Hashtbl.fold (fun k p acc ->
-  (k,p.reg_desc)::acc) printers []
+let list_printers () =
+  Hstr.fold (fun k (desc,_) acc -> (k,desc)::acc) printers []
 
-let print_printer_desc fmt (s,f) =
-  fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]"
-    s Pp.formatted f
-
-let () = register_printer ~desc:"Print nothing" "(null)"
+let () = register_printer
+  ~desc:"Dummy@ printer@ with@ no@ output@ (used@ for@ debugging)." "(null)"
   (fun _ _ _ _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
@@ -152,9 +139,9 @@ let get_type_arguments t = match t.t_node with
       let m = oty_match Mtv.empty ls.ls_value t.t_ty in
       let m = List.fold_left2
         (fun m ty t -> oty_match m (Some ty) t.t_ty) m ls.ls_args tl in
-      let name tv = Util.Mstr.add tv.tv_name.id_string in
-      let m = Mtv.fold name m Util.Mstr.empty in
-      Array.of_list (Util.Mstr.values m)
+      let name tv = Stdlib.Mstr.add tv.tv_name.id_string in
+      let m = Mtv.fold name m Stdlib.Mstr.empty in
+      Array.of_list (Stdlib.Mstr.values m)
   | _ ->
       [||]
 
@@ -205,27 +192,31 @@ let print_prelude_for_theory th fmt pm =
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
 
-let meta_syntax_type  = register_meta "syntax_type" [MTtysymbol; MTstring]
-  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ the@ type@ symbols.@ \
+let meta_syntax_type = register_meta "syntax_type" [MTtysymbol; MTstring]
+  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ type@ symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax type'@ rule."
 
 let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring]
-  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ the@ logic@ symbols.@ \
+  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ function/predicate@ \
+         symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax function'@ \
-         rule."
+         or@ 'syntax predicate'@ rules."
 
-let meta_remove_prop  = register_meta "remove_prop" [MTprsymbol]
-  ~desc:"Specify@ the@ logical@ propositions@ to@ remove.@ \
-         Can@ be@ specified@ in@ the@ driver@ with@ the@ remove@ prop@ rule."
+let meta_remove_prop = register_meta "remove_prop" [MTprsymbol]
+  ~desc:"Remove@ a@ logical@ proposition@ from@ proof@ obligations.@ \
+         Can@ be@ specified@ in@ the@ driver@ with@ the@ 'remove prop'@ rule."
 
-let meta_remove_type_symbol  = register_meta "remove_type_symbol" [MTtysymbol]
-  ~desc:"Specify@ the@ type@ symbol@ to@ remove."
+let meta_remove_type = register_meta "remove_type" [MTtysymbol]
+  ~desc:"Remove@ a@ type@ symbol@ from@ proof@ obligations.@ \
+         Used@ in@ bisection."
 
-let meta_remove_logic  = register_meta "remove_logic" [MTlsymbol]
-  ~desc:"Specify@ the@ logic@ symbol@ propositions@ to@ remove."
+let meta_remove_logic = register_meta "remove_logic" [MTlsymbol]
+  ~desc:"Remove@ a@ function/predicate@ symbol@ from@ proof@ obligations.@ \
+         Used@ in@ bisection."
 
-let meta_realized     = register_meta "realized" [MTstring; MTstring]
-  ~desc:"TODO??"
+let meta_realized_theory = register_meta "realized_theory" [MTstring; MTstring]
+  ~desc:"Specify@ that@ a@ Why3@ theory@ is@ realized@ as@ a@ module@ \
+         in@ an@ ITP."
 
 let check_syntax_type ts s = check_syntax s (List.length ts.ts_args)
 

@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Term
 
@@ -27,15 +18,14 @@ let checksum_of_string x = x
 let equal_checksum x y = (x : checksum) = y
 let dumb_checksum = ""
 
-type shape    = string
+type shape = string
 let print_shape = Format.pp_print_string
 let string_of_shape x = x
 let shape_of_string x = x
 
 let debug = Debug.register_info_flag "session_pairing"
-  ~desc:"About@ the@ way@ old@ goals@ recorded@ in@ sessions@ are@ paired@ \
-         with@ new@ goals@ obtained@ after@ modifications@ of@ the@ source@ \
-         file."
+  ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
+         session@ trees@ after@ modification@ of@ source@ files."
 
 let current_shape_version = 2
 

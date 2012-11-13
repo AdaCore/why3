@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/usr/local/share/why3/why3session.dtd">
-<why3session
- name="check-builtin/bool/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,20 +23,28 @@
   expanded="false">
   <theory
    name="Test"
-   locfile="check-builtin/bool/../bool.why"
+   locfile="../bool.why"
    loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    locfile="check-builtin/bool/../bool.why"
+    locfile="../bool.why"
     loclnum="4" loccnumb="11" loccnume="13"
     sum="af4d670afdfdd1e631e80d30d19ede7b"
     proved="true"
     expanded="true"
     shape="ainfix =aTrueaFalseN">
     <proof
-     prover="3"
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -53,15 +60,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="3"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -71,14 +70,22 @@
    </goal>
    <goal
     name="G2"
-    locfile="check-builtin/bool/../bool.why"
+    locfile="../bool.why"
     loclnum="5" loccnumb="11" loccnume="13"
     sum="7a72a9f2346a915442af5b3c5630e0f3"
     proved="true"
     expanded="true"
     shape="ainfix =V0aFalseOainfix =V0aTrueF">
     <proof
-     prover="3"
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -94,15 +101,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="3"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -112,27 +111,19 @@
    </goal>
    <goal
     name="G3"
-    locfile="check-builtin/bool/../bool.why"
+    locfile="../bool.why"
     loclnum="6" loccnumb="11" loccnume="13"
     sum="a79670357144984023e697f917d5885f"
     proved="true"
     expanded="true"
     shape="fIainfix =V2V0NAainfix =V1V2NAainfix =V0V1NF">
     <proof
-     prover="3"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="1"
@@ -143,12 +134,20 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.00"/>
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

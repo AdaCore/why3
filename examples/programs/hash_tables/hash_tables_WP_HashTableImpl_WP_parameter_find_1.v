@@ -19,9 +19,8 @@ Existing Instance option_WhyType.
 Implicit Arguments None [[a] [a_WT]].
 Implicit Arguments Some [[a] [a_WT]].
 
-Parameter map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b},
-  Type.
-Axiom map_WhyType : forall (a:Type) {a_WT:WhyType a}
+Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
+Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
   (b:Type) {b_WT:WhyType b}, WhyType (map a b).
 Existing Instance map_WhyType.
 
@@ -63,30 +62,34 @@ Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
 
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : BuiltIn.int -> (map BuiltIn.int a) -> array a.
+  | mk_array : Z -> (map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map BuiltIn.int
-  a) := match v with
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+  match v with
   | (mk_array x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): BuiltIn.int :=
+Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:BuiltIn.int): a :=
+Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
   (get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:BuiltIn.int)
-  (v:a): (array a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (set (elts a1) i v)).
+
+(* Why3 assumption *)
+Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
+  (mk_array n (const v:(map Z a))).
 
 (* Why3 assumption *)
 Inductive t (a:Type) {a_WT:WhyType a}
@@ -113,11 +116,16 @@ Definition contents {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(v:(t
 Definition get2 {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(h:(t a
   b)) (k:a): (option b) := (get (contents h) k).
 
-Parameter hash: forall {a:Type} {a_WT:WhyType a}, a -> BuiltIn.int.
+Parameter hash: forall {a:Type} {a_WT:WhyType a}, a -> Z.
 
 (* Why3 assumption *)
 Definition idx {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(h:(t a b))
-  (k:a): BuiltIn.int := (ZOmod (Zabs (hash k)) (length (data h))).
+  (k:a): Z := (ZOmod (Zabs (hash k)) (length (data h))).
+
+Axiom idx_bounds : forall {a:Type} {a_WT:WhyType a}
+  {b:Type} {b_WT:WhyType b}, forall (h:(t a b)) (k:a),
+  (0%Z < (length (data h)))%Z -> ((0%Z <= (idx h k))%Z /\ ((idx h
+  k) < (length (data h)))%Z).
 
 (* Why3 assumption *)
 Fixpoint occurs_first {a:Type} {a_WT:WhyType a}
@@ -138,28 +146,18 @@ Axiom cons_occurs_first : forall {a:Type} {a_WT:WhyType a}
   (occurs_first k1 v1 l) -> forall (k:a) (v:b), (~ (k = k1)) ->
   (occurs_first k1 v1 (Cons (k, v) l)).
 
-(* Why3 assumption *)
-Definition valid {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(h:(t a
-  b)): Prop := (0%Z < (length (data h)))%Z /\ ((forall (k:a) (v:b), ((get2 h
-  k) = (Some v)) <-> (occurs_first k v (get1 (data h) (idx h k)))) /\
-  forall (k:a) (v:b), forall (i:BuiltIn.int), ((0%Z <= i)%Z /\
-  (i < (length (data h)))%Z) -> ((mem (k, v) (get1 (data h) i)) ->
-  (i = (idx h k)))).
-
-Axiom idx_bounds : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (h:(t a b)), (valid h) -> forall (k:a),
-  (0%Z <= (idx h k))%Z /\ ((idx h k) < (length (data h)))%Z.
-
 (* Why3 goal *)
 Theorem WP_parameter_find : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (h:BuiltIn.int) (k:a), forall (rho:(map
-  BuiltIn.int (list (a* b)%type))) (rho1:(map a (option b))),
-  (valid (mk_t rho1 (mk_array h rho))) -> let i :=
+  {b:Type} {b_WT:WhyType b}, forall (h:Z) (k:a), forall (rho:(map Z (list (a*
+  b)%type))) (rho1:(map a (option b))), ((0%Z < h)%Z /\ ((forall (k1:a)
+  (v:b), ((get rho1 k1) = (Some v)) <-> (occurs_first k1 v (get rho
+  (ZOmod (Zabs (hash k1)) h)))) /\ forall (k1:a) (v:b), forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < h)%Z) -> ((mem (k1, v) (get rho i)) ->
+  (i = (ZOmod (Zabs (hash k1)) h))))) -> let i :=
   (ZOmod (Zabs (hash k)) h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
   ((forall (v:b), ~ (mem (k, v) (get rho i))) -> ((get rho1
   k) = (None :(option b))))).
 intros a _a b _b h k rho rho1.
-unfold valid.
 pose (i := (Zabs (hash k) mod h)).
 unfold get1; simpl.
 intuition.

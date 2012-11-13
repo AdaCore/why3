@@ -1,11 +1,12 @@
 \begin{syntax}
-  assert ::= "assert" | "assume" | "check"
+  rec-defn ::=  fun-defn ("with" fun-defn)* ;
   \
-  to-downto ::= "to" | "downto"
+  fun-defn ::= "ghost"? lident label* fun-body ;
   \
-  loop-annot ::= loop-inv? variant?
+  fun-body ::= binder+ (":" type)? spec* "=" spec* expr ;
   \
-  loop-inv ::= "invariant" annotation
+  binder ::= "ghost"? lident label*
+                  |  param
   \
-  variant ::= "variant" "{" term "}" ("with" lqualid)?
+  param ::= "(" ("ghost"? lident label*)+ ":" type ")"   
 \end{syntax}

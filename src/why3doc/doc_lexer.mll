@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (* Why3 to HTML *)
 
@@ -38,23 +29,20 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  let is_keyword1 = make_table
-    [ "theory"; "end"; "meta";
-      "type"; "constant"; "function"; "predicate"; "inductive";
-      "clone"; "use";
-      "import"; "export"; "axiom"; "goal"; "lemma"; ]
+  let is_keyword1 = make_table [ "as"; "axiom"; "clone"; "coinductive";
+    "constant"; "else"; "end"; "epsilon"; "exists"; "export"; "false";
+    "forall"; "function"; "goal"; "if"; "import"; "in"; "inductive";
+    "lemma"; "let"; "match"; "meta"; "namespace"; "not"; "predicate";
+    "prop"; "then"; "theory"; "true"; "type"; "use"; "with";
+    (* programs *) "abstract"; "any";
+    "begin"; "do"; "done"; "downto"; "exception";
+    "for"; "fun"; "ghost"; "loop"; "model"; "module";
+    "mutable"; "private"; "raise"; "rec";
+    "to"; "try"; "val"; "while"; ]
 
-  let is_keyword2 = make_table
-    [ "match"; "with"; "let"; "in"; "if"; "then"; "else";
-      "forall"; "exists";
-      (* programs *)
-      "as"; "assert"; "begin";
-      "do"; "done"; "downto"; "else";
-      "exception"; "val"; "for"; "fun";
-      "if"; "in";
-      "module"; "mutable";
-      "rec"; "then"; "to";
-      "try"; "while"; "invariant"; "variant"; "raise"; "label"; ]
+  let is_keyword2 = make_table [ "absurd"; "assert"; "assume";
+    "ensures"; "check"; "invariant"; "raises"; "reads"; "requires";
+    "returns"; "variant"; "writes"; ]
 
   let get_loc lb =
     let p = Lexing.lexeme_start_p lb in
@@ -67,6 +55,29 @@
       | '&' -> "&amp;"
       | _ -> assert false)
 
+  let html_escape s =
+    let len = ref 0 in
+    String.iter (function '<' | '>' -> len := !len + 4
+      | '&' -> len := !len + 5 | _ -> incr len) s;
+    let len' = !len in
+    let len = String.length s in
+    if len = len' then s else begin
+      let t = String.create len' in
+      let j = ref 0 in
+      let app u =
+        let l = String.length u in
+        String.blit u 0 t !j l;
+        j := !j + l in
+      for i = 0 to len - 1 do
+        match s.[i] with
+        | '<' -> app "&lt;"
+        | '>' -> app "&gt;"
+        | '&' -> app "&amp;"
+        | c -> t.[!j] <- c; incr j
+      done;
+      t
+    end
+
   let current_file = ref ""
 
   let print_ident fmt lexbuf s =
@@ -78,6 +89,7 @@
       let (* f,l,c as *) loc = get_loc lexbuf in
       (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
       (* is this a def point? *)
+      let s = html_escape s in
       try
         let t = Doc_def.is_def loc in
         fprintf fmt "<a name=\"%s\">%s</a>" t s
@@ -95,8 +107,29 @@
 
 }
 
+let op_char_1 = ['=' '<' '>' '~']
+let op_char_2 = ['+' '-']
+let op_char_3 = ['*' '/' '%']
+let op_char_4 = ['!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
+let op_char_34 = op_char_3 | op_char_4
+let op_char_234 = op_char_2 | op_char_34
+let op_char_1234 = op_char_1 | op_char_234
+let op_char_pref = ['!' '?']
+let prefix_op =
+    op_char_1234* op_char_1 op_char_1234*
+  | op_char_234*  op_char_2 op_char_234*
+  | op_char_34* op_char_3 op_char_34*
+  | op_char_4+
+let operator =
+    op_char_pref op_char_4*
+  | prefix_op
+  | prefix_op '_'
+  | "[]"
+  | "[<-]"
+  | "[]<-"
+
 let space = [' ' '\t']
-let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
+let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
 let special = ['<' '>' '&']
 
 rule scan fmt = parse
@@ -120,9 +153,6 @@ rule scan fmt = parse
   | ident as s
           { print_ident fmt lexbuf s;
             scan fmt lexbuf }
-  | special as c
-           { html_char fmt c;
-             scan fmt lexbuf }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
              scan fmt lexbuf }
@@ -144,9 +174,6 @@ and scan_embedded fmt depth = parse
   | ident as s
           { print_ident fmt lexbuf s;
             scan_embedded fmt depth lexbuf }
-  | special as c
-           { html_char fmt c;
-             scan_embedded fmt depth lexbuf }
   | "\n"   { newline lexbuf;
              fprintf fmt "\n";
              scan_embedded fmt depth lexbuf }
@@ -212,7 +239,7 @@ and doc fmt block headings = parse
   | '}'    { let brace r =
                if not block then pp_print_string fmt "<p>";
                fprintf fmt "}";
-               doc fmt true r lexbuf 
+               doc fmt true r lexbuf
              in
              match headings with
               | [] -> brace headings
@@ -278,11 +305,11 @@ and skip_comment = parse
     lb.Lexing.lex_curr_p <-
       { lb.Lexing.lex_curr_p with Lexing.pos_fname = fname };
     (* output *)
-    fprintf fmt "<span class=\"why3doc\">@\n";
+    fprintf fmt "<div class=\"why3doc\">@\n";
     fprintf fmt "<pre>@\n";
     scan fmt lb;
     fprintf fmt "</pre>@\n";
-    fprintf fmt "</span>@\n";
+    fprintf fmt "</div>@\n";
     close_in cin
 
   let extract_header fname =

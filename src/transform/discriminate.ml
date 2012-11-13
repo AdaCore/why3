@@ -1,24 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -26,55 +17,50 @@ open Decl
 open Theory
 open Task
 
-let meta_inst   = register_meta "encoding : inst"   [MTty]
-  ~desc:"Specify@ which@ type@ should@ instantiate@ symbol@ marked@ by@ \
+let meta_inst = register_meta "encoding : inst" [MTty]
+  ~desc:"Specify@ which@ types@ should@ instantiate@ symbols@ marked@ by@ \
          'encoding : lskept'."
-let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
-  ~desc:"Specify@ which@ function@ symbols@ should@ be@ kept.@ If@ the@ \
-         function@ is@ polymorphic,@ the@ monorphisations@ which@ signatures@ \
-         contain@ only@ types@ @ marked@ with@ 'encoding : inst'@ are@ kept."
-let meta_lsinst = register_meta "encoding : lsinst" [MTlsymbol;MTlsymbol]
-  ~desc:"Specify@ which@ instantiations@ of@ symbols@ should@ be@ kept.@ \
-         The first@ symbol@ specifies@ the@ symbol,@ the@ signature@ of@ the@ \
-         second@ specifies@ the@ instantiation@ to@ keep."
 
-let meta_select_inst   = register_meta_excl "select_inst"   [MTstring]
-  ~desc:"@[Specify@ how@ to@ automatically@ mark@ type@ by@ \
-'encoding : inst':@]@\n  \
-@[\
-  - none:@[ don't@ mark@ automatically@]@\n\
-  - goal:@[ mark@ all@ the@ closed@ type@ that@ appear@ has@ argument@ \
-            in@ the@ goal@]@\n\
-  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
-@]"
+let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
+  ~desc:"Specify@ which@ function/predicate@ symbols@ should@ be@ kept.@ \
+         When@ the@ symbol@ is@ polymorphic,@ generate@ every@ possible@ \
+         type@ insntance@ with@ types@ marked@ by@ 'encoding : inst'."
+
+let meta_lsinst = register_meta "encoding : lsinst" [MTlsymbol;MTlsymbol]
+  ~desc:"Specify@ which@ type@ instances@ of@ symbols@ should@ be@ kept.@ \
+         The first@ symbol@ specifies@ the@ polymorphic@ symbol,@ \
+         the@ second@ provides@ a@ monomorphic@ type@ signature@ to@ keep."
+
+let meta_select_inst = register_meta_excl "select_inst" [MTstring]
+  ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding : inst':@;  \
+    @[\
+      - none: @[don't@ mark@ any@ type@ automatically@]@\n\
+      - goal: @[mark@ every@ closed@ type@ in@ the@ goal@]@\n\
+      - all:  @[mark@ every@ closed@ type@ in@ the@ task.@]\
+    @]"
 
 let meta_select_lskept = register_meta_excl "select_lskept" [MTstring]
-  ~desc:"@[Specify@ how@ to@ automatically@ mark@ symbol@ by@ \
-'encoding : lskept':@]@\n  \
-@[\
-  - none:@[ don't@ mark@ automatically@]@\n\
-  - goal:@[ mark@ all@ the@ symbols@ acceptable@ that@ appear@ in@ the@ \
-            goal.@ The signature@ of an@ acceptable@ symbol@ contain@ at@ \
-            least@ one@ type@ that@ is@ not@ a@ type@ variable@ neither@]@\n\
-  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
-@]"
+  ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding : lskept':@;  \
+    @[\
+      - none: @[don't@ mark@ any@ symbol@ automatically@]@\n\
+      - goal: @[mark@ every@ polymorphic@ symbol@ in@ the@ goal@]@\n\
+      - all:  @[mark@ every@ polymorphic@ symbol@ in@ the@ task.@]\
+    @]"
 
 let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
-  ~desc:"@[Specify@ how@ to@ automatically@ mark@ symbol@ by@ \
-'encoding : lskept':@]@\n  \
-@[\
-  - none:@[ don't@ mark@ automatically@]@\n\
-  - goal:@[ mark@ all@ the@ instantiation of symbols@ that@ appear@ in@ \
-             the@ goal@]@\n\
-  - all:@[ same@ as@ goal@ but@ also@ in@ the@ premises.@]\
-@]"
+  ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding : lsinst':@;  \
+    @[\
+      - none: @[don't@ mark@ any@ symbol@ automatically@]@\n\
+      - goal: @[mark@ every@ monomorphic@ instance@ in@ the@ goal@]@\n\
+      - all:  @[mark@ every@ monomorphic@ instance@ in@ the@ task.@]\
+    @]"
 
-module OHTy = OrderedHash(struct
+module OHTy = OrderedHashed(struct
   type t = ty
   let tag = ty_hash
 end)
 
-module OHTyl = OrderedHashList(struct
+module OHTyl = OrderedHashedList(struct
   type t = ty
   let tag = ty_hash
 end)
@@ -306,16 +292,6 @@ let discriminate env = Trans.seq [
   lsymbol_distinction;
 ]
 
-let empty_formatted : Pp.formatted = ""
-
 let () = Trans.register_env_transform "discriminate" discriminate
-  ~desc_metas:[meta_select_inst  , empty_formatted;
-               meta_select_lskept, empty_formatted;
-               meta_select_lsinst, empty_formatted;
-               meta_inst         , empty_formatted;
-               meta_lskept       , empty_formatted;
-               meta_lsinst       , empty_formatted]
-  ~desc:"Discriminate@ polymorphic@ function@ and@ predicate@ symbols.@ \
-         Allow@ to@ keep@ some@ instantiations@ from@ being@ touched@ by@ \
-         following@ polymorphism@ encodings."
-
+  ~desc:"Generate@ monomorphic@ type@ instances@ of@ function@ and@ \
+         predicate@ symbols@ and@ monomorphize@ task@ premises."

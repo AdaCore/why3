@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="check-builtin/int/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,21 +31,37 @@
   expanded="false">
   <theory
    name="Test"
-   locfile="check-builtin/int/../int.why"
+   locfile="../int.why"
    loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="G1"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="3" loccnumb="7" loccnume="9"
     sum="793a59a8ba82def354f3655079810b34"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix *c5c10c50">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -61,15 +76,7 @@
      <result status="timeout" time="10.06"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -84,26 +91,34 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="G2"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="4" loccnumb="7" loccnume="9"
     sum="6207f3d6b193e19710ea6979a537912c"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -118,15 +133,7 @@
      <result status="timeout" time="10.28"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -135,14 +142,6 @@
     </proof>
     <proof
      prover="5"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -152,15 +151,31 @@
    </goal>
    <goal
     name="CompatOrderAdd"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="6" loccnumb="7" loccnume="21"
     sum="fb86cd94ea9e7995764b01fdde1dda71"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=ainfix +V0V2ainfix +V1V2Iainfix &lt;=V0V1F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -175,15 +190,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -192,14 +199,6 @@
     </proof>
     <proof
      prover="5"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -209,36 +208,12 @@
    </goal>
    <goal
     name="CompatOrderMult"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="7" loccnumb="7" loccnume="22"
     sum="066a222cd10f71c95de993ff0ef14f12"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=ainfix *V0V2ainfix *V1V2Iainfix &lt;=c0V2Iainfix &lt;=V0V1F">
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
     <proof
      prover="0"
      timelimit="10"
@@ -248,7 +223,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
+     prover="1"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -263,15 +238,14 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-   </goal>
-   <goal
-    name="InvMult"
-    locfile="check-builtin/int/../int.why"
-    loclnum="9" loccnumb="7" loccnume="14"
-    sum="2702d4e9a783e21ff807e9c06a19a2f3"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
     <proof
      prover="4"
      timelimit="10"
@@ -279,6 +253,47 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="InvMult"
+    locfile="../int.why"
+    loclnum="9" loccnumb="7" loccnume="14"
+    sum="2702d4e9a783e21ff807e9c06a19a2f3"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -289,15 +304,7 @@
      <result status="timeout" time="10.10"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -312,6 +319,31 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+   </goal>
+   <goal
+    name="InvSquare"
+    locfile="../int.why"
+    loclnum="10" loccnumb="7" loccnume="16"
+    sum="1a74910025dc0199cb9dd3df6a0a4d1c"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
     <proof
      prover="2"
      timelimit="3"
@@ -319,23 +351,6 @@
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="InvSquare"
-    locfile="check-builtin/int/../int.why"
-    loclnum="10" loccnumb="7" loccnume="16"
-    sum="1a74910025dc0199cb9dd3df6a0a4d1c"
-    proved="true"
-    expanded="true"
-    shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -346,15 +361,7 @@
      <result status="timeout" time="10.37"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -369,26 +376,34 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="ZeroMult"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="11" loccnumb="7" loccnume="15"
     sum="f66f1b9823284cfe417e810de6dcdc9c"
     proved="true"
     expanded="true"
     shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -403,15 +418,7 @@
      <result status="timeout" time="10.42"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -426,30 +433,38 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="SquareNonNeg1"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="12" loccnumb="7" loccnume="20"
     sum="e6307bc8330ae275e9c0dc6f02e89dc6"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=c0ainfix *V0V0Iainfix &lt;=V0c0F">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -460,15 +475,7 @@
      <result status="timeout" time="10.17"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -483,6 +490,31 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+   </goal>
+   <goal
+    name="SquareNonNeg"
+    locfile="../int.why"
+    loclnum="13" loccnumb="7" loccnume="19"
+    sum="f311a48de395de78876c891d818d5b82"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=c0ainfix *V0V0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
     <proof
      prover="2"
      timelimit="3"
@@ -490,23 +522,6 @@
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="SquareNonNeg"
-    locfile="check-builtin/int/../int.why"
-    loclnum="13" loccnumb="7" loccnume="19"
-    sum="f311a48de395de78876c891d818d5b82"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=c0ainfix *V0V0F">
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -517,15 +532,7 @@
      <result status="timeout" time="10.41"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -540,26 +547,34 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="ZeroLessOne"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="14" loccnumb="7" loccnume="18"
     sum="a739f39bf04bc2d7b527dca2689c5960"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=c0c1">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -574,15 +589,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -591,14 +598,6 @@
     </proof>
     <proof
      prover="5"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -609,33 +608,25 @@
   </theory>
   <theory
    name="MinMax"
-   locfile="check-builtin/int/../int.why"
+   locfile="../int.why"
    loclnum="17" loccnumb="7" loccnume="13"
    verified="true"
    expanded="true">
    <goal
     name="G"
-    locfile="check-builtin/int/../int.why"
+    locfile="../int.why"
     loclnum="20" loccnumb="7" loccnume="8"
     sum="d617d156ca3ceb6fbf59d33be511b118"
     proved="true"
     expanded="true"
     shape="ainfix =aminc1aminc3c2c1">
     <proof
-     prover="4"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="9.96"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="1"
@@ -646,12 +637,28 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="10"
+     prover="2"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="9.96"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="5"
@@ -660,14 +667,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>

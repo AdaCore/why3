@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/same_fringe/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,36 +15,36 @@
   expanded="false">
   <theory
    name="SameFringe"
-   locfile="programs/same_fringe/../same_fringe.mlw"
+   locfile="../same_fringe.mlw"
    loclnum="8" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter enum"
-    locfile="programs/same_fringe/../same_fringe.mlw"
+    locfile="../same_fringe.mlw"
     loclnum="41" loccnumb="10" loccnume="14"
-    expl="normal postcondition"
+    expl="VC for enum"
     sum="7c928899f74971cda0368a1189fe4691"
     proved="true"
     expanded="true"
     shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FAainfix &lt;alengthaelementsV2alengthaelementsV0Aainfix &lt;=c0alengthaelementsV0F">
     <label
-     name="expl:parameter enum"/>
+     name="expl:VC for enum"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter enum.1"
-      locfile="programs/same_fringe/../same_fringe.mlw"
+      locfile="../same_fringe.mlw"
       loclnum="41" loccnumb="10" loccnume="14"
-      expl="normal postcondition"
+      expl="1. postcondition"
       sum="1ac2c7860eb27d060755784e0fb1cccf"
       proved="true"
       expanded="true"
       shape="CV0aEmptyainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aNodeVVVtF">
       <label
-       name="expl:parameter enum"/>
+       name="expl:VC for enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -57,15 +56,15 @@
      </goal>
      <goal
       name="WP_parameter enum.2"
-      locfile="programs/same_fringe/../same_fringe.mlw"
+      locfile="../same_fringe.mlw"
       loclnum="41" loccnumb="10" loccnume="14"
-      expl="variant decreases"
+      expl="2. variant decrease"
       sum="735e4f27809578ab9399dbbfbca4d241"
       proved="true"
       expanded="true"
       shape="CV0aEmptytaNodeVVVainfix &lt;alengthaelementsV2alengthaelementsV0Aainfix &lt;=c0alengthaelementsV0F">
       <label
-       name="expl:parameter enum"/>
+       name="expl:VC for enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -77,15 +76,15 @@
      </goal>
      <goal
       name="WP_parameter enum.3"
-      locfile="programs/same_fringe/../same_fringe.mlw"
+      locfile="../same_fringe.mlw"
       loclnum="41" loccnumb="10" loccnume="14"
-      expl="normal postcondition"
+      expl="3. postcondition"
       sum="6089fbf43a7140eb34ae184403bdbb2c"
       proved="true"
       expanded="true"
       shape="CV0aEmptytaNodeVVVainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FF">
       <label
-       name="expl:parameter enum"/>
+       name="expl:VC for enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -99,32 +98,32 @@
    </goal>
    <goal
     name="WP_parameter eq_enum"
-    locfile="programs/same_fringe/../same_fringe.mlw"
-    loclnum="49" loccnumb="10" loccnume="17"
-    expl="normal postcondition"
+    locfile="../same_fringe.mlw"
+    loclnum="48" loccnumb="10" loccnume="17"
+    expl="VC for eq_enum"
     sum="c6f50cda22c451ec91ae7032ecd983c4"
     proved="true"
     expanded="true"
     shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueAainfix =V5V2Iainfix =aenum_elementsV9aenum_elementsV8qainfix =V10aTrueFAainfix &lt;alengthaenum_elementsV9alengthaenum_elementsV0Aainfix &lt;=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV6aenum_elementsV7FIainfix =aenum_elementsV8ainfix ++aelementsV3aenum_elementsV4Fwainfix =aenum_elementsV0aenum_elementsV1NaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1wainfix =aenum_elementsV0aenum_elementsV1NF">
     <label
-     name="expl:parameter eq_enum"/>
+     name="expl:VC for eq_enum"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter eq_enum.1"
-      locfile="programs/same_fringe/../same_fringe.mlw"
-      loclnum="49" loccnumb="10" loccnume="17"
-      expl="variant decreases"
+      locfile="../same_fringe.mlw"
+      loclnum="48" loccnumb="10" loccnume="17"
+      expl="1. variant decrease"
       sum="ad48f2e04dc69cb0597dd8f677b829c7"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVainfix &lt;alengthaenum_elementsV9alengthaenum_elementsV0Aainfix &lt;=c0alengthaenum_elementsV0Iainfix =aenum_elementsV9ainfix ++aelementsV6aenum_elementsV7FIainfix =aenum_elementsV8ainfix ++aelementsV3aenum_elementsV4FwtaDonetF">
       <label
-       name="expl:parameter eq_enum"/>
+       name="expl:VC for eq_enum"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -132,7 +131,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="0"
+       prover="1"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -142,15 +141,15 @@
      </goal>
      <goal
       name="WP_parameter eq_enum.2"
-      locfile="programs/same_fringe/../same_fringe.mlw"
-      loclnum="49" loccnumb="10" loccnume="17"
-      expl="normal postcondition"
+      locfile="../same_fringe.mlw"
+      loclnum="48" loccnumb="10" loccnume="17"
+      expl="2. postcondition"
       sum="ad130b8ddf80af541359513b5ce53db4"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVainfix =aenum_elementsV0aenum_elementsV1qainfix =V10aTrueAainfix =V5V2Iainfix =aenum_elementsV9aenum_elementsV8qainfix =V10aTrueFIainfix =aenum_elementsV9ainfix ++aelementsV6aenum_elementsV7FIainfix =aenum_elementsV8ainfix ++aelementsV3aenum_elementsV4FwtaDonetF">
       <label
-       name="expl:parameter eq_enum"/>
+       name="expl:VC for eq_enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -162,15 +161,15 @@
      </goal>
      <goal
       name="WP_parameter eq_enum.3"
-      locfile="programs/same_fringe/../same_fringe.mlw"
-      loclnum="49" loccnumb="10" loccnume="17"
-      expl="normal postcondition"
+      locfile="../same_fringe.mlw"
+      loclnum="48" loccnumb="10" loccnume="17"
+      expl="3. postcondition"
       sum="f72201d6855ddfb2608c7ef6a43c03b9"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVCV0aNextVVVtwainfix =aenum_elementsV0aenum_elementsV1NaDonetF">
       <label
-       name="expl:parameter eq_enum"/>
+       name="expl:VC for eq_enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -182,15 +181,15 @@
      </goal>
      <goal
       name="WP_parameter eq_enum.4"
-      locfile="programs/same_fringe/../same_fringe.mlw"
-      loclnum="49" loccnumb="10" loccnume="17"
-      expl="normal postcondition"
+      locfile="../same_fringe.mlw"
+      loclnum="48" loccnumb="10" loccnume="17"
+      expl="4. postcondition"
       sum="3b8b8e9c41f0886605636dc429b8f79e"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVtaDoneCV0aDoneainfix =aenum_elementsV0aenum_elementsV1wtF">
       <label
-       name="expl:parameter eq_enum"/>
+       name="expl:VC for eq_enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -202,15 +201,15 @@
      </goal>
      <goal
       name="WP_parameter eq_enum.5"
-      locfile="programs/same_fringe/../same_fringe.mlw"
-      loclnum="49" loccnumb="10" loccnume="17"
-      expl="normal postcondition"
+      locfile="../same_fringe.mlw"
+      loclnum="48" loccnumb="10" loccnume="17"
+      expl="5. postcondition"
       sum="8702bc52f02c207aaf83ed13466876c9"
       proved="true"
       expanded="true"
       shape="CV1aNextVVVtaDoneCV0aDonetwainfix =aenum_elementsV0aenum_elementsV1NF">
       <label
-       name="expl:parameter eq_enum"/>
+       name="expl:VC for eq_enum"/>
       <proof
        prover="0"
        timelimit="10"
@@ -224,15 +223,15 @@
    </goal>
    <goal
     name="WP_parameter same_fringe"
-    locfile="programs/same_fringe/../same_fringe.mlw"
-    loclnum="61" loccnumb="6" loccnume="17"
-    expl="normal postcondition"
+    locfile="../same_fringe.mlw"
+    loclnum="59" loccnumb="6" loccnume="17"
+    expl="VC for same_fringe"
     sum="a5b9d5eebec3eba161c8602a11a7d539"
     proved="true"
     expanded="true"
     shape="ainfix =aelementsV0aelementsV1qainfix =V4aTrueIainfix =aenum_elementsV3aenum_elementsV2qainfix =V4aTrueFIainfix =aenum_elementsV3ainfix ++aelementsV0aenum_elementsaDoneFIainfix =aenum_elementsV2ainfix ++aelementsV1aenum_elementsaDoneFF">
     <label
-     name="expl:parameter same_fringe"/>
+     name="expl:VC for same_fringe"/>
     <proof
      prover="0"
      timelimit="10"

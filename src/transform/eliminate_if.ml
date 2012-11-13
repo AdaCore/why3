@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ident
 open Term
 open Decl
@@ -27,7 +17,7 @@ open Decl
 
 let rec has_if t = match t.t_node with
   | Tif _ -> true
-  | _ -> TermTF.t_any has_if ffalse t
+  | _ -> TermTF.t_any has_if Util.ffalse t
 
 let rec elim_t contT t =
   let contTl e = contT (t_label_copy t e) in
@@ -107,7 +97,7 @@ and elim_f sign f = match f.t_node with
       if sign then t_and (t_implies f1n f2) (t_implies (t_not f1p) f3)
               else t_or (t_and f1p f2) (t_and (t_not f1n) f3)
   | _ ->
-      TermTF.t_map_sign (const elim_t) elim_f sign f
+      TermTF.t_map_sign (Util.const elim_t) elim_f sign f
 
 let eliminate_if_fmla = Trans.rewriteTF elim_t (elim_f true) None
 
@@ -115,12 +105,9 @@ let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 
 let () =
   Trans.register_transform "eliminate_if_term" eliminate_if_term
-  ~desc:"Replaces@ terms@ of@ the@ form@ [if formula then t2 else t3]@ by@ \
-         lifting@ them@ at@ the@ level@ of@ formulas.@ This@ may@ introduce@ \
-         [if then else]@ in@ formulas.";
+    ~desc:"Replaces@ terms@ of@ the@ form@ [if f1 then t2 else t3]@ by@ \
+           lifting@ them@ at@ the@ level@ of@ formulas.";
   Trans.register_transform "eliminate_if_fmla" eliminate_if_fmla
-    ~desc:"Replaces@ formulas@ of@ the@ form@ [if f1 then f2\
-           else f3]@ by@ an@ equivalent@ formula@ using@ implications@ and@ \
-           other@ connectives.";
+    ~desc:"Eliminate@ formulas@ of@ the@ form@ [if f1 then f2 else f3].";
   Trans.register_transform "eliminate_if" eliminate_if
-    ~desc:"Apply@ both@ eliminate_if_term/fmla."
+    ~desc:"Eliminate@ all@ if-expressions."

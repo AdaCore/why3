@@ -1,29 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
-
-open Stdlib
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Useful functions *)
-
-val ($) : ('a -> 'b) -> 'a -> 'b
-val (|>) : 'a -> ('a -> 'b) -> 'b
 
 val const : 'a -> 'b -> 'a
 
@@ -33,112 +19,12 @@ val const3 : 'a -> 'b -> 'c -> 'd -> 'a
 
 val flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
 
-val cons : ('a -> 'b) -> 'b list -> 'a -> 'b list
-
-(* useful option combinators *)
-
-val of_option : 'a option -> 'a
-
-val exn_option : exn -> 'a option -> 'a
-
-val def_option : 'a -> 'a option -> 'a
-
-val option_map : ('a -> 'b) -> 'a option -> 'b option
-
-val option_iter : ('a -> unit) -> 'a option -> unit
-
-val option_apply : 'b -> ('a -> 'b) -> 'a option -> 'b
-
-val apply_option : 'b -> ('a -> 'b) option -> 'a -> 'b
-
-val apply_option2 : 'c -> ('a -> 'b -> 'c) option -> 'a -> 'b -> 'c
-
-val option_fold : ('b -> 'a -> 'b) -> 'b -> 'a option -> 'b
-(** [option_fold f d o] returns [d] if [o] is [None], and
-    [f d x] if [o] is [Some x] *)
-
-val option_map2 : ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
-
-val option_eq : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
-
-val option_map_fold :
-  ('a -> 'b -> 'a * 'b) -> 'a -> 'b option -> 'a * 'b option
-
-(* useful int iterator *)
 val foldi : ('a -> int -> 'a) -> 'a -> int -> int -> 'a
+
 val mapi : (int -> 'a) -> int -> int -> 'a list
 
-(* useful float iterator *)
 val iterf : (float -> unit) -> float -> float -> float -> unit
 (** [iterf f min max step] *)
-
-(* useful list combinators *)
-
-val rev_map_fold_left :
-  ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
-
-val map_fold_left :
-  ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
-
-val list_all2 : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
-
-val map_join_left : ('a -> 'b) -> ('b -> 'b -> 'b) -> 'a list -> 'b
-
-val list_apply : ('a -> 'b list) -> 'a list -> 'b list
-(** [list_apply f [a1;..;an]] returns (f a1)@...@(f an) *)
-
-val list_fold_product :
-  ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
-  (** [list_fold_product f acc l1 l2] apply the function [f] with the
-      accumulator [acc] on all the pair of elements of [l1] and [l2]
-      tail-reccursive *)
-
-val list_fold_product_l :
-  ('a -> 'b list -> 'a) -> 'a -> 'b list list -> 'a
-  (** generalisation of {! list_fold_product}
-      not tail-reccursive *)
-
-val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
-
-val list_flatten_rev : 'a list list -> 'a list
-
-val list_part : ('a -> 'a -> int) -> 'a list -> 'a list list
-(** [list_part cmp l] returns the list of the congruence classes with
-    respect to [cmp]. They are returned in reverse order *)
-
-val list_first : ('a -> 'b option) -> 'a list -> 'b
-(** [list_first f l] returns the first result of the application of
-    [f] to an element of [l] which doesn't return [None]. [raise
-    Not_found] if all the element of [l] return [None] *)
-
-val list_find_nth : ('a -> bool) -> 'a list -> int
-(** [list_find_nth p l] returns the index of the first element that
-    satifies the predicate [p]. [raise Not_found] if no element of [l]
-    verify the predicate *)
-
-
-val list_first_nth : ('a -> 'b option) -> 'a list -> int * 'b
-(** The combinaison of {!list_first} and {!list_find_nth}. *)
-
-
-val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
-val list_iteri : (int -> 'a -> unit) -> 'a list -> unit
-val list_fold_lefti : ('a -> int -> 'b -> 'a) -> 'a -> 'b list -> 'a
-(** similar to List.map, List.iter and List.fold_left,
-    but with element index passed as extra argument (in 0..len-1) *)
-
-val list_or : ('a -> bool) -> 'a list -> bool
-val list_and : ('a -> bool) -> 'a list -> bool
-(** make the or or the and of the results of the function on all the
-    element of the list *)
-
-val prefix : int -> 'a list -> 'a list
-(** the first n elements of a list *)
-val chop : int -> 'a list -> 'a list
-  (** removes the first n elements of a list;
-      raises Invalid_argument if the list is not long enough *)
-val chop_last : 'a list -> 'a list * 'a
-  (** removes (and returns) the last element of a list *)
 
 (* boolean fold accumulators *)
 
@@ -155,98 +41,3 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
-
-(* useful function on string *)
-val split_string_rev : string -> char -> string list
-
-val ends_with : string -> string -> bool
-(** test if a string ends with another *)
-
-val starts_with : string -> string -> bool
-(** test if a string ends with another *)
-
-val padd_string : char -> string -> int -> string
-(** extract or padd the given string in order to have the given length *)
-
-val concat_non_empty : string -> string list -> string
-
-(* useful function on char *)
-val is_uppercase : char -> bool
-
-(* useful function on int *)
-val count : int -> ('a -> int)
-(** return the consecutie number from the first given *)
-
-(* Set and Map on ints and strings *)
-
-module Mint : Map.S with type key = int
-module Sint : Mint.Set
-module Hint : Hashtbl.S with type key = int
-
-module Mstr : Map.S with type key = string
-module Sstr : Mstr.Set
-module Hstr : Hashtbl.S with type key = string
-
-(* Set, Map, Hashtbl on structures with a unique tag *)
-
-module type Tagged =
-sig
-  type t
-  val tag : t -> int
-end
-
-module type OrderedHash =
-sig
-  type t
-  val hash : t -> int
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-end
-
-module OrderedHash (X : Tagged) : OrderedHash with type t = X.t
-module OrderedHashList (X : Tagged) : OrderedHash with type t = X.t list
-
-module StructMake (X : Tagged) :
-sig
-  module M : Map.S with type key = X.t
-  module S : M.Set
-  module H : Hashtbl.S with type key = X.t
-end
-
-module WeakStructMake (X : Hashweak.Weakey) :
-sig
-  module M : Map.S with type key = X.t
-  module S : M.Set
-  module H : Hashtbl.S with type key = X.t
-  module W : Hashweak.S with type key = X.t
-end
-
-module type PrivateHashtbl = sig
-  (** Private Hashtbl *)
-  type 'a t
-  type key
-
-  val find : 'a t -> key -> 'a
-    (** Same as {!Hashtbl.find} *)
-  val iter : (key -> 'a -> unit) -> 'a t -> unit
-    (** Same as {!Hashtbl.iter} *)
-  val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
-    (** Same as {!Hashtbl.fold} *)
-  val mem : 'a t -> key -> bool
-    (** Same as {!Hashtbl.mem} *)
-  val length : 'a t -> int
-    (** Same as {!Hashtbl.length} *)
-
-end
-
-module type PrivateArray = sig
-  (** Private Array *)
-  type 'a t
-
-  val get : 'a t -> int -> 'a
-  val iter : ('a -> unit) -> 'a t -> unit
-    (** Same as {!Array.iter} *)
-  val fold_left : ('acc -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
-    (** Same as {!Array.fold} *)
-
-end

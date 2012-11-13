@@ -1,25 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -245,7 +235,7 @@ let add_symbol add id v uc =
 let add_decl uc d =
   let add_ts uc ts = add_symbol add_ts ts.ts_name (TS ts) uc in
   let add_ls uc ls = add_symbol add_ps ls.ls_name (LS ls) uc in
-  let add_pj uc pj = Util.option_fold add_ls uc pj in
+  let add_pj uc pj = Opt.fold add_ls uc pj in
   let add_cs uc (cs,pjl) = List.fold_left add_pj (add_ls uc cs) pjl in
   let add_data uc (ts,csl) = List.fold_left add_cs (add_ts uc ts) csl in
   let add_logic uc (ls,_) = add_ls uc ls in
@@ -294,7 +284,7 @@ let add_type uc its =
 
 let add_data uc (its,csl,_) =
   let add_pl uc pl = add_symbol add_ps pl.pl_ls.ls_name (PL pl) uc in
-  let add_pj uc pj = Util.option_fold add_pl uc pj in
+  let add_pj uc pj = Opt.fold add_pl uc pj in
   let add_cs uc (cs,pjl) = List.fold_left add_pj (add_pl uc cs) pjl in
   let uc = add_symbol add_ts its.its_pure.ts_name (PT its) uc in
   if its.its_abst then uc else List.fold_left add_cs uc csl
@@ -337,7 +327,7 @@ let add_pdecl ~wp uc d =
       add_to_theory Theory.add_ty_decl uc its.its_pure
   | PDdata dl ->
       let uc = List.fold_left add_data uc dl in
-      let projection = option_map (fun pls -> pls.pl_ls) in
+      let projection = Opt.map (fun pls -> pls.pl_ls) in
       let constructor (pls,pjl) = pls.pl_ls, List.map projection pjl in
       let defn cl = List.map constructor cl in
       let dl = List.map (fun (its,cl,_) -> its.its_pure, defn cl) dl in
@@ -352,15 +342,18 @@ let add_pdecl ~wp uc d =
 (* we can safely add a new type invariant as long as
    the type was introduced in the last program decl,
    and no let, rec or val could see it *)
+
+exception TooLateInvariant
+
 let add_invariant uc its p =
   let rec add = function
+    | d :: dl when Mid.mem its.its_pure.ts_name d.pd_news ->
+        let d = Mlw_decl.add_invariant d its p in d, d :: dl
     | { pd_node = PDtype _ } as d :: dl ->
         let nd, dl = add dl in nd, d :: dl
-    | d :: dl ->
-        let d = Mlw_decl.add_invariant d its p in d, d :: dl
-    | [] -> invalid_arg "Mlw_module.add_invariant" in
+    | _ -> raise TooLateInvariant in
   let decl, decls = add uc.muc_decls in
-  let kn = Mid.map (const decl) decl.pd_news in
+  let kn = Mid.map (Util.const decl) decl.pd_news in
   let kn = Mid.set_union kn uc.muc_known in
   { uc with muc_decls = decls; muc_known = kn }
 
@@ -451,7 +444,7 @@ let clone_export uc m inst =
     Mreg.fold conv eff.eff_resets e in
   let conv_term mv t = t_gen_map (ty_s_map conv_ts) conv_ls mv t in
   let addx mv xs t q = Mexn.add (conv_xs xs) (conv_term mv t) q in
-  let conv_vari mv (t,r) = conv_term mv t, Util.option_map conv_ls r in
+  let conv_vari mv (t,r) = conv_term mv t, Opt.map conv_ls r in
   let conv_spec mv c = {
     c_pre     = conv_term mv c.c_pre;
     c_post    = conv_term mv c.c_post;

@@ -151,16 +151,17 @@ module RedBlackTree
 
   exception Not_found
 
-  let rec find (t : tree) (k : key) : value =
-    { bst t }
-    match t with
+  let rec find (t : tree) (k : key) : value
+    requires { bst t }
+    ensures { memt t k result }
+    raises { Not_found -> forall v : value. not (memt t k v) }
+  = match t with
     | Leaf -> raise Not_found
     | Node _ l k' v r ->
         if k = k' then v
         else if k < k' then find l k
         else (* k > k' *) find r k
     end
-    { memt t k result } | Not_found -> { forall v : value. not (memt t k v) }
 
   (* insertion *)
 
@@ -198,22 +199,21 @@ module RedBlackTree
 
       The result is not necessarily a black node. *)
 
-  let lbalance (l : tree) (k : key) (v : value) (r : tree) =
-    { lt_tree k l /\ gt_tree k r /\ bst l /\ bst r }
-    match l with
+  let lbalance (l : tree) (k : key) (v : value) (r : tree)
+    requires { lt_tree k l /\ gt_tree k r /\ bst l /\ bst r }
+    ensures { bst result /\
+      (forall n : int. almost_rbtree n l -> rbtree n r -> rbtree (n+1) result)
+      /\
+      forall k':key, v':value.
+        memt result k' v' <->
+        if k' = k then v' = v else (memt l k' v' \/ memt r k' v') }
+  = match l with
     | Node Red (Node Red a kx vx b) ky vy c
     | Node Red a kx vx (Node Red b ky vy c) ->
         Node Red (Node Black a kx vx b) ky vy (Node Black c k v r)
     | _ ->
         Node Black l k v r
     end
-    { bst result /\
-      (forall n : int. almost_rbtree n l -> rbtree n r -> rbtree (n+1) result)
-      /\
-      forall k':key, v':value.
-        memt result k' v' <->
-        if k' = k then v' = v else (memt l k' v' \/ memt r k' v')
-    }
 
   (** [rbalance l x r] is similar to [lbalance], solving a possible red-red
       conflict on [r]. The balancing schema is similar:
@@ -223,29 +223,34 @@ module RedBlackTree
       B a x b -> B a x b
    *)
 
-  let rbalance (l : tree) (k : key) (v : value) (r : tree) =
-    { lt_tree k l /\ gt_tree k r /\ bst l /\ bst r }
-    match r with
+  let rbalance (l : tree) (k : key) (v : value) (r : tree)
+    requires { lt_tree k l /\ gt_tree k r /\ bst l /\ bst r }
+    ensures { bst result /\
+      (forall n : int. almost_rbtree n r -> rbtree n l -> rbtree (n+1) result)
+      /\
+      forall k':key, v':value.
+        memt result k' v' <->
+        if k' = k then v' = v else (memt l k' v' \/ memt r k' v') }
+  = match r with
     | Node Red (Node Red b ky vy c) kz vz d
     | Node Red b ky vy (Node Red c kz vz d) ->
         Node Red (Node Black l k v b) ky vy (Node Black c kz vz d)
     | _ ->
         Node Black l k v r
     end
-    { bst result /\
-      (forall n : int. almost_rbtree n r -> rbtree n l -> rbtree (n+1) result)
-      /\
-      forall k':key, v':value.
-        memt result k' v' <->
-        if k' = k then v' = v else (memt l k' v' \/ memt r k' v')
-    }
 
   (* [insert x s] inserts [x] in tree [s], resulting in a possible top red-red
      conflict when [s] is red. *)
 
-  let rec insert (t : tree) (k : key) (v : value) : tree =
-    { bst t /\ exists n: int. rbtree n t }
-    match t with
+  let rec insert (t : tree) (k : key) (v : value) : tree
+    requires { bst t /\ exists n: int. rbtree n t }
+    ensures { bst result /\
+      (forall n : int. rbtree n t -> almost_rbtree n result /\
+         (is_not_red t -> rbtree n result)) /\
+      memt result k v /\
+      forall k':key, v':value.
+      memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
+  = match t with
     | Leaf ->
         Node Red Leaf k v Leaf
     | Node Red l k' v' r ->
@@ -257,25 +262,19 @@ module RedBlackTree
         else if k' < k then rbalance l k' v' (insert r k v)
         else (* k = k' *) Node Black l k' v r
     end
-    { bst result /\
-      (forall n : int. rbtree n t -> almost_rbtree n result /\
-         (is_not_red t -> rbtree n result)) /\
-      memt result k v /\
-      forall k':key, v':value.
-      memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
 
   (* finally [add x s] calls [insert] and recolors the root as black *)
 
-  let add (t : tree) (k : key) (v : value) : tree =
-    { bst t /\ exists n:int. rbtree n t }
-    match insert t k v with
-    | Node _ l k' v' r -> Node Black l k' v' r
-    | Leaf -> absurd
-    end
-    { bst result /\ (exists n:int. rbtree n result) /\
+  let add (t : tree) (k : key) (v : value) : tree
+    requires { bst t /\ exists n:int. rbtree n t }
+    ensures { bst result /\ (exists n:int. rbtree n result) /\
       memt result k v /\
       forall k':key, v':value.
       memt result k' v' <-> if k' = k then v' = v else memt t k' v' }
+  = match insert t k v with
+    | Node _ l k' v' r -> Node Black l k' v' r
+    | Leaf -> absurd
+    end
 
 end
 
@@ -283,8 +282,8 @@ module Vacid0
 
   (* the VACID-0 interface = mutable map with default value*)
 
-  use import module ref.Ref
-  use import module RedBlackTree
+  use import ref.Ref
+  use import RedBlackTree
 
   type rbt = (value, tree)
 
@@ -298,41 +297,34 @@ module Vacid0
     let (d, t) = r in
     memt t k v \/ (v = d /\ forall v':value. not (memt t k v'))
 
-  let create (d : int) =
-    { }
-    let x = (d, Leaf) in ref x (* BUG: ref (d, Leaf) *)
-    { inv !result /\
+  let create (d : int)
+    ensures { inv !result /\
       default !result = d /\
       forall k:key, v:value. mem !result k v <-> v = d }
+  = let x = (d, Leaf) in ref x (* BUG: ref (d, Leaf) *)
 
-  let replace (m : ref rbt) k v =
-    { inv !m }
-    let (d, t) = !m in
-    m := (d, add t k v)
-    { inv !m /\
+  let replace (m : ref rbt) k v
+    requires { inv !m }
+    ensures { inv !m /\
       default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
+  = let (d, t) = !m in
+    m := (d, add t k v)
 
-  let lookup (m : ref rbt) k =
-    { inv !m }
-    let (d, t) = !m in
+  let lookup (m : ref rbt) k
+    requires { inv !m }
+    ensures { mem !m k result }
+  = let (d, t) = !m in
     try find t k with Not_found -> d end
-    { mem !m k result }
 
   (* the easy way: implements [remove] using [replace] *)
-  let remove (m : ref rbt) k =
-    { inv !m }
-    replace m k (default !m)
-    { inv !m /\
+  let remove (m : ref rbt) k
+    requires { inv !m }
+    ensures { inv !m /\
       default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
+  = replace m k (default !m)
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_red_black_trees.gui"
-End:
-*)

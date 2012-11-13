@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ident
 open Ty
 open Term
@@ -109,7 +99,7 @@ let elt d =
              let s =
                    List.fold_left
                      (fun acc ({ls_args = tyl; ls_value = ty},_) ->
-                        let ty = of_option ty in
+                        let ty = Opt.get ty in
                         List.fold_left
                           (fun acc ty -> ty_s_fold tyoccurences acc ty)
                           acc (ty::tyl)
@@ -125,4 +115,4 @@ let elt d =
 let t = Trans.decl elt None
 
 let () = Trans.register_transform "simplify_recursive_definition" t
-  ~desc:"Separate@ the@ definitions@ that@ are@ not@ really@ recursive."
+  ~desc:"Separate@ the@ definitions@ that@ are@ not@ mutually@ recursive."

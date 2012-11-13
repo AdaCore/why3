@@ -1,27 +1,17 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 open Ty
-open Stdlib
 
 (** Variable symbols *)
 
@@ -30,7 +20,7 @@ type vsymbol = {
   vs_ty   : ty;
 }
 
-module Vsym = WeakStructMake (struct
+module Vsym = MakeMSHW (struct
   type t = vsymbol
   let tag vs = vs.vs_name.id_tag
 end)
@@ -57,7 +47,7 @@ type lsymbol = {
   ls_value  : ty option;
 }
 
-module Lsym = WeakStructMake (struct
+module Lsym = MakeMSHW (struct
   type t = lsymbol
   let tag ls = ls.ls_name.id_tag
 end)
@@ -133,7 +123,7 @@ module Hspat = Hashcons.Make (struct
   let tag n p = { p with pat_tag = n }
 end)
 
-module Pat = StructMake (struct
+module Pat = MakeMSH (struct
   type t = pattern
   let tag pat = pat.pat_tag
 end)
@@ -190,8 +180,11 @@ let pat_fold fn acc pat = match pat.pat_node with
   | Pas (p, _) -> fn acc p
   | Por (p, q) -> fn (fn acc p) q
 
-let pat_all pr pat = try pat_fold (all_fn pr) true pat with FoldSkip -> false
-let pat_any pr pat = try pat_fold (any_fn pr) false pat with FoldSkip -> true
+let pat_all pr pat =
+  try pat_fold (Util.all_fn pr) true pat with Util.FoldSkip -> false
+
+let pat_any pr pat =
+  try pat_fold (Util.any_fn pr) false pat with Util.FoldSkip -> true
 
 (* smart constructors for patterns *)
 
@@ -258,20 +251,6 @@ type binop =
   | Timplies
   | Tiff
 
-type integer_constant =
-  | IConstDecimal of string
-  | IConstHexa of string
-  | IConstOctal of string
-  | IConstBinary of string
-
-type real_constant =
-  | RConstDecimal of string * string * string option (* int / frac / exp *)
-  | RConstHexa of string * string * string
-
-type constant =
-  | ConstInt of integer_constant
-  | ConstReal of real_constant
-
 type term = {
   t_node  : term_node;
   t_ty    : ty option;
@@ -283,7 +262,7 @@ type term = {
 
 and term_node =
   | Tvar of vsymbol
-  | Tconst of constant
+  | Tconst of Number.constant
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -333,11 +312,11 @@ let vs_check v t = ty_equal_check v.vs_ty (t_type t)
 
 (* trigger equality and traversal *)
 
-let tr_equal = list_all2 (list_all2 t_equal)
+let tr_equal = Lists.equal (Lists.equal t_equal)
 
 let tr_map fn = List.map (List.map fn)
 let tr_fold fn = List.fold_left (List.fold_left fn)
-let tr_map_fold fn = Util.map_fold_left (Util.map_fold_left fn)
+let tr_map_fold fn = Lists.map_fold_left (Lists.map_fold_left fn)
 
 (* bind_info equality, hash, and traversal *)
 
@@ -374,7 +353,7 @@ module Hsterm = Hashcons.Make (struct
     pat_equal p1 p2 && bnd_equal b1 b2 && t_equal t1 t2
 
   let t_eq_quant (vl1,b1,tl1,f1) (vl2,b2,tl2,f2) =
-    t_equal f1 f2 && list_all2 vs_equal vl1 vl2 &&
+    t_equal f1 f2 && Lists.equal vs_equal vl1 vl2 &&
     bnd_equal b1 b2 && tr_equal tl1 tl2
 
   let t_equal_node t1 t2 = match t1,t2 with
@@ -387,7 +366,7 @@ module Hsterm = Hashcons.Make (struct
     | Tlet (t1,b1), Tlet (t2,b2) ->
         t_equal t1 t2 && t_eq_bound b1 b2
     | Tcase (t1,bl1), Tcase (t2,bl2) ->
-        t_equal t1 t2 && list_all2 t_eq_branch bl1 bl2
+        t_equal t1 t2 && Lists.equal t_eq_branch bl1 bl2
     | Teps f1, Teps f2 -> t_eq_bound f1 f2
     | Tquant (q1,b1), Tquant (q2,b2) ->
         q1 = q2 && t_eq_quant b1 b2
@@ -401,7 +380,7 @@ module Hsterm = Hashcons.Make (struct
     oty_equal t1.t_ty t2.t_ty &&
     t_equal_node t1.t_node t2.t_node &&
     Slab.equal t1.t_label t2.t_label &&
-    option_eq Loc.equal t1.t_loc t2.t_loc
+    Opt.equal Loc.equal t1.t_loc t2.t_loc
 
   let t_hash_bound (v,b,t) =
     Hashcons.combine (vs_hash v) (bnd_hash b (t_hash t))
@@ -452,7 +431,7 @@ module Hsterm = Hashcons.Make (struct
 
 end)
 
-module Term = StructMake (struct
+module Term = MakeMSH (struct
   type t = term
   let tag term = term.t_tag
 end)
@@ -474,8 +453,6 @@ let mk_term n ty = Hsterm.hashcons {
 
 let t_var v         = mk_term (Tvar v) (Some v.vs_ty)
 let t_const c ty    = mk_term (Tconst c) (Some ty)
-let t_int_const s   = mk_term (Tconst (ConstInt (IConstDecimal s))) (Some Ty.ty_int)
-let t_real_const r  = mk_term (Tconst (ConstReal r)) (Some Ty.ty_real)
 let t_app f tl ty   = mk_term (Tapp (f, tl)) ty
 let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty
 let t_let t1 bt ty  = mk_term (Tlet (t1, bt)) ty
@@ -557,7 +534,7 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
   | Tvar _ | Tconst _ ->
       acc, t
   | Tapp (f,tl) ->
-      let acc,sl = map_fold_left fn acc tl in
+      let acc,sl = Lists.map_fold_left fn acc tl in
       if List.for_all2 t_equal sl tl then acc,t else
       acc, t_label_copy t (t_app f sl t.t_ty)
   | Tif (f,t1,t2) ->
@@ -572,7 +549,7 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
       acc, t_label_copy t (t_let e b t.t_ty)
   | Tcase (e,bl) ->
       let acc, e = fn acc e in
-      let acc, bl = map_fold_left (bound_map_fold fn) acc bl in
+      let acc, bl = Lists.map_fold_left (bound_map_fold fn) acc bl in
       acc, t_label_copy t (t_case e bl t.t_ty)
   | Teps b ->
       let acc, b = bound_map_fold fn acc b in
@@ -665,7 +642,7 @@ let vs_rename h v =
   Mvs.add v (t_var u) h, u
 
 let vl_rename h vl =
-  Util.map_fold_left vs_rename h vl
+  Lists.map_fold_left vs_rename h vl
 
 let pat_rename h p =
   let add_vs v () = fresh_vsymbol v in
@@ -705,7 +682,7 @@ let t_open_branch_cb tbr =
 let t_open_quant_cb fq =
   let vl, tl, f = t_open_quant fq in
   let close vl' tl' f' =
-    if t_equal f f' && tr_equal tl tl' && list_all2 vs_equal vl vl'
+    if t_equal f f' && tr_equal tl tl' && Lists.equal vs_equal vl vl'
     then fq else t_close_quant vl' tl' f'
   in
   vl, tl, f, close
@@ -736,8 +713,11 @@ let fs_app fs tl ty = t_app fs tl (Some ty)
 let ps_app ps tl    = t_app ps tl None
 
 let t_const c = match c with
-  | ConstInt _  -> t_const c ty_int
-  | ConstReal _ -> t_const c ty_real
+  | Number.ConstInt _  -> t_const c ty_int
+  | Number.ConstReal _ -> t_const c ty_real
+
+let t_nat_const n =
+  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;
@@ -813,7 +793,7 @@ let t_bool_false = fs_app fs_bool_false [] ty_bool
 
 let fs_tuple_ids = Hid.create 17
 
-let fs_tuple = Util.Hint.memo 17 (fun n ->
+let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
@@ -862,7 +842,7 @@ let gen_vs_rename fnT h v =
   Mvs.add v u h, u
 
 let gen_vl_rename fnT h vl =
-  Util.map_fold_left (gen_vs_rename fnT) h vl
+  Lists.map_fold_left (gen_vs_rename fnT) h vl
 
 let gen_pat_rename fnT fnL h p =
   let add_vs v () = gen_fresh_vsymbol fnT v in
@@ -890,7 +870,7 @@ let rec t_gen_map fnT fnL m t =
     | Tconst _ ->
         t
     | Tapp (fs, tl) ->
-        t_app (fnL fs) (List.map fn tl) (option_map fnT t.t_ty)
+        t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
         t_if (fn f) (fn t1) (fn t2)
     | Tlet (t1, (u,b,t2)) ->
@@ -942,7 +922,7 @@ let t_ty_subst mapT mapV t =
 
 let rec t_gen_fold fnT fnL acc t =
   let fn = t_gen_fold fnT fnL in
-  let acc = option_fold fnT acc t.t_ty in
+  let acc = Opt.fold fnT acc t.t_ty in
   match t.t_node with
   | Tconst _ | Tvar _ -> acc
   | Tapp (f, tl) -> List.fold_left fn (fnL acc f) tl
@@ -964,10 +944,12 @@ let rec t_gen_fold fnT fnL acc t =
 let t_s_fold = t_gen_fold
 
 let t_s_all prT prL t =
-  try t_s_fold (all_fn prT) (all_fn prL) true t with FoldSkip -> false
+  try t_s_fold (Util.all_fn prT) (Util.all_fn prL) true t
+  with Util.FoldSkip -> false
 
 let t_s_any prT prL t =
-  try t_s_fold (any_fn prT) (any_fn prL) false t with FoldSkip -> true
+  try t_s_fold (Util.any_fn prT) (Util.any_fn prL) false t
+  with Util.FoldSkip -> true
 
 (* map/fold over types in terms and formulas *)
 
@@ -1028,8 +1010,8 @@ let t_fold fn acc t = match t.t_node with
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
 
-let t_all pr t = try t_fold (all_fn pr) true t with FoldSkip -> false
-let t_any pr t = try t_fold (any_fn pr) false t with FoldSkip -> true
+let t_all pr t = try t_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
+let t_any pr t = try t_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
 
 (* safe opening map_fold *)
 
@@ -1044,7 +1026,7 @@ let t_map_fold fn acc t = match t.t_node with
       let brn acc b =
         let p,t,close = t_open_branch_cb b in
         let acc,t = fn acc t in acc, close p t in
-      let acc, bl = map_fold_left brn acc bl in
+      let acc, bl = Lists.map_fold_left brn acc bl in
       acc, t_label_copy t (t_case e bl)
   | Teps b ->
       let u,t1,close = t_open_bound_cb b in
@@ -1216,7 +1198,7 @@ let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
           let m2 = pat_rename_alpha c2 m2 p2 in
           t_equal_alpha c1 c2 m1 m2 e1 e2
         in
-        list_all2 br_eq bl1 bl2
+        Lists.equal br_eq bl1 bl2
     | Teps b1, Teps b2 ->
         let u1,e1 = t_open_bound b1 in
         let u2,e2 = t_open_bound b2 in
@@ -1225,7 +1207,7 @@ let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
         t_equal_alpha c1 c2 m1 m2 e1 e2
     | Tquant (q1,((vl1,_,_,_) as b1)), Tquant (q2,((vl2,_,_,_) as b2)) ->
         q1 = q2 &&
-        list_all2 (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
+        Lists.equal (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
         let vl1,_,e1 = t_open_quant b1 in
         let vl2,_,e2 = t_open_quant b2 in
         let m1 = vl_rename_alpha c1 m1 vl1 in
@@ -1302,7 +1284,7 @@ let rec t_hash_alpha c m t =
 
 let t_hash_alpha = t_hash_alpha (ref (-1)) Mvs.empty
 
-module Hterm_alpha = Hashtbl.Make (struct
+module Hterm_alpha = XHashtbl.Make (struct
   type t = term
   let equal = t_equal_alpha
   let hash = t_hash_alpha

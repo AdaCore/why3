@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (* Smoke detector try to find if the axiomatisation is self-contradicting.
 
@@ -34,7 +25,7 @@ let top = create t_not
 
 let rec neg f = match f.t_node with
   | Tbinop (Timplies,f1,f2) -> t_and f1 (neg f2)
-(* Would show too much smoke ? 
+(* Would show too much smoke ?
   | Tbinop (Timplies,f1,f2) -> t_implies f1 (neg f2)
 *)
   | Tquant (Tforall,fq) ->
@@ -48,16 +39,14 @@ let rec neg f = match f.t_node with
 let deep = create neg
 
 let () = Trans.register_transform "smoke_detector_top" top
-  ~desc:"Transformation@ that@ doesn't@ keep@ satisfiability.@ Add@ a@ \
-         negation@ at@ the@ top@ of@ the@ goal@ in@ order@ to@ (try)@ to@ \
-         detect@ inconsistencies@ in@ the@ premises."
+  ~desc:"Put@ the@ goal@ under@ negation.@ Used@ to@ \
+         detect@ inconsistency@ in@ premises."
 
 let () = Trans.register_transform "smoke_detector_deep" deep
-  ~desc:"Transformation@ that@ doesn't@ keep@ satisfiability.@ Add@ a@ \
-         negation@ under@ all@ the@ universal@ quantifications@ and@ \
-         hypothesis@ of@ the@ goal@ in@ order@ to@ (try)@ to@ \
-         detect@ inconsistencies@ in@ the@ premises."
-
+  ~desc:"Put@ the@ conclusion@ of@ the@ goal@ (under@ universal@ \
+         quantifiers@ and@ implications)@ under@ negation.@ \
+         Used@ to@ detect@ inconsistency@ in@ premises@ \
+         and@ goal@ hypotheses."
 
 (*
 Local Variables:

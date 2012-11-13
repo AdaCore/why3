@@ -1,26 +1,17 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Managing the configuration of Why3 *)
 
-open Util
+open Stdlib
 
 (** {2 General configuration} *)
 
@@ -104,13 +95,14 @@ type prover =
     (** record of necessary data for a given external prover *)
 
 val print_prover : Format.formatter -> prover -> unit
-val print_prover_parsable_format : Format.formatter -> prover -> unit
+val print_prover_parseable_format : Format.formatter -> prover -> unit
+val prover_parseable_format : prover -> string
 
 (** Printer for prover *)
-module Prover   : Util.OrderedHash with type t = prover
-module Mprover  : Stdlib.Map.S with type key = prover
+module Prover   : OrderedHashedType with type t = prover
+module Mprover  : Map.S with type key = prover
 module Sprover  : Mprover.Set
-module Hprover  : Hashtbl.S with type key = prover
+module Hprover  : XHashtbl.S with type key = prover
 
 (** {3 Prover configuration} *)
 
@@ -133,7 +125,7 @@ val get_provers : config  -> config_prover Mprover.t
     keys are the unique ids of the prover (argument of the family) *)
 
 val set_provers : config ->
-  ?shortcuts:Mprover.key Util.Mstr.t -> config_prover Mprover.t -> config
+  ?shortcuts:Mprover.key Mstr.t -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
     one given *)
 
@@ -152,7 +144,7 @@ type config_editor = {
   editor_options : string list;
 }
 
-module Meditor : Stdlib.Map.S with type key = string
+module Meditor : Map.S with type key = string
 
 val set_editors : config -> config_editor Meditor.t -> config
 (** replace the set of editors *)

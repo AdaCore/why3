@@ -2,22 +2,19 @@
 module LocalFunctions
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
 
   (* local function (f) accessing a local reference (x) *)
   let test1 () =
     let x = ref 0 in
-    let f (y: int) = {} x := !x + y { !x = old !x + y } in
+    let f (y: int) ensures { !x = old !x + y } = x := !x + y in
     f 2;
     assert { !x = 2 }
 
   val r: ref int
 
   (* recursive function accessing a global reference *)
-  let rec test2 () =
-    { }
-    r := 0
-    { !r = 0 }
+  let rec test2 () ensures { !r = 0 } = r := 0
 
 end
 

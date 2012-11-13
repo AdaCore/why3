@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Names
 open Namegen
@@ -398,20 +389,21 @@ let rec tr_positive p = match kind_of_term p with
   | _ ->
       raise NotArithConstant
 
-let const_of_big_int b = Term.t_int_const (Big_int.string_of_big_int b)
+let const_of_big_int b =
+  Term.t_const
+    (Number.ConstInt (Number.int_const_dec (Big_int.string_of_big_int b)))
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant t = match kind_of_term t with
-  | Construct _ when is_constant t coq_Z0 ->
-      Term.t_int_const "0"
+  | Construct _ when is_constant t coq_Z0 -> Term.t_nat_const 0
   | App (f, [|a|]) when is_constant f coq_Zpos ->
       const_of_big_int (tr_positive a)
   | App (f, [|a|]) when is_constant f coq_Zneg ->
       const_of_big_int (Big_int.minus_big_int (tr_positive a))
   | Const _ when is_constant t coq_R0 ->
-      Term.t_real_const (Term.RConstDecimal ("0", "0", None))
+      Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
   | Const _ when is_constant t coq_R1 ->
-      Term.t_real_const (Term.RConstDecimal ("1", "0", None))
+      Term.t_const (Number.ConstReal (Number.real_const_dec "1" "0" None))
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)
 (*       let tb = tr_arith_constant b in *)
@@ -569,7 +561,7 @@ and tr_global_ts dep env r =
           (* Format.printf "decl = %a@." Pretty.print_decl decl; *)
           List.iter (add_new_decl dep !dep') tl;
           List.iter (add_dep dep') tl;
-          Util.option_iter (add_new_decl dep !dep') decl;
+          Opt.iter (add_new_decl dep !dep') decl;
           lookup_table global_ts r
 
 (* the function/predicate symbol for r *)
@@ -608,14 +600,14 @@ and tr_global_ls dep env r =
           let pl, d = decompose_definition dep' env c in
           List.iter (add_new_decl dep !dep') pl;
           List.iter (add_dep dep') pl;
-          Util.option_iter (add_new_decl dep !dep') d;
+          Opt.iter (add_new_decl dep !dep') d;
           lookup_table global_ls r
       | IndRef i ->
           assert (is_Prop t);
           let pl, d = decompose_inductive dep' env i in
           List.iter (add_new_decl dep !dep') pl;
           List.iter (add_dep dep') pl;
-          Util.option_iter (add_new_decl dep !dep') d;
+          Opt.iter (add_new_decl dep !dep') d;
           lookup_table global_ls r
       | VarRef _ ->
           make_one_ls dep' env r;
@@ -684,11 +676,11 @@ and decompose_definition dep env c =
       | Some b ->
           let tvs = List.fold_left Ty.ty_freevars Stv.empty
             (Ty.oty_cons ls.ls_args ls.ls_value) in
-          let add tv tvm = Util.Mstr.add tv.tv_name.Ident.id_string tv tvm in
-          let tvm = Stv.fold add tvs Util.Mstr.empty in
+          let add tv tvm = Stdlib.Mstr.add tv.tv_name.Ident.id_string tv tvm in
+          let tvm = Stv.fold add tvs Stdlib.Mstr.empty in
           let ty = Global.type_of_global r in
           let (_, vars), env, _ = decomp_type_quantifiers env ty in
-          let conv tv = Util.Mstr.find tv.tv_name.Ident.id_string tvm in
+          let conv tv = Stdlib.Mstr.find tv.tv_name.Ident.id_string tvm in
           let vars = List.map conv vars in
           let tvm, env, b = decomp_type_lambdas Idmap.empty env vars b in
           let (bv, vsl), env, b =
@@ -1079,7 +1071,7 @@ let is_goal s =
   n >= 11 && String.sub s 0 11 = "Unnamed_thm" ||
   n >= 9 && String.sub s (n - 9) 9 = "_admitted"
 
-let tr_top_decl ((sp, kn),node) = 
+let tr_top_decl ((sp, kn),node) =
   CoqCompat.on_leaf_node node (function lobj ->
     let dep = empty_dep () in
     let env = Global.env () in
@@ -1156,7 +1148,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     | Whyconf.ProverNotFound (_, fp) ->
         let pl =
           Mprover.fold (fun prover p l -> if not p.interactive
-            then (Pp.string_of_wnl Whyconf.print_prover prover) :: l
+            then ("\"" ^ Whyconf.prover_parseable_format prover ^ "\"") :: l
             else l)
           (get_provers config) [] in
         let msg = pr_str "No such prover `"
@@ -1167,7 +1159,8 @@ let why3tac ?(timelimit=timelimit) s gl =
         errorlabstrm "Whyconf.ProverNotFound" msg
     | Whyconf.ProverAmbiguity (_, fp,provers) ->
         let pl = Mprover.keys provers in
-        let pl = List.map (Pp.string_of_wnl Whyconf.print_prover) pl in
+        let pl = List.map (fun prover ->
+          "\"" ^ Whyconf.prover_parseable_format prover ^ "\"") pl in
         let msg = pr_str "More than one prover corresponding to `" ++
           pr_fp fp ++ pr_str "'." ++
           pr_spc () ++ pr_str "Corresponding provers are:" ++ pr_fnl () ++
@@ -1177,7 +1170,6 @@ let why3tac ?(timelimit=timelimit) s gl =
       let msg = pr_str "Syntax error prover identification '" ++
         pr_str s ++ pr_str "' :  name[,version[,alternative]|,,alternative]" in
       errorlabstrm "Whyconf.ParseFilterProver" msg
-
     | e ->
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;

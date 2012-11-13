@@ -1,12 +1,16 @@
 
-\newcommand{\todo}[1]{{\Huge\bfseries TODO: #1}}
+% \newcommand{\todo}[1]{{\Huge\bfseries TODO: #1}}
 
 \newcommand{\why}{\textsf{Why3}\xspace}
 \newcommand{\whyml}{\textsf{WhyML}\xspace}
 \newcommand{\eg}{\emph{e.g.}\xspace}
 \newcommand{\ie}{\emph{i.e.}\xspace}
 
-\newcommand{\emptyitem}{\begin{latexonly}~\end{latexonly}}
+\newcommand{\emptyitem}{%
+%BEGIN LATEX
+~
+%END LATEX
+}
 
 % BNF grammar
 \newcommand{\keyword}[1]{\texttt{#1}}
@@ -14,7 +18,7 @@
 \newcommand{\indexttbs}[1]{\index{#1@\protect\keywordbs{#1}}}
 \newif\ifspace
 \newif\ifnewentry
-\newcommand{\addspace}{\ifspace ~ \spacefalse \fi}
+\newcommand{\addspace}{\ifspace \: \spacefalse \fi}
 \newcommand{\term}[2]{\addspace\mbox{\lstinline|#1|%
 \ifthenelse{\equal{#2}{}}{}{\indexttbase{#2}{#1}}}\spacetrue}
 \newcommand{\nonterm}[2]{%
@@ -57,7 +61,8 @@
 morekeywords={namespace,predicate,function,inductive,type,use,clone,%
 import,export,theory,module,end,in,with,%
 let,rec,for,to,do,done,match,if,then,else,while,try,invariant,variant,%
-absurd,raise,assert,exception,%
+absurd,raise,assert,exception,private,abstract,mutable,ghost,%
+downto,raises,writes,reads,requires,ensures,returns,val,model,%
 goal,axiom,lemma,forall},%
 string=[b]",%
 sensitive=true,%

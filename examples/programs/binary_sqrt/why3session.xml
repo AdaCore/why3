@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/binary_sqrt/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="CVC3"
@@ -9,43 +8,43 @@
  <prover
   id="1"
   name="Z3"
-  version="4.0"/>
+  version="4.2"/>
  <file
   name="../binary_sqrt.mlw"
   verified="true"
   expanded="true">
   <theory
    name="BinarySqrt"
-   locfile="programs/binary_sqrt/../binary_sqrt.mlw"
+   locfile="../binary_sqrt.mlw"
    loclnum="7" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter sqrt"
-    locfile="programs/binary_sqrt/../binary_sqrt.mlw"
+    locfile="../binary_sqrt.mlw"
     loclnum="11" loccnumb="10" loccnume="14"
-    expl="parameter sqrt"
+    expl="VC for sqrt"
     sum="e08f528fae51036632b313fa55e111e7"
     proved="true"
     expanded="true"
     shape="iainfix &lt;c1.V1Aainfix &lt;V0V1ainfix &lt;V0ainfix *ainfix +c0.V1ainfix +c0.V1Aainfix &lt;=ainfix *c0.c0.V0ainfix &lt;V0ainfix *ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1Aainfix &lt;=ainfix *iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V0Iainfix &lt;V0ainfix *ainfix +V2ainfix *c2.V1ainfix +V2ainfix *c2.V1Aainfix &lt;=ainfix *V2V2V0FAainfix &lt;c0.ainfix *c2.V1Aainfix &lt;=c0.V0Iainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
     <label
-     name="expl:parameter sqrt"/>
+     name="expl:VC for sqrt"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter sqrt.1"
-      locfile="programs/binary_sqrt/../binary_sqrt.mlw"
+      locfile="../binary_sqrt.mlw"
       loclnum="11" loccnumb="10" loccnume="14"
-      expl="normal postcondition"
+      expl="1. postcondition"
       sum="dff5fb4cc54d4ce8b3085bf8500cf886"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V0ainfix *ainfix +c0.V1ainfix +c0.V1Aainfix &lt;=ainfix *c0.c0.V0Iainfix &lt;c1.V1Aainfix &lt;V0V1Iainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
       <label
-       name="expl:parameter sqrt"/>
+       name="expl:VC for sqrt"/>
       <proof
        prover="1"
        timelimit="10"
@@ -57,15 +56,15 @@
      </goal>
      <goal
       name="WP_parameter sqrt.2"
-      locfile="programs/binary_sqrt/../binary_sqrt.mlw"
+      locfile="../binary_sqrt.mlw"
       loclnum="11" loccnumb="10" loccnume="14"
-      expl="precondition"
+      expl="2. precondition"
       sum="a5829dc493992a85b515662d7f6094db"
       proved="true"
       expanded="true"
       shape="ainfix &lt;c0.ainfix *c2.V1Aainfix &lt;=c0.V0Iainfix &lt;c1.V1Aainfix &lt;V0V1NIainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
       <label
-       name="expl:parameter sqrt"/>
+       name="expl:VC for sqrt"/>
       <proof
        prover="0"
        timelimit="10"
@@ -77,15 +76,15 @@
      </goal>
      <goal
       name="WP_parameter sqrt.3"
-      locfile="programs/binary_sqrt/../binary_sqrt.mlw"
+      locfile="../binary_sqrt.mlw"
       loclnum="11" loccnumb="10" loccnume="14"
-      expl="normal postcondition"
+      expl="3. postcondition"
       sum="e6eafff38a2ee8e8809732d3ebe73f6b"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V0ainfix *ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1ainfix +iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V1Aainfix &lt;=ainfix *iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2iainfix &lt;=ainfix *ainfix +V2V1ainfix +V2V1V0ainfix +V2V1V2V0Iainfix &lt;V0ainfix *ainfix +V2ainfix *c2.V1ainfix +V2ainfix *c2.V1Aainfix &lt;=ainfix *V2V2V0FIainfix &lt;c0.ainfix *c2.V1Aainfix &lt;=c0.V0Iainfix &lt;c1.V1Aainfix &lt;V0V1NIainfix &lt;c0.V1Aainfix &lt;=c0.V0F">
       <label
-       name="expl:parameter sqrt"/>
+       name="expl:VC for sqrt"/>
       <proof
        prover="0"
        timelimit="10"

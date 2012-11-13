@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Gappa printer *)
 
@@ -40,8 +31,8 @@ let syntactic_transform transf =
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
     (syntactic_transform Abstraction.abstraction)
-    ~desc_metas:[meta_syntax_logic,Pp.empty_formatted]
-    ~desc:"Abstract@ application@ of@ non-built-in@ symbols@ with@ constants.";
+    ~desc:"Abstract@ applications@ of@ non-built-in@ symbols@ with@ \
+      constants.@ Used@ by@ the@ Gappa@ pretty-printer.";
   Trans.register_transform "simplify_unknown_lsymbols"
     (syntactic_transform (fun check_ls -> Trans.goal (fun pr f ->
       [create_prop_decl Pgoal pr (Simplify_formula.fmla_cond_subst
@@ -55,9 +46,9 @@ let () =
           | Tapp(ls,_) -> not (check_ls ls)
           | _ -> true) f)
       ])))
-    ~desc_metas:[meta_syntax_logic,("" : Pp.formatted)]
-    ~desc:"In the goal substitute equality on application of unknown symbols.";
-
+    ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ \
+      of@ substituting@ quantified@ variables,@ substitute@ applications@ \
+      of@ non-buit-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer."
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
 
@@ -102,13 +93,14 @@ let real_minus = ref ps_equ
 (** lsymbol, ""/"not ", op, rev_op *)
 let arith_meta = register_meta "gappa arith"
   [MTlsymbol;MTstring;MTstring;MTstring]
-  ~desc:"Specifies how to pretty-print symbols into gappa format:@\n  \
-@[\
- @[<hov 2>- first argument: which symbol@]@\n\
- @[<hov 2>- second argument: which prefix around the term@]@\n\
- @[<hov 2>- third argument: which operator to pretty-print@]@\n\
- @[<hov 2>- fourth argument: which is the inverse operator to pretty-print@]\
-@]"
+  ~desc:"Specify@ how@ to@ pretty-print@ arithmetic@ \
+          operations@ in@ the@ Gappa@ format:@\n  \
+    @[\
+     @[<hov 2>- first@ argument:@ the@ symbol@]@\n\
+     @[<hov 2>- second@ argument:@ the@ prefix@ to@ put@ before@ the@ term@]@\n\
+     @[<hov 2>- third@ argument:@ the@ operator@ to@ print@]@\n\
+     @[<hov 2>- fourth@ argument:@ the@ inverse@ operator@]\
+    @]"
 
 let find_th env file th =
   let theory = Env.find_theory env [file] th in
@@ -151,26 +143,27 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let constant_value =
-  let number_format = {
-      Print_number.long_int_support = true;
-      Print_number.dec_int_support = Print_number.Number_default;
-      Print_number.hex_int_support = Print_number.Number_default;
-      Print_number.oct_int_support = Print_number.Number_unsupported;
-      Print_number.bin_int_support = Print_number.Number_unsupported;
-      Print_number.def_int_support = Print_number.Number_unsupported;
-      Print_number.dec_real_support = Print_number.Number_default;
-      Print_number.hex_real_support = Print_number.Number_default;
-      Print_number.frac_real_support = Print_number.Number_unsupported;
-      Print_number.def_real_support = Print_number.Number_unsupported;
-    } in
-  fun t -> match t.t_node with
+let number_format = {
+    Number.long_int_support = true;
+    Number.dec_int_support = Number.Number_default;
+    Number.hex_int_support = Number.Number_default;
+    Number.oct_int_support = Number.Number_unsupported;
+    Number.bin_int_support = Number.Number_unsupported;
+    Number.def_int_support = Number.Number_unsupported;
+    Number.dec_real_support = Number.Number_default;
+    Number.hex_real_support = Number.Number_default;
+    Number.frac_real_support = Number.Number_unsupported;
+    Number.def_real_support = Number.Number_unsupported;
+  }
+
+let constant_value t =
+  match t.t_node with
     | Tconst c ->
-        fprintf str_formatter "%a" (Print_number.print number_format) c;
+        fprintf str_formatter "%a" (Number.print number_format) c;
         flush_str_formatter ()
     | Tapp(ls, [{ t_node = Tconst c}])
         when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-        fprintf str_formatter "-%a" (Print_number.print number_format) c;
+        fprintf str_formatter "-%a" (Number.print number_format) c;
         flush_str_formatter ()
     | _ -> raise Not_found
 
@@ -180,7 +173,7 @@ let rec print_term info fmt t =
   let term = print_term info in
   match t.t_node with
   | Tconst c ->
-      Pretty.print_const fmt c
+      fprintf fmt "%a" (Number.print number_format) c
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp ( { ls_name = id } ,[] ) ->
@@ -402,6 +395,23 @@ let prepare info defs ((eqs,hyps,goal) as acc) d =
         unsupportedDecl d
           "gappa: lemmas are not supported"
 
+let find_used_equations eqs hyps goal =
+  let used = Hid.create 17 in
+  let mark_used f =
+    t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace used ls.ls_name ()) () f in
+  begin match goal with
+  | Goal_good (_,f) -> mark_used f;
+  | _ -> ()
+  end;
+  List.iter (fun (_,f) -> mark_used f) hyps;
+  List.fold_left (fun acc ((_, v, t) as eq) ->
+    let v = match v.t_node with Tapp (l,[]) -> l.ls_name | _ -> assert false in
+    if Hid.mem used v then begin
+      mark_used t;
+      eq :: acc
+    end else acc
+  ) [] eqs
+
 let print_equation info fmt (pr,t1,t2) =
   fprintf fmt "# equation '%a'@\n" print_ident pr.pr_name;
   fprintf fmt "%a = %a ;@\n" (print_term info) t1 (print_term info) t2
@@ -430,7 +440,7 @@ let print_task env pr thpr _blacklist ?old:_ fmt task =
   let equations,hyps,goal =
     List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
   in
-  List.iter (print_equation info fmt) (List.rev equations);
+  List.iter (print_equation info fmt) (find_used_equations equations hyps goal);
   fprintf fmt "@[<v 2>{ %a%a}@\n@]" (print_list nothing (print_hyp info)) (List.rev hyps)
     (print_goal info) goal
 (*

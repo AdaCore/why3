@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/relabel/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,13 +11,13 @@
   expanded="true">
   <theory
    name="Relabel"
-   locfile="programs/relabel/../relabel.mlw"
+   locfile="../relabel.mlw"
    loclnum="8" loccnumb="7" loccnume="14"
    verified="true"
    expanded="true">
    <goal
     name="labels_Leaf"
-    locfile="programs/relabel/../relabel.mlw"
+    locfile="../relabel.mlw"
     loclnum="23" loccnumb="8" loccnume="19"
     sum="edabf18fba3b5281db869693ebeddd74"
     proved="true"
@@ -35,7 +34,7 @@
    </goal>
    <goal
     name="labels_Node"
-    locfile="programs/relabel/../relabel.mlw"
+    locfile="../relabel.mlw"
     loclnum="26" loccnumb="8" loccnume="19"
     sum="ef445afe8dfc238fca999acc9800a8bb"
     proved="true"
@@ -52,15 +51,15 @@
    </goal>
    <goal
     name="WP_parameter fresh"
-    locfile="programs/relabel/../relabel.mlw"
+    locfile="../relabel.mlw"
     loclnum="44" loccnumb="6" loccnume="11"
-    expl="normal postcondition"
+    expl="VC for fresh"
     sum="16a78bc9aa7165aad006fec62c5f46db"
     proved="true"
     expanded="false"
     shape="ainfix =V1V1Aainfix =V1ainfix +V0c1Iainfix =V1ainfix +V0c1FF">
     <label
-     name="expl:parameter fresh"/>
+     name="expl:VC for fresh"/>
     <proof
      prover="0"
      timelimit="60"
@@ -72,30 +71,30 @@
    </goal>
    <goal
     name="WP_parameter relabel"
-    locfile="programs/relabel/../relabel.mlw"
+    locfile="../relabel.mlw"
     loclnum="47" loccnumb="10" loccnume="17"
-    expl="parameter relabel"
+    expl="VC for relabel"
     sum="1e6a3f4f73d8bd8801b3f1ab0f2ac211"
     proved="true"
     expanded="true"
     shape="CV0aLeafwainfix &lt;=V3V2Aainfix &lt;V1V3IamemV3alabelsaLeafV2FAainfix &lt;=V1V2AadistinctalabelsaLeafV2Aasame_shapeV0aLeafV2Iainfix =V2ainfix +V1c1FaNodeVVainfix &lt;=V10V8Aainfix &lt;V1V10IamemV10alabelsaNodeV9V7FAainfix &lt;=V1V8AadistinctalabelsaNodeV9V7Aasame_shapeV0aNodeV9V7Iainfix &lt;=V11V8Aainfix &lt;V6V11IamemV11alabelsV9FAainfix &lt;=V6V8AadistinctalabelsV9Aasame_shapeV4V9FFIainfix &lt;=V12V6Aainfix &lt;V1V12IamemV12alabelsV7FAainfix &lt;=V1V6AadistinctalabelsV7Aasame_shapeV5V7FFFF">
     <label
-     name="expl:parameter relabel"/>
+     name="expl:VC for relabel"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter relabel.1"
-      locfile="programs/relabel/../relabel.mlw"
+      locfile="../relabel.mlw"
       loclnum="47" loccnumb="10" loccnume="17"
-      expl="parameter relabel"
+      expl="1. postcondition"
       sum="92555841b294511d67fac1a04187fe44"
       proved="true"
       expanded="false"
       shape="CV0aLeafwainfix &lt;=V3V2Aainfix &lt;V1V3IamemV3alabelsaLeafV2FAainfix &lt;=V1V2AadistinctalabelsaLeafV2Aasame_shapeV0aLeafV2Iainfix =V2ainfix +V1c1FaNodeVVtFF">
       <label
-       name="expl:parameter relabel"/>
+       name="expl:VC for relabel"/>
       <proof
        prover="0"
        timelimit="60"
@@ -107,15 +106,15 @@
      </goal>
      <goal
       name="WP_parameter relabel.2"
-      locfile="programs/relabel/../relabel.mlw"
+      locfile="../relabel.mlw"
       loclnum="47" loccnumb="10" loccnume="17"
-      expl="parameter relabel"
+      expl="2. postcondition"
       sum="1d138a192248b1e6bfc59de57e797cb6"
       proved="true"
       expanded="false"
       shape="CV0aLeafwtaNodeVVainfix &lt;=V8V6Aainfix &lt;V1V8IamemV8alabelsaNodeV7V5FAainfix &lt;=V1V6AadistinctalabelsaNodeV7V5Aasame_shapeV0aNodeV7V5Iainfix &lt;=V9V6Aainfix &lt;V4V9IamemV9alabelsV7FAainfix &lt;=V4V6AadistinctalabelsV7Aasame_shapeV2V7FFIainfix &lt;=V10V4Aainfix &lt;V1V10IamemV10alabelsV5FAainfix &lt;=V1V4AadistinctalabelsV5Aasame_shapeV3V5FFFF">
       <label
-       name="expl:parameter relabel"/>
+       name="expl:VC for relabel"/>
       <proof
        prover="0"
        timelimit="60"

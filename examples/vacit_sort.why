@@ -2,7 +2,7 @@ theory Sorted
        use import int.Int
        use real.Real
        use import map.Map
-       
+
        type array = map int real
        type multi = map real int
 
@@ -23,16 +23,16 @@ theory Sorted
 
 (*
        function model_aux(m1 : array, i : int) : multi
-       axiom Model_aux_def1 : 
+       axiom Model_aux_def1 :
        forall m1 : array. forall i : int. forall v : real.
-              1 <= i /\ i <= n -> 
+              1 <= i /\ i <= n ->
               get(model_aux(m1,i),v) =
                if get(m1,i)=v then get(model_aux(m1,i+1),v) + 1
                                  else get(model_aux(m1,i+1),v)
 
-       axiom Model_aux_def2 : 
+       axiom Model_aux_def2 :
        forall m1 : array. forall v : real. get(model_aux(m1,n+1),v) = 0
-               
+
        predicate model(m1 : array, m2 : multi) = model_aux(m1, 1) = m2
 *)
 
@@ -41,7 +41,7 @@ theory Sorted
 
        axiom TPTP2 : forall x,y : real. x < y -> x<>y*)
 
-       goal G : 
+       goal G :
             forall m1 : array.
             m1[1] = 42. ->
             m1[2] = 13. ->
@@ -57,7 +57,7 @@ theory Sorted
             m2[3] = 42. /\
             m2[4] = 45.
 
-(*       goal G_false : 
+(*       goal G_false :
             forall m1 : array.
             m1[1] = 42. ->
             m1[2] = 13. ->
@@ -70,5 +70,5 @@ theory Sorted
             m2[1] = 42. /\
             m2[2] = 13. /\
             m2[3] = 42.
-*)           
+*)
 end

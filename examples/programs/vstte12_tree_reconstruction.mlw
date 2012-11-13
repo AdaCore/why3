@@ -71,9 +71,10 @@ module TreeReconstruction
     (* used to signal the algorithm's failure i.e. there is no tree *)
 
   let rec build_rec (d: int) (s: list int) : (tree, list int)
-    variant { (s, d) } with lex =
-    { }
-    match s with
+    variant { (s, d) with lex }
+    ensures { let t, s' = result in s = depths d t ++ s' }
+    raises  { Failure -> forall t: tree, s' : list int. depths d t ++ s' <> s }
+  = match s with
     | Nil ->
         raise Failure
     | Cons h t ->
@@ -85,34 +86,30 @@ module TreeReconstruction
           let r, s = build_rec (d+1) s in
           (Node l r, s)
     end
-    { let t, s' = result in s = depths d t ++ s' }
-    | Failure -> { forall t: tree, s' : list int. depths d t ++ s' <> s }
 
-  let build (s: list int) : tree =
-    { }
-    let t, s = build_rec 0 s in
+  let build (s: list int) : tree
+    ensures { depths 0 result = s }
+    raises  { Failure -> forall t: tree. depths 0 t <> s }
+  = let t, s = build_rec 0 s in
     match s with
     | Nil -> t
     | _ -> raise Failure
     end
-    { depths 0 result = s }
-    | Failure -> { forall t: tree. depths 0 t <> s }
 
 end
 
 module Harness
 
-  use import module TreeReconstruction
+  use import TreeReconstruction
 
-  let harness () =
-    {}
-    build (Cons 1 (Cons 3 (Cons 3 (Cons 2 Nil))))
-    { result = Node Leaf (Node (Node Leaf Leaf) Leaf) } | Failure -> { false }
+  let harness ()
+    ensures { result = Node Leaf (Node (Node Leaf Leaf) Leaf) }
+    raises  { Failure -> false }
+  = build (Cons 1 (Cons 3 (Cons 3 (Cons 2 Nil))))
 
-  let harness2 () =
-    {}
-    build (Cons 1 (Cons 3 (Cons 2 (Cons 2 Nil))))
-    { false } | Failure -> { true }
+  let harness2 ()
+    ensures { false } raises { Failure -> true }
+  = build (Cons 1 (Cons 3 (Cons 2 (Cons 2 Nil))))
 
 end
 
@@ -139,16 +136,14 @@ end
 module ZipperBasedTermination
 
   use import Tree
-  use import int.Lex2
   use import list.Length
   use import list.Reverse
 
   exception Failure
 
   let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
-    variant { (length left + length right, length right) } with lex =
-    {}
-    match left, right with
+    variant { length left + length right, length right }
+  = match left, right with
     | _, Nil ->
         raise Failure
     | Nil, Cons (v, t) Nil ->
@@ -159,7 +154,6 @@ module ZipperBasedTermination
         if v1 = v2 then tc left' (Cons (v1 - 1, Node t1 t2) right')
         else tc (Cons (v2, t2) left) right'
     end
-    {} | Failure -> {}
 
 end
 
@@ -168,7 +162,6 @@ end
 module ZipperBased
 
   use import Tree
-  use import int.Lex2
   use import list.Length
   use import list.Reverse
 
@@ -240,8 +233,8 @@ module ZipperBased
 
   exception Failure
 
-  let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree =
-    { (* list [left] satisfies the invariant *)
+  let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
+    requires { (* list [left] satisfies the invariant *)
       g left /\
       (* when [left] has one element, it can't be a solution *)
       match left with Cons (d1, t1) Nil -> d1 <> 0 \/ right <> Nil
@@ -253,9 +246,11 @@ module ZipperBased
         | Cons (d2, t2) right' -> only_leaf right' /\
             match t2 with Node l2 _ -> g (Cons (d2+1, l2) left)
                         | Leaf      -> true end
-        | Nil -> true end
-    }
-    match left, right with
+        | Nil -> true end }
+    ensures { depths 0 result = forest_depths (reverse left ++ right) }
+    raises { Failure ->
+      forall t: tree. depths 0 t <> forest_depths (reverse left ++ right) }
+  = match left, right with
     | _, Nil ->
         raise Failure
     | Nil, Cons (v, t) Nil ->
@@ -266,9 +261,6 @@ module ZipperBased
         if v1 = v2 then tc left' (Cons (v1 - 1, Node t1 t2) right')
         else tc (Cons (v2, t2) left) right'
     end
-    { depths 0 result = forest_depths (reverse left ++ right) }
-    | Failure ->
-    { forall t: tree. depths 0 t <> forest_depths (reverse left ++ right) }
 
   (* Getting function [build] from [tc] is easy: from the list
      [x1; x2; ...; xn] we simply build the list of pairs
@@ -288,17 +280,9 @@ module ZipperBased
   lemma map_leaf_only_leaf:
     forall l: list int. only_leaf (map_leaf l)
 
-  let build (s: list int) =
-    {}
-    tc Nil (map_leaf s)
-    { depths 0 result = s }
-    | Failure -> { forall t: tree. depths 0 t <> s }
+  let build (s: list int)
+    ensures { depths 0 result = s }
+    raises  { Failure -> forall t: tree. depths 0 t <> s }
+  = tc Nil (map_leaf s)
 
 end
-
-
-(*
-Local Variables:
-compile-command: "why3ide vstte12_tree_reconstruction.mlw"
-End:
-*)

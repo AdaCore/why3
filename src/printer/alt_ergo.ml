@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Alt-ergo printer *)
 
@@ -29,15 +20,17 @@ open Decl
 open Printer
 
 let meta_ac = Theory.register_meta "AC" [Theory.MTlsymbol]
-  ~desc:"Specify that a symbol is associative and commutative."
+  ~desc:"Specify@ that@ a@ symbol@ is@ associative@ and@ commutative."
+
 let meta_printer_option =
   Theory.register_meta "printer_option" [Theory.MTstring]
-    ~desc:"Some paramters given to the printer."
+    ~desc:"Pass@ additional@ parameters@ to@ the@ pretty-printer."
 
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
   info_show_labels : bool;
+  info_type_casts : bool;
   info_csm : lsymbol list Mls.t;
   info_pjs : Sls.t;
   info_axs : Spr.t;
@@ -93,21 +86,34 @@ and print_tyapp info fmt = function
   | [ty] -> fprintf fmt "%a " (print_type info) ty
   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl
 
+(* can the type of a value be derived from the type of the arguments? *)
+let unambig_fs fs =
+  let rec lookup v ty = match ty.ty_node with
+    | Tyvar u when tv_equal u v -> true
+    | _ -> ty_any (lookup v) ty
+  in
+  let lookup v = List.exists (lookup v) fs.ls_args in
+  let rec inspect ty = match ty.ty_node with
+    | Tyvar u when not (lookup u) -> false
+    | _ -> ty_all inspect ty
+  in
+  inspect (Opt.get fs.ls_value)
+
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
-          Print_number.long_int_support = true;
-          Print_number.dec_int_support = Print_number.Number_default;
-          Print_number.hex_int_support = Print_number.Number_unsupported;
-          Print_number.oct_int_support = Print_number.Number_unsupported;
-          Print_number.bin_int_support = Print_number.Number_unsupported;
-          Print_number.def_int_support = Print_number.Number_unsupported;
-          Print_number.dec_real_support = Print_number.Number_default;
-          Print_number.hex_real_support = Print_number.Number_default;
-          Print_number.frac_real_support = Print_number.Number_unsupported;
-          Print_number.def_real_support = Print_number.Number_unsupported;
+          Number.long_int_support = true;
+          Number.dec_int_support = Number.Number_default;
+          Number.hex_int_support = Number.Number_unsupported;
+          Number.oct_int_support = Number.Number_unsupported;
+          Number.bin_int_support = Number.Number_unsupported;
+          Number.def_int_support = Number.Number_unsupported;
+          Number.dec_real_support = Number.Number_default;
+          Number.hex_real_support = Number.Number_default;
+          Number.frac_real_support = Number.Number_unsupported;
+          Number.def_real_support = Number.Number_unsupported;
         } in
-      Print_number.print number_format fmt c
+      Number.print number_format fmt c
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -119,8 +125,11 @@ let rec print_term info fmt t = match t.t_node with
             (List.combine (Mls.find ls info.info_csm) tl)
       | None when Sls.mem ls info.info_pjs ->
           fprintf fmt "%a.%a" (print_tapp info) tl print_ident ls.ls_name
-      | None ->
+      | None when unambig_fs ls || not info.info_type_casts ->
           fprintf fmt "%a%a" print_ident ls.ls_name (print_tapp info) tl
+      | None ->
+          fprintf fmt "(%a%a : %a)" print_ident ls.ls_name (print_tapp info) tl
+             (print_type info) (t_type t)
     end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo : you must eliminate let in term"
@@ -234,7 +243,7 @@ let print_data_decl info fmt = function
       let pjl = Mls.find cs info.info_csm in
       let print_field fmt ls =
         fprintf fmt "%a@ :@ %a" print_ident ls.ls_name
-          (print_type info) (Util.of_option ls.ls_value) in
+          (print_type info) (Opt.get ls.ls_value) in
       fprintf fmt "%a@ =@ {@ %a@ }@\n@\n" print_type_decl ts
         (print_list semi print_field) pjl
   | _, _ -> unsupported
@@ -264,7 +273,7 @@ let print_logic_decl info fmt ls ld =
         fprintf fmt "@[<hov 2>function %a(%a) : %a =@ %a@]@\n@\n"
           print_ident ls.ls_name
           (print_list comma (print_logic_binder info)) vl
-          (print_type info) (Util.of_option ls.ls_value)
+          (print_type info) (Opt.get ls.ls_value)
           (print_term info) e
     | None ->
         fprintf fmt "@[<hov 2>predicate %a(%a) =@ %a@]@\n@\n"
@@ -314,14 +323,15 @@ let add_projection (csm,pjs,axs) = function
       csm, Sls.add ls pjs, Spr.add pr axs
   | _ -> assert false
 
-let check_showlabels acc l =
-  match l with
-    | [Theory.MAstr s] ->
-      begin match s with
-        | "show_labels" -> true
-        | _ -> acc
-      end
-    | _ -> assert false
+let check_showlabels acc = function
+  | [Theory.MAstr "show_labels"] -> true
+  | [Theory.MAstr _] -> acc
+  | _ -> assert false
+
+let check_typecasts acc = function
+  | [Theory.MAstr "no_type_cast"] -> false
+  | [Theory.MAstr _] -> acc
+  | _ -> assert false
 
 (*
 let print_task_old pr thpr fmt task =
@@ -348,11 +358,12 @@ let () = register_printer "alt-ergo-old"
 *)
 
 let print_decls =
-  let print ac sl csm pjs axs sm fmt d =
+  let print ac sl tc csm pjs axs sm fmt d =
     let info = {
       info_syn = sm;
       info_ac  = ac;
       info_show_labels = sl;
+      info_type_casts = tc;
       info_csm = Mls.map Array.to_list csm;
       info_pjs = pjs;
       info_axs = axs;
@@ -361,10 +372,11 @@ let print_decls =
   Trans.on_tagged_ls meta_ac (fun ac ->
   Trans.on_meta meta_printer_option (fun args ->
     let sl = List.fold_left check_showlabels false args in
+    let tc = List.fold_left check_typecasts  true  args in
   Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
     let csm,pjs,axs = List.fold_left
       add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
-    Printer.sprint_decls (print ac sl csm pjs axs))))
+    Printer.sprint_decls (print ac sl tc csm pjs axs))))
 
 let print_task _env pr thpr _blacklist ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
@@ -375,7 +387,7 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
     (List.rev (Trans.apply print_decls task))
 
 let () = register_printer "alt-ergo" print_task
-  ~desc:"Printer for the alt-ergo theorem provers"
+  ~desc:"Printer for the Alt-Ergo theorem prover."
 (*
 let print_goal info fmt (id, f, task) =
   print_task info fmt task;

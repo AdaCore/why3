@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Proof sessions *)
 (** Define all the functions needed for managing a session:
@@ -30,8 +21,8 @@ open Stdlib
 val debug : Debug.flag
 (** The debug flag "session" *)
 
-module PHstr : Util.PrivateHashtbl with type key = string
-module PHprover : Util.PrivateHashtbl with type key = Whyconf.prover
+module PHstr : XHashtbl.Private with type key = string
+module PHprover : XHashtbl.Private with type key = Whyconf.prover
 
 (** {2 Proof attempts} *)
 
@@ -65,7 +56,8 @@ type ident_path =
 type meta_args = Theory.meta_arg list
 module Mmeta_args : Map.S with type key = meta_args
 module Smeta_args : Mmeta_args.Set
-type metas_args =  Smeta_args.t Util.Mstr.t
+
+type metas_args =  Smeta_args.t Mstr.t
 module Mmetas_args : Map.S with type key = metas_args
 
 type idpos = {
@@ -174,7 +166,7 @@ val create_session : ?shape_version:int -> string -> 'key session
     directory of the program if you give a relative path *)
 
 val get_project_dir : string -> string
-(** find the session which correspond to the given file or return
+(** find the session which corresponds to the given file or return
     directly the given directory;
     return {Not_found} if the file or the directory doesn't exists
 *)
@@ -397,11 +389,10 @@ val copy_external_proof :
 
 val add_transformation :
   keygen:'key keygen ->
-  goal:('goal -> Ident.ident * expl * Task.task) ->
   'key env_session ->
   string ->
   'key goal ->
-  'goal list ->
+  Task.task list ->
   'key transf
 (** Add a transformation by its subgoals *)
 
@@ -447,10 +438,7 @@ val add_file :
 val remove_file : 'key file -> unit
 (** Remove a file *)
 
-(** {2 Explanation} *)
 
-val get_explanation : Ident.ident -> Task.task -> expl
-val goal_expl_task : Task.task -> Ident.ident * expl * Task.task
 
 (** {2 Iterators} *)
 

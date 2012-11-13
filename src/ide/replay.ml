@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 
 open Format
@@ -94,12 +85,12 @@ let spec = Arg.align [
   "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
   " try to find compatible provers for all unknown provers";
 *)
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
-  Debug.Opt.desc_shortcut
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+  Debug.Args.desc_shortcut
     "type_only" "--type-only" " Stop after type checking";
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
 
 ]
 
@@ -149,8 +140,8 @@ let env = Env.create_env loadpath
 let () = Whyconf.load_plugins (Whyconf.get_main config)
 
 let () =
-  Debug.Opt.set_flags_selected ();
-  if Debug.Opt.option_list () then exit 0
+  Debug.Args.set_flags_selected ();
+  if Debug.Args.option_list () then exit 0
 
 module O =
   struct
@@ -217,9 +208,9 @@ let replace_prover _ _ = false
 
 let uninstalled_prover _eS unknown =
   try
-    Whyconf.get_prover_upgrade_policy config unknown 
+    Whyconf.get_prover_upgrade_policy config unknown
   with Not_found ->
-    Whyconf.CPU_keep 
+    Whyconf.CPU_keep
 
 module Scheduler = Session_scheduler.Base_scheduler(struct end)
 
@@ -318,36 +309,29 @@ let add_to_check_no_smoke config found_obs env_session sched =
           | _ -> true)
         report
     in
-    if report = [] then 
+    let save () =
+      if !opt_verbose then eprintf "Saving session...@?";
+      S.save_session config session;
+      if !opt_verbose then eprintf " done@." in
+    printf " %d/%d " n m;
+    if report = [] then
       begin
         if found_obs then
-          if n=m then
-            printf " %d/%d (replay OK, all proved: obsolete session \
-updated)@." n m
-          else
-            if !opt_force then
-              printf " %d/%d (replay OK, but not all proved: session going to be saved since -force was given)@." n m
-            else
-              printf " %d/%d (replay OK, but not all proved: obsolete \
-session NOT updated)@." n m
+          printf "(replay OK, obsolete session updated)@."
         else
-          printf " %d/%d@." n m ;
+          printf "(replay OK)@.";
         if !opt_stats && n<m then print_statistics files;
         if !opt_verbose then eprintf "Everything replayed OK.@.";
-        if found_obs && (n=m || !opt_force) then
-          begin
-            if !opt_verbose then eprintf "Saving session...@?";
-            S.save_session config session;
-            if !opt_verbose then eprintf " done@."
-          end;
+        if found_obs then save ();
         exit 0
       end
     else
       let report = List.rev report in
       begin
-        printf " %d/%d (replay failed)@." n m ;
+        printf "(replay failed)@.";
         List.iter print_report report;
         eprintf "Replay failed.@.";
+        if !opt_force then save ();
         exit 1
       end
   in

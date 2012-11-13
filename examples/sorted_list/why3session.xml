@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="./sorted_list/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -32,40 +31,32 @@
   expanded="false">
   <theory
    name="Order"
-   locfile="./sorted_list/../sorted_list.why"
+   locfile="../sorted_list.why"
    loclnum="1" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="List"
-   locfile="./sorted_list/../sorted_list.why"
+   locfile="../sorted_list.why"
    loclnum="10" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="SortedList"
-   locfile="./sorted_list/../sorted_list.why"
+   locfile="../sorted_list.why"
    loclnum="20" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="sorted_inf"
-    locfile="./sorted_list/../sorted_list.why"
+    locfile="../sorted_list.why"
     loclnum="33" loccnumb="8" loccnume="18"
     sum="c325b7d5aaed50a7a293ef09b92526b0"
     proved="true"
     expanded="true"
     shape="asortedaConsV0V2IasortedaConsV1V2Iainfix &lt;=V0V1F">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
     <proof
      prover="0"
      timelimit="5"
@@ -74,10 +65,18 @@
      archived="false">
      <result status="valid" time="0.15"/>
     </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
    <goal
     name="sorted_mem"
-    locfile="./sorted_list/../sorted_list.why"
+    locfile="../sorted_list.why"
     loclnum="38" loccnumb="8" loccnume="18"
     sum="4362710f1aa3a33ed0a0285d93666318"
     proved="true"
@@ -96,25 +95,25 @@
   </theory>
   <theory
    name="SortedIntList"
-   locfile="./sorted_list/../sorted_list.why"
+   locfile="../sorted_list.why"
    loclnum="45" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
    <goal
     name="sorted123"
-    locfile="./sorted_list/../sorted_list.why"
+    locfile="../sorted_list.why"
     loclnum="50" loccnumb="7" loccnume="16"
     sum="db453eba06bf5592d9d04310e5abf6bb"
     proved="true"
     expanded="true"
     shape="asortedaConsc1aConsc2aConsc3aNil">
     <proof
-     prover="5"
+     prover="0"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -123,14 +122,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
@@ -147,6 +138,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>

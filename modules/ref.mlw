@@ -3,7 +3,6 @@
 
    A mutable variable, or ``reference'' in ML terminology, is simply a
    record with a single mutable field [contents].
-
 *)
 
 (** {2 Generic references}
@@ -14,15 +13,15 @@
 
 module Ref
 
-  type ref 'a = {| mutable contents : 'a |}
+  type ref 'a = { mutable contents : 'a }
 
   function (!) (x: ref 'a) : 'a = x.contents
 
-  let ref (v: 'a) = {} {| contents = v |} { result = {| contents = v |} }
+  let ref (v: 'a) ensures { result = { contents = v } } = { contents = v }
 
-  let (!) (r:ref 'a) = {} r.contents { result = !r }
+  let (!) (r:ref 'a) ensures { result = !r } = r.contents
 
-  let (:=) (r:ref 'a) (v:'a) = {} r.contents <- v { !r = v }
+  let (:=) (r:ref 'a) (v:'a) ensures { !r = v } = r.contents <- v
 
 end
 
@@ -33,19 +32,13 @@ a few operations specific to integer references *)
 module Refint
 
   use export int.Int
-  use export module Ref
+  use export Ref
 
-  let incr (r: ref int) = {} r := !r + 1 { !r = old !r + 1 }
-  let decr (r: ref int) = {} r := !r - 1 { !r = old !r - 1 }
+  let incr (r: ref int) ensures { !r = old !r + 1 } = r := !r + 1
+  let decr (r: ref int) ensures { !r = old !r - 1 } = r := !r - 1
 
-  let (+=)   (r: ref int) (v: int) = {} r := !r + v { !r = old !r + v }
-  let (-=)   (r: ref int) (v: int) = {} r := !r - v { !r = old !r - v }
-  let ( *= ) (r: ref int) (v: int) = {} r := !r * v { !r = old !r * v }
+  let (+=)   (r: ref int) (v: int) ensures { !r = old !r + v } = r := !r + v
+  let (-=)   (r: ref int) (v: int) ensures { !r = old !r - v } = r := !r - v
+  let ( *= ) (r: ref int) (v: int) ensures { !r = old !r * v } = r := !r * v
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/ref"
-End:
-*)

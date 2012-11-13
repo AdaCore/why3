@@ -49,13 +49,12 @@ module Enum
     | Next x r e -> Cons x (tree_elements r ++ enum_elements e)
   end
 
-  let rec enum t e variant { length (tree_elements t) } =
-    { }
-    match t with
+  let rec enum t e variant {t}
+    ensures { enum_elements result = tree_elements t ++ enum_elements e }
+  = match t with
     | Empty -> e
     | Node l x r -> enum l (Next x r e)
     end
-    { enum_elements result = tree_elements t ++ enum_elements e }
 
 end
 
@@ -64,31 +63,29 @@ end
 module Iterator
 
   use import Tree
-  use import module Enum
+  use import Enum
 
-  type iterator = {| mutable it: enum |}
+  type iterator = { mutable it: enum }
 
   function elements (i: iterator) : list elt = enum_elements i.it
 
-  let create_iterator (t: tree) =
-    {}
-    {| it = enum t Done |}
-    { elements result = tree_elements t }
+  let create_iterator (t: tree)
+    ensures { elements result = tree_elements t }
+  = { it = enum t Done }
 
   predicate hasNext (i: iterator) = i.it <> Done
 
-  let hasNext (i: iterator) =
-    { }
-    i.it <> Done
-    { result = True <-> hasNext i }
+  let hasNext (i: iterator)
+    ensures { result = True <-> hasNext i }
+  = i.it <> Done
 
-  let next (i: iterator) =
-    { hasNext i }
-    match i.it with
+  let next (i: iterator)
+    requires { hasNext i }
+    ensures { old (elements i) = Cons result (elements i) }
+  = match i.it with
     | Done -> absurd
     | Next x r e -> i.it <- enum r e; x
     end
-    { old (elements i) = Cons result (elements i) }
 
 end
 
@@ -110,31 +107,30 @@ module BSTree
     | Node l x r -> bst l /\ bst r /\ lt_tree x l /\ gt_tree x r
     end
 
-  let rec bst_mem (x: elt) (t: tree) =
-    { bst t }
-    match t with
+  let rec bst_mem (x: elt) (t: tree)
+    requires { bst t } ensures { result=True <-> mem x t }
+  = match t with
     | Empty ->
         False
     | Node l y r ->
         if x < y then bst_mem x l else x = y || bst_mem x r
     end
-    { result=True <-> mem x t }
 
   exception Already
     (* bst_add raises exception Already when the element is already present *)
 
-  let rec bst_add (x: elt) (t: tree) =
-    { bst t }
-    match t with
+  let rec bst_add (x: elt) (t: tree)
+    requires { bst t }
+    ensures { bst result /\ not (mem x t) /\
+      forall y: elt. mem y result <-> y=x || mem y t }
+    raises { Already -> mem x t }
+  = match t with
     | Empty ->
         Node Empty x Empty
     | Node l y r ->
         if x = y then raise Already;
         if x < y then Node (bst_add x l) y r else Node l y (bst_add x r)
     end
-    { bst result /\ not (mem x t) /\
-      forall y: elt. mem y result <-> y=x || mem y t }
-    | Already -> { mem x t }
 
 end
 
@@ -142,46 +138,33 @@ end
 
 module ITree
 
-  use export module BSTree
-  use export module Iterator
+  use export BSTree
+  use export Iterator
 
-  type itree = {| mutable tree: tree |}
+  type itree = { mutable tree: tree } invariant { bst self.tree }
 
-  predicate inv (t: itree) = bst t.tree
+  let create () = { tree = Empty }
 
-  let create () =
-    {}
-    {| tree = Empty |}
-    { inv result }
+  let contains (t: itree) (x: elt)
+    ensures { result=True <-> mem x t.tree }
+  = bst_mem x t.tree
 
-  let contains (t: itree) (x: elt) =
-    { inv t }
-    bst_mem x t.tree
-    { result=True <-> mem x t.tree }
-
-  let add (t: itree) (x: elt) =
-    { inv t }
-    try t.tree <- bst_add x t.tree; True
-    with Already -> False
-    end
-    { inv t /\ (result=False <-> mem x (old t.tree)) /\
+  let add (t: itree) (x: elt)
+    ensures { (result=False <-> mem x (old t.tree)) /\
       forall y: elt. mem y t.tree <-> y=x || mem y (old t.tree) }
+  = try t.tree <- bst_add x t.tree; True with Already -> False end
 
-  let snapshot (t: itree) =
-    { inv t }
-    {| tree = t.tree |}
-    { inv result }
+  let snapshot (t: itree) = { tree = t.tree }
 
-  let iterator (t: itree) =
-    { inv t }
-    create_iterator t.tree
-    { elements result = tree_elements t.tree }
+  let iterator (t: itree)
+    ensures { elements result = tree_elements t.tree }
+  = create_iterator t.tree
 
 end
 
 module Harness
 
-  use import module ITree
+  use import ITree
 
   let test () =
      let t = create () in
@@ -192,7 +175,7 @@ module Harness
      let s = snapshot t in
      let it = iterator s in
      while hasNext it do
-       invariant { inv t }
+       invariant { bst t.tree }
        variant { length (elements it) }
        let x = next it in
        let _ = add t (x * 3) in
@@ -200,9 +183,3 @@ module Harness
      done
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/snapshotable_trees.gui"
-End:
-*)

@@ -6,40 +6,27 @@ module M
   use import floating_point.Rounding
   use import floating_point.Single
 
-val single_of_real_exact : x:real ->
-  { }
-  single
-  { value result = x }
+val single_of_real_exact (x: real) : single
+  ensures { value result = x }
 
-val add : x:single -> y:single ->
-  { no_overflow NearestTiesToEven ((value x) +. (value y)) }
-  single
-  { value result = round NearestTiesToEven ((value x) +. (value y))}
+val add (x y: single) : single
+  requires { no_overflow NearestTiesToEven ((value x) +. (value y)) }
+  ensures  { value result = round NearestTiesToEven ((value x) +. (value y))}
 
-val sub : x:single -> y:single ->
-  { no_overflow NearestTiesToEven ((value x) -. (value y)) }
-  single
-  { value result = round NearestTiesToEven ((value x) -. (value y))}
+val sub (x y: single) : single
+  requires { no_overflow NearestTiesToEven ((value x) -. (value y)) }
+  ensures  { value result = round NearestTiesToEven ((value x) -. (value y))}
 
-val mul : x:single -> y:single ->
-  { no_overflow NearestTiesToEven ((value x) *. (value y)) }
-  single
-  { value result = round NearestTiesToEven ((value x) *. (value y))}
+val mul (x y: single) : single
+  requires { no_overflow NearestTiesToEven ((value x) *. (value y)) }
+  ensures  { value result = round NearestTiesToEven ((value x) *. (value y))}
 
-
-let my_cosine (x:single) : single =
-{ abs (value x) <=. 0x1p-5 }
-  assert {
+let my_cosine (x:single) : single
+  requires { abs (value x) <=. 0x1p-5 }
+  ensures { abs (value result -. cos (value x)) <=. 0x1p-23 }
+= assert {
     abs (1.0 -. (value x) *. (value x) *. 0.5 -. cos (value x)) <=. 0x1p-24
   };
-  sub (single_of_real_exact 1.0)
-      (mul (mul x x) (single_of_real_exact 0.5))
-{ abs (value result -. cos (value x)) <=. 0x1p-23 }
+  sub (single_of_real_exact 1.0) (mul (mul x x) (single_of_real_exact 0.5))
 
 end
-
-(*
-Local Variables:
-compile-command: "../../bin/why3ide.byte my_cosine.mlw"
-End:
-*)

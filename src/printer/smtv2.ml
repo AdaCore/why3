@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** SMT v1 printer with some extensions *)
 
@@ -132,19 +123,19 @@ let print_var_list info fmt vsl =
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
-          Print_number.long_int_support = true;
-          Print_number.dec_int_support = Print_number.Number_default;
-          Print_number.hex_int_support = Print_number.Number_unsupported;
-          Print_number.oct_int_support = Print_number.Number_unsupported;
-          Print_number.bin_int_support = Print_number.Number_unsupported;
-          Print_number.def_int_support = Print_number.Number_unsupported;
-          Print_number.dec_real_support = Print_number.Number_unsupported;
-          Print_number.hex_real_support = Print_number.Number_unsupported;
-          Print_number.frac_real_support = Print_number.Number_custom
-            (Print_number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
-          Print_number.def_real_support = Print_number.Number_unsupported;
+          Number.long_int_support = true;
+          Number.dec_int_support = Number.Number_default;
+          Number.hex_int_support = Number.Number_unsupported;
+          Number.oct_int_support = Number.Number_unsupported;
+          Number.bin_int_support = Number.Number_unsupported;
+          Number.def_int_support = Number.Number_unsupported;
+          Number.dec_real_support = Number.Number_unsupported;
+          Number.hex_real_support = Number.Number_unsupported;
+          Number.frac_real_support = Number.Number_custom
+            (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
+          Number.def_real_support = Number.Number_unsupported;
         } in
-      Print_number.print number_format fmt c
+      Number.print number_format fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
@@ -326,8 +317,9 @@ let () = register_printer "smtv2"
   (fun _env pr thpr blacklist ?old:_ fmt task ->
      forget_all ident_printer;
      print_task_old pr thpr blacklist fmt task)
-  ~desc:"Printer for the smtlib version 2 format."
+  ~desc:"Printer for the SMTlib version 2 format."
 
+(*
 let print_decls =
   let add_ls sm acc = function
     | [MAls ls; MAls lsdis] ->
@@ -352,4 +344,5 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
     (List.rev (Trans.apply print_decls task))
 
 let () = register_printer "smtv2new" print_task
-  ~desc:"New (TODO: in which sense?) printer for the smtlib version 2 format."
+  ~desc:"Printer for the SMTlib version 2 format."
+*)

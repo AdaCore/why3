@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
-<why3session
- name="./ns_clone/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +12,7 @@
  <prover
   id="2"
   name="Gappa"
-  version="0.16.0"/>
+  version="0.16.1"/>
  <prover
   id="3"
   name="Simplify"
@@ -40,43 +39,27 @@
   expanded="false">
   <theory
    name="Sig"
-   locfile="./ns_clone/../ns_clone.why"
+   locfile="../ns_clone.why"
    loclnum="1" loccnumb="7" loccnume="10"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Struct"
-   locfile="./ns_clone/../ns_clone.why"
+   locfile="../ns_clone.why"
    loclnum="11" loccnumb="7" loccnume="13"
    verified="true"
    expanded="true">
    <goal
     name="AddMem"
-    locfile="./ns_clone/../ns_clone.why"
+    locfile="../ns_clone.why"
     loclnum="8" loccnumb="8" loccnume="14"
     sum="8ca1d07054d62ed5bc6aa86320ae9ec1"
     proved="true"
     expanded="true"
     shape="amemV0aaddV0V1F">
     <proof
-     prover="7"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -84,7 +67,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -108,6 +91,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="5"
      memlimit="0"
@@ -123,62 +114,54 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
    </goal>
   </theory>
   <theory
    name="Shared"
-   locfile="./ns_clone/../ns_clone.why"
+   locfile="../ns_clone.why"
    loclnum="26" loccnumb="7" loccnume="13"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="AbstractUser"
-   locfile="./ns_clone/../ns_clone.why"
+   locfile="../ns_clone.why"
    loclnum="30" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="ConcreteUser"
-   locfile="./ns_clone/../ns_clone.why"
+   locfile="../ns_clone.why"
    loclnum="37" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
    <goal
     name="AddMem"
-    locfile="./ns_clone/../ns_clone.why"
+    locfile="../ns_clone.why"
     loclnum="8" loccnumb="8" loccnume="14"
     sum="d2270f0f237fa13fd35239867f78b902"
     proved="true"
     expanded="true"
     shape="amemV0aaddV0V1F">
     <proof
-     prover="7"
+     prover="0"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -202,6 +185,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="4"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="5"
      memlimit="0"
@@ -211,6 +202,14 @@
     </proof>
     <proof
      prover="6"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
      timelimit="5"
      memlimit="0"
      obsolete="false"
