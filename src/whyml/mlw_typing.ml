@@ -184,10 +184,13 @@ let dity_mark = ts_app ts_mark []
 *)
 
 let unify_loc unify_fn loc x1 x2 = try unify_fn x1 x2 with
-  | TypeMismatch (ity1,ity2) -> errorm ~loc
+  | TypeMismatch (ity1,ity2,_) -> errorm ~loc
       "This expression has type %a,@ but is expected to have type %a"
       Mlw_pretty.print_ity ity2 Mlw_pretty.print_ity ity1
-  | exn when not (Debug.test_flag Debug.stack_trace) -> error ~loc exn
+  | DTypeMismatch (dity1,dity2) -> errorm ~loc
+      "This expression has type %a,@ but is expected to have type %a"
+      Mlw_dty.print_dity dity2 Mlw_dty.print_dity dity1
+  | exn when Debug.nottest_flag Debug.stack_trace -> error ~loc exn
 
 let expected_type { de_loc = loc ; de_type = (argl,res) } dity =
   if argl <> [] then errorm ~loc "This expression is not a first-order value";
