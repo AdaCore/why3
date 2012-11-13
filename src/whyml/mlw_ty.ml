@@ -1,26 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
 open Stdlib
-open Util
 open Ident
 open Ty
 open Term
@@ -49,7 +38,7 @@ module rec T : sig
   and ity = {
     ity_node : ity_node;
     ity_vars : varset;
-    ity_tag  : Hashweak.tag;
+    ity_tag  : Weakhtbl.tag;
   }
 
   and ity_node =
@@ -84,7 +73,7 @@ end = struct
   and ity = {
     ity_node : ity_node;
     ity_vars : varset;
-    ity_tag  : Hashweak.tag;
+    ity_tag  : Weakhtbl.tag;
   }
 
   and ity_node =
@@ -102,9 +91,9 @@ end
 and Reg : sig
   module M : Map.S with type key = T.region
   module S : M.Set
-  module H : Hashtbl.S with type key = T.region
-  module W : Hashweak.S with type key = T.region
-end = WeakStructMake (struct
+  module H : XHashtbl.S with type key = T.region
+  module W : Weakhtbl.S with type key = T.region
+end = MakeMSHW (struct
   type t = T.region
   let tag r = r.T.reg_name.id_tag
 end)
@@ -141,7 +130,7 @@ let create_varset tvs regs = {
 
 (* value type symbols *)
 
-module Itsym = WeakStructMake (struct
+module Itsym = MakeMSHW (struct
   type t = itysymbol
   let tag its = its.its_pure.ts_name.id_tag
 end)
@@ -155,7 +144,7 @@ let its_equal : itysymbol -> itysymbol -> bool = (==)
 let ity_equal : ity       -> ity       -> bool = (==)
 
 let its_hash its = id_hash its.its_pure.ts_name
-let ity_hash ity = Hashweak.tag_hash ity.ity_tag
+let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
 
 module Hsity = Hashcons.Make (struct
   type t = ity
@@ -191,11 +180,11 @@ module Hsity = Hashcons.Make (struct
 
   let tag n ity = { ity with
     ity_vars = vars vars_empty ity;
-    ity_tag  = Hashweak.create_tag n }
+    ity_tag  = Weakhtbl.create_tag n }
 
 end)
 
-module Ity = WeakStructMake (struct
+module Ity = MakeMSHW (struct
   type t = ity
   let tag ity = ity.ity_tag
 end)
@@ -208,7 +197,7 @@ module Wity = Ity.W
 let mk_ity n = {
   ity_node = n;
   ity_vars = vars_empty;
-  ity_tag  = Hashweak.dummy_tag;
+  ity_tag  = Weakhtbl.dummy_tag;
 }
 
 let ity_var n = Hsity.hashcons (mk_ity (Ityvar n))
@@ -228,10 +217,10 @@ let ity_fold fn acc ity = match ity.ity_node with
   | Ityapp (_,tl,_) -> List.fold_left fn acc tl
 
 let ity_all pr ity =
-  try ity_fold (all_fn pr) true ity with FoldSkip -> false
+  try ity_fold (Util.all_fn pr) true ity with Util.FoldSkip -> false
 
 let ity_any pr ity =
-  try ity_fold (any_fn pr) false ity with FoldSkip -> true
+  try ity_fold (Util.any_fn pr) false ity with Util.FoldSkip -> true
 
 (* symbol-wise map/fold *)
 
@@ -243,10 +232,12 @@ let rec ity_s_fold fn fts acc ity = match ity.ity_node with
       List.fold_left (fun acc r -> ity_s_fold fn fts acc r.reg_ity) acc rl
 
 let ity_s_all pr pts ity =
-  try ity_s_fold (all_fn pr) (all_fn pts) true ity with FoldSkip -> false
+  try ity_s_fold (Util.all_fn pr) (Util.all_fn pts) true ity
+  with Util.FoldSkip -> false
 
 let ity_s_any pr pts ity =
-  try ity_s_fold (any_fn pr) (any_fn pts) false ity with FoldSkip -> true
+  try ity_s_fold (Util.any_fn pr) (Util.any_fn pts) false ity
+  with Util.FoldSkip -> true
 
 (* traversal functions on type variables and regions *)
 
@@ -373,11 +364,11 @@ let rec ity_inst_fresh mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
       mr, ity_pur_unsafe s tl
   | Ityapp (s,tl,rl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
-      let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,rl = Lists.map_fold_left (reg_refresh mv) mr rl in
       mr, ity_app_unsafe s tl rl
 
 and reg_refresh mv mr r = match Mreg.find_opt r mr with
@@ -396,7 +387,7 @@ let ity_app_fresh s tl =
     with Invalid_argument _ ->
       raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
   (* refresh regions *)
-  let mr,rl = Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+  let mr,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
   (* every top region in def is guaranteed to be in mr *)
   match s.its_def with
   | Some ity -> ity_subst_unsafe mv mr ity
@@ -446,7 +437,7 @@ let create_itysymbol_unsafe, restore_its =
 
 let create_itysymbol
       name ?(abst=false) ?(priv=false) ?(inv=false) args regs def =
-  let puredef = option_map ty_of_ity def in
+  let puredef = Opt.map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
   let add s v = Sreg.add_new (DuplicateRegion v) v s in
@@ -460,7 +451,7 @@ let create_itysymbol
   (* all regions in [def] must be in [regs] *)
   let check dregs = if not (Sreg.subset dregs sregs) then
     raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs))) in
-  Util.option_iter (fun d -> check d.ity_vars.vars_reg) def;
+  Opt.iter (fun d -> check d.ity_vars.vars_reg) def;
   (* if a type is an alias then it cannot be abstract or private *)
   if abst && def <> None then Loc.errorm "Type aliases cannot be abstract";
   if priv && def <> None then Loc.errorm "Type aliases cannot be private";
@@ -490,7 +481,7 @@ let its_clone sm =
       let priv = oits.its_priv in
       let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
-      let def = Util.option_map conv_ity oits.its_def in
+      let def = Opt.map conv_ity oits.its_def in
       create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
     in
     Hits.replace itsh oits nits;
@@ -544,9 +535,9 @@ let create_xsymbol id ity =
   if not (ity_pure ity) then raise (MutableException (id, ity));
   { xs_name = id; xs_ity = ity; }
 
-module Exn = StructMake (struct
+module Exn = MakeMSH (struct
   type t = xsymbol
-  let tag xs = Hashweak.tag_hash xs.xs_name.id_tag
+  let tag xs = Weakhtbl.tag_hash xs.xs_name.id_tag
 end)
 
 module Sexn = Exn.S
@@ -677,7 +668,7 @@ let eff_full_inst s e =
   (* calculate instantiated effect *)
   let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
   let add_mreg r v acc =
-    Mreg.add (Mreg.find r s) (option_map (fun v -> Mreg.find v s) v) acc in
+    Mreg.add (Mreg.find r s) (Opt.map (fun v -> Mreg.find v s) v) acc in
   { e with
     eff_reads  = Sreg.fold add_sreg e.eff_reads  Sreg.empty;
     eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
@@ -801,7 +792,7 @@ type vty_value = {
 }
 
 let vty_value ?(ghost=false) ?mut ity =
-  Util.option_iter (fun r -> ity_equal_check ity r.reg_ity) mut;
+  Opt.iter (fun r -> ity_equal_check ity r.reg_ity) mut;
   { vtv_ity   = ity;
     vtv_ghost = ghost;
     vtv_mut   = mut }
@@ -820,7 +811,7 @@ type pvsymbol = {
   pv_vars : varset;
 }
 
-module PVsym = WeakStructMake (struct
+module PVsym = MakeMSHW (struct
   type t = pvsymbol
   let tag pv = pv.pv_vs.vs_name.id_tag
 end)
@@ -942,7 +933,7 @@ let vta_full_inst sbs vta =
     let nv = pv_inst pv in
     Mvs.add pv.pv_vs (t_var nv.pv_vs) vsm, nv in
   let rec vta_inst vsm vta =
-    let vsm, args = Util.map_fold_left add_arg vsm vta.vta_args in
+    let vsm, args = Lists.map_fold_left add_arg vsm vta.vta_args in
     let spec = spec_full_inst sbs tvm vsm vta.vta_spec in
     let vty = match vta.vta_result with
       | VTarrow vta -> VTarrow (vta_inst vsm vta)

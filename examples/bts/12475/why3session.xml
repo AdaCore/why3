@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="bts/12475/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +12,7 @@
  <prover
   id="2"
   name="Gappa"
-  version="0.16.0"/>
+  version="0.16.1"/>
  <prover
   id="3"
   name="Z3"
@@ -24,7 +23,7 @@
   expanded="false">
   <theory
    name="Stmt"
-   locfile="bts/12475/../12475.why"
+   locfile="../12475.why"
    loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
@@ -32,19 +31,19 @@
     name="some_statement"/>
    <goal
     name="toto"
-    locfile="bts/12475/../12475.why"
+    locfile="../12475.why"
     loclnum="6" loccnumb="7" loccnume="11"
     sum="124ff5e00ef7f3e7e752aa5c976dfeed"
     proved="true"
     expanded="true"
     shape="ainfix &lt;V0ainfix +aroundaUpV0c1.F">
     <proof
-     prover="3"
+     prover="0"
      timelimit="2"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -55,20 +54,20 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="2"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="2"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>

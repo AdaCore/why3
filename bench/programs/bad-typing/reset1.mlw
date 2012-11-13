@@ -3,12 +3,11 @@ module Bad
   use import int.Int
   use import ref.Ref
 
-  type dref 'a = {| mutable dcontents : ref 'a |}
+  type dref 'a = { mutable dcontents : ref 'a }
 
-  let one (x : dref 'a) (y : ref 'a) =
-  { }
-    x.dcontents <- y;
+  let one (x : dref 'a) (y : ref 'a)
+    ensures { !(x.dcontents) = !(old y) }
+  = x.dcontents <- y;
     y
-  { !(x.dcontents) = !(old y) }
 
 end

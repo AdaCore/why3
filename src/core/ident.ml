@@ -1,25 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Stdlib
-open Util
 
 (** Labels *)
 
@@ -28,7 +18,7 @@ type label = {
   lab_tag    : int;
 }
 
-module Lab = StructMake (struct
+module Lab = MakeMSH (struct
   type t = label
   let tag lab = lab.lab_tag
 end)
@@ -58,10 +48,10 @@ type ident = {
   id_string : string;               (* non-unique name *)
   id_label  : Slab.t;               (* identifier labels *)
   id_loc    : Loc.position option;  (* optional location *)
-  id_tag    : Hashweak.tag;         (* unique magical tag *)
+  id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
 
-module Id = WeakStructMake (struct
+module Id = MakeMSHW (struct
   type t = ident
   let tag id = id.id_tag
 end)
@@ -75,18 +65,18 @@ type preid = ident
 
 let id_equal : ident -> ident -> bool = (==)
 
-let id_hash id = Hashweak.tag_hash id.id_tag
+let id_hash id = Weakhtbl.tag_hash id.id_tag
 
 (* constructors *)
 
 let id_register = let r = ref 0 in fun id ->
-  { id with id_tag = (incr r; Hashweak.create_tag !r) }
+  { id with id_tag = (incr r; Weakhtbl.create_tag !r) }
 
 let create_ident name labels loc = {
   id_string = name;
   id_label  = labels;
   id_loc    = loc;
-  id_tag    = Hashweak.dummy_tag;
+  id_tag    = Weakhtbl.dummy_tag;
 }
 
 let id_fresh ?(label = Slab.empty) ?loc nm =
@@ -168,9 +158,6 @@ let forget_all printer =
 
 (** Sanitizers *)
 
-let unsanitizable = Debug.register_info_flag "unsanitizable"
-  ~desc:"About@ the@ sanitazing@ during@ the@ pretty-printing."
-
 let char_to_alpha c = match c with
   | 'a'..'z' | 'A'..'Z' -> String.make 1 c
   | ' ' -> "sp" | '_'  -> "us" | '#' -> "sh"
@@ -187,10 +174,7 @@ let char_to_alpha c = match c with
   | '0' -> "zr" | '1'  -> "un" | '2' -> "du"
   | '3' -> "tr" | '4'  -> "qr" | '5' -> "qn"
   | '6' -> "sx" | '7'  -> "st" | '8' -> "oc"
-  | '9' -> "nn" | '\n' -> "br"
-  | _ ->
-    Debug.dprintf unsanitizable "Unsanitizable : '%c' can't be sanitized@." c;
-    "zz"
+  | '9' -> "nn" | '\n' -> "br" |  _  -> "zz"
 
 let char_to_lalpha c = String.uncapitalize (char_to_alpha c)
 let char_to_ualpha c = String.capitalize (char_to_alpha c)

@@ -1,26 +1,18 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Pp
-open Util
+open Stdlib
+open Number
 open Ident
 open Ty
 open Term
@@ -67,7 +59,7 @@ let print_ident_labels fmt id =
       not (Slab.is_empty id.id_label) then
     fprintf fmt "@ %a" print_labels id.id_label;
   if Debug.test_flag debug_print_locs then
-    Util.option_iter (fprintf fmt "@ %a" print_loc) id.id_loc
+    Opt.iter (fprintf fmt "@ %a" print_loc) id.id_loc
 
 (* type variables always start with a quote *)
 let print_tv fmt tv =
@@ -138,13 +130,14 @@ let rec print_ty_node inn fmt ty = match ty.ty_node with
 let print_ty = print_ty_node false
 
 let print_const fmt = function
-  | ConstInt (IConstDecimal s) -> fprintf fmt "%s" s
-  | ConstInt (IConstHexa s) -> fprintf fmt "0x%s" s
-  | ConstInt (IConstOctal s) -> fprintf fmt "0o%s" s
-  | ConstInt (IConstBinary s) -> fprintf fmt "0b%s" s
-  | ConstReal (RConstDecimal (i,f,None)) -> fprintf fmt "%s.%s" i f
-  | ConstReal (RConstDecimal (i,f,Some e)) -> fprintf fmt "%s.%se%s" i f e
-  | ConstReal (RConstHexa (i,f,e)) -> fprintf fmt "0x%s.%sp%s" i f e
+  | ConstInt (IConstDec s) -> fprintf fmt "%s" s
+  | ConstInt (IConstHex s) -> fprintf fmt "0x%s" s
+  | ConstInt (IConstOct s) -> fprintf fmt "0o%s" s
+  | ConstInt (IConstBin s) -> fprintf fmt "0b%s" s
+  | ConstReal (RConstDec (i,f,None)) -> fprintf fmt "%s.%s" i f
+  | ConstReal (RConstDec (i,f,Some e)) -> fprintf fmt "%s.%se%s" i f e
+  | ConstReal (RConstHex (i,f,Some e)) -> fprintf fmt "0x%s.%sp%s" i f e
+  | ConstReal (RConstHex (i,f,None)) -> fprintf fmt "0x%s.%s" i f
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -157,7 +150,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  option_apply true inspect fs.ls_value
+  Opt.fold (fun _ -> inspect) true fs.ls_value
 
 (** Patterns, terms, and formulas *)
 

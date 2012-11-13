@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Stdlib
 open Ident
@@ -29,7 +20,7 @@ type tvsymbol = private {
 
 module Mtv : Map.S with type key = tvsymbol
 module Stv : Mtv.Set
-module Htv : Hashtbl.S with type key = tvsymbol
+module Htv : XHashtbl.S with type key = tvsymbol
 
 val tv_equal : tvsymbol -> tvsymbol -> bool
 
@@ -47,7 +38,7 @@ type tysymbol = private {
 
 and ty = private {
   ty_node : ty_node;
-  ty_tag  : Hashweak.tag;
+  ty_tag  : Weakhtbl.tag;
 }
 
 and ty_node = private
@@ -56,13 +47,13 @@ and ty_node = private
 
 module Mts : Map.S with type key = tysymbol
 module Sts : Mts.Set
-module Hts : Hashtbl.S with type key = tysymbol
-module Wts : Hashweak.S with type key = tysymbol
+module Hts : XHashtbl.S with type key = tysymbol
+module Wts : Weakhtbl.S with type key = tysymbol
 
 module Mty : Map.S with type key = ty
 module Sty : Mty.Set
-module Hty : Hashtbl.S with type key = ty
-module Wty : Hashweak.S with type key = ty
+module Hty : XHashtbl.S with type key = ty
+module Wty : Weakhtbl.S with type key = ty
 
 val ts_equal : tysymbol -> tysymbol -> bool
 val ty_equal : ty -> ty -> bool

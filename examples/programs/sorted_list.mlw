@@ -10,18 +10,10 @@ module FindInSortedList
     forall x y : int, l : list int.
     x < y -> sorted (Cons y l) -> not mem x (Cons y l)
 
-  let rec find x l =
-    { sorted l }
-    match l with
+  let rec find x l requires { sorted l } ensures { result=True <-> mem x l }
+  = match l with
     | Nil -> False
     | Cons y r -> x = y || x > y && find x r
     end
-    { result=True <-> mem x l }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/sorted_list.gui"
-End:
-*)

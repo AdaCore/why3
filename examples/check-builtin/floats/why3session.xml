@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="check-builtin/floats/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -13,7 +12,7 @@
  <prover
   id="2"
   name="Gappa"
-  version="0.16.0"/>
+  version="0.16.1"/>
  <prover
   id="3"
   name="Z3"
@@ -24,13 +23,13 @@
   expanded="false">
   <theory
    name="TestGappa"
-   locfile="check-builtin/floats/../floats.why"
+   locfile="../floats.why"
    loclnum="2" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <goal
     name="Round_single_01"
-    locfile="check-builtin/floats/../floats.why"
+    locfile="../floats.why"
     loclnum="11" loccnumb="7" loccnume="22"
     sum="ac8fb5c518fdaf4bad7594011ae003ab"
     proved="true"
@@ -47,7 +46,7 @@
    </goal>
    <goal
     name="Round_double_01"
-    locfile="check-builtin/floats/../floats.why"
+    locfile="../floats.why"
     loclnum="14" loccnumb="7" loccnume="22"
     sum="87b5e80887ea503e084252e96c8d66e0"
     proved="true"
@@ -64,19 +63,19 @@
    </goal>
    <goal
     name="Test00"
-    locfile="check-builtin/floats/../floats.why"
+    locfile="../floats.why"
     loclnum="17" loccnumb="8" loccnume="14"
     sum="b114d5c0d983e9b86d30e9bc670a910d"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=aprefix -c3.0V0Iainfix &lt;=aabsV0c2.0F">
     <proof
-     prover="3"
+     prover="0"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
@@ -87,14 +86,6 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="2"
      timelimit="5"
      memlimit="0"
@@ -102,10 +93,18 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
    <goal
     name="Test01"
-    locfile="check-builtin/floats/../floats.why"
+    locfile="../floats.why"
     loclnum="19" loccnumb="8" loccnume="14"
     sum="1a41216beb8df2c29dcd85ff00fffa1d"
     proved="true"
@@ -122,7 +121,7 @@
    </goal>
    <goal
     name="Test02"
-    locfile="check-builtin/floats/../floats.why"
+    locfile="../floats.why"
     loclnum="25" loccnumb="8" loccnume="14"
     sum="a1a6c04d2584b459a573420acacd56af"
     proved="true"
@@ -139,7 +138,7 @@
    </goal>
    <goal
     name="Test03"
-    locfile="check-builtin/floats/../floats.why"
+    locfile="../floats.why"
     loclnum="32" loccnumb="8" loccnume="14"
     sum="f56223f27c38752ad3ccc8af80cc1511"
     proved="true"

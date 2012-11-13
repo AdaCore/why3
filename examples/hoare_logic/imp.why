@@ -173,7 +173,7 @@ predicate eval_fmla (s:state) (f:fmla) =
   | Fnot f ->  not (eval_fmla s f)
   end
 
-(* substitution *) 
+(* substitution *)
 
 function subst_expr (e:expr) (x:ident) (t:expr) : expr =
   match e with

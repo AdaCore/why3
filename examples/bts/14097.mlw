@@ -2,13 +2,10 @@
 
 module M
 
-  use import module ref.Ref
+  use import ref.Ref
 
   val x : ref int
 
-  let f () : int =
-  { }
-    !x
-  { result = !x }
+  let f () : int ensures { result = !x } = !x
 
 end

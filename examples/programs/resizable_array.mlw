@@ -8,53 +8,49 @@ module ResizableArrayImplem
   type elt
   constant dummy: elt
 
-  type rarray = {| mutable length: int; mutable data: A.array elt |}
-    invariant { 0 <= length <= A.length data }
+  type rarray = { mutable length: int; mutable data: A.array elt }
+    invariant { 0 <= self.length <= A.length self.data }
 
   function ([]) (r: rarray) (i: int) : elt = A.get r.data i
   function ([<-]) (r: rarray) (i: int) (v: elt) : rarray =
-     {| r with data = A.set r.data i v |}
+    { r with data = A.set r.data i v }
 
   function make (len: int) : rarray =
-    {| length = len; data = A.make len dummy |}
+    { length = len; data = A.make len dummy }
 
-  let make (len: int) =
-    { 0 <= len }
-    {| length = len; data = A.make len dummy |}
-    { result = make len }
+  let make (len: int)
+    requires { 0 <= len } ensures { result = make len }
+  = { length = len; data = A.make len dummy }
 
-  let ([]) (r: rarray) (i: int) =
-    { 0 <= i < r.length }
-    A.([]) r.data i
-    { result = r[i] }
+  let ([]) (r: rarray) (i: int)
+    requires { 0 <= i < r.length } ensures { result = r[i] }
+  = A.([]) r.data i
 
-  let ([]<-) (r: rarray) (i: int) (v: elt) =
-    { 0 <= i < r.length }
-    A.([]<-) r.data i v
-    { r = (old r)[i <- v] }
+  let ([]<-) (r: rarray) (i: int) (v: elt)
+    requires { 0 <= i < r.length } ensures { r = (old r)[i <- v] }
+  = A.([]<-) r.data i v
 
-  let resize (r: rarray) (len: int) =
-    { 0 <= len }
-    let n = A.length r.data in
+  let resize (r: rarray) (len: int)
+    requires { 0 <= len }
+    ensures { r.length = len /\
+      forall i: int.
+        0 <= i < min (old r.length) len -> r[i] = (old r)[i] }
+  = let n = A.length r.data in
     if len > n then begin
       let a = A.make (max len (2 * n)) dummy in
       A.blit r.data 0 a 0 n;
       r.data <- a
     end;
     r.length <- len
-    { r.length = len /\
-      forall i: int.
-        0 <= i < min (old r.length) len -> r[i] = (old r)[i] }
 
-  let append (r1: rarray) (r2: rarray) =
-     {}
-     let n1 = length r1 in
-     resize r1 (length r1 + length r2);
-     A.blit r2.data 0 r1.data n1 (length r2)
-     { r1.length = old r1.length + r2.length /\
-       forall i: int. 0 <= i < r1.length ->
-         (i < old r1.length  -> r1[i] = (old r1)[i]) /\
-         (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
+  let append (r1: rarray) (r2: rarray)
+    ensures { r1.length = old r1.length + r2.length /\
+      forall i: int. 0 <= i < r1.length ->
+        (i < old r1.length  -> r1[i] = (old r1)[i]) /\
+        (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
+  = let n1 = length r1 in
+    resize r1 (length r1 + length r2);
+    A.blit r2.data 0 r1.data n1 (length r2)
 
   (* sanity checks for WhyML typing system *)
 

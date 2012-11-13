@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/foveoos11_challenge1/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -9,43 +8,43 @@
  <file
   name="../foveoos11_challenge1.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Max"
-   locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+   locfile="../foveoos11_challenge1.mlw"
    loclnum="8" loccnumb="7" loccnume="10"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter max"
-    locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+    locfile="../foveoos11_challenge1.mlw"
     loclnum="13" loccnumb="6" loccnume="9"
-    expl="parameter max"
+    expl="VC for max"
     sum="02323a95805ccd6d5f44a3aaa574d423"
     proved="true"
     expanded="true"
     shape="iainfix =V3V2Niainfix &lt;=agetV1V3agetV1V2ainfix &lt;ainfix -V2V4ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix &lt;=agetV1V5agetV1V4Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V4Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V4V2Aainfix &lt;=c0V4Iainfix =V4ainfix +V3c1Fainfix &lt;ainfix -V6V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix &lt;=agetV1V7agetV1V3Oainfix &lt;=agetV1V7agetV1V6Iainfix &lt;V7V0Aainfix &lt;V6V7Oainfix &lt;V7V3Aainfix &lt;=c0V7FAainfix &lt;V6V0Aainfix &lt;=V3V6Aainfix &lt;=c0V3Iainfix =V6ainfix -V2c1FAainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &lt;=agetV1V8agetV1V3Iainfix &lt;V8V0Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;=agetV1V9agetV1V3Oainfix &lt;=agetV1V9agetV1V2Iainfix &lt;V9V0Aainfix &lt;V2V9Oainfix &lt;V9V3Aainfix &lt;=c0V9FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FAainfix &lt;=agetV1V10agetV1c0Oainfix &lt;=agetV1V10agetV1ainfix -V0c1Iainfix &lt;V10V0Aainfix &lt;ainfix -V0c1V10Oainfix &lt;V10c0Aainfix &lt;=c0V10FAainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0ainfix -V0c1Aainfix &lt;=c0c0Iainfix &gt;V0c0FF">
     <label
-     name="expl:parameter max"/>
+     name="expl:VC for max"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter max.1"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="loop invariant init"
-      sum="4cf7f5fbc5c8ecbb50df86644d55499f"
+      expl="1. loop invariant init"
+      sum="d9b9db7ebdf848e9d01cb594fd10ce49"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=agetV1V2agetV1c0Oainfix &lt;=agetV1V2agetV1ainfix -V0c1Iainfix &lt;V2V0Aainfix &lt;ainfix -V0c1V2Oainfix &lt;V2c0Aainfix &lt;=c0V2FAainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0ainfix -V0c1Aainfix &lt;=c0c0Iainfix &gt;V0c0FF">
+      shape="ainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0ainfix -V0c1Aainfix &lt;=c0c0Iainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
+       name="expl:VC for max"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -53,15 +52,15 @@
      </goal>
      <goal
       name="WP_parameter max.2"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="precondition"
-      sum="1d738f7a10b19d5a02e99843bfdf0658"
+      expl="2. loop invariant init"
+      sum="2aa45304da5041b8d011374118b00d68"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      shape="ainfix &lt;=agetV1V2agetV1c0Oainfix &lt;=agetV1V2agetV1ainfix -V0c1Iainfix &lt;V2V0Aainfix &lt;ainfix -V0c1V2Oainfix &lt;V2c0Aainfix &lt;=c0V2FIainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
+       name="expl:VC for max"/>
       <proof
        prover="0"
        timelimit="10"
@@ -73,15 +72,15 @@
      </goal>
      <goal
       name="WP_parameter max.3"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="precondition"
-      sum="c63ed548fef7fe780bcc3260d6ba1fca"
+      expl="3. precondition"
+      sum="1d738f7a10b19d5a02e99843bfdf0658"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      shape="ainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
+       name="expl:VC for max"/>
       <proof
        prover="0"
        timelimit="10"
@@ -93,112 +92,15 @@
      </goal>
      <goal
       name="WP_parameter max.4"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="loop invariant preservation"
-      sum="e699262ccada6299b5ea167733132999"
+      expl="4. precondition"
+      sum="c63ed548fef7fe780bcc3260d6ba1fca"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=agetV1V5agetV1V4Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V4Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V4V2Aainfix &lt;=c0V4Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V6agetV1V3Oainfix &lt;=agetV1V6agetV1V2Iainfix &lt;V6V0Aainfix &lt;V2V6Oainfix &lt;V6V3Aainfix &lt;=c0V6FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter max.4.1"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="7b46ed6ab834e0c0ec5f8cbedb7371f6"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=c0V4Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.4.2"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="fecc831e26b4b411335cafc75a77210a"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=V4V2Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.4.3"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="ca861d3a6a893ac1ef8195d0bc626e32"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;V2V0Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.4.4"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="124bb14cb10d7e337b8b9936a4e9f5f5"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV1V5agetV1V4Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V6agetV1V3Oainfix &lt;=agetV1V6agetV1V2Iainfix &lt;V6V0Aainfix &lt;V2V6Oainfix &lt;V6V3Aainfix &lt;=c0V6FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal
-      name="WP_parameter max.5"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-      loclnum="13" loccnumb="6" loccnume="9"
-      expl="loop variant decrease"
-      sum="76af9098ab05968b2cb07759939fd3e0"
-      proved="true"
-      expanded="false"
-      shape="ainfix &lt;ainfix -V2V4ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-      <label
-       name="expl:parameter max"/>
+       name="expl:VC for max"/>
       <proof
        prover="0"
        timelimit="10"
@@ -209,113 +111,56 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter max.6"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      name="WP_parameter max.5"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="loop invariant preservation"
-      sum="861b1dc6d1ef95c1e350ba135f297ff8"
+      expl="5. loop invariant preservation"
+      sum="08959d78639b8ed12149a14388b81e62"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix &lt;V4V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V4V0Aainfix &lt;=V3V4Aainfix &lt;=c0V3Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V6agetV1V3Oainfix &lt;=agetV1V6agetV1V2Iainfix &lt;V6V0Aainfix &lt;V2V6Oainfix &lt;V6V3Aainfix &lt;=c0V6FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      shape="ainfix &lt;V2V0Aainfix &lt;=V4V2Aainfix &lt;=c0V4Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter max.6.1"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="ace050bc95db24377d102b4b1a83c1e3"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=c0V3Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.6.2"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="cbec2df0e3f894a61f67e59add531b28"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=V3V4Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.6.3"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="68fcdb7e27c62591fb9058d3f01c8ba9"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;V4V0Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.6.4"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="acef488352f1b7c65771445c5596d869"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix &lt;V4V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FIainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V6agetV1V3Oainfix &lt;=agetV1V6agetV1V2Iainfix &lt;V6V0Aainfix &lt;V2V6Oainfix &lt;V6V3Aainfix &lt;=c0V6FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter max.6"
+      locfile="../foveoos11_challenge1.mlw"
+      loclnum="13" loccnumb="6" loccnume="9"
+      expl="6. loop invariant preservation"
+      sum="124bb14cb10d7e337b8b9936a4e9f5f5"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV1V5agetV1V4Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V6agetV1V3Oainfix &lt;=agetV1V6agetV1V2Iainfix &lt;V6V0Aainfix &lt;V2V6Oainfix &lt;V6V3Aainfix &lt;=c0V6FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter max.7"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="loop variant decrease"
-      sum="779d4d8cb215a63ac59c61aea9b9dd9d"
+      expl="7. loop variant decrease"
+      sum="76af9098ab05968b2cb07759939fd3e0"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;ainfix -V4V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      shape="ainfix &lt;ainfix -V2V4ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V4ainfix +V3c1FIainfix &lt;=agetV1V3agetV1V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
+       name="expl:VC for max"/>
       <proof
        prover="0"
        timelimit="10"
@@ -327,80 +172,103 @@
      </goal>
      <goal
       name="WP_parameter max.8"
-      locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
+      locfile="../foveoos11_challenge1.mlw"
       loclnum="13" loccnumb="6" loccnume="9"
-      expl="postcondition"
-      sum="26e19ea342875255309c4475425052ed"
+      expl="8. loop invariant preservation"
+      sum="48420132d6886a91566b645d8e6dadf0"
       proved="true"
-      expanded="true"
-      shape="ainfix &lt;=agetV1V4agetV1V3Iainfix &lt;V4V0Aainfix &lt;=c0V4FAainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =V3V2NNIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      expanded="false"
+      shape="ainfix &lt;V4V0Aainfix &lt;=V3V4Aainfix &lt;=c0V3Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
       <label
-       name="expl:parameter max"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter max.8.1"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="91d2ddbe2532a939a350155a404a8238"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=c0V3Iainfix =V3V2NNIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.8.2"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="218f07e49ccf3eaf91ebe98eeaba5835"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;V3V0Iainfix =V3V2NNIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter max.8.3"
-        locfile="programs/foveoos11_challenge1/../foveoos11_challenge1.mlw"
-        loclnum="13" loccnumb="6" loccnume="9"
-        expl="parameter max"
-        sum="9a5e059057a30bfffbd4bfc8f095b516"
-        proved="true"
-        expanded="true"
-        shape="ainfix &lt;=agetV1V4agetV1V3Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix =V3V2NNIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
-        <label
-         name="expl:parameter max"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter max.9"
+      locfile="../foveoos11_challenge1.mlw"
+      loclnum="13" loccnumb="6" loccnume="9"
+      expl="9. loop invariant preservation"
+      sum="acef488352f1b7c65771445c5596d869"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V4Iainfix &lt;V5V0Aainfix &lt;V4V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FIainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V6agetV1V3Oainfix &lt;=agetV1V6agetV1V2Iainfix &lt;V6V0Aainfix &lt;V2V6Oainfix &lt;V6V3Aainfix &lt;=c0V6FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter max.10"
+      locfile="../foveoos11_challenge1.mlw"
+      loclnum="13" loccnumb="6" loccnume="9"
+      expl="10. loop variant decrease"
+      sum="779d4d8cb215a63ac59c61aea9b9dd9d"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -V4V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V4ainfix -V2c1FIainfix &lt;=agetV1V3agetV1V2NIainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3V2NIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter max.11"
+      locfile="../foveoos11_challenge1.mlw"
+      loclnum="13" loccnumb="6" loccnume="9"
+      expl="11. postcondition"
+      sum="639384401acb62d305bc79d62e812e77"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =V3V2NNIainfix &lt;=agetV1V4agetV1V3Oainfix &lt;=agetV1V4agetV1V2Iainfix &lt;V4V0Aainfix &lt;V2V4Oainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter max.12"
+      locfile="../foveoos11_challenge1.mlw"
+      loclnum="13" loccnumb="6" loccnume="9"
+      expl="12. postcondition"
+      sum="9a5e059057a30bfffbd4bfc8f095b516"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV1V4agetV1V3Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix =V3V2NNIainfix &lt;=agetV1V5agetV1V3Oainfix &lt;=agetV1V5agetV1V2Iainfix &lt;V5V0Aainfix &lt;V2V5Oainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=c0V3FIainfix &gt;V0c0FF">
+      <label
+       name="expl:VC for max"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
     </transf>
    </goal>

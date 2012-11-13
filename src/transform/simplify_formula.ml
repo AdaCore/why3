@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Term
 open Decl
@@ -46,7 +37,7 @@ let () = Trans.register_transform
 let () = Trans.register_transform_l
   "simplify_formula_and_task" simplify_formula_and_task
   ~desc:"Same as simplify_formula, but also@ \
-         removes@ axioms@ and@ goals@ that@ become@ trivial."
+         remove@ axioms@ and@ goals@ that@ become@ trivial."
 
 (** remove_trivial_quantification
     Original version in the alt-ergo prover by Sylvain Conchon *)
@@ -136,9 +127,9 @@ let simplify_trivial_quantification =
 let () = Trans.register_transform
   "simplify_trivial_quantification" simplify_trivial_quantification
   ~desc:"@[Simplify@ trivial@ quantifications:@]@\n  \
-@[\
- - @[transform \\exists x. x == y /\\ F@ into F[y/x],@]@\n\
- - @[transform \\forall x. x <> y \\/ F@ into F[y/x].@]@]"
+    @[\
+     - @[transform \\exists x. x == y /\\ F@ into F[y/x],@]@\n\
+     - @[transform \\forall x. x <> y \\/ F@ into F[y/x].@]@]"
 
 let simplify_trivial_quantification_in_goal =
   Trans.goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])

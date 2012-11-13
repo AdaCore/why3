@@ -1,24 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Format
 open Pp
 open Ident
@@ -82,9 +73,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let debug_parse_only = Debug.register_flag "parse_only"
-  ~desc:"Stop@ after@ the@ parsing."
+  ~desc:"Stop@ after@ parsing."
 let debug_type_only  = Debug.register_flag "type_only"
-  ~desc:"Stop@ after@ the@ typing."
+  ~desc:"Stop@ after@ type-checking."
 
 (** Environments *)
 
@@ -112,10 +103,10 @@ let unify_raise ~loc ty1 ty2 =
     It is only local to this module and created with [create_denv] below. *)
 
 let create_user_tv =
-  let hs = Hashtbl.create 17 in
-  fun s -> try Hashtbl.find hs s with Not_found ->
+  let hs = Hstr.create 17 in
+  fun s -> try Hstr.find hs s with Not_found ->
   let tv = create_tvsymbol (id_fresh s) in
-  Hashtbl.add hs s tv;
+  Hstr.add hs s tv;
   tv
 
 (* TODO: shouldn't we localize this ident? *)
@@ -147,11 +138,6 @@ let rec string_list_of_qualid acc = function
   | Qident id -> id.id :: acc
   | Qdot (p, id) -> string_list_of_qualid (id.id :: acc) p
 
-let specialize_tysymbol loc p uc =
-  let sl = string_list_of_qualid [] p in
-  try ns_find_ts (get_namespace uc) sl
-  with Not_found -> error ~loc (UnboundType sl)
-
 (* lazy declaration of tuples *)
 
 let add_ty_decl uc ts = add_decl_with_tuples uc (create_ty_decl ts)
@@ -160,18 +146,6 @@ let add_param_decl uc ls = add_decl_with_tuples uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl_with_tuples uc (create_logic_decl dl)
 let add_ind_decl uc s dl = add_decl_with_tuples uc (create_ind_decl s dl)
 let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
-
-let rec dty uc = function
-  | PPTtyvar {id=x} ->
-      create_user_type_var x
-  | PPTtyapp (p, x) ->
-      let loc = qloc x in
-      let ts = specialize_tysymbol loc x uc in
-      let tyl = List.map (dty uc) p in
-      Loc.try2 loc tyapp ts tyl
-  | PPTtuple tyl ->
-      let ts = ts_tuple (List.length tyl) in
-      tyapp ts (List.map (dty uc) tyl)
 
 let find_ns get_id find p ns =
   let loc = qloc p in
@@ -210,6 +184,17 @@ let find_namespace_ns = find_ns get_dummy_id ns_find_ns
 (* dead code
 let find_namespace q uc = find_namespace_ns q (get_namespace uc)
 *)
+
+let rec dty uc = function
+  | PPTtyvar {id=x} ->
+      create_user_type_var x
+  | PPTtyapp (p, x) ->
+      let ts = find_tysymbol x uc in
+      let tyl = List.map (dty uc) p in
+      Loc.try2 (qloc x) tyapp ts tyl
+  | PPTtuple tyl ->
+      let ts = ts_tuple (List.length tyl) in
+      tyapp ts (List.map (dty uc) tyl)
 
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
@@ -338,10 +323,6 @@ let check_pat_linearity p =
   in
   check p
 
-let fresh_type_var loc =
-  let tv = create_tvsymbol (id_user "a" loc) in
-  tyvar (create_ty_decl_var ~loc tv)
-
 let rec dpat uc env pat =
   let env, n, ty = dpat_node pat.pat_loc uc env pat.pat_desc in
   env, { dp_node = n; dp_ty = ty }
@@ -374,7 +355,7 @@ and dpat_node loc uc env = function
             { dp_node = Pwild; dp_ty = ty }
       in
       let al = List.map2 get_val pjl tyl in
-      !renv, Papp (cs, al), Util.of_option ty
+      !renv, Papp (cs, al), Opt.get ty
   | PPptuple pl ->
       let n = List.length pl in
       let s = fs_tuple n in
@@ -419,7 +400,7 @@ let check_quant_linearity uqu =
   let check id =
     s := Loc.try3 id.id_loc Sstr.add_new (DuplicateVar id.id) id.id !s
   in
-  List.iter (fun (idl, _) -> Util.option_iter check idl) uqu
+  List.iter (fun (idl, _) -> Opt.iter check idl) uqu
 
 let check_highord uc env x tl = match x with
   | Qident { id = x } when Mstr.mem x env.dvars -> true
@@ -450,10 +431,8 @@ and dterm_node ~localize loc uc env = function
       let ty = Mstr.find x env.dvars in
       Tvar x, ty
   | PPvar x when env.gvars x <> None ->
-      let vs = Util.of_option (env.gvars x) in
-      assert (ty_closed vs.vs_ty);
-      let ty = specialize_ty ~loc (Htv.create 0) vs.vs_ty in
-      Tgvar vs, ty
+      let vs = Opt.get (env.gvars x) in
+      Tgvar vs, dty_of_ty vs.vs_ty
   | PPvar x ->
       (* 0-arity symbol (constant) *)
       let s, tyl, ty = specialize_fsymbol x uc in
@@ -464,7 +443,7 @@ and dterm_node ~localize loc uc env = function
       let tl = apply_highord loc x tl in
       let atyl, aty = Denv.specialize_lsymbol ~loc fs_func_app in
       let tl = dtype_args ~localize fs_func_app loc uc env atyl tl in
-      Tapp (fs_func_app, tl), Util.of_option aty
+      Tapp (fs_func_app, tl), Opt.get aty
   | PPapp (x, tl) ->
       let s, tyl, ty = specialize_fsymbol x uc in
       let tl = dtype_args ~localize s loc uc env tyl tl in
@@ -480,9 +459,9 @@ and dterm_node ~localize loc uc env = function
       let s, tyl, ty = specialize_fsymbol (Qident x) uc in
       let tl = dtype_args ~localize s loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
-  | PPconst (ConstInt _ as c) ->
+  | PPconst (Number.ConstInt _ as c) ->
       Tconst c, tyapp Ty.ts_int []
-  | PPconst (ConstReal _ as c) ->
+  | PPconst (Number.ConstReal _ as c) ->
       Tconst c, tyapp Ty.ts_real []
   | PPlet (x, e1, e2) ->
       let e1 = dterm ~localize uc env e1 in
@@ -537,7 +516,7 @@ and dterm_node ~localize loc uc env = function
         in
         add_var id.id ty env, (id,ty)
       in
-      let env, uqu = map_fold_left uquant env uqu in
+      let env, uqu = Lists.map_fold_left uquant env uqu in
       let trigger e =
         try
           TRterm (dterm ~localize uc env e)
@@ -598,7 +577,7 @@ and dterm_node ~localize loc uc env = function
         | None -> error ~loc (RecordFieldMissing (cs,pj))
       in
       let al = List.map2 get_val pjl tyl in
-      Tapp (cs,al), Util.of_option ty
+      Tapp (cs,al), Opt.get ty
   | PPupdate (e,fl) ->
       let e = dterm ~localize uc env e in
       let fl = List.map (fun (q,e) -> find_lsymbol q uc,e) fl in
@@ -612,13 +591,13 @@ and dterm_node ~localize loc uc env = function
             e
         | None ->
             let ptyl,pty = Denv.specialize_lsymbol ~loc pj in
-            unify_raise ~loc (of_option pty) ty;
+            unify_raise ~loc (Opt.get pty) ty;
             unify_raise ~loc (List.hd ptyl) e.dt_ty;
             (* FIXME? if e is a complex expression, use let *)
             { dt_node = Tapp (pj,[e]) ; dt_ty = ty }
       in
       let al = List.map2 get_val pjl tyl in
-      Tapp (cs,al), Util.of_option ty
+      Tapp (cs,al), Opt.get ty
   | PPquant _ | PPbinop _ | PPunop _ | PPfalse | PPtrue ->
       error ~loc TermExpected
 
@@ -656,7 +635,7 @@ and dfmla_node ~localize loc uc env = function
         in
         add_var id.id ty env, (id,ty)
       in
-      let env, uqu = map_fold_left uquant env uqu in
+      let env, uqu = Lists.map_fold_left uquant env uqu in
       let trigger e =
         try
           TRterm (dterm ~localize uc env e)
@@ -805,21 +784,21 @@ let add_types dl th =
       Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d def)
     Mstr.empty dl
   in
-  let tysymbols = Hashtbl.create 17 in
+  let tysymbols = Hstr.create 17 in
   let rec visit x =
     let d = Mstr.find x def in
     try
-      match Hashtbl.find tysymbols x with
+      match Hstr.find tysymbols x with
         | None -> errorm ~loc:d.td_loc "Cyclic type definition"
         | Some ts -> ts
     with Not_found ->
-      Hashtbl.add tysymbols x None;
-      let vars = Hashtbl.create 17 in
+      Hstr.add tysymbols x None;
+      let vars = Hstr.create 17 in
       let vl = List.map (fun id ->
-        if Hashtbl.mem vars id.id then
+        if Hstr.mem vars id.id then
           error ~loc:id.id_loc (DuplicateTypeVar id.id);
         let i = create_user_tv id.id in
-        Hashtbl.add vars id.id i;
+        Hstr.add vars id.id i;
         i) d.td_params
       in
       let id = create_user_id d.td_ident in
@@ -828,7 +807,7 @@ let add_types dl th =
             let rec apply = function
               | PPTtyvar v ->
                   begin
-                    try ty_var (Hashtbl.find vars v.id)
+                    try ty_var (Hstr.find vars v.id)
                     with Not_found -> error ~loc:v.id_loc (UnboundTypeVar v.id)
                   end
               | PPTtyapp (tyl, q) ->
@@ -849,7 +828,7 @@ let add_types dl th =
         | TDrecord _ ->
             assert false
       in
-      Hashtbl.add tysymbols x (Some ts);
+      Hstr.add tysymbols x (Some ts);
       ts
   in
   let th' =
@@ -863,9 +842,9 @@ let add_types dl th =
       th
     with ClashSymbol s -> error ~loc:(Mstr.find s def).td_loc (ClashSymbol s)
   in
-  let csymbols = Hashtbl.create 17 in
+  let csymbols = Hstr.create 17 in
   let decl d (abstr,algeb,alias) =
-    let ts = match Hashtbl.find tysymbols d.td_ident.id with
+    let ts = match Hstr.find tysymbols d.td_ident.id with
       | None ->
           assert false
       | Some ts ->
@@ -875,28 +854,28 @@ let add_types dl th =
       | TDabstract -> ts::abstr, algeb, alias
       | TDalias _ -> abstr, algeb, ts::alias
       | TDalgebraic cl ->
-          let ht = Hashtbl.create 17 in
+          let ht = Hstr.create 17 in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let param (_,t) = ty_of_dty (dty th' t) in
           let projection (id,_) fty = match id with
             | None -> None
             | Some id ->
                 try
-                  let pj = Hashtbl.find ht id.id in
-                  let ty = of_option pj.ls_value in
+                  let pj = Hstr.find ht id.id in
+                  let ty = Opt.get pj.ls_value in
                   ignore (Loc.try2 id.id_loc ty_equal_check ty fty);
                   Some pj
                 with Not_found ->
                   let fn = create_user_id id in
                   let pj = create_fsymbol fn [ty] fty in
-                  Hashtbl.replace csymbols id.id id.id_loc;
-                  Hashtbl.replace ht id.id pj;
+                  Hstr.replace csymbols id.id id.id_loc;
+                  Hstr.replace ht id.id pj;
                   Some pj
           in
           let constructor (loc, id, pl) =
             let tyl = List.map param pl in
             let pjl = List.map2 projection pl tyl in
-            Hashtbl.replace csymbols id.id loc;
+            Hstr.replace csymbols id.id loc;
             create_fsymbol (create_user_id id) tyl ty, pjl
           in
           abstr, (ts, List.map constructor cl) :: algeb, alias
@@ -911,11 +890,11 @@ let add_types dl th =
     th
   with
     | ClashSymbol s ->
-        error ~loc:(Hashtbl.find csymbols s) (ClashSymbol s)
+        error ~loc:(Hstr.find csymbols s) (ClashSymbol s)
     | RecordFieldMissing ({ ls_name = { id_string = s }} as cs,ls) ->
-        error ~loc:(Hashtbl.find csymbols s) (RecordFieldMissing (cs,ls))
+        error ~loc:(Hstr.find csymbols s) (RecordFieldMissing (cs,ls))
     | DuplicateRecordField ({ ls_name = { id_string = s }} as cs,ls) ->
-        error ~loc:(Hashtbl.find csymbols s) (DuplicateRecordField (cs,ls))
+        error ~loc:(Hstr.find csymbols s) (DuplicateRecordField (cs,ls))
 
 let prepare_typedef td =
   if td.td_model then
@@ -945,26 +924,26 @@ let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl
 
 let add_logics dl th =
-  let fsymbols = Hashtbl.create 17 in
-  let psymbols = Hashtbl.create 17 in
-  let denvs = Hashtbl.create 17 in
+  let fsymbols = Hstr.create 17 in
+  let psymbols = Hstr.create 17 in
+  let denvs = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
     let denv = denv_empty in
-    Hashtbl.add denvs id denv;
+    Hstr.add denvs id denv;
     let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.ld_params in
     let add d = match d.ld_type with
       | None -> (* predicate *)
           let ps = create_psymbol v pl in
-          Hashtbl.add psymbols id ps;
+          Hstr.add psymbols id ps;
           add_param_decl th ps
       | Some t -> (* function *)
           let t = type_ty (None, t) in
           let fs = create_fsymbol v pl t in
-          Hashtbl.add fsymbols id fs;
+          Hstr.add fsymbols id fs;
           add_param_decl th fs
     in
     Loc.try1 d.ld_loc add d
@@ -978,7 +957,7 @@ let add_logics dl th =
       | None -> denv
       | Some id -> add_var id.id (dty th' ty) denv
     in
-    let denv = Hashtbl.find denvs id in
+    let denv = Hstr.find denvs id in
     let denv = List.fold_left dadd_var denv d.ld_params in
     let create_var (x, _) ty =
       let id = match x with
@@ -990,7 +969,7 @@ let add_logics dl th =
     let mk_vlist = List.map2 create_var d.ld_params in
     match d.ld_type with
     | None -> (* predicate *)
-        let ps = Hashtbl.find psymbols id in
+        let ps = Hstr.find psymbols id in
         begin match d.ld_def with
           | None -> ps :: abst, defn
           | Some f ->
@@ -1003,7 +982,7 @@ let add_logics dl th =
               abst, make_ls_defn ps vl (fmla env f) :: defn
         end
     | Some ty -> (* function *)
-        let fs = Hashtbl.find fsymbols id in
+        let fs = Hstr.find fsymbols id in
         begin match d.ld_def with
           | None -> fs :: abst, defn
           | Some t ->
@@ -1024,43 +1003,44 @@ let add_logics dl th =
   let th = if defn = [] then th else add_logic_decl th defn in
   th
 
-let type_term uc denv env t =
-  let t = dterm uc denv t in
-  term env t
+let type_term uc gfn t =
+  let denv = denv_empty_with_globals gfn in
+  let t = dterm ~localize:(Some None) uc denv t in
+  term Mstr.empty t
 
-let type_fmla uc denv env f =
+let type_fmla uc gfn f =
+  let denv = denv_empty_with_globals gfn in
   let f = dfmla ~localize:(Some None) uc denv f in
-  fmla env f
+  fmla Mstr.empty f
 
 let add_prop k loc s f th =
   let pr = create_prsymbol (create_user_id s) in
-  let f = type_fmla th denv_empty Mstr.empty f in
+  let f = type_fmla th (fun _ -> None) f in
   Loc.try4 loc add_prop_decl th k pr f
 
-let loc_of_id id = of_option id.Ident.id_loc
+let loc_of_id id = Opt.get id.Ident.id_loc
 
 let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
-  let denv = denv_empty in
-  let psymbols = Hashtbl.create 17 in
+  let psymbols = Hstr.create 17 in
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
     let type_ty (_,t) = ty_of_dty (dty th t) in
     let pl = List.map type_ty d.in_params in
     let ps = create_psymbol v pl in
-    Hashtbl.add psymbols id ps;
+    Hstr.add psymbols id ps;
     Loc.try2 d.in_loc add_param_decl th ps
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
-  let propsyms = Hashtbl.create 17 in
+  let propsyms = Hstr.create 17 in
   let type_decl d =
     let id = d.in_ident.id in
-    let ps = Hashtbl.find psymbols id in
+    let ps = Hstr.find psymbols id in
     let clause (loc, id, f) =
-      Hashtbl.replace propsyms id.id loc;
-      let f = type_fmla th' denv Mstr.empty f in
+      Hstr.replace propsyms id.id loc;
+      let f = type_fmla th' (fun _ -> None) f in
       create_prsymbol (create_user_id id), f
     in
     ps, List.map clause d.in_def
@@ -1068,7 +1048,7 @@ let add_inductives s dl th =
   try add_ind_decl th s (List.map type_decl dl)
   with
   | ClashSymbol s ->
-      error ~loc:(Hashtbl.find propsyms s) (ClashSymbol s)
+      error ~loc:(Hstr.find propsyms s) (ClashSymbol s)
   | InvalidIndDecl (ls,pr) ->
       error ~loc:(loc_of_id pr.pr_name) (InvalidIndDecl (ls,pr))
   | NonPositiveIndDecl (ls,pr,s) ->
@@ -1142,8 +1122,8 @@ let type_inst th t s =
   let add_inst s = function
     | CSns (loc,p,q) ->
       let find ns x = find_namespace_ns x ns in
-      let ns1 = option_fold find t.th_export p in
-      let ns2 = option_fold find (get_namespace th) q in
+      let ns1 = Opt.fold find t.th_export p in
+      let ns2 = Opt.fold find (get_namespace th) q in
       clone_ns loc t.th_local ns2 ns1 s
     | CStsym (loc,p,q) ->
       let ts1 = find_tysymbol_ns p t.th_export in
@@ -1237,8 +1217,7 @@ let open_file, close_file =
       use_clone = use_clone;
       open_module = (fun _ -> assert false);
       close_module = (fun _ -> assert false);
-      new_pdecl = (fun _ -> assert false);
-      use_module = (fun _ _ -> assert false); }
+      new_pdecl = (fun _ -> assert false); }
   in
   let close_file () = Stack.pop lenv in
   open_file, close_file

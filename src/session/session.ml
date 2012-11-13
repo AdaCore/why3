@@ -1,26 +1,16 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Stdlib
 open Debug
-open Util
+open Stdlib
 open Ty
 open Ident
 open Decl
@@ -35,11 +25,12 @@ module C = Whyconf
 module Tc = Termcode
 
 let debug = Debug.register_info_flag "session"
-  ~desc:"About the why3 session creation, reading and writing."
+  ~desc:"Pring@ debugging@ messages@ about@ Why3@ session@ \
+         creation,@ reading@ and@ writing."
 
 (** {2 Type definitions} *)
 
-module PHstr = Util.Hstr
+module PHstr = Hstr
 
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)
@@ -65,11 +56,11 @@ let print_ident_path fmt ip =
     (Pp.print_list Pp.dot Pp.string) ip.ip_qualid
 
 let compare_ident_path x y =
-  let c = list_compare String.compare x.ip_library y.ip_library in
+  let c = Lists.compare String.compare x.ip_library y.ip_library in
   if c <> 0 then -c else (* in order to be bottom up *)
   let c = String.compare x.ip_theory y.ip_theory in
   if c <> 0 then c else
-  let c = list_compare String.compare x.ip_qualid y.ip_qualid in
+  let c = Lists.compare String.compare x.ip_qualid y.ip_qualid in
   c
 
 module Pos = struct
@@ -81,7 +72,7 @@ end
 
 module Mpos = Map.Make(Pos)
 module Spos = Mpos.Set
-module Hpos = Hashtbl.Make(Pos)
+module Hpos = XHashtbl.Make(Pos)
 
 type meta_args = meta_arg list
 
@@ -107,11 +98,12 @@ module Mmeta_args = Map.Make(struct
     | MAint x, MAint y -> compare x y
     | _ -> compare (meta_arg_id x) (meta_arg_id y)
 
-  let compare = list_compare compare_meta_arg
+  let compare = Lists.compare compare_meta_arg
 end)
 module Smeta_args = Mmeta_args.Set
 
-type metas_args =  Smeta_args.t Mstr.t
+type metas_args = Smeta_args.t Mstr.t
+
 module Mmetas_args = Map.Make(struct
   type t = metas_args
   let compare = Mstr.compare Smeta_args.compare
@@ -142,10 +134,12 @@ let posid_of_idpos idpos =
   posid
 *)
 
+type expl = string option
+
 type 'a goal =
   { mutable goal_key  : 'a;
     goal_name : Ident.ident;
-    goal_expl : string option;
+    goal_expl : expl;
     goal_parent : 'a goal_parent;
     mutable goal_checksum : Tc.checksum;
     mutable goal_shape : Tc.shape;
@@ -450,10 +444,10 @@ let get_used_provers session =
 
 exception NoTask
 
-let goal_task g = Util.exn_option NoTask g.goal_task
+let goal_task g = Opt.get_exn NoTask g.goal_task
 let goal_task_option g = g.goal_task
 
-let goal_expl g = Util.def_option g.goal_name.Ident.id_string g.goal_expl
+let goal_expl g = Opt.get_def g.goal_name.Ident.id_string g.goal_expl
 
 (************************)
 (* saving state on disk *)
@@ -461,6 +455,7 @@ let goal_expl g = Util.def_option g.goal_name.Ident.id_string g.goal_expl
 open Format
 
 let db_filename = "why3session.xml"
+let session_dir_for_save = ref "."
 
 let save_string fmt s =
   for i=0 to String.length s - 1 do
@@ -518,6 +513,7 @@ let save_ident fmt id =
     | None -> ()
     | Some loc ->
       let file,lnum,cnumb,cnume = Loc.get loc in
+      let file = Sysutil.relativize_filename !session_dir_for_save file in
       fprintf fmt
         "@ locfile=\"%a\"@ loclnum=\"%i\" loccnumb=\"%i\" loccnume=\"%i\""
         save_string file lnum cnumb cnume
@@ -643,15 +639,18 @@ name=\"%a\"@ version=\"%a\"%a/>@]"
     p.C.prover_altern;
   Mprover.add p id provers, id+1
 
-let save fname config session =
+let save fname _config session =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session SYSTEM \"%a\">@\n"
-    save_string (Filename.concat (Whyconf.datadir (Whyconf.get_main config))
-                   "why3session.dtd");
+  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v2//EN\" \"http://why3.lri.fr/why3session.dtd\">@\n";
+(*
+  let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
   fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
-    save_string fname session.session_shape_version;
+    save_string rel_file session.session_shape_version;
+*)
+  fprintf fmt "@[<v 1><why3session shape_version=\"%d\">"
+    session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
@@ -662,6 +661,7 @@ let save fname config session =
 let save_session config session =
   let f = Filename.concat session.session_dir db_filename in
   Sysutil.backup_file f;
+  session_dir_for_save := session.session_dir;
   save f config session
 
 (*******************************)
@@ -676,7 +676,9 @@ let check_expl lab acc =
   then Some (Str.matched_group 1 lab)
   else acc
 
-let check_expl lab = Ident.Slab.fold check_expl lab None
+let check_expl lab =
+  if Ident.Slab.mem Split_goal.stop_split lab then None
+  else Ident.Slab.fold check_expl lab None
 
 let rec get_expl_fmla acc f =
   if f.t_ty <> None then acc else
@@ -691,12 +693,14 @@ let rec get_expl_fmla acc f =
 
 let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
 
-type expl = string option
-
-let get_explanation id task =
-  let fmla = Task.task_goal_fmla task in
-  let res = get_expl_fmla fmla in
-  if res <> None then res else check_expl id.Ident.id_label
+let goal_expl_task ~root task =
+  let gid = (Task.task_goal task).Decl.pr_name in
+  let info =
+    let fmla = Task.task_goal_fmla task in
+    let res = get_expl_fmla fmla in
+    if res <> None || not root then res else check_expl gid.Ident.id_label
+  in
+  gid, info, task
 
 
 (*****************************)
@@ -840,7 +844,7 @@ let set_obsolete ?(notify=notify) a =
 let set_archived a b = a.proof_archived <- b
 
 let get_edited_as_abs session pr =
-  option_map (Filename.concat session.session_dir) pr.proof_edited_as
+  Opt.map (Filename.concat session.session_dir) pr.proof_edited_as
 
 (* [raw_add_goal parent name expl sum t] adds a goal to the given parent
    DOES NOT record the new goal in its parent, thus this should not be exported
@@ -1085,7 +1089,7 @@ and load_proof_or_transf ~old_provers mg a =
         let prover = string_attribute "prover" a in
         let p =
           try
-            let p = Util.Mstr.find prover old_provers in
+            let p = Mstr.find prover old_provers in
             p
           with Not_found ->
             eprintf "[Error] prover not listing in header '%s'@." prover;
@@ -1163,7 +1167,7 @@ and load_metas ~old_provers mg a =
         let idpos = begin match a.Xml.name with
           | "ts_pos" ->
             let arity = int_attribute "arity" a in
-            let tvs = foldi (fun l _ ->
+            let tvs = Util.foldi (fun l _ ->
               (create_tvsymbol (Ident.id_fresh "a"))::l)
               [] 0 arity in
             let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs None in
@@ -1293,12 +1297,12 @@ let load_file session old_provers f =
         let p = {C.prover_name = name;
                    prover_version = version;
                    prover_altern = altern} in
-        Util.Mstr.add id p old_provers
+        Mstr.add id p old_provers
     | s ->
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
 
-let old_provers = ref Util.Mstr.empty
+let old_provers = ref Mstr.empty
 (* dead code
 let get_old_provers () = !old_provers
 *)
@@ -1311,7 +1315,7 @@ let load_session session xml =
       dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
       old_provers :=
-        List.fold_left (load_file session) Util.Mstr.empty xml.Xml.elements;
+        List.fold_left (load_file session) Mstr.empty xml.Xml.elements;
       dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
@@ -1440,7 +1444,7 @@ end)
 let read_file env ?format fn =
   let theories = Env.read_file env ?format fn in
   let ltheories =
-    Util.Mstr.fold
+    Mstr.fold
       (fun name th acc ->
         (** Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
         let th_name =
@@ -1454,14 +1458,9 @@ let read_file env ?format fn =
     (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
     ltheories,theories
 
-let goal_expl_task task =
-  let gid = (Task.task_goal task).Decl.pr_name in
-  let info = get_explanation gid task in
-  gid, info, task
-
 let add_file_return_theories ~keygen env ?format filename =
   let x_keygen = keygen in
-  let x_goal = goal_expl_task in
+  let x_goal = goal_expl_task ~root:true in
   let x_fold_theory f acc th =
     let tasks = List.rev (Task.split_theory th None None) in
     List.fold_left f acc tasks in
@@ -1488,49 +1487,28 @@ let remove_file file =
 (*      transformations    *)
 (***************************)
 
-(*
-
-module AddTransf(X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * string option * Task.task
-
-  type transf
-  val fold_transf : ('a -> goal -> 'a) -> 'a -> Task.task -> transf -> 'a
-end) = (struct
-
-  let add_goal parent acc goal =
-    let name,expl,task = X.goal goal in
-    let g =
-      raw_add_task ~version:Termcode.current_shape_version
-        ~keygen:X.keygen ~expanded:true parent name expl task
-    in
-    g::acc
-
-  let add_transformation g name transf =
-    let task = goal_task g in
-    let rtransf =
-      raw_add_transformation ~keygen:X.keygen ~expanded:transf.transf_expanded g name
-    in
-    let parent = Parent_transf rtransf in
-    let goals = X.fold_transf (add_goal parent) [] task transf in
-    rtransf.transf_goals <- List.rev goals;
-    rtransf.transf_verified <- transf_verified rtransf;
-    rtransf
-
-end : sig
-  val add_transformation : X.key goal -> string -> X.transf -> X.key transf
-end)
-
-  *)
-
-let add_transformation ~keygen ~goal env_session transfn g goals =
-  let rtransf = raw_add_transformation ~keygen ~expanded:false g transfn in
+let add_transformation ~keygen env_session transfn g goals =
+  let rtransf = raw_add_transformation ~keygen ~expanded:true g transfn in
   let parent = Parent_transf rtransf in
+  let i = ref 0 in
+  let parent_goal_name = g.goal_name.Ident.id_string in
+  let next_subgoal task =
+    incr i;
+    let gid,expl,_ = goal_expl_task ~root:false task in
+    let expl = match expl with
+      | None -> string_of_int !i ^ "."
+      | Some e -> string_of_int !i ^ ". " ^ e
+    in
+    let expl = Some expl in
+    (* Format.eprintf "parent_goal_name = %s@." parent_goal_name; *)
+    let goal_name = parent_goal_name ^ "." ^ string_of_int !i in
+    let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
+    (* Format.eprintf "goal_name = %s@." goal_name.Ident.id_string; *)
+    goal_name, expl, task
+  in
   let add_goal acc g =
-    let name,expl,task = goal g in
+    let name,expl,task = next_subgoal g in
+    (* Format.eprintf "call raw_add_task with name = %s@." name.Ident.id_string; *)
     let g = raw_add_task ~version:env_session.session.session_shape_version
       ~keygen ~expanded:false parent name expl task
     in
@@ -1553,18 +1531,8 @@ let add_registered_transformation ~keygen env_session tr_name g =
     Hstr.find g.goal_transformations tr_name
   with Not_found ->
     let task = goal_task g in
-    let gname = g.goal_name in
     let subgoals = Trans.apply_transform tr_name env_session.env task in
-    let i = ref 1 in
-    let goal task =
-      let gid = (Task.task_goal task).Decl.pr_name in
-      let expl = get_explanation gid task in
-      let goal_name = gname.Ident.id_string ^ "." ^ (string_of_int (!i)) in
-      incr i;
-      let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
-      goal_name, expl, task
-    in
-    add_transformation ~keygen ~goal env_session tr_name g subgoals
+    add_transformation ~keygen env_session tr_name g subgoals
 
 (****************)
 (**    metas    *)
@@ -1685,12 +1653,12 @@ let copy_external_proof
   let session = match env_session with
     | Some eS -> Some eS.session
     | _ -> session in
-  let obsolete = def_option a.proof_obsolete obsolete in
-  let archived = def_option a.proof_archived archived in
-  let timelimit = def_option a.proof_timelimit timelimit in
-  let memlimit = def_option a.proof_memlimit memlimit in
-  let pas = def_option a.proof_state attempt_status in
-  let ngoal = def_option a.proof_parent goal in
+  let obsolete = Opt.get_def a.proof_obsolete obsolete in
+  let archived = Opt.get_def a.proof_archived archived in
+  let timelimit = Opt.get_def a.proof_timelimit timelimit in
+  let memlimit = Opt.get_def a.proof_memlimit memlimit in
+  let pas = Opt.get_def a.proof_state attempt_status in
+  let ngoal = Opt.get_def a.proof_parent goal in
   let nprover = match prover with
     | None -> a.proof_prover
     | Some prover -> prover in
@@ -1777,7 +1745,7 @@ let update_edit_external_proof env_session a =
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
   Driver.print_task ?old driver fmt goal;
-  Util.option_iter close_in old;
+  Opt.iter close_in old;
   close_out ch;
   file
 
@@ -1871,6 +1839,10 @@ let merge_proof ~keygen obsolete to_goal _ from_proof =
 (* dead code
 exception MalformedMetas of ident_path
 *)
+
+exception Ts_not_found of tysymbol
+exception Ls_not_found of lsymbol
+exception Pr_not_found of prsymbol
 
 (** ~theories is the current theory library path empty : [] *)
 let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =
@@ -1994,11 +1966,14 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
 
   (** Now convert the metas to the new symbol *)
   let add_meta ((metas,task) as acc) meta_name meta_args =
+    let conv_ts ts = Hts.find_exn hts (Ts_not_found ts) ts in
+    let conv_ls ls = Hls.find_exn hls (Ls_not_found ls) ls in
+    let conv_pr pr = Hpr.find_exn hpr (Pr_not_found pr) pr in
     let map = function
-      | MAty ty -> MAty (Ty.ty_s_map (Hts.find' hts) ty)
-      | MAts ts -> MAts (Hts.find' hts ts)
-      | MAls ls -> MAls (Hls.find' hls ls)
-      | MApr pr -> MApr (Hpr.find' hpr pr)
+      | MAty ty -> MAty (Ty.ty_s_map conv_ts ty)
+      | MAts ts -> MAts (conv_ts ts)
+      | MAls ls -> MAls (conv_ls ls)
+      | MApr pr -> MApr (conv_pr pr)
       | (MAstr _ | MAint _) as m -> m
     in
     try
@@ -2010,7 +1985,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
             Smeta_args.add meta_args smeta_args,
             Task.add_meta task meta meta_args
           with
-          | Hts.Key_not_found ts ->
+          | Ts_not_found ts ->
             obsolete := true;
             let pos = Mts.find ts from_metas.metas_idpos.idpos_ts in
             dprintf debug
@@ -2019,7 +1994,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
               print_meta (meta_name,meta_args)
               print_ident_path pos;
             acc
-          | Hls.Key_not_found ls ->
+          | Ls_not_found ls ->
             obsolete := true;
             let pos = Mls.find ls from_metas.metas_idpos.idpos_ls in
             dprintf debug
@@ -2028,7 +2003,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
               print_meta (meta_name,meta_args)
               print_ident_path pos;
             acc
-          | Hpr.Key_not_found pr ->
+          | Pr_not_found pr ->
             obsolete := true;
             let pos = Mpr.find pr from_metas.metas_idpos.idpos_pr in
             dprintf debug
@@ -2076,14 +2051,14 @@ let merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
-      Util.Mstr.add g.goal_name.Ident.id_string g from_goals)
-    Util.Mstr.empty from_th.theory_goals
+      Mstr.add g.goal_name.Ident.id_string g from_goals)
+    Mstr.empty from_th.theory_goals
   in
   List.iter
     (fun to_goal ->
       try
         let from_goal =
-          Util.Mstr.find to_goal.goal_name.Ident.id_string from_goals in
+          Mstr.find to_goal.goal_name.Ident.id_string from_goals in
         let goal_obsolete = to_goal.goal_checksum <> from_goal.goal_checksum in
         if goal_obsolete then
           begin
@@ -2104,17 +2079,17 @@ let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
-    (fun acc t -> Util.Mstr.add t.theory_name.Ident.id_string t acc)
-    Util.Mstr.empty from_f.file_theories
+    (fun acc t -> Mstr.add t.theory_name.Ident.id_string t acc)
+    Mstr.empty from_f.file_theories
   in
   List.iter
     (fun to_th ->
       try
         let from_th =
           let name = to_th.theory_name.Ident.id_string in
-          try Util.Mstr.find name from_theories
+          try Mstr.find name from_theories
           (* TODO: remove this later when all sessions are updated *)
-          with Not_found -> Util.Mstr.find ("WP "^name) from_theories
+          with Not_found -> Mstr.find ("WP "^name) from_theories
         in
         merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th
       with

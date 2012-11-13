@@ -34,8 +34,8 @@ module PrimeNumbers
   use import number.Parity
   use import number.Divisibility
   use import number.Prime
-  use import module ref.Refint
-  use import module array.Array
+  use import ref.Refint
+  use import array.Array
 
   predicate no_prime_in (l u: int) =
     forall x: int. l < x < u -> not (prime x)
@@ -60,38 +60,37 @@ module PrimeNumbers
 
   (* returns an array containing the first m prime numbers *)
 
-  let prime_numbers (m: int) =
-    { m >= 2 }
-    let p = make m 0 in
+  let prime_numbers (m: int)
+    requires { m >= 2 }
+    ensures  { first_primes result m }
+  = let p = make m 0 in
     p[0] <- 2;
     p[1] <- 3;
     let n = ref 5 in (* candidate for next prime *)
     for j = 2 to m - 1 do
-      invariant { first_primes p j /\
-        p[j-1] < !n < 2*p[j-1] /\ odd !n /\ no_prime_in p[j-1] !n }
-      let rec test (k: int) variant { (2*p[j-1] - !n, j - k) } with lex =
-        { 1 <= k < j /\ first_primes p j /\
-          p[j-1] < !n < 2*p[j-1] /\ odd !n /\ no_prime_in p[j-1] !n /\
-          forall i: int. 0 <= i < k -> not (divides p[i] !n) }
-        if mod !n p[k] = 0 then begin
+      invariant { first_primes p j }
+      invariant { p[j-1] < !n < 2*p[j-1] }
+      invariant { odd !n }
+      invariant { no_prime_in p[j-1] !n }
+      let rec test (k: int) variant { 2*p[j-1] - !n, j - k }
+        requires { 1 <= k < j }
+        requires { first_primes p j }
+        requires { p[j-1] < !n < 2*p[j-1] }
+        requires { odd !n }
+        requires { no_prime_in p[j-1] !n }
+        requires { forall i: int. 0 <= i < k -> not (divides p[i] !n) }
+        ensures  { p[j-1] < !n /\ prime !n /\ no_prime_in p[j-1] !n }
+      = if mod !n p[k] = 0 then begin
           assert { not (prime !n) }; n += 2; test 1
         end else if div !n p[k] > p[k] then
           test (k + 1)
         else
           assert { prime !n }
-        { p[j-1] < !n /\ prime !n /\ no_prime_in p[j-1] !n }
       in
       test 1;
       p[j] <- !n;
       n += 2
     done;
     p
-    { first_primes result m }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/knuth_prime_numbers.gui"
-End:
-*)

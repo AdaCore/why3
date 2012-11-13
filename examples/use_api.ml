@@ -78,27 +78,14 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 
 (* One prover named Alt-Ergo in the config file *)
 let alt_ergo : Whyconf.config_prover =
-  try
-    let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-    (** all the prover that have the name "Alt-Ergo" *)
-    let provers = Whyconf.filter_provers config fp in
-    snd (Whyconf.Mprover.choose provers)
-  with Whyconf.ProverNotFound _ ->
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  (** all provers that have the name "Alt-Ergo" *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
     exit 0
-
-(*
-(* the [prover alt-ergo] section of the config file *)
-let alt_ergo : Whyconf.config_prover =
-  try
-    let prover = {Whyconf.prover_name = "Alt-Ergo";
-                  prover_version = "0.92.3";
-                  prover_altern = ""} in
-    Whyconf.Mprover.find prover provers
-  with Not_found ->
-    eprintf "Prover alt-ergo not installed or not configured@.";
-    exit 0
-*)
+  end else
+    snd (Whyconf.Mprover.choose provers)
 
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
@@ -140,8 +127,8 @@ An arithmetic goal: 2+2 = 4
 
 *)
 
-let two : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "2"))
-let four : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "4"))
+let two : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
+let four : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
 let int_theory : Theory.theory =
   Env.find_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
@@ -169,7 +156,7 @@ let () = printf "@[On task 3, alt-ergo answers %a@."
   Call_provers.print_prover_result result3
 
 (* quantifiers: let's build "forall x:int. x*x >= 0" *)
-let zero : Term.term = Term.t_const (Term.ConstInt (Term.IConstDecimal "0"))
+let zero : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
 let ge_symbol : Term.lsymbol =
@@ -199,4 +186,121 @@ let () = printf "@[On task 4, alt-ergo answers %a@."
 
 (* build a theory with all these goals *)
 
-(* TODO *)
+(* create a theory *)
+let () = printf "@[creating theory 'My_theory'@]@."
+
+let my_theory : Theory.theory_uc = 
+  Theory.create_theory (Ident.id_fresh "My_theory")
+
+(* add declarations of goals *)
+
+let () = printf "@[adding goal 1@]@."
+let decl_goal1 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal1
+
+let () = printf "@[adding goal 2@]@."
+let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_A
+let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_B
+let decl_goal2 : Decl.decl = 
+  Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
+
+(* helper function: [use th1 th2] insert the equivalent of a "use import th2"
+   in theory th1 under construction *)
+let use th1 th2 =
+  let name = th2.Theory.th_name in
+  Theory.close_namespace
+    (Theory.use_export (Theory.open_namespace th1 name.Ident.id_string) th2)
+    true
+
+let () = printf "@[adding goal 3@]@."
+(* use import int.Int *)
+let my_theory : Theory.theory_uc = use my_theory int_theory
+let decl_goal3 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal3
+
+let () = printf "@[adding goal 4@]@."
+let decl_goal4 : Decl.decl = Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
+let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal4
+
+(* closing the theory *)
+let my_theory : Theory.theory = Theory.close_theory my_theory
+
+(* printing the result *)
+
+let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
+
+(* getting set of task from a theory *)
+
+let my_tasks : Task.task list = 
+  List.rev (Task.split_theory my_theory None None)
+
+
+let () = 
+  printf "Tasks are:@.";
+  let _ =
+    List.fold_left
+      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
+      1 my_tasks
+  in ()
+
+
+
+
+
+(* build a whyml program *)
+
+let m = Mlw_module.create_module env (Ident.id_fresh "Program")
+
+let mul_int : Term.lsymbol =
+  Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+
+let unit_type = Ty.ty_tuple []
+
+let d =
+  let args =
+    [Mlw_ty.create_pvsymbol
+        (Ident.id_fresh "_dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+  in
+  let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
+  let spec = {
+    Mlw_ty.c_pre = Term.t_true;
+    c_post = Term.t_eps (Term.t_close_bound result Term.t_true);
+    c_xpost = Mlw_ty.Mexn.empty;
+    c_effect = Mlw_ty.eff_empty;
+    c_variant = [];
+    c_letrec  = 0;
+  }
+  in
+  let body =
+    let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
+    let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
+    let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
+    let p =
+      Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
+    in
+    Mlw_expr.e_assert Mlw_expr.Aassert p
+  in
+  let lambda = {
+    Mlw_expr.l_args = args;
+    l_expr = body;
+    l_spec = spec;
+  }
+  in
+  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
+  Mlw_decl.create_rec_decl [def]
+
+
+(* TODO: continue *)
+
+(*
+let () = Printexc.record_backtrace true
+
+let () =
+  try
+    let _buggy : Mlw_module.module_uc = Mlw_module.add_pdecl ~wp:true m d in
+    ()
+  with Not_found ->
+    Printexc.print_backtrace stderr;
+    flush stderr
+*)

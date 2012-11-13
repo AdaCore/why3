@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="programs/algo65/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -10,46 +9,42 @@
   id="1"
   name="CVC3"
   version="2.4.1"/>
- <prover
-  id="2"
-  name="Z3"
-  version="3.2"/>
  <file
   name="../algo65.mlw"
   verified="true"
   expanded="true">
   <theory
    name="Algo65"
-   locfile="programs/algo65/../algo65.mlw"
-   loclnum="15" loccnumb="7" loccnume="13"
+   locfile="../algo65.mlw"
+   loclnum="14" loccnumb="7" loccnume="13"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter find"
-    locfile="programs/algo65/../algo65.mlw"
+    locfile="../algo65.mlw"
     loclnum="36" loccnumb="10" loccnume="14"
-    expl="parameter find"
+    expl="VC for find"
     sum="6402456072bf489eab0dc24693bc9181"
     proved="true"
     expanded="true"
     shape="iainfix &lt;V1V2iainfix &lt;=V3V5iainfix &lt;=V6V3ainfix &lt;=agetV9V3agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV9V11agetV9V3Iainfix &lt;=V11V3Aainfix &lt;=V1V11FAapermut_subV4V9V1ainfix +V2c1Iainfix &lt;=agetV9V3agetV9V12Iainfix &lt;=V12V2Aainfix &lt;=V3V12FAainfix &lt;=agetV9V13agetV9V3Iainfix &lt;=V13V3Aainfix &lt;=V6V13FAapermut_subV8V9V6ainfix +V2c1FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Aainfix &lt;ainfix -V2V6ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1ainfix &lt;=agetV8V3agetV8V14Iainfix &lt;=V14V2Aainfix &lt;=V3V14FAainfix &lt;=agetV8V15agetV8V3Iainfix &lt;=V15V3Aainfix &lt;=V1V15FAapermut_subV4V8V1ainfix +V2c1Aapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V16Iainfix &lt;=V16V5Aainfix &lt;=V3V16FAainfix &lt;=agetV8V17agetV8V3Iainfix &lt;=V17V3Aainfix &lt;=V1V17FAapermut_subV7V8V1ainfix +V5c1FAainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Aainfix &lt;ainfix -V5V1ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1iainfix &lt;=V6V3ainfix &lt;=agetV18V3agetV18V19Iainfix &lt;=V19V2Aainfix &lt;=V3V19FAainfix &lt;=agetV18V20agetV18V3Iainfix &lt;=V20V3Aainfix &lt;=V1V20FAapermut_subV4V18V1ainfix +V2c1Iainfix &lt;=agetV18V3agetV18V21Iainfix &lt;=V21V2Aainfix &lt;=V3V21FAainfix &lt;=agetV18V22agetV18V3Iainfix &lt;=V22V3Aainfix &lt;=V6V22FAapermut_subV7V18V6ainfix +V2c1FAainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Aainfix &lt;ainfix -V2V6ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1ainfix &lt;=agetV7V3agetV7V23Iainfix &lt;=V23V2Aainfix &lt;=V3V23FAainfix &lt;=agetV7V24agetV7V3Iainfix &lt;=V24V3Aainfix &lt;=V1V24FAapermut_subV4V7V1ainfix +V2c1Aapermut_subV7V7V1ainfix +V2c1Aapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V26V25Iainfix &lt;=V26V2Aainfix &lt;=V6V26FAainfix =agetV7V27V25Iainfix &lt;V27V6Aainfix &lt;V5V27FAainfix &lt;=agetV7V28V25Iainfix &lt;=V28V5Aainfix &lt;=V1V28FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FAainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1ainfix &lt;=agetV4V3agetV4V29Iainfix &lt;=V29V2Aainfix &lt;=V3V29FAainfix &lt;=agetV4V30agetV4V3Iainfix &lt;=V30V3Aainfix &lt;=V1V30FAapermut_subV4V4V1ainfix +V2c1Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
     <label
-     name="expl:parameter find"/>
+     name="expl:VC for find"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter find.1"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="precondition"
+      expl="1. precondition"
       sum="46609cdcca56cbfb55042031d6fb2838"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -61,15 +56,15 @@
      </goal>
      <goal
       name="WP_parameter find.2"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="assertion"
+      expl="2. assertion"
       sum="dad0644ecac0906ecd39dbe4d188a8d9"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="apermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -81,15 +76,15 @@
      </goal>
      <goal
       name="WP_parameter find.3"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="variant decrease"
+      expl="3. variant decrease"
       sum="5bb18b95ba29199d5c49020b11dc41f8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &lt;ainfix -V5V1ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -101,15 +96,15 @@
      </goal>
      <goal
       name="WP_parameter find.4"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="precondition"
+      expl="4. precondition"
       sum="9d30430aae0ad38449c99c499f6b82fa"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -121,15 +116,15 @@
      </goal>
      <goal
       name="WP_parameter find.5"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="assertion"
+      expl="5. assertion"
       sum="4220dd03ba2e2f5c6744cc42f1222ef3"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="apermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -141,15 +136,15 @@
      </goal>
      <goal
       name="WP_parameter find.6"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="variant decrease"
+      expl="6. variant decrease"
       sum="d88698317a22ad94b0f4642b9ab9e8ae"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &lt;ainfix -V2V6ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1Iainfix &lt;=V6V3Iapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -161,15 +156,15 @@
      </goal>
      <goal
       name="WP_parameter find.7"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="precondition"
+      expl="7. precondition"
       sum="4841ebfd2c98cd186eda40867801a4ff"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -181,115 +176,18 @@
      </goal>
      <goal
       name="WP_parameter find.8"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="postcondition"
-      sum="29bf6e17fd407d382f2fd2c777ed5d3b"
-      proved="true"
-      expanded="false"
-      shape="ainfix &lt;=agetV9V3agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV9V11agetV9V3Iainfix &lt;=V11V3Aainfix &lt;=V1V11FAapermut_subV4V9V1ainfix +V2c1Iainfix &lt;=agetV9V3agetV9V12Iainfix &lt;=V12V2Aainfix &lt;=V3V12FAainfix &lt;=agetV9V13agetV9V3Iainfix &lt;=V13V3Aainfix &lt;=V6V13FAapermut_subV8V9V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V14Iainfix &lt;=V14V5Aainfix &lt;=V3V14FAainfix &lt;=agetV8V15agetV8V3Iainfix &lt;=V15V3Aainfix &lt;=V1V15FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V17V16Iainfix &lt;=V17V2Aainfix &lt;=V6V17FAainfix =agetV7V18V16Iainfix &lt;V18V6Aainfix &lt;V5V18FAainfix &lt;=agetV7V19V16Iainfix &lt;=V19V5Aainfix &lt;=V1V19FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-      <label
-       name="expl:parameter find"/>
-      <proof
-       prover="0"
-       timelimit="19"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter find.9"
-      locfile="programs/algo65/../algo65.mlw"
-      loclnum="36" loccnumb="10" loccnume="14"
-      expl="postcondition"
-      sum="8113db0a54af329aadb5e3bd1bcc92b1"
+      expl="8. postcondition"
+      sum="1cbb8acd1a86bd174de8180382c65d87"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV4V8V1ainfix +V2c1Iainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=V3V11FAainfix &lt;=agetV8V12agetV8V3Iainfix &lt;=V12V3Aainfix &lt;=V1V12FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V14V13Iainfix &lt;=V14V2Aainfix &lt;=V6V14FAainfix =agetV7V15V13Iainfix &lt;V15V6Aainfix &lt;V5V15FAainfix &lt;=agetV7V16V13Iainfix &lt;=V16V5Aainfix &lt;=V1V16FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      shape="apermut_subV4V9V1ainfix +V2c1Iainfix &lt;=agetV9V3agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV9V11agetV9V3Iainfix &lt;=V11V3Aainfix &lt;=V6V11FAapermut_subV8V9V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V12Iainfix &lt;=V12V5Aainfix &lt;=V3V12FAainfix &lt;=agetV8V13agetV8V3Iainfix &lt;=V13V3Aainfix &lt;=V1V13FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V15V14Iainfix &lt;=V15V2Aainfix &lt;=V6V15FAainfix =agetV7V16V14Iainfix &lt;V16V6Aainfix &lt;V5V16FAainfix &lt;=agetV7V17V14Iainfix &lt;=V17V5Aainfix &lt;=V1V17FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter find.9.1"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="44dac25fd685d710ede6c4fadd6c93ce"
-        proved="true"
-        expanded="false"
-        shape="apermut_subV4V8V1ainfix +V2c1Iainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.9.2"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="4be0307418eced3f4693b6a4ba9cfed2"
-        proved="true"
-        expanded="true"
-        shape="ainfix &lt;=agetV8V9agetV8V3Iainfix &lt;=V9V3Aainfix &lt;=V1V9FIainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V1V11FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="1"
-         timelimit="20"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.9.3"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="4e834408b002c4f2e30b03e5d31b993e"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FIainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V1V11FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="2"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal
-      name="WP_parameter find.10"
-      locfile="programs/algo65/../algo65.mlw"
-      loclnum="36" loccnumb="10" loccnume="14"
-      expl="assertion"
-      sum="4c3a1a3fa39953d9b10b1a566dc0e035"
-      proved="true"
-      expanded="false"
-      shape="apermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-      <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
-       timelimit="19"
+       timelimit="17"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -297,19 +195,59 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter find.11"
-      locfile="programs/algo65/../algo65.mlw"
+      name="WP_parameter find.9"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="variant decrease"
-      sum="b950aba6fcdb1b4253ec5c7c1bcea042"
+      expl="9. postcondition"
+      sum="85f38aa53cb2f72a85a71fe919383f2b"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;ainfix -V2V6ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      expanded="true"
+      shape="ainfix &lt;=agetV9V10agetV9V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FIainfix &lt;=agetV9V3agetV9V11Iainfix &lt;=V11V2Aainfix &lt;=V3V11FAainfix &lt;=agetV9V12agetV9V3Iainfix &lt;=V12V3Aainfix &lt;=V6V12FAapermut_subV8V9V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V13Iainfix &lt;=V13V5Aainfix &lt;=V3V13FAainfix &lt;=agetV8V14agetV8V3Iainfix &lt;=V14V3Aainfix &lt;=V1V14FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V16V15Iainfix &lt;=V16V2Aainfix &lt;=V6V16FAainfix =agetV7V17V15Iainfix &lt;V17V6Aainfix &lt;V5V17FAainfix &lt;=agetV7V18V15Iainfix &lt;=V18V5Aainfix &lt;=V1V18FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
-       timelimit="19"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.10"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="10. postcondition"
+      sum="3801c5e0ea77b37fa7bd804d82a39be6"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV9V3agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FIainfix &lt;=agetV9V3agetV9V11Iainfix &lt;=V11V2Aainfix &lt;=V3V11FAainfix &lt;=agetV9V12agetV9V3Iainfix &lt;=V12V3Aainfix &lt;=V6V12FAapermut_subV8V9V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V13Iainfix &lt;=V13V5Aainfix &lt;=V3V13FAainfix &lt;=agetV8V14agetV8V3Iainfix &lt;=V14V3Aainfix &lt;=V1V14FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V16V15Iainfix &lt;=V16V2Aainfix &lt;=V6V16FAainfix =agetV7V17V15Iainfix &lt;V17V6Aainfix &lt;V5V17FAainfix &lt;=agetV7V18V15Iainfix &lt;=V18V5Aainfix &lt;=V1V18FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.11"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="11. postcondition"
+      sum="44dac25fd685d710ede6c4fadd6c93ce"
+      proved="true"
+      expanded="true"
+      shape="apermut_subV4V8V1ainfix +V2c1Iainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -318,15 +256,95 @@
      </goal>
      <goal
       name="WP_parameter find.12"
-      locfile="programs/algo65/../algo65.mlw"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="precondition"
+      expl="12. postcondition"
+      sum="4be0307418eced3f4693b6a4ba9cfed2"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV8V9agetV8V3Iainfix &lt;=V9V3Aainfix &lt;=V1V9FIainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V1V11FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.13"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="13. postcondition"
+      sum="4e834408b002c4f2e30b03e5d31b993e"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FIainfix &lt;=V6V3NIapermut_subV7V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V1V11FAapermut_subV7V8V1ainfix +V5c1FIainfix &lt;V5V0Aainfix &lt;=V3V5Aainfix &lt;=V1V3Aainfix &lt;=c0V1Iainfix &lt;=V3V5Iapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="1"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.53"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.14"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="14. assertion"
+      sum="4c3a1a3fa39953d9b10b1a566dc0e035"
+      proved="true"
+      expanded="true"
+      shape="apermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="19"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.15"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="15. variant decrease"
+      sum="b950aba6fcdb1b4253ec5c7c1bcea042"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;ainfix -V2V6ainfix -V2V1Aainfix &lt;=c0ainfix -V2V1Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="19"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.16"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="16. precondition"
       sum="8d962f3a44b5315375b3a8daca7709a2"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="ainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
+       name="expl:VC for find"/>
       <proof
        prover="0"
        timelimit="19"
@@ -337,235 +355,184 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter find.13"
-      locfile="programs/algo65/../algo65.mlw"
+      name="WP_parameter find.17"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="postcondition"
-      sum="365e20cd23ccb33d8593189c6b637b07"
+      expl="17. postcondition"
+      sum="3493802dbda4377074ba526559af93eb"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V1V10FAapermut_subV4V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V11Iainfix &lt;=V11V2Aainfix &lt;=V3V11FAainfix &lt;=agetV8V12agetV8V3Iainfix &lt;=V12V3Aainfix &lt;=V6V12FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V14V13Iainfix &lt;=V14V2Aainfix &lt;=V6V14FAainfix =agetV7V15V13Iainfix &lt;V15V6Aainfix &lt;V5V15FAainfix &lt;=agetV7V16V13Iainfix &lt;=V16V5Aainfix &lt;=V1V16FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      shape="apermut_subV4V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V6V10FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter find.13.1"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="3493802dbda4377074ba526559af93eb"
-        proved="true"
-        expanded="false"
-        shape="apermut_subV4V8V1ainfix +V2c1Iainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FAainfix &lt;=agetV8V10agetV8V3Iainfix &lt;=V10V3Aainfix &lt;=V6V10FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V12V11Iainfix &lt;=V12V2Aainfix &lt;=V6V12FAainfix =agetV7V13V11Iainfix &lt;V13V6Aainfix &lt;V5V13FAainfix &lt;=agetV7V14V11Iainfix &lt;=V14V5Aainfix &lt;=V1V14FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="18"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="2.64"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.13.2"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="e8f0513dcddd263cd8b83b45354c6746"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV8V9agetV8V3Iainfix &lt;=V9V3Aainfix &lt;=V1V9FIainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V6V11FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="2"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.13.3"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="f6b77a3fdeeb496253952238e37edcad"
-        proved="true"
-        expanded="true"
-        shape="ainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FIainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V6V11FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="1"
-         timelimit="20"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.68"/>
+      </proof>
      </goal>
      <goal
-      name="WP_parameter find.14"
-      locfile="programs/algo65/../algo65.mlw"
+      name="WP_parameter find.18"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="postcondition"
-      sum="2029a5c77bfd7a9b7bba570508d04e58"
+      expl="18. postcondition"
+      sum="e8f0513dcddd263cd8b83b45354c6746"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;=agetV7V3agetV7V8Iainfix &lt;=V8V2Aainfix &lt;=V3V8FAainfix &lt;=agetV7V9agetV7V3Iainfix &lt;=V9V3Aainfix &lt;=V1V9FAapermut_subV4V7V1ainfix +V2c1Iainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V11V10Iainfix &lt;=V11V2Aainfix &lt;=V6V11FAainfix =agetV7V12V10Iainfix &lt;V12V6Aainfix &lt;V5V12FAainfix &lt;=agetV7V13V10Iainfix &lt;=V13V5Aainfix &lt;=V1V13FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      expanded="true"
+      shape="ainfix &lt;=agetV8V9agetV8V3Iainfix &lt;=V9V3Aainfix &lt;=V1V9FIainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V6V11FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter find.14.1"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="9c0b83cecb4ae5cb99607e0157e2a716"
-        proved="true"
-        expanded="false"
-        shape="apermut_subV4V7V1ainfix +V2c1Iainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.14.2"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="03b5cd958c09e175bf839272a8ef4015"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV7V8agetV7V3Iainfix &lt;=V8V3Aainfix &lt;=V1V8FIainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V10V9Iainfix &lt;=V10V2Aainfix &lt;=V6V10FAainfix =agetV7V11V9Iainfix &lt;V11V6Aainfix &lt;V5V11FAainfix &lt;=agetV7V12V9Iainfix &lt;=V12V5Aainfix &lt;=V1V12FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.14.3"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="23979b64545e2d4314937a9acd867051"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV7V3agetV7V8Iainfix &lt;=V8V2Aainfix &lt;=V3V8FIainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V10V9Iainfix &lt;=V10V2Aainfix &lt;=V6V10FAainfix =agetV7V11V9Iainfix &lt;V11V6Aainfix &lt;V5V11FAainfix &lt;=agetV7V12V9Iainfix &lt;=V12V5Aainfix &lt;=V1V12FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
+       name="expl:VC for find"/>
+      <proof
+       prover="1"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.16"/>
+      </proof>
      </goal>
      <goal
-      name="WP_parameter find.15"
-      locfile="programs/algo65/../algo65.mlw"
+      name="WP_parameter find.19"
+      locfile="../algo65.mlw"
       loclnum="36" loccnumb="10" loccnume="14"
-      expl="postcondition"
-      sum="915aaeb34c22f846ab18c591cf72789f"
+      expl="19. postcondition"
+      sum="f6b77a3fdeeb496253952238e37edcad"
       proved="true"
-      expanded="false"
-      shape="ainfix &lt;=agetV4V3agetV4V5Iainfix &lt;=V5V2Aainfix &lt;=V3V5FAainfix &lt;=agetV4V6agetV4V3Iainfix &lt;=V6V3Aainfix &lt;=V1V6FAapermut_subV4V4V1ainfix +V2c1Iainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      expanded="true"
+      shape="ainfix &lt;=agetV8V3agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=V3V9FIainfix &lt;=agetV8V3agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=V3V10FAainfix &lt;=agetV8V11agetV8V3Iainfix &lt;=V11V3Aainfix &lt;=V6V11FAapermut_subV7V8V6ainfix +V2c1FIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V6V3Aainfix &lt;=c0V6Iainfix &lt;=V6V3Iapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V13V12Iainfix &lt;=V13V2Aainfix &lt;=V6V13FAainfix =agetV7V14V12Iainfix &lt;V14V6Aainfix &lt;V5V14FAainfix &lt;=agetV7V15V12Iainfix &lt;=V15V5Aainfix &lt;=V1V15FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
       <label
-       name="expl:parameter find"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="true">
-       <goal
-        name="WP_parameter find.15.1"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="06ebd4475ad5c193cf976b2e7409f860"
-        proved="true"
-        expanded="false"
-        shape="apermut_subV4V4V1ainfix +V2c1Iainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.15.2"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="25f20bfb2e8fadd7702816c55e7d7443"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV4V5agetV4V3Iainfix &lt;=V5V3Aainfix &lt;=V1V5FIainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal
-        name="WP_parameter find.15.3"
-        locfile="programs/algo65/../algo65.mlw"
-        loclnum="36" loccnumb="10" loccnume="14"
-        expl="parameter find"
-        sum="daaa4d0f1aaab55a5e7cbf6aff59affe"
-        proved="true"
-        expanded="false"
-        shape="ainfix &lt;=agetV4V3agetV4V5Iainfix &lt;=V5V2Aainfix &lt;=V3V5FIainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
-        <label
-         name="expl:parameter find"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.20"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="20. postcondition"
+      sum="9c0b83cecb4ae5cb99607e0157e2a716"
+      proved="true"
+      expanded="true"
+      shape="apermut_subV4V7V1ainfix +V2c1Iainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V9V8Iainfix &lt;=V9V2Aainfix &lt;=V6V9FAainfix =agetV7V10V8Iainfix &lt;V10V6Aainfix &lt;V5V10FAainfix &lt;=agetV7V11V8Iainfix &lt;=V11V5Aainfix &lt;=V1V11FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.21"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="21. postcondition"
+      sum="03b5cd958c09e175bf839272a8ef4015"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV7V8agetV7V3Iainfix &lt;=V8V3Aainfix &lt;=V1V8FIainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V10V9Iainfix &lt;=V10V2Aainfix &lt;=V6V10FAainfix =agetV7V11V9Iainfix &lt;V11V6Aainfix &lt;V5V11FAainfix &lt;=agetV7V12V9Iainfix &lt;=V12V5Aainfix &lt;=V1V12FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.22"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="22. postcondition"
+      sum="23979b64545e2d4314937a9acd867051"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV7V3agetV7V8Iainfix &lt;=V8V2Aainfix &lt;=V3V8FIainfix &lt;=V6V3NIapermut_subV7V7V1ainfix +V2c1Iainfix &lt;=V3V5NIapermut_subV4V7V1ainfix +V2c1Iainfix &gt;=agetV7V10V9Iainfix &lt;=V10V2Aainfix &lt;=V6V10FAainfix =agetV7V11V9Iainfix &lt;V11V6Aainfix &lt;V5V11FAainfix &lt;=agetV7V12V9Iainfix &lt;=V12V5Aainfix &lt;=V1V12FEAapermut_subV4V7V1ainfix +V2c1Aainfix &lt;=V6V2Aainfix &lt;V5V6Aainfix &lt;=V1V5FIainfix &lt;V2V0Aainfix &lt;V1V2Aainfix &lt;=c0V1Iainfix &lt;V1V2Iainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.23"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="23. postcondition"
+      sum="06ebd4475ad5c193cf976b2e7409f860"
+      proved="true"
+      expanded="true"
+      shape="apermut_subV4V4V1ainfix +V2c1Iainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.24"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="24. postcondition"
+      sum="25f20bfb2e8fadd7702816c55e7d7443"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV4V5agetV4V3Iainfix &lt;=V5V3Aainfix &lt;=V1V5FIainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter find.25"
+      locfile="../algo65.mlw"
+      loclnum="36" loccnumb="10" loccnume="14"
+      expl="25. postcondition"
+      sum="daaa4d0f1aaab55a5e7cbf6aff59affe"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=agetV4V3agetV4V5Iainfix &lt;=V5V2Aainfix &lt;=V3V5FIainfix &lt;V1V2NIainfix &lt;V2V0Aainfix &lt;=V3V2Aainfix &lt;=V1V3Aainfix &lt;=c0V1FF">
+      <label
+       name="expl:VC for find"/>
+      <proof
+       prover="0"
+       timelimit="17"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
     </transf>
    </goal>

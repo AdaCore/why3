@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Term
 
@@ -45,7 +36,7 @@ let remove_triggers =
     Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "remove_triggers" remove_triggers
-  ~desc:"Remove@ all@ the@ triggers@ from@ quantifiers."
+  ~desc:"Remove@ all@ triggers@ from@ quantifiers."
 
 let keep_no_predicate e = e.t_ty <> None
 
@@ -55,7 +46,7 @@ let filter_trigger_no_predicate =
 
 let () = Trans.register_transform "filter_trigger_no_predicate"
   filter_trigger_no_predicate
-  ~desc:"Keep@ only@ triggers@ which@ patterns@ are@ terms."
+  ~desc:"Remove@ all@ formula@ triggers@ from@ quantifiers."
 
 let keep_no_fmla = function
   | { t_ty = Some _ } -> true
@@ -67,9 +58,8 @@ let filter_trigger =
     Trans.rewriteTF rt rf None
 
 let () = Trans.register_transform "filter_trigger" filter_trigger
-  ~desc:"Same@ as@ filter_trigger_no_predicate@ but@ keep@ also@ pattern@ \
-         that@ are@ a@ predicate@ application@ (except@ equality)."
-
+  ~desc:"Remove@ all@ complex@ formula@ triggers@ \
+         (anything@ but@ predicate@ applications)."
 
 let keep_no_builtin rem_ls = function
   | { t_ty = Some _ } -> true
@@ -84,5 +74,5 @@ let filter_trigger_builtin =
 
 let () = Trans.register_transform "filter_trigger_builtin"
   filter_trigger_builtin
-  ~desc:"Same@ as@ filter_trigger_no_predicate@ but@ keep@ also@ pattern@ \
-         that@ are@ a@ predicate@ application@ not@ builtin."
+  ~desc:"Remove@ all@ complex@ or@ interpreted@ formula@ triggers@ \
+         (anything@ but@ non-built-in@ predicate@ applications)."

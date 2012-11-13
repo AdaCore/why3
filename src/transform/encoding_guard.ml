@@ -1,28 +1,19 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** transformation from polymorphic logic to untyped logic. The polymorphic
 logic must not have finite support types. *)
 
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -81,7 +72,7 @@ module Transform = struct
 
 
   let type_variable_only_in_value lsymbol =
-    let tvar_val = ty_freevars Stv.empty (of_option lsymbol.ls_value) in
+    let tvar_val = ty_freevars Stv.empty (Opt.get lsymbol.ls_value) in
     let tvar_arg = List.fold_left ty_freevars Stv.empty lsymbol.ls_args in
     Stv.diff tvar_val tvar_arg
 
@@ -142,7 +133,7 @@ module Transform = struct
 
   and args_transform kept varM lsymbol args ty =
     (* Debug.print_list Pretty.print_ty Format.std_formatter type_vars; *)
-    let tv_to_ty = ty_match Mtv.empty (of_option lsymbol.ls_value) ty in
+    let tv_to_ty = ty_match Mtv.empty (Opt.get lsymbol.ls_value) ty in
     let new_ty = type_variable_only_in_value lsymbol in
     let tv_to_ty = Mtv.set_inter tv_to_ty new_ty in
     (* Debug.print_mtv Pretty.print_ty Format.err_formatter tv_to_ty; *)
@@ -255,8 +246,8 @@ let lsmap kept = Wls.memoize 63 (fun ls ->
   let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
   let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
   let ty_arg = List.map neg ls.ls_args in
-  let ty_res = Util.option_map pos ls.ls_value in
-  if Util.option_eq ty_equal ty_res ls.ls_value &&
+  let ty_res = Opt.map pos ls.ls_value in
+  if Opt.equal ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
   else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/fact/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,21 +11,21 @@
   expanded="false">
   <theory
    name="FactRecursive"
-   locfile="programs/fact/../fact.mlw"
+   locfile="../fact.mlw"
    loclnum="4" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fact_rec"
-    locfile="programs/fact/../fact.mlw"
+    locfile="../fact.mlw"
     loclnum="8" loccnumb="10" loccnume="18"
-    expl="parameter fact_rec"
+    expl="VC for fact_rec"
     sum="3c997ee84426ac81764c6afd42d1eaf8"
     proved="true"
     expanded="true"
     shape="iainfix =V0c0ainfix =c1afactV0ainfix =ainfix *V0afactainfix -V0c1afactV0Aainfix &gt;=ainfix -V0c1c0Aainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0Iainfix &gt;=V0c0F">
     <label
-     name="expl:parameter fact_rec"/>
+     name="expl:VC for fact_rec"/>
     <proof
      prover="0"
      timelimit="10"
@@ -39,21 +38,21 @@
   </theory>
   <theory
    name="FactImperative"
-   locfile="programs/fact/../fact.mlw"
-   loclnum="15" loccnumb="7" loccnume="21"
+   locfile="../fact.mlw"
+   loclnum="14" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter fact_imp"
-    locfile="programs/fact/../fact.mlw"
-    loclnum="20" loccnumb="6" loccnume="14"
-    expl="parameter fact_imp"
+    locfile="../fact.mlw"
+    loclnum="19" loccnumb="6" loccnume="14"
+    expl="VC for fact_imp"
     sum="49d6146eee9f750d861ab3aa242c4fa6"
     proved="true"
     expanded="true"
     shape="iainfix &lt;V2V0ainfix =V4afactV3Aainfix &lt;=V3V0Aainfix &lt;=c0V3Iainfix =V4ainfix *V1V3FIainfix =V3ainfix +V2c1Fainfix =V1afactV0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FAainfix =c1afactc0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &gt;=V0c0F">
     <label
-     name="expl:parameter fact_imp"/>
+     name="expl:VC for fact_imp"/>
     <proof
      prover="0"
      timelimit="10"

@@ -2,19 +2,19 @@
 (* Computing the square root (up to eps) using binary search
 
    Note: precondition 0. < eps is not necessary for soundness
-   but it ensures termination. *)
+   but it could be used to ensure termination (not done here). *)
 
 module BinarySqrt
 
   use import real.Real
 
-  let rec sqrt (r: real) (eps: real) : real =
-    { 0. <= r /\ 0. < eps }
-    if r < eps && 1. < eps then
+  let rec sqrt (r: real) (eps: real) : real
+    requires { 0. <= r /\ 0. < eps }
+    ensures  { result * result <= r < (result + eps) * (result + eps) }
+  = if r < eps && 1. < eps then
       0.
     else
       let r' = sqrt r (2. * eps) in
       if (r' + eps) * (r' + eps) <= r then r' + eps else r'
-   { result * result <= r < (result + eps) * (result + eps) }
 
 end

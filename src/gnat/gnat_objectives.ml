@@ -454,7 +454,7 @@ let extract_sloc main_goal =
    try
       Ident.Slab.iter (fun lab ->
          let s = lab.Ident.lab_string in
-         if Util.starts_with s "GP_Subp:" then raise (Found s)) label_set;
+         if Strings.starts_with s "GP_Subp:" then raise (Found s)) label_set;
       assert false
    with Found s -> s
 

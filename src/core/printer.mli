@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ident
 open Ty
@@ -34,14 +25,13 @@ type blacklist = string list
 type 'a pp = Format.formatter -> 'a -> unit
 
 type printer =
-    Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
+  Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 
 val lookup_printer : string -> printer
 
 val list_printers : unit -> (string * Pp.formatted) list
-val print_printer_desc : Pp.formatter -> (string * Pp.formatted) -> unit
 
 (** {2 use printers} *)
 
@@ -53,8 +43,8 @@ val meta_syntax_type : meta
 val meta_syntax_logic : meta
 val meta_remove_prop : meta
 val meta_remove_logic : meta
-val meta_remove_type_symbol : meta
-val meta_realized : meta
+val meta_remove_type : meta
+val meta_realized_theory : meta
 
 val syntax_type : tysymbol -> string -> tdecl
 val syntax_logic : lsymbol -> string -> tdecl

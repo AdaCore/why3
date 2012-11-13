@@ -1,6 +1,6 @@
 (**
 
- {1 The VerifyThis competition at FM2012: Problem 2}
+ ensures {1 The VerifyThis competition at FM2012: Problem 2}
 
   see {h <a href="http://fm2012.verifythis.org/challenges">this web page</a>}
 
@@ -80,17 +80,22 @@ module PrefixSumRec
        a0[i] = a0'[i]) ->
     phase1 left right a0 a -> phase1 left right a0' a
 
-(** {2 The upsweep phase} 
+(** {2 The upsweep phase}
 
   First function: modify partially the table and compute some
-      intermediate partial sums 
+      intermediate partial sums
 
 *)
 
-  let rec upsweep (left right: int) (a: array int) =
-    { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
+  let rec upsweep (left right: int) (a: array int)
+    requires { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
       is_power_of_2 (right - left) }
-    'Init:
+    ensures { let space = right - left in
+      phase1 left right (old a) a /\
+      a[right] = sum (old a) (left-(right-left)+1) (right+1) /\
+      (forall i: int. i <= left-space -> a[i] = (old a)[i]) /\
+      (forall i: int. i > right -> a[i] = (old a)[i]) }
+  = 'Init:
     let space = right - left in
     if right > left+1 then begin
       upsweep (left - div space 2) left a;
@@ -101,15 +106,10 @@ module PrefixSumRec
       assert { a[right] = sum (at a 'Init) (left+1) (right+1) }
     end;
     a[right] <- a[left] + a[right];
-    assert
-      { right > left+1 -> phase1 (left - div space 2) left (at a 'Init) a };
-    assert
-      { right > left+1 -> phase1 (right - div space 2) right (at a 'Init) a }
-    { let space = right - left in
-      phase1 left right (old a) a /\
-      a[right] = sum (old a) (left-(right-left)+1) (right+1) /\
-      (forall i: int. i <= left-space -> a[i] = (old a)[i]) /\
-      (forall i: int. i > right -> a[i] = (old a)[i]) }
+    assert {
+      right > left+1 -> phase1 (left - div space 2) left (at a 'Init) a };
+    assert {
+      right > left+1 -> phase1 (right - div space 2) right (at a 'Init) a }
 
 (** {2 The downsweep phase} *)
 
@@ -119,12 +119,15 @@ module PrefixSumRec
 
   (** Second function: complete the partial using the remaining intial
       value and the partial sum already computed *)
-  let rec downsweep (left right: int) (ghost a0 : array int) (a : array int) =
-    { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
+  let rec downsweep (left right: int) (ghost a0 : array int) (a : array int)
+    requires { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
       is_power_of_2 (right - left) /\
       a[right] = sum a0 0 (left-(right-left) + 1) /\
       phase1 left right a0 a }
-    'Init:
+    ensures { partial_sum left right a0 a /\
+      (forall i: int. i <= left-(right-left) -> a[i] = (old a)[i]) /\
+      (forall i: int. i > right -> a[i] = (old a)[i]) }
+  = 'Init:
     let tmp = a[right] in
     assert { a[right] = sum a0 0 (left-(right-left) + 1) };
     assert { a[left] = sum a0 (left-(right-left)+1) (left+1) };
@@ -140,15 +143,13 @@ module PrefixSumRec
     downsweep (right - div space 2) right a0 a;
     assert { partial_sum (left - div space 2) left a0 a };
     assert { partial_sum (right - div space 2) right a0 a }
-    { partial_sum left right a0 a /\
-      (forall i: int. i <= left-(right-left) -> a[i] = (old a)[i]) /\
-      (forall i: int. i > right -> a[i] = (old a)[i]) }
 
 (** {2 The main procedure} *)
 
-  let compute_sums a =
-    { a.length >= 2 && is_power_of_2 a.length }
-    let a0 = ghost (copy a) in
+  let compute_sums a
+    requires { a.length >= 2 && is_power_of_2 a.length }
+    ensures { forall i : int. 0 <= i < a.length -> a[i] = sum (old a) 0 i }
+  = let a0 = ghost (copy a) in
     let l = a.length in
     let left = div l 2 - 1 in
     let right = l - 1 in
@@ -160,7 +161,6 @@ module PrefixSumRec
     (* needed to prove the post-condition *)
     assert { forall i : int.
       left-(right-left) < i <= right -> a[i] = sum a0 0 i }
-    { forall i : int. 0 <= i < a.length -> a[i] = sum (old a) 0 i }
 
 
 (** {2 A simple test} *)
@@ -182,10 +182,3 @@ module PrefixSumRec
     assert { a[7] = 22 }
 
 end
-
-(***
-Local Variables:
-compile-command: "why3ide verifythis_PrefixSumRec.mlw"
-End:
-*)
-

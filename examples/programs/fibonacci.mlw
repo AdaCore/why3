@@ -26,11 +26,12 @@ module FibonacciLinear
 
   use import Fibonacci
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
 
-  let fib (n:int) : int =
-    { n >= 0 }
-    let y = ref 0 in
+  let fib (n:int) : int
+    requires { n >= 0 }
+    ensures { fib n = result}
+  = let y = ref 0 in
     let x = ref 1 in
     for i = 0 to n - 1 do
       invariant { 0 <= i <= n /\ fib (i+1) = !x /\ fib i = !y }
@@ -39,7 +40,6 @@ module FibonacciLinear
       x := !x + aux
     done;
     !y
-    { fib n = result}
 
 end
 
@@ -47,15 +47,15 @@ theory Mat22 "2x2 integer matrices"
 
   use import int.Int
 
-  type t = {| a11: int; a12: int; a21: int; a22: int |}
+  type t = { a11: int; a12: int; a21: int; a22: int }
 
-  constant id : t = {| a11 = 1; a12 = 0; a21 = 0; a22 = 1 |}
+  constant id : t = { a11 = 1; a12 = 0; a21 = 0; a22 = 1 }
 
   function mult (x: t) (y: t) : t =
-    {|
+    {
     a11 = x.a11 * y.a11 + x.a12 * y.a21; a12 = x.a11 * y.a12 + x.a12 * y.a22;
     a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22;
-    |}
+    }
 
   (* holds, but not useful *)
   (* clone algebra.Assoc with type t = t, function op = mult, lemma Assoc *)
@@ -71,17 +71,19 @@ module FibonacciLogarithmic
   use import int.EuclideanDivision
   use import Mat22
 
-  constant m1110 : t = {| a11 = 1; a12 = 1;
-                          a21 = 1; a22 = 0 |}
+  constant m1110 : t = { a11 = 1; a12 = 1;
+                         a21 = 1; a22 = 0 }
 
   (* computes ((1 1) (1 0))^n in O(log(n)) time
 
      since it is a matrix of the shape ((a+b b) (b a)),
      we only return the pair (a, b) *)
 
-  let rec logfib n variant { n } =
-    { n >= 0 }
-    if n = 0 then
+  let rec logfib n variant { n }
+    requires { n >= 0 }
+    ensures  { let a, b = result in
+      power m1110 n = { a11 = a+b; a12 = b; a21 = b; a22 = a } }
+  = if n = 0 then
       (1, 0)
     else begin
       let a, b = logfib (div n 2) in
@@ -91,8 +93,6 @@ module FibonacciLogarithmic
       else
         (b*(a + c), c*c + b*b)
     end
-    { let a, b = result in
-      power m1110 n = {| a11 = a+b; a12 = b; a21 = b; a22 = a |} }
 
   (* by induction, we easily prove that
 
@@ -106,15 +106,7 @@ module FibonacciLogarithmic
     forall n: int. n >= 0 ->
     let p = power m1110 n in fib (n+1) = p.a11 /\ fib n = p.a21
 
-  let fibo n =
-    { n >= 0 }
+  let fibo n requires { n >= 0 } ensures { result = fib n } =
     let _, b = logfib n in b
-    { result = fib n }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/fibonacci.gui"
-End:
-*)

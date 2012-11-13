@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Term
 
@@ -38,9 +29,8 @@ let eliminate_let      = Trans.rewrite (elim_t true true  Mvs.empty) None
 
 let () =
   Trans.register_transform "eliminate_let_term" eliminate_let_term
-    ~desc:"Eliminates@ let@ by@ substitution,@ at@ the@ term@ level.";
+    ~desc:"Eliminate@ let-expressions@ in@ terms.";
   Trans.register_transform "eliminate_let_fmla" eliminate_let_fmla
-    ~desc:"Eliminates@ let@ by@ substitution,@ at@ the@ predicate@ level.";
+    ~desc:"Eliminate@ let-expressions@ in@ formulas.";
   Trans.register_transform "eliminate_let" eliminate_let
-    ~desc:"Apply@ both@ eliminate_let_term/fmla"
-
+    ~desc:"Eliminate@ all@ let-expressions.";

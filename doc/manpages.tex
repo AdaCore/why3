@@ -141,8 +141,8 @@ The \texttt{why3} tool executes the following steps:
   \whyml modules are turned into
   theories containing verification conditions as goals.
 \item Extract the selected goals inside each of the selected theories
-  into tasks. The goals and theories are selected using the options
-  \verb|-G/--goal| and \verb|-T/--theory|. The option
+  into tasks. The goals and theories are selected using options
+  \verb|-G/--goal| and \verb|-T/--theory|. Option
   \verb|-T/--theory| applies to the last file appearing on the
   command line, the option \verb|-G/--goal| applies to the last theory
   appearing on the command line. If no theories are selected in a file,
@@ -154,21 +154,21 @@ The \texttt{why3} tool executes the following steps:
   \index{theory@\verb+--theory+}
 \item Apply the transformation requested
   with \verb|-a/--apply-transform| in their order of appearance on the
-  command line. \verb|--list-transforms| list the known
+  command line. \verb|--list-transforms| lists the known
   transformations, plugins can add more of them.
   \index{a@\verb+-a+|see{\texttt{-{}-apply-transform}}}
   \index{apply-transform@\verb+--apply-transform+}
   \index{list-transforms@\verb+--list-transforms+}
 \item Apply the driver selected with the \verb|-D/--driver| option,
-  or the driver of the prover selected with \verb|-P/--prover|
+  or the driver of the prover selected with the \verb|-P/--prover|
   option. \verb|--list-provers| lists the known provers, \ie the ones
   that appear in the configuration file.
   \index{D@\verb+-D+|see{\texttt{-{}-driver}}}
   \index{driver@\verb+--driver+}
   \index{P@\verb+-P+|see{\texttt{-{}-prover}}}
   \index{prover@\verb+--prover+}
-\item If the option \verb|-P/--prover| is given, call the selected prover
-  on each generated task and print the results. If the option
+\item If option \verb|-P/--prover| is given, call the selected prover
+  on each generated task and print the results. If option
   \verb|-D/--driver| is given, print each generated task using
   the format specified in the selected driver.
 \end{enumerate}
@@ -179,11 +179,11 @@ The \texttt{why3} tool executes the following steps:
 \noindent
 The provers can give the following output:
 \begin{description}
-\item[Valid] the goal is proved in the given context,
-\item[Unknown] the prover has stopped its search,
-\item[Timeout] the prover has reached the time limit,
-\item[Failure] an error has occurred,
-\item[Invalid] the prover knows the goal cannot be proved.
+\item[Valid] The goal is proved in the given context.
+\item[Unknown] The prover has stopped its search.
+\item[Timeout] The prover has reached the time limit.
+\item[Failure] An error has occurred.
+\item[Invalid] The prover knows the goal cannot be proved.
 \end{description}
 % \why can also be *)
 % used to provide other informations : *)
@@ -193,12 +193,12 @@ The provers can give the following output:
 % \item TO BE COMPLETED *)
 % \end{itemize} *)
 
-The option \verb|--bisect| changes the behavior of why3. With this
+Option \verb|--bisect| changes the behavior of why3. With this
 option, \verb|-P/--prover| and \verb|-o/--output| must be given
 and a valid goal must be selected. The last step executed by why3 is
 replaced by computing a minimal set (in the great majority of the
 case) of declarations that still prove the goal. Currently it does not
-use any information provided by the prover, it call the prover
+use any information provided by the prover; it calls the prover
 multiple times with reduced context. The minimal set of declarations is
 then written in the prover syntax into a file located in the directory
 given to the \verb|-o/--output| option.
@@ -224,44 +224,47 @@ time limit and memory limit given, and the result of the prover. The
 result of the prover is the same as when you run the why3 tool. It
 contains the time taken and the state of the proof:
 
-\begin{itemize}
-\item \texttt{Valid}: the task is valid according to the prover. The
+\begin{description}
+\item[Valid] The task is valid according to the prover. The
   goal is considered proved.
-\item \texttt{Invalid}: the task is invalid.
-\item \texttt{Timeout}: the prover exceeds the time or memory limit.
-\item \texttt{Unknown}: the prover can't determine if the task
-  is valid; Some additional information can be provided.
-\item \texttt{Failure}: the prover reports a failure.
-\item \texttt{HighFailure}: an error occurred while trying to call the
+\item[Invalid] The task is invalid.
+\item[Timeout] the prover exceeded the time limit.
+\item[OufOfMemory] The prover exceeded the memory limit.
+\item[Unknown] The prover cannot determine if the task
+  is valid. Some additional information can be provided.
+\item[Failure] The prover reported a failure.
+\item[HighFailure] An error occurred while trying to call the
   prover, or the prover answer was not understood.
-\end{itemize}
+\end{description}
 
-Additionally a proof attempt can have the following attribute:
+Additionally, a proof attempt can have the following attributes:
 
-\begin{itemize}
-\item obsolete:\index{obsolete!proof attempt} the proof attempt has not been run in
-  its current state. You'll need to replay the proof attempt, ie run
-  the prover with the current state of the proof attempt, in order to
-  update the answer of the prover and remove this attribute.
-\item archived:\index{archived!proof attempt} the proof attempt is not useful
-  anymore it is kept for history, no why3 tools will select it by
-  default. The section \ref{sec:uninstalledprovers} shows an example
-  of its utilization.
-\end{itemize}
+\begin{description}
+\item[obsolete]\index{obsolete!proof attempt} The prover associated to
+  that proof attempt has not been run on the current task, but on an
+  earlier version of that task. You need to replay the proof
+  attempt, \emph{i.e.} run the prover with the current task of the proof
+  attempt, in order to update the answer of the prover and remove this
+  attribute.
+\item[archived]\index{archived!proof attempt} The proof attempt is not useful
+  anymore; it is kept for history; no why3 tools will select it by
+  default. Section \ref{sec:uninstalledprovers} shows an example
+  of this usage.
+\end{description}
 
-Generally proof attempt are marked obsolete just after
+Generally, proof attempts are marked obsolete just after
 the start of why3ide. Indeed when you load a session in order to
 modify it (not with \texttt{why3session info} for instance), why3
 rebuilds the goals to prove by using the information provided in the
 session. If you modify the original file (.why, .mlw) or if the
-transformations have changed (new version of why3) why3 will detect
-that. The provers will perhaps answer differently on this new
-problems. So the proof attempts that corresponds to a goal that
-changed are marked obsolete. 
+transformations have changed (new version of why3), why3 will detect
+that. The provers will perhaps answer differently on these new
+problems. So the proof attempts that correspond to a goal that
+changed are marked obsolete.
 
-% non 
+% non
 % We say that a session is obsolete if new
-% goals are made obsolete by this method during start-up. 
+% goals are made obsolete by this method during start-up.
 
 % Claude: Alors la je ne vois pas pourquoi
 % A session can
@@ -280,9 +283,12 @@ changed are marked obsolete.
   button starts the corresponding prover on the selected goal(s).
 
 \item[Split] splits the current goal into subgoals if it is a
-  conjunction of two or more goals.
+  conjunction of two or more goals. It corresponds to the
+  \verb|split_goal_wp| transformation.
 
-\item[Inline] replaces the head predicate symbol of the goal with its definition.
+\item[Inline] replaces the head predicate symbol of the goal with its
+  definition. It corresponds to the
+  \verb|inline_goal| transformation.
 
 \item[Edit] starts an editor on the selected task.
 
@@ -327,7 +333,7 @@ changed are marked obsolete.
 \begin{description}
 \item[Expand All] expands all the rows of the tree view.
 \item[Collapse proved goals] closes all the rows of the tree view
-  which are proved.
+  that are proved.
 % \item[Hide proved goals] completely hides the proved rows of the tree
 %   view [EXPERIMENTAL]
 \end{description}
@@ -337,7 +343,12 @@ A copy of the tools already available in the left toolbar, plus:
 \begin{description}
 \item[Mark as obsolete] marks all the proof as
   obsolete.
-  This allows to replay every proofs.
+  This allows to replay every proof.
+\item[Non-splitting transformation] applies one of the available
+  transformations, as listed in Section~\ref{sec:transformations}
+\item[Splitting transformation] is the same as above, but for
+  splitting transformations, \emph{i.e.} those that can generate
+  several sub-goals.
 \end{description}
 
 \item[Menu \textsf{Help}]
@@ -346,8 +357,8 @@ A very short online help, and some information about this software.
 
 \subsection{Preferences Dialog}
 
-The preferences dialog allows you to customize various settings. These
-are groups together under several tabs
+The preferences dialog allows you to customize various settings. They
+are grouped together under several tabs.
 
 \begin{description}
 \item[\textsf{General Settings} tab] allows one to set
@@ -359,6 +370,9 @@ are groups together under several tabs
   \item the memory given to provers, in megabytes
   \item the maximal number of simultaneous provers allowed to run in parallel
   \end{itemize}
+  By default, modification of any of these settings has effect only
+  for the current run of the GUI. a checkbox allows you to save these
+  settings also for future sessions.
 \item a few display settings:
   \begin{itemize}
   \item introduce premises: if selected, the goal of the task shown in
@@ -396,8 +410,8 @@ are groups together under several tabs
   the editor to use will be set to ``CoqIDE'' by default, and this
   \urldef{\urlprfgen}{\url}{http://proofgeneral.inf.ed.ac.uk/}
   dialog allows you to select the Emacs editor and its
-  \ahref{\urlprfgen}{Proof General} mode instead%
-  \begin{latexonly} (\urlprfgen)\end{latexonly}.
+ \ahref{\urlprfgen}{Proof General} mode instead%
+ \begin{latexonly} (\urlprfgen)\end{latexonly}.
 \end{itemize}
 \item[\textsf{Provers} tab]
   allows to select which of the installed provers one wants to see
@@ -418,20 +432,20 @@ of a theory. For that goal it tries to prove predefined goals using
 each component to compare. \texttt{why3bench} allows to output the
 comparison in various formats:
 \begin{itemize}
-\item csv: the simpler and more informative format, the results are
-  represented in an array, the rows corresponds to the
+\item csv: the simpler and more informative format; the results are
+  represented in an array; the rows correspond to the
   compared components, the columns correspond to the result
   (Valid, Unknown, Timeout, Failure, Invalid) and the CPU time taken in seconds.
 \item average: summarizes the number of the five different answers
   for each component. It also gives the average time taken.
-\item timeline: for each component it gives the number of valid goals
+\item timeline: for each component, it gives the number of valid goals
   along the time (10 slices between 0 and the longest time a component
   takes to prove a goal)
 \end{itemize}
 
-The compared components can be defined in an \emph{rc-file},
+The compared components can be defined in an \emph{rc-file};
 \texttt{examples/programs/\ prgbench.rc} is such an example. More
-generally a bench configuration file:
+generally, a bench configuration file looks like
 \begin{verbatim}
 [probs "myprobs"]
    file = "examples/mygoal.why" #relatives to the rc file
@@ -517,7 +531,7 @@ file is fully proved, the subtree is not shown.
 When some proof attempts stored in the session file are
 obsolete\index{obsolete!proof attempt},
 the replay is run anyway, as with the replay button in the IDE. Then, the session
-file will be updated if both 
+file will be updated if both
 \begin{itemize}
 \item all the replayed proof attempts give the same result as what
   is stored in the session
@@ -681,15 +695,15 @@ For example, here are the session tree produced on the ``hello
 proof'' example of Section~\ref{chap:starting}.
 {\scriptsize
 \begin{verbatim}
-hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Alt-Ergo (0.93)
-                                                |    `-Simplify (1.5.4)?
-                                                |-G2?-+-split_goal?-+-G2.1-+-Alt-Ergo (0.93)
-                                                |     |             |      `-Simplify (1.5.4)
-                                                |     |             `-G2.0?-+-Alt-Ergo (0.93)?
+hello_proof---../hello_proof.why?---HelloProof?-+-G3-+-Simplify (1.5.4)?
+                                                |    `-Alt-Ergo (0.94)
+                                                |-G2?-+-split_goal?-+-G2.2-+-Simplify (1.5.4)
+                                                |     |             |      `-Alt-Ergo (0.94)
+                                                |     |             `-G2.1?-+-Coq (8.3pl4)?
                                                 |     |                     |-Simplify (1.5.4)?
-                                                |     |                     `-Coq (8.3pl3)?
-                                                |     |-Alt-Ergo (0.93)?
-                                                |     `-Simplify (1.5.4)?
+                                                |     |                     `-Alt-Ergo (0.94)?
+                                                |     |-Simplify (1.5.4)?
+                                                |     `-Alt-Ergo (0.94)?
                                                 `-G1---Simplify (1.5.4)
 \end{verbatim}
 }
@@ -726,17 +740,18 @@ proof'' example of Section~\ref{chap:starting}.
     +-- theory HelloProof
       +-- goal G2
         +-- transformation split_goal
-          +-- goal G2.0
+          +-- goal G2.1
 
 == Goals proved by only one prover ==
   +-- file ../hello_proof.why
     +-- theory HelloProof
-      +-- goal G1: Simplify (1.5.4) (0.01)
-      +-- goal G3: Alt-Ergo (0.93) (0.02)
+      +-- goal G1: Simplify (1.5.4) (0.00)
+      +-- goal G3: Alt-Ergo (0.94) (0.00)
 
 == Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==
-  Alt-Ergo (0.93)      :   2   0.02   0.02   0.02
-  Simplify (1.5.4)     :   2   0.01   0.01   0.01
+  Alt-Ergo (0.94)      :   2   0.00   0.00   0.00
+  Simplify (1.5.4)     :   2   0.00   0.00   0.00
+
 \end{verbatim}
 }
 
@@ -787,13 +802,11 @@ output.
 \label{fig:custom-latex}
 \end{figure}
 
-\todo{rejouer HelloProofs, pour eviter tout ces 0.00, et qu'en plus
-  cela soit coherent avec la sortie HTML ci-dessous}
 \begin{figure}[t]
 \begin{center}
-\begin{toimage}
+%HEVEA\begin{toimage}
 \input{HelloProof.tex}
-\end{toimage}
+%HEVEA\end{toimage}
 %HEVEA\imageflush
 \end{center}
 \caption{LaTeX table produced for the HelloProof example (style 1)}
@@ -802,9 +815,9 @@ output.
 
 \begin{figure}[t]
 \begin{center}
-\begin{toimage}
+%HEVEA\begin{toimage}
 \input{HelloProof-style2.tex}
-\end{toimage}
+%HEVEA\end{toimage}
 %HEVEA\imageflush
 \end{center}
 \caption{LaTeX table produced for the HelloProof example (style 2)}
@@ -823,23 +836,25 @@ There are three styles of output: `table', `simpletree', and
 `jstree'. The default is `table'.
 
 \begin{figure}[t]
+%BEGIN LATEX
 \begin{center}
-\begin{latexonly}
 \fbox{\includegraphics[width=0.9\textwidth]{hello_proof.png}}
-\end{latexonly}
+\end{center}
+%END LATEX
 \begin{htmlonly}
 \begin{rawhtml}
+<h1>Why3 Proof Results for Project "hello_proof"</h1>
+<h2><font color="#FF0000">Theory "HelloProof": not fully verified</font></h2>
 <table border="1"><tr><td colspan="2">Obligations</td><td text-rotation="90">Alt-Ergo (0.94)</td><td text-rotation="90">Coq (8.3pl4)</td><td text-rotation="90">Simplify (1.5.4)</td></td></tr>
 <td bgcolor="#C0FFC0" colspan="2">G1</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
 <td bgcolor="#FF0000" colspan="2">G2</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
 <tr><td bgcolor="#FF0000" colspan="2">split_goal</td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td><td bgcolor="#E0E0E0"></td></tr>
-<td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">G2.1</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.49</td><td bgcolor="#FF8000">0.00</td></tr>
-<tr><td bgcolor="#C0FFC0" colspan="1">G2.2</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
+<td rowspan="2">&nbsp;&nbsp;</td><td bgcolor="#FF0000" colspan="1">1.</td><td bgcolor="#FF8000">0.00</td><td bgcolor="#FF8000">0.43</td><td bgcolor="#FF8000">0.00</td></tr>
+<tr><td bgcolor="#C0FFC0" colspan="1">2.</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#C0FFC0">0.00</td></tr>
 <td bgcolor="#C0FFC0" colspan="2">G3</td><td bgcolor="#C0FFC0">0.00</td><td bgcolor="#E0E0E0">---</td><td bgcolor="#FF8000">0.00</td></tr>
 </table>
 \end{rawhtml}
 \end{htmlonly}
-\end{center}
 \caption{HTML table produced for the HelloProof example}
 \label{fig:html}
 \end{figure}

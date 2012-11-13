@@ -9,12 +9,13 @@
 module MaxAndSum
 
   use import int.Int
-  use import module ref.Ref
-  use import module array.Array
+  use import ref.Ref
+  use import array.Array
 
-  let max_sum (a: array int) (n: int) =
-    { 0 <= n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
-    let sum = ref 0 in
+  let max_sum (a: array int) (n: int)
+    requires { 0 <= n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
+    ensures { let (sum, max) = result in sum <= n * max }
+  = let sum = ref 0 in
     let max = ref 0 in
     for i = 0 to n - 1 do
       invariant { !sum <= i * !max }
@@ -22,25 +23,25 @@ module MaxAndSum
       sum := !sum + a[i]
     done;
     (!sum, !max)
-    { let (sum, max) = result in sum <= n * max }
 
 end
 
 module MaxAndSum2
 
   use import int.Int
-  use import module ref.Ref
-  use import module array.Array
-  use import module array.ArraySum
+  use import ref.Ref
+  use import array.Array
+  use import array.ArraySum
 
   predicate is_max (a: array int) (l h: int) (m: int) =
     (forall k: int. l <= k < h -> a[k] <= m) &&
     ((h <= l && m = 0) ||
      (l <  h && exists k: int. l <= k < h && m = a[k]))
 
-  let max_sum (a: array int) (n: int) =
-    { 0 <= n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
-    let s = ref 0 in
+  let max_sum (a: array int) (n: int)
+    requires { 0 <= n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
+    ensures { let (s, m) = result in s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
+  = let s = ref 0 in
     let m = ref 0 in
     for i = 0 to n - 1 do
       invariant { !s = sum a 0 i /\ is_max a 0 i !m /\ !s <= i * !m }
@@ -48,15 +49,14 @@ module MaxAndSum2
       s := !s + a[i]
     done;
     (!s, !m)
-    { let (s, m) = result in s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
 
 end
 
 module TestCase
 
-  use import module MaxAndSum2
-  use import module array.Array
-  use import module array.ArraySum
+  use import MaxAndSum2
+  use import array.Array
+  use import array.ArraySum
 
   let test_case () =
     let n = 10 in
@@ -76,9 +76,3 @@ module TestCase
     assert { m = 10 }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vstte10_max_sum.gui"
-End:
-*)

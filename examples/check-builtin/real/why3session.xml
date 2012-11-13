@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
-<why3session
- name="check-builtin/real/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -21,7 +20,7 @@
  <prover
   id="4"
   name="Gappa"
-  version="0.16.0"/>
+  version="0.16.1"/>
  <prover
   id="5"
   name="Yices"
@@ -40,25 +39,25 @@
   expanded="true">
   <theory
    name="Test"
-   locfile="check-builtin/real/../real.why"
+   locfile="../real.why"
    loclnum="1" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
    <goal
     name="G1"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="3" loccnumb="7" loccnume="9"
     sum="f207e29e9079f1be6781c87d4c160c81"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix *c5.5c10.c55.">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
@@ -67,14 +66,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
@@ -87,14 +78,6 @@
     <proof
      prover="4"
      timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -108,15 +91,6 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
-   </goal>
-   <goal
-    name="G2"
-    locfile="check-builtin/real/../real.why"
-    loclnum="4" loccnumb="7" loccnume="9"
-    sum="9e04fefcbd74163191244b6b8d7562ea"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix /c9.c3.c3.">
     <proof
      prover="6"
      timelimit="3"
@@ -126,13 +100,22 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="5"
+     prover="7"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+   </goal>
+   <goal
+    name="G2"
+    locfile="../real.why"
+    loclnum="4" loccnumb="7" loccnume="9"
+    sum="9e04fefcbd74163191244b6b8d7562ea"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix /c9.c3.c3.">
     <proof
      prover="0"
      timelimit="3"
@@ -140,6 +123,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -152,6 +143,14 @@
     <proof
      prover="4"
      timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -168,14 +167,14 @@
    </goal>
    <goal
     name="G3"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="5" loccnumb="7" loccnume="9"
     sum="1a2d5acb41bac2a5d5a5ae9a44802cf2"
     proved="true"
     expanded="false"
     shape="ainfix =ainvc5.c0.2">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -191,16 +190,16 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="3"
+     prover="3"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -218,20 +217,20 @@
   </theory>
   <theory
    name="TestInfix"
-   locfile="check-builtin/real/../real.why"
+   locfile="../real.why"
    loclnum="8" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
    <goal
     name="Add"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="10" loccnumb="7" loccnume="10"
     sum="0e9baf7fe8694089437161de221049eb"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix +.c5.5c10.c15.5">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -241,14 +240,6 @@
     <proof
      prover="2"
      timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -265,6 +256,14 @@
     <proof
      prover="4"
      timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -281,14 +280,14 @@
    </goal>
    <goal
     name="Sub"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="11" loccnumb="7" loccnume="10"
     sum="b96ec09f1f28908a2a176b392f18f9d1"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix -.c9.c3.c6.">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -298,14 +297,6 @@
     <proof
      prover="2"
      timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -322,6 +313,14 @@
     <proof
      prover="4"
      timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -338,19 +337,19 @@
    </goal>
    <goal
     name="Neg"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="12" loccnumb="7" loccnume="10"
     sum="d23a894b757b84a44b8fff0618108d37"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix +.aprefix -.c5.c3.5aprefix -.c1.5">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
@@ -359,14 +358,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
@@ -379,6 +370,14 @@
     <proof
      prover="4"
      timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -395,19 +394,19 @@
    </goal>
    <goal
     name="Mul"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="13" loccnumb="7" loccnume="10"
     sum="e29404325109ec3f401b46eee6e14b98"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix *.c5.5c10.c55.">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
@@ -416,14 +415,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
@@ -436,6 +427,14 @@
     <proof
      prover="4"
      timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -452,14 +451,14 @@
    </goal>
    <goal
     name="Div"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="14" loccnumb="7" loccnume="10"
     sum="c06e2f7b6439bb0fb78135acce05d589"
     proved="true"
     expanded="false"
     shape="ainfix =ainfix /.c9.c2.c4.5">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -469,14 +468,6 @@
     <proof
      prover="2"
      timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -499,6 +490,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="3"
      memlimit="0"
@@ -509,19 +508,19 @@
    </goal>
    <goal
     name="Inv"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="15" loccnumb="7" loccnume="10"
     sum="7a5279ca7f27da7d779586f6eb3b0123"
     proved="true"
     expanded="false"
     shape="ainfix =ainvc5.c0.2">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
@@ -532,16 +531,16 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="3"
+     prover="3"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
+     prover="6"
+     timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -559,25 +558,25 @@
   </theory>
   <theory
    name="SquareTest"
-   locfile="check-builtin/real/../real.why"
+   locfile="../real.why"
    loclnum="19" loccnumb="7" loccnume="17"
    verified="true"
    expanded="false">
    <goal
     name="Sqrt_zero"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="23" loccnumb="8" loccnume="17"
     sum="b353ced9b0f041c36c827f26d50b3acd"
     proved="true"
     expanded="false"
     shape="ainfix =asqrtc0.0c0.0">
     <proof
-     prover="6"
-     timelimit="60"
-     memlimit="1000"
+     prover="0"
+     timelimit="3"
+     memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
@@ -586,14 +585,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
@@ -610,6 +601,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="7"
@@ -622,14 +621,14 @@
    </goal>
    <goal
     name="Sqrt_one"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="24" loccnumb="8" loccnume="16"
     sum="e8ec282b918f9ea65664f75b3f6ba8f4"
     proved="true"
     expanded="false"
     shape="ainfix =asqrtc1.0c1.0">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -643,14 +642,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
@@ -667,6 +658,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="7"
@@ -679,31 +678,23 @@
    </goal>
    <goal
     name="Sqrt_four"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="25" loccnumb="8" loccnume="17"
     sum="84ef0743ccce40f492768328498afce8"
     proved="true"
     expanded="false"
     shape="ainfix =asqrtc4.0c2.0">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.27"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="3"
+     prover="2"
+     timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
@@ -724,6 +715,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.27"/>
     </proof>
     <proof
      prover="7"
@@ -737,20 +736,20 @@
   </theory>
   <theory
    name="ExpLogTest"
-   locfile="check-builtin/real/../real.why"
+   locfile="../real.why"
    loclnum="29" loccnumb="7" loccnume="17"
    verified="true"
    expanded="true">
    <goal
     name="Log_e"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="33" loccnumb="8" loccnume="13"
     sum="da0b025851b39560876d3ece835be34c"
     proved="true"
     expanded="true"
     shape="ainfix =alogaec1.0">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -766,20 +765,20 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="3"
      timelimit="5"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="7"
@@ -793,25 +792,33 @@
   </theory>
   <theory
    name="PowerIntTest"
-   locfile="check-builtin/real/../real.why"
+   locfile="../real.why"
    loclnum="38" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
    <goal
     name="Pow_2_2"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="42" loccnumb="8" loccnume="15"
     sum="0c57c43ad51efde644bc54caf05b6e35"
     proved="true"
     expanded="true"
     shape="ainfix =apowerc2.0c2c4.0">
     <proof
-     prover="6"
+     prover="0"
      timelimit="3"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="2"
@@ -820,14 +827,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="3"
@@ -846,38 +845,6 @@
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="PowerRealTest"
-   locfile="check-builtin/real/../real.why"
-   loclnum="47" loccnumb="7" loccnume="20"
-   verified="true"
-   expanded="true">
-   <goal
-    name="Pow_2_2"
-    locfile="check-builtin/real/../real.why"
-    loclnum="51" loccnumb="8" loccnume="15"
-    sum="38a4f95c27069a2dc6dcd4d7442ce8f7"
-    proved="true"
-    expanded="true"
-    shape="ainfix =apowc2.0c2.0c4.0">
-    <proof
      prover="6"
      timelimit="3"
      memlimit="0"
@@ -886,7 +853,39 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="7"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="PowerRealTest"
+   locfile="../real.why"
+   loclnum="47" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+   <goal
+    name="Pow_2_2"
+    locfile="../real.why"
+    loclnum="51" loccnumb="8" loccnume="15"
+    sum="38a4f95c27069a2dc6dcd4d7442ce8f7"
+    proved="true"
+    expanded="true"
+    shape="ainfix =apowc2.0c2.0c4.0">
+    <proof
      prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -905,26 +904,18 @@
   </theory>
   <theory
    name="TrigonometryTest"
-   locfile="check-builtin/real/../real.why"
+   locfile="../real.why"
    loclnum="56" loccnumb="7" loccnume="23"
    verified="false"
    expanded="true">
    <goal
     name="Cos_2_pi"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="62" loccnumb="8" loccnume="16"
     sum="fed2556e175a5a894d0c067466ee4ba5"
     proved="true"
     expanded="true"
     shape="ainfix =acosainfix *c2.0apic1.0">
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.11"/>
-    </proof>
     <proof
      prover="0"
      timelimit="3"
@@ -950,6 +941,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="3"
      memlimit="0"
@@ -960,20 +959,12 @@
    </goal>
    <goal
     name="Sin_2_pi"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="63" loccnumb="8" loccnume="16"
     sum="f3bd7f5c25e900c5b9192d125cd94d8d"
     proved="true"
     expanded="true"
     shape="ainfix =asinainfix *c2.0apic0.">
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.16"/>
-    </proof>
     <proof
      prover="0"
      timelimit="60"
@@ -981,6 +972,14 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="3.93"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.36"/>
     </proof>
     <proof
      prover="2"
@@ -999,6 +998,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.16"/>
+    </proof>
+    <proof
      prover="7"
      timelimit="3"
      memlimit="0"
@@ -1006,31 +1013,15 @@
      archived="false">
      <result status="valid" time="0.12"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.36"/>
-    </proof>
    </goal>
    <goal
     name="Tan_pi_3"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="64" loccnumb="8" loccnume="16"
     sum="71dffba24c326a5ef2b7a294be8367b5"
     proved="false"
     expanded="true"
     shape="ainfix =atanainfix /apic2.0asqrtc3.0">
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
     <proof
      prover="0"
      timelimit="3"
@@ -1046,6 +1037,14 @@
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.01"/>
     </proof>
     <proof
      prover="7"
@@ -1058,20 +1057,12 @@
    </goal>
    <goal
     name="Atan_1"
-    locfile="check-builtin/real/../real.why"
+    locfile="../real.why"
     loclnum="65" loccnumb="8" loccnume="14"
     sum="706631d649ed857b77c6d151ceb04080"
     proved="false"
     expanded="true"
     shape="ainfix =aatanc1.0ainfix /apic4.0">
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
     <proof
      prover="0"
      timelimit="3"
@@ -1087,6 +1078,14 @@
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.01"/>
     </proof>
     <proof
      prover="7"

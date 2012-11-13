@@ -14,62 +14,45 @@ module Hashtbl
 
   type key
 
-  type t 'a model {| mutable contents: map key (list 'a) |}
+  type t 'a model { mutable contents: map key (list 'a) }
 
   function ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
 
-  val create (n:int) :
-    {} t 'a { forall k: key. result[k] = Nil }
+  val create (n:int) : t 'a ensures { forall k: key. result[k] = Nil }
 
-  val clear (h: t 'a) :
-    {} unit writes h { forall k: key. h[k] = Nil }
+  val clear (h: t 'a) : unit writes {h} ensures { forall k: key. h[k] = Nil }
 
-  val add (h: t 'a) (k: key) (v: 'a) :
-    {}
-    unit writes h
-    { h[k] = Cons v (old h)[k] /\
-      forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+  val add (h: t 'a) (k: key) (v: 'a) : unit writes {h}
+    ensures { h[k] = Cons v (old h)[k] }
+    ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  val mem (h: t 'a) (k: key) :
-    {}
-    bool reads h
-    { result=True <-> h[k] <> Nil }
+  val mem (h: t 'a) (k: key) : bool reads {h}
+    ensures { result=True <-> h[k] <> Nil }
 
-  val find (h: t 'a) (k: key) :
-    { h[k] <> Nil }
-    'a reads h
-    { match h[k] with Nil -> false | Cons v _ -> result = v end }
+  val find (h: t 'a) (k: key) : 'a reads {h}
+    requires { h[k] <> Nil }
+    ensures  { match h[k] with Nil -> false | Cons v _ -> result = v end }
 
-  val find_all (h: t 'a) (k: key) :
-    {}
-    list 'a reads h
-    { result = h[k] }
+  val find_all (h: t 'a) (k: key) : list 'a reads {h}
+    ensures { result = h[k] }
 
   exception NotFound
 
-  val defensive_find (h: t 'a) (k: key) :
-    {}
-    'a reads h raises NotFound
-    { match h[k] with Nil -> false | Cons v _ -> result = v end }
-    | NotFound -> { h[k] = Nil }
+  val defensive_find (h: t 'a) (k: key) : 'a reads {h}
+    ensures { match h[k] with Nil -> false | Cons v _ -> result = v end }
+    raises  { NotFound -> h[k] = Nil }
 
-  val copy (h: t 'a) :
-    {}
-    t 'a reads h
-    { forall k: key. result[k] = h[k] }
+  val copy (h: t 'a) : t 'a reads {h}
+    ensures { forall k: key. result[k] = h[k] }
 
-  val remove (h: t 'a) (k: key) :
-    {}
-    unit writes h
-    { h[k] = match (old h)[k] with Nil -> Nil | Cons _ l -> l end /\
-      forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+  val remove (h: t 'a) (k: key) : unit writes {h}
+    ensures { h[k] = match (old h)[k] with Nil -> Nil | Cons _ l -> l end }
+    ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  val replace (h: t 'a) (k: key) (v: 'a) :
-    {}
-    unit writes h
-    { (h[k] = Cons v (match (old h)[k] with Nil -> Nil | Cons _ l -> l end))
-      /\
-      forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+  val replace (h: t 'a) (k: key) (v: 'a) : unit writes {h}
+    ensures {
+      h[k] = Cons v (match (old h)[k] with Nil -> Nil | Cons _ l -> l end) }
+    ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
   (*** TODO
      - val length: t 'a -> int (the number of distinct key)
@@ -83,7 +66,7 @@ module TestHashtbl
 
   use import int.Int
   use import list.List
-  use import module Hashtbl
+  use import Hashtbl
 
   function k1: key
   function k2: key
@@ -124,12 +107,12 @@ module HashtblImpl
     forall n: int. 0 < n ->
     forall k: key. 0 <= bucket k n < n
 
-  type t 'a = {| mutable size: int; (* total number of elements *)
-                 mutable data: array (list (key, 'a)); |}
-    invariant { let n = Array.length data in
+  type t 'a = { mutable size: int; (* total number of elements *)
+                mutable data: array (list (key, 'a)); }
+    invariant { let n = Array.length self.data in
                 0 < n /\
                 forall i: int. 0 <= i < n ->
-                forall k: key, v: 'a. mem (k, v) data[i] -> bucket k n = i }
+                forall k: key, v: 'a. mem (k,v) self.data[i] -> bucket k n = i }
 
   function extract (k: key) (l: list (key, 'a)) : list 'a = match l with
     | Nil -> Nil
@@ -139,26 +122,50 @@ module HashtblImpl
   function ([]) (t: t 'a) (k: key): list 'a =
     extract k (Array.get t.data (bucket k (length t.data)))
 
-  let create (n:int) : t 'a =
-    { 1 <= n }
-    {| size = 0; data = Array.make n Nil |}
-    { forall k: key. result[k] = Nil }
+  let create (n:int) : t 'a
+    requires { 1 <= n }
+    ensures  { forall k: key. result[k] = Nil }
+  = { size = 0; data = Array.make n Nil }
 
-  let clear (h: t 'a) =
-    {}
-    h.size <- 0;
+  let clear (h: t 'a)
+    ensures { forall k: key. h[k] = Nil }
+  = h.size <- 0;
     Array.fill h.data 0 (Array.length h.data) Nil
-    { forall k: key. h[k] = Nil }
+
+  let resize (h: t 'a)
+    ensures { forall k: key. h[k] = (old h)[k] }
+  = let odata = h.data in
+    let osize = Array.length odata in
+    let nsize = 2 * osize + 1 in
+    let ndata = Array.make nsize Nil in
+    let rec rehash l = match l with
+      | Nil -> ()
+      | Cons (k, v) r ->
+          let b = bucket k nsize in
+          ndata[b] <- Cons (k, v) (Array.([]) ndata b);
+          rehash r
+      end
+    in
+    for i = 0 to osize - 1 do rehash (Array.([]) odata i) done;
+    h.data <- ndata
 
   lemma extract_neq:
     forall k k': key, v: 'a, l: list (key, 'a).
     k <> k' -> extract k' l = extract k' (Cons (k, v) l)
 
-  let add (h: t 'a) (k: key) (v: 'a) =
-    {}
-    let b = bucket k (Array.length h.data) in
-    h.data[b] <- Cons (k, v) (Array.([]) h.data b)
-    { h[k] = Cons v (old h)[k] /\
+  let add (h: t 'a) (k: key) (v: 'a)
+    ensures { h[k] = Cons v (old h)[k] /\
       forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+  = let b = bucket k (Array.length h.data) in
+    h.data[b] <- Cons (k, v) (Array.([]) h.data b)
+
+(*
+  let add (h: t 'a) (k: key) (v: 'a) =
+    ensures { h[k] = Cons v (old h)[k] /\
+      forall k': key. k' <> k -> h[k'] = (old h)[k'] }
+    let b = bucket k (Array.length h.data) in
+    h.data[b] <- Cons (k, v) (Array.([]) h.data b);
+    if h.size > 2 * Array.length h.data then resize h
+*)
 
 end

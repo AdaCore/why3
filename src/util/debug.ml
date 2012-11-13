@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 let formatter = ref Format.err_formatter
 
@@ -68,7 +59,7 @@ let stack_trace = register_info_flag "stack_trace"
   ~desc:"Avoid@ catching@ exceptions@ in@ order@ to@ get@ the@ stack@ trace."
 
 let timestamp = register_info_flag "timestamp"
-  ~desc:"Print@ a@ timestamp@ before@ debug@ messages."
+  ~desc:"Print@ a@ timestamp@ before@ debugging@ messages."
 
 let time_start = Unix.gettimeofday ()
 
@@ -85,9 +76,9 @@ let dprintf flag s =
   else Format.ifprintf !formatter s
 
 
-(*** Options ****)
+(*** Command-line arguments ****)
 
-module Opt = struct
+module Args = struct
   type spec = (Arg.key * Arg.spec * Arg.doc)
 
   let desc_debug_list, option_list =
@@ -136,8 +127,9 @@ module Opt = struct
   let set_flags_selected () =
     if !opt_debug_all then
       List.iter
-        (fun (s,f,_,_) -> if not (is_info_flag s) then set_flag f)
+        (fun (s,f,_,_) -> if is_info_flag s then set_flag f)
         (list_flags ());
     Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
-      opt_list_flags
+      opt_list_flags;
+    if test_flag stack_trace then Printexc.record_backtrace true
 end

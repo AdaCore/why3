@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 
@@ -93,18 +84,18 @@ and print_term info fmt t = match t.t_node with
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
       let number_format = {
-        Print_number.long_int_support = true;
-        Print_number.dec_int_support = Print_number.Number_default;
-        Print_number.hex_int_support = Print_number.Number_unsupported;
-        Print_number.oct_int_support = Print_number.Number_unsupported;
-        Print_number.bin_int_support = Print_number.Number_unsupported;
-        Print_number.def_int_support = Print_number.Number_unsupported;
-        Print_number.dec_real_support = Print_number.Number_default;
-        Print_number.hex_real_support = Print_number.Number_unsupported;
-        Print_number.frac_real_support = Print_number.Number_unsupported;
-        Print_number.def_real_support = Print_number.Number_unsupported;
+        Number.long_int_support = true;
+        Number.dec_int_support = Number.Number_default;
+        Number.hex_int_support = Number.Number_unsupported;
+        Number.oct_int_support = Number.Number_unsupported;
+        Number.bin_int_support = Number.Number_unsupported;
+        Number.def_int_support = Number.Number_unsupported;
+        Number.dec_real_support = Number.Number_default;
+        Number.hex_real_support = Number.Number_unsupported;
+        Number.frac_real_support = Number.Number_unsupported;
+        Number.def_real_support = Number.Number_unsupported;
       } in
-      Print_number.print number_format fmt c
+      Number.print number_format fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt "$let_tt(%a@ =@ %a,@ %a)"

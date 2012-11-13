@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="tests-provers/alt-ergo-models/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,21 +11,21 @@
   expanded="true">
   <theory
    name="M1"
-   locfile="tests-provers/alt-ergo-models/../alt-ergo-models.mlw"
+   locfile="../alt-ergo-models.mlw"
    loclnum="12" loccnumb="7" loccnume="9"
    verified="false"
    expanded="true">
    <goal
     name="WP_parameter f"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.mlw"
+    locfile="../alt-ergo-models.mlw"
     loclnum="16" loccnumb="6" loccnume="7"
-    expl="normal postcondition"
+    expl="VC for f"
     sum="fa9d27cfcdbaf26cbec70dea19c6b487"
     proved="false"
     expanded="true"
     shape="ainfix &lt;=iainfix &gt;=V0c42ainfix +V0c3c0c50F">
     <label
-     name="expl:parameter f"/>
+     name="expl:VC for f"/>
     <proof
      prover="0"
      timelimit="3"
@@ -38,15 +37,15 @@
    </goal>
    <goal
     name="WP_parameter f_no_lab"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.mlw"
-    loclnum="21" loccnumb="6" loccnume="14"
-    expl="normal postcondition"
+    locfile="../alt-ergo-models.mlw"
+    loclnum="20" loccnumb="6" loccnume="14"
+    expl="VC for f_no_lab"
     sum="5ed482124bdd4cb477f64f6d7179c7ce"
     proved="false"
     expanded="true"
     shape="ainfix &lt;=iainfix &gt;=V0c42ainfix +V0c3c0c50F">
     <label
-     name="expl:parameter f_no_lab"/>
+     name="expl:VC for f_no_lab"/>
     <proof
      prover="0"
      timelimit="3"
@@ -58,15 +57,15 @@
    </goal>
    <goal
     name="WP_parameter g"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.mlw"
-    loclnum="28" loccnumb="6" loccnume="7"
-    expl="parameter g"
+    locfile="../alt-ergo-models.mlw"
+    loclnum="26" loccnumb="6" loccnume="7"
+    expl="VC for g"
     sum="711200eea292348643546c67b9348249"
     proved="false"
     expanded="true"
     shape="iainfix &gt;=V1c42ainfix &lt;=ainfix +V1c3c50ainfix &lt;=c0c50Iainfix =V1ainfix +V0c1FF">
     <label
-     name="expl:parameter g"/>
+     name="expl:VC for g"/>
     <proof
      prover="0"
      timelimit="3"
@@ -84,13 +83,13 @@
   expanded="true">
   <theory
    name="T"
-   locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+   locfile="../alt-ergo-models.why"
    loclnum="2" loccnumb="7" loccnume="8"
    verified="false"
    expanded="true">
    <goal
     name="g_no_lab"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="6" loccnumb="7" loccnume="15"
     sum="97f5b4dfb02726d6b8e716e9886e02bc"
     proved="false"
@@ -107,7 +106,7 @@
    </goal>
    <goal
     name="g_lab0"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="8" loccnumb="7" loccnume="13"
     sum="0bc58aa442c3f8d8afb3c6ae7a2302c0"
     proved="false"
@@ -124,7 +123,7 @@
    </goal>
    <goal
     name="g_lab1"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="11" loccnumb="7" loccnume="13"
     sum="e1d8deb4519593d3e1c068d1e126e09f"
     proved="false"
@@ -141,7 +140,7 @@
    </goal>
    <goal
     name="g2_lab"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="16" loccnumb="7" loccnume="13"
     sum="d5a1ca982de4eefb75fcf96898a28cab"
     proved="false"
@@ -159,13 +158,13 @@
   </theory>
   <theory
    name="ModelInt"
-   locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+   locfile="../alt-ergo-models.why"
    loclnum="21" loccnumb="7" loccnume="15"
    verified="false"
    expanded="true">
    <goal
     name="test0"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="25" loccnumb="5" loccnume="10"
     sum="6fe88533f2ae320631640ca9ef7e209e"
     proved="true"
@@ -182,7 +181,7 @@
    </goal>
    <goal
     name="test1"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="27" loccnumb="5" loccnume="10"
     sum="ec79515136dd9d9c1db26c9272c47e90"
     proved="false"
@@ -199,7 +198,7 @@
    </goal>
    <goal
     name="test2"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="31" loccnumb="5" loccnume="10"
     sum="bd78811ee73cff3e51da3e1ed1f502e1"
     proved="false"
@@ -216,7 +215,7 @@
    </goal>
    <goal
     name="test_overflow"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="33" loccnumb="5" loccnume="18"
     sum="1b6dc3ea74be047562b1f69f8f65b741"
     proved="false"
@@ -233,7 +232,7 @@
    </goal>
    <goal
     name="test_overflow2"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="37" loccnumb="5" loccnume="19"
     sum="4b58b728654ff2072f6317dcb41301eb"
     proved="false"
@@ -250,7 +249,7 @@
    </goal>
    <goal
     name="test_overflow_int16"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="43" loccnumb="5" loccnume="24"
     sum="02c71d9f281a6838e6e470d03e9edf76"
     proved="false"
@@ -267,7 +266,7 @@
    </goal>
    <goal
     name="test_overflow_int16_alt"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="47" loccnumb="5" loccnume="28"
     sum="43e5ab45c0e6488a38b842ca5b023b46"
     proved="false"
@@ -284,7 +283,7 @@
    </goal>
    <goal
     name="test_overflow_int16_bis"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="51" loccnumb="5" loccnume="28"
     sum="ac90b3f950a194612b923c3993638d54"
     proved="false"
@@ -301,7 +300,7 @@
    </goal>
    <goal
     name="test_overflow_int32"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="58" loccnumb="5" loccnume="24"
     sum="fe1d83b19e02f37ccc5837ac472b3f09"
     proved="false"
@@ -318,7 +317,7 @@
    </goal>
    <goal
     name="test_overflow_int32_bis"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="62" loccnumb="5" loccnume="28"
     sum="8220a3f4d9bdd86e8067869ef1ccab3f"
     proved="false"
@@ -335,7 +334,7 @@
    </goal>
    <goal
     name="test_overflow_int32_bis_inline"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="66" loccnumb="5" loccnume="35"
     sum="0d9a8798aac56361d27bf4a7328d4196"
     proved="false"
@@ -353,13 +352,13 @@
   </theory>
   <theory
    name="ModelReal"
-   locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+   locfile="../alt-ergo-models.why"
    loclnum="72" loccnumb="7" loccnume="16"
    verified="false"
    expanded="true">
    <goal
     name="test1"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="76" loccnumb="5" loccnume="10"
     sum="50033b5fbdb8733cbbe648a19bd5c24d"
     proved="false"
@@ -376,7 +375,7 @@
    </goal>
    <goal
     name="test2"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="78" loccnumb="5" loccnume="10"
     sum="ed91beaed415468e0e938dee53444945"
     proved="false"
@@ -394,13 +393,13 @@
   </theory>
   <theory
    name="ModelArray"
-   locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+   locfile="../alt-ergo-models.why"
    loclnum="82" loccnumb="7" loccnume="17"
    verified="false"
    expanded="true">
    <goal
     name="t1"
-    locfile="tests-provers/alt-ergo-models/../alt-ergo-models.why"
+    locfile="../alt-ergo-models.why"
     loclnum="86" loccnumb="5" loccnume="7"
     sum="80ac2844addd3bc5d617d1bfe18cfa0f"
     proved="false"

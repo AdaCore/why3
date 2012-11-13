@@ -15,16 +15,18 @@ module ArrayMax
 
   use import int.Int
   use import int.MinMax
-  use import module ref.Ref
-  use import module array.Array
+  use import ref.Ref
+  use import array.Array
 
   let max (a: array int) =
-    { 0 < length a }
+    requires { 0 < length a }
+    ensures  { 0 <= result < length a /\
+      forall i:int. 0 <= i < a.length -> a[i] <= a[result] }
     let x = ref 0 in
     let y = ref (length a - 1) in
     while !x <> !y do
       invariant { 0 <= !x <= !y < length a /\
-                    forall i:int.
+                  forall i:int.
                     0 <= i < !x \/ !y < i < length a ->
                        a[i] <= max a[!x] a[!y]
                 }
@@ -32,15 +34,5 @@ module ArrayMax
       if a[!x] <= a[!y] then x := !x+1 else y := !y-1
     done;
     !x
-    { 0 <= result < length a /\
-      forall i:int. 0 <= i < a.length -> a[i] <= a[result] }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide array_max.mlw"
-End:
-*)
-
-

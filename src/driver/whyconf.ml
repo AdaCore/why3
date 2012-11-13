@@ -1,27 +1,17 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
-open Util
-open Rc
 open Stdlib
+open Rc
 
 (* magicnumber for the configuration :
   - 0 before the magic number
@@ -45,7 +35,9 @@ let magicnumber = 14
 exception WrongMagicNumber
 
 let why3_regexp_of_string s = (** define a regexp in why3 *)
-  if s.[0] = '^' then Str.regexp s else Str.regexp ("^"^Str.quote s^"$")
+  if s = "" then Str.regexp "^$" else
+  if s.[0] = '^' then Str.regexp s else
+  Str.regexp ("^" ^ Str.quote s ^ "$")
 
 (* lib and shared dirs *)
 
@@ -71,10 +63,12 @@ let print_prover fmt p =
     p.prover_name p.prover_version
     (if p.prover_altern = "" then "" else " ") p.prover_altern
 
-let print_prover_parsable_format fmt p =
-  Format.fprintf fmt "%s,%s,%s"
+let prover_parseable_format p =
+  Format.sprintf "%s,%s,%s"
     p.prover_name p.prover_version p.prover_altern
 
+let print_prover_parseable_format fmt p =
+  Format.pp_print_string fmt (prover_parseable_format p)
 
 module Prover = struct
   type t = prover
@@ -101,7 +95,7 @@ end
 
 module Mprover = Map.Make(Prover)
 module Sprover = Mprover.Set
-module Hprover = Hashtbl.Make(Prover)
+module Hprover = XHashtbl.Make(Prover)
 
 module Editor = struct
   type t = string
@@ -313,7 +307,7 @@ let set_prover_upgrade_policy prover policy (i, family) =
   let section = set_string section "alternative" prover.prover_altern in
   let section =
     match policy with
-      | CPU_keep -> 
+      | CPU_keep ->
         set_string section "policy" "keep"
       | CPU_upgrade p ->
         let section = set_string section "target_name" p.prover_name in
@@ -419,7 +413,7 @@ let load_policy provers acc (_,section) =
         in
         let _target = Mprover.find target provers in
         Mprover.add source (CPU_upgrade target) acc
-      | "duplicate" -> 
+      | "duplicate" ->
         let target =
           { prover_name = get_string section "target_name";
             prover_version = get_string section "target_version";
@@ -463,8 +457,11 @@ let read_config_rc conf_file =
 
 exception ConfigFailure of string (* filename *) * string
 
+let get_dirname filename =
+  Filename.dirname (absolute_filename (Sys.getcwd ()) filename)
+
 let get_config (filename,rc) =
-  let dirname = Filename.dirname filename in
+  let dirname = get_dirname filename in
   let rc, main =
     match get_section rc "main" with
       | None      -> raise (ConfigFailure (filename, "no main section"))
@@ -521,8 +518,8 @@ let mk_filter_prover ?version ?altern name =
   | Some "" -> invalid_arg "mk_filter_prover: version can't be an empty string"
   | _ -> () end;
   { filter_name    = mk_regexp name;
-    filter_version = option_map mk_regexp version;
-    filter_altern  = option_map mk_regexp altern;
+    filter_version = Opt.map mk_regexp version;
+    filter_altern  = Opt.map mk_regexp altern;
   }
 
 let print_filter_prover fmt fp =
@@ -537,7 +534,7 @@ exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t
 exception ParseFilterProver of string
 
 let parse_filter_prover s =
-  let sl = Util.split_string_rev s ',' in
+  let sl = Strings.rev_split s ',' in
   (* reverse order *)
   match sl with
   | [name] -> mk_filter_prover name
@@ -549,8 +546,8 @@ let parse_filter_prover s =
 let filter_prover fp p =
   let check s schema = Str.string_match schema.reg s 0 in
   check p.prover_name fp.filter_name
-  && option_apply true (check p.prover_version) fp.filter_version
-  && option_apply true (check p.prover_altern) fp.filter_altern
+  && Opt.fold (fun _ -> check p.prover_version) true fp.filter_version
+  && Opt.fold (fun _ -> check p.prover_altern) true fp.filter_altern
 
 let filter_provers whyconf fp =
   try
@@ -571,14 +568,14 @@ let filter_one_prover whyconf fp =
   if Mprover.is_num_elt 1 provers then
     snd (Mprover.choose provers)
   else if Mprover.is_empty provers then
-    raise $ ProverNotFound (whyconf,fp)
+    raise (ProverNotFound (whyconf,fp))
   else
-    raise $ ProverAmbiguity (whyconf,fp,provers)
+    raise (ProverAmbiguity (whyconf,fp,provers))
 
 (** merge config *)
 
 let merge_config config filename =
-  let dirname = Filename.dirname filename in
+  let dirname = get_dirname filename in
   let rc = Rc.from_file filename in
   (** modify main *)
   let main = match get_section rc "main" with
@@ -595,7 +592,7 @@ let merge_config config filename =
       let name = get_string section "name" in
       let version = get_stringo section "version" in
       let altern = get_stringo section "alternative" in
-      mk_filter_prover ?version ?altern name 
+      mk_filter_prover ?version ?altern name
     with MissingField s ->
       eprintf "[Warning] sec prover_modifiers is missing a '%s' field@." s;
       mk_filter_prover "none"
@@ -656,7 +653,7 @@ let set_main config main =
   }
 
 let set_provers config ?shortcuts provers =
-  let shortcuts = def_option config.prover_shortcuts shortcuts in
+  let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
   {config with
     config = set_provers_shortcuts config.config shortcuts provers;
     provers = provers;
@@ -682,7 +679,7 @@ let set_prover_upgrade_policy config prover target =
     provers_upgrade_policy = m;
   }
 
-let set_policies config policies = 
+let set_policies config policies =
   { config with
     config = set_policies config.config policies;
     provers_upgrade_policy = policies }

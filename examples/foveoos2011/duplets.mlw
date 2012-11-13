@@ -28,8 +28,8 @@ module Duplets
 
   use import int.Int
   use import Option
-  use import module ref.Ref
-  use import module array.Array
+  use import ref.Ref
+  use import array.Array
 
   (* duplet in array a is a pair of indexes (i,j) in the bounds of array
      a such that a[i] = a[j] *)
@@ -40,11 +40,13 @@ module Duplets
 
   (* (duplet a) returns the indexes (i,j) of a
      duplet in a. *)
-  let duplet (a:array int) (except:option int) =
-     { 2 <= length a /\
+  let duplet (a:array int) (except:option int)
+     requires { 2 <= length a /\
        exists i j:int. is_duplet a i j /\
                        not (eq_opt a[i] except) }
-     let res = ref (0,0) in
+     ensures { let (i,j) = result in
+       is_duplet a i j /\ not (eq_opt a[i] except) }
+   = let res = ref (0,0) in
      try
       for i=0 to length a - 2 do
         invariant {
@@ -68,25 +70,14 @@ module Duplets
       absurd
      with Break -> !res
      end
-  { let (i,j) = result in
-    is_duplet a i j /\ not (eq_opt a[i] except) }
 
-
-  let duplets (a: array int) =
-    { 4 <= length a /\ exists i j k l:int.
-      is_duplet a i j /\ is_duplet a k l /\ a[i] <> a[k] 
-    }
-    let (i,j) = duplet a None in
+  let duplets (a: array int)
+    requires { 4 <= length a /\ exists i j k l:int.
+      is_duplet a i j /\ is_duplet a k l /\ a[i] <> a[k] }
+    ensures { let ((i,j),(k,l)) = result in
+      is_duplet a i j /\ is_duplet a k l /\ a[i] <> a[k] }
+  = let (i,j) = duplet a None in
     let (k,l) = duplet a (Some a[j]) in
     ((i,j),(k,l))
-    { let ((i,j),(k,l)) = result in
-      is_duplet a i j /\ is_duplet a k l /\ a[i] <> a[k] }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide duplets.mlw"
-End:
-*)
-

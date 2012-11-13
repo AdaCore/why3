@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/andrei/prj/why-git/share/why3session.dtd">
-<why3session
- name="examples/programs/checking_a_large_routine/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,36 +15,36 @@
   expanded="true">
   <theory
    name="CheckingALargeRoutine"
-   locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+   locfile="../checking_a_large_routine.mlw"
    loclnum="7" loccnumb="7" loccnume="28"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter routine"
-    locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+    locfile="../checking_a_large_routine.mlw"
     loclnum="13" loccnumb="6" loccnume="13"
-    expl="parameter routine"
+    expl="VC for routine"
     sum="2c87a5e73941cd3b02af61bf8fce44e6"
     proved="true"
     expanded="true"
     shape="iainfix &lt;V2V0iainfix &lt;=V3V2ainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =V5ainfix *V6afactV2Aainfix &lt;=V6ainfix +V2c1Aainfix &lt;=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1Fainfix &lt;ainfix -V0V7ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Aainfix =V4afactV7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Iainfix =V7ainfix +V2c1FIainfix =V4ainfix *V3afactV2Aainfix &lt;=V3ainfix +V2c1Aainfix &lt;=c1V3FAainfix =V1ainfix *c1afactV2Aainfix &lt;=c1ainfix +V2c1Aainfix &lt;=c1c1ainfix =V1afactV0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FAainfix =c1afactc0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &gt;=V0c0F">
     <label
-     name="expl:parameter routine"/>
+     name="expl:VC for routine"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter routine.1"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="loop invariant init"
+      expl="1. loop invariant init"
       sum="1f1332adbddf942e33b91fc159bd1721"
       proved="true"
       expanded="true"
       shape="ainfix =c1afactc0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="0"
        timelimit="10"
@@ -57,15 +56,15 @@
      </goal>
      <goal
       name="WP_parameter routine.2"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="loop invariant init"
+      expl="2. loop invariant init"
       sum="3c949a8367aa36916278f22d2233e42b"
       proved="true"
       expanded="true"
       shape="ainfix =V1ainfix *c1afactV2Aainfix &lt;=c1ainfix +V2c1Aainfix &lt;=c1c1Iainfix &lt;V2V0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="0"
        timelimit="10"
@@ -77,15 +76,15 @@
      </goal>
      <goal
       name="WP_parameter routine.3"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="loop invariant preservation"
+      expl="3. loop invariant preservation"
       sum="16adecdb605315af127fab31763c4f24"
       proved="true"
       expanded="true"
       shape="ainfix =V5ainfix *V6afactV2Aainfix &lt;=V6ainfix +V2c1Aainfix &lt;=c1V6Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1FIainfix &lt;=V3V2Iainfix =V4ainfix *V3afactV2Aainfix &lt;=V3ainfix +V2c1Aainfix &lt;=c1V3FIainfix &lt;V2V0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="1"
        timelimit="10"
@@ -97,15 +96,15 @@
      </goal>
      <goal
       name="WP_parameter routine.4"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="loop variant decrease"
+      expl="4. loop variant decrease"
       sum="658ecffa25b241aba563b686c7a7880d"
       proved="true"
       expanded="true"
       shape="ainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V6ainfix +V3c1FIainfix =V5ainfix +V4V1FIainfix &lt;=V3V2Iainfix =V4ainfix *V3afactV2Aainfix &lt;=V3ainfix +V2c1Aainfix &lt;=c1V3FIainfix &lt;V2V0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="0"
        timelimit="10"
@@ -117,15 +116,15 @@
      </goal>
      <goal
       name="WP_parameter routine.5"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="loop invariant preservation"
+      expl="5. loop invariant preservation"
       sum="78ac374bb40b2a7ba345a472c13cbf81"
       proved="true"
       expanded="true"
       shape="ainfix =V4afactV5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V5ainfix +V2c1FIainfix &lt;=V3V2NIainfix =V4ainfix *V3afactV2Aainfix &lt;=V3ainfix +V2c1Aainfix &lt;=c1V3FIainfix &lt;V2V0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="0"
        timelimit="10"
@@ -137,15 +136,15 @@
      </goal>
      <goal
       name="WP_parameter routine.6"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="loop variant decrease"
+      expl="6. loop variant decrease"
       sum="cfe6e6f973867f21832faea47e50402e"
       proved="true"
       expanded="true"
       shape="ainfix &lt;ainfix -V0V5ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Iainfix =V5ainfix +V2c1FIainfix &lt;=V3V2NIainfix =V4ainfix *V3afactV2Aainfix &lt;=V3ainfix +V2c1Aainfix &lt;=c1V3FIainfix &lt;V2V0Iainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="0"
        timelimit="10"
@@ -157,15 +156,15 @@
      </goal>
      <goal
       name="WP_parameter routine.7"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
+      locfile="../checking_a_large_routine.mlw"
       loclnum="13" loccnumb="6" loccnume="13"
-      expl="postcondition"
+      expl="7. postcondition"
       sum="eb589caeed04d036cf730be9c7c45e0f"
       proved="true"
       expanded="true"
       shape="ainfix =V1afactV0Iainfix &lt;V2V0NIainfix =V1afactV2Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine"/>
+       name="expl:VC for routine"/>
       <proof
        prover="0"
        timelimit="10"
@@ -179,30 +178,30 @@
    </goal>
    <goal
     name="WP_parameter routine2"
-    locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-    loclnum="34" loccnumb="6" loccnume="14"
-    expl="parameter routine2"
+    locfile="../checking_a_large_routine.mlw"
+    loclnum="32" loccnumb="6" loccnume="14"
+    expl="VC for routine2"
     sum="3a19abec2be89a45778d01d35bc323c6"
     proved="true"
     expanded="true"
     shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1Aainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2Aainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix &lt;=V4V2Aainfix &lt;=c1V4FFAainfix =V1ainfix *c1afactV2Iainfix &lt;=c1V2Aainfix =V1afactainfix +V2c1Iainfix &gt;c1V2Iainfix =V1afactV2Iainfix &lt;=V2ainfix -V0c1Aainfix &lt;=c0V2FFAainfix =c1afactc0Iainfix &lt;=c0ainfix -V0c1Aainfix =c1afactV0Iainfix &gt;c0ainfix -V0c1Iainfix &gt;=V0c0F">
     <label
-     name="expl:parameter routine2"/>
+     name="expl:VC for routine2"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter routine2.1"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="postcondition"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="1. postcondition"
       sum="704ab83d1cf9f3cc9a75b6d5dff22493"
       proved="true"
       expanded="true"
       shape="ainfix =c1afactV0Iainfix &gt;c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="10"
@@ -214,15 +213,15 @@
      </goal>
      <goal
       name="WP_parameter routine2.2"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="loop invariant init"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="2. loop invariant init"
       sum="6f4355c291edd1a40e47bdd2b472aeee"
       proved="true"
       expanded="true"
       shape="ainfix =c1afactc0Iainfix &lt;=c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="10"
@@ -234,15 +233,15 @@
      </goal>
      <goal
       name="WP_parameter routine2.3"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="loop invariant preservation"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="3. loop invariant preservation"
       sum="9ff28d6d6d727b7dae866368db832070"
       proved="true"
       expanded="true"
       shape="ainfix =V1afactainfix +V2c1Iainfix &gt;c1V2Iainfix =V1afactV2Iainfix &lt;=V2ainfix -V0c1Aainfix &lt;=c0V2FFIainfix &lt;=c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="5"
@@ -254,15 +253,15 @@
      </goal>
      <goal
       name="WP_parameter routine2.4"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="loop invariant init"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="4. loop invariant init"
       sum="cd8123d3adfacc7366bbe70963b4be4b"
       proved="true"
       expanded="true"
       shape="ainfix =V1ainfix *c1afactV2Iainfix &lt;=c1V2Iainfix =V1afactV2Iainfix &lt;=V2ainfix -V0c1Aainfix &lt;=c0V2FFIainfix &lt;=c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="5"
@@ -274,15 +273,15 @@
      </goal>
      <goal
       name="WP_parameter routine2.5"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="loop invariant preservation"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="5. loop invariant preservation"
       sum="a7a95f15d6b3c0699a8c1e9c9aad724c"
       proved="true"
       expanded="true"
       shape="ainfix =V5ainfix *ainfix +V4c1afactV2Iainfix =V5ainfix +V3V1FIainfix =V3ainfix *V4afactV2Iainfix &lt;=V4V2Aainfix &lt;=c1V4FFIainfix &lt;=c1V2Iainfix =V1afactV2Iainfix &lt;=V2ainfix -V0c1Aainfix &lt;=c0V2FFIainfix &lt;=c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="5"
@@ -294,15 +293,15 @@
      </goal>
      <goal
       name="WP_parameter routine2.6"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="loop invariant preservation"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="6. loop invariant preservation"
       sum="47be5d244ba8f38f45fa3321641b30e3"
       proved="true"
       expanded="true"
       shape="ainfix =V3afactainfix +V2c1Iainfix =V3ainfix *ainfix +V2c1afactV2FIainfix &lt;=c1V2Iainfix =V1afactV2Iainfix &lt;=V2ainfix -V0c1Aainfix &lt;=c0V2FFIainfix &lt;=c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="10"
@@ -314,15 +313,15 @@
      </goal>
      <goal
       name="WP_parameter routine2.7"
-      locfile="examples/programs/checking_a_large_routine/../checking_a_large_routine.mlw"
-      loclnum="34" loccnumb="6" loccnume="14"
-      expl="postcondition"
+      locfile="../checking_a_large_routine.mlw"
+      loclnum="32" loccnumb="6" loccnume="14"
+      expl="7. postcondition"
       sum="e8ed7c7dd8be78212fb8330764a50027"
       proved="true"
       expanded="true"
       shape="ainfix =V1afactV0Iainfix =V1afactainfix +ainfix -V0c1c1FIainfix &lt;=c0ainfix -V0c1Iainfix &gt;=V0c0F">
       <label
-       name="expl:parameter routine2"/>
+       name="expl:VC for routine2"/>
       <proof
        prover="0"
        timelimit="10"

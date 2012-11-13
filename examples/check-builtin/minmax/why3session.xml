@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/home/marche/why3/share/why3session.dtd">
-<why3session
- name="check-builtin/minmax/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -24,33 +23,25 @@
   expanded="false">
   <theory
    name="MinMax"
-   locfile="check-builtin/minmax/../minmax.why"
+   locfile="../minmax.why"
    loclnum="1" loccnumb="7" loccnume="13"
    verified="true"
    expanded="true">
    <goal
     name="G"
-    locfile="check-builtin/minmax/../minmax.why"
+    locfile="../minmax.why"
     loclnum="4" loccnumb="7" loccnume="8"
     sum="6bacc0fd5d26f89c6e59d03b42a0619c"
     proved="true"
     expanded="true"
     shape="ainfix =aminV0amaxaminV2V0V1V0IageV1V0IageV2V0IageV2V1F">
     <proof
-     prover="3"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="1"
@@ -61,32 +52,32 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G2"
-    locfile="check-builtin/minmax/../minmax.why"
+    locfile="../minmax.why"
     loclnum="7" loccnumb="7" loccnume="9"
     sum="cd6d7550208e10b3075d00cc8492ace1"
     proved="true"
     expanded="true"
     shape="ageV0V1Iainfix =amaxV0V1V0F">
     <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
+     prover="0"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -102,12 +93,20 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="0"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>

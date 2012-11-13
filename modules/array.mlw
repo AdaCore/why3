@@ -12,98 +12,84 @@ module Array
   use import int.Int
   use import map.Map as M
 
-  type array 'a model {| length : int; mutable elts : map int 'a |}
+  type array 'a model { length : int; mutable elts : map int 'a }
 
   function get (a: array 'a) (i: int) : 'a = M.get a.elts i
 
   function set (a: array 'a) (i: int) (v: 'a) : array 'a =
-    {| a with elts = M.set a.elts i v |}
+    { a with elts = M.set a.elts i v }
 
   (** syntactic sugar *)
   function ([]) (a: array 'a) (i: int) : 'a = get a i
   function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
-  val ([]) (a: array 'a) (i: int) :
-    { 0 <= i < length a } 'a reads a { result = a[i] }
+  val ([]) (a: array 'a) (i: int) : 'a reads {a}
+    requires { 0 <= i < length a }
+    ensures  { result = a[i] }
 
-  val ([]<-) (a: array 'a) (i: int) (v: 'a) :
-    { 0 <= i < length a } unit writes a { a.elts = M.set (old a.elts) i v }
+  val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
+    requires { 0 <= i < length a }
+    ensures  { a.elts = M.set (old a.elts) i v }
 
-  val length (a: array 'a) : {} int { result = a.length }
+  val length (a: array 'a) : int ensures { result = a.length }
 
   (** unsafe get/set operations with no precondition *)
   exception OutOfBounds
 
-  let defensive_get (a: array 'a) (i: int) =
-    { }
-    if i < 0 || i >= length a then raise OutOfBounds;
+  let defensive_get (a: array 'a) (i: int)
+    ensures { 0 <= i < length a /\ result = a[i] }
+    raises { OutOfBounds -> i < 0 \/ i >= length a }
+  = if i < 0 || i >= length a then raise OutOfBounds;
     a[i]
-    { 0 <= i < length a /\ result = a[i] }
-    | OutOfBounds -> { i < 0 \/ i >= length a }
 
-  let defensive_set (a: array 'a) (i: int) (v: 'a) =
-    { }
-    if i < 0 || i >= length a then raise OutOfBounds;
+  let defensive_set (a: array 'a) (i: int) (v: 'a)
+    ensures { 0 <= i < length a /\ a = (old a)[i <- v] }
+    raises { OutOfBounds -> i < 0 \/ i >= length a }
+  = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
-    { 0 <= i < length a /\ a = (old a)[i <- v] }
-    | OutOfBounds -> { i < 0 \/ i >= length a }
 
   function make (n: int) (v: 'a) : array 'a =
-    {| length = n; elts = M.const v |}
+    { length = n; elts = M.const v }
 
-  val make (n: int) (v: 'a) :
-    { n >= 0 }
-    array 'a
-    { result = make n v }
+  val make (n: int) (v: 'a) : array 'a
+    requires { n >= 0 } ensures { result = make n v }
 
-  val append (a1: array 'a) (a2: array 'a) :
-    {}
-    array 'a
-    { length result = length a1 + length a2 /\
-      (forall i:int. 0 <= i < length a1 -> result[i] = a1[i]) /\
-      (forall i:int. 0 <= i < length a2 -> result[length a1 + i] = a2[i]) }
+  val append (a1: array 'a) (a2: array 'a) : array 'a
+    ensures { length result = length a1 + length a2 }
+    ensures { forall i:int. 0 <= i < length a1 -> result[i] = a1[i] }
+    ensures {
+      forall i:int. 0 <= i < length a2 -> result[length a1 + i] = a2[i] }
 
-  val sub (a: array 'a) (ofs: int) (len: int) :
-    { 0 <= ofs /\ ofs + len <= length a }
-    array 'a
-    { length result = len /\
-      forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
+  val sub (a: array 'a) (ofs: int) (len: int) : array 'a
+    requires { 0 <= ofs /\ ofs + len <= length a }
+    ensures  { length result = len }
+    ensures  { forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
 
-  val copy (a: array 'a) :
-    {}
-    array 'a
-    { length result = length a /\
-      forall i:int. 0 <= i < length result -> result[i] = a[i] }
+  val copy (a: array 'a) : array 'a
+    ensures  { length result = length a }
+    ensures  { forall i:int. 0 <= i < length result -> result[i] = a[i] }
 
-  let fill (a: array 'a) (ofs: int) (len: int) (v: 'a) =
-    { 0 <= ofs /\ ofs + len <= length a }
-'Init:
+  let fill (a: array 'a) (ofs: int) (len: int) (v: 'a)
+    requires { 0 <= ofs /\ ofs + len <= length a }
+    ensures  { forall i:int.
+      (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (old a)[i] }
+    ensures  { forall i:int. ofs <= i < ofs + len -> a[i] = v }
+  = 'Init:
     for k = 0 to len - 1 do
-      invariant {
-        (forall i:int.
-        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (at a 'Init)[i])
-        /\
-        (forall i:int. ofs <= i < ofs + k -> a[i] = v)
-      }
+      invariant { forall i:int.
+        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (at a 'Init)[i] }
+      invariant { forall i:int. ofs <= i < ofs + k -> a[i] = v }
       a[ofs + k] <- v
     done
-    { (forall i:int.
-        (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (old a)[i])
-      /\
-      (forall i:int.
-        ofs <= i < ofs + len -> a[i] = v) }
 
   val blit (a1: array 'a) (ofs1: int)
-                 (a2: array 'a) (ofs2: int) (len: int) :
-    { 0 <= ofs1 /\ ofs1 + len <= length a1 /\
-      0 <= ofs2 /\ ofs2 + len <= length a2 }
-    unit
-    writes a2
-    { (forall i:int.
-        (0 <= i < ofs2 \/ ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i])
-      /\
-      (forall i:int.
-        ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2]) }
+                 (a2: array 'a) (ofs2: int) (len: int) : unit writes {a2}
+    requires { 0 <= ofs1 /\ ofs1 + len <= length a1 }
+    requires { 0 <= ofs2 /\ ofs2 + len <= length a2 }
+    ensures  { forall i:int.
+      (0 <= i < ofs2 \/ ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i] }
+    ensures  { forall i:int.
+      ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2] }
 
   (*** TODO?
      - concat : 'a array list -> 'a array
@@ -118,7 +104,7 @@ end
 module ArraySorted
 
   use import int.Int
-  use import module Array
+  use import Array
   clone import map.MapSorted as M with type elt = int, predicate le = (<=)
 
   predicate sorted_sub (a : array int) (l u : int) =
@@ -133,7 +119,7 @@ end
 
 module ArrayEq
 
-  use import module Array
+  use import Array
   use import map.MapEq as M
 
   predicate array_eq_sub (a1 a2: array 'a) (l u: int) =
@@ -150,7 +136,7 @@ end
 module ArrayPermut
 
   use import int.Int
-  use import module Array
+  use import Array
   clone import map.MapPermut as M
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
@@ -176,7 +162,7 @@ module ArrayPermut
     forall a1 a2 a3: array 'a.
     permut a1 a2 -> permut a2 a3 -> permut a1 a3
 
-  use import module ArrayEq
+  use import ArrayEq
 
   lemma array_eq_sub_permut:
     forall a1 a2: array 'a, l u: int.
@@ -192,7 +178,7 @@ end
 
 module ArraySum
 
-  use import module Array
+  use import Array
   clone import map.MapSum as M
 
   (** [sum a l h] is the sum of [a[i]] for [l <= i < h] *)
@@ -226,7 +212,7 @@ end
 module TestArray
 
   use import int.Int
-  use import module Array
+  use import Array
 
   let test_append () =
     let a1 = make 17 2 in
@@ -259,9 +245,3 @@ module TestArray
     assert { a2[24] = False }
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/array"
-End:
-*)

@@ -1,28 +1,18 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Why3 printer *)
 
 open Format
 open Pp
-open Util
 open Ident
 open Ty
 open Term
@@ -46,7 +36,7 @@ let iprinter,aprinter,tprinter,pprinter =
 let forget_tvs () =
   forget_all aprinter
 
-let forget_all () =
+let _forget_all () =
   forget_all iprinter;
   forget_all aprinter;
   forget_all tprinter;
@@ -118,7 +108,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  option_apply true inspect fs.ls_value
+  Opt.fold (fun _ -> inspect) true fs.ls_value
 
 (** Patterns, terms, and formulas *)
 
@@ -387,6 +377,7 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
+(*
 let print_task_old _env pr thpr _blacklist ?old:_ fmt task =
   forget_all ();
   print_prelude fmt pr;
@@ -394,6 +385,9 @@ let print_task_old _env pr thpr _blacklist ?old:_ fmt task =
   info := { info_syn = get_syntax_map task };
   fprintf fmt "theory Task@\n%a@\nend@."
     (print_list nothing print_tdecl) (Task.task_tdecls task)
+
+let () = register_printer "why3old" print_task_old ~desc:""
+*)
 
 let print_tdecls =
   let print sm fmt td =
@@ -410,8 +404,6 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
     (print_list nothing string)
       (List.rev (Trans.apply print_tdecls task))
 
-let () = register_printer "why3old" print_task_old
-  ~desc:"TODO"
 let () = register_printer "why3" print_task
-  ~desc:"Printer@ for@ the@ logical@ format@ of@ why3.@ There@ is@ currently@ \
-         a@ lose@ of@ informations@ between@ the@ parser@ and@ the@ printer."
+  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ \
+    Used@ for@ debugging."

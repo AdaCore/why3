@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
 open Mlw_ty
 open Mlw_expr
 open Mlw_dty
@@ -29,22 +19,18 @@ type ident = Ptree.ident
 type ghost = bool
 
 type dpre = Ptree.lexpr list
-type dpost = (string * Ptree.lexpr) list
+type dpost = (Ptree.pattern * Ptree.lexpr) list
 type dxpost = dpost Mexn.t
+type deffect = Ptree.lexpr list
 type dvariant = Ptree.lexpr * Term.lsymbol option
 type dinvariant = Ptree.lexpr list
-
-type deffect = {
-  deff_reads  : Ptree.lexpr list;
-  deff_writes : Ptree.lexpr list;
-  deff_raises : xsymbol list;
-}
 
 type dspec = {
   ds_pre     : dpre;
   ds_post    : dpost;
   ds_xpost   : dxpost;
-  ds_effect  : deffect;
+  ds_reads   : deffect;
+  ds_writes  : deffect;
   ds_variant : dvariant list;
 }
 
@@ -64,7 +50,7 @@ type dexpr = {
 }
 
 and dexpr_desc =
-  | DEconstant of Term.constant
+  | DEconstant of Number.constant
   | DElocal of string
   | DEglobal_pv of pvsymbol
   | DEglobal_ps of psymbol
@@ -82,7 +68,7 @@ and dexpr_desc =
   | DEmatch of dexpr * (pre_ppattern * dexpr) list
   | DEabsurd
   | DEraise of xsymbol * dexpr
-  | DEtry of dexpr * (xsymbol * ident * dexpr) list
+  | DEtry of dexpr * (xsymbol * pre_ppattern * dexpr) list
   | DEfor of ident * dexpr * Ptree.for_direction * dexpr * dinvariant * dexpr
   | DEassert of Ptree.assertion_kind * Ptree.lexpr
   | DEabstract of dtriple

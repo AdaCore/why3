@@ -1,24 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
+open Stdlib
 open Ident
 
 (** Types *)
@@ -27,7 +18,7 @@ type tvsymbol = {
   tv_name : ident;
 }
 
-module Tvar = WeakStructMake (struct
+module Tvar = Stdlib.MakeMSHW (struct
   type t = tvsymbol
   let tag tv = tv.tv_name.id_tag
 end)
@@ -52,14 +43,14 @@ type tysymbol = {
 
 and ty = {
   ty_node : ty_node;
-  ty_tag  : Hashweak.tag;
+  ty_tag  : Weakhtbl.tag;
 }
 
 and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Tsym = WeakStructMake (struct
+module Tsym = Stdlib.MakeMSHW (struct
   type t = tysymbol
   let tag ts = ts.ts_name.id_tag
 end)
@@ -73,7 +64,7 @@ let ts_equal : tysymbol -> tysymbol -> bool = (==)
 let ty_equal : ty       -> ty       -> bool = (==)
 
 let ts_hash ts = id_hash ts.ts_name
-let ty_hash ty = Hashweak.tag_hash ty.ty_tag
+let ty_hash ty = Weakhtbl.tag_hash ty.ty_tag
 
 let mk_ts name args def = {
   ts_name = id_register name;
@@ -94,10 +85,10 @@ module Hsty = Hashcons.Make (struct
     | Tyvar v -> tv_hash v
     | Tyapp (s,tl) -> Hashcons.combine_list ty_hash (ts_hash s) tl
 
-  let tag n ty = { ty with ty_tag = Hashweak.create_tag n }
+  let tag n ty = { ty with ty_tag = Weakhtbl.create_tag n }
 end)
 
-module Ty = WeakStructMake (struct
+module Ty = MakeMSHW (struct
   type t = ty
   let tag ty = ty.ty_tag
 end)
@@ -109,7 +100,7 @@ module Wty = Ty.W
 
 let mk_ty n = {
   ty_node = n;
-  ty_tag  = Hashweak.dummy_tag;
+  ty_tag  = Weakhtbl.dummy_tag;
 }
 
 let ty_var n = Hsty.hashcons (mk_ty (Tyvar n))
@@ -126,10 +117,10 @@ let ty_fold fn acc ty = match ty.ty_node with
   | Tyapp (_, tl) -> List.fold_left fn acc tl
 
 let ty_all pr ty =
-  try ty_fold (all_fn pr) true ty with FoldSkip -> false
+  try ty_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
 
 let ty_any pr ty =
-  try ty_fold (any_fn pr) false ty with FoldSkip -> true
+  try ty_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
 
 (* traversal functions on type variables *)
 
@@ -142,10 +133,10 @@ let rec ty_v_fold fn acc ty = match ty.ty_node with
   | Tyapp (_, tl) -> List.fold_left (ty_v_fold fn) acc tl
 
 let ty_v_all pr ty =
-  try ty_v_fold (all_fn pr) true ty with FoldSkip -> false
+  try ty_v_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
 
 let ty_v_any pr ty =
-  try ty_v_fold (any_fn pr) false ty with FoldSkip -> true
+  try ty_v_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
 
 let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
 let ty_freevars s ty = ty_v_fold (fun s v -> Stv.add v s) s ty
@@ -161,7 +152,7 @@ let create_tysymbol name args def =
   let add s v = Stv.add_new (DuplicateTypeVar v) v s in
   let s = List.fold_left add Stv.empty args in
   let check v = Stv.mem v s || raise (UnboundTypeVar v) in
-  ignore (option_map (ty_v_all check) def);
+  ignore (Opt.map (ty_v_all check) def);
   mk_ts name args def
 
 let ty_app s tl =
@@ -187,10 +178,10 @@ let rec ty_s_fold fn acc ty = match ty.ty_node with
   | Tyapp (f, tl) -> List.fold_left (ty_s_fold fn) (fn acc f) tl
 
 let ty_s_all pr ty =
-  try ty_s_fold (all_fn pr) true ty with FoldSkip -> false
+  try ty_s_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
 
 let ty_s_any pr ty =
-  try ty_s_fold (any_fn pr) false ty with FoldSkip -> true
+  try ty_s_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
 
 (* type matching *)
 
@@ -240,7 +231,7 @@ let ty_pred ty_a = ty_app ts_pred [ty_a]
 
 let ts_tuple_ids = Hid.create 17
 
-let ts_tuple = Util.Hint.memo 17 (fun n ->
+let ts_tuple = Hint.memo 17 (fun n ->
   let vl = ref [] in
   for _i = 1 to n do vl := create_tvsymbol (id_fresh "a") :: !vl done;
   let ts = create_tysymbol (id_fresh ("tuple" ^ string_of_int n)) !vl None in
@@ -260,17 +251,17 @@ exception UnexpectedProp
 
 let oty_type = function Some ty -> ty | None -> raise UnexpectedProp
 
-let oty_equal = Util.option_eq ty_equal
-let oty_hash = Util.option_apply 1 ty_hash
+let oty_equal = Opt.equal ty_equal
+let oty_hash = Opt.fold (fun _ -> ty_hash) 1
 
 let oty_match m o1 o2 = match o1,o2 with
   | Some ty1, Some ty2 -> ty_match m ty1 ty2
   | None, None -> m
   | _ -> raise UnexpectedProp
 
-let oty_inst m = Util.option_map (ty_inst m)
-let oty_freevars = Util.option_fold ty_freevars
-let oty_cons = Util.option_fold (fun tl t -> t::tl)
+let oty_inst m = Opt.map (ty_inst m)
+let oty_freevars = Opt.fold ty_freevars
+let oty_cons = Opt.fold (fun tl t -> t::tl)
 
 let ty_equal_check ty1 ty2 =
   if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))

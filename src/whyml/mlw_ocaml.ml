@@ -1,27 +1,19 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
-open Why3
 open Pp
-open Util
+
+open Stdlib
+open Number
 open Ident
 open Ty
 open Term
@@ -31,8 +23,8 @@ open Printer
 open Mlw_ty
 
 let debug =
-  Debug.register_info_flag
-    ~desc:"Print details on program extraction." "extraction"
+  Debug.register_info_flag "extraction"
+    ~desc:"Print@ details@ of@ program@ extraction."
 
 let clean_fname fname =
   let fname = Filename.basename fname in
@@ -53,16 +45,6 @@ let modulename path t =
   String.capitalize
     (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t)
 
-(** Driver *)
-
-(* dead code
-
-(* (path,id) -> string Hid *)
-let stdlib = Hashtbl.create 17
-let is_stdlib path id = Hashtbl.mem stdlib (path, id)
-
-*)
-
 (** Printers *)
 
 let ocaml_keywords =
@@ -77,9 +59,9 @@ let ocaml_keywords =
    "raise";]
 
 let is_ocaml_keyword =
-  let h = Hashtbl.create 17 in
-  List.iter (fun s -> Hashtbl.add h s ()) ocaml_keywords;
-  Hashtbl.mem h
+  let h = Hstr.create 17 in
+  List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
+  Hstr.mem h
 
 let iprinter,aprinter,_tprinter,_pprinter =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
@@ -125,7 +107,7 @@ let get_record info ls =
         let rec lookup = function
         | [] -> []
         | (_, [cs, pjl]) :: _ when ls_equal cs ls ->
-          (try List.map Util.of_option pjl with _ -> [])
+          (try List.map Opt.get pjl with _ -> [])
         | _ :: dl -> lookup dl
         in
         lookup dl
@@ -258,7 +240,7 @@ let print_data_decl info fst fmt (ts,csl) =
   let print_default () = print_list newline (print_constr info) fmt csl in
   let print_field fmt ls =
     fprintf fmt "%a: %a"
-      (print_ls info) ls (print_ty info) (Util.of_option ls.ls_value) in
+      (print_ls info) ls (print_ty info) (Opt.get ls.ls_value) in
   let print_defn fmt = function
     | [cs, _] ->
         let pjl = get_record info cs in
@@ -283,7 +265,7 @@ let is_record = function
 
 let print_projections info fmt (_, csl) =
   let pjl = List.filter ((<>) None) (snd (List.hd csl)) in
-  let pjl = List.map Util.of_option pjl in
+  let pjl = List.map Opt.get pjl in
   let print ls =
     let print_branch fmt (cs, pjl) =
       let print_arg fmt = function
@@ -355,14 +337,15 @@ and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
 let print_const fmt = function
-  | ConstInt (IConstDecimal s) ->
+  | ConstInt (IConstDec s) ->
       fprintf fmt "(Why3__BuiltIn.int_constant \"%s\")" s
-  | ConstInt (IConstHexa s) -> fprintf fmt (tbi "0x%s") s
-  | ConstInt (IConstOctal s) -> fprintf fmt (tbi "0o%s") s
-  | ConstInt (IConstBinary s) -> fprintf fmt (tbi "0b%s") s
-  | ConstReal (RConstDecimal (i,f,None)) -> fprintf fmt (tbi "%s.%s") i f
-  | ConstReal (RConstDecimal (i,f,Some e)) -> fprintf fmt (tbi "%s.%se%s") i f e
-  | ConstReal (RConstHexa (i,f,e)) -> fprintf fmt (tbi "0x%s.%sp%s") i f e
+  | ConstInt (IConstHex s) -> fprintf fmt (tbi "0x%s") s
+  | ConstInt (IConstOct s) -> fprintf fmt (tbi "0o%s") s
+  | ConstInt (IConstBin s) -> fprintf fmt (tbi "0b%s") s
+  | ConstReal (RConstDec (i,f,None)) -> fprintf fmt (tbi "%s.%s") i f
+  | ConstReal (RConstDec (i,f,Some e)) -> fprintf fmt (tbi "%s.%se%s") i f e
+  | ConstReal (RConstHex (i,f,Some e)) -> fprintf fmt (tbi "0x%s.%sp%s") i f e
+  | ConstReal (RConstHex (i,f,None)) -> fprintf fmt (tbi "0x%s.%s") i f
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -375,7 +358,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  option_apply true inspect fs.ls_value
+  Opt.fold (fun _ -> inspect) true fs.ls_value
 
 (** Patterns, terms, and formulas *)
 
@@ -601,7 +584,7 @@ let extract_theory drv ?old ?fname fmt th =
     current_theory = th;
     th_known_map = th.th_known;
     mo_known_map = Mid.empty;
-    fname = Util.option_map clean_fname fname; } in
+    fname = Opt.map clean_fname fname; } in
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     print_theory_name th;
@@ -941,7 +924,7 @@ let is_record = function
 
 let print_pprojections info fmt (_, csl, _) =
   let pjl = List.filter ((<>) None) (snd (List.hd csl)) in
-  let pjl = List.map Util.of_option pjl in
+  let pjl = List.map Opt.get pjl in
   let print ls =
     let print_branch fmt (cs, pjl) =
       let print_arg fmt = function
@@ -997,7 +980,7 @@ let extract_module drv ?old ?fname fmt m =
     current_theory = th;
     th_known_map = th.th_known;
     mo_known_map = m.mod_known;
-    fname = Util.option_map clean_fname fname; } in
+    fname = Opt.map clean_fname fname; } in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     print_module_name m;

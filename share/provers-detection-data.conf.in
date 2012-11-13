@@ -1,14 +1,3 @@
-[ATP alt-ergo-model]
-name = "Alt-Ergo"
-exec = "alt-ergo"
-exec = "alt-ergo-0.95-dev"
-version_switch = "-version"
-version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
-version_ok = "0.95-dev"
-command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t -model %f"
-driver = "drivers/alt_ergo_model.drv"
-editor = "altgr-ergo"
-
 [ATP alt-ergo]
 name = "Alt-Ergo"
 exec = "alt-ergo"
@@ -17,7 +6,33 @@ version_switch = "-version"
 version_regexp = "\\([0-9.]+\\)"
 version_ok = "0.94"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
+driver = "drivers/alt_ergo_0.94.drv"
+editor = "altgr-ergo"
+
+[ATP alt-ergo]
+name = "Alt-Ergo"
+exec = "alt-ergo"
+exec = "alt-ergo-0.95"
+exec = "alt-ergo-0.95-dev"
+version_switch = "-version"
+version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
+version_ok = "0.95"
+version_ok = "0.95-dev"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t %f"
 driver = "drivers/alt_ergo.drv"
+editor = "altgr-ergo"
+
+[ATP alt-ergo-model]
+name = "Alt-Ergo"
+alternative = "models"
+exec = "alt-ergo"
+exec = "alt-ergo-0.95-dev"
+version_switch = "-version"
+version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
+version_ok = "0.95"
+version_ok = "0.95-dev"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t -model %f"
+driver = "drivers/alt_ergo_model.drv"
 editor = "altgr-ergo"
 
 [ATP alt-ergo]
@@ -51,7 +66,7 @@ version_old = "0.91"
 version_old = "0.9"
 version_old = "0.8"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
-driver = "drivers/alt_ergo_bare.drv"
+driver = "drivers/alt_ergo_0.92.drv"
 
 [ATP cvc3]
 name = "CVC3"
@@ -133,6 +148,15 @@ driver = "drivers/gappa.drv"
 
 [ATP gappa]
 name = "Gappa"
+exec = "gappa-0.16.0"
+version_switch = "--version"
+version_regexp = "Gappa \\([^ \n]*\\)"
+version_ok = "0.16.0"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
+driver = "drivers/gappa.drv"
+
+[ATP gappa]
+name = "Gappa"
 exec = "gappa-0.15.1"
 version_switch = "--version"
 version_regexp = "Gappa \\([^ \n]*\\)"
@@ -194,9 +218,15 @@ driver = "drivers/verit.drv"
 [ATP z3]
 name = "Z3"
 exec = "z3"
+exec = "z3-4.2"
+exec = "z3-4.1.2"
+exec = "z3-4.1.1"
 exec = "z3-4.0"
 version_switch = "-version"
 version_regexp = "Z3 version \\([^ \n\r]+\\)"
+version_ok  = "4.2"
+version_ok  = "4.1.2"
+version_ok  = "4.1.1"
 version_ok  = "4.0"
 driver = "drivers/z3.drv"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt2 -rs:42 %f"
@@ -278,7 +308,9 @@ exec = "iprover"
 version_switch = " | grep iProver"
 version_regexp = "iProver v\\([^ \n\t]+\\)"
 version_ok = "0.8.1"
-command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none --time_out_virtual %t --clausifier /usr/bin/env --clausifier_options \"eprover --cnf --tstp-format \" %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none \
+--time_out_virtual %t --clausifier /usr/bin/env --clausifier_options \
+\"eprover --cnf --tstp-format \" %f"
 driver = "drivers/iprover.drv"
 
 [ITP coq]
@@ -287,6 +319,15 @@ exec = "coqtop -batch"
 version_switch = "-v"
 version_regexp = "The Coq Proof Assistant, version \\([^ \n]+\\)"
 version_ok = "8.4"
+command = "'@LOCALBIN@why3-cpulimit' 0 %m -s %e -I %l/coq-tactic -R %l/coq Why3 -l %f"
+driver = "drivers/coq_8_4.drv"
+editor = "coqide"
+
+[ITP coq]
+name = "Coq"
+exec = "coqtop -batch"
+version_switch = "-v"
+version_regexp = "The Coq Proof Assistant, version \\([^ \n]+\\)"
 version_ok = "8.3pl4"
 version_ok = "8.3pl3"
 version_ok = "8.3pl2"

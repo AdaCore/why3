@@ -1,28 +1,18 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Coq printer *)
 
 open Format
 open Pp
-open Util
 open Ident
 open Ty
 open Term
@@ -179,7 +169,7 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (of_option fs.ls_value)
+  inspect (Opt.get fs.ls_value)
 
 (** Patterns, terms, and formulas *)
 
@@ -263,19 +253,19 @@ and print_tnode opl opr info fmt t = match t.t_node with
       print_vs fmt v
   | Tconst c ->
       let number_format = {
-          Print_number.long_int_support = true;
-          Print_number.dec_int_support = Print_number.Number_custom "%s%%Z";
-          Print_number.hex_int_support = Print_number.Number_unsupported;
-          Print_number.oct_int_support = Print_number.Number_unsupported;
-          Print_number.bin_int_support = Print_number.Number_unsupported;
-          Print_number.def_int_support = Print_number.Number_unsupported;
-          Print_number.dec_real_support = Print_number.Number_unsupported;
-          Print_number.hex_real_support = Print_number.Number_unsupported;
-          Print_number.frac_real_support = Print_number.Number_custom
-            (Print_number.PrintFracReal ("%s%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
-          Print_number.def_real_support = Print_number.Number_unsupported;
+          Number.long_int_support = true;
+          Number.dec_int_support = Number.Number_custom "%s%%Z";
+          Number.hex_int_support = Number.Number_unsupported;
+          Number.oct_int_support = Number.Number_unsupported;
+          Number.bin_int_support = Number.Number_unsupported;
+          Number.def_int_support = Number.Number_unsupported;
+          Number.dec_real_support = Number.Number_unsupported;
+          Number.hex_real_support = Number.Number_unsupported;
+          Number.frac_real_support = Number.Number_custom
+            (Number.PrintFracReal ("%s%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
+          Number.def_real_support = Number.Number_unsupported;
         } in
-      Print_number.print number_format fmt c
+      Number.print number_format fmt c
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on opr "if %a@ then %a@ else %a")
         (print_fmla info) f (print_term info) t1 (print_opl_term info) t2
@@ -388,7 +378,7 @@ let print_constr info ts fmt (cs,_) =
 
 let ls_ty_vars ls =
   let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
-  let ty_vars_value = option_fold Ty.ty_freevars Stv.empty ls.ls_value in
+  let ty_vars_value = Opt.fold Ty.ty_freevars Stv.empty ls.ls_value in
   (ty_vars_args, ty_vars_value, Stv.union ty_vars_args ty_vars_value)
 
 (*
@@ -787,7 +777,7 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Paxiom -> ""
     | Plemma -> "Lemma"
     | Pgoal -> "Theorem"
-    | Pskip -> assert false (* impossible *) 
+    | Pskip -> assert false (* impossible *)
   in
   if stt <> "" then
     match prev with
@@ -846,11 +836,13 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
   print_th_prelude task fmt thpr;
   (* find theories that are both used and realized from metas *)
   let realized_theories =
-    Task.on_meta meta_realized (fun mid args ->
+    Task.on_meta meta_realized_theory (fun mid args ->
       match args with
       | [Theory.MAstr s1; Theory.MAstr s2] ->
         (* TODO: do not split string; in fact, do not even use a string argument *)
-        let f,id = let l = split_string_rev s1 '.' in List.rev (List.tl l),List.hd l in
+        let f,id =
+          let l = Strings.rev_split s1 '.' in
+          List.rev (List.tl l), List.hd l in
         let th = Env.find_theory env f id in
         Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
       | _ -> assert false

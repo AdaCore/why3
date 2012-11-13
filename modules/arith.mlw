@@ -1,7 +1,7 @@
 
 (** {1 Arithmetic for programs} *)
 
-(** {2 Integer Division} 
+(** {2 Integer Division}
 
 It is checked that divisor is not null.
 
@@ -12,7 +12,9 @@ module Int
   use export int.Int
   use export int.ComputerDivision
 
-  let (/) (x: int) (y:int) = { y <> 0 } div x y { result = div x y }
+  let (/) (x: int) (y:int)
+    requires { y <> 0 } ensures { result = div x y }
+  = div x y
 
 end
 
@@ -29,21 +31,28 @@ module Int32
   function min_int : int = -2147483648
   function max_int : int =  2147483647
 
-  let (+) (x: int) (y:int) =
-    { min_int <= x + y <= max_int } x + y { result = x + y }
-  let (-) (x: int) (y:int) =
-    { min_int <= x - y <= max_int } x - y { result = x - y }
+  let (+) (x: int) (y:int)
+    requires { min_int <= x + y <= max_int } ensures { result = x + y }
+  = x + y
 
-  let (-_) (x: int) =
-    { min_int <= -x <= max_int } -x { result = -x  }
+  let (-) (x: int) (y:int)
+    requires { min_int <= x - y <= max_int } ensures { result = x - y }
+  = x - y
 
-  let ( * ) (x: int) (y:int) =
-    { min_int <= x * y <= max_int } x * y { result = x * y }
+  let (-_) (x: int)
+    requires { min_int <= -x <= max_int } ensures { result = -x }
+  = -x
+
+  let (*) (x: int) (y:int)
+    requires { min_int <= x * y <= max_int } ensures { result = x * y }
+  = x * y
 
   use export int.ComputerDivision
 
-  let (/) (x: int) (y:int) =
-    { y <> 0 && min_int <= div x y <= max_int } div x y { result = div x y }
+  let (/) (x: int) (y:int)
+    requires { y <> 0 && min_int <= div x y <= max_int }
+    ensures { result = div x y }
+  = div x y
 
 end
 
@@ -59,12 +68,8 @@ module Real
   use export real.RealInfix
   use export real.FromInt
 
-  let (/.) (x: real) (y: real) = { y <> 0. } x / y { result = x / y }
+  let (/.) (x: real) (y: real)
+    requires { y <> 0. } ensures { result = x / y }
+  = x / y
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/arith"
-End:
-*)

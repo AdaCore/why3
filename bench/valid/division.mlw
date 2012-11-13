@@ -1,0 +1,72 @@
+
+(* Division and modulo *)
+
+theory Euclidean
+
+  use import int.Int
+  use import int.EuclideanDivision
+
+  (* -2,-1,0,1,2 div/mod 2 *)
+
+  goal div_m2_2: div (-2) 2 = -1
+  goal div_m1_2: div (-1) 2 = -1
+  goal div__0_2: div    0 2 =  0
+  goal div__1_2: div    1 2 =  0
+  goal div__2_2: div    2 2 =  1
+
+  goal mod_m2_2: mod (-2) 2 = 0
+  goal mod_m1_2: mod (-1) 2 = 1
+  goal mod__0_2: mod    0 2 = 0
+  goal mod__1_2: mod    1 2 = 1
+  goal mod__2_2: mod    2 2 = 0
+
+  (* -2,-1,0,1,2 div/mod -2 *)
+
+  goal div_m2_m2: div (-2) (-2) = 1
+  goal div_m1_m2: div (-1) (-2) = 1
+  goal div__0_m2: div    0 (-2) = 0
+  goal div__1_m2: div    1 (-2) = -1
+  goal div__2_m2: div    2 (-2) = -1
+
+  goal mod_m2_m2: mod (-2) (-2) = 0
+  goal mod_m1_m2: mod (-1) (-2) = 1
+  goal mod__0_m2: mod    0 (-2) = 0
+  goal mod__1_m2: mod    1 (-2) = 1
+  goal mod__2_m2: mod    2 (-2) = 0
+
+end
+
+theory Computer
+
+  use import int.Int
+  use import int.ComputerDivision
+
+  (* -2,-1,0,1,2 div/mod 2 *)
+
+  goal div_m2_2: div (-2) 2 = -1
+  goal div_m1_2: div (-1) 2 =  0
+  goal div__0_2: div    0 2 =  0
+  goal div__1_2: div    1 2 =  0
+  goal div__2_2: div    2 2 =  1
+
+  goal mod_m2_2: mod (-2) 2 = 0
+  goal mod_m1_2: mod (-1) 2 = -1
+  goal mod__0_2: mod    0 2 = 0
+  goal mod__1_2: mod    1 2 = 1
+  goal mod__2_2: mod    2 2 = 0
+
+  (* -2,-1,0,1,2 div/mod -2 *)
+
+  goal div_m2_m2: div (-2) (-2) = 1
+  goal div_m1_m2: div (-1) (-2) = 0
+  goal div__0_m2: div    0 (-2) = 0
+  goal div__1_m2: div    1 (-2) = 0
+  goal div__2_m2: div    2 (-2) = -1
+
+  goal mod_m2_m2: mod (-2) (-2) = 0
+  goal mod_m1_m2: mod (-1) (-2) = -1
+  goal mod__0_m2: mod    0 (-2) = 0
+  goal mod__1_m2: mod    1 (-2) = 1
+  goal mod__2_m2: mod    2 (-2) = 0
+
+end

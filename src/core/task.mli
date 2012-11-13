@@ -1,26 +1,17 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** Proof Tasks, Cloning and Meta History *)
 
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -29,7 +20,7 @@ open Theory
 
 type tdecl_set = private {
   tds_set : Stdecl.t;
-  tds_tag : Hashweak.tag;
+  tds_tag : Weakhtbl.tag;
 }
 
 val tds_equal : tdecl_set -> tdecl_set -> bool
@@ -52,7 +43,7 @@ and task_hd = private {
   task_known : known_map;    (* known identifiers *)
   task_clone : clone_map;    (* cloning history *)
   task_meta  : meta_map;     (* meta properties *)
-  task_tag   : Hashweak.tag; (* unique magical tag *)
+  task_tag   : Weakhtbl.tag; (* unique magical tag *)
 }
 
 val task_equal : task -> task -> bool

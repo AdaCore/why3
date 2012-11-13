@@ -1,26 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Why3
 open Stdlib
-open Util
 open Ident
 open Ty
 open Term
@@ -29,7 +18,7 @@ open Mlw_ty.T
 
 (** program/logic symbols *)
 
-(* plymbols represent algebraic type constructors and projections.
+(* plsymbols represent algebraic type constructors and projections.
    They must be fully applied and the result is equal to the application of
    the lsymbol. We need this kind of symbols to cover nullary constructors,
    such as Nil, which cannot be given a post-condition. They cannot be
@@ -73,13 +62,6 @@ type ppattern = private {
   ppat_effect  : effect;
 }
 
-val ppat_wild : vty_value -> ppattern
-val ppat_var : pvsymbol -> ppattern
-val ppat_plapp : plsymbol -> ppattern list -> vty_value -> ppattern
-val ppat_lapp : lsymbol -> ppattern list -> vty_value -> ppattern
-val ppat_or : ppattern -> ppattern -> ppattern
-val ppat_as : ppattern -> pvsymbol -> ppattern
-
 type pre_ppattern =
   | PPwild
   | PPvar  of preid
@@ -111,8 +93,8 @@ type psymbol = private {
 
 module Mps : Map.S with type key = psymbol
 module Sps : Mps.Set
-module Hps : Hashtbl.S with type key = psymbol
-module Wps : Hashweak.S with type key = psymbol
+module Hps : XHashtbl.S with type key = psymbol
+module Wps : Weakhtbl.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 
@@ -192,6 +174,7 @@ val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
 val e_arrow : psymbol -> vty_arrow -> expr
+(** DOCUMENTATION NEEDED PLEASE *)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
@@ -227,12 +210,11 @@ exception Immutable of expr
 val e_assign : expr -> expr -> expr
 val e_ghost : expr -> expr
 
+val fs_void : lsymbol
+val t_void : term
 val e_void : expr
 
-val e_const : constant -> expr
-val e_int_const : string -> expr
-val e_real_const : real_constant -> expr
-
+val e_const : Number.constant -> expr
 val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr

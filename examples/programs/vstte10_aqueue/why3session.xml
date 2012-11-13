@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session SYSTEM "/users/demons/melquion/src/why3/share/why3session.dtd">
-<why3session
- name="programs/vstte10_aqueue/why3session.xml" shape_version="2">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -12,21 +11,21 @@
   expanded="false">
   <theory
    name="AmortizedQueue"
-   locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
+   locfile="../vstte10_aqueue.mlw"
    loclnum="9" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter empty"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-    loclnum="23" loccnumb="6" loccnume="11"
-    expl="normal postcondition"
-    sum="498d84262c30a9b2934c3bb7bcc44d5a"
+    locfile="../vstte10_aqueue.mlw"
+    loclnum="21" loccnumb="6" loccnume="11"
+    expl="VC for empty"
+    sum="aea875c423b224787143908f6ec83ec2"
     proved="true"
     expanded="false"
-    shape="ainfix =ainfix ++aNilareverseaNilaNilAainvamk queueaNilc0aNilc0">
+    shape="ainfix =ainfix ++aNilareverseaNilaNilAainfix =alengthaNilc0Aainfix &gt;=c0alengthaNilAainfix =alengthaNilc0">
     <label
-     name="expl:parameter empty"/>
+     name="expl:VC for empty"/>
     <proof
      prover="0"
      timelimit="20"
@@ -38,15 +37,15 @@
    </goal>
    <goal
     name="WP_parameter head"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-    loclnum="28" loccnumb="6" loccnume="10"
-    expl="parameter head"
-    sum="64983e0baac48d883c036004ba40e21e"
+    locfile="../vstte10_aqueue.mlw"
+    loclnum="24" loccnumb="6" loccnume="10"
+    expl="VC for head"
+    sum="436664d3d5a243b8e8053c7805a09a8f"
     proved="true"
     expanded="false"
-    shape="CV0aNilfaConsVwCainfix ++V0areverseV2aNilfaConsVwainfix =V4V5Iainfix =ainfix ++V0areverseV2aNilNAainvamk queueV0V1V2V3F">
+    shape="CV0aNilfaConsVwCainfix ++V0areverseV2aNilfaConsVwainfix =V4V5Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
     <label
-     name="expl:parameter head"/>
+     name="expl:VC for head"/>
     <proof
      prover="0"
      timelimit="20"
@@ -58,50 +57,50 @@
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-    loclnum="36" loccnumb="6" loccnume="12"
-    expl="parameter create"
-    sum="a165a71d9f58b13dbc4acbd82b56df31"
+    locfile="../vstte10_aqueue.mlw"
+    loclnum="32" loccnumb="6" loccnume="12"
+    expl="VC for create"
+    sum="653d92fe520fa8b672e0d4cb3a2a30c4"
     proved="true"
     expanded="false"
-    shape="iainfix &gt;=V1V3ainfix =ainfix ++V0areverseV2ainfix ++V0areverseV2Aainvamk queueV0V1V2V3ainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Aainvamk queueainfix ++V0areverseV2ainfix +V1V3aNilc0Iainfix =V3alengthV2Aainfix =V1alengthV0F">
+    shape="iainfix &gt;=V1V3ainfix =ainfix ++V0areverseV2ainfix ++V0areverseV2Aainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1ainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Aainfix =alengthaNilc0Aainfix &gt;=ainfix +V1V3alengthaNilAainfix =alengthainfix ++V0areverseV2ainfix +V1V3Iainfix =V3alengthV2Aainfix =V1alengthV0F">
     <label
-     name="expl:parameter create"/>
+     name="expl:VC for create"/>
     <proof
      prover="0"
      timelimit="20"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.26"/>
+     <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter tail"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-    loclnum="45" loccnumb="6" loccnume="10"
-    expl="parameter tail"
-    sum="f3431d96040089e759a45554b314a269"
+    locfile="../vstte10_aqueue.mlw"
+    loclnum="41" loccnumb="6" loccnume="10"
+    expl="VC for tail"
+    sum="69d2fa37a97df558d6f6a1ea0a8d177c"
     proved="true"
     expanded="false"
-    shape="CV0aNilfaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V10AainvV9Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2AainvV9Lamk queueV5V6V7V8FAainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainvamk queueV0V1V2V3F">
+    shape="CV0aNilfaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V9Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FAainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
     <label
-     name="expl:parameter tail"/>
+     name="expl:VC for tail"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter tail.1"
-      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-      loclnum="45" loccnumb="6" loccnume="10"
-      expl="parameter tail"
-      sum="4888cb9fe8cfdc43be348ddd8f842f70"
+      locfile="../vstte10_aqueue.mlw"
+      loclnum="41" loccnumb="6" loccnume="10"
+      expl="1."
+      sum="2f2dc95d9acd449cd338c2386b3a2e3b"
       proved="true"
       expanded="false"
-      shape="CV0aNilfaConswVtIainfix =ainfix ++V0areverseV2aNilNAainvamk queueV0V1V2V3F">
+      shape="CV0aNilfaConswVtIainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
       <label
-       name="expl:parameter tail"/>
+       name="expl:VC for tail"/>
       <proof
        prover="0"
        timelimit="20"
@@ -113,15 +112,15 @@
      </goal>
      <goal
       name="WP_parameter tail.2"
-      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-      loclnum="45" loccnumb="6" loccnume="10"
-      expl="parameter tail"
-      sum="68931e7ee369bfa166975119600e3b21"
+      locfile="../vstte10_aqueue.mlw"
+      loclnum="41" loccnumb="6" loccnume="10"
+      expl="2. precondition"
+      sum="4461409ec1feafc0250e6711212337cb"
       proved="true"
       expanded="false"
-      shape="CV0aNiltaConswVainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainvamk queueV0V1V2V3F">
+      shape="CV0aNiltaConswVainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
       <label
-       name="expl:parameter tail"/>
+       name="expl:VC for tail"/>
       <proof
        prover="0"
        timelimit="20"
@@ -133,37 +132,37 @@
      </goal>
      <goal
       name="WP_parameter tail.3"
-      locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-      loclnum="45" loccnumb="6" loccnume="10"
-      expl="parameter tail"
-      sum="e3cd38003adee97315e3cf49b49723ab"
+      locfile="../vstte10_aqueue.mlw"
+      loclnum="41" loccnumb="6" loccnume="10"
+      expl="3. postcondition"
+      sum="1e31605f819ec67974424062e4da9d75"
       proved="true"
       expanded="false"
-      shape="CV0aNiltaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V10AainvV9Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2AainvV9Lamk queueV5V6V7V8FIainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainvamk queueV0V1V2V3F">
+      shape="CV0aNiltaConswVCainfix ++V0areverseV2aNilfaConswVainfix =ainfix ++V5areverseV7V9Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FIainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4Iainfix =ainfix ++V0areverseV2aNilNAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
       <label
-       name="expl:parameter tail"/>
+       name="expl:VC for tail"/>
       <proof
        prover="0"
        timelimit="20"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.26"/>
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter enqueue"
-    locfile="programs/vstte10_aqueue/../vstte10_aqueue.mlw"
-    loclnum="53" loccnumb="6" loccnume="13"
-    expl="parameter enqueue"
-    sum="75784486f186bfc210e481f8526ecff3"
+    locfile="../vstte10_aqueue.mlw"
+    loclnum="49" loccnumb="6" loccnume="13"
+    expl="VC for enqueue"
+    sum="34eb486749bdc14a6a35a9c85acb53dd"
     proved="true"
     expanded="false"
-    shape="ainfix =ainfix ++V5areverseV7ainfix ++ainfix ++V1areverseV3aConsV0aNilAainvV9Iainfix =ainfix ++V5areverseV7ainfix ++V1areverseaConsV0V3AainvV9Lamk queueV5V6V7V8FAainfix =ainfix +V4c1alengthaConsV0V3Aainfix =V2alengthV1Iainvamk queueV1V2V3V4F">
+    shape="ainfix =ainfix ++V5areverseV7ainfix ++ainfix ++V1areverseV3aConsV0aNilIainfix =ainfix ++V5areverseV7ainfix ++V1areverseaConsV0V3Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FAainfix =ainfix +V4c1alengthaConsV0V3Aainfix =V2alengthV1Iainfix =alengthV3V4Aainfix &gt;=V2alengthV3Aainfix =alengthV1V2F">
     <label
-     name="expl:parameter enqueue"/>
+     name="expl:VC for enqueue"/>
     <proof
      prover="0"
      timelimit="20"

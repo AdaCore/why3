@@ -18,14 +18,22 @@ installed provers is stored in the file
 \texttt{provers-detection-data.conf} typically located in directory
 \verb|/usr/local/share/why3| after installation. The contents of this
 file is reproduced below.
-{\footnotesize\lstinputlisting{../share/provers-detection-data.conf}}
+%BEGIN LATEX
+{\footnotesize
+%END LATEX
+\lstinputlisting{../share/provers-detection-data.conf}
+%BEGIN LATEX
+}
+%END LATEX
 
 \section{The \texttt{why3.conf} configuration file}
 \label{sec:whyconffile}
 \index{why3.conf@\texttt{why3.conf}}\index{configuration file}
 
 \begin{figure}[p]
+%BEGIN LATEX
 {\footnotesize
+%END LATEX
 \begin{verbatim}
 [main]
 loadpath = "/usr/local/share/why3/theories"
@@ -80,7 +88,9 @@ version = "0.93.1"
 command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
 name = "CoqIDE"
 \end{verbatim}
+%BEGIN LATEX
 }
+%END LATEX
   \caption{Sample why3.conf file}
 \label{fig:why3conf}
 \end{figure}

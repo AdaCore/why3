@@ -7,9 +7,7 @@ be:
 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ...
 
 By considering the terms in the Fibonacci sequence whose values do not
-exceed four million, find the sum of the even-valued terms.
-
-*)
+exceed four million, find the sum of the even-valued terms. *)
 
 theory Fib "Definition of Fibonacci sequence"
 
@@ -91,13 +89,13 @@ end
 
 module Solve
 
-
-  use import module ref.Ref
+  use import ref.Ref
   use import FibOnlyEven
 
-  let f m : int =
-    { m >= 0 }
-    let x = ref 2 in
+  let f m : int
+    requires { m >= 0 }
+    ensures  { result = fib_sum_even_lt m }
+  = let x = ref 2 in
     let y = ref 8 in
     let sum = ref 0 in
     while !x < m do
@@ -107,12 +105,5 @@ module Solve
       sum := !sum + tmp
     done;
     !sum
-    { result = fib_sum_even_lt m }
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/euler002.gui"
-End:
-*)

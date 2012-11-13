@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ident
 open Ty
@@ -82,7 +73,7 @@ let rec add_quant kn (vl,tl,f) v =
   in
   match cl with
     | [ls,_] ->
-        let s = ty_match Mtv.empty (Util.of_option ls.ls_value) ty in
+        let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
         let nvl = List.map mk_v ls.ls_args in
         let t = fs_app ls (List.map t_var nvl) ty in
@@ -149,6 +140,9 @@ let eval_match ~inline kn t =
         let_map eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
+        let make_flat_case = match t.t_loc with
+          | Some loc -> Loc.try3 loc make_flat_case
+          | None -> make_flat_case in
         let fn env t = eval env (make_flat_case kn t bl1) in
         begin try dive_to_constructor kn fn env t1
         with Exit -> branch_map eval env t1 bl1 end

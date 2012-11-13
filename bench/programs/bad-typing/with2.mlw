@@ -2,10 +2,10 @@ module M
 
   use import int.Int
 
-  type t 'a = {| a: 'a; b: bool; c: 'a |}
+  type t 'a = { a: 'a; b: bool; c: 'a }
 
   let test1 (x: t bool) =
-    {| x with a = 0; c = True |}
+    { x with a = 0; c = True }
 
 end
 

@@ -1,0 +1,60 @@
+
+theory TestOverriding
+
+  use import settheory.Relation
+  use import settheory.InverseDomRan
+  use import settheory.Overriding
+  use import settheory.Function
+
+  constant f : rel int int = singleton (3,4)
+  constant g : rel int int = f <+ (singleton (5,6))
+  constant h : rel int int = g <+ (singleton (3,7))
+
+  goal testdom1: mem 3 (dom g)
+  goal testdom2: mem 3 (dom h)
+
+  goal testapply1: apply f 3 = 4
+
+  goal testapply2: apply g 3 = 4
+  goal testapply3: apply g 5 = 6
+
+  goal testapply4: apply h 3 = 7
+  goal testapply5: apply h 5 = 6
+
+  goal testapply_smoke1: apply h 3 = 8
+  goal testapply_smoke2: apply h 5 = 9
+
+end
+
+theory TestCompose
+
+  use import settheory.Relation
+  use import settheory.InverseDomRan
+  use import settheory.Composition
+  use import settheory.Function
+
+  constant f : rel int int = singleton (3,4)
+  constant g : rel int int = singleton (4,6)
+  constant h : rel int int = semicolon f g
+
+  use import settheory.Interval
+
+  constant fun_int_int : set (rel int int) = integer +-> integer
+
+(*
+  lemma f_is_fun : mem f fun_int_int
+
+  lemma g_is_fun : mem g fun_int_int
+
+  lemma h_is_fun : mem h fun_int_int
+*)
+
+  goal test1: mem (apply h 3) (Interval.mk 0 10)
+
+  goal test2: 0 <= apply h 3 <= 10
+
+  goal test3: apply h 3 = 6
+
+
+end
+

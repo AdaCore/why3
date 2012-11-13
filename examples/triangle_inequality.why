@@ -1,9 +1,9 @@
 
-(** {1 The Triangle Inequality} 
+(** {1 The Triangle Inequality}
 
   by Claude Marché, using suggestions from Guillaume Melquiond
 
-  We first prove the Cauchy-Schwarz inequality. 
+  We first prove the Cauchy-Schwarz inequality.
 
   See also on Wikipedia: {h <a
 href="http://en.wikipedia.org/wiki/Cauchy–Schwarz_inequality">Cauchy-Schwarz
@@ -53,7 +53,7 @@ theory CauchySchwarzInequality
   lemma p_val_part:
     forall x1 x2 y1 y2:real.
       norm2 y1 y2 > 0.0 ->
-        p x1 x2 y1 y2 (- dot x1 x2 y1 y2 / norm2 y1 y2) =
+        p x1 x2 y1 y2 (- (dot x1 x2 y1 y2 / norm2 y1 y2)) =
         norm2 x1 x2 - sqr (dot x1 x2 y1 y2) / norm2 y1 y2
 
   lemma p_val_part_pos:

@@ -1,25 +1,15 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Stdlib
-open Util
 open Ident
 open Ty
 open Term
@@ -45,7 +35,7 @@ let ty_dumb = ty_var tv_dumb
    instantié. Un tag sur un logique polymorphe doit être un tag sur toute
    la famille de fonctions *)
 
-module OHTyl = OrderedHashList(struct
+module OHTyl = OrderedHashedList(struct
   type t = ty
   let tag = ty_hash
 end)
@@ -202,7 +192,7 @@ let clone_lsymbol_memo =
   let clone_lsymbol p =
     let h = Htyl.create 7 in
     fun arg result ->
-      let key = (option_apply arg (fun r -> r::arg) result) in
+      let key = (Opt.fold (fun arg r -> r::arg) arg result) in
       try
         Htyl.find h key
       with Not_found ->
@@ -238,13 +228,13 @@ let find_logic menv tvar p tyl ret =
       let proj ty = reduce_to_real (projty menv Mtv.empty ty) in
       let arg = List.map (ty_inst inst) p.ls_args in
       let arg = List.map proj arg in
-      let result = option_map (ty_inst inst) p.ls_value in
-      let result = option_map proj result in
+      let result = Opt.map (ty_inst inst) p.ls_value in
+      let result = Opt.map proj result in
       (* Format.eprintf "arg : %a ; result : %a@." *)
       (*   (Pp.print_list Pp.comma Pretty.print_ty) arg *)
       (*   (Pp.print_option Pretty.print_ty) result; *)
       let ls = if List.for_all2 ty_equal arg p.ls_args &&
-          option_eq ty_equal result p.ls_value
+          Opt.equal ty_equal result p.ls_value
         then p else clone_lsymbol_memo p arg result in
       let insts = Mtyl.add inst_l ls insts in
       menv.defined_lsymbol <- Mls.add p insts menv.defined_lsymbol;
@@ -315,7 +305,7 @@ and rewrite_fmla menv tvar vsvar f =
       ps_app p tl'
     | Tquant(q, b) ->
       let vl, tl, f1, cb = t_open_quant_cb b in
-      let vsvar,vl = map_fold_left (conv_vs menv tvar) vsvar vl in
+      let vsvar,vl = Lists.map_fold_left (conv_vs menv tvar) vsvar vl in
 
       let f1 = fnF vsvar f1 in
       (* Ici un trigger qui ne match pas assez de variables
@@ -528,10 +518,10 @@ let encoding_instantiate complete =
     create_trans_complete kept complete))
 
 let () = Hstr.replace Encoding.ft_enco_kept "instantiate"
-  (const (encoding_instantiate Incomplete))
+  (Util.const (encoding_instantiate Incomplete))
 
 let () = Hstr.replace Encoding.ft_enco_kept "instantiate_complete"
-  (const (encoding_instantiate Complete))
+  (Util.const (encoding_instantiate Complete))
 
 (*
 Local Variables:

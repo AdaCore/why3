@@ -1,0 +1,30 @@
+
+FRAMAC_SHARE    := $(shell frama-c -print-path)
+FRAMAC_LIBDIR   := $(shell frama-c -print-libpath)
+PLUGIN_NAME     := Jessie3
+PLUGIN_CMO      := literals ACSLtoWhy3 register
+
+SHELL := /bin/bash
+
+ifeq (@enable_local@,yes)
+WHYLIB := ../../lib/why3
+else
+WHYLIB := @OCAMLLIB@/why3
+endif
+
+PLUGIN_EXTRA_BYTE:= $(WHYLIB)/why3.cma 
+PLUGIN_EXTRA_OPT:= $(WHYLIB)/why3.cmxa
+PLUGIN_BFLAGS:= -I $(WHYLIB)
+PLUGIN_OFLAGS:= -I $(WHYLIB)
+PLUGIN_LINK_BFLAGS:= -I $(WHYLIB) 
+PLUGIN_LINK_OFLAGS:= -I $(WHYLIB)
+PLUGIN_TESTS_DIRS := basic
+
+literals.ml: literals.mll
+	ocamllex $<
+
+include $(FRAMAC_SHARE)/Makefile.dynamic
+
+tests::
+	grep Status tests/basic/result/*
+

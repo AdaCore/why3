@@ -1,26 +1,17 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Pp
-open Util
+open Stdlib
 open Ident
 open Ptree
 open Ty
@@ -40,7 +31,6 @@ and type_var = {
   type_var_loc : loc option;
 }
 
-let tyvar v = Tyvar v
 let tyuvar tv = Tyuvar tv
 
 let rec type_inst s ty = match ty.ty_node with
@@ -52,12 +42,13 @@ let tyapp ts tyl = match ts.ts_def with
       Tyapp (ts, tyl)
   | Some ty ->
       let add m v t = Mtv.add v t m in
-      let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
-      type_inst s ty
+      try
+        let s = List.fold_left2 add Mtv.empty ts.ts_args tyl in
+        type_inst s ty
+      with Invalid_argument _ ->
+        Loc.errorm "this type expects %d parameters" (List.length ts.ts_args)
 
 type dty = dty_view
-
-let tvsymbol_of_type_var tv = tv.tvsymbol
 
 let rec print_dty fmt = function
   | Tyvar { type_val = Some t } ->
@@ -72,15 +63,15 @@ let rec print_dty fmt = function
   | Tyapp (s, l) ->
       fprintf fmt "%s %a" s.ts_name.id_string (print_list space print_dty) l
 
-let rec view_dty = function
-  | Tyvar { type_val = Some dty } -> view_dty dty
-  | dty -> dty
-
 let create_ty_decl_var =
   let t = ref 0 in
   fun ?loc tv ->
     incr t;
     { tag = !t; tvsymbol = tv; type_val = None; type_var_loc = loc }
+
+let fresh_type_var loc =
+  let tv = create_tvsymbol (id_user "a" loc) in
+  Tyvar (create_ty_decl_var ~loc tv)
 
 let rec occurs v = function
   | Tyvar { type_val = Some t } -> occurs v t
@@ -120,6 +111,10 @@ let rec ty_of_dty = function
   | Tyapp (s, tl) ->
       ty_app s (List.map ty_of_dty tl)
 
+let rec dty_of_ty ty = match ty.ty_node with
+  | Ty.Tyvar tv -> Tyuvar tv
+  | Ty.Tyapp (ts,tl) -> Tyapp (ts, List.map dty_of_ty tl)
+
 type ident = Ptree.ident
 
 type dpattern = { dp_node : dpattern_node; dp_ty : dty }
@@ -137,7 +132,7 @@ let create_user_id { id = x ; id_lab = ll ; id_loc = loc } =
     | Lpos p -> ll, Some p
   in
   let label,p = List.fold_left get_labels (Slab.empty,None) ll in
-  id_user ~label x (def_option loc p)
+  id_user ~label x (Opt.get_def loc p)
 
 let create_user_vs id ty = create_vsymbol (create_user_id id) ty
 
@@ -265,7 +260,7 @@ and fmla env = function
         let v = create_user_vs id (ty_of_dty ty) in
         Mstr.add id.id v env, v
       in
-      let env, vl = map_fold_left uquant env uqu in
+      let env, vl = Lists.map_fold_left uquant env uqu in
       let trigger = function
         | TRterm t -> term env t
         | TRfmla f -> fmla env f
@@ -319,5 +314,5 @@ let specialize_lsymbol ~loc s =
   let tl = s.ls_args in
   let t = s.ls_value in
   let env = Htv.create 17 in
-  List.map (specialize_ty ~loc env) tl, option_map (specialize_ty ~loc env) t
+  List.map (specialize_ty ~loc env) tl, Opt.map (specialize_ty ~loc env) t
 

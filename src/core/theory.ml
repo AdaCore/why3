@@ -1,25 +1,16 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
-open Util
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -110,7 +101,7 @@ let print_meta_desc fmt m =
   fprintf fmt "@[%s@\n  @[%a@]@]"
     m.meta_name Pp.formatted m.meta_desc
 
-module SMmeta = StructMake(struct type t = meta let tag m = m.meta_tag end)
+module SMmeta = MakeMSH(struct type t = meta let tag m = m.meta_tag end)
 
 module Smeta = SMmeta.S
 module Mmeta = SMmeta.M
@@ -125,7 +116,7 @@ exception UnknownMeta of string
 exception BadMetaArity of meta * int * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
-let meta_table = Hashtbl.create 17
+let meta_table = Hstr.create 17
 
 let mk_meta =
   let c = ref (-1) in
@@ -139,22 +130,20 @@ let mk_meta =
 
 let register_meta ~desc s al excl =
   try
-    let m = Hashtbl.find meta_table s in
+    let m = Hstr.find meta_table s in
     if al = m.meta_type && excl = m.meta_excl then m
     else raise (KnownMeta m)
   with Not_found ->
     let m = mk_meta desc s al excl in
-    Hashtbl.add meta_table s m;
+    Hstr.add meta_table s m;
     m
 
 let register_meta_excl ~desc s al = register_meta ~desc s al true
 let register_meta      ~desc s al = register_meta ~desc s al false
 
-let lookup_meta s =
-  try Hashtbl.find meta_table s
-  with Not_found -> raise (UnknownMeta s)
+let lookup_meta s = Hstr.find_exn meta_table (UnknownMeta s) s
 
-let list_metas () = Hashtbl.fold (fun _ v acc -> v::acc) meta_table []
+let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
 
 (** Theory *)
 
@@ -211,7 +200,7 @@ module Hstdecl = Hashcons.Make (struct
     | Clone (th1,sm1), Clone (th2,sm2) ->
         id_equal th1.th_name th2.th_name && eq_smap sm1 sm2
     | Meta (t1,al1), Meta (t2,al2) ->
-        t1 = t2 && list_all2 eq_marg al1 al2
+        t1 = t2 && Lists.equal eq_marg al1 al2
     | _,_ -> false
 
   let hs_cl_ts _ ts acc = Hashcons.combine acc (ts_hash ts)
@@ -243,7 +232,7 @@ end)
 
 let mk_tdecl n = Hstdecl.hashcons { td_node = n ; td_tag = -1 }
 
-module Tdecl = StructMake (struct
+module Tdecl = MakeMSH (struct
   type t = tdecl
   let tag td = td.td_tag
 end)
@@ -469,7 +458,7 @@ let rec cl_find_ts cl ts =
   if not (Sid.mem ts.ts_name cl.cl_local) then ts
   else try Mts.find ts cl.ts_table
   with Not_found ->
-    let td' = option_map (cl_trans_ty cl) ts.ts_def in
+    let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
     let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
     cl.ts_table <- Mts.add ts ts' cl.ts_table;
     ts'
@@ -481,7 +470,7 @@ let cl_find_ls cl ls =
   else try Mls.find ls cl.ls_table
   with Not_found ->
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
-    let vt' = option_map (cl_trans_ty cl) ls.ls_value in
+    let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
     let ls' = create_lsymbol (id_clone ls.ls_name) ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
@@ -551,7 +540,7 @@ let cl_data cl inst tdl =
     cl_find_ls cl ls
   in
   let add_constr (ls,pl) =
-    add_ls ls, List.map (option_map add_ls) pl
+    add_ls ls, List.map (Opt.map add_ls) pl
   in
   let add_type (ts,csl) =
     if Mts.mem ts inst.inst_ts then
@@ -641,7 +630,7 @@ let clone_theory cl add_td acc th inst =
       try  Some (mk_tdecl (cl_tdecl cl inst td))
       with EmptyDecl -> None
     in
-    option_apply acc (add_td acc) td
+    Opt.fold add_td acc td
   in
   let acc = List.fold_left add acc th.th_decls in
   let sm = {
@@ -684,8 +673,6 @@ let clone_export uc th inst =
 
 let clone_theory add_td acc th inst =
   clone_theory (cl_init th inst) add_td acc th inst
-
-let create_clone = clone_theory (fun tdl td -> td :: tdl)
 
 let create_null_clone th =
   let sm = {
@@ -747,7 +734,7 @@ let clone_meta tdt sm = match tdt.td_node with
 (** access to meta *)
 
 (*
-let theory_meta  = option_apply Mmeta.empty (fun t -> t.task_meta)
+let theory_meta = Opt.fold (fun _ t -> t.task_meta) Mmeta.empty
 
 let find_meta_tds th (t : meta) = mm_find (theory_meta th) t
 
@@ -797,7 +784,7 @@ let highord_theory =
   let uc = add_param_decl uc ps_pred_app in
   close_theory uc
 
-let tuple_theory = Util.Hint.memo 17 (fun n ->
+let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
   let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in

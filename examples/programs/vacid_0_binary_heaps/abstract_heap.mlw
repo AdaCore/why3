@@ -12,33 +12,20 @@ use import bag_of_integers.Bag_integers
 type logic_heap
 function model (h:logic_heap): (bag int)
 
-use import module ref.Ref
+use import ref.Ref
 
-val create :
-  sz:int ->
-  { 0 <= sz }
-  ref logic_heap
-  { model !result = empty_bag }
+val create (sz:int) : ref logic_heap
+  requires { 0 <= sz }
+  ensures  { model !result = empty_bag }
 
-val insert :
-  this:ref logic_heap -> e:int ->
-  { true }
-  unit writes this
-  { model !this = add e (model (old !this)) }
+val insert (this:ref logic_heap) (e:int) : unit writes {this}
+  ensures  { model !this = add e (model (old !this)) }
 
-val extractMin :
-  this:ref logic_heap ->
-  { model !this <> empty_bag }
-  int writes this
-  { result = min_bag (model (old !this)) /\
+val extractMin (this:ref logic_heap) : int writes {this}
+  requires { model !this <> empty_bag }
+  ensures  { result = min_bag (model (old !this)) /\
     model (old !this) = add result (model !this) /\
     card (model (old !this)) = (card (model !this)) + 1
   }
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide -I . proofs"
-End:
-*)

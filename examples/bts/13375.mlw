@@ -44,15 +44,10 @@ module Spec
  axiom axiom_last :
   My_Type_T.last = 100
 
- val my_type_t_from___int_ :
-  n : int ->
-   { (My_Type_T.in_range n) }
-    my_type
-   { (My_Type_T.to_int result) = n }
+ val my_type_t_from___int_ (n : int) : my_type
+   requires { (My_Type_T.in_range n) }
+   ensures  { (My_Type_T.to_int result) = n }
 
- let to_int_ (x : my_type) =
-  { true }
-   (My_Type_T.to_int x)
-  { true }
+ let to_int_ (x : my_type) = (My_Type_T.to_int x)
 
 end

@@ -393,9 +393,12 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
   end
 
 
-  let rec compute_writes (s:stmt) : Set.set ident =
-   { }
-    match s with
+  let rec compute_writes (s:stmt) : Set.set ident
+   ensures {
+     forall sigma pi sigma' pi':env, n:int.
+       many_steps sigma pi s sigma' pi' Sskip n ->
+       assigns sigma result sigma' }
+  = match s with
     | Sskip -> Set.empty
     | Sassign i _ -> Set.singleton i
     | Sseq s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
@@ -403,19 +406,12 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
     | Swhile _ _ s -> compute_writes s
     | Sassert _ -> Set.empty
     end
-   { forall sigma pi sigma' pi':env, n:int.
-       many_steps sigma pi s sigma' pi' Sskip n ->
-       assigns sigma result sigma' }
 
-  val fresh_from_fmla (q:fmla) :
-     { }
-     ident
-     { fresh_in_fmla result q }
+  val fresh_from_fmla (q:fmla) : ident
+    ensures { fresh_in_fmla result q }
 
-  val abstract_effects (i:stmt) (f:fmla) :
-    { }
-    fmla
-    { forall sigma pi:env. eval_fmla sigma pi result ->
+  val abstract_effects (i:stmt) (f:fmla) : fmla
+    ensures { forall sigma pi:env. eval_fmla sigma pi result ->
         eval_fmla sigma pi f /\
 (***
         forall sigma':env, w:Set.set ident.
@@ -429,9 +425,9 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
 
   use HoareLogic
 
-  let rec wp (i:stmt) (q:fmla) =
-    { true }
-    match i with
+  let rec wp (i:stmt) (q:fmla)
+    ensures { valid_triple result i q }
+  = match i with
     | Sskip -> q
     | Sseq i1 i2 -> wp i1 (wp i2 q)
     | Sassign x e ->
@@ -447,10 +443,9 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
           (abstract_effects i
             (Fand
                 (Fimplies (Fand (Fterm e) inv) (wp i inv))
-                (Fimplies (Fand (Fnot (Fterm e)) inv) q))) 
+                (Fimplies (Fand (Fnot (Fterm e)) inv) q)))
 
     end
-    { valid_triple result i q }
 
 
 end

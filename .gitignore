@@ -30,9 +30,15 @@ why3.conf
 /output_coq
 /dep.pdf
 /distrib
-/META
 /why3regtests.err
 /why3regtests.out
+/META
+
+# /lib/why3/
+/lib/why3/META
+/lib/why3/why3.cm*
+/lib/why3/why3.a
+/lib/why3/why3.o
 
 # /bench/
 /bench/programs/good/booleans/
@@ -101,6 +107,7 @@ why3.conf
 /doc/manual.gls
 /doc/manual.ist
 /doc/manual.out
+/doc/manual.image.out
 /doc/*.haux
 /doc/*.pdf
 /doc/html/
@@ -119,11 +126,6 @@ why3.conf
 
 # /src/
 /src/config.sh
-/src/config.ml
-/src/coq_config.ml
-/src/*.cma
-/src/*.cmxa
-/src/*.a
 
 # Coq tactic
 /src/coq-tactic/coqCompat.ml
@@ -153,6 +155,7 @@ pvsbin/
 /src/why3doc/doc_lexer.ml
 
 # /src/util/
+/src/util/config.ml
 /src/util/rc.ml
 
 # /src/session
@@ -181,7 +184,6 @@ pvsbin/
 /examples/programs/vacid_0_red_black_trees_harness/
 /examples/programs/next_digit_sum/
 /examples/programs/binary_search_c/
-/examples/programs/dijkstra/
 /examples/why3bench.html
 /examples/why3regtests.err
 /examples/why3regtests.out
@@ -191,6 +193,8 @@ pvsbin/
 /examples/*/*.tex
 /examples/*/*/*.tex
 /examples/*/*/*/*.tex
+/examples/runstrat/makejob.opt
+/examples/runstrat/runstrat.opt
 
 # modules
 /modules/string/
@@ -198,3 +202,14 @@ pvsbin/
 /modules/queue/
 /modules/pqueue/
 
+# jessie3
+/src/jessie/.depend
+/src/jessie/Jessie3.cma
+/src/jessie/Jessie3_DEP
+/src/jessie/autom4te.cache/
+/src/jessie/config.log
+/src/jessie/config.status
+/src/jessie/Makefile
+/src/jessie/literals.ml
+/src/jessie/ptests_local_config.ml
+/src/jessie/tests/basic/result/*.log

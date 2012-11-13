@@ -18,19 +18,16 @@ module Pqueue
   use import list.Permut
   use import list.Length
 
-  type t model {| mutable elts: list elt |}
+  type t model { mutable elts: list elt }
 
   (** {3 Operations} *)
 
   (** creates a fresh, empty queue *)
-  val create: unit -> {} t { result.elts = Nil }
+  val create () : t ensures { result.elts = Nil }
 
   (** pushes an element in a queue *)
-  val push:
-    x: elt -> q: t ->
-    { }
-    unit writes q
-    { q.elts = Cons x (old q.elts) }
+  val push (x: elt) (q: t) : unit writes {q}
+    ensures { q.elts = Cons x (old q.elts) }
 
   (** exception raised by [pop] and [peek] to signal an empty queue *)
   exception Empty
@@ -40,42 +37,36 @@ module Pqueue
      mem x s /\ forall e: elt. mem e s -> rel x e
 
   (** removes and returns the minimal element *)
-  val pop:
-    q: t ->
-    {}
-    elt
-    writes q raises Empty
-    { permut (Cons result q.elts) (old q.elts) /\
-      minimal_elt result (old q.elts) }
-    | Empty -> { q.elts = (old q.elts) = Nil }
+  val pop (q: t) : elt writes {q}
+    ensures { permut (Cons result q.elts) (old q.elts) }
+    ensures { minimal_elt result (old q.elts) }
+    raises  { Empty -> q.elts = (old q.elts) = Nil }
 
   (** returns the minimal element, without modifying the queue *)
-  val peek:
-    q: t ->
-    {}
-    elt
-    reads q raises Empty
-    { minimal_elt result q.elts } | Empty -> { q.elts = Nil }
+  val peek (q: t) : elt reads {q}
+    ensures { minimal_elt result q.elts }
+    raises  { Empty -> q.elts = Nil }
 
   (** empties the queue *)
-  val clear: q: t -> {} unit writes q {q.elts = Nil }
+  val clear (q: t) : unit writes {q} ensures { q.elts = Nil }
 
   (** returns a fresh copy of the queue *)
-  val copy: q: t -> {} t reads q { result = q }
+  val copy (q: t) : t reads {q} ensures { result = q }
 
   (** checks whether the queue is empty *)
-  val is_empty:
-    q: t -> {} bool reads q { result=True <-> q.elts = Nil }
+  val is_empty (q: t) : bool reads {q}
+    ensures { result = True <-> q.elts = Nil }
 
   (** returns the number of elements in the queue *)
-  val length: q: t -> {} int reads q { result = length q.elts }
+  val length (q: t) : int reads {q}
+    ensures { result = length q.elts }
 
 end
 
 module Test
 
   use import list.List
-  use import module Pqueue as P
+  use import Pqueue as P
 
   function v1 : elt
   function v2 : elt
@@ -101,7 +92,7 @@ end
 
 (** {2 Simpler interface}
 
-when duplicate elements are not allowed 
+when duplicate elements are not allowed
 
 *)
 
@@ -118,19 +109,16 @@ module PqueueNoDup
   (** the priority queue is modeled as a finite set of elements *)
   use import set.Fset
 
-  type t model {| mutable elts: set elt |}
+  type t model { mutable elts: set elt }
 
   (** {3 Operations} *)
 
   (** creates a fresh, empty queue *)
-  val create: unit -> {} t { result.elts = empty }
+  val create () : t ensures { result.elts = empty }
 
   (** pushes an element in a queue *)
-  val push:
-    x: elt -> q: t ->
-    { }
-    unit writes q
-    { q.elts = add x (old q.elts) }
+  val push (x: elt) (q: t) : unit writes {q}
+    ensures { q.elts = add x (old q.elts) }
 
   (** exception raised by [pop] and [peek] to signal an empty queue *)
   exception Empty
@@ -140,41 +128,36 @@ module PqueueNoDup
      mem x s /\ forall e: elt. mem e s -> rel x e
 
   (** removes and returns the minimal element *)
-  val pop:
-    q: t ->
-    {}
-    elt
-    writes q raises Empty
-    { q.elts = remove result (old q.elts) /\ minimal_elt result (old q.elts) }
-    | Empty -> { q.elts = (old q.elts) = empty }
+  val pop (q: t) : elt writes {q}
+    ensures { q.elts = remove result (old q.elts) }
+    ensures { minimal_elt result (old q.elts) }
+    raises  { Empty -> q.elts = (old q.elts) = empty }
 
   (** returns the minimal element, without modifying the queue *)
-  val peek:
-    q: t ->
-    {}
-    elt
-    reads q raises Empty
-    { minimal_elt result q.elts } | Empty -> { q.elts = empty }
+  val peek (q: t) : elt reads {q}
+    ensures { minimal_elt result q.elts }
+    raises  { Empty -> q.elts = empty }
 
   (** empties the queue *)
-  val clear: q: t -> {} unit writes q {q.elts = empty }
+  val clear (q: t) : unit writes {q} ensures {q.elts = empty }
 
   (** returns a fresh copy of the queue *)
-  val copy: q: t -> {} t reads q { result = q }
+  val copy (q: t) : t reads {q} ensures { result = q }
 
   (** checks whether the queue is empty *)
-  val is_empty:
-    q: t -> {} bool reads q { result=True <-> q.elts = empty }
+  val is_empty (q: t) : bool reads {q}
+    ensures { result=True <-> q.elts = empty }
 
   (** returns the number of elements in the queue *)
-  val length: q: t -> {} int reads q { result = cardinal q.elts }
+  val length (q: t) : int reads {q}
+    ensures { result = cardinal q.elts }
 
 end
 
 module TestNoDup
 
   use import set.Fset
-  use import module PqueueNoDup as P
+  use import PqueueNoDup as P
 
   function v1 : elt
   function v2 : elt
@@ -197,9 +180,3 @@ module TestNoDup
     ()
 
 end
-
-(***
-Local Variables:
-compile-command: "unset LANG; make -C .. modules/pqueue"
-End:
-*)

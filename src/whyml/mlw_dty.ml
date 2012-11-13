@@ -1,26 +1,16 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (* destructive types for program type inference *)
 
-open Why3
 open Ident
 open Ty
 open Term
@@ -86,11 +76,11 @@ let rec ity_inst_fresh mv mr ity = match ity.ity_node with
   | Ityvar v ->
       mr, Mtv.find v mv
   | Itypur (s,tl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
       mr, ts_app_real s tl
   | Ityapp (s,tl,rl) ->
-      let mr,tl = Util.map_fold_left (ity_inst_fresh mv) mr tl in
-      let mr,rl = Util.map_fold_left (reg_refresh mv) mr rl in
+      let mr,tl = Lists.map_fold_left (ity_inst_fresh mv) mr tl in
+      let mr,rl = Lists.map_fold_left (reg_refresh mv) mr rl in
       mr, its_app_real s tl rl
 
 and reg_refresh mv mr r = match Mreg.find_opt r mr with
@@ -112,7 +102,7 @@ let its_app s tl =
       snd (ity_inst_fresh mv Mreg.empty ity)
   | None ->
       let _, rl =
-        Util.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+        Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
       its_app_real s tl rl
 
 let ts_app ts dl = match ts.ts_def with
@@ -310,5 +300,5 @@ let dity_of_ty htv hreg vars ty =
 let specialize_lsymbol ls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv ty = dity_of_ty htv hreg vars_empty ty in
-  let ty = Util.def_option ty_bool ls.ls_value in
+  let ty = Opt.get_def ty_bool ls.ls_value in
   List.map conv ls.ls_args, conv ty

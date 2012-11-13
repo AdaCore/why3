@@ -6,26 +6,19 @@ module EWD673
   use import bool.Bool
   use import int.Int
   use import int.Lex2
-  use import module ref.Refint
+  use import ref.Refint
 
-  val any_bool: unit -> {} bool {}
-  val any_nat: unit -> {} int { result >= 0 }
+  val any_bool () : bool
+  val any_nat  () : int ensures { result >= 0 }
 
   let s (x: ref int) (y: ref int) =
-    { !x >= 0 /\ !y >= 0 }
+    requires { !x >= 0 /\ !y >= 0 }
     while !x > 0 || !y > 0 do
       invariant { !x >= 0 /\ !y >= 0 }
-      variant   { (!x, !y) } with lex
+      variant   { !x, !y }
       if !x > 0 then begin decr x; y := any_nat () end;
       (* else *)
       if !y > 0 then decr y
     done
-    {}
 
 end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/ewd673.gui"
-End:
-*)

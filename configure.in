@@ -1,22 +1,13 @@
-##########################################################################
-#                                                                        #
-#  Copyright (C) 2010-2012                                               #
-#    François Bobot                                                      #
-#    Jean-Christophe Filliâtre                                           #
-#    Claude Marché                                                       #
-#    Guillaume Melquiond                                                 #
-#    Andrei Paskevich                                                    #
-#                                                                        #
-#  This software is free software; you can redistribute it and/or        #
-#  modify it under the terms of the GNU Library General Public           #
-#  License version 2.1, with the special exception on linking            #
-#  described in file LICENSE.                                            #
-#                                                                        #
-#  This software is distributed in the hope that it will be useful,      #
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  #
-#                                                                        #
-##########################################################################
+####################################################################
+#                                                                  #
+#  The Why3 Verification Platform   /   The Why3 Development Team  #
+#  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  #
+#                                                                  #
+#  This software is distributed under the terms of the GNU Lesser  #
+#  General Public License version 2.1, with the special exception  #
+#  on linking described in file LICENSE.                           #
+#                                                                  #
+####################################################################
 
 #
 # autoconf input for Objective Caml programs
@@ -90,11 +81,11 @@ AC_ARG_ENABLE(bench,
     [  --enable-bench          enable Why3 benchmarking tool],,
     enable_bench=yes)
 
-# Coq plugin and libraries
+# Coq tactic and libraries
 
-AC_ARG_ENABLE(coq-plugin,
-    [  --enable-coq-plugin     enable Coq plugin],,
-    enable_coq_plugin=yes)
+AC_ARG_ENABLE(coq-tactic,
+    [  --enable-coq-tactic     enable Coq "why3" tactic],,
+    enable_coq_tactic=yes)
 
 AC_ARG_ENABLE(coq-libs,
     [  --enable-coq-libs       enable Coq realizations],,
@@ -117,12 +108,6 @@ AC_ARG_ENABLE(hypothesis-selection,
 AC_ARG_ENABLE(doc,
     [  --enable-doc            build documentation],,
     enable_doc=yes)
-
-# debug symbols
-
-AC_ARG_ENABLE(debug,
-    [  --enable-debug          enable debugging symbols],,
-    enable_debug=no)
 
 # profiling
 
@@ -325,7 +310,10 @@ fi
 # checking for lablgtksourceview2
 if test "$enable_ide" = yes ; then
    if test "$USEOCAMLFIND" = yes; then
-      LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+      LABLGTKSV2LIB=$(ocamlfind query lablgtk2.sourceview2)
+      if test -z "$LABLGTKSV2LIB"; then
+         LABLGTKSV2LIB=$(ocamlfind query lablgtksourceview2)
+      fi
    fi
    if test -n "$LABLGTKSV2LIB";then
       echo "ocamlfind found lablgtksourceview2 in $LABLGTKSV2LIB"
@@ -379,7 +367,9 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 enable_coq_fp_libs=yes
 
-if test "$enable_coq_plugins" = no -a "$enable_coq_libs" = no; then
+coq_compat_version=
+
+if test "$enable_coq_tactic" = no -a "$enable_coq_libs" = no; then
     enable_coq_support=no
     AC_MSG_WARN(coq support disabled)
     reason_coq_support=" (disabled by user)"
@@ -397,12 +387,12 @@ else
         case $COQVERSION in
           8.3*)
 	        enable_coq_support=yes
-                cp -f src/coq-tactic/coqCompat.8.3.ml src/coq-tactic/coqCompat.ml
+                coq_compat_version=".8.3"
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           8.4*|trunk)
 	        enable_coq_support=yes
-                cp -f src/coq-tactic/coqCompat.8.4.ml src/coq-tactic/coqCompat.ml
+                coq_compat_version=".8.4"
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           *)
@@ -415,25 +405,25 @@ else
 fi
 
 if test "$enable_coq_support" = no; then
-   enable_coq_plugin=no
+   enable_coq_tactic=no
    enable_coq_libs=no
 fi
 
-if test "$enable_coq_plugin" = yes; then
-   AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_plugin=no)
-   if test "$enable_coq_plugin" = no; then
-      reason_coq_plugin=" ($COQLIB/kernel/term.cmi not found)"
+if test "$enable_coq_tactic" = yes; then
+   AC_CHECK_FILE($COQLIB/kernel/term.cmi,,enable_coq_tactic=no)
+   if test "$enable_coq_tactic" = no; then
+      reason_coq_tactic=" ($COQLIB/kernel/term.cmi not found)"
    fi
 fi
 
-if test "$enable_coq_plugin" = yes -a "$CAMLP5O" = no; then
-   enable_coq_plugin=no
-   reason_coq_plugin=" (camlp5o not found)"
+if test "$enable_coq_tactic" = yes -a "$CAMLP5O" = no; then
+   enable_coq_tactic=no
+   reason_coq_tactic=" (camlp5o not found)"
 fi
 
-# coq-plugin currently disabled
-dnl enable_coq_plugin=no
-dnl reason_coq_plugin=" (not yet implemented)"
+# coq-tactic currently disabled
+dnl enable_coq_tactic=no
+dnl reason_coq_tactic=" (not yet implemented)"
 
 if test "$enable_coq_libs" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
@@ -571,7 +561,6 @@ dnl AC_SUBST(FORPACK)
 AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
 
-AC_SUBST(enable_debug)
 AC_SUBST(enable_profiling)
 
 AC_SUBST(CAMLP5O)
@@ -582,9 +571,10 @@ AC_SUBST(SQLITE3LIB)
 AC_SUBST(enable_bench)
 AC_SUBST(META_OCAMLGRAPH)
 
-AC_SUBST(enable_coq_plugin)
+AC_SUBST(enable_coq_tactic)
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
+AC_SUBST(coq_compat_version)
 
 AC_SUBST(COQC)
 AC_SUBST(COQDEP)
@@ -613,10 +603,12 @@ dnl AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
 AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
-AC_CONFIG_FILES(share/provers-detection-data.conf META)
+AC_CONFIG_FILES(share/provers-detection-data.conf lib/why3/META)
+AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
-chmod a-w share/provers-detection-data.conf META;
+chmod a-w share/provers-detection-data.conf lib/why3/META;
+chmod a-w src/jessie/Makefile;
 chmod u+x src/config.sh)
 
 AC_OUTPUT
@@ -638,7 +630,7 @@ echo "Coq support             : $enable_coq_support $reason_coq_support"
 if test "$enable_coq_support" = "yes" ; then
    echo "    Version             : $COQVERSION"
    echo "    Lib                 : $COQLIB"
-   echo "    Plugin support      : $enable_coq_plugin $reason_coq_plugin"
+   echo "    \"why3\" tactic       : $enable_coq_tactic $reason_coq_tactic"
    echo "    Realization support : $enable_coq_libs $reason_coq_libs"
    if test "$enable_coq_libs" = "yes" ; then
       echo "        FP arithmetic   : $enable_coq_fp_libs $reason_coq_fp_libs"
@@ -654,7 +646,6 @@ if test "$enable_pvs_support" = "yes" ; then
    fi
 fi
 echo "hypothesis selection    : $enable_hypothesis_selection"
-echo "debugging symbols       : $enable_debug"
 echo "profiling               : $enable_profiling"
 echo "relocatable install     : $enable_relocation"
 echo "localdir                : $enable_local"

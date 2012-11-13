@@ -32,6 +32,8 @@ theory SetGen
 
   axiom empty_def1: is_empty (empty : set 'a)
 
+  lemma mem_empty: forall x:'a. mem x empty <-> false
+
   (** addition *)
   function add 'a (set 'a) : set 'a
 
@@ -88,7 +90,7 @@ end
 theory Set
 
   clone export SetGen
-  
+
   (** the set of all x of type 'a *)
   constant all: set 'a
 
@@ -299,9 +301,3 @@ theory SetMap
     (complement s)[x] = notb s[x]
 
 end
-
-(***
-Local Variables:
-compile-command: "make -C .. theories/set"
-End:
-*)

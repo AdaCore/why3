@@ -6,9 +6,8 @@ module T
 
   (* g can raise MyExc *)
 
-  let rec f (x: int) : int  = {} raise MyExc {} | MyExc -> {}
-
-  with    g (x: int) : int = {} f x {} | MyExc -> {}
+  let rec f (x: int) : int raises {MyExc} = raise MyExc
+  with    g (x: int) : int raises {MyExc} = f x
 
 end
 

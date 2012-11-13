@@ -4,7 +4,7 @@ theory Genealogy
   type person
 
   type gender = Male | Female
-  
+
   function gender person : gender
 
   function father person : person
@@ -20,7 +20,7 @@ theory Genealogy
 
   predicate child (c : person) (p : person) = parent p c
 
-  goal Child_is_son_or_daughter: 
+  goal Child_is_son_or_daughter:
     forall c p : person. child c p <-> son c p \/ daughter c p
 
   predicate sibling (p1 : person) (p2 : person) =
@@ -45,14 +45,14 @@ theory Genealogy
   goal Grandparent_is_grandfather_or_grandmother:
     forall g p : person. grandparent g p <-> grandfather g p \/ grandmother g p
 
-  goal Grandfather_male: 
+  goal Grandfather_male:
     forall g p : person. grandfather g p -> gender g = Male
-  goal Grandmother_female: 
+  goal Grandmother_female:
     forall g p : person. grandmother g p -> gender g = Female
 
   goal Only_two_grandfathers:
      forall g1 g2 g3 p : person.
-     grandfather g1 p -> 
+     grandfather g1 p ->
      grandfather g2 p ->
      grandfather g3 p ->
      (g1 = g2 \/ g2 = g3 \/ g1 = g3)

@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ident
 open Ty
@@ -51,26 +42,22 @@ let elim_abstract undef_ls rem_pr rem_ls rem_ts d = match d.d_node with
 
 let eliminate_builtin =
   Trans.on_tagged_ls Printer.meta_syntax_logic (fun undef_ls ->
-  Trans.on_tagged_pr Printer.meta_remove_prop  (fun rem_pr ->
-  Trans.on_tagged_ls Printer.meta_remove_logic  (fun rem_ls ->
-  Trans.on_tagged_ts Printer.meta_remove_type_symbol  (fun rem_ts ->
+  Trans.on_tagged_pr Printer.meta_remove_prop (fun rem_pr ->
+  Trans.on_tagged_ls Printer.meta_remove_logic (fun rem_ls ->
+  Trans.on_tagged_ts Printer.meta_remove_type (fun rem_ts ->
     Trans.decl (elim_abstract undef_ls rem_pr rem_ls rem_ts) None))))
 
 let () = Trans.register_transform "eliminate_builtin" eliminate_builtin
-  ~desc_metas:[Printer.meta_syntax_logic,
-               ("@ Remove@ their@ definitions@ since@ they@ are@ considered@ \
-                 builtin."
-                   : Pp.formatted);
-               Printer.meta_remove_prop, Pp.empty_formatted]
-  ~desc:"Eliminate@ facts@ which@ are@ builtin@ in@ the@ prover:@ symbol@ \
-         definitions@ or@ axiomatics."
+  ~desc:"Eliminate@ propositions@ and@ definitions@ of@ symbols@ \
+    that@ are@ builtin@ in@ the@ prover@ (see@ 'syntax'@ and@ \
+    'remove'@ clauses@ in@ the@ prover's@ driver)."
 
 (** compute the meta_remove_* given two task one included in the other *)
 let compute_diff t1 t2 =
   let km = Mid.set_diff (Task.task_known t1) (Task.task_known t2) in
   let hdone = Hdecl.create 10 in
   let remove_ts acc ts =
-    (Printer.meta_remove_type_symbol, [Theory.MAts ts])::acc in
+    (Printer.meta_remove_type, [Theory.MAts ts])::acc in
   let remove_ls acc ls =
     (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
   let remove_pr acc pr =
@@ -78,7 +65,7 @@ let compute_diff t1 t2 =
   Mid.fold_left (fun acc _ decl ->
     if Hdecl.mem hdone decl then acc
     else begin
-      Hdecl.set hdone decl;
+      Hdecl.replace hdone decl ();
       match decl.d_node with
       | Dtype ts -> remove_ts acc ts
       | Ddata l -> List.fold_left (fun acc (ts,_) -> remove_ts acc ts) acc l
@@ -160,30 +147,25 @@ let eliminate_mutual_recursion = Trans.decl elim_mutual None
 let () =
   Trans.register_transform "eliminate_definition_func"
     eliminate_definition_func
-    ~desc:"Transform@ function@ definition@ into@ axioms.";
+    ~desc:"Transform@ function@ definitions@ into@ axioms.";
   Trans.register_transform "eliminate_definition_pred"
     eliminate_definition_pred
-    ~desc:"Transform@ predicate@ definition@ into@ axioms.";
+    ~desc:"Transform@ predicate@ definitions@ into@ axioms.";
   Trans.register_transform "eliminate_definition"
     eliminate_definition
-    ~desc:"Same@ as@ eliminate_definition_func/_pred@ at@ the@ same@ time.";
+    ~desc:"Transform@ function@ and@ predicate@ definitions@ into@ axioms.";
   Trans.register_transform "eliminate_recursion"
     eliminate_recursion
-    ~desc:"Same@ as@ eliminate_definition@ ,but@ only@ for@ recursive@ \
-           definition";
+    ~desc:"Same@ as@ eliminate_definition,@ but@ only@ for@ recursive@ \
+           definitions.";
   Trans.register_transform "eliminate_non_struct_recursion"
     eliminate_non_struct_recursion
-    ~desc:"Same@ as@ eliminate_recursion@ ,but@ only@ for@ non@ structural@ \
-           recursive@ definition";
+    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ non-structural@ \
+           recursive@ definitions.";
   Trans.register_transform "eliminate_mutual_recursion"
     eliminate_mutual_recursion
-    ~desc:"Same@ as@ eliminate_recursion@ ,but@ only@ for@ mutual@ \
-           recursive@ definition (at@ least@ two@ functions@ or@ \
-           predicates@ defined@ at@ the@ same@ time)";
-
-
-
-
+    ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutually@ \
+           recursive@ definitions."
 
 (** Bisect *)
 open Task
@@ -236,7 +218,7 @@ let _union_rem rem1 rem2 =
 
 let create_meta_rem_list rem =
   let remove_ts acc ts =
-    (Printer.meta_remove_type_symbol, [Theory.MAts ts])::acc in
+    (Printer.meta_remove_type, [Theory.MAts ts])::acc in
   let remove_ls acc ls =
     (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
   let remove_pr acc pr =

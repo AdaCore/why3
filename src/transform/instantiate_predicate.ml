@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Decl
 open Term
@@ -70,7 +61,8 @@ let trans spr task_hd (((lpr, past), task) as current) =
   (current, Task.add_tdecl task task_hd.Task.task_decl)
 
 let meta = Theory.register_meta "instantiate : auto" [Theory.MTprsymbol]
-  ~desc:"Mark proposition that should be automatically instantiated."
+  ~desc:"Mark@ proposition@ that@ should@ be@ automatically@ instantiated@ \
+    by@ the@ 'instantiate_predicate'@ transformation."
 
 (** all the symbols (unary predicates) that have the "instantiate : auto"
     meta are marked for instantiation by the above transformation *)
@@ -78,6 +70,5 @@ let () =
   Trans.register_transform "instantiate_predicate"
     (Trans.on_tagged_pr meta (fun spr ->
       Trans.fold_map (trans spr) ([], Sterm.empty) None))
-    ~desc_metas:[meta,Pp.empty_formatted]
-    ~desc:"Look@ into@ all@ the@ task@ for@ terms@ that@ can@ instantiate@ \
-           proposition@ marked@ by@ the@ meta."
+    ~desc:"Instantiate@ proposition@ marked@ by@ 'instantiate : auto'.@ \
+           Used@ for@ Gappa."

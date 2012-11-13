@@ -1,6 +1,6 @@
 module M
 
-  use import module ref.Ref
+  use import ref.Ref
 
   type key = int
   type value = int
@@ -8,32 +8,20 @@ module M
   function default rbt : value
   predicate mem rbt key value
 
-  val create :
-    d:value ->
-    {}
-    ref rbt
-    { default !result = d /\
+  val create (d:value) : ref rbt
+    ensures { default !result = d /\
       forall k:key, v:value. mem !result k v <-> v = d }
 
-  val replace :
-    m:ref rbt -> k:key -> v:value ->
-    {}
-    unit writes m
-    { default !m = default (old !m) /\
+  val replace (m:ref rbt) (k:key) (v:value) : unit writes {m}
+    ensures { default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
 
-  val lookup :
-    m:ref rbt -> k:key ->
-    {}
-    value reads m
-    { mem !m k result }
+  val lookup (m:ref rbt) (k:key) : value reads {m}
+    ensures { mem !m k result }
 
-  val remove :
-    m:ref rbt -> k:key ->
-    {}
-    unit writes m
-    { default !m = default (old !m) /\
+  val remove (m:ref rbt) (k:key) : unit writes {m}
+    ensures { default !m = default (old !m) /\
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = default !m else mem (old !m) k' v' }
 
@@ -54,9 +42,3 @@ module M
     ()
 
   end
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. examples/programs/vacid_0_red_black_trees_harness"
-End:
-*)

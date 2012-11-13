@@ -1,24 +1,14 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-open Util
 open Ident
 open Ty
 open Term
@@ -26,11 +16,11 @@ open Decl
 open Theory
 
 let debug = Debug.register_info_flag "encoding"
-  ~desc:"About the encoding of polymorphism."
+  ~desc:"Print@ debugging@ messages@ about@ polymorphism@ encoding."
 
 (* meta to tag the protected types *)
 let meta_kept = register_meta "encoding : kept" [MTty]
-  ~desc:"Specify a type to keep during the encoding of polymorphism."
+  ~desc:"Specify@ a@ type@ to@ keep@ during@ polymorphism@ encoding."
 
 (* sort symbol of the "universal" type *)
 let ts_base = create_tysymbol (id_fresh "uni") [] None
@@ -52,7 +42,7 @@ let d_ts_type = create_ty_decl ts_type
 
 (* function symbol mapping ty_type^n to ty_type *)
 let ls_of_ts = Wts.memoize 63 (fun ts ->
-  let args = List.map (const ty_type) ts.ts_args in
+  let args = List.map (Util.const ty_type) ts.ts_args in
   create_fsymbol (id_clone ts.ts_name) args ty_type)
 
 (* function symbol selecting ty_type from ty_type^n *)
@@ -72,10 +62,10 @@ let ls_selects_def_of_ts acc ts =
   in
   let tvars = List.map t_var vars in
   (** type to int *)
-  let id = string_of_int (id_hash ts.ts_name) in
+  let id = id_hash ts.ts_name in
   let acc =
     let t = fs_app ls tvars ty_type in
-    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_int_const id) in
+    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_nat_const id) in
     let f = t_forall_close vars [[t]] f in
     let prsymbol = create_prsymbol (id_clone ts.ts_name) in
     create_prop_decl Paxiom prsymbol f :: acc
@@ -155,7 +145,7 @@ let is_protected_vs kept vs =
   is_protected_id vs.vs_name && Sty.mem vs.vs_ty kept
 
 let is_protected_ls kept ls =
-  is_protected_id ls.ls_name && Sty.mem (of_option ls.ls_value) kept
+  is_protected_id ls.ls_name && Sty.mem (Opt.get ls.ls_value) kept
 
 (* monomorphise modulo the set of kept types * and an lsymbol map *)
 

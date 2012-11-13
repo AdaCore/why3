@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Format
 open Why3
@@ -24,7 +15,8 @@ open Rc
 open Whyconf
 
 let debug = Debug.register_info_flag "ide_info"
-  ~desc:"About why3ide."
+  ~desc:"Print@ why3ide@ debugging@ messages."
+
 let () = Debug.set_flag debug
 
 (** set the exception call back handler to the Exn_printer of why3 *)
@@ -203,7 +195,7 @@ let load_altern alterns (_,section) =
 *)
 
 let load_config config original_config =
-  let main = get_main config in 
+  let main = get_main config in
   let ide  = match get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
@@ -558,16 +550,29 @@ let show_legend_window () =
 let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
-      ~name:"Why3"
+      ~name:"The Why3 Verification Platform "
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
                 "Claude Marché";
-                "Andrei Paskevich"
+                "Guillaume Melquiond";
+                "Andrei Paskevich";
+                "";
+                "with contributions of";
+                "";
+                "Sylvie Boldo";
+                "Simon Cruanes";
+                "Leon Gondelman";
+                "Johannes Kanig";
+                "David Mentré";
+                "Benjamin Monate";
+                "Thi-Minh-Tuyen Nguyen";
+                "Simão Melo de Sousa";
+                "Asma Tafat-Bouzid";
                ]
-      ~copyright:"Copyright 2010-2011 Univ Paris-Sud, CNRS, INRIA"
-      ~license:"GNU Lesser General Public License"
-      ~website:"https://gforge.inria.fr/projects/why3"
-      ~website_label:"Project web site"
+      ~copyright:"Copyright 2010-2012    INRIA, CNRS, Paris-Sud University"
+      ~license:"GNU Lesser General Public License version 2.1"
+      ~website:"http://why3.lri.fr"
+      ~website_label:"http://why3.lri.fr"
       ~version:Config.version
       ()
   in
@@ -769,10 +774,10 @@ let provers_page c (notebook:GPack.notebook) =
   let hidden_provers = Hashtbl.create 7 in
   Mprover.iter
     (fun _ p ->
-      let p = p.prover in
-      let label = p.prover_name ^ " " ^ p.prover_version in
-      let hidden = ref (List.mem label c.hidden_provers) in
-      Hashtbl.add hidden_provers label hidden;
+      let name = prover_parseable_format p.prover in
+      let label = Pp.string_of_wnl print_prover p.prover in
+      let hidden = ref (List.mem name c.hidden_provers) in
+      Hashtbl.add hidden_provers name hidden;
       let b =
         GButton.check_button ~label ~packing:provers_box#add ()
           ~active:(not !hidden)
@@ -858,7 +863,7 @@ let editors_page c (notebook:GPack.notebook) =
   in
   let strings = "(default)" :: "--" :: (List.rev strings) in
   let add_prover p pi =
-    let text = p.prover_name ^ " " ^ p.prover_version in
+    let text = Pp.string_of_wnl Whyconf.print_prover p in
     let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
     let _ = GMisc.label ~width:150 ~xalign:0.0 ~text ~packing:(hb#pack ~expand:false) () in
     let (combo, ((_ : GTree.list_store), column)) =

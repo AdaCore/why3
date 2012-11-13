@@ -1,22 +1,13 @@
-(**************************************************************************)
-(*                                                                        *)
-(*  Copyright (C) 2010-2012                                               *)
-(*    François Bobot                                                      *)
-(*    Jean-Christophe Filliâtre                                           *)
-(*    Claude Marché                                                       *)
-(*    Guillaume Melquiond                                                 *)
-(*    Andrei Paskevich                                                    *)
-(*                                                                        *)
-(*  This software is free software; you can redistribute it and/or        *)
-(*  modify it under the terms of the GNU Library General Public           *)
-(*  License version 2.1, with the special exception on linking            *)
-(*  described in file LICENSE.                                            *)
-(*                                                                        *)
-(*  This software is distributed in the hope that it will be useful,      *)
-(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
-(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                  *)
-(*                                                                        *)
-(**************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 
 open Format
@@ -24,7 +15,7 @@ open Format
 open Why3
 open Whyconf
 open Gconfig
-open Util
+open Stdlib
 open Debug
 module C = Whyconf
 
@@ -69,9 +60,9 @@ let spec = Arg.align [
    Arg.String (fun s -> input_files := s :: !input_files),
    "<f> add file f to the project (ignored if it is already there)") ;
 *)
-  Debug.Opt.desc_debug_list;
-  Debug.Opt.desc_debug_all;
-  Debug.Opt.desc_debug;
+  Debug.Args.desc_debug_list;
+  Debug.Args.desc_debug_all;
+  Debug.Args.desc_debug;
   ("-v",
    Arg.Set opt_version,
    " print version information") ;
@@ -103,8 +94,8 @@ let () = Gconfig.read_config !opt_config !opt_extra
 let () = C.load_plugins (get_main ())
 
 let () =
-  Debug.Opt.set_flags_selected ();
-  if Debug.Opt.option_list () then exit 0
+  Debug.Args.set_flags_selected ();
+  if Debug.Args.option_list () then exit 0
 
 let () =
   if !opt_list_formats then begin
@@ -499,12 +490,12 @@ let set_proof_state a =
   let t = if a.S.proof_archived then t ^ " (archived)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
 
-let model_index = Hashtbl.create 17
+let model_index = Hint.create 17
 
 let get_any_from_iter row =
   try
     let idx = goals_model#get ~row ~column:index_column in
-    Hashtbl.find model_index idx
+    Hint.find model_index idx
   with Not_found -> invalid_arg "Gmain.get_any_from_iter"
 
 (*
@@ -549,14 +540,14 @@ let env_session () =
     | None -> assert false
     | Some e -> e
 
-let task_text t = Pp.string_of Pretty.print_task t 
+let task_text t = Pp.string_of Pretty.print_task t
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
 let intro_transformation = "introduce_premises"
 
 let update_task_view a =
-  let text = 
+  let text =
   match a with
     | S.Goal g ->
       if (Gconfig.config ()).intro_premises then
@@ -579,7 +570,7 @@ let update_task_view a =
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
-            | S.Done r -> 
+            | S.Done r ->
               let out = r.Call_provers.pr_output in
               begin
                 let env = env_session () in
@@ -708,12 +699,12 @@ let init =
     if ind < 0 then
       begin
         incr cpt;
-        Hashtbl.add model_index !cpt any;
+        Hint.add model_index !cpt any;
         goals_model#set ~row:row#iter ~column:index_column !cpt
       end
     else
       begin
-        Hashtbl.replace model_index ind any;
+        Hint.replace model_index ind any;
       end;
     (* useless since it has no child: goals_view#expand_row row#path; *)
     goals_model#set ~row:row#iter ~column:icon_column
@@ -810,11 +801,10 @@ let record_warning ?loc msg = Queue.push (loc,msg) warnings
 
 let () = Warning.set_hook record_warning
 
-
 let display_warnings () =
   if Queue.is_empty warnings then () else
     begin
-      Queue.iter 
+      Queue.iter
         (fun (loc,msg) ->
           match loc with
             | None ->
@@ -830,7 +820,7 @@ let display_warnings () =
       in
   (* file_info#set_text msg; *)
       info_window `WARNING msg
-    end  
+    end
 
 (* check if provers are present *)
 let () =
@@ -883,7 +873,6 @@ let () =
           try
             Debug.dprintf debug "[Info] adding file %s in database@." fn;
             ignore (M.add_file (env_session()) ?format:!opt_parser fn);
-            display_warnings ()
           with e ->
             eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
               Exn_printer.exn_printer e;
@@ -1138,8 +1127,7 @@ let select_file () =
               let f = Sysutil.relativize_filename project_dir f in
               Debug.dprintf debug "Adding file '%s'@." f;
               try
-                ignore (M.add_file (env_session()) f);
-                display_warnings ()
+                ignore (M.add_file (env_session()) f)
               with e ->
                 fprintf str_formatter
                   "@[Error while reading file@ '%s':@ %a@]" f
@@ -1321,7 +1309,7 @@ let rec hide_proved_in_goal g =
 *)
     end
   else
-    Hashtbl.iter
+    Hstr.iter
       (fun _ t -> List.iter hide_proved_in_goal t.M.subgoals)
       g.M.transformations
 
@@ -1355,7 +1343,7 @@ let rec show_all_in_goal g =
     goals_view#collapse_row (goals_model#get_path row)
   else
     goals_view#expand_row (goals_model#get_path row);
-  Hashtbl.iter
+  Hstr.iter
     (fun _ t -> List.iter show_all_in_goal t.M.subgoals)
     g.M.transformations
 
@@ -1417,8 +1405,7 @@ let () =
       C.Mprover.fold
         (fun k p acc ->
           let pr = p.prover in
-          if List.mem (pr.prover_name ^ " " ^ pr.prover_version)
-            gconfig.hidden_provers
+          if List.mem (C.prover_parseable_format pr) gconfig.hidden_provers
           then acc
           else C.Mprover.add k p acc)
         provers C.Mprover.empty
@@ -1487,8 +1474,10 @@ let () =
       let callback () = apply_trans_on_selection name in
       let ii = non_splitting#add_image_item
         ~label:(sanitize_markup name) ~callback () in
+      let print_trans_desc fmt (x,r) =
+        fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r in
       ii#misc#set_tooltip_text
-        (Pp.string_of Trans.print_trans_desc desc) in
+        (Pp.string_of print_trans_desc desc) in
     let trans =
       if nonsplitting
       then Trans.list_transforms ()
@@ -1653,7 +1642,12 @@ let scroll_to_loc ?(yalign=0.0) ~color loc =
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
-      source_view#source_buffer#set_language (any_lang f);
+      let lang =
+        if Filename.check_suffix f ".why" ||
+          Filename.check_suffix f ".mlw"
+        then why_lang else any_lang f
+      in
+      source_view#source_buffer#set_language lang;
       source_view#source_buffer#set_text (source_text f);
       set_current_file f;
     end;
@@ -1677,7 +1671,7 @@ let color_loc ~color loc =
 
 let rec color_locs ~color f =
   let b = ref false in
-  Util.option_iter (fun loc -> color_loc ~color loc; b := true) f.Term.t_loc;
+  Opt.iter (fun loc -> color_loc ~color loc; b := true) f.Term.t_loc;
   Term.t_fold (fun b loc -> color_locs ~color loc || b) !b f
 
 (* FIXME: we shouldn't open binders _every_time_ we redraw screen!!!
@@ -1707,7 +1701,7 @@ let scroll_to_source_goal g =
             { Theory.td_node =
                 Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
         if not (color_t_locs f) then
-          Util.option_iter (color_loc ~color:goal_tag) id.Ident.id_loc
+          Opt.iter (color_loc ~color:goal_tag) id.Ident.id_loc
     | _ ->
         assert false
 
@@ -2038,6 +2032,8 @@ let (_ : GtkSignal.id) =
 (*
 let () = Debug.set_flag (Debug.lookup_flag "transform")
 *)
+
+let () = display_warnings ()
 
 let () = GMain.main ()
 
