@@ -64,6 +64,9 @@ val filter_spec : spec_list
 
 val read_filter_spec : Whyconf.config -> filters * bool
 
+val theory_iter_proof_attempt_by_filter :
+  filters ->
+  ('key Session.proof_attempt -> unit) -> 'key Session.theory -> unit
 val session_iter_proof_attempt_by_filter :
   filters ->
   ('key Session.proof_attempt -> unit) -> 'key Session.session -> unit

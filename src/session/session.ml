@@ -292,6 +292,10 @@ let iter_transf f t =
 
 let iter_metas f t = f t.metas_goal
 
+let iter_file f fi = List.iter f fi.file_theories
+
+let iter_session f s = PHstr.iter (fun _ th -> f th) s.session_files
+
 let goal_iter f g =
   PHprover.iter
     (fun _ a -> f (Proof_attempt a)) g.goal_external_proofs;

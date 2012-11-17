@@ -609,9 +609,9 @@ install_local: bin/why3replayer
 # Session
 ###############
 
-SESSION_FILES = why3session_lib why3session_copy why3session_info \
-		why3session_latex why3session_html why3session_rm \
-		why3session
+SESSION_FILES = why3session_lib why3session_copy why3session_info	\
+		why3session_latex why3session_html why3session_rm	\
+		why3session_output why3session
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
 
