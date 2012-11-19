@@ -281,7 +281,7 @@ theory NumOfParam
     (* by induction on b *)
 
   lemma Full :
-    forall p : param, a b : int. a < b ->
+    forall p : param, a b : int. a <= b ->
     (forall n : int. a <= n < b -> pr p n) -> num_of p a b = b - a
     (* by induction on b *)
 
