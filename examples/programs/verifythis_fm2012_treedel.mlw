@@ -1,0 +1,127 @@
+
+(* {1 The VerifyThis competition at FM2012: Problem 3}
+
+   See {h <a href="http://fm2012.verifythis.org/challenges">this web page</a>}
+
+   Author: Jean-Christophe Filliâtre *)
+
+(* Why3 has no pointer data structures, so we model it *)
+module Memory
+
+  use export map.Map
+  use export ref.Ref
+
+  type pointer
+  constant null: pointer
+  type node = { left: pointer; right: pointer; data: int; }
+  type memory = map pointer node
+
+  function get_left   (m: memory) (p: pointer) : pointer = (get m p).left
+  function get_right  (m: memory) (p: pointer) : pointer = (get m p).right
+  function get_data   (m: memory) (p: pointer) : int     = (get m p).data
+
+  (* the global variable mem contains the current state of the memory *)
+  val mem: ref memory
+
+  (* accessor functions to ensure safety i.e. no null pointer dereference *)
+  let get_left (p: pointer) =
+    requires { p <> null }
+    ensures  { result = (get !mem p).left }
+    (get !mem p).left
+  let get_right (p: pointer) =
+    requires { p <> null }
+    ensures  { result = (get !mem p).right }
+    (get !mem p).right
+  let get_data (p: pointer) =
+    requires { p <> null }
+    ensures  { result = (get !mem p).data }
+    (get !mem p).data
+
+end
+
+module Treedel
+
+  use import Memory
+  use import bintree.Tree
+  use import bintree.Inorder
+  use import bintree.Zipper
+  use import list.Distinct
+
+  (* there is a binary tree t rooted at p in memory m *)
+  inductive tree (m: memory) (p: pointer) (t: tree pointer) =
+    | leaf: forall m: memory. tree m null Empty
+    | node: forall m: memory, p: pointer, l r: tree pointer.
+        p <> null ->
+        tree m (get_left m p) l ->
+        tree m (get_right m p) r ->
+        tree m p (Node l p r)
+
+(*
+  lemma frame:
+    forall m1: memory, p: pointer.
+    let n = get m1 p in
+    let m2 = set m1 p { n with left = (get m1 n.left).right } in
+    forall q: pointer. tree m1 q -> tree m2 q
+
+  function leaves (m: memory) (p: pointer) : list pointer
+
+  axiom leaves_null: forall m: memory. leaves m null = Nil
+  axiom leaves_node:
+    forall m: memory, p: pointer. tree m p -> p <> null ->
+    leaves m p =
+    leaves m (get_left m p) ++ (Cons p Nil) ++ leaves m (get_right m p)
+*)
+
+  let left (t: tree pointer) =
+     requires { t <> Empty }
+     ensures  { match t with Empty -> false | Node l _ _ -> result = l end }
+     match t with Empty -> absurd | Node l _ _ -> l end
+
+  let right (t: tree pointer) =
+     requires { t <> Empty }
+     ensures  { match t with Empty -> false | Node _ _ r -> result = r end }
+     match t with Empty -> absurd | Node _ _ r -> r end
+
+  (* specification is as follows: if t is a tree and its list of pointers
+     is x::l then, at the end of execution, its list is l and m = x.data *)
+  let search_tree_delete_min
+    (t: pointer) (ghost x: pointer) (ghost gt: tree pointer) =
+    requires { t <> null }
+    requires { tree !mem t gt }
+    requires { match inorder gt with
+               | Nil -> false
+               | Cons p l -> p = x /\ distinct (Cons p l) end }
+(*
+    ensures  { let (t, m) = result in
+      tree !mem t /\ leaves !mem t = l /\ m = get_data !mem x }
+*)
+    let p = ref (get_left t) in
+    if !p = null then begin
+      let m = get_data t in
+      let tt = get_right t in
+      (tt, m)
+    end else begin
+      let pp = ref t in
+      let tt = ref (get_left !p) in
+      let ghost zipper = ref (Left Top t (right gt)) in
+      let ghost subtree = ref (left gt) in
+      while !tt <> null do
+        invariant {
+          (* tree !mem !pp /\
+          leaves !mem t = leaves !mem !pp ++ !suffix /\ *)
+          !pp <> null /\ get_left !mem !pp = !p /\
+          !p <> null /\ get_left !mem !p = !tt }
+        zipper := Left !zipper !p (right !subtree);
+        subtree := left !subtree;
+        pp := !p;
+        p := !tt;
+        tt := get_left !p
+      done;
+      assert { !p = x };
+      let m = get_data !p in
+      tt := get_right !p;
+      mem := set !mem !pp { (get !mem !pp) with left = !tt };
+      (t, m)
+    end
+
+end
