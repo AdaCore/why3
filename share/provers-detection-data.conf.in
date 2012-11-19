@@ -313,6 +313,16 @@ command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none \
 \"eprover --cnf --tstp-format \" %f"
 driver = "drivers/iprover.drv"
 
+[ATP mathematica]
+name = "Mathematica"
+exec = "math"
+version_switch = "-run \"Exit[]\""
+version_regexp = "Mathematica \\([0-9.]+\\)"
+version_ok = "8.0"
+version_ok = "7.0"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -noprompt < %f"
+driver = "drivers/mathematica.drv"
+
 [ITP coq]
 name = "Coq"
 exec = "coqtop -batch"
