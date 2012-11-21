@@ -1,0 +1,1075 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../verifythis_fm2012_treedel.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="Memory"
+   locfile="../verifythis_fm2012_treedel.mlw"
+   loclnum="9" loccnumb="7" loccnume="13"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter get_left"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="23" loccnumb="6" loccnume="14"
+    expl="VC for get_left"
+    sum="b5175a3787de16d05ce0fb90adf7715c"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aleftagetV1V0aleftagetV1V0Iainfix =V0anullNFF">
+    <label
+     name="expl:VC for get_left"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter get_right"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="27" loccnumb="6" loccnume="15"
+    expl="VC for get_right"
+    sum="27a9da39fadab55c6a833e0dafb0e443"
+    proved="true"
+    expanded="false"
+    shape="ainfix =arightagetV1V0arightagetV1V0Iainfix =V0anullNFF">
+    <label
+     name="expl:VC for get_right"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter get_data"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="31" loccnumb="6" loccnume="14"
+    expl="VC for get_data"
+    sum="77819bfc08f5209dc563e4d81a1a974c"
+    proved="true"
+    expanded="false"
+    shape="ainfix =adataagetV1V0adataagetV1V0Iainfix =V0anullNFF">
+    <label
+     name="expl:VC for get_data"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="Treedel"
+   locfile="../verifythis_fm2012_treedel.mlw"
+   loclnum="38" loccnumb="7" loccnume="14"
+   verified="false"
+   expanded="true">
+   <goal
+    name="inorder_zip"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="64" loccnumb="8" loccnume="19"
+    sum="9e58b1a0ac813d1cb156465bd483b3b6"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0F">
+    <transf
+     name="induction_ty_lex"
+     proved="true"
+     expanded="false">
+     <goal
+      name="inorder_zip.1"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="64" loccnumb="8" loccnume="19"
+      expl="1."
+      sum="4f8861704f70f7e4e36ce61051a56380"
+      proved="true"
+      expanded="false"
+      shape="CV0aTopainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0FaLeftVVVainfix =ainorderazipaNodeV8V7V9V0ainfix ++ainorderV8aConsV7ainorderazipV9V0FIainfix =ainorderazipaNodeV11V10V12V4ainfix ++ainorderV11aConsV10ainorderazipV12V4FF">
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="inorder_zip.1.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="64" loccnumb="8" loccnume="19"
+        expl="1."
+        sum="19a8e10a34c97930b46443d73184cba9"
+        proved="true"
+        expanded="false"
+        shape="CV0aTopainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0FaLeftVVVtF">
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="inorder_zip.1.2"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="64" loccnumb="8" loccnume="19"
+        expl="2."
+        sum="b4de059965d0d279fb25933cf770df02"
+        proved="true"
+        expanded="false"
+        shape="CV0aToptaLeftVVVainfix =ainorderazipaNodeV5V4V6V0ainfix ++ainorderV5aConsV4ainorderazipV6V0FIainfix =ainorderazipaNodeV8V7V9V1ainfix ++ainorderV8aConsV7ainorderazipV9V1FF">
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.34"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="zip_bottom_left"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="68" loccnumb="8" loccnume="23"
+    sum="e153f973d1b6508b776030693cd64564"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainorderazipaNodeaEmptyV0V1V2aConsV0ainorderazipV1V2F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter left"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="72" loccnumb="6" loccnume="10"
+    expl="VC for left"
+    sum="d3e0be486058d09fc6108f7a678525be"
+    proved="true"
+    expanded="false"
+    shape="CV0aEmptyfaNodeVwwCV0aEmptyfaNodeVwwainfix =V1V2Iainfix =V0aEmptyNF">
+    <label
+     name="expl:VC for left"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter right"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="77" loccnumb="6" loccnume="11"
+    expl="VC for right"
+    sum="ca41beddc3a59dc2945cadb0720004fd"
+    proved="true"
+    expanded="false"
+    shape="CV0aEmptyfaNodewwVCV0aEmptyfaNodewwVainfix =V1V2Iainfix =V0aEmptyNF">
+    <label
+     name="expl:VC for right"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="main_lemma"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="82" loccnumb="8" loccnume="18"
+    sum="cd8fe1d5e21d4463daf6b860046ca1c6"
+    proved="false"
+    expanded="true"
+    shape="atreeV7V1azipV4V5Lamixfix [&lt;-]V0V2amk nodearightamixfix []V0V3arightamixfix []V0V2adataamixfix []V0V2Iainfix =aleftamixfix []V0V2V3IadistinctainorderV6IatreeV0V1V6LazipaNodeaEmptyV3V4V5F">
+   </goal>
+   <goal
+    name="WP_parameter search_tree_delete_min"
+    locfile="../verifythis_fm2012_treedel.mlw"
+    loclnum="93" loccnumb="6" loccnume="28"
+    expl="VC for search_tree_delete_min"
+    sum="fd0a5d94368635d618faf242246b7978"
+    proved="true"
+    expanded="true"
+    shape="iainfix =aleftagetV2V0anullCV1aEmptyfaNodeVwVCainorderV1aNilfaConsVVainfix =ainorderV5V7Aainfix =adataagetV2V0adataagetV2V6AatreeV2arightagetV2V0V5Iainfix =V5V4FAainfix =V3aEmptyAainfix =V0anullNAainfix =V0anullNiainfix =V13anullNCV11aEmptyfaNodeVwVainfix =azipV19V18V1AatreeV2V21V19Aainfix =aleftagetV2V21V22Aainfix =V21anullNAainfix =aleftagetV2V20V21Aainfix =V20anullNIainfix =V22aleftagetV2V21FAainfix =V21anullNIainfix =V21V13FIainfix =V20V15FIainfix =V19V16FIainfix =V18aLeftV12V15V17FCV11aEmptyfaNodeVwVCainorderV1aNilfaConsVVainfix =ainorderV27V29Aainfix =adataagetV2V15adataagetV24V28AatreeV24V0V27Iainfix =V27azipV26V12FAainfix =V25aEmptyIainfix =V24asetV2V14amk nodeV23arightagetV2V14adataagetV2V14FIainfix =V23arightagetV2V15FAainfix =V15anullNAainfix =V15anullNIainfix =azipV11V12V1AatreeV2V15V11Aainfix =aleftagetV2V15V13Aainfix =V15anullNAainfix =aleftagetV2V14V15Aainfix =V14anullNFAainfix =azipV10aLeftaTopV0V9V1AatreeV2aleftagetV2V0V10Aainfix =aleftagetV2aleftagetV2V0aleftagetV2V8Aainfix =aleftagetV2V0anullNAainfix =aleftagetV2V0aleftagetV2V0Aainfix =V0anullNICV1aEmptyfaNodeVwwainfix =V10V30FAainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V9V31FAainfix =V1aEmptyNAainfix =V8anullNLaleftagetV2V0Aainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+    <label
+     name="expl:VC for search_tree_delete_min"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter search_tree_delete_min.1"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="1. precondition"
+      sum="fbb1867b56ed8c7dc3c1725df7efd4f5"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.2"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="2. precondition"
+      sum="177b46b5efdc6639b5a6037d634cd5ed"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.3"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="3. precondition"
+      sum="f3396600c365b8efa18b54fb5d6bc6b0"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.4"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="4."
+      sum="276e0fc816bc1753323e66abf8d90a84"
+      proved="true"
+      expanded="false"
+      shape="CV1aEmptyfaNodeVwVtIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.4.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1."
+        sum="276e0fc816bc1753323e66abf8d90a84"
+        proved="true"
+        expanded="false"
+        shape="CV1aEmptyfaNodeVwVtIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.5"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="5. assertion"
+      sum="485c0676c73cca5d9cdf815808e0abe2"
+      proved="true"
+      expanded="false"
+      shape="CV1aEmptytaNodeVwVainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.5.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1. assertion"
+        sum="485c0676c73cca5d9cdf815808e0abe2"
+        proved="true"
+        expanded="false"
+        shape="CV1aEmptytaNodeVwVainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.6"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="6. postcondition"
+      sum="959b3088a0c984d5f448615142e252be"
+      proved="true"
+      expanded="false"
+      shape="CV1aEmptytaNodeVwVCainorderV1aNilfaConsVVainfix =ainorderV5V7Aainfix =adataagetV2V0adataagetV2V6AatreeV2arightagetV2V0V5Iainfix =V5V4FIainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.6.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1."
+        sum="4522ad643a9ec29a6ed4a828891652ad"
+        proved="true"
+        expanded="false"
+        shape="CV1aEmptytaNodeVwVatreeV2arightagetV2V0V5Iainfix =V5V4FIainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.6.2"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="2."
+        sum="8ad348a4ff23c09c6045e234ed029bf8"
+        proved="true"
+        expanded="false"
+        shape="CV1aEmptytaNodeVwVCainorderV1aNilfaConsVVtIainfix =V5V4FIainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.11"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.6.3"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="3."
+        sum="d8f27d733e3182b17bb7ec484ef415de"
+        proved="true"
+        expanded="false"
+        shape="CV1aEmptytaNodeVwVCainorderV1aNiltaConsVVainfix =adataagetV2V0adataagetV2V6Iainfix =V5V4FIainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.99"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.6.4"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="4."
+        sum="a8cd3d87413368850600b6ab4775eb14"
+        proved="true"
+        expanded="false"
+        shape="CV1aEmptytaNodeVwVCainorderV1aNiltaConsVVainfix =ainorderV5V7Iainfix =V5V4FIainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.52"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.7"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="7. precondition"
+      sum="84d236d44cf04ffda8a6a4d2c171b41c"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.8"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="8. precondition"
+      sum="f9df01b000b4490c4c53c23d45b40fa9"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.9"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="9. precondition"
+      sum="f1c082b7ac3a819e3868311db653d670"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V5FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.10"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="10. loop invariant init"
+      sum="b6ebf7733bf1a2144eb9f996f150b274"
+      proved="true"
+      expanded="false"
+      shape="ainfix =azipV5aLeftaTopV0V4V1AatreeV2aleftagetV2V0V5Aainfix =aleftagetV2aleftagetV2V0aleftagetV2V3Aainfix =aleftagetV2V0anullNAainfix =aleftagetV2V0aleftagetV2V0Aainfix =V0anullNICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.10.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1."
+        sum="3f9c46121f020cb6acb0507fc8e38127"
+        proved="true"
+        expanded="false"
+        shape="ainfix =V0anullNICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.10.2"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="2."
+        sum="d2998474eaa47223cc5797107d929081"
+        proved="true"
+        expanded="false"
+        shape="ainfix =aleftagetV2V0aleftagetV2V0ICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.10.3"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="3."
+        sum="eeb87a8e4209c38d6fe4e68603410e5b"
+        proved="true"
+        expanded="false"
+        shape="ainfix =aleftagetV2V0anullNICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.10.4"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="4."
+        sum="0459da39d9115237a4b2fbcbe5687a55"
+        proved="true"
+        expanded="false"
+        shape="ainfix =aleftagetV2aleftagetV2V0aleftagetV2V3ICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.10.5"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="5."
+        sum="33f17b1703471c468541be6e69d3cf09"
+        proved="true"
+        expanded="false"
+        shape="atreeV2aleftagetV2V0V5ICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.09"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.10.6"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="6."
+        sum="947752b272750a43ed8d05517cb3e998"
+        proved="true"
+        expanded="false"
+        shape="ainfix =azipV5aLeftaTopV0V4V1ICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.11"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="11."
+      sum="9a4b9502fcba09de9b5202aa16578e7e"
+      proved="true"
+      expanded="false"
+      shape="CV6aEmptyfaNodeVwVtIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.11.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1."
+        sum="9a4b9502fcba09de9b5202aa16578e7e"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptyfaNodeVwVtIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="10.71"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.12"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="12. precondition"
+      sum="d1faeb38fd8412492039c2d9e942b5f8"
+      proved="true"
+      expanded="false"
+      shape="CV6aEmptytaNodeVwVainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V17FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V18FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.13"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="13. loop invariant preservation"
+      sum="20761f48ab15b75a0c835ffda34c7581"
+      proved="true"
+      expanded="false"
+      shape="CV6aEmptytaNodeVwVainfix =azipV14V13V1AatreeV2V16V14Aainfix =aleftagetV2V16V17Aainfix =V16anullNAainfix =aleftagetV2V15V16Aainfix =V15anullNIainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.13.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1."
+        sum="5844b9ec3951300b13ddd51902bb261d"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVainfix =V15anullNIainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.13.2"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="2."
+        sum="fcd3d70279638e187a55def072e990eb"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVainfix =aleftagetV2V15V16Iainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.13.3"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="3."
+        sum="7ff858cf06652dc3dc172f48a7948b48"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVainfix =V16anullNIainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.13.4"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="4."
+        sum="7bf367b992f567e5fdeea48106d42f07"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVainfix =aleftagetV2V16V17Iainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.13.5"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="5."
+        sum="75202a1b5c8c3c48d7f7269f6c6d763e"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVatreeV2V16V14Iainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.13.6"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="6."
+        sum="9e04be1e46ac863096763d33d4b789f7"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVainfix =azipV14V13V1Iainfix =V17aleftagetV2V16FIainfix =V16anullNIainfix =V16V8FIainfix =V15V10FIainfix =V14V11FIainfix =V13aLeftV7V10V12FIainfix =V8anullNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.14"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="14. precondition"
+      sum="a7bda9a91a418abe4c821b9a850e6112"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V11FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V12FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.15"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="15. precondition"
+      sum="4f74491b4b4f320a50179781cd85bf7b"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V11FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V12FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.16"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="16."
+      sum="9ece3e052757cd918ca1b960eba27069"
+      proved="true"
+      expanded="false"
+      shape="CV6aEmptyfaNodeVwVtIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V15FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V16FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.17"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="17. assertion"
+      sum="28bea16ebb66de6626f94ff148ac4ad4"
+      proved="true"
+      expanded="false"
+      shape="CV6aEmptytaNodeVwVainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V15FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V16FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter search_tree_delete_min.17.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1. assertion"
+        sum="28bea16ebb66de6626f94ff148ac4ad4"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V15FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V16FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.15"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter search_tree_delete_min.18"
+      locfile="../verifythis_fm2012_treedel.mlw"
+      loclnum="93" loccnumb="6" loccnume="28"
+      expl="18. postcondition"
+      sum="1ad50226d87b0dd5ac1d0688d9542157"
+      proved="true"
+      expanded="true"
+      shape="CV6aEmptytaNodeVwVCainorderV1aNilfaConsVVainfix =ainorderV15V17Aainfix =adataagetV2V10adataagetV12V16AatreeV12V0V15Iainfix =V15azipV14V7FIainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+      <label
+       name="expl:VC for search_tree_delete_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter search_tree_delete_min.18.1"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="1."
+        sum="6b34d3ed522ea49594a2a60243eab115"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVatreeV12V0V15Iainfix =V15azipV14V7FIainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V16FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V17FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.75"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.18.2"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="2."
+        sum="688b0b1ae626d57674efd72afd97b4cb"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVCainorderV1aNilfaConsVVtIainfix =V15azipV14V7FIainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="8.88"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.18.3"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="3."
+        sum="dab5bc3e8749cb0e1b413fec42b46035"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVCainorderV1aNiltaConsVVainfix =adataagetV2V10adataagetV12V16Iainfix =V15azipV14V7FIainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.95"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter search_tree_delete_min.18.4"
+        locfile="../verifythis_fm2012_treedel.mlw"
+        loclnum="93" loccnumb="6" loccnume="28"
+        expl="4."
+        sum="76520aeabc031c404826e33c0519a6d6"
+        proved="true"
+        expanded="false"
+        shape="CV6aEmptytaNodeVwVCainorderV1aNiltaConsVVainfix =ainorderV15V17Iainfix =V15azipV14V7FIainfix =V13aEmptyIainfix =V12asetV2V9amk nodeV11arightagetV2V9adataagetV2V9FIainfix =V11arightagetV2V10FIainfix =V10anullNIainfix =V10anullNIainfix =V8anullNNIainfix =azipV6V7V1AatreeV2V10V6Aainfix =aleftagetV2V10V8Aainfix =V10anullNAainfix =aleftagetV2V9V10Aainfix =V9anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AatreeV2V0V1Aainfix =V0anullNFF">
+        <label
+         name="expl:VC for search_tree_delete_min"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.58"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
