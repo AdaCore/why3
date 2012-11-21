@@ -114,9 +114,8 @@ module Treedel
                     tree !mem !pp pt /\ zip pt !zipper = it }
         assert { tree !mem !p !subtree };
         ghost zipper := Left !zipper !pp !ppr;
-        ghost match !subtree with
-          | Empty -> absurd
-          | Node l _ r -> ppr := r; subtree := l end;
+        ghost ppr := right !subtree;
+        ghost subtree := left !subtree;
         pp := !p;
         p := !tt;
         tt := get_left !p
@@ -126,6 +125,10 @@ module Treedel
       let m = get_data !p in
       tt := get_right !p;
       mem := set !mem !pp { !mem[!pp] with left = !tt };
+(*
+      let ghost pl = left !subtree in assert { pl = Empty };
+      ghost ot := zip (right !subtree) (Left !zipper !pp !ppr);
+*)
       ghost match !subtree with Empty -> absurd
         | Node pl _ pr ->
             assert { pl = Empty }; ot := zip pr (Left !zipper !pp !ppr) end;

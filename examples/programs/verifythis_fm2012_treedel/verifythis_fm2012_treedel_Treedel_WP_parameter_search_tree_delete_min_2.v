@@ -189,10 +189,6 @@ Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(zipper a))
   (x:a) (l:(tree a)) (r:(tree a)), ((inorder (zip (Node l x r)
   z)) = (infix_plpl (inorder l) (Cons x (inorder (zip r z))))).
 
-Axiom zip_bottom_left : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (r:(tree a)) (z:(zipper a)), ((inorder (zip (Node (Empty :(tree a)) x r)
-  z)) = (Cons x (inorder (zip r z)))).
-
 Axiom main_lemma : forall (m:(map pointer node)) (t:pointer) (pp:pointer)
   (p:pointer) (ppr:(tree pointer)) (pr:(tree pointer)) (z:(zipper pointer)),
   let it := (zip (Node (Empty :(tree pointer)) p pr) (Left z pp ppr)) in
@@ -224,15 +220,20 @@ Theorem WP_parameter_search_tree_delete_min : forall (t:pointer) (it:(tree
   ((~ (p = null)) -> forall (tt1:pointer), (tt1 = (right1 (get mem1 p))) ->
   forall (mem2:(map pointer node)), (mem2 = (set mem1 pp (mk_node tt1
   (right1 (get mem1 pp)) (data (get mem1 pp))))) ->
+  ((~ (subtree = (Empty :(tree pointer)))) -> forall (pl:(tree pointer)),
   match subtree with
-  | Empty => True
-  | (Node pl _ pr) => (pl = (Empty :(tree pointer))) -> forall (ot:(tree
-      pointer)), (ot = (zip pr (Left zipper1 pp ppr))) ->
-      match (inorder it) with
-      | Nil => True
-      | (Cons p1 l) => ((inorder ot) = l)
-      end
-  end)))))))))).
+  | Empty => False
+  | (Node l _ _) => (pl = l)
+  end -> ((pl = (Empty :(tree pointer))) -> ((~ (subtree = (Empty :(tree
+  pointer)))) -> forall (o2:(tree pointer)),
+  match subtree with
+  | Empty => False
+  | (Node _ _ r) => (o2 = r)
+  end -> forall (ot:(tree pointer)), (ot = (zip o2 (Left zipper1 pp ppr))) ->
+  match (inorder it) with
+  | Nil => True
+  | (Cons p1 l) => ((inorder ot) = l)
+  end))))))))))))).
 intros t it mem1 ((h1,h2),h3) h4 h5 h6 h7 o h8 h9 o1 h10 subtree ppr zipper1
 tt pp p (h11,(h12,(h13,(h14,h15)))) h16 h17 h18 h19 h20 tt1 h21 mem2 h22.
 destruct subtree; auto.
