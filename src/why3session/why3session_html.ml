@@ -353,9 +353,9 @@ struct
     if c <> 0 then
       eprintf "[Error] '%s' stopped abnormaly : code %i" cmd c
 
- let edited_dst = Filename.concat !output_dir "edited"
 
   let find_pp edited =
+    let edited_dst = Filename.concat !output_dir "edited" in
     let basename = Filename.basename edited in
     try
       let suff,(cmd,suff_out) =
@@ -375,8 +375,10 @@ struct
         Sysutil.copy_file edited (Filename.concat edited_dst base_dst);
       base_dst
 
+let print_session name fmt session =
+
   let print_proof_attempt fmt pa =
-    match pa.proof_edited_as with
+    match get_edited_as_abs session pa with
       | None ->
         fprintf fmt "@[<hov><li rel='prover' ><a href='#'>%a : %a</a></li>@]"
           print_prover pa.proof_prover
@@ -387,7 +389,7 @@ struct
 onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
           output
           print_prover pa.proof_prover
-          print_proof_status pa.proof_state
+          print_proof_status pa.proof_state in
 
   let rec print_transf fmt tr =
     fprintf fmt
@@ -408,7 +410,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
       g.goal_external_proofs
       (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing
          Pp.nothing print_transf)
-      g.goal_transformations
+      g.goal_transformations in
 
   let print_theory fmt th =
     fprintf fmt
@@ -416,7 +418,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
       print_verified th.theory_verified
       th.theory_name.Ident.id_string
-      (Pp.print_list Pp.newline print_goal) th.theory_goals
+      (Pp.print_list Pp.newline print_goal) th.theory_goals in
 
   let print_file fmt f =
     fprintf fmt
@@ -424,16 +426,14 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
       print_verified f.file_verified
       f.file_name
-      (Pp.print_list Pp.newline print_theory) f.file_theories
+      (Pp.print_list Pp.newline print_theory) f.file_theories in
 
-  let print_session_aux name fmt s =
+  let print_session_aux fmt name =
     fprintf fmt "@[<hov><ul><a href='#'>%s</a>@,%a</ul>@]"
       name
       (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing print_file)
-      s.session_files
+      session.session_files in
 
-
-  let print_session name fmt s =
     fprintf fmt
       "<a href='#' onclick=\"$('#%s_session').jstree('open_all');\">
 expand all
@@ -470,7 +470,7 @@ $(function () {
 });
 </script>
 "
-  name name name (print_session_aux name) s name
+  name name name print_session_aux name name
 
 
   let context : context = "<!DOCTYPE html
@@ -503,6 +503,7 @@ $(function () {
 "
 
   let run_files config =
+    let edited_dst = Filename.concat !output_dir "edited" in
     if !opt_context then
       if not (Sys.file_exists edited_dst) then Unix.mkdir edited_dst 0o755;
     iter_files (run_file context print_session);
@@ -510,6 +511,7 @@ $(function () {
       let data_dir = Whyconf.datadir (Whyconf.get_main config) in
       (** copy images *)
       let img_dir_src = Filename.concat data_dir "images" in
+      let img_dir_src = Filename.concat img_dir_src "boomy" in
       let img_dir_dst = Filename.concat !output_dir "images" in
       if not (Sys.file_exists img_dir_dst) then Unix.mkdir img_dir_dst 0o755;
       List.iter (fun img_name ->
@@ -532,7 +534,22 @@ let run () =
   match !opt_style with
     | Table -> iter_files Table.run_one
     | SimpleTree -> iter_files Simple.run_one
-    | Jstree -> Jstree.run_files config
+    | Jstree ->
+      if !output_dir = "-" then begin
+        Format.eprintf "Option \"-o -\" is not compatible with \"--style jstree\".@.";
+        exit 1
+      end;
+      if !output_dir = "" then begin
+        let first = ref true in
+        iter_files (fun fname ->
+          if not !first then begin
+            Format.eprintf "Option \"-o -\" is mandatory when \"--style jstree\" is used for several files at once.@.";
+            exit 1
+          end;
+          output_dir := Session.get_project_dir fname;
+          first := false);
+      end;
+      Jstree.run_files config
 
 
 let cmd =
