@@ -5,7 +5,7 @@
 
    Author: Jean-Christophe Filliâtre *)
 
-(* Why3 has no pointer data structures, so we model it *)
+(* Why3 has no pointer data structures, so we model the heap *)
 module Memory
 
   use export map.Map
@@ -44,7 +44,8 @@ module Treedel
 
   (* there is a binary tree t rooted at p in memory m *)
   inductive tree (m: memory) (p: pointer) (t: tree pointer) =
-    | leaf: forall m: memory. tree m null Empty
+    | leaf: forall m: memory.
+        tree m null Empty
     | node: forall m: memory, p: pointer, l r: tree pointer.
         p <> null ->
         tree m m[p].left l ->
@@ -65,10 +66,6 @@ module Treedel
      forall z "induction": zipper 'a, x: 'a, l r: tree 'a.
      inorder (zip (Node l x r) z) = inorder l ++ Cons x (inorder (zip r z))
 
-  lemma zip_bottom_left:
-     forall x: 'a, r: tree 'a, z: zipper 'a.
-     inorder (zip (Node Empty x r) z) = Cons x (inorder (zip r z))
-
   let left (t: tree pointer) =
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node l _ _ -> result = l end }
@@ -80,13 +77,11 @@ module Treedel
      match t with Empty -> absurd | Node _ _ r -> r end
 
   lemma main_lemma:
-    forall m: memory, t pp p: pointer, r: tree pointer, z: zipper pointer.
-     let it = zip (Node Empty p r) z in
-     tree m t it ->
-     distinct (inorder it) ->
-     m[pp].left = p ->
-     let m' = m[pp <- { m[pp] with left = m[p].right }] in
-     tree m' t (zip r z)
+    forall m: memory, t pp p: pointer, ppr pr: tree pointer, z: zipper pointer.
+    let it = zip (Node Empty p pr) (Left z pp ppr) in
+    tree m t it -> distinct (inorder it) ->
+    let m' = m[pp <- { m[pp] with left = m[p].right }] in
+    tree m' t (zip pr (Left z pp ppr))
 
   (* specification is as follows: if t is a tree and its list of pointers
      is x::l then, at the end of execution, its list is l and m = x.data *)
@@ -109,25 +104,31 @@ module Treedel
     end else begin
       let pp = ref t in
       let tt = ref (get_left !p) in
-      let ghost zipper = ref (Left Top t (right it)) in
+      let ghost zipper = ref Top in
+      let ghost ppr = ref (right it) in
       let ghost subtree = ref (left it) in
       while !tt <> null do
         invariant { !pp <> null /\ !mem[!pp].left = !p /\
                     !p <> null /\ !mem[!p].left = !tt /\
-                    tree !mem !p !subtree /\
-                    zip !subtree !zipper = it }
+                    let pt = Node !subtree !pp !ppr in
+                    tree !mem !pp pt /\ zip pt !zipper = it }
+        assert { tree !mem !p !subtree };
+        ghost zipper := Left !zipper !pp !ppr;
         ghost match !subtree with
           | Empty -> absurd
-          | Node l _ r -> zipper := Left !zipper !p r; subtree := l end;
+          | Node l _ r -> ppr := r; subtree := l end;
         pp := !p;
         p := !tt;
         tt := get_left !p
       done;
+      assert { tree !mem !p !subtree };
+      assert { !pp <> !p };
       let m = get_data !p in
       tt := get_right !p;
       mem := set !mem !pp { !mem[!pp] with left = !tt };
       ghost match !subtree with Empty -> absurd
-        | Node l _ r -> assert { l = Empty }; ot := zip r !zipper end;
+        | Node pl _ pr ->
+            assert { pl = Empty }; ot := zip pr (Left !zipper !pp !ppr) end;
       (t, m)
     end
 

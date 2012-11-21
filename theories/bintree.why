@@ -7,12 +7,11 @@ theory Tree
 
 end
 
-theory Size
+theory Size "number of nodes"
 
   use export Tree
   use export int.Int
 
-  (* number of nodes *)
   function size (t: tree 'a) : int = match t with
     | Empty -> 0
     | Node l _ r -> 1 + size l + size r
