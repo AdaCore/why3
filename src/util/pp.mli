@@ -98,6 +98,8 @@ val lchevron : formatter -> unit -> unit
 val rchevron : formatter -> unit -> unit
 val nothing : formatter -> 'a -> unit
 val string : formatter -> string -> unit
+val float : formatter -> float -> unit
+val int : formatter -> int -> unit
 val constant_string : string -> formatter -> unit -> unit
 val formatted : formatter -> formatted -> unit
 val constant_formatted : formatted -> formatter -> unit -> unit
@@ -107,6 +109,9 @@ val indent : int -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit
 (** add the indentation at the first line *)
 
 val add_flush : (formatter -> 'a -> unit) -> formatter -> 'a -> unit
+
+val asd : (formatter -> 'a -> unit) -> (formatter -> 'a -> unit)
+(** add string delimiter  " " *)
 
 val open_formatter : ?margin:int -> out_channel -> formatter
 val close_formatter : formatter -> unit

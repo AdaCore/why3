@@ -197,11 +197,14 @@ val parse_filter_prover : string -> filter_prover
     regexp must start with ^. Partial match will be used.
 *)
 
+val filter_prover_with_shortcut : config -> filter_prover -> filter_prover
+(** resolve prover shortcut in filter *)
+
 val filter_prover : filter_prover -> prover -> bool
 (** test if the prover match the filter prover *)
 
 val filter_provers : config -> filter_prover -> config_prover Mprover.t
-(** test if the prover match the filter prover *)
+(** Get all the provers that match this filter *)
 
 exception ProverNotFound  of config * filter_prover
 exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t

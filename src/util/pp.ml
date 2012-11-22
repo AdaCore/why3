@@ -96,12 +96,16 @@ let rparen fmt () = fprintf fmt ")"
 let lchevron fmt () = fprintf fmt "<"
 let rchevron fmt () = fprintf fmt ">"
 let nothing _fmt _ = ()
-let string fmt s = fprintf fmt "%s" s
+let string = pp_print_string
+let float = pp_print_float
+let int = pp_print_int
 let constant_string s fmt () = string fmt s
 let formatted fmt x = Format.fprintf fmt "%( %)" x
 let constant_formatted f fmt () = formatted fmt f
 let print0 fmt () = pp_print_string fmt "\000"
 let add_flush sep fmt x = sep fmt x; pp_print_flush fmt ()
+
+let asd f fmt x = fprintf fmt "\"%a\"" f x
 
 let print_pair pr1 = print_pair_delim lparen comma rparen pr1
 
