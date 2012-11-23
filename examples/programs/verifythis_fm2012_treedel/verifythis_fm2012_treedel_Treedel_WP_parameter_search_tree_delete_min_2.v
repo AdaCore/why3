@@ -237,10 +237,12 @@ Theorem WP_parameter_search_tree_delete_min : forall (t:pointer) (it:(tree
 intros t it mem1 ((h1,h2),h3) h4 h5 h6 h7 o h8 h9 o1 h10 subtree ppr zipper1
 tt pp p (h11,(h12,(h13,(h14,h15)))) h16 h17 h18 h19 h20 tt1 h21 mem2 h22.
 destruct subtree; auto.
+intuition.
 intros.
 subst subtree1; simpl in h15.
 intuition.
-rewrite <- H1.
+rewrite <- H5.
+subst pl; simpl.
 rewrite inorder_zip.
 simpl.
 ae.

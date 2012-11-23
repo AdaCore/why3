@@ -52,7 +52,7 @@ module Treedel
         tree m m[p].right r ->
         tree m p (Node l p r)
 
-  (* degenerated zipper for a left descent *)
+  (* degenerated zipper for a left descent (= list of pairs) *)
   type zipper 'a =
     | Top
     | Left (zipper 'a) 'a (tree 'a)
@@ -78,10 +78,10 @@ module Treedel
 
   lemma main_lemma:
     forall m: memory, t pp p: pointer, ppr pr: tree pointer, z: zipper pointer.
-    let it = zip (Node Empty p pr) (Left z pp ppr) in
+    let it = zip (Node (Node Empty p pr) pp ppr) z in
     tree m t it -> distinct (inorder it) ->
     let m' = m[pp <- { m[pp] with left = m[p].right }] in
-    tree m' t (zip pr (Left z pp ppr))
+    tree m' t (zip (Node pr pp ppr) z)
 
   (* specification is as follows: if t is a tree and its list of pointers
      is x::l then, at the end of execution, its list is l and m = x.data *)
@@ -125,13 +125,8 @@ module Treedel
       let m = get_data !p in
       tt := get_right !p;
       mem := set !mem !pp { !mem[!pp] with left = !tt };
-(*
       let ghost pl = left !subtree in assert { pl = Empty };
       ghost ot := zip (right !subtree) (Left !zipper !pp !ppr);
-*)
-      ghost match !subtree with Empty -> absurd
-        | Node pl _ pr ->
-            assert { pl = Empty }; ot := zip pr (Left !zipper !pp !ppr) end;
       (t, m)
     end
 
