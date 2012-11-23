@@ -56,7 +56,7 @@ type info = {
   info_symbols : Sid.t;
   info_ops_of_rel : (string * string * string) Mls.t;
   info_syn : syntax_map;
-  mutable info_vars : vsymbol list;
+  (*mutable info_vars : vsymbol list;*)
 }
 
 let int_minus = ref ps_equ
@@ -99,7 +99,7 @@ let get_info env task =
     info_symbols = symb;
     info_ops_of_rel = ops;
     info_syn = syn;
-    info_vars = [];
+    (*info_vars = [];*)
   }
 
 (* Mathematica printing *)
@@ -266,16 +266,20 @@ let rec print_term info fmt t =
       end
   (*| Tquant _ ->
       unsupportedTerm f "math: quantifiers are not supported"*)
-  | Tquant (Tforall, fq) ->
+  (*| Tquant (Tforall, fq) ->
       let vl, _tl, f = t_open_quant fq in
 	info.info_vars <- List.append info.info_vars vl;
-        fprintf fmt "%a" fmla f
+        fprintf fmt "%a" fmla f*)
+  | Tquant (Tforall, fq) ->
+      let vl, _tl, f = t_open_quant fq in
+      let var fmt v = (* TODO: type check v.vs_ty *)
+	print_ident fmt v.vs_name in
+        fprintf fmt "ForAll[{%a}, %a]" (print_list comma var) vl fmla f
   | Tquant (Texists, fq) ->
       let vl, _tl, f = t_open_quant fq in
       let var fmt v = (* TODO: type check v.vs_ty *)
 	print_ident fmt v.vs_name in
-        fprintf fmt "Exists[{%a}, %a]"
-	  (print_list comma var) vl fmla f
+        fprintf fmt "Exists[{%a}, %a]" (print_list comma var) vl fmla f
   | Tbinop (Tand, f1, f2) ->
       fprintf fmt "(%a &&@ %a)" fmla f1 fmla f2
   | Tbinop (Tor, f1, f2) ->
@@ -541,13 +545,18 @@ let print_task env pr thpr _blacklist ?old:_ fmt task =
     (*"@[<hov 2>vcWhy = (@\n%a%a@,);@]@\n" *)
     (print_list nothing (print_dom info)) params
     (print_goal info) goal;
-  fprintf fmt "@[<hov 2>varsWhy = {%a%s@ %a};@]@\n" 
-    (print_list simple_comma (print_param info)) params
-    (if List.length params = 0 then "" else ",")
-    (print_list simple_comma (print_var   info)) info.info_vars;
+
+  (*fprintf fmt "@[<hov 2>varsWhy = {%a%s@ %a};@]@\n" *)
+  fprintf fmt "@[<hov 2>varsWhy = {%a};@]@\n" 
+    (print_list simple_comma (print_param info)) params;
+    (*(if List.length params = 0 then "" else ",")
+    (print_list simple_comma (print_var   info)) info.info_vars;*)
+
   fprintf fmt "@[<hov 2>resWhy = FullSimplify[vcWhy];@]@\n";
   fprintf fmt "@[<hov 2>If[resWhy===True||resWhy===False,resWhy,@,";
-  fprintf fmt "resWhy = FindInstance[Not[vcWhy],varsWhy,Reals];@,";
+  (*fprintf fmt "resWhy = Resolve[resWhy,varsWhy,Reals];@,";
+  fprintf fmt "If[resWhy===True||resWhy===False,resWhy,@,";*)
+  fprintf fmt "resWhy = FindInstance[Not[resWhy],varsWhy,Reals];@,";
   fprintf fmt "If[Head[resWhy]==List&&Length[resWhy]==0,True,@,";
   fprintf fmt "Reduce[vcWhy,varsWhy,Reals] ]]@]@."
 (*
