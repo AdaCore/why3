@@ -173,6 +173,16 @@ version_ok = "0.14.1"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
 driver = "drivers/gappa.drv"
 
+[ATP mathsat]
+name = "MathSAT5"
+exec = "mathsat"
+version_switch = "-version"
+version_regexp = "MathSAT5 version \\([^ \n]+\\)"
+version_ok  = "5.2.2"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -input=smt2 -model -random_seed=80 %f"
+driver = "drivers/mathsat.drv"
+
+
 [ATP simplify]
 name = "Simplify"
 exec = "Simplify"
