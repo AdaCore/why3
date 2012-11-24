@@ -23,6 +23,7 @@ let cmds =
     Why3session_copy.cmd_archive;
     Why3session_rm.cmd;
     Why3session_output.cmd;
+    Why3session_run.cmd;
   |]
 
 let exec_name = Sys.argv.(0)

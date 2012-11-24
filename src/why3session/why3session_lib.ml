@@ -237,3 +237,36 @@ let opt_force_obsolete = ref false
 let force_obsolete_spec =
   ["-F", Arg.Set opt_force_obsolete,
    " transform obsolete session"]
+
+
+
+let rec ask_yn () =
+  Format.printf "(y/n)@.";
+  let answer = read_line () in
+  match answer with
+    | "y" -> true
+    | "n" -> false
+    | _ -> ask_yn ()
+
+let rec ask_yn_nonblock ~callback =
+  let b = Buffer.create 3 in
+  let s = String.create 1 in
+  Format.printf "(y/n)@.";
+  fun () ->
+    match Unix.select [Unix.stdin] [] [] 0. with
+    | [],_,_ -> true
+    | _ ->
+      if Unix.read Unix.stdin s 1 0 = 0 then
+        begin (** EndOfFile*) callback false; false end
+      else begin
+        if s.[0] <> '\n'
+        then (Buffer.add_char b s.[0]; true)
+        else
+          match Buffer.contents b with
+          | "y" -> callback true; false
+          | "n" | "" -> callback false; false
+          | _ ->
+            Format.printf "(y/N)@.";
+            Buffer.clear b;
+            true
+      end
