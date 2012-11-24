@@ -302,6 +302,15 @@ version_old = "1.3"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt %f"
 driver = "drivers/z3_smtv1.drv"
 
+[ATP cvc4]
+name = "CVC4"
+exec = "cvc4"
+version_switch = "--version"
+version_regexp = "This is CVC4 version \\([^ \n\r]+\\)"
+version_ok  = "0.0prerelease"
+driver = "drivers/cvc4.drv"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
+
 [ATP zenon]
 name = "Zenon"
 exec = "zenon"
