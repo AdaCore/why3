@@ -1371,11 +1371,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
         let ne = t_and_simp wp1.post.ne post.ne in
         let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
+          let p2_effect = Sreg.union e1_regs call_regs in
           let p1 = get_exn e1_regs ex wp1.exn in
-          let p2 = get_exn call_regs ex xpost in
+          let p2 = get_exn p2_effect ex xpost in
           let s, r1, r2 =
-            Subst.merge_states s (e1_regs, p1.s)
-              (Sreg.union e1_regs call_regs, p2.s) in
+            Subst.merge_states s (e1_regs, p1.s) (p2_effect, p2.s) in
           { s = s;
             ne =
               t_or_simp (t_and_simp p1.ne r1)
@@ -1400,11 +1400,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let e2_regs = regs_of_writes e2.e_effect in
       let ne = wp_label e (t_and_simp wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
+        let p2_effect = Sreg.union e1_regs e2_regs in
         let p1 = get_exn e1_regs ex wp1.exn in
-        let p2 = get_exn e2_regs ex wp2.exn in
+        let p2 = get_exn p2_effect ex wp2.exn in
         let s, r1, r2 =
            Subst.merge_states s (e1_regs, p1.s)
-                                (Sreg.union e1_regs e2_regs, p2.s) in
+                                (p2_effect, p2.s) in
         { s = s;
           ne =
             t_or_simp (t_and_simp p1.ne r1)
