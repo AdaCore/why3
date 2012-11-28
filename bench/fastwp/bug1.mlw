@@ -6,13 +6,14 @@ module Test
  exception Exit
 
 (* Unknown *)
- let def  ()  =
-  { true }
+ let def  ()
+  requires { true }
+  ensures { !x = old !x }
+  =
    try
       x := False;
       raise Exit
     with Exit -> ()
     end
-  { !x = old !x }
 end
 

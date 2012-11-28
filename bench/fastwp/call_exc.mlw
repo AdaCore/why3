@@ -4,27 +4,27 @@ module Call_Exc
 
   exception Test
 
-  val maybe_increase : x : ref int ->
-    { }
-    unit
-    writes x
-    raises Test
-    { !x = old !x + 1}
-    | Test -> { !x = old !x }
+  val maybe_increase (x : ref int) : unit
+    requires { true }
+    writes {x}
+    raises {Test -> !x = old !x}
+    ensures { !x = old !x + 1}
 
 (* Valid *)
 
-  let test1 (x : ref int) =
-    { }
+  let test1 (x : ref int)
+    requires { true }
+    ensures { !x = old !x + 1}
+    raises { Test -> !x = old !x }
+    =
     maybe_increase x
-    { !x = old !x + 1}
-    | Test -> { !x = old !x }
 
 (* Unknown *)
-  let test2 (x : ref int) =
-    { }
+  let test2 (x : ref int)
+    requires { true }
+    ensures { !x = old !x + 1}
+    raises { Test -> !x = old !x + 1 }
+    =
     maybe_increase x
-    { !x = old !x + 1}
-    | Test -> { !x = old !x + 1 }
 
 end

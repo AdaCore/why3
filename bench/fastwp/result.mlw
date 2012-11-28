@@ -2,48 +2,50 @@ module Result
    use import int.Int
    use import ref.Ref
 
-   val postplusplus : x : ref int ->
-      { }
-      int
-      writes x
-      { result = old !x /\ !x = old !x + 1 }
+   val postplusplus (x : ref int) : int
+      requires { true }
+      writes { x }
+      ensures { result = old !x /\ !x = old !x + 1 }
 
-   val preplusplus : x : ref int ->
-      { }
-      int
-      writes x
-      { result = !x /\ !x = old !x + 1 }
+   val preplusplus (x : ref int) : int
+      requires { true }
+      ensures { result = !x /\ !x = old !x + 1 }
+      writes { x }
 
 (* Valid *)
 
-    let test1 (x : ref int) =
-      { }
+    let test1 (x : ref int)
+      requires { true }
+      ensures { result = 1 /\ !x = 2 }
+      =
       x := 1;
       postplusplus x
-      { result = 1 /\ !x = 2 }
 
 (* Unknown *)
 
-    let test2 (x : ref int) =
-      { }
+    let test2 (x : ref int)
+      requires { true }
+      ensures { result = 2 /\ !x = 2 }
+      =
       x := 1;
       postplusplus x
-      { result = 2 /\ !x = 2 }
 
 
 (* Valid *)
 
-    let test3 (x : ref int) =
-      { }
+    let test3 (x : ref int)
+      requires { true }
+      ensures { result = 2 /\ !x = 2 }
+      =
       x := 1;
       preplusplus x
-      { result = 2 /\ !x = 2 }
 
 (* Unknown *)
 
-    let test4 (x : ref int) =
-      { }
+    let test4 (x : ref int)
+      requires { true }
+      ensures { result = 1 /\ !x = 2 }
+      =
       x := 1;
       preplusplus x
-      { result = 1 /\ !x = 2 }
 end

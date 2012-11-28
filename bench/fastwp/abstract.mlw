@@ -3,29 +3,32 @@ module Abstr
    use import ref.Ref
 
 (* Unknown *)
-   let test1 (x : ref int) =
-      { !x = 1 }
+   let test1 (x : ref int)
+      requires { !x = 1 }
+      ensures { !x = 1 }
+      =
       abstract
-         x := !x + 1;
-         x := !x - 1
-         { !x > 0 }
-      { !x = 1 }
+         (x := !x + 1;
+         x := !x - 1)
+         ensures { !x > 0 }
 
 (* Unknown *)
-   let test2 (x : ref int) =
-      { !x = 1 }
+   let test2 (x : ref int)
+      requires { !x = 1 }
+      ensures { !x > 1 }
+      =
       abstract
-         x := !x + 1;
-         x := !x - 1
-         { !x > 0 }
-      { !x > 1 }
+         (x := !x + 1;
+         x := !x - 1)
+         ensures { !x > 0 }
 
 (* Valid *)
-   let test3 (x : ref int) =
-      { !x = 1 }
+   let test3 (x : ref int)
+      requires { !x = 1 }
+      ensures { !x > 0 }
+      =
       abstract
-         x := !x + 1;
-         x := !x - 1
-         { !x > 0 }
-      { !x > 0 }
+         (x := !x + 1;
+         x := !x - 1)
+         ensures { !x > 0 }
 end

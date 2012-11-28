@@ -4,51 +4,56 @@ module Call
 
    val g : ref int
 
-   val f : x : ref int ->
-      { !g > !x }
-      unit reads g
-      writes x
-      { !g = !x }
+   val f (x : ref int) : unit
+      requires { !g > !x }
+      reads { g }
+      writes { x }
+      ensures { !g = !x }
 
 
-   val incr : x : ref int ->
-      { }
-      unit writes x
-      { !x = old !x + 1 }
+   val incr (x : ref int) : unit
+      requires { true }
+      writes { x }
+      ensures { !x = old !x + 1 }
 
 (* Valid *)
-let test0 (x : ref int) =
-   { }
+let test0 (x : ref int)
+   requires { true }
+   ensures { !x = old !x + 1 }
+   =
    incr x
-   { !x = old !x + 1 }
 
 (* Unknown *)
-let testx (x : ref int) =
-   { }
+let testx (x : ref int)
+   requires { true }
+   ensures { !x = old !x }
+   =
    incr x
-   { !x = old !x }
 
 (* Unknown *)
-   let test3 (x : ref int) =
-      { }
+   let test3 (x : ref int)
+   requires { true }
+   ensures { !x = old !x + 1 }
+   =
       incr x;
       incr x
-      { !x = old !x + 1 }
 
 
 (* Valid *)
-   let test2 (x : ref int) =
-      { }
+   let test2 (x : ref int)
+   requires { true }
+   ensures { !x = old !x + 2 }
+   =
       incr x;
       incr x
-      { !x = old !x + 2 }
 
 (* Valid *)
-   let test1 (x : ref int) =
-      { !g > !x }
+   let test1 (x : ref int)
+   requires { !g > !x }
+   ensures { !g = !x }
+   =
       f x;
       g := !x + 1;
       f x
-      { !g = !x }
 
 end
