@@ -13,6 +13,7 @@ open Ident
 open Ty
 open Term
 open Decl
+open Task
 
 type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 
@@ -193,3 +194,18 @@ let rec inline_nonrec_linear kn ls tyl ty =
           res
         end
     | _ -> false
+
+
+let eval_match_trans =
+  let eval_match_fun = eval_match ~inline:inline_nonrec_linear in
+  Trans.fold (fun th acc ->
+      match th.task_decl.Theory.td_node with
+      | Theory.Decl { d_node = Dprop (kind, sym, f) } ->
+          let f = eval_match_fun th.task_known f in
+          add_decl acc (create_prop_decl kind sym f)
+      | _ -> add_tdecl acc th.task_decl) None
+
+let () = Trans.register_transform
+  "eval_match" eval_match_trans
+  ~desc:"simplify pattern matching on constructors"
+
