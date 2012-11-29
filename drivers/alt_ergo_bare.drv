@@ -20,6 +20,8 @@ time "why3cpulimit time : %s s"
 (*transformation "simplify_recursive_definition"*)
 transformation "inline_trivial"
 
+transformation "inline_tagged"
+transformation "eval_match"
 transformation "eliminate_builtin"
 transformation "eliminate_recursion"
 transformation "eliminate_inductive"
@@ -28,7 +30,6 @@ transformation "eliminate_if"
 transformation "eliminate_let"
 
 transformation "simplify_formula"
-transformation "inline_tagged"
 (*transformation "simplify_trivial_quantification_in_goal"*)
 
 theory BuiltIn
