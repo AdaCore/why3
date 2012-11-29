@@ -85,7 +85,6 @@ theory MapPermut
 
   use import int.Int
   use export Map
-  use import MapEq
 
   predicate exchange (a1 a2 : map int 'a) (i j : int) =
     a1[i] = a2[j] /\ a2[i] = a1[j] /\
@@ -97,8 +96,7 @@ theory MapPermut
 
   inductive permut_sub (map int 'a) (map int 'a) int int =
   | permut_refl :
-      forall a1 a2 : map int 'a. forall l u : int.
-      map_eq_sub a1 a2 l u -> permut_sub a1 a2 l u
+      forall a : map int 'a. forall l u : int. permut_sub a a l u
   | permut_sym :
       forall a1 a2 : map int 'a. forall l u : int.
       permut_sub a1 a2 l u -> permut_sub a2 a1 l u

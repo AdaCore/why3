@@ -7,12 +7,11 @@ theory Tree
 
 end
 
-theory Size
+theory Size "number of nodes"
 
   use export Tree
   use export int.Int
 
-  (* number of nodes *)
   function size (t: tree 'a) : int = match t with
     | Empty -> 0
     | Node l _ r -> 1 + size l + size r
@@ -61,23 +60,23 @@ theory Zipper "Huet's zipper"
 
   (* navigating in a tree using a zipper *)
 
-  type pointer 'a = (tree 'a, zipper 'a)
+  type pointed 'a = (tree 'a, zipper 'a)
 
-  function start (t: tree 'a) : pointer 'a = (t, Top)
+  function start (t: tree 'a) : pointed 'a = (t, Top)
 
-  function up (p: pointer 'a) : pointer 'a = match p with
+  function up (p: pointed 'a) : pointed 'a = match p with
     | _, Top -> p (* do nothing *)
     | l, Left z x r | r, Right l x z -> (Node l x r, z)
   end
 
-  function top (p: pointer 'a) : tree 'a = let t, z = p in zip t z
+  function top (p: pointed 'a) : tree 'a = let t, z = p in zip t z
 
-  function down_left (p: pointer 'a) : pointer 'a = match p with
+  function down_left (p: pointed 'a) : pointed 'a = match p with
     | Empty, _ -> p (* do nothing *)
     | Node l x r, z -> (l, Left z x r)
   end
 
-  function down_right (p: pointer 'a) : pointer 'a = match p with
+  function down_right (p: pointed 'a) : pointed 'a = match p with
     | Empty, _ -> p (* do nothing *)
     | Node l x r, z -> (r, Right l x z)
   end

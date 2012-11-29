@@ -17,6 +17,33 @@ let debug = register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformtion@ applications."
 
+module Todo = struct
+  type ('a,'b) todo =
+      {mutable todo : int;
+       mutable report : 'a;
+       push_report : 'a -> 'b -> 'a;
+       callback : 'a -> unit}
+
+  let create init push callback =
+    {todo = 0;  report = init; push_report = push; callback = callback}
+
+  let stop todo =
+    todo.todo <- todo.todo - 1;
+    if todo.todo=0 then todo.callback todo.report
+
+  let _done todo v =
+    todo.report <- todo.push_report todo.report v;
+    stop todo
+
+  let start todo =
+    todo.todo <- todo.todo + 1
+
+(** dead code
+  let print todo =
+    dprintf debug "[Sched] todo : %i@." todo.todo
+*)
+end
+
 (***************************)
 (*     main functor        *)
 (***************************)
@@ -201,12 +228,10 @@ let schedule_any_timeout t callback =
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
-(* dead code
-let add_a_check t callback =
+let schedule_check t callback =
   dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
   run_timeout_handler t
-*)
 
 (* idle handler *)
 
@@ -441,34 +466,27 @@ let fuzzy_proof_time nres ores =
     Done { res' with Call_provers.pr_time = told }
   | _, _ -> nres
 
-let run_external_proof_v2 eS eT a callback =
-  callback a a.proof_prover 0 None Starting;
+(** run_external_proof_v3 doesn't modify existing proof attempt, it can just
+    create new one by find_prover *)
+let run_external_proof_v3 eS eT a callback =
   match find_prover eS a with
   | None ->
+    callback a a.proof_prover 0 None Starting;
     (* nothing to do *)
     callback a a.proof_prover 0 None MissingProver
   | Some(ap,npc,a) ->
+    callback a ap 0 None Starting;
     if a.proof_edited_as = None &&
        npc.prover_config.Whyconf.interactive
     then begin
-      set_proof_state ~notify ~obsolete:false ~archived:false
-        Unedited a;
       callback a ap 0 None (MissingFile "unedited")
     end else begin
-      let previous_result,previous_obs = a.proof_state,a.proof_obsolete in
+      let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in
       let cb result =
         let result = fuzzy_proof_time result previous_result in
-        begin match result with
-        | Interrupted ->
-          set_proof_state ~notify ~obsolete:previous_obs
-            ~archived:false previous_result a
-        | _ ->
-          set_proof_state ~notify ~obsolete:false
-            ~archived:false result a
-        end;
         callback a ap timelimit
           (match previous_result with Done res -> Some res | _ -> None)
           (StatusChange result) in
@@ -487,10 +505,32 @@ let run_external_proof_v2 eS eT a callback =
           eT
           (goal_task a.proof_parent)
       with NoFile f ->
-        set_proof_state ~notify ~obsolete:false ~archived:false
-          Unedited a;
         callback a ap 0 None (MissingFile f)
     end
+
+(** run_external_proof_v2 modify the session according to the current state *)
+let run_external_proof_v2 eS eT a callback =
+  let previous_res = ref (a.proof_state,a.proof_obsolete) in
+  let callback a ap timelimit previous state =
+    begin match state with
+    | Starting -> previous_res := (a.proof_state,a.proof_obsolete)
+    | MissingFile _ ->
+      set_proof_state ~notify ~obsolete:false ~archived:false
+        Unedited a
+    | StatusChange result ->
+      begin match result with
+      | Interrupted ->
+        let previous_result,obsolete = !previous_res in
+        set_proof_state ~notify ~obsolete
+          ~archived:false previous_result a
+      | _ ->
+        set_proof_state ~notify ~obsolete:false
+          ~archived:false result a
+      end
+    | _ -> ()
+    end;
+    callback a ap timelimit previous state in
+  run_external_proof_v3 eS eT a callback
 
 let run_external_proof_v2 eS eT a callback =
   (* Perhaps the test a.proof_archived should be done somewhere else *)
@@ -643,45 +683,15 @@ type report =
   | Edited_file_absent of string
   | No_former_result of Call_provers.prover_result
 
-module Todo = struct
-  type ('a,'b) todo =
-      {mutable todo : int;
-       report : 'a;
-       push_report : 'a -> 'b -> unit}
-
-  let create init push =
-    {todo = 0;  report = init; push_report = push}
-
-  let _done todo v =
-    todo.todo <- todo.todo - 1;
-    todo.push_report todo.report v
-
-(* dead code
-  let stop todo =
-    todo.todo <- todo.todo - 1
-*)
-
-  let todo todo =
-    todo.todo <- todo.todo + 1
-
-  let _end todo =
-    if todo.todo<>0 then None else Some todo.report
-
-(* dead code
-  let print todo =
-    dprintf debug "[Sched] todo : %i@." todo.todo
-*)
-end
-
 let push_report report (g,p,t,r) =
-  report := (g.goal_name,p,t,r)::!report
+  (g.goal_name,p,t,r)::report
 
 let check_external_proof eS eT todo a =
   let callback a ap tl old s =
     let g = a.proof_parent in
     match s with
     | Starting ->
-      Todo.todo todo
+      Todo.start todo
     | MissingFile f ->
       Todo._done todo (g, ap, tl, Edited_file_absent f)
     | MissingProver ->
@@ -705,15 +715,11 @@ let check_goal_and_children eS eT todo g =
 
 let check_all eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
-  let todo = Todo.create (ref []) push_report  in
+ let todo = Todo.create [] push_report callback in
+  Todo.start todo;
   session_iter_proof_attempt (check_external_proof eS eT todo)
     eS.session;
-  let timeout () =
-    match Todo._end todo with
-      | None -> true
-      | Some reports -> callback !reports;false
-  in
-  schedule_any_timeout eT timeout
+  Todo.stop todo
 
 
 (***********************************)
@@ -725,7 +731,7 @@ let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
     if not (running status) then Todo._done todo () in
   List.iter
     (fun p ->
-      Todo.todo todo;
+      Todo.start todo;
       (* eprintf "todo increased to %d@." todo.Todo.todo; *)
       (* eprintf "prover %a on goal %s@." *)
       (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
@@ -743,7 +749,8 @@ let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
 
 
 let play_all eS eT ~callback ~timelimit ~memlimit l =
-  let todo = Todo.create (ref ()) (fun _ _ -> ())  in
+  let todo = Todo.create () (fun () _ -> ()) callback in
+  Todo.start todo;
   PHstr.iter
     (fun _ file ->
       List.iter
@@ -753,14 +760,7 @@ let play_all eS eT ~callback ~timelimit ~memlimit l =
             th.theory_goals)
         file.file_theories)
     eS.session.session_files;
-  let timeout () =
-    (* eprintf "Timeout handler@."; *)
-    match Todo._end todo with
-      | None ->  true
-      | Some _ -> callback (); false
-  in
-  schedule_any_timeout eT timeout
-
+  Todo.stop todo
 
 
 (** Transformation *)
@@ -814,20 +814,14 @@ let rec transform eS sched ~context_unproved_goals_only ?callback tr a =
 (* method: edit current goal *)
 (*****************************)
 
-let edit_proof eS sched ~default_editor a =
-  (* check that the state is not Scheduled or Running *)
-  if a.proof_archived || running a.proof_state then ()
-(*
-    info_window `ERROR "Edition already in progress"
-*)
-  else
-      match find_prover eS a with
-        | None ->
+let edit_proof_v3 eS sched ~default_editor callback a =
+  match find_prover eS a with
+  | None ->
           (* nothing to do
              TODO: report an non replayable proof if some option is set
           *)
-          ()
-        | Some(_,npc,a) ->
+    ()
+  | Some(_,npc,a) ->
 (*
     let ap = a.proof_prover in
     match find_loadable_prover eS a.proof_prover with
@@ -854,32 +848,51 @@ let edit_proof eS sched ~default_editor a =
           (** Now [a] is a proof_attempt of the lodable prover [nap] *)
 *)
 
-          let callback res =
-            match res with
-              | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
-                set_proof_state ~notify ~obsolete:true ~archived:false
-                  JustEdited a
-              | _ ->
-                  set_proof_state ~notify ~obsolete:false ~archived:false
-                    res a
-          in
-          let editor =
-            match npc.prover_config.Whyconf.editor with
-            | "" -> default_editor
-            | s ->
-              try
-                let ed = Whyconf.editor_by_id eS.whyconf s in
-                String.concat " "(ed.Whyconf.editor_command ::
-                  ed.Whyconf.editor_options)
-              with Not_found -> default_editor
-          in
-          let file = update_edit_external_proof eS a in
-          dprintf debug "[Editing] goal %a with command '%s' on file %s@."
-            (fun fmt a -> pp_print_string fmt
-              (Task.task_goal (goal_task a.proof_parent))
-              . Decl.pr_name.Ident.id_string)
-            a editor file;
-          schedule_edition sched editor file callback
+    let editor =
+      match npc.prover_config.Whyconf.editor with
+      | "" -> default_editor
+      | s ->
+        try
+          let ed = Whyconf.editor_by_id eS.whyconf s in
+          String.concat " "(ed.Whyconf.editor_command ::
+                              ed.Whyconf.editor_options)
+        with Not_found -> default_editor
+    in
+    let file = update_edit_external_proof eS a in
+    dprintf debug "[Editing] goal %a with command '%s' on file %s@."
+      (fun fmt a -> pp_print_string fmt
+        (Task.task_goal (goal_task a.proof_parent))
+        . Decl.pr_name.Ident.id_string)
+      a editor file;
+    schedule_edition sched editor file (fun res -> callback a res)
+
+let edit_proof eS sched ~default_editor a =
+  (* check that the state is not Scheduled or Running *)
+  if a.proof_archived || running a.proof_state then ()
+(*
+    info_window `ERROR "Edition already in progress"
+*)
+  else
+    let callback a res =
+      match res with
+      | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
+        set_proof_state ~notify ~obsolete:true ~archived:false
+          JustEdited a
+      | _ ->
+        set_proof_state ~notify ~obsolete:false ~archived:false
+          res a
+    in
+    edit_proof_v3 eS sched ~default_editor callback a
+
+let edit_proof_v3 eS sched ~default_editor ~callback a =
+  let callback a res =
+    match res with
+    | Done {Call_provers.pr_answer = Call_provers.Unknown ""} ->
+      callback a
+    | _ -> ()
+  in
+  edit_proof_v3 eS sched ~default_editor callback a
+
 
 (*************)
 (* removing  *)

@@ -473,6 +473,10 @@ val iter_transf :
   ('key goal -> unit) -> 'key transf -> unit
 val iter_metas :
   ('key goal -> unit) -> 'key metas -> unit
+val iter_file :
+  ('key theory -> unit) -> 'key file -> unit
+val iter_session :
+  ('key file -> unit) -> 'key session -> unit
 
 
 val goal_iter : ('key any -> unit) -> 'key goal -> unit

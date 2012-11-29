@@ -1,0 +1,243 @@
+
+(* Why driver for Mathematica *)
+
+prelude "(* this is a prelude for Mathematica *)"
+
+printer "mathematica"
+filename "%f-%t-%g.m"
+
+valid "\\bTrue\\b"
+unknown "\\bFalse\\b" "\\bFalse\\b"
+time "why3cpulimit time : %s s"
+
+(*transformation "simplify_recursive_definition"*)
+(*transformation "inline_trivial"*)
+(*transformation "inline_all"*)
+
+transformation "eliminate_builtin"
+(*transformation "eliminate_definition"*)
+(*transformation "eliminate_recursion"*)
+(*transformation "eliminate_inductive"*)
+(*transformation "eliminate_algebraic"*)
+(*transformation "eliminate_algebraic_math"*)
+(*transformation "eliminate_if"*)
+transformation "eliminate_let"
+
+(*transformation "split_premise"*)
+transformation "simplify_formula"
+(*transformation "simplify_unknown_lsymbols"*)
+transformation "simplify_trivial_quantification"
+(*transformation "introduce_premises"*)
+(*transformation "instantiate_predicate"*)
+(*transformation "abstract_unknown_lsymbols"*)
+
+theory BuiltIn
+  syntax type int   "Integers"
+  syntax type real  "Reals"
+  syntax predicate (=)  "(%1 == %2)"
+
+  meta "encoding : kept" type int
+end
+
+(* int *)
+
+theory int.Int
+
+  prelude "(* this is a prelude for Mathematica integer arithmetic *)"
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (*)  "(%1 %2)"
+  syntax function (-_) "(-%1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 < %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 > %2)"
+
+  meta "inline : no" predicate (<=)
+  meta "inline : no" predicate (>=)
+  meta "inline : no" predicate (>)
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+  meta "encoding : kept" type int
+end
+
+theory int.Abs
+
+  syntax function abs  "Abs[%1]"
+
+end
+
+theory int.EuclideanDivision
+
+  syntax function div "Quotient[%1, %2]"
+  syntax function mod "Mod[%1, %2]"
+
+  remove prop Mod_bound
+  remove prop Div_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
+
+  meta "encoding : kept" type int
+end
+
+(* real *)
+
+theory real.Real
+
+  prelude "(* this is a prelude for Mathematica real arithmetic *)"
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (/)  "(%1 / %2)"
+  syntax function (-_) "(-%1)"
+  syntax function inv  "(1 / %1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 < %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 > %2)"
+
+  meta "inline : no" predicate (<=)
+  meta "inline : no" predicate (>=)
+  meta "inline : no" predicate (>)
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+  (*meta "encoding : kept" type real*)
+end
+
+theory real.Abs
+
+  syntax function abs "Abs[%1]"
+
+end
+
+theory real.MinMax
+
+  syntax function min "Min[%1, %2]"
+  syntax function max "Max[%1, %2]"
+
+end
+
+theory real.Square
+
+  syntax function sqr  "Power[%1,2]"
+  syntax function sqrt "Sqrt[%1]"
+
+end
+
+theory real.ExpLog
+
+  syntax function exp "Exp[%1]"
+  syntax function e   "E"
+  syntax function log "Log[%1]"
+  syntax function log2 "Log[2, %1]"
+  syntax function log10 "Log[10, %1]"
+
+  remove prop Exp_zero
+  remove prop Exp_sum
+  remove prop Log_one
+  remove prop Log_mul
+  remove prop Log_exp
+  remove prop Exp_log
+
+end
+
+theory real.PowerInt
+
+  syntax function power "Power[%1, %2]"
+
+end
+
+theory real.PowerReal
+
+  syntax function pow "Power[%1, %2]"
+
+end
+
+theory real.Trigonometry
+
+  syntax function cos "Cos[%1]"
+  syntax function sin "Sin[%1]"
+  syntax function tan "Tan[%1]"
+  syntax function atan "ArcTan[%1]"
+
+  syntax function pi "Pi"
+
+end
+
+theory real.Hyperbolic
+
+  syntax function sinh "Sinh[%1]"
+  syntax function cosh "Cosh[%1]"
+  syntax function tanh "Tanh[%1]"
+  syntax function asinh "ArcSinh[%1]"
+  syntax function acosh "ArcCosh[%1]"
+  syntax function atanh "ArcTanh[%1]"
+
+end
+
+theory real.FromInt
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+
+end
+
+
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)

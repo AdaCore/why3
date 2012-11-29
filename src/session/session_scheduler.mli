@@ -9,6 +9,24 @@
 (*                                                                  *)
 (********************************************************************)
 
+(*** One module for calling callback when it's time to *)
+module Todo : sig
+  type ('a,'b) todo
+
+  val create : 'a -> ('a -> 'b -> 'a) -> ('a -> unit) -> ('a,'b) todo
+    (** create init step callback *)
+
+  val start : ('a,'b) todo -> unit
+  (** one task is started *)
+
+  val stop : ('a,'b) todo -> unit
+  (** one task is stopped without information *)
+
+  val _done : ('a,'b) todo -> 'b -> unit
+  (** one task is stopped with information *)
+
+end
+
 (** Proof sessions *)
 
 open Session
@@ -131,6 +149,25 @@ module Make(O: OBSERVER) : sig
   *)
 
 
+  type run_external_status =
+  | Starting
+  | MissingProver
+  | MissingFile of string
+  | StatusChange of proof_attempt_status
+
+  val run_external_proof_v3 :
+    O.key Session.env_session -> t -> O.key Session.proof_attempt ->
+    (O.key Session.proof_attempt -> Whyconf.prover ->
+     int -> Call_provers.prover_result option -> run_external_status -> unit) ->
+    unit
+  (** [run_external_proof_v3 env_session sched pa callback] the
+      callback is applied with [callback pa p timelimit old_result
+      status]. run_external_proof_v3 don't change the existing proof
+      attempt just can add new by O.uninstalled_prover. Be aware since
+      the session is not modified there is no test to see if the
+      proof_attempt had already be started *)
+
+
   val prover_on_goal :
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
@@ -180,6 +217,15 @@ module Make(O: OBSERVER) : sig
     default_editor:string ->
     O.key proof_attempt -> unit
     (** edit the given proof attempt using the appropriate editor *)
+
+  val edit_proof_v3 :
+    O.key env_session -> t ->
+    default_editor:string ->
+    callback:(O.key Session.proof_attempt ->  unit) ->
+    O.key proof_attempt -> unit
+    (** edit the given proof attempt using the appropriate editor but don't
+        modify the session *)
+
 
   val cancel : O.key any -> unit
     (** [cancel a] marks all proofs under [a] as obsolete *)
@@ -246,6 +292,13 @@ module Make(O: OBSERVER) : sig
 
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
+
+  val schedule_check: t -> (unit -> bool) -> unit
+    (** test the check time to time, reschedule it if it returns true *)
+
+  val schedule_any_timeout: t -> (unit -> bool) -> unit
+    (** run it when an action slot/worker/cpu is available. Reschedule it if it
+        return true *)
 
 end
 

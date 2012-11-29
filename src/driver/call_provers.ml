@@ -177,7 +177,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
       close_in cout;
 
       fun () ->
-        if Debug.nottest_flag debug then begin
+        if Debug.test_noflag debug then begin
           if cleanup then Sysutil.safe_remove fin;
           if inplace then Sys.rename (save fin) fin;
           Sysutil.safe_remove fout;

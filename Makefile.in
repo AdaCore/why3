@@ -129,7 +129,7 @@ LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
 		eval_match instantiate_predicate smoke_detector
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs \
-		simplify gappa cvc3 yices
+		simplify gappa cvc3 yices mathematica
 
 LIB_SESSION = xml termcode session session_tools session_scheduler
 
@@ -652,8 +652,9 @@ install_local: bin/why3replayer
 # Session
 ###############
 
-SESSION_FILES = why3session_lib why3session_copy why3session_info \
-		why3session_latex why3session_html why3session_rm \
+SESSION_FILES = why3session_lib why3session_copy why3session_info	\
+		why3session_latex why3session_html why3session_rm	\
+		why3session_output why3session_run why3session_csv	\
 		why3session
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))

@@ -209,6 +209,20 @@ module NumOfParam
   function numof (a: array elt) (p: param) (l u: int) : int = num_of (a, p) l u
 end
 
+module NumOf
+  use import Array
+
+  type elt
+  predicate pr (i: int) (e: elt)
+
+  type param = array elt
+  predicate pr_ (a: param) (i: int) = pr i a[i]
+  clone import int.NumOfParam with type param = param, predicate pr = pr_
+
+  (* the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
+  function numof (a: array elt) (l u: int) : int = num_of a l u
+end
+
 module TestArray
 
   use import int.Int

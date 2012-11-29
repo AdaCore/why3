@@ -37,11 +37,10 @@ and rvar =
   | Rtvs  of tvsymbol * dity * region Lazy.t
   | Rval  of dreg
 
-let ity_of_dity ?(strict=true) dity =
+let ity_of_dity dity =
   let rec get_ity = function
-    | Dvar { contents = Dtvs _ } when strict ->
+    | Dvar { contents = Dtvs _ } ->
         Loc.errorm "undefined type variable"
-    | Dvar { contents = Dtvs tv } -> ity_var tv
     | Dvar { contents = Dval dty } -> get_ity dty
     | Duvar tv -> ity_var tv
     | Dits (its,dl,rl) ->
@@ -49,8 +48,6 @@ let ity_of_dity ?(strict=true) dity =
     | Dts (ts,dl) -> ity_pur ts (List.map get_ity dl)
   and get_reg = function
     | Rreg (r,_) -> r
-    | Rvar { contents = Rtvs (_,dity,_) } when not strict ->
-        create_region (id_fresh "rho") (get_ity dity)
     | Rvar { contents = Rtvs (_,_,r) } -> Lazy.force r
     | Rvar { contents = Rval dreg } -> get_reg dreg
   in
@@ -182,17 +179,18 @@ and unify_reg r1 r2 =
     | Rreg (reg1,_), Rreg (reg2,_) when reg_equal reg1 reg2 -> ()
     | _ -> raise Exit
 
+exception DTypeMismatch of dity * dity
+
 let unify ~weak d1 d2 =
-  try unify ~weak d1 d2 with Exit -> raise (TypeMismatch
-    (ity_of_dity ~strict:false d1, ity_of_dity ~strict:false d2))
+  try unify ~weak d1 d2 with Exit -> raise (DTypeMismatch (d1,d2))
 
 let unify_weak d1 d2 = unify ~weak:true d1 d2
 let unify d1 d2 = unify ~weak:false d1 d2
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
-let vty_of_dvty ?(strict=true) (argl,res) =
-  let ity_of_dity dity = ity_of_dity ~strict dity in
+let vty_of_dvty (argl,res) =
+  let ity_of_dity dity = ity_of_dity dity in
   let vtv = VTvalue (vty_value (ity_of_dity res)) in
   let conv a = create_pvsymbol (id_fresh "x") (vty_value (ity_of_dity a)) in
   if argl = [] then vtv else VTarrow (vty_arrow (List.map conv argl) vtv)
@@ -302,3 +300,58 @@ let specialize_lsymbol ls =
   let conv ty = dity_of_ty htv hreg vars_empty ty in
   let ty = Opt.get_def ty_bool ls.ls_value in
   List.map conv ls.ls_args, conv ty
+
+(* Pretty-printing *)
+
+let debug_print_reg_types = Debug.register_info_flag "print_reg_types"
+  ~desc:"Print@ types@ of@ regions@ (mutable@ fields)."
+
+let print_dity fmt dity =
+  let protect_on x s = if x then "(" ^^ s ^^ ")" else s in
+  let rec print_dity inn fmt = function
+    | Dvar { contents = Dtvs tv }
+    | Duvar tv ->
+        Pretty.print_tv fmt tv
+    | Dvar { contents = Dval dty } ->
+        print_dity inn fmt dty
+    | Dts (ts,tl) when is_ts_tuple ts ->
+        Format.fprintf fmt "(%a)"
+          (Pp.print_list Pp.comma (print_dity false)) tl
+    | Dts (ts,[]) ->
+        Pretty.print_ts fmt ts
+    | Dts (ts,tl) ->
+        Format.fprintf fmt (protect_on inn "%a@ %a")
+          Pretty.print_ts ts (Pp.print_list Pp.space (print_dity true)) tl
+    | Dits (its,[],rl) ->
+        Format.fprintf fmt (protect_on inn "%a@ <%a>")
+          Mlw_pretty.print_its its (Pp.print_list Pp.comma print_dreg) rl
+    | Dits (its,tl,rl) ->
+        Format.fprintf fmt (protect_on inn "%a@ <%a>@ %a")
+          Mlw_pretty.print_its its (Pp.print_list Pp.comma print_dreg) rl
+          (Pp.print_list Pp.space (print_dity true)) tl
+  and print_dreg fmt = function
+    | Rreg (r,_) when Debug.test_flag debug_print_reg_types ->
+        Format.fprintf fmt "@[%a:@,%a@]" Mlw_pretty.print_reg r
+          Mlw_pretty.print_ity r.reg_ity
+    | Rreg (r,_) ->
+        Mlw_pretty.print_reg fmt r
+    | Rvar { contents = Rtvs (tv,dity,_) }
+      when Debug.test_flag debug_print_reg_types ->
+        let r = create_region (id_clone tv.tv_name) Mlw_ty.ity_unit in
+        Format.fprintf fmt "@[%a:@,%a@]" Mlw_pretty.print_reg r
+          (print_dity false) dity
+    | Rvar { contents = Rtvs (tv,_,_) } ->
+        let r = create_region (id_clone tv.tv_name) Mlw_ty.ity_unit in
+        Mlw_pretty.print_reg fmt r
+    | Rvar { contents = Rval dreg } ->
+        print_dreg fmt dreg
+  in
+  print_dity false fmt dity
+
+let () = Exn_printer.register
+  begin fun fmt exn -> match exn with
+  | DTypeMismatch (t1,t2) ->
+      Format.fprintf fmt "Type mismatch between %a and %a"
+        print_dity t1 print_dity t2
+  | _ -> raise exn
+  end

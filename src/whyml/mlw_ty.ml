@@ -255,9 +255,9 @@ let ity_subst_unsafe mv mr ity =
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
 let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
 
-let rec ity_inv ity = match ity.ity_node with
-  | Ityapp (its,_,_) -> its.its_inv || ity_any ity_inv ity
-  | _ -> ity_any ity_inv ity
+let rec ity_has_inv ity = match ity.ity_node with
+  | Ityapp (its,_,_) -> its.its_inv || ity_any ity_has_inv ity
+  | _ -> ity_any ity_has_inv ity
 
 let rec reg_fold fn vars acc =
   let on_reg r acc = reg_fold fn r.reg_ity.ity_vars (fn r acc) in
@@ -285,17 +285,6 @@ exception BadRegArity of itysymbol * int * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
-exception RegionMismatch of region * region
-exception TypeMismatch of ity * ity
-
-let ity_equal_check ty1 ty2 =
-  if not (ity_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
-
-(* dead code
-let reg_equal_check r1 r2 =
-  if not (reg_equal r1 r2) then raise (RegionMismatch (r1, r2))
-*)
-
 type ity_subst = {
   ity_subst_tv  : ity Mtv.t;
   ity_subst_reg : region Mreg.t; (* must preserve ghost-ness *)
@@ -306,12 +295,14 @@ let ity_subst_empty = {
   ity_subst_reg = Mreg.empty;
 }
 
-let tv_inst s v = Mtv.find_def (ity_var v) v s.ity_subst_tv
-let reg_inst s r = Mreg.find_def r r s.ity_subst_reg
+exception RegionMismatch of region * region * ity_subst
+exception TypeMismatch of ity * ity * ity_subst
 
-let ity_inst s ity =
-  if ity_closed ity && ity_pure ity then ity
-  else ity_v_map (tv_inst s) (reg_inst s) ity
+let ity_equal_check ty1 ty2 =
+  if not (ity_equal ty1 ty2) then raise (TypeMismatch (ty1,ty2,ity_subst_empty))
+
+let reg_equal_check r1 r2 =
+  if not (reg_equal r1 r2) then raise (RegionMismatch (r1,r2,ity_subst_empty))
 
 let reg_full_inst s r = Mreg.find r s.ity_subst_reg
 
@@ -349,7 +340,11 @@ and reg_match s r1 r2 =
 
 let ity_match s ity1 ity2 =
   try ity_match s ity1 ity2
-  with Exit -> raise (TypeMismatch (ity_inst s ity1, ity2))
+  with Exit -> raise (TypeMismatch (ity1,ity2,s))
+
+let reg_match s r1 r2 =
+  try reg_match s r1 r2
+  with Exit -> raise (RegionMismatch (r1,r2,s))
 
 let rec ty_of_ity ity = match ity.ity_node with
   | Ityvar v -> ty_var v
@@ -632,7 +627,7 @@ let eff_assign e ?(ghost=false) r ty =
     | Ityvar tv' -> tv_equal tv tv'
     | _ -> false in
   if not (Mtv.for_all check sub.ity_subst_tv) then
-    raise (TypeMismatch (r.reg_ity,ty));
+    raise (TypeMismatch (r.reg_ity,ty,ity_subst_empty));
   (* r:t[r1,r2] <- t[r1,r1] introduces an alias *)
   let add_right _ v s = Sreg.add_new (IllegalAlias v) v s in
   ignore (Mreg.fold add_right sub.ity_subst_reg Sreg.empty);
