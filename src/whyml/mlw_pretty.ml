@@ -93,7 +93,7 @@ let rec print_ity_node inn fmt ity = match ity.ity_node with
       (print_list space (print_ity_node true)) tl
 
 and print_regty fmt reg =
-  if Debug.test_flag debug_print_reg_types then print_reg fmt reg else
+  if Debug.test_noflag debug_print_reg_types then print_reg fmt reg else
   fprintf fmt "@[%a:@,%a@]" print_reg reg (print_ity_node false) reg.reg_ity
 
 let print_ity = print_ity_node false
@@ -439,10 +439,10 @@ let () = Exn_printer.register
   | Mlw_ty.UnboundException xs ->
       fprintf fmt "This function raises %a but does not \
         specify a post-condition for it" print_xs xs
-  | Mlw_ty.RegionMismatch (r1,r2) ->
+  | Mlw_ty.RegionMismatch (r1,r2,_s) ->
       fprintf fmt "Region mismatch between %a and %a"
         print_regty r1 print_regty r2
-  | Mlw_ty.TypeMismatch (t1,t2) ->
+  | Mlw_ty.TypeMismatch (t1,t2,_s) ->
       fprintf fmt "Type mismatch between %a and %a"
         print_ity t1 print_ity t2
   | Mlw_ty.PolymorphicException (id,_ity) ->

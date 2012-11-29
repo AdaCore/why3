@@ -64,6 +64,9 @@ val filter_spec : spec_list
 
 val read_filter_spec : Whyconf.config -> filters * bool
 
+val theory_iter_proof_attempt_by_filter :
+  filters ->
+  ('key Session.proof_attempt -> unit) -> 'key Session.theory -> unit
 val session_iter_proof_attempt_by_filter :
   filters ->
   ('key Session.proof_attempt -> unit) -> 'key Session.session -> unit
@@ -76,3 +79,11 @@ val set_filter_verified_goal : filter_three -> unit
 (** force obsolete *)
 val opt_force_obsolete : bool ref
 val force_obsolete_spec : spec_list
+
+
+(** ask yes/no question to the user *)
+val ask_yn : unit -> bool
+
+val ask_yn_nonblock : callback:(bool -> unit) -> (unit -> bool)
+(** call the callback when an answer have been given,
+    return true if it must be retried *)

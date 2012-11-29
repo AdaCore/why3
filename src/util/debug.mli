@@ -38,7 +38,7 @@ val toggle_flag : flag -> unit
 
 (** Return the state of the flag *)
 val test_flag : flag -> bool
-val nottest_flag : flag -> bool
+val test_noflag : flag -> bool
 
 val set_debug_formatter : Format.formatter -> unit
 (** Set the formatter used when printing debug material *)

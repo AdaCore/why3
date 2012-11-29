@@ -124,6 +124,8 @@ let add_filter_three r = function
 
 let opt_three r = Arg.Symbol (["yes";"no";"all"], add_filter_three r)
 
+let opt_status = ref []
+
 let filter_spec =
   ["--filter-prover", Arg.String add_filter_prover,
    " [name,version[,alternative]|id] \
@@ -136,6 +138,21 @@ the proof containing this prover are selected";
    " no: only parent goal not verified, yes: only verified (default all)";
    "--filter-verified", opt_three opt_filter_verified,
    " no: only not verified, yes: only verified (default all)";
+   "--filter-highfailure",
+   Arg.Unit (fun () -> opt_status := Call_provers.HighFailure::!opt_status),
+   " filter the call that fail in an unexpeted way";
+   "--filter-valid",
+   Arg.Unit (fun () -> opt_status := Call_provers.Valid::!opt_status),
+   " filter the valid goals (can be obsolete)";
+   "--filter-invalid",
+   Arg.Unit (fun () -> opt_status := Call_provers.Invalid::!opt_status),
+   " filter the invalid goals";
+   "--filter-unknown",
+   Arg.String (fun s -> opt_status := Call_provers.Unknown s::!opt_status),
+   " filter when the prover reports it can't determine if the task is valid";
+   "--filter-failure",
+   Arg.String (fun s -> opt_status := Call_provers.Failure s::!opt_status),
+   " filter when the prover reports a failure";
 ]
 
 type filters =
@@ -144,6 +161,7 @@ type filters =
       archived : filter_three;
       verified : filter_three;
       verified_goal : filter_three;
+      status : Call_provers.prover_answer list; (* if empty : any answer *)
     }
 
 let provers_of_filter_prover whyconf = function
@@ -175,9 +193,10 @@ let read_filter_spec whyconf : filters * bool =
    archived = !opt_filter_archived;
    verified = !opt_filter_verified;
    verified_goal = !opt_filter_verified_goal;
+   status = !opt_status;
   },!should_exit
 
-let session_iter_proof_attempt_by_filter filters f session =
+let iter_proof_attempt_by_filter iter filters f session =
   (** provers *)
   let iter_provers a =
     if C.Sprover.mem a.S.proof_prover filters.provers then f a in
@@ -199,8 +218,17 @@ let session_iter_proof_attempt_by_filter filters f session =
     (fun a -> a.S.proof_parent.S.goal_verified) in
   (** verified *)
   let f = three_value f filters.verified S.proof_verified in
-  S.session_iter_proof_attempt f session
+  (** status *)
+  let f = if filters.status = [] then f else
+      (fun a -> match a.S.proof_state with
+      | S.Done pr when List.mem pr.Call_provers.pr_answer filters.status -> f a
+      | _ -> ()) in
+  iter f session
 
+let theory_iter_proof_attempt_by_filter filters f th =
+  iter_proof_attempt_by_filter S.theory_iter_proof_attempt filters f th
+let session_iter_proof_attempt_by_filter filters f s =
+  iter_proof_attempt_by_filter S.session_iter_proof_attempt filters f s
 
 let set_filter_verified_goal t = opt_filter_verified_goal := t
 
@@ -209,3 +237,36 @@ let opt_force_obsolete = ref false
 let force_obsolete_spec =
   ["-F", Arg.Set opt_force_obsolete,
    " transform obsolete session"]
+
+
+
+let rec ask_yn () =
+  Format.printf "(y/n)@.";
+  let answer = read_line () in
+  match answer with
+    | "y" -> true
+    | "n" -> false
+    | _ -> ask_yn ()
+
+let rec ask_yn_nonblock ~callback =
+  let b = Buffer.create 3 in
+  let s = String.create 1 in
+  Format.printf "(y/n)@.";
+  fun () ->
+    match Unix.select [Unix.stdin] [] [] 0. with
+    | [],_,_ -> true
+    | _ ->
+      if Unix.read Unix.stdin s 1 0 = 0 then
+        begin (** EndOfFile*) callback false; false end
+      else begin
+        if s.[0] <> '\n'
+        then (Buffer.add_char b s.[0]; true)
+        else
+          match Buffer.contents b with
+          | "y" -> callback true; false
+          | "n" | "" -> callback false; false
+          | _ ->
+            Format.printf "(y/N)@.";
+            Buffer.clear b;
+            true
+      end

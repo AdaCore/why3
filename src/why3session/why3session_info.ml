@@ -252,13 +252,13 @@ let stats2_of_file ~nb_proofs file =
         | r -> (th,List.rev r)::acc)
     [] file.file_theories
 
-let stats2_of_session ~nb_proofs s =
+let stats2_of_session ~nb_proofs s acc =
   PHstr.fold
     (fun _ f acc ->
       match stats2_of_file ~nb_proofs f with
         | [] -> acc
         | r -> (f,List.rev r)::acc)
-    s.session_files []
+    s.session_files acc
 
 let print_file_stats (f,r) =
   printf "+-- file %s@\n" f.file_name;
@@ -308,7 +308,7 @@ let print_stats r0 r1 stats =
   printf "@]@\n"
 
 
-let run_one fname =
+let run_one stats r0 r1 fname =
   let project_dir = Session.get_project_dir fname in
   if !opt_project_dir then printf "%s@." project_dir;
   let session = Session.read_session project_dir in
@@ -327,20 +327,21 @@ let run_one fname =
     printf "%a@." print_session session;
   if !opt_stats_print then
     begin
-      let stats = new_proof_stats () in
       (* fill_prover_data stats session; *)
       PHstr.iter (stats_of_file stats) session.session_files;
-      let r0 = stats2_of_session ~nb_proofs:0 session in
-      let r1 = stats2_of_session ~nb_proofs:1 session in
-      finalize_stats stats;
-      print_stats r0 r1 stats;
+      r0 := stats2_of_session ~nb_proofs:0 session !r0;
+      r1 := stats2_of_session ~nb_proofs:1 session !r1
     end
 
 
 let run () =
   let _,_,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
-  iter_files run_one
+  let stats = new_proof_stats () in
+  let r0 = ref [] and r1 = ref [] in
+  iter_files (run_one stats r0 r1);
+  finalize_stats stats;
+  print_stats !r0 !r1 stats
 
 
 let cmd =

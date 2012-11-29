@@ -173,6 +173,16 @@ version_ok = "0.14.1"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -Eprecision=70"
 driver = "drivers/gappa.drv"
 
+[ATP mathsat]
+name = "MathSAT5"
+exec = "mathsat"
+version_switch = "-version"
+version_regexp = "MathSAT5 version \\([^ \n]+\\)"
+version_ok  = "5.2.2"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -input=smt2 -model -random_seed=80 %f"
+driver = "drivers/mathsat.drv"
+
+
 [ATP simplify]
 name = "Simplify"
 exec = "Simplify"
@@ -292,6 +302,15 @@ version_old = "1.3"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt %f"
 driver = "drivers/z3_smtv1.drv"
 
+[ATP cvc4]
+name = "CVC4"
+exec = "cvc4"
+version_switch = "--version"
+version_regexp = "This is CVC4 version \\([^ \n\r]+\\)"
+version_ok  = "0.0prerelease"
+driver = "drivers/cvc4.drv"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
+
 [ATP zenon]
 name = "Zenon"
 exec = "zenon"
@@ -312,6 +331,16 @@ command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --fof true --out_options none \
 --time_out_virtual %t --clausifier /usr/bin/env --clausifier_options \
 \"eprover --cnf --tstp-format \" %f"
 driver = "drivers/iprover.drv"
+
+[ATP mathematica]
+name = "Mathematica"
+exec = "math"
+version_switch = "-run \"Exit[]\""
+version_regexp = "Mathematica \\([0-9.]+\\)"
+version_ok = "8.0"
+version_ok = "7.0"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -noprompt < %f"
+driver = "drivers/mathematica.drv"
 
 [ITP coq]
 name = "Coq"
@@ -359,7 +388,7 @@ command = "coqide -I %l/coq-tactic -R %l/coq Why3 %f"
 
 [editor proofgeneral-coq]
 name = "Emacs/ProofGeneral/Coq"
-command = "emacs23 --eval \"(setq coq-load-path '((\\\"%l/coq\\\" \\\"Why3\\\")))\" %f"
+command = "emacs23 --eval \"(setq coq-load-path '(\\\"%l/coq-tactic\\\" (\\\"%l/coq\\\" \\\"Why3\\\")))\" %f"
 
 [editor altgr-ergo]
 name = "AltGr-Ergo"

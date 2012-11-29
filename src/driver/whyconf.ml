@@ -522,6 +522,12 @@ let mk_filter_prover ?version ?altern name =
     filter_altern  = Opt.map mk_regexp altern;
   }
 
+let filter_from_prover pr =
+    { filter_name    = mk_regexp pr.prover_name ;
+      filter_version = Some (mk_regexp pr.prover_version);
+      filter_altern  = Some (mk_regexp pr.prover_altern);
+    }
+
 let print_filter_prover fmt fp =
   match fp.filter_version, fp.filter_altern with
   | None  , None -> fprintf fmt "%s" fp.filter_name.desc
@@ -549,19 +555,18 @@ let filter_prover fp p =
   && Opt.fold (fun _ -> check p.prover_version) true fp.filter_version
   && Opt.fold (fun _ -> check p.prover_altern) true fp.filter_altern
 
-let filter_provers whyconf fp =
-  try
-    if fp.filter_version = None && fp.filter_altern = None then
+let filter_prover_with_shortcut whyconf fp =
+  if fp.filter_version = None && fp.filter_altern = None then
+    try
       let prover = (Mstr.find fp.filter_name.desc whyconf.prover_shortcuts) in
-      try
-        let prover_config = Mprover.find prover whyconf.provers in
-        Mprover.singleton prover prover_config
-      with Not_found ->
-        (** shortcut send to nothing *)
-        Mprover.empty
-    else raise Not_found
-  with Not_found ->
-    Mprover.filter (fun p _ -> filter_prover fp p) whyconf.provers
+      filter_from_prover prover
+    with Not_found -> fp
+  else fp
+
+
+let filter_provers whyconf fp =
+  let fp = filter_prover_with_shortcut whyconf fp in
+  Mprover.filter (fun p _ -> filter_prover fp p) whyconf.provers
 
 let filter_one_prover whyconf fp =
   let provers = filter_provers whyconf fp in
@@ -571,6 +576,7 @@ let filter_one_prover whyconf fp =
     raise (ProverNotFound (whyconf,fp))
   else
     raise (ProverAmbiguity (whyconf,fp,provers))
+
 
 (** merge config *)
 

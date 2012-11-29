@@ -124,13 +124,9 @@ val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 
 val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
-(* traversal functions on type variables and regions *)
-
-val ity_v_map : (tvsymbol -> ity) -> (region -> region) -> ity -> ity
-
-val ity_closed : ity -> bool
-val ity_pure : ity -> bool
-val ity_inv : ity -> bool
+val ity_closed  : ity -> bool
+val ity_pure    : ity -> bool
+val ity_has_inv : ity -> bool
 
 (* these functions attend the sub-regions *)
 
@@ -150,13 +146,13 @@ val ity_int : ity
 val ity_bool : ity
 val ity_unit : ity
 
-exception RegionMismatch of region * region
-exception TypeMismatch of ity * ity
-
 type ity_subst = private {
   ity_subst_tv  : ity Mtv.t;
   ity_subst_reg : region Mreg.t;
 }
+
+exception RegionMismatch of region * region * ity_subst
+exception TypeMismatch of ity * ity * ity_subst
 
 val ity_subst_empty : ity_subst
 
@@ -165,6 +161,8 @@ val ity_match : ity_subst -> ity -> ity -> ity_subst
 val reg_match : ity_subst -> region -> region -> ity_subst
 
 val ity_equal_check : ity -> ity -> unit
+
+val reg_equal_check : region -> region -> unit
 
 val ity_full_inst : ity_subst -> ity -> ity
 

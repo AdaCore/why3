@@ -16,9 +16,9 @@ module XHashtbl = Exthtbl.Hashtbl
 
 module Int = struct
   type t = int
-  let compare = Pervasives.compare
-  let equal x y = x = y
-  let hash x = x
+  let compare (x : int) y  = Pervasives.compare x y
+  let equal (x : int) y = x = y
+  let hash  (x : int) = x
  end
 
 module Mint = Map.Make(Int)
@@ -33,6 +33,19 @@ module Hstr = XHashtbl.Make
     let hash    = (Hashtbl.hash : string -> int)
     let equal   = ((=) : string -> string -> bool)
   end)
+
+
+module Float = struct
+  type t = float
+  let compare (x : float) y  = Pervasives.compare x y
+  let equal (x : float) y = x = y
+  let hash  (x : float) = XHashtbl.hash x
+end
+
+module Mfloat = Map.Make(Float)
+module Sfloat = Mfloat.Set
+module Hfloat = XHashtbl.Make(Float)
+
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
 

@@ -43,6 +43,8 @@ let ident_printer =
       "Array";"select";"store";"const";
        (** div and mod are builtin *)
       "div";"mod";
+      (** distinct is builtin in some provers *)
+      "distinct"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in

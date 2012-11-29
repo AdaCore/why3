@@ -425,8 +425,16 @@ let rec tr_arith_constant t = match kind_of_term t with
   | _ ->
       raise NotArithConstant
 
+let body_of_constant c = 
+  if Reductionops.is_transparent (ConstKey c) then
+    CoqCompat.body_of_constant (Global.lookup_constant c)
+  else None
+
 let rec tr_type dep tvm env t =
-  let t = Reductionops.nf_betadeltaiota env Evd.empty t in
+  let t = Reductionops.clos_norm_flags
+      (Closure.RedFlags.red_add_transparent
+	 Closure.betadeltaiota (Conv_oracle.get_transp_state()))
+      env Evd.empty t in
   if is_constant t coq_Z then
     Ty.ty_int
   else if is_constant t coq_R then
@@ -492,7 +500,7 @@ and tr_global_ts dep env r =
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id (Nametab.basename_of_global r) in
-          let ts = match CoqCompat.body_of_constant (Global.lookup_constant c) with
+          let ts = match body_of_constant c with
             | Some b ->
                 let b = force b in
                 let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
@@ -640,7 +648,7 @@ and make_one_ls dep env r =
   add_poly_arity ls vars
 
 and decompose_definition dep env c =
-  let dl = match CoqCompat.body_of_constant (Global.lookup_constant c) with
+  let dl = match body_of_constant c with
     | None ->
         [ConstRef c, None]
     | Some b ->

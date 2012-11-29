@@ -22,6 +22,10 @@ module Mstr : Map.S with type key = string
 module Sstr : Mstr.Set
 module Hstr : XHashtbl.S with type key = string
 
+module Mfloat : Map.S with type key = float
+module Sfloat : Mfloat.Set
+module Hfloat : XHashtbl.S with type key = float
+
 (* Set, Map, Hashtbl on structures with a unique tag *)
 
 module type TaggedType =
