@@ -169,36 +169,74 @@ let next objective =
    with Not_found ->
       None
 
-let is_full_split_goal goal =
-   (* check whether the goal has been obtained by split_conj transformation *)
+let strategy =
+  [ "split_goal";
+    Gnat_split_conj.split_conj_name;
+    "split_goal_full"
+  ]
+
+let parent_transform_name goal =
    match goal.Session.goal_parent with
-   | Session.Parent_transf t ->
-         t.Session.transf_name = Gnat_split_conj.split_conj_name
+   | Session.Parent_transf t -> Some t.Session.transf_name
+   | _ -> None
+
+let rev_strategy = List.rev strategy
+
+let last_transform = List.hd rev_strategy
+
+exception Trans_Found of string
+
+let find_next_transformation goal =
+  match parent_transform_name goal with
+  | None -> List.hd strategy
+  | Some s ->
+      (* return the transformation that comes *after* the parent in the
+         strategy *)
+      let found = ref false in
+      try
+        List.iter (fun trans ->
+          if !found then raise (Trans_Found trans);
+          if trans = s then found := true) strategy;
+        if !found then
+          Gnat_util.abort_with_message
+            "find_next_transformation: already on last transformation";
+          Format.printf "transformation: %s@." s;
+          Gnat_util.abort_with_message
+            "applied transformation was not found in the list";
+      with Trans_Found trans ->
+        trans
+
+let is_full_split_goal goal =
+   (* check whether the goal has been obtained by the last transformation in
+      the transformation list *)
+   match parent_transform_name goal with
+   | Some name when name = last_transform -> true
    | _ -> false
 
-let is_already_split goal =
-   (* check whether the goal has already been split by split_conj *)
-   Session.PHstr.mem goal.Session.goal_transformations
-      Gnat_split_conj.split_conj_name
+let has_already_been_applied trans goal =
+   (* check whether the goal has already been split by the given
+      transformation *)
+   Session.PHstr.mem goal.Session.goal_transformations trans
 
-let get_split_goals goal =
-   (* apply the split_conj transformation, if not already done;
-      return the goals that have been obtained through this transformation;
-      if not more than one new goal is obtained this way, the transformation is
+let further_split goal =
+   (* check which was the last transformation applied to the goal and
+      apply the next one on the list. Note that this may have already been done
+      in a previous session, in which case we simply return the underlying
+      goals. If it hasn't been done yet, we apply the transformation. If not
+      more than one new goal is obtained this way, the transformation is
       removed, and the empty list is returned *)
-      if is_already_split goal then
-         let transf =
-            Session.PHstr.find goal.Session.goal_transformations
-              Gnat_split_conj.split_conj_name in
+   let trans = find_next_transformation goal in
+   if has_already_been_applied trans goal then
+       let transf =
+          Session.PHstr.find goal.Session.goal_transformations trans in
          transf.Session.transf_goals
       else
          let transf =
             Session.add_registered_transformation
               ~keygen:Keygen.keygen
               (get_session ())
-              Gnat_split_conj.split_conj_name
-              goal
-         in
+              trans
+              goal in
          let new_goals = transf.Session.transf_goals in
          if List.length new_goals <= 1 then begin
             Session.remove_transformation transf;
@@ -236,7 +274,7 @@ let register_result goal result =
          (* the goal was not proved.
             We first check whether we can simplify the goal. *)
          if is_full_split_goal goal then raise Exit;
-         let new_goals = get_split_goals goal in
+         let new_goals = further_split goal in
          if new_goals = [] then raise Exit;
          (* if we are here, it means we have simplified the goal. We add the
             new goals to the set of goals to be proved/scheduled. *)
@@ -538,7 +576,7 @@ let all_split_leaf_goals () =
       if is_registered then
          if is_full_split_goal goal then begin Save_VCs.save_vc goal end
          else begin
-            let new_goals = get_split_goals goal in
+            let new_goals = further_split goal in
             if new_goals = [] then begin Save_VCs.save_vc goal end
             else begin
                List.iter (add_clone goal) new_goals;
