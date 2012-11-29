@@ -82,12 +82,11 @@ struct
       with Found k -> k
 end
 
-(* let mutex = Mutex.create () *)
-
 type objective_rec =
    { to_be_scheduled : GoalSet.t;
      to_be_proved    : GoalSet.t
    }
+(* an objective consists of to be scheduled and to be proved goals *)
 
 let empty_objective () =
    { to_be_scheduled = GoalSet.empty ();
