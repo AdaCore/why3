@@ -20,6 +20,9 @@ val expl_compare : expl -> expl -> int
 
 val reason_from_string : string -> reason
 
+val simple_print_expl : Format.formatter -> expl -> unit
+(* simple text to represent VC, used for debugging *)
+
 val print_simple_proven : Format.formatter -> expl -> unit
 val print_expl : bool -> Task.task -> Format.formatter -> expl -> unit
 

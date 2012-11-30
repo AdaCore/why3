@@ -184,27 +184,29 @@ let rev_strategy = List.rev strategy
 
 let last_transform = List.hd rev_strategy
 
-exception Trans_Found of string
+let next_transform =
+  let h = Hashtbl.create 17 in
+  let rec fill before l =
+    match l with
+    | [] -> ()
+    | x::rest ->
+        Hashtbl.add h before x;
+        fill x rest
+  in
+  let _ =
+    match strategy with
+    | [] -> assert false
+    | head::tail -> fill head tail
+  in
+  (fun trans -> Hashtbl.find h trans)
 
 let find_next_transformation goal =
   match parent_transform_name goal with
   | None -> List.hd strategy
   | Some s ->
-      (* return the transformation that comes *after* the parent in the
-         strategy *)
-      let found = ref false in
-      try
-        List.iter (fun trans ->
-          if !found then raise (Trans_Found trans);
-          if trans = s then found := true) strategy;
-        if !found then
-          Gnat_util.abort_with_message
-            "find_next_transformation: already on last transformation";
-          Format.printf "transformation: %s@." s;
-          Gnat_util.abort_with_message
-            "applied transformation was not found in the list";
-      with Trans_Found trans ->
-        trans
+      try next_transform s
+      with Not_found ->
+        Gnat_util.abort_with_message "unknown transformation found"
 
 let is_full_split_goal goal =
    (* check whether the goal has been obtained by the last transformation in
@@ -223,14 +225,15 @@ let further_split goal =
       apply the next one on the list. Note that this may have already been done
       in a previous session, in which case we simply return the underlying
       goals. If it hasn't been done yet, we apply the transformation. If not
-      more than one new goal is obtained this way, the transformation is
-      removed, and the empty list is returned *)
-   let trans = find_next_transformation goal in
-   if has_already_been_applied trans goal then
-       let transf =
-          Session.PHstr.find goal.Session.goal_transformations trans in
-         transf.Session.transf_goals
-      else
+      more than one new goal is obtained this way, we move to the next
+      transformation in the strategy list. If that still doesn't help, we
+      return the empty list. *)
+   let rec split trans =
+     if has_already_been_applied trans goal then
+         let transf =
+            Session.PHstr.find goal.Session.goal_transformations trans in
+           transf.Session.transf_goals
+     else
          let transf =
             Session.add_registered_transformation
               ~keygen:Keygen.keygen
@@ -238,10 +241,19 @@ let further_split goal =
               trans
               goal in
          let new_goals = transf.Session.transf_goals in
-         if List.length new_goals <= 1 then begin
+         if List.length new_goals > 1 then begin
+           Format.printf "   successfully applied %s@." trans;
+           new_goals
+         end else begin
             Session.remove_transformation transf;
-            []
-         end else new_goals
+            try
+              let trans' = next_transform trans in
+              split trans'
+            with Not_found -> []
+         end
+   in
+   split (find_next_transformation goal)
+
 
 let why3_says_goal_is_verified goal =
    (* this is a partial check to verify that gnatwhy3 and why3 agree. We only
@@ -271,11 +283,15 @@ let register_result goal result =
          obj, Work_Left
       end
    end else begin try
+     Format.printf "not proved: %a @." Gnat_expl.simple_print_expl obj;
          (* the goal was not proved.
             We first check whether we can simplify the goal. *)
          if is_full_split_goal goal then raise Exit;
+     Format.printf "   not yet full split@.";
          let new_goals = further_split goal in
+     Format.printf "   searching for new goals ...@.";
          if new_goals = [] then raise Exit;
+     Format.printf "   found %d new goals@." (List.length new_goals);
          (* if we are here, it means we have simplified the goal. We add the
             new goals to the set of goals to be proved/scheduled. *)
          List.iter (add_clone goal) new_goals;
@@ -285,6 +301,7 @@ let register_result goal result =
          GoalSet.remove obj_rec.to_be_proved goal;
          obj, Work_Left
       with Exit ->
+        Format.printf "   nothing left to be done@.";
          (* if we cannot simplify, the objective has been disproved *)
          let n = GoalSet.count obj_rec.to_be_scheduled in
          GoalSet.reset obj_rec.to_be_scheduled;

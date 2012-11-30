@@ -172,6 +172,12 @@ let rec extract_msg t =
    | _ ->
          read_labels t.t_label
 
+let simple_print_expl fmt p =
+  match p.loc with
+  | [] -> assert false
+  | primary :: _ ->
+      Format.fprintf fmt "%a:%a" simple_print_loc primary print_reason p.reason
+
 let print_simple_proven fmt p =
    match p.loc with
    | [] -> assert false (* the sloc of a VC is never empty *)
