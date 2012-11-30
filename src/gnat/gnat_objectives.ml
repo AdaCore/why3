@@ -172,7 +172,7 @@ let next objective =
 let strategy =
   [ "split_goal";
     Gnat_split_conj.split_conj_name;
-    "split_goal_full"
+    Gnat_split_disj.split_disj_name
   ]
 
 let parent_transform_name goal =

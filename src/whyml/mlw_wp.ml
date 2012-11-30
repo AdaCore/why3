@@ -1165,6 +1165,10 @@ end = struct
 
 end
 
+let fastwp_or_label = Ident.create_label "fastwp:or"
+let wp_or f1 f2 = t_label_add fastwp_or_label (t_or_simp f1 f2)
+let wp_ors l = List.fold_left wp_or t_false l
+
 let xs_result xs = create_vsymbol (id_fresh "result") (ty_of_ity xs.xs_ity)
 let result e =
   vs_result e, Mexn.mapi (fun xs _ -> xs_result xs) e.e_effect.eff_raises
@@ -1378,8 +1382,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             Subst.merge_states s (e1_regs, p1.s) (p2_effect, p2.s) in
           { s = s;
             ne =
-              t_or_simp (t_and_simp p1.ne r1)
-                (t_and_simp_l [p2.ne; r2; wp1.post.ne])
+              wp_or (t_and_simp p1.ne r1)
+                    (t_and_simp_l [p2.ne; r2; wp1.post.ne])
           }) in
         { ok = ok;
           post = { ne = ne; s = state_after_call };
@@ -1408,8 +1412,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                                 (p2_effect, p2.s) in
         { s = s;
           ne =
-            t_or_simp (t_and_simp p1.ne r1)
-                      (t_and_simp_l [p2.ne; r2; wp1.post.ne])
+            wp_or (t_and_simp p1.ne r1)
+                  (t_and_simp_l [p2.ne; r2; wp1.post.ne])
         }) in
       { ok = ok;
         post = { ne = ne; s = wp2.post.s };
@@ -1457,7 +1461,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2] in
           let third_case =
             t_and_simp_l [wp1.post.ne; t_not test; post3.ne; q23; r3] in
-          let ne = t_or_simp_l [first_case; second_case; third_case] in
+          let ne = wp_ors [first_case; second_case; third_case] in
           { ne = ne; s = s' }) in
       { ok = ok;
         post = { ne = ne; s = state };
@@ -1476,8 +1480,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           (e1_regs, wp1.post.s) in
       let r3 = t_equ (t_var ex_res) (t_var (Mexn.find ex xresult)) in
       let ne =
-        t_or_simp (t_and_simp p.ne r1)
-          (t_and_simp_l [wp1.post.ne; r2; r3]) in
+        wp_or (t_and_simp p.ne r1)
+              (t_and_simp_l [wp1.post.ne; r2; r3]) in
       let ne = wp_label e ne in
       let xpost = { s = s; ne = ne } in
       let xne = Mexn.add ex xpost wp1.exn in
@@ -1506,7 +1510,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             Subst.merge_states s (e1_regs, wp1.post.s)
                                  (Sreg.union e1_regs e2_regs, wp2.post.s) in
           let ne =
-             t_or_simp
+             wp_or
                 (t_and_simp acc.post.ne f1)
                 (t_and_simp_l [post.ne; wp2.post.ne; f2]) in
           { ok = t_and_simp acc.ok (t_implies_simp post.ne wp2.ok);

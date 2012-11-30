@@ -420,7 +420,8 @@ clean::
 # GNATWhy3
 ########
 
-GNAT_FILES = gnat_split_conj gnat_util gnat_loc gnat_config gnat_expl gnat_objectives gnat_main
+GNAT_FILES = gnat_split_conj gnat_split_disj gnat_util gnat_loc gnat_config \
+	     gnat_expl gnat_objectives gnat_main
 
 GNATMODULES = $(addprefix src/gnat/, $(GNAT_FILES))
 
@@ -434,6 +435,8 @@ $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 
 byte: bin/gnatwhy3.byte
 opt:  bin/gnatwhy3.opt
+
+gnat_split_conj.o: lib/why3/why3.cmxa
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
