@@ -436,7 +436,8 @@ $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 byte: bin/gnatwhy3.byte
 opt:  bin/gnatwhy3.opt
 
-gnat_split_conj.o: lib/why3/why3.cmxa
+gnat_split_conj.cmx: lib/why3/why3.cmxa
+gnat_split_disj.cmx: lib/why3/why3.cmxa
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \

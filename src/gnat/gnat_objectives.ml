@@ -242,7 +242,6 @@ let further_split goal =
               goal in
          let new_goals = transf.Session.transf_goals in
          if List.length new_goals > 1 then begin
-           Format.printf "   successfully applied %s@." trans;
            new_goals
          end else begin
             Session.remove_transformation transf;
@@ -283,15 +282,11 @@ let register_result goal result =
          obj, Work_Left
       end
    end else begin try
-     Format.printf "not proved: %a @." Gnat_expl.simple_print_expl obj;
          (* the goal was not proved.
             We first check whether we can simplify the goal. *)
          if is_full_split_goal goal then raise Exit;
-     Format.printf "   not yet full split@.";
          let new_goals = further_split goal in
-     Format.printf "   searching for new goals ...@.";
          if new_goals = [] then raise Exit;
-     Format.printf "   found %d new goals@." (List.length new_goals);
          (* if we are here, it means we have simplified the goal. We add the
             new goals to the set of goals to be proved/scheduled. *)
          List.iter (add_clone goal) new_goals;
@@ -301,7 +296,6 @@ let register_result goal result =
          GoalSet.remove obj_rec.to_be_proved goal;
          obj, Work_Left
       with Exit ->
-        Format.printf "   nothing left to be done@.";
          (* if we cannot simplify, the objective has been disproved *)
          let n = GoalSet.count obj_rec.to_be_scheduled in
          GoalSet.reset obj_rec.to_be_scheduled;

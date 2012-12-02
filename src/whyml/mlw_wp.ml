@@ -172,6 +172,30 @@ let wp_forall_post v p f =
     | Some t, p -> wp_let v t (wp_implies p f)
     | _ -> wp_forall [v] (wp_implies p f)
 
+let is_equality_for v t =
+  (* check whether [t] is an equality defining variable [v], that is, of the
+     form [ x = def] for some term [def]. If so, return [Some def], otherwise
+     return [None] *)
+  match t.t_node with
+  | Tapp (ls, [ { t_node = Tvar eq_v } ; t2 ])
+          when ls_equal ls ps_equ && vs_equal eq_v v ->
+            Some t2
+  | _ -> None
+
+let t_and_subst v t1 t2 =
+  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
+     definition. Otherwise return [t1 /\ t2] *)
+  match is_equality_for v t1 with
+  | Some def -> t_subst_single v def t2
+  | None -> t_and_simp t1 t2
+
+let t_implies_subst v t1 t2 =
+  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
+     definition. Otherwise return [t1 -> t2] *)
+  match is_equality_for v t1 with
+  | Some def -> t_subst_single v def t2
+  | None -> t_implies_simp t1 t2
+
 (* regs_of_reads, and therefore regs_of_effect, only take into account
    reads in program expressions and ignore the variables in specification *)
 (* dead code
@@ -1392,17 +1416,18 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
       (* NE: ne(e1) /\ ne(e2) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
+      let v = v.pv_vs in
       let e2 =
-         if Opt.equal Loc.equal v.pv_vs.vs_name.id_loc e1.e_loc then
+         if Opt.equal Loc.equal v.vs_name.id_loc e1.e_loc then
             e_label_copy e e2
          else e2 in
-      let wp1 = fast_wp_expr env s (v.pv_vs, xresult) e1 in
+      let wp1 = fast_wp_expr env s (v, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne wp2.ok) in
       let ok = wp_label e ok in
       let e1_regs = regs_of_writes e1.e_effect in
       let e2_regs = regs_of_writes e2.e_effect in
-      let ne = wp_label e (t_and_simp wp1.post.ne wp2.post.ne) in
+      let ne = wp_label e (t_and_subst v wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
         let p2_effect = Sreg.union e1_regs e2_regs in
         let p1 = get_exn e1_regs ex wp1.exn in
@@ -1434,7 +1459,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let test = t_equ (t_var cond_res) t_bool_true in
       let ok =
         t_and_simp wp1.ok
-          (t_implies_simp wp1.post.ne
+          (t_implies_subst cond_res wp1.post.ne
             (t_if_simp test wp2.ok wp3.ok)) in
       let ok = wp_label e ok in
       let state, f1, f2 =
@@ -1442,7 +1467,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
            (e2_regs, wp2.post.s, wp2.post.ne)
            (e3_regs, wp3.post.s, wp3.post.ne) in
       let ne =
-        t_and_simp wp1.post.ne (t_if test f1 f2) in
+        t_and_subst cond_res wp1.post.ne (t_if test f1 f2) in
       let ne = wp_label e ne in
       let xne = iter_all_exns [wp1.exn; wp2.exn; wp3.exn]
         (fun ex ->
@@ -1458,9 +1483,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
               (Sreg.union e1_regs (Sreg.union e2_regs e3_regs), s23) in
           let first_case = t_and_simp q1 post1.ne in
           let second_case =
-            t_and_simp_l [wp1.post.ne; test; post2.ne; q23; r2] in
+            t_and_subst cond_res wp1.post.ne
+               (t_and_simp_l [test; post2.ne; q23; r2]) in
           let third_case =
-            t_and_simp_l [wp1.post.ne; t_not test; post3.ne; q23; r3] in
+            t_and_subst cond_res wp1.post.ne
+                (t_and_simp_l [t_not test; post3.ne; q23; r3]) in
           let ne = wp_ors [first_case; second_case; third_case] in
           { ne = ne; s = s' }) in
       { ok = ok;
