@@ -20,7 +20,10 @@ Defined.
 Global Instance set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Proof.
 intros.
+split.
 exact (fun _ => False).
+intros x y.
+apply excluded_middle_informative.
 Qed.
 
 (* Why3 goal *)
@@ -176,7 +179,7 @@ Qed.
 (* Why3 goal *)
 Definition choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
 intros a a_WT s.
-assert (i: inhabited a) by (apply inhabits; assumption).
+assert (i: inhabited a) by (apply inhabits, why_inhabitant).
 exact (epsilon i (fun x => mem x s)).
 Defined.
 
