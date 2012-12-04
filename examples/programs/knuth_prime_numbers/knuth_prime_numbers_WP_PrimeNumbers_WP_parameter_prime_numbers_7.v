@@ -10,6 +10,7 @@ Require int.ComputerDivision.
 Require number.Parity.
 Require number.Divisibility.
 Require number.Prime.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -37,40 +38,15 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -82,81 +58,83 @@ Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 (* Why3 assumption *)
 Definition no_prime_in(l:Z) (u:Z): Prop := forall (x:Z), ((l < x)%Z /\
   (x < u)%Z) -> ~ (number.Prime.prime x).
 
 (* Why3 assumption *)
-Definition first_primes(p:(array Z)) (u:Z): Prop := ((get1 p 0%Z) = 2%Z) /\
-  ((forall (i:Z) (j:Z), (((0%Z <= i)%Z /\ (i < j)%Z) /\ (j < u)%Z) ->
-  ((get1 p i) < (get1 p j))%Z) /\ ((forall (i:Z), ((0%Z <= i)%Z /\
-  (i < u)%Z) -> (number.Prime.prime (get1 p i))) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < (u - 1%Z)%Z)%Z) -> (no_prime_in (get1 p i) (get1 p
-  (i + 1%Z)%Z)))).
+Definition first_primes(p:(array Z)) (u:Z): Prop := ((get p 0%Z) = 2%Z) /\
+  ((forall (i:Z) (j:Z), (((0%Z <= i)%Z /\ (i < j)%Z) /\ (j < u)%Z) -> ((get p
+  i) < (get p j))%Z) /\ ((forall (i:Z), ((0%Z <= i)%Z /\ (i < u)%Z) ->
+  (number.Prime.prime (get p i))) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i < (u - 1%Z)%Z)%Z) -> (no_prime_in (get p i) (get p (i + 1%Z)%Z)))).
 
 Axiom exists_prime : forall (p:(array Z)) (u:Z), (1%Z <= u)%Z ->
-  ((first_primes p u) -> forall (d:Z), ((2%Z <= d)%Z /\ (d <= (get1 p
+  ((first_primes p u) -> forall (d:Z), ((2%Z <= d)%Z /\ (d <= (get p
   (u - 1%Z)%Z))%Z) -> ((number.Prime.prime d) -> exists i:Z, ((0%Z <= i)%Z /\
-  (i < u)%Z) /\ (d = (get1 p i)))).
+  (i < u)%Z) /\ (d = (get p i)))).
 
 Axiom Bertrand_postulate : forall (p:Z), (number.Prime.prime p) ->
   ~ (no_prime_in p (2%Z * p)%Z).
 
 
-
 (* Why3 goal *)
 Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
-  ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z < m)%Z) -> forall (p:(map Z Z)),
-  (p = (set (const 0%Z:(map Z Z)) 0%Z 2%Z)) -> (((0%Z <= 1%Z)%Z /\
-  (1%Z < m)%Z) -> forall (p1:(map Z Z)), (p1 = (set p 1%Z 3%Z)) ->
-  ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z) (p2:(map Z Z)), forall (j:Z),
-  ((2%Z <= j)%Z /\ (j <= (m - 1%Z)%Z)%Z) -> (((((first_primes (mk_array m p2)
-  j) /\ (((get p2 (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (get p2
-  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n)) /\ (no_prime_in (get p2
-  (j - 1%Z)%Z) n)) -> forall (k:Z), forall (n1:Z) (p3:(map Z Z)),
-  (((((((1%Z <= k)%Z /\ (k < j)%Z) /\ (first_primes (mk_array m p3) j)) /\
-  (((get p3 (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (get p3
-  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n1)) /\ (no_prime_in (get p3
-  (j - 1%Z)%Z) n1)) /\ forall (i:Z), ((0%Z <= i)%Z /\ (i < k)%Z) ->
-  ~ (number.Divisibility.divides (get p3 i) n1)) -> (((0%Z <= k)%Z /\
-  (k < m)%Z) -> ((~ ((ZOmod n1 (get p3 k)) = 0%Z)) -> (((0%Z <= k)%Z /\
-  (k < m)%Z) -> (((0%Z <= k)%Z /\ (k < m)%Z) -> (((get p3
-  k) < (ZOdiv n1 (get p3 k)))%Z -> ((k + 1%Z)%Z < j)%Z)))))))))).
-(* YOU MAY EDIT THE PROOF BELOW *)
+  ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z < m)%Z) -> forall (p:(map.Map.map
+  Z Z)), (p = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z 2%Z)) ->
+  (((0%Z <= 1%Z)%Z /\ (1%Z < m)%Z) -> forall (p1:(map.Map.map Z Z)),
+  (p1 = (map.Map.set p 1%Z 3%Z)) -> ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z)
+  (p2:(map.Map.map Z Z)), forall (j:Z), ((2%Z <= j)%Z /\
+  (j <= (m - 1%Z)%Z)%Z) -> (((((first_primes (mk_array m p2) j) /\
+  (((map.Map.get p2 (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2
+  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n)) /\
+  (no_prime_in (map.Map.get p2 (j - 1%Z)%Z) n)) -> forall (k:Z),
+  forall (n1:Z) (p3:(map.Map.map Z Z)), (((((((1%Z <= k)%Z /\ (k < j)%Z) /\
+  (first_primes (mk_array m p3) j)) /\ (((map.Map.get p3
+  (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3
+  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n1)) /\
+  (no_prime_in (map.Map.get p3 (j - 1%Z)%Z) n1)) /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < k)%Z) ->
+  ~ (number.Divisibility.divides (map.Map.get p3 i) n1)) -> (((0%Z <= k)%Z /\
+  (k < m)%Z) -> ((~ ((ZOmod n1 (map.Map.get p3 k)) = 0%Z)) ->
+  (((0%Z <= k)%Z /\ (k < m)%Z) -> (((0%Z <= k)%Z /\ (k < m)%Z) ->
+  (((map.Map.get p3 k) < (ZOdiv n1 (map.Map.get p3 k)))%Z ->
+  ((k + 1%Z)%Z < j)%Z)))))))))).
+Proof.
 intuition.
 intros. clear H9.
 assert (case: (k = j-1 \/ k+1<j)%Z) by omega. destruct case. 2: auto.
 apply False_ind.
 subst k.
-assert (2 < get p3 (j-1))%Z.
+assert (2 < Map.get p3 (j-1))%Z.
 red in H29. destruct H29 as (h1, (h2, _)).
 rewrite <- h1. apply h2; omega.
-generalize (ZO_div_mod_eq n1 (get p3 (j-1))%Z). intro div.
-assert (ne1: (0 <= n1 /\ get p3 (j-1) <> 0)%Z) by omega.
-assert (mod_: (0 <= ZOmod n1 (get p3 (j-1)))%Z).
+generalize (ZO_div_mod_eq n1 (Map.get p3 (j-1))%Z). intro div.
+assert (ne1: (0 <= n1 /\ Map.get p3 (j-1) <> 0)%Z) by omega.
+assert (mod_: (0 <= ZOmod n1 (Map.get p3 (j-1)))%Z).
 destruct (not_Zeq_inf _ _ (proj2 ne1)) as [Zm|Zm].
 now apply ZOmod_lt_pos_neg.
 now apply ZOmod_lt_pos_pos.
-assert (n1 > get p3 (j - 1) * get p3 (j-1))%Z.
-assert (get p3 (j - 1) * (ZOdiv n1 (get p3 (j - 1))) > get p3 (j - 1) * get p3 (j-1))%Z.
+assert (n1 > Map.get p3 (j - 1) * Map.get p3 (j-1))%Z.
+assert (Map.get p3 (j - 1) * (ZOdiv n1 (Map.get p3 (j - 1))) > Map.get p3 (j - 1) * Map.get p3 (j-1))%Z.
 apply Zmult_gt_compat_l.
 omega.
 apply Zlt_gt.
 assumption.
 omega.
-assert (n1 < get p3 (j - 1) * get p3 (j - 1)%Z).
-assert (2 * get p3 (j - 1) < get p3 (j - 1) * get p3 (j - 1))%Z.
+assert (n1 < Map.get p3 (j - 1) * Map.get p3 (j - 1)%Z).
+assert (2 * Map.get p3 (j - 1) < Map.get p3 (j - 1) * Map.get p3 (j - 1))%Z.
 apply Zmult_lt_compat_r; omega.
 omega.
 omega.

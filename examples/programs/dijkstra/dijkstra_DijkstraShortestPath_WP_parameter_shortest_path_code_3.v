@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -117,31 +118,6 @@ Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set1: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set1 m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set1 m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 Axiom vertex : Type.
 Parameter vertex_WhyType : WhyType vertex.
 Existing Instance vertex_WhyType.
@@ -157,8 +133,9 @@ Parameter weight: vertex -> vertex -> Z.
 Axiom Weight_nonneg : forall (x:vertex) (y:vertex), (0%Z <= (weight x y))%Z.
 
 (* Why3 assumption *)
-Definition min(m:vertex) (q:(set vertex)) (d:(map vertex Z)): Prop := (mem m
-  q) /\ forall (x:vertex), (mem x q) -> ((get d m) <= (get d x))%Z.
+Definition min(m:vertex) (q:(set vertex)) (d:(map.Map.map vertex Z)): Prop :=
+  (mem m q) /\ forall (x:vertex), (mem x q) -> ((map.Map.get d
+  m) <= (map.Map.get d x))%Z.
 
 (* Why3 assumption *)
 Inductive path : vertex -> vertex -> Z -> Prop :=
@@ -195,26 +172,28 @@ Definition inv_src(src:vertex) (s:(set vertex)) (q:(set vertex)): Prop :=
   (mem src s) \/ (mem src q).
 
 (* Why3 assumption *)
-Definition inv(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map vertex
-  Z)): Prop := (inv_src src s q) /\ (((get d src) = 0%Z) /\ ((subset s v) /\
-  ((subset q v) /\ ((forall (v1:vertex), (mem v1 q) -> ~ (mem v1 s)) /\
-  ((forall (v1:vertex), (mem v1 s) -> (shortest_path src v1 (get d v1))) /\
-  forall (v1:vertex), (mem v1 q) -> (path src v1 (get d v1))))))).
+Definition inv(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map.Map.map
+  vertex Z)): Prop := (inv_src src s q) /\ (((map.Map.get d src) = 0%Z) /\
+  ((subset s v) /\ ((subset q v) /\ ((forall (v1:vertex), (mem v1 q) ->
+  ~ (mem v1 s)) /\ ((forall (v1:vertex), (mem v1 s) -> (shortest_path src v1
+  (map.Map.get d v1))) /\ forall (v1:vertex), (mem v1 q) -> (path src v1
+  (map.Map.get d v1))))))).
 
 (* Why3 assumption *)
-Definition inv_succ(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
-  vertex Z)): Prop := forall (x:vertex), (mem x s) -> forall (y:vertex),
-  (mem y (g_succ x)) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
-  x) + (weight x y))%Z)%Z).
+Definition inv_succ(src:vertex) (s:(set vertex)) (q:(set vertex))
+  (d:(map.Map.map vertex Z)): Prop := forall (x:vertex), (mem x s) ->
+  forall (y:vertex), (mem y (g_succ x)) -> (((mem y s) \/ (mem y q)) /\
+  ((map.Map.get d y) <= ((map.Map.get d x) + (weight x y))%Z)%Z).
 
 (* Why3 assumption *)
-Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex)) (d:(map
-  vertex Z)) (u:vertex) (su:(set vertex)): Prop := forall (x:vertex), (mem x
-  s) -> forall (y:vertex), (mem y (g_succ x)) -> (((~ (x = u)) \/ ((x = u) /\
-  ~ (mem y su))) -> (((mem y s) \/ (mem y q)) /\ ((get d y) <= ((get d
-  x) + (weight x y))%Z)%Z)).
+Definition inv_succ2(src:vertex) (s:(set vertex)) (q:(set vertex))
+  (d:(map.Map.map vertex Z)) (u:vertex) (su:(set vertex)): Prop :=
+  forall (x:vertex), (mem x s) -> forall (y:vertex), (mem y (g_succ x)) ->
+  (((~ (x = u)) \/ ((x = u) /\ ~ (mem y su))) -> (((mem y s) \/ (mem y q)) /\
+  ((map.Map.get d y) <= ((map.Map.get d x) + (weight x y))%Z)%Z)).
 
-Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
 Ltac z := why3 "z3" timelimit 3.
 Require Import Classical.
 
@@ -241,23 +220,24 @@ Qed.
 
 (* Why3 goal *)
 Theorem WP_parameter_shortest_path_code : forall (src:vertex) (dst:vertex),
-  forall (d:(map vertex Z)), ((mem src v) /\ (mem dst v)) -> forall (q:(set
-  vertex)) (d1:(map vertex Z)) (visited:(set vertex)),
+  forall (d:(map.Map.map vertex Z)), ((mem src v) /\ (mem dst v)) ->
+  forall (q:(set vertex)) (d1:(map.Map.map vertex Z)) (visited:(set vertex)),
   (((is_empty visited) /\ (q = (add src (empty :(set vertex))))) /\
-  (d1 = (set1 d src 0%Z))) -> forall (q1:(set vertex)) (d2:(map vertex Z))
-  (visited1:(set vertex)), (((inv src visited1 q1 d2) /\ (inv_succ src
-  visited1 q1 d2)) /\ forall (m:vertex), (min m q1 d2) -> forall (x:vertex),
-  forall (dx:Z), (path src x dx) -> ((dx < (get d2 m))%Z -> (mem x
-  visited1))) -> forall (o:bool), ((o = true) <-> (is_empty q1)) ->
-  ((~ (o = true)) -> ((~ (is_empty q1)) -> forall (q2:(set vertex)),
-  forall (u:vertex), ((min u q1 d2) /\ (q2 = (remove u q1))) ->
-  ((shortest_path src u (get d2 u)) -> forall (visited2:(set vertex)),
-  (visited2 = (add u visited1)) -> forall (su:(set vertex)) (q3:(set vertex))
-  (d3:(map vertex Z)), (((subset su (g_succ u)) /\ (inv src visited2 q3
-  d3)) /\ (inv_succ2 src visited2 q3 d3 u su)) -> forall (result:bool),
-  ((result = true) <-> ~ (is_empty su)) -> ((~ (result = true)) ->
-  forall (m:vertex), (min m q3 d3) -> forall (x:vertex), forall (dx:Z),
-  (path src x dx) -> ((dx < (get d3 m))%Z -> (mem x visited2)))))).
+  (d1 = (map.Map.set d src 0%Z))) -> forall (q1:(set vertex))
+  (d2:(map.Map.map vertex Z)) (visited1:(set vertex)), (((inv src visited1 q1
+  d2) /\ (inv_succ src visited1 q1 d2)) /\ forall (m:vertex), (min m q1
+  d2) -> forall (x:vertex), forall (dx:Z), (path src x dx) ->
+  ((dx < (map.Map.get d2 m))%Z -> (mem x visited1))) -> forall (o:bool),
+  ((o = true) <-> (is_empty q1)) -> ((~ (o = true)) -> ((~ (is_empty q1)) ->
+  forall (q2:(set vertex)), forall (u:vertex), ((min u q1 d2) /\
+  (q2 = (remove u q1))) -> ((shortest_path src u (map.Map.get d2 u)) ->
+  forall (visited2:(set vertex)), (visited2 = (add u visited1)) ->
+  forall (su:(set vertex)) (q3:(set vertex)) (d3:(map.Map.map vertex Z)),
+  (((subset su (g_succ u)) /\ (inv src visited2 q3 d3)) /\ (inv_succ2 src
+  visited2 q3 d3 u su)) -> forall (result:bool), ((result = true) <->
+  ~ (is_empty su)) -> ((~ (result = true)) -> forall (m:vertex), (min m q3
+  d3) -> forall (x:vertex), forall (dx:Z), (path src x dx) ->
+  ((dx < (map.Map.get d3 m))%Z -> (mem x visited2)))))).
 intros src dst d (h1,h2) q d1 visited ((h3,h4),h5) q1 d2 visited1
 ((h6,h7),h8) o h9 h10 h11 q2 u (h12,h13) h14 visited2 h15 su q3 d3
 ((h16,h17),h18) result h19 h20 m h21 x dx h22 h23.
@@ -272,8 +252,8 @@ destruct (inside_or_exit visited2 src x dx); auto.
 destruct H2 as (y, (z, (dy, (a1, (a2, (a3, (a4, a5))))))).
 unfold min in h21.
 assert (mem z q3) by z.
-assert (get d3 z <= get d3 y + weight y z)%Z by ae.
-assert (dy = get d3 y) by z.
+assert (Map.get d3 z <= Map.get d3 y + weight y z)%Z by ae.
+assert (dy = Map.get d3 y) by z.
 z.
 Qed.
 

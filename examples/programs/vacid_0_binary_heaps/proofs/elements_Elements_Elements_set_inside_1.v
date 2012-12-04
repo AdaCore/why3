@@ -4,13 +4,13 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require map.Map.
 
-Parameter bag : forall (a:Type) {a_WT:WhyType a}, Type.
-Axiom bag_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (bag a).
+Axiom bag : forall (a:Type) {a_WT:WhyType a}, Type.
+Parameter bag_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (bag a).
 Existing Instance bag_WhyType.
 
-Parameter nb_occ: forall {a:Type} {a_WT:WhyType a}, a -> (bag a) ->
-  BuiltIn.int.
+Parameter nb_occ: forall {a:Type} {a_WT:WhyType a}, a -> (bag a) -> Z.
 
 Axiom occ_non_negative : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a))
   (x:a), (0%Z <= (nb_occ x b))%Z.
@@ -77,7 +77,7 @@ Axiom occ_add_eq : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a)) (x:a)
 Axiom occ_add_neq : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a))
   (x:a) (y:a), (~ (x = y)) -> ((nb_occ y (add x b)) = (nb_occ y b)).
 
-Parameter card: forall {a:Type} {a_WT:WhyType a}, (bag a) -> BuiltIn.int.
+Parameter card: forall {a:Type} {a_WT:WhyType a}, (bag a) -> Z.
 
 Axiom Card_empty : forall {a:Type} {a_WT:WhyType a}, ((card (empty_bag :(bag
   a))) = 0%Z).
@@ -116,84 +116,55 @@ Axiom Diff_comm : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a))
 Axiom Add_diff : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a)) (x:a),
   (mem x b) -> ((add x (diff b (singleton x))) = b).
 
-Parameter map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b},
-  Type.
-Axiom map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
-Definition array (a:Type) {a_WT:WhyType a} := (map BuiltIn.int a).
+Definition array (a:Type) {a_WT:WhyType a} := (map.Map.map Z a).
 
-Parameter elements: forall {a:Type} {a_WT:WhyType a}, (map BuiltIn.int a)
-  -> BuiltIn.int -> BuiltIn.int -> (bag a).
+Parameter elements: forall {a:Type} {a_WT:WhyType a}, (map.Map.map Z a) -> Z
+  -> Z -> (bag a).
 
-Axiom Elements_empty : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map
-  BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int), (j <= i)%Z ->
-  ((elements a1 i j) = (empty_bag :(bag a))).
+Axiom Elements_empty : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z), (j <= i)%Z -> ((elements a1 i
+  j) = (empty_bag :(bag a))).
 
-Axiom Elements_add : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map
-  BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int), (i < j)%Z -> ((elements a1
-  i j) = (add (get a1 (j - 1%Z)%Z) (elements a1 i (j - 1%Z)%Z))).
+Axiom Elements_add : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z), (i < j)%Z -> ((elements a1 i
+  j) = (add (map.Map.get a1 (j - 1%Z)%Z) (elements a1 i (j - 1%Z)%Z))).
 
-Axiom Elements_singleton : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map
-  BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int), (j = (i + 1%Z)%Z) ->
-  ((elements a1 i j) = (singleton (get a1 i))).
+Axiom Elements_singleton : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z), (j = (i + 1%Z)%Z) ->
+  ((elements a1 i j) = (singleton (map.Map.get a1 i))).
 
-Axiom Elements_union : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map
-  BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int) (k:BuiltIn.int),
-  ((i <= j)%Z /\ (j <= k)%Z) -> ((elements a1 i k) = (union (elements a1 i j)
-  (elements a1 j k))).
+Axiom Elements_union : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z) (k:Z), ((i <= j)%Z /\
+  (j <= k)%Z) -> ((elements a1 i k) = (union (elements a1 i j) (elements a1 j
+  k))).
 
-Axiom Elements_add1 : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map
-  BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int), (i < j)%Z -> ((elements a1
-  i j) = (add (get a1 i) (elements a1 (i + 1%Z)%Z j))).
+Axiom Elements_add1 : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z), (i < j)%Z -> ((elements a1 i
+  j) = (add (map.Map.get a1 i) (elements a1 (i + 1%Z)%Z j))).
 
 Axiom Elements_remove_last : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(map BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int),
-  (i < (j - 1%Z)%Z)%Z -> ((elements a1 i (j - 1%Z)%Z) = (diff (elements a1 i
-  j) (singleton (get a1 (j - 1%Z)%Z)))).
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z), (i < (j - 1%Z)%Z)%Z ->
+  ((elements a1 i (j - 1%Z)%Z) = (diff (elements a1 i j)
+  (singleton (map.Map.get a1 (j - 1%Z)%Z)))).
 
-Axiom Occ_elements : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map
-  BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int) (n:BuiltIn.int),
-  ((i <= j)%Z /\ (j < n)%Z) -> (0%Z < (nb_occ (get a1 j) (elements a1 i
-  n)))%Z.
+Axiom Occ_elements : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z) (n:Z), ((i <= j)%Z /\
+  (j < n)%Z) -> (0%Z < (nb_occ (map.Map.get a1 j) (elements a1 i n)))%Z.
 
 Axiom Elements_set_outside : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(map BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int),
-  (i <= j)%Z -> forall (k:BuiltIn.int), ((k < i)%Z \/ (j <= k)%Z) ->
-  forall (e:a), ((elements (set a1 k e) i j) = (elements a1 i j)).
-
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z), (i <= j)%Z -> forall (k:Z),
+  ((k < i)%Z \/ (j <= k)%Z) -> forall (e:a), ((elements (map.Map.set a1 k e)
+  i j) = (elements a1 i j)).
 
 (* Why3 goal *)
 Theorem Elements_set_inside : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(map BuiltIn.int a)) (i:BuiltIn.int) (j:BuiltIn.int)
-  (n:BuiltIn.int) (e:a) (b:(bag a)), ((i <= j)%Z /\ (j < n)%Z) ->
-  (((elements a1 i n) = (add (get a1 j) b)) -> ((elements (set a1 j e) i
-  n) = (add e b))).
-(* YOU MAY EDIT THE PROOF BELOW *)
+  forall (a1:(map.Map.map Z a)) (i:Z) (j:Z) (n:Z) (e:a) (b:(bag a)),
+  ((i <= j)%Z /\ (j < n)%Z) -> (((elements a1 i n) = (add (map.Map.get a1 j)
+  b)) -> ((elements (map.Map.set a1 j e) i n) = (add e b))).
+Proof.
 intros X _X a i j n e b Hi H.
-apply bag_simpl_left with (a1:=(add (get a j) empty_bag)).
+apply bag_simpl_left with (a1:=(add (Map.get a j) empty_bag)).
 replace (add e b) with (union b (add e empty_bag)).
 2: rewrite Union_comm ; unfold add ; rewrite Union_identity; auto.
 rewrite Union_assoc.
@@ -201,15 +172,15 @@ unfold add; rewrite Union_identity.
 unfold add in H; rewrite <- H; clear H.
 rewrite (Elements_union _ _ j); auto with zarith.
 rewrite Elements_set_outside; auto with zarith.
-pattern (elements (set a j e) j n); rewrite Elements_add1; auto with zarith.
-rewrite Select_eq; auto.
+pattern (elements (Map.set a j e) j n); rewrite Elements_add1; auto with zarith.
+rewrite Map.Select_eq; auto.
 rewrite Elements_set_outside; auto with zarith.
 rewrite (Elements_union _ i j n); auto with zarith.
 pattern (elements a j n); rewrite Elements_add1; auto with zarith.
 (* AC1 equality *)
 rewrite Union_identity.
 rewrite Union_assoc.
-pattern (union (singleton (get a j)) (elements a i j)); rewrite Union_comm.
+pattern (union (singleton (Map.get a j)) (elements a i j)); rewrite Union_comm.
 rewrite <- Union_assoc.
 rewrite <- Union_assoc.
 apply f_equal.

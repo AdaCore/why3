@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -60,8 +61,7 @@ Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
   ((infix_plpl l (Nil :(list a))) = l).
 
 (* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list
-  a)) {struct l}: BuiltIn.int :=
+Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
   match l with
   | Nil => 0%Z
   | (Cons _ r) => (1%Z + (length r))%Z
@@ -103,62 +103,38 @@ Axiom reverse_reverse : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
 Axiom Reverse_length : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
   ((length (reverse l)) = (length l)).
 
-Parameter map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b},
-  Type.
-Axiom map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
-Parameter loc : Type.
-Axiom loc_WhyType : WhyType loc.
+Axiom loc : Type.
+Parameter loc_WhyType : WhyType loc.
 Existing Instance loc_WhyType.
 
 Parameter null: loc.
 
 (* Why3 assumption *)
-Inductive list_seg : loc -> (map loc loc) -> (list loc) -> loc -> Prop :=
-  | list_seg_nil : forall (p:loc) (next:(map loc loc)), (list_seg p next
-      (Nil :(list loc)) p)
-  | list_seg_cons : forall (p:loc) (q:loc) (next:(map loc loc)) (l:(list
-      loc)), ((~ (p = null)) /\ (list_seg (get next p) next l q)) ->
-      (list_seg p next (Cons p l) q).
+Inductive list_seg : loc -> (map.Map.map loc loc) -> (list loc)
+  -> loc -> Prop :=
+  | list_seg_nil : forall (p:loc) (next:(map.Map.map loc loc)), (list_seg p
+      next (Nil :(list loc)) p)
+  | list_seg_cons : forall (p:loc) (q:loc) (next:(map.Map.map loc loc))
+      (l:(list loc)), ((~ (p = null)) /\ (list_seg (map.Map.get next p) next
+      l q)) -> (list_seg p next (Cons p l) q).
 
-Axiom list_seg_frame : forall (next1:(map loc loc)) (next2:(map loc loc))
-  (p:loc) (q:loc) (v:loc) (pM:(list loc)), ((list_seg p next1 pM null) /\
-  ((next2 = (set next1 q v)) /\ ~ (mem q pM))) -> (list_seg p next2 pM null).
+Axiom list_seg_frame : forall (next1:(map.Map.map loc loc))
+  (next2:(map.Map.map loc loc)) (p:loc) (q:loc) (v:loc) (pM:(list loc)),
+  ((list_seg p next1 pM null) /\ ((next2 = (map.Map.set next1 q v)) /\
+  ~ (mem q pM))) -> (list_seg p next2 pM null).
 
-Axiom list_seg_functional : forall (next:(map loc loc)) (l1:(list loc))
-  (l2:(list loc)) (p:loc), ((list_seg p next l1 null) /\ (list_seg p next l2
-  null)) -> (l1 = l2).
+Axiom list_seg_functional : forall (next:(map.Map.map loc loc)) (l1:(list
+  loc)) (l2:(list loc)) (p:loc), ((list_seg p next l1 null) /\ (list_seg p
+  next l2 null)) -> (l1 = l2).
 
-Axiom list_seg_sublistl : forall (next:(map loc loc)) (l1:(list loc))
+Axiom list_seg_sublistl : forall (next:(map.Map.map loc loc)) (l1:(list loc))
   (l2:(list loc)) (p:loc) (q:loc), (list_seg p next (infix_plpl l1 (Cons q
   l2)) null) -> (list_seg q next (Cons q l2) null).
 
 (* Why3 goal *)
-Theorem list_seg_no_repet : forall (next:(map loc loc)) (pM:(list loc))
-  (p:loc), (list_seg p next pM null) -> (no_repet pM).
-(* YOU MAY EDIT THE PROOF BELOW *)
+Theorem list_seg_no_repet : forall (next:(map.Map.map loc loc)) (pM:(list
+  loc)) (p:loc), (list_seg p next pM null) -> (no_repet pM).
+Proof.
 induction pM.
 now simpl.
 intros p h.
@@ -178,7 +154,7 @@ generalize (Length_nonnegative l1).
 change (length (Cons p l1)) with (1+length l1)%Z in h4.
 omega.
 inversion h; subst; clear h.
-apply IHpM with (p := get next p).
+apply IHpM with (p := Map.get next p).
 tauto.
 Qed.
 

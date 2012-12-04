@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -20,40 +21,15 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -65,16 +41,16 @@ Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 Parameter n: Z.
 
@@ -100,23 +76,27 @@ Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
 Theorem WP_parameter_distance : (0%Z <= n)%Z -> ((((0%Z < 0%Z)%Z \/
-  (0%Z = 0%Z)) /\ (0%Z < n)%Z) -> forall (g:(map Z Z)),
-  (g = (set (const 0%Z:(map Z Z)) 0%Z (-1%Z)%Z)) -> ((0%Z <= n)%Z ->
-  (((1%Z < (n - 1%Z)%Z)%Z \/ (1%Z = (n - 1%Z)%Z)) -> forall (count:Z) (d:(map
-  Z Z)) (g1:(map Z Z)), (((((get d 0%Z) = 0%Z) /\ (((get g1
-  0%Z) = (-1%Z)%Z) /\ (((count + (get d
+  (0%Z = 0%Z)) /\ (0%Z < n)%Z) -> forall (g:(map.Map.map Z Z)),
+  (g = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z (-1%Z)%Z)) ->
+  ((0%Z <= n)%Z -> (((1%Z < (n - 1%Z)%Z)%Z \/ (1%Z = (n - 1%Z)%Z)) ->
+  forall (count:Z) (d:(map.Map.map Z Z)) (g1:(map.Map.map Z Z)),
+  (((((map.Map.get d 0%Z) = 0%Z) /\ (((map.Map.get g1 0%Z) = (-1%Z)%Z) /\
+  (((count + (map.Map.get d
   (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z < (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)%Z \/
-  ((count + (get d
+  ((count + (map.Map.get d
   (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z = (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)))) /\
-  forall (k:Z), ((0%Z < k)%Z /\ (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (((((get g1
-  (get g1 k)) < (f k))%Z /\ (((f k) < (get g1 k))%Z \/ ((f k) = (get g1
-  k)))) /\ ((get g1 k) < k)%Z) /\ (((0%Z < (get d k))%Z /\ ((get d
-  k) = ((get d (get g1 k)) + 1%Z)%Z)) /\ forall (k':Z), (((get g1
-  k) < k')%Z /\ (k' < k)%Z) -> ((get d (get g1 k)) < (get d k'))%Z))) /\
+  forall (k:Z), ((0%Z < k)%Z /\ (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) ->
+  (((((map.Map.get g1 (map.Map.get g1 k)) < (f k))%Z /\
+  (((f k) < (map.Map.get g1 k))%Z \/ ((f k) = (map.Map.get g1 k)))) /\
+  ((map.Map.get g1 k) < k)%Z) /\ (((0%Z < (map.Map.get d k))%Z /\
+  ((map.Map.get d k) = ((map.Map.get d (map.Map.get g1 k)) + 1%Z)%Z)) /\
+  forall (k':Z), (((map.Map.get g1 k) < k')%Z /\ (k' < k)%Z) ->
+  ((map.Map.get d (map.Map.get g1 k)) < (map.Map.get d k'))%Z))) /\
   forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
-  (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (path (get d k) k)) -> ((count < n)%Z ->
-  forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\ (k < n)%Z) -> forall (d':Z),
-  (path d' k) -> ((get d k) <= d')%Z)))).
+  (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (path (map.Map.get d k) k)) ->
+  ((count < n)%Z -> forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
+  (k < n)%Z) -> forall (d':Z), (path d' k) -> ((map.Map.get d
+  k) <= d')%Z)))).
 intros h1 (h2,h3) g h4 h5 h6 count d g1 (((h7,(h8,h9)),h10),h11) h12 k
 (h13,h14) d' h15.
 clear h1 h2.
@@ -127,7 +107,7 @@ generalize h13 h14 d' h15.
 pattern k.
 apply Z_lt_induction; [clear k h13 h14 d' h15 | omega].
 intros k IH hk1 hk2 d' hd'.
-assert (case: (get d k <= d' \/ d' < get d k)%Z) by omega.
+assert (case: (Map.get d k <= d' \/ d' < Map.get d k)%Z) by omega.
 destruct case; auto.
 destruct hk1.
 (* 0 < k *)
@@ -136,7 +116,7 @@ omega.
 subst i.
 assert (h: (0 < k < n)%Z) by omega.
 generalize (h10 k h). intros h10k.
-assert (case: (j < get g1 k \/ j = get g1 k \/ j > get g1 k)%Z) by omega.
+assert (case: (j < Map.get g1 k \/ j = Map.get g1 k \/ j > Map.get g1 k)%Z) by omega.
 destruct case.
 (* j < g[k] *)
 why3 "z3" timelimit 5.

@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -39,6 +40,9 @@ Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set a)): Prop :=
 
 Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set
   a))).
+
+Axiom mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
+  (empty :(set a))).
 
 Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
@@ -101,16 +105,6 @@ Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
 Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
 
-Parameter nth: forall {a:Type} {a_WT:WhyType a}, Z -> (set a) -> a.
-
-Axiom nth_injective : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a))
-  (i:Z) (j:Z), ((0%Z <= i)%Z /\ (i < (cardinal s))%Z) -> (((0%Z <= j)%Z /\
-  (j < (cardinal s))%Z) -> (((nth i s) = (nth j s)) -> (i = j))).
-
-Axiom nth_surjective : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a))
-  (x:a), (mem x s) -> exists i:Z, ((0%Z <= i)%Z /\ (i < (cardinal s))%Z) ->
-  (x = (nth i s)).
-
 Parameter min_elt: (set Z) -> Z.
 
 Axiom min_elt_def1 : forall (s:(set Z)), (~ (is_empty s)) -> (mem (min_elt s)
@@ -159,106 +153,86 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set1: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set1 m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set1 m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 Parameter n: Z.
 
 (* Why3 assumption *)
-Definition solution  := (map Z Z).
+Definition solution  := (map.Map.map Z Z).
 
 (* Why3 assumption *)
-Definition eq_prefix {a:Type} {a_WT:WhyType a}(t:(map Z a)) (u:(map Z a))
-  (i:Z): Prop := forall (k:Z), ((0%Z <= k)%Z /\ (k < i)%Z) -> ((get t
-  k) = (get u k)).
+Definition eq_prefix {a:Type} {a_WT:WhyType a}(t:(map.Map.map Z a))
+  (u:(map.Map.map Z a)) (i:Z): Prop := forall (k:Z), ((0%Z <= k)%Z /\
+  (k < i)%Z) -> ((map.Map.get t k) = (map.Map.get u k)).
 
 (* Why3 assumption *)
-Definition partial_solution(k:Z) (s:(map Z Z)): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < k)%Z) -> (((0%Z <= (get s i))%Z /\ ((get s
-  i) < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) -> ((~ ((get s
-  i) = (get s j))) /\ ((~ (((get s i) - (get s j))%Z = (i - j)%Z)) /\
-  ~ (((get s i) - (get s j))%Z = (j - i)%Z)))).
+Definition partial_solution(k:Z) (s:(map.Map.map Z Z)): Prop := forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < k)%Z) -> (((0%Z <= (map.Map.get s i))%Z /\
+  ((map.Map.get s i) < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) ->
+  ((~ ((map.Map.get s i) = (map.Map.get s j))) /\ ((~ (((map.Map.get s
+  i) - (map.Map.get s j))%Z = (i - j)%Z)) /\ ~ (((map.Map.get s
+  i) - (map.Map.get s j))%Z = (j - i)%Z)))).
 
-Axiom partial_solution_eq_prefix : forall (u:(map Z Z)) (t:(map Z Z)) (k:Z),
-  (partial_solution k t) -> ((eq_prefix t u k) -> (partial_solution k u)).
-
-(* Why3 assumption *)
-Definition lt_sol(s1:(map Z Z)) (s2:(map Z Z)): Prop := exists i:Z,
-  ((0%Z <= i)%Z /\ (i < n)%Z) /\ ((eq_prefix s1 s2 i) /\ ((get s1
-  i) < (get s2 i))%Z).
+Axiom partial_solution_eq_prefix : forall (u:(map.Map.map Z Z))
+  (t:(map.Map.map Z Z)) (k:Z), (partial_solution k t) -> ((eq_prefix t u
+  k) -> (partial_solution k u)).
 
 (* Why3 assumption *)
-Definition solutions  := (map Z (map Z Z)).
+Definition lt_sol(s1:(map.Map.map Z Z)) (s2:(map.Map.map Z Z)): Prop :=
+  exists i:Z, ((0%Z <= i)%Z /\ (i < n)%Z) /\ ((eq_prefix s1 s2 i) /\
+  ((map.Map.get s1 i) < (map.Map.get s2 i))%Z).
 
 (* Why3 assumption *)
-Definition sorted(s:(map Z (map Z Z))) (a:Z) (b:Z): Prop := forall (i:Z)
-  (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\ (j < b)%Z) -> (lt_sol (get s i) (get s
-  j)).
+Definition solutions  := (map.Map.map Z (map.Map.map Z Z)).
 
-Axiom no_duplicate : forall (s:(map Z (map Z Z))) (a:Z) (b:Z), (sorted s a
-  b) -> forall (i:Z) (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\ (j < b)%Z) ->
-  ~ (eq_prefix (get s i) (get s j) n).
+(* Why3 assumption *)
+Definition sorted(s:(map.Map.map Z (map.Map.map Z Z))) (a:Z) (b:Z): Prop :=
+  forall (i:Z) (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\ (j < b)%Z) ->
+  (lt_sol (map.Map.get s i) (map.Map.get s j)).
+
+Axiom no_duplicate : forall (s:(map.Map.map Z (map.Map.map Z Z))) (a:Z)
+  (b:Z), (sorted s a b) -> forall (i:Z) (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\
+  (j < b)%Z) -> ~ (eq_prefix (map.Map.get s i) (map.Map.get s j) n).
 
 (* Why3 goal *)
 Theorem WP_parameter_t3 : forall (a:(set Z)) (b:(set Z)) (c:(set Z)),
-  forall (s:Z) (sol:(map Z (map Z Z))) (k:Z) (col:(map Z Z)),
-  ((0%Z <= k)%Z /\ (((k + (cardinal a))%Z = n) /\ ((0%Z <= s)%Z /\
-  ((forall (i:Z), (mem i a) <-> (((0%Z <= i)%Z /\ (i < n)%Z) /\ forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < k)%Z) -> ~ ((get col j) = i))) /\ ((forall (i:Z),
-  (0%Z <= i)%Z -> ((~ (mem i b)) <-> forall (j:Z), ((0%Z <= j)%Z /\
-  (j < k)%Z) -> ~ ((get col j) = ((i + j)%Z - k)%Z))) /\ ((forall (i:Z),
-  (0%Z <= i)%Z -> ((~ (mem i c)) <-> forall (j:Z), ((0%Z <= j)%Z /\
-  (j < k)%Z) -> ~ ((get col j) = ((i + k)%Z - j)%Z))) /\ (partial_solution k
-  col))))))) -> ((~ (is_empty a)) -> forall (f:Z) (e:(set Z)) (s1:Z)
-  (sol1:(map Z (map Z Z))) (k1:Z) (col1:(map Z Z)), (((f = (s1 - s)%Z) /\
+  forall (s:Z) (sol:(map.Map.map Z (map.Map.map Z Z))) (k:Z)
+  (col:(map.Map.map Z Z)), ((0%Z <= k)%Z /\ (((k + (cardinal a))%Z = n) /\
+  ((0%Z <= s)%Z /\ ((forall (i:Z), (mem i a) <-> (((0%Z <= i)%Z /\
+  (i < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < k)%Z) ->
+  ~ ((map.Map.get col j) = i))) /\ ((forall (i:Z), (0%Z <= i)%Z -> ((~ (mem i
+  b)) <-> forall (j:Z), ((0%Z <= j)%Z /\ (j < k)%Z) -> ~ ((map.Map.get col
+  j) = ((i + j)%Z - k)%Z))) /\ ((forall (i:Z), (0%Z <= i)%Z -> ((~ (mem i
+  c)) <-> forall (j:Z), ((0%Z <= j)%Z /\ (j < k)%Z) -> ~ ((map.Map.get col
+  j) = ((i + k)%Z - j)%Z))) /\ (partial_solution k col))))))) ->
+  ((~ (is_empty a)) -> forall (f:Z) (e:(set Z)) (s1:Z) (sol1:(map.Map.map Z
+  (map.Map.map Z Z))) (k1:Z) (col1:(map.Map.map Z Z)), (((f = (s1 - s)%Z) /\
   (0%Z <= (s1 - s)%Z)%Z) /\ ((k1 = k) /\ ((subset e (diff (diff a b) c)) /\
   ((partial_solution k1 col1) /\ ((sorted sol1 s s1) /\ ((forall (i:Z) (j:Z),
   (mem i (diff (diff (diff a b) c) e)) -> ((mem j e) -> (i < j)%Z)) /\
-  ((forall (t:(map Z Z)), ((partial_solution n t) /\ ((eq_prefix col1 t
-  k1) /\ (mem (get t k1) (diff (diff (diff a b) c) e)))) <-> exists i:Z,
-  ((s <= i)%Z /\ (i < s1)%Z) /\ (eq_prefix t (get sol1 i) n)) /\
-  ((eq_prefix col col1 k1) /\ (eq_prefix sol sol1 s))))))))) ->
-  ((~ (is_empty e)) -> forall (col2:(map Z Z)), (col2 = (set1 col1 k1
-  (min_elt e))) -> forall (k2:Z), (k2 = (k1 + 1%Z)%Z) -> (((0%Z <= k2)%Z /\
+  ((forall (t:(map.Map.map Z Z)), ((partial_solution n t) /\ ((eq_prefix col1
+  t k1) /\ (mem (map.Map.get t k1) (diff (diff (diff a b) c) e)))) <->
+  exists i:Z, ((s <= i)%Z /\ (i < s1)%Z) /\ (eq_prefix t (map.Map.get sol1 i)
+  n)) /\ ((eq_prefix col col1 k1) /\ (eq_prefix sol sol1 s))))))))) ->
+  ((~ (is_empty e)) -> forall (col2:(map.Map.map Z Z)),
+  (col2 = (map.Map.set col1 k1 (min_elt e))) -> forall (k2:Z),
+  (k2 = (k1 + 1%Z)%Z) -> (((0%Z <= k2)%Z /\
   (((k2 + (cardinal (remove (min_elt e) a)))%Z = n) /\ ((0%Z <= s1)%Z /\
   ((forall (i:Z), (mem i (remove (min_elt e) a)) <-> (((0%Z <= i)%Z /\
-  (i < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < k2)%Z) -> ~ ((get col2
-  j) = i))) /\ ((forall (i:Z), (0%Z <= i)%Z -> ((~ (mem i
-  (succ (add (min_elt e) b)))) <-> forall (j:Z), ((0%Z <= j)%Z /\
-  (j < k2)%Z) -> ~ ((get col2 j) = ((i + j)%Z - k2)%Z))) /\ ((forall (i:Z),
-  (0%Z <= i)%Z -> ((~ (mem i (pred (add (min_elt e) c)))) <-> forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < k2)%Z) -> ~ ((get col2 j) = ((i + k2)%Z - j)%Z))) /\
-  (partial_solution k2 col2))))))) -> forall (s2:Z) (sol2:(map Z (map Z Z)))
-  (k3:Z) (col3:(map Z Z)), ((0%Z <= (s2 - s1)%Z)%Z /\ ((k3 = k2) /\
-  ((sorted sol2 s1 s2) /\ ((forall (t:(map Z Z)), ((partial_solution n t) /\
-  (eq_prefix col3 t k3)) <-> exists i:Z, ((s1 <= i)%Z /\ (i < s2)%Z) /\
-  (eq_prefix t (get sol2 i) n)) /\ ((eq_prefix col2 col3 k3) /\
-  (eq_prefix sol1 sol2 s1)))))) -> forall (f1:Z),
-  (f1 = (f + (s2 - s1)%Z)%Z) -> forall (k4:Z), (k4 = (k3 - 1%Z)%Z) ->
-  forall (e1:(set Z)), (e1 = (remove (min_elt e) e)) -> (sorted sol2 s
-  s2)))).
+  (i < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < k2)%Z) ->
+  ~ ((map.Map.get col2 j) = i))) /\ ((forall (i:Z), (0%Z <= i)%Z ->
+  ((~ (mem i (succ (add (min_elt e) b)))) <-> forall (j:Z), ((0%Z <= j)%Z /\
+  (j < k2)%Z) -> ~ ((map.Map.get col2 j) = ((i + j)%Z - k2)%Z))) /\
+  ((forall (i:Z), (0%Z <= i)%Z -> ((~ (mem i (pred (add (min_elt e) c)))) <->
+  forall (j:Z), ((0%Z <= j)%Z /\ (j < k2)%Z) -> ~ ((map.Map.get col2
+  j) = ((i + k2)%Z - j)%Z))) /\ (partial_solution k2 col2))))))) ->
+  forall (s2:Z) (sol2:(map.Map.map Z (map.Map.map Z Z))) (k3:Z)
+  (col3:(map.Map.map Z Z)), ((0%Z <= (s2 - s1)%Z)%Z /\ ((k3 = k2) /\
+  ((sorted sol2 s1 s2) /\ ((forall (t:(map.Map.map Z Z)),
+  ((partial_solution n t) /\ (eq_prefix col3 t k3)) <-> exists i:Z,
+  ((s1 <= i)%Z /\ (i < s2)%Z) /\ (eq_prefix t (map.Map.get sol2 i) n)) /\
+  ((eq_prefix col2 col3 k3) /\ (eq_prefix sol1 sol2 s1)))))) ->
+  forall (f1:Z), (f1 = (f + (s2 - s1)%Z)%Z) -> forall (k4:Z),
+  (k4 = (k3 - 1%Z)%Z) -> forall (e1:(set Z)), (e1 = (remove (min_elt e)
+  e)) -> (sorted sol2 s s2)))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 red; intros i j hij.
@@ -278,13 +252,13 @@ assert (case: (cardinal a = 0 \/ cardinal a > 0)%Z) by omega. destruct case.
 absurd (is_empty a); auto.
 omega.
 
-destruct (H15 (get sol1 i)) as (_,hi).
+destruct (H15 (Map.get sol1 i)) as (_,hi).
 destruct hi.
 exists i; intuition.
 red; intuition.
 clear H15.
 
-destruct (H30 (get sol2 j)) as (_,hj).
+destruct (H30 (Map.get sol2 j)) as (_,hj).
 destruct hj.
 exists j; intuition.
 red; intuition.
@@ -297,14 +271,14 @@ red; intros l hl.
 rewrite <- H40; try omega.
 rewrite <- H42; try omega.
 rewrite <- H31; try omega.
-subst col2; rewrite Select_neq; try omega.
+subst col2; rewrite Map.Select_neq; try omega.
 (* s[i][k] < s[j][k] *)
 apply H14.
 rewrite <- H33; try omega.
 auto.
 rewrite <- H40; try omega.
 rewrite <- H31; try omega.
-subst col2; rewrite Select_eq; try omega.
+subst col2; rewrite Map.Select_eq; try omega.
 generalize (min_elt_def1 e); intuition.
 Qed.
 

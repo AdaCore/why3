@@ -3,67 +3,46 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
 
-Parameter map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b},
-  Type.
-Axiom map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : BuiltIn.int -> (map BuiltIn.int a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map BuiltIn.int
-  a) := match v with
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
+  match v with
   | (mk_array x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): BuiltIn.int :=
+Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:BuiltIn.int): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:BuiltIn.int)
-  (v:a): (array a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
+
+(* Why3 assumption *)
+Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 (* Why3 assumption *)
 Inductive sparse_array (a:Type) {a_WT:WhyType a} :=
-  | mk_sparse_array : (array a) -> (array BuiltIn.int) -> (array BuiltIn.int)
-      -> BuiltIn.int -> a -> sparse_array a.
+  | mk_sparse_array : (array a) -> (array Z) -> (array Z) -> Z
+      -> a -> sparse_array a.
 Axiom sparse_array_WhyType : forall (a:Type) {a_WT:WhyType a},
   WhyType (sparse_array a).
 Existing Instance sparse_array_WhyType.
@@ -76,20 +55,20 @@ Definition def {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): a :=
   end.
 
 (* Why3 assumption *)
-Definition card {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): BuiltIn.int :=
+Definition card {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): Z :=
   match v with
   | (mk_sparse_array x x1 x2 x3 x4) => x3
   end.
 
 (* Why3 assumption *)
-Definition back {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): (array
-  BuiltIn.int) := match v with
+Definition back {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): (array Z) :=
+  match v with
   | (mk_sparse_array x x1 x2 x3 x4) => x2
   end.
 
 (* Why3 assumption *)
-Definition index {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): (array
-  BuiltIn.int) := match v with
+Definition index {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): (array Z) :=
+  match v with
   | (mk_sparse_array x x1 x2 x3 x4) => x1
   end.
 
@@ -101,40 +80,37 @@ Definition values {a:Type} {a_WT:WhyType a}(v:(sparse_array a)): (array a) :=
 
 (* Why3 assumption *)
 Definition is_elt {a:Type} {a_WT:WhyType a}(a1:(sparse_array a))
-  (i:BuiltIn.int): Prop := ((0%Z <= (get1 (index a1) i))%Z /\
-  ((get1 (index a1) i) < (card a1))%Z) /\ ((get1 (back a1) (get1 (index a1)
-  i)) = i).
+  (i:Z): Prop := ((0%Z <= (get (index a1) i))%Z /\ ((get (index a1)
+  i) < (card a1))%Z) /\ ((get (back a1) (get (index a1) i)) = i).
 
-Parameter value: forall {a:Type} {a_WT:WhyType a}, (sparse_array a)
-  -> BuiltIn.int -> a.
+Parameter value: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) -> Z ->
+  a.
 
 Axiom value_def : forall {a:Type} {a_WT:WhyType a}, forall (a1:(sparse_array
-  a)) (i:BuiltIn.int), ((is_elt a1 i) -> ((value a1 i) = (get1 (values a1)
-  i))) /\ ((~ (is_elt a1 i)) -> ((value a1 i) = (def a1))).
+  a)) (i:Z), ((is_elt a1 i) -> ((value a1 i) = (get (values a1) i))) /\
+  ((~ (is_elt a1 i)) -> ((value a1 i) = (def a1))).
 
 (* Why3 assumption *)
-Definition length1 {a:Type} {a_WT:WhyType a}(a1:(sparse_array
-  a)): BuiltIn.int := (length (values a1)).
+Definition length1 {a:Type} {a_WT:WhyType a}(a1:(sparse_array a)): Z :=
+  (length (values a1)).
 
 (* Why3 assumption *)
-Definition injective(a:(map BuiltIn.int BuiltIn.int))
-  (n:BuiltIn.int): Prop := forall (i:BuiltIn.int) (j:BuiltIn.int),
+Definition injective(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
-  ((~ (i = j)) -> ~ ((get a i) = (get a j)))).
+  ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
 
 (* Why3 assumption *)
-Definition surjective(a:(map BuiltIn.int BuiltIn.int))
-  (n:BuiltIn.int): Prop := forall (i:BuiltIn.int), ((0%Z <= i)%Z /\
-  (i < n)%Z) -> exists j:BuiltIn.int, ((0%Z <= j)%Z /\ (j < n)%Z) /\ ((get a
-  j) = i).
+Definition surjective(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
+  ((map.Map.get a j) = i).
 
 (* Why3 assumption *)
-Definition range(a:(map BuiltIn.int BuiltIn.int)) (n:BuiltIn.int): Prop :=
-  forall (i:BuiltIn.int), ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (get a
-  i))%Z /\ ((get a i) < n)%Z).
+Definition range(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
+  ((map.Map.get a i) < n)%Z).
 
-Axiom injective_surjective : forall (a:(map BuiltIn.int BuiltIn.int))
-  (n:BuiltIn.int), (injective a n) -> ((range a n) -> (surjective a n)).
+Axiom injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
+  n) -> ((range a n) -> (surjective a n)).
 
 Require Import Why3.
 Ltac ae := why3 "alt-ergo".
@@ -145,15 +121,14 @@ Theorem permutation : forall {a:Type} {a_WT:WhyType a},
   ((card a1) <= (length (values a1)))%Z) /\
   ((length (values a1)) <= 1000%Z)%Z) /\
   ((((length (values a1)) = (length (index a1))) /\
-  ((length (index a1)) = (length (back a1)))) /\ forall (i:BuiltIn.int),
-  ((0%Z <= i)%Z /\ (i < (card a1))%Z) -> (((0%Z <= (get1 (back a1) i))%Z /\
-  ((get1 (back a1) i) < (length (values a1)))%Z) /\ ((get1 (index a1)
-  (get1 (back a1) i)) = i)))) -> (((card a1) = (length1 a1)) ->
-  forall (i:BuiltIn.int), ((0%Z <= i)%Z /\ (i < (length1 a1))%Z) ->
-  (is_elt a1 i)).
+  ((length (index a1)) = (length (back a1)))) /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < (card a1))%Z) -> (((0%Z <= (get (back a1) i))%Z /\
+  ((get (back a1) i) < (length (values a1)))%Z) /\ ((get (index a1)
+  (get (back a1) i)) = i)))) -> (((card a1) = (length1 a1)) -> forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < (length1 a1))%Z) -> (is_elt a1 i)).
 intros a _a a1.
 destruct a1 as ((n0, a_values), (n1, a_index), (n2, a_back), a_card, a_def); simpl.
-unfold is_elt, length1, get1; simpl.
+unfold is_elt, length1, get; simpl.
 intro H; decompose [and] H; clear H.
 clear a_values a_def H0 H3 H4.
 subst n1 n2.

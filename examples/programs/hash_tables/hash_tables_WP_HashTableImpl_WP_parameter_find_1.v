@@ -6,6 +6,7 @@ Require BuiltIn.
 Require int.Int.
 Require int.Abs.
 Require int.ComputerDivision.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -18,31 +19,6 @@ Axiom option_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (option a).
 Existing Instance option_WhyType.
 Implicit Arguments None [[a] [a_WT]].
 Implicit Arguments Some [[a] [a_WT]].
-
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
 Inductive list (a:Type) {a_WT:WhyType a} :=
@@ -62,13 +38,13 @@ Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
 
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -80,21 +56,21 @@ Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 (* Why3 assumption *)
 Inductive t (a:Type) {a_WT:WhyType a}
   (b:Type) {b_WT:WhyType b} :=
-  | mk_t : (map a (option b)) -> (array (list (a* b)%type)) -> t a b.
+  | mk_t : (map.Map.map a (option b)) -> (array (list (a* b)%type)) -> t a b.
 Axiom t_WhyType : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b},
   WhyType (t a b).
 Existing Instance t_WhyType.
@@ -108,13 +84,13 @@ Definition data {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(v:(t a
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(v:(t
-  a b)): (map a (option b)) := match v with
+  a b)): (map.Map.map a (option b)) := match v with
   | (mk_t x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get2 {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(h:(t a
-  b)) (k:a): (option b) := (get (contents h) k).
+Definition get1 {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}(h:(t a
+  b)) (k:a): (option b) := (map.Map.get (contents h) k).
 
 Parameter hash: forall {a:Type} {a_WT:WhyType a}, a -> Z.
 
@@ -148,14 +124,14 @@ Axiom cons_occurs_first : forall {a:Type} {a_WT:WhyType a}
 
 (* Why3 goal *)
 Theorem WP_parameter_find : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (h:Z) (k:a), forall (rho:(map Z (list (a*
-  b)%type))) (rho1:(map a (option b))), ((0%Z < h)%Z /\ ((forall (k1:a)
-  (v:b), ((get rho1 k1) = (Some v)) <-> (occurs_first k1 v (get rho
-  (ZOmod (Zabs (hash k1)) h)))) /\ forall (k1:a) (v:b), forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < h)%Z) -> ((mem (k1, v) (get rho i)) ->
-  (i = (ZOmod (Zabs (hash k1)) h))))) -> let i :=
-  (ZOmod (Zabs (hash k)) h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
-  ((forall (v:b), ~ (mem (k, v) (get rho i))) -> ((get rho1
+  {b:Type} {b_WT:WhyType b}, forall (h:Z) (k:a), forall (rho:(map.Map.map Z
+  (list (a* b)%type))) (rho1:(map.Map.map a (option b))), ((0%Z < h)%Z /\
+  ((forall (k1:a) (v:b), ((map.Map.get rho1 k1) = (Some v)) <->
+  (occurs_first k1 v (map.Map.get rho (ZOmod (Zabs (hash k1)) h)))) /\
+  forall (k1:a) (v:b), forall (i:Z), ((0%Z <= i)%Z /\ (i < h)%Z) -> ((mem (
+  k1, v) (map.Map.get rho i)) -> (i = (ZOmod (Zabs (hash k1)) h))))) ->
+  let i := (ZOmod (Zabs (hash k)) h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
+  ((forall (v:b), ~ (mem (k, v) (map.Map.get rho i))) -> ((map.Map.get rho1
   k) = (None :(option b))))).
 intros a _a b _b h k rho rho1.
 pose (i := (Zabs (hash k) mod h)).
@@ -163,8 +139,8 @@ unfold get1; simpl.
 intuition.
 generalize (H0 k); clear H0.
 generalize (H5 k); clear H5.
-unfold get2; simpl; intuition.
-destruct (get rho1 k); auto.
+unfold get1; simpl; intuition.
+destruct (Map.get rho1 k); auto.
 elim (H1 b0); clear H1.
 generalize (H3 b0); clear H3.
 intuition.

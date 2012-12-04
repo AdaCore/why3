@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -99,40 +100,15 @@ Axiom nth_append_2 : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
   (l2:(list a)) (i:Z), ((length l1) <= i)%Z -> ((nth i (infix_plpl l1
   l2)) = (nth (i - (length l1))%Z l2)).
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -144,16 +120,16 @@ Definition length1 {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length1 a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length1 a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 (* Why3 assumption *)
 Inductive buffer (a:Type) {a_WT:WhyType a} :=
@@ -194,12 +170,13 @@ Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
 Theorem WP_parameter_pop : forall {a:Type} {a_WT:WhyType a}, forall (b:Z),
-  forall (rho:(list a)) (rho1:(map Z a)) (rho2:Z) (rho3:Z),
+  forall (rho:(list a)) (rho1:(map.Map.map Z a)) (rho2:Z) (rho3:Z),
   ((((0%Z <= rho3)%Z /\ (rho3 < b)%Z) /\ (((0%Z <= rho2)%Z /\
   (rho2 <= b)%Z) /\ ((rho2 = (length rho)) /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i < rho2)%Z) -> ((((rho3 + i)%Z < b)%Z -> ((nth i rho) = (Some (get rho1
-  (rho3 + i)%Z)))) /\ ((0%Z <= ((rho3 + i)%Z - b)%Z)%Z -> ((nth i
-  rho) = (Some (get rho1 ((rho3 + i)%Z - b)%Z)))))))) /\ (0%Z < rho2)%Z) ->
+  (i < rho2)%Z) -> ((((rho3 + i)%Z < b)%Z -> ((nth i
+  rho) = (Some (map.Map.get rho1 (rho3 + i)%Z)))) /\
+  ((0%Z <= ((rho3 + i)%Z - b)%Z)%Z -> ((nth i rho) = (Some (map.Map.get rho1
+  ((rho3 + i)%Z - b)%Z)))))))) /\ (0%Z < rho2)%Z) ->
   match rho with
   | Nil => True
   | (Cons _ s) => forall (rho4:(list a)), (rho4 = s) -> (((0%Z <= rho3)%Z /\
@@ -208,15 +185,15 @@ Theorem WP_parameter_pop : forall {a:Type} {a_WT:WhyType a}, forall (b:Z),
       forall (rho7:Z), (rho7 = 0%Z) -> ((((0%Z <= rho7)%Z /\ (rho7 < b)%Z) /\
       (((0%Z <= rho5)%Z /\ (rho5 <= b)%Z) /\ ((rho5 = (length rho4)) /\
       forall (i:Z), ((0%Z <= i)%Z /\ (i < rho5)%Z) ->
-      ((((rho7 + i)%Z < b)%Z -> ((nth i rho4) = (Some (get rho1
+      ((((rho7 + i)%Z < b)%Z -> ((nth i rho4) = (Some (map.Map.get rho1
       (rho7 + i)%Z)))) /\ ((0%Z <= ((rho7 + i)%Z - b)%Z)%Z -> ((nth i
-      rho4) = (Some (get rho1 ((rho7 + i)%Z - b)%Z)))))))) ->
+      rho4) = (Some (map.Map.get rho1 ((rho7 + i)%Z - b)%Z)))))))) ->
       match rho with
       | Nil => True
-      | (Cons x l) => ((get rho1 rho3) = x)
+      | (Cons x l) => ((map.Map.get rho1 rho3) = x)
       end)))
   end.
-unfold get1; simpl.
+unfold get; simpl.
 intros a _a b rho rho1 rho2 rho3 (((h1,h2),(h3,(h4,h5))),h6).
 destruct rho; auto.
 intros; subst.

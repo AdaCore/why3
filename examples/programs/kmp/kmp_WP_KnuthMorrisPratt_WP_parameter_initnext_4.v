@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -20,40 +21,15 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -65,16 +41,16 @@ Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 Axiom char : Type.
 Parameter char_WhyType : WhyType char.
@@ -84,7 +60,7 @@ Existing Instance char_WhyType.
 Definition matches(a1:(array char)) (i1:Z) (a2:(array char)) (i2:Z)
   (n:Z): Prop := ((0%Z <= i1)%Z /\ (i1 <= ((length a1) - n)%Z)%Z) /\
   (((0%Z <= i2)%Z /\ (i2 <= ((length a2) - n)%Z)%Z) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((get1 a1 (i1 + i)%Z) = (get1 a2
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((get a1 (i1 + i)%Z) = (get a2
   (i2 + i)%Z))).
 
 Axiom matches_empty : forall (a1:(array char)) (a2:(array char)) (i1:Z)
@@ -94,18 +70,17 @@ Axiom matches_empty : forall (a1:(array char)) (a2:(array char)) (i1:Z)
 Axiom matches_right_extension : forall (a1:(array char)) (a2:(array char))
   (i1:Z) (i2:Z) (n:Z), (matches a1 i1 a2 i2 n) ->
   ((i1 <= (((length a1) - n)%Z - 1%Z)%Z)%Z ->
-  ((i2 <= (((length a2) - n)%Z - 1%Z)%Z)%Z -> (((get1 a1
-  (i1 + n)%Z) = (get1 a2 (i2 + n)%Z)) -> (matches a1 i1 a2 i2
-  (n + 1%Z)%Z)))).
+  ((i2 <= (((length a2) - n)%Z - 1%Z)%Z)%Z -> (((get a1 (i1 + n)%Z) = (get a2
+  (i2 + n)%Z)) -> (matches a1 i1 a2 i2 (n + 1%Z)%Z)))).
 
 Axiom matches_contradiction_at_first : forall (a1:(array char)) (a2:(array
-  char)) (i1:Z) (i2:Z) (n:Z), (0%Z < n)%Z -> ((~ ((get1 a1 i1) = (get1 a2
+  char)) (i1:Z) (i2:Z) (n:Z), (0%Z < n)%Z -> ((~ ((get a1 i1) = (get a2
   i2))) -> ~ (matches a1 i1 a2 i2 n)).
 
 Axiom matches_contradiction_at_i : forall (a1:(array char)) (a2:(array char))
   (i1:Z) (i2:Z) (i:Z) (n:Z), (0%Z < n)%Z -> (((0%Z <= i)%Z /\ (i < n)%Z) ->
-  ((~ ((get1 a1 (i1 + i)%Z) = (get1 a2 (i2 + i)%Z))) -> ~ (matches a1 i1 a2
-  i2 n))).
+  ((~ ((get a1 (i1 + i)%Z) = (get a2 (i2 + i)%Z))) -> ~ (matches a1 i1 a2 i2
+  n))).
 
 Axiom matches_right_weakening : forall (a1:(array char)) (a2:(array char))
   (i1:Z) (i2:Z) (n:Z) (n':Z), (matches a1 i1 a2 i2 n) -> ((n' < n)%Z ->
@@ -142,18 +117,20 @@ Axiom next_1_0 : forall (p:(array char)), (1%Z <= (length p))%Z -> (is_next p
   1%Z 0%Z).
 
 (* Why3 goal *)
-Theorem WP_parameter_initnext : forall (p:Z), forall (p1:(map Z char)),
-  let p2 := (mk_array p p1) in ((1%Z <= p)%Z -> ((0%Z <= p)%Z ->
-  ((1%Z < p)%Z -> (((0%Z <= 1%Z)%Z /\ (1%Z < p)%Z) -> forall (next:(map Z
-  Z)), (next = (set (const 0%Z:(map Z Z)) 1%Z 0%Z)) -> forall (j:Z) (i:Z)
-  (next1:(map Z Z)), ((((((0%Z <= j)%Z /\ (j < i)%Z) /\ (i <= p)%Z) /\
-  (matches p2 (i - j)%Z p2 0%Z j)) /\ forall (z:Z), (((j + 1%Z)%Z < z)%Z /\
-  (z < (i + 1%Z)%Z)%Z) -> ~ (matches p2 ((i + 1%Z)%Z - z)%Z p2 0%Z z)) /\
-  forall (k:Z), ((0%Z < k)%Z /\ (k <= i)%Z) -> (is_next p2 k (get next1
-  k))) -> ((i < (p - 1%Z)%Z)%Z -> (((0%Z <= j)%Z /\ (j < p)%Z) ->
-  (((0%Z <= i)%Z /\ (i < p)%Z) -> ((~ ((get p1 i) = (get p1 j))) ->
+Theorem WP_parameter_initnext : forall (p:Z), forall (p1:(map.Map.map Z
+  char)), let p2 := (mk_array p p1) in ((1%Z <= p)%Z -> ((0%Z <= p)%Z ->
+  ((1%Z < p)%Z -> (((0%Z <= 1%Z)%Z /\ (1%Z < p)%Z) ->
+  forall (next:(map.Map.map Z Z)),
+  (next = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 1%Z 0%Z)) ->
+  forall (j:Z) (i:Z) (next1:(map.Map.map Z Z)), ((((((0%Z <= j)%Z /\
+  (j < i)%Z) /\ (i <= p)%Z) /\ (matches p2 (i - j)%Z p2 0%Z j)) /\
+  forall (z:Z), (((j + 1%Z)%Z < z)%Z /\ (z < (i + 1%Z)%Z)%Z) -> ~ (matches p2
+  ((i + 1%Z)%Z - z)%Z p2 0%Z z)) /\ forall (k:Z), ((0%Z < k)%Z /\
+  (k <= i)%Z) -> (is_next p2 k (map.Map.get next1 k))) ->
+  ((i < (p - 1%Z)%Z)%Z -> (((0%Z <= j)%Z /\ (j < p)%Z) -> (((0%Z <= i)%Z /\
+  (i < p)%Z) -> ((~ ((map.Map.get p1 i) = (map.Map.get p1 j))) ->
   ((~ (j = 0%Z)) -> (((0%Z <= j)%Z /\ (j < p)%Z) -> forall (j1:Z),
-  (j1 = (get next1 j)) -> forall (z:Z), (((j1 + 1%Z)%Z < z)%Z /\
+  (j1 = (map.Map.get next1 j)) -> forall (z:Z), (((j1 + 1%Z)%Z < z)%Z /\
   (z < (i + 1%Z)%Z)%Z) -> ~ (matches p2 ((i + 1%Z)%Z - z)%Z p2 0%Z
   z))))))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
@@ -180,11 +157,11 @@ assert (casez: (z = j+1 \/ z < j+1)%Z) by omega. destruct casez.
 
 (* z = j+1 *)
 subst z.
-red; intro h. unfold matches, length , get1 in h. simpl in h.
+red; intro h. unfold matches, length, get in h. simpl in h.
 destruct h as (hy1, (hy2, hy3)).
 generalize (hy3 j%Z).
 ring_simplify (i + 1 - (j + 1)+ j)%Z.
-intro. absurd (get p1 i = get p1 j); intuition. 
+intro. absurd (Map.get p1 i = Map.get p1 j); intuition. 
 
 (* z < j+1 *)
 clear H. red; intro h.
@@ -193,9 +170,9 @@ apply (hn3 (z-1)%Z); omega.
 clear hn2 hn3.
 apply matches_trans with (mk_array n p1) (i+1-z)%Z.
 
-unfold matches, length, get1; simpl.
+unfold matches, length, get; simpl.
 repeat split; try omega. intros.
-unfold matches, length, get1 in h0. simpl in h0.
+unfold matches, length, get in h0. simpl in h0.
 destruct h0 as (hy1, (hy2, hy3)).
 assert (hi0: (0 <= j+1-z+i0 < j)%Z) by omega.
 generalize (hy3 (j+1-z+i0) hi0)%Z.

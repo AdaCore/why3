@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -20,40 +21,15 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -65,59 +41,59 @@ Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 (* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a}(a1:(map Z a)) (a2:(map Z a))
-  (l:Z) (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ((get a1
-  i) = (get a2 i)).
+Definition exchange {a:Type} {a_WT:WhyType a}(a1:(map.Map.map Z a))
+  (a2:(map.Map.map Z a)) (i:Z) (j:Z): Prop := ((map.Map.get a1
+  i) = (map.Map.get a2 j)) /\ (((map.Map.get a2 i) = (map.Map.get a1 j)) /\
+  forall (k:Z), ((~ (k = i)) /\ ~ (k = j)) -> ((map.Map.get a1
+  k) = (map.Map.get a2 k))).
 
-(* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a}(a1:(map Z a)) (a2:(map Z a))
-  (i:Z) (j:Z): Prop := ((get a1 i) = (get a2 j)) /\ (((get a2 i) = (get a1
-  j)) /\ forall (k:Z), ((~ (k = i)) /\ ~ (k = j)) -> ((get a1 k) = (get a2
-  k))).
-
-Axiom exchange_set : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map Z a)),
-  forall (i:Z) (j:Z), (exchange a1 (set (set a1 i (get a1 j)) j (get a1 i)) i
+Axiom exchange_set : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)), forall (i:Z) (j:Z), (exchange a1
+  (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) i
   j).
 
 (* Why3 assumption *)
-Inductive permut_sub{a:Type} {a_WT:WhyType a}  : (map Z a) -> (map Z a) -> Z
-  -> Z -> Prop :=
-  | permut_refl : forall (a1:(map Z a)) (a2:(map Z a)), forall (l:Z) (u:Z),
-      (map_eq_sub a1 a2 l u) -> (permut_sub a1 a2 l u)
-  | permut_sym : forall (a1:(map Z a)) (a2:(map Z a)), forall (l:Z) (u:Z),
-      (permut_sub a1 a2 l u) -> (permut_sub a2 a1 l u)
-  | permut_trans : forall (a1:(map Z a)) (a2:(map Z a)) (a3:(map Z a)),
-      forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> ((permut_sub a2 a3 l
-      u) -> (permut_sub a1 a3 l u))
-  | permut_exchange : forall (a1:(map Z a)) (a2:(map Z a)), forall (l:Z)
-      (u:Z) (i:Z) (j:Z), ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\
-      (j < u)%Z) -> ((exchange a1 a2 i j) -> (permut_sub a1 a2 l u))).
+Inductive permut_sub{a:Type} {a_WT:WhyType a}  : (map.Map.map Z a)
+  -> (map.Map.map Z a) -> Z -> Z -> Prop :=
+  | permut_refl : forall (a1:(map.Map.map Z a)), forall (l:Z) (u:Z),
+      (permut_sub a1 a1 l u)
+  | permut_sym : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)),
+      forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> (permut_sub a2 a1 l u)
+  | permut_trans : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a))
+      (a3:(map.Map.map Z a)), forall (l:Z) (u:Z), (permut_sub a1 a2 l u) ->
+      ((permut_sub a2 a3 l u) -> (permut_sub a1 a3 l u))
+  | permut_exchange : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)),
+      forall (l:Z) (u:Z) (i:Z) (j:Z), ((l <= i)%Z /\ (i < u)%Z) ->
+      (((l <= j)%Z /\ (j < u)%Z) -> ((exchange a1 a2 i j) -> (permut_sub a1
+      a2 l u))).
 
-Axiom permut_weakening : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map Z
-  a)) (a2:(map Z a)), forall (l1:Z) (r1:Z) (l2:Z) (r2:Z), (((l1 <= l2)%Z /\
-  (l2 <= r2)%Z) /\ (r2 <= r1)%Z) -> ((permut_sub a1 a2 l2 r2) ->
-  (permut_sub a1 a2 l1 r1)).
+Axiom permut_weakening : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)), forall (l1:Z) (r1:Z)
+  (l2:Z) (r2:Z), (((l1 <= l2)%Z /\ (l2 <= r2)%Z) /\ (r2 <= r1)%Z) ->
+  ((permut_sub a1 a2 l2 r2) -> (permut_sub a1 a2 l1 r1)).
 
-Axiom permut_eq : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map Z a))
-  (a2:(map Z a)), forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z),
-  ((i < l)%Z \/ (u <= i)%Z) -> ((get a2 i) = (get a1 i)).
+Axiom permut_eq : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map.Map.map Z
+  a)) (a2:(map.Map.map Z a)), forall (l:Z) (u:Z), (permut_sub a1 a2 l u) ->
+  forall (i:Z), ((i < l)%Z \/ (u <= i)%Z) -> ((map.Map.get a2
+  i) = (map.Map.get a1 i)).
 
-Axiom permut_exists : forall {a:Type} {a_WT:WhyType a}, forall (a1:(map Z a))
-  (a2:(map Z a)), forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z),
-  ((l <= i)%Z /\ (i < u)%Z) -> exists j:Z, ((l <= j)%Z /\ (j < u)%Z) /\
-  ((get a2 i) = (get a1 j)).
+Axiom permut_exists : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)), forall (l:Z) (u:Z),
+  (permut_sub a1 a2 l u) -> forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) ->
+  exists j:Z, ((l <= j)%Z /\ (j < u)%Z) /\ ((map.Map.get a2
+  i) = (map.Map.get a1 j)).
 
 (* Why3 assumption *)
 Definition exchange1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (a2:(array a))
@@ -145,6 +121,11 @@ Axiom permut_trans1 : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array a))
   (permut a1 a3)).
 
 (* Why3 assumption *)
+Definition map_eq_sub {a:Type} {a_WT:WhyType a}(a1:(map.Map.map Z a))
+  (a2:(map.Map.map Z a)) (l:Z) (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\
+  (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
+
+(* Why3 assumption *)
 Definition array_eq_sub {a:Type} {a_WT:WhyType a}(a1:(array a)) (a2:(array
   a)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l u).
 
@@ -170,37 +151,36 @@ Existing Instance color_WhyType.
 
 (* Why3 assumption *)
 Definition monochrome(a:(array color)) (i:Z) (j:Z) (c:color): Prop :=
-  forall (k:Z), ((i <= k)%Z /\ (k < j)%Z) -> ((get1 a k) = c).
-
+  forall (k:Z), ((i <= k)%Z /\ (k < j)%Z) -> ((get a k) = c).
 
 
 (* Why3 goal *)
-Theorem WP_parameter_dutch_flag : forall (a:Z) (n:Z), forall (a1:(map Z
-  color)), ((0%Z <= n)%Z /\ (a = n)) -> forall (r:Z) (i:Z) (b:Z) (a2:(map Z
-  color)), let a3 := (mk_array a a2) in ((((((((((0%Z <= b)%Z /\
-  (b <= i)%Z) /\ (i <= r)%Z) /\ (r <= n)%Z) /\ (monochrome a3 0%Z b Blue)) /\
-  (monochrome a3 b i White)) /\ (monochrome a3 r n Red)) /\ (a = n)) /\
-  (permut_sub a1 a2 0%Z n)) -> ((i < r)%Z -> (((0%Z <= i)%Z /\ (i < a)%Z) ->
-  match (get a2
+Theorem WP_parameter_dutch_flag : forall (a:Z) (n:Z), forall (a1:(map.Map.map
+  Z color)), ((0%Z <= n)%Z /\ (a = n)) -> forall (r:Z) (i:Z) (b:Z)
+  (a2:(map.Map.map Z color)), let a3 := (mk_array a a2) in
+  ((((((((((0%Z <= b)%Z /\ (b <= i)%Z) /\ (i <= r)%Z) /\ (r <= n)%Z) /\
+  (monochrome a3 0%Z b Blue)) /\ (monochrome a3 b i White)) /\ (monochrome a3
+  r n Red)) /\ (a = n)) /\ (permut_sub a1 a2 0%Z n)) -> ((i < r)%Z ->
+  (((0%Z <= i)%Z /\ (i < a)%Z) -> match (map.Map.get a2
   i) with
   | Blue => (((0%Z <= b)%Z /\ (b < a)%Z) /\ ((0%Z <= i)%Z /\ (i < a)%Z)) ->
-      forall (a4:(map Z color)), (exchange a2 a4 b i) -> forall (b1:Z),
-      (b1 = (b + 1%Z)%Z) -> forall (i1:Z), (i1 = (i + 1%Z)%Z) ->
-      (monochrome (mk_array a a4) 0%Z b1 Blue)
+      forall (a4:(map.Map.map Z color)), (exchange a2 a4 b i) ->
+      forall (b1:Z), (b1 = (b + 1%Z)%Z) -> forall (i1:Z),
+      (i1 = (i + 1%Z)%Z) -> (monochrome (mk_array a a4) 0%Z b1 Blue)
   | White => True
   | Red => True
   end))).
-(* YOU MAY EDIT THE PROOF BELOW *)
+Proof.
 intuition.
 intuition.
-generalize (refl_equal (get a2 i)).
-pattern (get a2 i) at 1.
-destruct (get a2 i); intro hc; rewrite <- hc; simpl; intuition.
+generalize (refl_equal (Map.get a2 i)).
+pattern (Map.get a2 i) at 1.
+destruct (Map.get a2 i); intro hc; rewrite <- hc; simpl; intuition.
 red; intros.
 subst b1 i1.
-unfold get1; simpl.
+unfold get; simpl.
 assert (case: (k < b \/ k = b)%Z) by omega. destruct case.
-replace (get a4 k) with (get a2 k).
+replace (Map.get a4 k) with (Map.get a2 k).
 apply H10; omega.
 destruct H15 as (_,h). destruct h as (_,h).
 apply h; omega.
