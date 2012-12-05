@@ -1423,7 +1423,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
          else e2 in
       let wp1 = fast_wp_expr env s (v, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
-      let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne wp2.ok) in
+      let ok = t_and_simp wp1.ok (t_implies_subst v wp1.post.ne wp2.ok) in
       let ok = wp_label e ok in
       let e1_regs = regs_of_writes e1.e_effect in
       let e2_regs = regs_of_writes e2.e_effect in
