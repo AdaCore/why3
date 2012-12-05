@@ -12,6 +12,7 @@ type reason =
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
+   | VC_Loop_Variant
    | VC_Assert
 
 type expl
