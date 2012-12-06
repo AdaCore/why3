@@ -1590,13 +1590,13 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         let wp1 = fast_wp_expr env havoc_state r e1 in
         let post_inv =
            t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
+        let loop_body_ok = t_implies_simp inv_hypo wp1.ok in
         let preserv_inv =
-           t_implies_simp (t_and_simp inv_hypo wp1.post.ne)
-                          (t_and_simp wp1.ok post_inv) in
+           t_implies_simp (t_and_simp inv_hypo wp1.post.ne) post_inv in
         let exn =
            Mexn.map (fun post ->
               { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
-        let ok = t_and_simp_l [init_inv; preserv_inv] in
+        let ok = t_and_simp_l [init_inv; preserv_inv; loop_body_ok] in
         (* TODO variant proof *)
         { ok = ok;
           post = { s = wp1.post.s; ne = t_false };
