@@ -13,6 +13,7 @@ type reason =
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
+   | VC_Loop_Variant
    | VC_Assert
 
 type expl = { loc : loc ; reason : reason }
@@ -43,6 +44,7 @@ let reason_from_string s =
    | "VC_LOOP_INVARIANT"          -> VC_Loop_Invariant
    | "VC_LOOP_INVARIANT_INIT"     -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"  -> VC_Loop_Invariant_Preserv
+   | "VC_LOOP_VARIANT"            -> VC_Loop_Variant
    | "VC_ASSERT"                  -> VC_Assert
    | _                            -> assert false
 
@@ -58,6 +60,7 @@ let string_of_reason s =
    | VC_Loop_Invariant            -> "loop invariant"
    | VC_Loop_Invariant_Init       -> "loop invariant initialization"
    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
+   | VC_Loop_Variant              -> "loop variant"
    | VC_Assert                    -> "assertion"
 
 let get_loc e = e.loc
