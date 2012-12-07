@@ -115,6 +115,8 @@ let () =
     exit 0
   end
 
+let () = if Debug.Args.option_list () then exit 0
+
 (* let () = *)
 (*   if !opt_smoke <> Session.SD_None && !opt_force then begin *)
 (*     Format.printf "You can't force when detecting smoke@."; *)
