@@ -68,10 +68,8 @@ let spec = Arg.align [
   ("-smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
-(*
-  ("-bench",
+  ("--bench",
    Arg.Set opt_bench, " run as bench (experimental)");
-*)
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
