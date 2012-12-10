@@ -1,6 +1,7 @@
 open Why3
 open Term
 open Decl
+open Ident
 
 let apply_append fn acc l =
   List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
@@ -9,10 +10,13 @@ let join_and f l =
   if l = [] then [f] else
     List.map (fun f2 -> t_and f f2) l
 
+let stop f = Slab.mem Split_goal.stop_split f.t_label
+
 let rec collect_cases acc f =
   match f.t_node with
   | Ttrue | Tfalse | Tapp _ | Tnot _ | Tquant _ | Tlet _
   | Tbinop ((Timplies | Tiff), _ , _) -> join_and f acc
+  | _ when stop f -> join_and f acc
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
   | Tcase _ ->
       Format.printf "not implemented@.";
@@ -29,8 +33,8 @@ let rec collect_cases acc f =
 let rec split f =
   match f.t_node with
   | Ttrue | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _)
-  | Tbinop ( (Tand | Tor | Tiff), _, _) | Tif _
-  -> [f]
+  | Tbinop ( (Tand | Tor | Tiff), _, _) | Tif _ -> [f]
+  | _ when stop f -> [f]
   | Tcase _ ->
       Format.printf "not implemented@.";
       raise Exit
