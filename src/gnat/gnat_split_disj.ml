@@ -19,8 +19,8 @@ let rec collect_cases acc f =
   | _ when stop f -> join_and f acc
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
   | Tcase _ ->
-      Format.printf "not implemented@.";
-      raise Exit
+      (* ??? We should split pattern matching, just as we do for Tif *)
+      join_and f acc
   | Tbinop (Tor, f1, f2) ->
       collect_cases acc f1 @ collect_cases acc f2
   | Tbinop (Tand, f1, f2) ->
@@ -33,11 +33,8 @@ let rec collect_cases acc f =
 let rec split f =
   match f.t_node with
   | Ttrue | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _)
-  | Tbinop ( (Tand | Tor | Tiff), _, _) | Tif _ -> [f]
+  | Tbinop ( (Tand | Tor | Tiff), _, _) | Tif _ | Tcase _ -> [f]
   | _ when stop f -> [f]
-  | Tcase _ ->
-      Format.printf "not implemented@.";
-      raise Exit
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
   | Tquant (Tforall,fq) ->
       let vsl,trl,f1,close = t_open_quant_cb fq in
