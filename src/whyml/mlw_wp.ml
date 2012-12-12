@@ -1396,7 +1396,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           r
           call_post
           xpost in
-        let ok = wp_and ~sym:false wp1.ok (wp_implies wp1.post.ne pre) in
+        let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
         let ne = t_and_simp wp1.post.ne post.ne in
         let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
           let p2_effect = Sreg.union e1_regs call_regs in
@@ -1424,7 +1424,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let wp1 = fast_wp_expr env s (v, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let ok =
-         wp_and ~sym:false wp1.ok (t_implies_subst v wp1.post.ne wp2.ok) in
+         t_and_simp wp1.ok (t_implies_subst v wp1.post.ne wp2.ok) in
       let ok = wp_label e ok in
       let e1_regs = regs_of_writes e1.e_effect in
       let e2_regs = regs_of_writes e2.e_effect in
@@ -1591,13 +1591,18 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         let wp1 = fast_wp_expr env havoc_state r e1 in
         let post_inv =
            t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
-        let loop_body_ok = t_implies_simp inv_hypo wp1.ok in
+        (* preservation also includes the "OK" of the loop body, the overall
+           form is:
+             I => (OK /\ (NE => I'))
+         *)
         let preserv_inv =
-           t_implies_simp (t_and_simp inv_hypo wp1.post.ne) post_inv in
+          t_implies_simp inv_hypo
+            (t_and_simp wp1.ok
+              (t_implies_simp wp1.post.ne post_inv)) in
         let exn =
            Mexn.map (fun post ->
               { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
-        let ok = t_and_simp_l [init_inv; preserv_inv; loop_body_ok] in
+        let ok = t_and_simp_l [init_inv; preserv_inv] in
         (* TODO variant proof *)
         { ok = ok;
           post = { s = wp1.post.s; ne = t_false };
