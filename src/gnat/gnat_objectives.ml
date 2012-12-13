@@ -170,10 +170,14 @@ let next objective =
       None
 
 let strategy =
-  [ "split_goal";
+  "split_goal" ::
+  (if Gnat_config.proof_mode = Gnat_config.No_Split then
+    []
+  else
+  [
     Gnat_split_conj.split_conj_name;
     Gnat_split_disj.split_disj_name
-  ]
+  ])
 
 let parent_transform_name goal =
    match goal.Session.goal_parent with
@@ -276,7 +280,6 @@ let register_result goal result =
       (* goal has been proved, we only need to store that info *)
       GoalSet.remove obj_rec.to_be_proved goal;
       if GoalSet.is_empty obj_rec.to_be_proved then begin
-         assert (why3_says_goal_is_verified goal);
          obj, Proved
       end else begin
          obj, Work_Left

@@ -24,9 +24,6 @@ type vc_info =
    { expl : Gnat_expl.expl option; trace : Gnat_loc.loc list }
 (* The VC information that has been found in a VC *)
 
-let _ =
-   Debug.set_flag (Debug.lookup_flag "fast_wp")
-
 let rec search_labels acc f =
    (* This function takes a VC formula, and returns the VC info found in that
       formula. The argument "acc" will be enriched at each node. *)
@@ -222,7 +219,9 @@ let _ =
    try
       Gnat_objectives.init ();
       match Gnat_config.proof_mode with
-      | Gnat_config.Normal ->
+      | Gnat_config.Normal
+      | Gnat_config.Path_WP
+      | Gnat_config.No_Split ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
          Gnat_objectives.save_session ()
       | Gnat_config.All_Split ->

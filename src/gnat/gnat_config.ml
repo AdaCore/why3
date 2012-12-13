@@ -2,7 +2,12 @@ open Why3
 
 type report_mode = Fail | Verbose | Detailed
 
-type proof_mode = Normal | No_WP | All_Split
+type proof_mode =
+    Normal
+  | No_WP
+  | All_Split
+  | Path_WP
+  | No_Split
 
 let gnatprove_why3conf_file = "why3.conf"
 
@@ -43,10 +48,14 @@ let set_proof_mode s =
       opt_proof_mode := No_WP
    else if s = "all_split" then
       opt_proof_mode := All_Split
+   else if s = "path_wp" then
+      opt_proof_mode := Path_WP
+   else if s = "no_split" then
+      opt_proof_mode := No_Split
    else if s <> "normal" then
       Gnat_util.abort_with_message
         "argument for option --proof should be one of\
-        (normal|no_wp|all_split)."
+        (normal|no_wp|all_split|path_wp|no_split)."
 
 let set_prover s =
    opt_prover := Some s
@@ -208,3 +217,8 @@ let parallel = !opt_parallel
 
 (* when not doing proof, stop after typing to avoid the exponential WP work *)
 let () = if proof_mode = No_WP then Debug.set_flag Typing.debug_type_only
+let () =
+  if proof_mode <> Path_WP then
+    Debug.set_flag (Debug.lookup_flag "fast_wp")
+
+let () = if debug then Debug.set_flag (Debug.lookup_flag "stack_trace")
