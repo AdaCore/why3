@@ -1228,6 +1228,8 @@ type fast_wp_result =
      post : fwp_post;
      exn  : fast_wp_exn_map }
 
+(* Create a formula expressing that "n" implies "q", and for each exception
+   "xn" implies "xq", quantifying over the result names. *)
 let wp_nimplies (n : term) (xn : fast_wp_exn_map) ((result, q), xq) =
   let f = wp_forall [result] (wp_implies n q) in
   assert (Mexn.cardinal xn = Mexn.cardinal xq);
@@ -1306,7 +1308,7 @@ let iter_all_exns xmap_list f =
    - formula NE means
    ``e terminates normally with final state s and output result''
    - for each exception x, EX(x) = (fx,sx), where formula fx means
-   ``e raises exception x, with final state sw and value xresult(x) in x''
+   ``e raises exception x, with final state sx and value xresult(x) in sx''
 *)
 let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
     : fast_wp_result =
@@ -1519,7 +1521,10 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
   | Etry (e1, handlers) ->
       (* OK: ok(e1) /\ (forall x. ex(e1)(x) => ok(handlers(x))) *)
       (* NE: ne(e1) \/ (bigor x. ex(e1)(x) /\ ne(handlers(x))) *)
-      (* EX(x): *)
+      (* EX(x): if x is captured in handlers
+          (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
+      (* EX(x): if x is not captured in handlers
+          ex(e1)(x) \/ (bigor y. ex(e1)(y) /\ ex(handlers(y))(x)) *)
       let handlers =
         List.fold_left (fun acc (ex,pv,expr) -> Mexn.add ex (pv,expr) acc)
            Mexn.empty handlers in
@@ -1542,9 +1547,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                 (t_and_simp acc.post.ne f1)
                 (t_and_simp_l [post.ne; wp2.post.ne; f2]) in
           { ok = t_and_simp acc.ok (t_implies_simp post.ne wp2.ok);
-            post = { s  = s; ne = ne ; };
-            exn =
-              Mexn.fold Mexn.add wp2.exn acc.exn
+            post = { s = s; ne = ne; };
+            exn = Mexn.fold Mexn.add wp2.exn acc.exn
           }
         with Not_found ->
           { acc with exn = Mexn.add ex post acc.exn }
@@ -1555,59 +1559,69 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           exn = Mexn.empty
         }
   | Eabstr (e1, spec) ->
-        let wp1 = fast_wp_expr env s r e1 in
-        let xpost = Mexn.map (fun p ->
-          { s = wp1.post.s;
-            ne  = p}) spec.c_xpost in
-        let abstr_post = { ne = spec.c_post; s = wp1.post.s } in
-        let post, xpost =
-           adapt_post_to_state_pair env s r abstr_post xpost in
-        let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
-        let ok =
-           t_and_simp_l
-              [wp1.ok; (Subst.term env s spec.c_pre);
-               wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
-        let ok = wp_label e ok in
-        { ok = ok ;
-          post = post;
-          exn  = xpost
-        }
+      (* OK: spec.pre /\ ok(e1) /\ (ne(e1) => spec.post)
+             /\ (forall x. ex(e1)(x) => spec.xpost(x) *)
+      (* NE: spec.post *)
+      (* EX: spec.xpost *)
+      let wp1 = fast_wp_expr env s r e1 in
+      let xpost = Mexn.map (fun p ->
+        { s = wp1.post.s;
+          ne = p }) spec.c_xpost in
+      let abstr_post = { s = wp1.post.s; ne = spec.c_post } in
+      let post, xpost =
+        adapt_post_to_state_pair env s r abstr_post xpost in
+      let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
+      let ok =
+        t_and_simp_l
+          [wp1.ok; (Subst.term env s spec.c_pre);
+           wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
+      let ok = wp_label e ok in
+      { ok = ok ;
+        post = post;
+        exn = xpost
+      }
   | Eany spec ->
-        let poststate = Subst.refresh (regs_of_writes spec.c_effect) s in
-        let post = { ne = spec.c_post; s = poststate } in
-        let xpost =
-           Mexn.map (fun p -> { s = poststate; ne = p}) spec.c_xpost in
-        let post, xpost =
-           adapt_post_to_state_pair env s r post xpost in
-        let pre = Subst.term env s spec.c_pre in
-        { ok = wp_label e pre;
-          post = post;
-          exn = xpost;
-        }
-  | Eloop (inv, _, e1) ->
-        let havoc_state = Subst.refresh (regs_of_writes e1.e_effect) s in
-        let init_inv = t_label_add expl_loop_init (Subst.term env s inv) in
-        let inv_hypo = Subst.term env havoc_state inv in
-        let wp1 = fast_wp_expr env havoc_state r e1 in
-        let post_inv =
-           t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
+      (* OK: spec.pre *)
+      (* NE: spec.post *)
+      (* EX: spec.xpost *)
+      let poststate = Subst.refresh (regs_of_writes spec.c_effect) s in
+      let post = { s = poststate; ne = spec.c_post } in
+      let xpost =
+        Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in
+      let post, xpost =
+        adapt_post_to_state_pair env s r post xpost in
+      let pre = Subst.term env s spec.c_pre in
+      { ok = wp_label e pre;
+        post = post;
+        exn = xpost;
+      }
+  | Eloop (inv, _varl, e1) -> (* TODO variant proof *)
+      (* OK: inv /\ (forall r in writes(e1), replace r by fresh r' in
+                       inv => (ok(e1) /\ (ne(e1) => inv'))) *)
+      (* NE: inv[r -> r'] *)
+      (* EX: ex(e1)[r -> r'] *)
+      let havoc_state = Subst.refresh (regs_of_writes e1.e_effect) s in
+      let init_inv = t_label_add expl_loop_init (Subst.term env s inv) in
+      let inv_hypo = Subst.term env havoc_state inv in
+      let wp1 = fast_wp_expr env havoc_state r e1 in
+      let post_inv =
+        t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
-             I => (OK /\ (NE => I'))
-         *)
-        let preserv_inv =
-          t_implies_simp inv_hypo
-            (t_and_simp wp1.ok
-              (t_implies_simp wp1.post.ne post_inv)) in
-        let exn =
-           Mexn.map (fun post ->
-              { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
-        let ok = t_and_simp_l [init_inv; preserv_inv] in
-        (* TODO variant proof *)
-        { ok = ok;
-          post = { s = wp1.post.s; ne = t_false };
-          exn = exn
-        }
+           I => (OK /\ (NE => I'))
+        *)
+      let preserv_inv =
+        t_implies_simp inv_hypo
+          (t_and_simp wp1.ok
+             (t_implies_simp wp1.post.ne post_inv)) in
+      let exn =
+        Mexn.map (fun post ->
+          { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
+      let ok = t_and_simp_l [init_inv; preserv_inv] in
+      { ok = ok;
+        post = { s = wp1.post.s; ne = t_false }; (* this is an infinite loop *)
+        exn = exn
+      }
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
