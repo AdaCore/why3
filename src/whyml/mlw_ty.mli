@@ -26,8 +26,7 @@ module rec T : sig
   type varmap = varset Mid.t
 
   type itysymbol = private {
-    its_pure : tysymbol;
-    its_args : tvsymbol list;
+    its_ts   : tysymbol;
     its_regs : region list;
     its_def  : ity option;
     its_inv  : bool;

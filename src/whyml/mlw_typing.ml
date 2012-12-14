@@ -142,7 +142,7 @@ let uc_find_ls uc p =
   Typing.find_ns (fun ls -> ls.ls_name) Theory.ns_find_ls p ns
 
 let get_id_ts = function
-  | PT pt -> pt.its_pure.ts_name
+  | PT pt -> pt.its_ts.ts_name
   | TS ts -> ts.ts_name
 
 let uc_find_ts uc p =
@@ -1274,7 +1274,7 @@ let add_type_invariant loc uc id params inv =
     let e = Loc.Located (loc, DuplicateTypeVar id) in
     Sstr.add_new e id acc, Typing.create_user_tv id in
   let _, tvl = Lists.map_fold_left add_tv Sstr.empty params in
-  let ty = ty_app its.its_pure (List.map ty_var tvl) in
+  let ty = ty_app its.its_ts (List.map ty_var tvl) in
   let res = create_vsymbol (id_fresh x) ty in
   let find = function
     | Qident { id = id } when id = x -> Some res
@@ -1284,9 +1284,9 @@ let add_type_invariant loc uc id params inv =
     t_label_add Split_goal.stop_split f in
   let inv = List.map mk_inv inv in
   let q = Mlw_ty.create_post res (t_and_simp_l inv) in
-  let q = if List.for_all2 tv_equal its.its_args tvl then q else
+  let q = if List.for_all2 tv_equal its.its_ts.ts_args tvl then q else
     let add mtv u v = Mtv.add u (ty_var v) mtv in
-    let mtv = List.fold_left2 add Mtv.empty tvl its.its_args in
+    let mtv = List.fold_left2 add Mtv.empty tvl its.its_ts.ts_args in
     t_ty_subst mtv Mvs.empty q in
   let uc = (count_term_tuples q; flush_tuples uc) in
   Mlw_module.add_invariant uc its q
@@ -1485,7 +1485,8 @@ let add_types ~wp uc tdl =
     let x = d.td_ident.id in
     let ts = Opt.get (Hstr.find tysymbols x) in
     let add_tv s x v = Mstr.add x.id v s in
-    let vars = List.fold_left2 add_tv Mstr.empty d.td_params ts.its_args in
+    let vars =
+      List.fold_left2 add_tv Mstr.empty d.td_params ts.its_ts.ts_args in
     let get_ts = function
       | Qident { id = x } when Mstr.mem x def ->
           PT (Opt.get (Hstr.find tysymbols x))
@@ -1550,7 +1551,7 @@ let add_types ~wp uc tdl =
   (* detect pure type declarations *)
 
   let kn = get_known uc in
-  let check its = Mid.mem its.its_pure.ts_name kn in
+  let check its = Mid.mem its.its_ts.ts_name kn in
   let check ity = ity_s_any check Util.ffalse ity in
   let is_impure_type ts =
     ts.its_abst || ts.its_priv || ts.its_inv || ts.its_regs <> [] ||
@@ -1565,7 +1566,7 @@ let add_types ~wp uc tdl =
   in
   let mk_pure_decl (ts,csl) =
     let pjt = Hvs.create 3 in
-    let ty = ty_app ts.its_pure (List.map ty_var ts.its_args) in
+    let ty = ty_app ts.its_ts (List.map ty_var ts.its_ts.ts_args) in
     let mk_proj (pv,f) =
       let vs = pv.pv_vs in
       if f then try vs.vs_ty, Some (Hvs.find pjt vs) with Not_found ->
@@ -1580,13 +1581,13 @@ let add_types ~wp uc tdl =
       let cs = create_fsymbol id (List.map fst pjl) ty in
       cs, List.map snd pjl
     in
-    ts.its_pure, List.map mk_constr csl
+    ts.its_ts, List.map mk_constr csl
   in
   let add_type_decl uc ts =
     if is_impure_type ts then
       add_pdecl_with_tuples ~wp uc (create_ty_decl ts)
     else
-      add_decl_with_tuples uc (Decl.create_ty_decl ts.its_pure)
+      add_decl_with_tuples uc (Decl.create_ty_decl ts.its_ts)
   in
   let add_invariant uc d = if d.td_inv = [] then uc else
     add_type_invariant d.td_loc uc d.td_ident d.td_params d.td_inv

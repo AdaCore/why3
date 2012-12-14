@@ -90,9 +90,9 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
 
 let its_app s tl =
   let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
     with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_args, List.length tl))
+      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl))
   in
   match s.its_def with
   | Some ity ->

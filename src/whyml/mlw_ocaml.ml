@@ -599,7 +599,7 @@ open Mlw_expr
 open Mlw_decl
 open Mlw_module
 
-let print_its info fmt ts = print_ts info fmt ts.its_pure
+let print_its info fmt ts = print_ts info fmt ts.its_ts
 let print_pv info fmt pv =
   if pv.pv_vtv.vtv_ghost then
     fprintf fmt "((* ghost %a *))" (print_lident info) pv.pv_vs.vs_name
@@ -642,7 +642,7 @@ let rec print_ity_node inn info fmt ity = match ity.ity_node with
         end
       end
   | Ityapp (ts, tl, _) ->
-      begin match query_syntax info.info_syn ts.its_pure.ts_name with
+      begin match query_syntax info.info_syn ts.its_ts.ts_name with
         | Some s -> syntax_arguments s (print_ity_node true info) fmt tl
         | None -> begin match tl with
             | [] -> print_its info fmt ts
@@ -859,15 +859,16 @@ let print_type_decl info fmt its = match its.its_def with
   | None ->
       fprintf fmt
         "@[<hov 2>type %a%a (* to be defined (uninterpreted type) *)@]@\n@\n"
-        print_tv_args its.its_args (print_its info) its
+        print_tv_args its.its_ts.ts_args (print_its info) its
   | Some ty ->
       fprintf fmt "@[<hov 2>type %a%a =@ %a@]@\n@\n"
-        print_tv_args its.its_args (print_its info) its (print_ity info) ty
+        print_tv_args its.its_ts.ts_args
+        (print_its info) its (print_ity info) ty
 
 let print_type_decl info fmt its =
-  if has_syntax info its.its_pure.ts_name then
+  if has_syntax info its.its_ts.ts_name then
     fprintf fmt "(* type %a is overridden by driver *)"
-      (print_lident info) its.its_pure.ts_name
+      (print_lident info) its.its_ts.ts_name
   else begin print_type_decl info fmt its; forget_tvs () end
 
 let print_exn_decl info fmt xs =
@@ -910,12 +911,12 @@ let print_pdata_decl info fst fmt (its, csl, _) =
   in
   fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]"
     (if fst then "type" else "and")
-    print_tv_args its.its_args (print_its info) its print_defn csl
+    print_tv_args its.its_ts.ts_args (print_its info) its print_defn csl
 
 let print_pdata_decl info first fmt (its, _, _ as d) =
-  if has_syntax info its.its_pure.ts_name then
+  if has_syntax info its.its_ts.ts_name then
     fprintf fmt "(* type %a is overridden by driver *)"
-      (print_lident info) its.its_pure.ts_name
+      (print_lident info) its.its_ts.ts_name
   else begin print_pdata_decl info first fmt d; forget_tvs () end
 
 let is_record = function
@@ -940,7 +941,7 @@ let print_pprojections info fmt (_, csl, _) =
   List.iter print pjl
 
 let print_pprojections info fmt (ts, _, _ as d) =
-  if not (has_syntax info ts.its_pure.ts_name) && not (is_record d) then begin
+  if not (has_syntax info ts.its_ts.ts_name) && not (is_record d) then begin
     print_pprojections info fmt d; forget_tvs ()
   end
 

@@ -26,8 +26,7 @@ module rec T : sig
   type varmap = varset Mid.t
 
   type itysymbol = {
-    its_pure : tysymbol;
-    its_args : tvsymbol list;
+    its_ts   : tysymbol;
     its_regs : region list;
     its_def  : ity option;
     its_inv  : bool;
@@ -61,9 +60,8 @@ end = struct
   type varmap = varset Mid.t
 
   type itysymbol = {
-    its_pure : tysymbol;
-    its_args : tvsymbol list;
-    its_regs : region   list;
+    its_ts   : tysymbol;
+    its_regs : region list;
     its_def  : ity option;
     its_inv  : bool;
     its_abst : bool;
@@ -132,7 +130,7 @@ let create_varset tvs regs = {
 
 module Itsym = MakeMSHW (struct
   type t = itysymbol
-  let tag its = its.its_pure.ts_name.id_tag
+  let tag its = its.its_ts.ts_name.id_tag
 end)
 
 module Sits = Itsym.S
@@ -143,7 +141,7 @@ module Wits = Itsym.W
 let its_equal : itysymbol -> itysymbol -> bool = (==)
 let ity_equal : ity       -> ity       -> bool = (==)
 
-let its_hash its = id_hash its.its_pure.ts_name
+let its_hash its = id_hash its.its_ts.ts_name
 let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
 
 module Hsity = Hashcons.Make (struct
@@ -349,7 +347,7 @@ let reg_match s r1 r2 =
 let rec ty_of_ity ity = match ity.ity_node with
   | Ityvar v -> ty_var v
   | Itypur (s,tl) -> ty_app s (List.map ty_of_ity tl)
-  | Ityapp (s,tl,_) -> ty_app s.its_pure (List.map ty_of_ity tl)
+  | Ityapp (s,tl,_) -> ty_app s.its_ts (List.map ty_of_ity tl)
 
 let rec ity_of_ty ty = match ty.ty_node with
   | Tyvar v -> ity_var v
@@ -378,9 +376,9 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
 let ity_app_fresh s tl =
   (* type variable map *)
   let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
     with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
+      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
   (* refresh regions *)
   let mr,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
   (* every top region in def is guaranteed to be in mr *)
@@ -391,15 +389,15 @@ let ity_app_fresh s tl =
 let ity_app s tl rl =
   (* type variable map *)
   let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
     with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_args, List.length tl)) in
+      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
   (* region map *)
   let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
   let sub = try List.fold_left2 reg_match sub s.its_regs rl
     with Invalid_argument _ ->
       raise (BadRegArity (s, List.length s.its_regs, List.length rl)) in
-  (* every type var and top region in def are in its_args and its_regs *)
+  (* every type var and top region in def are in its_ts.ts_args and its_regs *)
   match s.its_def with
   | Some ity -> ity_full_inst sub ity
   | None -> ity_app_unsafe s tl rl
@@ -418,8 +416,7 @@ let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
   (fun ts ~abst ~priv ~inv regs def ->
     let its = {
-      its_pure  = ts;
-      its_args  = ts.ts_args;
+      its_ts    = ts;
       its_regs  = regs;
       its_def   = def;
       its_inv   = inv;
@@ -498,7 +495,7 @@ let its_clone sm =
     | Ityvar _ -> ity
   and conv_its its =
     try Hits.find itsh its with Not_found ->
-      try add_ts its (Mts.find its.its_pure sm.Theory.sm_ts)
+      try add_ts its (Mts.find its.its_ts sm.Theory.sm_ts)
       with Not_found -> its
   and conv_ts ts =
     Mts.find_def ts ts sm.Theory.sm_ts

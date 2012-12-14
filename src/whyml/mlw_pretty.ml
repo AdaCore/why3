@@ -73,7 +73,7 @@ let print_ps fmt ps =
 
 let forget_ps ps = forget_id iprinter ps.ps_name
 
-let print_its fmt ts = print_ts fmt ts.its_pure
+let print_its fmt ts = print_ts fmt ts.its_ts
 
 (** Types *)
 
@@ -368,9 +368,9 @@ let print_head fst fmt ts =
     (if ts.its_abst then "abstract " else "")
     (if ts.its_priv then "private " else "")
     print_its ts
-    print_ident_labels ts.its_pure.ts_name
+    print_ident_labels ts.its_ts.ts_name
     (print_list comma print_regty) ts.its_regs
-    (print_list nothing print_tv_arg) ts.its_args
+    (print_list nothing print_tv_arg) ts.its_ts.ts_args
 
 let print_ty_decl fmt ts = match ts.its_def with
   | None ->

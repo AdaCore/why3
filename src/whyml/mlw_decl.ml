@@ -54,7 +54,7 @@ let syms_ps s ps = Sid.add ps.ps_name s
 let syms_xs s xs = Sid.add xs.xs_name s
 let syms_pl s pl = Sid.add pl.pl_ls.ls_name s
 
-let syms_its s its = Sid.add its.its_pure.ts_name s
+let syms_its s its = Sid.add its.its_ts.ts_name s
 
 let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ty syms_ls s t
@@ -104,14 +104,14 @@ let syms_expr s _e = s (* TODO *)
 
 let create_ty_decl its =
 (*   let syms = Opt.fold syms_ity Sid.empty its.its_def in *)
-  let news = Sid.singleton its.its_pure.ts_name in
+  let news = Sid.singleton its.its_ts.ts_name in
   mk_decl (PDtype its) Sid.empty news
 
 type pre_constructor = preid * (pvsymbol * bool) list
 
 type pre_data_decl = itysymbol * pre_constructor list
 
-let null_invariant { its_pure = ts } =
+let null_invariant { its_ts = ts } =
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
   let vs = create_vsymbol (id_fresh "dummy") ty in
   create_post vs t_true
@@ -123,7 +123,7 @@ let create_data_decl tdl =
   let build_constructor its (id,al) =
     (* check well-formedness *)
     let vtvs = List.map (fun (pv,_) -> pv.pv_vtv) al in
-    let tvs = List.fold_right Stv.add its.its_args Stv.empty in
+    let tvs = List.fold_right Stv.add its.its_ts.ts_args Stv.empty in
     let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
     let check_vars { vars_tv = atvs; vars_reg = aregs } =
       if not (Stv.subset atvs tvs) then
@@ -137,7 +137,7 @@ let create_data_decl tdl =
     (* build the constructor ps *)
     let hidden = its.its_abst in
     let rdonly = its.its_priv in
-    let tvl = List.map ity_var its.its_args in
+    let tvl = List.map ity_var its.its_ts.ts_args in
     let res = vty_value (ity_app its tvl its.its_regs) in
     let pls = create_plsymbol ~hidden ~rdonly id vtvs res in
     news := news_id !news pls.pl_ls.ls_name;
@@ -158,7 +158,7 @@ let create_data_decl tdl =
   in
   let build_type (its,cl) =
     Hid.clear projections;
-    news := news_id !news its.its_pure.ts_name;
+    news := news_id !news its.its_ts.ts_name;
     its, List.map (build_constructor its) cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
@@ -269,7 +269,7 @@ let clone_data_decl sm pd = match pd.pd_node with
         let conv_ls ls = Mls.find_def ls ls sm.sm_pure.Theory.sm_ls in
         let inv = Term.t_s_map (Ty.ty_s_map conv_ts) conv_ls inv in
         let its = Mits.find its sm.sm_its in
-        news := news_id !news its.its_pure.ts_name;
+        news := news_id !news its.its_ts.ts_name;
         its, List.map add_cs csl, inv in
       let tdl = List.map add_td tdl in
       mk_decl (PDdata tdl) Sid.empty !news
@@ -307,13 +307,13 @@ let rec find_td its1 = function
   | [] -> raise Not_found
 
 let find_constructors kn its =
-  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  match (Mid.find its.its_ts.ts_name kn).pd_node with
   | PDtype _ -> []
   | PDdata tdl -> fst (find_td its tdl)
   | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
 
 let find_invariant kn its =
-  match (Mid.find its.its_pure.ts_name kn).pd_node with
+  match (Mid.find its.its_ts.ts_name kn).pd_node with
   | PDtype _ -> null_invariant its
   | PDdata tdl -> snd (find_td its tdl)
   | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
@@ -351,10 +351,11 @@ let inst_constructors lkn kn ity = match ity.ity_node with
       List.map (fun (cs,_) -> cs, List.map subst cs.ls_args) csl
   | Ityapp (its,_,_) ->
       let csl = find_constructors kn its in
-      let d = Mid.find its.its_pure.ts_name lkn in
-      let is_rec = Mid.mem its.its_pure.ts_name d.Decl.d_syms in
+      let d = Mid.find its.its_ts.ts_name lkn in
+      let is_rec = Mid.mem its.its_ts.ts_name d.Decl.d_syms in
       if csl = [] || is_rec then raise (NonupdatableType ity);
-      let base = ity_app its (List.map ity_var its.its_args) its.its_regs in
+      let args = List.map ity_var its.its_ts.ts_args in
+      let base = ity_app its args its.its_regs in
       let sbs = ity_match ity_subst_empty base ity in
       let subst vtv =
         let ghost = vtv.vtv_ghost in

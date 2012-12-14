@@ -354,7 +354,7 @@ let get_invariant km t =
     | Tyapp (ts,_) -> ts
     | _ -> assert false in
   let rec find_td = function
-    | (its,_,inv) :: _ when ts_equal ts its.its_pure -> inv
+    | (its,_,inv) :: _ when ts_equal ts its.its_ts -> inv
     | _ :: tdl -> find_td tdl
     | [] -> assert false in
   let pd = Mid.find ts.ts_name km in
