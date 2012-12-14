@@ -68,6 +68,7 @@ version_old = "0.8"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/alt_ergo_0.92.drv"
 
+# CVC3 versions 2.4.x
 [ATP cvc3]
 name = "CVC3"
 exec = "cvc3"
@@ -81,6 +82,7 @@ version_old = "2.4"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/cvc3.drv"
 
+# CVC3 versions 2.x
 [ATP cvc3]
 name = "CVC3"
 exec = "cvc3"
@@ -93,6 +95,18 @@ version_old = "2.1"
 # we pass time 0 to why3-cpulimit to avoid race
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timeout %t %f"
 driver = "drivers/cvc3.drv"
+
+# CVC4 version 1.0
+[ATP cvc4]
+name = "CVC4"
+exec = "cvc4"
+exec = "cvc4-1.0"
+version_switch = "--version"
+version_regexp = "This is CVC4 version \\([^ \n\r]+\\)"
+version_ok  = "1.0"
+driver = "drivers/cvc4.drv"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
+
 
 [ATP yices]
 name = "Yices"
@@ -301,15 +315,6 @@ version_old = "^2\.[0-9]$"
 version_old = "1.3"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -smt %f"
 driver = "drivers/z3_smtv1.drv"
-
-[ATP cvc4]
-name = "CVC4"
-exec = "cvc4"
-version_switch = "--version"
-version_regexp = "This is CVC4 version \\([^ \n\r]+\\)"
-version_ok  = "0.0prerelease"
-driver = "drivers/cvc4.drv"
-command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
 
 [ATP zenon]
 name = "Zenon"
