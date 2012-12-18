@@ -277,7 +277,7 @@ let update_var env mreg vs =
     let vs = Opt.fold (fun _ -> get_vs) vs mut in
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
-    if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
+    if ity_immutable ity || not (Mreg.exists check_reg mreg) then t_var vs
     else analyze_var update fs_app env.pure_known env.prog_known vs ity
   in
   update vs (vtv_of_vs vs)

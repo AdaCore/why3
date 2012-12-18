@@ -1334,6 +1334,41 @@ let add_types ~wp uc tdl =
         Mstr.add x true seen in
   ignore (Mstr.fold cyc_visit def Mstr.empty);
 
+  (* detect impure types *)
+
+  let impures = Hstr.create 5 in
+  let rec imp_visit x =
+    try Hstr.find impures x
+    with Not_found ->
+      let ts_imp = function
+        | Qident { id = x } when Mstr.mem x def -> imp_visit x
+        | q ->
+            begin match uc_find_ts uc q with
+              | PT _ -> true | TS _ -> false
+            end
+      in
+      let rec check = function
+        | PPTtyvar _ -> false
+        | PPTtyapp (tyl,q) -> ts_imp q || List.exists check tyl
+        | PPTtuple tyl -> List.exists check tyl in
+      Hstr.replace impures x false;
+      let imp =
+        let td = Mstr.find x def in
+        match td.td_def with
+        | TDabstract -> false
+        | TDalias ty -> check ty
+        | TDalgebraic csl ->
+            let cons (_,_,l) = List.exists (fun (_,ty) -> check ty) l in
+            td.td_inv <> [] || td.td_vis <> Public || List.exists cons csl
+        | TDrecord fl ->
+            let field f = f.f_ghost || f.f_mutable || check f.f_pty in
+            td.td_inv <> [] || td.td_vis <> Public || List.exists field fl
+      in
+      Hstr.replace impures x imp;
+      imp
+  in
+  Mstr.iter (fun x _ -> ignore (imp_visit x)) def;
+
   (* detect mutable types and invariants *)
 
   let mutables = Hstr.create 5 in
@@ -1355,16 +1390,16 @@ let add_types ~wp uc tdl =
       Hstr.replace mutables x false;
       let mut =
         let td = Mstr.find x def in
-        td.td_inv <> [] ||
         match td.td_def with
         | TDabstract -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
-            let proj (_,pty) = check pty in
-            List.exists (fun (_,_,l) -> List.exists proj l) csl
+            let cons (_,_,l) = List.exists (fun (_,ty) -> check ty) l in
+            td.td_inv <> [] || List.exists cons csl
         | TDrecord fl ->
             let field f = f.f_mutable || check f.f_pty in
-            List.exists field fl in
+            td.td_inv <> [] || List.exists field fl
+      in
       Hstr.replace mutables x mut;
       mut
   in
@@ -1395,7 +1430,7 @@ let add_types ~wp uc tdl =
       let priv = d.td_vis = Private in
       Hstr.add tysymbols x None;
       let get_ts = function
-        | Qident { id = x } when Mstr.mem x def -> PT (its_visit x)
+        | Qident { id = x } when Mstr.mem x def -> its_visit x
         | q -> uc_find_ts uc q
       in
       let rec parse = function
@@ -1413,10 +1448,13 @@ let add_types ~wp uc tdl =
             ity_pur ts (List.map parse tyl)
       in
       let ts = match d.td_def with
-        | TDalias ty ->
+        | TDalias ty when Hstr.find impures x ->
             let def = parse ty in
             let rl = Sreg.elements def.ity_vars.vars_reg in
-            create_itysymbol id ~abst ~priv ~inv:false vl rl (Some def)
+            PT (create_itysymbol id ~abst ~priv ~inv:false vl rl (Some def))
+        | TDalias ty ->
+            let def = ty_of_ity (parse ty) in
+            TS (create_tysymbol id vl (Some def))
         | TDalgebraic csl when Hstr.find mutables x ->
             let projs = Hstr.create 5 in
             (* to check projections' types we must fix the tyvars *)
@@ -1449,8 +1487,9 @@ let add_types ~wp uc tdl =
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),def = Lists.map_fold_left mk_constr init csl in
+            let rl = Sreg.elements regs in
             Hstr.replace predefs x def;
-            create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None
+            PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
         | TDrecord fl when Hstr.find mutables x ->
             let mk_field (regs,inv) f =
               let ghost = f.f_ghost in
@@ -1468,11 +1507,14 @@ let add_types ~wp uc tdl =
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),pjl = Lists.map_fold_left mk_field init fl in
+            let rl = Sreg.elements regs in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
             Hstr.replace predefs x [Denv.create_user_id cid, pjl];
-            create_itysymbol id ~abst ~priv ~inv vl (Sreg.elements regs) None
+            PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
+        | TDalgebraic _ | TDrecord _ when Hstr.find impures x ->
+            PT (create_itysymbol id ~abst ~priv ~inv:false vl [] None)
         | TDalgebraic _ | TDrecord _ | TDabstract ->
-            create_itysymbol id ~abst ~priv ~inv:false vl [] None
+            TS (create_tysymbol id vl None)
       in
       Hstr.add tysymbols x (Some ts);
       ts
@@ -1484,12 +1526,13 @@ let add_types ~wp uc tdl =
   let def_visit d (abstr,algeb,alias) =
     let x = d.td_ident.id in
     let ts = Opt.get (Hstr.find tysymbols x) in
+    let vl = match ts with
+      | PT s -> s.its_ts.ts_args | TS s -> s.ts_args in
     let add_tv s x v = Mstr.add x.id v s in
-    let vars =
-      List.fold_left2 add_tv Mstr.empty d.td_params ts.its_ts.ts_args in
+    let vars = List.fold_left2 add_tv Mstr.empty d.td_params vl in
     let get_ts = function
       | Qident { id = x } when Mstr.mem x def ->
-          PT (Opt.get (Hstr.find tysymbols x))
+          Opt.get (Hstr.find tysymbols x)
       | q -> uc_find_ts uc q
     in
     let rec parse = function
@@ -1548,25 +1591,11 @@ let add_types ~wp uc tdl =
   in
   let abstr,algeb,alias = List.fold_right def_visit tdl ([],[],[]) in
 
-  (* detect pure type declarations *)
+  (* create pure type declarations *)
 
-  let kn = get_known uc in
-  let check its = Mid.mem its.its_ts.ts_name kn in
-  let check ity = ity_s_any check Util.ffalse ity in
-  let is_impure_type ts =
-    ts.its_abst || ts.its_priv || ts.its_inv || ts.its_regs <> [] ||
-    Opt.fold (fun _ -> check) false ts.its_def
-  in
-  let check (pv,_) =
-    let vtv = pv.pv_vtv in
-    vtv.vtv_ghost || vtv.vtv_mut <> None || check vtv.vtv_ity in
-  let is_impure_data (ts,csl) =
-    is_impure_type ts ||
-    List.exists (fun (_,l) -> List.exists check l) csl
-  in
-  let mk_pure_decl (ts,csl) =
+  let mk_pure_decl ts csl =
     let pjt = Hvs.create 3 in
-    let ty = ty_app ts.its_ts (List.map ty_var ts.its_ts.ts_args) in
+    let ty = ty_app ts (List.map ty_var ts.ts_args) in
     let mk_proj (pv,f) =
       let vs = pv.pv_vs in
       if f then try vs.vs_ty, Some (Hvs.find pjt vs) with Not_found ->
@@ -1581,26 +1610,28 @@ let add_types ~wp uc tdl =
       let cs = create_fsymbol id (List.map fst pjl) ty in
       cs, List.map snd pjl
     in
-    ts.its_ts, List.map mk_constr csl
+    List.map mk_constr csl
   in
-  let add_type_decl uc ts =
-    if is_impure_type ts then
-      add_pdecl_with_tuples ~wp uc (create_ty_decl ts)
-    else
-      add_decl_with_tuples uc (Decl.create_ty_decl ts.its_ts)
+  let mk_data_decl (s,csl) (alg_pur,alg_imp) = match s with
+    | PT its -> alg_pur, (its, csl) :: alg_imp
+    | TS ts  -> (ts, mk_pure_decl ts csl) :: alg_pur, alg_imp
+  in
+  let alg_pur,alg_imp = List.fold_right mk_data_decl algeb ([],[]) in
+
+  (* add type declarations *)
+
+  let add_type_decl uc = function
+    | PT ts -> add_pdecl_with_tuples ~wp uc (create_ty_decl ts)
+    | TS ts -> add_decl_with_tuples uc (Decl.create_ty_decl ts)
   in
   let add_invariant uc d = if d.td_inv = [] then uc else
-    add_type_invariant d.td_loc uc d.td_ident d.td_params d.td_inv
-  in
+    add_type_invariant d.td_loc uc d.td_ident d.td_params d.td_inv in
   try
     let uc = List.fold_left add_type_decl uc abstr in
-    let uc = if algeb = [] then uc else
-      if List.exists is_impure_data algeb then
-        add_pdecl_with_tuples ~wp uc (create_data_decl algeb)
-      else
-        let d = List.map mk_pure_decl algeb in
-        add_decl_with_tuples uc (Decl.create_data_decl d)
-    in
+    let uc = if alg_imp = [] then uc else
+      add_pdecl_with_tuples ~wp uc (create_data_decl alg_imp) in
+    let uc = if alg_pur = [] then uc else
+      add_decl_with_tuples uc (Decl.create_data_decl alg_pur) in
     let uc = List.fold_left add_type_decl uc alias in
     let uc = List.fold_left add_invariant uc tdl in
     uc

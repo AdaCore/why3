@@ -46,8 +46,8 @@ module rec T : sig
     | Ityapp of itysymbol * ity list * region list
 
   and region = private {
-    reg_name  : ident;
-    reg_ity   : ity;
+    reg_name : ident;
+    reg_ity  : ity;
   }
 
 end
@@ -118,9 +118,9 @@ val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 
 val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
-val ity_closed  : ity -> bool
-val ity_pure    : ity -> bool
-val ity_has_inv : ity -> bool
+val ity_closed    : ity -> bool
+val ity_immutable : ity -> bool
+val ity_has_inv   : ity -> bool
 
 (* these functions attend the sub-regions *)
 
@@ -175,7 +175,7 @@ val create_varset : Stv.t -> Sreg.t -> varset
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
-  xs_ity  : ity; (* closed and pure *)
+  xs_ity  : ity; (* closed and immutable *)
 }
 
 val xs_equal : xsymbol -> xsymbol -> bool

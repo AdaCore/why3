@@ -46,8 +46,8 @@ module rec T : sig
     | Ityapp of itysymbol * ity list * region list
 
   and region = {
-    reg_name  : ident;
-    reg_ity   : ity;
+    reg_name : ident;
+    reg_ity  : ity;
   }
 
 end = struct
@@ -80,8 +80,8 @@ end = struct
     | Ityapp of itysymbol * ity list * region list
 
   and region = {
-    reg_name  : ident;
-    reg_ity   : ity;
+    reg_name : ident;
+    reg_ity  : ity;
   }
 
 end
@@ -251,7 +251,7 @@ let ity_subst_unsafe mv mr ity =
   ity_v_map (fun v -> Mtv.find v mv) (fun r -> Mreg.find r mr) ity
 
 let ity_closed ity = Stv.is_empty ity.ity_vars.vars_tv
-let ity_pure ity = Sreg.is_empty ity.ity_vars.vars_reg
+let ity_immutable ity = Sreg.is_empty ity.ity_vars.vars_reg
 
 let rec ity_has_inv ity = match ity.ity_node with
   | Ityapp (its,_,_) -> its.its_inv || ity_any ity_has_inv ity
@@ -305,7 +305,7 @@ let reg_equal_check r1 r2 =
 let reg_full_inst s r = Mreg.find r s.ity_subst_reg
 
 let ity_full_inst s ity =
-  if ity_closed ity && ity_pure ity then ity
+  if ity_closed ity && ity_immutable ity then ity
   else ity_subst_unsafe s.ity_subst_tv s.ity_subst_reg ity
 
 let rec ity_match s ity1 ity2 =
@@ -381,9 +381,10 @@ let ity_app_fresh s tl =
       raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
   (* refresh regions *)
   let mr,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+  let sub = { ity_subst_tv = mv; ity_subst_reg = mr } in
   (* every top region in def is guaranteed to be in mr *)
   match s.its_def with
-  | Some ity -> ity_subst_unsafe mv mr ity
+  | Some ity -> ity_full_inst sub ity
   | None -> ity_app_unsafe s tl rl
 
 let ity_app s tl rl =
@@ -402,15 +403,19 @@ let ity_app s tl rl =
   | Some ity -> ity_full_inst sub ity
   | None -> ity_app_unsafe s tl rl
 
-let ity_pur s tl = match s.ts_def with
-  | Some ty ->
-      let add m v t = Mtv.add v t m in
-      let m = try List.fold_left2 add Mtv.empty s.ts_args tl
-        with Invalid_argument _ ->
-          raise (Ty.BadTypeArity (s, List.length s.ts_args, List.length tl)) in
-      ity_subst_unsafe m Mreg.empty (ity_of_ty ty)
-  | None ->
-      ity_pur_unsafe s tl
+let ity_pur s tl =
+  (* type variable map *)
+  let add m v t = Mtv.add v t m in
+  let mv = try List.fold_left2 add Mtv.empty s.ts_args tl
+    with Invalid_argument _ ->
+      raise (Ty.BadTypeArity (s, List.length s.ts_args, List.length tl)) in
+  let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
+  (* every top region in def is guaranteed to be in mr *)
+  match s.ts_def with
+  | Some ty -> ity_full_inst sub (ity_of_ty ty)
+  | None -> ity_pur_unsafe s tl
+
+(* itysymbol creation *)
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
@@ -445,9 +450,11 @@ let create_itysymbol
     raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs))) in
   Opt.iter (fun d -> check d.ity_vars.vars_reg) def;
   (* if a type is an alias then it cannot be abstract or private *)
-  if abst && def <> None then Loc.errorm "Type aliases cannot be abstract";
-  if priv && def <> None then Loc.errorm "Type aliases cannot be private";
-  if inv  && def <> None then Loc.errorm "Type aliases cannot have invariants";
+  if def <> None then begin
+    if abst then Loc.errorm "Type aliases cannot be abstract";
+    if priv then Loc.errorm "Type aliases cannot be private";
+    if inv  then Loc.errorm "Type aliases cannot have invariants"
+  end;
   create_itysymbol_unsafe purets ~abst ~priv ~inv regs def
 
 let ts_unit = ts_tuple 0
@@ -473,7 +480,7 @@ let its_clone sm =
       let priv = oits.its_priv in
       let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
-      let def = Opt.map conv_ity oits.its_def in
+      let def  = Opt.map conv_ity oits.its_def in
       create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
     in
     Hits.replace itsh oits nits;
@@ -524,7 +531,7 @@ let xs_equal : xsymbol -> xsymbol -> bool = (==)
 let create_xsymbol id ity =
   let id = id_register id in
   if not (ity_closed ity) then raise (PolymorphicException (id, ity));
-  if not (ity_pure ity) then raise (MutableException (id, ity));
+  if not (ity_immutable ity) then raise (MutableException (id, ity));
   { xs_name = id; xs_ity = ity; }
 
 module Exn = MakeMSH (struct

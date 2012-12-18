@@ -92,22 +92,21 @@ let its_app s tl =
   let add m v t = Mtv.add v t m in
   let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
     with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl))
-  in
+      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
   match s.its_def with
   | Some ity ->
       snd (ity_inst_fresh mv Mreg.empty ity)
   | None ->
-      let _, rl =
-        Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+      let _,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
       its_app_real s tl rl
 
-let ts_app ts dl = match ts.ts_def with
+let ts_app ts dl =
+  let add m v t = Mtv.add v t m in
+  let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
+    with Invalid_argument _ ->
+      raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
+  match ts.ts_def with
   | Some ty ->
-      let add m v t = Mtv.add v t m in
-      let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
-        with Invalid_argument _ ->
-          raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
       snd (ity_inst_fresh mv Mreg.empty (ity_of_ty ty))
   | None ->
       ts_app_real ts dl
