@@ -248,7 +248,7 @@ let hidden_pl ~loc pl =
 
 let hidden_ls ~loc ls =
   { de_desc = DEglobal_ls ls;
-    de_type = specialize_lsymbol ls;
+    de_type = Loc.try1 loc specialize_lsymbol ls;
     de_loc  = loc; de_lab = Slab.empty }
 
 (* helper functions for let-expansion *)
@@ -286,7 +286,7 @@ let specialize_qualid uc p = match uc_find_ps uc p with
   | PV pv -> DEglobal_pv pv, ([],specialize_pvsymbol pv)
   | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
   | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
-  | LS ls -> DEglobal_ls ls, specialize_lsymbol ls
+  | LS ls -> DEglobal_ls ls, Loc.try1 (qloc p) specialize_lsymbol ls
   | XS xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
 
 let find_xsymbol uc p = match uc_find_ps uc p with

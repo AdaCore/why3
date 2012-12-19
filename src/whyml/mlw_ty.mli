@@ -89,6 +89,9 @@ val create_itysymbol :
   preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
     tvsymbol list -> region list -> ity option -> itysymbol
 
+val restore_its : tysymbol -> itysymbol
+  (* raises Not_found if the argument is not a its_ts *)
+
 val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
 

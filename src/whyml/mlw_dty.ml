@@ -292,6 +292,12 @@ let specialize_plsymbol pls =
   List.map conv pls.pl_args, conv pls.pl_value
 
 let dity_of_ty htv hreg vars ty =
+  let rec pure ty = match ty.ty_node with
+    | Tyapp (ts,tl) ->
+        begin try ignore (restore_its ts); false
+        with Not_found -> List.for_all pure tl end
+    | Tyvar _ -> true in
+  if not (pure ty) then raise Exit;
   dity_of_ity htv hreg vars (ity_of_ty ty)
 
 let specialize_lsymbol ls =
@@ -299,6 +305,11 @@ let specialize_lsymbol ls =
   let conv ty = dity_of_ty htv hreg vars_empty ty in
   let ty = Opt.get_def ty_bool ls.ls_value in
   List.map conv ls.ls_args, conv ty
+
+let specialize_lsymbol ls =
+  try specialize_lsymbol ls with Exit ->
+    Loc.errorm "Function symbol `%a' can only be used in specification"
+      Pretty.print_ls ls
 
 (* Pretty-printing *)
 
