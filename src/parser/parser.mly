@@ -357,7 +357,8 @@ list1_comma_subst:
 
 subst:
 | NAMESPACE ns     EQUAL ns     { CSns   (floc (), $2, $4) }
-| TYPE      qualid EQUAL qualid { CStsym (floc (), $2, $4) }
+| TYPE qualid type_args EQUAL primitive_type
+                                { CStsym (floc (), $2, $3, $5) }
 | CONSTANT  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
 | FUNCTION  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
 | PREDICATE qualid EQUAL qualid { CSpsym (floc (), $2, $4) }

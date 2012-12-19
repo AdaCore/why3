@@ -308,8 +308,12 @@ let close_namespace uc import =
 
 (* Base constructors *)
 
+let known_ts kn ts = match ts.ts_def with
+  | Some ty -> ty_s_fold (fun () ts -> known_id kn ts.ts_name) () ty
+  | None -> known_id kn ts.ts_name
+
 let known_clone kn sm =
-  Mts.iter (fun _ ts -> known_id kn ts.ts_name) sm.sm_ts;
+  Mts.iter (fun _ ts -> known_ts kn ts) sm.sm_ts;
   Mls.iter (fun _ ls -> known_id kn ls.ls_name) sm.sm_ls;
   Mpr.iter (fun _ pr -> known_id kn pr.pr_name) sm.sm_pr
 

@@ -95,7 +95,7 @@ type use = {
 
 type clone_subst =
   | CSns    of loc * qualid option * qualid option
-  | CStsym  of loc * qualid * qualid
+  | CStsym  of loc * qualid * ident list * pty
   | CSfsym  of loc * qualid * qualid
   | CSpsym  of loc * qualid * qualid
   | CSlemma of loc * qualid
