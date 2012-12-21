@@ -27,6 +27,16 @@ module Stack
       | Cons x _ -> result = x end }
     raises  { Empty -> s.elts = Nil }
 
+  val safe_pop (s: t 'a) : 'a writes {s}
+    requires { s.elts <> Nil }
+    ensures { match old s.elts with Nil -> false
+      | Cons x t -> result = x /\ s.elts = t end }
+
+  val safe_top (s: t 'a) : 'a reads {s}
+    requires { s.elts <> Nil }
+    ensures { match s.elts with Nil -> false
+      | Cons x _ -> result = x end }
+
   val clear (s: t 'a) : unit writes {s} ensures { s.elts = Nil }
 
   val copy (s: t 'a) : t 'a ensures { result = s }

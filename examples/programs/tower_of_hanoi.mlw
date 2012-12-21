@@ -1,0 +1,98 @@
+
+module TowerOfHanoi
+
+  use import int.Int
+  use import list.List
+  use import list.Append
+  use import list.Length
+  use import list.SortedInt
+  use import list.NthLength
+
+  type tower = list int
+
+  lemma unique_decomposition:
+    forall a b c d: list 'a.
+    a ++ b = c ++ d -> length a = length c -> a = c /\ b = d
+
+  lemma sorted_append:
+    forall a b: list int. sorted (a ++ b) -> sorted a /\ sorted b
+
+  predicate legal (x: int) (b: tower) = match b with
+    | Nil -> true
+    | Cons y _ -> x <= y
+  end
+
+  lemma sorted_nth:
+    forall a b: list int. sorted (a ++ b) ->
+    forall i x: int. 0 <= i < length a -> nth i a = Some x -> legal x b
+
+  let move (x: int) (b: tower)
+    requires { legal x b }
+    ensures  { result = Cons x b }
+  = Cons x b
+
+  (* move n elements from a to b using c *)
+  let rec hanoirec (a b c: tower) (n: int)
+    requires { 0 <= n <= length a }
+    requires { sorted a /\ sorted b /\ sorted c }
+    requires { forall i: int. 0 <= i < n ->
+               forall x: int. nth i a = Some x -> legal x b /\ legal x c }
+    variant  { n }
+    ensures  { let (a',b',c') = result in
+               exists t: tower. length t = n /\
+               a = t ++ a' /\ b' = t ++ b /\ c' = c }
+  =
+    if n > 0 then
+      let a,c,b = hanoirec a c b (n-1) in
+      match a with
+      | Nil -> absurd
+      | Cons x a ->
+          let b = move x b in let c,b,a = hanoirec c b a (n-1) in (a,b,c)
+      end
+    else
+      (a,b,c)
+
+  let tower_of_hanoi (a b c: tower)
+    requires { b = c = Nil /\ sorted a }
+    ensures  { let (a',b',c') = result in b' = a }
+  =
+    hanoirec a b c (length a)
+
+end
+
+module TowerOfHanoi_stack
+
+  use import int.Int
+  use import list.List
+  use import stack.Stack
+
+  type tower = Stack.t int
+
+  let move (a b: tower) =
+    requires { Stack.length a > 0 }
+    ensures  { match old a.elts with Nil -> false
+               | Cons x sa -> a.elts = sa /\ b.elts = Cons x (old b.elts) end }
+    let x = Stack.safe_pop a in
+    Stack.push x b
+
+  (* move n elements from a to b using c *)
+  let rec hanoirec (a b c: tower) (n: int)
+    requires { 0 <= n <= Stack.length a }
+    variant  { n }
+    ensures  { Stack.length c = old (Stack.length c) }
+    ensures  { Stack.length a = old (Stack.length a) - n }
+    ensures  { Stack.length b = old (Stack.length b) + n }
+  =
+    if n > 0 then begin
+      hanoirec a c b (n-1);
+      (* move a b; *) let x = Stack.safe_pop a in Stack.push x b;
+      hanoirec c b a (n-1)
+    end
+
+  let tower_of_hanoi (a b c: tower)
+    requires { Stack.length b = Stack.length c = 0 }
+    ensures  { b.elts = old a.elts }
+  =
+    hanoirec a b c (Stack.length a)
+
+end

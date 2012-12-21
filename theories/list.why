@@ -79,10 +79,10 @@ theory NthLength
   use import int.Int
 
   lemma nth_none_1:
-     forall l: list 'a, i: int. i < 0 -> nth i l  = None
+     forall l: list 'a, i: int. i < 0 -> nth i l = None
 
   lemma nth_none_2:
-     forall l: list 'a, i: int. i >= length l -> nth i l  = None
+     forall l: list 'a, i: int. i >= length l -> nth i l = None
 
   lemma nth_none_3:
      forall l: list 'a, i: int. nth i l = None -> i < 0 \/ i >= length l
