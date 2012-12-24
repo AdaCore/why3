@@ -188,7 +188,7 @@ let find_namespace q uc = find_namespace_ns q (get_namespace uc)
 let rec dty uc = function
   | PPTtyvar {id=x} ->
       create_user_type_var x
-  | PPTtyapp (p, x) ->
+  | PPTtyapp (x, p) ->
       let ts = find_tysymbol x uc in
       let tyl = List.map (dty uc) p in
       Loc.try2 (qloc x) tyapp ts tyl
@@ -199,7 +199,7 @@ let rec dty uc = function
 let rec ty_of_pty uc = function
   | PPTtyvar {id=x} ->
       ty_var (create_user_tv x)
-  | PPTtyapp (p, x) ->
+  | PPTtyapp (x, p) ->
       let ts = find_tysymbol x uc in
       let tyl = List.map (ty_of_pty uc) p in
       Loc.try2 (qloc x) ty_app ts tyl
@@ -821,7 +821,7 @@ let add_types dl th =
                     try ty_var (Hstr.find vars v.id)
                     with Not_found -> error ~loc:v.id_loc (UnboundTypeVar v.id)
                   end
-              | PPTtyapp (tyl, q) ->
+              | PPTtyapp (q, tyl) ->
                   let ts = match q with
                     | Qident x when Mstr.mem x.id def ->
                         visit x.id
@@ -1136,7 +1136,7 @@ let type_inst th t s =
       let ns1 = Opt.fold find t.th_export p in
       let ns2 = Opt.fold find (get_namespace th) q in
       clone_ns loc t.th_local ns2 ns1 s
-    | CStsym (loc,p,[],PPTtyapp ([],q)) ->
+    | CStsym (loc,p,[],PPTtyapp (q,[])) ->
       let ts1 = find_tysymbol_ns p t.th_export in
       let ts2 = find_tysymbol q th in
       if Mts.mem ts1 s.inst_ts

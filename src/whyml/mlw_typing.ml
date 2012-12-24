@@ -167,7 +167,7 @@ let uc_find_ps uc p =
 let rec dity_of_pty denv = function
   | Ptree.PPTtyvar id ->
       create_user_type_variable id
-  | Ptree.PPTtyapp (pl, p) ->
+  | Ptree.PPTtyapp (p, pl) ->
       let dl = List.map (dity_of_pty denv) pl in
       begin match uc_find_ts denv.uc p with
         | PT ts -> its_app ts dl
@@ -1508,7 +1508,7 @@ let add_types ~wp uc tdl =
           | _ -> seen in
         let rec check seen = function
           | PPTtyvar _ -> seen
-          | PPTtyapp (tyl,q) -> List.fold_left check (ts_seen seen q) tyl
+          | PPTtyapp (q,tyl) -> List.fold_left check (ts_seen seen q) tyl
           | PPTtuple tyl -> List.fold_left check seen tyl in
         let seen = match d.td_def with
           | TDabstract | TDalgebraic _ | TDrecord _ -> seen
@@ -1531,7 +1531,7 @@ let add_types ~wp uc tdl =
       in
       let rec check = function
         | PPTtyvar _ -> false
-        | PPTtyapp (tyl,q) -> ts_imp q || List.exists check tyl
+        | PPTtyapp (q,tyl) -> ts_imp q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hstr.replace impures x false;
       let imp =
@@ -1567,7 +1567,7 @@ let add_types ~wp uc tdl =
       in
       let rec check = function
         | PPTtyvar _ -> false
-        | PPTtyapp (tyl,q) -> ts_mut q || List.exists check tyl
+        | PPTtyapp (q,tyl) -> ts_mut q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hstr.replace mutables x false;
       let mut =
@@ -1619,7 +1619,7 @@ let add_types ~wp uc tdl =
         | PPTtyvar { id = v ; id_loc = loc } ->
             let e = Loc.Located (loc, UnboundTypeVar v) in
             ity_var (Mstr.find_exn e v vars)
-        | PPTtyapp (tyl,q) ->
+        | PPTtyapp (q,tyl) ->
             let tyl = List.map parse tyl in
             begin match get_ts q with
               | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
@@ -1718,7 +1718,7 @@ let add_types ~wp uc tdl =
       | PPTtyvar { id = v ; id_loc = loc } ->
           let e = Loc.Located (loc, UnboundTypeVar v) in
           ity_var (Mstr.find_exn e v vars)
-      | PPTtyapp (tyl,q) ->
+      | PPTtyapp (q,tyl) ->
           let tyl = List.map parse tyl in
           begin match get_ts q with
             | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl

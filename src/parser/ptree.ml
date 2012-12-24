@@ -40,7 +40,7 @@ type qualid =
 
 type pty =
   | PPTtyvar of ident
-  | PPTtyapp of pty list * qualid
+  | PPTtyapp of qualid * pty list
   | PPTtuple of pty list
 
 type param = ident option * pty

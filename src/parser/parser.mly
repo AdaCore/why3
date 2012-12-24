@@ -560,12 +560,12 @@ indcase:
 
 primitive_type:
 | primitive_type_arg           { $1 }
-| lqualid primitive_type_args  { PPTtyapp ($2, $1) }
+| lqualid primitive_type_args  { PPTtyapp ($1, $2) }
 ;
 
 primitive_type_non_lident:
 | primitive_type_arg_non_lident           { $1 }
-| uqualid DOT lident primitive_type_args  { PPTtyapp ($4, Qdot ($1, $3)) }
+| uqualid DOT lident primitive_type_args  { PPTtyapp (Qdot ($1, $3), $4) }
 ;
 
 primitive_type_args:
@@ -574,13 +574,13 @@ primitive_type_args:
 ;
 
 primitive_type_arg:
-| lident                         { PPTtyapp ([], Qident $1) }
+| lident                         { PPTtyapp (Qident $1, []) }
 | primitive_type_arg_non_lident  { $1 }
 ;
 
 primitive_type_arg_non_lident:
 | uqualid DOT lident
-   { PPTtyapp ([], Qdot ($1, $3)) }
+   { PPTtyapp (Qdot ($1, $3), []) }
 | type_var
    { PPTtyvar $1 }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR
@@ -815,15 +815,15 @@ param:
 | type_var
    { [None, PPTtyvar $1] }
 | lqualid
-   { [None, PPTtyapp ([], $1)] }
+   { [None, PPTtyapp ($1, [])] }
 ;
 
 param_type:
 | lident param_type_cont
-   { PPTtyapp ($2, Qident $1) }
+   { PPTtyapp (Qident $1, $2) }
 | lident list1_lident param_type_cont
-   { let id2ty i = PPTtyapp ([], Qident i) in
-     PPTtyapp (List.map id2ty $2 @ $3, Qident $1) }
+   { let id2ty i = PPTtyapp (Qident i, []) in
+     PPTtyapp (Qident $1, List.map id2ty $2 @ $3) }
 | primitive_type_non_lident
    { $1 }
 ;
