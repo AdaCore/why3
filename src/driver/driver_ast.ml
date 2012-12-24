@@ -15,8 +15,13 @@ type qualid = loc * string list
 
 type cloned = bool
 
+type pty =
+  | PTyvar of string
+  | PTyapp of qualid * pty list
+  | PTuple of pty list
+
 type metarg =
-  | PMAts  of qualid
+  | PMAty  of pty
   | PMAfs  of qualid
   | PMAps  of qualid
   | PMApr  of qualid

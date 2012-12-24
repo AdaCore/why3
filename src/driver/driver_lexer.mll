@@ -40,6 +40,7 @@
         "time",    TIME;
         "unknown", UNKNOWN;
         "fail", FAIL;
+        "constant", CONSTANT;
         "function", FUNCTION;
         "predicate", PREDICATE;
         "type", TYPE;
@@ -93,6 +94,8 @@ rule token = parse
       { DOT }
   | ","
       { COMMA }
+  | "'"
+      { QUOTE }
   | op_char+ as op
       { OPERATOR op }
   | "\""

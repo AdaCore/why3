@@ -27,12 +27,15 @@
 %token <string> OPERATOR
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
 %token VALID INVALID TIMEOUT OUTOFMEMORY UNKNOWN FAIL TIME
-%token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT EOF
+%token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT QUOTE EOF
 %token BLACKLIST
 %token MODULE EXCEPTION VAL
 %token FUNCTION PREDICATE TYPE PROP FILENAME TRANSFORM PLUGIN
-%token LEFTPAR_STAR_RIGHTPAR COMMA
+%token LEFTPAR_STAR_RIGHTPAR COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
+
+%nonassoc SYNTAX REMOVE PRELUDE
+%nonassoc prec_pty
 
 %type <Driver_ast.file> file
 %start file
@@ -88,6 +91,7 @@ list0_trule:
 trule:
 | PRELUDE STRING                          { Rprelude  ($2) }
 | SYNTAX cloned TYPE      qualid STRING   { Rsyntaxts ($2, $4, $5) }
+| SYNTAX cloned CONSTANT  qualid STRING   { Rsyntaxfs ($2, $4, $5) }
 | SYNTAX cloned FUNCTION  qualid STRING   { Rsyntaxfs ($2, $4, $5) }
 | SYNTAX cloned PREDICATE qualid STRING   { Rsyntaxps ($2, $4, $5) }
 | REMOVE cloned PROP qualid               { Rremovepr ($2, $4) }
@@ -101,7 +105,7 @@ meta_args:
 ;
 
 meta_arg:
-| TYPE      qualid { PMAts  $2 }
+| TYPE primitive_type_top { PMAty $2 }
 | FUNCTION  qualid { PMAfs  $2 }
 | PREDICATE qualid { PMAps  $2 }
 | PROP      qualid { PMApr  $2 }
@@ -161,6 +165,49 @@ operator:
 list1_string_list:
 | STRING                   { [$1] }
 | list1_string_list STRING { $2 :: $1 }
+;
+
+/* Types */
+
+primitive_type_top:
+| qualid primitive_type_args_top  { PTyapp ($1, $2) }
+| primitive_type_arg_common       { $1 }
+;
+
+primitive_type_args_top:
+| /* epsilon */ %prec prec_pty                { [] }
+| primitive_type_arg primitive_type_args_top  { $1 :: $2 }
+;
+
+primitive_type:
+| qualid primitive_type_args  { PTyapp ($1, $2) }
+| primitive_type_arg          { $1 }
+;
+
+primitive_type_args:
+| primitive_type_arg                      { [$1] }
+| primitive_type_arg primitive_type_args  { $1 :: $2 }
+;
+
+primitive_type_arg:
+| qualid                    { PTyapp ($1, []) }
+| primitive_type_arg_common { $1 }
+;
+
+primitive_type_arg_common:
+| type_var                          { PTyvar $1 }
+| LEFTPAR primitive_types RIGHTPAR  { PTuple $2 }
+| LEFTPAR RIGHTPAR                  { PTuple [] }
+| LEFTPAR primitive_type RIGHTPAR   { $2 }
+;
+
+primitive_types:
+| primitive_type COMMA primitive_type  { [$1; $3] }
+| primitive_type COMMA primitive_types { $1 :: $3 }
+;
+
+type_var:
+| QUOTE ident { $2 }
 ;
 
 /* WhyML */

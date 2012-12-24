@@ -379,7 +379,8 @@ list1_meta_arg_sep_comma:
 ;
 
 meta_arg:
-| TYPE      qualid { PMAts  $2 }
+| TYPE primitive_type { PMAty $2 }
+| CONSTANT  qualid { PMAfs  $2 }
 | FUNCTION  qualid { PMAfs  $2 }
 | PREDICATE qualid { PMAps  $2 }
 | PROP      qualid { PMApr  $2 }

@@ -148,7 +148,7 @@ type prop_kind =
   | Kaxiom | Klemma | Kgoal
 
 type metarg =
-  | PMAts  of qualid
+  | PMAty  of pty
   | PMAfs  of qualid
   | PMAps  of qualid
   | PMApr  of qualid
