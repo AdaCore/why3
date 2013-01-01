@@ -79,24 +79,30 @@ let print_its fmt ts = print_ts fmt ts.its_ts
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_ity_node inn fmt ity = match ity.ity_node with
-  | Ityvar v -> print_tv fmt v
+let rec print_ity_node s inn fmt ity = match ity.ity_node with
+  | Ityvar v ->
+      begin match Mtv.find_opt v s.ity_subst_tv with
+        | Some ity -> print_ity_node ity_subst_empty inn fmt ity
+        | None     -> print_tv fmt v
+      end
   | Itypur (ts,tl) when is_ts_tuple ts -> fprintf fmt "(%a)"
-      (print_list comma (print_ity_node false)) tl
+      (print_list comma (print_ity_node s false)) tl
   | Itypur (ts,[]) -> print_ts fmt ts
   | Itypur (ts,tl) -> fprintf fmt (protect_on inn "%a@ %a")
-      print_ts ts (print_list space (print_ity_node true)) tl
+      print_ts ts (print_list space (print_ity_node s true)) tl
   | Ityapp (ts,[],rl) -> fprintf fmt (protect_on inn "%a@ <%a>")
-      print_its ts (print_list comma print_regty) rl
+      print_its ts (print_list comma print_regty)
+      (List.map (fun r -> Mreg.find_def r r s.ity_subst_reg) rl)
   | Ityapp (ts,tl,rl) -> fprintf fmt (protect_on inn "%a@ <%a>@ %a")
-      print_its ts (print_list comma print_regty) rl
-      (print_list space (print_ity_node true)) tl
+      print_its ts (print_list comma print_regty)
+      (List.map (fun r -> Mreg.find_def r r s.ity_subst_reg) rl)
+      (print_list space (print_ity_node s true)) tl
 
 and print_regty fmt reg =
-  if Debug.test_noflag debug_print_reg_types then print_reg fmt reg else
-  fprintf fmt "@[%a:@,%a@]" print_reg reg (print_ity_node false) reg.reg_ity
+  if Debug.test_noflag debug_print_reg_types then print_reg fmt reg
+  else fprintf fmt "@[%a:@,%a@]" print_reg reg print_ity reg.reg_ity
 
-let print_ity = print_ity_node false
+and print_ity fmt ity = print_ity_node ity_subst_empty false fmt ity
 
 let print_reg_opt fmt = function
   | Some r -> fprintf fmt "<%a>" print_regty r
@@ -339,7 +345,9 @@ and print_tl fmt tl =
 (** Type declarations *)
 
 let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ity_node true) ty
+
+let print_ty_arg fmt ty =
+  fprintf fmt "@ %a" (print_ity_node ity_subst_empty true) ty
 
 let print_constr fmt (cs,pjl) =
   let print_pj fmt (vtv,pj) = match pj with
@@ -439,12 +447,13 @@ let () = Exn_printer.register
   | Mlw_ty.UnboundException xs ->
       fprintf fmt "This function raises %a but does not \
         specify a post-condition for it" print_xs xs
-  | Mlw_ty.RegionMismatch (r1,r2,_s) ->
+  | Mlw_ty.RegionMismatch (r1,r2,s) ->
+      let r1 = Mreg.find_def r1 r1 s.ity_subst_reg in
       fprintf fmt "Region mismatch between %a and %a"
         print_regty r1 print_regty r2
-  | Mlw_ty.TypeMismatch (t1,t2,_s) ->
+  | Mlw_ty.TypeMismatch (t1,t2,s) ->
       fprintf fmt "Type mismatch between %a and %a"
-        print_ity t1 print_ity t2
+        (print_ity_node s false) t1 print_ity t2
   | Mlw_ty.PolymorphicException (id,_ity) ->
       fprintf fmt "Exception %s has a polymorphic type" id.id_string
   | Mlw_ty.MutableException (id,_ity) ->
