@@ -15,6 +15,25 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
 
+(* the type of labels that are used by gnatprove and recognized by gnatwhy3 *)
+type gp_label =
+  | Gp_Sloc of Gnat_loc.loc
+  (* generic location label "GP_Sloc" *)
+  | Gp_Subp of Gnat_loc.loc
+  (* label "GP_Subp" used to indicate the location of the subprogram *)
+  | Gp_Sloc_VC of Gnat_loc.loc
+  (* label "GP_Subp" used to indicate the location of a VC *)
+  | Gp_Reason of reason
+  (* label "GP_Reason" used to indicate the kind of a VC *)
+  | Gp_Pretty_Ada of string
+  (* label "GP_Pretty_Ada" used to give the Ada source text for some
+     predicate *)
+
+val read_label : string -> gp_label option
+(* parse a string into a gp_label; abort if the label starts with "GP_" but
+   is not one of the predefined labels. Return [None] if the string does not
+   start with "GP_" *)
+
 type expl
 
 val expl_compare : expl -> expl -> int

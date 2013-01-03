@@ -63,6 +63,44 @@ let string_of_reason s =
    | VC_Loop_Variant              -> "loop variant"
    | VC_Assert                    -> "assertion"
 
+type gp_label =
+  | Gp_Sloc of Gnat_loc.loc
+  | Gp_Subp of Gnat_loc.loc
+  | Gp_Sloc_VC of Gnat_loc.loc
+  | Gp_Reason of reason
+  | Gp_Pretty_Ada of string
+
+let read_label s =
+    if Gnat_util.starts_with s "GP_" then
+       match Gnat_util.colon_split s with
+       | ["GP_Reason"; reason] ->
+             Some (Gp_Reason (reason_from_string reason))
+       | ["GP_Pretty_Ada"; msg] ->
+             Some (Gp_Pretty_Ada msg)
+       | "GP_Sloc" :: rest ->
+           begin try Some (Gp_Sloc (Gnat_loc.parse_loc rest))
+           with Failure "int_of_string" ->
+              Format.printf "GP_Sloc: cannot parse string: %s" s;
+              Gnat_util.abort_with_message ""
+           end
+       | "GP_Sloc_VC" :: rest ->
+           begin try Some (Gp_Sloc_VC (Gnat_loc.parse_loc rest))
+           with Failure "int_of_string" ->
+              Format.printf "GP_Sloc_VC: cannot parse string: %s" s;
+              Gnat_util.abort_with_message ""
+           end
+       | ["GP_Subp" ; file ; line ] ->
+           begin try
+             Some (Gp_Subp (Gnat_loc.mk_loc_line file (int_of_string line)))
+           with Failure "int_of_string" ->
+              Format.printf "GP_Subp: cannot parse string: %s" s;
+              Gnat_util.abort_with_message ""
+           end
+       | _ ->
+             Gnat_util.abort_with_message
+                 "found malformed GNATprove label"
+    else None
+
 let get_loc e = e.loc
 
 let to_filename expl =
@@ -96,42 +134,31 @@ type node_info =
    | No_Info
 (* The information that has been found in a node *)
 
-let read_labels s =
+let read_vc_labels s =
    let b = { expl_loc    = No_Sloc;
              expl_reason = None;
              expl_msg    = None } in
    Ident.Slab.iter
      (fun x ->
         let s = x.Ident.lab_string in
-        if Gnat_util.starts_with s "GP_" then
-           match Gnat_util.colon_split s with
-           | ["GP_Reason"; reason] ->
-                 b.expl_reason <- Some (reason_from_string reason)
-           | ["GP_Pretty_Ada"; msg] ->
-                 b.expl_msg <- Some msg
-           | "GP_Sloc" :: rest ->
-                 (* We only use a "normal" sloc information if the same node
-                    does not have have a VC sloc info already. *)
-                 begin
-                    match b.expl_loc with
-                    | VC_Sloc _ -> ()
-                    | _ ->
-                          try
-                             b.expl_loc <- Reg_Sloc (Gnat_loc.parse_loc rest)
-                    with Failure "int_of_string" ->
-                       Format.printf "GP_Sloc: cannot parse string: %s" s;
-                       Gnat_util.abort_with_message ""
-                 end
-           | "GP_Sloc_VC" :: rest ->
-                 begin try
-                    b.expl_loc <- VC_Sloc (Gnat_loc.parse_loc rest)
-                 with Failure "int_of_string" ->
-                    Format.printf "GP_Sloc: cannot parse string: %s" s;
-                    Gnat_util.abort_with_message ""
-                 end
-           | _ ->
-                 Gnat_util.abort_with_message
-                     "found malformed GNATprove label"
+        match read_label s with
+        | Some Gp_Reason reason ->
+            b.expl_reason <- Some reason
+        | Some Gp_Pretty_Ada msg ->
+            b.expl_msg <- Some msg
+        | Some Gp_Sloc loc ->
+            begin
+               match b.expl_loc with
+               | VC_Sloc _ -> ()
+               | _ -> b.expl_loc <- Reg_Sloc loc
+            end
+        | Some Gp_Sloc_VC loc ->
+            b.expl_loc <- VC_Sloc loc
+        | Some Gp_Subp _ ->
+             Gnat_util.abort_with_message
+                 "read_vc_labels: GP_Subp unexpected here"
+        | None ->
+            ()
      ) s;
      (* We potentially need to rectify in the case of loop invariants: We need
         to check whether the VC is for initialization or preservation *)
@@ -152,7 +179,7 @@ let extract_explanation s =
       labels of the node. If the record is entirely filled, we return an
       "Expl"; if there was at least a location, we return a "Sloc";
       otherwise we return "No_Info" *)
-     match read_labels s with
+     match read_vc_labels s with
      | { expl_loc = VC_Sloc sloc ;
          expl_reason = Some reason } ->
            Expl (mk_expl reason sloc)
@@ -173,7 +200,7 @@ let rec extract_msg t =
          let _,_,t = t_open_quant tq in
          extract_msg t
    | _ ->
-         read_labels t.t_label
+         read_vc_labels t.t_label
 
 let simple_print_expl fmt p =
   match p.loc with

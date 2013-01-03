@@ -33,3 +33,4 @@ val orig_loc : loc -> simple_loc
 val equal_line : loc -> loc -> bool
 (* compare two locations by file and line only, ignoring the column *)
 
+val compare : loc -> loc -> int

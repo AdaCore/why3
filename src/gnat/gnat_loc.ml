@@ -12,6 +12,8 @@ let equal_line l1 l2 =
    let l1 = List.hd l1 and l2 = List.hd l2 in
    l1.line = l2.line && l1.file = l2.file
 
+let compare = Pervasives.compare
+
 let orig_loc l =
    (* the original source is always the last source location *)
    List.hd l

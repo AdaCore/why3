@@ -496,7 +496,7 @@ let display_progress () =
       !nb_goals_done !total_nb_goals (!nb_goals_done * 100 / !total_nb_goals)
    end
 
-exception Found of string
+exception Found of Gnat_loc.loc
 
 let extract_sloc main_goal =
    let task = Session.goal_task main_goal in
@@ -504,13 +504,15 @@ let extract_sloc main_goal =
    let label_set = goal_ident.Ident.id_label in
    try
       Ident.Slab.iter (fun lab ->
-         let s = lab.Ident.lab_string in
-         if Strings.starts_with s "GP_Subp:" then raise (Found s)) label_set;
+        match Gnat_expl.read_label lab.Ident.lab_string with
+        | Some Gnat_expl.Gp_Subp loc -> raise (Found (loc))
+        | _ -> ()
+      ) label_set;
       assert false
-   with Found s -> s
+   with Found l -> l
 
 let compare_by_sloc g1 g2 =
-   Pervasives.compare (extract_sloc g1) (extract_sloc g2)
+   Gnat_loc.compare (extract_sloc g1) (extract_sloc g2)
 
 let iter_subps f =
    let acc = ref [] in
@@ -527,7 +529,6 @@ let matches_subp_filter subp =
          let goal_ident = (Task.task_goal task).Decl.pr_name in
          let label_set = goal_ident.Ident.id_label in
          Ident.Slab.mem lab label_set
-
 
 module Save_VCs = struct
 
