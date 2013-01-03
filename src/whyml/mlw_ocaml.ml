@@ -21,6 +21,7 @@ open Decl
 open Theory
 open Printer
 open Mlw_ty
+open Mlw_module
 
 let debug =
   Debug.register_info_flag "extraction"
@@ -30,20 +31,20 @@ let clean_fname fname =
   let fname = Filename.basename fname in
   (try Filename.chop_extension fname with _ -> fname)
 
-let modulename ?fname th =
-  let fname = match fname, th.th_path with
+let modulename ?fname path t =
+  let fname = match fname, path with
     | Some fname, _ -> clean_fname fname
-    | None, [] -> assert false
-    | None, path -> String.concat "__" path
+    | None, [] -> "why3"
+    | None, _ -> String.concat "__" path
   in
-  fname ^ "__" ^ th.th_name.Ident.id_string
+  fname ^ "__" ^ t
 
 let extract_filename ?fname th =
-  (modulename ?fname th) ^ ".ml"
+  (modulename ?fname th.th_path th.th_name.Ident.id_string) ^ ".ml"
 
-let modulename path t =
-  String.capitalize
-    (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t)
+(* let modulename path t = *)
+(*   String.capitalize *)
+(*     (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t) *)
 
 (** Printers *)
 
@@ -87,6 +88,7 @@ let forget_all () =
 type info = {
   info_syn: syntax_map;
   current_theory: Theory.theory;
+  current_module: Mlw_module.modul option;
   th_known_map: Decl.known_map;
   mo_known_map: Mlw_decl.known_map;
   fname: string option;
@@ -141,10 +143,14 @@ let print_qident ~sanitizer info fmt id =
     let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
     let s = sanitizer s in
     let s = if is_ocaml_keyword s then s ^ "_renamed" else s in
-    if Sid.mem id info.current_theory.th_local then
+    if Sid.mem id info.current_theory.th_local ||
+       Opt.fold (fun _ m -> Sid.mem id m.mod_local) false info.current_module
+    then
       fprintf fmt "%s" s
     else
-      fprintf fmt "%s.%s" (modulename lp t) s
+      let fname = if lp = [] then info.fname else None in
+      let m = String.capitalize (modulename ?fname lp t) in
+      fprintf fmt "%s.%s" m s
   with Not_found ->
     let s = id_unique ~sanitizer iprinter id in
     fprintf fmt "%s" s
@@ -408,7 +414,8 @@ and print_app pri ls info fmt tl =
   let isconstr = is_constructor info ls in
   let is_field (_, csl) = match csl with
     | [_, pjl] ->
-        List.for_all ((<>) None) pjl && List.exists ((=) (Some ls)) pjl
+        let is_ls = function None -> false | Some ls' -> ls_equal ls ls' in
+        List.for_all ((<>) None) pjl && List.exists is_ls pjl
     | _ -> false in
   let isfield = match Mid.find_opt ls.ls_name info.th_known_map with
     | Some { d_node = Ddata dl } -> not isconstr && List.exists is_field dl
@@ -582,6 +589,7 @@ let extract_theory drv ?old ?fname fmt th =
   let info = {
     info_syn = sm;
     current_theory = th;
+    current_module = None;
     th_known_map = th.th_known;
     mo_known_map = Mid.empty;
     fname = Opt.map clean_fname fname; } in
@@ -979,6 +987,7 @@ let extract_module drv ?old ?fname fmt m =
   let info = {
     info_syn = sm;
     current_theory = th;
+    current_module = Some m;
     th_known_map = th.th_known;
     mo_known_map = m.mod_known;
     fname = Opt.map clean_fname fname; } in
