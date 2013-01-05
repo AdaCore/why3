@@ -86,7 +86,7 @@ let implicit_post = Debug.register_flag "implicit_post"
 
 type denv = {
   uc     : module_uc;
-  locals : (tvars * dvty) Mstr.t;
+  locals : (tvars option * dvty) Mstr.t;
   tvars  : tvars;
   uloc   : Ptree.loc option;
 }
@@ -179,9 +179,6 @@ let dity_int  = ts_app ts_int  []
 let dity_real = ts_app ts_real []
 let dity_bool = ts_app ts_bool []
 let dity_unit = ts_app ts_unit []
-(* dead code
-let dity_mark = ts_app ts_mark []
-*)
 
 let unify_loc unify_fn loc x1 x2 = try unify_fn x1 x2 with
   | TypeMismatch (ity1,ity2,_) -> errorm ~loc
@@ -277,10 +274,15 @@ let mk_let ~loc ~uloc e (desc,dvty) =
 
 (* patterns *)
 
-let add_var id dity denv =
-  let tvars = add_dity denv.tvars dity in
-  let locals = Mstr.add id.id (tvars,([],dity)) denv.locals in
-  { denv with locals = locals; tvars = tvars }
+let add_poly id dvty denv =
+  let locals = Mstr.add id.id (Some denv.tvars, dvty) denv.locals in
+  { denv with locals = locals }
+
+let add_mono id dvty denv =
+  let locals = Mstr.add id.id (None, dvty) denv.locals in
+  { denv with locals = locals; tvars = add_dvty denv.tvars dvty }
+
+let add_var id dity denv = add_mono id ([],dity) denv
 
 let specialize_qualid uc p = match uc_find_ps uc p with
   | PV pv -> DEglobal_pv pv, ([],specialize_pvsymbol pv)
@@ -451,11 +453,12 @@ let rec dexpr denv e =
   mk_dexpr d ty loc labs
 
 and de_desc denv loc = function
-  | Ptree.Eident (Qident {id=x}) when Mstr.mem x denv.locals ->
-      (* local variable *)
-      let tvs, dvty = Mstr.find x denv.locals in
-      let dvty = specialize_scheme tvs dvty in
-      DElocal x, dvty
+  | Ptree.Eident (Qident {id = x} as p) ->
+      begin match Mstr.find_opt x denv.locals with
+        | Some (Some tvs, dvty) -> DElocal x, specialize_scheme tvs dvty
+        | Some (None,     dvty) -> DElocal x, dvty
+        | None                  -> specialize_qualid denv.uc p
+      end
   | Ptree.Eident p ->
       specialize_qualid denv.uc p
   | Ptree.Eapply (e1, e2) ->
@@ -464,18 +467,14 @@ and de_desc denv loc = function
       de_app loc (dexpr denv e) el
   | Ptree.Elet (id, gh, e1, e2) ->
       let e1 = dexpr denv e1 in
-      let dvty = e1.de_type in
-      let tvars = match e1.de_desc with
-        | DEfun _ -> denv.tvars
-        | _ -> add_dvty denv.tvars dvty in
-      let locals = Mstr.add id.id (tvars, dvty) denv.locals in
-      let denv = { denv with locals = locals; tvars = tvars } in
+      let denv = match e1.de_desc with
+        | DEfun _ -> add_poly id e1.de_type denv
+        | _       -> add_mono id e1.de_type denv in
       let e2 = dexpr denv e2 in
       DElet (id, gh, e1, e2), e2.de_type
   | Ptree.Eletrec (fdl, e1) ->
       let fdl = dletrec denv fdl in
-      let add_one denv ({ id = id }, _, dvty, _, _) =
-        { denv with locals = Mstr.add id (denv.tvars, dvty) denv.locals } in
+      let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
       let denv = List.fold_left add_one denv fdl in
       let e1 = dexpr denv e1 in
       DEletrec (fdl, e1), e1.de_type
@@ -644,9 +643,7 @@ and dletrec denv fdl =
   let add_one denv (_,id,_,bl,_) =
     let argl = List.map (fun _ -> create_type_variable ()) bl in
     let dvty = argl, create_type_variable () in
-    let tvars = add_dvty denv.tvars dvty in
-    let locals = Mstr.add id.id (tvars, dvty) denv.locals in
-    { denv with locals = locals; tvars = tvars }, dvty in
+    add_mono id dvty denv, dvty in
   let denv, dvtyl = Lists.map_fold_left add_one denv fdl in
   (* then unify the binders *)
   let bind_one (_,_,_,bl,_) (argl,res) =
@@ -1005,11 +1002,6 @@ and type_v lenv gh pvs vars = function
 
 (* expressions *)
 
-(* dead code
-let vty_ghostify gh vty =
-  if gh && not (vty_ghost vty) then vty_ghostify vty else vty
-*)
-
 let e_ghostify gh e =
   if gh && not (vty_ghost e.e_vty) then e_ghost e else e
 
@@ -1218,6 +1210,7 @@ and expr_rec lenv dfdl =
   let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
     let pvl = binders bl in
     let vta = vty_arrow pvl ~ghost:gh (vty_of_dvty de.de_type) in
+    let vta = vta_filter Mid.empty vta (* add reset effects *) in
     let ps = create_psymbol (Denv.create_user_id id) vta in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in

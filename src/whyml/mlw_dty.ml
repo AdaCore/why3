@@ -189,7 +189,6 @@ let unify d1 d2 = unify ~weak:false d1 d2
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let vty_of_dvty (argl,res) =
-  let ity_of_dity dity = ity_of_dity dity in
   let vtv = VTvalue (vty_value (ity_of_dity res)) in
   let conv a = create_pvsymbol (id_fresh "x") (vty_value (ity_of_dity a)) in
   if argl = [] then vtv else VTarrow (vty_arrow (List.map conv argl) vtv)
