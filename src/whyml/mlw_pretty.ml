@@ -401,13 +401,13 @@ let print_val_decl fmt lv =
   let vty = match lv with
     | LetV pv -> VTvalue pv.pv_vtv | LetA ps -> VTarrow ps.ps_vta in
   fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v vty;
-  (* FIXME: don't forget global regions *)
-  forget_tvs_regs ()
+  (* FIXME: forget only generalized regions *)
+  match lv with LetA _ -> forget_tvs_regs () | _ -> ()
 
 let print_let_decl fmt { let_sym = lv ; let_expr = e } =
   fprintf fmt "@[<hov 2>let %a =@ %a@]" print_lv lv print_expr e;
-  (* FIXME: don't forget global regions *)
-  forget_tvs_regs ()
+  (* FIXME: forget only generalized regions *)
+  match lv with LetA _ -> forget_tvs_regs () | _ -> ()
 
 let print_rec_decl lr fst fmt fd =
   print_rec lr fst fmt fd;
