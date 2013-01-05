@@ -483,7 +483,7 @@ and de_desc denv loc = function
       DEfun (bl, tr), (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in
-      expected_type e1 (dity_of_pty denv pty);
+      expected_type_weak e1 (dity_of_pty denv pty);
       e1.de_desc, e1.de_type
   | Ptree.Enamed _ ->
       assert false
@@ -661,6 +661,205 @@ and dtriple denv (e, sp) =
   let e = dexpr denv e in
   let sp = dspec denv.uc sp in
   (e, sp), e.de_type
+
+(** stage 1.5 *)
+
+(* After the stage 1, we know precisely the types of all binders
+   and program expressions. However, the regions in recursive functions
+   might be over-unified, since we do not support recursive polymorphism.
+   For example, the letrec below will require that a and b share the region.
+
+     let rec main a b : int = if !a = 0 then main b a else 5
+
+   To avoid this, we retype the whole dexpr generated at the stage 1.
+   Every binder keeps its previous type with all regions refreshed.
+   Every non-arrow expression keeps its previous type modulo regions.
+   When we type-check recursive functions, we add them to the denv
+   as polymorphic, but freeze every type variable. In other words,
+   only regions are specialized during recursive calls. *)
+
+let add_preid id dity denv =
+  add_var (mk_id (Ident.preid_name id) Loc.dummy_position) dity denv
+
+let rec rpattern denv pp dity = match pp with
+  | PPwild -> denv
+  | PPvar id -> add_preid id dity denv
+  | PPlapp (ls, ppl) -> rpat_app denv (specialize_lsymbol ls) ppl dity
+  | PPpapp (pl, ppl) -> rpat_app denv (specialize_plsymbol pl) ppl dity
+  | PPor (pp1, pp2) -> rpattern (rpattern denv pp1 dity) pp2 dity
+  | PPas (pp1, id) -> add_preid id dity (rpattern denv pp1 dity)
+
+and rpat_app denv (argl,res) ppl dity =
+  unify res dity;
+  List.fold_left2 rpattern denv ppl argl
+
+let rbinders denv bl =
+  let rbinder (id,gh,dity) (denv,bl,tyl) =
+    let dity = dity_refresh dity in
+    add_var id dity denv, (id,gh,dity)::bl, dity::tyl in
+  List.fold_right rbinder bl (denv,[],[])
+
+let rec rtype_c denv (tyv, sp) =
+  let tyv, dvty = rtype_v denv tyv in (tyv, sp), dvty
+
+and rtype_v denv = function
+  | DSpecV (gh, dity) ->
+      let dity = dity_refresh dity in
+      DSpecV (gh,dity), ([],dity)
+  | DSpecA (bl,tyc) ->
+      let denv,bl,tyl = rbinders denv bl in
+      let tyc,(argl,res) = rtype_c denv tyc in
+      DSpecA (bl,tyc), (tyl @ argl,res)
+
+let rec rexpr denv de =
+  let re = re_desc denv de in
+  if fst re.de_type = [] then (* restore the type casts *)
+    expected_type_weak re (dity_refresh (snd de.de_type));
+  re
+
+and re_desc denv de = match de.de_desc with
+  | DEconstant _ -> de
+  | DElocal x ->
+      let ty = match Mstr.find x denv.locals with
+        | Some tvs, dvty -> specialize_scheme tvs dvty
+        | None,     dvty -> dvty in
+      { de with de_type = ty }
+  | DEglobal_pv pv -> { de with de_type = ([],specialize_pvsymbol pv) }
+  | DEglobal_ps ps -> { de with de_type = specialize_psymbol ps }
+  | DEglobal_pl pl -> { de with de_type = specialize_plsymbol pl }
+  | DEglobal_ls ls -> { de with de_type = specialize_lsymbol ls }
+  | DEapply (e1, el) ->
+      let e1 = rexpr denv e1 in
+      let el = List.map (rexpr denv) el in
+      let d,ty = de_app de.de_loc e1 el in
+      { de with de_desc = d; de_type = ty }
+  | DEfun (bl, (e1, sp)) ->
+      let denv, bl, tyl = rbinders denv bl in
+      let e1 = rexpr denv e1 in
+      let argl, res = e1.de_type in
+      { de with de_desc = DEfun (bl, (e1, sp)); de_type = (tyl @ argl, res) }
+  | DElet (id, gh, e1, e2) ->
+      let e1 = rexpr denv e1 in
+      let denv = match e1.de_desc with
+        | DEfun _ -> add_poly id e1.de_type denv
+        | _       -> add_mono id e1.de_type denv in
+      let e2 = rexpr denv e2 in
+      { de with de_desc = DElet (id, gh, e1, e2); de_type = e2.de_type }
+  | DEletrec (fdl, e1) ->
+      let fdl = rletrec denv fdl in
+      let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
+      let denv = List.fold_left add_one denv fdl in
+      let e1 = rexpr denv e1 in
+      { de with de_desc = DEletrec (fdl, e1); de_type = e1.de_type }
+  | DEassign (e1, e2) ->
+      let e1 = rexpr denv e1 in
+      let e2 = rexpr denv e2 in
+      let res = create_type_variable () in
+      expected_type e1 res;
+      expected_type_weak e2 res;
+      { de with de_desc = DEassign (e1, e2); de_type = ([], dity_unit) }
+  | DEif (e1, e2, e3) ->
+      let e1 = rexpr denv e1 in
+      expected_type e1 dity_bool;
+      let e2 = rexpr denv e2 in
+      let e3 = rexpr denv e3 in
+      let res = create_type_variable () in
+      expected_type e2 res;
+      expected_type e3 res;
+      { de with de_desc = DEif (e1, e2, e3); de_type = e2.de_type }
+  | DElazy (op, e1, e2) ->
+      let e1 = rexpr denv e1 in
+      let e2 = rexpr denv e2 in
+      expected_type e1 dity_bool;
+      expected_type e2 dity_bool;
+      { de with de_desc = DElazy (op, e1, e2); de_type = ([], dity_bool) }
+  | DEnot e1 ->
+      let e1 = rexpr denv e1 in
+      expected_type e1 dity_bool;
+      { de with de_desc = DEnot e1; de_type = ([], dity_bool) }
+  | DEmatch (e1, bl) ->
+      let e1 = rexpr denv e1 in
+      let res = create_type_variable () in
+      let ety = create_type_variable () in
+      expected_type e1 ety;
+      let branch (pp,e) =
+        let denv = rpattern denv pp ety in
+        let e = rexpr denv e in
+        expected_type e res;
+        pp, e in
+      let bl = List.map branch bl in
+      { de with de_desc = DEmatch (e1, bl); de_type = ([], res) }
+  | DEraise (xs, e1) ->
+      let dity = specialize_xsymbol xs in
+      let e1 = rexpr denv e1 in
+      expected_type e1 dity;
+      let res = create_type_variable () in
+      { de with de_desc = DEraise (xs, e1); de_type = ([], res) }
+  | DEtry (e1, cl) ->
+      let res = create_type_variable () in
+      let e1 = rexpr denv e1 in
+      expected_type e1 res;
+      let branch (xs, pp, e) =
+        let ety = specialize_xsymbol xs in
+        let denv = rpattern denv pp ety in
+        let e = rexpr denv e in
+        expected_type e res;
+        xs, pp, e in
+      let cl = List.map branch cl in
+      { de with de_desc = DEtry (e1, cl); de_type = e1.de_type }
+  | DEabsurd ->
+      { de with de_type = ([], create_type_variable ()) }
+  | DEassert _ ->
+      { de with de_type = ([], dity_unit) }
+  | DEabstract (e1, sp) ->
+      let e1 = rexpr denv e1 in
+      { de with de_desc = DEabstract (e1, sp); de_type = e1.de_type }
+  | DEmark (id, e1) ->
+      let e1 = rexpr denv e1 in
+      { de with de_desc = DEmark (id, e1); de_type = e1.de_type }
+  | DEghost e1 ->
+      let e1 = rexpr denv e1 in
+      { de with de_desc = DEghost e1; de_type = e1.de_type }
+  | DEany tyc ->
+      let tyc, dvty = rtype_c denv tyc in
+      { de with de_desc = DEany tyc; de_type = dvty }
+  | DEloop (var, inv, e1) ->
+      let e1 = rexpr denv e1 in
+      expected_type e1 dity_unit;
+      { de with de_desc = DEloop (var,inv,e1); de_type = e1.de_type }
+  | DEfor (id, efrom, dir, eto, inv, e1) ->
+      let efrom = rexpr denv efrom in
+      let eto = rexpr denv eto in
+      let denv = add_var id dity_int denv in
+      let e1 = rexpr denv e1 in
+      expected_type efrom dity_int;
+      expected_type eto dity_int;
+      expected_type e1 dity_unit;
+      let d = DEfor (id,efrom,dir,eto,inv,e1) in
+      { de with de_desc = d; de_type = e1.de_type }
+
+and rletrec denv fdl =
+  (* add all functions into the environment *)
+  let add_one denv (id,_,(argl,res),_,_) =
+    let dvty = List.map dity_refresh argl, dity_refresh res in
+    let tvars = add_dvty_vars denv.tvars dvty in
+    let locals = Mstr.add id.id (Some tvars, dvty) denv.locals in
+    { denv with locals = locals; tvars = tvars } in
+  let denv = List.fold_left add_one denv fdl in
+  (* then type-check the bodies *)
+  let type_one (id,gh,_,bl,(e,sp)) =
+    let denv,bl,tyl = rbinders denv bl in
+    let e = rexpr denv e in
+    let argl, tyv = e.de_type in
+    assert (argl = []);
+    id, gh, (tyl, tyv), bl, (e, sp) in
+  List.map type_one fdl
+
+let dexpr denv e =
+  rexpr denv (dexpr denv e)
+
+let dletrec denv fdl =
+  rletrec denv (dletrec denv fdl)
 
 (** stage 2 *)
 

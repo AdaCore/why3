@@ -111,6 +111,13 @@ let ts_app ts dl =
   | None ->
       ts_app_real ts dl
 
+let rec dity_refresh = function
+  | Dvar { contents = Dtvs _ } as dity -> dity
+  | Dvar { contents = Dval dty } -> dity_refresh dty
+  | Duvar _ as dity -> dity
+  | Dits (its,dl,_) -> its_app its (List.map dity_refresh dl)
+  | Dts (ts,dl) -> ts_app_real ts (List.map dity_refresh dl)
+
 (* unification *)
 
 let rec occur_check tv = function
@@ -199,6 +206,16 @@ let empty_tvars = []
 
 let add_dity tvs dity = dity :: tvs
 let add_dvty tvs (argl,res) = res :: List.rev_append argl tvs
+
+let rec add_dity_vars tvs = function
+  | Dvar { contents = Dtvs _ } as dity -> dity :: tvs
+  | Dvar { contents = Dval dity } -> add_dity_vars tvs dity
+  | Duvar _ as dity -> dity :: tvs
+  | Dits (_,dl,_)
+  | Dts (_,dl) -> List.fold_left add_dity_vars tvs dl
+
+let add_dvty_vars tvs (argl,res) =
+  add_dity_vars (List.fold_left add_dity_vars tvs argl) res
 
 let tv_in_tvars tv tvs =
   try List.iter (occur_check tv) tvs; false with Exit -> true
