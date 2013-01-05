@@ -310,58 +310,57 @@ let find_vs uc lvm p = match p with
       let ovs = Mstr.find_opt id.id lvm in
       if ovs = None then find_global_vs uc p else ovs
 
-let rec dpattern denv ({ pat_loc = loc } as pp) = match pp.pat_desc with
+let rec dpattern denv ({ pat_loc = loc } as pp) dity = match pp.pat_desc with
   | Ptree.PPpwild ->
-      PPwild, create_type_variable (), denv
+      PPwild, denv
   | Ptree.PPpvar id ->
-      let dity = create_type_variable () in
-      PPvar (Denv.create_user_id id), dity, add_var id dity denv
+      PPvar (Denv.create_user_id id), add_var id dity denv
   | Ptree.PPpapp (q,ppl) ->
       let sym, dvty = specialize_qualid denv.uc q in
-      dpat_app denv loc (mk_dexpr sym dvty loc Slab.empty) ppl
+      dpat_app denv loc (mk_dexpr sym dvty loc Slab.empty) ppl dity
   | Ptree.PPprec fl when is_pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj flm in
-      dpat_app denv loc (hidden_ls ~loc cs) (List.map get_val pjl)
+      dpat_app denv loc (hidden_ls ~loc cs) (List.map get_val pjl) dity
   | Ptree.PPprec fl ->
       let fl = List.map (find_prog_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj.pl_ls flm in
-      dpat_app denv loc (hidden_pl ~loc cs) (List.map get_val pjl)
+      dpat_app denv loc (hidden_pl ~loc cs) (List.map get_val pjl) dity
   | Ptree.PPptuple ppl ->
       let cs = fs_tuple (List.length ppl) in
-      dpat_app denv loc (hidden_ls ~loc cs) ppl
+      dpat_app denv loc (hidden_ls ~loc cs) ppl dity
   | Ptree.PPpor (lpp1, lpp2) ->
-      let pp1, dity1, denv = dpattern denv lpp1 in
-      let pp2, dity2, denv = dpattern denv lpp2 in
-      unify_loc unify lpp2.pat_loc dity1 dity2;
-      PPor (pp1, pp2), dity1, denv
+      let pp1, denv = dpattern denv lpp1 dity in
+      let pp2, denv = dpattern denv lpp2 dity in
+      PPor (pp1, pp2), denv
   | Ptree.PPpas (pp, id) ->
-      let pp, dity, denv = dpattern denv pp in
-      PPas (pp, Denv.create_user_id id), dity, add_var id dity denv
+      let pp, denv = dpattern denv pp dity in
+      PPas (pp, Denv.create_user_id id), add_var id dity denv
 
-and dpat_app denv gloc ({ de_loc = loc } as de) ppl =
-  let add_pp lp (ppl, tyl, denv) =
-    let pp, ty, denv = dpattern denv lp in
-    pp::ppl, (lp.pat_loc,ty)::tyl, denv in
-  let ppl, tyl, denv = List.fold_right add_pp ppl ([],[],denv) in
-  let pp, ls = match de.de_desc with
-    | DEglobal_pl pl -> Mlw_expr.PPpapp (pl, ppl), pl.pl_ls
-    | DEglobal_ls ls -> Mlw_expr.PPlapp (ls, ppl), ls
+and dpat_app denv gloc ({ de_loc = loc } as de) ppl dity =
+  let ls = match de.de_desc with
+    | DEglobal_pl pl -> pl.pl_ls
+    | DEglobal_ls ls -> ls
     | DEglobal_pv pv -> errorm ~loc "%a is not a constructor" print_pv pv
     | DEglobal_ps ps -> errorm ~loc "%a is not a constructor" print_ps ps
-    | _ -> assert false
-  in
+    | _ -> assert false in
   let argl, res = de.de_type in
   if List.length argl <> List.length ppl then error ~loc:gloc
     (Term.BadArity (ls, List.length argl, List.length ppl));
-  let unify_arg ta (loc,tv) = unify_loc unify loc ta tv in
-  List.iter2 unify_arg argl tyl;
-  pp, res, denv
+  unify_loc unify gloc res dity;
+  let add_pp lp ty (ppl, denv) =
+    let pp, denv = dpattern denv lp ty in pp::ppl, denv in
+  let ppl, denv = List.fold_right2 add_pp ppl argl ([],denv) in
+  let pp = match de.de_desc with
+    | DEglobal_pl pl -> Mlw_expr.PPpapp (pl, ppl)
+    | DEglobal_ls ls -> Mlw_expr.PPlapp (ls, ppl)
+    | _ -> assert false in
+  pp, denv
 
 (* specifications *)
 
@@ -577,8 +576,7 @@ and de_desc denv loc = function
       let res = create_type_variable () in
       expected_type e1 ety;
       let branch (pp,e) =
-        let ppat, dity, denv = dpattern denv pp in
-        unify_loc unify pp.pat_loc ety dity;
+        let ppat, denv = dpattern denv pp ety in
         let e = dexpr denv e in
         expected_type e res;
         ppat, e in
@@ -599,8 +597,7 @@ and de_desc denv loc = function
       let branch (q, pp, e) =
         let xs = find_xsymbol denv.uc q in
         let ety = specialize_xsymbol xs in
-        let ppat, dity, denv = dpattern denv pp in
-        unify_loc unify pp.pat_loc ety dity;
+        let ppat, denv = dpattern denv pp ety in
         let e = dexpr denv e in
         expected_type e res;
         xs, ppat, e in
