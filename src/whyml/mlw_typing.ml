@@ -583,12 +583,11 @@ and de_desc denv loc = function
       DEmatch (e1, List.map branch bl), ([], res)
   | Ptree.Eraise (q, e1) ->
       let xs = find_xsymbol denv.uc q in
-      let dity = specialize_xsymbol xs in
       let e1 = match e1 with
         | Some e1 -> dexpr denv e1
         | None when ity_equal xs.xs_ity ity_unit -> de_unit ~loc
         | _ -> errorm ~loc "exception argument expected" in
-      expected_type e1 dity;
+      expected_type e1 (specialize_xsymbol xs);
       DEraise (xs, e1), ([], create_type_variable ())
   | Ptree.Etry (e1, cl) ->
       let res = create_type_variable () in
@@ -601,8 +600,7 @@ and de_desc denv loc = function
         let e = dexpr denv e in
         expected_type e res;
         xs, ppat, e in
-      let cl = List.map branch cl in
-      DEtry (e1, cl), e1.de_type
+      DEtry (e1, List.map branch cl), e1.de_type
   | Ptree.Eabsurd ->
       DEabsurd, ([], create_type_variable ())
   | Ptree.Eassert (ak, lexpr) ->
@@ -624,7 +622,7 @@ and de_desc denv loc = function
       let e1 = dexpr denv e1 in
       let var = dvariant denv.uc var in
       expected_type e1 dity_unit;
-      DEloop (var,inv,e1), e1.de_type
+      DEloop (var, inv, e1), e1.de_type
   | Ptree.Efor (id, efrom, dir, eto, inv, e1) ->
       let efrom = dexpr denv efrom in
       let eto = dexpr denv eto in
@@ -633,7 +631,7 @@ and de_desc denv loc = function
       expected_type efrom dity_int;
       expected_type eto dity_int;
       expected_type e1 dity_unit;
-      DEfor (id,efrom,dir,eto,inv,e1), e1.de_type
+      DEfor (id, efrom, dir, eto, inv, e1), e1.de_type
 
 and dletrec denv fdl =
   (* add all functions into the environment *)
@@ -711,53 +709,52 @@ and rtype_v denv = function
       let tyc,(argl,res) = rtype_c denv tyc in
       DSpecA (bl,tyc), (tyl @ argl,res)
 
-let rec rexpr denv de =
-  let re = re_desc denv de in
-  if fst re.de_type = [] then (* restore the type casts *)
-    expected_type_weak re (dity_refresh (snd de.de_type));
-  re
+let rec rexpr denv ({ de_type = (argl,res) } as de) =
+  let desc, dvty = re_desc denv de in
+  let de = { de with de_desc = desc; de_type = dvty } in
+  if argl = [] then expected_type_weak de (dity_refresh res);
+  de
 
 and re_desc denv de = match de.de_desc with
-  | DEconstant _ -> de
-  | DElocal x ->
-      let ty = match Mstr.find x denv.locals with
+  | DElocal x as d ->
+      let dvty = match Mstr.find x denv.locals with
         | Some tvs, dvty -> specialize_scheme tvs dvty
         | None,     dvty -> dvty in
-      { de with de_type = ty }
-  | DEglobal_pv pv -> { de with de_type = ([],specialize_pvsymbol pv) }
-  | DEglobal_ps ps -> { de with de_type = specialize_psymbol ps }
-  | DEglobal_pl pl -> { de with de_type = specialize_plsymbol pl }
-  | DEglobal_ls ls -> { de with de_type = specialize_lsymbol ls }
+      d, dvty
+  | DEglobal_pv pv as d -> d, ([],specialize_pvsymbol pv)
+  | DEglobal_ps ps as d -> d, specialize_psymbol ps
+  | DEglobal_pl pl as d -> d, specialize_plsymbol pl
+  | DEglobal_ls ls as d -> d, specialize_lsymbol ls
+  | DEconstant _   as d -> d, de.de_type
   | DEapply (e1, el) ->
       let e1 = rexpr denv e1 in
       let el = List.map (rexpr denv) el in
-      let d,ty = de_app de.de_loc e1 el in
-      { de with de_desc = d; de_type = ty }
+      de_app de.de_loc e1 el
   | DEfun (bl, (e1, sp)) ->
       let denv, bl, tyl = rbinders denv bl in
       let e1 = rexpr denv e1 in
       let argl, res = e1.de_type in
-      { de with de_desc = DEfun (bl, (e1, sp)); de_type = (tyl @ argl, res) }
+      DEfun (bl, (e1, sp)), (tyl @ argl, res)
   | DElet (id, gh, e1, e2) ->
       let e1 = rexpr denv e1 in
       let denv = match e1.de_desc with
         | DEfun _ -> add_poly id e1.de_type denv
         | _       -> add_mono id e1.de_type denv in
       let e2 = rexpr denv e2 in
-      { de with de_desc = DElet (id, gh, e1, e2); de_type = e2.de_type }
+      DElet (id, gh, e1, e2), e2.de_type
   | DEletrec (fdl, e1) ->
       let fdl = rletrec denv fdl in
       let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
       let denv = List.fold_left add_one denv fdl in
       let e1 = rexpr denv e1 in
-      { de with de_desc = DEletrec (fdl, e1); de_type = e1.de_type }
+      DEletrec (fdl, e1), e1.de_type
   | DEassign (e1, e2) ->
       let e1 = rexpr denv e1 in
       let e2 = rexpr denv e2 in
       let res = create_type_variable () in
       expected_type e1 res;
       expected_type_weak e2 res;
-      { de with de_desc = DEassign (e1, e2); de_type = ([], dity_unit) }
+      DEassign (e1, e2), ([], dity_unit)
   | DEif (e1, e2, e3) ->
       let e1 = rexpr denv e1 in
       expected_type e1 dity_bool;
@@ -766,17 +763,17 @@ and re_desc denv de = match de.de_desc with
       let res = create_type_variable () in
       expected_type e2 res;
       expected_type e3 res;
-      { de with de_desc = DEif (e1, e2, e3); de_type = e2.de_type }
+      DEif (e1, e2, e3), e2.de_type
   | DElazy (op, e1, e2) ->
       let e1 = rexpr denv e1 in
       let e2 = rexpr denv e2 in
       expected_type e1 dity_bool;
       expected_type e2 dity_bool;
-      { de with de_desc = DElazy (op, e1, e2); de_type = ([], dity_bool) }
+      DElazy (op, e1, e2), ([], dity_bool)
   | DEnot e1 ->
       let e1 = rexpr denv e1 in
       expected_type e1 dity_bool;
-      { de with de_desc = DEnot e1; de_type = ([], dity_bool) }
+      DEnot e1, ([], dity_bool)
   | DEmatch (e1, bl) ->
       let e1 = rexpr denv e1 in
       let res = create_type_variable () in
@@ -787,14 +784,11 @@ and re_desc denv de = match de.de_desc with
         let e = rexpr denv e in
         expected_type e res;
         pp, e in
-      let bl = List.map branch bl in
-      { de with de_desc = DEmatch (e1, bl); de_type = ([], res) }
+      DEmatch (e1, List.map branch bl), ([], res)
   | DEraise (xs, e1) ->
-      let dity = specialize_xsymbol xs in
       let e1 = rexpr denv e1 in
-      expected_type e1 dity;
-      let res = create_type_variable () in
-      { de with de_desc = DEraise (xs, e1); de_type = ([], res) }
+      expected_type e1 (specialize_xsymbol xs);
+      DEraise (xs, e1), ([], create_type_variable ())
   | DEtry (e1, cl) ->
       let res = create_type_variable () in
       let e1 = rexpr denv e1 in
@@ -805,28 +799,27 @@ and re_desc denv de = match de.de_desc with
         let e = rexpr denv e in
         expected_type e res;
         xs, pp, e in
-      let cl = List.map branch cl in
-      { de with de_desc = DEtry (e1, cl); de_type = e1.de_type }
-  | DEabsurd ->
-      { de with de_type = ([], create_type_variable ()) }
-  | DEassert _ ->
-      { de with de_type = ([], dity_unit) }
+      DEtry (e1, List.map branch cl), e1.de_type
+  | DEabsurd as d ->
+      d, ([], create_type_variable ())
+  | DEassert _ as d ->
+      d, ([], dity_unit)
   | DEabstract (e1, sp) ->
       let e1 = rexpr denv e1 in
-      { de with de_desc = DEabstract (e1, sp); de_type = e1.de_type }
+      DEabstract (e1, sp), e1.de_type
   | DEmark (id, e1) ->
       let e1 = rexpr denv e1 in
-      { de with de_desc = DEmark (id, e1); de_type = e1.de_type }
+      DEmark (id, e1), e1.de_type
   | DEghost e1 ->
       let e1 = rexpr denv e1 in
-      { de with de_desc = DEghost e1; de_type = e1.de_type }
+      DEghost e1, e1.de_type
   | DEany tyc ->
       let tyc, dvty = rtype_c denv tyc in
-      { de with de_desc = DEany tyc; de_type = dvty }
+      DEany tyc, dvty
   | DEloop (var, inv, e1) ->
       let e1 = rexpr denv e1 in
       expected_type e1 dity_unit;
-      { de with de_desc = DEloop (var,inv,e1); de_type = e1.de_type }
+      DEloop (var, inv, e1), e1.de_type
   | DEfor (id, efrom, dir, eto, inv, e1) ->
       let efrom = rexpr denv efrom in
       let eto = rexpr denv eto in
@@ -835,8 +828,7 @@ and re_desc denv de = match de.de_desc with
       expected_type efrom dity_int;
       expected_type eto dity_int;
       expected_type e1 dity_unit;
-      let d = DEfor (id,efrom,dir,eto,inv,e1) in
-      { de with de_desc = d; de_type = e1.de_type }
+      DEfor (id, efrom, dir, eto, inv, e1), e1.de_type
 
 and rletrec denv fdl =
   (* add all functions into the environment *)
