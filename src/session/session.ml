@@ -1913,14 +1913,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
         read_theory ip formats
   in
   let read_theory ip =
-    if ip.ip_library = [] then
-      match ip.ip_theory with
-        (** Hack?? *)
-      | "BuiltIn" -> Theory.builtin_theory
-      | "Bool" -> Theory.bool_theory
-      (* | "Tuple"??? -> ... *)
-      (* | "Unit" -> ??? *)
-      | s -> Mstr.find s theories
+    if ip.ip_library = [] then Mstr.find ip.ip_theory theories
     else read_theory ip ["why";"whyml"] in
 
   let to_idpos_ts = Mts.fold_left (fun idpos_ts from_ts ip ->

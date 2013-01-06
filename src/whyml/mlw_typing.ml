@@ -1851,7 +1851,7 @@ let find_theory loc lib path s =
   in
   (* search also in .why files, unless the theory is built-in *)
   let th =
-    if path = [] then None else
+    if path = [] || path = ["why3"] then None else
     try Some (Env.find_theory (Env.env_of_library lib) path s)
     with LibFileNotFound _ | TheoryNotFound _ -> None
   in

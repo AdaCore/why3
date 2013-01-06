@@ -766,7 +766,7 @@ let on_meta _meta fn acc theory =
 (** Base theories *)
 
 let builtin_theory =
-  let uc = empty_theory (id_fresh "BuiltIn") [] in
+  let uc = empty_theory (id_fresh "BuiltIn") ["why3"] in
   let uc = add_ty_decl uc ts_int in
   let uc = add_ty_decl uc ts_real in
   let uc = add_param_decl uc ps_equ in
@@ -776,12 +776,12 @@ let create_theory ?(path=[]) n =
   use_export (empty_theory n path) builtin_theory
 
 let bool_theory =
-  let uc = empty_theory (id_fresh "Bool") [] in
+  let uc = empty_theory (id_fresh "Bool") ["why3"] in
   let uc = add_data_decl uc [ts_bool, [fs_bool_true,[]; fs_bool_false,[]]] in
   close_theory uc
 
 let highord_theory =
-  let uc = empty_theory (id_fresh "HighOrd") [] in
+  let uc = empty_theory (id_fresh "HighOrd") ["why3"] in
   let uc = add_ty_decl uc ts_func in
   let uc = add_ty_decl uc ts_pred in
   let uc = add_param_decl uc fs_func_app in
@@ -791,7 +791,7 @@ let highord_theory =
 let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
-  let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) [] in
+  let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) ["why3"] in
   let uc = add_data_decl uc [ts, [fs,pl]] in
   close_theory uc)
 

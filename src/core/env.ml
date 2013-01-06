@@ -101,6 +101,7 @@ let check_qualifier s =
   then raise (InvalidQualifier s)
 
 let locate_lib_file env path exts =
+  if path = [] || path = ["why3"] then raise (LibFileNotFound path);
   List.iter check_qualifier path;
   let file = List.fold_left Filename.concat "" path in
   let add_ext ext = file ^ "." ^ ext in
@@ -172,7 +173,7 @@ let get_builtin s =
   | None -> raise (TheoryNotFound ([],s))
 
 let read_lib_theory lib path th =
-  if path = [] then get_builtin th else
+  if path = [] || path = ["why3"] then get_builtin th else
   let _,mth = read_lib_file lib path in
   try Mstr.find th mth with Not_found ->
   raise (TheoryNotFound (path,th))
