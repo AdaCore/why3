@@ -1,5 +1,98 @@
 
+(* a stack of disks is modeled as a sorted list of integers *)
+
+module Disks
+
+  use export int.Int
+  use export list.List
+  use export list.Append
+  use export list.SortedInt
+  use export list.NthLength
+  use export list.Length
+
+  lemma unique_decomposition:
+    forall a b c d: list 'a.
+    a ++ b = c ++ d -> length a = length c -> a = c /\ b = d
+
+  lemma sorted_append_elim:
+    forall a b: list int. sorted (a ++ b) -> sorted a /\ sorted b
+
+  predicate legal (x: int) (b: list int) = match b with
+    | Nil -> true
+    | Cons y _ -> x <= y
+  end
+
+  lemma sorted_nth:
+    forall a b: list int. sorted (a ++ b) ->
+    forall i x: int. 0 <= i < length a -> nth i a = Some x -> legal x b
+
+  lemma sorted_legal_Cons:
+    forall x: int, a: list int. sorted a -> legal x a -> sorted (Cons x a)
+
+  lemma nth_prefix1:
+    forall t r: list int, x: int. nth (length t) (t ++ Cons x r) = Some x
+
+  lemma nth_prefix2:
+    forall t a: list int, i: int. 0 <= i < length t -> nth i (t ++ a) = nth i t
+
+  lemma sorted_append_intro:
+    forall t a: list int. sorted t -> sorted a ->
+    forall x: int. nth (length t - 1) t = Some x -> legal x a ->
+    sorted (t ++ a)
+
+end
+
+(* recursive implementation of the game ``tower of hanoi''
+   using three mutables stacks *)
+
 module TowerOfHanoi
+
+  use import stack.Stack
+  use import Disks
+
+  type tower = Stack.t int
+
+  (* precondition of function move ensures the validity of each move *)
+  let move (a b: tower)
+    requires { match a.elts with Nil -> false
+               | Cons x _ -> legal x b.elts end }
+    ensures  { match old a.elts with Nil -> false
+               | Cons x sa -> a.elts = sa /\ b.elts = Cons x (old b.elts) end }
+  =
+    let x = Stack.safe_pop a in
+    Stack.push x b
+
+  (* moves n elements from a to b using c *)
+  let rec hanoirec (a b c: tower) (n: int)
+    requires { 0 <= n <= Stack.length a }
+    requires { sorted a.elts /\ sorted b.elts /\ sorted c.elts }
+    requires { forall i: int. 0 <= i < n -> forall x: int.
+               nth i a.elts = Some x -> legal x b.elts /\ legal x c.elts }
+    variant  { n }
+    ensures  { Stack.length c = old (Stack.length c) }
+    ensures  { Stack.length a = old (Stack.length a) - n }
+    ensures  { Stack.length b = old (Stack.length b) + n }
+    ensures  { exists t: list int. length t = n /\ sorted t /\
+               old a.elts = t ++ a.elts /\ b.elts = t ++ old b.elts }
+    ensures  { c.elts = old c.elts }
+  =
+    if n > 0 then begin
+      hanoirec a c b (n-1);
+      move a b;
+      hanoirec c b a (n-1)
+    end
+
+  let tower_of_hanoi (a b c: tower)
+    requires { Stack.length b = Stack.length c = 0 }
+    requires { sorted a.elts }
+    ensures  { b.elts = old a.elts }
+  =
+    hanoirec a b c (Stack.length a)
+
+end
+
+(***
+module TowerOfHanoi_lists
 
   use import int.Int
   use import list.List
@@ -59,40 +152,4 @@ module TowerOfHanoi
     hanoirec a b c (length a)
 
 end
-
-module TowerOfHanoi_stack
-
-  use import int.Int
-  use import list.List
-  use import stack.Stack
-
-  type tower = Stack.t int
-
-  let move (a b: tower) =
-    requires { Stack.length a > 0 }
-    ensures  { match old a.elts with Nil -> false
-               | Cons x sa -> a.elts = sa /\ b.elts = Cons x (old b.elts) end }
-    let x = Stack.safe_pop a in
-    Stack.push x b
-
-  (* move n elements from a to b using c *)
-  let rec hanoirec (a b c: tower) (n: int)
-    requires { 0 <= n <= Stack.length a }
-    variant  { n }
-    ensures  { Stack.length c = old (Stack.length c) }
-    ensures  { Stack.length a = old (Stack.length a) - n }
-    ensures  { Stack.length b = old (Stack.length b) + n }
-  =
-    if n > 0 then begin
-      hanoirec a c b (n-1);
-      (* move a b; *) let x = Stack.safe_pop a in Stack.push x b;
-      hanoirec c b a (n-1)
-    end
-
-  let tower_of_hanoi (a b c: tower)
-    requires { Stack.length b = Stack.length c = 0 }
-    ensures  { b.elts = old a.elts }
-  =
-    hanoirec a b c (Stack.length a)
-
-end
+***)
