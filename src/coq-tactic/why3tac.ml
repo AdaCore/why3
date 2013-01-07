@@ -394,12 +394,14 @@ let const_of_big_int b =
     (Number.ConstInt (Number.int_const_dec (Big_int.string_of_big_int b)))
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
-let rec tr_arith_constant t = match kind_of_term t with
+let rec tr_arith_constant dep t = match kind_of_term t with
   | Construct _ when is_constant t coq_Z0 -> Term.t_nat_const 0
   | App (f, [|a|]) when is_constant f coq_Zpos ->
       const_of_big_int (tr_positive a)
   | App (f, [|a|]) when is_constant f coq_Zneg ->
-      const_of_big_int (Big_int.minus_big_int (tr_positive a))
+      let t = const_of_big_int (tr_positive a) in
+      let fs = why_constant_int dep ["prefix -"] in
+      Term.fs_app fs [t] Ty.ty_int
   | Const _ when is_constant t coq_R0 ->
       Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
   | Const _ when is_constant t coq_R1 ->
@@ -421,7 +423,7 @@ let rec tr_arith_constant t = match kind_of_term t with
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_powerRZ -> *)
 (*       tr_powerRZ a b *)
   | Cast (t, _, _) ->
-      tr_arith_constant t
+      tr_arith_constant dep t
   | _ ->
       raise NotArithConstant
 
@@ -762,7 +764,7 @@ and decompose_inductive dep env i =
    assumption: t:T:Set *)
 and tr_term dep tvm bv env t =
   try
-    tr_arith_constant t
+    tr_arith_constant dep t
   with NotArithConstant -> match kind_of_term t with
     (* binary operations on integers *)
     | App (c, [|a;b|]) when is_constant c coq_Zplus ->
@@ -1079,47 +1081,68 @@ let is_goal s =
   n >= 11 && String.sub s 0 11 = "Unnamed_thm" ||
   n >= 9 && String.sub s (n - 9) 9 = "_admitted"
 
-let tr_top_decl ((sp, kn),node) =
-  CoqCompat.on_leaf_node node (function lobj ->
-    let dep = empty_dep () in
-    let env = Global.env () in
-    let bv = Idmap.empty in
-    let bn = basename sp in
-    let s = string_of_id bn in
-(* Format.printf "tr_top_decl: %s@." s; *)
-    begin try
-      if is_goal s then raise NotFO;
-      let id = Ident.id_fresh s in
-      let r = match Libobject.object_tag lobj with
-        | "VARIABLE" ->
-            (* ignore variables out of sections *)
-            ignore (try Global.lookup_named bn with Not_found -> raise NotFO);
-            VarRef bn
-        | "CONSTANT" -> ConstRef (constant_of_kn kn)
-        | "INDUCTIVE" -> IndRef (mind_of_kn kn, 0)
-        | _ -> raise NotFO
-      in
-      let c = constr_of_reference r in
-      let ty = type_of env Evd.empty c in
-      if is_fo_kind ty then
-        ignore (tr_task_ts (empty_dep ()) env r)
+let tr_top_decl env r s =
+  let dep = empty_dep () in
+  let bv = Idmap.empty in
+  let id = Ident.id_fresh s in
+  let c = constr_of_reference r in
+  let ty = type_of env Evd.empty c in
+  try
+    if is_fo_kind ty then
+      ignore (tr_task_ts (empty_dep ()) env r)
+    else
+      let t = type_of env Evd.empty ty in
+      if is_Set t || is_Type t then
+        ignore (tr_task_ls (empty_dep ()) env r)
+      else if is_Prop t then
+        let (tvm,_), env, f = decomp_type_quantifiers env ty in
+        let f = tr_formula dep tvm bv env f in
+        let pr = Decl.create_prsymbol id in
+        task := Task.add_prop_decl !task Decl.Paxiom pr f
       else
-        let t = type_of env Evd.empty ty in
-        if is_Set t || is_Type t then
-          ignore (tr_task_ls (empty_dep ()) env r)
-        else if is_Prop t then
-          let (tvm,_), env, f = decomp_type_quantifiers env ty in
-          let f = tr_formula dep tvm bv env f in
-          let pr = Decl.create_prsymbol id in
-          task := Task.add_prop_decl !task Decl.Paxiom pr f
-        else
-          raise NotFO
-      with NotFO ->
-(* Format.printf "  IGNORING top decl %s@." s; *)
-        ()
-    end
-(* Format.printf "done@." *)
-  )
+        raise NotFO
+  with NotFO ->
+    (* Format.eprintf "  IGNORING top decl %s@." s; *)
+    ()
+
+(* decide whether we translate the Coq declaration or not, based on its
+   kernel name; if so, returns (Some s) where s will be the Why3 name,
+   otherwise returns None
+
+   FIXME: currently, we simply check for the toplevel module "Top"
+   and for modules imported from Why3's library of realizations
+   (with paths as Why3.X.Y); later we will improve this with vernacular
+   commands to select modules and/or constants to be translated/not
+   translated *)
+let rec is_acceptable_dirpath = function
+  | [id] -> let s = string_of_id id in s = "Top" || s = "Why3"
+  | [] -> false
+  | _ :: p -> is_acceptable_dirpath p
+
+let why3_builtin = [id_of_string "BuiltIn"; id_of_string "Why3"]
+let is_acceptable_dirpath dp = dp <> why3_builtin && is_acceptable_dirpath dp
+
+let tr_kernel_name kn =
+  (* Format.eprintf "  kn = %s@." (string_of_kn kn); *)
+  let mp, _, lab = repr_kn kn in
+  let s = string_of_label lab in
+  match mp with
+    | MPfile dp when is_acceptable_dirpath (repr_dirpath dp) ->
+        Some s
+    | _ ->
+        None
+
+let tr_top_constant env c = match tr_kernel_name (user_con c) with
+  | Some s ->
+      (* Format.eprintf "tr_top_constant %s@." (string_of_con c); *)
+      tr_top_decl env (ConstRef c) s
+  | None -> ()
+
+let tr_top_decls () =
+  let env = Global.env () in
+  let prenv = Environ.pre_env env in
+  Cmap_env.iter (fun c _ -> tr_top_constant env c)
+    prenv.Pre_env.env_globals.Pre_env.env_constants
 
 let pr_fp fp =
   pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)
@@ -1130,8 +1153,8 @@ let why3tac ?(timelimit=timelimit) s gl =
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
   try
-    (* add global declarations from module Top *)
-    List.iter tr_top_decl (List.rev (Lib.contents_after None));
+    (* add global declarations from modules Top and Why3.X.Y *)
+    tr_top_decls ();
     (* then translate the goal *)
     tr_goal gl;
     let cp, drv = get_prover s in
