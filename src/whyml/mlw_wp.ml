@@ -1234,7 +1234,7 @@ let wp_nimplies (n : term) (xn : fast_wp_exn_map) ((result, q), xq) =
   let f = wp_forall [result] (wp_implies n q) in
   assert (Mexn.cardinal xn = Mexn.cardinal xq);
   let x_implies _xs { ne = n } (xresult, q) f =
-    wp_forall [xresult] (t_and_simp f (wp_implies n q)) in
+    t_and_simp f (wp_forall [xresult] (wp_implies n q)) in
   Mexn.fold2_inter x_implies xn xq f
 
 type res_type = vsymbol * vsymbol Mexn.t
