@@ -1081,7 +1081,7 @@ let is_goal s =
   n >= 11 && String.sub s 0 11 = "Unnamed_thm" ||
   n >= 9 && String.sub s (n - 9) 9 = "_admitted"
 
-let tr_top_decl env r s =
+let tr_reference env r s =
   let dep = empty_dep () in
   let bv = Idmap.empty in
   let id = Ident.id_fresh s in
@@ -1115,12 +1115,13 @@ let tr_top_decl env r s =
    commands to select modules and/or constants to be translated/not
    translated *)
 let rec is_acceptable_dirpath = function
-  | [id] -> let s = string_of_id id in s = "Top" || s = "Why3"
+  | [id] -> let s = string_of_id id in s <> "Coq" (*s = "Top" || s = "Why3"*)
   | [] -> false
   | _ :: p -> is_acceptable_dirpath p
 
 let why3_builtin = [id_of_string "BuiltIn"; id_of_string "Why3"]
-let is_acceptable_dirpath dp = dp <> why3_builtin && is_acceptable_dirpath dp
+let is_acceptable_dirpath dp =
+  dp <> why3_builtin && is_acceptable_dirpath dp
 
 let tr_kernel_name kn =
   (* Format.eprintf "  kn = %s@." (string_of_kn kn); *)
@@ -1135,7 +1136,7 @@ let tr_kernel_name kn =
 let tr_top_constant env c = match tr_kernel_name (user_con c) with
   | Some s ->
       (* Format.eprintf "tr_top_constant %s@." (string_of_con c); *)
-      tr_top_decl env (ConstRef c) s
+      tr_reference env (ConstRef c) s
   | None -> ()
 
 let tr_top_decls () =
