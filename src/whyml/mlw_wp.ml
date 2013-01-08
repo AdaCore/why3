@@ -1645,17 +1645,26 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
     let tl = List.map t_at_lab c.c_variant in
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
+  (* generate the initial state, using the overall effect of the function *)
   let prestate = Subst.init c.c_effect in
+  (* extract the result and xresult variables *)
   let result, _  = open_post c.c_post in
   let xresult = Mexn.map (fun x -> fst (open_post x)) c.c_xpost in
+  (* call the fast wp, using the result variables *)
   let res = fast_wp_expr env prestate (result, xresult) l.l_expr in
+  (* put the post of the function in the right format expected by
+     adapt_post_to_state_pair. This is doen by wrapping everything in
+    [fwp_post] records *)
   let xq =
     Mexn.mapi (fun ex q -> {ne = q; s = (Mexn.find ex res.exn).s }) c.c_xpost in
   let fun_post = { s = res.post.s ; ne = c.c_post } in
   let q, xq =
     adapt_post_to_state_pair ~lab env prestate (result, xresult) fun_post xq in
+  (* apply the prestate to the precondition *)
   let pre = Subst.term env prestate c.c_pre in
   let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xq in
+  (* build the formula "forall variables, pre implies OK,
+     and NE implies post" *)
   let f =
      t_and_simp res.ok
      (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
