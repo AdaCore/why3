@@ -341,6 +341,20 @@ theory Distinct
 
 end
 
+theory Prefix
+
+  use export List
+  use import int.Int
+
+  function prefix (n: int) (l: list 'a) : list 'a =
+    if n <= 0 then Nil else
+    match l with
+    | Nil -> Nil
+    | Cons x r -> Cons x (prefix (n-1) r)
+    end
+
+end
+
 (** {2 Induction on lists} *)
 
 theory Induction
