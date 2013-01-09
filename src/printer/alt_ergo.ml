@@ -69,7 +69,9 @@ let tv_printer =
   create_ident_printer [] ~sanitizer:san
 
 let print_tvsymbol fmt tv =
-  fprintf fmt "'%s" (id_unique tv_printer tv.tv_name)
+  (* fprintf fmt "'%s" (id_unique tv_printer tv.tv_name) *)
+  (* workaround a "duplicate type variable" bug of Alt-Ergo 0.94 *)
+  fprintf fmt "'%s" (id_unique ident_printer tv.tv_name)
 
 let forget_tvs () = forget_all tv_printer
 
