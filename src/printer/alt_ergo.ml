@@ -64,16 +64,26 @@ let print_ident_label info fmt id =
 
 let forget_var v = forget_id ident_printer v.vs_name
 
+(*
 let tv_printer =
   let san = sanitizer char_to_lalpha char_to_alnumus in
   create_ident_printer [] ~sanitizer:san
 
 let print_tvsymbol fmt tv =
-  (* fprintf fmt "'%s" (id_unique tv_printer tv.tv_name) *)
-  (* workaround a "duplicate type variable" bug of Alt-Ergo 0.94 *)
-  fprintf fmt "'%s" (id_unique ident_printer tv.tv_name)
+  fprintf fmt "'%s" (id_unique tv_printer tv.tv_name)
 
 let forget_tvs () = forget_all tv_printer
+*)
+
+(* work around a "duplicate type variable" bug of Alt-Ergo 0.94 *)
+let print_tvsymbol, forget_tvs =
+  let htv = Hid.create 5 in
+  (fun fmt tv ->
+    Hid.replace htv tv.tv_name ();
+    fprintf fmt "'%s" (id_unique ident_printer tv.tv_name)),
+  (fun () ->
+    Hid.iter (fun id _ -> forget_id ident_printer id) htv;
+    Hid.clear htv)
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar id ->
