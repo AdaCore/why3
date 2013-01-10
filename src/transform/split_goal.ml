@@ -44,6 +44,7 @@ let unstop f =
 type split = {
   right_only : bool;
   stop_label : bool;
+  respect_as : bool;
 }
 
 let rec split_pos ro acc f = match f.t_node with
@@ -51,7 +52,7 @@ let rec split_pos ro acc f = match f.t_node with
   | Ttrue -> acc
   | Tfalse -> f::acc
   | Tapp _ -> f::acc
-  | Tbinop (Tand,f1,f2) when asym f1 ->
+  | Tbinop (Tand,f1,f2) when ro.respect_as && asym f1 ->
       split_pos ro (split_pos ro acc (t_implies f1 f2)) f1
   | Tbinop (Tand,f1,f2) ->
       split_pos ro (split_pos ro acc f2) f1
@@ -98,7 +99,7 @@ and split_neg ro acc f = match f.t_node with
   | Tbinop (Tand,f1,f2) ->
       let fn f1 f2 = t_label_copy f (t_and f1 f2) in
       apply_append2 fn acc (split_neg ro [] f1) (split_neg ro [] f2)
-  | Tbinop (Timplies,f1,f2) when asym f1 ->
+  | Tbinop (Timplies,f1,f2) when ro.respect_as && asym f1 ->
       split_neg ro (split_neg ro acc (t_and f1 f2)) (t_not f1)
   | Tbinop (Timplies,f1,f2) ->
       split_neg ro (split_neg ro acc f2) (t_not f1)
@@ -106,7 +107,7 @@ and split_neg ro acc f = match f.t_node with
       let f12 = t_label_copy f (t_and f1 f2) in
       let f21 = t_label_copy f (t_and (t_not f1) (t_not f2)) in
       split_neg ro (split_neg ro acc f21) f12
-  | Tbinop (Tor,f1,f2) when asym f1 ->
+  | Tbinop (Tor,f1,f2) when ro.respect_as && asym f1 ->
       split_neg ro (split_neg ro acc (t_and (t_not f1) f2)) f1
   | Tbinop (Tor,f1,f2) ->
       split_neg ro (split_neg ro acc f2) f1
@@ -138,6 +139,7 @@ let split_axiom ro pr f =
   let make_prop f =
     let pr = create_prsymbol (id_clone pr.pr_name) in
     create_prop_decl Paxiom pr f in
+  let ro = { ro with respect_as = false } in
   match split_pos ro [] f with
     | [f] -> [create_prop_decl Paxiom pr f]
     | fl  -> List.map make_prop fl
@@ -151,9 +153,10 @@ let split_premise ro d = match d.d_node with
   | Dprop (Paxiom,pr,f) ->  split_axiom ro pr f
   | _ -> [d]
 
-let full_split  = { right_only = false; stop_label = false }
-let right_split = { right_only = true;  stop_label = false }
-let wp_split    = { right_only = true;  stop_label = true }
+let full_split  = { right_only = false; stop_label = false; respect_as = true  }
+let right_split = { right_only = true;  stop_label = false; respect_as = true  }
+let wp_split    = { right_only = true;  stop_label = true;  respect_as = true  }
+let intro_split = { right_only = true;  stop_label = true;  respect_as = false }
 
 let split_pos_full  = split_pos full_split []
 let split_neg_full  = split_neg full_split []
@@ -163,6 +166,9 @@ let split_neg_right = split_neg right_split []
 
 let split_pos_wp    = split_pos wp_split []
 let split_neg_wp    = split_neg wp_split []
+
+let split_pos_intro = split_pos intro_split []
+let split_neg_intro = split_neg intro_split []
 
 let split_goal_full  = Trans.goal_l (split_goal full_split)
 let split_goal_right = Trans.goal_l (split_goal right_split)
