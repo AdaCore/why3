@@ -940,8 +940,8 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       e_app_real (expr_subst psm e) pv
   | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->
       let nd = expr_subst psm d in
-      let vtv = match nd.e_vty with VTvalue vtv -> vtv | _ -> assert false in
-      if not (vtv_equal vtv pv.pv_vtv) then Loc.errorm "vty_value mismatch";
+      if not (vtv_equal (vtv_unmut (vtv_of_expr nd)) pv.pv_vtv) then
+        Loc.errorm "vty_value mismatch";
       e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
   | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
       let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in

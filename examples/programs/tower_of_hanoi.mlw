@@ -42,7 +42,7 @@ module Hanoi
     ensures  { b.rod = prepend n (old b.rod) }
     ensures  { c.rod = old c.rod }
   = if n > 0 then begin
-      let ghost t = prepend 0 c.rod in
+      let ghost t = c.rod in
       hanoi_rec a c b (n-1) (Cons n s);
       move a b n s;
       hanoi_rec c b a (n-1) t
