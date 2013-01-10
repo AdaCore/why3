@@ -1,3 +1,61 @@
+module Hanoi
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.SortedInt
+
+  type tower = {
+    mutable rod : list int;
+  } invariant {
+    sorted self.rod
+  }
+
+  function prepend (n: int) (s: list int) : list int
+
+  axiom prepend_def_zero :
+    forall s: list int, n: int.
+      n <= 0 -> prepend n s = s
+
+  axiom prepend_def_succ :
+    forall s: list int, n: int.
+      n > 0 -> prepend n s = prepend (n - 1) (Cons n s)
+
+  let move (a b: tower) (ghost n: int) (ghost s: list int)
+    requires { a.rod = Cons n s }
+    requires { match b.rod with Nil -> true | Cons x _ -> x > n end }
+    ensures  { a.rod = s }
+    ensures  { b.rod = Cons n (old b.rod) }
+  = match a.rod with
+    | Cons x r ->
+        a.rod <- r;
+        b.rod <- Cons x b.rod
+    | Nil -> absurd
+    end
+
+  let rec hanoi_rec (a b c: tower) (n: int) (ghost s: list int)
+    requires { a.rod = prepend n s }
+    requires { match b.rod with Nil -> true | Cons x _ -> x > n end }
+    requires { match c.rod with Nil -> true | Cons x _ -> x > n end }
+    variant  { n }
+    ensures  { a.rod = s }
+    ensures  { b.rod = prepend n (old b.rod) }
+    ensures  { c.rod = old c.rod }
+  = if n > 0 then begin
+      let ghost t = prepend 0 c.rod in
+      hanoi_rec a c b (n-1) (Cons n s);
+      move a b n s;
+      hanoi_rec c b a (n-1) t
+    end
+
+  let tower_of_hanoi (a b c: tower)
+    requires { a.rod = prepend (length a.rod) Nil }
+    requires { b.rod = c.rod = Nil }
+    ensures  { b.rod = old a.rod }
+    ensures  { a.rod = c.rod = Nil }
+  = hanoi_rec a b c (length a.rod) Nil
+
+end
 
 (* a stack of disks is modeled as a sorted list of integers *)
 
