@@ -205,10 +205,24 @@ module NumOfParam
   predicate pr_ (p: param_) (i: int) = let (a, p) = p in pr p i a[i]
   clone import int.NumOfParam with type param = param_, predicate pr = pr_
 
-  (* the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
+  (** the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
   function numof (a: array elt) (p: param) (l u: int) : int = num_of (a, p) l u
 end
 
+(** the number of a[i] such that [l <= i < u] and [a[i] = v] *)
+module NumOfEq
+  use import Array
+
+  type elt
+
+  type param = (array elt, elt)
+  predicate pr (p: param) (i: int) = let (a, v) = p in a[i] = v
+  clone import int.NumOfParam with type param = param, predicate pr = pr
+
+  function numof (a: array elt) (v: elt) (l u: int) : int = num_of (a, v) l u
+end
+
+(** the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
 module NumOf
   use import Array
 
@@ -219,7 +233,6 @@ module NumOf
   predicate pr_ (a: param) (i: int) = pr i a[i]
   clone import int.NumOfParam with type param = param, predicate pr = pr_
 
-  (* the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
   function numof (a: array elt) (l u: int) : int = num_of a l u
 end
 

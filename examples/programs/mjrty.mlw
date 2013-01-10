@@ -31,9 +31,7 @@ module Mjrty
 
   type candidate
 
-  predicate pr (c: candidate) (i: int) (ai: candidate) = ai = c
-  clone import array.NumOfParam
-    with type elt = candidate, type param = candidate, predicate pr = pr
+  clone import array.NumOfEq with type elt = candidate
 
   let mjrty (a: array candidate)
     requires { 1 <= length a }
