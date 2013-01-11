@@ -57,6 +57,79 @@ module Hanoi
 
 end
 
+module Tower_of_Hanoi
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+
+  clone list.Sorted as S with type t = int, predicate le = (<)
+  clone list.Sorted as R with type t = int, predicate le = (>)
+
+  type tower = {
+    mutable rod : list int;
+  } invariant {
+    S.sorted self.rod
+  }
+
+  let move (a b: tower) (ghost x: int) (ghost s: list int)
+    requires { a.rod = Cons x s }
+    requires { match b.rod with Nil -> true | Cons y _ -> x < y end }
+    ensures  { a.rod = s }
+    ensures  { b.rod = Cons x (old b.rod) }
+  = match a.rod with
+    | Cons x r ->
+        a.rod <- r;
+        b.rod <- Cons x b.rod
+    | Nil -> absurd
+    end
+
+  predicate compat (s t: list int) =
+    match s, t with
+    | Cons x _, Cons y _ -> x < y
+    | _, _ -> true
+    end
+
+  function rev_append (s t: list int) : list int =
+    match s with
+    | Cons x r -> rev_append r (Cons x t)
+    | Nil -> t
+    end
+
+  let rec hanoi_rec (a b c: tower) (n: int) (ghost p s: list int)
+    requires { length p = n /\ R.sorted p }
+    requires { a.rod = rev_append p s }
+    requires { compat p b.rod }
+    requires { compat p c.rod }
+    variant  { n }
+    ensures  { a.rod = s }
+    ensures  { b.rod = rev_append p (old b.rod) }
+    ensures  { c.rod = old c.rod }
+  = if n > 0 then begin
+      let ghost t = c.rod in
+      let ghost x = match p with Cons x _ -> x | Nil -> absurd end in
+      let ghost r = match p with Cons _ r -> r | Nil -> absurd end in
+      hanoi_rec a c b (n-1) r (Cons x s);
+      move a b x s;
+      hanoi_rec c b a (n-1) r t
+    end
+
+  use import list.Reverse
+
+  lemma rev_sorted:
+    forall s: list int. S.sorted s -> R.sorted (reverse s)
+
+  lemma rev_append_rev:
+    forall s: list int. s = rev_append (reverse s) Nil
+
+  let tower_of_hanoi (a b c: tower)
+    requires { b.rod = c.rod = Nil }
+    ensures  { b.rod = old a.rod }
+    ensures  { a.rod = c.rod = Nil }
+  = hanoi_rec a b c (length a.rod) (ghost reverse a.rod) Nil
+
+end
+
 (* a stack of disks is modeled as a sorted list of integers *)
 
 module Disks
