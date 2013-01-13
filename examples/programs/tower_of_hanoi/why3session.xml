@@ -4,7 +4,7 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95-dev"/>
  <prover
   id="1"
   name="CVC3"
@@ -15,8 +15,16 @@
   version="8.3pl4"/>
  <prover
   id="3"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="4"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="5"
   name="Z3"
-  version="4.0"/>
+  version="4.2"/>
  <file
   name="../tower_of_hanoi.mlw"
   verified="true"
@@ -199,7 +207,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.47"/>
+       <result status="valid" time="0.51"/>
       </proof>
      </goal>
      <goal
@@ -274,14 +282,6 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.27"/>
-      </proof>
-      <proof
        prover="1"
        timelimit="5"
        memlimit="1000"
@@ -290,7 +290,7 @@
        <result status="valid" time="0.06"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -482,7 +482,7 @@
      edited="tower_of_hanoi_ListRevAppend_rev_append_append_l_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.49"/>
     </proof>
    </goal>
    <goal
@@ -500,7 +500,7 @@
      edited="tower_of_hanoi_ListRevAppend_rev_append_append_r_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.75"/>
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
    <goal
@@ -518,7 +518,7 @@
      edited="tower_of_hanoi_ListRevAppend_rev_append_length_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.77"/>
+     <result status="valid" time="0.51"/>
     </proof>
    </goal>
   </theory>
@@ -543,7 +543,7 @@
      edited="tower_of_hanoi_ListRevSorted_rev_append_sorted_incr_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.85"/>
+     <result status="valid" time="0.58"/>
     </proof>
    </goal>
    <goal
@@ -561,7 +561,7 @@
      edited="tower_of_hanoi_ListRevSorted_rev_append_sorted_decr_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.83"/>
+     <result status="valid" time="0.55"/>
     </proof>
    </goal>
   </theory>
@@ -588,7 +588,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.82"/>
+     <result status="valid" time="0.67"/>
     </proof>
     <proof
      prover="1"
@@ -596,15 +596,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.44"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.84"/>
+     <result status="valid" time="0.24"/>
     </proof>
    </goal>
    <goal
@@ -635,7 +627,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -643,15 +635,15 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
-       timelimit="10"
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -671,7 +663,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -679,19 +671,11 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.66"/>
       </proof>
      </goal>
      <goal
@@ -707,7 +691,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -715,7 +699,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -723,7 +707,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="3.71"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.19"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -742,28 +742,28 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.81"/>
-      </proof>
-      <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.28"/>
+       <result status="valid" time="0.12"/>
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.59"/>
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.61"/>
       </proof>
      </goal>
      <goal
@@ -778,16 +778,8 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.82"/>
-      </proof>
-      <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -795,11 +787,19 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.28"/>
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.63"/>
       </proof>
      </goal>
      <goal
@@ -815,7 +815,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -823,7 +823,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -831,7 +831,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -851,7 +867,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -859,7 +875,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -867,7 +883,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -886,16 +918,8 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.66"/>
-      </proof>
-      <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -903,11 +927,19 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.14"/>
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
       </proof>
      </goal>
      <goal
@@ -923,7 +955,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -931,15 +963,15 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
-       timelimit="10"
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -959,7 +991,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -967,7 +999,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -975,7 +1007,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -995,7 +1043,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1003,7 +1051,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1011,7 +1059,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1030,28 +1094,28 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.02"/>
-      </proof>
-      <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.39"/>
+       <result status="valid" time="0.24"/>
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.12"/>
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.46"/>
       </proof>
      </goal>
      <goal
@@ -1066,28 +1130,28 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.10"/>
-      </proof>
-      <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="9.37"/>
+       <result status="valid" time="5.82"/>
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.41"/>
+       <result status="valid" time="0.14"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.50"/>
       </proof>
      </goal>
      <goal
@@ -1103,7 +1167,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1111,7 +1175,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1119,7 +1183,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1139,7 +1219,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1147,7 +1227,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1155,7 +1235,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1174,24 +1270,16 @@
       <label
        name="expl:VC for hanoi_rec"/>
       <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.59"/>
-      </proof>
-      <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.77"/>
+       <result status="valid" time="0.45"/>
       </proof>
       <proof
-       prover="3"
-       timelimit="10"
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1211,7 +1299,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1219,7 +1307,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1227,7 +1315,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1247,7 +1351,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1255,7 +1359,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1263,7 +1367,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1283,7 +1403,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1291,15 +1411,15 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="3"
-       timelimit="10"
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1319,27 +1439,27 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.19"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.73"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.54"/>
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
@@ -1355,27 +1475,27 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.20"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.54"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.51"/>
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
@@ -1391,7 +1511,7 @@
        name="expl:VC for hanoi_rec"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1399,7 +1519,7 @@
       </proof>
       <proof
        prover="1"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1407,7 +1527,23 @@
       </proof>
       <proof
        prover="3"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -1448,7 +1584,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.11"/>
+       <result status="valid" time="1.92"/>
       </proof>
       <proof
        prover="1"
@@ -1459,7 +1595,7 @@
        <result status="valid" time="0.14"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1495,7 +1631,7 @@
        <result status="valid" time="0.12"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1531,7 +1667,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1567,7 +1703,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1603,7 +1739,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1639,7 +1775,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1675,7 +1811,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
