@@ -13,10 +13,14 @@
   id="2"
   name="Coq"
   version="8.3pl4"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../vstte10_queens.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="NQueens"
    locfile="../vstte10_queens.mlw"
@@ -109,28 +113,11 @@
     </proof>
    </goal>
    <goal
-    name="is_consistent_eq"
-    locfile="../vstte10_queens.mlw"
-    loclnum="46" loccnumb="8" loccnume="24"
-    sum="6db432aea228745f803b640b3f3a3cd2"
-    proved="true"
-    expanded="true"
-    shape="ais_consistentV1V2Iais_consistentV0V2Iaeq_boardV0V1ainfix +V2c1F">
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.11"/>
-    </proof>
-   </goal>
-   <goal
     name="WP_parameter check_is_consistent"
     locfile="../vstte10_queens.mlw"
-    loclnum="52" loccnumb="6" loccnume="25"
+    loclnum="48" loccnumb="6" loccnume="25"
     expl="VC for check_is_consistent"
-    sum="9b9fe53705ff1fdacb76d9bf3485c67a"
+    sum="a01e8ddfcefeadc95d2579ea51a3fe42"
     proved="true"
     expanded="true"
     shape="ais_consistentV3V1Iaconsistent_rowV3V1V4Iainfix &lt;V4ainfix +ainfix -V1c1c1Aainfix &lt;=c0V4FAiainfix =V6V7ais_consistentV3V1NAaconsistent_rowV3V1V5Niainfix =ainfix -V6V7ainfix -V1V5ais_consistentV3V1NAaconsistent_rowV3V1V5Niainfix =ainfix -V7V6ainfix -V1V5ais_consistentV3V1NAaconsistent_rowV3V1V5Naconsistent_rowV3V1V8Iainfix &lt;V8ainfix +V5c1Aainfix &lt;=c0V8FLagetV2V1Aainfix &lt;V1V0Aainfix &lt;=c0V1LagetV2V5Aainfix &lt;V5V0Aainfix &lt;=c0V5Iaconsistent_rowV3V1V9Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix &lt;=V5ainfix -V1c1Aainfix &lt;=c0V5FAaconsistent_rowV3V1V10Iainfix &lt;V10c0Aainfix &lt;=c0V10FIainfix &lt;=c0ainfix -V1c1Aais_consistentV3V1Iainfix &gt;c0ainfix -V1c1Iainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V2FF">
@@ -148,8 +135,8 @@
    <goal
     name="solution_eq_board"
     locfile="../vstte10_queens.mlw"
-    loclnum="77" loccnumb="8" loccnume="25"
-    sum="2cc3eab73478fa09a4652bb7c5d11a5d"
+    loclnum="73" loccnumb="8" loccnume="25"
+    sum="2cac87d6ffd3978dbdf6e60452bbdcd4"
     proved="true"
     expanded="true"
     shape="asolutionV1V2IasolutionV0V2Iaeq_boardV0V1V2Iainfix =alengthV0alengthV1F">
@@ -160,15 +147,23 @@
      edited="vstte10_queens_NQueens_solution_eq_board_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.65"/>
+     <result status="valid" time="2.37"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="8"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.25"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter bt_queens"
     locfile="../vstte10_queens.mlw"
-    loclnum="83" loccnumb="10" loccnume="19"
+    loclnum="79" loccnumb="10" loccnume="19"
     expl="VC for bt_queens"
-    sum="f5fcd3509a214c42b5f06696dcc277f5"
+    sum="ae240cdc44fa77d1c11ecbb577d566f5"
     proved="true"
     expanded="true"
     shape="iainfix =V2V1asolutionV4V1asolutionV9V1NIaeq_boardV6V9V2Iais_boardV9V1Iainfix =V7V1Lamk arrayV7V8FAaeq_boardV6V4V2IasolutionV12V1NIainfix &lt;agetV11V2ainfix +ainfix -V1c1c1Aainfix &lt;=c0agetV11V2Iaeq_boardV6V12V2Iais_boardV12V1Iainfix =V10V1Lamk arrayV10V11FAaeq_boardV6V4V2Aiainfix =V16aTrueasolutionV18V1IasolutionV18V1Lamk arrayV0V17FAasolutionV23V1NIainfix &lt;agetV22V2ainfix +V13c1Aainfix &lt;=c0agetV22V2Iaeq_boardV20V23V2Iais_boardV23V1Iainfix =V21V1Lamk arrayV21V22FAaeq_boardV20V4V2IasolutionV26V1NIaeq_boardV20V26ainfix +V2c1Iais_boardV26V1Iainfix =V24V1Lamk arrayV24V25FAaeq_boardV20V15ainfix +V2c1Lamk arrayV0V19FAasolutionV15ainfix +V2c1Aainfix &lt;=ainfix +V2c1V1Aainfix &lt;=c0ainfix +V2c1Aainfix =V0V1Aainfix &lt;ainfix -V1ainfix +V2c1ainfix -V1V2Aainfix &lt;=c0ainfix -V1V2asolutionV29V1NIainfix &lt;agetV28V2ainfix +V13c1Aainfix &lt;=c0agetV28V2Iaeq_boardV15V29V2Iais_boardV29V1Iainfix =V27V1Lamk arrayV27V28FAaeq_boardV15V4V2Iais_consistentV15V2qainfix =V16aTrueFAainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V14asetV5V2V13Lamk arrayV0V14FAainfix &lt;V2V0Aainfix &lt;=c0V2IasolutionV32V1NIainfix &lt;agetV31V2V13Aainfix &lt;=c0agetV31V2Iaeq_boardV6V32V2Iais_boardV32V1Iainfix =V30V1Lamk arrayV30V31FAaeq_boardV6V4V2Iainfix &lt;=V13ainfix -V1c1Aainfix &lt;=c0V13FLamk arrayV0V5FAasolutionV35V1NIainfix &lt;agetV34V2c0Aainfix &lt;=c0agetV34V2Iaeq_boardV4V35V2Iais_boardV35V1Iainfix =V33V1Lamk arrayV33V34FAaeq_boardV4V4V2Iainfix &lt;=c0ainfix -V1c1AasolutionV38V1NIaeq_boardV4V38V2Iais_boardV38V1Iainfix =V36V1Lamk arrayV36V37FAaeq_boardV4V4V2Iainfix &gt;c0ainfix -V1c1IasolutionV4V2Aainfix &lt;=V2V1Aainfix &lt;=c0V2Aainfix =V0V1Lamk arrayV0V3FF">
@@ -180,15 +175,15 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.29"/>
+     <result status="valid" time="1.08"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter queens"
     locfile="../vstte10_queens.mlw"
-    loclnum="101" loccnumb="6" loccnume="12"
+    loclnum="97" loccnumb="6" loccnume="12"
     expl="VC for queens"
-    sum="1dee95b034aecdb6a26cabba2f64050d"
+    sum="60ef2893903d9d2ba018dc581dd1b0cb"
     proved="true"
     expanded="true"
     shape="asolutionV5V1IasolutionV5V1Lamk arrayV0V4FAasolutionV10V1NIais_boardV10V1Iainfix =V8V1Lamk arrayV8V9FIasolutionV13V1NIaeq_boardV7V13c0Iais_boardV13V1Iainfix =V11V1Lamk arrayV11V12FAaeq_boardV7V3c0Lamk arrayV0V6FAasolutionV3c0Aainfix &lt;=c0V1Aainfix &lt;=c0c0Aainfix =V0V1Iainfix =V0V1Aainfix &lt;=c0V0Lamk arrayV0V2FF">

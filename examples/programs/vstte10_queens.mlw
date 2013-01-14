@@ -43,10 +43,6 @@ module NQueens
   predicate is_consistent (board: array int) (pos: int) =
     forall q:int. 0 <= q < pos -> consistent_row board pos q
 
-  lemma is_consistent_eq:
-    forall b1 b2: array int, pos: int.
-    eq_board b1 b2 (pos+1) -> is_consistent b1 pos -> is_consistent b2 pos
-
   exception Inconsistent int
 
   let check_is_consistent (board: array int) (pos: int)
