@@ -1,17 +1,6 @@
 [ATP alt-ergo]
 name = "Alt-Ergo"
 exec = "alt-ergo"
-exec = "alt-ergo-0.94"
-version_switch = "-version"
-version_regexp = "\\([0-9.]+\\)"
-version_ok = "0.94"
-command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
-driver = "drivers/alt_ergo_0.94.drv"
-editor = "altgr-ergo"
-
-[ATP alt-ergo]
-name = "Alt-Ergo"
-exec = "alt-ergo"
 exec = "alt-ergo-0.95"
 exec = "alt-ergo-0.95-dev"
 version_switch = "-version"
@@ -26,6 +15,7 @@ editor = "altgr-ergo"
 name = "Alt-Ergo"
 alternative = "models"
 exec = "alt-ergo"
+exec = "alt-ergo-0.95"
 exec = "alt-ergo-0.95-dev"
 version_switch = "-version"
 version_regexp = "\\([0-9.]+\\(-dev\\)?\\)"
@@ -33,6 +23,17 @@ version_ok = "0.95"
 version_ok = "0.95-dev"
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timelimit %t -model %f"
 driver = "drivers/alt_ergo_model.drv"
+editor = "altgr-ergo"
+
+[ATP alt-ergo]
+name = "Alt-Ergo"
+exec = "alt-ergo"
+exec = "alt-ergo-0.94"
+version_switch = "-version"
+version_regexp = "\\([0-9.]+\\)"
+version_ok = "0.94"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
+driver = "drivers/alt_ergo_0.94.drv"
 editor = "altgr-ergo"
 
 [ATP alt-ergo]
