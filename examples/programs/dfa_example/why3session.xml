@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="Coq"
+  version="8.3pl4"/>
+ <file
+  name="../dfa_example.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="DfaExample"
+   locfile="../dfa_example.mlw"
+   loclnum="2" loccnumb="7" loccnume="17"
+   verified="false"
+   expanded="true">
+   <goal
+    name="nil_notin_r1"
+    locfile="../dfa_example.mlw"
+    loclnum="34" loccnumb="8" loccnume="20"
+    sum="ba0ea9ca4fb3a71d8890dc19b32937d5"
+    proved="true"
+    expanded="false"
+    shape="amemaNilar1N">
+    <proof
+     prover="2"
+     timelimit="8"
+     memlimit="1000"
+     edited="dfa_example_DfaExample_nil_notin_r1_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.68"/>
+    </proof>
+   </goal>
+   <goal
+    name="ends_with_one"
+    locfile="../dfa_example.mlw"
+    loclnum="36" loccnumb="8" loccnume="21"
+    sum="5566cd69ae8ef446c881ff7869b8079f"
+    proved="false"
+    expanded="true"
+    shape="ainfix =V0ainfix ++V1aConsaOneaNilEqamemV0ar1F">
+   </goal>
+   <goal
+    name="zero_w_in_r1"
+    locfile="../dfa_example.mlw"
+    loclnum="40" loccnumb="8" loccnume="20"
+    sum="c5379a40ddcdf96a03953829fc80e368"
+    proved="false"
+    expanded="true"
+    shape="amemaConsaZeroV0ar1qamemV0ar1F">
+   </goal>
+   <goal
+    name="one_w_in_r1"
+    locfile="../dfa_example.mlw"
+    loclnum="41" loccnumb="8" loccnume="19"
+    sum="9b3694df82907053575ef5816f8f7d5f"
+    proved="false"
+    expanded="true"
+    shape="amemaConsaOneV0ar1qamemV0ar2F">
+   </goal>
+   <goal
+    name="zero_w_in_r2"
+    locfile="../dfa_example.mlw"
+    loclnum="43" loccnumb="8" loccnume="20"
+    sum="3cc829cb151131f597cb1990e0e950a4"
+    proved="false"
+    expanded="true"
+    shape="amemaConsaZeroV0ar2qamemV0ar1F">
+   </goal>
+   <goal
+    name="one_w_in_r2"
+    locfile="../dfa_example.mlw"
+    loclnum="44" loccnumb="8" loccnume="19"
+    sum="7cc931c0012ee6a36a62469815035f94"
+    proved="false"
+    expanded="true"
+    shape="amemaConsaOneV0ar2qamemV0ar2F">
+   </goal>
+   <goal
+    name="WP_parameter astate1"
+    locfile="../dfa_example.mlw"
+    loclnum="46" loccnumb="10" loccnume="17"
+    expl="VC for astate1"
+    sum="d7f10fbaf3327e6b9769a05c4fcbcc10"
+    proved="true"
+    expanded="false"
+    shape="CV2aNoneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilNaSomeaZeroamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueFFICV0aConsVVainfix =V2aSomeV7Aainfix =V1V8aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+    <label
+     name="expl:VC for astate1"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter astate1.1"
+      locfile="../dfa_example.mlw"
+      loclnum="46" loccnumb="10" loccnume="17"
+      expl="1. postcondition"
+      sum="b35261aff4ac9655ab1b9f13b5920ea8"
+      proved="true"
+      expanded="false"
+      shape="CV2aNoneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilNaSomeaZerotaSomeaOnetICV0aConsVVainfix =V2aSomeV3Aainfix =V1V4aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+      <label
+       name="expl:VC for astate1"/>
+      <proof
+       prover="1"
+       timelimit="20"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate1.2"
+      locfile="../dfa_example.mlw"
+      loclnum="46" loccnumb="10" loccnume="17"
+      expl="2. postcondition"
+      sum="13367b914989f216d2ea2c013c13c859"
+      proved="true"
+      expanded="false"
+      shape="CV2aNonetaSomeaZeroamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOnetICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+      <label
+       name="expl:VC for astate1"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter astate1.2.1"
+        locfile="../dfa_example.mlw"
+        loclnum="46" loccnumb="10" loccnume="17"
+        expl="1. postcondition"
+        sum="1fe1eb3176c9c151f54279e21d952bfe"
+        proved="true"
+        expanded="false"
+        shape="CV2aNonetaSomeaZeroainfix =V3aNilIainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOnetICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+        <label
+         name="expl:VC for astate1"/>
+        <proof
+         prover="0"
+         timelimit="20"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter astate1.2.2"
+        locfile="../dfa_example.mlw"
+        loclnum="46" loccnumb="10" loccnume="17"
+        expl="2. postcondition"
+        sum="1a33f7e714b75ff6e46ed4fb6316e55a"
+        proved="true"
+        expanded="false"
+        shape="CV2aNonetaSomeaZeroamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneIainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOnetICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+        <label
+         name="expl:VC for astate1"/>
+        <proof
+         prover="0"
+         timelimit="8"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter astate1.2.3"
+        locfile="../dfa_example.mlw"
+        loclnum="46" loccnumb="10" loccnume="17"
+        expl="3. postcondition"
+        sum="1ad3706f90cd5c2d9612ad792f5323f9"
+        proved="true"
+        expanded="false"
+        shape="CV2aNonetaSomeaZeroainfix =V4aTrueIamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOnetICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+        <label
+         name="expl:VC for astate1"/>
+        <proof
+         prover="0"
+         timelimit="8"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter astate1.3"
+      locfile="../dfa_example.mlw"
+      loclnum="46" loccnumb="10" loccnume="17"
+      expl="3. postcondition"
+      sum="6bb80a59b73f4ae77ba5970cb20be7dc"
+      proved="true"
+      expanded="false"
+      shape="CV2aNonetaSomeaZerotaSomeaOneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+      <label
+       name="expl:VC for astate1"/>
+      <proof
+       prover="0"
+       timelimit="8"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.38"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter astate2"
+    locfile="../dfa_example.mlw"
+    loclnum="55" loccnumb="7" loccnume="14"
+    expl="VC for astate2"
+    sum="9e914ab61e555c48469d32eaf807ae31"
+    proved="true"
+    expanded="false"
+    shape="CV2aNoneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaSomeaZeroamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueFFICV0aConsVVainfix =V2aSomeV7Aainfix =V1V8aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+    <label
+     name="expl:VC for astate2"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter astate2.1"
+      locfile="../dfa_example.mlw"
+      loclnum="55" loccnumb="7" loccnume="14"
+      expl="1. postcondition"
+      sum="3a7bd9e70eda6d691f13571ffd8fa8aa"
+      proved="true"
+      expanded="false"
+      shape="CV2aNoneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaSomeaZerotaSomeaOnetICV0aConsVVainfix =V2aSomeV3Aainfix =V1V4aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+      <label
+       name="expl:VC for astate2"/>
+      <proof
+       prover="1"
+       timelimit="8"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate2.2"
+      locfile="../dfa_example.mlw"
+      loclnum="55" loccnumb="7" loccnume="14"
+      expl="2. postcondition"
+      sum="259f5cbeaec9f34726649e6bba41cb78"
+      proved="true"
+      expanded="false"
+      shape="CV2aNonetaSomeaZeroamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOnetICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+      <label
+       name="expl:VC for astate2"/>
+      <proof
+       prover="1"
+       timelimit="8"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate2.3"
+      locfile="../dfa_example.mlw"
+      loclnum="55" loccnumb="7" loccnume="14"
+      expl="3. postcondition"
+      sum="5b82ce1fd64ac980d92269e9328c77f4"
+      proved="true"
+      expanded="false"
+      shape="CV2aNonetaSomeaZerotaSomeaOneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFICV0aConsVVainfix =V2aSomeV5Aainfix =V1V6aNilainfix =V2aNoneAainfix =V1aNilAainfix =V0V1FFF">
+      <label
+       name="expl:VC for astate2"/>
+      <proof
+       prover="0"
+       timelimit="8"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.37"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
