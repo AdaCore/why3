@@ -97,10 +97,14 @@ use import ref.Refint
 let lcp (a:array int) (x y:int) : int 
   requires { 0 <= x < a.length }
   requires { 0 <= y < a.length }
+  ensures { 0 <= result /\ x+result <= a.length /\ y+result <= a.length }
+  ensures { forall i:int. 0 <= i < result -> a[x+i] = a[y+i] }
+  ensures { x+result = a.length \/ y+result = a.length \/ a[x+result] <> a[y+result] }
   = let n = a.length in
     let l = ref 0 in
     while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
-      invariant { 0 <= !l }
+      invariant { 0 <= !l /\ x + !l <= n /\ y + !l <= n }
+      invariant { forall i:int. 0 <= i < !l -> a[x+i] = a[y+i] }
       incr l
     done;
     !l
