@@ -1,0 +1,184 @@
+(*
+
+Longest Common Prefix (LCP) - 45 minutes
+
+VERIFICATION TASK
+-----------------
+
+Longest Common Prefix (LCP) is an algorithm used for text querying. In
+the following, we model text as an integer array. You may use other
+representations (e.g., Java Strings), if your system supports them.
+
+LCP can be implemented with the pseudocode given below. Formalize and
+verify the following informal specification for LCP.
+
+Input:  an integer array a, and two indices x and y into this array
+Output: length of the longest common prefix of the subarrays of a
+        starting at x and y respectively.
+
+Pseudocode:
+
+    int lcp(int[] a, int x, int y) {
+        int l = 0;
+        while (x+l<a.length && y+l<a.length && a[x+l]==a[y+l]) {
+            l++;
+        }
+        return l;
+    }
+
+
+
+
+
+
+ADVANCED 
+========
+
+
+
+BACKGROUND
+----------
+
+Together with a suffix array, LCP can be used to solve interesting text
+problems, such as finding the longest repeated substring (LRS) in a text.
+
+A suffix array (for a given text) is an array of all suffixes of the
+text. For the text [7,8,8,6], the suffix array is
+[[7,8,8,6],
+   [8,8,6],
+     [8,6],
+       [6]]
+
+Typically, the suffixes are not stored explicitly as above but
+represented as pointers into the original text. The suffixes in a suffix
+array  are sorted in lexicographical order. This way, occurrences of
+repeated substrings in the original text are neighbors in the suffix
+array. 
+
+For the above, example (assuming pointers are 0-based integers), the
+sorted suffix array is:
+
+[3,0,2,1]
+
+
+VERIFICATION TASK
+-----------------
+
+The attached Java code contains an implementation of a suffix array
+(SuffixArray.java), consisting essentially of a lexicographical
+comparison on arrays, a sorting routine, and LCP.
+
+The client code (LRS.java) uses these to solve the LRS problem. Verify
+that it does so correctly.
+
+*)
+
+
+module SuffixArray 
+
+type suffixArray = {
+    a : map int int;
+    suffixes : map int int;
+    n : int;
+}
+
+let create (a:map int int) (length:int) : suffixArray  =
+ let s = Array.make 0 length in
+ for i = 0 to length-1 do s[i] <- i done;
+ sort(s);
+ { a = a;
+   n = length;
+   suffixes = s.elts;
+ }
+
+let select (s:suffixArray) (int i) : int = s.suffixes[i]
+ 
+let private_lcp (s:suffixArray) (x y:int) : int =
+   let n = s.n in
+   let l = ref 0 in
+   while x + !l < n && y + !l < n && s.a[x + !l] = a[y + !l] do
+     incr l
+   done;
+   !l
+
+let lcp (s:suffixArray) (i:int) : int =
+  private_lcp s.suffixes[i] s.suffixes[i-1]
+
+let compare (s:suffixArray) (x y:int) : int =
+  if x = y then 0 else
+  let l = ref 0 in 
+  while x + !l < n && y + !l < n && s.a[x + !l] = s.a[y + !l] do
+    incr l
+  done;
+  if x + !l = n then -1 else
+  if y + !l = n then 1 else
+  if s.a[x + !l] < s.a[y + !l] then -1 else
+  if s.a[x + !l] > s.a[y + !l] then 1 else
+  absurd
+
+let sort (s:suffixArray) (data : array int) =
+   for i = 0 to data.length do
+      let j = ref i in
+      while j > 0 && compare s data[!j-1] data[!j] > 0 do
+                let b = !j - 1 in
+                let t = data[!j] in
+                data[!j] <- data[b];
+                data[b] <- t;
+                decr j
+      done
+  done
+
+
+let test1 () =
+  int[] arr = {1,2,2,5};
+  let sa = create_suffixArray arr in
+  let x = lcp sa 1 2 in
+  assert {x = ?};
+  int[] brr = {1,2,3,5};
+  let sa = create_suffixArray brr in
+  let x = lcp sa 1 2 in
+  assert {x = ?};
+  int[] crr = {1,2,3,5};
+  let sa = create_suffixArray crr in
+  let x = lcp sa 2 3 in
+  assert {x = ?};
+  int[] drr = {1,2,3,3};
+  let sa = create_suffixArray drr in
+  let x = lcp sa 2 3 in
+  assert {x = ?}
+
+end
+
+module LRS 
+
+    private static int solStart = 0;
+    private static int solLength = 0;
+    private static int[] a;
+
+    public static void main(String[] args) {
+        a = new int[args.length];
+        for (int i=0; i<args.length; i++) {
+            a[i]=Integer.parseInt(args[i]);
+        }
+        doLRS();
+        System.out.println(solStart+"->"+solLength);
+    }
+
+
+
+    public static void doLRS() {
+        SuffixArray sa = new SuffixArray(a);
+
+        for (int i=1; i < a.length; i++) {
+            int length = sa.lcp(i);
+            if (length > solLength) {
+                solStart = sa.select(i);
+                solLength = length;
+            }
+        }
+    }
+
+end
+
+
+//Based on code by Robert Sedgewick and Kevin Wayne.
