@@ -84,17 +84,47 @@ type suffixArray = {
     suffixes : array int;
 }
 
-let select (s:suffixArray) (i:int) : int = s.suffixes[i]
+predicate inv(s:suffixArray) =
+  s.values.length = s.suffixes.length
+
+let select (s:suffixArray) (i:int) : int 
+  requires { inv s /\ 0 <= i < s.values.length }
+  ensures { result = s.suffixes[i] }
+  = s.suffixes[i]
 
 use import ref.Refint
 
-let lcp (a:array int) (x y:int) : int =
-   let n = a.length in
-   let l = ref 0 in
-   while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
-     incr l
-   done;
-   !l
+let lcp (a:array int) (x y:int) : int 
+  requires { 0 <= x < a.length }
+  requires { 0 <= y < a.length }
+  = let n = a.length in
+    let l = ref 0 in
+    while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
+      invariant { 0 <= !l }
+      incr l
+    done;
+    !l
+
+let test1 () =
+  let arr = Array.make 4 0 in
+  arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
+  let x = lcp arr 1 2 in
+  assert { x = 1 };
+  (* int[] brr = {1,2,3,5}; *)
+  let brr = Array.make 4 0 in
+  brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
+  let x = lcp brr 1 2 in
+  assert { x = 0 };
+  (* int[] crr = {1,2,3,5}; *)
+  let crr = Array.make 4 0 in
+  crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
+  let x = lcp crr 2 3 in
+  assert { x = 0 };
+  (* int[] drr = {1,2,3,3}; *)
+  let drr = Array.make 4 0 in
+  drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
+  let x = lcp drr 2 3 in
+  assert {x = 1}
 
 let compare (a:array int) (x y:int) : int =
   if x = y then 0 else
@@ -125,60 +155,67 @@ let create (a:array int) : suffixArray  =
  sort a suf;
  { values = a; suffixes = suf }
 
-let test1 () =
-  int[] arr = {1,2,2,5};
-  let sa = create_suffixArray arr in
-  let x = lcp sa 1 2 in
-  assert {x = ?};
-  int[] brr = {1,2,3,5};
-  let sa = create_suffixArray brr in
-  let x = lcp sa 1 2 in
-  assert {x = ?};
-  int[] crr = {1,2,3,5};
-  let sa = create_suffixArray crr in
-  let x = lcp sa 2 3 in
-  assert {x = ?};
-  int[] drr = {1,2,3,3};
-  let sa = create_suffixArray drr in
-  let x = lcp sa 2 3 in
-  assert {x = ?}
+let lcp2 (s:suffixArray) (i:int) : int =
+   lcp s.values s.suffixes[i] s.suffixes[i-1]
+
+
+let test2 () =
+  let arr = Array.make 4 0 in
+  arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
+  let sa = create arr in
+  let x = lcp2 sa 1 in
+  assert {x = -1 (* TODO *)};
+  (* int[] brr = {1,2,3,5}; *)
+  let brr = Array.make 4 0 in
+  brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
+  let sa = create brr in
+  let x = lcp2 sa 1 in
+  assert {x = -1 (* TODO *)};
+  (* int[] crr = {1,2,3,5}; *)
+  let crr = Array.make 4 0 in
+  crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
+  let sa = create crr in
+  let x = lcp2 sa 2 in
+  assert {x = -1 (* TODO *)};
+  (* int[] drr = {1,2,3,3}; *)
+  let drr = Array.make 4 0 in
+  drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
+  let sa = create drr in
+  let x = lcp2 sa 2 in
+  assert {x = -1 (* TODO *)}
 
 end
 
 module LRS
 
-  let lcp (s:suffixArray) (i:int) : int =
-    SuffixArray.lcp s s.suffixes[i] s.suffixes[i-1]
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use SuffixArray
 
+    val solStart : ref int
+    val solLength : ref int
 
-    private static int solStart = 0;
-    private static int solLength = 0;
-    private static int[] a;
+    let lrs (a:array int) : unit =
+      let sa = SuffixArray.create a in
+      solStart := 0;
+      solLength := 0;
+      for i=1 to a.length - 1 do
+         let l = SuffixArray.lcp2 sa i in
+         if l > !solLength then begin
+            solStart := SuffixArray.select sa i;
+            solLength := l
+         end
+      done
 
-    public static void main(String[] args) {
-        a = new int[args.length];
-        for (int i=0; i<args.length; i++) {
-            a[i]=Integer.parseInt(args[i]);
-        }
-        doLRS();
-        System.out.println(solStart+"->"+solLength);
-    }
-
-
-
-    public static void doLRS() {
-        SuffixArray sa = new SuffixArray(a);
-
-        for (int i=1; i < a.length; i++) {
-            int length = sa.lcp(i);
-            if (length > solLength) {
-                solStart = sa.select(i);
-                solLength = length;
-            }
-        }
-    }
+  let test () =
+    let arr = Array.make 4 0 in
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-9;
+    lrs arr;
+    assert { !solStart = 1 };
+    assert { !solLength = 1 }
 
 end
 
 
-//Based on code by Robert Sedgewick and Kevin Wayne.
+(* Based on code by Robert Sedgewick and Kevin Wayne. *)
