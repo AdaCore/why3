@@ -1982,16 +1982,17 @@ let use_clone_pure lib mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
   let th = find_theory loc lib mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp = None then uc
-  else Theory.open_namespace uc use.use_as in
+  let uc = match use.use_import with
+    | Some (_, use_as) -> Theory.open_namespace uc use_as
+    | None -> uc in
   (* use or clone *)
   let uc = match inst with
     | None -> Theory.use_export uc th
     | Some inst -> Theory.clone_export uc th (Typing.type_inst uc th inst) in
   (* close namespace, if any *)
-  match use.use_imp_exp with
+  match use.use_import with
+    | Some (import, _) -> Theory.close_namespace uc import
     | None -> uc
-    | Some imp -> Theory.close_namespace uc imp
 
 let use_clone_pure lib mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
@@ -2001,8 +2002,9 @@ let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
-  let uc = if use.use_imp_exp = None then uc
-  else open_namespace uc use.use_as in
+  let uc = match use.use_import with
+    | Some (_, use_as) -> open_namespace uc use_as
+    | None -> uc in
   (* use or clone *)
   let uc = match mth, inst with
     | Module m, None -> use_export uc m
@@ -2012,9 +2014,9 @@ let use_clone lib mmd mth uc loc (use,inst) =
     | Theory th, Some inst ->
         clone_export_theory uc th (Typing.type_inst (get_theory uc) th inst) in
   (* close namespace, if any *)
-  match use.use_imp_exp with
+  match use.use_import with
+    | Some (import, _) -> close_namespace uc import
     | None -> uc
-    | Some imp -> close_namespace uc imp
 
 let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else

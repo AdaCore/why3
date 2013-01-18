@@ -87,10 +87,8 @@ type plogic_type =
   | PFunction  of pty list * pty
 
 type use = {
-  use_theory  : qualid;
-  use_as      : string;
-  use_imp_exp : bool option;
-    (* None = export, Some false = default, Some true = import *)
+  use_theory : qualid;
+  use_import : (bool (* import *) * string (* as *)) option;
 }
 
 type clone_subst =

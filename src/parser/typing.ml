@@ -1187,12 +1187,12 @@ let add_use_clone env lenv th loc (use, subst) =
     | None -> use_export th t
     | Some s -> clone_export th t (type_inst th t s)
   in
-  let use_or_clone th = match use.use_imp_exp with
-    | Some imp ->
+  let use_or_clone th = match use.use_import with
+    | Some (import, use_as) ->
         (* use T = namespace T use_export T end *)
-        let th = open_namespace th use.use_as in
+        let th = open_namespace th use_as in
         let th = use_or_clone th in
-        close_namespace th imp
+        close_namespace th import
     | None ->
         use_or_clone th
   in

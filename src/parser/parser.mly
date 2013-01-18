@@ -333,16 +333,17 @@ use_clone:
 ;
 
 use:
-| imp_exp tqualid
-    { { use_theory = $2; use_as = qualid_last $2; use_imp_exp = $1 } }
-| imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = $4.id; use_imp_exp = $1 } }
+| opt_import tqualid
+    { { use_theory = $2; use_import = Some ($1, qualid_last $2) } }
+| opt_import tqualid AS uident
+    { { use_theory = $2; use_import = Some ($1, $4.id) } }
+| EXPORT tqualid
+    { { use_theory = $2; use_import = None } }
 ;
 
-imp_exp:
-| IMPORT        { Some true }
-| EXPORT        { None }
-| /* epsilon */ { Some false }
+opt_import:
+| /* epsilon */ { false }
+| IMPORT        { true  }
 ;
 
 clone_subst:
