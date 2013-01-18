@@ -485,7 +485,7 @@ let do_theory env drv fname tname th glist =
       exit 1
     end else begin
       let drv = Opt.get drv in
-      let task = Task.use_export None th in
+      let task = Task.use_export !opt_task th in
       do_tasks env drv fname tname th task
     end
   else begin
