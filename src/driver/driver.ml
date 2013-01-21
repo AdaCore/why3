@@ -249,14 +249,18 @@ let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
 
 exception NoPrinter
 
-let update_task drv task =
-  let task, goal = match task with
+let update_task drv task_orig =
+  (** task_orig is the task for looking for theories
+      task      is the task for adding new metas
+      goal      is the last decl that we want to keep at the end (goal or clone)
+  *)
+  let task, goal = match task_orig with
     | Some { task_decl = g ; task_prev = t } -> t,g
     | None -> raise Task.GoalNotFound
   in
   let task =
     Mid.fold (fun _ (th,s) task ->
-      if Task.on_used_theory th task then
+      if Task.on_used_theory th task_orig then
         Stdecl.fold (fun tdm task ->
           add_tdecl task tdm
         ) s task
@@ -269,7 +273,7 @@ let update_task drv task =
         Stdecl.fold (fun tdm task ->
           add_tdecl task (clone_meta tdm sm)
         ) s task
-      ) task task
+      ) task task_orig
     ) drv.drv_meta_cl task
   in
   add_tdecl task goal

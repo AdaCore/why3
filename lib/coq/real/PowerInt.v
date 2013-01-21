@@ -9,11 +9,11 @@ Require real.RealInfix.
 
 Require Import Exponentiation.
 
-(* Why3 goal *)
-Notation power := powerRZ.
+(* Why3 comment *)
+(* power is replaced with (powerRZ x x1) by the coq driver *)
 
 Lemma power_is_exponentiation :
-  forall x n, (0 <= n)%Z -> power x n = Exponentiation.power _ R1 Rmult x n.
+  forall x n, (0 <= n)%Z -> powerRZ x n = Exponentiation.power _ R1 Rmult x n.
 Proof.
 intros x [|n|n] H.
 easy.
@@ -27,15 +27,15 @@ now rewrite IHn0.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_0 : forall (x:R), ((power x 0%Z) = 1%R).
+Lemma Power_0 : forall (x:R), ((powerRZ x 0%Z) = 1%R).
 Proof.
 intros x.
 easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s : forall (x:R) (n:Z), (0%Z <= n)%Z -> ((power x
-  (n + 1%Z)%Z) = (x * (power x n))%R).
+Lemma Power_s : forall (x:R) (n:Z), (0%Z <= n)%Z ->
+  ((powerRZ x (n + 1%Z)%Z) = (x * (powerRZ x n))%R).
 Proof.
 intros x n h1.
 rewrite 2!power_is_exponentiation by auto with zarith.
@@ -43,8 +43,8 @@ now apply Power_s.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s_alt : forall (x:R) (n:Z), (0%Z < n)%Z -> ((power x
-  n) = (x * (power x (n - 1%Z)%Z))%R).
+Lemma Power_s_alt : forall (x:R) (n:Z), (0%Z < n)%Z ->
+  ((powerRZ x n) = (x * (powerRZ x (n - 1%Z)%Z))%R).
 intros x n h1.
 rewrite <- Power_s.
 f_equal; omega.
@@ -52,14 +52,14 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_1 : forall (x:R), ((power x 1%Z) = x).
+Lemma Power_1 : forall (x:R), ((powerRZ x 1%Z) = x).
 Proof.
 exact Rmult_1_r.
 Qed.
 
 (* Why3 goal *)
 Lemma Power_sum : forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
-  ((power x (n + m)%Z) = ((power x n) * (power x m))%R)).
+  ((powerRZ x (n + m)%Z) = ((powerRZ x n) * (powerRZ x m))%R)).
 Proof.
 intros x n m h1 h2.
 rewrite 3!power_is_exponentiation by auto with zarith.
@@ -68,7 +68,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_mult : forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> ((0%Z <= m)%Z ->
-  ((power x (n * m)%Z) = (power (power x n) m))).
+  ((powerRZ x (n * m)%Z) = (powerRZ (powerRZ x n) m))).
 Proof.
 intros x n m h1 h2.
 rewrite 3!power_is_exponentiation by auto with zarith.
@@ -77,7 +77,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_mult2 : forall (x:R) (y:R) (n:Z), (0%Z <= n)%Z ->
-  ((power (x * y)%R n) = ((power x n) * (power y n))%R).
+  ((powerRZ (x * y)%R n) = ((powerRZ x n) * (powerRZ y n))%R).
 Proof.
 intros x y n h1.
 rewrite 3!power_is_exponentiation by auto with zarith.
@@ -86,7 +86,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_ge_one : forall (x:R) (n:Z), ((0%Z <= n)%Z /\ (1%R <= x)%R) ->
-  (1%R <= (power x n))%R.
+  (1%R <= (powerRZ x n))%R.
 intros x n (h1,h2).
 generalize h1.
 pattern n; apply Z_lt_induction; auto.
@@ -96,7 +96,7 @@ destruct h.
 subst n; rewrite Power_0; auto with *.
 replace n with ((n-1)+1)%Z by omega.
 rewrite Power_s; auto with zarith.
-assert (h : (1 <= power x (n-1))%R).
+assert (h : (1 <= powerRZ x (n-1))%R).
 apply Hind; omega.
 replace 1%R with (1*1)%R by auto with real.
 apply Rmult_le_compat; auto with real.

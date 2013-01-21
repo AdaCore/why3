@@ -5,6 +5,9 @@ prelude "(* Beware! Only edit allowed sections below    *)"
 printer "coq"
 filename "%f_%t_%g.v"
 
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+
 import "coq-common.gen"
 
 theory real.Trigonometry

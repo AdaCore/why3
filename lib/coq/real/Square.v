@@ -5,13 +5,15 @@ Require Import R_sqrt.
 Require BuiltIn.
 Require real.Real.
 
-(* Why3 assumption *)
-Definition sqr(x:R): R := (x * x)%R.
-
 (* Why3 goal *)
-Definition sqrt: R -> R.
-exact sqrt.
-Defined.
+Lemma sqr_def : forall (x:R), ((Rsqr x) = (x * x)%R).
+reflexivity.
+Qed.
+
+
+
+(* Why3 comment *)
+(* sqrt is replaced with (sqrt x) by the coq driver *)
 
 (* Why3 goal *)
 Lemma Sqrt_positive : forall (x:R), (0%R <= x)%R -> (0%R <= (sqrt x))%R.
@@ -20,7 +22,7 @@ apply sqrt_pos.
 Qed.
 
 (* Why3 goal *)
-Lemma Sqrt_square : forall (x:R), (0%R <= x)%R -> ((sqr (sqrt x)) = x).
+Lemma Sqrt_square : forall (x:R), (0%R <= x)%R -> ((Rsqr (sqrt x)) = x).
 exact sqrt_sqrt.
 Qed.
 

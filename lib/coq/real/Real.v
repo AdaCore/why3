@@ -3,100 +3,101 @@
 Require Import BuiltIn.
 Require BuiltIn.
 
-(* Why3 goal *)
-Definition infix_ls: R -> R -> Prop.
-exact Rlt.
-Defined.
-
-(* Why3 assumption *)
-Definition infix_lseq(x:R) (y:R): Prop := (infix_ls x y) \/ (x = y).
+(* Why3 comment *)
+(* infix_ls is replaced with (x < x1)%R by the coq driver *)
 
 (* Why3 goal *)
-Definition infix_pl: R -> R -> R.
-exact Rplus.
-Defined.
+Lemma infix_lseq_def : forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/
+  (x = y)).
+reflexivity.
+Qed.
+
+
+
+(* Why3 comment *)
+(* infix_pl is replaced with (x + x1)%R by the coq driver *)
+
+(* Why3 comment *)
+(* prefix_mn is replaced with (-x)%R by the coq driver *)
+
+(* Why3 comment *)
+(* infix_as is replaced with (x * x1)%R by the coq driver *)
 
 (* Why3 goal *)
-Definition prefix_mn: R -> R.
-exact Ropp.
-Defined.
-
-(* Why3 goal *)
-Definition infix_as: R -> R -> R.
-exact Rmult.
-Defined.
-
-(* Why3 goal *)
-Lemma Assoc : forall (x:R) (y:R) (z:R), ((infix_pl (infix_pl x y)
-  z) = (infix_pl x (infix_pl y z))).
+Lemma Assoc : forall (x:R) (y:R) (z:R),
+  (((x + y)%R + z)%R = (x + (y + z)%R)%R).
 Proof.
 exact Rplus_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Unit_def_l : forall (x:R), ((infix_pl 0%R x) = x).
+Lemma Unit_def_l : forall (x:R), ((0%R + x)%R = x).
 Proof.
 exact Rplus_0_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Unit_def_r : forall (x:R), ((infix_pl x 0%R) = x).
+Lemma Unit_def_r : forall (x:R), ((x + 0%R)%R = x).
 Proof.
 exact Rplus_0_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Inv_def_l : forall (x:R), ((infix_pl (prefix_mn x) x) = 0%R).
+Lemma Inv_def_l : forall (x:R), (((-x)%R + x)%R = 0%R).
 Proof.
 exact Rplus_opp_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Inv_def_r : forall (x:R), ((infix_pl x (prefix_mn x)) = 0%R).
+Lemma Inv_def_r : forall (x:R), ((x + (-x)%R)%R = 0%R).
 Proof.
 exact Rplus_opp_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Comm : forall (x:R) (y:R), ((infix_pl x y) = (infix_pl y x)).
+Lemma Comm : forall (x:R) (y:R), ((x + y)%R = (y + x)%R).
 Proof.
 exact Rplus_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc1 : forall (x:R) (y:R) (z:R), ((infix_as (infix_as x y)
-  z) = (infix_as x (infix_as y z))).
+Lemma Assoc1 : forall (x:R) (y:R) (z:R),
+  (((x * y)%R * z)%R = (x * (y * z)%R)%R).
 Proof.
 exact Rmult_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_l : forall (x:R) (y:R) (z:R), ((infix_as x (infix_pl y
-  z)) = (infix_pl (infix_as x y) (infix_as x z))).
+Lemma Mul_distr_l : forall (x:R) (y:R) (z:R),
+  ((x * (y + z)%R)%R = ((x * y)%R + (x * z)%R)%R).
 Proof.
 intros x y z.
 apply Rmult_plus_distr_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_r : forall (x:R) (y:R) (z:R), ((infix_as (infix_pl y z)
-  x) = (infix_pl (infix_as y x) (infix_as z x))).
+Lemma Mul_distr_r : forall (x:R) (y:R) (z:R),
+  (((y + z)%R * x)%R = ((y * x)%R + (z * x)%R)%R).
 Proof.
 intros x y z.
 apply Rmult_plus_distr_r.
 Qed.
 
-(* Why3 assumption *)
-Definition infix_mn(x:R) (y:R): R := (infix_pl x (prefix_mn y)).
+(* Why3 goal *)
+Lemma infix_mn_def : forall (x:R) (y:R), ((x - y)%R = (x + (-y)%R)%R).
+reflexivity.
+Qed.
+
+
 
 (* Why3 goal *)
-Lemma Comm1 : forall (x:R) (y:R), ((infix_as x y) = (infix_as y x)).
+Lemma Comm1 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R).
 Proof.
 exact Rmult_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Unitary : forall (x:R), ((infix_as 1%R x) = x).
+Lemma Unitary : forall (x:R), ((1%R * x)%R = x).
 Proof.
 exact Rmult_1_l.
 Qed.
@@ -108,49 +109,50 @@ apply not_eq_sym.
 exact R1_neq_R0.
 Qed.
 
-(* Why3 goal *)
-Definition inv: R -> R.
-exact Rinv.
-Defined.
+(* Why3 comment *)
+(* inv is replaced with (Rinv x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma Inverse : forall (x:R), (~ (x = 0%R)) -> ((infix_as x (inv x)) = 1%R).
+Lemma Inverse : forall (x:R), (~ (x = 0%R)) -> ((x * (Rinv x))%R = 1%R).
 exact Rinv_r.
 Qed.
 
-(* Why3 assumption *)
-Definition infix_sl(x:R) (y:R): R := (infix_as x (inv y)).
+(* Why3 goal *)
+Lemma infix_sl_def : forall (x:R) (y:R), ((Rdiv x y)%R = (x * (Rinv y))%R).
+reflexivity.
+Qed.
+
 
 (* Why3 goal *)
 Lemma add_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  ((infix_sl (infix_pl x y) z) = (infix_pl (infix_sl x z) (infix_sl y z))).
+  ((Rdiv (x + y)%R z)%R = ((Rdiv x z)%R + (Rdiv y z)%R)%R).
 Proof.
 intros.
-unfold infix_sl, infix_as, infix_pl.
 field.
+assumption.
 Qed.
 
 (* Why3 goal *)
 Lemma sub_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  ((infix_sl (infix_mn x y) z) = (infix_mn (infix_sl x z) (infix_sl y z))).
+  ((Rdiv (x - y)%R z)%R = ((Rdiv x z)%R - (Rdiv y z)%R)%R).
 Proof.
 intros.
-unfold infix_sl, infix_as, infix_mn, infix_pl, prefix_mn.
 field.
+assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma neg_div : forall (x:R) (y:R), (~ (y = 0%R)) -> ((infix_sl (prefix_mn x)
-  y) = (prefix_mn (infix_sl x y))).
+Lemma neg_div : forall (x:R) (y:R), (~ (y = 0%R)) ->
+  ((Rdiv (-x)%R y)%R = (-(Rdiv x y)%R)%R).
 Proof.
 intros.
-unfold infix_sl, infix_as, prefix_mn.
 field.
+assumption.
 Qed.
 
 (* Why3 goal *)
 Lemma assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  ((infix_sl (infix_as x y) z) = (infix_as x (infix_sl y z))).
+  ((Rdiv (x * y)%R z)%R = (x * (Rdiv y z)%R)%R).
 Proof.
 intros x y z _.
 apply Rmult_assoc.
@@ -158,48 +160,44 @@ Qed.
 
 (* Why3 goal *)
 Lemma assoc_div_mul : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
-  ~ (z = 0%R)) -> ((infix_sl (infix_sl x y) z) = (infix_sl x (infix_as y
-  z))).
+  ~ (z = 0%R)) -> ((Rdiv (Rdiv x y)%R z)%R = (Rdiv x (y * z)%R)%R).
 Proof.
 intros x y z (Zy, Zz).
-unfold infix_sl, infix_as, inv.
+unfold Rdiv.
 rewrite Rmult_assoc.
 now rewrite Rinv_mult_distr.
 Qed.
 
 (* Why3 goal *)
 Lemma assoc_div_div : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
-  ~ (z = 0%R)) -> ((infix_sl x (infix_sl y z)) = (infix_sl (infix_as x z)
-  y)).
+  ~ (z = 0%R)) -> ((Rdiv x (Rdiv y z)%R)%R = (Rdiv (x * z)%R y)%R).
 Proof.
 intros x y z (Zy, Zz).
-unfold infix_sl, infix_as, inv.
 field.
 now split.
 Qed.
 
 (* Why3 goal *)
-Lemma Refl : forall (x:R), (infix_lseq x x).
+Lemma Refl : forall (x:R), (x <= x)%R.
 Proof.
 exact Rle_refl.
 Qed.
 
 (* Why3 goal *)
-Lemma Trans : forall (x:R) (y:R) (z:R), (infix_lseq x y) -> ((infix_lseq y
-  z) -> (infix_lseq x z)).
+Lemma Trans : forall (x:R) (y:R) (z:R), (x <= y)%R -> ((y <= z)%R ->
+  (x <= z)%R).
 Proof.
 exact Rle_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma Antisymm : forall (x:R) (y:R), (infix_lseq x y) -> ((infix_lseq y x) ->
-  (x = y)).
+Lemma Antisymm : forall (x:R) (y:R), (x <= y)%R -> ((y <= x)%R -> (x = y)).
 Proof.
 exact Rle_antisym.
 Qed.
 
 (* Why3 goal *)
-Lemma Total : forall (x:R) (y:R), (infix_lseq x y) \/ (infix_lseq y x).
+Lemma Total : forall (x:R) (y:R), (x <= y)%R \/ (y <= x)%R.
 Proof.
 intros x y.
 destruct (Rle_or_lt x y) as [H|H].
@@ -209,22 +207,22 @@ now apply Rlt_le.
 Qed.
 
 (* Why3 goal *)
-Lemma ZeroLessOne : (infix_lseq 0%R 1%R).
+Lemma ZeroLessOne : (0%R <= 1%R)%R.
 Proof.
 exact Rle_0_1.
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderAdd : forall (x:R) (y:R) (z:R), (infix_lseq x y) ->
-  (infix_lseq (infix_pl x z) (infix_pl y z)).
+Lemma CompatOrderAdd : forall (x:R) (y:R) (z:R), (x <= y)%R ->
+  ((x + z)%R <= (y + z)%R)%R.
 Proof.
 intros x y z.
 exact (Rplus_le_compat_r z x y).
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderMult : forall (x:R) (y:R) (z:R), (infix_lseq x y) ->
-  ((infix_lseq 0%R z) -> (infix_lseq (infix_as x z) (infix_as y z))).
+Lemma CompatOrderMult : forall (x:R) (y:R) (z:R), (x <= y)%R ->
+  ((0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R).
 Proof.
 intros x y z H Zz.
 now apply Rmult_le_compat_r.

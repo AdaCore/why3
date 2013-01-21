@@ -391,6 +391,7 @@ type content_type =
   Notation | (*Gallina |*) Vernacular
 
 type statement =
+  | Info  of string  (* name *)
   | Axiom of string (* name *)
   | Query of string * content_type * string (* name and content *)
   | Other of string (* content *)
@@ -408,6 +409,30 @@ let read_generated_name =
     done;
     assert false
   with StringValue name -> name
+
+(** no nested comment *)
+let read_comment =
+  let start_comment = Str.regexp "(\\*[ ]+\\([^ :]+\\)" in
+  let end_comment = Str.regexp ".*\\*)" in
+  fun ch ->
+    let line = ref "" in
+    (** look for "( * name" *)
+    let name =
+      try
+        while true do
+          let s = input_line ch in
+          if Str.string_match start_comment s 0 then begin
+            line := s;
+            raise (StringValue (Str.matched_group 1 s))
+          end
+        done;
+        assert false
+      with StringValue name -> name in
+    (** look for end of comment *)
+    while not (Str.string_match end_comment (!line) 0) do
+      line := input_line ch
+    done;
+    name
 
 let read_old_proof =
   let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\|Variable\\|Hypothesis\\)[ ]+\\([^ :(.]+\\)" in
@@ -471,6 +496,9 @@ let read_old_script =
       let s = input_line ch in
       if s = "" then last_empty_line := pos_in ch;
       if !skip_to_empty then (if s = "" then skip_to_empty := false) else
+      if s = "(* Why3 comment *)" then
+        (let name = read_comment ch in sc := Info name :: !sc;
+         skip_to_empty := true) else
       if s = "(* Why3 assumption *)" then
         (let name = read_generated_name ch in sc := Axiom name :: !sc;
         skip_to_empty := true) else
@@ -511,6 +539,7 @@ let output_till_statement fmt script name =
       | [] -> assert false in
     aux [] !script in
   let rec find = function
+    | Info n as o :: _ when n = name -> print o; Some o
     | Axiom n as o :: _ when n = name -> print o; Some o
     | Query (n,_,_) as o :: _ when n = name -> print o; Some o
     | [] -> None
@@ -519,7 +548,7 @@ let output_till_statement fmt script name =
 
 let output_remaining fmt script =
   List.iter (function
-    | Axiom _ -> ()
+    | Info _ | Axiom _ -> ()
     | Query (n,_,c) -> fprintf fmt "(* Unused content named %s@\n%s *)@\n" n c
     | Other c -> fprintf fmt "%s@\n" c) script
 
@@ -605,7 +634,7 @@ let print_previous_proof def fmt previous =
   | Some (Query (_,Vernacular,c)) ->
     fprintf fmt "%s" c
   | Some (Query (_,Notation,_))
-  | Some (Axiom _) | Some (Other _) ->
+  | Some (Axiom _) | Some (Other _) | Some (Info _) ->
     assert false
 
 let print_type_decl ~prev info fmt ts =
@@ -697,6 +726,19 @@ let print_param_decl ~prev info fmt ls =
         print_ls ls print_params all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+    | (* Some Info *) _ when Mid.mem ls.ls_name info.info_syn ->
+      let vl =
+        List.map (fun ty -> create_vsymbol (id_fresh "x") ty) ls.ls_args in
+      let e = Term.t_app ls (List.map Term.t_var vl) ls.ls_value in
+      fprintf fmt
+        "(* Why3 comment *)@\n\
+         (* %a is replaced with %a by the coq driver *)@\n@\n"
+        print_ls ls
+        (* print_ne_params all_ty_params *)
+        (* (print_space_list (print_vsty info)) vl *)
+        (* (print_ls_type info) ls.ls_value *)
+        (print_expr info) e;
+      List.iter forget_var vl
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a: %a%a%a.@]@\n%a@\n"
         print_ls ls print_params all_ty_params
@@ -710,7 +752,7 @@ let print_param_decl ~prev info fmt ls =
       (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
 
 let print_param_decl ~prev info fmt ls =
-  if not (Mid.mem ls.ls_name info.info_syn) then
+  if info.realization || not (Mid.mem ls.ls_name info.info_syn) then
     (print_param_decl ~prev info fmt ls; forget_tvs ())
 
 let print_logic_decl info fmt (ls,ld) =
@@ -725,9 +767,34 @@ let print_logic_decl info fmt (ls,ld) =
   List.iter forget_var vl;
   fprintf fmt "@\n"
 
-let print_logic_decl info fmt d =
+let print_equivalence_lemma ~prev info fmt name (ls,ld) =
+  let _, _, all_ty_params = ls_ty_vars ls in
+  let def_formula = ls_defn_axiom ld in
+  fprintf fmt
+    "(* Why3 goal *)@\n@[<hov 2>Lemma %s %a:@ %a.@]@\n"
+    name
+    print_ne_params all_ty_params
+    (print_expr info) def_formula;
+  fprintf fmt "%a@\n"
+    (print_previous_proof (Some(all_ty_params,def_formula))) prev;
+  fprintf fmt "@\n"
+
+let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
+  if info.realization && (Mid.mem ls.ls_name info.info_syn) then
+    let name = Ident.string_unique iprinter
+      ((id_unique iprinter ls.ls_name)^"_def") in
+    let prev = output_till_statement fmt old name in
+    (print_equivalence_lemma ~prev info fmt name d; forget_tvs ())
+
+
+let print_logic_decl ~old info fmt d =
+  (** During realization the definition of a "builtin" symbol is
+      printed and an equivalence lemma with associated coq function is
+      requested *)
   if not (Mid.mem (fst d).ls_name info.info_syn) then
     (print_logic_decl info fmt d; forget_tvs ())
+  else if info.realization then
+    print_equivalence_lemma ~old info fmt d
 
 let print_recursive_decl info fmt (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
@@ -743,15 +810,22 @@ let print_recursive_decl info fmt (ls,ld) =
     (print_expr info) e;
   List.iter forget_var vl
 
-let print_recursive_decl info fmt dl =
-  fprintf fmt "(* Why3 assumption *)@\n";
-  print_list_delim
-    ~start:(fun fmt () -> fprintf fmt "@[<hov 2>Fixpoint ")
-    ~stop:(fun fmt () -> fprintf fmt ".@\n")
-    ~sep:(fun fmt () -> fprintf fmt "@\n@[<hov 2>with ")
-    (fun fmt d -> print_recursive_decl info fmt d; forget_tvs ())
-    fmt dl;
-  fprintf fmt "@\n"
+let print_recursive_decl ~old info fmt dl =
+  let dl_syn, dl_no_syn =
+    List.partition (fun (ls,_) ->
+      info.realization && (Mid.mem ls.ls_name info.info_syn)) dl in
+  if dl_no_syn <> [] then begin
+    fprintf fmt "(* Why3 assumption *)@\n";
+    print_list_delim
+      ~start:(fun fmt () -> fprintf fmt "@[<hov 2>Fixpoint ")
+      ~stop:(fun fmt () -> fprintf fmt ".@]@\n")
+      ~sep:(fun fmt () -> fprintf fmt "@]@\n@[<hov 2>with ")
+      (fun fmt d -> print_recursive_decl info fmt d; forget_tvs ())
+      fmt dl_no_syn;
+    fprintf fmt "@\n";
+  end;
+  List.iter (print_equivalence_lemma ~old info fmt) dl_syn
+
 
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
@@ -816,12 +890,12 @@ let print_decl ~old info fmt d =
   | Dparam ls ->
       print_param_decl ~prev info fmt ls
   | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
-      print_logic_decl info fmt ld
+      print_logic_decl ~old info fmt ld
   | Dlogic ll ->
-      print_recursive_decl info fmt ll
+      print_recursive_decl ~old info fmt ll
   | Dind (s, il) ->
       print_list nothing (print_ind_decl info s) fmt il
-  | Dprop (_,pr,_) when Mid.mem pr.pr_name info.info_syn ->
+  | Dprop (_,pr,_) when not info.realization && Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop pr ->
       print_prop_decl ~prev info fmt pr

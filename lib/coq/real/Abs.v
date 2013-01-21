@@ -5,14 +5,12 @@ Require Import Rbasic_fun.
 Require BuiltIn.
 Require real.Real.
 
-(* Why3 goal *)
-Definition abs: R -> R.
-exact Rabs.
-Defined.
+(* Why3 comment *)
+(* abs is replaced with (Rabs x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma abs_def : forall (x:R), ((0%R <= x)%R -> ((abs x) = x)) /\
-  ((~ (0%R <= x)%R) -> ((abs x) = (-x)%R)).
+Lemma abs_def : forall (x:R), ((0%R <= x)%R -> ((Rabs x) = x)) /\
+  ((~ (0%R <= x)%R) -> ((Rabs x) = (-x)%R)).
 split ; intros H.
 apply Rabs_right.
 now apply Rle_ge.
@@ -21,10 +19,10 @@ now apply Rnot_le_lt.
 Qed.
 
 (* Why3 goal *)
-Lemma Abs_le : forall (x:R) (y:R), ((abs x) <= y)%R <-> (((-y)%R <= x)%R /\
+Lemma Abs_le : forall (x:R) (y:R), ((Rabs x) <= y)%R <-> (((-y)%R <= x)%R /\
   (x <= y)%R).
 intros x y.
-unfold abs, Rabs.
+unfold Rabs.
 case Rcase_abs ; intros H ; (split ; [intros H0;split | intros (H0,H1)]).
 rewrite <- (Ropp_involutive x).
 now apply Ropp_le_contravar.
@@ -47,25 +45,25 @@ exact H1.
 Qed.
 
 (* Why3 goal *)
-Lemma Abs_pos : forall (x:R), (0%R <= (abs x))%R.
+Lemma Abs_pos : forall (x:R), (0%R <= (Rabs x))%R.
 exact Rabs_pos.
 Qed.
 
 (* Why3 goal *)
 Lemma Abs_sum : forall (x:R) (y:R),
-  ((abs (x + y)%R) <= ((abs x) + (abs y))%R)%R.
+  ((Rabs (x + y)%R) <= ((Rabs x) + (Rabs y))%R)%R.
 exact Rabs_triang.
 Qed.
 
 (* Why3 goal *)
 Lemma Abs_prod : forall (x:R) (y:R),
-  ((abs (x * y)%R) = ((abs x) * (abs y))%R).
+  ((Rabs (x * y)%R) = ((Rabs x) * (Rabs y))%R).
 exact Rabs_mult.
 Qed.
 
 (* Why3 goal *)
 Lemma triangular_inequality : forall (x:R) (y:R) (z:R),
-  ((abs (x - z)%R) <= ((abs (x - y)%R) + (abs (y - z)%R))%R)%R.
+  ((Rabs (x - z)%R) <= ((Rabs (x - y)%R) + (Rabs (y - z)%R))%R)%R.
 intros x y z.
 replace (x - z)%R with ((x - y) + (y - z))%R by ring.
 apply Rabs_triang.

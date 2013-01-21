@@ -6,8 +6,8 @@ Require Import Rpower.
 Require BuiltIn.
 Require real.Real.
 
-(* Why3 goal *)
-Notation exp := exp (only parsing).
+(* Why3 comment *)
+(* exp is replaced with (exp x) by the coq driver *)
 
 (* Why3 goal *)
 Lemma Exp_zero : ((exp 0%R) = 1%R).
@@ -22,35 +22,35 @@ Lemma Exp_sum : forall (x:R) (y:R),
 exact exp_plus.
 Qed.
 
-(* Why3 goal *)
-Notation log := ln (only parsing).
+(* Why3 comment *)
+(* log is replaced with (ln x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma Log_one : ((log 1%R) = 0%R).
+Lemma Log_one : ((ln 1%R) = 0%R).
 exact ln_1.
 Qed.
 
 (* Why3 goal *)
 Lemma Log_mul : forall (x:R) (y:R), ((0%R < x)%R /\ (0%R < y)%R) ->
-  ((log (x * y)%R) = ((log x) + (log y))%R).
+  ((ln (x * y)%R) = ((ln x) + (ln y))%R).
 intros x y (Hx,Hy).
 now apply ln_mult.
 Qed.
 
 (* Why3 goal *)
-Lemma Log_exp : forall (x:R), ((log (exp x)) = x).
+Lemma Log_exp : forall (x:R), ((ln (exp x)) = x).
 exact ln_exp.
 Qed.
 
 (* Why3 goal *)
-Lemma Exp_log : forall (x:R), (0%R < x)%R -> ((exp (log x)) = x).
+Lemma Exp_log : forall (x:R), (0%R < x)%R -> ((exp (ln x)) = x).
 exact exp_ln.
 Qed.
 
 (* Why3 assumption *)
-Definition log2(x:R): R := (Rdiv (log x) (log 2%R))%R.
+Definition log2(x:R): R := (Rdiv (ln x) (ln 2%R))%R.
 
 (* Why3 assumption *)
-Definition log10(x:R): R := (Rdiv (log x) (log 10%R))%R.
+Definition log10(x:R): R := (Rdiv (ln x) (ln 10%R))%R.
 
 
