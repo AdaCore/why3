@@ -167,7 +167,7 @@ module type Map = sig
     (** Same as {!Map.S.map}, but the function receives as arguments both
         the key and the associated value for each binding of the map. *)
 
-    (** {3} Added into why stdlib version *)
+    (** Added into why stdlib version *)
 
     val is_num_elt : int -> 'a t -> bool
     (** check if the map has the given number of elements *)

@@ -1225,11 +1225,11 @@ endif
 
 .PHONY: apidoc
 
-MODULESTODOC = util/util util/weakhtbl \
+MODULESTODOC = \
+	util/exthtbl util/extmap util/rc util/stdlib util/util util/weakhtbl \
 	core/ident core/ty core/term core/decl core/theory \
 	core/env core/task \
 	driver/whyconf driver/driver \
-	util/rc \
 	session/session session/session_tools session/session_scheduler
 #	transform/introduction \
 #	ide/db
