@@ -66,12 +66,12 @@ module Treedel
      forall z "induction": zipper 'a, x: 'a, l r: tree 'a.
      inorder (zip (Node l x r) z) = inorder l ++ Cons x (inorder (zip r z))
 
-  let left (t: tree pointer) =
+  let ghost left (t: tree pointer) =
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node l _ _ -> result = l end }
      match t with Empty -> absurd | Node l _ _ -> l end
 
-  let right (t: tree pointer) =
+  let ghost right (t: tree pointer) =
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node _ _ r -> result = r end }
      match t with Empty -> absurd | Node _ _ r -> r end
