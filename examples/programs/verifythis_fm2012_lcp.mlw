@@ -84,8 +84,23 @@ type suffixArray = {
     suffixes : array int;
 }
 
+predicate array_bounded (a:array int) (b:int) =
+  forall i:int. 0 <= i < a.length -> 0 <= a[i] < b
+  
+(*
+  use import array.ArraySorted
+*)
+  use import array.ArrayPermut
+
+  lemma permut_bounded :
+    forall a1 a2:array int, n:int.
+    a1.length = a2.length /\
+    array_bounded a1 n /\ 
+    permut_sub a1 a2 0 a1.length -> array_bounded a2 n
+
 predicate inv(s:suffixArray) =
-  s.values.length = s.suffixes.length
+  s.values.length = s.suffixes.length /\
+  array_bounded s.suffixes s.values.length
 
 let select (s:suffixArray) (i:int) : int 
   requires { inv s /\ 0 <= i < s.values.length }
@@ -130,7 +145,10 @@ let test1 () =
   let x = lcp drr 2 3 in
   assert {x = 1}
 
-let compare (a:array int) (x y:int) : int =
+let compare (a:array int) (x y:int) : int 
+  requires { 0 <= x < a.length }
+  requires { 0 <= y < a.length }
+  =
   if x = y then 0 else
   let n = a.length in
   let l = lcp a x y in
@@ -140,26 +158,44 @@ let compare (a:array int) (x y:int) : int =
   if a[x + l] > a[y + l] then 1 else
   absurd
 
-let sort (a:array int) (data : array int) =
+  let sort (a:array int) (data : array int) 
+  requires { array_bounded data a.length }
+  =
+   'Init:
    for i = 0 to data.length - 1 do
-      let j = ref i in
-      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
-        let b = !j - 1 in
-        let t = data[!j] in
-        data[!j] <- data[b];
-        data[b] <- t;
-        decr j
-      done
-  done
+     invariant { permut (at data 'Init) data   }
+     invariant { array_bounded data a.length }
+     let j = ref i in
+     while !j > 0 && compare a data[!j-1] data[!j] > 0 do
+       invariant { 0 <= !j <= i }
+       invariant { permut (at data 'Init) data   }
+       invariant { array_bounded data a.length }
+       'L:
+       let b = !j - 1 in
+       let t = data[!j] in
+       data[!j] <- data[b];
+       data[b] <- t;
+       assert { exchange (at data 'L) data (!j-1) !j };
+       decr j
+     done
+   done
 
-let create (a:array int) : suffixArray  =
+let create (a:array int) : suffixArray 
+  requires { a.length >= 0 }
+  ensures { result.values.length = a.length /\ inv result }
+ =
  let n = a.length in
- let suf = Array.make 0 n in
- for i = 0 to n-1 do suf[i] <- i done;
+ let suf = Array.make n 0 in
+ for i = 0 to n-1 do 
+   invariant { array_bounded suf n }
+   suf[i] <- i done;
  sort a suf;
  { values = a; suffixes = suf }
 
-let lcp2 (s:suffixArray) (i:int) : int =
+let lcp2 (s:suffixArray) (i:int) : int 
+  requires { inv s }
+  requires { 0 < i < s.values.length }
+  =
    lcp s.values s.suffixes[i] s.suffixes[i-1]
 
 
