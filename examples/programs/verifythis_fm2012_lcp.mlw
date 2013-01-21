@@ -94,9 +94,7 @@ predicate array_bounded (a:array int) (b:int) =
 
   lemma permut_bounded :
     forall a1 a2:array int, n:int.
-    a1.length = a2.length /\
-    array_bounded a1 n /\ 
-    permut_sub a1 a2 0 a1.length -> array_bounded a2 n
+    permut a1 a2 /\ array_bounded a1 n -> array_bounded a2 n
 
 predicate inv(s:suffixArray) =
   s.values.length = s.suffixes.length /\
@@ -128,22 +126,22 @@ let test1 () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let x = lcp arr 1 2 in
-  assert { x = 1 };
+  check { x = 1 };
   (* int[] brr = {1,2,3,5}; *)
   let brr = Array.make 4 0 in
   brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
   let x = lcp brr 1 2 in
-  assert { x = 0 };
+  check { x = 0 };
   (* int[] crr = {1,2,3,5}; *)
   let crr = Array.make 4 0 in
   crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
   let x = lcp crr 2 3 in
-  assert { x = 0 };
+  check { x = 0 };
   (* int[] drr = {1,2,3,3}; *)
   let drr = Array.make 4 0 in
   drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
   let x = lcp drr 2 3 in
-  assert {x = 1}
+  check {x = 1}
 
 let compare (a:array int) (x y:int) : int 
   requires { 0 <= x < a.length }
@@ -160,6 +158,7 @@ let compare (a:array int) (x y:int) : int
 
   let sort (a:array int) (data : array int) 
   requires { array_bounded data a.length }
+  ensures { permut (old data) data }
   =
    'Init:
    for i = 0 to data.length - 1 do
@@ -204,25 +203,25 @@ let test2 () =
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let sa = create arr in
   let x = lcp2 sa 1 in
-  assert {x = -1 (* TODO *)};
+  check {x = -1 (* TODO *)};
   (* int[] brr = {1,2,3,5}; *)
   let brr = Array.make 4 0 in
   brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
   let sa = create brr in
   let x = lcp2 sa 1 in
-  assert {x = -1 (* TODO *)};
+  check {x = -1 (* TODO *)};
   (* int[] crr = {1,2,3,5}; *)
   let crr = Array.make 4 0 in
   crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
   let sa = create crr in
   let x = lcp2 sa 2 in
-  assert {x = -1 (* TODO *)};
+  check {x = -1 (* TODO *)};
   (* int[] drr = {1,2,3,3}; *)
   let drr = Array.make 4 0 in
   drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
   let sa = create drr in
   let x = lcp2 sa 2 in
-  assert {x = -1 (* TODO *)}
+  check {x = -1 (* TODO *)}
 
 end
 
@@ -236,7 +235,9 @@ module LRS
     val solStart : ref int
     val solLength : ref int
 
-    let lrs (a:array int) : unit =
+    let lrs (a:array int) : unit 
+      requires { a.length >= 0 }
+    =
       let sa = SuffixArray.create a in
       solStart := 0;
       solLength := 0;
@@ -252,8 +253,7 @@ module LRS
     let arr = Array.make 4 0 in
     arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-9;
     lrs arr;
-    assert { !solStart = 1 };
-    assert { !solLength = 1 }
+    check { !solStart = 1 /\ !solLength = 1 }
 
 end
 
