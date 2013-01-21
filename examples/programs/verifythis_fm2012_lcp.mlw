@@ -107,19 +107,36 @@ let select (s:suffixArray) (i:int) : int
 
 use import ref.Refint
 
+predicate is_common_prefix (a:array int) (x y:int) (l:int) =
+  0 <= l /\ x+l <= a.length /\ y+l <= a.length /\
+  (forall i:int. 0 <= i < l -> a[x+i] = a[y+i]) 
+
+lemma not_common_prefix_if_last_different:
+  forall a:array int, x y:int, l:int.
+    0 < l /\ x+l < a.length /\ y+l < a.length /\ a[x+(l-1)] <> a[y+(l-1)] ->
+      not is_common_prefix a x y l
+
+function longest_common_prefix (a:array int) (x y:int) :int
+
+axiom lcp_spec:
+  forall a:array int, x y:int, l:int.
+  0 <= x < a.length /\ 0 <= y < a.length ->
+  (l = longest_common_prefix a x y <->
+   is_common_prefix a x y l /\ not is_common_prefix a x y (l+1))
+   
 let lcp (a:array int) (x y:int) : int 
   requires { 0 <= x < a.length }
   requires { 0 <= y < a.length }
-  ensures { 0 <= result /\ x+result <= a.length /\ y+result <= a.length }
-  ensures { forall i:int. 0 <= i < result -> a[x+i] = a[y+i] }
-  ensures { x+result = a.length \/ y+result = a.length \/ a[x+result] <> a[y+result] }
+  ensures { result = longest_common_prefix a x y }
   = let n = a.length in
     let l = ref 0 in
     while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
-      invariant { 0 <= !l /\ x + !l <= n /\ y + !l <= n }
-      invariant { forall i:int. 0 <= i < !l -> a[x+i] = a[y+i] }
+      invariant { is_common_prefix a x y !l }
       incr l
     done;
+    assert { is_common_prefix a x y !l };
+    assert { x + !l < n /\ y + !l < n -> a[x + !l] <> a[y + !l] };
+    assert { not is_common_prefix a x y (!l+1) };
     !l
 
 let test1 () =
@@ -143,21 +160,31 @@ let test1 () =
   let x = lcp drr 2 3 in
   check {x = 1}
 
+(*
+  predicate le (a : array int) (x y:int) =
+*)
+    
 let compare (a:array int) (x y:int) : int 
   requires { 0 <= x < a.length }
   requires { 0 <= y < a.length }
+  (* ensures { result <= 0 <-> le a x y } *)
   =
   if x = y then 0 else
   let n = a.length in
   let l = lcp a x y in
+  assert { is_common_prefix a x y l };
   if x + l = n then -1 else
   if y + l = n then 1 else
   if a[x + l] < a[y + l] then -1 else
   if a[x + l] > a[y + l] then 1 else
   absurd
 
+  (* predicate sorted_sub (a : array int) (data:array int) (l u:int) = *)
+  (*   forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2] *)
+
   let sort (a:array int) (data : array int) 
   requires { array_bounded data a.length }
+  (* ensures { sorted a data } *)
   ensures { permut (old data) data }
   =
    'Init:
