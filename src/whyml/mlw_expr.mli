@@ -91,9 +91,9 @@ type psymbol = private {
      in ps_vars to itself *)
 }
 
-module Mps : Map.S with type key = psymbol
-module Sps : Mps.Set
-module Hps : XHashtbl.S with type key = psymbol
+module Mps : Extmap.S with type key = psymbol
+module Sps : Extset.S with module M = Mps
+module Hps : Exthtbl.S with type key = psymbol
 module Wps : Weakhtbl.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool

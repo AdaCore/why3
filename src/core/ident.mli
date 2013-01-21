@@ -20,8 +20,8 @@ type label = private {
   lab_tag    : int;
 }
 
-module Mlab : Map.S with type key = label
-module Slab : Mlab.Set
+module Mlab : Extmap.S with type key = label
+module Slab : Extset.S with module M = Mlab
 
 val lab_equal : label -> label -> bool
 val lab_hash  : label -> int
@@ -37,9 +37,9 @@ type ident = private {
   id_tag    : Weakhtbl.tag;         (* unique magical tag *)
 }
 
-module Mid : Map.S with type key = ident
-module Sid : Mid.Set
-module Hid : XHashtbl.S with type key = ident
+module Mid : Extmap.S with type key = ident
+module Sid : Extset.S with module M = Mid
+module Hid : Exthtbl.S with type key = ident
 module Wid : Weakhtbl.S with type key = ident
 
 val id_equal : ident -> ident -> bool

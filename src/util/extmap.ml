@@ -60,6 +60,8 @@ module type S =
     val set_diff : 'a t -> 'b t -> 'a t
     val set_submap : 'a t -> 'b t -> bool
     val set_disjoint : 'a t -> 'b t -> bool
+    val set_compare : 'a t -> 'b t -> int
+    val set_equal : 'a t -> 'b t -> bool
     val find_def : 'a -> key -> 'a t -> 'a
     val find_opt : key -> 'a t -> 'a option
     val find_exn : exn -> key -> 'a t -> 'a
@@ -67,6 +69,7 @@ module type S =
     val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
+    val fold_left : ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     val fold2_union:
       (key -> 'a option -> 'b option -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
@@ -76,68 +79,16 @@ module type S =
     val add_new : exn -> key -> 'a -> 'a t -> 'a t
     val keys: 'a t -> key list
     val values: 'a t -> 'a list
+    val of_list : (key * 'a) list -> 'a t
     type 'a enumeration
     val val_enum : 'a enumeration -> (key * 'a) option
     val start_enum : 'a t -> 'a enumeration
     val next_enum : 'a enumeration -> 'a enumeration
     val start_ge_enum : key -> 'a t -> 'a enumeration
     val next_ge_enum : key -> 'a enumeration -> 'a enumeration
-    val fold_left : ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
-    val of_list : (key * 'a) list -> 'a t
-
-    module type Set =
-      sig
-        type elt = key
-        type set = unit t
-        type t = set
-        val empty: t
-        val is_empty: t -> bool
-        val mem: elt -> t -> bool
-        val add: elt -> t -> t
-        val singleton: elt -> t
-        val remove: elt -> t -> t
-        val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
-        val compare: t -> t -> int
-        val equal: t -> t -> bool
-        val subset: t -> t -> bool
-        val disjoint: t -> t -> bool
-        val iter: (elt -> unit) -> t -> unit
-        val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
-        val for_all: (elt -> bool) -> t -> bool
-        val exists: (elt -> bool) -> t -> bool
-        val filter: (elt -> bool) -> t -> t
-        val partition: (elt -> bool) -> t -> t * t
-        val cardinal: t -> int
-        val elements: t -> elt list
-        val min_elt: t -> elt
-        val max_elt: t -> elt
-        val choose: t -> elt
-        val split: elt -> t -> t * bool * t
-        val change : (bool -> bool) -> elt -> t -> t
-        val union : t -> t -> t
-        val inter : t -> t -> t
-        val diff : t -> t -> t
-        val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
-        val translate : (elt -> elt) -> t -> t
-        val add_new : exn -> elt -> t -> t
-        val is_num_elt : int -> t -> bool
-        val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
-        val of_list : elt list -> t
-      end
-
-    module Set : Set
   end
 
-module type Map = sig
   module type OrderedType = Map.OrderedType
-  module type S = S
-  module Make (Ord : OrderedType) : S with type key = Ord.t
-end
-
-module Map =
-struct
-  module type OrderedType = Map.OrderedType
-  module type S = S
 
   module Make(Ord: OrderedType) = struct
     type key = Ord.t
@@ -521,7 +472,8 @@ struct
     let set_diff m1 m2 = diff (fun _ _ _ -> None) m1 m2
     let set_submap m1 m2 = submap (fun _ _ _ -> true) m1 m2
     let set_disjoint m1 m2 = disjoint (fun _ _ _ -> false) m1 m2
-
+    let set_compare m1 m2 = compare (fun _ _ -> 0) m1 m2
+    let set_equal m1 m2 = equal (fun _ _ -> true) m1 m2
 
     let rec find_def def x = function
         Empty -> def
@@ -672,91 +624,4 @@ struct
     let of_list l =
       List.fold_left (fun acc (k,d) -> add k d acc) empty l
 
-    module type Set =
-      sig
-        type elt = key
-        type set = unit t
-        type t = set
-        val empty: t
-        val is_empty: t -> bool
-        val mem: elt -> t -> bool
-        val add: elt -> t -> t
-        val singleton: elt -> t
-        val remove: elt -> t -> t
-        val merge: (elt -> bool -> bool -> bool) -> t -> t -> t
-        val compare: t -> t -> int
-        val equal: t -> t -> bool
-        val subset: t -> t -> bool
-        val disjoint: t -> t -> bool
-        val iter: (elt -> unit) -> t -> unit
-        val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
-        val for_all: (elt -> bool) -> t -> bool
-        val exists: (elt -> bool) -> t -> bool
-        val filter: (elt -> bool) -> t -> t
-        val partition: (elt -> bool) -> t -> t * t
-        val cardinal: t -> int
-        val elements: t -> elt list
-        val min_elt: t -> elt
-        val max_elt: t -> elt
-        val choose: t -> elt
-        val split: elt -> t -> t * bool * t
-        val change : (bool -> bool) -> elt -> t -> t
-        val union : t -> t -> t
-        val inter : t -> t -> t
-        val diff : t -> t -> t
-        val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
-        val translate : (elt -> elt) -> t -> t
-        val add_new : exn -> elt -> t -> t
-        val is_num_elt : int -> t -> bool
-        val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
-        val of_list : elt list -> t
-      end
-
-    module Set =
-      struct
-        type elt = Ord.t
-        type set = unit t
-        type t = set
-
-        let is_true b = if b then Some () else None
-        let is_some o = o <> None
-        let const f e _ = f e
-
-        let empty = empty
-        let is_empty = is_empty
-        let mem = mem
-        let add e s = add e () s
-        let singleton e = singleton e ()
-        let remove = remove
-        let merge f = merge (fun e a b ->
-          is_true (f e (is_some a) (is_some b)))
-        let compare = compare (fun _ _ -> 0)
-        let equal = equal (fun _ _ -> true)
-        let subset = submap (fun _ _ _ -> true)
-        let disjoint = disjoint (fun _ _ _ -> false)
-        let iter f = iter (const f)
-        let fold f = fold (const f)
-        let for_all f = for_all (const f)
-        let exists f = exists (const f)
-        let filter f = filter (const f)
-        let partition f = partition (const f)
-        let cardinal = cardinal
-        let elements = keys
-        let min_elt t = fst (min_binding t)
-        let max_elt t = fst (max_binding t)
-        let choose t = fst (choose t)
-        let split e t = let l,m,r = split e t in l,(m <> None),r
-        let change f x s = change (fun a -> is_true (f (is_some a))) x s
-        let union = union (fun _ _ _ -> Some ())
-        let inter = inter (fun _ _ _ -> Some ())
-        let diff = diff (fun _ _ _ -> None)
-        let fold2 f = fold2_union (fun k _ _ acc -> f k acc)
-        let translate = translate
-        let add_new e x s = add_new e x () s
-        let is_num_elt n m = is_num_elt n m
-        let fold_left f = fold_left (fun accu k () -> f accu k)
-        let of_list l =
-          List.fold_left (fun acc a -> add a acc) empty l
-      end
   end
-end

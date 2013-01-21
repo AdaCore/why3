@@ -76,8 +76,8 @@ module VsList = Stdlib.OrderedHashedList(struct
   type t = vsymbol
   let tag = vs_hash
 end)
-module Mvsl = Stdlib.Map.Make(VsList)
-module Svsl = Mvsl.Set
+module Mvsl = Extmap.Make(VsList)
+module Svsl = Extset.MakeOfMap(Mvsl)
 
 (* DEBUGGING AND PRINTING *)
 

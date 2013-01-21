@@ -93,16 +93,16 @@ module Prover = struct
       5 * Hashtbl.hash s1.prover_altern
 end
 
-module Mprover = Map.Make(Prover)
-module Sprover = Mprover.Set
-module Hprover = XHashtbl.Make(Prover)
+module Mprover = Extmap.Make(Prover)
+module Sprover = Extset.MakeOfMap(Mprover)
+module Hprover = Exthtbl.Make(Prover)
 
 module Editor = struct
   type t = string
   let compare = Pervasives.compare
 end
 
-module Meditor = Map.Make(Editor)
+module Meditor = Extmap.Make(Editor)
 
 (* Configuration file *)
 

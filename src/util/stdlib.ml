@@ -9,9 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-module Map = Extmap.Map
-module XHashtbl = Exthtbl.Hashtbl
-
 (* Set, Map, Hashtbl on ints and strings *)
 
 module Int = struct
@@ -19,32 +16,31 @@ module Int = struct
   let compare (x : int) y  = Pervasives.compare x y
   let equal (x : int) y = x = y
   let hash  (x : int) = x
- end
+end
 
-module Mint = Map.Make(Int)
-module Sint = Mint.Set
-module Hint = XHashtbl.Make(Int)
+module Mint = Extmap.Make(Int)
+module Sint = Extset.MakeOfMap(Mint)
+module Hint = Exthtbl.Make(Int)
 
-module Mstr = Map.Make(String)
-module Sstr = Mstr.Set
-module Hstr = XHashtbl.Make
-  (struct
-    type t = String.t
-    let hash    = (Hashtbl.hash : string -> int)
-    let equal   = ((=) : string -> string -> bool)
-  end)
+module Mstr = Extmap.Make(String)
+module Sstr = Extset.MakeOfMap(Mstr)
+module Hstr = Exthtbl.Make(struct
+  type t    = String.t
+  let hash  = (Hashtbl.hash : string -> int)
+  let equal = ((=) : string -> string -> bool)
+end)
 
 
 module Float = struct
   type t = float
   let compare (x : float) y  = Pervasives.compare x y
   let equal (x : float) y = x = y
-  let hash  (x : float) = XHashtbl.hash x
+  let hash  (x : float) = Exthtbl.hash x
 end
 
-module Mfloat = Map.Make(Float)
-module Sfloat = Mfloat.Set
-module Hfloat = XHashtbl.Make(Float)
+module Mfloat = Extmap.Make(Float)
+module Sfloat = Extset.MakeOfMap(Mfloat)
+module Hfloat = Exthtbl.Make(Float)
 
 
 (* Set, Map, Hashtbl on structures with a unique tag *)
@@ -84,9 +80,9 @@ end
 module MakeMSH (X : TaggedType) =
 struct
   module T = OrderedHashed(X)
-  module M = Map.Make(T)
-  module S = M.Set
-  module H = XHashtbl.Make(T)
+  module M = Extmap.Make(T)
+  module S = Extset.MakeOfMap(M)
+  module H = Exthtbl.Make(T)
 end
 
 module MakeTagged (X : Weakhtbl.Weakey) =
@@ -98,8 +94,8 @@ end
 module MakeMSHW (X : Weakhtbl.Weakey) =
 struct
   module T = OrderedHashed(MakeTagged(X))
-  module M = Map.Make(T)
-  module S = M.Set
-  module H = XHashtbl.Make(T)
+  module M = Extmap.Make(T)
+  module S = Extset.MakeOfMap(M)
+  module H = Exthtbl.Make(T)
   module W = Weakhtbl.Make(X)
 end

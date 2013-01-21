@@ -21,8 +21,8 @@ open Stdlib
 val debug : Debug.flag
 (** The debug flag "session" *)
 
-module PHstr : XHashtbl.Private with type key = string
-module PHprover : XHashtbl.Private with type key = Whyconf.prover
+module PHstr : Exthtbl.Private with type key = string
+module PHprover : Exthtbl.Private with type key = Whyconf.prover
 
 (** {2 Proof attempts} *)
 
@@ -54,11 +54,11 @@ type ident_path =
   }
 
 type meta_args = Theory.meta_arg list
-module Mmeta_args : Map.S with type key = meta_args
-module Smeta_args : Mmeta_args.Set
+module Mmeta_args : Extmap.S with type key = meta_args
+module Smeta_args : Extset.S with module M = Mmeta_args
 
-type metas_args =  Smeta_args.t Mstr.t
-module Mmetas_args : Map.S with type key = metas_args
+type metas_args = Smeta_args.t Mstr.t
+module Mmetas_args : Extmap.S with type key = metas_args
 
 type idpos = {
   idpos_ts : ident_path Ty.Mts.t;

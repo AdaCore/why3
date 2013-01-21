@@ -87,9 +87,9 @@ end = struct
 end
 
 and Reg : sig
-  module M : Map.S with type key = T.region
-  module S : M.Set
-  module H : XHashtbl.S with type key = T.region
+  module M : Extmap.S with type key = T.region
+  module S : Extset.S with module M = M
+  module H : Exthtbl.S with type key = T.region
   module W : Weakhtbl.S with type key = T.region
 end = MakeMSHW (struct
   type t = T.region

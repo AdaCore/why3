@@ -40,8 +40,8 @@ module OHTyl = OrderedHashedList(struct
   let tag = ty_hash
 end)
 
-module Mtyl = Map.Make(OHTyl)
-module Htyl = Hashtbl.Make(OHTyl)
+module Mtyl = Extmap.Make(OHTyl)
+module Htyl = Exthtbl.Make(OHTyl)
 
 type tenv =
   | Complete (* The transformation keep the polymorphism *)

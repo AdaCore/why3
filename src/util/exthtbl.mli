@@ -9,10 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
-module type Hashtbl =
-sig
-
 val hash : 'a -> int
+  (** the same as Hashtbl.hash *)
 
 module type S =
 sig
@@ -75,7 +73,3 @@ sig
 end
 
 module Make (X:Hashtbl.HashedType) : S with type key = X.t
-
-end
-
-module Hashtbl : Hashtbl
