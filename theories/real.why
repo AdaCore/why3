@@ -105,13 +105,17 @@ theory FromInt
   axiom One: from_int 1 = 1.0
 
   axiom Add:
-    forall x y:int. from_int (Int.(+) x y) = from_int x + from_int y
+    forall x y:int [from_int (Int.(+) x y) | from_int x, from_int y].
+      from_int (Int.(+) x y) = from_int x + from_int y
   axiom Sub:
-    forall x y:int. from_int (Int.(-) x y) = from_int x - from_int y
+    forall x y:int [from_int (Int.(-) x y) | from_int x, from_int y].
+      from_int (Int.(-) x y) = from_int x - from_int y
   axiom Mul:
-    forall x y:int. from_int (Int.(*) x y) = from_int x * from_int y
+    forall x y:int [from_int (Int.(*) x y) | from_int x, from_int y].
+      from_int (Int.(*) x y) = from_int x * from_int y
   axiom Neg:
-    forall x:int. from_int (Int.(-_) (x)) = - from_int x
+    forall x:int [from_int (Int.(-_) (x)), from_int x].
+      from_int (Int.(-_) (x)) = - from_int x
 
   lemma Monotonic:
     forall x y:int. Int.(<=) x y -> from_int x <= from_int y
