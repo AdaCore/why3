@@ -119,7 +119,19 @@ axiom lcp_spec:
   (l = longest_common_prefix a x y <->
    is_common_prefix a x y l /\ not is_common_prefix a x y (l+1))
 
+lemma lcp_is_cp :
+  forall a:array int, x y:int.
+     0 <= x < a.length /\ 0 <= y < a.length ->
+     let l = longest_common_prefix a x y in
+     is_common_prefix a x y l
+
 lemma lcp_eq :
+  forall a:array int, x y:int.
+     0 <= x < a.length /\ 0 <= y < a.length ->
+     let l = longest_common_prefix a x y in
+     forall i:int. 0 <= i < l -> a[x+i] = a[y+i]
+
+lemma lcp_refl :
   forall a:array int, x:int.
      0 <= x < a.length -> longest_common_prefix a x x = a.length - x
 
@@ -176,10 +188,17 @@ let test1 () =
     forall a:array int, x :int.
     0 <= x < a.length -> le a x x
 
+  lemma le_trans :
+    forall a:array int, x y z:int.
+    0 <= x < a.length /\ 0 <= y < a.length /\
+    0 <= z < a.length /\ le a x y /\ le a y z -> le a x z
+
 let compare (a:array int) (x y:int) : int
   requires { 0 <= x < a.length }
   requires { 0 <= y < a.length }
-  ensures { result <= 0 <-> le a x y }
+  ensures { result = 0 -> x = y }
+  ensures { result < 0 -> le a x y }
+  ensures { result > 0 -> le a y x }
   =
   if x = y then 0 else
   let n = a.length in
@@ -191,31 +210,61 @@ let compare (a:array int) (x y:int) : int
   if a[x + l] > a[y + l] then 1 else
   absurd
 
-  (* predicate sorted_sub (a : array int) (data:array int) (l u:int) = *)
-  (*   forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2] *)
+  predicate sorted_sub (a : array int) (data:array int) (l u:int) =
+    forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2]
+
+  lemma sorted_sub_sub:
+    forall a data:array int, l u l' u':int.
+    l <= l' /\ u' <= u ->
+    sorted_sub a data l u ->
+    sorted_sub a data l' u'
+
+  lemma sorted_sub_add:
+    forall a data:array int, l u:int.
+    sorted_sub a data (l+1) u /\ le a data[l] data[l+1] ->
+    sorted_sub a data l u
+
+  lemma sorted_sub_concat:
+    forall a data:array int, l m u:int.
+    l <= m <= u /\ sorted_sub a data l m /\ sorted_sub a data m u /\
+    le a data[m-1] data[m] ->
+    sorted_sub a data l u
+
+  predicate sorted (a : array int) (data:array int) =
+    sorted_sub a data 0 data.length
 
   let sort (a:array int) (data : array int)
+  (* requires { data.length >= 0 } *)
   requires { array_bounded data a.length }
-  (* ensures { sorted a data } *)
+  ensures { sorted a data }
   ensures { permut (old data) data }
   =
    'Init:
    for i = 0 to data.length - 1 do
      invariant { permut (at data 'Init) data   }
+     invariant { sorted_sub a data 0 i  }
      invariant { array_bounded data a.length }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
        invariant { permut (at data 'Init) data   }
+       invariant { sorted_sub a data 0 !j }
+       invariant { sorted_sub a data !j (i+1) }
+       invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
+                     le a data[k1] data[k2] }
        invariant { array_bounded data a.length }
        'L:
+       assert { le a data[!j] data[!j-1] };
        let b = !j - 1 in
        let t = data[!j] in
        data[!j] <- data[b];
        data[b] <- t;
+       assert { le a data[!j-1] data[!j] };
+       assert { forall k:int. !j <= k <=i -> le a data[!j] data[k] };
        assert { exchange (at data 'L) data (!j-1) !j };
        decr j
-     done
+     done;
+     assert { !j > 0 -> le a data[!j-1] data[!j] }
    done
 
 
