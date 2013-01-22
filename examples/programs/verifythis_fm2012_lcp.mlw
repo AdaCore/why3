@@ -213,6 +213,16 @@ let compare (a:array int) (x y:int) : int
   predicate sorted_sub (a : array int) (data:array int) (l u:int) =
     forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2]
 
+  lemma sorted_le:
+    forall a data: array int, l u i x:int.
+    sorted_sub a data l u /\ le a x data[l] /\ l <= i < u ->
+    le a x data[i]
+
+  lemma sorted_ge:
+    forall a data: array int, l u i x:int.
+    sorted_sub a data l u /\ le a data[u] x /\ l <= i < u ->
+    le a data[i] x
+
   lemma sorted_sub_sub:
     forall a data:array int, l u l' u':int.
     l <= l' /\ u' <= u ->
