@@ -73,7 +73,9 @@ that it does so correctly.
 
 *)
 
-module LCP
+
+
+module LCP "longest common prefix"
 
 use import int.Int
 use import array.Array
@@ -81,7 +83,7 @@ use import array.Array
 (* TODO: dire plus precisement que c'est une permutation de 0..b-1 *)
 predicate array_bounded (a:array int) (b:int) =
   forall i:int. 0 <= i < a.length -> 0 <= a[i] < b
-  
+
 (*
   use import array.ArraySorted
 *)
@@ -94,7 +96,15 @@ predicate array_bounded (a:array int) (b:int) =
 
 predicate is_common_prefix (a:array int) (x y:int) (l:int) =
   0 <= l /\ x+l <= a.length /\ y+l <= a.length /\
-  (forall i:int. 0 <= i < l -> a[x+i] = a[y+i]) 
+  (forall i:int. 0 <= i < l -> a[x+i] = a[y+i])
+
+lemma common_prefix_eq:
+  forall a:array int, x:int.
+     0 <= x < a.length -> is_common_prefix a x x (a.length - x)
+
+lemma common_prefix_eq2:
+  forall a:array int, x:int.
+     0 <= x < a.length -> not (is_common_prefix a x x (a.length - x + 1))
 
 lemma not_common_prefix_if_last_different:
   forall a:array int, x y:int, l:int.
@@ -108,11 +118,15 @@ axiom lcp_spec:
   0 <= x < a.length /\ 0 <= y < a.length ->
   (l = longest_common_prefix a x y <->
    is_common_prefix a x y l /\ not is_common_prefix a x y (l+1))
-   
+
+lemma lcp_eq :
+  forall a:array int, x:int.
+     0 <= x < a.length -> longest_common_prefix a x x = a.length - x
+
 
 use import ref.Refint
 
-let lcp (a:array int) (x y:int) : int 
+let lcp (a:array int) (x y:int) : int
   requires { 0 <= x < a.length }
   requires { 0 <= y < a.length }
   ensures { result = longest_common_prefix a x y }
@@ -131,31 +145,41 @@ let test1 () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let x = lcp arr 1 2 in
+  assert { is_common_prefix arr 1 2 1};
   check { x = 1 };
   (* int[] brr = {1,2,3,5}; *)
   let brr = Array.make 4 0 in
   brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
   let x = lcp brr 1 2 in
+  assert { is_common_prefix brr 1 2 0};
   check { x = 0 };
   (* int[] crr = {1,2,3,5}; *)
   let crr = Array.make 4 0 in
   crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
   let x = lcp crr 2 3 in
+  assert { is_common_prefix crr 2 3 0};
   check { x = 0 };
   (* int[] drr = {1,2,3,3}; *)
   let drr = Array.make 4 0 in
   drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
   let x = lcp drr 2 3 in
+  assert { is_common_prefix drr 2 3 1};
   check {x = 1}
 
-(*
   predicate le (a : array int) (x y:int) =
-*)
-    
-let compare (a:array int) (x y:int) : int 
+     let n = a.length in
+     let l = longest_common_prefix a x y in
+     x+l = n \/
+     (x+l < n /\ y+l < n /\ a[x+l] <= a[y+l])
+
+  lemma eq_le :
+    forall a:array int, x :int.
+    0 <= x < a.length -> le a x x
+
+let compare (a:array int) (x y:int) : int
   requires { 0 <= x < a.length }
   requires { 0 <= y < a.length }
-  (* ensures { result <= 0 <-> le a x y } *)
+  ensures { result <= 0 <-> le a x y }
   =
   if x = y then 0 else
   let n = a.length in
@@ -170,7 +194,7 @@ let compare (a:array int) (x y:int) : int
   (* predicate sorted_sub (a : array int) (data:array int) (l u:int) = *)
   (*   forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2] *)
 
-  let sort (a:array int) (data : array int) 
+  let sort (a:array int) (data : array int)
   requires { array_bounded data a.length }
   (* ensures { sorted a data } *)
   ensures { permut (old data) data }
@@ -197,6 +221,11 @@ let compare (a:array int) (x y:int) : int
 
 end
 
+
+
+
+
+
 module SuffixArray
 
 use import int.Int
@@ -212,24 +241,24 @@ predicate inv(s:suffixArray) =
   s.values.length = s.suffixes.length /\
   array_bounded s.suffixes s.values.length
 
-let select (s:suffixArray) (i:int) : int 
+let select (s:suffixArray) (i:int) : int
   requires { inv s /\ 0 <= i < s.values.length }
   ensures { result = s.suffixes[i] }
   = s.suffixes[i]
 
-let create (a:array int) : suffixArray 
+let create (a:array int) : suffixArray
   requires { a.length >= 0 }
   ensures { result.values.length = a.length /\ inv result }
  =
  let n = a.length in
  let suf = Array.make n 0 in
- for i = 0 to n-1 do 
+ for i = 0 to n-1 do
    invariant { array_bounded suf n }
    suf[i] <- i done;
  sort a suf;
  { values = a; suffixes = suf }
 
-let lcp (s:suffixArray) (i:int) : int 
+let lcp (s:suffixArray) (i:int) : int
   requires { inv s }
   requires { 0 < i < s.values.length }
   =
@@ -263,6 +292,10 @@ let test2 () =
 
 end
 
+
+
+
+
 module LRS "longest repeated substring"
 
   use import int.Int
@@ -273,7 +306,7 @@ module LRS "longest repeated substring"
     val solStart : ref int
     val solLength : ref int
 
-    let lrs (a:array int) : unit 
+    let lrs (a:array int) : unit
       requires { a.length >= 0 }
     =
       let sa = SuffixArray.create a in
