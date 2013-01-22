@@ -220,5 +220,3 @@ let () = if proof_mode = No_WP then Debug.set_flag Typing.debug_type_only
 let () =
   if proof_mode <> Path_WP then
     Debug.set_flag (Debug.lookup_flag "fast_wp")
-
-let () = if debug then Debug.set_flag (Debug.lookup_flag "stack_trace")

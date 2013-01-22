@@ -229,6 +229,7 @@ let _ =
       | Gnat_config.No_WP ->
          (* we should never get here *)
          ()
-    with e when not (Debug.test_flag Debug.stack_trace) ->
+    with e ->
+       Format.eprintf "Internal error:@.";
        Format.eprintf "%a.@." Exn_printer.exn_printer e;
        Gnat_util.abort_with_message ""
