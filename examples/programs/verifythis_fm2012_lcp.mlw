@@ -78,6 +78,7 @@ that it does so correctly.
 module LCP "longest common prefix"
 
 use import int.Int
+use map.Map
 use import array.Array
 
 (* TODO: dire plus precisement que c'est une permutation de 0..b-1 *)
@@ -180,11 +181,12 @@ let test1 () =
 
   predicate le (a : array int) (x y:int) =
      let n = a.length in
+     0 <= x < n /\ 0 <= y < n /\
      let l = longest_common_prefix a x y in
      x+l = n \/
      (x+l < n /\ y+l < n /\ a[x+l] <= a[y+l])
 
-  lemma eq_le :
+  lemma le_refl :
     forall a:array int, x :int.
     0 <= x < a.length -> le a x x
 
@@ -213,14 +215,18 @@ let compare (a:array int) (x y:int) : int
   predicate sorted_sub (a : array int) (data:array int) (l u:int) =
     forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2]
 
+  lemma sorted_bounded:
+    forall a data: array int, l u i:int.
+    l <= i < u /\ sorted_sub a data l u -> 0 <= data[i] < a.length
+
   lemma sorted_le:
     forall a data: array int, l u i x:int.
-    sorted_sub a data l u /\ le a x data[l] /\ l <= i < u ->
+    l <= i < u /\ sorted_sub a data l u /\ le a x data[l] ->
     le a x data[i]
 
   lemma sorted_ge:
     forall a data: array int, l u i x:int.
-    sorted_sub a data l u /\ le a data[u] x /\ l <= i < u ->
+    sorted_sub a data l u /\ le a data[u-1] x /\ l <= i < u ->
     le a data[i] x
 
   lemma sorted_sub_sub:
@@ -239,6 +245,18 @@ let compare (a:array int) (x y:int) : int
     l <= m <= u /\ sorted_sub a data l m /\ sorted_sub a data m u /\
     le a data[m-1] data[m] ->
     sorted_sub a data l u
+
+(*
+  lemma sorted_sub_set:
+    forall a data:array int, l u i v:int.
+    sorted_sub a data l u /\ u <= i ->
+    sorted_sub a (data[i<-v]) l u
+
+  lemma sorted_sub_set2:
+    forall a data:array int, l u i v:int.
+    sorted_sub a data l u /\ u <= i ->
+    sorted_sub a { length = a.length; elts = Map.set data.elts i v } l u
+*)
 
   predicate sorted (a : array int) (data:array int) =
     sorted_sub a data 0 data.length
@@ -267,11 +285,14 @@ let compare (a:array int) (x y:int) : int
        assert { le a data[!j] data[!j-1] };
        let b = !j - 1 in
        let t = data[!j] in
+       assert { sorted_sub a data 0 (!j-1) };
        data[!j] <- data[b];
+       assert { sorted_sub a data 0 (!j-1) };
        data[b] <- t;
        assert { le a data[!j-1] data[!j] };
        assert { forall k:int. !j <= k <=i -> le a data[!j] data[k] };
        assert { exchange (at data 'L) data (!j-1) !j };
+       assert { sorted_sub a data 0 (!j-1) };
        decr j
      done;
      assert { !j > 0 -> le a data[!j-1] data[!j] }
