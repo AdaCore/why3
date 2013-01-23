@@ -43,3 +43,55 @@ module InsertionSortDumb
 
 
 end
+
+
+module InsertionSortDumbGen
+
+  use import int.Int
+  use import ref.Ref
+  use import ref.Refint
+  use import array.Array
+  use import array.ArrayPermut
+
+  clone import map.MapSorted as M
+
+  axiom le_refl: forall x:elt. le x x
+
+  axiom le_asym: forall x y:elt. not (le x y) -> le y x
+
+  axiom le_trans: forall x y z:elt. le x y /\ le y z -> le x z
+
+  predicate sorted_sub (a : array elt) (l u : int) =
+    M.sorted_sub a.elts l u
+
+  predicate sorted (a : array elt) =
+    M.sorted_sub a.elts 0 a.length
+
+  let sort (a:array elt) 
+    ensures { sorted a }
+    ensures { permut (old a) a }
+  =
+   'Init:
+   for i = 0 to a.length - 1 do
+     invariant { permut (at a 'Init) a   }
+     invariant { sorted_sub a 0 i  }
+     let j = ref i in
+     while !j > 0 && not (le a[!j-1] a[!j])  do
+       invariant { 0 <= !j <= i }
+       invariant { permut (at a 'Init) a   }
+       invariant { sorted_sub a 0 !j }
+       invariant { sorted_sub a !j (i+1) }
+       invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
+                      le a[k1] a[k2] }
+       'L:
+       let b = !j - 1 in
+       let t = a[!j] in
+       a[!j] <- a[b];
+       a[b] <- t;
+       assert { exchange (at a 'L) a (!j-1) !j };
+       decr j
+     done
+   done
+
+
+end
