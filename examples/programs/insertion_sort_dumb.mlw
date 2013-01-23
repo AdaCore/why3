@@ -1,0 +1,45 @@
+(*
+
+  "dumb" version of insertion sort: makes too many swap
+
+  see insertion_sort.mlw for a better version
+
+*)
+
+module InsertionSortDumb
+
+  use import int.Int
+  use import ref.Ref
+  use import ref.Refint
+  use import array.Array
+  use import array.ArraySorted
+  use import array.ArrayPermut
+
+  let sort (a:array int) 
+    ensures { sorted a }
+    ensures { permut (old a) a }
+  =
+   'Init:
+   for i = 0 to a.length - 1 do
+     invariant { permut (at a 'Init) a   }
+     invariant { sorted_sub a 0 i  }
+     let j = ref i in
+     while !j > 0 && a[!j-1] > a[!j]  do
+       invariant { 0 <= !j <= i }
+       invariant { permut (at a 'Init) a   }
+       invariant { sorted_sub a 0 !j }
+       invariant { sorted_sub a !j (i+1) }
+       invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
+                      a[k1] <= a[k2] }
+       'L:
+       let b = !j - 1 in
+       let t = a[!j] in
+       a[!j] <- a[b];
+       a[b] <- t;
+       assert { exchange (at a 'L) a (!j-1) !j };
+       decr j
+     done
+   done
+
+
+end
