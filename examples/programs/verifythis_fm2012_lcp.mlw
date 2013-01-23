@@ -190,6 +190,10 @@ let test1 () =
     forall a:array int, x :int.
     0 <= x < a.length -> le a x x
 
+  lemma le_asym :
+    forall a:array int, x y:int.
+    0 <= x < a.length /\ 0 <= y < a.length /\ not (le a x y) -> le a y x
+
   lemma le_trans :
     forall a:array int, x y z:int.
     0 <= x < a.length /\ 0 <= y < a.length /\
