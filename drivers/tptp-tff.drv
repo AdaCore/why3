@@ -1,4 +1,4 @@
-(* Why driver for first-order tptp provers supporting TFF1 *)
+(* Why driver for first-order tptp provers supporting TFF0 *)
 
 printer "tptp-tff"
 filename "%f-%t-%g.p"
@@ -31,6 +31,7 @@ transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 
 transformation "encoding_smt"
+transformation "encoding_sort"
 
 theory BuiltIn
   syntax predicate (=)  "(%1 = %2)"
