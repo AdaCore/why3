@@ -14,7 +14,7 @@ module BinarySearch
   exception Break int (* raised to exit the loop *)
   exception Not_found (* raised to signal a search failure *)
 
-  let binary_search (a :array int) (v : int)
+  let binary_search (a : array int) (v : int)
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
@@ -43,7 +43,7 @@ module BinarySearch
 end
 
 (* A generalization: the midpoint is computed by some abstract function.
-   The only requirement is that is lies between l and u. *)
+   The only requirement is that it lies between l and u. *)
 
 module BinarySearchAnyMidPoint
 
@@ -97,7 +97,7 @@ module BinarySearchInt32
   exception Break int (* raised to exit the loop *)
   exception Not_found (* raised to signal a search failure *)
 
-  let binary_search (a :array int) (v : int)
+  let binary_search (a : array int) (v : int)
     requires { 0 <= length a <= max_int }
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
