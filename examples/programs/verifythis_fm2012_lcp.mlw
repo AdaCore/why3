@@ -90,7 +90,7 @@ use import array.ArrayPermut
 
 lemma permut_permutation :
   forall a1 a2:array int.
-  permut a1 a2 /\ permutation a1 -> permutation a2
+  permut a1 a2 -> permutation a1 -> permutation a2
 
 
 
@@ -138,7 +138,7 @@ lemma lcp_refl :
 
 lemma lcp_sym :
   forall a:array int, x y:int.
-     0 <= x <= a.length /\ 0 <= y <= a.length -> 
+     0 <= x <= a.length /\ 0 <= y <= a.length ->
        longest_common_prefix a x y = longest_common_prefix a y x
 
 
@@ -183,6 +183,7 @@ let test1 () =
   let x = lcp drr 2 3 in
   assert { is_common_prefix drr 2 3 1};
   check {x = 1}
+
 
   predicate le (a : array int) (x y:int) =
      let n = a.length in
@@ -313,6 +314,14 @@ let compare (a:array int) (x y:int) : int
 
 *)
 
+  use import int.MinMax
+
+  lemma lcp_le_le_min:
+    forall a:array int, x y z:int [le a x y, le a y z].
+     le a x y /\ le a y z ->
+     longest_common_prefix a x z =
+       min (longest_common_prefix a x y) (longest_common_prefix a y z)
+
   lemma lcp_le_le:
     forall a:array int, x y z:int.
      le a x y /\ le a y z ->
@@ -339,7 +348,9 @@ type suffixArray = {
 use map.MapInjection
 
 predicate inv(s:suffixArray) =
-  s.values.length = s.suffixes.length /\ permutation s.suffixes
+  s.values.length = s.suffixes.length /\
+  permutation s.suffixes /\
+  sorted s.values s.suffixes
 
 let select (s:suffixArray) (i:int) : int
   requires { inv s /\ 0 <= i < s.values.length }
@@ -362,11 +373,11 @@ let lcp (s:suffixArray) (i:int) : int
   requires { inv s }
   requires { 0 < i < s.values.length }
   ensures { result =
-            longest_common_prefix s.values s.suffixes[i] s.suffixes[i-1] }
+            longest_common_prefix s.values s.suffixes[i-1] s.suffixes[i] }
   =
    LCP.lcp s.values s.suffixes[i] s.suffixes[i-1]
 
-
+(*
 let test2 () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
@@ -395,6 +406,7 @@ let test2 () =
   let sa = create drr in
   let x = lcp sa 2 in
   check {x = 0 (* TODO *)}
+*)
 
 end
 
@@ -446,7 +458,7 @@ module LRS "longest repeated substring"
          assert { forall j:int. 0 <= j < i ->
                     LCP.longest_common_prefix a
                              sa.SuffixArray.suffixes[j]
-                             sa.SuffixArray.suffixes[i] 
+                             sa.SuffixArray.suffixes[i]
                   <= l };
          assert { forall j k:int. 0 <= j < k  < i-1 ->
                     !solLength >= LCP.longest_common_prefix a
@@ -470,11 +482,13 @@ module LRS "longest repeated substring"
                   x = sa.SuffixArray.suffixes[j] /\
                   y = sa.SuffixArray.suffixes[k] }
 
+(*
   let test () =
     let arr = Array.make 4 0 in
     arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-9;
     lrs arr;
     check { !solStart = 1 /\ !solLength = 1 }
+*)
 
 end
 
