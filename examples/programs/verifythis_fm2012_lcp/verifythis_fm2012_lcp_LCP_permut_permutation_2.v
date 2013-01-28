@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require map.Map.
+Require map.MapPermut.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -25,6 +26,14 @@ Definition range(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
 
 Axiom injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
   n) -> ((range a n) -> (surjective a n)).
+
+(* Why3 assumption *)
+Definition map_permutation(m:(map.Map.map Z Z)) (u:Z): Prop := (range m u) /\
+  (injective m u).
+
+Axiom map_permut_permutation : forall (m1:(map.Map.map Z Z)) (m2:(map.Map.map
+  Z Z)) (u:Z), (map.MapPermut.permut_sub m1 m2 0%Z u) -> ((map_permutation m1
+  u) -> (map_permutation m2 u)).
 
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
@@ -56,10 +65,6 @@ Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
   (mk_array n (map.Map.const v:(map.Map.map Z a))).
-
-(* Why3 assumption *)
-Definition permutation(a:(array Z)): Prop := (range (elts a) (length a)) /\
-  (injective (elts a) (length a)).
 
 (* Why3 assumption *)
 Definition exchange {a:Type} {a_WT:WhyType a}(a1:(map.Map.map Z a))
@@ -150,20 +155,22 @@ Axiom array_eq_sub_permut : forall {a:Type} {a_WT:WhyType a},
 Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
   a)) (a2:(array a)), (array_eq a1 a2) -> (permut a1 a2).
 
+(* Why3 assumption *)
+Definition permutation(a:(array Z)): Prop := (map_permutation (elts a)
+  (length a)).
+
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
 Theorem permut_permutation : forall (a1:(array Z)) (a2:(array Z)), (permut a1
   a2) -> ((permutation a1) -> (permutation a2)).
-intros (l1,a1) (l2,a2) (h1,h2) h.
+intros (l1,a1) (l2,a2) (h1,h2).
+unfold permutation in *.
 simpl in *.
 subst l2.
-induction h2.
-ae.
-ae.
-apply IHh2_2; auto.
-ae.
+intro.
+apply map_permut_permutation with (m1:=a1); auto.
 Qed.
 
 
