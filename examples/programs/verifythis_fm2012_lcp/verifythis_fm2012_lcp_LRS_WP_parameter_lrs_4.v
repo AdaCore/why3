@@ -310,6 +310,7 @@ Definition inv(s:suffixArray): Prop :=
   (permutation (suffixes s)).
 
 Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
 Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map Z Z)), let a2 :=
@@ -318,18 +319,30 @@ Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map Z Z)), let a2 :=
   (inv (mk_suffixArray (mk_array sa sa1) (mk_array sa2 sa3)))) ->
   ((permutation (mk_array sa2 sa3)) -> forall (solStart:Z),
   (solStart = 0%Z) -> forall (solLength:Z), (solLength = 0%Z) ->
-  (((a - 1%Z)%Z < 1%Z)%Z -> ((surjective sa3 sa2) -> ((forall (j:Z) (k:Z),
-  (((0%Z <= j)%Z /\ (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\
-  ~ (j = k))) -> ((longest_common_prefix a2 (get sa3 j) (get sa3
-  k)) <= solLength)%Z) -> ((forall (x:Z) (y:Z), (((0%Z <= x)%Z /\
-  (x < y)%Z) /\ (y < a)%Z) -> exists j:Z, exists k:Z, ((0%Z <= j)%Z /\
-  (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
-  ((x = (get sa3 j)) /\ (y = (get sa3 k)))))) -> exists y:Z, ((0%Z <= y)%Z /\
-  (y <= a)%Z) /\ ((~ (solStart = y)) /\
-  (solLength = (longest_common_prefix a2 solStart y)))))))))).
-intro a; intros.
-exists a.
-why3 "alt-ergo".
+  ((1%Z <= (a - 1%Z)%Z)%Z -> forall (solLength1:Z) (solStart1:Z),
+  (((((0%Z <= solLength1)%Z /\ (solLength1 <= a)%Z) /\
+  ((0%Z <= solStart1)%Z /\ (solStart1 <= a)%Z)) /\ exists y:Z,
+  ((0%Z <= y)%Z /\ (y <= a)%Z) /\ ((~ (solStart1 = y)) /\
+  (solLength1 = (longest_common_prefix a2 solStart1 y)))) /\ forall (j:Z)
+  (k:Z), (((0%Z <= j)%Z /\ (j < k)%Z) /\ (k < ((a - 1%Z)%Z + 1%Z)%Z)%Z) ->
+  ((longest_common_prefix a2 (get sa3 j) (get sa3 k)) <= solLength1)%Z) ->
+  ((surjective sa3 sa2) -> ((forall (j:Z) (k:Z), (((0%Z <= j)%Z /\
+  (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ~ (j = k))) ->
+  ((longest_common_prefix a2 (get sa3 j) (get sa3 k)) <= solLength1)%Z) ->
+  ((forall (x:Z) (y:Z), (((0%Z <= x)%Z /\ (x < y)%Z) /\ (y < a)%Z) ->
+  exists j:Z, exists k:Z, ((0%Z <= j)%Z /\ (j < a)%Z) /\ (((0%Z <= k)%Z /\
+  (k < a)%Z) /\ ((~ (j = k)) /\ ((x = (get sa3 j)) /\ (y = (get sa3
+  k)))))) -> forall (x:Z) (y:Z), (((0%Z <= x)%Z /\ (x < y)%Z) /\
+  (y < a)%Z) -> ((longest_common_prefix a2 x y) <= solLength1)%Z))))))).
+intros a a1 a2 h1 h2 sa sa1 sa2 sa3 ((h3,h4),h5) h6 solStart h7 solLength h8
+h9 solLength1 solStart1
+((((h10,h11),(h12,h13)),(y,((h14,h15),(h16,h17)))),h18) h19 h20 h21 x y0
+h22.
+elim (h21 _ _ h22).
+intros i (j & H1 & H2 & H3 & H4 & H5).
+subst x y0.
+apply h20.
+omega.
 Qed.
 
 
