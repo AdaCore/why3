@@ -171,8 +171,7 @@ module Tower_of_Hanoi
     ensures  { c.rod = old c.rod }
   = if n > 0 then begin
       let ghost t = c.rod in
-      let ghost x = match p with Cons x _ -> x | Nil -> absurd end in
-      let ghost r = match p with Cons _ r -> r | Nil -> absurd end in
+      let x,r = match p with Cons x r -> (x,r) | Nil -> absurd end in
       hanoi_rec a c b (n-1) r (Cons x s);
       move a b x s;
       hanoi_rec c b a (n-1) r t

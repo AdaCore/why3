@@ -663,7 +663,9 @@ let e_case e0 bl =
         let vty = VTvalue (vty_value ~ghost bity) in
         mk_expr (Ecase (e0,bl)) vty eff (add_e_vars e0 varm)
   in
-  branch vtv0.vtv_ghost eff_empty Mid.empty bl
+  (* a one-branch match may be not ghost even if the matched expr is *)
+  let ghost = match bl with [_] -> false | _ -> vtv0.vtv_ghost in
+  branch ghost eff_empty Mid.empty bl
 
 (* ghost *)
 

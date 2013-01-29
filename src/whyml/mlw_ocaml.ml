@@ -753,6 +753,8 @@ and print_lexpr pri info fmt e =
   | Eany _ ->
       fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
         (print_vty info) e.e_vty
+  | Ecase (e1, [_,e2]) when vty_ghost e1.e_vty ->
+      print_lexpr pri info fmt e2
   | Ecase (e1, bl) ->
       fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
         (print_expr info) e1 (print_list newline (print_ebranch info)) bl
