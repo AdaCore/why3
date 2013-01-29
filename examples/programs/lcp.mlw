@@ -1,0 +1,36 @@
+
+(* {1 The VerifyThis competition at FM2012: Problem 1}
+
+   See {h <a href="http://fm2012.verifythis.org/challenges">this web page</a>}
+
+   Authors: Jean-Christophe Filliâtre and Andrei Paskevich *)
+
+module LCP
+
+  use import int.Int
+  use import ref.Refint
+  use import array.Array
+
+  predicate eqseq (a: array int) (x y: int) (len: int) =
+    0 <= len /\ x + len <= length a /\ y + len <= length a /\
+    forall i: int. 0 <= i < len -> a[x + i] = a[y + i]
+
+  lemma not_eqseq:
+    forall a: array int, x y: int, i: int. 0 <= i ->
+    a[x + i] <> a[y + i] ->
+    forall len: int. i < len -> not (eqseq a x y len)
+
+  let lcp (a: array int) (x: int) (y: int) : int
+    requires { 0 <= x < length a /\ 0 <= y < length a }
+    ensures  { eqseq a x y result }
+    ensures  { forall len: int. result < len -> not (eqseq a x y len) }
+    =
+    let l = ref 0 in
+    while x + !l < length a && y + !l < length a && a[x + !l] = a[y + !l] do
+      invariant { eqseq a x y !l }
+      variant   { length a - !l }
+      incr l
+    done;
+    !l
+
+end

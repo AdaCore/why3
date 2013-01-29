@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95-dev"/>
+ <prover
+  id="1"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="2"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../lcp.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="LCP"
+   locfile="../lcp.mlw"
+   loclnum="8" loccnumb="7" loccnume="10"
+   verified="true"
+   expanded="true">
+   <goal
+    name="not_eqseq"
+    locfile="../lcp.mlw"
+    loclnum="18" loccnumb="8" loccnume="17"
+    sum="c5fb1ad48d350cca501bd2afef0be079"
+    proved="true"
+    expanded="true"
+    shape="aeqseqV0V1V2V4NIainfix &lt;V3V4FIainfix =amixfix []V0ainfix +V1V3amixfix []V0ainfix +V2V3NIainfix &lt;=c0V3F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter lcp"
+    locfile="../lcp.mlw"
+    loclnum="23" loccnumb="6" loccnume="9"
+    expl="VC for lcp"
+    sum="9c6ffd4a3401bb53af02f60b9ab842a3"
+    proved="true"
+    expanded="true"
+    shape="iainfix &lt;ainfix +V1V5V0iainfix &lt;ainfix +V2V5V0iainfix =agetV3ainfix +V1V5agetV3ainfix +V2V5ainfix &lt;ainfix -V0V6ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5AaeqseqV4V1V2V6Iainfix =V6ainfix +V5c1FaeqseqV4V1V2V7NIainfix &lt;V5V7FAaeqseqV4V1V2V5Aainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Aainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5aeqseqV4V1V2V8NIainfix &lt;V5V8FAaeqseqV4V1V2V5aeqseqV4V1V2V9NIainfix &lt;V5V9FAaeqseqV4V1V2V5IaeqseqV4V1V2V5FAaeqseqV4V1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+    <label
+     name="expl:VC for lcp"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter lcp.1"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="1. loop invariant init"
+      sum="e93057554dfe628f84af9d2eacf0f4ed"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.2"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="2. precondition"
+      sum="e61e7b1676915a9af5434456050ed3ac"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.3"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="3. precondition"
+      sum="74962aa66b59adcdb85478dd5a8efa83"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Iainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.4"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="4. loop invariant preservation"
+      sum="b9671fc342b633ac8884e1bd9631c425"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2V6Iainfix =V6ainfix +V5c1FIainfix =agetV3ainfix +V1V5agetV3ainfix +V2V5Iainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Iainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.5"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="5. loop variant decrease"
+      sum="061d40a5090500fe40970cdab1cb4c1e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -V0V6ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Iainfix =V6ainfix +V5c1FIainfix =agetV3ainfix +V1V5agetV3ainfix +V2V5Iainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Iainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.6"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="6. postcondition"
+      sum="c3259940ebf1821cc21657424588bb28"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2V5Iainfix =agetV3ainfix +V1V5agetV3ainfix +V2V5NIainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Iainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.7"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="7. postcondition"
+      sum="8c7a266e3207904b1e7fa90e1d7051d5"
+      proved="true"
+      expanded="true"
+      shape="aeqseqV4V1V2V6NIainfix &lt;V5V6FIainfix =agetV3ainfix +V1V5agetV3ainfix +V2V5NIainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Iainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter lcp.7.1"
+        locfile="../lcp.mlw"
+        loclnum="23" loccnumb="6" loccnume="9"
+        expl="1. postcondition"
+        sum="ed78edf09d6305bc4887a0c8a534c570"
+        proved="true"
+        expanded="true"
+        shape="ainfix =amixfix []V4ainfix +V1V7amixfix []V4ainfix +V2V7Iainfix &lt;V7V6Aainfix &lt;=c0V7FAainfix &lt;=ainfix +V2V6alengthV4Aainfix &lt;=ainfix +V1V6alengthV4Aainfix &lt;=c0V6NIainfix &lt;V5V6FIainfix =agetV3ainfix +V1V5agetV3ainfix +V2V5NIainfix &lt;ainfix +V1V5V0Aainfix =c0ainfix +V1V5Oainfix &lt;c0ainfix +V1V5Iainfix &lt;ainfix +V2V5V0Aainfix =c0ainfix +V2V5Oainfix &lt;c0ainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0Iainfix =amixfix []V4ainfix +V1V8amixfix []V4ainfix +V2V8Iainfix &lt;V8V5Aainfix &lt;=c0V8FAainfix &lt;=ainfix +V2V5alengthV4Aainfix &lt;=ainfix +V1V5alengthV4Aainfix &lt;=c0V5FIainfix &lt;V2V0Aainfix =c0V2Oainfix &lt;c0V2Aainfix &lt;V1V0Aainfix =c0V1Oainfix &lt;c0V1Lamk arrayV0V3FF">
+        <label
+         name="expl:VC for lcp"/>
+        <proof
+         prover="1"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.22"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter lcp.8"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="8. postcondition"
+      sum="b47cce91d7ec196d67364ab487ee096e"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2V5Iainfix &lt;ainfix +V2V5V0NIainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.9"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="9. postcondition"
+      sum="ca0036ada6b2206530b38fa8cf0d37a9"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2V6NIainfix &lt;V5V6FIainfix &lt;ainfix +V2V5V0NIainfix &lt;ainfix +V1V5V0IaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.10"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="10. postcondition"
+      sum="02dd4e8735e6cedae4476c0215a168f0"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2V5Iainfix &lt;ainfix +V1V5V0NIaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter lcp.11"
+      locfile="../lcp.mlw"
+      loclnum="23" loccnumb="6" loccnume="9"
+      expl="11. postcondition"
+      sum="532e3c94bfd7039b660b8539a70c907b"
+      proved="true"
+      expanded="false"
+      shape="aeqseqV4V1V2V6NIainfix &lt;V5V6FIainfix &lt;ainfix +V1V5V0NIaeqseqV4V1V2V5FIainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V1V0Aainfix &lt;=c0V1Lamk arrayV0V3FF">
+      <label
+       name="expl:VC for lcp"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
