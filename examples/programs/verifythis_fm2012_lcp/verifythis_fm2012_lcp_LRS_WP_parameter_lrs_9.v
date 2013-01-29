@@ -301,9 +301,6 @@ Definition inv(s:suffixArray): Prop :=
   ((length (values s)) = (length (suffixes s))) /\
   ((permutation (suffixes s)) /\ (sorted (values s) (suffixes s))).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
-
 (* Why3 goal *)
 Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map.Map.map Z Z)),
   let a2 := (mk_array a a1) in ((0%Z < a)%Z -> ((0%Z <= a)%Z -> forall (sa:Z)
@@ -323,27 +320,17 @@ Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map.Map.map Z Z)),
   ((surjective sa3 sa2) -> ((forall (j:Z) (k:Z), (((0%Z <= j)%Z /\
   (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ~ (j = k))) ->
   ((longest_common_prefix a2 (map.Map.get sa3 j) (map.Map.get sa3
-  k)) <= solLength1)%Z) -> forall (x:Z) (y:Z), (((0%Z <= x)%Z /\
+  k)) <= solLength1)%Z) -> ((forall (x:Z) (y:Z), (((0%Z <= x)%Z /\
   (x < y)%Z) /\ (y < a)%Z) -> exists j:Z, exists k:Z, ((0%Z <= j)%Z /\
   (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
-  ((x = (map.Map.get sa3 j)) /\ (y = (map.Map.get sa3 k))))))))))).
-intros.
-(*
- a a1 a2 h1 h2 sa sa1 sa2 sa3 ((h3,h4),h5) h6 solStart h7 solLength h8
-h9 solLength1 solStart1 solStart.
-((((h10,h11),(h12,h13)),(z,((h14,h15),(h16,h17)))),h18) h19 _ x y
-(h20,h22).
-*)
-assert (h: sa2 = a) by ae.
-subst sa2.
-red in H8.
-assert (ha : (0 <= x < a)%Z) by omega.
-destruct (H8 _ ha) as (j & h30 & h31).
-assert (hb : (0 <= y < a)%Z) by omega.
-destruct (H8 _ hb) as (k & k32 & h33).
-exists j.
-exists k.
-ae.
+  ((x = (map.Map.get sa3 j)) /\ (y = (map.Map.get sa3 k)))))) -> forall (x:Z)
+  (y:Z), (((0%Z <= x)%Z /\ (x < y)%Z) /\ (y < a)%Z) ->
+  ((longest_common_prefix a2 x y) <= solLength1)%Z))))))).
+intros a a1 a2 h1 h2 sa sa1 sa2 sa3 ((h3,h4),h5) h6 solStart h7 solLength h8
+solStart2 h9 h10 solStart21 solLength1 solStart1
+((((h11,h12),(h13,h14)),((h15,h16),(h17,h18))),h19) h20 h21 h22 x y
+((h23,h24),h25).
+
 Qed.
 
 

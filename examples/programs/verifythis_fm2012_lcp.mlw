@@ -86,10 +86,11 @@ predicate map_permutation (m:Map.map int int) (u : int) =
   MapInjection.range m u /\
   MapInjection.injective m u
 
+(*
 lemma map_permut_permutation :
   forall m1 m2:Map.map int int, u:int [MapPermut.permut_sub m1 m2 0 u].
   MapPermut.permut_sub m1 m2 0 u -> map_permutation m1 u -> map_permutation m2 u
-
+*)
 
 use import array.Array
 use import array.ArrayPermut
@@ -97,10 +98,11 @@ use import array.ArrayPermut
 predicate permutation (a:array int) =
   map_permutation a.elts a.length
 
+(**)
 lemma permut_permutation :
   forall a1 a2:array int.
   permut a1 a2 -> permutation a1 -> permutation a2
-
+(**)
 
 
 
@@ -129,6 +131,24 @@ axiom lcp_spec:
   (l = longest_common_prefix a x y <->
    is_common_prefix a x y l /\ not is_common_prefix a x y (l+1))
 
+use import ref.Refint
+
+let lcp (a:array int) (x y:int) : int
+  requires { 0 <= x <= a.length }
+  requires { 0 <= y <= a.length }
+  ensures { result = longest_common_prefix a x y }
+  = let n = a.length in
+    let l = ref 0 in
+    while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
+      invariant { is_common_prefix a x y !l }
+      incr l
+    done;
+    assert { is_common_prefix a x y !l };
+    assert { x + !l < n /\ y + !l < n -> a[x + !l] <> a[y + !l] };
+    assert { not is_common_prefix a x y (!l+1) };
+    !l
+
+
 lemma lcp_is_cp :
   forall a:array int, x y:int.
      0 <= x <= a.length /\ 0 <= y <= a.length ->
@@ -149,24 +169,6 @@ lemma lcp_sym :
   forall a:array int, x y:int.
      0 <= x <= a.length /\ 0 <= y <= a.length ->
        longest_common_prefix a x y = longest_common_prefix a y x
-
-
-use import ref.Refint
-
-let lcp (a:array int) (x y:int) : int
-  requires { 0 <= x <= a.length }
-  requires { 0 <= y <= a.length }
-  ensures { result = longest_common_prefix a x y }
-  = let n = a.length in
-    let l = ref 0 in
-    while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
-      invariant { is_common_prefix a x y !l }
-      incr l
-    done;
-    assert { is_common_prefix a x y !l };
-    assert { x + !l < n /\ y + !l < n -> a[x + !l] <> a[y + !l] };
-    assert { not is_common_prefix a x y (!l+1) };
-    !l
 
 let test1 () =
   let arr = Array.make 4 0 in
@@ -434,14 +436,14 @@ module LRS "longest repeated substring"
 
     val solStart : ref int
     val solLength : ref int
+    val ghost solStart2 : ref int
 
     let lrs (a:array int) : unit
       requires { a.length > 0 }
       ensures { 0 <= !solLength <= a.length }
       ensures { 0 <= !solStart <= a.length }
-      ensures { exists y:int.
-                  0 <= y <= a.length /\ !solStart <> y /\
-                  !solLength = LCP.longest_common_prefix a !solStart y }
+      ensures { 0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
+                !solLength = LCP.longest_common_prefix a !solStart !solStart2 }
       ensures { forall x y:int.
                   0 <= x < y < a.length ->
                   !solLength >= LCP.longest_common_prefix a x y }
@@ -450,12 +452,13 @@ module LRS "longest repeated substring"
       assert { LCP.permutation sa.SuffixArray.suffixes };
       solStart := 0;
       solLength := 0;
+      solStart2 := a.length;
       for i=1 to a.length - 1 do
         invariant { 0 <= !solLength <= a.length }
         invariant { 0 <= !solStart <= a.length }
-        invariant { exists y:int.
-                  0 <= y <= a.length /\ !solStart <> y /\
-                  !solLength = LCP.longest_common_prefix a !solStart y }
+        invariant { 
+                  0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
+                  !solLength = LCP.longest_common_prefix a !solStart !solStart2 }
         invariant { forall j k:int.
                   0 <= j < k < i ->
                   !solLength >= LCP.longest_common_prefix a
@@ -475,6 +478,7 @@ module LRS "longest repeated substring"
                              sa.SuffixArray.suffixes[k] };
          if l > !solLength then begin
             solStart := SuffixArray.select sa i;
+            solStart2 := SuffixArray.select sa (i-1);
             solLength := l
          end
       done;
