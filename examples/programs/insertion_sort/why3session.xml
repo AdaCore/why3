@@ -12,15 +12,27 @@
  <prover
   id="2"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="5"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="4"
+  id="6"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../insertion_sort.mlw"
   verified="true"
@@ -30,13 +42,13 @@
    locfile="../insertion_sort.mlw"
    loclnum="4" loccnumb="7" loccnume="20"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter insertion_sort"
     locfile="../insertion_sort.mlw"
     loclnum="13" loccnumb="6" loccnume="20"
     expl="VC for insertion_sort"
-    sum="0cbfa0be2a879cf891ac4488c2ca009b"
+    sum="4659a9d44e24cdf4323d23a497c548a5"
     proved="true"
     expanded="false"
     shape="apermutV2V4Aasorted_subV3c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Aiainfix &gt;V7c0iainfix &gt;agetV8ainfix -V7c1V6ainfix &lt;V10V7Aainfix &lt;=c0V7Aainfix &lt;V6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FAainfix &lt;=agetV9V12agetV9V13Iainfix =V13V10NIainfix =V12V10NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV9V10V6Aainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FAaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1apermutV2amk arrayV0V14Aasorted_subV14c0ainfix +V5c1Iainfix =V14asetV8V7V6FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=agetV8V15V6Iainfix &lt;V15V7Aainfix &lt;=c0V15FAainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1apermutV2amk arrayV0V16Aasorted_subV16c0ainfix +V5c1Iainfix =V16asetV8V7V6FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=agetV8V17V6Iainfix &lt;V17V7Aainfix &lt;=c0V17FIainfix &lt;V6agetV8V18Iainfix &lt;=V18V5Aainfix &lt;=ainfix +V7c1V18FAainfix &lt;=agetV8V19agetV8V20Iainfix =V20V7NIainfix =V19V7NIainfix &lt;=V20V5Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix &lt;V6agetV3V21Iainfix &lt;=V21V5Aainfix &lt;=ainfix +V5c1V21FAainfix &lt;=agetV3V22agetV3V23Iainfix =V23V5NIainfix =V22V5NIainfix &lt;=V23V5Aainfix &lt;=V22V23Aainfix &lt;=c0V22FAapermutV2amk arrayV0asetV3V5V6Aainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Aainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FAapermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1AapermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -51,7 +63,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="1. postcondition"
-      sum="dcb0952c2d312bb6c2cc1675a9b16edf"
+      sum="a7f337bf08136bd2f3c87724d374feee"
       proved="true"
       expanded="false"
       shape="apermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -66,7 +78,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="4"
+       prover="6"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -79,7 +91,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="2. loop invariant init"
-      sum="e0c1a8dc028883291d624009488a500f"
+      sum="c8a1c96adb8e69ec621e265621c85725"
       proved="true"
       expanded="false"
       shape="apermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -99,7 +111,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="3. precondition"
-      sum="84e7e07145f2f81fec8a1df271b33b1d"
+      sum="6689e9a3973ee55234a4f3825da27909"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -119,7 +131,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="4. loop invariant init"
-      sum="ab31ebd382f613c6633982d7a64bd689"
+      sum="f782523b92c255d9ff96f3b6247ea7c4"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -139,14 +151,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="5. loop invariant init"
-      sum="ec511efc335975d03695e947e1b85028"
+      sum="df703cc6d3008bcc45d78cc6642b769f"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0asetV3V5V6LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -159,7 +171,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="6. loop invariant init"
-      sum="13846e9950f09132cf19b7a37330a25d"
+      sum="f9af26cda7475a4d82fc40d0ddb6b969"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=agetV3V7agetV3V8Iainfix =V8V5NIainfix =V7V5NIainfix &lt;=V8V5Aainfix &lt;=V7V8Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -179,7 +191,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="7. loop invariant init"
-      sum="9553f8bc4e6834448fe67718fb89282b"
+      sum="e5b9b8d6a7b7f631233eeec090159f1f"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V6agetV3V7Iainfix &lt;=V7V5Aainfix &lt;=ainfix +V5c1V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -194,7 +206,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -207,7 +219,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="8. precondition"
-      sum="fe91aa0d5359bed9f974324c9d121c95"
+      sum="b5723e53adcd1780c26c754bb3df7f30"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -227,7 +239,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="9. precondition"
-      sum="a27aa9cf8cd8c20657a10a1dc0accd17"
+      sum="ec2c1e6553768699576dc1a729631bd4"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -247,7 +259,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="10. precondition"
-      sum="28a4813d2f173235e57b92daa544cf05"
+      sum="7cf429e2778eecd3455881402a8b692c"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -267,7 +279,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="11. assertion"
-      sum="d0dd665b053b4f0c21796749efedaa05"
+      sum="7021dbe2b279b5739658e336c8006607"
       proved="true"
       expanded="false"
       shape="aexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -287,7 +299,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="12. loop invariant preservation"
-      sum="1689a15d25355db54407ec02cbd7d26b"
+      sum="0edbf5817bee9c91b8da9a03f7b37046"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -307,14 +319,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="13. loop invariant preservation"
-      sum="f0d780089504db0858d133e4231f017e"
+      sum="376546a7bf69da06e892862450c35970"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0asetV9V10V6Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        edited="insertion_sort_WP_InsertionSort_WP_parameter_insertion_sort_1.v"
@@ -328,7 +340,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="14. loop invariant preservation"
-      sum="ca1d4f9977e30561a8ec05f3960385b9"
+      sum="a9bcf74075af5b4e12a34b47957a0799"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=agetV9V11agetV9V12Iainfix =V12V10NIainfix =V11V10NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V13Iainfix &lt;=V13V5Aainfix &lt;=ainfix +V7c1V13FAainfix &lt;=agetV8V14agetV8V15Iainfix =V15V7NIainfix =V14V7NIainfix &lt;=V15V5Aainfix &lt;=V14V15Aainfix &lt;=c0V14FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -348,14 +360,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="15. loop invariant preservation"
-      sum="42185d86d541856e19c99c82bd06ff3b"
+      sum="6ff701327a4d265c12899644ecb04aae"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V12Iainfix &lt;=V12V5Aainfix &lt;=ainfix +V7c1V12FAainfix &lt;=agetV8V13agetV8V14Iainfix =V14V7NIainfix =V13V7NIainfix &lt;=V14V5Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -368,7 +380,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="16. loop variant decrease"
-      sum="a6b99df863da51ce101e3ad1a1603832"
+      sum="2ebdd4130c6121d223c6944a60aec32f"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V10V7Aainfix &lt;=c0V7Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -388,7 +400,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="17. assertion"
-      sum="b07990f48136b0a7ba5a39ad3b88d27d"
+      sum="7a32361814e1afc883e54831d690ce94"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;agetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -408,7 +420,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="18. precondition"
-      sum="dc9f35006cfd730069f66484336d3e62"
+      sum="c088713e2e99fa1e403965c68fe906f6"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;agetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -428,7 +440,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="19. loop invariant preservation"
-      sum="dd5e1160349af2d7dc6f50687f90d6fc"
+      sum="04a327a3b75c2cf85257c348d053bf51"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=agetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIainfix &gt;agetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -448,7 +460,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="20. assertion"
-      sum="bdb19ffbc9047fde425a941a596d05e1"
+      sum="06be3321f01c04b06e6725063c88c7bc"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -468,7 +480,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="21. precondition"
-      sum="853728823e97656d8cbc1c7b9a22c9c1"
+      sum="79a1af10113facafc9cce06c484476a2"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -488,7 +500,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="22. loop invariant preservation"
-      sum="bb563c5ed5571626192b690a446a6478"
+      sum="f7e1b4f82b43bf4ada3156d08bb3c902"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=agetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIainfix &gt;V7c0NIainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -508,7 +520,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="13" loccnumb="6" loccnume="20"
       expl="23. postcondition"
-      sum="526151322846a28447afd38db176193f"
+      sum="72da7ef61efc3ab6f2448c40bcff1f64"
       proved="true"
       expanded="false"
       shape="apermutV2V4Aasorted_subV3c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Lamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -523,7 +535,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="6"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -545,22 +557,22 @@
     locfile="../insertion_sort.mlw"
     loclnum="61" loccnumb="6" loccnume="20"
     expl="VC for insertion_sort"
-    sum="87a607f650b1e19fbc20bd8d746dc5b6"
+    sum="94d1b9009f44d6f5e601fc07956a6723"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="apermutV2V4Aasorted_subV3c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Aiainfix &gt;V7c0ialeagetV8ainfix -V7c1V6Nainfix &lt;V10V7Aainfix &lt;=c0V7AaleV6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FAaleagetV9V12agetV9V13Iainfix =V13V10NIainfix =V12V10NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV9V10V6Aainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FAaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1apermutV2amk arrayV0V14Aasorted_subV14c0ainfix +V5c1Iainfix =V14asetV8V7V6FAainfix &lt;V7V0Aainfix &lt;=c0V7AaleagetV8V15V6Iainfix &lt;V15V7Aainfix &lt;=c0V15FAainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1apermutV2amk arrayV0V16Aasorted_subV16c0ainfix +V5c1Iainfix =V16asetV8V7V6FAainfix &lt;V7V0Aainfix &lt;=c0V7AaleagetV8V17V6Iainfix &lt;V17V7Aainfix &lt;=c0V17FIaleV6agetV8V18Iainfix &lt;=V18V5Aainfix &lt;=ainfix +V7c1V18FAaleagetV8V19agetV8V20Iainfix =V20V7NIainfix =V19V7NIainfix &lt;=V20V5Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FAaleV6agetV3V21Iainfix &lt;=V21V5Aainfix &lt;=ainfix +V5c1V21FAaleagetV3V22agetV3V23Iainfix =V23V5NIainfix =V22V5NIainfix &lt;=V23V5Aainfix &lt;=V22V23Aainfix &lt;=c0V22FAapermutV2amk arrayV0asetV3V5V6Aainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Aainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FAapermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1AapermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Lamk arrayV0V1FF">
     <label
      name="expl:VC for insertion_sort"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter insertion_sort.1"
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="1. postcondition"
-      sum="e9e7990e86b9bdd5db01d4a3cb698379"
+      sum="a19c290ecfad059e3ac50a70131cda96"
       proved="true"
       expanded="false"
       shape="apermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -580,7 +592,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="2. loop invariant init"
-      sum="a568414c9463defca6fad354134a7e57"
+      sum="908b42ed960c481fcc6fa75f3f83acbd"
       proved="true"
       expanded="false"
       shape="apermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -600,7 +612,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="3. precondition"
-      sum="b40d8b0dec4f01a1956709db990c8f6e"
+      sum="0aa44db78d73c4f792297b7f2c88b556"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -620,7 +632,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="4. loop invariant init"
-      sum="bc795325ce40e9f5d4f43624b6b0483b"
+      sum="7f068943c032954f124ac4f645e4260b"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -640,14 +652,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="5. loop invariant init"
-      sum="9d574f2535ff333eedd9211b6b5a709c"
+      sum="6adec7acbd994400adc96cf75fa54a41"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0asetV3V5V6LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -660,7 +672,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="6. loop invariant init"
-      sum="cd3b742fef0d195495ab70396621cea8"
+      sum="0f8f2c549c4403d0f920f923bc9b898c"
       proved="true"
       expanded="false"
       shape="aleagetV3V7agetV3V8Iainfix =V8V5NIainfix =V7V5NIainfix &lt;=V8V5Aainfix &lt;=V7V8Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -680,7 +692,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="7. loop invariant init"
-      sum="854c2e5f8856272aa1f8b569fd49fbfd"
+      sum="275e93175ac61ecca19e268261e70829"
       proved="true"
       expanded="false"
       shape="aleV6agetV3V7Iainfix &lt;=V7V5Aainfix &lt;=ainfix +V5c1V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -700,7 +712,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="8. precondition"
-      sum="fa0fdb1830cefd6c6cf01628e5893821"
+      sum="e19dbf77eb855459676a97c4b06b3ea4"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -720,7 +732,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="9. precondition"
-      sum="f6e72c3a08aa17a341ed604aad638b32"
+      sum="84a502ce3c16f597ed4617c0e30d27ea"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -740,7 +752,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="10. precondition"
-      sum="47cac88f6f8fea968b0541cf6a1cf462"
+      sum="493d8bcc44e6fdf016acb2bf7389d677"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -760,7 +772,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="11. assertion"
-      sum="b3587ecc269d3dbf673345e2143b0b9a"
+      sum="7472965c3d7837e8b10c243c9d11f329"
       proved="true"
       expanded="false"
       shape="aexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -780,7 +792,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="12. loop invariant preservation"
-      sum="80bcc4eb3608aa9a44c6f0ff9a8bab1c"
+      sum="7d7048ebc1e8361ad216c3fa7f72a5de"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -800,14 +812,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="13. loop invariant preservation"
-      sum="eaf95793682c4e55f792649011f45780"
+      sum="1a871bca3f1240f9cadf2c2911abb8e7"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0asetV9V10V6Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        edited="insertion_sort_InsertionSortGen_WP_parameter_insertion_sort_1.v"
@@ -821,19 +833,51 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="14. loop invariant preservation"
-      sum="a54897814d7af1b727d4453c0a195c73"
+      sum="524297914b1b2eecf88080d3b944477f"
       proved="true"
       expanded="false"
       shape="aleagetV9V11agetV9V12Iainfix =V12V10NIainfix =V11V10NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V13Iainfix &lt;=V13V5Aainfix &lt;=ainfix +V7c1V13FAaleagetV8V14agetV8V15Iainfix =V15V7NIainfix =V14V7NIainfix &lt;=V15V5Aainfix &lt;=V14V15Aainfix &lt;=c0V14FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="5"
-       memlimit="1000"
+       memlimit="4000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.48"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.39"/>
       </proof>
      </goal>
      <goal
@@ -841,7 +885,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="15. loop invariant preservation"
-      sum="b8426c26e2ca1edfa981bf311e52133e"
+      sum="a26b003215c47015d66bf28c3f092350"
       proved="true"
       expanded="false"
       shape="aleV6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V12Iainfix &lt;=V12V5Aainfix &lt;=ainfix +V7c1V12FAaleagetV8V13agetV8V14Iainfix =V14V7NIainfix =V13V7NIainfix &lt;=V14V5Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -861,7 +905,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="16. loop variant decrease"
-      sum="f3cff6a267a71231da1aa63476b0c352"
+      sum="0810b6430f005c587512635ec94db19a"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V10V7Aainfix &lt;=c0V7Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -881,7 +925,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="17. assertion"
-      sum="7d9f8867aa38e77fe2f6d926142c2434"
+      sum="b8d2285867caf5e332596340eaca83e3"
       proved="true"
       expanded="false"
       shape="aleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIaleagetV8ainfix -V7c1V6NNIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -901,7 +945,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="18. precondition"
-      sum="252f65f8257b7664b82fbe0f923a2171"
+      sum="832df6a7669c0a563c24a8f097f5f62c"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V7V0Aainfix &lt;=c0V7IaleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIaleagetV8ainfix -V7c1V6NNIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -921,14 +965,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="19. loop invariant preservation"
-      sum="413da874f999ef30ef7773cd6fba7ee3"
+      sum="53a41f087be19060bf2a0198d1d1e857"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6FIainfix &lt;V7V0Aainfix &lt;=c0V7IaleagetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIaleagetV8ainfix -V7c1V6NNIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -941,7 +985,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="20. assertion"
-      sum="0cc8b8602f95aab5f2a986e3737bb169"
+      sum="f2209c38539bb738f4d51ff781237fc0"
       proved="true"
       expanded="false"
       shape="aleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -961,7 +1005,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="21. precondition"
-      sum="3cfde79a998f1f963bade396ada064e5"
+      sum="255cd079ceadc78d00d204613890c796"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V7V0Aainfix &lt;=c0V7IaleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
@@ -981,14 +1025,14 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="22. loop invariant preservation"
-      sum="eb0882109752bd533414bd9169c38e76"
+      sum="2b2689603bd8a51d75ac1f4022fc4ca1"
       proved="true"
       expanded="false"
       shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6FIainfix &lt;V7V0Aainfix &lt;=c0V7IaleagetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIainfix &gt;V7c0NIaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1001,7 +1045,7 @@
       locfile="../insertion_sort.mlw"
       loclnum="61" loccnumb="6" loccnume="20"
       expl="23. postcondition"
-      sum="573e6918c775b64d2a51fb91f3100378"
+      sum="7974746739938e44a5813b6ff9e7a175"
       proved="true"
       expanded="false"
       shape="apermutV2V4Aasorted_subV3c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Lamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Lamk arrayV0V1FF">
