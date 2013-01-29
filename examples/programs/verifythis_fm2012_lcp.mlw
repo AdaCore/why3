@@ -78,32 +78,8 @@ that it does so correctly.
 module LCP "longest common prefix"
 
 use import int.Int
-use map.Map
-use map.MapPermut
-use map.MapInjection
-
-predicate map_permutation (m:Map.map int int) (u : int) =
-  MapInjection.range m u /\
-  MapInjection.injective m u
-
-(*
-lemma map_permut_permutation :
-  forall m1 m2:Map.map int int, u:int [MapPermut.permut_sub m1 m2 0 u].
-  MapPermut.permut_sub m1 m2 0 u -> map_permutation m1 u -> map_permutation m2 u
-*)
-
 use import array.Array
 use import array.ArrayPermut
-
-predicate permutation (a:array int) =
-  map_permutation a.elts a.length
-
-(**)
-lemma permut_permutation :
-  forall a1 a2:array int.
-  permut a1 a2 -> permutation a1 -> permutation a2
-(**)
-
 
 
 predicate is_common_prefix (a:array int) (x y:int) (l:int) =
@@ -236,6 +212,7 @@ let compare (a:array int) (x y:int) : int
   predicate sorted_sub (a : array int) (data:array int) (l u:int) =
     forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2]
 
+(*
   lemma sorted_le:
     forall a data: array int, l u i x:int.
     l <= i < u /\ sorted_sub a data l u /\ le a x data[l] ->
@@ -272,13 +249,27 @@ let compare (a:array int) (x y:int) : int
     forall a data:array int, l u i v:int.
     sorted_sub a data l u /\ u <= i ->
     sorted_sub a { length = a.length; elts = Map.set data.elts i v } l u
+*)
+
+use map.Map
+use map.MapPermut
+use map.MapInjection
+
+predicate map_permutation (m:Map.map int int) (u : int) =
+  MapInjection.range m u /\
+  MapInjection.injective m u
+
+predicate permutation (a:array int) =
+  map_permutation a.elts a.length
+
+
 
   predicate sorted (a : array int) (data:array int) =
     sorted_sub a data 0 data.length
 
   let sort (a:array int) (data : array int)
   requires { data.length = a.length }
-  requires { permutation data }
+  requires { MapInjection.range data.elts data.length }
   ensures { sorted a data }
   ensures { permut (old data) data }
   =
@@ -286,44 +277,62 @@ let compare (a:array int) (x y:int) : int
    for i = 0 to data.length - 1 do
      invariant { permut (at data 'Init) data   }
      invariant { sorted_sub a data 0 i  }
-     invariant { permutation data }
+     invariant { MapInjection.range data.elts data.length }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
-       invariant { permutation data }
+       invariant { MapInjection.range data.elts data.length }
        invariant { permut (at data 'Init) data   }
        invariant { sorted_sub a data 0 !j }
        invariant { sorted_sub a data !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                      le a data[k1] data[k2] }
        'L:
+(*
        assert { le a data[!j] data[!j-1] };
        assert { forall k:int. !j+1 <= k <= i -> le a data[!j-1] data[k] };
        assert { sorted_sub a data 0 (!j-1) };
        assert { sorted_sub a data (!j+1) (i+1) };
+*)
        let b = !j - 1 in
        let t = data[!j] in
        data[!j] <- data[b];
+(*
        assert { sorted_sub a data 0 (!j-1) };
        assert { sorted_sub a data (!j+1) (i+1) };
        assert { forall k:int. !j <= k <= i -> le a data[!j] data[k] };
        assert { sorted_sub a data !j (i+1) };
+*)
        data[b] <- t;
+(*
        assert { le a data[!j-1] data[!j] };
        assert { forall k:int. !j <= k <=i -> le a data[!j] data[k] };
-       assert { exchange (at data 'L) data (!j-1) !j };
        assert { sorted_sub a data 0 (!j-1) };
        assert { sorted_sub a data !j (i+1) };
+*)
+       assert { exchange (at data 'L) data (!j-1) !j };
        decr j
-     done;
+     done
+(*;
      assert { !j > 0 -> le a data[!j-1] data[!j] }
-   done
+*)   done
 
 
 (* additional properties relating le and longest_common_prefix, needed
-   for LRS
+   for SuffixArray and LRS
 
 *)
+
+
+(*
+lemma map_permut_permutation :
+  forall m1 m2:Map.map int int, u:int [MapPermut.permut_sub m1 m2 0 u].
+  MapPermut.permut_sub m1 m2 0 u -> map_permutation m1 u -> map_permutation m2 u
+*)
+
+lemma permut_permutation :
+  forall a1 a2:array int.
+  permut a1 a2 -> permutation a1 -> permutation a2
 
   use import int.MinMax
 
