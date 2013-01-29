@@ -95,3 +95,119 @@ module InsertionSortDumbGen
 
 
 end
+
+
+
+module InsertionSortParam
+
+  use import int.Int
+  use import ref.Ref
+  use import ref.Refint
+  use map.Map
+  use import array.Array
+  use import array.ArrayPermut
+
+  type param
+
+  type elt
+
+  predicate le param elt elt
+
+  axiom le_refl: forall p:param, x:elt. le p x x
+
+  axiom le_asym: forall p:param, x y:elt. not (le p x y) -> le p y x
+
+  axiom le_trans: forall p:param, x y z:elt. le p x y /\ le p y z -> le p x z
+
+  (* a[l..u) is sorted for le *)
+  predicate sorted_sub (p:param) (a : Map.map int elt) (l u : int) =
+    forall i1 i2 : int. l <= i1 <= i2 < u -> le p (Map.get a i1) (Map.get a i2)
+
+  predicate sorted (p:param) (a : array elt) =
+    sorted_sub p a.elts 0 a.length
+
+  let sort (p:param) (a:array elt)
+    ensures { sorted p a }
+    ensures { permut (old a) a }
+  =
+   'Init:
+   for i = 0 to a.length - 1 do
+     invariant { permut (at a 'Init) a   }
+     invariant { sorted_sub p a.elts 0 i  }
+     let j = ref i in
+     while !j > 0 && not (le p a[!j-1] a[!j])  do
+       invariant { 0 <= !j <= i }
+       invariant { permut (at a 'Init) a   }
+       invariant { sorted_sub p a.elts 0 !j }
+       invariant { sorted_sub p a.elts !j (i+1) }
+       invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
+                      le p a[k1] a[k2] }
+       'L:
+       let b = !j - 1 in
+       let t = a[!j] in
+       a[!j] <- a[b];
+       a[b] <- t;
+       assert { exchange (at a 'L) a (!j-1) !j };
+       decr j
+     done
+   done
+
+
+end
+
+module InsertionSortParamBad
+
+  use import int.Int
+  use import ref.Ref
+  use import ref.Refint
+  use map.Map
+  use import array.Array
+  use import array.ArrayPermut
+
+  type param
+
+  type elt
+
+  predicate le param elt elt
+
+  axiom le_refl: forall p:param, x:elt. le p x x
+
+  axiom le_asym: forall p:param, x y:elt. not (le p x y) -> le p y x
+
+  axiom le_trans: forall p:param, x y z:elt. le p x y /\ le p y z -> le p x z
+
+  (* a[l..u) is sorted for le *)
+  predicate sorted_sub (p:param) (a : array elt) (l u : int) =
+    forall i1 i2 : int. l <= i1 <= i2 < u -> le p a[i1] a[i2]
+
+  predicate sorted (p:param) (a : array elt) =
+    sorted_sub p a 0 a.length
+
+  let sort (p:param) (a:array elt)
+    ensures { sorted p a }
+    ensures { permut (old a) a }
+  =
+   'Init:
+   for i = 0 to a.length - 1 do
+     invariant { permut (at a 'Init) a   }
+     invariant { sorted_sub p a 0 i  }
+     let j = ref i in
+     while !j > 0 && not (le p a[!j-1] a[!j])  do
+       invariant { 0 <= !j <= i }
+       invariant { permut (at a 'Init) a   }
+       invariant { sorted_sub p a 0 !j }
+       invariant { sorted_sub p a !j (i+1) }
+       invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
+                      le p a[k1] a[k2] }
+       'L:
+       let b = !j - 1 in
+       let t = a[!j] in
+       a[!j] <- a[b];
+       a[b] <- t;
+       assert { exchange (at a 'L) a (!j-1) !j };
+       decr j
+     done
+   done
+
+
+end

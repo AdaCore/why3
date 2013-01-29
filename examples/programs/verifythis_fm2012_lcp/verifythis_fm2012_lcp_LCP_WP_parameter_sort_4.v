@@ -273,18 +273,9 @@ j data5 data6 ((((((h9,h10),h11),h12),h13),h14),h15) h16 (h17,h18) o
 (h19,h20) o1 ((h21,h22),(h23,h24)) o2 ((h25,h26),h27) h28 (h29,h30) (h31,h32)
 (h33,h34) data7 h35 (h36,h37) data8 h38 h39 j1 h40.
 subst data6.
-unfold sorted_sub, get.
+unfold sorted_sub, get in *.
 simpl in *.
-generalize (h27 h28); clear h25 h26 h27 h28 o2.
-subst o o1.
-clear h12 h6 h11 h8.
-intros.
-assert (h:(i1 = j1 \/ i1 = j \/ i1 > j)%Z) by omega.
-destruct h.
-admit.
-destruct H1.
 ae.
-why3 "cvc3".
 Qed.
 
 

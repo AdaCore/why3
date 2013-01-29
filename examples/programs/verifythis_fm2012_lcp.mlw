@@ -209,63 +209,23 @@ let compare (a:array int) (x y:int) : int
   if a[x + l] > a[y + l] then 1 else
   absurd
 
-  predicate sorted_sub (a : array int) (data:array int) (l u:int) =
-    forall i1 i2 : int. l <= i1 <= i2 < u -> le a data[i1] data[i2]
+  use map.Map
+  use map.MapPermut
+  use map.MapInjection
 
-(*
-  lemma sorted_le:
-    forall a data: array int, l u i x:int.
-    l <= i < u /\ sorted_sub a data l u /\ le a x data[l] ->
-    le a x data[i]
+  predicate map_permutation (m:Map.map int int) (u : int) =
+    MapInjection.range m u /\ MapInjection.injective m u
 
-  lemma sorted_ge:
-    forall a data: array int, l u i x:int.
-    sorted_sub a data l u /\ le a data[u-1] x /\ l <= i < u ->
-    le a data[i] x
-
-  lemma sorted_sub_sub:
-    forall a data:array int, l u l' u':int.
-    l <= l' /\ u' <= u ->
-    sorted_sub a data l u ->
-    sorted_sub a data l' u'
-
-  lemma sorted_sub_add:
-    forall a data:array int, l u:int.
-    sorted_sub a data (l+1) u /\ le a data[l] data[l+1] ->
-    sorted_sub a data l u
-
-  lemma sorted_sub_concat:
-    forall a data:array int, l m u:int.
-    l <= m <= u /\ sorted_sub a data l m /\ sorted_sub a data m u /\
-    le a data[m-1] data[m] ->
-    sorted_sub a data l u
-
-  lemma sorted_sub_set:
-    forall a data:array int, l u i v:int.
-    sorted_sub a data l u /\ u <= i ->
-    sorted_sub a (data[i<-v]) l u
-
-  lemma sorted_sub_set2:
-    forall a data:array int, l u i v:int.
-    sorted_sub a data l u /\ u <= i ->
-    sorted_sub a { length = a.length; elts = Map.set data.elts i v } l u
-*)
-
-use map.Map
-use map.MapPermut
-use map.MapInjection
-
-predicate map_permutation (m:Map.map int int) (u : int) =
-  MapInjection.range m u /\
-  MapInjection.injective m u
-
-predicate permutation (a:array int) =
-  map_permutation a.elts a.length
+  predicate permutation (a:array int) =
+    map_permutation a.elts a.length
 
 
+  predicate sorted_sub (a:array int) (data:Map.map int int) (l u:int) =
+    forall i1 i2 : int. l <= i1 <= i2 < u ->
+      le a (Map.get data i1) (Map.get data i2)
 
   predicate sorted (a : array int) (data:array int) =
-    sorted_sub a data 0 data.length
+    sorted_sub a data.elts 0 data.length
 
   let sort (a:array int) (data : array int)
   requires { data.length = a.length }
@@ -276,46 +236,26 @@ predicate permutation (a:array int) =
    'Init:
    for i = 0 to data.length - 1 do
      invariant { permut (at data 'Init) data   }
-     invariant { sorted_sub a data 0 i  }
+     invariant { sorted_sub a data.elts 0 i  }
      invariant { MapInjection.range data.elts data.length }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
        invariant { MapInjection.range data.elts data.length }
        invariant { permut (at data 'Init) data   }
-       invariant { sorted_sub a data 0 !j }
-       invariant { sorted_sub a data !j (i+1) }
+       invariant { sorted_sub a data.elts 0 !j }
+       invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                      le a data[k1] data[k2] }
        'L:
-(*
-       assert { le a data[!j] data[!j-1] };
-       assert { forall k:int. !j+1 <= k <= i -> le a data[!j-1] data[k] };
-       assert { sorted_sub a data 0 (!j-1) };
-       assert { sorted_sub a data (!j+1) (i+1) };
-*)
        let b = !j - 1 in
        let t = data[!j] in
        data[!j] <- data[b];
-(*
-       assert { sorted_sub a data 0 (!j-1) };
-       assert { sorted_sub a data (!j+1) (i+1) };
-       assert { forall k:int. !j <= k <= i -> le a data[!j] data[k] };
-       assert { sorted_sub a data !j (i+1) };
-*)
        data[b] <- t;
-(*
-       assert { le a data[!j-1] data[!j] };
-       assert { forall k:int. !j <= k <=i -> le a data[!j] data[k] };
-       assert { sorted_sub a data 0 (!j-1) };
-       assert { sorted_sub a data !j (i+1) };
-*)
        assert { exchange (at data 'L) data (!j-1) !j };
        decr j
      done
-(*;
-     assert { !j > 0 -> le a data[!j-1] data[!j] }
-*)   done
+   done
 
 
 (* additional properties relating le and longest_common_prefix, needed
@@ -465,7 +405,7 @@ module LRS "longest repeated substring"
       for i=1 to a.length - 1 do
         invariant { 0 <= !solLength <= a.length }
         invariant { 0 <= !solStart <= a.length }
-        invariant { 
+        invariant {
                   0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
                   !solLength = LCP.longest_common_prefix a !solStart !solStart2 }
         invariant { forall j k:int.
