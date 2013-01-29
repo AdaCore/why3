@@ -16,21 +16,21 @@
    It is distributed under the terms of its initial license, which
    is provided in the file OCAML-LICENSE. *)
 
-  (** Association tables over ordered types.
+(** Association tables over ordered types.
 
-     This module implements applicative association tables, also known as
-     finite maps or dictionaries, given a total ordering function
-     over the keys.
-     All operations over maps are purely applicative (no side-effects).
-     The implementation uses balanced binary trees, and therefore searching
-     and insertion take time logarithmic in the size of the map.
-  *)
+   This module implements applicative association tables, also known as
+   finite maps or dictionaries, given a total ordering function
+   over the keys.
+   All operations over maps are purely applicative (no side-effects).
+   The implementation uses balanced binary trees, and therefore searching
+   and insertion take time logarithmic in the size of the map.
+*)
 
-  (** Input signature of the functor {!Extmap.Make}. *)
-  module type OrderedType = Map.OrderedType
+(** Input signature of the functor {!Extmap.Make}. *)
+module type OrderedType = Map.OrderedType
 
-  (** Output signature of the functor {!Extmap.Make}. *)
-  module type S =
+(** Output signature of the functor {!Extmap.Make}. *)
+module type S =
   sig
     type key
     (** The type of the map keys. *)
@@ -155,9 +155,6 @@
 
     (** @Added in Why3 *)
 
-    val is_num_elt : int -> 'a t -> bool
-    (** check if the map has the given number of elements *)
-
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     (** [change f x m] returns a map containing the same bindings as
         [m], except the binding of [x] in [m] is changed from [y] to
@@ -236,6 +233,10 @@
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
     (** fold and map at the same time *)
 
+    val mapi_filter_fold:
+      (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
+    (** Same as {!Extmap.S.mapi_fold}, but may remove bindings. *)
+
     val fold_left: ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
     (** same as {!fold} but in the order of {!List.fold_left} *)
 
@@ -250,10 +251,6 @@
     (** [translate f m] translates the keys in the map [m] by the
         function [f]. [f] must be strictly monotone on the key of [m].
         Otherwise it raises invalid_arg *)
-
-    val mapi_filter_fold:
-      (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
-    (** Same as {!Extmap.S.mapi_fold}, but may remove bindings. *)
 
     val add_new : exn -> key -> 'a -> 'a t -> 'a t
     (** [add_new e x v m] binds [x] to [v] in [m] if [x] is not bound,
@@ -273,6 +270,9 @@
 
     val of_list: (key * 'a) list -> 'a t
     (** construct a map from a pair of bindings *)
+
+    val is_num_elt : int -> 'a t -> bool
+    (** check if the map has the given number of elements *)
 
     type 'a enumeration
     (** enumeration: zipper style *)
@@ -296,6 +296,6 @@
         greater or equal to the given key *)
   end
 
-  module Make (Ord : OrderedType) : S with type key = Ord.t
-  (** Functor building an implementation of the map structure
-      given a totally ordered type. *)
+module Make (Ord : OrderedType) : S with type key = Ord.t
+(** Functor building an implementation of the map structure
+    given a totally ordered type. *)

@@ -12,10 +12,9 @@
 (***********************************************************************)
 
 (* This file originates from the OCaml v 3.12 Standard Library.
-   It was extended and modified for the needs of the Why3 project
-   by François Bobot and Andrei Paskevich. It is distributed under
-   the terms of its initial license, which is provided in file
-   OCAML-LICENSE. *)
+   It was extended and modified for the needs of the Why3 project.
+   It is distributed under the terms of its initial license, which
+   is provided in the file OCAML-LICENSE. *)
 
 module type S =
   sig
@@ -48,7 +47,6 @@ module type S =
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
 
     (** Added into why stdlib version *)
-    val is_num_elt : int -> 'a t -> bool
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
@@ -69,17 +67,18 @@ module type S =
     val mapi_filter: (key -> 'a -> 'b option) -> 'a t -> 'b t
     val mapi_fold:
       (key -> 'a -> 'acc -> 'acc * 'b) -> 'a t -> 'acc -> 'acc * 'b t
+    val mapi_filter_fold:
+      (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
     val fold_left : ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     val fold2_union:
       (key -> 'a option -> 'b option -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     val translate : (key -> key) -> 'a t -> 'a t
-    val mapi_filter_fold:
-      (key -> 'a -> 'acc -> 'acc * 'b option) -> 'a t -> 'acc -> 'acc * 'b t
     val add_new : exn -> key -> 'a -> 'a t -> 'a t
     val keys: 'a t -> key list
     val values: 'a t -> 'a list
     val of_list : (key * 'a) list -> 'a t
+    val is_num_elt : int -> 'a t -> bool
     type 'a enumeration
     val val_enum : 'a enumeration -> (key * 'a) option
     val start_enum : 'a t -> 'a enumeration

@@ -9,11 +9,13 @@
 (*                                                                  *)
 (********************************************************************)
 
-  (** Input signature of the functor {!Extset.Make}. *)
-  module type OrderedType = Set.OrderedType
+(** This module extends the standard OCaml Set module. *)
 
-  (** Output signature of the functor {!Extset.Make}. *)
-  module type S =
+(** Input signature of the functor {!Extset.Make}. *)
+module type OrderedType = Set.OrderedType
+
+(** Output signature of the functor {!Extset.Make}. *)
+module type S =
   sig
     module M : Extmap.S
     (** The module of association tables over [elt]. *)
@@ -132,11 +134,16 @@
     val diff : t -> t -> t
     (** [diff f s1 s2] computes the difference of two sets *)
 
-    val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
+    val fold_left : ('b -> elt -> 'b) -> 'b -> t -> 'b
     (** same as {!fold} but in the order of {!List.fold_left} *)
 
-    val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
-    (** [fold2 f s1 s2 a] computes [(f eN ... (f e1 a) ...)],
+    val fold2_inter : (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
+    (** [fold2_inter f s1 s2 a] computes [(f eN ... (f e1 a) ...)],
+        where [e1 ... eN] are the elements of [inter s1 s2]
+        in increasing order. *)
+
+    val fold2_union : (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
+    (** [fold2_union f s1 s2 a] computes [(f eN ... (f e1 a) ...)],
         where [e1 ... eN] are the elements of [union s1 s2]
         in increasing order. *)
 
@@ -156,10 +163,10 @@
     (** construct a set from a list of elements *)
   end
 
-  module MakeOfMap (M : Extmap.S) : S with module M = M
-  (** Functor building an implementation of the set structure
-      given a totally ordered type. *)
+module MakeOfMap (M : Extmap.S) : S with module M = M
+(** Functor building an implementation of the set structure
+    given a totally ordered type. *)
 
-  module Make (Ord : OrderedType) : S with type M.key = Ord.t
-  (** Functor building an implementation of the set structure
-      given a totally ordered type. *)
+module Make (Ord : OrderedType) : S with type M.key = Ord.t
+(** Functor building an implementation of the set structure
+    given a totally ordered type. *)

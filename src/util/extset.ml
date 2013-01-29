@@ -40,8 +40,9 @@ module type S = sig
   val union : t -> t -> t
   val inter : t -> t -> t
   val diff : t -> t -> t
-  val fold_left: ('b -> elt -> 'b) -> 'b -> t -> 'b
-  val fold2:  (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
+  val fold_left : ('b -> elt -> 'b) -> 'b -> t -> 'b
+  val fold2_inter : (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
+  val fold2_union : (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
   val translate : (elt -> elt) -> t -> t
   val add_new : exn -> elt -> t -> t
   val is_num_elt : int -> t -> bool
@@ -83,11 +84,12 @@ module MakeOfMap (M: Extmap.S) = struct
   let union = M.set_union
   let inter = M.set_inter
   let diff = M.set_diff
-  let fold2 f s t acc = M.fold2_union (fun k _ _ acc -> f k acc) s t acc
+  let fold_left f acc s = M.fold_left (fun acc k () -> f acc k) acc s
+  let fold2_inter f s t acc = M.fold2_inter (fun k _ _ acc -> f k acc) s t acc
+  let fold2_union f s t acc = M.fold2_union (fun k _ _ acc -> f k acc) s t acc
   let translate = M.translate
   let add_new e x s = M.add_new e x () s
   let is_num_elt n m = M.is_num_elt n m
-  let fold_left f acc s = M.fold_left (fun acc k () -> f acc k) acc s
   let of_list l = List.fold_left (fun acc a -> add a acc) empty l
 end
 
