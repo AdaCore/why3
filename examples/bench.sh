@@ -47,30 +47,30 @@ run_dir () {
     echo '</ul>' >> $HTML
 }
 
-echo "=== Logic ==="
-run_dir .
-echo ""
-
-echo "=== BTS ==="
-run_dir bts
-echo ""
-
-echo "=== Programs ==="
-run_dir programs
-echo ""
-
-echo "=== Programs in their own subdir ==="
-run_dir programs/vacid_0_binary_heaps "-I programs/vacid_0_binary_heaps"
-run_dir hoare_logic "-I hoare_logic"
+echo "=== Tests Provers ==="
+run_dir tests-provers
 echo ""
 
 echo "=== Check Builtin translation ==="
 run_dir check-builtin
 echo ""
 
+echo "=== BTS ==="
+run_dir bts
+echo ""
+
+echo "=== Logic ==="
+run_dir logic
+run_dir bitvectors "-I bitvectors"
+echo ""
+
+echo "=== Programs ==="
+run_dir .
+run_dir foveoos11-cm
+run_dir hoare_logic
+run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
+echo ""
+
 echo '</body></html>' >> $HTML
 echo "Summary: $success/$total"
 exit $res
-
-
-

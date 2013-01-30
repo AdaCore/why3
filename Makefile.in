@@ -425,14 +425,14 @@ clean::
 
 gallery::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
-	@for x in `find examples/programs/ -name why3session.xml`; do \
+	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
 	  f=`basename $$d`; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
-	  cp examples/programs/$$f.mlw $(GALLERYDIR)/$$f/; \
+	  cp examples/$$f.mlw $(GALLERYDIR)/$$f/; \
 	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
-	  cd examples/programs/; \
+	  cd examples/; \
 	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f; \
 	  cd ../..; \
 	done
@@ -1130,28 +1130,28 @@ testl-ide: bin/why3ide.opt
 testl-type: bin/why3.byte
 	ocamlrun -bt bin/why3.byte --type-only tests/test-pgm-jcf.mlw
 
-test-api.byte: examples/use_api.ml lib/why3/why3.cma
+test-api.byte: examples/use_api/use_api.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 
-test-api.opt: examples/use_api.ml lib/why3/why3.cmxa
+test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
 	&& ./test-api.opt) \
 	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
 	@rm -f test-api.opt
 
-test-shape: lib/why3/why3.cma
-	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
+#test-shape: lib/why3/why3.cma
+#	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
-test-session.byte: examples/create_session.ml lib/why3/why3.cma
+test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
 	|| (printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
-test-session.opt: examples/create_session.ml lib/why3/why3.cmxa
+test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
 	&& ./test-session.opt) \
@@ -1162,12 +1162,12 @@ test-session.opt: examples/create_session.ml lib/why3/why3.cmxa
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/runstrat clean
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/runstrat byte
+	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
+	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat byte
 
 test-runstrat.opt: lib/why3/why3.cmxa lib/why3/META
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/runstrat clean
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/runstrat opt
+	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
+	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat opt
 
 test-runstrat: test-runstrat.$(OCAMLBEST)
 
@@ -1393,16 +1393,16 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       lib/why3/META.in lib/why3/why3.ml \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
-      examples/*.why examples/programs/*.mlw examples/tptp/*.why \
+      examples/*.mlw examples/logic/*.why \
       examples/tests-provers/*.why examples/check-builtin/*.why \
       examples/bts/*.why \
-      examples/programs/vacid_0_binary_heaps/*.why \
-      examples/programs/vacid_0_binary_heaps/*.mlw \
+      examples/vacid_0_binary_heaps/*.why \
+      examples/vacid_0_binary_heaps/*.mlw \
       examples/bitvectors/*.why \
-      examples/foveoos2011/*.mlw \
+      examples/foveoos11-cm/*.mlw \
       examples/*/*.xml examples/*/*/*.xml examples/*/*/*/*.xml \
       examples/*/*.v   examples/*/*/*.v examples/*/*/*/*.v\
-      examples/use_api.ml \
+      examples/use_api/*.ml \
       theories/*.why \
       modules/*.mlw \
       lib/coq/*.v lib/coq/*/*.v lib/coq-tactic/*.v \
@@ -1445,6 +1445,7 @@ $(DISTRIB_TAR): doc/manual.pdf
 	ln -s ../theories $(DISTRIB_DIR)/share/theories
 	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
 	rm -rf $(DISTRIB_DIR)/examples/hoare_logic
+	rm -rf $(DISTRIB_DIR)/examples/misc
 	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
           $(COQPGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar

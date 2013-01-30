@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="2"
+  name="Gappa"
+  version="0.16.1"/>
+ <file
+  name="../my_cosine.why"
+  verified="true"
+  expanded="true">
+  <theory
+   name="CosineSingle"
+   locfile="../my_cosine.why"
+   loclnum="1" loccnumb="7" loccnume="19"
+   verified="true"
+   expanded="true">
+   <goal
+    name="MethodError"
+    locfile="../my_cosine.why"
+    loclnum="13" loccnumb="6" loccnume="17"
+    sum="978ab09b639ffe3178e09c3a81d167a7"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix &lt;=aabsV0c0x1.p-5F">
+    <proof
+     prover="1"
+     timelimit="8"
+     memlimit="1000"
+     edited="my_cosine_CosineSingle_MethodError_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.79"/>
+    </proof>
+   </goal>
+   <goal
+    name="TotalErrorFullyExpanded"
+    locfile="../my_cosine.why"
+    loclnum="20" loccnumb="6" loccnume="29"
+    sum="9876f9a79aea912be13c183bb50be37f"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix =V3aroundaNearestTiesToEvenainfix -c1.0V2Iainfix =V2aroundaNearestTiesToEvenainfix *c0.5V1Iainfix =V1aroundaNearestTiesToEvenainfix *avalueV0avalueV0FIainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *avalueV0avalueV0acosavalueV0c0x1.p-24Iainfix &lt;=aabsavalueV0c0x1.p-5F">
+    <proof
+     prover="2"
+     timelimit="2"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="TotalErrorExpanded"
+    locfile="../my_cosine.why"
+    loclnum="31" loccnumb="6" loccnume="24"
+    sum="d1eed012ea0faadc94a01b1733233191"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=aabsainfix -V3acosavalueV0c0x1.p-23LaroundaNearestTiesToEvenainfix -c1.0V2LaroundaNearestTiesToEvenainfix *c0.5V1LaroundaNearestTiesToEvenainfix *avalueV0avalueV0Iainfix &lt;=aabsavalueV0c0x1.p-5F">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.82"/>
+    </proof>
+   </goal>
+   <goal
+    name="TotalError"
+    locfile="../my_cosine.why"
+    loclnum="51" loccnumb="6" loccnume="16"
+    sum="080e9779447679163127cacce09b31ad"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=aabsainfix -avalueV1acosavalueV0c0x1.p-23Lacos_singleV0Iainfix &lt;=aabsavalueV0c0x1.p-5F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.04"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
