@@ -5,6 +5,39 @@
 
    Author: Jean-Christophe Filliâtre *)
 
+(*
+Iterative deletion in a binary search tree - 90 minutest
+
+
+VERIFICATION TASK
+-----------------
+
+Given: a pointer t to the root of a non-empty binary search tree (not
+necessarily balanced). Verify that the following procedure removes the
+node with the minimal key from the tree. After removal, the data
+structure should again be a binary search tree.
+
+
+(Tree, int) search_tree_delete_min (Tree t) {
+   Tree tt, pp, p;
+   int m;
+   p = t->left;
+   if (p == NULL) {
+       m = t->data; tt = t->right; dispose (t); t = tt;
+   } else {
+       pp = t; tt = p->left;
+       while (tt != NULL) {
+           pp = p; p = tt; tt = p->left;
+       }
+       m = p->data; tt = p->right; dispose(p); pp->left= tt;
+   }
+   return (t,m);
+}
+
+Note: When implementing in a garbage-collected language, the call to
+dispose() is superfluous.
+*)
+
 (* Why3 has no pointer data structures, so we model the heap *)
 module Memory
 
