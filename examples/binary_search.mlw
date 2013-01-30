@@ -98,7 +98,7 @@ module BinarySearchInt32
   exception Not_found (* raised to signal a search failure *)
 
   let binary_search (a : array int) (v : int)
-    requires { 0 <= length a <= max_int }
+    requires { length a <= max_int }
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }

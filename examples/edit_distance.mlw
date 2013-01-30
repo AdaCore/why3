@@ -137,7 +137,6 @@ module EditDistance
   (* The program. *)
 
   let distance (w1: array char) (w2: array char)
-    requires { length w1 >= 0 /\ length w2 >= 0 }
     ensures  { min_dist (word_of w1) (word_of w2) result }
   = let n1 = length w1 in
     let n2 = length w2 in

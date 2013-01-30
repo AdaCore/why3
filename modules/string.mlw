@@ -53,6 +53,7 @@ module String
   use import map.Map as M
 
   type string model { length: int; mutable chars: map int char }
+    invariant { self.length >= 0 }
 
   val create (len:int) : string
     requires { len >= 0 } ensures { length result = len }
@@ -117,6 +118,7 @@ module Buffer
   use import map.Map as M
 
   type t model { mutable length: int; mutable contents: map int char }
+    invariant { self.length >= 0 }
 
   val create (size:int) : t
     requires { size >= 0 } ensures { result.length = 0 }

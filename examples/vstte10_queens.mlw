@@ -95,7 +95,7 @@ module NQueens
     done
 
   let queens (board: array int) (n: int)
-    requires { 0 <= length board = n }
+    requires { length board = n }
     ensures { forall b:array int. length b = n -> is_board b n -> not (solution b n) }
     raises { Solution -> solution board n }
   = bt_queens board n 0

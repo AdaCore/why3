@@ -23,7 +23,6 @@ module Flag
     end
 
   let dutch_flag (a:array color) : unit
-    requires { 0 <= length a }
     ensures  { exists b r: int.
                monochrome a 0 b Blue /\
                monochrome a b r White /\

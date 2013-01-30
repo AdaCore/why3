@@ -328,7 +328,6 @@ let select (s:suffixArray) (i:int) : int
   = s.suffixes[i]
 
 let create (a:array int) : suffixArray
-  requires { a.length >= 0 }
   ensures { result.values = a /\ inv result }
  =
  let n = a.length in

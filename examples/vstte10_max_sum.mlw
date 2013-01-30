@@ -13,7 +13,7 @@ module MaxAndSum
   use import array.Array
 
   let max_sum (a: array int) (n: int)
-    requires { 0 <= n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
+    requires { n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
     ensures { let (sum, max) = result in sum <= n * max }
   = let sum = ref 0 in
     let max = ref 0 in
@@ -39,7 +39,7 @@ module MaxAndSum2
      (l <  h && exists k: int. l <= k < h && m = a[k]))
 
   let max_sum (a: array int) (n: int)
-    requires { 0 <= n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
+    requires { n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
     ensures { let (s, m) = result in s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
   = let s = ref 0 in
     let m = ref 0 in

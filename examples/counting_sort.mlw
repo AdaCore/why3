@@ -63,7 +63,7 @@ module CountingSort
 
   (* sorts array a into array b *)
   let counting_sort (a: array int) (b: array int)
-    requires { k_values a /\ 0 <= length a = length b }
+    requires { k_values a /\ length a = length b }
     ensures  { sorted b /\ permut a b }
   = let c = make k 0 in
     for i = 0 to length a - 1 do
@@ -100,7 +100,7 @@ module InPlaceCountingSort
 
   (* sorts array a in place *)
   let in_place_counting_sort (a: array int)
-    requires { k_values a /\ 0 <= length a }
+    requires { k_values a }
     ensures  { sorted a /\ permut (old a) a }
   = 'L:
     let c = make k 0 in

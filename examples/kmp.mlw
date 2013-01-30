@@ -123,7 +123,7 @@ module KnuthMorrisPratt
     (forall k: int. 0 <= k < r -> not (matches a k p 0 (length p)))
 
   let kmp (p a: array char)
-    requires { 1 <= length p /\ 0 <= length a }
+    requires { 1 <= length p }
     ensures  { first_occur p a result }
   = let m = length p in
     let n = length a in
