@@ -615,23 +615,29 @@ let intros fmt params fmla =
     | _ -> false
   in
   if need_intros then
-    fprintf fmt "@[intros%a%a.@]@\n" intros_params params (do_intros 1) fmla
+    fprintf fmt "@[intros%a%a.@]" intros_params params (do_intros 1) fmla
 
 let print_empty_proof fmt def =
   match def with
     | Some (params,fmla) ->
       intros fmt params fmla;
-      fprintf fmt "@\n";
+      fprintf fmt "@\n@\n";
       fprintf fmt "Qed.@\n"
     | None ->
       fprintf fmt "@\n";
       fprintf fmt "Defined.@\n"
 
 let print_previous_proof def fmt previous =
+  let old_intros = Str.regexp "^ *([*] intros " in
   match previous with
   | None ->
     print_empty_proof fmt def
   | Some (Query (_,Vernacular,c)) ->
+    begin match def with
+    | Some def when not (Str.string_match old_intros c 0) ->
+      fprintf fmt "@[(* %a *)@]@\n" (fun fmt (p,f) -> intros fmt p f) def
+    | _ -> ()
+    end;
     fprintf fmt "%s" c
   | Some (Query (_,Notation,_))
   | Some (Axiom _) | Some (Other _) | Some (Info _) ->
