@@ -171,12 +171,12 @@ Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
 (* Why3 goal *)
 Theorem WP_parameter_pop : forall {a:Type} {a_WT:WhyType a}, forall (b:Z),
   forall (rho:(list a)) (rho1:(map.Map.map Z a)) (rho2:Z) (rho3:Z),
-  ((((0%Z <= rho3)%Z /\ (rho3 < b)%Z) /\ (((0%Z <= rho2)%Z /\
+  (((((0%Z <= rho3)%Z /\ (rho3 < b)%Z) /\ (((0%Z <= rho2)%Z /\
   (rho2 <= b)%Z) /\ ((rho2 = (length rho)) /\ forall (i:Z), ((0%Z <= i)%Z /\
   (i < rho2)%Z) -> ((((rho3 + i)%Z < b)%Z -> ((nth i
   rho) = (Some (map.Map.get rho1 (rho3 + i)%Z)))) /\
   ((0%Z <= ((rho3 + i)%Z - b)%Z)%Z -> ((nth i rho) = (Some (map.Map.get rho1
-  ((rho3 + i)%Z - b)%Z)))))))) /\ (0%Z < rho2)%Z) ->
+  ((rho3 + i)%Z - b)%Z)))))))) /\ (0%Z <= b)%Z) /\ (0%Z < rho2)%Z) ->
   match rho with
   | Nil => True
   | (Cons _ s) => forall (rho4:(list a)), (rho4 = s) -> (((0%Z <= rho3)%Z /\
@@ -194,7 +194,7 @@ Theorem WP_parameter_pop : forall {a:Type} {a_WT:WhyType a}, forall (b:Z),
       end)))
   end.
 unfold get; simpl.
-intros a a_WT b rho rho1 rho2 rho3 ((h1,(h2,(h3,h4))),h5).
+intros a a_WT b rho rho1 rho2 rho3 (((h1,(h2,(h3,h4))),_),h5).
 destruct rho; auto.
 intros; subst.
 generalize (h4 (0%Z)).

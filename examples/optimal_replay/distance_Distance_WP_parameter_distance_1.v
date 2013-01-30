@@ -75,13 +75,14 @@ Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem WP_parameter_distance : (0%Z <= n)%Z -> ((((0%Z < 0%Z)%Z \/
-  (0%Z = 0%Z)) /\ (0%Z < n)%Z) -> forall (g:(map.Map.map Z Z)),
-  (g = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z (-1%Z)%Z)) ->
-  ((0%Z <= n)%Z -> (((1%Z < (n - 1%Z)%Z)%Z \/ (1%Z = (n - 1%Z)%Z)) ->
-  forall (count:Z) (d:(map.Map.map Z Z)) (g1:(map.Map.map Z Z)),
-  (((((map.Map.get d 0%Z) = 0%Z) /\ (((map.Map.get g1 0%Z) = (-1%Z)%Z) /\
-  (((count + (map.Map.get d
+Theorem WP_parameter_distance : (0%Z <= n)%Z -> (((0%Z < n)%Z \/
+  (0%Z = n)) -> ((((0%Z < 0%Z)%Z \/ (0%Z = 0%Z)) /\ (0%Z < n)%Z) ->
+  forall (g:(map.Map.map Z Z)), (((0%Z < n)%Z \/ (0%Z = n)) /\
+  (g = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z (-1%Z)%Z))) ->
+  ((0%Z <= n)%Z -> (((0%Z < n)%Z \/ (0%Z = n)) -> (((1%Z < (n - 1%Z)%Z)%Z \/
+  (1%Z = (n - 1%Z)%Z)) -> forall (count:Z) (d:(map.Map.map Z Z))
+  (g1:(map.Map.map Z Z)), (((((map.Map.get d 0%Z) = 0%Z) /\ (((map.Map.get g1
+  0%Z) = (-1%Z)%Z) /\ (((count + (map.Map.get d
   (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z < (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)%Z \/
   ((count + (map.Map.get d
   (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z))%Z = (((n - 1%Z)%Z + 1%Z)%Z - 1%Z)%Z)))) /\
@@ -96,8 +97,8 @@ Theorem WP_parameter_distance : (0%Z <= n)%Z -> ((((0%Z < 0%Z)%Z \/
   (k < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> (path (map.Map.get d k) k)) ->
   ((count < n)%Z -> forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
   (k < n)%Z) -> forall (d':Z), (path d' k) -> ((map.Map.get d
-  k) <= d')%Z)))).
-intros h1 (h2,h3) g h4 h5 h6 count d g1 (((h7,(h8,h9)),h10),h11) h12 k
+  k) <= d')%Z)))))).
+intros _ h1 (h2,h3) g _ h4 h5 h6 count d g1 (((h7,(h8,h9)),h10),h11) h12 k
 (h13,h14) d' h15.
 clear h1 h2.
 clear h5 h6.

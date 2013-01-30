@@ -154,30 +154,31 @@ Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
   a)) (a2:(array a)), (array_eq a1 a2) -> (permut a1 a2).
 
 
-
 (* Why3 goal *)
 Theorem WP_parameter_quick_rec : forall (t:Z) (l:Z) (r:Z),
-  forall (t1:(map.Map.map Z Z)), ((0%Z <= l)%Z /\ (r < t)%Z) -> ((l < r)%Z ->
-  (((0%Z <= l)%Z /\ (l < t)%Z) -> let v := (map.Map.get t1 l) in
-  (((l + 1%Z)%Z <= r)%Z -> forall (m:Z) (t2:(map.Map.map Z Z)),
-  ((forall (j:Z), ((l < j)%Z /\ (j <= m)%Z) -> ((map.Map.get t2 j) < v)%Z) /\
-  ((forall (j:Z), ((m < j)%Z /\ (j < (r + 1%Z)%Z)%Z) -> (v <= (map.Map.get t2
-  j))%Z) /\ ((permut_sub t1 t2 l (r + 1%Z)%Z) /\ (((map.Map.get t2 l) = v) /\
-  ((l <= m)%Z /\ (m < (r + 1%Z)%Z)%Z))))) -> ((((0%Z <= l)%Z /\ (l < t)%Z) /\
-  ((0%Z <= m)%Z /\ (m < t)%Z)) -> forall (t3:(map.Map.map Z Z)), (exchange t2
-  t3 l m) -> (((0%Z <= l)%Z /\ ((m - 1%Z)%Z < t)%Z) ->
-  forall (t4:(map.Map.map Z Z)), ((sorted_sub t4 l ((m - 1%Z)%Z + 1%Z)%Z) /\
-  (permut_sub t3 t4 l ((m - 1%Z)%Z + 1%Z)%Z)) -> (((0%Z <= (m + 1%Z)%Z)%Z /\
-  (r < t)%Z) -> forall (t5:(map.Map.map Z Z)), ((sorted_sub t5 (m + 1%Z)%Z
-  (r + 1%Z)%Z) /\ (permut_sub t4 t5 (m + 1%Z)%Z (r + 1%Z)%Z)) ->
+  forall (t1:(map.Map.map Z Z)), ((0%Z <= t)%Z /\ ((0%Z <= l)%Z /\
+  (r < t)%Z)) -> ((l < r)%Z -> (((0%Z <= l)%Z /\ (l < t)%Z) -> let v :=
+  (map.Map.get t1 l) in (((l + 1%Z)%Z <= r)%Z -> forall (m:Z)
+  (t2:(map.Map.map Z Z)), ((forall (j:Z), ((l < j)%Z /\ (j <= m)%Z) ->
+  ((map.Map.get t2 j) < v)%Z) /\ ((forall (j:Z), ((m < j)%Z /\
+  (j < (r + 1%Z)%Z)%Z) -> (v <= (map.Map.get t2 j))%Z) /\ ((permut_sub t1 t2
+  l (r + 1%Z)%Z) /\ (((map.Map.get t2 l) = v) /\ ((l <= m)%Z /\
+  (m < (r + 1%Z)%Z)%Z))))) -> (((0%Z <= t)%Z /\ (((0%Z <= l)%Z /\
+  (l < t)%Z) /\ ((0%Z <= m)%Z /\ (m < t)%Z))) -> forall (t3:(map.Map.map Z
+  Z)), ((0%Z <= t)%Z /\ (exchange t2 t3 l m)) -> (((0%Z <= l)%Z /\
+  ((m - 1%Z)%Z < t)%Z) -> forall (t4:(map.Map.map Z Z)), ((0%Z <= t)%Z /\
+  ((sorted_sub t4 l ((m - 1%Z)%Z + 1%Z)%Z) /\ (permut_sub t3 t4 l
+  ((m - 1%Z)%Z + 1%Z)%Z))) -> (((0%Z <= (m + 1%Z)%Z)%Z /\ (r < t)%Z) ->
+  forall (t5:(map.Map.map Z Z)), ((0%Z <= t)%Z /\ ((sorted_sub t5 (m + 1%Z)%Z
+  (r + 1%Z)%Z) /\ (permut_sub t4 t5 (m + 1%Z)%Z (r + 1%Z)%Z))) ->
   ((sorted_sub t5 l (r + 1%Z)%Z) /\ (permut_sub t1 t5 l (r + 1%Z)%Z)))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros n l r t1.
-intros (hl, hr) hlr hl2 v hlr2.
+intros (_, (hl, hr)) hlr hl2 v hlr2.
 intros m t2 (inv1, (inv2, (inv3, (inv4, inv5)))).
-intros (_, hm) t3 exch.
-intros _ t4 (lsorted, lpermut).
-intros _ t5 (rsorted, rpermut).
+intros (_, (_, hm)) t3 (_, exch).
+intros _ t4 (_, (lsorted, lpermut)).
+intros _ t5 (_, (rsorted, rpermut)).
 split.
 (* sorted *)
 red; intros.

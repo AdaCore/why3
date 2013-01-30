@@ -155,23 +155,24 @@ Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
 
 (* Why3 goal *)
 Theorem WP_parameter_insertion_sort : forall (a:Z), forall (a1:(map.Map.map Z
-  Z)), let a2 := (mk_array a a1) in ((1%Z <= (a - 1%Z)%Z)%Z ->
-  forall (a3:(map.Map.map Z Z)), forall (i:Z), ((1%Z <= i)%Z /\
-  (i <= (a - 1%Z)%Z)%Z) -> (((sorted_sub a3 0%Z i) /\ (permut a2 (mk_array a
-  a3))) -> (((0%Z <= i)%Z /\ (i < a)%Z) -> let v := (map.Map.get a3 i) in
-  forall (j:Z) (a4:(map.Map.map Z Z)), (((((0%Z <= j)%Z /\ (j <= i)%Z) /\
-  (permut a2 (mk_array a (map.Map.set a4 j v)))) /\ forall (k1:Z) (k2:Z),
-  (((0%Z <= k1)%Z /\ (k1 <= k2)%Z) /\ (k2 <= i)%Z) -> ((~ (k1 = j)) ->
-  ((~ (k2 = j)) -> ((map.Map.get a4 k1) <= (map.Map.get a4 k2))%Z))) /\
-  forall (k:Z), (((j + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (v < (map.Map.get a4
-  k))%Z) -> ((0%Z < j)%Z -> (((0%Z <= (j - 1%Z)%Z)%Z /\
-  ((j - 1%Z)%Z < a)%Z) -> ((v < (map.Map.get a4 (j - 1%Z)%Z))%Z ->
+  Z)), let a2 := (mk_array a a1) in ((0%Z <= a)%Z ->
+  ((1%Z <= (a - 1%Z)%Z)%Z -> forall (a3:(map.Map.map Z Z)), forall (i:Z),
+  ((1%Z <= i)%Z /\ (i <= (a - 1%Z)%Z)%Z) -> (((sorted_sub a3 0%Z i) /\
+  (permut a2 (mk_array a a3))) -> (((0%Z <= a)%Z /\ ((0%Z <= i)%Z /\
+  (i < a)%Z)) -> let v := (map.Map.get a3 i) in forall (j:Z) (a4:(map.Map.map
+  Z Z)), (((((0%Z <= j)%Z /\ (j <= i)%Z) /\ (permut a2 (mk_array a
+  (map.Map.set a4 j v)))) /\ forall (k1:Z) (k2:Z), (((0%Z <= k1)%Z /\
+  (k1 <= k2)%Z) /\ (k2 <= i)%Z) -> ((~ (k1 = j)) -> ((~ (k2 = j)) ->
+  ((map.Map.get a4 k1) <= (map.Map.get a4 k2))%Z))) /\ forall (k:Z),
+  (((j + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (v < (map.Map.get a4 k))%Z) ->
+  ((0%Z < j)%Z -> (((0%Z <= a)%Z /\ ((0%Z <= (j - 1%Z)%Z)%Z /\
+  ((j - 1%Z)%Z < a)%Z)) -> ((v < (map.Map.get a4 (j - 1%Z)%Z))%Z ->
   (((0%Z <= (j - 1%Z)%Z)%Z /\ ((j - 1%Z)%Z < a)%Z) -> (((0%Z <= j)%Z /\
-  (j < a)%Z) -> forall (a5:(map.Map.map Z Z)), (a5 = (map.Map.set a4 j
-  (map.Map.get a4 (j - 1%Z)%Z))) -> ((exchange (map.Map.set a4 j v)
-  (map.Map.set a5 (j - 1%Z)%Z v) (j - 1%Z)%Z j) -> forall (j1:Z),
-  (j1 = (j - 1%Z)%Z) -> (permut a2 (mk_array a (map.Map.set a5 j1
-  v)))))))))))).
+  (j < a)%Z) -> forall (a5:(map.Map.map Z Z)), ((0%Z <= a)%Z /\
+  (a5 = (map.Map.set a4 j (map.Map.get a4 (j - 1%Z)%Z)))) ->
+  ((exchange (map.Map.set a4 j v) (map.Map.set a5 (j - 1%Z)%Z v) (j - 1%Z)%Z
+  j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) -> (permut a2 (mk_array a
+  (map.Map.set a5 j1 v))))))))))))).
 intuition.
 intuition.
 unfold permut.
@@ -182,7 +183,7 @@ subst a5.
 simpl.
 apply permut_trans with (elts (set (mk_array a a4) j (Map.get a3 i))); auto.
 subst j1.
-unfold permut in H18.
+unfold permut in H21.
 intuition.
 apply permut_exchange with (j-1)%Z j.
 simpl; omega.

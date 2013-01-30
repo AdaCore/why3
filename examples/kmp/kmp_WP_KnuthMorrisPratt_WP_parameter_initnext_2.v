@@ -118,10 +118,10 @@ Axiom next_1_0 : forall (p:(array char)), (1%Z <= (length p))%Z -> (is_next p
 
 (* Why3 goal *)
 Theorem WP_parameter_initnext : forall (p:Z), forall (p1:(map.Map.map Z
-  char)), let p2 := (mk_array p p1) in ((1%Z <= p)%Z -> ((0%Z <= p)%Z ->
-  ((1%Z < p)%Z -> (((0%Z <= 1%Z)%Z /\ (1%Z < p)%Z) ->
-  forall (next:(map.Map.map Z Z)),
-  (next = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 1%Z 0%Z)) ->
+  char)), let p2 := (mk_array p p1) in (((0%Z <= p)%Z /\ (1%Z <= p)%Z) ->
+  ((0%Z <= p)%Z -> ((0%Z <= p)%Z -> ((1%Z < p)%Z -> (((0%Z <= 1%Z)%Z /\
+  (1%Z < p)%Z) -> forall (next:(map.Map.map Z Z)), ((0%Z <= p)%Z /\
+  (next = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 1%Z 0%Z))) ->
   forall (j:Z) (i:Z) (next1:(map.Map.map Z Z)), ((((((0%Z <= j)%Z /\
   (j < i)%Z) /\ (i <= p)%Z) /\ (matches p2 (i - j)%Z p2 0%Z j)) /\
   forall (z:Z), (((j + 1%Z)%Z < z)%Z /\ (z < (i + 1%Z)%Z)%Z) -> ~ (matches p2
@@ -130,14 +130,15 @@ Theorem WP_parameter_initnext : forall (p:Z), forall (p1:(map.Map.map Z
   ((i < (p - 1%Z)%Z)%Z -> (((0%Z <= j)%Z /\ (j < p)%Z) -> (((0%Z <= i)%Z /\
   (i < p)%Z) -> (((map.Map.get p1 i) = (map.Map.get p1 j)) -> forall (i1:Z),
   (i1 = (i + 1%Z)%Z) -> forall (j1:Z), (j1 = (j + 1%Z)%Z) ->
-  (((0%Z <= i1)%Z /\ (i1 < p)%Z) -> forall (next2:(map.Map.map Z Z)),
-  (next2 = (map.Map.set next1 i1 j1)) -> forall (z:Z),
+  (((0%Z <= p)%Z /\ ((0%Z <= i1)%Z /\ (i1 < p)%Z)) ->
+  forall (next2:(map.Map.map Z Z)), ((0%Z <= p)%Z /\
+  (next2 = (map.Map.set next1 i1 j1))) -> forall (z:Z),
   (((j1 + 1%Z)%Z < z)%Z /\ (z < (i1 + 1%Z)%Z)%Z) -> ~ (matches p2
-  ((i1 + 1%Z)%Z - z)%Z p2 0%Z z)))))))))).
+  ((i1 + 1%Z)%Z - z)%Z p2 0%Z z))))))))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros n p1.
 intro p3. unfold p3. clear p3.
-intros _ _ hn _ _ _.
+intros _ _ _ hn _ _ _.
 intros j i next4 ((((hj, hi), h0), h1), h2).
 intros hi' _ _ eq.
 intros i1 hi1; subst i1.

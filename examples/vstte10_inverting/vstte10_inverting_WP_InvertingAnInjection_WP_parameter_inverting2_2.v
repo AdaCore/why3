@@ -66,13 +66,13 @@ Definition surjective1(a:(array Z)) (n:Z): Prop := (surjective (elts a) n).
 (* Why3 assumption *)
 Definition range1(a:(array Z)) (n:Z): Prop := (range (elts a) n).
 
-
 (* Why3 goal *)
 Theorem WP_parameter_inverting2 : forall (a:Z) (n:Z), forall (a1:(map.Map.map
-  Z Z)), (((0%Z <= n)%Z /\ (n = a)) /\ ((injective a1 n) /\ (range a1 n))) ->
-  ((0%Z <= n)%Z -> ((0%Z <= (n - 1%Z)%Z)%Z -> forall (b:(map.Map.map Z Z)),
-  (forall (j:Z), ((0%Z <= j)%Z /\ (j < ((n - 1%Z)%Z + 1%Z)%Z)%Z) ->
-  ((map.Map.get b (map.Map.get a1 j)) = j)) -> (injective b n))).
+  Z Z)), ((0%Z <= a)%Z /\ ((n = a) /\ ((injective a1 n) /\ (range a1 n)))) ->
+  ((0%Z <= n)%Z -> ((0%Z <= n)%Z -> ((0%Z <= (n - 1%Z)%Z)%Z ->
+  forall (b:(map.Map.map Z Z)), (forall (j:Z), ((0%Z <= j)%Z /\
+  (j < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> ((map.Map.get b (map.Map.get a1
+  j)) = j)) -> ((0%Z <= n)%Z -> (injective b n))))).
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.
@@ -80,14 +80,14 @@ red; intros.
 unfold get; simpl.
 assert (surjective a1 n).
 apply injective_surjective; assumption.
-generalize (H9 i H6); unfold get; simpl; intros (i1, (Hi1,Hi2)).
-generalize (H9 j H7); unfold get; simpl; intros (j1, (Hj1,Hj2)).
+generalize (H11 i H8); unfold get; simpl; intros (i1, (Hi1,Hi2)).
+generalize (H11 j H9); unfold get; simpl; intros (j1, (Hj1,Hj2)).
 rewrite <- Hi2.
 rewrite <- Hj2.
-rewrite H3; try omega.
-rewrite H3; try omega.
+rewrite H5; try omega.
+rewrite H5; try omega.
 intro.
-apply H8.
+apply H10.
 subst.
 auto.
 Qed.

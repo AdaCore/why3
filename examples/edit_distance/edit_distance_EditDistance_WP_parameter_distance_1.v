@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require map.Map.
 
 (* Why3 assumption *)
 Definition unit  := unit.
@@ -155,40 +156,15 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
 Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+  | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
@@ -200,16 +176,16 @@ Definition length1 {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length1 a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+  a) := (mk_array (length1 a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
 Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
-  (mk_array n (const v:(map Z a))).
+  (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 Parameter suffix: (array char) -> Z -> (list char).
 
@@ -217,7 +193,7 @@ Axiom suffix_nil : forall (a:(array char)), ((suffix a
   (length1 a)) = (Nil :(list char))).
 
 Axiom suffix_cons : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
-  (i < (length1 a))%Z) -> ((suffix a i) = (Cons (get1 a i) (suffix a
+  (i < (length1 a))%Z) -> ((suffix a i) = (Cons (get a i) (suffix a
   (i + 1%Z)%Z))).
 
 Axiom suffix_length : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
@@ -232,21 +208,24 @@ Ltac ae := why3 "alt-ergo" timelimit 3.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Theorem WP_parameter_distance : forall (w1:Z) (w2:Z), forall (w21:(map Z
-  char)) (w11:(map Z char)), let w22 := (mk_array w2 w21) in let w12 :=
-  (mk_array w1 w11) in (((0%Z <= w1)%Z /\ (0%Z <= w2)%Z) ->
-  ((0%Z <= (w2 + 1%Z)%Z)%Z -> ((0%Z <= w2)%Z -> forall (t:(map Z Z)),
-  (forall (j:Z), ((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> ((get t
-  j) = (w2 - j)%Z)) -> ((0%Z <= (w1 - 1%Z)%Z)%Z -> forall (t1:(map Z Z)),
-  forall (i:Z), ((i <= (w1 - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) -> ((forall (j:Z),
-  ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist (suffix w12 (i + 1%Z)%Z)
-  (suffix w22 j) (get t1 j))) -> (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) ->
+Theorem WP_parameter_distance : forall (w1:Z) (w2:Z),
+  forall (w21:(map.Map.map Z char)) (w11:(map.Map.map Z char)), let w22 :=
+  (mk_array w2 w21) in let w12 := (mk_array w1 w11) in (((0%Z <= w1)%Z /\
+  (0%Z <= w2)%Z) -> ((0%Z <= (w2 + 1%Z)%Z)%Z -> ((0%Z <= (w2 + 1%Z)%Z)%Z ->
+  ((0%Z <= w2)%Z -> forall (t:(map.Map.map Z Z)), (forall (j:Z),
+  ((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> ((map.Map.get t
+  j) = (w2 - j)%Z)) -> ((0%Z <= (w1 - 1%Z)%Z)%Z -> forall (t1:(map.Map.map Z
+  Z)), forall (i:Z), ((i <= (w1 - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) ->
+  ((forall (j:Z), ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist (suffix w12
+  (i + 1%Z)%Z) (suffix w22 j) (map.Map.get t1 j))) ->
+  (((0%Z <= (w2 + 1%Z)%Z)%Z /\ ((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z)) ->
   (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= w2)%Z /\
-  (w2 < (w2 + 1%Z)%Z)%Z) -> forall (t2:(map Z Z)), (t2 = (set t1 w2 ((get t1
-  w2) + 1%Z)%Z)) -> (((w2 - 1%Z)%Z < 0%Z)%Z -> forall (j:Z), ((0%Z <= j)%Z /\
-  (j <= w2)%Z) -> (min_dist (suffix w12 ((i - 1%Z)%Z + 1%Z)%Z) (suffix w22 j)
-  (get t2 j))))))))))).
-intros w1 w2 w21 w11 w22 w12 (h1,h2) h3 h4 t h5 h6 t1 i (h7,h8) h9 (h10,h11)
+  (w2 < (w2 + 1%Z)%Z)%Z) -> forall (t2:(map.Map.map Z Z)),
+  ((0%Z <= (w2 + 1%Z)%Z)%Z /\ (t2 = (map.Map.set t1 w2 ((map.Map.get t1
+  w2) + 1%Z)%Z))) -> (((w2 - 1%Z)%Z < 0%Z)%Z -> forall (j:Z),
+  ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist (suffix w12
+  ((i - 1%Z)%Z + 1%Z)%Z) (suffix w22 j) (map.Map.get t2 j)))))))))))).
+intros w1 w2 w21 w11 w22 w12 (h1,h2) h3 h4 _ t h5 h6 t1 i (h7,h8) h9 (h10,h11)
 (h12,h13) (h14,h15) t2 h16 h17 j (h18,h19).
 replace (i-1+1) with i by omega.
 rewrite suffix_cons.

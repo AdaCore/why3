@@ -207,32 +207,35 @@ Definition min_suffix(a1:(array char)) (a2:(array char)) (i:Z) (j:Z)
 Theorem WP_parameter_distance : forall (w1:Z) (w2:Z),
   forall (w21:(map.Map.map Z char)) (w11:(map.Map.map Z char)), let w22 :=
   (mk_array w2 w21) in let w12 := (mk_array w1 w11) in (((0%Z <= w1)%Z /\
-  (0%Z <= w2)%Z) -> ((0%Z <= (w2 + 1%Z)%Z)%Z -> ((0%Z <= w2)%Z ->
-  forall (t:(map.Map.map Z Z)), (forall (j:Z), ((0%Z <= j)%Z /\
-  (j < (w2 + 1%Z)%Z)%Z) -> ((map.Map.get t j) = (w2 - j)%Z)) ->
-  ((0%Z <= (w1 - 1%Z)%Z)%Z -> forall (t1:(map.Map.map Z Z)), forall (i:Z),
-  ((i <= (w1 - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) -> ((forall (j:Z), ((0%Z <= j)%Z /\
-  (j <= w2)%Z) -> (min_dist (suffix w12 (i + 1%Z)%Z) (suffix w22 j)
-  (map.Map.get t1 j))) -> (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) ->
+  (0%Z <= w2)%Z) -> ((0%Z <= (w2 + 1%Z)%Z)%Z -> ((0%Z <= (w2 + 1%Z)%Z)%Z ->
+  ((0%Z <= w2)%Z -> forall (t:(map.Map.map Z Z)), (forall (j:Z),
+  ((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> ((map.Map.get t
+  j) = (w2 - j)%Z)) -> ((0%Z <= (w1 - 1%Z)%Z)%Z -> forall (t1:(map.Map.map Z
+  Z)), forall (i:Z), ((i <= (w1 - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) ->
+  ((forall (j:Z), ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist (suffix w12
+  (i + 1%Z)%Z) (suffix w22 j) (map.Map.get t1 j))) ->
+  (((0%Z <= (w2 + 1%Z)%Z)%Z /\ ((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z)) ->
   (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= w2)%Z /\
   (w2 < (w2 + 1%Z)%Z)%Z) -> forall (t2:(map.Map.map Z Z)),
-  (t2 = (map.Map.set t1 w2 ((map.Map.get t1 w2) + 1%Z)%Z)) ->
-  ((0%Z <= (w2 - 1%Z)%Z)%Z -> forall (oldt:Z) (t3:(map.Map.map Z Z)),
-  forall (j:Z), ((j <= (w2 - 1%Z)%Z)%Z /\ (0%Z <= j)%Z) -> ((((forall (k:Z),
-  ((j < k)%Z /\ (k <= w2)%Z) -> (min_dist (suffix w12 i) (suffix w22 k)
-  (map.Map.get t3 k))) /\ forall (k:Z), ((0%Z <= k)%Z /\ (k <= j)%Z) ->
-  (min_dist (suffix w12 (i + 1%Z)%Z) (suffix w22 k) (map.Map.get t3 k))) /\
-  (min_dist (suffix w12 (i + 1%Z)%Z) (suffix w22 (j + 1%Z)%Z) oldt)) ->
-  (((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> forall (oldt1:Z),
-  (oldt1 = (map.Map.get t3 j)) -> (((0%Z <= j)%Z /\ (j < w2)%Z) ->
-  (((0%Z <= i)%Z /\ (i < w1)%Z) -> ((~ ((map.Map.get w11
+  ((0%Z <= (w2 + 1%Z)%Z)%Z /\ (t2 = (map.Map.set t1 w2 ((map.Map.get t1
+  w2) + 1%Z)%Z))) -> ((0%Z <= (w2 - 1%Z)%Z)%Z -> forall (oldt:Z)
+  (t3:(map.Map.map Z Z)), forall (j:Z), ((j <= (w2 - 1%Z)%Z)%Z /\
+  (0%Z <= j)%Z) -> ((((forall (k:Z), ((j < k)%Z /\ (k <= w2)%Z) ->
+  (min_dist (suffix w12 i) (suffix w22 k) (map.Map.get t3 k))) /\
+  forall (k:Z), ((0%Z <= k)%Z /\ (k <= j)%Z) -> (min_dist (suffix w12
+  (i + 1%Z)%Z) (suffix w22 k) (map.Map.get t3 k))) /\ (min_dist (suffix w12
+  (i + 1%Z)%Z) (suffix w22 (j + 1%Z)%Z) oldt)) ->
+  (((0%Z <= (w2 + 1%Z)%Z)%Z /\ ((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z)) ->
+  forall (oldt1:Z), (oldt1 = (map.Map.get t3 j)) -> (((0%Z <= j)%Z /\
+  (j < w2)%Z) -> (((0%Z <= i)%Z /\ (i < w1)%Z) -> ((~ ((map.Map.get w11
   i) = (map.Map.get w21 j))) -> (((0%Z <= (j + 1%Z)%Z)%Z /\
   ((j + 1%Z)%Z < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= j)%Z /\
   (j < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) ->
-  forall (t4:(map.Map.map Z Z)), (t4 = (map.Map.set t3 j
-  ((Zmin (map.Map.get t3 j) (map.Map.get t3 (j + 1%Z)%Z)) + 1%Z)%Z)) ->
-  forall (k:Z), (((j - 1%Z)%Z < k)%Z /\ (k <= w2)%Z) -> (min_dist (suffix w12
-  i) (suffix w22 k) (map.Map.get t4 k))))))))))))))))))).
+  forall (t4:(map.Map.map Z Z)), ((0%Z <= (w2 + 1%Z)%Z)%Z /\
+  (t4 = (map.Map.set t3 j ((Zmin (map.Map.get t3 j) (map.Map.get t3
+  (j + 1%Z)%Z)) + 1%Z)%Z))) -> forall (k:Z), (((j - 1%Z)%Z < k)%Z /\
+  (k <= w2)%Z) -> (min_dist (suffix w12 i) (suffix w22 k) (map.Map.get t4
+  k)))))))))))))))))))).
 Proof.
 intuition.
 intuition.
@@ -252,17 +255,17 @@ assert (k=j \/ j<k)%Z by omega. intuition.
   2: unfold length1; simpl; omega.
   subst.
   assert (min_suffix (mk_array w1 w11) (mk_array w2 w21) i (k+1) (Map.get t3 (k+1)))%Z; auto with *.
-  apply H18; auto with *.
+  apply H21; auto with *.
   rewrite <- (suffix_cons _ k).
   subst.
   assert (min_suffix (mk_array w1 w11) (mk_array w2 w21) (i + 1) k (Map.get t3 k)); auto with *.
-  apply H23; auto with *.
+  apply H26; auto with *.
   unfold length1; simpl; omega.
   (* j<k *)
   subst.
   rewrite Map.Select_neq; try omega.
   assert (min_suffix (mk_array w1 w11) (mk_array w2 w21) i k (Map.get t3 k)); auto with *.
-  apply H18; auto with *.
+  apply H21; auto with *.
 Qed.
 
 

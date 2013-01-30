@@ -64,7 +64,7 @@ Axiom nb_occ_store_eq_eq : forall (a:(map.Map.map Z color)) (i:Z) (j:Z) (k:Z)
 
 Open Scope Z_scope.
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95," timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.95," timelimit 15.
 
 (* Why3 goal *)
 Theorem nb_occ_store_eq_neq : forall (a:(map.Map.map Z color)) (i:Z) (j:Z)

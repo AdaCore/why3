@@ -88,37 +88,37 @@ Axiom exists_prime : forall (p:(array Z)) (u:Z), (1%Z <= u)%Z ->
 Axiom Bertrand_postulate : forall (p:Z), (number.Prime.prime p) ->
   ~ (no_prime_in p (2%Z * p)%Z).
 
-
 (* Why3 goal *)
 Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
-  ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z < m)%Z) -> forall (p:(map.Map.map
-  Z Z)), (p = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z 2%Z)) ->
+  ((0%Z <= m)%Z -> ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z < m)%Z) ->
+  forall (p:(map.Map.map Z Z)), ((0%Z <= m)%Z /\
+  (p = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z 2%Z))) ->
   (((0%Z <= 1%Z)%Z /\ (1%Z < m)%Z) -> forall (p1:(map.Map.map Z Z)),
-  (p1 = (map.Map.set p 1%Z 3%Z)) -> ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z)
-  (p2:(map.Map.map Z Z)), forall (j:Z), ((2%Z <= j)%Z /\
-  (j <= (m - 1%Z)%Z)%Z) -> (((((first_primes (mk_array m p2) j) /\
-  (((map.Map.get p2 (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2
-  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n)) /\
-  (no_prime_in (map.Map.get p2 (j - 1%Z)%Z) n)) -> forall (k:Z),
-  forall (n1:Z) (p3:(map.Map.map Z Z)), (((((((1%Z <= k)%Z /\ (k < j)%Z) /\
-  (first_primes (mk_array m p3) j)) /\ (((map.Map.get p3
-  (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3
+  ((0%Z <= m)%Z /\ (p1 = (map.Map.set p 1%Z 3%Z))) ->
+  ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z) (p2:(map.Map.map Z Z)),
+  forall (j:Z), ((2%Z <= j)%Z /\ (j <= (m - 1%Z)%Z)%Z) ->
+  (((((first_primes (mk_array m p2) j) /\ (((map.Map.get p2
+  (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2 (j - 1%Z)%Z))%Z)%Z)) /\
+  (number.Parity.odd n)) /\ (no_prime_in (map.Map.get p2 (j - 1%Z)%Z) n)) ->
+  forall (k:Z), forall (n1:Z) (p3:(map.Map.map Z Z)), ((0%Z <= m)%Z /\
+  (((((((1%Z <= k)%Z /\ (k < j)%Z) /\ (first_primes (mk_array m p3) j)) /\
+  (((map.Map.get p3 (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3
   (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n1)) /\
   (no_prime_in (map.Map.get p3 (j - 1%Z)%Z) n1)) /\ forall (i:Z),
   ((0%Z <= i)%Z /\ (i < k)%Z) ->
-  ~ (number.Divisibility.divides (map.Map.get p3 i) n1)) -> (((0%Z <= k)%Z /\
-  (k < m)%Z) -> ((~ ((ZOmod n1 (map.Map.get p3 k)) = 0%Z)) ->
-  (((0%Z <= k)%Z /\ (k < m)%Z) -> (((0%Z <= k)%Z /\ (k < m)%Z) ->
-  (((map.Map.get p3 k) < (ZOdiv n1 (map.Map.get p3 k)))%Z ->
-  ((k + 1%Z)%Z < j)%Z)))))))))).
+  ~ (number.Divisibility.divides (map.Map.get p3 i) n1))) ->
+  (((0%Z <= k)%Z /\ (k < m)%Z) -> ((~ ((ZOmod n1 (map.Map.get p3
+  k)) = 0%Z)) -> (((0%Z <= k)%Z /\ (k < m)%Z) -> (((0%Z <= k)%Z /\
+  (k < m)%Z) -> (((map.Map.get p3 k) < (ZOdiv n1 (map.Map.get p3 k)))%Z ->
+  ((k + 1%Z)%Z < j)%Z))))))))))).
 Proof.
 intuition.
-intros. clear H9.
+intros.
 assert (case: (k = j-1 \/ k+1<j)%Z) by omega. destruct case. 2: auto.
 apply False_ind.
 subst k.
 assert (2 < Map.get p3 (j-1))%Z.
-red in H29. destruct H29 as (h1, (h2, _)).
+red in H33. destruct H33 as (h1, (h2, _)).
 rewrite <- h1. apply h2; omega.
 generalize (ZO_div_mod_eq n1 (Map.get p3 (j-1))%Z). intro div.
 assert (ne1: (0 <= n1 /\ Map.get p3 (j-1) <> 0)%Z) by omega.

@@ -181,28 +181,30 @@ Definition termination(i:Z) (j:Z) (i0:Z) (j0:Z) (r:Z) (a:(array Z)): Prop :=
 
 (* Why3 goal *)
 Theorem WP_parameter_find : forall (a:Z), forall (a1:(map.Map.map Z Z)),
-  let a2 := (mk_array a a1) in ((a = (usN + 1%Z)%Z) -> forall (n:Z) (m:Z)
-  (a3:(map.Map.map Z Z)), let a4 := (mk_array a a3) in (((m_invariant m
-  a4) /\ ((n_invariant n a4) /\ ((permut a4 a2) /\ ((1%Z <= m)%Z /\
-  (n <= usN)%Z)))) -> ((m < n)%Z -> (((0%Z <= f)%Z /\ (f < a)%Z) -> let r :=
-  (map.Map.get a3 f) in forall (j:Z) (i:Z) (a5:(map.Map.map Z Z)), let a6 :=
-  (mk_array a a5) in (((i_invariant m n i r a6) /\ ((j_invariant m n j r
-  a6) /\ ((m_invariant m a6) /\ ((n_invariant n a6) /\ ((0%Z <= j)%Z /\
-  ((i <= (usN + 1%Z)%Z)%Z /\ ((termination i j m n r a6) /\ (permut a6
-  a2)))))))) -> ((i <= j)%Z -> forall (i1:Z), ((i_invariant m n i1 r a6) /\
-  (((i <= i1)%Z /\ (i1 <= n)%Z) /\ (termination i1 j m n r a6))) ->
-  (((0%Z <= i1)%Z /\ (i1 < a)%Z) -> ((~ ((map.Map.get a5 i1) < r)%Z) ->
+  let a2 := (mk_array a a1) in (((0%Z <= a)%Z /\ (a = (usN + 1%Z)%Z)) ->
+  forall (n:Z) (m:Z) (a3:(map.Map.map Z Z)), let a4 := (mk_array a a3) in
+  (((m_invariant m a4) /\ ((n_invariant n a4) /\ ((permut a4 a2) /\
+  ((1%Z <= m)%Z /\ (n <= usN)%Z)))) -> ((m < n)%Z -> (((0%Z <= a)%Z /\
+  ((0%Z <= f)%Z /\ (f < a)%Z)) -> let r := (map.Map.get a3 f) in forall (j:Z)
+  (i:Z) (a5:(map.Map.map Z Z)), let a6 := (mk_array a a5) in (((i_invariant m
+  n i r a6) /\ ((j_invariant m n j r a6) /\ ((m_invariant m a6) /\
+  ((n_invariant n a6) /\ ((0%Z <= j)%Z /\ ((i <= (usN + 1%Z)%Z)%Z /\
+  ((termination i j m n r a6) /\ (permut a6 a2)))))))) -> ((i <= j)%Z ->
+  forall (i1:Z), ((i_invariant m n i1 r a6) /\ (((i <= i1)%Z /\
+  (i1 <= n)%Z) /\ (termination i1 j m n r a6))) -> (((0%Z <= a)%Z /\
+  ((0%Z <= i1)%Z /\ (i1 < a)%Z)) -> ((~ ((map.Map.get a5 i1) < r)%Z) ->
   forall (j1:Z), ((j_invariant m n j1 r a6) /\ ((j1 <= j)%Z /\
   ((m <= j1)%Z /\ (termination i1 j1 m n r a6)))) -> (((0%Z <= j1)%Z /\
   (j1 < a)%Z) -> ((~ (r < (map.Map.get a5 j1))%Z) -> ((((map.Map.get a5
   j1) <= r)%Z /\ (r <= (map.Map.get a5 i1))%Z) -> ((i1 <= j1)%Z ->
   (((0%Z <= i1)%Z /\ (i1 < a)%Z) -> (((0%Z <= j1)%Z /\ (j1 < a)%Z) ->
   (((0%Z <= i1)%Z /\ (i1 < a)%Z) -> forall (a7:(map.Map.map Z Z)),
-  (a7 = (map.Map.set a5 i1 (map.Map.get a5 j1))) -> (((0%Z <= j1)%Z /\
-  (j1 < a)%Z) -> forall (a8:(map.Map.map Z Z)), let a9 := (mk_array a a8) in
-  ((a8 = (map.Map.set a7 j1 (map.Map.get a5 i1))) -> ((exchange a8 a5 i1
-  j1) -> (((map.Map.get a8 i1) <= r)%Z -> ((r <= (map.Map.get a8 j1))%Z ->
-  forall (i2:Z), (i2 = (i1 + 1%Z)%Z) -> forall (j2:Z), (j2 = (j1 - 1%Z)%Z) ->
+  ((0%Z <= a)%Z /\ (a7 = (map.Map.set a5 i1 (map.Map.get a5 j1)))) ->
+  (((0%Z <= j1)%Z /\ (j1 < a)%Z) -> forall (a8:(map.Map.map Z Z)), let a9 :=
+  (mk_array a a8) in (((0%Z <= a)%Z /\ (a8 = (map.Map.set a7 j1
+  (map.Map.get a5 i1)))) -> ((exchange a8 a5 i1 j1) -> (((map.Map.get a8
+  i1) <= r)%Z -> ((r <= (map.Map.get a8 j1))%Z -> forall (i2:Z),
+  (i2 = (i1 + 1%Z)%Z) -> forall (j2:Z), (j2 = (j1 - 1%Z)%Z) ->
   ((i_invariant m n i2 r a9) /\ ((j_invariant m n j2 r a9) /\ ((m_invariant m
   a9) /\ ((n_invariant n a9) /\ ((0%Z <= j2)%Z /\ ((i2 <= (usN + 1%Z)%Z)%Z /\
   ((termination i2 j2 m n r a9) /\ (permut a9 a2)))))))))))))))))))))))))))).
@@ -211,7 +213,7 @@ intuition.
 intuition.
 (* i_invariant *)
 red; intuition.
-red in H20. intuition.
+red in H22. intuition.
 unfold get; simpl.
 assert (h: (p < i1 \/ p = i1)%Z) by omega.
 destruct h.
@@ -219,8 +221,8 @@ subst a8.
 rewrite Map.Select_neq; try omega.
 subst a7.
 rewrite Map.Select_neq; try omega.
-red in H20.
-unfold get in H20; simpl in H20. intuition.
+red in H22.
+unfold get in H22; simpl in H22. intuition.
 subst p a8.
 assert (h: (i1 = j1 \/ i1 <> j1)%Z) by omega.
 destruct h.
@@ -230,21 +232,21 @@ rewrite Map.Select_neq; try omega.
 subst a7.
 rewrite Map.Select_eq; try omega.
 unfold get; simpl.
-red in H20; unfold get in H20; simpl in H20; intuition.
+red in H22; unfold get in H22; simpl in H22; intuition.
 assert (h: (i1 < j1 \/ i1 = j1)%Z) by omega. destruct h.
 exists j1.
-split. red in H32; omega.
+split. red in H35; omega.
 subst a8; rewrite Map.Select_eq; try omega.
 assert (h: (j1 < n)%Z) by omega.
 exists (j1+1)%Z.
 split. omega.
-red in H32; unfold get in H32. simpl in H32; intuition.
+red in H35; unfold get in H35. simpl in H35; intuition.
 subst a8; rewrite Map.Select_neq; try omega.
 subst a7; rewrite Map.Select_neq; try omega.
-apply H32; omega.
+apply H35; omega.
 (* j_invariant *)
 red; intuition.
-red in H32; intuition.
+red in H35; intuition.
 unfold get; simpl.
 assert (h: (j1 < q \/ q = j1)%Z) by omega.
 destruct h.
@@ -252,8 +254,8 @@ subst a8.
 rewrite Map.Select_neq; try omega.
 subst a7.
 rewrite Map.Select_neq; try omega.
-red in H32.
-unfold get in H32; simpl in H32. intuition.
+red in H35.
+unfold get in H35; simpl in H35. intuition.
 subst q a8.
 assert (h: (i1 = j1 \/ i1 <> j1)%Z) by omega.
 destruct h.
@@ -262,54 +264,54 @@ rewrite Map.Select_eq; try omega.
 rewrite Map.Select_eq; try omega.
 assert (h: (i1 < j1 \/ i1 = j1)%Z) by omega. destruct h.
 exists i1.
-split. red in H20; omega.
+split. red in H22; omega.
 unfold get; simpl.
 subst a8; rewrite Map.Select_neq; try omega.
 subst a7; rewrite Map.Select_eq; try omega.
 assert (h: (m < i1)%Z) by omega.
 exists (i1-1)%Z.
 split. omega.
-red in H20; unfold get in H20. simpl in H20; intuition.
+red in H22; unfold get in H22. simpl in H22; intuition.
 unfold get; simpl.
 subst a8; rewrite Map.Select_neq; try omega.
 subst a7; rewrite Map.Select_neq; try omega.
-apply H20; omega.
+apply H22; omega.
 (* m_invariant *)
-clear H15 H23 H40.
+(*clear H15 H23 H40.*)
 red; intuition.
-red in H11; omega.
+red in H13; omega.
 unfold get; simpl.
-red in H11; intuition.
-unfold get in H51; simpl in H51.
+red in H13; intuition.
+unfold get in H52; simpl in H52.
 subst a8.
 rewrite Map.Select_neq at 1; try omega.
 subst a7.
-rewrite Map.Select_neq at 1; red in H20; try omega.
+rewrite Map.Select_neq at 1; red in H22; try omega.
 assert (h: (q = i1 \/ q <> i1)%Z) by omega. destruct h.
 subst q.
 assert (h: (i1 = j1 \/ i1 <> j1)%Z) by omega. destruct h.
 subst i1.
 rewrite Map.Select_eq; try omega.
-apply H51; omega.
+apply H59; omega.
 rewrite Map.Select_neq; try omega.
 rewrite Map.Select_eq; try omega.
-apply H51; omega.
+apply H59; omega.
 assert (h: (q = j1 \/ q <> j1)%Z) by omega. destruct h.
 subst q.
 rewrite Map.Select_eq; try omega.
-apply H51; omega.
+apply H59; omega.
 rewrite Map.Select_neq; try omega.
 rewrite Map.Select_neq; try omega.
-apply H51; omega.
+apply H59; omega.
 (* n_invariant *)
-clear H15 H23 H40.
+(*clear H15 H23 H40.*)
 red; intuition.
-red in H12; omega.
+red in H14; omega.
 unfold get; simpl.
-red in H12; intuition.
-unfold get in H51; simpl in H51.
+red in H14; intuition.
+unfold get in H59; simpl in H59.
 subst a8.
-rewrite (Map.Select_neq _ _ q); red in H32; try omega.
+rewrite (Map.Select_neq _ _ q); red in H35; try omega.
 subst a7.
 rewrite (Map.Select_neq _ _ q); try omega.
 assert (h: (p = i1 \/ p <> i1)%Z) by omega. destruct h.
@@ -317,22 +319,22 @@ subst p.
 assert (h: (i1 = j1 \/ i1 <> j1)%Z) by omega. destruct h.
 subst i1.
 rewrite Map.Select_eq; try omega.
-apply H51; omega.
+apply H59; omega.
 rewrite Map.Select_neq; try omega.
 rewrite Map.Select_eq; try omega.
-apply H51; omega.
+apply H59; omega.
 assert (h: (p = j1 \/ p <> j1)%Z) by omega. destruct h.
 subst p.
 rewrite Map.Select_eq; try omega.
-apply H51; red in H20; omega.
+apply H59; red in H22; omega.
 rewrite Map.Select_neq; try omega.
 rewrite Map.Select_neq; try omega.
-apply H51; omega.
+apply H59; omega.
 (* termination *)
 red; intros.
 unfold get; simpl.
-red in H20.
-red in H32.
+red in H22.
+red in H35.
 left.
 intuition.
 (* permut *)
@@ -341,7 +343,7 @@ split. trivial.
 apply permut_trans with a5.
 apply permut_exchange with i1 j1; try omega.
 assumption.
-red in H17; simpl in H17.
+red in H19; simpl in H19.
 intuition.
 Qed.
 

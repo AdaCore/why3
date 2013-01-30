@@ -90,42 +90,43 @@ Axiom Bertrand_postulate : forall (p:Z), (number.Prime.prime p) ->
 
 (* Why3 goal *)
 Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
-  ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z < m)%Z) -> forall (p:(map.Map.map
-  Z Z)), (p = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z 2%Z)) ->
+  ((0%Z <= m)%Z -> ((0%Z <= m)%Z -> (((0%Z <= 0%Z)%Z /\ (0%Z < m)%Z) ->
+  forall (p:(map.Map.map Z Z)), ((0%Z <= m)%Z /\
+  (p = (map.Map.set (map.Map.const 0%Z:(map.Map.map Z Z)) 0%Z 2%Z))) ->
   (((0%Z <= 1%Z)%Z /\ (1%Z < m)%Z) -> forall (p1:(map.Map.map Z Z)),
-  (p1 = (map.Map.set p 1%Z 3%Z)) -> ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z)
-  (p2:(map.Map.map Z Z)), forall (j:Z), ((2%Z <= j)%Z /\
-  (j <= (m - 1%Z)%Z)%Z) -> (((((first_primes (mk_array m p2) j) /\
-  (((map.Map.get p2 (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2
-  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n)) /\
-  (no_prime_in (map.Map.get p2 (j - 1%Z)%Z) n)) -> forall (k:Z),
-  forall (n1:Z) (p3:(map.Map.map Z Z)), (((((((1%Z <= k)%Z /\ (k < j)%Z) /\
-  (first_primes (mk_array m p3) j)) /\ (((map.Map.get p3
-  (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3
+  ((0%Z <= m)%Z /\ (p1 = (map.Map.set p 1%Z 3%Z))) ->
+  ((2%Z <= (m - 1%Z)%Z)%Z -> forall (n:Z) (p2:(map.Map.map Z Z)),
+  forall (j:Z), ((2%Z <= j)%Z /\ (j <= (m - 1%Z)%Z)%Z) ->
+  (((((first_primes (mk_array m p2) j) /\ (((map.Map.get p2
+  (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2 (j - 1%Z)%Z))%Z)%Z)) /\
+  (number.Parity.odd n)) /\ (no_prime_in (map.Map.get p2 (j - 1%Z)%Z) n)) ->
+  forall (k:Z), forall (n1:Z) (p3:(map.Map.map Z Z)), ((0%Z <= m)%Z /\
+  (((((((1%Z <= k)%Z /\ (k < j)%Z) /\ (first_primes (mk_array m p3) j)) /\
+  (((map.Map.get p3 (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3
   (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n1)) /\
   (no_prime_in (map.Map.get p3 (j - 1%Z)%Z) n1)) /\ forall (i:Z),
   ((0%Z <= i)%Z /\ (i < k)%Z) ->
-  ~ (number.Divisibility.divides (map.Map.get p3 i) n1)) -> (((0%Z <= k)%Z /\
-  (k < m)%Z) -> (((ZOmod n1 (map.Map.get p3 k)) = 0%Z) ->
-  ~ (number.Prime.prime n1)))))))).
+  ~ (number.Divisibility.divides (map.Map.get p3 i) n1))) ->
+  (((0%Z <= k)%Z /\ (k < m)%Z) -> (((ZOmod n1 (map.Map.get p3 k)) = 0%Z) ->
+  ~ (number.Prime.prime n1))))))))).
 Proof.
 intuition.
 intuition.
-red in H18. destruct H18.
-red in H25; decompose  [and] H25; clear H25.
-apply H19 with (Map.get p3 k).
+red in H21. destruct H21.
+red in H29. decompose [and] H29. clear H29.
+apply H21 with (Map.get p3 k).
 assert (2 < Map.get p3 k)%Z.
-rewrite <- H28.
-apply H30; omega.
+rewrite <- H32.
+apply H34; omega.
 split. omega.
 assert (case: (k<j-1 \/ k=j-1)%Z) by omega. destruct case.
 apply Zlt_trans with (Map.get p3 (j-1))%Z; try omega.
-apply H30; omega.
+apply H34; omega.
 subst k; auto.
 apply Divisibility.mod_divides_computer; auto.
 assert (2 < Map.get p3 k)%Z.
-rewrite <- H28.
-apply H30; omega.
+rewrite <- H32.
+apply H34; omega.
 omega.
 Qed.
 

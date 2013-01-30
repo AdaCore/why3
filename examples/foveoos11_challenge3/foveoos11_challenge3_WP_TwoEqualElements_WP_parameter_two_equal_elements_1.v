@@ -60,34 +60,35 @@ Definition appear_twice(a:(array Z)) (v:Z) (u:Z): Prop := exists i:Z,
 (* Why3 goal *)
 Theorem WP_parameter_two_equal_elements : forall (a:Z) (n:Z),
   forall (a1:(map.Map.map Z Z)), let a2 := (mk_array a a1) in
-  (((((a = (n + 2%Z)%Z) /\ (2%Z <= n)%Z) /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i < a)%Z) -> ((0%Z <= (map.Map.get a1 i))%Z /\ ((map.Map.get a1
-  i) < n)%Z)) /\ exists v1:Z, (appear_twice a2 v1 (n + 2%Z)%Z) /\
-  exists v2:Z, (appear_twice a2 v2 (n + 2%Z)%Z) /\ ~ (v2 = v1)) ->
-  ((0%Z <= n)%Z -> ((0%Z <= (n + 1%Z)%Z)%Z -> forall (v2:Z) (v1:Z)
-  (deja_vu:(map.Map.map Z bool)), forall (i:Z), ((0%Z <= i)%Z /\
-  (i <= (n + 1%Z)%Z)%Z) -> ((((((((v1 = (-1%Z)%Z) -> (v2 = (-1%Z)%Z)) /\
-  ((~ (v1 = (-1%Z)%Z)) -> (appear_twice a2 v1 i))) /\ ((~ (v2 = (-1%Z)%Z)) ->
-  ((appear_twice a2 v2 i) /\ ~ (v2 = v1)))) /\ forall (v:Z), ((0%Z <= v)%Z /\
-  (v < n)%Z) -> ((((map.Map.get deja_vu v) = true) /\ exists j:Z,
-  ((0%Z <= j)%Z /\ (j < i)%Z) /\ ((map.Map.get a1 j) = v)) \/
-  ((~ ((map.Map.get deja_vu v) = true)) /\ forall (j:Z), ((0%Z <= j)%Z /\
-  (j < i)%Z) -> ~ ((map.Map.get a1 j) = v)))) /\ ((v1 = (-1%Z)%Z) ->
-  forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) -> ~ (appear_twice a2 v i))) /\
+  (((0%Z <= a)%Z /\ ((((a = (n + 2%Z)%Z) /\ (2%Z <= n)%Z) /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < a)%Z) -> ((0%Z <= (map.Map.get a1 i))%Z /\
+  ((map.Map.get a1 i) < n)%Z)) /\ exists v1:Z, (appear_twice a2 v1
+  (n + 2%Z)%Z) /\ exists v2:Z, (appear_twice a2 v2 (n + 2%Z)%Z) /\
+  ~ (v2 = v1))) -> ((0%Z <= n)%Z -> ((0%Z <= n)%Z ->
+  ((0%Z <= (n + 1%Z)%Z)%Z -> forall (v2:Z) (v1:Z) (deja_vu:(map.Map.map Z
+  bool)), forall (i:Z), ((0%Z <= i)%Z /\ (i <= (n + 1%Z)%Z)%Z) ->
+  ((((((((v1 = (-1%Z)%Z) -> (v2 = (-1%Z)%Z)) /\ ((~ (v1 = (-1%Z)%Z)) ->
+  (appear_twice a2 v1 i))) /\ ((~ (v2 = (-1%Z)%Z)) -> ((appear_twice a2 v2
+  i) /\ ~ (v2 = v1)))) /\ forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) ->
+  ((((map.Map.get deja_vu v) = true) /\ exists j:Z, ((0%Z <= j)%Z /\
+  (j < i)%Z) /\ ((map.Map.get a1 j) = v)) \/ ((~ ((map.Map.get deja_vu
+  v) = true)) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) ->
+  ~ ((map.Map.get a1 j) = v)))) /\ ((v1 = (-1%Z)%Z) -> forall (v:Z),
+  ((0%Z <= v)%Z /\ (v < n)%Z) -> ~ (appear_twice a2 v i))) /\
   ((v2 = (-1%Z)%Z) -> forall (v:Z), ((0%Z <= v)%Z /\ (v < n)%Z) ->
   ((~ (v = v1)) -> ~ (appear_twice a2 v i)))) -> (((0%Z <= i)%Z /\
-  (i < a)%Z) -> let v := (map.Map.get a1 i) in (((0%Z <= v)%Z /\
-  (v < n)%Z) -> (((map.Map.get deja_vu v) = true) -> ((v1 = (-1%Z)%Z) ->
-  forall (v11:Z), (v11 = v) -> ((v2 = (-1%Z)%Z) -> forall (v3:Z),
-  ((0%Z <= v3)%Z /\ (v3 < n)%Z) -> ((~ (v3 = v11)) -> ~ (appear_twice a2 v3
-  (i + 1%Z)%Z))))))))))).
+  (i < a)%Z) -> let v := (map.Map.get a1 i) in (((0%Z <= n)%Z /\
+  ((0%Z <= v)%Z /\ (v < n)%Z)) -> (((map.Map.get deja_vu v) = true) ->
+  ((v1 = (-1%Z)%Z) -> forall (v11:Z), (v11 = v) -> ((v2 = (-1%Z)%Z) ->
+  forall (v3:Z), ((0%Z <= v3)%Z /\ (v3 < n)%Z) -> ((~ (v3 = v11)) ->
+  ~ (appear_twice a2 v3 (i + 1%Z)%Z)))))))))))).
 Proof.
 intuition.
 intuition.
-red in H23.
-destruct H23 as (i0, (h0, (h1, (j, (h2, (h3, h4)))))).
+red in H26.
+destruct H26 as (i0, (h0, (h1, (j, (h2, (h3, h4)))))).
 subst v11.
-apply (H8 v3); auto.
+apply (H10 v3); auto.
 red; exists i0; intuition.
 assert (case: (i0 < i \/ i0 = i)%Z) by omega. destruct case.
 auto.

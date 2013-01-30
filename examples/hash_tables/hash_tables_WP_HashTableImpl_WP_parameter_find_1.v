@@ -125,24 +125,24 @@ Axiom cons_occurs_first : forall {a:Type} {a_WT:WhyType a}
 (* Why3 goal *)
 Theorem WP_parameter_find : forall {a:Type} {a_WT:WhyType a}
   {b:Type} {b_WT:WhyType b}, forall (h:Z) (k:a), forall (rho:(map.Map.map Z
-  (list (a* b)%type))) (rho1:(map.Map.map a (option b))), ((0%Z < h)%Z /\
+  (list (a* b)%type))) (rho1:(map.Map.map a (option b))), (((0%Z < h)%Z /\
   ((forall (k1:a) (v:b), ((map.Map.get rho1 k1) = (Some v)) <->
   (occurs_first k1 v (map.Map.get rho (ZOmod (Zabs (hash k1)) h)))) /\
   forall (k1:a) (v:b), forall (i:Z), ((0%Z <= i)%Z /\ (i < h)%Z) -> ((mem (
-  k1, v) (map.Map.get rho i)) -> (i = (ZOmod (Zabs (hash k1)) h))))) ->
-  let i := (ZOmod (Zabs (hash k)) h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
-  ((forall (v:b), ~ (mem (k, v) (map.Map.get rho i))) -> ((map.Map.get rho1
-  k) = (None :(option b))))).
+  k1, v) (map.Map.get rho i)) -> (i = (ZOmod (Zabs (hash k1)) h))))) /\
+  (0%Z <= h)%Z) -> let i := (ZOmod (Zabs (hash k)) h) in (((0%Z <= i)%Z /\
+  (i < h)%Z) -> ((forall (v:b), ~ (mem (k, v) (map.Map.get rho i))) ->
+  ((map.Map.get rho1 k) = (None :(option b))))).
 intros a _a b _b h k rho rho1.
 pose (i := (Zabs (hash k) mod h)).
 unfold get1; simpl.
 intuition.
-generalize (H0 k); clear H0.
-generalize (H5 k); clear H5.
+generalize (H2 k); clear H2.
+generalize (H6 k); clear H6.
 unfold get1; simpl; intuition.
 destruct (Map.get rho1 k); auto.
 elim (H1 b0); clear H1.
-generalize (H3 b0); clear H3.
+generalize (H5 b0); clear H3.
 intuition.
 apply mem_occurs_first; auto.
 Qed.
