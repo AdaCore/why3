@@ -5,10 +5,10 @@ Require BuiltIn.
 Require int.Int.
 
 (* Why3 assumption *)
-Definition even(n:Z): Prop := exists k:Z, (n = (2%Z * k)%Z).
+Definition even (n:Z): Prop := exists k:Z, (n = (2%Z * k)%Z).
 
 (* Why3 assumption *)
-Definition odd(n:Z): Prop := exists k:Z, (n = ((2%Z * k)%Z + 1%Z)%Z).
+Definition odd (n:Z): Prop := exists k:Z, (n = ((2%Z * k)%Z + 1%Z)%Z).
 
 Lemma even_is_Zeven :
   forall n, even n <-> Zeven n.

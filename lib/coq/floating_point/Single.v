@@ -39,15 +39,15 @@ exact (model 24 128).
 Defined.
 
 (* Why3 assumption *)
-Definition round_error(x:floating_point.SingleFormat.single): R :=
+Definition round_error (x:floating_point.SingleFormat.single): R :=
   (Rabs ((value x) - (exact x))%R).
 
 (* Why3 assumption *)
-Definition total_error(x:floating_point.SingleFormat.single): R :=
+Definition total_error (x:floating_point.SingleFormat.single): R :=
   (Rabs ((value x) - (model x))%R).
 
 (* Why3 assumption *)
-Definition no_overflow(m:floating_point.Rounding.mode) (x:R): Prop :=
+Definition no_overflow (m:floating_point.Rounding.mode) (x:R): Prop :=
   ((Rabs (round m x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
 
 Lemma max_single_eq: (33554430 * 10141204801825835211973625643008 = max 24 128)%R.
@@ -126,12 +126,12 @@ now apply Round_up_neg.
 Qed.
 
 (* Why3 assumption *)
-Definition of_real_post(m:floating_point.Rounding.mode) (x:R)
+Definition of_real_post (m:floating_point.Rounding.mode) (x:R)
   (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
   x)) /\ (((exact res) = x) /\ ((model res) = x)).
 
 (* Why3 assumption *)
-Definition add_post(m:floating_point.Rounding.mode)
+Definition add_post (m:floating_point.Rounding.mode)
   (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single)
   (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
@@ -140,7 +140,7 @@ Definition add_post(m:floating_point.Rounding.mode)
   ((model res) = ((model x) + (model y))%R)).
 
 (* Why3 assumption *)
-Definition sub_post(m:floating_point.Rounding.mode)
+Definition sub_post (m:floating_point.Rounding.mode)
   (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single)
   (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
@@ -149,7 +149,7 @@ Definition sub_post(m:floating_point.Rounding.mode)
   ((model res) = ((model x) - (model y))%R)).
 
 (* Why3 assumption *)
-Definition mul_post(m:floating_point.Rounding.mode)
+Definition mul_post (m:floating_point.Rounding.mode)
   (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single)
   (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
@@ -158,7 +158,7 @@ Definition mul_post(m:floating_point.Rounding.mode)
   ((model res) = ((model x) * (model y))%R)).
 
 (* Why3 assumption *)
-Definition div_post(m:floating_point.Rounding.mode)
+Definition div_post (m:floating_point.Rounding.mode)
   (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single)
   (res:floating_point.SingleFormat.single): Prop := ((value res) = (round m
@@ -167,17 +167,17 @@ Definition div_post(m:floating_point.Rounding.mode)
   ((model res) = (Rdiv (model x) (model y))%R)).
 
 (* Why3 assumption *)
-Definition neg_post(x:floating_point.SingleFormat.single)
+Definition neg_post (x:floating_point.SingleFormat.single)
   (res:floating_point.SingleFormat.single): Prop :=
   ((value res) = (-(value x))%R) /\ (((exact res) = (-(exact x))%R) /\
   ((model res) = (-(model x))%R)).
 
 (* Why3 assumption *)
-Definition lt(x:floating_point.SingleFormat.single)
+Definition lt (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single): Prop := ((value x) < (value y))%R.
 
 (* Why3 assumption *)
-Definition gt(x:floating_point.SingleFormat.single)
+Definition gt (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single): Prop := ((value y) < (value x))%R.
 
 

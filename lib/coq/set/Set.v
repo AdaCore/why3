@@ -35,7 +35,7 @@ Defined.
 Hint Unfold mem.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
   a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
@@ -50,8 +50,8 @@ apply h1.
 Qed.
 
 (* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set a)): Prop :=
-  forall (x:a), (mem x s1) -> (mem x s2).
+Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
+  a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
 
 (* Why3 goal *)
 Lemma subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
@@ -75,7 +75,7 @@ exact (fun _ => False).
 Defined.
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set a)): Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
   forall (x:a), ~ (mem x s).
 
 (* Why3 goal *)

@@ -12,7 +12,7 @@ Require number.Parity.
 (* Hack so that Why3 does not override the notation below.
 
 (* Why3 assumption *)
-Definition divides(d:Z) (n:Z): Prop := exists q:Z, (n = (q * d)%Z).
+Definition divides (d:Z) (n:Z): Prop := exists q:Z, (n = (q * d)%Z).
 
 *)
 
@@ -38,15 +38,15 @@ exact Zdivide_0.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_left : forall (a:Z) (b:Z) (c:Z), (divides a b) ->
-  (divides (c * a)%Z (c * b)%Z).
+Lemma divides_left : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides
+  (c * a)%Z (c * b)%Z).
 Proof.
 exact Zmult_divide_compat_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_right : forall (a:Z) (b:Z) (c:Z), (divides a b) ->
-  (divides (a * c)%Z (b * c)%Z).
+Lemma divides_right : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides
+  (a * c)%Z (b * c)%Z).
 Proof.
 exact Zmult_divide_compat_r.
 Qed.
@@ -160,8 +160,8 @@ ring.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_mod_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
-  ((divides b a) -> ((int.EuclideanDivision.mod1 a b) = 0%Z)).
+Lemma divides_mod_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides
+  b a) -> ((int.EuclideanDivision.mod1 a b) = 0%Z)).
 Proof.
 intros a b Zb H.
 assert (Zmod a b = Z0).

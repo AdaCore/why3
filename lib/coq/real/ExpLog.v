@@ -48,9 +48,9 @@ exact exp_ln.
 Qed.
 
 (* Why3 assumption *)
-Definition log2(x:R): R := (Rdiv (ln x) (ln 2%R))%R.
+Definition log2 (x:R): R := (Rdiv (ln x) (ln 2%R))%R.
 
 (* Why3 assumption *)
-Definition log10(x:R): R := (Rdiv (ln x) (ln 10%R))%R.
+Definition log10 (x:R): R := (Rdiv (ln x) (ln 10%R))%R.
 
 

@@ -6,7 +6,7 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a}(a1:(map.Map.map Z a))
+Definition exchange {a:Type} {a_WT:WhyType a} (a1:(map.Map.map Z a))
   (a2:(map.Map.map Z a)) (i:Z) (j:Z): Prop := ((map.Map.get a1
   i) = (map.Map.get a2 j)) /\ (((map.Map.get a2 i) = (map.Map.get a1 j)) /\
   forall (k:Z), ((~ (k = i)) /\ ~ (k = j)) -> ((map.Map.get a1

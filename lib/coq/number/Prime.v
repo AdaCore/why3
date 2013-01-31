@@ -13,7 +13,7 @@ Require number.Divisibility.
 Import Znumtheory.
 
 (* Why3 assumption *)
-Definition prime(p:Z): Prop := (2%Z <= p)%Z /\ forall (n:Z), ((1%Z < n)%Z /\
+Definition prime (p:Z): Prop := (2%Z <= p)%Z /\ forall (n:Z), ((1%Z < n)%Z /\
   (n < p)%Z) -> ~ (number.Divisibility.divides n p).
 
 Lemma prime_is_Zprime :
@@ -58,8 +58,8 @@ Qed.
 (* Why3 goal *)
 Lemma small_divisors : forall (p:Z), (2%Z <= p)%Z -> ((forall (d:Z),
   (2%Z <= d)%Z -> ((prime d) -> (((1%Z < (d * d)%Z)%Z /\
-  ((d * d)%Z <= p)%Z) -> ~ (number.Divisibility.divides d p)))) ->
-  (prime p)).
+  ((d * d)%Z <= p)%Z) -> ~ (number.Divisibility.divides d p)))) -> (prime
+  p)).
 Proof.
 intros p Hp H.
 apply <- prime_is_Zprime.

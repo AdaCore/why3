@@ -4,12 +4,12 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Inductive mode  :=
-  | NearestTiesToEven : mode 
-  | ToZero : mode 
-  | Up : mode 
-  | Down : mode 
-  | NearestTiesToAway : mode .
+Inductive mode :=
+  | NearestTiesToEven : mode
+  | ToZero : mode
+  | Up : mode
+  | Down : mode
+  | NearestTiesToAway : mode.
 Axiom mode_WhyType : WhyType mode.
 Existing Instance mode_WhyType.
 
