@@ -979,13 +979,11 @@ drivers/pvs-realizations.aux: Makefile
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/pvs/int
-	cp $(PVSLIBS_INT) $(LIBDIR)/why3/pvs/int/
+	cp $(addsuffix .pvs, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
+	cp $(addsuffix .prf, $(PVSLIBS_INT)) $(LIBDIR)/why3/pvs/int/
 	mkdir -p $(LIBDIR)/why3/pvs/real
-	cp $(PVSLIBS_REAL) $(LIBDIR)/why3/pvs/real/
-	mkdir -p $(LIBDIR)/why3/pvs/list
-	cp $(PVSLIBS_LIST) $(LIBDIR)/why3/pvs/list/
-	mkdir -p $(LIBDIR)/why3/pvs/number
-	cp $(PVSLIBS_NUMBER) $(LIBDIR)/why3/pvs/number/
+	cp $(addsuffix .pvs, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
+	cp $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
 ifeq (@enable_pvs_nasa_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/pvs/floating_point/
 	cp $(PVSLIBS_FP) $(LIBDIR)/why3/pvs/
