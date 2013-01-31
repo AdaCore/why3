@@ -66,11 +66,6 @@ let print_ne_params fmt stv =
     (fun tv -> fprintf fmt "@ %a" print_implicit_tv_binder tv)
     stv
 
-let print_ne_params_list fmt ltv =
-  List.iter
-    (fun tv -> fprintf fmt "@ %a" print_tv_binder tv)
-    ltv
-
 let print_params fmt stv =
   if Stv.is_empty stv then () else
     fprintf fmt "forall%a,@ " print_ne_params stv
@@ -81,7 +76,7 @@ let print_implicit_params fmt stv =
 let print_params_list fmt ltv =
   match ltv with
     | [] -> ()
-    | _ -> fprintf fmt "forall%a,@ " print_ne_params_list ltv
+    | _ -> fprintf fmt "forall %a,@ " (print_list space print_tv_binder) ltv
 
 let forget_tvs () =
   Sid.iter (forget_id iprinter) !tv_set;
@@ -186,7 +181,6 @@ let print_paren_r fmt x =
 
 let arrow fmt () = fprintf fmt "@ -> "
 let print_arrow_list fmt x = print_list arrow fmt x
-let print_space_list fmt x = print_list space fmt x
 
 let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
@@ -295,9 +289,9 @@ and print_tnode opl opr info fmt t = match t.t_node with
           then
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
             else fprintf fmt "(%a %a)" (print_ls_real info) fs
-              (print_space_list (print_term info)) tl
+              (print_list space (print_term info)) tl
           else fprintf fmt (protect_on opl "(%a %a:%a)") (print_ls_real info) fs
-            (print_space_list (print_term info)) tl (print_ty info) (t_type t)
+            (print_list space (print_term info)) tl (print_ty info) (t_type t)
     end
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
@@ -305,7 +299,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
       fprintf fmt (protect_on opr "forall %a,@ %a")
-        (print_space_list (print_vsty info)) vl
+        (print_list space (print_vsty info)) vl
         (* (print_tl info) tl *) (print_fmla info) f;
       List.iter forget_var vl
   | Tquant (Texists,fq) ->
@@ -344,8 +338,8 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
-      | _ -> fprintf fmt "(%a %a)" (print_ls_real info) ps
-          (print_space_list (print_term info)) tl
+      | _ -> fprintf fmt "(%a%a)" (print_ls_real info) ps
+          (print_list_pre space (print_term info)) tl
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
@@ -369,12 +363,12 @@ let print_expr info fmt =
 let print_constr info ts fmt (cs,_) =
   match cs.ls_args with
     | [] ->
-        fprintf fmt "@[<hov 4>| %a : %a %a@]" print_ls cs
-          print_ts ts (print_list space print_tv) ts.ts_args
+        fprintf fmt "@[<hov 4>| %a : %a%a@]" print_ls cs
+          print_ts ts (print_list_pre space print_tv) ts.ts_args
     | l ->
-        fprintf fmt "@[<hov 4>| %a : %a -> %a %a@]" print_ls cs
+        fprintf fmt "@[<hov 4>| %a : %a -> %a%a@]" print_ls cs
           (print_arrow_list (print_ty info)) l
-          print_ts ts (print_list space print_tv) ts.ts_args
+          print_ts ts (print_list_pre space print_tv) ts.ts_args
 
 let ls_ty_vars ls =
   let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
@@ -668,8 +662,8 @@ let print_type_decl ~prev info fmt ts =
           print_ts ts print_params_list ts.ts_args print_ts_tv ts
           print_ts ts
     | Some ty ->
-      fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a %a :=@ %a.@]@\n@\n"
-        print_ts ts (print_list space print_tv_binder) ts.ts_args
+      fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a :=@ %a.@]@\n@\n"
+        print_ts ts (print_list_pre space print_tv_binder) ts.ts_args
         (print_ty info) ty
 
 let print_type_decl ~prev info fmt ts =
@@ -681,8 +675,8 @@ let print_data_decl ~first info fmt ts csl =
   if first then
     fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Inductive"
   else fprintf fmt "@\nwith";
-  fprintf fmt " %s %a :=@\n@[<hov>%a@]"
-    name (print_list space print_tv_binder) ts.ts_args
+  fprintf fmt " %s%a :=@\n@[<hov>%a@]"
+    name (print_list_pre space print_tv_binder) ts.ts_args
     (print_list newline (print_constr info ts)) csl;
   name
 
@@ -769,7 +763,7 @@ let print_logic_decl info fmt (ls,ld) =
   fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a%a: %a :=@ %a.@]@\n"
     print_ls ls
     print_ne_params all_ty_params
-    (print_space_list (print_vsty info)) vl
+    (print_list_pre space (print_vsty info)) vl
     (print_ls_type info) ls.ls_value
     (print_expr info) e;
   List.iter forget_var vl;
@@ -812,7 +806,7 @@ let print_recursive_decl info fmt (ls,ld) =
   fprintf fmt "%a%a%a {struct %a}: %a :=@ %a@]"
     print_ls ls
     print_ne_params all_ty_params
-    (print_space_list (print_vsty info)) vl
+    (print_list_pre space (print_vsty info)) vl
     print_vs (List.nth vl i)
     (print_ls_type info) ls.ls_value
     (print_expr info) e;
