@@ -605,37 +605,39 @@ let intros_params fmt params =
       fprintf fmt "@ %s %s_WT" n n)
     params
 
+let need_intros params fmla =
+  not (Stv.is_empty params) ||
+  match fmla.t_node with
+  | Tlet _
+  | Tquant(Tforall,_)
+  | Tbinop(Timplies, _, _) -> true
+  | _ -> false
+
 let intros fmt params fmla =
-  let need_intros =
-    not (Stv.is_empty params) ||
-      match fmla.t_node with
-    | Tlet _
-    | Tquant(Tforall,_)
-    | Tbinop(Timplies, _, _) -> true
-    | _ -> false
-  in
-  if need_intros then
-    fprintf fmt "@[intros%a%a.@]" intros_params params (do_intros 1) fmla
+  fprintf fmt "@[intros%a%a.@]" intros_params params (do_intros 1) fmla
 
 let print_empty_proof fmt def =
   match def with
     | Some (params,fmla) ->
-      intros fmt params fmla;
+      if need_intros params fmla then intros fmt params fmla;
       fprintf fmt "@\n@\n";
       fprintf fmt "Qed.@\n"
     | None ->
       fprintf fmt "@\n";
       fprintf fmt "Defined.@\n"
 
-let print_previous_proof def fmt previous =
-  let old_intros = Str.regexp "^ *([*] intros " in
+let old_intros = Str.regexp "^ *([*] intros "
+
+let print_previous_proof def info fmt previous =
   match previous with
   | None ->
     print_empty_proof fmt def
   | Some (Query (_,Vernacular,c)) ->
     begin match def with
-    | Some def when not (Str.string_match old_intros c 0) ->
-      fprintf fmt "@[(* %a *)@]@\n" (fun fmt (p,f) -> intros fmt p f) def
+    | Some (p, f) ->
+      if not info.realization && need_intros p f &&
+         not (Str.string_match old_intros c 0)
+      then fprintf fmt "@[(* %a *)@]@\n" (fun fmt f -> intros fmt p f) f
     | _ -> ()
     end;
     fprintf fmt "%s" c
@@ -659,7 +661,7 @@ let print_type_decl ~prev info fmt ts =
         | _ ->
           fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a : %aType.@]@\n%a@\n"
             print_ts ts print_params_list ts.ts_args
-            (print_previous_proof None) prev
+            (print_previous_proof None info) prev
       else
         fprintf fmt "@[<hov 2>Axiom %a : %aType.@]@\n@[<hov 2>Parameter %a_WhyType : %aWhyType %a.@]@\nExisting Instance %a_WhyType.@\n@\n"
           print_ts ts print_params_list ts.ts_args
@@ -750,7 +752,7 @@ let print_param_decl ~prev info fmt ls =
         print_ls ls print_params all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
-        (print_previous_proof None) prev
+        (print_previous_proof None info) prev
   else
     fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n@\n"
       print_ls ls print_params all_ty_params
@@ -782,7 +784,7 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
     print_ne_params all_ty_params
     (print_expr info) def_formula;
   fprintf fmt "%a@\n"
-    (print_previous_proof (Some(all_ty_params,def_formula))) prev;
+    (print_previous_proof (Some (all_ty_params,def_formula)) info) prev;
   fprintf fmt "@\n"
 
 let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
@@ -869,7 +871,7 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
         stt print_pr pr print_params params
         (print_fmla info) f
-        (print_previous_proof (Some (params,f))) prev
+        (print_previous_proof (Some (params,f)) info) prev
   else
     fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
       print_pr pr print_params params
