@@ -806,6 +806,9 @@ COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
 COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 
+COQLIBS_BOOL_FILES = Bool
+COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
+
 COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
@@ -824,7 +827,7 @@ COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -844,6 +847,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory BuiltIn meta "realized_theory" "BuiltIn", "" end'; \
 	for f in $(COQLIBS_INT_FILES); do \
 	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_BOOL_FILES); do \
+	echo 'theory bool.'"$$f"' meta "realized_theory" "bool.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_REAL_FILES); do \
 	echo 'theory real.'"$$f"' meta "realized_theory" "real.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_NUMBER_FILES); do \
@@ -863,6 +868,8 @@ install_no_local::
 	cp lib/coq/BuiltIn.vo $(LIBDIR)/why3/coq/
 	mkdir -p $(LIBDIR)/why3/coq/int
 	cp $(addsuffix .vo, $(COQLIBS_INT)) $(LIBDIR)/why3/coq/int/
+	mkdir -p $(LIBDIR)/why3/coq/bool
+	cp $(addsuffix .vo, $(COQLIBS_BOOL)) $(LIBDIR)/why3/coq/bool/
 	mkdir -p $(LIBDIR)/why3/coq/real
 	cp $(addsuffix .vo, $(COQLIBS_REAL)) $(LIBDIR)/why3/coq/real/
 	mkdir -p $(LIBDIR)/why3/coq/number
@@ -890,10 +897,13 @@ depend: $(COQVD)
 clean::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
-update-coq: update-coq-int update-coq-real update-coq-number update-coq-set update-coq-map update-coq-fp
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-fp
 
 update-coq-int: bin/why3 drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+
+update-coq-bool: bin/why3 drivers/coq-realizations.aux theories/bool.why
+	for f in $(COQLIBS_BOOL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T bool.$$f -o lib/coq/bool/; done
 
 update-coq-real: bin/why3 drivers/coq-realizations.aux theories/real.why
 	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
