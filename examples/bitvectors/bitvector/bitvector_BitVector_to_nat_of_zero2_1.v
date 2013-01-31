@@ -266,8 +266,10 @@ Axiom to_nat_sub_one : forall (b:bv) (j:Z) (i:Z), (((0%Z <= i)%Z /\
 Axiom to_nat_sub_high : forall (b:bv) (j:Z) (i:Z), (j < i)%Z ->
   ((to_nat_sub b j i) = 0%Z).
 
+(*
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.94" timelimit 5.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+*)
 Open Scope Z_scope.
 
 (* Why3 goal *)
@@ -278,20 +280,13 @@ Theorem to_nat_of_zero2 : forall (b:bv) (i:Z) (j:Z), (((j < size)%Z /\
 intros b i j ((Hj,Hij),Hipos).
 generalize Hj.
 pattern j; apply Zlt_lower_bound_ind with (z:=i); auto.
-ae.
-(*
-clear j Hj.
+clear j Hj Hij.
 intros j Hind Hij.
 assert (h:(i=j \/i < j)) by omega.
 destruct h.
-subst x; auto.
+subst; auto.
 intros Hbits Hnth.
 rewrite to_nat_sub_zero; auto with zarith.
-destruct Hij.
-exact H0.
-destruct Hij.
-exact H.
-*)
 Qed.
 
 

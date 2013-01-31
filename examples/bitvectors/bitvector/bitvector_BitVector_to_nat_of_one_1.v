@@ -276,7 +276,6 @@ Axiom to_nat_of_zero : forall (b:bv) (i:Z) (j:Z), ((j < size)%Z /\
   k) = false)) -> ((to_nat_sub b j i) = 0%Z)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 5.
 Open Scope Z_scope.
 
 (* Why3 goal *)
@@ -287,7 +286,7 @@ Theorem to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j < size)%Z /\
 intros b i j ((Hj,Hij),Hi).
 generalize Hij Hj.
 pattern j; apply Zlt_lower_bound_ind with (z:=i); auto.
-ae.
+why3 "cvc3" timelimit 3.
 Qed.
 
 
