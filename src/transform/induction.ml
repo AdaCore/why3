@@ -467,12 +467,14 @@ let induction_int_lex th_int = function
       with Exit -> [t] end
   | _ -> assert false
 
+(*
 let () =
   Trans.register_env_transform_l "induction_int_lex"
     (fun env ->
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ integers."
+*)
 
 (*
 Local Variables:
