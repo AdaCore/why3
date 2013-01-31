@@ -12,8 +12,6 @@ Lemma infix_lseq_def : forall (x:Z) (y:Z), (x <= y)%Z <-> ((x < y)%Z \/
 exact Zle_lt_or_eq_iff.
 Qed.
 
-
-
 (* Why3 comment *)
 (* infix_pl is replaced with (x + x1)%Z by the coq driver *)
 
@@ -91,7 +89,6 @@ Qed.
 Lemma infix_mn_def : forall (x:Z) (y:Z), ((x - y)%Z = (x + (-y)%Z)%Z).
 reflexivity.
 Qed.
-
 
 (* Why3 goal *)
 Lemma Comm1 : forall (x:Z) (y:Z), ((x * y)%Z = (y * x)%Z).

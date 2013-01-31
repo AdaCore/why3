@@ -10,8 +10,6 @@ Lemma sqr_def : forall (x:R), ((Rsqr x) = (x * x)%R).
 reflexivity.
 Qed.
 
-
-
 (* Why3 comment *)
 (* sqrt is replaced with (sqrt x) by the coq driver *)
 

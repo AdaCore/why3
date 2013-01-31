@@ -778,8 +778,7 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
     print_ne_params all_ty_params
     (print_expr info) def_formula;
   fprintf fmt "%a@\n"
-    (print_previous_proof (Some (all_ty_params,def_formula)) info) prev;
-  fprintf fmt "@\n"
+    (print_previous_proof (Some (all_ty_params,def_formula)) info) prev
 
 let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
   if info.realization && (Mid.mem ls.ls_name info.info_syn) then
@@ -787,7 +786,6 @@ let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
       ((id_unique iprinter ls.ls_name)^"_def") in
     let prev = output_till_statement fmt old name in
     (print_equivalence_lemma ~prev info fmt name d; forget_tvs ())
-
 
 let print_logic_decl ~old info fmt d =
   (** During realization the definition of a "builtin" symbol is

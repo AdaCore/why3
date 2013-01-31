@@ -12,8 +12,6 @@ Lemma infix_lseq_def : forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/
 reflexivity.
 Qed.
 
-
-
 (* Why3 comment *)
 (* infix_pl is replaced with (x + x1)%R by the coq driver *)
 
@@ -88,8 +86,6 @@ Lemma infix_mn_def : forall (x:R) (y:R), ((x - y)%R = (x + (-y)%R)%R).
 reflexivity.
 Qed.
 
-
-
 (* Why3 goal *)
 Lemma Comm1 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R).
 Proof.
@@ -121,7 +117,6 @@ Qed.
 Lemma infix_sl_def : forall (x:R) (y:R), ((Rdiv x y)%R = (x * (Rinv y))%R).
 reflexivity.
 Qed.
-
 
 (* Why3 goal *)
 Lemma add_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
