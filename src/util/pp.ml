@@ -23,10 +23,14 @@ let print_option_or_default default f fmt = function
   | None -> fprintf fmt "%s" default
   | Some x -> f fmt x
 
-let rec print_list sep print fmt = function
+let rec print_list_pre sep print fmt = function
+  | [] -> ()
+  | x :: r -> sep fmt (); print fmt x; print_list_pre sep print fmt r
+
+let print_list sep print fmt = function
   | [] -> ()
   | [x] -> print fmt x
-  | x :: r -> print fmt x; sep fmt (); print_list sep print fmt r
+  | x :: r -> print fmt x; print_list_pre sep print fmt r
 
 let print_list_or_default default sep print fmt = function
   | [] -> fprintf fmt "%s" default
