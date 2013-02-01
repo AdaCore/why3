@@ -13,10 +13,11 @@ int isqrt(int x) {
   /*@ loop invariant count >= 0 && x >= sqr(count) && sum == sqr(count+1);
     @ loop variant  x - count; 
     @*/
-  while (sum <= x) sum += 2 * ++count + 1;
+  while (sum <= x) { ++count; sum += 2 * count + 1; }
   return count;
 }
 
+#if 0
 //@ ensures \result == 4;
 int main () {
   int r;
@@ -25,6 +26,8 @@ int main () {
   //@ assert r > 4 ==> \false;
   return r;
 }
+
+#endif
 
 /*
 Local Variables:

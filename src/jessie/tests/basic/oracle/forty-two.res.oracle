@@ -24,7 +24,8 @@
             
             goal WP_parameter_f : (6 * 7) = 42
             
-            goal WP_parameter_g : true
+            goal WP_parameter_g :
+              forall us_retres:int. us_retres = (6 * 7) -> us_retres = 42
             end
 [jessie3] Alt-Ergo 0.94, Alt-Ergo 0.95, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.2
 [jessie3] Task 1: Valid, Valid, Valid, Valid, Valid, Valid
