@@ -351,40 +351,42 @@ let d2 =
   }
   in
   let body =
-    (* ref 0 *)
+    (* building expression "ref 0" *)
     let e =
-      (* recall that "ref" has type forall 'a, 'a -> ref 'a *)
-      (* (???) we built the instance of 'a by int *)
-      (* (???) or we built a dummy effective parameter of type int ? *)
+      (* recall that "ref" has type "(v:'a) -> ref 'a". We need to build an
+         instance of it *)
+      (* we first built a dummy effective parameter v of type int *)
       let pv =
         Mlw_ty.create_pvsymbol
-          (Ident.id_fresh "a") (Mlw_ty.vty_value Mlw_ty.ity_int)
+          (Ident.id_fresh "v") (Mlw_ty.vty_value Mlw_ty.ity_int)
       in
-      (* ity is (ref int) with a *fresh* region *)
+      (* we build "ref int" with a *fresh* region *)
       let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
-      (* ??? the type  (int -> ref <fresh region> int) ? *)
+      (* we build the type "(v:int) -> ref <fresh region> int)" *)
       let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+      (* e1 : the appropriate instance of "ref" *)
       let e1 = Mlw_expr.e_arrow ref_fun vta in
+      (* we apply it to 0 *)
       let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
       Mlw_expr.e_app e1 [c0]
     in
-    (* let x = ref 0 *)
+    (* building the first part of the let x = ref 0 *)
     let letdef = Mlw_expr.create_let_defn (Ident.id_fresh "x") e in
+    (* get back the variable x *)
     let var_x = match letdef.Mlw_expr.let_sym with
       | Mlw_expr.LetV vs -> vs
       | Mlw_expr.LetA _ -> assert false
     in
-    (* !x *)
+    (* building expression "!x" *)
     let bang_x =
-      (* recall that "!" as type forall 'a. ref 'a -> 'a *)
-      let pv =
-        Mlw_ty.create_pvsymbol (Ident.id_fresh "r") var_x.Mlw_ty.pv_vtv
-      in
+      (* recall that "!" as type "ref 'a -> 'a" *)
+      (* we build a dummy parameter r of the same type as x *)
       let vta =
-        Mlw_ty.vty_arrow [pv]
+        Mlw_ty.vty_arrow [var_x]
           (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_int))
       in
-      Mlw_expr.e_arrow get_fun vta
+      let e1 = Mlw_expr.e_arrow get_fun vta in
+      Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
     in
     (* the complete body *)
     Mlw_expr.e_let letdef bang_x
@@ -420,5 +422,5 @@ let () =
 
 
 (*
-ocamlc -I ../../lib/why3 -c use_api.ml 
+ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma use_api.ml
 *)

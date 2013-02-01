@@ -1141,13 +1141,14 @@ testl-type: bin/why3.byte
 test-api.byte: examples/use_api/use_api.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
-	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
+	|| (rm -f test-api.byte; printf "Test of Why API calls failed. Please fix it"; exit 2)
+	@rm -f test-api.byte; 
 
 test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
 	&& ./test-api.opt) \
-	|| (printf "Test of Why API calls failed. Please fix it"; exit 2)
+	|| (rm -f test-api.opt; printf "Test of Why API calls failed. Please fix it"; exit 2)
 	@rm -f test-api.opt
 
 #test-shape: lib/why3/why3.cma
@@ -1156,14 +1157,16 @@ test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
 test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
-	|| (printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
+	|| (rm -f why3session.xml;  \
+	printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
 test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
 	&& ./test-session.opt) \
-	|| (printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
+	|| (rm -f test-session.opt why3session.xml; \
+	printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml
 
 

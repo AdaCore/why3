@@ -34,6 +34,7 @@ module rec T : sig
     its_priv : bool;
   }
 
+  (** ity = individual type in programs, first-order, i.e. no functions *)
   and ity = private {
     ity_node : ity_node;
     ity_vars : varset;
@@ -85,6 +86,8 @@ exception UnboundRegion of region
 
 val create_region : preid -> ity -> region
 
+
+(** creation of a symbol for type in programs *)
 val create_itysymbol :
   preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
     tvsymbol list -> region list -> ity option -> itysymbol
