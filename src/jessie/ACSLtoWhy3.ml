@@ -517,12 +517,16 @@ let mk_get ref_ty ty =
     Self.fatal "Exception raised during mk_get@ %a@."
       Exn_printer.exn_printer e
 
-let mk_set ty =
-    let pv =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
+let mk_set ref_ty ty =
+    (* (:=) has type (r:ref 'a) (v:'a) unit *)
+    let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
+    let pv2 = 
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "v") (Mlw_ty.vty_value ty) 
     in
-    (* let ity = Mlw_ty.ity_app_fresh ref_type [ty] in *)
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
+    let vta = 
+      Mlw_ty.vty_arrow [pv1;pv2] 
+        (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_unit)) 
+    in
     Mlw_expr.e_arrow set_fun vta
 
 let create_var v =
@@ -537,7 +541,7 @@ let create_var v =
 (*
   Self.result "create program variable %s (%d)" v.vname v.vid;
 *)
-  Hashtbl.add program_vars v.vid (vs,ty);
+  Hashtbl.add program_vars v.vid (vs,true,ty);
   let_defn
 
 let get_var v =
@@ -550,15 +554,18 @@ let get_var v =
 let lval (host,offset) =
   match host,offset with
     | Var v, NoOffset ->
-      let v,ty = get_var v in
-      begin try
-              Mlw_expr.e_app
-                (mk_get v.Mlw_ty.pv_vty ty)
-                [Mlw_expr.e_value v]
-        with e ->
-          Self.fatal "Exception raised during application of !@ %a@."
-            Exn_printer.exn_printer e
-      end
+      let v,is_mutable,ty = get_var v in
+      if is_mutable then
+        begin try
+                Mlw_expr.e_app
+                  (mk_get v.Mlw_ty.pv_vtv ty)
+                  [Mlw_expr.e_value v]
+          with e ->
+            Self.fatal "Exception raised during application of !@ %a@."
+              Exn_printer.exn_printer e
+        end
+      else
+        Mlw_expr.e_value v
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
     | Mem _, _ ->
@@ -633,15 +640,18 @@ let rec expr e =
 let assignment (lhost,offset) e _loc =
   match lhost,offset with
     | Var v , NoOffset ->
-      let v,ty = get_var v in
-      begin try
-              Mlw_expr.e_app
-                (mk_set ty)
-                [Mlw_expr.e_value v; expr e]
-        with e ->
-          Self.fatal "Exception raised during application of :=@ %a@."
+      let v,is_mutable,ty = get_var v in
+      if is_mutable then
+        begin try
+                Mlw_expr.e_app
+                  (mk_set v.Mlw_ty.pv_vtv ty)
+                  [Mlw_expr.e_value v; expr e]
+          with e ->
+            Self.fatal "Exception raised during application of :=@ %a@."
             Exn_printer.exn_printer e
-      end
+        end
+      else
+        Self.not_yet_implemented "mutation of formal parameters"
     | Var _ , Field _ ->
       Self.not_yet_implemented "assignment Var/Field"
     | Var _ , Index _ ->
@@ -754,21 +764,28 @@ let fundecl fdec =
   let fun_id = fdec.svar in
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
-  let formals =
+  let args =
     match Kernel_function.get_formals kf with
-      | [] -> [ "_dummy", Mlw_ty.ity_unit ]
-      | l -> List.map (fun v -> (v.vname, ctype v.vtype)) l
+      | [] -> 
+        [ Mlw_ty.create_pvsymbol 
+            (Ident.id_fresh "_dummy") 
+            (Mlw_ty.vty_value Mlw_ty.ity_unit) ]
+      | l -> 
+        List.map (fun v -> 
+          let ity = ctype v.vtype in
+          let vs = 
+            Mlw_ty.create_pvsymbol 
+              (Ident.id_fresh v.vname) 
+              (Mlw_ty.vty_value ity)
+          in
+          Hashtbl.add program_vars v.vid (vs,false,ity);
+          vs) 
+        l
   in
   let body = fdec.sbody in
   let contract = Annotations.funspec kf in
   let _pre,_post,_ass = extract_simple_contract contract in
   let _ret_type = ctype (Kernel_function.get_return_type kf) in
-  let args =
-    List.map
-      (fun (id,ity) ->
-        Mlw_ty.create_pvsymbol (Ident.id_fresh id) (Mlw_ty.vty_value ity))
-      formals
-  in
   let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
   let locals =
     List.map create_var (Kernel_function.get_locals kf)
@@ -868,8 +885,16 @@ let use m th =
        th)
     true
 
+let use_module m modul =
+  let name = modul.Mlw_module.mod_theory.Theory.th_name in
+  Mlw_module.close_namespace
+    (Mlw_module.use_export
+       (Mlw_module.open_namespace m name.Ident.id_string)
+       modul)
+    true
+
 let prog p =
-  try
+  (* try *)
     let theories,decls,functions =
       List.fold_left global ([],[],[]) p.globals
     in
@@ -885,10 +910,11 @@ let prog p =
     let m = use m int_theory in
     let m = use m real_theory in
     let m = List.fold_left use m theories in
+    let m = use_module m ref_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
-  with e ->
-    Self.fatal "Exception raised during translation to Why3:@ %a@."
-      Exn_printer.exn_printer e
+  (* with e -> *)
+  (*   Self.fatal "Exception raised during translation to Why3:@ %a@." *)
+  (*     Exn_printer.exn_printer e *)

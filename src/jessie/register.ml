@@ -63,7 +63,7 @@ let process () =
         "Z32", "Z3,3.2"; 
         "C24", "CVC3,2.4.1";
         "C22", "CVC3,2.2"; 
-        "A95", "Alt-Ergo,0.95";
+        "A95", "Alt-Ergo,0.95,";
         "A94", "Alt-Ergo,0.94";
         ] 
   in
