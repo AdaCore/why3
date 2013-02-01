@@ -83,21 +83,35 @@ let ge_real : Term.lsymbol = find real_theory "infix >="
 
 (* ref.Ref module *)
 
-let ref_modules, ref_theories = 
+let ref_modules, ref_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
 
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
-let ref_type : Mlw_ty.T.itysymbol = 
+let ref_type : Mlw_ty.T.itysymbol =
   match
     Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
   with
     | Mlw_module.PT itys -> itys
     | Mlw_module.TS _ -> assert false
 
-let ref_fun : Mlw_expr.psymbol = 
+let ref_fun : Mlw_expr.psymbol =
   match
     Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
+  with
+    | Mlw_module.PS p -> p
+    | _ -> assert false
+
+let get_fun : Mlw_expr.psymbol =
+  match
+    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
+  with
+    | Mlw_module.PS p -> p
+    | _ -> assert false
+
+let set_fun : Mlw_expr.psymbol =
+  match
+    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
   with
     | Mlw_module.PS p -> p
     | _ -> assert false
@@ -152,7 +166,7 @@ let rec logic_type ty =
         try
           let ts = Hashtbl.find logic_types lt.lt_name in
           Ty.ty_app ts (List.map logic_type args)
-        with 
+        with
             Not_found -> Self.fatal "logic type %s not found" lt.lt_name
       end
     | Lvar v -> Ty.ty_var (find_type_var v)
@@ -169,16 +183,16 @@ let rec logic_type ty =
 (* terms *)
 (*********)
 
-let constant c =
+let logic_constant c =
   match c with
-    | Integer(_value,Some s) -> 
-      let c = Literals.integer s in Term.ConstInt c
+    | Integer(_value,Some s) ->
+      let c = Literals.integer s in Number.ConstInt c
     | Integer(_value,None) ->
-      Self.not_yet_implemented "constant Integer None"
+      Self.not_yet_implemented "logic_constant Integer None"
     | LReal(_value,s) ->
-      let c = Literals.floating_point s in Term.ConstReal c
+      let c = Literals.floating_point s in Number.ConstReal c
     | (LStr _|LWStr _|LChr _|LEnum _) ->
-      Self.not_yet_implemented "constant"
+      Self.not_yet_implemented "logic_constant"
 
 let t_app ls args =
   try
@@ -261,7 +275,7 @@ let tlval (host,offset) =
 
 let rec term_node t =
   match t with
-    | TConst cst -> Term.t_const (constant cst)
+    | TConst cst -> Term.t_const (logic_constant cst)
     | TLval lv -> tlval lv
     | TBinOp (op, t1, t2) -> bin (term t1) op (term t2)
     | TUnOp (op, t) -> unary op (term t)
@@ -273,7 +287,7 @@ let rec term_node t =
             let ls = get_lsymbol li in
             let args = List.map (fun x -> snd(term x)) args in
             t_app ls args
-          | _ -> 
+          | _ ->
             Self.not_yet_implemented "term_node Tapp with labels"
       end
     | TSizeOf _
@@ -447,9 +461,9 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
     | Daxiomatic (name, decls', loc) ->
-      let theories = 
-        add_decls_as_theory theories 
-          (Ident.id_fresh global_logic_decls_theory_name) decls 
+      let theories =
+        add_decls_as_theory theories
+          (Ident.id_fresh global_logic_decls_theory_name) decls
       in
       let (t,decls'') =
         List.fold_left
@@ -483,23 +497,46 @@ let identified_proposition p =
 
 let program_vars = Hashtbl.create 257
 
-let any _ty = 
-  Mlw_expr.e_const (Term.ConstInt (Term.int_const_decimal "0")) 
+let any _ty =
+  Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
+
+let mk_ref ty =
+    let pv =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
+    in
+    let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+    Mlw_expr.e_arrow ref_fun vta
+
+let mk_get ty =
+  try
+    let vty = Mlw_ty.vty_value ty in
+    let r = match vty.Mlw_ty.vtv_mut with
+      | Some r -> r
+      | None -> assert false
+    in
+    let ity = Mlw_ty.ity_app ref_type [ty] [r] in 
+    let pv =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") vty
+    in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
+    Mlw_expr.e_arrow get_fun vta
+  with e ->
+    Self.fatal "Exception raised during mk_get@ %a@."
+      Exn_printer.exn_printer e
+
+let mk_set ty =
+    let pv =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
+    in
+    (* let ity = Mlw_ty.ity_app_fresh ref_type [ty] in *)
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
+    Mlw_expr.e_arrow set_fun vta
 
 let create_var v =
   let id = Ident.id_fresh v.vname in
-  let ty = Mlw_ty.vty_value (ctype v.vtype) in
-  let specialize_ref = Mlw_dty.specialize_psymbol ref_fun in
-  let vty =
-    match Mlw_dty.vty_of_dvty specialize_ref with
-      | Mlw_ty.VTarrow vty -> vty
-      | Mlw_ty.VTvalue _ -> assert false
-  in
-  let def = 
-    Mlw_expr.e_app
-      (Mlw_expr.e_arrow ref_fun vty)
-      [any ty] 
-  in
+  let ty = ctype v.vtype in
+  let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
   let let_defn = Mlw_expr.create_let_defn id def in
   let vs = match let_defn.Mlw_expr.let_sym with
     | Mlw_expr.LetV vs -> vs
@@ -508,7 +545,7 @@ let create_var v =
 (*
   Self.result "create program variable %s (%d)" v.vname v.vid;
 *)
-  Hashtbl.add program_vars v.vid vs;
+  Hashtbl.add program_vars v.vid (vs,ty);
   let_defn
 
 let get_var v =
@@ -520,7 +557,16 @@ let get_var v =
 
 let lval (host,offset) =
   match host,offset with
-    | Var v, NoOffset -> Mlw_expr.e_value (get_var v)
+    | Var v, NoOffset -> 
+      let v,ty = get_var v in
+      begin try
+              Mlw_expr.e_app 
+                (mk_get ty) 
+                [Mlw_expr.e_value v]
+        with e ->
+          Self.fatal "Exception raised during application of !@ %a@."
+            Exn_printer.exn_printer e
+      end
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
     | Mem _, _ ->
@@ -552,28 +598,68 @@ let annot a e =
   | APragma _ ->
     Self.not_yet_implemented "annot APragma"
 
-let expr e =
+let binop op e1 e2 =
+  match op with
+    | PlusA -> Mlw_expr.e_lapp mul_int [e1;e2] Mlw_ty.ity_int
+    | Mult -> Mlw_expr.e_lapp mul_int [e1;e2] Mlw_ty.ity_int
+    | PlusPI|IndexPI|MinusA|MinusPI|MinusPP
+    | Div|Mod|Shiftlt|Shiftrt|Lt|Gt|Le
+    | Ge|Eq|Ne|BAnd|BXor|BOr|LAnd|LOr ->
+      Self.not_yet_implemented "binop"
+
+let constant c = 
+  match c with
+  | CInt64(_t,_ikind, Some s) -> 
+      Number.ConstInt (Literals.integer s)
+  | CInt64(_t,_ikind, None) -> 
+      Self.not_yet_implemented "constant CInt64/None"
+  | CStr _
+  | CWStr _
+  | CChr _
+  | CReal (_, _, _)
+  | CEnum _ ->
+      Self.not_yet_implemented "constant"
+ 
+let rec expr e =
   match e.enode with
-    | Const _c -> (* constant c *)
-      Self.not_yet_implemented "expr Const"
+    | Const c -> Mlw_expr.e_const (constant c)
     | Lval lv -> lval lv
+    | BinOp (op, e1, e2, _loc) ->
+      binop op (expr e1) (expr e2) 
     | SizeOf _
     | SizeOfE _
     | SizeOfStr _
     | AlignOf _
     | AlignOfE _
     | UnOp (_, _, _)
-    | BinOp (_, _, _, _)
     | CastE (_, _)
     | AddrOf _
     | StartOf _
     | Info (_, _)
       -> Self.not_yet_implemented "expr"
 
+let assignment (lhost,offset) e _loc =
+  match lhost,offset with
+    | Var v , NoOffset ->
+      let v,ty = get_var v in
+      begin try
+              Mlw_expr.e_app 
+                (mk_set ty) 
+                [Mlw_expr.e_value v; expr e]
+        with e ->
+          Self.fatal "Exception raised during application of :=@ %a@."
+            Exn_printer.exn_printer e
+      end
+    | Var _ , Field _ ->
+      Self.not_yet_implemented "assignment Var/Field"
+    | Var _ , Index _ ->
+      Self.not_yet_implemented "assignment Var/Index"
+    | Mem _, _ ->
+      Self.not_yet_implemented "assignment Mem"
+
 let instr i =
   match i with
-  | Set(_lv,_e,_loc) ->
-    Self.not_yet_implemented "instr Set"
+  | Set(lv,e,loc) -> assignment lv e loc
   | Call (_, _, _, _) ->
     Self.not_yet_implemented "instr Call"
   | Asm (_, _, _, _, _, _) ->
@@ -676,7 +762,7 @@ let fundecl fdec =
   let fun_id = fdec.svar in
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
-  let formals = 
+  let formals =
     match Kernel_function.get_formals kf with
       | [] -> [ "_dummy", Mlw_ty.ity_unit ]
       | l -> List.map (fun v -> (v.vname, ctype v.vtype)) l
@@ -686,8 +772,8 @@ let fundecl fdec =
   let _pre,_post,_ass = extract_simple_contract contract in
   let _ret_type = ctype (Kernel_function.get_return_type kf) in
   let args =
-    List.map 
-      (fun (id,ity) -> 
+    List.map
+      (fun (id,ity) ->
         Mlw_ty.create_pvsymbol (Ident.id_fresh id) (Mlw_ty.vty_value ity))
       formals
   in
@@ -778,15 +864,15 @@ let add_pdecl m d =
   try
     Mlw_module.add_pdecl ~wp:true m d
   with
-      Not_found -> 
+      Not_found ->
         Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id)
-          (Ident.Sid.elements d.Mlw_decl.pd_news) 
+          (Ident.Sid.elements d.Mlw_decl.pd_news)
 
 let use m th =
   let name = th.Theory.th_name in
   Mlw_module.close_namespace
     (Mlw_module.use_export_theory
-       (Mlw_module.open_namespace m name.Ident.id_string) 
+       (Mlw_module.open_namespace m name.Ident.id_string)
        th)
     true
 
@@ -797,12 +883,12 @@ let prog p =
     in
     Self.result "found %d logic decl(s)" (List.length decls);
     let theories =
-      add_decls_as_theory theories 
+      add_decls_as_theory theories
         (Ident.id_fresh global_logic_decls_theory_name) decls
     in
     Self.result "made %d theory(ies)" (List.length theories);
-    let m = Mlw_module.create_module env 
-      (Ident.id_fresh programs_module_name) 
+    let m = Mlw_module.create_module env
+      (Ident.id_fresh programs_module_name)
     in
     let m = use m int_theory in
     let m = use m real_theory in
@@ -811,6 +897,6 @@ let prog p =
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
-  with
-      Decl.UnknownIdent(s) ->
-        Self.fatal "unknown identifier %s" s.Ident.id_string
+  with e ->
+    Self.fatal "Exception raised during translation to Why3:@ %a@."
+      Exn_printer.exn_printer e
