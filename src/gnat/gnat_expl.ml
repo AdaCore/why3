@@ -7,6 +7,7 @@ type reason =
    | VC_Index_Check
    | VC_Overflow_Check
    | VC_Range_Check
+   | VC_Length_Check
    | VC_Discriminant_Check
    | VC_Precondition
    | VC_Postcondition
@@ -38,6 +39,7 @@ let reason_from_string s =
    | "VC_INDEX_CHECK"             -> VC_Index_Check
    | "VC_OVERFLOW_CHECK"          -> VC_Overflow_Check
    | "VC_RANGE_CHECK"             -> VC_Range_Check
+   | "VC_LENGTH_CHECK"            -> VC_Length_Check
    | "VC_DISCRIMINANT_CHECK"      -> VC_Discriminant_Check
    | "VC_PRECONDITION"            -> VC_Precondition
    | "VC_POSTCONDITION"           -> VC_Postcondition
@@ -54,6 +56,7 @@ let string_of_reason s =
    | VC_Index_Check               -> "index check"
    | VC_Overflow_Check            -> "overflow check"
    | VC_Range_Check               -> "range check"
+   | VC_Length_Check              -> "length check"
    | VC_Discriminant_Check        -> "discriminant check"
    | VC_Precondition              -> "precondition"
    | VC_Postcondition             -> "postcondition"
