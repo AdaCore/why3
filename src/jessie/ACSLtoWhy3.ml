@@ -664,12 +664,13 @@ let binop op e1 e2 =
   let ls,ty =
     match op with
       | PlusA -> add_int, Mlw_ty.ity_int
+      | MinusA -> sub_int, Mlw_ty.ity_int
       | Mult -> mul_int, Mlw_ty.ity_int
       | Lt -> lt_int, Mlw_ty.ity_bool
       | Le -> le_int, Mlw_ty.ity_bool
       | Gt | Ge | Eq | Ne ->
         Self.not_yet_implemented "binop comp"
-      | PlusPI|IndexPI|MinusA|MinusPI|MinusPP ->
+      | PlusPI|IndexPI|MinusPI|MinusPP ->
         Self.not_yet_implemented "binop plus/minus"
       | Div|Mod ->
         Self.not_yet_implemented "binop div/mod"
