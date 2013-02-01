@@ -174,7 +174,14 @@ val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
 val e_arrow : psymbol -> vty_arrow -> expr
-(** DOCUMENTATION NEEDED PLEASE *)
+(** [e_arrow p ty] instantiates the program function symbol [p] into a
+    program expression having the given value type [ty], instantiating
+    appropriately the type variables and region variables. The
+    resulting expression can be applied to arguments using [e_app]
+    given below.
+
+    See also [examples/use_api/use_api.ml]
+*)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
@@ -187,6 +194,12 @@ exception GhostRaise of expr * xsymbol
 (* a ghost expression writes in a non-ghost region or raises an exception *)
 
 val e_app : expr -> expr list -> expr
+(** [e_app e el] builds the application of [e] to arguments [el].
+    [e] is typically constructed using [e_arrow] defined above].
+
+    See also [examples/use_api/use_api.ml]
+*)
+
 val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
 

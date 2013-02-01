@@ -9,6 +9,17 @@ int f(int x) {
   return x+1;
 }
 
+#if 0
+
+int g;
+
+/*@ ensures g == \old(g)+x;
+  @*/
+void h(int x) {
+  g += x;
+}
+
+#endif
 
 /*
 Local Variables:

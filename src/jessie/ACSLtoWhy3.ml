@@ -105,6 +105,9 @@ let ref_fun : Mlw_expr.psymbol =
     | Mlw_module.PS p -> p
     | _ -> assert false
 
+let get_logic_fun : Term.lsymbol =
+  find ref_module.Mlw_module.mod_theory "prefix !"
+
 let get_fun : Mlw_expr.psymbol =
   match
     Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
@@ -179,6 +182,36 @@ let rec logic_type ty =
 
 
 
+let any _ty =
+  Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
+
+
+let mk_ref ty =
+    let pv =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
+    in
+    let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+    Mlw_expr.e_arrow ref_fun vta
+
+let mk_get ref_ty ty =
+    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
+    Mlw_expr.e_arrow get_fun vta
+
+let mk_set ref_ty ty =
+    (* (:=) has type (r:ref 'a) (v:'a) unit *)
+    let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
+    let pv2 =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "v") (Mlw_ty.vty_value ty)
+    in
+    let vta =
+      Mlw_ty.vty_arrow [pv1;pv2]
+        (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_unit))
+    in
+    Mlw_expr.e_arrow set_fun vta
+
+
 
 
 
@@ -247,7 +280,31 @@ let get_lvar lv =
   try
     Hashtbl.find bound_vars lv.lv_id
   with Not_found ->
-    Self.fatal "variable %d not found" lv.lv_id
+    Self.fatal "logic variable %s (%d) not found" lv.lv_name lv.lv_id
+
+
+let program_vars = Hashtbl.create 257
+
+let create_var v =
+  let id = Ident.id_fresh v.vname in
+  let ty = ctype v.vtype in
+  let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
+  let let_defn = Mlw_expr.create_let_defn id def in
+  let vs = match let_defn.Mlw_expr.let_sym with
+    | Mlw_expr.LetV vs -> vs
+    | Mlw_expr.LetA _ -> assert false
+  in
+(*
+  Self.result "create program variable %s (%d)" v.vname v.vid;
+*)
+  Hashtbl.add program_vars v.vid (vs,true,ty);
+  let_defn
+
+let get_var v =
+  try
+    Hashtbl.find program_vars v.vid
+  with Not_found ->
+    Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
 let logic_symbols = Hashtbl.create 257
 
@@ -274,7 +331,17 @@ let result_vsymbol =
 let tlval (host,offset) =
   match host,offset with
     | TResult _, TNoOffset -> Term.t_var !result_vsymbol
-    | TVar lv, TNoOffset -> Term.t_var (get_lvar lv)
+    | TVar lv, TNoOffset -> 
+      begin
+        match lv.lv_origin with
+          | None -> Term.t_var (get_lvar lv)
+          | Some v -> 
+            let (v,is_mutable,_ty) = get_var v in
+            if is_mutable then
+              t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
+            else
+              Term.t_var v.Mlw_ty.pv_vs
+      end
     | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
       Self.not_yet_implemented "tlval TVar"
     | TResult _, _ ->
@@ -282,19 +349,21 @@ let tlval (host,offset) =
     | TMem _, _ ->
       Self.not_yet_implemented "tlval Mem"
 
-let rec term_node t =
+type label = Here | Old | At of string
+
+let rec term_node ~label t =
   match t with
     | TConst cst -> Term.t_const (logic_constant cst)
     | TLval lv -> tlval lv
-    | TBinOp (op, t1, t2) -> bin (term t1) op (term t2)
-    | TUnOp (op, t) -> unary op (term t)
+    | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
+    | TUnOp (op, t) -> unary op (term ~label t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | Tapp (li, labels, args) ->
       begin
         match labels with
           | [] ->
             let ls = get_lsymbol li in
-            let args = List.map (fun x -> snd(term x)) args in
+            let args = List.map (fun x -> snd(term ~label x)) args in
             t_app ls args
           | _ ->
             Self.not_yet_implemented "term_node Tapp with labels"
@@ -302,11 +371,13 @@ let rec term_node t =
     | Tat (t, lab) ->
       begin
         match lab with
-          | LogicLabel(None, "Here") -> snd (term t)
-          | LogicLabel(None, "Old") ->
-            Self.not_yet_implemented "term_node Tat/Old"
-          | _ ->
-            Self.not_yet_implemented "term_node Tat"
+          | LogicLabel(None, "Here") -> snd (term ~label:Here t)
+          | LogicLabel(None, "Old") -> snd (term ~label:Old t)
+          | LogicLabel(None, lab) -> snd (term ~label:(At lab) t)
+          | LogicLabel(Some _, _lab) -> 
+            Self.not_yet_implemented "term_node Tat/LogicLabel/Some"
+          | StmtLabel _ ->
+            Self.not_yet_implemented "term_node Tat/StmtLabel"
       end
     | TSizeOf _
     | TSizeOfE _
@@ -335,7 +406,7 @@ let rec term_node t =
     | Tlet (_, _) ->
       Self.not_yet_implemented "term_node"
 
-and term t = (t.term_type, term_node t.term_node)
+and term ~label t = (t.term_type, term_node ~label t.term_node)
 
 
 
@@ -354,18 +425,18 @@ let rel (ty1,t1) op (ty2,t2) =
     | (Rlt|Rgt|Rle),_,_ ->
       Self.not_yet_implemented "rel"
 
-let rec predicate p =
+let rec predicate ~label p =
   match p with
     | Pfalse -> Term.t_false
     | Ptrue -> Term.t_true
-    | Prel (op, t1, t2) -> rel (term t1) op (term t2)
+    | Prel (op, t1, t2) -> rel (term ~label t1) op (term ~label t2)
     | Pforall (lv, p) ->
       let l = List.map create_lvar lv in
-      Term.t_forall_close l [] (predicate_named p)
+      Term.t_forall_close l [] (predicate_named ~label p)
     | Pimplies (p1, p2) ->
-      Term.t_implies (predicate_named p1) (predicate_named p2)
+      Term.t_implies (predicate_named ~label p1) (predicate_named ~label p2)
     | Pand (p1, p2) ->
-      Term.t_and (predicate_named p1) (predicate_named p2)
+      Term.t_and (predicate_named ~label p1) (predicate_named ~label p2)
     | Papp (_, _, _)
     | Pseparated _
     | Por (_, _)
@@ -385,7 +456,7 @@ let rec predicate p =
     | Psubtype (_, _) ->
         Self.not_yet_implemented "predicate"
 
-and predicate_named p = predicate p.content
+and predicate_named ~label p = predicate ~label p.content
 
 
 
@@ -449,7 +520,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
                   Decl.create_param_decl ls
                 | LBterm d ->
                   let ls,args = create_lsymbol li in
-                  let (_ty,d) = term d in
+                  let (_ty,d) = term ~label:Here d in
                   let def = Decl.make_ls_defn ls args d in
                   Decl.create_logic_decl [def]
                 | _ ->
@@ -472,7 +543,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
               in
               Decl.create_prop_decl
                 (if is_axiom then Decl.Paxiom else Decl.Plemma)
-                pr (predicate_named p)
+                pr (predicate_named ~label:Here p)
             in
             (theories,d::decls)
           | _ ->
@@ -513,56 +584,6 @@ let identified_proposition p =
 (* statements *)
 (**************)
 
-let program_vars = Hashtbl.create 257
-
-let any _ty =
-  Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
-
-let mk_ref ty =
-    let pv =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
-    in
-    let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
-    Mlw_expr.e_arrow ref_fun vta
-
-let mk_get ref_ty ty =
-    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
-    Mlw_expr.e_arrow get_fun vta
-
-let mk_set ref_ty ty =
-    (* (:=) has type (r:ref 'a) (v:'a) unit *)
-    let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let pv2 =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "v") (Mlw_ty.vty_value ty)
-    in
-    let vta =
-      Mlw_ty.vty_arrow [pv1;pv2]
-        (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_unit))
-    in
-    Mlw_expr.e_arrow set_fun vta
-
-let create_var v =
-  let id = Ident.id_fresh v.vname in
-  let ty = ctype v.vtype in
-  let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
-  let let_defn = Mlw_expr.create_let_defn id def in
-  let vs = match let_defn.Mlw_expr.let_sym with
-    | Mlw_expr.LetV vs -> vs
-    | Mlw_expr.LetA _ -> assert false
-  in
-(*
-  Self.result "create program variable %s (%d)" v.vname v.vid;
-*)
-  Hashtbl.add program_vars v.vid (vs,true,ty);
-  let_defn
-
-let get_var v =
-  try
-    Hashtbl.find program_vars v.vid
-  with Not_found ->
-    Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
 
 let lval (host,offset) =
@@ -593,7 +614,7 @@ let seq e1 e2 =
 let annot a e =
   match (Annotations.code_annotation_of_rooted a).annot_content with
   | AAssert ([],pred) ->
-    let p = predicate_named pred in
+    let p = predicate_named ~label:Here pred in
     let a = Mlw_expr.e_assert Mlw_expr.Aassert p in
     seq a e
   | AAssert(_labels,_pred) ->
@@ -848,7 +869,7 @@ let fundecl fdec =
   in
   let body = fdec.sbody in
   let contract = Annotations.funspec kf in
-  let _pre,post,_ass = extract_simple_contract contract in
+  let pre,post,_ass = extract_simple_contract contract in
   let ret_type = ctype (Kernel_function.get_return_type kf) in
   let result =
     Term.create_vsymbol (Ident.id_fresh "result")
@@ -859,8 +880,10 @@ let fundecl fdec =
     List.map create_var (Kernel_function.get_locals kf)
   in
   let spec = {
-    Mlw_ty.c_pre = Term.t_true;
-    c_post = Term.t_eps (Term.t_close_bound result (predicate_named post));
+    Mlw_ty.c_pre = predicate_named ~label:Here pre;
+    c_post = 
+      Term.t_eps 
+        (Term.t_close_bound result (predicate_named ~label:Here post));
     c_xpost = Mlw_ty.Mexn.empty;
     c_effect = Mlw_ty.eff_empty;
     c_variant = [];
