@@ -419,6 +419,9 @@ let rel (ty1,t1) op (ty2,t2) =
     | Req,_,_ -> Term.t_equ t1 t2
     | Rneq,_,_ -> Term.t_neq t1 t2
     | Rge,Linteger,Linteger -> t_app ge_int [t1;t2]
+    | Rle,Linteger,Linteger -> t_app le_int [t1;t2]
+    | Rgt,Linteger,Linteger -> t_app gt_int [t1;t2]
+    | Rlt,Linteger,Linteger -> t_app lt_int [t1;t2]
     | Rge,Lreal,Lreal -> t_app ge_real [t1;t2]
     | Rge,_,_ ->
       Self.not_yet_implemented "rel Rge"
@@ -633,18 +636,22 @@ let annot a e =
     Self.not_yet_implemented "annot APragma"
 
 let loop_annot a =
-  List.fold_left (fun (_inv,_var) a ->
-    match a.annot_content with
+  List.fold_left (fun (inv,var) a ->
+    match (Annotations.code_annotation_of_rooted a).annot_content with
       | AAssert ([],_pred) ->
         Self.not_yet_implemented "loop_annot AAssert"
       | AAssert(_labels,_pred) ->
         Self.not_yet_implemented "loop_annot AAssert"
       | AStmtSpec _ ->
         Self.not_yet_implemented "loop_annot AStmtSpec"
+      | AInvariant([],true,p) ->
+        (Term.t_and inv (predicate_named ~label:Here p),var)
       | AInvariant _ ->
         Self.not_yet_implemented "loop_annot AInvariant"
-      | AVariant _ ->
-        Self.not_yet_implemented "loop_annot AVariant"
+      | AVariant (t, None) ->
+        (inv,(snd (term ~label:Here t),None)::var)
+      | AVariant (_var, Some _) ->
+        Self.not_yet_implemented "loop_annot AVariant/Some"
       | AAssigns _ ->
         Self.not_yet_implemented "loop_annot AAssigns"
       | AAllocation _ ->
@@ -767,6 +774,8 @@ let rec stmt s =
           with Continue -> ()
         with Break -> ()
       *)
+      assert (annots = []);
+      let annots = Annotations.code_annot s in
       let inv, var = loop_annot annots in
       let v =
         Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy")
