@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require bool.Bool.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
@@ -182,7 +183,7 @@ Axiom Nth_one : forall (n:Z), ((0%Z <= n)%Z /\ (n < size)%Z) -> ((nth bvone
   n) = true).
 
 (* Why3 assumption *)
-Definition eq(v1:bv) (v2:bv): Prop := forall (n:Z), ((0%Z <= n)%Z /\
+Definition eq (v1:bv) (v2:bv): Prop := forall (n:Z), ((0%Z <= n)%Z /\
   (n < size)%Z) -> ((nth v1 n) = (nth v2 n)).
 
 Axiom extensionality : forall (v1:bv) (v2:bv), (eq v1 v2) -> (v1 = v2).
@@ -289,6 +290,7 @@ Theorem to_nat_sub_footprint : forall (b1:bv) (b2:bv) (j:Z) (i:Z),
   ((j < size)%Z /\ (0%Z <= i)%Z) -> ((forall (k:Z), ((i <= k)%Z /\
   (k <= j)%Z) -> ((nth b1 k) = (nth b2 k))) -> ((to_nat_sub b1 j
   i) = (to_nat_sub b2 j i))).
+(* intros b1 b2 j i (h1,h2) h3. *)
 intros b1 b2 j i (Hij,Hipos).
 assert (h:(j < i \/ i <= j)) by omega; destruct h.
 ae.
@@ -298,7 +300,13 @@ clear j Hij H.
 intros j Hind Hij Hj Hfootprint.
 assert (h:i=j \/ i<j) by omega; destruct h.
 ae.
-why3 "cvc3" timelimit 5.
+assert (h : (nth b1 j = false \/ nth b1 j = true)).
+ elim (nth b1 j); auto.
+destruct h.
+rewrite to_nat_sub_zero; auto with zarith.
+ae.
+rewrite to_nat_sub_one; auto with zarith.
+ae.
 Qed.
 
 
