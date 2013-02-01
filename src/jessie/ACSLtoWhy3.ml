@@ -508,17 +508,9 @@ let mk_ref ty =
     let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
     Mlw_expr.e_arrow ref_fun vta
 
-let mk_get ty =
+let mk_get ref_ty ty =
   try
-    let vty = Mlw_ty.vty_value ty in
-    let r = match vty.Mlw_ty.vtv_mut with
-      | Some r -> r
-      | None -> assert false
-    in
-    let ity = Mlw_ty.ity_app ref_type [ty] [r] in 
-    let pv =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") vty
-    in
+    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
     let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
     Mlw_expr.e_arrow get_fun vta
   with e ->
@@ -557,11 +549,11 @@ let get_var v =
 
 let lval (host,offset) =
   match host,offset with
-    | Var v, NoOffset -> 
+    | Var v, NoOffset ->
       let v,ty = get_var v in
       begin try
-              Mlw_expr.e_app 
-                (mk_get ty) 
+              Mlw_expr.e_app
+                (mk_get v.Mlw_ty.pv_vty ty)
                 [Mlw_expr.e_value v]
         with e ->
           Self.fatal "Exception raised during application of !@ %a@."
@@ -607,11 +599,11 @@ let binop op e1 e2 =
     | Ge|Eq|Ne|BAnd|BXor|BOr|LAnd|LOr ->
       Self.not_yet_implemented "binop"
 
-let constant c = 
+let constant c =
   match c with
-  | CInt64(_t,_ikind, Some s) -> 
+  | CInt64(_t,_ikind, Some s) ->
       Number.ConstInt (Literals.integer s)
-  | CInt64(_t,_ikind, None) -> 
+  | CInt64(_t,_ikind, None) ->
       Self.not_yet_implemented "constant CInt64/None"
   | CStr _
   | CWStr _
@@ -619,13 +611,13 @@ let constant c =
   | CReal (_, _, _)
   | CEnum _ ->
       Self.not_yet_implemented "constant"
- 
+
 let rec expr e =
   match e.enode with
     | Const c -> Mlw_expr.e_const (constant c)
     | Lval lv -> lval lv
     | BinOp (op, e1, e2, _loc) ->
-      binop op (expr e1) (expr e2) 
+      binop op (expr e1) (expr e2)
     | SizeOf _
     | SizeOfE _
     | SizeOfStr _
@@ -643,8 +635,8 @@ let assignment (lhost,offset) e _loc =
     | Var v , NoOffset ->
       let v,ty = get_var v in
       begin try
-              Mlw_expr.e_app 
-                (mk_set ty) 
+              Mlw_expr.e_app
+                (mk_set ty)
                 [Mlw_expr.e_value v; expr e]
         with e ->
           Self.fatal "Exception raised during application of :=@ %a@."

@@ -181,7 +181,7 @@ let () = printf "@[On task 4, alt-ergo answers %a@."
 (* create a theory *)
 let () = printf "@[creating theory 'My_theory'@]@."
 
-let my_theory : Theory.theory_uc = 
+let my_theory : Theory.theory_uc =
   Theory.create_theory (Ident.id_fresh "My_theory")
 
 (* add declarations of goals *)
@@ -193,7 +193,7 @@ let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal1
 let () = printf "@[adding goal 2@]@."
 let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_A
 let my_theory : Theory.theory_uc = Theory.add_param_decl my_theory prop_var_B
-let decl_goal2 : Decl.decl = 
+let decl_goal2 : Decl.decl =
   Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2
 let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
 
@@ -224,11 +224,11 @@ let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
 
 (* getting set of task from a theory *)
 
-let my_tasks : Task.task list = 
+let my_tasks : Task.task list =
   List.rev (Task.split_theory my_theory None None)
 
 
-let () = 
+let () =
   printf "Tasks are:@.";
   let _ =
     List.fold_left
@@ -251,10 +251,10 @@ let mul_int : Term.lsymbol =
 let unit_type = Ty.ty_tuple []
 
 (* declaration of
-     let f (_dummy:unit) : unit 
+     let f (_dummy:unit) : unit
         requires { true }
         ensures { true }
-      =  
+      =
         assert { 6*7 = 42 }
  *)
 let d =
@@ -290,13 +290,13 @@ let d =
   let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
   Mlw_decl.create_rec_decl [def]
 
-(* 
+(*
 
 declaration of
-     let f (_dummy:unit) : unit 
+     let f (_dummy:unit) : unit
         requires { true }
         ensures { result = 0 }
-      =  
+      =
         let x = ref 0 in
         !x
 
@@ -305,12 +305,12 @@ declaration of
 
 (* import the ref.Ref module *)
 
-let ref_modules, ref_theories = 
+let ref_modules, ref_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
 
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
-let ref_type : Mlw_ty.T.itysymbol = 
+let ref_type : Mlw_ty.T.itysymbol =
   match
     Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
   with
@@ -318,9 +318,18 @@ let ref_type : Mlw_ty.T.itysymbol =
     | Mlw_module.TS _ -> assert false
 
 (* the "ref" function *)
-let ref_fun : Mlw_expr.psymbol = 
+let ref_fun : Mlw_expr.psymbol =
   match
     Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
+  with
+    | Mlw_module.PS p -> p
+    | _ -> assert false
+
+
+(* the "!" function *)
+let get_fun : Mlw_expr.psymbol =
+  match
+    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
   with
     | Mlw_module.PS p -> p
     | _ -> assert false
@@ -342,14 +351,43 @@ let d2 =
   }
   in
   let body =
-    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value Mlw_ty.ity_int) in
-    let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
-    let e1 = Mlw_expr.e_arrow ref_fun vta in
-    let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
-    let e = Mlw_expr.e_app e1 [c0] in
+    (* ref 0 *)
+    let e =
+      (* recall that "ref" has type forall 'a, 'a -> ref 'a *)
+      (* (???) we built the instance of 'a by int *)
+      (* (???) or we built a dummy effective parameter of type int ? *)
+      let pv =
+        Mlw_ty.create_pvsymbol
+          (Ident.id_fresh "a") (Mlw_ty.vty_value Mlw_ty.ity_int)
+      in
+      (* ity is (ref int) with a *fresh* region *)
+      let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
+      (* ??? the type  (int -> ref <fresh region> int) ? *)
+      let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+      let e1 = Mlw_expr.e_arrow ref_fun vta in
+      let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      Mlw_expr.e_app e1 [c0]
+    in
+    (* let x = ref 0 *)
     let letdef = Mlw_expr.create_let_defn (Ident.id_fresh "x") e in
-    Mlw_expr.e_let letdef c0
+    let var_x = match letdef.Mlw_expr.let_sym with
+      | Mlw_expr.LetV vs -> vs
+      | Mlw_expr.LetA _ -> assert false
+    in
+    (* !x *)
+    let bang_x =
+      (* recall that "!" as type forall 'a. ref 'a -> 'a *)
+      let pv =
+        Mlw_ty.create_pvsymbol (Ident.id_fresh "r") var_x.Mlw_ty.pv_vtv
+      in
+      let vta =
+        Mlw_ty.vty_arrow [pv]
+          (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_int))
+      in
+      Mlw_expr.e_arrow get_fun vta
+    in
+    (* the complete body *)
+    Mlw_expr.e_let letdef bang_x
   in
   let lambda = {
     Mlw_expr.l_args = args;
@@ -377,4 +415,10 @@ let () =
   with Not_found ->
     Printexc.print_backtrace stderr;
     flush stderr
+*)
+
+
+
+(*
+ocamlc -I ../../lib/why3 -c use_api.ml 
 *)
