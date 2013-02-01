@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** This module extends the standard OCaml Set module. *)
+(** Sets over ordered types *)
 
 (** Input signature of the functor {!Extset.Make}. *)
 module type OrderedType = Set.OrderedType

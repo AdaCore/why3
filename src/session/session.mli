@@ -9,11 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Proof sessions *)
-(** Define all the functions needed for managing a session:
-    Creation, saving, loading, modification, ...
-    All the operations are immediately done.
-    Use session_scheduler if you want to queue the operations
+(** Proof sessions
+
+    Define all the functions needed for managing a session:
+    creation, saving, loading, modification, and so on.
+    All the operations are immediately performed.
+    Use session_scheduler if you want to queue operations.
 *)
 
 open Stdlib

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** This module contains generic tools which can be applied on sessions *)
+(** Generic tools that can be applied on sessions *)
 
 open Session
 
@@ -27,7 +27,7 @@ val convert_unknown_prover : keygen:'a keygen -> 'a env_session -> unit
 val filter_proof_attempt :
   ?notify:'key notify ->
   ('key proof_attempt -> bool) -> 'key session -> unit
-(** remove all the proof attempts which doesn't satisfy the given predicate *)
+(** remove all the proof attempts that do not satisfy the given predicate *)
 
 val transform_proof_attempt :
   ?notify:'key notify ->

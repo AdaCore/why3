@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* useful function on string *)
+(** Useful functions on string *)
 
 val rev_split : string -> char -> string list
 

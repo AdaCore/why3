@@ -16,7 +16,7 @@
    It is distributed under the terms of its initial license, which
    is provided in the file OCAML-LICENSE. *)
 
-(** Association tables over ordered types.
+(** Association tables over ordered types
 
    This module implements applicative association tables, also known as
    finite maps or dictionaries, given a total ordering function

@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Scheduling operations on sessions and calls to provers *)
+
 (*** One module for calling callback when it's time to *)
 module Todo : sig
   type ('a,'b) todo
