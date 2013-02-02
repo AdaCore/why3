@@ -133,15 +133,22 @@ let ctype ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit
     | TInt (_, _) -> Mlw_ty.ity_pur Ty.ts_int []
-    | TFloat (_, _)
-    | TPtr (_, _)
-    | TArray (_, _, _, _)
-    | TFun (_, _, _, _)
-    | TNamed (_, _)
-    | TComp (_, _, _)
-    | TEnum (_, _)
-    | TBuiltin_va_list _
-    -> Self.not_yet_implemented "ctype"
+    | TFloat (_, _) -> 
+      Self.not_yet_implemented "ctype TFloat"
+    | TPtr (_, _) -> 
+      Self.not_yet_implemented "ctype TPtr"
+    | TArray (_, _, _, _) -> 
+      Self.not_yet_implemented "ctype TArray"
+    | TFun (_, _, _, _) -> 
+      Self.not_yet_implemented "ctype TFun"
+    | TNamed (_, _) -> 
+      Self.not_yet_implemented "ctype TNamed"
+    | TComp (_, _, _) -> 
+      Self.not_yet_implemented "ctype TComp"
+    | TEnum (_, _) -> 
+      Self.not_yet_implemented "ctype TEnum"
+    | TBuiltin_va_list _ -> 
+      Self.not_yet_implemented "ctype TBuiltin_va_list"
 
 let logic_types = Hashtbl.create 257
 
@@ -285,7 +292,7 @@ let get_lvar lv =
 
 let program_vars = Hashtbl.create 257
 
-let create_var v =
+let create_var_full v =
   let id = Ident.id_fresh v.vname in
   let ty = ctype v.vtype in
   let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
@@ -298,7 +305,9 @@ let create_var v =
   Self.result "create program variable %s (%d)" v.vname v.vid;
 *)
   Hashtbl.add program_vars v.vid (vs,true,ty);
-  let_defn
+  let_defn,vs
+
+let create_var v = fst (create_var_full v)
 
 let get_var v =
   try
@@ -328,19 +337,29 @@ let get_lsymbol li =
 let result_vsymbol =
   ref (Term.create_vsymbol (Ident.id_fresh "result") unit_type)
 
-let tlval (host,offset) =
+type label = Here | Old | At of string
+
+let tlval ~label (host,offset) =
   match host,offset with
     | TResult _, TNoOffset -> Term.t_var !result_vsymbol
     | TVar lv, TNoOffset -> 
       begin
-        match lv.lv_origin with
-          | None -> Term.t_var (get_lvar lv)
-          | Some v -> 
-            let (v,is_mutable,_ty) = get_var v in
-            if is_mutable then
-              t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
-            else
-              Term.t_var v.Mlw_ty.pv_vs
+        let t =
+          match lv.lv_origin with
+            | None -> Term.t_var (get_lvar lv)
+            | Some v -> 
+              let (v,is_mutable,_ty) = get_var v in
+              if is_mutable then
+                t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
+              else
+                Term.t_var v.Mlw_ty.pv_vs
+        in
+        match label with
+          | Here -> t
+          | Old -> Mlw_wp.t_at_old t
+          | At _lab -> 
+            (* t_app Mlw_wp.fs_at [t; ??? lab] *)
+      Self.not_yet_implemented "tlval TVar/At"
       end
     | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
       Self.not_yet_implemented "tlval TVar"
@@ -349,12 +368,10 @@ let tlval (host,offset) =
     | TMem _, _ ->
       Self.not_yet_implemented "tlval Mem"
 
-type label = Here | Old | At of string
-
 let rec term_node ~label t =
   match t with
     | TConst cst -> Term.t_const (logic_constant cst)
-    | TLval lv -> tlval lv
+    | TLval lv -> tlval ~label lv
     | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
     | TUnOp (op, t) -> unary op (term ~label t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
@@ -944,11 +961,19 @@ let global (theories,lemmas,functions) g =
         { acc with AST.prog_vars =
           (intern_string vi.vname, g)::acc.AST.prog_vars }
 *)
-     Self.not_yet_implemented "WARNING: Variable %s not translated" vi.vname
+     let _,pv = create_var_full vi in
+     let sym = Mlw_expr.LetV pv in
+     (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
 
     | GVarDecl(_funspec,vi,_location) ->
-      Self.error "WARNING: Variable %s not translated" vi.vname;
-      (theories,lemmas,functions)
+      begin match vi.vname with
+        | "Frama_C_bzero" | "Frama_C_copy_block" ->
+          (theories,lemmas,functions)
+        | _ ->
+          let _,pv = create_var_full vi in
+          let sym = Mlw_expr.LetV pv in
+          (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
+      end
     | GAnnot (a, loc) ->
       let (t,l) = logic_decl ~in_axiomatic:false a loc (theories,lemmas) in
       (t,l,functions)

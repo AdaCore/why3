@@ -13,7 +13,7 @@ PLUGIN_BFLAGS:= -I $(WHYLIB)
 PLUGIN_OFLAGS:= -I $(WHYLIB)
 PLUGIN_LINK_BFLAGS:= -I $(WHYLIB)
 PLUGIN_LINK_OFLAGS:= -I $(WHYLIB)
-PLUGIN_TESTS_DIRS := basic
+PLUGIN_TESTS_DIRS := basic demo
 
 OCAMLLEX  = @OCAMLLEX@
 
@@ -23,5 +23,5 @@ literals.ml: literals.mll
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
 tests::
-	grep Status tests/basic/result/*
+	grep 'Task\|Ergo' tests/basic/result/*.res.log  tests/demo/result/*.res.log
 

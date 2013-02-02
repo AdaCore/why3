@@ -422,5 +422,7 @@ let () =
 
 
 (*
-ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma use_api.ml
+Local Variables:
+compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma use_api.ml"
+End:
 *)

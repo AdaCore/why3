@@ -1,10 +1,9 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/incr.c"
-[jessie3] user error: WARNING: Variable Frama_C_bzero not translated
-[jessie3] user error: WARNING: Variable Frama_C_copy_block not translated
 [jessie3] processing function f
+[jessie3] processing function h
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
-[jessie3] made 1 function(s)
+[jessie3] made 3 function(s)
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
             (* use why3.BuiltIn *)
@@ -24,6 +23,10 @@
             goal WP_parameter_f :
               forall x:int.
                forall us_retres:int. us_retres = (x + 1) -> us_retres = (x + 1)
+            
+            goal WP_parameter_h :
+              forall x:int. forall g:int. forall g1:int. g1 = (g + x) -> g1 = (g + x)
             end
 [jessie3] Alt-Ergo 0.94, Alt-Ergo 0.95, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.2
 [jessie3] Task 1: Valid, Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 2: Valid, Valid, Valid, Valid, Valid, Valid

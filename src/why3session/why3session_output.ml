@@ -11,7 +11,6 @@
 
 open Why3
 open Why3session_lib
-open Whyconf
 open Session
 open Format
 

@@ -41,7 +41,9 @@ exception UnboundTheory of qualid
 exception UnboundType of string list
 *)
 exception UnboundTypeVar of string
+(* unused
 exception UnboundSymbol of qualid
+*)
 
 let error = Loc.error
 let errorm = Loc.errorm
@@ -76,8 +78,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
 *)
   | UnboundTypeVar s ->
       Format.fprintf fmt "Unbound type variable '%s" s
+(* unused
   | UnboundSymbol q ->
       Format.fprintf fmt "Unbound symbol '%a'" print_qualid q
+*)
   | _ -> raise e)
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
