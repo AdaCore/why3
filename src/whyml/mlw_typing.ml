@@ -917,10 +917,6 @@ let post_invariant lenv rvs inv ity q =
   let q = t_and_asym_simp (t_and_simp res_inv inv) q in
   Mlw_ty.create_post vs q
 
-let ity_or_unit = function
-  | VTvalue v -> v
-  | VTarrow _ -> ity_unit
-
 let reset_vars eff pvs =
   let add pv s =
     if eff_stale_region eff pv.pv_ity.ity_vars
@@ -940,7 +936,7 @@ let complete_xpost eff xq =
   Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xe xq))
 
 let spec_invariant lenv pvs vty spec =
-  let ity = ity_or_unit vty in
+  let ity = ity_of_vty vty in
   let pvs = spec_pvset pvs spec in
   let rvs = reset_vars spec.c_effect pvs in
   let xpost = complete_xpost spec.c_effect spec.c_xpost in
