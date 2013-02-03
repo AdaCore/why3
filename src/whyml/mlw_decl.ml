@@ -106,7 +106,7 @@ let syms_expr s _e = s (* TODO *)
 let create_ty_decl its =
 (*   let syms = Opt.fold syms_ity Sid.empty its.its_def in *)
   let news = Sid.singleton its.its_ts.ts_name in
-  (* an abstract type must be declared using Theory.create_ty_decl *)
+  (* an abstract type must be declared using Decl.create_ty_decl *)
   if its.its_def = None then invalid_arg "Mlw_decl.create_ty_decl";
   mk_decl (PDtype its) Sid.empty news
 

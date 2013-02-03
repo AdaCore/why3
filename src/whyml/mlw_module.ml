@@ -299,6 +299,14 @@ let add_rec uc { fun_ps = ps } =
 let add_exn uc xs =
   add_symbol add_ps xs.xs_name (XS xs) uc
 
+let pdecl_ns uc d = match d.pd_node with
+  | PDtype its -> add_type uc its
+  | PDdata tdl -> List.fold_left add_data uc tdl
+  | PDval lv | PDlet { let_sym = lv } -> add_let uc lv
+  | PDrec fdl -> List.fold_left add_rec uc fdl
+  | PDexn xs -> add_exn uc xs
+
+(* FIXME: move the choice to Mlw_wp and make it dynamic, not start-time *)
 let if_fast_wp f1 f2 x = if Debug.test_flag Mlw_wp.fast_wp then f1 x else f2 x
 let wp_val = if_fast_wp Mlw_wp.fast_wp_val Mlw_wp.wp_val
 let wp_let = if_fast_wp Mlw_wp.fast_wp_let Mlw_wp.wp_let
@@ -310,34 +318,29 @@ let pdecl_vc env km th d = match d.pd_node with
   | PDlet ld -> wp_let env km th ld
   | PDrec rd -> wp_rec env km th rd
 
+let pdecl_vc uc d = add_to_theory (pdecl_vc uc.muc_env uc.muc_known) uc d
+
+let pure_data_decl tdl =
+  let proj pj = Opt.map (fun pls -> pls.pl_ls) pj in
+  let cons (pls,pjl) = pls.pl_ls, List.map proj pjl in
+  let defn (its,csl,_) = its.its_ts, List.map cons csl in
+  List.map defn tdl
+
+let pdecl_pure th d = match d.pd_node with
+  | PDtype its -> Theory.add_ty_decl th its.its_ts
+  | PDdata tdl -> Theory.add_data_decl th (pure_data_decl tdl)
+  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> th
+
 let add_pdecl ~wp uc d =
   let uc = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news }
   in
-  let uc =
-    if not wp then uc else
-    let th = pdecl_vc uc.muc_env uc.muc_known uc.muc_theory d in
-    { uc with muc_theory = th }
-  in
-  match d.pd_node with
-  | PDtype its ->
-      let uc = add_type uc its in
-      add_to_theory Theory.add_ty_decl uc its.its_ts
-  | PDdata dl ->
-      let uc = List.fold_left add_data uc dl in
-      let projection = Opt.map (fun pls -> pls.pl_ls) in
-      let constructor (pls,pjl) = pls.pl_ls, List.map projection pjl in
-      let defn cl = List.map constructor cl in
-      let dl = List.map (fun (its,cl,_) -> its.its_ts, defn cl) dl in
-      add_to_theory Theory.add_data_decl uc dl
-  | PDval lv | PDlet { let_sym = lv } ->
-      add_let uc lv
-  | PDrec fdl ->
-      List.fold_left add_rec uc fdl
-  | PDexn xs ->
-      add_exn uc xs
+  let uc = pdecl_ns uc d in
+  let uc = if wp then pdecl_vc uc d else uc in
+  let uc = add_to_theory pdecl_pure uc d in
+  uc
 
 (* we can safely add a new type invariant as long as
    the type was introduced in the last program decl,
