@@ -254,17 +254,10 @@ type spec = {
 
 (** program variables *)
 
-type vty_value = private {
-  vtv_ity   : ity;
-}
-
-val vty_value : ity -> vty_value
-
 type pvsymbol = private {
   pv_vs    : vsymbol;
-  pv_vtv   : vty_value;
+  pv_ity   : ity;
   pv_ghost : bool;
-  pv_vars  : varset;
 }
 
 module Mpv : Extmap.S with type key = pvsymbol
@@ -274,7 +267,7 @@ module Wpv : Weakhtbl.S with type key = pvsymbol
 
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
-val create_pvsymbol : preid -> ?ghost:bool -> vty_value -> pvsymbol
+val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
   (* raises Not_found if the argument is not a pv_vs *)
@@ -285,7 +278,7 @@ val restore_pv_by_id : ident -> pvsymbol
 (** program types *)
 
 type vty =
-  | VTvalue of vty_value
+  | VTvalue of ity
   | VTarrow of vty_arrow
 
 and vty_arrow = private {

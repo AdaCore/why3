@@ -886,7 +886,7 @@ let env_invariant lenv eff pvs =
   let lkn = Theory.get_known (get_theory lenv.mod_uc) in
   let regs = Sreg.union eff.eff_writes eff.eff_ghostw in
   let add_pv pv (pinv,qinv) =
-    let ity = pv.pv_vtv.vtv_ity in
+    let ity = pv.pv_ity in
     let written r = reg_occurs r ity.ity_vars in
     let inv = Mlw_wp.full_invariant lkn kn pv.pv_vs ity in
     let qinv = (* we reprove invariants for modified non-reset variables *)
@@ -918,12 +918,12 @@ let post_invariant lenv rvs inv ity q =
   Mlw_ty.create_post vs q
 
 let ity_or_unit = function
-  | VTvalue v -> v.vtv_ity
+  | VTvalue v -> v
   | VTarrow _ -> ity_unit
 
 let reset_vars eff pvs =
   let add pv s =
-    if eff_stale_region eff pv.pv_vtv.vtv_ity.ity_vars
+    if eff_stale_region eff pv.pv_ity.ity_vars
     then Svs.add pv.pv_vs s else s in
   if Mreg.is_empty eff.eff_resets then Svs.empty else
   Spv.fold add pvs Svs.empty
@@ -1025,8 +1025,7 @@ let add_local x lv lenv = match lv with
 
 let binders bl =
   let binder (id, ghost, dity) =
-    let vtv = vty_value (ity_of_dity dity) in
-    create_pvsymbol (Denv.create_user_id id) ~ghost vtv in
+    create_pvsymbol (Denv.create_user_id id) ~ghost (ity_of_dity dity) in
   List.map binder bl
 
 let add_binders lenv pvl =
@@ -1034,7 +1033,7 @@ let add_binders lenv pvl =
   List.fold_left add lenv pvl
 
 let mk_field ity gh mut = { fd_ity = ity; fd_ghost = gh; fd_mut = mut }
-let fd_of_pv pv = mk_field pv.pv_vtv.vtv_ity pv.pv_ghost None
+let fd_of_pv pv = mk_field pv.pv_ity pv.pv_ghost None
 
 (* TODO: devise a good grammar for effect expressions *)
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
@@ -1159,7 +1158,7 @@ let rec type_c lenv pvs vars (dtyv, dsp) =
   let eff = match vty with
     | VTvalue v ->
         let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
-        reg_fold on_reg v.vtv_ity.ity_vars eff
+        reg_fold on_reg v.ity_vars eff
     | VTarrow _ -> eff in
   (* refresh every unmodified subregion of a modified region *)
   let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
@@ -1189,11 +1188,11 @@ let rec type_c lenv pvs vars (dtyv, dsp) =
 
 and type_v lenv pvs vars = function
   | DSpecV v ->
-      VTvalue (vty_value (ity_of_dity v))
+      VTvalue (ity_of_dity v)
   | DSpecA (bl,tyc) ->
       let pvl = binders bl in
       let lenv = add_binders lenv pvl in
-      let add_pv pv s = vars_union pv.pv_vars s in
+      let add_pv pv s = vars_union pv.pv_ity.ity_vars s in
       let vars = List.fold_right add_pv pvl vars in
       let pvs = List.fold_right Spv.add pvl pvs in
       let spec, vty = type_c lenv pvs vars tyc in
@@ -1260,7 +1259,7 @@ and expr_desc lenv loc de = match de.de_desc with
         let lenv = add_local x.id def1.let_sym lenv in
         let e2 = expr lenv de2 in
         let e2_unit = match e2.e_vty with
-          | VTvalue { vtv_ity = ity } -> ity_equal ity ity_unit
+          | VTvalue ity -> ity_equal ity ity_unit
           | _ -> false in
         let e2 =
           if e2_unit (* e2 is ghost unit *)
@@ -1317,9 +1316,9 @@ and expr_desc lenv loc de = match de.de_desc with
       e_not (expr lenv de1)
   | DEmatch (de1, bl) ->
       let e1 = expr lenv de1 in
-      let vtv = vtv_of_expr e1 in
+      let ity = ity_of_expr e1 in
       let branch (pp,de) =
-        let vm, pp = make_ppattern pp ~ghost:e1.e_ghost vtv in
+        let vm, pp = make_ppattern pp ~ghost:e1.e_ghost ity in
         let lenv = Mstr.fold (fun s pv -> add_local s (LetV pv)) vm lenv in
         pp, expr lenv de in
       e_case e1 (List.map branch bl)
@@ -1344,7 +1343,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEtry (de1, bl) ->
       let e1 = expr lenv de1 in
       let add_branch (m,l) (xs,pp,de) =
-        let vm, pp = make_ppattern pp (vty_value xs.xs_ity) in
+        let vm, pp = make_ppattern pp xs.xs_ity in
         let lenv = Mstr.fold (fun s pv -> add_local s (LetV pv)) vm lenv in
         let e = expr lenv de in
         try Mexn.add xs ((pp,e) :: Mexn.find xs m) m, l
@@ -1354,12 +1353,12 @@ and expr_desc lenv loc de = match de.de_desc with
         | [{ ppat_pattern = { pat_node = Pvar vs }}, e] ->
             xs, Mlw_ty.restore_pv vs, e
         | [{ ppat_pattern = { pat_node = Pwild }} as p, e] ->
-            xs, create_pvsymbol (id_fresh "wild") p.ppat_vtv, e
+            xs, create_pvsymbol (id_fresh "wild") p.ppat_ity, e
         | [{ ppat_pattern = { pat_node = Papp (fs,[]) }} as p, e]
           when ls_equal fs Mlw_expr.fs_void ->
-            xs, create_pvsymbol (id_fresh "void") p.ppat_vtv, e
+            xs, create_pvsymbol (id_fresh "void") p.ppat_ity, e
         | bl ->
-            let pv = create_pvsymbol (id_fresh "res") (vty_value xs.xs_ity) in
+            let pv = create_pvsymbol (id_fresh "res") xs.xs_ity in
             let pl = List.rev_map (fun (p,_) -> [p.ppat_pattern],t_void) bl in
             let lkn = Theory.get_known (get_theory lenv.mod_uc) in
             let find ts = List.map fst (Decl.find_constructors lkn ts) in
@@ -1368,7 +1367,7 @@ and expr_desc lenv loc de = match de.de_desc with
               bl
             with Pattern.NonExhaustive _ ->
               let ity = ity_of_dity (snd de.de_type) in
-              let _, pp = make_ppattern PPwild pv.pv_vtv in
+              let _, pp = make_ppattern PPwild pv.pv_ity in
               (pp, e_raise xs (e_value pv) ity) :: bl
             in
             xs, pv, e_case (e_value pv) (List.rev bl)
@@ -1395,7 +1394,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEfor (x,defrom,dir,deto,inv,de1) ->
       let efrom = expr lenv defrom in
       let eto = expr lenv deto in
-      let pv = create_pvsymbol (Denv.create_user_id x) (vty_value ity_int) in
+      let pv = create_pvsymbol (Denv.create_user_id x) ity_int in
       let lenv = add_local x.id (LetV pv) lenv in
       let inv = create_pre lenv inv in
       let e1 = expr lenv de1 in

@@ -61,7 +61,7 @@ val pl_clone : Theory.symbol_map -> symbol_map
 
 type ppattern = private {
   ppat_pattern : pattern;
-  ppat_vtv     : vty_value;
+  ppat_ity     : ity;
   ppat_ghost   : bool;
   ppat_effect  : effect;
 }
@@ -75,7 +75,7 @@ type pre_ppattern =
   | PPas   of pre_ppattern * preid
 
 val make_ppattern :
-  pre_ppattern -> ?ghost:bool -> vty_value -> pvsymbol Mstr.t * ppattern
+  pre_ppattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * ppattern
 
 (** program symbols *)
 
@@ -194,7 +194,7 @@ val e_arrow : psymbol -> vty_arrow -> expr
 exception ValueExpected of expr
 exception ArrowExpected of expr
 
-val vtv_of_expr : expr -> vty_value
+val ity_of_expr : expr -> ity
 val vta_of_expr : expr -> vty_arrow
 
 exception GhostWrite of expr * region

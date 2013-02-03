@@ -84,18 +84,18 @@ let rec syms_type_c s tyc =
   syms_type_v s tyc.c_result
 
 and syms_type_v s = function
-  | SpecV vtv -> syms_ity s vtv.vtv_ity
+  | SpecV ity -> syms_ity s ity
   | SpecA (pvl,tyc) ->
-      let add_pv s pv = syms_ity s pv.pv_vtv.vtv_ity in
+      let add_pv s pv = syms_ity s pv.pv_ity in
       List.fold_left add_pv (syms_type_c s tyc) pvl
 
 let rec syms_vta s a =
-  let s = syms_ity s a.vta_arg.vtv_ity in
+  let s = syms_ity s a.vta_arg in
   let s = syms_effect s a.vta_effect in
   syms_vty s a.vta_result
 
 and syms_vty s = function
-  | VTvalue vtv -> syms_ity s vtv.vtv_ity
+  | VTvalue ity -> syms_ity s ity
   | VTarrow vta -> syms_vta s vta
 
 let syms_expr s _e = s (* TODO *)
@@ -199,7 +199,7 @@ let check_vars vars =
     raise (UnboundTypeVar (Stv.choose vars.vars_tv))
 
 let letvar_news = function
-  | LetV pv -> check_vars pv.pv_vars; Sid.singleton pv.pv_vs.vs_name
+  | LetV pv -> check_vars pv.pv_ity.ity_vars; Sid.singleton pv.pv_vs.vs_name
   | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
 
 let new_regs old_vars news vars =
@@ -214,7 +214,7 @@ let create_let_decl ld =
   let news = letvar_news ld.let_sym in
   let news = match ld.let_sym with
     | LetA ps -> new_regs vars news ps.ps_vars
-    | LetV pv -> new_regs vars news pv.pv_vars in
+    | LetV pv -> new_regs vars news pv.pv_ity.ity_vars in
   let syms = Mid.map (fun _ -> ()) ld.let_expr.e_varm in
 (*
   let syms = syms_varmap Sid.empty ld.let_expr.e_vars in
@@ -247,7 +247,7 @@ let create_rec_decl fdl =
 let create_val_decl lv =
   let news = letvar_news lv in
   let news, syms = match lv with
-    | LetV pv -> new_regs vars_empty news pv.pv_vars, Sid.empty
+    | LetV pv -> new_regs vars_empty news pv.pv_ity.ity_vars, Sid.empty
     | LetA ps -> news, Mid.map (fun _ -> ()) ps.ps_varm in
 (*
   let syms = syms_type_v Sid.empty vd.val_spec in
@@ -330,8 +330,8 @@ let find_invariant kn its =
 let check_match lkn _kn d =
   let rec checkE () e = match e.e_node with
     | Ecase (e1,bl) ->
-        let typ = ty_of_ity (vtv_of_expr e1).vtv_ity in
-        let tye = ty_of_ity (vtv_of_expr e).vtv_ity in
+        let typ = ty_of_ity (ity_of_expr e1) in
+        let tye = ty_of_ity (ity_of_expr e) in
         let t_p = t_var (create_vsymbol (id_fresh "x") typ) in
         let t_e = t_var (create_vsymbol (id_fresh "y") tye) in
         let bl = List.map (fun (pp,_) -> [pp.ppat_pattern], t_e) bl in
@@ -395,7 +395,7 @@ let check_ghost lkn kn d =
     let pvs = List.fold_right Spv.add vta.vta_args pvs in
     let test pv =
       if pv.pv_ghost then () else
-      access eff.eff_ghostw pv.pv_vtv.vtv_ity
+      access eff.eff_ghostw pv.pv_ity
     in
     Spv.iter test pvs;
     match vta.vta_result with

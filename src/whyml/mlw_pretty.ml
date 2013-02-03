@@ -124,20 +124,17 @@ let print_effect fmt eff =
   Sexn.iter (print_xs  "ghost raise") eff.eff_ghostx;
   Mreg.iter print_reset eff.eff_resets
 
-let print_vtv fmt vtv =
-  fprintf fmt "%a" print_ity vtv.vtv_ity
-
 let rec print_vta fmt vta =
-  let print_arg fmt pv = fprintf fmt "%a ->@ " print_vtv pv.pv_vtv in
+  let print_arg fmt pv = fprintf fmt "%a ->@ " print_ity pv.pv_ity in
   fprintf fmt "%a%a%a" (print_list nothing print_arg) vta.vta_args
     print_effect vta.vta_spec.c_effect print_vty vta.vta_result
 
 and print_vty fmt = function
   | VTarrow vta -> print_vta fmt vta
-  | VTvalue vtv -> print_vtv fmt vtv
+  | VTvalue ity -> print_ity fmt ity
 
 let print_pvty fmt pv = fprintf fmt "@[%a:@,%a@]"
-  print_pv pv print_vtv pv.pv_vtv
+  print_pv pv print_ity pv.pv_ity
 
 let print_psty fmt ps =
   let print_tvs fmt tvs = if not (Stv.is_empty tvs) then
@@ -167,7 +164,7 @@ let forget_lv = function
   | LetA ps -> forget_ps ps
 
 let rec print_type_v fmt = function
-  | VTvalue vtv -> print_vtv fmt vtv
+  | VTvalue ity -> print_ity fmt ity
   | VTarrow vta ->
       let print_arg fmt pv = fprintf fmt "@[(%a)@] ->@ " print_pvty pv in
       fprintf fmt "%a%a"
@@ -271,7 +268,7 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "(%a@ %a)" (print_lexpr pri) e print_pv v
   | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
     when pv.pv_vs.vs_name.id_string = "_" &&
-         ity_equal pv.pv_vtv.vtv_ity ity_unit ->
+         ity_equal pv.pv_ity ity_unit ->
       fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
         print_expr e1 print_expr e2;
   | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
@@ -398,7 +395,7 @@ let print_data_decl fst fmt (ts,csl,inv) =
 
 let print_val_decl fmt lv =
   let vty = match lv with
-    | LetV pv -> VTvalue pv.pv_vtv | LetA ps -> VTarrow ps.ps_vta in
+    | LetV pv -> VTvalue pv.pv_ity | LetA ps -> VTarrow ps.ps_vta in
   fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v vty;
   (* FIXME: forget only generalized regions *)
   match lv with LetA _ -> forget_tvs_regs () | _ -> ()

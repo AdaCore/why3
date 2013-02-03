@@ -664,20 +664,18 @@ let rec print_ity_node inn info fmt ity = match ity.ity_node with
 
 let print_ity info = print_ity_node false info
 
-let print_vtv info fmt vtv = print_ity info fmt vtv.vtv_ity
-
 let print_pvty info fmt pv =
   if pv.pv_ghost then fprintf fmt "((* ghost *))" else
   fprintf fmt "@[(%a:@ %a)@]"
-    (print_lident info) pv.pv_vs.vs_name (print_vtv info) pv.pv_vtv
+    (print_lident info) pv.pv_vs.vs_name (print_ity info) pv.pv_ity
 
 let rec print_vta info fmt vta =
-  let print_arg fmt pv = print_vtv info fmt pv.pv_vtv in
+  let print_arg fmt pv = print_ity info fmt pv.pv_ity in
   fprintf fmt "(%a -> %a)" (print_list arrow print_arg) vta.vta_args
     (print_vty info) vta.vta_result
 
 and print_vty info fmt = function
-  | VTvalue vtv -> print_vtv info fmt vtv
+  | VTvalue ity -> print_ity info fmt ity
   | VTarrow vta -> print_vta info fmt vta
 
 let is_letrec = function
@@ -705,11 +703,11 @@ and print_lexpr pri info fmt e =
   | Elet ({ let_expr = e1 }, e2) when e1.e_ghost ->
       print_expr info fmt e2
   | Elet ({ let_sym = LetV pv }, e2)
-    when ity_equal pv.pv_vtv.vtv_ity ity_mark ->
+    when ity_equal pv.pv_ity ity_mark ->
       print_expr info fmt e2
   | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
     when pv.pv_vs.vs_name.id_string = "_" &&
-         ity_equal pv.pv_vtv.vtv_ity ity_unit ->
+         ity_equal pv.pv_ity ity_unit ->
       fprintf fmt (protect_on (pri > 0) "@[begin %a;@ %a end@]")
         (print_expr info) e1 (print_expr info) e2;
   | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
@@ -835,19 +833,19 @@ let rec extract_vta_args args vta =
   let new_args = List.map (fun pv -> pv.pv_vs) vta.vta_args in
   let args = List.rev_append new_args args in
   match vta.vta_result with
-  | VTvalue vtv -> List.rev args, vtv
+  | VTvalue ity -> List.rev args, ity
   | VTarrow vta -> extract_vta_args args vta
 
 let extract_lv_args = function
-  | LetV pv -> [], pv.pv_vtv
+  | LetV pv -> [], pv.pv_ity
   | LetA ps -> extract_vta_args [] ps.ps_vta
 
 let print_val_decl info fmt lv =
-  let vars, vtv = extract_lv_args lv in
+  let vars, ity = extract_lv_args lv in
   fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
     (print_lv info) lv
     (print_list space (print_vs_arg info)) vars
-    (print_vtv info) vtv
+    (print_ity info) ity
     to_be_implemented "val";
   forget_vars vars;
   forget_tvs ()

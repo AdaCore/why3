@@ -416,10 +416,9 @@ let clone_export uc m inst =
     let nr = create_region (id_clone r.reg_name) (conv_ity r.reg_ity) in
     Hreg.replace regh r nr;
     nr in
-  let conv_vtv v = vty_value (conv_ity v.vtv_ity) in
   let conv_pv pv =
     create_pvsymbol (id_clone pv.pv_vs.vs_name)
-      ~ghost:pv.pv_ghost (conv_vtv pv.pv_vtv) in
+      ~ghost:pv.pv_ghost (conv_ity pv.pv_ity) in
   let psh = Hid.create 3 in
   let conv_xs xs = try match Hid.find psh xs.xs_name with
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
@@ -455,7 +454,7 @@ let clone_export uc m inst =
     let spec = conv_spec mv a.vta_spec in
     let vty = match a.vta_result with
       | VTarrow a -> VTarrow (conv_vta mv a)
-      | VTvalue v -> VTvalue (conv_vtv v) in
+      | VTvalue v -> VTvalue (conv_ity v) in
     vty_arrow args ~spec vty in
   let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
   let add_pdecl uc d = { uc with

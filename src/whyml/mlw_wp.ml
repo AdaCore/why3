@@ -33,7 +33,7 @@ let no_eval = Debug.register_flag "wp_no_eval"
 let ts_mark = create_tysymbol (id_fresh "'mark") [] None
 let ty_mark = ty_app ts_mark []
 
-let vtv_mark = vty_value (ity_pur ts_mark [])
+let ity_mark = ity_pur ts_mark []
 
 let fresh_mark () = create_vsymbol (id_fresh "'mark") ty_mark
 
@@ -63,7 +63,7 @@ let e_now = e_lapp fs_now [] (ity_pur ts_mark [])
 
 (* [vs_old] appears in the postconditions given to the core API,
    which expects every vsymbol to be a pure part of a pvsymbol *)
-let pv_old = create_pvsymbol (id_fresh "%old") vtv_mark
+let pv_old = create_pvsymbol (id_fresh "%old") ity_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 
@@ -77,8 +77,7 @@ let to_term t = if t.t_ty = None then mk_t_if t else t
 
 (* any vs in post/xpost is either a pvsymbol or a fresh mark *)
 let ity_of_vs vs =
-  if Ty.ty_equal vs.vs_ty ty_mark then vtv_mark.vtv_ity
-  else (restore_pv vs).pv_vtv.vtv_ity
+  if Ty.ty_equal vs.vs_ty ty_mark then ity_mark else (restore_pv vs).pv_ity
 
 (* replace every occurrence of [old(t)] with [at(t,'old)] *)
 let rec remove_old f = match f.t_node with
@@ -732,9 +731,10 @@ and wp_desc env e q xq = match e.e_node with
         | Evalue v -> vs_result e1, t_var v.pv_vs
         | Elogic t -> vs_result e1, t
         | _ ->
+            let ity = ity_of_expr e1 in
             let id = id_fresh ?loc:e1.e_loc "o" in
             (* must be a pvsymbol or restore_pv will fail *)
-            let npv = create_pvsymbol id ~ghost:e1.e_ghost (vtv_of_expr e1) in
+            let npv = create_pvsymbol id ~ghost:e1.e_ghost ity in
             npv.pv_vs, t_var npv.pv_vs
       in
       let res, t = get_term e1 in
@@ -822,7 +822,7 @@ and wp_abstract env c_eff c_q c_xq q xq =
 
 and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () and c = l.l_spec in
-  let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
+  let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
@@ -1004,7 +1004,7 @@ let result e =
   vs_result e, Mexn.mapi (fun xs _ -> xs_result xs) e.e_effect.eff_raises
 
 let is_vty_unit = function
-  | VTvalue vtv -> ity_equal vtv.vtv_ity ity_unit
+  | VTvalue ity -> ity_equal ity ity_unit
   | VTarrow _   -> false
 
 let map_exns e f = Mexn.mapi (fun xs _ -> f xs) e.e_effect.eff_raises
@@ -1088,7 +1088,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
      NE: true *)
   let lab = fresh_mark () and c = l.l_spec in
-  let add_arg sbs pv = ity_match sbs pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ity in
+  let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in

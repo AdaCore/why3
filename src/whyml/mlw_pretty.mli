@@ -29,7 +29,6 @@ val print_reg : formatter -> region -> unit       (* region *)
 val print_its : formatter -> itysymbol -> unit    (* type symbol *)
 val print_ity : formatter -> ity -> unit          (* individual type *)
 
-val print_vtv : formatter -> vty_value -> unit    (* value type *)
 val print_vta : formatter -> vty_arrow -> unit    (* arrow type *)
 val print_vty : formatter -> vty -> unit          (* expression type *)
 

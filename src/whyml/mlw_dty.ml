@@ -196,9 +196,9 @@ let unify d1 d2 = unify ~weak:false d1 d2
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let vty_of_dvty (argl,res) =
-  let vtv = VTvalue (vty_value (ity_of_dity res)) in
-  let conv a = create_pvsymbol (id_fresh "x") (vty_value (ity_of_dity a)) in
-  if argl = [] then vtv else VTarrow (vty_arrow (List.map conv argl) vtv)
+  let vty = VTvalue (ity_of_dity res) in
+  let conv a = create_pvsymbol (id_fresh "x") (ity_of_dity a) in
+  if argl = [] then vty else VTarrow (vty_arrow (List.map conv argl) vty)
 
 type tvars = dity list
 
@@ -274,25 +274,21 @@ and dreg_of_reg htv hreg vars r =
   Hreg.add hreg r dreg;
   dreg
 
-let dity_of_vtv htv hreg vars v = dity_of_ity htv hreg vars v.vtv_ity
-
-let specialize_vtvalue vtv =
+let specialize_ity ity =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
-  dity_of_vtv htv hreg vtv.vtv_ity.ity_vars vtv
+  dity_of_ity htv hreg ity.ity_vars ity
 
-let specialize_pvsymbol pv =
-  specialize_vtvalue pv.pv_vtv
+let specialize_pvsymbol pv = specialize_ity pv.pv_ity
 
-let specialize_xsymbol xs =
-  specialize_vtvalue (vty_value xs.xs_ity)
+let specialize_xsymbol xs = specialize_ity xs.xs_ity
 
 let specialize_vtarrow vars vta =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
-  let conv pv = dity_of_vtv htv hreg vars pv.pv_vtv in
+  let conv pv = dity_of_ity htv hreg vars pv.pv_ity in
   let rec specialize a =
     let argl = List.map conv a.vta_args in
     let narg,res = match a.vta_result with
-      | VTvalue v -> [], dity_of_vtv htv hreg vars v
+      | VTvalue v -> [], dity_of_ity htv hreg vars v
       | VTarrow a -> specialize a
     in
     argl @ narg, res

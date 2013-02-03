@@ -194,28 +194,21 @@ let any _ty =
 
 
 let mk_ref ty =
-    let pv =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
-    in
+    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "a") ty in
     let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ity) in
     Mlw_expr.e_arrow ref_fun vta
 
 let mk_get ref_ty ty =
     let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ty) in
     Mlw_expr.e_arrow get_fun vta
 
 let mk_set ref_ty ty =
     (* (:=) has type (r:ref 'a) (v:'a) unit *)
     let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let pv2 =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "v") (Mlw_ty.vty_value ty)
-    in
-    let vta =
-      Mlw_ty.vty_arrow [pv1;pv2]
-        (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_unit))
-    in
+    let pv2 = Mlw_ty.create_pvsymbol (Ident.id_fresh "v") ty in
+    let vta = Mlw_ty.vty_arrow [pv1;pv2] (Mlw_ty.VTvalue Mlw_ty.ity_unit) in
     Mlw_expr.e_arrow set_fun vta
 
 
@@ -613,7 +606,7 @@ let lval (host,offset) =
       if is_mutable then
         begin try
                 Mlw_expr.e_app
-                  (mk_get v.Mlw_ty.pv_vtv ty)
+                  (mk_get v.Mlw_ty.pv_ity ty)
                   [Mlw_expr.e_value v]
           with e ->
             Self.fatal "Exception raised during application of !@ %a@."
@@ -735,7 +728,7 @@ let assignment (lhost,offset) e _loc =
       let v,is_mutable,ty = get_var v in
       if is_mutable then
         Mlw_expr.e_app
-          (mk_set v.Mlw_ty.pv_vtv ty)
+          (mk_set v.Mlw_ty.pv_ity ty)
           [Mlw_expr.e_value v; expr e]
       else
         Self.not_yet_implemented "mutation of formal parameters"
@@ -796,8 +789,7 @@ let rec stmt s =
       let annots = Annotations.code_annot s in
       let inv, var = loop_annot annots in
       let v =
-        Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy")
-          (Mlw_ty.vty_value Mlw_ty.ity_unit)
+        Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit
       in
       Mlw_expr.e_try
         (Mlw_expr.e_loop inv var (block body))
@@ -879,16 +871,12 @@ let fundecl fdec =
   let args =
     match Kernel_function.get_formals kf with
       | [] ->
-        [ Mlw_ty.create_pvsymbol
-            (Ident.id_fresh "_dummy")
-            (Mlw_ty.vty_value Mlw_ty.ity_unit) ]
+        [ Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit ]
       | l ->
         List.map (fun v ->
           let ity = ctype v.vtype in
           let vs =
-            Mlw_ty.create_pvsymbol
-              (Ident.id_fresh v.vname)
-              (Mlw_ty.vty_value ity)
+            Mlw_ty.create_pvsymbol (Ident.id_fresh v.vname) ity
           in
           Hashtbl.add program_vars v.vid (vs,false,ity);
           vs)

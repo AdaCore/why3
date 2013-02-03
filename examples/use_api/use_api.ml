@@ -259,8 +259,7 @@ let unit_type = Ty.ty_tuple []
  *)
 let d =
   let args =
-    [Mlw_ty.create_pvsymbol
-        (Ident.id_fresh "_dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
   in
   let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
   let spec = {
@@ -337,8 +336,7 @@ let get_fun : Mlw_expr.psymbol =
 
 let d2 =
   let args =
-    [Mlw_ty.create_pvsymbol
-        (Ident.id_fresh "_dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
   in
   let result = Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int in
   let spec = {
@@ -356,14 +354,11 @@ let d2 =
       (* recall that "ref" has type "(v:'a) -> ref 'a". We need to build an
          instance of it *)
       (* we first built a dummy effective parameter v of type int *)
-      let pv =
-        Mlw_ty.create_pvsymbol
-          (Ident.id_fresh "v") (Mlw_ty.vty_value Mlw_ty.ity_int)
-      in
+      let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "v") Mlw_ty.ity_int in
       (* we build "ref int" with a *fresh* region *)
       let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
       (* we build the type "(v:int) -> ref <fresh region> int)" *)
-      let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+      let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ity) in
       (* e1 : the appropriate instance of "ref" *)
       let e1 = Mlw_expr.e_arrow ref_fun vta in
       (* we apply it to 0 *)
@@ -381,10 +376,7 @@ let d2 =
     let bang_x =
       (* recall that "!" as type "ref 'a -> 'a" *)
       (* we build a dummy parameter r of the same type as x *)
-      let vta =
-        Mlw_ty.vty_arrow [var_x]
-          (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_int))
-      in
+      let vta = Mlw_ty.vty_arrow [var_x] (Mlw_ty.VTvalue Mlw_ty.ity_int) in
       let e1 = Mlw_expr.e_arrow get_fun vta in
       Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
     in
