@@ -669,14 +669,14 @@ let print_pvty info fmt pv =
   fprintf fmt "@[(%a:@ %a)@]"
     (print_lident info) pv.pv_vs.vs_name (print_ity info) pv.pv_ity
 
-let rec print_vta info fmt vta =
+let rec print_aty info fmt aty =
   let print_arg fmt pv = print_ity info fmt pv.pv_ity in
-  fprintf fmt "(%a -> %a)" (print_list arrow print_arg) vta.vta_args
-    (print_vty info) vta.vta_result
+  fprintf fmt "(%a -> %a)" (print_list Pp.arrow print_arg) aty.aty_args
+    (print_vty info) aty.aty_result
 
 and print_vty info fmt = function
   | VTvalue ity -> print_ity info fmt ity
-  | VTarrow vta -> print_vta info fmt vta
+  | VTarrow aty -> print_aty info fmt aty
 
 let is_letrec = function
   | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
@@ -829,16 +829,16 @@ let print_let_decl info fmt ld =
   else
     print_let_decl info fmt ld
 
-let rec extract_vta_args args vta =
-  let new_args = List.map (fun pv -> pv.pv_vs) vta.vta_args in
+let rec extract_aty_args args aty =
+  let new_args = List.map (fun pv -> pv.pv_vs) aty.aty_args in
   let args = List.rev_append new_args args in
-  match vta.vta_result with
+  match aty.aty_result with
   | VTvalue ity -> List.rev args, ity
-  | VTarrow vta -> extract_vta_args args vta
+  | VTarrow aty -> extract_aty_args args aty
 
 let extract_lv_args = function
   | LetV pv -> [], pv.pv_ity
-  | LetA ps -> extract_vta_args [] ps.ps_vta
+  | LetA ps -> extract_aty_args [] ps.ps_aty
 
 let print_val_decl info fmt lv =
   let vars, ity = extract_lv_args lv in

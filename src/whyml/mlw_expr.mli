@@ -85,13 +85,13 @@ val make_ppattern :
 
 type psymbol = private {
   ps_name  : ident;
-  ps_vta   : vty_arrow;
+  ps_aty   : aty;
   ps_ghost : bool;
   ps_varm  : varmap;
   ps_vars  : varset;
   (* this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
-     and region in ps_vta is generalized and can be instantiated. *)
+     and region in ps_aty is generalized and can be instantiated. *)
   ps_subst : ity_subst;
   (* this substitution instantiates every type variable and region
      in ps_vars to itself *)
@@ -104,10 +104,10 @@ module Wps : Weakhtbl.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 
-val create_psymbol : preid -> ?ghost:bool -> vty_arrow -> psymbol
+val create_psymbol : preid -> ?ghost:bool -> aty -> psymbol
 
 val create_psymbol_extra :
-  preid -> ?ghost:bool -> vty_arrow -> Spv.t -> Sps.t -> psymbol
+  preid -> ?ghost:bool -> aty -> Spv.t -> Sps.t -> psymbol
 
 val spec_pvset : Spv.t -> spec -> Spv.t
 val ps_pvset : Spv.t -> psymbol -> Spv.t
@@ -181,9 +181,9 @@ val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-val e_arrow : psymbol -> vty_arrow -> expr
+val e_arrow : psymbol -> aty -> expr
 (** [e_arrow p ty] instantiates the program function symbol [p] into a
-    program expression having the given value type [ty], instantiating
+    program expression having the given arrow type [ty], instantiating
     appropriately the type variables and region variables. The
     resulting expression can be applied to arguments using [e_app]
     given below.
@@ -195,7 +195,7 @@ exception ValueExpected of expr
 exception ArrowExpected of expr
 
 val ity_of_expr : expr -> ity
-val vta_of_expr : expr -> vty_arrow
+val aty_of_expr : expr -> aty
 
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol

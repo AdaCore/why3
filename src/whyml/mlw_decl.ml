@@ -89,14 +89,14 @@ and syms_type_v s = function
       let add_pv s pv = syms_ity s pv.pv_ity in
       List.fold_left add_pv (syms_type_c s tyc) pvl
 
-let rec syms_vta s a =
-  let s = syms_ity s a.vta_arg in
-  let s = syms_effect s a.vta_effect in
-  syms_vty s a.vta_result
+let rec syms_aty s a =
+  let s = syms_ity s a.aty_arg in
+  let s = syms_effect s a.aty_effect in
+  syms_vty s a.aty_result
 
 and syms_vty s = function
   | VTvalue ity -> syms_ity s ity
-  | VTarrow vta -> syms_vta s vta
+  | VTarrow aty -> syms_aty s aty
 
 let syms_expr s _e = s (* TODO *)
 *)
@@ -232,7 +232,7 @@ let create_rec_decl fdl =
 (*
   let add_fd syms { rec_ps = ps; rec_lambda = l; rec_vars = vm } =
     let syms = syms_varmap syms vm in
-    let syms = syms_vta syms ps.ps_vta in
+    let syms = syms_aty syms ps.ps_aty in
     let syms = syms_term syms l.l_pre in
     let syms = syms_post syms l.l_post in
     let syms = syms_xpost syms l.l_xpost in
@@ -388,23 +388,23 @@ let check_ghost lkn kn d =
     if not (Sreg.exists occurs regs) then () else
     List.iter check (inst_constructors lkn kn ity)
   in
-  let rec check pvs vta =
-    let eff = vta.vta_spec.c_effect in
+  let rec check pvs aty =
+    let eff = aty.aty_spec.c_effect in
     if not (Sexn.is_empty eff.eff_ghostx) then
       raise (GhostRaise (e_void, Sexn.choose eff.eff_ghostx));
-    let pvs = List.fold_right Spv.add vta.vta_args pvs in
+    let pvs = List.fold_right Spv.add aty.aty_args pvs in
     let test pv =
       if pv.pv_ghost then () else
       access eff.eff_ghostw pv.pv_ity
     in
     Spv.iter test pvs;
-    match vta.vta_result with
-    | VTarrow vta -> check pvs vta
+    match aty.aty_result with
+    | VTarrow aty -> check pvs aty
     | VTvalue _ -> ()
   in
   let check ps =
     if ps.ps_ghost then () else
-    check (ps_pvset Spv.empty ps) ps.ps_vta
+    check (ps_pvset Spv.empty ps) ps.ps_aty
   in
   match d.pd_node with
   | PDrec fdl -> List.iter (fun fd -> check fd.fun_ps) fdl

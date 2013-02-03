@@ -823,21 +823,21 @@ let create_pvsymbol, restore_pv, restore_pv_by_id =
 
 type vty =
   | VTvalue of ity
-  | VTarrow of vty_arrow
+  | VTarrow of aty
 
-and vty_arrow = {
-  vta_args   : pvsymbol list;
-  vta_result : vty;
-  vta_spec   : spec;
+and aty = {
+  aty_args   : pvsymbol list;
+  aty_result : vty;
+  aty_spec   : spec;
 }
 
-let rec vta_vars vta =
+let rec aty_vars aty =
   let add_arg vars pv = vars_union vars pv.pv_ity.ity_vars in
-  List.fold_left add_arg (vty_vars vta.vta_result) vta.vta_args
+  List.fold_left add_arg (vty_vars aty.aty_result) aty.aty_args
 
 and vty_vars = function
   | VTvalue ity -> ity.ity_vars
-  | VTarrow vta -> vta_vars vta
+  | VTarrow aty -> aty_vars aty
 
 let ity_of_vty = function
   | VTvalue ity -> ity
@@ -850,9 +850,9 @@ let ty_of_vty = function
 let spec_check spec vty = spec_check spec (ty_of_vty vty)
 
 let vty_arrow_unsafe argl spec vty = {
-  vta_args   = argl;
-  vta_result = vty;
-  vta_spec   = spec;
+  aty_args   = argl;
+  aty_result = vty;
+  aty_spec   = spec;
 }
 
 let vty_arrow argl ?spec vty =
@@ -870,56 +870,56 @@ let vty_arrow argl ?spec vty =
   vty_arrow_unsafe argl spec vty
 
 (* this only compares the types of arguments and results, and ignores
-   the spec. In other words, only the type variables and regions
-   in .vta_vars are matched. The caller should supply a "freezing"
+   the spec. In other words, only the type variables and regions in
+   [aty_vars aty] are matched. The caller should supply a "freezing"
    substitution that covers all external type variables and regions. *)
-let rec vta_vars_match s a1 a2 =
+let rec aty_vars_match s a1 a2 =
   let rec match_args s l1 l2 = match l1, l2 with
-    | [],[] -> s, a1.vta_result, a2.vta_result
-    | [], _ -> s, a1.vta_result, VTarrow { a2 with vta_args = l2 }
-    | _, [] -> s, VTarrow { a1 with vta_args = l1 }, a2.vta_result
+    | [],[] -> s, a1.aty_result, a2.aty_result
+    | [], _ -> s, a1.aty_result, VTarrow { a2 with aty_args = l2 }
+    | _, [] -> s, VTarrow { a1 with aty_args = l1 }, a2.aty_result
     | {pv_ity = v1}::l1, {pv_ity = v2}::l2 ->
         match_args (ity_match s v1 v2) l1 l2
   in
-  let s, vty1, vty2 = match_args s a1.vta_args a2.vta_args in
+  let s, vty1, vty2 = match_args s a1.aty_args a2.aty_args in
   match vty1, vty2 with
-  | VTarrow a1, VTarrow a2 -> vta_vars_match s a1 a2
+  | VTarrow a1, VTarrow a2 -> aty_vars_match s a1 a2
   | VTvalue v1, VTvalue v2 -> ity_match s v1 v2
-  | _ -> invalid_arg "Mlw_ty.vta_vars_match"
+  | _ -> invalid_arg "Mlw_ty.aty_vars_match"
 
-(* the substitution must cover not only vta.vta_tvs and vta.vta_regs
-   but also every type variable and every region in vta_spec *)
-let vta_full_inst sbs vta =
+(* the substitution must cover not only [aty_vars aty] but
+   also every type variable and every region in [aty_spec] *)
+let aty_full_inst sbs aty =
   let tvm = Mtv.map ty_of_ity sbs.ity_subst_tv in
   let pv_inst { pv_vs = vs; pv_ity = ity; pv_ghost = ghost } =
     create_pvsymbol (id_clone vs.vs_name) ~ghost (ity_full_inst sbs ity) in
   let add_arg vsm pv =
     let nv = pv_inst pv in
     Mvs.add pv.pv_vs (t_var nv.pv_vs) vsm, nv in
-  let rec vta_inst vsm vta =
-    let vsm, args = Lists.map_fold_left add_arg vsm vta.vta_args in
-    let spec = spec_full_inst sbs tvm vsm vta.vta_spec in
-    let vty = match vta.vta_result with
-      | VTarrow vta -> VTarrow (vta_inst vsm vta)
+  let rec aty_inst vsm aty =
+    let vsm, args = Lists.map_fold_left add_arg vsm aty.aty_args in
+    let spec = spec_full_inst sbs tvm vsm aty.aty_spec in
+    let vty = match aty.aty_result with
+      | VTarrow aty -> VTarrow (aty_inst vsm aty)
       | VTvalue ity -> VTvalue (ity_full_inst sbs ity) in
     vty_arrow_unsafe args spec vty
   in
-  vta_inst Mvs.empty vta
+  aty_inst Mvs.empty aty
 
 (* remove from the given arrow every effect that is covered
-   neither by the arrow's vta_vars nor by the given varmap *)
-let rec vta_filter varm vars vta =
+   neither by the arrow's aty_vars nor by the given varmap *)
+let rec aty_filter varm vars aty =
   let add_m pv m = Mid.add pv.pv_vs.vs_name pv.pv_ity.ity_vars m in
   let add_s pv s = vars_union pv.pv_ity.ity_vars s in
-  let varm = List.fold_right add_m vta.vta_args varm in
-  let vars = List.fold_right add_s vta.vta_args vars in
-  let vty = match vta.vta_result with
-    | VTarrow a -> VTarrow (vta_filter varm vars a)
-    | VTvalue _ -> vta.vta_result in
+  let varm = List.fold_right add_m aty.aty_args varm in
+  let vars = List.fold_right add_s aty.aty_args vars in
+  let vty = match aty.aty_result with
+    | VTarrow a -> VTarrow (aty_filter varm vars a)
+    | VTvalue _ -> aty.aty_result in
   (* reads and writes must come from the context,
      resets may affect the regions in the result *)
-  let spec = spec_filter varm vars vta.vta_spec in
-  let rst = vta.vta_spec.c_effect.eff_resets in
+  let spec = spec_filter varm vars aty.aty_spec in
+  let rst = aty.aty_spec.c_effect.eff_resets in
   let spec = if Mreg.is_empty rst then spec else
     let vars = vars_union vars (vty_vars vty) in
     let rst = { eff_empty with eff_resets = rst } in
@@ -927,30 +927,30 @@ let rec vta_filter varm vars vta =
     let eff = { spec.c_effect with eff_resets = rst } in
     { spec with c_effect = eff } in
   (* we must also reset every fresh region in the value *)
-  let spec = match vta.vta_result with
+  let spec = match aty.aty_result with
     | VTvalue v ->
         let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
         let eff = reg_fold on_reg v.ity_vars spec.c_effect in
         { spec with c_effect = eff }
     | VTarrow _ -> spec in
-  vty_arrow_unsafe vta.vta_args spec vty
+  vty_arrow_unsafe aty.aty_args spec vty
 
-let vta_filter varm vta =
-  vta_filter varm (vars_merge varm vars_empty) vta
+let aty_filter varm aty =
+  aty_filter varm (vars_merge varm vars_empty) aty
 
-let vta_app vta pv =
-  let arg, rest = match vta.vta_args with
+let aty_app aty pv =
+  let arg, rest = match aty.aty_args with
     | arg::rest -> arg,rest | _ -> assert false in
   ity_equal_check arg.pv_ity pv.pv_ity;
   let sbs = Mvs.singleton arg.pv_vs (t_var pv.pv_vs) in
   let rec vty_subst = function
-    | VTarrow a when not (List.exists (pv_equal arg) a.vta_args) ->
-        let result = vty_subst a.vta_result in
-        let spec = spec_subst sbs a.vta_spec in
-        VTarrow (vty_arrow_unsafe a.vta_args spec result)
+    | VTarrow a when not (List.exists (pv_equal arg) a.aty_args) ->
+        let result = vty_subst a.aty_result in
+        let spec = spec_subst sbs a.aty_spec in
+        VTarrow (vty_arrow_unsafe a.aty_args spec result)
     | vty -> vty in
-  let result = vty_subst vta.vta_result in
-  let spec = spec_subst sbs vta.vta_spec in
+  let result = vty_subst aty.aty_result in
+  let spec = spec_subst sbs aty.aty_spec in
   if not pv.pv_ghost && arg.pv_ghost then
     Loc.errorm "non-ghost value passed as a ghost argument";
   let ghost = pv.pv_ghost && not arg.pv_ghost in

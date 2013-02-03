@@ -447,13 +447,13 @@ let clone_export uc m inst =
     c_effect  = conv_eff c.c_effect;
     c_variant = List.map (conv_vari mv) c.c_variant;
     c_letrec  = 0; } in
-  let rec conv_vta mv a =
-    let args = List.map conv_pv a.vta_args in
+  let rec conv_aty mv a =
+    let args = List.map conv_pv a.aty_args in
     let add mv pv npv = Mvs.add pv.pv_vs npv.pv_vs mv in
-    let mv = List.fold_left2 add mv a.vta_args args in
-    let spec = conv_spec mv a.vta_spec in
-    let vty = match a.vta_result with
-      | VTarrow a -> VTarrow (conv_vta mv a)
+    let mv = List.fold_left2 add mv a.aty_args args in
+    let spec = conv_spec mv a.aty_spec in
+    let vty = match a.aty_result with
+      | VTarrow a -> VTarrow (conv_aty mv a)
       | VTvalue v -> VTvalue (conv_ity v) in
     vty_arrow args ~spec vty in
   let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
@@ -482,8 +482,8 @@ let clone_export uc m inst =
         mvs := Mvs.add pv.pv_vs npv.pv_vs !mvs;
         add_pdecl uc (create_val_decl (LetV npv))
     | PDval (LetA ps) ->
-        let vta = conv_vta !mvs ps.ps_vta in
-        let nps = create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost vta in
+        let aty = conv_aty !mvs ps.ps_aty in
+        let nps = create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost aty in
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec fdl ->
@@ -509,10 +509,10 @@ let clone_export uc m inst =
             end in
         let conv_fd uc { fun_ps = ps } =
           let id = id_clone ps.ps_name in
-          let vta = conv_vta !mvs ps.ps_vta in
+          let aty = conv_aty !mvs ps.ps_aty in
           (* we must retrieve all pvsymbols and psymbols in ps.ps_varm *)
           let pvs,pss = Mid.fold add_id ps.ps_varm (Spv.empty,Sps.empty) in
-          let nps = create_psymbol_extra id ~ghost:ps.ps_ghost vta pvs pss in
+          let nps = create_psymbol_extra id ~ghost:ps.ps_ghost aty pvs pss in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
         List.fold_left conv_fd uc fdl

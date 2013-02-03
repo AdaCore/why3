@@ -215,7 +215,7 @@ let make_ppattern pp ?(ghost=false) ity =
 
 type psymbol = {
   ps_name  : ident;
-  ps_vta   : vty_arrow;
+  ps_aty   : aty;
   ps_ghost : bool;
   ps_varm  : varmap;
   ps_vars  : varset;
@@ -234,11 +234,11 @@ module Wps = Psym.W
 
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
-let create_psymbol_real ~poly id ghost vta varm =
-  let vars = if poly then vars_empty else vta_vars vta in
+let create_psymbol_real ~poly id ghost aty varm =
+  let vars = if poly then vars_empty else aty_vars aty in
   let vars = vars_merge varm vars in
   { ps_name  = id_register id;
-    ps_vta   = vta_filter varm vta;
+    ps_aty   = aty_filter varm aty;
     ps_ghost = ghost;
     ps_varm  = varm;
     ps_vars  = vars;
@@ -279,13 +279,13 @@ let spec_pvset pvs spec =
   let add_vs vs _ s = Spv.add (restore_pv vs) s in
   Mvs.fold add_vs (spec_vsset spec) pvs
 
-let rec vta_varmap vta =
-  let varm = match vta.vta_result with
-    | VTarrow a -> vta_varmap a
+let rec aty_varmap aty =
+  let varm = match aty.aty_result with
+    | VTarrow a -> aty_varmap a
     | VTvalue _ -> Mid.empty in
-  let varm = spec_varmap varm vta.vta_spec in
+  let varm = spec_varmap varm aty.aty_spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
-  List.fold_left del_pv varm vta.vta_args
+  List.fold_left del_pv varm aty.aty_args
 
 let eff_check vars result e =
   let check vars r = if not (reg_occurs r vars) then
@@ -300,33 +300,33 @@ let eff_check vars result e =
     let reset = reset (vars_union vars (vty_vars result)) in
     Mreg.iter reset e.eff_resets
 
-let vtv_check vars eff ity =
+let ity_check vars eff ity =
   let on_reg r =
     if not (reg_occurs r vars) &&
       (try Mreg.find r eff.eff_resets <> None with Not_found -> true)
     then Loc.errorm "every fresh region in the result must be reset" in
   reg_iter on_reg ity.ity_vars
 
-let rec vta_check vars vta =
+let rec aty_check vars aty =
   let add_arg vars pv = vars_union vars pv.pv_ity.ity_vars in
-  let vars = List.fold_left add_arg vars vta.vta_args in
-  eff_check vars vta.vta_result vta.vta_spec.c_effect;
-  if vta.vta_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.vta_check";
-  match vta.vta_result with
-  | VTarrow a -> vta_check vars a
-  | VTvalue v -> vtv_check vars vta.vta_spec.c_effect v
+  let vars = List.fold_left add_arg vars aty.aty_args in
+  eff_check vars aty.aty_result aty.aty_spec.c_effect;
+  if aty.aty_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.aty_check";
+  match aty.aty_result with
+  | VTarrow a -> aty_check vars a
+  | VTvalue v -> ity_check vars aty.aty_spec.c_effect v
 
-let create_psymbol id ?(ghost=false) vta =
-  let ps = create_psymbol_poly id ghost vta (vta_varmap vta) in
-  vta_check ps.ps_vars vta;
+let create_psymbol id ?(ghost=false) aty =
+  let ps = create_psymbol_poly id ghost aty (aty_varmap aty) in
+  aty_check ps.ps_vars aty;
   ps
 
-let create_psymbol_extra id ?(ghost=false) vta pvs pss =
-  let varm = vta_varmap vta in
+let create_psymbol_extra id ?(ghost=false) aty pvs pss =
+  let varm = aty_varmap aty in
   let varm = Spv.fold add_pv_vars pvs varm in
   let varm = Sps.fold add_ps_vars pss varm in
-  let ps = create_psymbol_poly id ghost vta varm in
-  vta_check ps.ps_vars vta;
+  let ps = create_psymbol_poly id ghost aty varm in
+  aty_check ps.ps_vars aty;
   ps
 
 (** program expressions *)
@@ -408,9 +408,9 @@ let ity_of_expr e = match e.e_vty with
   | VTvalue ity -> ity
   | VTarrow _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
 
-let vta_of_expr e = match e.e_vty with
+let aty_of_expr e = match e.e_vty with
   | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
-  | VTarrow vta -> vta
+  | VTarrow aty -> aty
 
 let add_e_vars e m = varmap_union e.e_varm m
 
@@ -475,17 +475,17 @@ let e_value pv =
   let varm = add_pv_vars pv Mid.empty in
   mk_expr (Evalue pv) (VTvalue pv.pv_ity) pv.pv_ghost eff_empty varm
 
-let e_arrow ps vta =
+let e_arrow ps aty =
   let varm = add_ps_vars ps Mid.empty in
-  let sbs = vta_vars_match ps.ps_subst ps.ps_vta vta in
-  let vta = vta_full_inst sbs ps.ps_vta in
-  mk_expr (Earrow ps) (VTarrow vta) ps.ps_ghost eff_empty varm
+  let sbs = aty_vars_match ps.ps_subst ps.ps_aty aty in
+  let aty = aty_full_inst sbs ps.ps_aty in
+  mk_expr (Earrow ps) (VTarrow aty) ps.ps_ghost eff_empty varm
 
 (* let-definitions *)
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTarrow vta -> LetA (create_psymbol_mono id e.e_ghost vta e.e_varm)
+    | VTarrow aty -> LetA (create_psymbol_mono id e.e_ghost aty e.e_varm)
     | VTvalue ity -> LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
   { let_sym = lv ; let_expr = e }
 
@@ -511,7 +511,7 @@ let on_value fn e = match e.e_node with
 (* application *)
 
 let e_app_real e pv =
-  let spec,ghost,vty = vta_app (vta_of_expr e) pv in
+  let spec,ghost,vty = aty_app (aty_of_expr e) pv in
   let ghost = e.e_ghost || ghost in
   let eff = eff_ghostify ghost spec.c_effect in
   check_postexpr e eff (add_pv_vars pv Mid.empty);
@@ -806,9 +806,9 @@ let pv_dummy = create_pvsymbol (id_fresh "dummy") ity_unit
 
 let e_any spec vty =
   if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_any";
-  let vta = vty_arrow [pv_dummy] ~spec vty in
-  let varm = vta_varmap vta in
-  vta_check (vars_merge varm vars_empty) vta;
+  let aty = vty_arrow [pv_dummy] ~spec vty in
+  let varm = aty_varmap aty in
+  aty_check (vars_merge varm vars_empty) aty;
   mk_expr (Eany spec) vty false spec.c_effect varm
 
 let e_abstract e spec =
@@ -832,8 +832,8 @@ let create_fun_defn id ({l_expr = e} as lam) recsyms =
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
   let varm_ps = Mid.set_diff varm recsyms in
-  let vta = vty_arrow lam.l_args ~spec e.e_vty in
-  { fun_ps     = create_psymbol_poly id e.e_ghost vta varm_ps;
+  let aty = vty_arrow lam.l_args ~spec e.e_vty in
+  { fun_ps     = create_psymbol_poly id e.e_ghost aty varm_ps;
     fun_lambda = lam;
     fun_varm   = varm; }
 
@@ -841,8 +841,8 @@ let rec_varmap varm fdl =
   let fd, rest = match fdl with
     | [] -> invalid_arg "Mlw_expr.rec_varm"
     | fd :: fdl -> fd, fdl in
-  let lr = fd.fun_ps.ps_vta.vta_spec.c_letrec in
-  let bad fd = fd.fun_ps.ps_vta.vta_spec.c_letrec <> lr in
+  let lr = fd.fun_ps.ps_aty.aty_spec.c_letrec in
+  let bad fd = fd.fun_ps.ps_aty.aty_spec.c_letrec <> lr in
   if List.exists bad rest then invalid_arg "Mlw_expr.rec_varm";
   let add_fd m fd = varmap_union fd.fun_varm m in
   let del_fd m fd = Mid.remove fd.fun_ps.ps_name m in
@@ -865,23 +865,23 @@ let eff_equal eff1 eff2 =
   Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
   Mreg.equal (Opt.equal reg_equal) eff1.eff_resets eff2.eff_resets
 
-let rec vta_compat a1 a2 =
-  assert (List.for_all2 pv_equal a1.vta_args a2.vta_args);
+let rec aty_compat a1 a2 =
+  assert (List.for_all2 pv_equal a1.aty_args a2.aty_args);
   (* no need to compare the rest of the spec, see below *)
-  eff_equal a1.vta_spec.c_effect a2.vta_spec.c_effect &&
-  match a1.vta_result, a2.vta_result with
-  | VTarrow a1, VTarrow a2 -> vta_compat a1 a2
+  eff_equal a1.aty_spec.c_effect a2.aty_spec.c_effect &&
+  match a1.aty_result, a2.aty_result with
+  | VTarrow a1, VTarrow a2 -> aty_compat a1 a2
   | VTvalue v1, VTvalue v2 -> ity_equal v1 v2
   | _,_ -> assert false
 
 let ps_compat ps1 ps2 =
-  vta_compat ps1.ps_vta ps2.ps_vta &&
+  aty_compat ps1.ps_aty ps2.ps_aty &&
   ps1.ps_ghost = ps2.ps_ghost &&
   Mid.equal (fun _ _ -> true) ps1.ps_varm ps2.ps_varm
 
 let rec expr_subst psm e = e_label_copy e (match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
-      e_arrow (Mid.find ps.ps_name psm) (vta_of_expr e)
+      e_arrow (Mid.find ps.ps_name psm) (aty_of_expr e)
   | Eapp (e,pv,_) ->
       e_app_real (expr_subst psm e) pv
   | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->

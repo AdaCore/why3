@@ -124,13 +124,13 @@ let print_effect fmt eff =
   Sexn.iter (print_xs  "ghost raise") eff.eff_ghostx;
   Mreg.iter print_reset eff.eff_resets
 
-let rec print_vta fmt vta =
+let rec print_aty fmt aty =
   let print_arg fmt pv = fprintf fmt "%a ->@ " print_ity pv.pv_ity in
-  fprintf fmt "%a%a%a" (print_list nothing print_arg) vta.vta_args
-    print_effect vta.vta_spec.c_effect print_vty vta.vta_result
+  fprintf fmt "%a%a%a" (print_list nothing print_arg) aty.aty_args
+    print_effect aty.aty_spec.c_effect print_vty aty.aty_result
 
 and print_vty fmt = function
-  | VTarrow vta -> print_vta fmt vta
+  | VTarrow aty -> print_aty fmt aty
   | VTvalue ity -> print_ity fmt ity
 
 let print_pvty fmt pv = fprintf fmt "@[%a:@,%a@]"
@@ -141,12 +141,12 @@ let print_psty fmt ps =
     fprintf fmt "[%a]@ " (print_list comma print_tv) (Stv.elements tvs) in
   let print_regs fmt regs = if not (Sreg.is_empty regs) then
     fprintf fmt "<%a>@ " (print_list comma print_regty) (Sreg.elements regs) in
-  let vars = vta_vars ps.ps_vta in
+  let vars = aty_vars ps.ps_aty in
   fprintf fmt "@[%a :@ %a%a%a@]"
     print_ps ps
     print_tvs (Mtv.set_diff vars.vars_tv ps.ps_subst.ity_subst_tv)
     print_regs (Mreg.set_diff vars.vars_reg ps.ps_subst.ity_subst_reg)
-    print_vta ps.ps_vta
+    print_aty ps.ps_aty
 
 (* specification *)
 
@@ -165,12 +165,12 @@ let forget_lv = function
 
 let rec print_type_v fmt = function
   | VTvalue ity -> print_ity fmt ity
-  | VTarrow vta ->
+  | VTarrow aty ->
       let print_arg fmt pv = fprintf fmt "@[(%a)@] ->@ " print_pvty pv in
       fprintf fmt "%a%a"
-        (print_list nothing print_arg) vta.vta_args
-        (print_type_c vta.vta_spec) vta.vta_result;
-      List.iter forget_pv vta.vta_args
+        (print_list nothing print_arg) aty.aty_args
+        (print_type_c aty.aty_spec) aty.aty_result;
+      List.iter forget_pv aty.aty_args
 
 and print_type_c spec fmt vty =
   fprintf fmt "{ %a }@ %a%a@ { %a }"
@@ -395,7 +395,7 @@ let print_data_decl fst fmt (ts,csl,inv) =
 
 let print_val_decl fmt lv =
   let vty = match lv with
-    | LetV pv -> VTvalue pv.pv_ity | LetA ps -> VTarrow ps.ps_vta in
+    | LetV pv -> VTvalue pv.pv_ity | LetA ps -> VTarrow ps.ps_aty in
   fprintf fmt "@[<hov 2>val (%a) :@ %a@]" print_lv lv print_type_v vty;
   (* FIXME: forget only generalized regions *)
   match lv with LetA _ -> forget_tvs_regs () | _ -> ()

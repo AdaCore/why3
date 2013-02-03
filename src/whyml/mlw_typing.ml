@@ -1205,7 +1205,7 @@ let e_ghostify gh e = if gh && not e.e_ghost then e_ghost e else e
 let e_app_gh e el =
   let rec decomp = function
     | VTvalue _ -> []
-    | VTarrow a -> a.vta_args @ decomp a.vta_result in
+    | VTarrow a -> a.aty_args @ decomp a.aty_result in
   let rec ghostify = function
     | _, [] -> []
     | [], _ -> assert false
@@ -1230,7 +1230,7 @@ and expr_desc lenv loc de = match de.de_desc with
       | LetV pv -> e_value pv
       | LetA ps ->
           begin match vty_of_dvty de.de_type with
-            | VTarrow vta -> e_arrow ps vta
+            | VTarrow aty -> e_arrow ps aty
             | VTvalue _ -> assert false
           end
       end
@@ -1242,13 +1242,13 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEfun (bl, tr) ->
       let x = mk_id "fn" loc in
       let fd = expr_fun lenv x false bl tr in
-      let e2 = e_arrow fd.fun_ps fd.fun_ps.ps_vta in
+      let e2 = e_arrow fd.fun_ps fd.fun_ps.ps_aty in
       e_rec [fd] e2
   (* FIXME? (ghost "lab" fun x -> ...) loses the label "lab" *)
   | DEghost { de_desc = DEfun (bl, tr) } ->
       let x = mk_id "fn" loc in
       let fd = expr_fun lenv x true bl tr in
-      let e2 = e_arrow fd.fun_ps fd.fun_ps.ps_vta in
+      let e2 = e_arrow fd.fun_ps fd.fun_ps.ps_aty in
       e_rec [fd] e2
   | DElet (x, gh, de1, de2) ->
       let e1 = e_ghostify gh (expr lenv de1) in
@@ -1295,7 +1295,7 @@ and expr_desc lenv loc de = match de.de_desc with
       e_value pv
   | DEglobal_ps ps ->
       begin match vty_of_dvty de.de_type with
-        | VTarrow vta -> e_arrow ps vta
+        | VTarrow aty -> e_arrow ps aty
         | VTvalue _ -> assert false
       end
   | DEglobal_pl pl ->
@@ -1406,9 +1406,9 @@ and expr_desc lenv loc de = match de.de_desc with
 and expr_rec lenv dfdl =
   let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
     let pvl = binders bl in
-    let vta = vty_arrow pvl (vty_of_dvty de.de_type) in
-    let vta = vta_filter Mid.empty vta (* add reset effects *) in
-    let ps = create_psymbol (Denv.create_user_id id) ~ghost:gh vta in
+    let aty = vty_arrow pvl (vty_of_dvty de.de_type) in
+    let aty = aty_filter Mid.empty aty (* add reset effects *) in
+    let ps = create_psymbol (Denv.create_user_id id) ~ghost:gh aty in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in

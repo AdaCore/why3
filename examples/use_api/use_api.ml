@@ -358,9 +358,9 @@ let d2 =
       (* we build "ref int" with a *fresh* region *)
       let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
       (* we build the type "(v:int) -> ref <fresh region> int)" *)
-      let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ity) in
+      let aty = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ity) in
       (* e1 : the appropriate instance of "ref" *)
-      let e1 = Mlw_expr.e_arrow ref_fun vta in
+      let e1 = Mlw_expr.e_arrow ref_fun aty in
       (* we apply it to 0 *)
       let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
       Mlw_expr.e_app e1 [c0]
@@ -376,8 +376,8 @@ let d2 =
     let bang_x =
       (* recall that "!" as type "ref 'a -> 'a" *)
       (* we build a dummy parameter r of the same type as x *)
-      let vta = Mlw_ty.vty_arrow [var_x] (Mlw_ty.VTvalue Mlw_ty.ity_int) in
-      let e1 = Mlw_expr.e_arrow get_fun vta in
+      let aty = Mlw_ty.vty_arrow [var_x] (Mlw_ty.VTvalue Mlw_ty.ity_int) in
+      let e1 = Mlw_expr.e_arrow get_fun aty in
       Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
     in
     (* the complete body *)

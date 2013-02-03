@@ -86,7 +86,6 @@ exception UnboundRegion of region
 
 val create_region : preid -> ity -> region
 
-
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
   preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
@@ -279,35 +278,35 @@ val restore_pv_by_id : ident -> pvsymbol
 
 type vty =
   | VTvalue of ity
-  | VTarrow of vty_arrow
+  | VTarrow of aty
 
-and vty_arrow = private {
-  vta_args   : pvsymbol list;
-  vta_result : vty;
-  vta_spec   : spec;
+and aty = private {
+  aty_args   : pvsymbol list;
+  aty_result : vty;
+  aty_spec   : spec;
 }
 
 exception UnboundException of xsymbol
 
-(* every raised exception must have a postcondition in spec.c_xpost *)
-val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> vty_arrow
+(* every raised exception must have a postcondition in [spec.c_xpost] *)
+val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> aty
 
 (* this only compares the types of arguments and results, and ignores
    the spec. In other words, only the type variables and regions in
-   [vta_vars vta] are matched. The caller should supply a "freezing"
+   [aty_vars aty] are matched. The caller should supply a "freezing"
    substitution that covers all external type variables and regions. *)
-val vta_vars_match : ity_subst -> vty_arrow -> vty_arrow -> ity_subst
+val aty_vars_match : ity_subst -> aty -> aty -> ity_subst
 
-(* the substitution must cover not only [vta_vars vta] but
-   also every type variable and every region in vta_spec *)
-val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
+(* the substitution must cover not only [aty_vars aty] but
+   also every type variable and every region in [aty_spec] *)
+val aty_full_inst : ity_subst -> aty -> aty
 
 (* remove from the given arrow every effect that is covered
    neither by the arrow's arguments nor by the given varmap *)
-val vta_filter : varmap -> vty_arrow -> vty_arrow
+val aty_filter : varmap -> aty -> aty
 
 (* apply a function specification to a variable argument *)
-val vta_app : vty_arrow -> pvsymbol -> spec * bool * vty
+val aty_app : aty -> pvsymbol -> spec * bool * vty
 
 (* verify that the spec corresponds to the result type *)
 val spec_check : spec -> vty -> unit
@@ -318,5 +317,5 @@ val ty_of_vty  : vty -> ty
 
 (* collects the type variables and regions in arguments and values,
    but ignores the spec *)
-val vta_vars : vty_arrow -> varset
+val aty_vars : aty -> varset
 val vty_vars : vty -> varset

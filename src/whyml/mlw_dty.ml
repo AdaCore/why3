@@ -282,21 +282,21 @@ let specialize_pvsymbol pv = specialize_ity pv.pv_ity
 
 let specialize_xsymbol xs = specialize_ity xs.xs_ity
 
-let specialize_vtarrow vars vta =
+let specialize_arrow vars aty =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv pv = dity_of_ity htv hreg vars pv.pv_ity in
   let rec specialize a =
-    let argl = List.map conv a.vta_args in
-    let narg,res = match a.vta_result with
+    let argl = List.map conv a.aty_args in
+    let narg,res = match a.aty_result with
       | VTvalue v -> [], dity_of_ity htv hreg vars v
       | VTarrow a -> specialize a
     in
     argl @ narg, res
   in
-  specialize vta
+  specialize aty
 
 let specialize_psymbol ps =
-  specialize_vtarrow ps.ps_vars ps.ps_vta
+  specialize_arrow ps.ps_vars ps.ps_aty
 
 let specialize_plsymbol pls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
