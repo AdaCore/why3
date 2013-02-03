@@ -104,7 +104,7 @@ goods examples/logic --type-only
 goods examples/bitvectors "--type-only -I examples/bitvectors"
 echo ""
 
-#echo "=== Parsing goods ==="
+#echo "=== Parsing programs ==="
 #goods bench/programs/bad-typing --parse-only
 #goods bench/programs/good --parse-only
 #goods examples --parse-only
@@ -114,16 +114,16 @@ echo ""
 #goods examples/vacid_0_binary_heaps "--parse-only -I examples/vacid_0_binary_heaps"
 #echo ""
 
-echo "=== Type-checking bad goods ==="
+echo "=== Type-checking bad programs ==="
 goods bench/programs/bad-typing --parse-only
-bads bench/goods/bad-typing --type-only
+bads bench/programs/bad-typing --type-only
 echo ""
 
 echo "=== Type-checking modules ==="
 goods modules --type-only
 echo ""
 
-#echo "=== Type-checking good goods ==="
+#echo "=== Type-checking good programs ==="
 #goods bench/programs/good --type-only
 #goods examples --type-only
 #goods examples/in_progress --type-only
@@ -132,7 +132,7 @@ echo ""
 #goods examples/vacid_0_binary_heaps "--type-only -I examples/vacid_0_binary_heaps"
 #echo ""
 
-echo "=== VC generation on good goods ==="
+echo "=== VC generation on good programs ==="
 goods bench/programs/good
 goods examples
 goods examples/in_progress
