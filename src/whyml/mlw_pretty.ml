@@ -57,7 +57,7 @@ let print_reg fmt reg =
   fprintf fmt "%s" (id_unique rprinter reg.reg_name)
 
 let print_pv fmt pv =
-  fprintf fmt "%s%a" (if pv.pv_vtv.vtv_ghost then "?" else "")
+  fprintf fmt "%s%a" (if pv.pv_ghost then "?" else "")
     print_vs pv.pv_vs
 
 let forget_pv pv = forget_var pv.pv_vs
@@ -68,7 +68,7 @@ let print_name fmt id =
 let print_xs fmt xs = print_name fmt xs.xs_name
 
 let print_ps fmt ps =
-  fprintf fmt "%s%a" (if ps.ps_vta.vta_ghost then "?" else "")
+  fprintf fmt "%s%a" (if ps.ps_ghost then "?" else "")
     print_name ps.ps_name
 
 let forget_ps ps = forget_id iprinter ps.ps_name
@@ -125,7 +125,7 @@ let print_effect fmt eff =
   Mreg.iter print_reset eff.eff_resets
 
 let print_vtv fmt vtv =
-  fprintf fmt "%s%a" (if vtv.vtv_ghost then "?" else "") print_ity vtv.vtv_ity
+  fprintf fmt "%a" print_ity vtv.vtv_ity
 
 let rec print_vta fmt vta =
   let print_arg fmt pv = fprintf fmt "%a ->@ " print_vtv pv.pv_vtv in

@@ -416,10 +416,10 @@ let clone_export uc m inst =
     let nr = create_region (id_clone r.reg_name) (conv_ity r.reg_ity) in
     Hreg.replace regh r nr;
     nr in
-  let conv_vtv v =
-    vty_value ~ghost:v.vtv_ghost (conv_ity v.vtv_ity) in
+  let conv_vtv v = vty_value (conv_ity v.vtv_ity) in
   let conv_pv pv =
-    create_pvsymbol (id_clone pv.pv_vs.vs_name) (conv_vtv pv.pv_vtv) in
+    create_pvsymbol (id_clone pv.pv_vs.vs_name)
+      ~ghost:pv.pv_ghost (conv_vtv pv.pv_vtv) in
   let psh = Hid.create 3 in
   let conv_xs xs = try match Hid.find psh xs.xs_name with
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
@@ -456,7 +456,7 @@ let clone_export uc m inst =
     let vty = match a.vta_result with
       | VTarrow a -> VTarrow (conv_vta mv a)
       | VTvalue v -> VTvalue (conv_vtv v) in
-    vty_arrow args ~spec ~ghost:a.vta_ghost vty in
+    vty_arrow args ~spec vty in
   let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
@@ -484,7 +484,7 @@ let clone_export uc m inst =
         add_pdecl uc (create_val_decl (LetV npv))
     | PDval (LetA ps) ->
         let vta = conv_vta !mvs ps.ps_vta in
-        let nps = create_psymbol (id_clone ps.ps_name) vta in
+        let nps = create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost vta in
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec fdl ->
@@ -513,7 +513,7 @@ let clone_export uc m inst =
           let vta = conv_vta !mvs ps.ps_vta in
           (* we must retrieve all pvsymbols and psymbols in ps.ps_varm *)
           let pvs,pss = Mid.fold add_id ps.ps_varm (Spv.empty,Sps.empty) in
-          let nps = create_psymbol_extra id vta pvs pss in
+          let nps = create_psymbol_extra id ~ghost:ps.ps_ghost vta pvs pss in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
         List.fold_left conv_fd uc fdl

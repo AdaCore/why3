@@ -37,7 +37,7 @@ type dspec = {
 type dbinder = ident * ghost * dity
 
 type dtype_v =
-  | DSpecV of ghost * dity
+  | DSpecV of dity
   | DSpecA of dbinder list * dtype_c
 
 and dtype_c = dtype_v * dspec

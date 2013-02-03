@@ -62,6 +62,7 @@ val pl_clone : Theory.symbol_map -> symbol_map
 type ppattern = private {
   ppat_pattern : pattern;
   ppat_vtv     : vty_value;
+  ppat_ghost   : bool;
   ppat_effect  : effect;
 }
 
@@ -73,7 +74,8 @@ type pre_ppattern =
   | PPor   of pre_ppattern * pre_ppattern
   | PPas   of pre_ppattern * preid
 
-val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
+val make_ppattern :
+  pre_ppattern -> ?ghost:bool -> vty_value -> pvsymbol Mstr.t * ppattern
 
 (** program symbols *)
 
@@ -84,6 +86,7 @@ val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 type psymbol = private {
   ps_name  : ident;
   ps_vta   : vty_arrow;
+  ps_ghost : bool;
   ps_varm  : varmap;
   ps_vars  : varset;
   (* this varset covers the type variables and regions of the defining
@@ -101,9 +104,10 @@ module Wps : Weakhtbl.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 
-val create_psymbol : preid -> vty_arrow -> psymbol
+val create_psymbol : preid -> ?ghost:bool -> vty_arrow -> psymbol
 
-val create_psymbol_extra : preid -> vty_arrow -> Spv.t -> Sps.t -> psymbol
+val create_psymbol_extra :
+  preid -> ?ghost:bool -> vty_arrow -> Spv.t -> Sps.t -> psymbol
 
 val spec_pvset : Spv.t -> spec -> Spv.t
 val ps_pvset : Spv.t -> psymbol -> Spv.t
@@ -125,6 +129,7 @@ type let_sym =
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
+  e_ghost  : bool;
   e_effect : effect;
   e_varm   : varmap;
   e_label  : Slab.t;

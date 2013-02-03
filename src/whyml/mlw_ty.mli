@@ -209,7 +209,7 @@ type effect = private {
 
 val eff_empty : effect
 val eff_union : effect -> effect -> effect
-val eff_ghostify : effect -> effect
+val eff_ghostify : bool -> effect -> effect
 
 val eff_read  : effect -> ?ghost:bool -> region -> effect
 val eff_write : effect -> ?ghost:bool -> region -> effect
@@ -256,15 +256,15 @@ type spec = {
 
 type vty_value = private {
   vtv_ity   : ity;
-  vtv_ghost : bool;
 }
 
-val vty_value : ?ghost:bool -> ity -> vty_value
+val vty_value : ity -> vty_value
 
 type pvsymbol = private {
-  pv_vs   : vsymbol;
-  pv_vtv  : vty_value;
-  pv_vars : varset;
+  pv_vs    : vsymbol;
+  pv_vtv   : vty_value;
+  pv_ghost : bool;
+  pv_vars  : varset;
 }
 
 module Mpv : Extmap.S with type key = pvsymbol
@@ -274,7 +274,7 @@ module Wpv : Weakhtbl.S with type key = pvsymbol
 
 val pv_equal : pvsymbol -> pvsymbol -> bool
 
-val create_pvsymbol : preid -> vty_value -> pvsymbol
+val create_pvsymbol : preid -> ?ghost:bool -> vty_value -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
   (* raises Not_found if the argument is not a pv_vs *)
@@ -292,13 +292,12 @@ and vty_arrow = private {
   vta_args   : pvsymbol list;
   vta_result : vty;
   vta_spec   : spec;
-  vta_ghost  : bool;
 }
 
 exception UnboundException of xsymbol
 
 (* every raised exception must have a postcondition in spec.c_xpost *)
-val vty_arrow : pvsymbol list -> ?spec:spec -> ?ghost:bool -> vty -> vty_arrow
+val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> vty_arrow
 
 (* this only compares the types of arguments and results, and ignores
    the spec. In other words, only the type variables and regions in
@@ -315,11 +314,7 @@ val vta_full_inst : ity_subst -> vty_arrow -> vty_arrow
 val vta_filter : varmap -> vty_arrow -> vty_arrow
 
 (* apply a function specification to a variable argument *)
-val vta_app : vty_arrow -> pvsymbol -> spec * vty
-
-(* test for ghostness and convert to ghost *)
-val vty_ghost : vty -> bool
-val vty_ghostify : vty -> vty
+val vta_app : vty_arrow -> pvsymbol -> spec * bool * vty
 
 (* verify that the spec corresponds to the result type *)
 val spec_check : spec -> vty -> unit

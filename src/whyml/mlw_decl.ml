@@ -394,7 +394,7 @@ let check_ghost lkn kn d =
       raise (GhostRaise (e_void, Sexn.choose eff.eff_ghostx));
     let pvs = List.fold_right Spv.add vta.vta_args pvs in
     let test pv =
-      if pv.pv_vtv.vtv_ghost then () else
+      if pv.pv_ghost then () else
       access eff.eff_ghostw pv.pv_vtv.vtv_ity
     in
     Spv.iter test pvs;
@@ -403,7 +403,7 @@ let check_ghost lkn kn d =
     | VTvalue _ -> ()
   in
   let check ps =
-    if ps.ps_vta.vta_ghost then () else
+    if ps.ps_ghost then () else
     check (ps_pvset Spv.empty ps) ps.ps_vta
   in
   match d.pd_node with

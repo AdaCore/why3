@@ -734,7 +734,7 @@ and wp_desc env e q xq = match e.e_node with
         | _ ->
             let id = id_fresh ?loc:e1.e_loc "o" in
             (* must be a pvsymbol or restore_pv will fail *)
-            let npv = create_pvsymbol id (vtv_of_expr e1) in
+            let npv = create_pvsymbol id ~ghost:e1.e_ghost (vtv_of_expr e1) in
             npv.pv_vs, t_var npv.pv_vs
       in
       let res, t = get_term e1 in
