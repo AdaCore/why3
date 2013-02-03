@@ -18,11 +18,16 @@ open Mlw_ty.T
 
 (** program/logic symbols *)
 
+type field = {
+  fd_ity   : ity;
+  fd_ghost : bool;
+  fd_mut   : region option;
+}
+
 type plsymbol = {
   pl_ls     : lsymbol;
-  pl_args   : vty_value list;
-  pl_value  : vty_value;
-  pl_effect : effect;
+  pl_args   : field list;
+  pl_value  : field;
   pl_hidden : bool;
   pl_rdonly : bool;
 }
@@ -31,12 +36,11 @@ let pl_equal : plsymbol -> plsymbol -> bool = (==)
 
 let create_plsymbol_unsafe, restore_pl =
   let ls_to_pls = Wls.create 17 in
-  (fun ls args value effect ~hidden ~rdonly ->
+  (fun ls args value ~hidden ~rdonly ->
     let pl = {
       pl_ls     = ls;
       pl_args   = args;
       pl_value  = value;
-      pl_effect = effect;
       pl_hidden = hidden;
       pl_rdonly = rdonly;
     } in
@@ -45,27 +49,26 @@ let create_plsymbol_unsafe, restore_pl =
   Wls.find ls_to_pls
 
 let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
-  let ty_of_vtv vtv = ty_of_ity vtv.vtv_ity in
+  let ty_of_vtv fd =
+    Opt.iter (fun r -> ity_equal_check fd.fd_ity r.reg_ity) fd.fd_mut;
+    ty_of_ity fd.fd_ity in
   let pure_args = List.map ty_of_vtv args in
   let ls = create_fsymbol id pure_args (ty_of_vtv value) in
-  let eff_read e r = eff_read e ~ghost:value.vtv_ghost r in
-  let effect = Opt.fold eff_read eff_empty value.vtv_mut in
-  let arg_reset acc a = Opt.fold eff_reset acc a.vtv_mut in
-  let effect = List.fold_left arg_reset effect args in
-  create_plsymbol_unsafe ls args value effect ~hidden ~rdonly
+  create_plsymbol_unsafe ls args value ~hidden ~rdonly
 
 let ity_of_ty_opt ty = ity_of_ty (Opt.get_def ty_bool ty)
 
+let fake_field ty = { fd_ity = ity_of_ty ty; fd_ghost = false; fd_mut = None }
+
 let fake_pls = Wls.memoize 17 (fun ls ->
   { pl_ls     = ls;
-    pl_args   = List.map (fun ty -> vty_value (ity_of_ty ty)) ls.ls_args;
-    pl_value  = vty_value (ity_of_ty_opt ls.ls_value);
-    pl_effect = eff_empty;
+    pl_args   = List.map fake_field ls.ls_args;
+    pl_value  = fake_field (Opt.get_def ty_bool ls.ls_value);
     pl_hidden = false;
     pl_rdonly = false; })
 
-exception HiddenPLS of lsymbol
-exception RdOnlyPLS of lsymbol
+exception HiddenPLS of plsymbol
+exception RdOnlyPLS of plsymbol
 
 (** cloning *)
 
@@ -90,36 +93,18 @@ let pl_clone sm =
         ity_pur (conv_ts ts) tl
     | Ityvar _ -> ity
   in
-  let conv_vtv v =
-    let ghost = v.vtv_ghost in
-    let mut, ity = match v.vtv_mut with
-      | Some r -> let r = conv_reg r in Some r, r.reg_ity
-      | None   -> None, conv_ity v.vtv_ity in
-    vty_value ~ghost ?mut ity
-  in
-  let conv_eff eff =
-    let e = eff_empty in
-    assert (Sexn.is_empty eff.eff_raises);
-    assert (Sexn.is_empty eff.eff_ghostx);
-    let conv ghost r e = eff_read ~ghost e (conv_reg r) in
-    let e = Sreg.fold (conv false) eff.eff_reads  e in
-    let e = Sreg.fold (conv true)  eff.eff_ghostr e in
-    let conv ghost r e = eff_write ~ghost e (conv_reg r) in
-    let e = Sreg.fold (conv false) eff.eff_writes e in
-    let e = Sreg.fold (conv true)  eff.eff_ghostw e in
-    let conv r u e = match u with
-      | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
-      | None   -> eff_reset e (conv_reg r) in
-    Mreg.fold conv eff.eff_resets e
+  let conv_field fd = {
+    fd_ity   = conv_ity fd.fd_ity;
+    fd_ghost = fd.fd_ghost;
+    fd_mut   = Opt.map conv_reg fd.fd_mut }
   in
   let add_pl opls nls acc =
     let npls = try restore_pl nls with Not_found ->
-      let args = List.map conv_vtv opls.pl_args in
-      let value = conv_vtv opls.pl_value in
-      let effect = conv_eff opls.pl_effect in
+      let args = List.map conv_field opls.pl_args in
+      let value = conv_field opls.pl_value in
       let hidden = opls.pl_hidden in
       let rdonly = opls.pl_rdonly in
-      create_plsymbol_unsafe nls args value effect ~hidden ~rdonly
+      create_plsymbol_unsafe nls args value ~hidden ~rdonly
     in
     Mls.add opls.pl_ls npls acc
   in
@@ -159,56 +144,54 @@ let make_ppattern pp vtv =
       let pv = create_pvsymbol id vtv in
       Hstr.add hv nm pv; pv
   in
+  let make_app ls ppl vtv =
+    let add_ppat e pp = eff_union e pp.ppat_effect, pp.ppat_pattern in
+    let effect, patl = Lists.map_fold_left add_ppat eff_empty ppl in
+    { ppat_pattern = pat_app ls patl (ty_of_ity vtv.vtv_ity);
+      ppat_vtv     = vtv;
+      ppat_effect  = effect; }
+  in
   let rec make vtv = function
     | PPwild -> {
         ppat_pattern = pat_wild (ty_of_ity vtv.vtv_ity);
-        ppat_vtv     = vtv_unmut vtv;
+        ppat_vtv     = vtv;
         ppat_effect  = eff_empty; }
     | PPvar id -> {
         ppat_pattern = pat_var (find id vtv).pv_vs;
         ppat_vtv     = vtv;
         ppat_effect  = eff_empty; }
     | PPpapp (pls,ppl) ->
-        if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
-        let sbs = ity_match ity_subst_empty pls.pl_value.vtv_ity vtv.vtv_ity in
+        if pls.pl_hidden then raise (HiddenPLS pls);
+        let ity = pls.pl_value.fd_ity in
+        let sbs = ity_match ity_subst_empty ity vtv.vtv_ity in
         let mtch arg pp =
-          let ity = ity_full_inst sbs arg.vtv_ity in
-          let ghost = vtv.vtv_ghost || arg.vtv_ghost in
-          let arg_mut = if pls.pl_rdonly then None else arg.vtv_mut in
-          let mut = Opt.map (reg_full_inst sbs) arg_mut in
-          let pp = make (vty_value ~ghost ?mut ity) pp in
-          match pp.ppat_pattern.pat_node with
-          | Pwild -> pp.ppat_effect, pp
-          | _ -> Opt.fold (eff_read ~ghost) pp.ppat_effect mut, pp in
+          let ity = ity_full_inst sbs arg.fd_ity in
+          let ghost = vtv.vtv_ghost || arg.fd_ghost in
+          let pp = make (vty_value ~ghost ity) pp in
+          match pp.ppat_pattern.pat_node, arg.fd_mut with
+            | Pwild, _ -> pp
+            | _, Some r ->
+                let reg = reg_full_inst sbs r in
+                let eff = eff_read ~ghost pp.ppat_effect reg in
+                { pp with ppat_effect = eff }
+            | _, _ -> pp in
         let ppl = try List.map2 mtch pls.pl_args ppl with
           | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
-        let eff = List.fold_left
-          (fun acc (eff,_) -> eff_union acc eff) eff_empty ppl in
-        let pl = List.map (fun (_,pp) -> pp.ppat_pattern) ppl in
-        { ppat_pattern = pat_app pls.pl_ls pl (ty_of_ity vtv.vtv_ity);
-          ppat_vtv     = vtv_unmut vtv;
-          ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+        make_app pls.pl_ls ppl vtv
     | PPlapp (ls,ppl) ->
         let ity = ity_of_ty_opt ls.ls_value in
         let sbs = ity_match ity_subst_empty ity vtv.vtv_ity in
         let mtch arg pp =
           let ity = ity_full_inst sbs (ity_of_ty arg) in
-          make (vty_value ~ghost:vtv.vtv_ghost ity) pp
-        in
+          make (vty_value ~ghost:vtv.vtv_ghost ity) pp in
         let ppl = try List.map2 mtch ls.ls_args ppl with
           | Not_found -> raise (Pattern.ConstructorExpected ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (ls,List.length ls.ls_args,List.length ppl)) in
-        let eff = List.fold_left
-          (fun acc pp -> eff_union acc pp.ppat_effect) eff_empty ppl in
-        let pl = List.map (fun pp -> pp.ppat_pattern) ppl in
-        { ppat_pattern = pat_app ls pl (ty_of_ity vtv.vtv_ity);
-          ppat_vtv     = vtv_unmut vtv;
-          ppat_effect  = if vtv.vtv_ghost then eff_ghostify eff else eff; }
+        make_app ls ppl vtv
     | PPor (pp1,pp2) ->
-        let vtv = vtv_unmut vtv in
         let pp1 = make vtv pp1 in
         let pp2 = make vtv pp2 in
         { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
@@ -217,10 +200,10 @@ let make_ppattern pp vtv =
     | PPas (pp,id) ->
         let pp = make vtv pp in
         { ppat_pattern = pat_as pp.ppat_pattern (find id vtv).pv_vs;
-          ppat_vtv     = vtv_unmut vtv;
+          ppat_vtv     = vtv;
           ppat_effect  = pp.ppat_effect; }
   in
-  let pp = make (vtv_unmut vtv) pp in
+  let pp = make vtv pp in
   Hstr.fold Mstr.add hv Mstr.empty, pp
 
 (** program symbols *)
@@ -371,7 +354,7 @@ and expr_node =
   | Erec    of fun_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
-  | Eassign of expr * region * pvsymbol
+  | Eassign of plsymbol * expr * region * pvsymbol
   | Eghost  of expr
   | Eany    of spec
   | Eloop   of invariant * variant list * expr
@@ -420,10 +403,6 @@ let vtv_of_expr e = match e.e_vty with
 let vta_of_expr e = match e.e_vty with
   | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
   | VTarrow vta -> vta
-
-let pv_effect pv = match pv.pv_vtv.vtv_mut with
-  | Some r -> eff_read ~ghost:pv.pv_vtv.vtv_ghost eff_empty r
-  | None -> eff_empty
 
 let add_e_vars e m = varmap_union e.e_varm m
 
@@ -485,7 +464,7 @@ let mk_expr node vty eff varm = {
 
 let e_value pv =
   let varm = add_pv_vars pv Mid.empty in
-  mk_expr (Evalue pv) (VTvalue pv.pv_vtv) (pv_effect pv) varm
+  mk_expr (Evalue pv) (VTvalue pv.pv_vtv) eff_empty varm
 
 let e_arrow ps vta =
   let varm = add_ps_vars ps Mid.empty in
@@ -497,11 +476,8 @@ let e_arrow ps vta =
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTvalue vtv ->
-        LetV (create_pvsymbol id (vtv_unmut vtv))
-    | VTarrow vta ->
-        LetA (create_psymbol_mono id vta e.e_varm)
-  in
+    | VTarrow vta -> LetA (create_psymbol_mono id vta e.e_varm)
+    | VTvalue vtv -> LetV (create_pvsymbol id vtv) in
   { let_sym = lv ; let_expr = e }
 
 let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
@@ -529,7 +505,6 @@ let e_app_real e pv =
   let spec,vty = vta_app (vta_of_expr e) pv in
   check_postexpr e spec.c_effect (add_pv_vars pv Mid.empty);
   let eff = eff_union e.e_effect spec.c_effect in
-  let eff = eff_union eff (pv_effect pv) in
   mk_expr (Eapp (e,pv,spec)) vty eff (add_pv_vars pv e.e_varm)
 
 let rec e_app_flatten e pv = match e.e_node with
@@ -563,54 +538,48 @@ let rec e_app_flatten e pv = match e.e_node with
 let e_app = List.fold_left (fun e -> on_value (e_app_flatten e))
 
 let e_plapp pls el ity =
-  if pls.pl_hidden then raise (HiddenPLS pls.pl_ls);
-  if pls.pl_rdonly then raise (RdOnlyPLS pls.pl_ls);
-  let rec app tl varm ghost eff sbs vtvl argl =
-    match vtvl, argl with
-      | [],[] ->
-          let vtv = pls.pl_value in
-          let ghost = ghost || vtv.vtv_ghost in
-          let sbs = ity_match sbs vtv.vtv_ity ity in
-          let mut = match pls.pl_args with
-            (* if our sole argument is a private type, then we are immutable *)
-            | [{vtv_ity = {ity_node = Ityapp ({its_priv = true},_,_)}}] -> None
-            | _ -> vtv.vtv_mut in
-          let mut = Opt.map (reg_full_inst sbs) mut in
-          let vty = VTvalue (vty_value ~ghost ?mut ity) in
-          let eff = eff_union eff (eff_full_inst sbs pls.pl_effect) in
-          let t = match pls.pl_ls.ls_value with
-            | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
-            | None   -> ps_app pls.pl_ls tl in
-          mk_expr (Elogic t) vty eff varm
-      | [],_ | _,[] ->
-          raise (Term.BadArity
-            (pls.pl_ls, List.length pls.pl_args, List.length el))
-      | vtv::vtvl, ({ e_node = Elogic t } as e)::argl ->
-          let t = match t.t_ty with
-            | Some _ -> t
-            | None -> t_if_simp t t_bool_true t_bool_false in
-          let evtv = vtv_of_expr e in
-          let ghost = ghost || (evtv.vtv_ghost && not vtv.vtv_ghost) in
-          if vtv.vtv_ghost && not evtv.vtv_ghost then
-            Loc.errorm "non-ghost value passed as a ghost argument";
-          let eff = eff_union eff e.e_effect in
-          let sbs = ity_match sbs vtv.vtv_ity evtv.vtv_ity in
-          app (t::tl) (add_e_vars e varm) ghost eff sbs vtvl argl
-      | vtv::vtvl, e::argl ->
-          let apply_to_pv pv =
-            let t = t_var pv.pv_vs in
-            let eff = eff_union eff (pv_effect pv) in
-            let ghost = ghost || (pv.pv_vtv.vtv_ghost && not vtv.vtv_ghost) in
-            let sbs = ity_match sbs vtv.vtv_ity pv.pv_vtv.vtv_ity in
-            app (t::tl) (add_pv_vars pv varm) ghost eff sbs vtvl argl
-          in
-          if vtv.vtv_ghost && not (vty_ghost e.e_vty) then
-            Loc.errorm "non-ghost value passed as a ghost argument";
-          on_value apply_to_pv e
+  if pls.pl_hidden then raise (HiddenPLS pls);
+  if pls.pl_rdonly then raise (RdOnlyPLS pls);
+  let rec app tl varm ghost eff sbs fdl argl = match fdl, argl with
+    | [],[] ->
+        let mut_fold fn eff fd = match fd.fd_mut with
+          | Some r -> fn eff (reg_full_inst sbs r)
+          | None -> eff in
+        let eff = List.fold_left (mut_fold eff_reset) eff pls.pl_args in
+        let eff = mut_fold (eff_read ~ghost) eff pls.pl_value in
+        let vty = VTvalue (vty_value ~ghost ity) in
+        let t = match pls.pl_ls.ls_value with
+          | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
+          | None   -> ps_app pls.pl_ls tl in
+        mk_expr (Elogic t) vty eff varm
+    | [],_ | _,[] ->
+        raise (Term.BadArity
+          (pls.pl_ls, List.length pls.pl_args, List.length el))
+    | fd::fdl, ({ e_node = Elogic t } as e)::argl ->
+        let t = match t.t_ty with
+          | Some _ -> t
+          | None -> t_if_simp t t_bool_true t_bool_false in
+        let evtv = vtv_of_expr e in
+        let ghost = ghost || (evtv.vtv_ghost && not fd.fd_ghost) in
+        if fd.fd_ghost && not evtv.vtv_ghost then
+          Loc.errorm "non-ghost value passed as a ghost argument";
+        let eff = eff_union eff e.e_effect in
+        let sbs = ity_match sbs fd.fd_ity evtv.vtv_ity in
+        app (t::tl) (add_e_vars e varm) ghost eff sbs fdl argl
+    | fd::fdl, e::argl ->
+        let apply_to_pv pv =
+          let t = t_var pv.pv_vs in
+          let ghost = ghost || (pv.pv_vtv.vtv_ghost && not fd.fd_ghost) in
+          let sbs = ity_match sbs fd.fd_ity pv.pv_vtv.vtv_ity in
+          app (t::tl) (add_pv_vars pv varm) ghost eff sbs fdl argl
+        in
+        if fd.fd_ghost && not (vty_ghost e.e_vty) then
+          Loc.errorm "non-ghost value passed as a ghost argument";
+        on_value apply_to_pv e
   in
-  let vtvl = List.rev pls.pl_args in
-  let argl = List.rev el in
-  app [] Mid.empty false eff_empty ity_subst_empty vtvl argl
+  let argl = List.rev el and fdl = List.rev pls.pl_args in
+  let sbs = ity_match ity_subst_empty pls.pl_value.fd_ity ity in
+  app [] Mid.empty pls.pl_value.fd_ghost eff_empty sbs fdl argl
 
 let e_lapp ls el ity = e_plapp (fake_pls ls) el ity
 
@@ -644,8 +613,6 @@ let e_case e0 bl =
   let rec branch ghost eff varm = function
     | (pp,e)::bl ->
         let vtv = vtv_of_expr e in
-        if pp.ppat_vtv.vtv_mut <> None then
-          Loc.errorm "Mutable pattern in a non-mutable position";
         if pp.ppat_vtv.vtv_ghost <> vtv0.vtv_ghost then
           Loc.errorm "Non-ghost pattern in a ghost position";
         ity_equal_check vtv0.vtv_ity pp.ppat_vtv.vtv_ity;
@@ -676,20 +643,26 @@ let e_ghost e =
 
 exception Immutable of expr
 
-let e_assign_real e0 pv =
+let e_assign_real pls e0 pv =
   let vtv0 = vtv_of_expr e0 in
-  let r = match vtv0.vtv_mut with
-    | Some r -> r
-    | None -> Loc.error ?loc:e0.e_loc (Immutable e0) in
-  let ghost = vtv0.vtv_ghost || pv.pv_vtv.vtv_ghost in
+  if pls.pl_hidden then raise (HiddenPLS pls);
+  if pls.pl_rdonly then raise (RdOnlyPLS pls);
+  let r = match pls.pl_value.fd_mut, pls.pl_args with
+    (* if pls.pl_value is mutable, it can only be a projection *)
+    | Some r, [{fd_ity = {ity_node = Ityapp (s,_,_)} as ity}] ->
+        if s.its_priv then raise (RdOnlyPLS pls);
+        reg_full_inst (ity_match ity_subst_empty ity vtv0.vtv_ity) r
+    | _,_ ->
+        raise (Immutable (e_plapp pls [e0] pv.pv_vtv.vtv_ity)) in
+  let lghost = vtv0.vtv_ghost || pls.pl_value.fd_ghost in
+  let ghost = lghost || pv.pv_vtv.vtv_ghost in
   let eff = eff_assign eff_empty ~ghost r pv.pv_vtv.vtv_ity in
   let varm = add_pv_vars pv Mid.empty in
   check_postexpr e0 eff varm;
   let varm = add_e_vars e0 varm in
   let eff = eff_union eff e0.e_effect in
-  let eff = eff_union eff (pv_effect pv) in
   let vty = VTvalue (vty_value ~ghost ity_unit) in
-  let e = mk_expr (Eassign (e0,r,pv)) vty eff varm in
+  let e = mk_expr (Eassign (pls,e0,r,pv)) vty eff varm in
   (* FIXME? Ok, this is awkward. We prohibit assignments
      where a ghost value is being written in a non-ghost
      mutable lvalue (which is reasonable), but we build the
@@ -702,11 +675,11 @@ let e_assign_real e0 pv =
      The real check is written above in e_let, where we ensure
      that every ghost write (whether it was made into a ghost
      lvalue or not) is never followed by a non-ghost read. *)
-  if not vtv0.vtv_ghost && pv.pv_vtv.vtv_ghost then
+  if not lghost && pv.pv_vtv.vtv_ghost then
     Loc.error (GhostWrite (e,r));
   e
 
-let e_assign me e = on_value (e_assign_real me) e
+let e_assign pls e0 e1 = on_value (e_assign_real pls e0) e1
 
 (* numeric constants *)
 
@@ -771,8 +744,7 @@ let e_loop inv variant e =
   let vsset = variant_vars variant vsset in
   let varm = add_t_vars vsset e.e_varm in
   check_postexpr e e.e_effect varm;
-  let vty = VTvalue (vtv_unmut vtv) in
-  mk_expr (Eloop (inv,variant,e)) vty e.e_effect varm
+  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_effect varm
 
 let e_for_real pv bounds inv e =
   let vtv = vtv_of_expr e in
@@ -781,8 +753,6 @@ let e_for_real pv bounds inv e =
   ity_equal_check pv.pv_vtv.vtv_ity ity_int;
   ity_equal_check pvfrom.pv_vtv.vtv_ity ity_int;
   ity_equal_check pvto.pv_vtv.vtv_ity ity_int;
-  if pv.pv_vtv.vtv_mut <> None then
-    Loc.errorm "mutable index in a for loop";
   let ghost = pv.pv_vtv.vtv_ghost || pvfrom.pv_vtv.vtv_ghost ||
     pvto.pv_vtv.vtv_ghost || vtv.vtv_ghost in
   let eff = if ghost then eff_ghostify e.e_effect else e.e_effect in
@@ -820,8 +790,6 @@ let e_try e0 bl =
         let vtv = vtv_of_expr e in
         ity_equal_check vtv0.vtv_ity vtv.vtv_ity;
         ity_equal_check xs.xs_ity pv.pv_vtv.vtv_ity;
-        if pv.pv_vtv.vtv_mut <> None then
-          Loc.errorm "Mutable variable in a try-with branch";
         (* we don't care about pv being ghost *)
         let ghost = ghost || vtv.vtv_ghost in
         let eff = eff_union eff e.e_effect in
@@ -880,10 +848,7 @@ let create_fun_defn id lam recsyms =
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
   let varm_ps = Mid.set_diff varm recsyms in
-  let vty = match lam.l_expr.e_vty with
-    | VTvalue ({ vtv_mut = Some _ } as vtv) -> VTvalue (vtv_unmut vtv)
-    | vty -> vty in
-  let vta = vty_arrow lam.l_args ~spec vty in
+  let vta = vty_arrow lam.l_args ~spec lam.l_expr.e_vty in
   { fun_ps     = create_psymbol_poly id vta varm_ps;
     fun_lambda = lam;
     fun_varm   = varm; }
@@ -918,8 +883,7 @@ let eff_equal eff1 eff2 =
 
 let vtv_equal vtv1 vtv2 =
   vtv1.vtv_ghost = vtv2.vtv_ghost &&
-  ity_equal vtv1.vtv_ity vtv2.vtv_ity &&
-  Opt.equal reg_equal vtv1.vtv_mut vtv2.vtv_mut
+  ity_equal vtv1.vtv_ity vtv2.vtv_ity
 
 let rec vta_compat a1 a2 =
   assert (List.for_all2 pv_equal a1.vta_args a2.vta_args);
@@ -942,7 +906,7 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       e_app_real (expr_subst psm e) pv
   | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->
       let nd = expr_subst psm d in
-      if not (vtv_equal (vtv_unmut (vtv_of_expr nd)) pv.pv_vtv) then
+      if not (vtv_equal (vtv_of_expr nd) pv.pv_vtv) then
         Loc.errorm "vty_value mismatch";
       e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
   | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
@@ -960,8 +924,8 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
   | Ecase (e,bl) ->
       let branch (pp,e) = pp, expr_subst psm e in
       e_case (expr_subst psm e) (List.map branch bl)
-  | Eassign (e,_,pv) ->
-      e_assign_real (expr_subst psm e) pv
+  | Eassign (pls,e,_,pv) ->
+      e_assign_real pls (expr_subst psm e) pv
   | Eghost e ->
       e_ghost (expr_subst psm e)
   | Eabstr (e,spec) ->
@@ -1049,7 +1013,7 @@ let e_fold fn acc e = match e.e_node with
       let fn_br acc (_,_,e) = fn acc e in
       List.fold_left fn_br (fn acc e) bl
   | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
-  | Eapp (e,_,_) | Eassign (e,_,_) | Eghost e
+  | Eapp (e,_,_) | Eassign (_,e,_,_) | Eghost e
   | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
   | Eabstr (e,_) -> fn acc e
   | Elogic _ | Evalue _ | Earrow _

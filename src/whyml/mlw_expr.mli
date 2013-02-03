@@ -25,24 +25,27 @@ open Mlw_ty.T
    locally defined and therefore every type variable and region in their
    type signature can be instantiated. *)
 
+type field = {
+  fd_ity   : ity;
+  fd_ghost : bool;
+  fd_mut   : region option;
+}
+
 type plsymbol = private {
   pl_ls     : lsymbol;
-  pl_args   : vty_value list;
-  pl_value  : vty_value;
-  pl_effect : effect;
+  pl_args   : field list;
+  pl_value  : field;
   pl_hidden : bool;
   pl_rdonly : bool;
 }
 
 val pl_equal : plsymbol -> plsymbol -> bool
 
-val create_plsymbol : ?hidden:bool -> ?rdonly:bool ->
-  preid -> vty_value list -> vty_value -> plsymbol
-  (* FIXME? Effect calculation is hardwired to correspond to constructors
-     and projections: mutable arguments are reset, mutable result is read. *)
+val create_plsymbol :
+  ?hidden:bool -> ?rdonly:bool -> preid -> field list -> field -> plsymbol
 
-exception HiddenPLS of lsymbol
-exception RdOnlyPLS of lsymbol
+exception HiddenPLS of plsymbol
+exception RdOnlyPLS of plsymbol
 
 (** cloning *)
 
@@ -137,7 +140,7 @@ and expr_node = private
   | Erec    of fun_defn list * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (ppattern * expr) list
-  | Eassign of expr * region * pvsymbol
+  | Eassign of plsymbol * expr * region * pvsymbol
   | Eghost  of expr
   | Eany    of spec
   | Eloop   of invariant * variant list * expr
@@ -220,7 +223,7 @@ val e_case : expr -> (ppattern * expr) list -> expr
 
 exception Immutable of expr
 
-val e_assign : expr -> expr -> expr
+val e_assign : plsymbol -> expr -> expr -> expr
 val e_ghost : expr -> expr
 
 val fs_void : lsymbol

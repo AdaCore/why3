@@ -60,7 +60,7 @@ and dexpr_desc =
   | DEfun of dbinder list * dtriple
   | DElet of ident * ghost * dexpr * dexpr
   | DEletrec of drecfun list * dexpr
-  | DEassign of dexpr * dexpr
+  | DEassign of plsymbol * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEloop of dvariant list * dinvariant * dexpr
   | DElazy of Ptree.lazy_op * dexpr * dexpr

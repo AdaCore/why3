@@ -41,7 +41,9 @@ and pdecl_node = private
 
 (** {2 Declaration constructors} *)
 
-type pre_constructor = preid * (pvsymbol * bool) list
+type pre_field = preid option * field
+
+type pre_constructor = preid * pre_field list
 
 type pre_data_decl = itysymbol * pre_constructor list
 
@@ -81,4 +83,4 @@ val find_invariant : known_map -> itysymbol -> post
 exception NonupdatableType of ity
 
 val inst_constructors :
-  Decl.known_map -> known_map -> ity -> (lsymbol * vty_value list) list
+  Decl.known_map -> known_map -> ity -> (lsymbol * field list) list

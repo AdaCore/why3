@@ -304,7 +304,7 @@ let specialize_psymbol ps =
 
 let specialize_plsymbol pls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
-  let conv vtv = dity_of_vtv htv hreg vars_empty vtv in
+  let conv fd = dity_of_ity htv hreg vars_empty fd.fd_ity in
   List.map conv pls.pl_args, conv pls.pl_value
 
 let dity_of_ty htv hreg vars ty =
