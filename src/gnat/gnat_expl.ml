@@ -48,7 +48,9 @@ let reason_from_string s =
    | "VC_LOOP_INVARIANT_PRESERV"  -> VC_Loop_Invariant_Preserv
    | "VC_LOOP_VARIANT"            -> VC_Loop_Variant
    | "VC_ASSERT"                  -> VC_Assert
-   | _                            -> assert false
+   | _                            ->
+       Format.printf "unknown VC reason: %s@." s;
+       Gnat_util.abort_with_message ""
 
 let string_of_reason s =
    match s with
