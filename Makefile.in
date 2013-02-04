@@ -1190,8 +1190,7 @@ test-runstrat: test-runstrat.$(OCAMLBEST)
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/manual.pdf
-# doc/manual.html
+doc: doc/manual.pdf doc/html/index.html
 
 BNF = qualid label constant operator term type formula theory theory2 \
 	why_file spec expr expr2 module whyml_file
@@ -1212,6 +1211,8 @@ DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
+ifeq (@enable_html_doc@,yes)
+
 # the dependency on the pdf ensures the bbl was built
 doc/html/manual.html: doc/manual.pdf doc/fix.hva
 	cd doc; rm -rf html; mkdir -p html
@@ -1220,6 +1221,12 @@ doc/html/manual.html: doc/manual.pdf doc/fix.hva
 
 doc/html/index.html: doc/html/manual.html
 	cd doc; $(HACHA) -tocbis -o html/index.html html/manual.html
+
+else
+
+doc/html/manual.html:
+
+endif
 
 clean::
 	cd doc; rm -rf html; $(RUBBER) --pdf --clean manual.tex
