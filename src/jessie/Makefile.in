@@ -1,5 +1,6 @@
-FRAMAC_SHARE    := $(shell frama-c -print-path)
-FRAMAC_LIBDIR   := $(shell frama-c -print-libpath)
+FRAMAC_SHARE  = @FRAMAC_SHARE@
+FRAMAC_LIBDIR = @FRAMAC_LIBDIR@
+
 PLUGIN_NAME     := Jessie3
 PLUGIN_CMO      := literals ACSLtoWhy3 register
 

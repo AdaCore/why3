@@ -48,6 +48,7 @@ OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
 COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
+FRAMAC_LIBDIR = @FRAMAC_LIBDIR@
 
 DEPFLAGS  = -slash -I lib/why3
 ifeq (@OCAMLBEST@,opt)
@@ -1010,6 +1011,30 @@ opt byte: drivers/pvs-realizations.aux
 
 clean::
 	rm -f drivers/pvs-realizations.aux
+
+################
+# Jessie3 plugin
+################
+
+ifeq (@enable_frama_c@,yes)
+
+byte: jessie.byte
+opt: jessie.opt
+
+jessie.byte: lib/why3/why3.cma
+	@$(MAKE) -C src/jessie Jessie3.cma
+
+jessie.opt: lib/why3/why3.cmxa
+	@$(MAKE) -C src/jessie Jessie3.cmxs
+
+install_no_local::
+	mkdir -p $(FRAMAC_LIBDIR)/plugins/
+	cp -f src/jessie/Jessie3.cm* $(FRAMAC_LIBDIR)/plugins/
+
+clean::
+	$(MAKE) -C src/jessie clean
+
+endif
 
 #######
 # tools
