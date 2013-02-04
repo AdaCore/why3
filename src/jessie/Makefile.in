@@ -21,6 +21,9 @@ OCAMLLEX  = @OCAMLLEX@
 literals.ml: literals.mll
 	$(OCAMLLEX) $<
 
+$(addsuffix .cmo, $(PLUGIN_CMO)): $(WHYLIB)/why3.cmi
+$(addsuffix .cmx, $(PLUGIN_CMO)): $(WHYLIB)/why3.cmi $(WHYLIB)/why3.cmx
+
 include $(FRAMAC_SHARE)/Makefile.dynamic
 
 tests::

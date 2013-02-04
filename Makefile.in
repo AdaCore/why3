@@ -1021,10 +1021,10 @@ ifeq (@enable_frama_c@,yes)
 byte: jessie.byte
 opt: jessie.opt
 
-jessie.byte: lib/why3/why3.cma
+jessie.byte: src/jessie/Makefile lib/why3/why3.cma
 	@$(MAKE) -C src/jessie Jessie3.cma
 
-jessie.opt: lib/why3/why3.cmxa
+jessie.opt: src/jessie/Makefile lib/why3/why3.cmxa
 	@$(MAKE) -C src/jessie Jessie3.cmxs
 
 install_no_local::
@@ -1557,6 +1557,9 @@ headers:
 #########
 
 Makefile: Makefile.in config.status
+	./config.status chmod --file $@
+
+src/jessie/Makefile: src/jessie/Makefile.in config.status
 	./config.status chmod --file $@
 
 src/config.sh: src/config.sh.in config.status
