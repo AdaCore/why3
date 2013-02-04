@@ -192,24 +192,16 @@ let rec logic_type ty =
 let any _ty =
   Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
 
-
 let mk_ref ty =
-    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "a") ty in
-    let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
-    let aty = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ity) in
-    Mlw_expr.e_arrow ref_fun aty
+    let ref_ty = Mlw_ty.ity_app_fresh ref_type [ty] in
+    Mlw_expr.e_arrow ref_fun [ty] ref_ty
 
 let mk_get ref_ty ty =
-    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let aty = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ty) in
-    Mlw_expr.e_arrow get_fun aty
+    Mlw_expr.e_arrow get_fun [ref_ty] ty
 
 let mk_set ref_ty ty =
     (* (:=) has type (r:ref 'a) (v:'a) unit *)
-    let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let pv2 = Mlw_ty.create_pvsymbol (Ident.id_fresh "v") ty in
-    let aty = Mlw_ty.vty_arrow [pv1;pv2] (Mlw_ty.VTvalue Mlw_ty.ity_unit) in
-    Mlw_expr.e_arrow set_fun aty
+    Mlw_expr.e_arrow set_fun [ref_ty; ty] Mlw_ty.ity_unit
 
 
 

@@ -1214,6 +1214,9 @@ let e_plapp_gh pl el ity =
   let ghostify fd e = e_ghostify fd.fd_ghost e in
   e_plapp pl (List.map2 ghostify pl.pl_args el) ity
 
+let e_arrow_dity ps (argl,res) =
+  e_arrow ps (List.map ity_of_dity argl) (ity_of_dity res)
+
 let rec expr lenv de =
   let loc = de.de_loc in
   let e = Loc.try3 loc expr_desc lenv loc de in
@@ -1224,11 +1227,7 @@ and expr_desc lenv loc de = match de.de_desc with
       assert (Mstr.mem x lenv.let_vars);
       begin match Mstr.find x lenv.let_vars with
       | LetV pv -> e_value pv
-      | LetA ps ->
-          begin match vty_of_dvty de.de_type with
-            | VTarrow aty -> e_arrow ps aty
-            | VTvalue _ -> assert false
-          end
+      | LetA ps -> e_arrow_dity ps de.de_type
       end
   | DElet (x, gh, { de_desc = DEfun (bl, tr) }, de2) ->
       let fd = expr_fun lenv x gh bl tr in
@@ -1238,13 +1237,13 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEfun (bl, tr) ->
       let x = mk_id "fn" loc in
       let fd = expr_fun lenv x false bl tr in
-      let e2 = e_arrow fd.fun_ps fd.fun_ps.ps_aty in
+      let e2 = e_arrow_dity fd.fun_ps de.de_type in
       e_rec [fd] e2
   (* FIXME? (ghost "lab" fun x -> ...) loses the label "lab" *)
   | DEghost { de_desc = DEfun (bl, tr) } ->
       let x = mk_id "fn" loc in
       let fd = expr_fun lenv x true bl tr in
-      let e2 = e_arrow fd.fun_ps fd.fun_ps.ps_aty in
+      let e2 = e_arrow_dity fd.fun_ps de.de_type in
       e_rec [fd] e2
   | DElet (x, gh, de1, de2) ->
       let e1 = e_ghostify gh (expr lenv de1) in
@@ -1290,10 +1289,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEglobal_pv pv ->
       e_value pv
   | DEglobal_ps ps ->
-      begin match vty_of_dvty de.de_type with
-        | VTarrow aty -> e_arrow ps aty
-        | VTvalue _ -> assert false
-      end
+      e_arrow_dity ps de.de_type
   | DEglobal_pl pl ->
       e_plapp pl [] (ity_of_dity (snd de.de_type))
   | DEglobal_ls ls ->

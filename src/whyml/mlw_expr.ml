@@ -475,11 +475,21 @@ let e_value pv =
   let varm = add_pv_vars pv Mid.empty in
   mk_expr (Evalue pv) (VTvalue pv.pv_ity) pv.pv_ghost eff_empty varm
 
-let e_arrow ps aty =
+let e_arrow ps argl res =
   let varm = add_ps_vars ps Mid.empty in
-  let sbs = aty_vars_match ps.ps_subst ps.ps_aty aty in
+  let sbs = aty_vars_match ps.ps_subst ps.ps_aty argl res in
   let aty = aty_full_inst sbs ps.ps_aty in
   mk_expr (Earrow ps) (VTarrow aty) ps.ps_ghost eff_empty varm
+
+let e_arrow_aty ps aty =
+  let rec get_types argl a =
+    let add argl pv = pv.pv_ity :: argl in
+    let argl = List.fold_left add argl a.aty_args in
+    match a.aty_result with
+    | VTarrow a -> get_types argl a
+    | VTvalue v -> e_arrow ps (List.rev argl) v
+  in
+  get_types [] aty
 
 (* let-definitions *)
 
@@ -881,7 +891,7 @@ let ps_compat ps1 ps2 =
 
 let rec expr_subst psm e = e_label_copy e (match e.e_node with
   | Earrow ps when Mid.mem ps.ps_name psm ->
-      e_arrow (Mid.find ps.ps_name psm) (aty_of_expr e)
+      e_arrow_aty (Mid.find ps.ps_name psm) (aty_of_expr e)
   | Eapp (e,pv,_) ->
       e_app_real (expr_subst psm e) pv
   | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->

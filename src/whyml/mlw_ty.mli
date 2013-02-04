@@ -295,7 +295,7 @@ val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> aty
    the spec. In other words, only the type variables and regions in
    [aty_vars aty] are matched. The caller should supply a "freezing"
    substitution that covers all external type variables and regions. *)
-val aty_vars_match : ity_subst -> aty -> aty -> ity_subst
+val aty_vars_match : ity_subst -> aty -> ity list -> ity -> ity_subst
 
 (* the substitution must cover not only [aty_vars aty] but
    also every type variable and every region in [aty_spec] *)

@@ -873,19 +873,17 @@ let vty_arrow argl ?spec vty =
    the spec. In other words, only the type variables and regions in
    [aty_vars aty] are matched. The caller should supply a "freezing"
    substitution that covers all external type variables and regions. *)
-let rec aty_vars_match s a1 a2 =
+let rec aty_vars_match s a argl res =
   let rec match_args s l1 l2 = match l1, l2 with
-    | [],[] -> s, a1.aty_result, a2.aty_result
-    | [], _ -> s, a1.aty_result, VTarrow { a2 with aty_args = l2 }
-    | _, [] -> s, VTarrow { a1 with aty_args = l1 }, a2.aty_result
-    | {pv_ity = v1}::l1, {pv_ity = v2}::l2 ->
-        match_args (ity_match s v1 v2) l1 l2
-  in
-  let s, vty1, vty2 = match_args s a1.aty_args a2.aty_args in
-  match vty1, vty2 with
-  | VTarrow a1, VTarrow a2 -> aty_vars_match s a1 a2
-  | VTvalue v1, VTvalue v2 -> ity_match s v1 v2
-  | _ -> invalid_arg "Mlw_ty.aty_vars_match"
+    | v1::l1, v2::l2 -> match_args (ity_match s v1.pv_ity v2) l1 l2
+    | [], l -> s, l
+    | _, [] -> invalid_arg "Mlw_ty.aty_vars_match" in
+  let s, argl = match_args s a.aty_args argl in
+  match a.aty_result, argl with
+  | VTvalue v, [] -> ity_match s v res
+  | VTvalue _, _
+  | VTarrow _, [] -> invalid_arg "Mlw_ty.aty_vars_match"
+  | VTarrow a, _  -> aty_vars_match s a argl res
 
 (* the substitution must cover not only [aty_vars aty] but
    also every type variable and every region in [aty_spec] *)

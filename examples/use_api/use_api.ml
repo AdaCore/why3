@@ -351,16 +351,12 @@ let d2 =
   let body =
     (* building expression "ref 0" *)
     let e =
-      (* recall that "ref" has type "(v:'a) -> ref 'a". We need to build an
-         instance of it *)
-      (* we first built a dummy effective parameter v of type int *)
-      let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "v") Mlw_ty.ity_int in
+      (* recall that "ref" has polymorphic type "(v:'a) -> ref 'a".
+         We need to build an instance of it *)
       (* we build "ref int" with a *fresh* region *)
       let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
-      (* we build the type "(v:int) -> ref <fresh region> int)" *)
-      let aty = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue ity) in
       (* e1 : the appropriate instance of "ref" *)
-      let e1 = Mlw_expr.e_arrow ref_fun aty in
+      let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
       (* we apply it to 0 *)
       let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
       Mlw_expr.e_app e1 [c0]
@@ -375,9 +371,7 @@ let d2 =
     (* building expression "!x" *)
     let bang_x =
       (* recall that "!" as type "ref 'a -> 'a" *)
-      (* we build a dummy parameter r of the same type as x *)
-      let aty = Mlw_ty.vty_arrow [var_x] (Mlw_ty.VTvalue Mlw_ty.ity_int) in
-      let e1 = Mlw_expr.e_arrow get_fun aty in
+      let e1 = Mlw_expr.e_arrow get_fun [var_x.Mlw_ty.pv_ity] Mlw_ty.ity_int in
       Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
     in
     (* the complete body *)

@@ -181,15 +181,14 @@ val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-val e_arrow : psymbol -> aty -> expr
-(** [e_arrow p ty] instantiates the program function symbol [p] into a
-    program expression having the given arrow type [ty], instantiating
-    appropriately the type variables and region variables. The
-    resulting expression can be applied to arguments using [e_app]
-    given below.
 
-    See also [examples/use_api/use_api.ml]
-*)
+val e_arrow : psymbol -> ity list -> ity -> expr
+(** [e_arrow p argl res] instantiates the program function symbol [p]
+    into a program expression having the given types of the arguments
+    and the result. The resulting expression can be applied to
+    arguments using [e_app] given below.
+
+    See also [examples/use_api/use_api.ml] *)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
