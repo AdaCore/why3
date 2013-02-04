@@ -265,11 +265,7 @@ let create_var_full v =
   let id = Ident.id_fresh v.vname in
   let ty = ctype v.vtype in
   let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
-  let let_defn = Mlw_expr.create_let_defn id def in
-  let vs = match let_defn.Mlw_expr.let_sym with
-    | Mlw_expr.LetV vs -> vs
-    | Mlw_expr.LetA _ -> assert false
-  in
+  let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
 (*
   Self.result "create program variable %s (%d)" v.vname v.vid;
 *)

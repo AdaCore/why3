@@ -210,7 +210,10 @@ val e_app : expr -> expr list -> expr
 val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
 
-val create_let_defn : preid -> expr -> let_defn
+val create_let_defn    : preid -> expr -> let_defn
+val create_let_pv_defn : preid -> expr -> let_defn * pvsymbol
+val create_let_ps_defn : preid -> expr -> let_defn * psymbol
+
 val create_fun_defn : preid -> lambda -> fun_defn
 val create_rec_defn : (psymbol * lambda) list -> fun_defn list
 

@@ -499,6 +499,18 @@ let create_let_defn id e =
     | VTvalue ity -> LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
   { let_sym = lv ; let_expr = e }
 
+let create_let_pv_defn id e =
+  let ld = create_let_defn id e in
+  match ld.let_sym with
+    | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
+    | LetV pv -> ld, pv
+
+let create_let_ps_defn id e =
+  let ld = create_let_defn id e in
+  match ld.let_sym with
+    | LetV _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
+    | LetA ps -> ld, ps
+
 let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
@@ -511,11 +523,7 @@ let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
 let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
   | _ ->
-      let id = id_fresh ?loc:e.e_loc "o" in
-      let ld = create_let_defn id e in
-      let pv = match ld.let_sym with
-        | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
-        | LetV pv -> pv in
+      let ld,pv = create_let_pv_defn (id_fresh ?loc:e.e_loc "o") e in
       e_let ld (fn pv)
 
 (* application *)
@@ -714,11 +722,7 @@ let on_fmla fn e = match e.e_node with
   | Elogic t -> fn e (t_equ_simp t t_bool_true)
   | Evalue pv -> fn e (t_equ_simp (t_var pv.pv_vs) t_bool_true)
   | _ ->
-      let id = id_fresh ?loc:e.e_loc "o" in
-      let ld = create_let_defn id e in
-      let pv = match ld.let_sym with
-        | LetA _ -> Loc.error ?loc:e.e_loc (ValueExpected e)
-        | LetV pv -> pv in
+      let ld,pv = create_let_pv_defn (id_fresh ?loc:e.e_loc "o") e in
       e_let ld (fn (e_value pv) (t_equ_simp (t_var pv.pv_vs) t_bool_true))
 
 let e_not e =
@@ -900,8 +904,7 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
         Loc.errorm "vty_value mismatch";
       e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
   | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
-      let ld = create_let_defn (id_clone ps.ps_name) (expr_subst psm d) in
-      let ns = match ld.let_sym with LetA a -> a | LetV _ -> assert false in
+      let ld,ns = create_let_ps_defn (id_clone ps.ps_name) (expr_subst psm d) in
       e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
   | Erec (fdl, e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in

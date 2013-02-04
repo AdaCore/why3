@@ -348,12 +348,7 @@ let d2 =
       Mlw_expr.e_app e1 [c0]
     in
     (* building the first part of the let x = ref 0 *)
-    let letdef = Mlw_expr.create_let_defn (Ident.id_fresh "x") e in
-    (* get back the variable x *)
-    let var_x = match letdef.Mlw_expr.let_sym with
-      | Mlw_expr.LetV vs -> vs
-      | Mlw_expr.LetA _ -> assert false
-    in
+    let letdef, var_x = Mlw_expr.create_let_pv_defn (Ident.id_fresh "x") e in
     (* building expression "!x" *)
     let bang_x =
       (* recall that "!" as type "ref 'a -> 'a" *)
