@@ -150,7 +150,7 @@ let get_id_ts = function
   | TS ts -> ts.ts_name
 
 let uc_find_ts uc p =
-  Typing.find_ns get_id_ts ns_find_ts p (get_namespace uc)
+  Typing.find_ns get_id_ts ns_find_type_symbol p (get_namespace uc)
 
 let get_id_ps = function
   | PV pv -> pv.pv_vs.vs_name
@@ -160,7 +160,7 @@ let get_id_ps = function
   | LS ls -> ls.ls_name
 
 let uc_find_ps uc p =
-  Typing.find_ns get_id_ps ns_find_ps p (get_namespace uc)
+  Typing.find_ns get_id_ps ns_find_prog_symbol p (get_namespace uc)
 
 (** Typing type expressions *)
 

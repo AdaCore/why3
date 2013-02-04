@@ -92,35 +92,19 @@ let ref_modules, ref_theories =
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
 let ref_type : Mlw_ty.T.itysymbol =
-  match
-    Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
-  with
-    | Mlw_module.PT itys -> itys
-    | Mlw_module.TS _ -> assert false
+  Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
 
 let ref_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
 
 let get_logic_fun : Term.lsymbol =
   find ref_module.Mlw_module.mod_theory "prefix !"
 
 let get_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
 
 let set_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
 
 
 (*********)

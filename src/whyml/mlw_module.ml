@@ -105,9 +105,30 @@ let rec ns_find get_map ns = function
   | [a]  -> Mstr.find a (get_map ns)
   | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
-let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
-let ns_find_ps = ns_find (fun ns -> ns.ns_ps)
-let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
+let ns_find_type_symbol = ns_find (fun ns -> ns.ns_ts)
+let ns_find_prog_symbol = ns_find (fun ns -> ns.ns_ps)
+let ns_find_ns          = ns_find (fun ns -> ns.ns_ns)
+
+let ns_find_its ns s = match ns_find_type_symbol ns s with
+  | PT its -> its | _ -> raise Not_found
+
+let ns_find_ts ns s = match ns_find_type_symbol ns s with
+  | TS ts -> ts | _ -> raise Not_found
+
+let ns_find_pv ns s = match ns_find_prog_symbol ns s with
+  | PV pv -> pv | _ -> raise Not_found
+
+let ns_find_ps ns s = match ns_find_prog_symbol ns s with
+  | PS ps -> ps | _ -> raise Not_found
+
+let ns_find_pl ns s = match ns_find_prog_symbol ns s with
+  | PL pl -> pl | _ -> raise Not_found
+
+let ns_find_xs ns s = match ns_find_prog_symbol ns s with
+  | XS xs -> xs | _ -> raise Not_found
+
+let ns_find_ls ns s = match ns_find_prog_symbol ns s with
+  | LS ls -> ls | _ -> raise Not_found
 
 (** Module *)
 

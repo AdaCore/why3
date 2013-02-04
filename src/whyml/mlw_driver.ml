@@ -141,16 +141,14 @@ let load_driver lib file extra_files =
     try add_local th rule with e -> raise (Loc.Located (loc,e))
   in
   let find_val m (loc,q) =
-    try match ns_find_ps m.mod_export q with
+    try match ns_find_prog_symbol m.mod_export q with
     | PV pv -> pv.pv_vs.vs_name
     | PS ps -> ps.ps_name
     | PL _ | XS _ | LS _ -> raise Not_found
     with Not_found -> raise (Loc.Located (loc, UnknownVal (!qualid,q)))
   in
   let find_xs m (loc,q) =
-    try match ns_find_ps m.mod_export q with
-    | XS xs -> xs
-    | PV _ | PS _ | PL _ | LS _ -> raise Not_found
+    try ns_find_xs m.mod_export q
     with Not_found -> raise (Loc.Located (loc, UnknownExn (!qualid,q)))
   in
   let add_local_module loc m = function
