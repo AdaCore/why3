@@ -86,6 +86,7 @@ predicate is_common_prefix (a:array int) (x y:int) (l:int) =
   0 <= l /\ x+l <= a.length /\ y+l <= a.length /\
   (forall i:int. 0 <= i < l -> a[x+i] = a[y+i])
 
+(*
 lemma common_prefix_eq:
   forall a:array int, x:int.
      0 <= x <= a.length -> is_common_prefix a x x (a.length - x)
@@ -93,11 +94,13 @@ lemma common_prefix_eq:
 lemma common_prefix_eq2:
   forall a:array int, x:int.
      0 <= x <= a.length -> not (is_common_prefix a x x (a.length - x + 1))
+*)
 
 lemma not_common_prefix_if_last_different:
   forall a:array int, x y:int, l:int.
     0 < l /\ x+l < a.length /\ y+l < a.length /\ a[x+(l-1)] <> a[y+(l-1)] ->
       not is_common_prefix a x y l
+
 
 (*
 function longest_common_prefix (a:array int) (x y:int) :int
@@ -124,11 +127,6 @@ let lcp (a:array int) (x y:int) : int
       invariant { is_common_prefix a x y !l }
       incr l
     done;
-(*
-    assert { is_common_prefix a x y !l };
-    assert { x + !l < n /\ y + !l < n -> a[x + !l] <> a[y + !l] };
-    assert { not is_common_prefix a x y (!l+1) };
-*)
     !l
 
 
