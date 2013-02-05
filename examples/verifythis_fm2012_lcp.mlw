@@ -71,6 +71,9 @@ comparison on arrays, a sorting routine, and LCP.
 The client code (LRS.java) uses these to solve the LRS problem. Verify
 that it does so correctly.
 
+
+(Based on code by Robert Sedgewick and Kevin Wayne.)
+
 *)
 
 
@@ -117,7 +120,7 @@ let lcp (a:array int) (x y:int) : int
     !l
 
 (** test harness for lcp *)
-let test1 () =
+let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let x = lcp arr 1 2 in
@@ -273,13 +276,15 @@ module SuffixArray
 use import array.Array
 use import LCP
 use import PrefixSort
+use map.MapInjection
 
 type suffixArray = {
     values : array int;
     suffixes : array int;
 }
-
-use map.MapInjection
+invariant { self.values.length = self.suffixes.length /\
+  permutation self.suffixes.elts self.suffixes.length /\
+  sorted self.values self.suffixes }
 
 predicate inv(s:suffixArray) =
   s.values.length = s.suffixes.length /\
@@ -287,20 +292,20 @@ predicate inv(s:suffixArray) =
   sorted s.values s.suffixes
 
 let select (s:suffixArray) (i:int) : int
-  requires { inv s /\ 0 <= i < s.values.length }
+  requires { 0 <= i < s.values.length }
   ensures { result = s.suffixes[i] }
   = s.suffixes[i]
 
-(* needed to establish invariant in function create *)
+use import array.ArrayPermut
 
-  use import array.ArrayPermut
-
+(** needed to establish invariant in function create *)
 lemma permut_permutation :
   forall a1 a2:array int.
   permut a1 a2 -> permutation a1.elts a1.length -> permutation a2.elts a2.length
 
+(** constructor of suffixArray structure *)
 let create (a:array int) : suffixArray
-  ensures { result.values = a /\ inv result }
+  ensures { result.values = a }
  =
  let n = a.length in
  let suf = Array.make n 0 in
@@ -318,7 +323,7 @@ let lcp (s:suffixArray) (i:int) : int
    LCP.lcp s.values s.suffixes[i] s.suffixes[i-1]
 
 (*
-let test2 () =
+let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let sa = create arr in
@@ -470,5 +475,3 @@ use import int.MinMax
 
 end
 
-
-(* Based on code by Robert Sedgewick and Kevin Wayne. *)

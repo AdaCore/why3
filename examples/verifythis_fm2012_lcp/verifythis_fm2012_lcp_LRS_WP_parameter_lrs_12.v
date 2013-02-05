@@ -213,6 +213,7 @@ Axiom le_le_longest_common_prefix : forall (a:(array Z)) (x:Z) (y:Z) (z:Z)
   (l:Z) (m:Z), ((le a x y) /\ (le a y z)) -> (((is_longest_common_prefix a x
   z l) /\ (is_longest_common_prefix a y z m)) -> (l <= m)%Z).
 
+
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
@@ -225,34 +226,28 @@ Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map.Map.map Z Z)),
   (sa1 = a1))) -> ((permutation sa3 sa2) -> forall (solStart:Z),
   (solStart = 0%Z) -> forall (solLength:Z), (solLength = 0%Z) ->
   forall (solStart2:Z), (solStart2 = a) -> ((1%Z <= (a - 1%Z)%Z)%Z ->
-  forall (solStart21:Z) (solLength1:Z) (solStart1:Z), forall (i:Z),
-  ((1%Z <= i)%Z /\ (i <= (a - 1%Z)%Z)%Z) -> ((((((0%Z <= solLength1)%Z /\
-  (solLength1 <= a)%Z) /\ ((0%Z <= solStart1)%Z /\ (solStart1 <= a)%Z)) /\
-  (((0%Z <= solStart21)%Z /\ (solStart21 <= a)%Z) /\
-  ((~ (solStart1 = solStart21)) /\ (is_longest_common_prefix a2 solStart1
-  solStart21 solLength1)))) /\ forall (j:Z) (k:Z) (l:Z), ((((0%Z <= j)%Z /\
-  (j < k)%Z) /\ (k < i)%Z) /\ (is_longest_common_prefix a2 (map.Map.get sa3
-  j) (map.Map.get sa3 k) l)) -> (l <= solLength1)%Z) -> (((inv
-  (mk_suffixArray (mk_array sa sa1) (mk_array sa2 sa3))) /\ ((0%Z < i)%Z /\
-  (i < sa)%Z)) -> forall (l:Z), (is_longest_common_prefix (mk_array sa sa1)
-  (map.Map.get sa3 (i - 1%Z)%Z) (map.Map.get sa3 i) l) -> ((forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < i)%Z) -> (le a2 (map.Map.get sa3 j) (map.Map.get sa3
-  i))) -> ((forall (j:Z) (m:Z), (((0%Z <= j)%Z /\ (j < i)%Z) /\
-  (is_longest_common_prefix a2 (map.Map.get sa3 j) (map.Map.get sa3 i) m)) ->
-  (m <= l)%Z) -> forall (j:Z) (k:Z) (m:Z), ((((0%Z <= j)%Z /\ (j < k)%Z) /\
-  (k < (i - 1%Z)%Z)%Z) /\ (is_longest_common_prefix a2 (map.Map.get sa3 j)
-  (map.Map.get sa3 k) m)) -> (m <= solLength1)%Z))))))).
+  forall (solStart21:Z) (solLength1:Z) (solStart1:Z),
+  (((((0%Z <= solLength1)%Z /\ (solLength1 <= a)%Z) /\
+  ((0%Z <= solStart1)%Z /\ (solStart1 <= a)%Z)) /\ (((0%Z <= solStart21)%Z /\
+  (solStart21 <= a)%Z) /\ ((~ (solStart1 = solStart21)) /\
+  (is_longest_common_prefix a2 solStart1 solStart21 solLength1)))) /\
+  forall (j:Z) (k:Z) (l:Z), ((((0%Z <= j)%Z /\ (j < k)%Z) /\
+  (k < ((a - 1%Z)%Z + 1%Z)%Z)%Z) /\ (is_longest_common_prefix a2
+  (map.Map.get sa3 j) (map.Map.get sa3 k) l)) -> (l <= solLength1)%Z) ->
+  ((surjective sa3 sa2) -> ((forall (j:Z) (k:Z) (l:Z), (((0%Z <= j)%Z /\
+  (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
+  (is_longest_common_prefix a2 (map.Map.get sa3 j) (map.Map.get sa3 k)
+  l)))) -> (l <= solLength1)%Z) -> ((forall (x:Z) (y:Z), (((0%Z <= x)%Z /\
+  (x < y)%Z) /\ (y < a)%Z) -> exists j:Z, exists k:Z, ((0%Z <= j)%Z /\
+  (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
+  ((x = (map.Map.get sa3 j)) /\ (y = (map.Map.get sa3 k)))))) -> forall (x:Z)
+  (y:Z) (l:Z), ((((0%Z <= x)%Z /\ (x < y)%Z) /\ (y < a)%Z) /\
+  (is_longest_common_prefix a2 x y l)) -> (l <= solLength1)%Z)))))).
 intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 (((h3,(h4,h5)),(h6,h7)),(h8,h9)) h10
-   solStart h11 solLength h12 solStart2 h13 h14 solStart21 solLength1
-   solStart1 i (h15,h16) ((((h17,h18),(h19,h20)),((h21,h22),(h23,h24))),h25)
-   (h26,(h27,h28)) l h29 h30 h31 j k m (((h32,h33),h34),h35).
-(*
-intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 ((h3,h4),((h5,h6),h7)) h8 solStart h9
-solLength h10 solStart2 h11 h12 solStart21 solLength1 solStart1
-((((h13,h14),(h15,h16)),((h17,h18),(h19,h20))),h21) h22 h23 h24 x y l
-(h25,h28).
-elim (h24 _ _ h25).
-*)
+solStart h11 solLength h12 solStart2 h13 h14 solStart21 solLength1 solStart1
+((((h15,h16),(h17,h18)),((h19,h20),(h21,h22))),h23) h24 h25 h26 x y l
+(h27,h30).
+elim (h26 _ _ h27).
 ae.
 Qed.
 
