@@ -10,6 +10,24 @@ Require map.MapPermut.
 Definition unit := unit.
 
 (* Why3 assumption *)
+Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
+  ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
+
+(* Why3 assumption *)
+Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
+  ((map.Map.get a j) = i).
+
+(* Why3 assumption *)
+Definition range (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
+  ((map.Map.get a i) < n)%Z).
+
+Axiom injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
+  n) -> ((range a n) -> (surjective a n)).
+
+(* Why3 assumption *)
 Inductive array
   (a:Type) {a_WT:WhyType a} :=
   | mk_array : Z -> (map.Map.map Z a) -> array a.
@@ -195,24 +213,6 @@ Axiom le_asym : forall (a:(array Z)) (x:Z) (y:Z), (((0%Z <= x)%Z /\
   y))) -> (le a y x).
 
 (* Why3 assumption *)
-Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
-  ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
-
-(* Why3 assumption *)
-Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
-  ((map.Map.get a j) = i).
-
-(* Why3 assumption *)
-Definition range (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
-  ((map.Map.get a i) < n)%Z).
-
-Axiom injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
-  n) -> ((range a n) -> (surjective a n)).
-
-(* Why3 assumption *)
 Definition permutation (m:(map.Map.map Z Z)) (u:Z): Prop := (range m u) /\
   (injective m u).
 
@@ -229,8 +229,6 @@ Axiom permut_permutation_aux : forall (m1:(map.Map.map Z Z)) (m2:(map.Map.map
   Z Z)) (u:Z), (map.MapPermut.permut_sub m1 m2 0%Z u) -> ((permutation m1
   u) <-> (permutation m2 u)).
 
-Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
 
 Inductive permut2 {a:Type} {a_WT:WhyType a} (l u : Z) : 
  (map.Map.map Z a)-> (map.Map.map Z a) -> Prop :=
@@ -247,7 +245,7 @@ Inductive permut2 {a:Type} {a_WT:WhyType a} (l u : Z) :
 
 Lemma permut_permut2: 
   forall (a:Type) (a_WT:WhyType a) (a1 a2 :(map.Map.map Z a)) (l u:Z),
-  MapPermut.permut_sub a1 a2 l u -> permut2 l u a1 a2.
+  permut_sub a1 a2 l u -> permut2 l u a1 a2.
 induction 1.
 apply permut2_refl.
 apply permut2_sym; auto.
@@ -258,8 +256,12 @@ apply H0.
 auto.
 Qed.
 
+
+Require Import Why3.
+Ltac ae := why3 "alt-ergo" timelimit 3.
+
 Lemma aux : forall (m1:(map.Map.map Z Z))
-  (m2:(map.Map.map Z Z)) (u:Z), (map.MapPermut.permut_sub m1 m2 0%Z u) ->
+  (m2:(map.Map.map Z Z)) (u:Z), (permut_sub m1 m2 0%Z u) ->
   ((permutation m1 u) <-> (permutation m2 u)).
 (* intros m1 m2 u h1. *)
 intros m1 m2 u H.
@@ -269,23 +271,12 @@ clear H.
 induction H0; ae.
 Qed.
 
+
 (* Why3 goal *)
 Theorem permut_permutation : forall (a1:(array Z)) (a2:(array Z)), (permut a1
   a2) -> ((permutation (elts a1) (length a1)) -> (permutation (elts a2)
   (length a2))).
-(* intros a1 a2 h1 h2. *)
-intros a1 a2 h1 h2.
-destruct h1 as (h3 & h4).
-rewrite <- h3.
-rewrite aux.
-apply h2.
-
-apply h2.
-intros m1 m2 u H.
-assert (permut2 0%Z u m1 m2).
-  apply permut_permut2; auto.
-clear H.
-induction H0; ae.
+ae.
 Qed.
 
 

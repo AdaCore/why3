@@ -225,10 +225,6 @@ Definition sorted_sub (a:(array Z)) (data:(map.Map.map Z Z)) (l:Z)
 Definition sorted (a:(array Z)) (data:(array Z)): Prop := (sorted_sub a
   (elts data) 0%Z (length data)).
 
-Axiom permut_permutation_aux : forall (m1:(map.Map.map Z Z)) (m2:(map.Map.map
-  Z Z)) (u:Z), (map.MapPermut.permut_sub m1 m2 0%Z u) -> ((permutation m1
-  u) <-> (permutation m2 u)).
-
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
@@ -258,29 +254,11 @@ apply H0.
 auto.
 Qed.
 
-Lemma aux : forall (m1:(map.Map.map Z Z))
+(* Why3 goal *)
+Theorem permut_permutation_aux : forall (m1:(map.Map.map Z Z))
   (m2:(map.Map.map Z Z)) (u:Z), (map.MapPermut.permut_sub m1 m2 0%Z u) ->
   ((permutation m1 u) <-> (permutation m2 u)).
 (* intros m1 m2 u h1. *)
-intros m1 m2 u H.
-assert (permut2 0%Z u m1 m2).
-  apply permut_permut2; auto.
-clear H.
-induction H0; ae.
-Qed.
-
-(* Why3 goal *)
-Theorem permut_permutation : forall (a1:(array Z)) (a2:(array Z)), (permut a1
-  a2) -> ((permutation (elts a1) (length a1)) -> (permutation (elts a2)
-  (length a2))).
-(* intros a1 a2 h1 h2. *)
-intros a1 a2 h1 h2.
-destruct h1 as (h3 & h4).
-rewrite <- h3.
-rewrite aux.
-apply h2.
-
-apply h2.
 intros m1 m2 u H.
 assert (permut2 0%Z u m1 m2).
   apply permut_permut2; auto.

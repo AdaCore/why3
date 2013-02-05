@@ -78,6 +78,13 @@ that it does so correctly.
 module LCP "longest common prefix"
 
 use import int.Int
+use map.Map
+use map.MapPermut
+use map.MapInjection
+
+
+
+
 use import array.Array
 use import array.ArrayPermut
 
@@ -98,9 +105,8 @@ lemma common_prefix_eq2:
 
 lemma not_common_prefix_if_last_different:
   forall a:array int, x y:int, l:int.
-    0 < l /\ x+l < a.length /\ y+l < a.length /\ a[x+(l-1)] <> a[y+(l-1)] ->
-      not is_common_prefix a x y l
-
+    0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
+      not is_common_prefix a x y (l+1)
 
 (*
 function longest_common_prefix (a:array int) (x y:int) :int
@@ -127,6 +133,9 @@ let lcp (a:array int) (x y:int) : int
       invariant { is_common_prefix a x y !l }
       incr l
     done;
+(* not needed, lemma not_common_prefix_if_last_different is enough
+    assert { not is_common_prefix a x y (!l+1)  };
+*)
     !l
 
 
@@ -156,24 +165,28 @@ let test1 () =
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let x = lcp arr 1 2 in
   assert { is_common_prefix arr 1 2 1};
+  assert { not is_common_prefix arr 1 2 2};
   check { x = 1 };
   (* int[] brr = {1,2,3,5}; *)
   let brr = Array.make 4 0 in
   brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
   let x = lcp brr 1 2 in
   assert { is_common_prefix brr 1 2 0};
+  assert { not is_common_prefix brr 1 2 1};
   check { x = 0 };
   (* int[] crr = {1,2,3,5}; *)
   let crr = Array.make 4 0 in
   crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
   let x = lcp crr 2 3 in
   assert { is_common_prefix crr 2 3 0};
+  assert { not is_common_prefix crr 2 3 1};
   check { x = 0 };
   (* int[] drr = {1,2,3,3}; *)
   let drr = Array.make 4 0 in
   drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
   let x = lcp drr 2 3 in
   assert { is_common_prefix drr 2 3 1};
+  assert { not is_common_prefix drr 2 3 2};
   check {x = 1}
 
 
@@ -214,9 +227,6 @@ let compare (a:array int) (x y:int) : int
   if a[x + l] > a[y + l] then 1 else
   absurd
 
-  use map.Map
-  use map.MapPermut
-  use map.MapInjection
 
   predicate permutation (m:Map.map int int) (u : int) =
     MapInjection.range m u /\ MapInjection.injective m u
@@ -265,17 +275,11 @@ let compare (a:array int) (x y:int) : int
 *)
 
 
-(*
-lemma map_permut_permutation :
-  forall m1 m2:Map.map int int, u:int [MapPermut.permut_sub m1 m2 0 u].
-  MapPermut.permut_sub m1 m2 0 u -> map_permutation m1 u -> map_permutation m2 u
-*)
-
 lemma permut_permutation :
   forall a1 a2:array int.
   permut a1 a2 -> permutation a1.elts a1.length -> permutation a2.elts a2.length
 
-  use import int.MinMax
+use import int.MinMax
 
 (*
   lemma lcp_le_le_min:
