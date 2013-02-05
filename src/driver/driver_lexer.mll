@@ -30,7 +30,6 @@
         "syntax", SYNTAX;
         "remove", REMOVE;
         "meta", META;
-        "cloned", CLONED;
         "prelude", PRELUDE;
         "printer", PRINTER;
         "valid", VALID;

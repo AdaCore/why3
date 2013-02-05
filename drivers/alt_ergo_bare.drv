@@ -144,14 +144,7 @@ theory Tuple0
 end
 
 theory algebra.AC
-  meta cloned AC function op
-  remove cloned prop Comm.Comm
-  remove cloned prop Assoc
+  meta AC function op
+  remove prop Comm.Comm
+  remove prop Assoc
 end
-
-(*
-Local Variables:
-mode: why
-compile-command: "make -C .. bench"
-End:
-*)

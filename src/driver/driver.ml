@@ -32,7 +32,6 @@ type driver = {
   drv_thprelude   : prelude_map;
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
-  drv_meta_cl     : (theory * Stdecl.t) Mid.t;
   drv_regexps     : (Str.regexp * prover_answer) list;
   drv_timeregexps : Call_provers.timeregexp list;
   drv_exitcodes   : (int * prover_answer) list;
@@ -111,7 +110,6 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
 
   let thprelude = ref Mid.empty in
   let meta      = ref Mid.empty in
-  let meta_cl   = ref Mid.empty in
   let qualid    = ref [] in
 
   let find_pr th (loc,q) = try ns_find_pr th.th_export q
@@ -137,19 +135,19 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
-    | Rsyntaxts (c,q,s) ->
+    | Rsyntaxts (q,s) ->
         let td = syntax_type (find_ts th q) s in
-        add_meta th td (if c then meta_cl else meta)
-    | Rsyntaxfs (c,q,s) ->
+        add_meta th td meta
+    | Rsyntaxfs (q,s) ->
         let td = syntax_logic (find_fs th q) s in
-        add_meta th td (if c then meta_cl else meta)
-    | Rsyntaxps (c,q,s) ->
+        add_meta th td meta
+    | Rsyntaxps (q,s) ->
         let td = syntax_logic (find_ps th q) s in
-        add_meta th td (if c then meta_cl else meta)
-    | Rremovepr (c,q) ->
+        add_meta th td meta
+    | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
-        add_meta th td (if c then meta_cl else meta)
-    | Rmeta (c,s,al) ->
+        add_meta th td meta
+    | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
               Ty.ty_var (Typing.create_user_tv x)
@@ -171,7 +169,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
         in
         let m = lookup_meta s in
         let td = create_meta m (List.map convert al) in
-        add_meta th td (if c then meta_cl else meta)
+        add_meta th td meta
   in
   let add_local th (loc,rule) =
     try add_local th rule with e -> raise (Loc.Located (loc,e))
@@ -198,7 +196,6 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_thprelude   = Mid.map List.rev !thprelude;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_meta        = !meta;
-    drv_meta_cl     = !meta_cl;
     drv_regexps     = List.rev !regexps;
     drv_timeregexps = List.rev !timeregexps;
     drv_exitcodes   = List.rev !exitcodes;
@@ -260,21 +257,12 @@ let update_task drv task_orig =
   in
   let task =
     Mid.fold (fun _ (th,s) task ->
-      if Task.on_used_theory th task_orig then
-        Stdecl.fold (fun tdm task ->
-          add_tdecl task tdm
-        ) s task
-      else task
-    ) drv.drv_meta task
-  in
-  let task =
-    Mid.fold (fun _ (th,s) task ->
       Task.on_theory th (fun task sm ->
         Stdecl.fold (fun tdm task ->
           add_tdecl task (clone_meta tdm sm)
         ) s task
       ) task task_orig
-    ) drv.drv_meta_cl task
+    ) drv.drv_meta task
   in
   add_tdecl task goal
 

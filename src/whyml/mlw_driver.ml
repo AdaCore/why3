@@ -100,21 +100,21 @@ let load_driver lib file extra_files =
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
-    | Rsyntaxts (_,q,s) ->
+    | Rsyntaxts (q,s) ->
         let ts = find_ts th q in
         check_syntax_type ts s;
         add_syntax ts.ts_name s
-    | Rsyntaxfs (_,q,s) ->
+    | Rsyntaxfs (q,s) ->
         let fs = find_fs th q in
         check_syntax_logic fs s;
         add_syntax fs.ls_name s
-    | Rsyntaxps (_,q,s) ->
+    | Rsyntaxps (q,s) ->
         let ps = find_ps th q in
         check_syntax_logic ps s;
         add_syntax ps.ls_name s
-    | Rremovepr (_,q) ->
+    | Rremovepr (q) ->
         ignore (find_pr th q)
-    | Rmeta (_,s,al) ->
+    | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
               Ty.ty_var (Typing.create_user_tv x)
@@ -153,10 +153,10 @@ let load_driver lib file extra_files =
   in
   let add_local_module loc m = function
     | MRtheory trule -> add_local m.mod_theory (loc,trule)
-    | MRexception (_,q,s) ->
+    | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.xs_name s
-    | MRval (_,q,s) ->
+    | MRval (q,s) ->
         let id = find_val m q in
         add_syntax id s
   in
