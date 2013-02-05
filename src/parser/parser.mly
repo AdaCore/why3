@@ -655,7 +655,9 @@ lexpr:
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
-   { $1 }
+   { match $1.pp_desc with (* break the infix relation chain *)
+     | PPinfix (l,o,r) -> { $1 with pp_desc = PPinnfix (l,o,r) }
+     | _ -> $1 }
 ;
 
 list1_field_value:

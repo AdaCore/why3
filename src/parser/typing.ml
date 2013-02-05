@@ -228,83 +228,6 @@ let is_psymbol p uc =
   let s = find_lsymbol p uc in
   s.ls_value = None
 
-(*
-(* [is_projection uc ls] returns
-   - [Some (ts, lsc, i)] if [ls] is the i-th projection of an
-     algebraic datatype [ts] with only one constructor [lcs]
-   - [None] otherwise
- *)
-let is_projection uc ls =
-  try
-    let ts,tl = match ls.ls_args, ls.ls_value with
-      | [{ty_node = Ty.Tyapp (ts, tl)}], Some _ -> ts,tl
-      | _ -> (* not a function with 1 argument *) raise Exit
-    in
-    ignore (List.fold_left (fun tvs t -> match t.ty_node with
-      | Ty.Tyvar tv -> Stv.add_new Exit tv tvs
-      | _ -> (* not a generic type *) raise Exit) Stv.empty tl);
-    let kn = get_known uc in
-    let lsc = match Decl.find_constructors kn ts with
-      | [lsc] -> lsc
-      | _ -> (* 0 or several constructors *) raise Exit
-    in
-    let def = match Decl.find_logic_definition kn ls with
-      | Some def -> def
-      | None -> (* no definition *) raise Exit
-    in
-    let v, t = match Decl.open_ls_defn def with
-      | [v], t -> v, t
-      | _ -> assert false
-    in
-    let b = match t.t_node with
-      | Tcase ({t_node=Term.Tvar v'}, [b]) when vs_equal v' v -> b
-      | _ -> raise Exit
-    in
-    let p, t = t_open_branch b in
-    let pl = match p with
-      | { pat_node = Term.Papp (lsc', pl) } when ls_equal lsc lsc' -> pl
-      | _ -> raise Exit
-    in
-    let i = match t.t_node with
-      | Term.Tvar xi ->
-          let rec index i = function
-            | [] -> raise Exit
-            | { pat_node = Term.Pvar v} :: _ when vs_equal v xi -> i
-            | _ :: l -> index (i+1) l
-          in
-          index 0 pl
-      | _ ->
-          raise Exit
-    in
-    Some (ts, lsc, i)
-  with Exit ->
-    None
-
-let list_fields uc fl =
-  let type_field (q, e) =
-    let loc = qloc q in
-    let ls = find_lsymbol q uc in
-    match is_projection uc ls with
-      | None -> errorm ~loc "this is not a record field"
-      | Some pr -> pr, loc, e
-  in
-  let fl = List.map type_field fl in
-  let (ts,cs,_),_,_ = List.hd fl in
-  let n = List.length cs.ls_args in
-  let args = Array.create n None in
-  let check_field ((ts',_,i),loc,e) =
-    if not (ts_equal ts' ts) then
-      errorm ~loc "this should be a field for type %a" Pretty.print_ts ts;
-    assert (0 <= i && i < n);
-    if args.(i) <> None then
-      errorm ~loc "this record field is defined several times";
-    args.(i) <- Some (loc,e);
-  in
-  List.iter check_field fl;
-  ts,cs,Array.to_list args
-*)
-
-
 (** Typing types *)
 
 let split_qualid = function
@@ -466,7 +389,8 @@ and dterm_node ~localize loc uc env = function
       let tl = dtype_args ~localize s loc uc env tyl tl in
       let ty = tyapp (ts_tuple n) tyl in
       Tapp (s, tl), ty
-  | PPinfix (e1, x, e2) ->
+  | PPinfix (e1, x, e2)
+  | PPinnfix (e1, x, e2) ->
       let s, tyl, ty = specialize_fsymbol (Qident x) uc in
       let tl = dtype_args ~localize s loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
@@ -669,7 +593,8 @@ and dfmla_node ~localize loc uc env = function
       let s, tyl = specialize_psymbol x uc in
       let tl = dtype_args ~localize s loc uc env tyl tl in
       Fapp (s, tl)
-  | PPinfix (e12, op2, e3) ->
+  | PPinfix (e12, op2, e3)
+  | PPinnfix (e12, op2, e3) ->
       begin match e12.pp_desc with
         | PPinfix (_, op1, e2) when is_psymbol (Qident op1) uc ->
             let e23 = { pp_desc = PPinfix (e2, op2, e3); pp_loc = loc } in

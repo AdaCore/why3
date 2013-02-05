@@ -67,6 +67,7 @@ and pp_desc =
   | PPfalse
   | PPconst of constant
   | PPinfix of lexpr * ident * lexpr
+  | PPinnfix of lexpr * ident * lexpr
   | PPbinop of lexpr * pp_binop * lexpr
   | PPunop of pp_unop * lexpr
   | PPif of lexpr * lexpr * lexpr
