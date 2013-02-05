@@ -391,6 +391,7 @@ and dterm_node ~localize loc uc env = function
       Tapp (s, tl), ty
   | PPinfix (e1, x, e2)
   | PPinnfix (e1, x, e2) ->
+      if x.id = "infix <>" then error ~loc TermExpected;
       let s, tyl, ty = specialize_fsymbol (Qident x) uc in
       let tl = dtype_args ~localize s loc uc env tyl [e1; e2] in
       Tapp (s, tl), ty
@@ -596,10 +597,15 @@ and dfmla_node ~localize loc uc env = function
   | PPinfix (e12, op2, e3)
   | PPinnfix (e12, op2, e3) ->
       begin match e12.pp_desc with
-        | PPinfix (_, op1, e2) when is_psymbol (Qident op1) uc ->
+        | PPinfix (_, op1, e2)
+          when op1.id = "infix <>" || is_psymbol (Qident op1) uc ->
             let e23 = { pp_desc = PPinfix (e2, op2, e3); pp_loc = loc } in
             Fbinop (Tand, dfmla ~localize uc env e12,
                     dfmla ~localize uc env e23)
+        | _ when op2.id = "infix <>" ->
+            let op2 = { op2 with id = "infix =" } in
+            let e0 = { pp_desc = PPinfix (e12, op2, e3); pp_loc = loc } in
+            Fnot (dfmla ~localize uc env e0)
         | _ ->
             let s, tyl = specialize_psymbol (Qident op2) uc in
             let tl = dtype_args ~localize s loc uc env tyl [e12;e3] in

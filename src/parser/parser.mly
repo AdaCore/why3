@@ -620,7 +620,7 @@ lexpr:
 | lexpr EQUAL lexpr
    { mk_l_infix $1 "=" $3 }
 | lexpr LTGT lexpr
-   { prefix_pp PPnot (mk_l_infix $1 "=" $3) }
+   { mk_l_infix $1 "<>" $3 }
 | lexpr OP1 lexpr
    { mk_l_infix $1 $2 $3 }
 | lexpr OP2 lexpr
