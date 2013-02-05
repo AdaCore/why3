@@ -628,6 +628,22 @@ let cl_tdecl cl inst td = match td.td_node with
   | Clone (th,sm) -> Clone (th, cl_smap cl sm)
   | Meta (id,al) -> Meta (id, List.map (cl_marg cl) al)
 
+let warn_clone_not_abstract loc th =
+  try
+    List.iter (fun d -> match d.td_node with
+      | Decl d ->
+        begin match d.d_node with
+        | Dtype { ts_def = None }
+        | Dparam _ -> raise Exit
+        | _ -> ()
+        end
+      | _ -> ()
+    ) th.th_decls;
+    Warning.emit ~loc "cloned theory %a.%s does not contain any abstract symbol; it should be used instead"
+      (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
+      th.th_name.id_string
+  with Exit -> ()
+
 let clone_theory cl add_td acc th inst =
   let add acc td =
     let td =

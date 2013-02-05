@@ -168,6 +168,8 @@ val create_inst :
   lemma : prsymbol list ->
   goal  : prsymbol list -> th_inst
 
+val warn_clone_not_abstract : Loc.position -> theory -> unit
+
 val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 
 val clone_export : theory_uc -> theory -> th_inst -> theory_uc

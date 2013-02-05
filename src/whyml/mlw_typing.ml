@@ -1979,7 +1979,9 @@ let use_clone_pure lib mth uc loc (use,inst) =
   (* use or clone *)
   let uc = match inst with
     | None -> Theory.use_export uc th
-    | Some inst -> Theory.clone_export uc th (Typing.type_inst uc th inst) in
+    | Some inst ->
+        Theory.warn_clone_not_abstract loc th;
+        Theory.clone_export uc th (Typing.type_inst uc th inst) in
   (* close namespace, if any *)
   match use.use_import with
     | Some (import, _) -> Theory.close_namespace uc import
@@ -2001,8 +2003,10 @@ let use_clone lib mmd mth uc loc (use,inst) =
     | Module m, None -> use_export uc m
     | Theory th, None -> use_export_theory uc th
     | Module m, Some inst ->
+        Theory.warn_clone_not_abstract loc m.mod_theory;
         clone_export uc m (Typing.type_inst (get_theory uc) m.mod_theory inst)
     | Theory th, Some inst ->
+        Theory.warn_clone_not_abstract loc th;
         clone_export_theory uc th (Typing.type_inst (get_theory uc) th inst) in
   (* close namespace, if any *)
   match use.use_import with

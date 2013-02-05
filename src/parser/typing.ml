@@ -1185,7 +1185,9 @@ let add_use_clone env lenv th loc (use, subst) =
       Glob.use (match use.use_theory with Qident x | Qdot (_,x) -> x.id_loc) t.th_name;
     match subst with
     | None -> use_export th t
-    | Some s -> clone_export th t (type_inst th t s)
+    | Some s ->
+        warn_clone_not_abstract loc t;
+        clone_export th t (type_inst th t s)
   in
   let use_or_clone th = match use.use_import with
     | Some (import, use_as) ->
