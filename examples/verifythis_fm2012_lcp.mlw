@@ -165,23 +165,6 @@ module PrefixSort
      exists l:int. is_common_prefix a x y l /\
      (y+l < n /\ (x+l = n \/ a[x+l] < a[y+l]))
 
-  predicate le (a : array int) (x y:int) = x = y \/ lt a x y
- 
-  lemma le_refl :
-    forall a:array int, x :int.
-    0 <= x <= a.length -> le a x x
-
-(* needed for le_trans (why ?) *)
-lemma lcp_refl :
-  forall a:array int, x:int.
-     0 <= x <= a.length -> is_longest_common_prefix a x x (a.length - x)
-
-
-  (* needed for le_trans *)
-  lemma not_common_prefix_if_last_different:
-    forall a:array int, x y:int, l:int.
-      0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
-        not is_common_prefix a x y (l+1)
 
 (* for proving lcp_sym and le_trans lemmas, and compare function in the absurd case *)
 lemma longest_common_prefix_succ:
@@ -189,12 +172,6 @@ lemma longest_common_prefix_succ:
   is_common_prefix a x y l /\ not (is_common_prefix a x y (l+1)) ->
   is_longest_common_prefix a x y l
 
-
-
-  lemma le_trans :
-    forall a:array int, x y z:int.
-    0 <= x <= a.length /\ 0 <= y <= a.length /\
-    0 <= z <= a.length /\ le a x y /\ le a y z -> le a x z
 
 (** comparison function, that decides the order of prefixes *)
 let compare (a:array int) (x y:int) : int
@@ -215,13 +192,33 @@ let compare (a:array int) (x y:int) : int
   absurd
 
 
+  predicate le (a : array int) (x y:int) = x = y \/ lt a x y
+ 
+(* needed ?
+  lemma le_refl :
+    forall a:array int, x :int.
+    0 <= x <= a.length -> le a x x
+*)
+
+(* needed for le_trans (why ?) *)
+lemma lcp_refl :
+  forall a:array int, x:int.
+     0 <= x <= a.length -> is_longest_common_prefix a x x (a.length - x)
+
+
+  (* needed for le_trans *)
+  lemma not_common_prefix_if_last_different:
+    forall a:array int, x y:int, l:int.
+      0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
+        not is_common_prefix a x y (l+1)
+
+  lemma le_trans :
+    forall a:array int, x y z:int.
+    0 <= x <= a.length /\ 0 <= y <= a.length /\
+    0 <= z <= a.length /\ le a x y /\ le a y z -> le a x z
+
+
 use map.Map
-use map.MapPermut
-use map.MapInjection
-
-
-  predicate permutation (m:Map.map int int) (u : int) =
-    MapInjection.range m u /\ MapInjection.injective m u
 
   predicate sorted_sub (a:array int) (data:Map.map int int) (l u:int) =
     forall i1 i2 : int. l <= i1 <= i2 < u ->
@@ -231,6 +228,8 @@ use map.MapInjection
     sorted_sub a data.elts 0 data.length
 
   use import array.ArrayPermut
+
+  use map.MapInjection (* for the range function used below *)
 
   let sort (a:array int) (data : array int)
   requires { data.length = a.length }
@@ -277,6 +276,10 @@ use import array.Array
 use import LCP
 use import PrefixSort
 use map.MapInjection
+
+
+  predicate permutation (m:Map.map int int) (u : int) =
+    MapInjection.range m u /\ MapInjection.injective m u
 
 type suffixArray = {
     values : array int;

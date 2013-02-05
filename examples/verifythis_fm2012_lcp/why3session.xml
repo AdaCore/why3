@@ -48,7 +48,7 @@
  <file
   name="../verifythis_fm2012_lcp.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="LCP"
    locfile="../verifythis_fm2012_lcp.mlw"
@@ -3709,15 +3709,23 @@
    verified="true"
    expanded="false">
    <goal
-    name="le_refl"
+    name="longest_common_prefix_succ"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="170" loccnumb="8" loccnume="15"
-    sum="c976d2586880482ad5d4d29d6b92238b"
+    loclnum="170" loccnumb="6" loccnume="32"
+    sum="51190516da17a220c40818abaaaee6b2"
     proved="true"
     expanded="false"
-    shape="aleV0V1V1Iainfix &lt;=V1alengthV0Aainfix &lt;=c0V1F">
+    shape="ais_longest_common_prefixV0V1V2V3Iais_common_prefixV0V1V2ainfix +V3c1NAais_common_prefixV0V1V2V3F">
     <proof
      prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3726,10 +3734,46 @@
     </proof>
    </goal>
    <goal
+    name="WP_parameter compare"
+    locfile="../verifythis_fm2012_lcp.mlw"
+    loclnum="177" loccnumb="4" loccnume="11"
+    expl="VC for compare"
+    sum="76eddbbc6ceee598c4a74b2c5e62ca95"
+    proved="true"
+    expanded="false"
+    shape="iainfix =V1V2altV4V2V1Iainfix &gt;c0c0AaltV4V1V2Iainfix &lt;c0c0Aainfix =V1V2Iainfix =c0c0iainfix =ainfix +V1V5V0altV4V2V1Iainfix &gt;aprefix -c1c0AaltV4V1V2Iainfix &lt;aprefix -c1c0Aainfix =V1V2Iainfix =aprefix -c1c0iainfix =ainfix +V2V5V0altV4V2V1Iainfix &gt;c1c0AaltV4V1V2Iainfix &lt;c1c0Aainfix =V1V2Iainfix =c1c0iainfix &lt;agetV3ainfix +V1V5agetV3ainfix +V2V5altV4V2V1Iainfix &gt;aprefix -c1c0AaltV4V1V2Iainfix &lt;aprefix -c1c0Aainfix =V1V2Iainfix =aprefix -c1c0altV4V2V1Iainfix &gt;c1c0AaltV4V1V2Iainfix &lt;c1c0Aainfix =V1V2Iainfix =c1c0Aainfix &gt;agetV3ainfix +V1V5agetV3ainfix +V2V5Aainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Aainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Aainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Aainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Aais_common_prefixV4V1V2V5Iais_longest_common_prefixV4V1V2V5FAainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Iainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3FF">
+    <label
+     name="expl:VC for compare"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.17"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.26"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.30"/>
+    </proof>
+   </goal>
+   <goal
     name="lcp_refl"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="175" loccnumb="6" loccnume="14"
-    sum="906ea4409b901768ea91a70c42a756e9"
+    loclnum="204" loccnumb="6" loccnume="14"
+    sum="f1b9cacdb6528c72b83978fb94aed899"
     proved="true"
     expanded="false"
     shape="ais_longest_common_prefixV0V1V1ainfix -alengthV0V1Iainfix &lt;=V1alengthV0Aainfix &lt;=c0V1F">
@@ -3753,8 +3797,8 @@
    <goal
     name="not_common_prefix_if_last_different"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="181" loccnumb="8" loccnume="43"
-    sum="0a3a5cc9fb9bc3d524388585daea84c3"
+    loclnum="210" loccnumb="8" loccnume="43"
+    sum="a1a7a305ff7dd54a02abd8bea34bd458"
     proved="true"
     expanded="false"
     shape="ais_common_prefixV0V1V2ainfix +V3c1NIainfix =amixfix []V0ainfix +V1V3amixfix []V0ainfix +V2V3NAainfix &lt;ainfix +V2V3alengthV0Aainfix &lt;ainfix +V1V3alengthV0Aainfix &lt;=c0V3F">
@@ -3776,35 +3820,10 @@
     </proof>
    </goal>
    <goal
-    name="longest_common_prefix_succ"
-    locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="187" loccnumb="6" loccnume="32"
-    sum="790baf5417cd9dddf894f87697ef7398"
-    proved="true"
-    expanded="false"
-    shape="ais_longest_common_prefixV0V1V2V3Iais_common_prefixV0V1V2ainfix +V3c1NAais_common_prefixV0V1V2V3F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
     name="le_trans"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="194" loccnumb="8" loccnume="16"
-    sum="b981b35b87edeb4cb2e5fce62ed00176"
+    loclnum="215" loccnumb="8" loccnume="16"
+    sum="c08f456e618dc0be8531b5a2c80a71c5"
     proved="true"
     expanded="false"
     shape="aleV0V1V3IaleV0V2V3AaleV0V1V2Aainfix &lt;=V3alengthV0Aainfix &lt;=c0V3Aainfix &lt;=V2alengthV0Aainfix &lt;=c0V2Aainfix &lt;=V1alengthV0Aainfix &lt;=c0V1F">
@@ -3826,47 +3845,11 @@
     </proof>
    </goal>
    <goal
-    name="WP_parameter compare"
-    locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="200" loccnumb="4" loccnume="11"
-    expl="VC for compare"
-    sum="d39aa86c3bcad594614ccdc8c7d77a6c"
-    proved="true"
-    expanded="false"
-    shape="iainfix =V1V2altV4V2V1Iainfix &gt;c0c0AaltV4V1V2Iainfix &lt;c0c0Aainfix =V1V2Iainfix =c0c0iainfix =ainfix +V1V5V0altV4V2V1Iainfix &gt;aprefix -c1c0AaltV4V1V2Iainfix &lt;aprefix -c1c0Aainfix =V1V2Iainfix =aprefix -c1c0iainfix =ainfix +V2V5V0altV4V2V1Iainfix &gt;c1c0AaltV4V1V2Iainfix &lt;c1c0Aainfix =V1V2Iainfix =c1c0iainfix &lt;agetV3ainfix +V1V5agetV3ainfix +V2V5altV4V2V1Iainfix &gt;aprefix -c1c0AaltV4V1V2Iainfix &lt;aprefix -c1c0Aainfix =V1V2Iainfix =aprefix -c1c0altV4V2V1Iainfix &gt;c1c0AaltV4V1V2Iainfix &lt;c1c0Aainfix =V1V2Iainfix =c1c0Aainfix &gt;agetV3ainfix +V1V5agetV3ainfix +V2V5Aainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Aainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Aainfix &lt;ainfix +V1V5V0Aainfix &lt;=c0ainfix +V1V5Aainfix &lt;ainfix +V2V5V0Aainfix &lt;=c0ainfix +V2V5Aais_common_prefixV4V1V2V5Iais_longest_common_prefixV4V1V2V5FAainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Iainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3FF">
-    <label
-     name="expl:VC for compare"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.17"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.43"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.30"/>
-    </proof>
-   </goal>
-   <goal
     name="WP_parameter sort"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="235" loccnumb="6" loccnume="10"
+    loclnum="234" loccnumb="6" loccnume="10"
     expl="VC for sort"
-    sum="72a9fbba4eb22914b9edb86756b670fc"
+    sum="634a3b20b8bdcb30edb7e081a07e1c67"
     proved="true"
     expanded="false"
     shape="apermutV4V7Aasorted_subV5V6c0V1Aainfix &lt;=c0V1IarangeV6V1Aasorted_subV5V6c0ainfix +ainfix -V1c1c1AapermutV4V7Aiainfix &gt;V9c0iainfix &gt;V14c0aleV5agetV16V18agetV16V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V17c1V19Aainfix &lt;V18V17Aainfix &lt;=c0V18FAasorted_subV5V16V17ainfix +V8c1Aasorted_subV5V16c0V17AapermutV4amk arrayV1V16AarangeV16V1Aainfix &lt;=V17V8Aainfix &lt;=c0V17Iainfix =V17ainfix -V9c1FAaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FAainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FAainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Aainfix &lt;V9V1Aainfix &lt;=c0V9arangeV10V1Aasorted_subV5V10c0ainfix +V8c1AapermutV4V11AaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FAainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Aainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Aainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1arangeV10V1Aasorted_subV5V10c0ainfix +V8c1AapermutV4V11AaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0IaleV5agetV10V20agetV10V21Iainfix &lt;=V21V8Aainfix &lt;=ainfix +V9c1V21Aainfix &lt;V20V9Aainfix &lt;=c0V20FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FAaleV5agetV6V22agetV6V23Iainfix &lt;=V23V8Aainfix &lt;=ainfix +V8c1V23Aainfix &lt;V22V8Aainfix &lt;=c0V22FAasorted_subV5V6V8ainfix +V8c1Aasorted_subV5V6c0V8AapermutV4V7AarangeV6V1Aainfix &lt;=V8V8Aainfix &lt;=c0V8IarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FAarangeV2V1Aasorted_subV5V2c0c0AapermutV4V4Iainfix &lt;=c0ainfix -V1c1AapermutV4V4Aasorted_subV5V2c0V1Iainfix &gt;c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -3879,9 +3862,9 @@
      <goal
       name="WP_parameter sort.1"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="1. postcondition"
-      sum="59ece99fc7958d00513c0e5f9102ec39"
+      sum="c93346713686283150f39e44d67f2b3d"
       proved="true"
       expanded="false"
       shape="asorted_subV5V2c0V1Iainfix &gt;c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -3963,9 +3946,9 @@
      <goal
       name="WP_parameter sort.2"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="2. postcondition"
-      sum="121e98c2cfb51d931cd876094437b220"
+      sum="397c1c4551877088bf519aef4d9fd429"
       proved="true"
       expanded="false"
       shape="apermutV4V4Iainfix &gt;c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4047,9 +4030,9 @@
      <goal
       name="WP_parameter sort.3"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="3. loop invariant init"
-      sum="b30172666eacc9f148184ee1188b2c80"
+      sum="ace5bffdd6c22549ad7ec48e04a31ebd"
       proved="true"
       expanded="false"
       shape="apermutV4V4Iainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4131,9 +4114,9 @@
      <goal
       name="WP_parameter sort.4"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="4. loop invariant init"
-      sum="e10d965a59c91cce30819cb4d31bd129"
+      sum="4cb0d3408197705380188b5405076a0f"
       proved="true"
       expanded="false"
       shape="asorted_subV5V2c0c0Iainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4215,9 +4198,9 @@
      <goal
       name="WP_parameter sort.5"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="5. loop invariant init"
-      sum="378c91ac2b1e2b6887a5762609d3960c"
+      sum="7836e3e40d86dafc92062f220597a93b"
       proved="true"
       expanded="false"
       shape="arangeV2V1Iainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4299,9 +4282,9 @@
      <goal
       name="WP_parameter sort.6"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="6. loop invariant init"
-      sum="45d0b4eded6117e1b74b24f06d0c8207"
+      sum="b4a28224f0afce0a388435511ab444e7"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V8V8Aainfix &lt;=c0V8IarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4383,9 +4366,9 @@
      <goal
       name="WP_parameter sort.7"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="7. loop invariant init"
-      sum="56e12234f535bc63c338e55c50b5b045"
+      sum="28ac6d731bc542ecdcc5bd87844a0a8a"
       proved="true"
       expanded="false"
       shape="arangeV6V1IarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4467,9 +4450,9 @@
      <goal
       name="WP_parameter sort.8"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="8. loop invariant init"
-      sum="650e49c5e22c3f1f61dbcc03c36be22e"
+      sum="3b432a7479944917781dd4e89587b4b4"
       proved="true"
       expanded="false"
       shape="apermutV4V7IarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4551,9 +4534,9 @@
      <goal
       name="WP_parameter sort.9"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="9. loop invariant init"
-      sum="e3be998f34cbd031763f141753361cd0"
+      sum="5fb6c6067ea053bd78866420427fd059"
       proved="true"
       expanded="false"
       shape="asorted_subV5V6c0V8IarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4611,9 +4594,9 @@
      <goal
       name="WP_parameter sort.10"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="10. loop invariant init"
-      sum="6ba111e143f954d8cac6da3c48b231e6"
+      sum="a14d769bd46baa99ef4b244a1c915f08"
       proved="true"
       expanded="false"
       shape="asorted_subV5V6V8ainfix +V8c1IarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4671,9 +4654,9 @@
      <goal
       name="WP_parameter sort.11"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="11. loop invariant init"
-      sum="52d746e23a716f046aaf7879cd24785a"
+      sum="6c75ae6475c26af8cf555ab55f682f0e"
       proved="true"
       expanded="false"
       shape="aleV5agetV6V9agetV6V10Iainfix &lt;=V10V8Aainfix &lt;=ainfix +V8c1V10Aainfix &lt;V9V8Aainfix &lt;=c0V9FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4755,9 +4738,9 @@
      <goal
       name="WP_parameter sort.12"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="12. type invariant"
-      sum="1cbdfc6f5a038ba884c6aa1600c241f0"
+      sum="7a023793227f95008f179d1ba44e87e5"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V12agetV10V13Iainfix &lt;=V13V8Aainfix &lt;=ainfix +V9c1V13Aainfix &lt;V12V9Aainfix &lt;=c0V12FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4839,9 +4822,9 @@
      <goal
       name="WP_parameter sort.13"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="13. precondition"
-      sum="e9018187974dcd1fe462d15390cd4230"
+      sum="2a2cb7e61b8482bb936bcc1042ac2fb3"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V12agetV10V13Iainfix &lt;=V13V8Aainfix &lt;=ainfix +V9c1V13Aainfix &lt;V12V9Aainfix &lt;=c0V12FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -4923,9 +4906,9 @@
      <goal
       name="WP_parameter sort.14"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="14. precondition"
-      sum="6a3b47baca1016933454e10dbe36cea5"
+      sum="01e2b88a786ddf29a76f286b2be4dd71"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V13agetV10V14Iainfix &lt;=V14V8Aainfix &lt;=ainfix +V9c1V14Aainfix &lt;V13V9Aainfix &lt;=c0V13FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5007,9 +4990,9 @@
      <goal
       name="WP_parameter sort.15"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="15. precondition"
-      sum="f4689caa0280751453159b088caca475"
+      sum="9fb152c7eb2f02a385571190d2ce8b24"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V14agetV10V15Iainfix &lt;=V15V8Aainfix &lt;=ainfix +V9c1V15Aainfix &lt;V14V9Aainfix &lt;=c0V14FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5091,9 +5074,9 @@
      <goal
       name="WP_parameter sort.16"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="16. precondition"
-      sum="b3c0011ab7cad2025ca8c467ae249d45"
+      sum="789319bb7417ebece67c8c9776d5cdf8"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V12V0Aainfix &lt;=c0V12LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V14agetV10V15Iainfix &lt;=V15V8Aainfix &lt;=ainfix +V9c1V15Aainfix &lt;V14V9Aainfix &lt;=c0V14FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5175,9 +5158,9 @@
      <goal
       name="WP_parameter sort.17"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="17. precondition"
-      sum="ac5f2d806c80b5a254db424e5853dbbc"
+      sum="ab92e77736e1948ba9230c21a95294bc"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5259,9 +5242,9 @@
      <goal
       name="WP_parameter sort.18"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="18. precondition"
-      sum="0d60d59997d24c40da9aece6ba8c6d9b"
+      sum="32464d36a2a9963910f940d5f44d6c9e"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5343,9 +5326,9 @@
      <goal
       name="WP_parameter sort.19"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="19. precondition"
-      sum="5540d7ae3bce30207345d096653841e6"
+      sum="9f6cb7f16972dc816cf2235fad4a750c"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5427,9 +5410,9 @@
      <goal
       name="WP_parameter sort.20"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="20. precondition"
-      sum="f36bdd9cf3fba7b65f7cb975057de756"
+      sum="3ebf5a81877b8ed4d465ff744f369dce"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V16agetV10V17Iainfix &lt;=V17V8Aainfix &lt;=ainfix +V9c1V17Aainfix &lt;V16V9Aainfix &lt;=c0V16FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5511,9 +5494,9 @@
      <goal
       name="WP_parameter sort.21"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="21. assertion"
-      sum="f10fc527d601107cb1620c6bec892198"
+      sum="b42a892a7a6cc6b21bc71e225f86d071"
       proved="true"
       expanded="false"
       shape="aexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V17agetV10V18Iainfix &lt;=V18V8Aainfix &lt;=ainfix +V9c1V18Aainfix &lt;V17V9Aainfix &lt;=c0V17FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5587,9 +5570,9 @@
      <goal
       name="WP_parameter sort.22"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="22. loop invariant preservation"
-      sum="17911355b1d5238b6650fe488fc5b2e1"
+      sum="f5d00be7ef4795174c174fe3fb5b7dcb"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V17V8Aainfix &lt;=c0V17Iainfix =V17ainfix -V9c1FIaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V18agetV10V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V9c1V19Aainfix &lt;V18V9Aainfix &lt;=c0V18FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5671,9 +5654,9 @@
      <goal
       name="WP_parameter sort.23"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="23. loop invariant preservation"
-      sum="dcdc422e65ede40bec7e32f2cf7a2901"
+      sum="30a564a0a55cf8a0b8847d390a1b3414"
       proved="true"
       expanded="false"
       shape="arangeV16V1Iainfix =V17ainfix -V9c1FIaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V18agetV10V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V9c1V19Aainfix &lt;V18V9Aainfix &lt;=c0V18FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5707,9 +5690,9 @@
      <goal
       name="WP_parameter sort.24"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="24. loop invariant preservation"
-      sum="eb23056702bf9103fc6c1ea94b9c616a"
+      sum="6ab8105801df1704d1fa9b4819a527b0"
       proved="true"
       expanded="false"
       shape="apermutV4amk arrayV1V16Iainfix =V17ainfix -V9c1FIaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V18agetV10V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V9c1V19Aainfix &lt;V18V9Aainfix &lt;=c0V18FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5735,9 +5718,9 @@
      <goal
       name="WP_parameter sort.25"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="25. loop invariant preservation"
-      sum="f75d26d0bbc45b833dcf8082f83f7795"
+      sum="c5a819d45d8e28bebec0c83bf299a823"
       proved="true"
       expanded="false"
       shape="asorted_subV5V16c0V17Iainfix =V17ainfix -V9c1FIaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V18agetV10V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V9c1V19Aainfix &lt;V18V9Aainfix &lt;=c0V18FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5749,7 +5732,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.69"/>
+       <result status="valid" time="0.44"/>
       </proof>
       <proof
        prover="1"
@@ -5795,9 +5778,9 @@
      <goal
       name="WP_parameter sort.26"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="26. loop invariant preservation"
-      sum="5f3dbbc417135140f2e275be585793cd"
+      sum="9b6ac852c66543a3daae433a9c38f71e"
       proved="true"
       expanded="false"
       shape="asorted_subV5V16V17ainfix +V8c1Iainfix =V17ainfix -V9c1FIaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V18agetV10V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V9c1V19Aainfix &lt;V18V9Aainfix &lt;=c0V18FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5817,7 +5800,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.13"/>
+       <result status="valid" time="1.66"/>
       </proof>
       <proof
        prover="2"
@@ -5825,7 +5808,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.80"/>
+       <result status="valid" time="1.30"/>
       </proof>
       <proof
        prover="3"
@@ -5847,9 +5830,9 @@
      <goal
       name="WP_parameter sort.27"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="27. loop invariant preservation"
-      sum="06a1be8976309ff60d3800d4cbd1c6ec"
+      sum="290bc56cb482fec5ff24d7da26b1a223"
       proved="true"
       expanded="false"
       shape="aleV5agetV16V18agetV16V19Iainfix &lt;=V19V8Aainfix &lt;=ainfix +V17c1V19Aainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix =V17ainfix -V9c1FIaexchangeV10V16ainfix -V9c1V9Iainfix =V16asetV15ainfix -V9c1agetV10V9Aainfix &lt;=c0V1FIainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix =V15asetV10V9agetV10ainfix -V9c1Aainfix &lt;=c0V1FIainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1Iainfix &lt;V9V1Aainfix &lt;=c0V9Iainfix &gt;V14c0IaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V20agetV10V21Iainfix &lt;=V21V8Aainfix &lt;=ainfix +V9c1V21Aainfix &lt;V20V9Aainfix &lt;=c0V20FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5861,7 +5844,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="4.94"/>
+       <result status="valid" time="1.97"/>
       </proof>
       <proof
        prover="1"
@@ -5869,7 +5852,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.32"/>
+       <result status="valid" time="0.68"/>
       </proof>
       <proof
        prover="2"
@@ -5877,7 +5860,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.18"/>
+       <result status="valid" time="0.60"/>
       </proof>
       <proof
        prover="3"
@@ -5907,9 +5890,9 @@
      <goal
       name="WP_parameter sort.28"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="28. assertion"
-      sum="eafea5d491aa1ee291895703ad82952c"
+      sum="29ab5dfbd961a306a317cd6bbe1bd98f"
       proved="true"
       expanded="false"
       shape="aleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V14c0NIaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -5967,9 +5950,9 @@
      <goal
       name="WP_parameter sort.29"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="29. loop invariant preservation"
-      sum="3d3ce8105074b709e3ffa1feb4cb9893"
+      sum="b4ee254e3da83ac680f14911b784f56a"
       proved="true"
       expanded="false"
       shape="apermutV4V11IaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V14c0NIaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6051,9 +6034,9 @@
      <goal
       name="WP_parameter sort.30"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="30. loop invariant preservation"
-      sum="d7154313693795a4147ef9d0b6d9134a"
+      sum="f23da23dffe81779627c668090373a55"
       proved="true"
       expanded="false"
       shape="asorted_subV5V10c0ainfix +V8c1IaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V14c0NIaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6087,9 +6070,9 @@
      <goal
       name="WP_parameter sort.31"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="31. loop invariant preservation"
-      sum="7199c6d8aa0a4ff0fbf343324ac7478e"
+      sum="505ce871e65f6322d9a801bddc3fb6a8"
       proved="true"
       expanded="false"
       shape="arangeV10V1IaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V14c0NIaltV5V12V13Iainfix &gt;V14c0AaltV5V13V12Iainfix &lt;V14c0Aainfix =V13V12Iainfix =V14c0FIainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V0Aainfix &lt;=c0V13LagetV10ainfix -V9c1Iainfix &lt;ainfix -V9c1V1Aainfix &lt;=c0ainfix -V9c1LagetV10V9Iainfix &lt;V9V1Aainfix &lt;=c0V9Aainfix &lt;=c0V1Iainfix &gt;V9c0IaleV5agetV10V15agetV10V16Iainfix &lt;=V16V8Aainfix &lt;=ainfix +V9c1V16Aainfix &lt;V15V9Aainfix &lt;=c0V15FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6163,9 +6146,9 @@
      <goal
       name="WP_parameter sort.32"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="32. assertion"
-      sum="9ac00cbdb4d8ed266910c3b98a0fec2f"
+      sum="e698348a73816b1cbf4dd8b5a31b6357"
       proved="true"
       expanded="false"
       shape="aleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V9c0NIaleV5agetV10V12agetV10V13Iainfix &lt;=V13V8Aainfix &lt;=ainfix +V9c1V13Aainfix &lt;V12V9Aainfix &lt;=c0V12FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6247,9 +6230,9 @@
      <goal
       name="WP_parameter sort.33"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="33. loop invariant preservation"
-      sum="0ca6cea30a612392f4d731ea4f4ad16c"
+      sum="5d362668fb4cff7106a9608d98df0c54"
       proved="true"
       expanded="false"
       shape="apermutV4V11IaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V9c0NIaleV5agetV10V12agetV10V13Iainfix &lt;=V13V8Aainfix &lt;=ainfix +V9c1V13Aainfix &lt;V12V9Aainfix &lt;=c0V12FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6331,9 +6314,9 @@
      <goal
       name="WP_parameter sort.34"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="34. loop invariant preservation"
-      sum="e474a1008c7db95076c353b6283de3ba"
+      sum="d2862e4e6c30d1f1dc108fb03f41193b"
       proved="true"
       expanded="false"
       shape="asorted_subV5V10c0ainfix +V8c1IaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V9c0NIaleV5agetV10V12agetV10V13Iainfix &lt;=V13V8Aainfix &lt;=ainfix +V9c1V13Aainfix &lt;V12V9Aainfix &lt;=c0V12FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6391,9 +6374,9 @@
      <goal
       name="WP_parameter sort.35"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="35. loop invariant preservation"
-      sum="47c621699b15df80d0eb97677f4bd41e"
+      sum="f4f9442ba3f97b0e62f1ff32903c40f8"
       proved="true"
       expanded="false"
       shape="arangeV10V1IaleV5agetV10ainfix -V9c1agetV10V9Iainfix &gt;V9c0Iainfix &gt;V9c0NIaleV5agetV10V12agetV10V13Iainfix &lt;=V13V8Aainfix &lt;=ainfix +V9c1V13Aainfix &lt;V12V9Aainfix &lt;=c0V12FAasorted_subV5V10V9ainfix +V8c1Aasorted_subV5V10c0V9AapermutV4V11AarangeV10V1Aainfix &lt;=V9V8Aainfix &lt;=c0V9Lamk arrayV1V10FIarangeV6V1Aasorted_subV5V6c0V8AapermutV4V7Iainfix &lt;=V8ainfix -V1c1Aainfix &lt;=c0V8FLamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6475,9 +6458,9 @@
      <goal
       name="WP_parameter sort.36"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="36. type invariant"
-      sum="1d98e351cf9cbdcc35d66fee65274bcf"
+      sum="af4b51c89245f347a20bd6d1834e8ed1"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0V1IarangeV6V1Aasorted_subV5V6c0ainfix +ainfix -V1c1c1AapermutV4V7Lamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6559,9 +6542,9 @@
      <goal
       name="WP_parameter sort.37"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="37. postcondition"
-      sum="d63e9d74bed395433aaf9909b5e75f49"
+      sum="8a5baff5ed16ef3dc0b4340824bfe4c6"
       proved="true"
       expanded="false"
       shape="asorted_subV5V6c0V1Iainfix &lt;=c0V1IarangeV6V1Aasorted_subV5V6c0ainfix +ainfix -V1c1c1AapermutV4V7Lamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6619,9 +6602,9 @@
      <goal
       name="WP_parameter sort.38"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="235" loccnumb="6" loccnume="10"
+      loclnum="234" loccnumb="6" loccnume="10"
       expl="38. postcondition"
-      sum="8b29561ffd9e6b54d8896ce6579a3c59"
+      sum="094e967fa2f3a801afe2cba0c80cbb74"
       proved="true"
       expanded="false"
       shape="apermutV4V7Iainfix &lt;=c0V1IarangeV6V1Aasorted_subV5V6c0ainfix +ainfix -V1c1c1AapermutV4V7Lamk arrayV1V6FIainfix &lt;=c0ainfix -V1c1IarangeV2V1Aainfix =V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3Lamk arrayV1V2FF">
@@ -6706,15 +6689,15 @@
   <theory
    name="SuffixArray"
    locfile="../verifythis_fm2012_lcp.mlw"
-   loclnum="274" loccnumb="7" loccnume="18"
+   loclnum="273" loccnumb="7" loccnume="18"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter select"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="294" loccnumb="4" loccnume="10"
+    loclnum="297" loccnumb="4" loccnume="10"
     expl="VC for select"
-    sum="948fa2b658a89e7b678365e574ef40cb"
+    sum="728ae2b34c4024737eddaaded066fc1a"
     proved="true"
     expanded="false"
     shape="ainfix =agetV3V2agetV3V2Aainfix &lt;V2V1Aainfix &lt;=c0V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -6748,8 +6731,8 @@
    <goal
     name="permut_permutation"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="302" loccnumb="6" loccnume="24"
-    sum="597b8831b26ab4dd16002dcdad88d139"
+    loclnum="305" loccnumb="6" loccnume="24"
+    sum="9fb4674b3ce33838b2308cc9b0e36c1f"
     proved="true"
     expanded="false"
     shape="apermutationaeltsV1alengthV1IapermutationaeltsV0alengthV0IapermutV0V1F">
@@ -6766,9 +6749,9 @@
    <goal
     name="WP_parameter create"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="307" loccnumb="4" loccnume="10"
+    loclnum="310" loccnumb="4" loccnume="10"
     expl="VC for create"
-    sum="b5dc67b17427d65e5c8b0c82d4b21fcb"
+    sum="38dff83e2e135beafc0cf8799e15e9cf"
     proved="true"
     expanded="false"
     shape="ainfix =V2V2Aasorted_subV2V4c0V0AapermutationV4V0Aainfix =V0V0Iapermutamk arrayV0V3amk arrayV0V4Aasorted_subV2V4c0V0Aainfix &lt;=c0V0FAarangeV3V0Aainfix =V0V0Aainfix &lt;=c0V0Iainfix =agetV3V5V5Iainfix &lt;V5ainfix +ainfix -V0c1c1Aainfix &lt;=c0V5FAainfix =agetV7V8V8Iainfix &lt;V8ainfix +V6c1Aainfix &lt;=c0V8FIainfix =V7asetV3V6V6Aainfix &lt;=c0V0FAainfix &lt;V6V0Aainfix &lt;=c0V6Aainfix &lt;=c0V0Iainfix =agetV3V9V9Iainfix &lt;V9V6Aainfix &lt;=c0V9FIainfix &lt;=V6ainfix -V0c1Aainfix &lt;=c0V6FFAainfix =agetaconstc0V10V10Iainfix &lt;V10c0Aainfix &lt;=c0V10FIainfix &lt;=c0ainfix -V0c1Aainfix =V2V2Aasorted_subV2V11c0V0AapermutationV11V0Aainfix =V0V0Iapermutamk arrayV0aconstc0amk arrayV0V11Aasorted_subV2V11c0V0Aainfix &lt;=c0V0FAarangeaconstc0V0Aainfix =V0V0Iainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0Aainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6781,9 +6764,9 @@
      <goal
       name="WP_parameter create.1"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="1. precondition"
-      sum="fa7dbddb06cdb105a8dc06499f0bc5f4"
+      sum="a53b4a0dcfac6f413aa0535844200305"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6817,9 +6800,9 @@
      <goal
       name="WP_parameter create.2"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="2. precondition"
-      sum="d27841ccb3b32702ccf3b45743f2c518"
+      sum="4cbb7ea485b02c34daa51c50e72f0526"
       proved="true"
       expanded="false"
       shape="ainfix =V0V0Iainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6853,9 +6836,9 @@
      <goal
       name="WP_parameter create.3"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="3. precondition"
-      sum="338311efd19ccc91420f58b893aa3b64"
+      sum="9fa1b70e901ba6898f7042ee34c98c10"
       proved="true"
       expanded="false"
       shape="arangeaconstc0V0Iainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6881,9 +6864,9 @@
      <goal
       name="WP_parameter create.4"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="4. type invariant"
-      sum="8c46f33ef083fe50282c30a559c90f3d"
+      sum="10cbed5058557a9bdfcc7169949b301c"
       proved="true"
       expanded="false"
       shape="asorted_subV2V3c0V0AapermutationV3V0Aainfix =V0V0Iapermutamk arrayV0aconstc0amk arrayV0V3Aasorted_subV2V3c0V0Aainfix &lt;=c0V0FIarangeaconstc0V0Aainfix =V0V0Iainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6933,9 +6916,9 @@
      <goal
       name="WP_parameter create.5"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="5. postcondition"
-      sum="9226f9bae7dd878ab9122df87c82d485"
+      sum="cd110cfc1756f27acf70539d55a216c9"
       proved="true"
       expanded="false"
       shape="ainfix =V2V2Iasorted_subV2V3c0V0AapermutationV3V0Aainfix =V0V0Iapermutamk arrayV0aconstc0amk arrayV0V3Aasorted_subV2V3c0V0Aainfix &lt;=c0V0FIarangeaconstc0V0Aainfix =V0V0Iainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6953,9 +6936,9 @@
      <goal
       name="WP_parameter create.6"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="6. loop invariant init"
-      sum="0a9ce24aa4cfae895f240f725b302674"
+      sum="f3c58dbb8b804ca0d9cd017bb6449219"
       proved="true"
       expanded="false"
       shape="ainfix =agetaconstc0V3V3Iainfix &lt;V3c0Aainfix &lt;=c0V3FIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -6989,9 +6972,9 @@
      <goal
       name="WP_parameter create.7"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="7. type invariant"
-      sum="e43cf10325314303d87e809a2a4154ba"
+      sum="30df1c97849029bc8ee4706db0982f58"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0V0Iainfix =agetV3V5V5Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4ainfix -V0c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7017,9 +7000,9 @@
      <goal
       name="WP_parameter create.8"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="8. precondition"
-      sum="ad19246c0c8f827dd08acbd06f1835c8"
+      sum="54c648b47ff84666c004e6021f5a9e5f"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;=c0V0Iainfix =agetV3V5V5Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4ainfix -V0c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7045,9 +7028,9 @@
      <goal
       name="WP_parameter create.9"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="9. loop invariant preservation"
-      sum="86fb2efcd68dd319ffe0217fa99459f6"
+      sum="c3723a8ad745bcfa993075a625071cd4"
       proved="true"
       expanded="false"
       shape="ainfix =agetV5V6V6Iainfix &lt;V6ainfix +V4c1Aainfix &lt;=c0V6FIainfix =V5asetV3V4V4Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix =agetV3V7V7Iainfix &lt;V7V4Aainfix &lt;=c0V7FIainfix &lt;=V4ainfix -V0c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7073,9 +7056,9 @@
      <goal
       name="WP_parameter create.10"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="10. type invariant"
-      sum="7099d97ff71f51c2501f07c34e932e52"
+      sum="2ba38787ae96864818ecc95b9b13754d"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0V0Iainfix =agetV3V4V4Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7101,9 +7084,9 @@
      <goal
       name="WP_parameter create.11"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="11. precondition"
-      sum="e06c3c0696a501a9df11841a5259805f"
+      sum="648c549d0f129b4b032ce503fa641691"
       proved="true"
       expanded="false"
       shape="ainfix =V0V0Iainfix &lt;=c0V0Iainfix =agetV3V4V4Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7137,9 +7120,9 @@
      <goal
       name="WP_parameter create.12"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="12. precondition"
-      sum="ab865453c6a4ff76b415067e8cbc4202"
+      sum="e61e0bd668a4404d6edce66197c99ebc"
       proved="true"
       expanded="false"
       shape="arangeV3V0Iainfix &lt;=c0V0Iainfix =agetV3V4V4Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7165,9 +7148,9 @@
      <goal
       name="WP_parameter create.13"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="13. type invariant"
-      sum="2cce0779ce87ddbb36f91a48b63126ce"
+      sum="3154985da7b5cd360ad63f4a30dc3097"
       proved="true"
       expanded="false"
       shape="asorted_subV2V4c0V0AapermutationV4V0Aainfix =V0V0Iapermutamk arrayV0V3amk arrayV0V4Aasorted_subV2V4c0V0Aainfix &lt;=c0V0FIarangeV3V0Aainfix =V0V0Aainfix &lt;=c0V0Iainfix =agetV3V5V5Iainfix &lt;V5ainfix +ainfix -V0c1c1Aainfix &lt;=c0V5FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7217,9 +7200,9 @@
      <goal
       name="WP_parameter create.14"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="307" loccnumb="4" loccnume="10"
+      loclnum="310" loccnumb="4" loccnume="10"
       expl="14. postcondition"
-      sum="e88613619eea93c2fa93342b0fd16f39"
+      sum="eb3566ca9802c1c7edbae2bdd6b61be1"
       proved="true"
       expanded="false"
       shape="ainfix =V2V2Iasorted_subV2V4c0V0AapermutationV4V0Aainfix =V0V0Iapermutamk arrayV0V3amk arrayV0V4Aasorted_subV2V4c0V0Aainfix &lt;=c0V0FIarangeV3V0Aainfix =V0V0Aainfix &lt;=c0V0Iainfix =agetV3V5V5Iainfix &lt;V5ainfix +ainfix -V0c1c1Aainfix &lt;=c0V5FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7255,9 +7238,9 @@
    <goal
     name="WP_parameter lcp"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="318" loccnumb="4" loccnume="7"
+    loclnum="321" loccnumb="4" loccnume="7"
     expl="VC for lcp"
-    sum="ff1b4b00b665b6a94397edc63bcc96ad"
+    sum="febff1104677dafab008b563f155aa0f"
     proved="true"
     expanded="false"
     shape="ais_longest_common_prefixamk arrayV0V4agetV3ainfix -V2c1agetV3V2V7Iais_longest_common_prefixamk arrayV0V4V6V5V7FAainfix &lt;=V5V0Aainfix &lt;=c0V5Aainfix &lt;=V6V0Aainfix &lt;=c0V6LagetV3V2Aainfix &lt;V2V1Aainfix &lt;=c0V2LagetV3ainfix -V2c1Aainfix &lt;ainfix -V2c1V1Aainfix &lt;=c0ainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;c0V2Aainvamk suffixArrayamk arrayV0V4amk arrayV1V3Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -7270,9 +7253,9 @@
      <goal
       name="WP_parameter lcp.1"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="318" loccnumb="4" loccnume="7"
+      loclnum="321" loccnumb="4" loccnume="7"
       expl="1. precondition"
-      sum="fc4b2d80c255946ad993470604d00c4d"
+      sum="b9e5d5696f334989ecae6f78d2db723c"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V2c1V1Aainfix &lt;=c0ainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;c0V2Aainvamk suffixArrayamk arrayV0V4amk arrayV1V3Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -7298,9 +7281,9 @@
      <goal
       name="WP_parameter lcp.2"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="318" loccnumb="4" loccnume="7"
+      loclnum="321" loccnumb="4" loccnume="7"
       expl="2. precondition"
-      sum="8f2a50a231457086a512cbd1bbf9a629"
+      sum="afbf8803983c27d1942e6edd53861a7c"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V2V1Aainfix &lt;=c0V2LagetV3ainfix -V2c1Iainfix &lt;ainfix -V2c1V1Aainfix &lt;=c0ainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;c0V2Aainvamk suffixArrayamk arrayV0V4amk arrayV1V3Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -7334,9 +7317,9 @@
      <goal
       name="WP_parameter lcp.3"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="318" loccnumb="4" loccnume="7"
+      loclnum="321" loccnumb="4" loccnume="7"
       expl="3. precondition"
-      sum="cd662b6b1b049ce37de1c24a61da4a05"
+      sum="1960511864645543ec2f1222db3570d3"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V6V0Aainfix &lt;=c0V6LagetV3V2Iainfix &lt;V2V1Aainfix &lt;=c0V2LagetV3ainfix -V2c1Iainfix &lt;ainfix -V2c1V1Aainfix &lt;=c0ainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;c0V2Aainvamk suffixArrayamk arrayV0V4amk arrayV1V3Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -7386,9 +7369,9 @@
      <goal
       name="WP_parameter lcp.4"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="318" loccnumb="4" loccnume="7"
+      loclnum="321" loccnumb="4" loccnume="7"
       expl="4. precondition"
-      sum="88a579ec7e1eb753e11336a9b7a100b4"
+      sum="60770c5ef456642344f592f7401b463b"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V5V0Aainfix &lt;=c0V5LagetV3V2Iainfix &lt;V2V1Aainfix &lt;=c0V2LagetV3ainfix -V2c1Iainfix &lt;ainfix -V2c1V1Aainfix &lt;=c0ainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;c0V2Aainvamk suffixArrayamk arrayV0V4amk arrayV1V3Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -7438,9 +7421,9 @@
      <goal
       name="WP_parameter lcp.5"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="318" loccnumb="4" loccnume="7"
+      loclnum="321" loccnumb="4" loccnume="7"
       expl="5. postcondition"
-      sum="ee49e6a28708fb28982ecb5283cfa984"
+      sum="cc769e4991c04ce1ac5ad88355747c86"
       proved="true"
       expanded="false"
       shape="ais_longest_common_prefixamk arrayV0V4agetV3ainfix -V2c1agetV3V2V7Iais_longest_common_prefixamk arrayV0V4V6V5V7FIainfix &lt;=V5V0Aainfix &lt;=c0V5Aainfix &lt;=V6V0Aainfix &lt;=c0V6LagetV3V2Iainfix &lt;V2V1Aainfix &lt;=c0V2LagetV3ainfix -V2c1Iainfix &lt;ainfix -V2c1V1Aainfix &lt;=c0ainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;c0V2Aainvamk suffixArrayamk arrayV0V4amk arrayV1V3Aainfix &lt;=c0V1Aainfix &lt;=c0V0Aasorted_subamk arrayV0V4V3c0V1AapermutationV3V1Aainfix =V0V1FF">
@@ -7469,7 +7452,7 @@
   <theory
    name="LRS"
    locfile="../verifythis_fm2012_lcp.mlw"
-   loclnum="362" loccnumb="7" loccnume="10"
+   loclnum="365" loccnumb="7" loccnume="10"
    verified="true"
    expanded="false">
    <label
@@ -7477,8 +7460,8 @@
    <goal
     name="lcp_sym"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="379" loccnumb="6" loccnume="13"
-    sum="2e5402ecfbd63d24d84dd990e9434c76"
+    loclnum="382" loccnumb="6" loccnume="13"
+    sum="400574d78b65207bf5563fd9d0ce6a9b"
     proved="true"
     expanded="false"
     shape="ais_longest_common_prefixV0V2V1V3Iais_longest_common_prefixV0V1V2V3Iainfix &lt;=V2alengthV0Aainfix &lt;=c0V2Aainfix &lt;=V1alengthV0Aainfix &lt;=c0V1F">
@@ -7518,8 +7501,8 @@
    <goal
     name="le_le_common_prefix"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="388" loccnumb="8" loccnume="27"
-    sum="635f66714d3b12a098bafe74266af312"
+    loclnum="391" loccnumb="8" loccnume="27"
+    sum="caf84dfbca83cd10d7c05d0fc6ae018a"
     proved="true"
     expanded="false"
     shape="ais_common_prefixV0V2V3V4Iais_common_prefixV0V1V3V4IaleV0V2V3AaleV0V1V2F">
@@ -7543,8 +7526,8 @@
    <goal
     name="le_le_longest_common_prefix"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="393" loccnumb="8" loccnume="35"
-    sum="9538971d34fd2daf5e5f7d1cf42d3f5f"
+    loclnum="396" loccnumb="8" loccnume="35"
+    sum="cedea51afded80e924e8d40ecd62e80a"
     proved="true"
     expanded="false"
     shape="ainfix &lt;=V4V5Iais_longest_common_prefixV0V2V3V5Aais_longest_common_prefixV0V1V3V4IaleV0V2V3AaleV0V1V2F">
@@ -7562,7 +7545,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.68"/>
+     <result status="valid" time="0.88"/>
     </proof>
     <proof
      prover="2"
@@ -7600,9 +7583,9 @@
    <goal
     name="WP_parameter lrs"
     locfile="../verifythis_fm2012_lcp.mlw"
-    loclnum="404" loccnumb="8" loccnume="11"
+    loclnum="407" loccnumb="8" loccnume="11"
     expl="VC for lrs"
-    sum="cfb6b92cd13c524de3a11dd879ea923f"
+    sum="fda2dd5730a9ccca2ca84da9f9db00d1"
     proved="true"
     expanded="false"
     shape="ainfix &gt;=V11V15Iais_longest_common_prefixV2V13V14V15Aainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Aainfix =V17agetV6V19Aainfix =V16agetV6V18Aainfix =V18V19NAainfix &lt;V19V0Aainfix &lt;=c0V19Aainfix &lt;V18V0Aainfix &lt;=c0V18EIainfix &lt;V17V0Aainfix &lt;V16V17Aainfix &lt;=c0V16FAainfix &gt;=V11V22Iais_longest_common_prefixV2agetV6V20agetV6V21V22Aainfix =V20V21NAainfix &lt;V21V0Aainfix &lt;=c0V21Aainfix &lt;V20V0Aainfix &lt;=c0V20FAasurjectiveV6V5Iainfix &gt;=V11V25Iais_longest_common_prefixV2agetV6V23agetV6V24V25Aainfix &lt;V24ainfix +ainfix -V0c1c1Aainfix &lt;V23V24Aainfix &lt;=c0V23FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Aiainfix &gt;V27V11ainfix &gt;=V30V33Iais_longest_common_prefixV2agetV6V31agetV6V32V33Aainfix &lt;V32ainfix +V26c1Aainfix &lt;V31V32Aainfix &lt;=c0V31FAais_longest_common_prefixV2V28V29V30Aainfix =V28V29NAainfix &lt;=V29V0Aainfix &lt;=c0V29Aainfix &lt;=V28V0Aainfix &lt;=c0V28Aainfix &lt;=V30V0Aainfix &lt;=c0V30Iainfix =V30V27FIainfix =V29agetV6ainfix -V26c1FAainfix &lt;ainfix -V26c1V3Aainfix &lt;=c0ainfix -V26c1Iainfix =V28agetV6V26FAainfix &lt;V26V3Aainfix &lt;=c0V26ainfix &gt;=V11V36Iais_longest_common_prefixV2agetV6V34agetV6V35V36Aainfix &lt;V35ainfix +V26c1Aainfix &lt;V34V35Aainfix &lt;=c0V34FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Aainfix &gt;=V11V39Iais_longest_common_prefixV2agetV6V37agetV6V38V39Aainfix &lt;V38ainfix -V26c1Aainfix &lt;V37V38Aainfix &lt;=c0V37FAainfix &lt;=V41V27Iais_longest_common_prefixV2agetV6V40agetV6V26V41Aainfix &lt;V40V26Aainfix &lt;=c0V40FAaleV2agetV6V42agetV6V26Iainfix &lt;V42V26Aainfix &lt;=c0V42FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V26c1agetV6V26V27FAainfix &lt;V26V3Aainfix &lt;c0V26Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V45Iais_longest_common_prefixV2agetV6V43agetV6V44V45Aainfix &lt;V44V26Aainfix &lt;V43V44Aainfix &lt;=c0V43FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V26ainfix -V0c1Aainfix &lt;=c1V26FFAainfix &gt;=V8V48Iais_longest_common_prefixV2agetV6V46agetV6V47V48Aainfix &lt;V47c1Aainfix &lt;V46V47Aainfix &lt;=c0V46FAais_longest_common_prefixV2V7V9V8Aainfix =V7V9NAainfix &lt;=V9V0Aainfix &lt;=c0V9Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix &lt;=c1ainfix -V0c1Aainfix &gt;=V8V51Iais_longest_common_prefixV2V49V50V51Aainfix &lt;V50V0Aainfix &lt;V49V50Aainfix &lt;=c0V49FAais_longest_common_prefixV2V7V9V8Aainfix =V7V9NAainfix &lt;=V9V0Aainfix &lt;=c0V9Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V0Aainfix &lt;=c0V8Aainfix =V53agetV6V55Aainfix =V52agetV6V54Aainfix =V54V55NAainfix &lt;V55V0Aainfix &lt;=c0V55Aainfix &lt;V54V0Aainfix &lt;=c0V54EIainfix &lt;V53V0Aainfix &lt;V52V53Aainfix &lt;=c0V52FAainfix &gt;=V8V58Iais_longest_common_prefixV2agetV6V56agetV6V57V58Aainfix =V56V57NAainfix &lt;V57V0Aainfix &lt;=c0V57Aainfix &lt;V56V0Aainfix &lt;=c0V56FAasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FAapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7615,9 +7598,9 @@
      <goal
       name="WP_parameter lrs.1"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="1. assertion"
-      sum="6701632457b97b478f3a8af10c22d439"
+      sum="0bd7620eee8292bcd581e7642d309839"
       proved="true"
       expanded="false"
       shape="apermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7683,9 +7666,9 @@
      <goal
       name="WP_parameter lrs.2"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="2. assertion"
-      sum="15b78244d77d00838c4172bc30a974b1"
+      sum="0cf275ae7f4b3fc769ff2d467c3b243a"
       proved="true"
       expanded="false"
       shape="asurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7711,9 +7694,9 @@
      <goal
       name="WP_parameter lrs.3"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="3. assertion"
-      sum="676031e87243cc787ef0085e213d4de1"
+      sum="201d3e74c70ccda4dac500286422ca9c"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V8V12Iais_longest_common_prefixV2agetV6V10agetV6V11V12Aainfix =V10V11NAainfix &lt;V11V0Aainfix &lt;=c0V11Aainfix &lt;V10V0Aainfix &lt;=c0V10FIasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7739,9 +7722,9 @@
      <goal
       name="WP_parameter lrs.4"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="4. assertion"
-      sum="c506c20d0129ac61ab8d7aff6acb753b"
+      sum="3e71a4f0fca31b962463cf2a1f2f9947"
       proved="true"
       expanded="false"
       shape="ainfix =V11agetV6V13Aainfix =V10agetV6V12Aainfix =V12V13NAainfix &lt;V13V0Aainfix &lt;=c0V13Aainfix &lt;V12V0Aainfix &lt;=c0V12EIainfix &lt;V11V0Aainfix &lt;V10V11Aainfix &lt;=c0V10FIainfix &gt;=V8V16Iais_longest_common_prefixV2agetV6V14agetV6V15V16Aainfix =V14V15NAainfix &lt;V15V0Aainfix &lt;=c0V15Aainfix &lt;V14V0Aainfix &lt;=c0V14FIasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7815,9 +7798,9 @@
      <goal
       name="WP_parameter lrs.5"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="5. postcondition"
-      sum="066617564c6f9b4d742c3800ee5b2614"
+      sum="3e072eee5cdde3486ebcc7d0b5469abc"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix =V11agetV6V13Aainfix =V10agetV6V12Aainfix =V12V13NAainfix &lt;V13V0Aainfix &lt;=c0V13Aainfix &lt;V12V0Aainfix &lt;=c0V12EIainfix &lt;V11V0Aainfix &lt;V10V11Aainfix &lt;=c0V10FIainfix &gt;=V8V16Iais_longest_common_prefixV2agetV6V14agetV6V15V16Aainfix =V14V15NAainfix &lt;V15V0Aainfix &lt;=c0V15Aainfix &lt;V14V0Aainfix &lt;=c0V14FIasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7851,9 +7834,9 @@
      <goal
       name="WP_parameter lrs.6"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="6. postcondition"
-      sum="504ee7ebd96a066288809c38b0e1862e"
+      sum="14ec18775d91db4592d149039cab1c97"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V7V0Aainfix &lt;=c0V7Iainfix =V11agetV6V13Aainfix =V10agetV6V12Aainfix =V12V13NAainfix &lt;V13V0Aainfix &lt;=c0V13Aainfix &lt;V12V0Aainfix &lt;=c0V12EIainfix &lt;V11V0Aainfix &lt;V10V11Aainfix &lt;=c0V10FIainfix &gt;=V8V16Iais_longest_common_prefixV2agetV6V14agetV6V15V16Aainfix =V14V15NAainfix &lt;V15V0Aainfix &lt;=c0V15Aainfix &lt;V14V0Aainfix &lt;=c0V14FIasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7927,9 +7910,9 @@
      <goal
       name="WP_parameter lrs.7"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="7. postcondition"
-      sum="7a9aea1b6f87c187a8ae7b637334b953"
+      sum="d03c50896cd10a2072ecf903fc62c212"
       proved="true"
       expanded="false"
       shape="ais_longest_common_prefixV2V7V9V8Aainfix =V7V9NAainfix &lt;=V9V0Aainfix &lt;=c0V9Iainfix =V11agetV6V13Aainfix =V10agetV6V12Aainfix =V12V13NAainfix &lt;V13V0Aainfix &lt;=c0V13Aainfix &lt;V12V0Aainfix &lt;=c0V12EIainfix &lt;V11V0Aainfix &lt;V10V11Aainfix &lt;=c0V10FIainfix &gt;=V8V16Iais_longest_common_prefixV2agetV6V14agetV6V15V16Aainfix =V14V15NAainfix &lt;V15V0Aainfix &lt;=c0V15Aainfix &lt;V14V0Aainfix &lt;=c0V14FIasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -7955,9 +7938,9 @@
      <goal
       name="WP_parameter lrs.8"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="8. postcondition"
-      sum="d44b30834515c9fcf13daad7425f6628"
+      sum="fdd162637331555c1688915b50e067b4"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V8V12Iais_longest_common_prefixV2V10V11V12Aainfix &lt;V11V0Aainfix &lt;V10V11Aainfix &lt;=c0V10FIainfix =V14agetV6V16Aainfix =V13agetV6V15Aainfix =V15V16NAainfix &lt;V16V0Aainfix &lt;=c0V16Aainfix &lt;V15V0Aainfix &lt;=c0V15EIainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FIainfix &gt;=V8V19Iais_longest_common_prefixV2agetV6V17agetV6V18V19Aainfix =V17V18NAainfix &lt;V18V0Aainfix &lt;=c0V18Aainfix &lt;V17V0Aainfix &lt;=c0V17FIasurjectiveV6V5Iainfix &gt;c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8015,9 +7998,9 @@
      <goal
       name="WP_parameter lrs.9"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="9. loop invariant init"
-      sum="7c856f2403445f0c6504cfa30d702426"
+      sum="0c95e62b72ccf5bff66ccbd8a889f2ea"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8091,9 +8074,9 @@
      <goal
       name="WP_parameter lrs.10"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="10. loop invariant init"
-      sum="da6a7ec3b6ff534cf5df34c30646bd4e"
+      sum="77187a7848911b11776cc4061506a214"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V7V0Aainfix &lt;=c0V7Iainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8127,9 +8110,9 @@
      <goal
       name="WP_parameter lrs.11"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="11. loop invariant init"
-      sum="0b63b27a7c735a92a4934ea890eaa55f"
+      sum="5188730bbea047ce789fb2d5a0c1d39a"
       proved="true"
       expanded="false"
       shape="ais_longest_common_prefixV2V7V9V8Aainfix =V7V9NAainfix &lt;=V9V0Aainfix &lt;=c0V9Iainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8179,9 +8162,9 @@
      <goal
       name="WP_parameter lrs.12"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="12. loop invariant init"
-      sum="897db659aeaf89db41a65aac26721d91"
+      sum="2762031ae5d7dc6db6401249aa35ff6c"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V8V12Iais_longest_common_prefixV2agetV6V10agetV6V11V12Aainfix &lt;V11c1Aainfix &lt;V10V11Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8239,9 +8222,9 @@
      <goal
       name="WP_parameter lrs.13"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="13. precondition"
-      sum="2664d3a0f76e6064a8b319f12c385662"
+      sum="059a7503c4eceab67255a8a1b86f835f"
       proved="true"
       expanded="false"
       shape="ainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V16Iais_longest_common_prefixV2agetV6V14agetV6V15V16Aainfix &lt;V15V13Aainfix &lt;V14V15Aainfix &lt;=c0V14FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8267,9 +8250,9 @@
      <goal
       name="WP_parameter lrs.14"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="14. precondition"
-      sum="18f61fe0e8f0b0665b1c20551505f7fa"
+      sum="c3d1dd23561d5db692eef3a9eed61aed"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V13V3Aainfix &lt;c0V13Iainfix &gt;=V11V16Iais_longest_common_prefixV2agetV6V14agetV6V15V16Aainfix &lt;V15V13Aainfix &lt;V14V15Aainfix &lt;=c0V14FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8295,9 +8278,9 @@
      <goal
       name="WP_parameter lrs.15"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="15. assertion"
-      sum="34536d77668d941483ac9db074805a1e"
+      sum="8baa47a0b5a60d30e0b4bedc993d8c3a"
       proved="true"
       expanded="false"
       shape="aleV2agetV6V15agetV6V13Iainfix &lt;V15V13Aainfix &lt;=c0V15FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V18Iais_longest_common_prefixV2agetV6V16agetV6V17V18Aainfix &lt;V17V13Aainfix &lt;V16V17Aainfix &lt;=c0V16FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8315,9 +8298,9 @@
      <goal
       name="WP_parameter lrs.16"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="16. assertion"
-      sum="3be1ba67e32d0f26eb115a638cb9c752"
+      sum="d8bbebfaea7fca357c18c3348b077482"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V16V14Iais_longest_common_prefixV2agetV6V15agetV6V13V16Aainfix &lt;V15V13Aainfix &lt;=c0V15FIaleV2agetV6V17agetV6V13Iainfix &lt;V17V13Aainfix &lt;=c0V17FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20Aainfix &lt;V19V13Aainfix &lt;V18V19Aainfix &lt;=c0V18FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8335,9 +8318,9 @@
      <goal
       name="WP_parameter lrs.17"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="17. assertion"
-      sum="88b9bfcf9f9ad388e0168c4d4c54ad9d"
+      sum="72980888f53e05df7c25560fafea9513"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V11V17Iais_longest_common_prefixV2agetV6V15agetV6V16V17Aainfix &lt;V16ainfix -V13c1Aainfix &lt;V15V16Aainfix &lt;=c0V15FIainfix &lt;=V19V14Iais_longest_common_prefixV2agetV6V18agetV6V13V19Aainfix &lt;V18V13Aainfix &lt;=c0V18FIaleV2agetV6V20agetV6V13Iainfix &lt;V20V13Aainfix &lt;=c0V20FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22V13Aainfix &lt;V21V22Aainfix &lt;=c0V21FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8395,9 +8378,9 @@
      <goal
       name="WP_parameter lrs.18"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="18. precondition"
-      sum="3ffa1588f12e858bbccac1b4cd9493e9"
+      sum="f179b9b2b3bbef7b006f33bc2a9ca743"
       proved="true"
       expanded="false"
       shape="ainfix &lt;V13V3Aainfix &lt;=c0V13Iainfix &gt;V14V11Iainfix &gt;=V11V17Iais_longest_common_prefixV2agetV6V15agetV6V16V17Aainfix &lt;V16ainfix -V13c1Aainfix &lt;V15V16Aainfix &lt;=c0V15FIainfix &lt;=V19V14Iais_longest_common_prefixV2agetV6V18agetV6V13V19Aainfix &lt;V18V13Aainfix &lt;=c0V18FIaleV2agetV6V20agetV6V13Iainfix &lt;V20V13Aainfix &lt;=c0V20FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22V13Aainfix &lt;V21V22Aainfix &lt;=c0V21FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8423,9 +8406,9 @@
      <goal
       name="WP_parameter lrs.19"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="19. precondition"
-      sum="b76e64f8cf06ca7ddbee2155fc1b1e74"
+      sum="457f0d86d6943f45676964721fcb8812"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix -V13c1V3Aainfix &lt;=c0ainfix -V13c1Iainfix =V15agetV6V13FIainfix &lt;V13V3Aainfix &lt;=c0V13Iainfix &gt;V14V11Iainfix &gt;=V11V18Iais_longest_common_prefixV2agetV6V16agetV6V17V18Aainfix &lt;V17ainfix -V13c1Aainfix &lt;V16V17Aainfix &lt;=c0V16FIainfix &lt;=V20V14Iais_longest_common_prefixV2agetV6V19agetV6V13V20Aainfix &lt;V19V13Aainfix &lt;=c0V19FIaleV2agetV6V21agetV6V13Iainfix &lt;V21V13Aainfix &lt;=c0V21FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V24Iais_longest_common_prefixV2agetV6V22agetV6V23V24Aainfix &lt;V23V13Aainfix &lt;V22V23Aainfix &lt;=c0V22FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8451,9 +8434,9 @@
      <goal
       name="WP_parameter lrs.20"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="20. loop invariant preservation"
-      sum="671f3929be1d64a6cccd14fc9481d891"
+      sum="7c7ec326f0a78e93d923b4656dbabac6"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V17V0Aainfix &lt;=c0V17Iainfix =V17V14FIainfix =V16agetV6ainfix -V13c1FIainfix &lt;ainfix -V13c1V3Aainfix &lt;=c0ainfix -V13c1Iainfix =V15agetV6V13FIainfix &lt;V13V3Aainfix &lt;=c0V13Iainfix &gt;V14V11Iainfix &gt;=V11V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20Aainfix &lt;V19ainfix -V13c1Aainfix &lt;V18V19Aainfix &lt;=c0V18FIainfix &lt;=V22V14Iais_longest_common_prefixV2agetV6V21agetV6V13V22Aainfix &lt;V21V13Aainfix &lt;=c0V21FIaleV2agetV6V23agetV6V13Iainfix &lt;V23V13Aainfix &lt;=c0V23FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V26Iais_longest_common_prefixV2agetV6V24agetV6V25V26Aainfix &lt;V25V13Aainfix &lt;V24V25Aainfix &lt;=c0V24FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8471,9 +8454,9 @@
      <goal
       name="WP_parameter lrs.21"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="21. loop invariant preservation"
-      sum="8a1a4994be996186e3713abbd4ed2717"
+      sum="00bbf125991eebe119dcf1bbe6711cb9"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V15V0Aainfix &lt;=c0V15Iainfix =V17V14FIainfix =V16agetV6ainfix -V13c1FIainfix &lt;ainfix -V13c1V3Aainfix &lt;=c0ainfix -V13c1Iainfix =V15agetV6V13FIainfix &lt;V13V3Aainfix &lt;=c0V13Iainfix &gt;V14V11Iainfix &gt;=V11V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20Aainfix &lt;V19ainfix -V13c1Aainfix &lt;V18V19Aainfix &lt;=c0V18FIainfix &lt;=V22V14Iais_longest_common_prefixV2agetV6V21agetV6V13V22Aainfix &lt;V21V13Aainfix &lt;=c0V21FIaleV2agetV6V23agetV6V13Iainfix &lt;V23V13Aainfix &lt;=c0V23FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V26Iais_longest_common_prefixV2agetV6V24agetV6V25V26Aainfix &lt;V25V13Aainfix &lt;V24V25Aainfix &lt;=c0V24FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8523,9 +8506,9 @@
      <goal
       name="WP_parameter lrs.22"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="22. loop invariant preservation"
-      sum="5171268abfe57aaf5ee1318f94c286f4"
+      sum="75b206822049a9fd322d38aec9ef10a5"
       proved="true"
       expanded="false"
       shape="ais_longest_common_prefixV2V15V16V17Aainfix =V15V16NAainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V17V14FIainfix =V16agetV6ainfix -V13c1FIainfix &lt;ainfix -V13c1V3Aainfix &lt;=c0ainfix -V13c1Iainfix =V15agetV6V13FIainfix &lt;V13V3Aainfix &lt;=c0V13Iainfix &gt;V14V11Iainfix &gt;=V11V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20Aainfix &lt;V19ainfix -V13c1Aainfix &lt;V18V19Aainfix &lt;=c0V18FIainfix &lt;=V22V14Iais_longest_common_prefixV2agetV6V21agetV6V13V22Aainfix &lt;V21V13Aainfix &lt;=c0V21FIaleV2agetV6V23agetV6V13Iainfix &lt;V23V13Aainfix &lt;=c0V23FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V26Iais_longest_common_prefixV2agetV6V24agetV6V25V26Aainfix &lt;V25V13Aainfix &lt;V24V25Aainfix &lt;=c0V24FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8551,9 +8534,9 @@
      <goal
       name="WP_parameter lrs.23"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="23. loop invariant preservation"
-      sum="f6bb84cab5a4cf3b708ddc7e4fd9b889"
+      sum="3a5dc2278e1fbcd7ce6a71b89f394d34"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V17V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20Aainfix &lt;V19ainfix +V13c1Aainfix &lt;V18V19Aainfix &lt;=c0V18FIainfix =V17V14FIainfix =V16agetV6ainfix -V13c1FIainfix &lt;ainfix -V13c1V3Aainfix &lt;=c0ainfix -V13c1Iainfix =V15agetV6V13FIainfix &lt;V13V3Aainfix &lt;=c0V13Iainfix &gt;V14V11Iainfix &gt;=V11V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22ainfix -V13c1Aainfix &lt;V21V22Aainfix &lt;=c0V21FIainfix &lt;=V25V14Iais_longest_common_prefixV2agetV6V24agetV6V13V25Aainfix &lt;V24V13Aainfix &lt;=c0V24FIaleV2agetV6V26agetV6V13Iainfix &lt;V26V13Aainfix &lt;=c0V26FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V29Iais_longest_common_prefixV2agetV6V27agetV6V28V29Aainfix &lt;V28V13Aainfix &lt;V27V28Aainfix &lt;=c0V27FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8587,9 +8570,9 @@
      <goal
       name="WP_parameter lrs.24"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="24. loop invariant preservation"
-      sum="5b803c2d0817bec84289e1eeed584551"
+      sum="5596a2be4c77c1cb8f7ceeb8dffde776"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &gt;V14V11NIainfix &gt;=V11V17Iais_longest_common_prefixV2agetV6V15agetV6V16V17Aainfix &lt;V16ainfix -V13c1Aainfix &lt;V15V16Aainfix &lt;=c0V15FIainfix &lt;=V19V14Iais_longest_common_prefixV2agetV6V18agetV6V13V19Aainfix &lt;V18V13Aainfix &lt;=c0V18FIaleV2agetV6V20agetV6V13Iainfix &lt;V20V13Aainfix &lt;=c0V20FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22V13Aainfix &lt;V21V22Aainfix &lt;=c0V21FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8655,9 +8638,9 @@
      <goal
       name="WP_parameter lrs.25"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="25. loop invariant preservation"
-      sum="dd8ddd833ae765983b18e60c6aeb9cd7"
+      sum="3c853ef94b15ccb49c629d74d4977386"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V12V0Aainfix &lt;=c0V12Iainfix &gt;V14V11NIainfix &gt;=V11V17Iais_longest_common_prefixV2agetV6V15agetV6V16V17Aainfix &lt;V16ainfix -V13c1Aainfix &lt;V15V16Aainfix &lt;=c0V15FIainfix &lt;=V19V14Iais_longest_common_prefixV2agetV6V18agetV6V13V19Aainfix &lt;V18V13Aainfix &lt;=c0V18FIaleV2agetV6V20agetV6V13Iainfix &lt;V20V13Aainfix &lt;=c0V20FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22V13Aainfix &lt;V21V22Aainfix &lt;=c0V21FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8683,9 +8666,9 @@
      <goal
       name="WP_parameter lrs.26"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="26. loop invariant preservation"
-      sum="c2c013d5ca40899e8bc7a092bd0aa624"
+      sum="9155c54be89d0854c31c9cba24e66874"
       proved="true"
       expanded="false"
       shape="ais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Iainfix &gt;V14V11NIainfix &gt;=V11V17Iais_longest_common_prefixV2agetV6V15agetV6V16V17Aainfix &lt;V16ainfix -V13c1Aainfix &lt;V15V16Aainfix &lt;=c0V15FIainfix &lt;=V19V14Iais_longest_common_prefixV2agetV6V18agetV6V13V19Aainfix &lt;V18V13Aainfix &lt;=c0V18FIaleV2agetV6V20agetV6V13Iainfix &lt;V20V13Aainfix &lt;=c0V20FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22V13Aainfix &lt;V21V22Aainfix &lt;=c0V21FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8711,9 +8694,9 @@
      <goal
       name="WP_parameter lrs.27"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="27. loop invariant preservation"
-      sum="3ebbcc830dd05eb9ace6392321b8e906"
+      sum="b7e39c1bc81ff546899f0d40ee12b7d9"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V11V17Iais_longest_common_prefixV2agetV6V15agetV6V16V17Aainfix &lt;V16ainfix +V13c1Aainfix &lt;V15V16Aainfix &lt;=c0V15FIainfix &gt;V14V11NIainfix &gt;=V11V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20Aainfix &lt;V19ainfix -V13c1Aainfix &lt;V18V19Aainfix &lt;=c0V18FIainfix &lt;=V22V14Iais_longest_common_prefixV2agetV6V21agetV6V13V22Aainfix &lt;V21V13Aainfix &lt;=c0V21FIaleV2agetV6V23agetV6V13Iainfix &lt;V23V13Aainfix &lt;=c0V23FIais_longest_common_prefixamk arrayV3V4agetV6ainfix -V13c1agetV6V13V14FIainfix &lt;V13V3Aainfix &lt;c0V13Aainvamk suffixArrayamk arrayV3V4amk arrayV5V6Iainfix &gt;=V11V26Iais_longest_common_prefixV2agetV6V24agetV6V25V26Aainfix &lt;V25V13Aainfix &lt;V24V25Aainfix &lt;=c0V24FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix &lt;=V13ainfix -V0c1Aainfix &lt;=c1V13FFIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8763,9 +8746,9 @@
      <goal
       name="WP_parameter lrs.28"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="28. assertion"
-      sum="7c9babad2cd9423e7d430465c4b6d6b2"
+      sum="2bce15b7f05563044acff07e90661fb2"
       proved="true"
       expanded="false"
       shape="asurjectiveV6V5Iainfix &gt;=V11V15Iais_longest_common_prefixV2agetV6V13agetV6V14V15Aainfix &lt;V14ainfix +ainfix -V0c1c1Aainfix &lt;V13V14Aainfix &lt;=c0V13FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8791,9 +8774,9 @@
      <goal
       name="WP_parameter lrs.29"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="29. assertion"
-      sum="3bc6f3fde6f173f1ef8194b358bd006f"
+      sum="7a52f8c8bdf47b7ef7d60d9c5d013d93"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V11V15Iais_longest_common_prefixV2agetV6V13agetV6V14V15Aainfix =V13V14NAainfix &lt;V14V0Aainfix &lt;=c0V14Aainfix &lt;V13V0Aainfix &lt;=c0V13FIasurjectiveV6V5Iainfix &gt;=V11V18Iais_longest_common_prefixV2agetV6V16agetV6V17V18Aainfix &lt;V17ainfix +ainfix -V0c1c1Aainfix &lt;V16V17Aainfix &lt;=c0V16FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8827,9 +8810,9 @@
      <goal
       name="WP_parameter lrs.30"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="30. assertion"
-      sum="5253a9b655dd6e51fd1b1457a810ae01"
+      sum="72c81adb00cdacc3ec1194e1a5977ae9"
       proved="true"
       expanded="false"
       shape="ainfix =V14agetV6V16Aainfix =V13agetV6V15Aainfix =V15V16NAainfix &lt;V16V0Aainfix &lt;=c0V16Aainfix &lt;V15V0Aainfix &lt;=c0V15EIainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FIainfix &gt;=V11V19Iais_longest_common_prefixV2agetV6V17agetV6V18V19Aainfix =V17V18NAainfix &lt;V18V0Aainfix &lt;=c0V18Aainfix &lt;V17V0Aainfix &lt;=c0V17FIasurjectiveV6V5Iainfix &gt;=V11V22Iais_longest_common_prefixV2agetV6V20agetV6V21V22Aainfix &lt;V21ainfix +ainfix -V0c1c1Aainfix &lt;V20V21Aainfix &lt;=c0V20FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8848,9 +8831,9 @@
      <goal
       name="WP_parameter lrs.31"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="31. postcondition"
-      sum="3e6bbf59cff4774644d09a341274c92f"
+      sum="a43ed9fc400b5fd53ad089208d086051"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V11V0Aainfix &lt;=c0V11Iainfix =V14agetV6V16Aainfix =V13agetV6V15Aainfix =V15V16NAainfix &lt;V16V0Aainfix &lt;=c0V16Aainfix &lt;V15V0Aainfix &lt;=c0V15EIainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FIainfix &gt;=V11V19Iais_longest_common_prefixV2agetV6V17agetV6V18V19Aainfix =V17V18NAainfix &lt;V18V0Aainfix &lt;=c0V18Aainfix &lt;V17V0Aainfix &lt;=c0V17FIasurjectiveV6V5Iainfix &gt;=V11V22Iais_longest_common_prefixV2agetV6V20agetV6V21V22Aainfix &lt;V21ainfix +ainfix -V0c1c1Aainfix &lt;V20V21Aainfix &lt;=c0V20FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8876,9 +8859,9 @@
      <goal
       name="WP_parameter lrs.32"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="32. postcondition"
-      sum="3bf262d3972e75ffcf717fc484a5a01e"
+      sum="1431e1f7509a8ea0b25a8af793e36680"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=V12V0Aainfix &lt;=c0V12Iainfix =V14agetV6V16Aainfix =V13agetV6V15Aainfix =V15V16NAainfix &lt;V16V0Aainfix &lt;=c0V16Aainfix &lt;V15V0Aainfix &lt;=c0V15EIainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FIainfix &gt;=V11V19Iais_longest_common_prefixV2agetV6V17agetV6V18V19Aainfix =V17V18NAainfix &lt;V18V0Aainfix &lt;=c0V18Aainfix &lt;V17V0Aainfix &lt;=c0V17FIasurjectiveV6V5Iainfix &gt;=V11V22Iais_longest_common_prefixV2agetV6V20agetV6V21V22Aainfix &lt;V21ainfix +ainfix -V0c1c1Aainfix &lt;V20V21Aainfix &lt;=c0V20FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8944,9 +8927,9 @@
      <goal
       name="WP_parameter lrs.33"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="33. postcondition"
-      sum="c185dc2579f65d858bb8de0fc85bf0e5"
+      sum="9e9d621d71ea2872debd4d4ee4650dd8"
       proved="true"
       expanded="false"
       shape="ais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Iainfix =V14agetV6V16Aainfix =V13agetV6V15Aainfix =V15V16NAainfix &lt;V16V0Aainfix &lt;=c0V16Aainfix &lt;V15V0Aainfix &lt;=c0V15EIainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FIainfix &gt;=V11V19Iais_longest_common_prefixV2agetV6V17agetV6V18V19Aainfix =V17V18NAainfix &lt;V18V0Aainfix &lt;=c0V18Aainfix &lt;V17V0Aainfix &lt;=c0V17FIasurjectiveV6V5Iainfix &gt;=V11V22Iais_longest_common_prefixV2agetV6V20agetV6V21V22Aainfix &lt;V21ainfix +ainfix -V0c1c1Aainfix &lt;V20V21Aainfix &lt;=c0V20FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
@@ -8996,9 +8979,9 @@
      <goal
       name="WP_parameter lrs.34"
       locfile="../verifythis_fm2012_lcp.mlw"
-      loclnum="404" loccnumb="8" loccnume="11"
+      loclnum="407" loccnumb="8" loccnume="11"
       expl="34. postcondition"
-      sum="a8fba6f498e2f32af0e303f49b0667d5"
+      sum="0ba85d5098112c3889177f58d4852988"
       proved="true"
       expanded="false"
       shape="ainfix &gt;=V11V15Iais_longest_common_prefixV2V13V14V15Aainfix &lt;V14V0Aainfix &lt;V13V14Aainfix &lt;=c0V13FIainfix =V17agetV6V19Aainfix =V16agetV6V18Aainfix =V18V19NAainfix &lt;V19V0Aainfix &lt;=c0V19Aainfix &lt;V18V0Aainfix &lt;=c0V18EIainfix &lt;V17V0Aainfix &lt;V16V17Aainfix &lt;=c0V16FIainfix &gt;=V11V22Iais_longest_common_prefixV2agetV6V20agetV6V21V22Aainfix =V20V21NAainfix &lt;V21V0Aainfix &lt;=c0V21Aainfix &lt;V20V0Aainfix &lt;=c0V20FIasurjectiveV6V5Iainfix &gt;=V11V25Iais_longest_common_prefixV2agetV6V23agetV6V24V25Aainfix &lt;V24ainfix +ainfix -V0c1c1Aainfix &lt;V23V24Aainfix &lt;=c0V23FAais_longest_common_prefixV2V12V10V11Aainfix =V12V10NAainfix &lt;=V10V0Aainfix &lt;=c0V10Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V11V0Aainfix &lt;=c0V11FIainfix &lt;=c1ainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIapermutationV6V5Iainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1FF">
