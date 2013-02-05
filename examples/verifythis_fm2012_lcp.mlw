@@ -108,16 +108,6 @@ lemma not_common_prefix_if_last_different:
     0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
       not is_common_prefix a x y (l+1)
 
-(*
-function longest_common_prefix (a:array int) (x y:int) :int
-
-axiom lcp_spec:
-  forall a:array int, x y:int, l:int.
-  0 <= x <= a.length /\ 0 <= y <= a.length ->
-  (l = longest_common_prefix a x y <->
-   is_common_prefix a x y l /\ not is_common_prefix a x y (l+1))
-*)
-
 predicate is_longest_common_prefix (a:array int) (x y:int) (l:int) =
   is_common_prefix a x y l /\ 
   forall m:int. l < m -> not (is_common_prefix a x y m)
@@ -146,26 +136,26 @@ let lcp (a:array int) (x y:int) : int
     !l
 
 
+(* not needed
 lemma lcp_is_cp :
   forall a:array int, x y l:int.
      0 <= x <= a.length /\ 0 <= y <= a.length ->
      is_longest_common_prefix a x y l ->
      is_common_prefix a x y l
+*)
 
+(*
 lemma lcp_eq :
   forall a:array int, x y l:int.
      0 <= x <= a.length /\ 0 <= y <= a.length ->
      is_longest_common_prefix a x y l ->
      forall i:int. 0 <= i < l -> a[x+i] = a[y+i]
+*)
 
+(* needed for le_trans (???) *)
 lemma lcp_refl :
   forall a:array int, x:int.
      0 <= x <= a.length -> is_longest_common_prefix a x x (a.length - x)
-
-lemma lcp_sym :
-  forall a:array int, x y l:int.
-     0 <= x <= a.length /\ 0 <= y <= a.length ->
-       is_longest_common_prefix a x y l -> is_longest_common_prefix a y x l
 
 let test1 () =
   let arr = Array.make 4 0 in
@@ -214,9 +204,20 @@ let test1 () =
     0 <= x <= a.length /\ 0 <= y <= a.length /\
     0 <= z <= a.length /\ le a x y /\ le a y z -> le a x z
 
+(* needed for ? 
+  lemma lcp_exists:
+     forall a : array int, x y:int.
+     let n = a.length in
+     0 <= x <= n /\ 0 <= y <= n ->
+     exists l:int. is_common_prefix a x y l /\
+     (y+l = n \/ x+l = n \/ a[x+l] <> a[y+l])
+*)
+
+(* needed for ? 
   lemma le_asym :
     forall a:array int, x y:int.
     0 <= x <= a.length /\ 0 <= y <= a.length /\ not (le a x y) -> le a y x
+*)
 
 let compare (a:array int) (x y:int) : int
   requires { 0 <= x <= a.length }
@@ -282,6 +283,13 @@ let compare (a:array int) (x y:int) : int
 
 *)
 
+(* needed for LRS function, last before last assert *)
+lemma lcp_sym :
+  forall a:array int, x y l:int.
+     0 <= x <= a.length /\ 0 <= y <= a.length ->
+       is_longest_common_prefix a x y l -> is_longest_common_prefix a y x l
+
+
 
 lemma permut_permutation :
   forall a1 a2:array int.
@@ -289,19 +297,12 @@ lemma permut_permutation :
 
 use import int.MinMax
 
-(*
-  lemma lcp_le_le_min:
-    forall a:array int, x y z:int [le a x y, le a y z].
-     le a x y /\ le a y z ->
-     longest_common_prefix a x z =
-       min (longest_common_prefix a x y) (longest_common_prefix a y z)
-*)
-  lemma lcp_le_le_aux:
+  lemma le_le_common_prefix:
     forall a:array int, x y z l:int.
      le a x y /\ le a y z ->
      is_common_prefix a x z l -> is_common_prefix a y z l
 
-  lemma lcp_le_le:
+  lemma le_le_longest_common_prefix:
     forall a:array int, x y z l m :int.
      le a x y /\ le a y z ->
      is_longest_common_prefix a x z l /\ is_longest_common_prefix a y z m
@@ -455,6 +456,7 @@ module LRS "longest repeated substring"
       done;
       assert { let s = sa.SuffixArray.suffixes in
                MapInjection.surjective s.elts s.length };
+      (* the following assert needs lcp_sym lemma *)
       assert { forall j k l:int.
                   0 <= j < a.length /\ 0 <= k < a.length /\ j <> k /\
                    LCP.is_longest_common_prefix a 
