@@ -138,7 +138,7 @@ module ArrayPermut
 
   use import int.Int
   use import Array
-  clone import map.MapPermut as M
+  use import map.MapPermut as M
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
     M.exchange a1.elts a2.elts i j
@@ -180,7 +180,7 @@ end
 module ArraySum
 
   use import Array
-  clone import map.MapSum as M
+  use import map.MapSum as M
 
   (** [sum a l h] is the sum of [a[i]] for [l <= i < h] *)
   function sum (a: array int) (l h: int) : int = M.sum a.elts l h
