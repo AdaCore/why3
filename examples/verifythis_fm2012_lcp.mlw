@@ -213,8 +213,10 @@ let compare (a:array int) (x y:int) : int
   absurd
 
 
-  (** for the [range] predicate used below *)
   use map.MapInjection
+  (** [range a] is true when for each [i], [a[i]] is between [0] at
+      [a.length-1] *)
+  predicate range (a:array int) = MapInjection.range a.elts a.length
 
   (** for the [permut] predicate (permutation of elements) *)
   use array.ArrayPermut
@@ -241,7 +243,7 @@ let compare (a:array int) (x y:int) : int
 
 let sort (a:array int) (data : array int)
   requires { data.length = a.length }
-  requires { MapInjection.range data.elts data.length }
+  requires { range data }
   ensures { sorted a data }
   ensures { ArrayPermut.permut (old data) data }
   =
@@ -249,11 +251,11 @@ let sort (a:array int) (data : array int)
    for i = 0 to data.length - 1 do
      invariant { ArrayPermut.permut (at data 'Init) data   }
      invariant { sorted_sub a data.elts 0 i  }
-     invariant { MapInjection.range data.elts data.length }
+     invariant { range data }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
-       invariant { MapInjection.range data.elts data.length }
+       invariant { range data }
        invariant { ArrayPermut.permut (at data 'Init) data   }
        invariant { sorted_sub a data.elts 0 !j }
        invariant { sorted_sub a data.elts !j (i+1) }
@@ -290,7 +292,6 @@ use SuffixSort
 use map.Map
 use map.MapInjection
 
-
 predicate permutation (m:Map.map int int) (u : int) =
   MapInjection.range m u /\ MapInjection.injective m u
 
@@ -307,11 +308,11 @@ let select (s:suffixArray) (i:int) : int
   ensures { result = s.suffixes[i] }
   = s.suffixes[i]
 
-use import array.ArrayPermut
+use array.ArrayPermut
 
 (** needed to establish invariant in function [create] *)
 lemma permut_permutation : forall a1 a2:array int.
-  permut a1 a2 /\ permutation a1.elts a1.length ->
+  ArrayPermut.permut a1 a2 /\ permutation a1.elts a1.length ->
     permutation a2.elts a2.length
 
 (** constructor of suffixArray structure *)
@@ -399,8 +400,6 @@ lemma lcp_sym :
        LCP.is_longest_common_prefix a x y l ->
        LCP.is_longest_common_prefix a y x l
 
-
-use import int.MinMax
 
 (** allows CVC to prove the next lemma *)
 lemma le_le_common_prefix:
