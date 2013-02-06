@@ -134,7 +134,6 @@ let lcp (a:array int) (x y:int) : int
       invariant { is_common_prefix a x y !l }
       incr l
     done;
-    assert { not is_common_prefix a x y (!l+1) };
     !l
 
 
@@ -179,8 +178,8 @@ let test () =
 
 end
 
-(** {2 Second module: sorting with respect to prefixes } *)
-module PrefixSort
+(** {2 Second module: sorting suffixes } *)
+module SuffixSort
 
   use import array.Array
   use import LCP
@@ -205,7 +204,6 @@ let compare (a:array int) (x y:int) : int
   if x = y then 0 else
   let n = a.length in
   let l = lcp a x y in
-  assert { is_common_prefix a x y l };
   if x + l = n then -1 else
   if y + l = n then 1 else
   if a[x + l] < a[y + l] then -1 else
@@ -284,7 +282,7 @@ module SuffixArray
 
 use import array.Array
 use import LCP
-use import PrefixSort
+use import SuffixSort
 use map.MapInjection
 
 
@@ -329,7 +327,13 @@ let lcp (s:suffixArray) (i:int) : int
   =
    LCP.lcp s.values s.suffixes[i] s.suffixes[i-1]
 
-(*
+end
+
+module SuffixArray_test
+
+use import array.Array
+use import SuffixArray
+
 let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
@@ -358,10 +362,8 @@ let test () =
   let sa = create drr in
   let x = lcp sa 2 in
   check {x = 0 (* TODO *)}
-*)
 
 end
-
 
 
 
@@ -374,7 +376,7 @@ module LRS
   use import array.Array
   use map.MapInjection
   use import LCP
-  use import PrefixSort
+  use import SuffixSort
   use import SuffixArray
 
 
@@ -470,13 +472,20 @@ lemma le_le_common_prefix:
                   y = sa.SuffixArray.suffixes[k] };
     ()
 
-(*
+end
+
+
+module LRS_test
+
+use import array.Array
+use import ref.Ref
+use import LRS
+
   let test () =
     let arr = Array.make 4 0 in
     arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-9;
     lrs arr;
     check { !solStart = 1 /\ !solLength = 1 }
-*)
 
 end
 
