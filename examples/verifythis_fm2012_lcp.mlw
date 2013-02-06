@@ -1,6 +1,16 @@
 (**
 
-{h <code>}
+{1 VerifyThis@fm2012 competition, Challenge 1: Longest Repeated Substring}
+
+{h
+The following is the original description of the verification task,
+reproduced verbatim. A <a
+href="http://fm2012.verifythis.org/challenges">reference
+implementation in Java</a> (based on code by Robert Sedgewick and
+Kevin Wayne) was also given. The Why3 implementation below follows the
+Java implementation as faithfully as possible.
+
+<pre>
 Longest Common Prefix (LCP) - 45 minutes
 
 VERIFICATION TASK
@@ -21,21 +31,15 @@ Pseudocode:
 
     int lcp(int[] a, int x, int y) {
         int l = 0;
-        while (x+l<a.length && y+l<a.length && a[x+l]==a[y+l]) {
+        while (x+l&lt;a.length && y+l&lt;a.length && a[x+l]==a[y+l]) {
             l++;
         }
         return l;
     }
 
 
-
-
-
-
 ADVANCED
 ========
-
-
 
 BACKGROUND
 ----------
@@ -61,7 +65,6 @@ sorted suffix array is:
 
 [3,0,2,1]
 
-
 VERIFICATION TASK
 -----------------
 
@@ -71,10 +74,7 @@ comparison on arrays, a sorting routine, and LCP.
 
 The client code (LRS.java) uses these to solve the LRS problem. Verify
 that it does so correctly.
-
-
-(Based on code by Robert Sedgewick and Kevin Wayne.)
-{h </code>}
+</pre>}
 
 *)
 
@@ -94,13 +94,14 @@ use import array.Array
 (** [is_common_prefix a x y l] is true when the prefixes of length [l]
     at respective positions [x] and [y] in array [a] are identical. In
     other words, the array parts a[x..x+l-1] and a[y..y+l-1] are equal
-    *) 
-predicate is_common_prefix (a:array int) (x y:int) (l:int) = 
+    *)
+predicate is_common_prefix (a:array int) (x y l:int) = 
   0 <= l /\ x+l <= a.length /\ y+l <= a.length /\ 
   (forall i:int. 0 <= i < l -> a[x+i] = a[y+i])
 
-(* helps the proof of [lcp] (but not mandatory) and needed later for [le_trans] *)
-lemma not_common_prefix_if_last_different:
+(** This lemma helps for the proof of [lcp] (but is not mandatory) and
+    is needed later (for [le_trans]) *)
+lemma not_common_prefix_if_last_char_are_different:
   forall a:array int, x y:int, l:int.
     0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
       not is_common_prefix a x y (l+1)
@@ -108,13 +109,13 @@ lemma not_common_prefix_if_last_different:
 (** [is_longest_common_prefix a x y l] is true when [l] is the maximal
     length such that prefixes at positions [x] and [y] in array [a]
     are identical. *) 
-predicate is_longest_common_prefix (a:array int) (x y:int) (l:int) = 
+predicate is_longest_common_prefix (a:array int) (x y l:int) = 
   is_common_prefix a x y l /\ 
   forall m:int. l < m -> not (is_common_prefix a x y m)
 
-(* helps proving [lcp] (but not mandatory), and needed
-for proving [lcp_sym] and [le_trans] lemmas, and the post of [compare] 
-function in the absurd case *)
+(** This lemma helps for proving [lcp] (but again is not mandatory),
+    and is needed for proving [lcp_sym] and [le_trans] lemmas, and the
+    post-condition of [compare] function in the "absurd" case *)
 lemma longest_common_prefix_succ:
  forall a:array int, x y l:int.
   is_common_prefix a x y l /\ not (is_common_prefix a x y (l+1)) ->
@@ -136,7 +137,16 @@ let lcp (a:array int) (x y:int) : int
     assert { not is_common_prefix a x y (!l+1) };
     !l
 
+
+end
+
+module LCP_test
+
 (** test harness for lcp *)
+
+use import array.Array
+use import LCP
+
 let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
