@@ -79,10 +79,19 @@ Definition is_common_prefix (a:(array Z)) (x:Z) (y:Z) (l:Z): Prop :=
   (((y + l)%Z <= (length a))%Z /\ forall (i:Z), ((0%Z <= i)%Z /\
   (i < l)%Z) -> ((get a (x + i)%Z) = (get a (y + i)%Z)))).
 
+Axiom not_common_prefix_if_last_char_are_different : forall (a:(array Z))
+  (x:Z) (y:Z) (l:Z), ((0%Z <= l)%Z /\ (((x + l)%Z < (length a))%Z /\
+  (((y + l)%Z < (length a))%Z /\ ~ ((get a (x + l)%Z) = (get a
+  (y + l)%Z))))) -> ~ (is_common_prefix a x y (l + 1%Z)%Z).
+
 (* Why3 assumption *)
 Definition is_longest_common_prefix (a:(array Z)) (x:Z) (y:Z) (l:Z): Prop :=
   (is_common_prefix a x y l) /\ forall (m:Z), (l < m)%Z ->
   ~ (is_common_prefix a x y m).
+
+Axiom longest_common_prefix_succ : forall (a:(array Z)) (x:Z) (y:Z) (l:Z),
+  ((is_common_prefix a x y l) /\ ~ (is_common_prefix a x y (l + 1%Z)%Z)) ->
+  (is_longest_common_prefix a x y l).
 
 (* Why3 assumption *)
 Definition lt (a:(array Z)) (x:Z) (y:Z): Prop := let n := (length a) in
@@ -93,30 +102,14 @@ Definition lt (a:(array Z)) (x:Z) (y:Z): Prop := let n := (length a) in
 (* Why3 assumption *)
 Definition le (a:(array Z)) (x:Z) (y:Z): Prop := (x = y) \/ (lt a x y).
 
-Axiom le_refl : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
-  (x <= (length a))%Z) -> (le a x x).
-
-Axiom lcp_refl : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
+Axiom lcp_same_index : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
   (x <= (length a))%Z) -> (is_longest_common_prefix a x x
   ((length a) - x)%Z).
-
-Axiom not_common_prefix_if_last_different : forall (a:(array Z)) (x:Z) (y:Z)
-  (l:Z), ((0%Z <= l)%Z /\ (((x + l)%Z < (length a))%Z /\
-  (((y + l)%Z < (length a))%Z /\ ~ ((get a (x + l)%Z) = (get a
-  (y + l)%Z))))) -> ~ (is_common_prefix a x y (l + 1%Z)%Z).
-
-Axiom longest_common_prefix_succ : forall (a:(array Z)) (x:Z) (y:Z) (l:Z),
-  ((is_common_prefix a x y l) /\ ~ (is_common_prefix a x y (l + 1%Z)%Z)) ->
-  (is_longest_common_prefix a x y l).
 
 Axiom le_trans : forall (a:(array Z)) (x:Z) (y:Z) (z:Z), (((0%Z <= x)%Z /\
   (x <= (length a))%Z) /\ (((0%Z <= y)%Z /\ (y <= (length a))%Z) /\
   (((0%Z <= z)%Z /\ (z <= (length a))%Z) /\ ((le a x y) /\ (le a y z))))) ->
   (le a x z).
-
-(* Why3 assumption *)
-Definition permutation (m:(map.Map.map Z Z)) (u:Z): Prop := (range m u) /\
-  (injective m u).
 
 (* Why3 assumption *)
 Definition sorted_sub (a:(array Z)) (data:(map.Map.map Z Z)) (l:Z)
@@ -174,6 +167,10 @@ Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
   a)) (a2:(array a)), (array_eq a1 a2) -> (permut a1 a2).
 
 (* Why3 assumption *)
+Definition permutation (m:(map.Map.map Z Z)) (u:Z): Prop := (range m u) /\
+  (injective m u).
+
+(* Why3 assumption *)
 Inductive suffixArray :=
   | mk_suffixArray : (array Z) -> (array Z) -> suffixArray.
 Axiom suffixArray_WhyType : WhyType suffixArray.
@@ -190,12 +187,6 @@ Definition values (v:suffixArray): (array Z) :=
   match v with
   | (mk_suffixArray x x1) => x
   end.
-
-(* Why3 assumption *)
-Definition inv (s:suffixArray): Prop :=
-  ((length (values s)) = (length (suffixes s))) /\ ((permutation
-  (elts (suffixes s)) (length (suffixes s))) /\ (sorted (values s)
-  (suffixes s))).
 
 Axiom permut_permutation : forall (a1:(array Z)) (a2:(array Z)), (permut a1
   a2) -> ((permutation (elts a1) (length a1)) -> (permutation (elts a2)
@@ -222,39 +213,37 @@ Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map.Map.map Z Z)),
   forall (sa:Z) (sa1:(map.Map.map Z Z)) (sa2:Z) (sa3:(map.Map.map Z Z)),
   ((((sa = sa2) /\ ((permutation sa3 sa2) /\ (sorted_sub (mk_array sa sa1)
   sa3 0%Z sa2))) /\ ((0%Z <= sa)%Z /\ (0%Z <= sa2)%Z)) /\ ((sa = a) /\
-  (sa1 = a1))) -> ((permutation sa3 sa2) -> forall (solStart:Z),
-  (solStart = 0%Z) -> forall (solLength:Z), (solLength = 0%Z) ->
-  forall (solStart2:Z), (solStart2 = a) -> ((1%Z <= (a - 1%Z)%Z)%Z ->
-  forall (solStart21:Z) (solLength1:Z) (solStart1:Z),
-  (((((0%Z <= solLength1)%Z /\ (solLength1 <= a)%Z) /\
-  ((0%Z <= solStart1)%Z /\ (solStart1 <= a)%Z)) /\ (((0%Z <= solStart21)%Z /\
-  (solStart21 <= a)%Z) /\ ((~ (solStart1 = solStart21)) /\
-  (is_longest_common_prefix a2 solStart1 solStart21 solLength1)))) /\
-  forall (j:Z) (k:Z) (l:Z), ((((0%Z <= j)%Z /\ (j < k)%Z) /\
-  (k < ((a - 1%Z)%Z + 1%Z)%Z)%Z) /\ (is_longest_common_prefix a2
-  (map.Map.get sa3 j) (map.Map.get sa3 k) l)) -> (l <= solLength1)%Z) ->
+  (sa1 = a1))) -> forall (solStart:Z), (solStart = 0%Z) ->
+  forall (solLength:Z), (solLength = 0%Z) -> forall (solStart2:Z),
+  (solStart2 = a) -> ((1%Z <= (a - 1%Z)%Z)%Z -> forall (solStart21:Z)
+  (solLength1:Z) (solStart1:Z), (((((0%Z <= solLength1)%Z /\
+  (solLength1 <= a)%Z) /\ ((0%Z <= solStart1)%Z /\ (solStart1 <= a)%Z)) /\
+  (((0%Z <= solStart21)%Z /\ (solStart21 <= a)%Z) /\
+  ((~ (solStart1 = solStart21)) /\ (is_longest_common_prefix a2 solStart1
+  solStart21 solLength1)))) /\ forall (j:Z) (k:Z) (l:Z), ((((0%Z <= j)%Z /\
+  (j < k)%Z) /\ (k < ((a - 1%Z)%Z + 1%Z)%Z)%Z) /\ (is_longest_common_prefix
+  a2 (map.Map.get sa3 j) (map.Map.get sa3 k) l)) -> (l <= solLength1)%Z) ->
   ((surjective sa3 sa2) -> ((forall (j:Z) (k:Z) (l:Z), (((0%Z <= j)%Z /\
   (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
   (is_longest_common_prefix a2 (map.Map.get sa3 j) (map.Map.get sa3 k)
   l)))) -> (l <= solLength1)%Z) -> forall (x:Z) (y:Z), (((0%Z <= x)%Z /\
   (x < y)%Z) /\ (y < a)%Z) -> exists j:Z, exists k:Z, ((0%Z <= j)%Z /\
   (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
-  ((x = (map.Map.get sa3 j)) /\ (y = (map.Map.get sa3 k)))))))))).
-(* intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 (((h3,(h4,h5)),(h6,h7)),(h8,h9)) h10
-   solStart h11 solLength h12 solStart2 h13 h14 solStart21 solLength1
-   solStart1 ((((h15,h16),(h17,h18)),((h19,h20),(h21,h22))),h23) h24 h25 x y
-   ((h26,h27),h28). *)
-intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 (((h3,(h4,h5)),(h6,h7)),(h8,h9)) h10
-   solStart h11 solLength h12 solStart2 h13 h14 solStart21 solLength1
-   solStart1 ((((h15,h16),(h17,h18)),((h19,h20),(h21,h22))),h23) h24 h25 x y
-   ((h26,h27),h28).
+  ((x = (map.Map.get sa3 j)) /\ (y = (map.Map.get sa3 k))))))))).
+(* intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 (((h3,(h4,h5)),(h6,h7)),(h8,h9))
+   solStart h10 solLength h11 solStart2 h12 h13 solStart21 solLength1
+   solStart1 ((((h14,h15),(h16,h17)),((h18,h19),(h20,h21))),h22) h23 h24 x y
+   ((h25,h26),h27). *)
+intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 h3 h10.
+intros solStart h11 solLength h12 solStart2 h13 h14 solStart21 solLength1.
+intros solStart1 h18 h25 x y h26.
 assert (h: sa2 = a) by ae.
-subst sa2 sa.
-red in h24.
+subst sa2.
+red in h18.
 assert (ha : (0 <= x < a)%Z) by omega.
-destruct (h24 _ ha) as (j & h30 & h31).
+destruct (h18 _ ha) as (j & h30 & h31).
 assert (hb : (0 <= y < a)%Z) by omega.
-destruct (h24 _ hb) as (k & k32 & h33).
+destruct (h18 _ hb) as (k & k32 & h33).
 exists j.
 exists k.
 ae.
