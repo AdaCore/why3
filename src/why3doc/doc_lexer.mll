@@ -273,7 +273,7 @@ and raw_html fmt depth = parse
   | '{'    { fprintf fmt "{"; raw_html fmt (succ depth) lexbuf }
   | '}'    { if depth = 0 then () else
                begin
-                 fprintf fmt "{";
+                 fprintf fmt "}";
                  raw_html fmt (pred depth) lexbuf
                end }
   | _ as c { pp_print_char fmt c; raw_html fmt depth lexbuf }
