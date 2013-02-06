@@ -117,13 +117,14 @@ let array_modules, array_theories =
 
 let array_module : Mlw_module.modul = Stdlib.Mstr.find "Array" array_modules
 
+(*
 let array_type : Mlw_ty.T.itysymbol =
   match
     Mlw_module.ns_find_ts array_module.Mlw_module.mod_export ["array"]
   with
     | Mlw_module.PT itys -> itys
     | Mlw_module.TS _ -> assert false
-
+*)
 
 
 (*********)
@@ -138,7 +139,9 @@ let ctype ty =
     | TInt (_, _) -> Mlw_ty.ity_pur Ty.ts_int []
     | TFloat (_, _) -> 
       Self.not_yet_implemented "ctype TFloat"
-    | TPtr(ty, _attr) -> array_type
+    | TPtr(_ty, _attr) -> 
+      (* array_type *)
+      Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) -> 
       Self.not_yet_implemented "ctype TArray"
     | TFun (_, _, _, _) -> 
