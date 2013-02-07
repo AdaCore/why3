@@ -11,21 +11,26 @@ exceed four million, find the sum of the even-valued terms. *)
 
 theory Fib "Definition of Fibonacci sequence"
 
-  use export int.Int
+  use import int.Int
 
   function fib int : int
 
   axiom fib0: fib 0 = 1
+
   axiom fib1: fib 1 = 2
+
   axiom fibn: forall n:int [fib n].
      n >= 2 -> fib n = fib (n-1) + fib (n-2)
+
+  goal smoke : false
 
 end
 
 theory FibSumEven "sum of even-valued Fibonacci numbers"
 
+  use import int.Int
   use import Fib
-  use import int.EuclideanDivision
+  use import int.ComputerDivision
 
   (* [fib_sum_even_lt m] is the sum of even-valued terms
       of the Fibonacci sequence that are less than m
@@ -53,19 +58,18 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
 
   function fib_sum_even_lt (m:int) : int = fib_sum_even_lt_from m 0
 
+  goal smoke : false
+
 end
 
 theory FibOnlyEven
 
-  use export Fib
-  use import int.EuclideanDivision
-
-  goal smoke0 : false
+  use import int.Int
+  use import int.ComputerDivision
+  use import Fib
 
   lemma fib_even : forall n:int. n >= 0 ->
       (mod (fib n) 2 = 0 <-> mod n 3 = 1)
-
-  goal smoke1 : false
 
   (* we pose xn = f(3n+1), that is
      x_0 = 2, x_1 = 8, x_{n+2} = 4 x_{n+1} + x_n
@@ -81,15 +85,15 @@ theory FibOnlyEven
   lemma fib_even_correct :
      forall n:int. fib_even n = fib (3*n+1)
 
-  goal smoke2 : false
-
-  use export FibSumEven
+  goal smoke : false
 
 end
 
 module Solve
 
+  use import int.Int
   use import ref.Ref
+  use import FibSumEven
   use import FibOnlyEven
 
   let f m : int
@@ -99,6 +103,7 @@ module Solve
     let y = ref 8 in
     let sum = ref 0 in
     while !x < m do
+      invariant { !sum = fib_sum_even_lt !x } 
       let tmp = !x in
       x := !y;
       y := 4 * !y + tmp;
