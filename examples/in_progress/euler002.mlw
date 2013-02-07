@@ -22,10 +22,41 @@ theory Fib "Definition of Fibonacci sequence"
   axiom fibn: forall n:int [fib n].
      n >= 2 -> fib n = fib (n-1) + fib (n-2)
 
-  goal smoke : false
+end
+
+theory FibSumEven "sum of even-valued Fibonacci numbers"
+
+  use import int.Int
+  use import Fib
+  use import int.ComputerDivision
+
+  (* [fib_sum_even m n] is the sum of even-valued terms of the
+      Fibonacci sequence from index 0 to n-1, that do not exceed m *)
+  function fib_sum_even int int : int
+
+  axiom SumZero: forall m:int. fib_sum_even m 0 = 0
+
+  axiom SumEvenLe: forall n m:int.
+     n >= 0 /\ (fib n) <= m /\ mod (fib n) 2 = 0 ->
+       fib_sum_even m (n+1) = fib_sum_even m n + fib n
+
+  axiom SumEvenGt: forall n m:int.
+     n >= 0 /\ (fib n) > m /\ mod (fib n) 2 = 0 ->
+       fib_sum_even m (n+1) = fib_sum_even m n
+
+  axiom SumOdd: forall n m:int.
+     n >= 0 /\ mod (fib n) 2 <> 0 ->
+       fib_sum_even m (n+1) = fib_sum_even m n
+
+  predicate is_fib_sum_even (m:int) (sum:int) = 
+    exists n:int. 
+      sum = fib_sum_even m n /\ fib n > m
+   (* Note: we take for granted that [fib] is an
+        increasing sequence *)
 
 end
 
+(*
 theory FibSumEven "sum of even-valued Fibonacci numbers"
 
   use import int.Int
@@ -58,10 +89,8 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
 
   function fib_sum_even_lt (m:int) : int = fib_sum_even_lt_from m 0
 
-  goal smoke : false
-
 end
-
+*)
 theory FibOnlyEven
 
   use import int.Int
@@ -83,9 +112,7 @@ theory FibOnlyEven
      n >= 2 -> fib_even n = 4 * fib_even (n-1) + fib_even (n-2)
 
   lemma fib_even_correct :
-     forall n:int. fib_even n = fib (3*n+1)
-
-  goal smoke : false
+     forall n:int. n >= 0 -> fib_even n = fib (3*n+1)
 
 end
 
@@ -93,21 +120,33 @@ module Solve
 
   use import int.Int
   use import ref.Ref
+  use import Fib
   use import FibSumEven
   use import FibOnlyEven
 
   let f m : int
     requires { m >= 0 }
-    ensures  { result = fib_sum_even_lt m }
+    ensures  { is_fib_sum_even m result }
   = let x = ref 2 in
     let y = ref 8 in
     let sum = ref 0 in
-    while !x < m do
-      invariant { !sum = fib_sum_even_lt !x } 
+    let ghost n = ref 0 in
+    let ghost k = ref 1 in
+    assert { !k = 0 + 1 };
+    while !x <= m do
+      invariant { !n >= 0 }
+      invariant { !k >= 1 }
+      invariant { !x = fib_even !n }
+      invariant { !x = fib !k }
+      invariant { !y = fib_even (!n+1) }
+      invariant { !y = fib (!k+3) }
+      invariant { !sum = fib_sum_even m !k }
       let tmp = !x in
       x := !y;
       y := 4 * !y + tmp;
-      sum := !sum + tmp
+      sum := !sum + tmp;
+      n := !n + 1;
+      k := !k + 3
     done;
     !sum
 

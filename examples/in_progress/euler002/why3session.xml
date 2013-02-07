@@ -4,459 +4,770 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.93.1"/>
  <prover
   id="1"
   name="Alt-Ergo"
-  version="0.95"/>
+  version="0.94"/>
  <prover
   id="2"
-  name="CVC3"
-  version="2.2"/>
+  name="Alt-Ergo"
+  version="0.95"/>
  <prover
   id="3"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="4"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="5"
   name="CVC4"
   version="1.0"/>
  <prover
-  id="5"
+  id="6"
+  name="Coq"
+  version="8.4"/>
+ <prover
+  id="7"
   name="Z3"
   version="2.19"/>
  <prover
-  id="6"
+  id="8"
   name="Z3"
   version="3.2"/>
  <prover
-  id="7"
+  id="9"
   name="Z3"
   version="4.2"/>
  <file
   name="../euler002.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Fib"
    locfile="../euler002.mlw"
    loclnum="12" loccnumb="7" loccnume="10"
-   verified="false"
+   verified="true"
    expanded="true">
    <label
     name="Definition of Fibonacci sequence"/>
-   <goal
-    name="smoke"
-    locfile="../euler002.mlw"
-    loclnum="25" loccnumb="7" loccnume="12"
-    sum="d24698e36750dd69ab5214ee7fd9d3a4"
-    proved="false"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.26"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.17"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-   </goal>
   </theory>
   <theory
    name="FibSumEven"
    locfile="../euler002.mlw"
-   loclnum="29" loccnumb="7" loccnume="17"
-   verified="false"
+   loclnum="27" loccnumb="7" loccnume="17"
+   verified="true"
    expanded="true">
    <label
     name="sum of even-valued Fibonacci numbers"/>
-   <goal
-    name="smoke"
-    locfile="../euler002.mlw"
-    loclnum="61" loccnumb="7" loccnume="12"
-    sum="4c2ab4907bff825f7aeae35a3445585c"
-    proved="false"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.27"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.04"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.05"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.15"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-   </goal>
   </theory>
   <theory
    name="FibOnlyEven"
    locfile="../euler002.mlw"
-   loclnum="65" loccnumb="7" loccnume="18"
-   verified="false"
-   expanded="true">
+   loclnum="94" loccnumb="7" loccnume="18"
+   verified="true"
+   expanded="false">
    <goal
     name="fib_even"
     locfile="../euler002.mlw"
-    loclnum="71" loccnumb="8" loccnume="16"
+    loclnum="100" loccnumb="8" loccnume="16"
     sum="d486dc78b6862c9ad860b8f66867d892"
-    proved="false"
-    expanded="true"
+    proved="true"
+    expanded="false"
     shape="ainfix =amodV0c3c1qainfix =amodafibV0c2c0Iainfix &gt;=V0c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.07"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.65"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="2.20"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.12"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.11"/>
-    </proof>
     <proof
      prover="6"
      timelimit="5"
      memlimit="1000"
+     edited="euler002_FibOnlyEven_fib_even_1.v"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.21"/>
+     <result status="valid" time="1.95"/>
     </proof>
    </goal>
    <goal
     name="fib_even_correct"
     locfile="../euler002.mlw"
-    loclnum="85" loccnumb="8" loccnume="24"
-    sum="95a3ceefca0ff2c3fba77386e957227d"
-    proved="false"
-    expanded="true"
-    shape="ainfix =afib_evenV0afibainfix +ainfix *c3V0c1F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="1.86"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.05"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.12"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.16"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.12"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.10"/>
-    </proof>
+    loclnum="114" loccnumb="8" loccnume="24"
+    sum="3a38e9bb92fcd974a8d29c247220a669"
+    proved="true"
+    expanded="false"
+    shape="ainfix =afib_evenV0afibainfix +ainfix *c3V0c1Iainfix &gt;=V0c0F">
     <proof
      prover="6"
      timelimit="5"
      memlimit="1000"
+     edited="euler002_FibOnlyEven_fib_even_correct_1.v"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="smoke"
-    locfile="../euler002.mlw"
-    loclnum="88" loccnumb="7" loccnume="12"
-    sum="3e18086c1fc95d379468f2ccc72cd74c"
-    proved="false"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.07"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.99"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.14"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.09"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.07"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.11"/>
+     <result status="valid" time="1.32"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="Solve"
    locfile="../euler002.mlw"
-   loclnum="92" loccnumb="7" loccnume="12"
-   verified="false"
-   expanded="true">
+   loclnum="119" loccnumb="7" loccnume="12"
+   verified="true"
+   expanded="false">
    <goal
     name="WP_parameter f"
     locfile="../euler002.mlw"
-    loclnum="99" loccnumb="6" loccnume="7"
+    loclnum="127" loccnumb="6" loccnume="7"
     expl="VC for f"
-    sum="05284a9e3094335743434a24c35e9e50"
-    proved="false"
-    expanded="true"
-    shape="iainfix &lt;V3V0ainfix =V6afib_sum_even_ltV4Iainfix =V6ainfix +V1V3FIainfix =V5ainfix +ainfix *c4V2V3FIainfix =V4V2Fainfix =V1afib_sum_even_ltV0Iainfix =V1afib_sum_even_ltV3FAainfix =c0afib_sum_even_ltc2Iainfix &gt;=V0c0F">
+    sum="9142cbfd463f10b9ac9caf96a1c48582"
+    proved="true"
+    expanded="false"
+    shape="iainfix &lt;=V5V0ainfix =V8afib_sum_evenV0V10Aainfix =V7afibainfix +V10c3Aainfix =V7afib_evenainfix +V9c1Aainfix =V6afibV10Aainfix =V6afib_evenV9Aainfix &gt;=V10c1Aainfix &gt;=V9c0Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4Fais_fib_sum_evenV0V3Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FAainfix =c0afib_sum_evenV0c1Aainfix =c8afibainfix +c1c3Aainfix =c8afib_evenainfix +c0c1Aainfix =c2afibc1Aainfix =c2afib_evenc0Aainfix &gt;=c1c1Aainfix &gt;=c0c0Aainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
     <label
      name="expl:VC for f"/>
     <transf
      name="split_goal_wp"
-     proved="false"
-     expanded="true">
+     proved="true"
+     expanded="false">
      <goal
       name="WP_parameter f.1"
       locfile="../euler002.mlw"
-      loclnum="99" loccnumb="6" loccnume="7"
-      expl="1. loop invariant init"
-      sum="0b96243886f60fcb271e6d947b08dfca"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="1. assertion"
+      sum="21781a67e90b7cda65256e5644086486"
       proved="true"
       expanded="false"
-      shape="ainfix =c0afib_sum_even_ltc2Iainfix &gt;=V0c0F">
+      shape="ainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.2"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="2. loop invariant init"
+      sum="11fef4c1e87673614d3cba0dd9a18155"
+      proved="true"
+      expanded="false"
+      shape="ainfix &gt;=c0c0Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.3"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="3. loop invariant init"
+      sum="57f75c54e563e80aa2a23c95b269c4ed"
+      proved="true"
+      expanded="false"
+      shape="ainfix &gt;=c1c1Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.4"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="4. loop invariant init"
+      sum="015082ce0b176bc232737d7ac014e240"
+      proved="true"
+      expanded="false"
+      shape="ainfix =c2afib_evenc0Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.5"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="5. loop invariant init"
+      sum="6bff46cbed04d4915b577b1517dc67e2"
+      proved="true"
+      expanded="false"
+      shape="ainfix =c2afibc1Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.6"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="6. loop invariant init"
+      sum="cef9f3845a5defa5d7cd32b0f0db01d4"
+      proved="true"
+      expanded="false"
+      shape="ainfix =c8afib_evenainfix +c0c1Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.7"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="7. loop invariant init"
+      sum="ad905b5b4d9ff4cb7c0cc73ff2066145"
+      proved="true"
+      expanded="false"
+      shape="ainfix =c8afibainfix +c1c3Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.8"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="8. loop invariant init"
+      sum="7e7018dfe3e352bcb445345019fdd09c"
+      proved="true"
+      expanded="false"
+      shape="ainfix =c0afib_sum_evenV0c1Iainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.56"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.14"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.9"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="9. loop invariant preservation"
+      sum="2788590c8c35405b2d171b8790a99658"
+      proved="true"
+      expanded="false"
+      shape="ainfix &gt;=V9c0Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for f"/>
       <proof
@@ -476,6 +787,14 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
        prover="3"
        timelimit="5"
        memlimit="1000"
@@ -492,7 +811,15 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -500,83 +827,407 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.10"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="10. loop invariant preservation"
+      sum="4b7122f0e5d01ee35bfea21a66a53515"
+      proved="true"
+      expanded="false"
+      shape="ainfix &gt;=V10c1Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
        prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.11"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="11. loop invariant preservation"
+      sum="ce1e43657794d8af748e2423379145bd"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V6afib_evenV9Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.12"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="12. loop invariant preservation"
+      sum="69f086bd2b7a56913c2d7d9cfa5d8442"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V6afibV10Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.13"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="13. loop invariant preservation"
+      sum="24d83c829656802c2bbfeba62dc3b65a"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V7afib_evenainfix +V9c1Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.14"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="14. loop invariant preservation"
+      sum="14cbde20c5baf5e2929f3ed662fabdb5"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V7afibainfix +V10c3Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="8"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.04"/>
       </proof>
-     </goal>
-     <goal
-      name="WP_parameter f.2"
-      locfile="../euler002.mlw"
-      loclnum="99" loccnumb="6" loccnume="7"
-      expl="2. loop invariant preservation"
-      sum="e0896c831fae96710d54659263487778"
-      proved="false"
-      expanded="true"
-      shape="ainfix =V6afib_sum_even_ltV4Iainfix =V6ainfix +V1V3FIainfix =V5ainfix +ainfix *c4V2V3FIainfix =V4V2FIainfix &lt;V3V0Iainfix =V1afib_sum_even_ltV3FIainfix &gt;=V0c0F">
-      <label
-       name="expl:VC for f"/>
       <proof
-       prover="0"
+       prover="9"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.13"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.01"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.23"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.11"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.16"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.15"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter f.3"
+      name="WP_parameter f.15"
       locfile="../euler002.mlw"
-      loclnum="99" loccnumb="6" loccnume="7"
-      expl="3. postcondition"
-      sum="e4fe2f576f26e164dd21aa31b67de360"
-      proved="false"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="15. loop invariant preservation"
+      sum="7311425f94be82d3cc0f10509e092569"
+      proved="true"
       expanded="false"
-      shape="ainfix =V1afib_sum_even_ltV0Iainfix &lt;V3V0NIainfix =V1afib_sum_even_ltV3FIainfix &gt;=V0c0F">
+      shape="ainfix =V8afib_sum_evenV0V10Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4FIainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.62"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.12"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.16"
+      locfile="../euler002.mlw"
+      loclnum="127" loccnumb="6" loccnume="7"
+      expl="16. postcondition"
+      sum="f1f6555981b4b852c82cf74fadd8e67c"
+      proved="true"
+      expanded="false"
+      shape="ais_fib_sum_evenV0V3Iainfix &lt;=V5V0NIainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FIainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for f"/>
       <proof
@@ -585,7 +1236,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.13"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="1"
@@ -593,7 +1244,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="4.98"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="3"
@@ -601,7 +1260,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.13"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="4"
@@ -609,15 +1268,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.13"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.15"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="7"
@@ -625,7 +1284,23 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.16"/>
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
     </transf>
