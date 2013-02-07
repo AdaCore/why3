@@ -1,12 +1,12 @@
 (*
 
-  "dumb" version of insertion sort: makes too many swap
+  "naive" version of insertion sort: makes too many swap
 
   see insertion_sort.mlw for a better version
 
 *)
 
-module InsertionSortDumb
+module InsertionSortNaive
 
   use import int.Int
   use import ref.Ref
@@ -45,7 +45,7 @@ module InsertionSortDumb
 end
 
 
-module InsertionSortDumbGen
+module InsertionSortNaiveGen
 
   use import int.Int
   use import ref.Ref
@@ -156,6 +156,8 @@ module InsertionSortParam
 end
 
 module InsertionSortParamBad
+
+   (* this version is hard to prove because predicate sorted_sub applies to an array instead of a map *)
 
   use import int.Int
   use import ref.Ref
