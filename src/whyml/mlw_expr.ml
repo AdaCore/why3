@@ -238,7 +238,7 @@ let create_psymbol_real ~poly id ghost aty varm =
   let vars = if poly then vars_empty else aty_vars aty in
   let vars = vars_merge varm vars in
   { ps_name  = id_register id;
-    ps_aty   = aty_filter varm aty;
+    ps_aty   = aty_filter ~ghost varm aty;
     ps_ghost = ghost;
     ps_varm  = varm;
     ps_vars  = vars;
@@ -747,13 +747,14 @@ let e_lazy_or e1 e2 =
 
 (* loops *)
 
-let e_loop inv variant e =
+let e_loop inv variant ({e_effect = eff} as e) =
   ity_equal_check (ity_of_expr e) ity_unit;
   let vsset = pre_vars inv Mvs.empty in
   let vsset = variant_vars variant vsset in
   let varm = add_t_vars vsset e.e_varm in
-  check_postexpr e e.e_effect varm;
-  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_ghost e.e_effect varm
+  check_postexpr e eff varm;
+  let eff = if variant = [] then eff_diverge eff else eff in
+  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_ghost eff varm
 
 let e_for_real pv bounds inv e =
   let pvfrom,_,pvto = bounds in
@@ -840,8 +841,10 @@ let e_absurd ity =
 
 (* simple functional definitions *)
 
-let create_fun_defn id ({l_expr = e} as lam) recsyms =
-  let spec = { lam.l_spec with c_effect = e.e_effect } in
+let create_fun_defn id ({l_expr = e; l_spec = c} as lam) recsyms =
+  let eff = if c.c_letrec <> 0 && c.c_variant = []
+    then eff_diverge e.e_effect else e.e_effect in
+  let spec = { c with c_effect = eff } in
   let varm = spec_varmap e.e_varm spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
@@ -869,15 +872,6 @@ let e_rec fdl e =
   mk_expr (Erec (fdl,e)) e.e_vty e.e_ghost e.e_effect varm
 
 (* compute the fixpoint on recursive definitions *)
-
-let eff_equal eff1 eff2 =
-  Sreg.equal eff1.eff_reads  eff2.eff_reads  &&
-  Sreg.equal eff1.eff_writes eff2.eff_writes &&
-  Sexn.equal eff1.eff_raises eff2.eff_raises &&
-  Sreg.equal eff1.eff_ghostr eff2.eff_ghostr &&
-  Sreg.equal eff1.eff_ghostw eff2.eff_ghostw &&
-  Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
-  Mreg.equal (Opt.equal reg_equal) eff1.eff_resets eff2.eff_resets
 
 let rec aty_compat a1 a2 =
   assert (List.for_all2 pv_equal a1.aty_args a2.aty_args);
@@ -964,7 +958,8 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   (* check that the all variants use the same order *)
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
-    let res = try List.for_all2 (fun (_,r1) (_,r2) ->
+    let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
+        Opt.equal ty_equal t1.t_ty t2.t_ty &&
         Opt.equal ls_equal r1 r2) vl variant1
       with Invalid_argument _ -> false in
     if not res then Loc.errorm
