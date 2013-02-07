@@ -93,7 +93,7 @@ let extract_from_rc rc =
   (* given a real decimal constant that is different from 0 and 1, return a
      pair (i, frac) where [i] is the integer part and [frac] is the fractional
      part *)
-  (* We special case 0.0 and 1.0 here, because a) these constants appear early
+  (* We special case 0.0 and 1.0 here, because these constants appear early
      in the Why standard library, before [from_int] is known, and also because
      Why already knows that 0.0 = 0 and 1.0 = 1. *)
   match rc with
@@ -126,7 +126,7 @@ let float_lift th_from_int th_real =
     t_app from_int_ls [t] (Some Ty.ty_real) in
   let rc_to_new_term rc =
     (* function that given a real constant x.y, builds the term
-       from_int (x) + 0.y, and returns [from_int x] and [x], see also the
+       from_int (x) + 0.y, and returns [from_int x] and [x.0], see also the
        documentation for [const_replace] *)
     match extract_from_rc rc with
     | Some (i, frac) ->
