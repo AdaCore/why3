@@ -12,6 +12,22 @@
 
 open Format
 open Why3
+
+
+(** {2 Warnings} *)
+
+(* warnings are shown on standard output instead of standard error:
+   they are not an error but should be present in the reporting of the
+   replay *)
+
+let display_warning ?loc msg =
+  match loc with
+    | None -> printf "%s@." msg
+    | Some l -> printf "%a: %s@." Loc.gen_report_position l msg
+
+let () = Warning.set_hook display_warning
+
+
 module S = Session
 
 let includes = ref []
@@ -22,6 +38,9 @@ let opt_force = ref false
 let opt_obsolete_only = ref false
 let opt_bench = ref false
 let opt_verbose = ref true
+
+
+
 
 (** {2 Smoke detector} *)
 
