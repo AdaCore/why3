@@ -335,11 +335,12 @@ lib/plugins/tptp.cmo: $(TPTPCMO)
 	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 PLUGSDIRS = plugins $(addprefix plugins/, $(PLUGDIRS))
-PLUGCLEAN = $(addsuffix /*.cm[iox], $(PLUGSDIRS)) \
+PLUGCLEAN = $(addsuffix /*.cm[ioxt], $(PLUGSDIRS)) \
 	    $(addsuffix /*.annot, $(PLUGSDIRS)) \
 	    $(addsuffix /*.output, $(PLUGSDIRS)) \
 	    $(addsuffix /*.automaton, $(PLUGSDIRS)) \
 	    $(addsuffix /*.dep, $(PLUGSDIRS)) \
+	    $(addsuffix /*.cmti, $(PLUGSDIRS)) \
 	    $(addsuffix /*.o, $(PLUGSDIRS)) \
 	    $(addsuffix /*~, $(PLUGSDIRS))
 

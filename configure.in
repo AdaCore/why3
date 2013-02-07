@@ -149,7 +149,7 @@ AC_PROG_CC()
 # Check for Ocaml compilers
 
 # we first look for ocamlc in the path; if not present, we fail
-AC_CHECK_PROG(OCAMLC,ocamlc,ocamlc,no)
+AC_CHECK_PROGS(OCAMLC,ocp-ocamlc ocamlc,no)
 if test "$OCAMLC" = no ; then
 	AC_MSG_ERROR(Cannot find ocamlc.)
 fi
@@ -171,7 +171,7 @@ echo "ocaml library path is $OCAMLLIB"
 # then we look for ocamlopt; if not present, we issue a warning
 # if the version is not the same, we also discard it
 # we set OCAMLBEST to "opt" or "byte", whether ocamlopt is available or not
-AC_CHECK_PROG(OCAMLOPT,ocamlopt,ocamlopt,no)
+AC_CHECK_PROGS(OCAMLOPT,ocp-ocamlopt ocamlopt,no)
 OCAMLBEST=byte
 if test "$OCAMLOPT" = no ; then
 	AC_MSG_WARN(Cannot find ocamlopt; bytecode compilation only.)
@@ -195,7 +195,7 @@ if test "$enable_native_code" != yes || test "$OCAMLBEST" = byte ; then
 fi
 
 # checking for ocamlc.opt
-AC_CHECK_PROG(OCAMLCDOTOPT,ocamlc.opt,ocamlc.opt,no)
+AC_CHECK_PROGS(OCAMLCDOTOPT,ocp-ocamlc.opt ocamlc.opt,no)
 if test "$OCAMLCDOTOPT" != no ; then
 	AC_MSG_CHECKING(ocamlc.opt version)
 	TMPVERSION=`$OCAMLCDOTOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
@@ -209,7 +209,7 @@ fi
 
 # checking for ocamlopt.opt
 if test "$OCAMLOPT" != no ; then
-    AC_CHECK_PROG(OCAMLOPTDOTOPT,ocamlopt.opt,ocamlopt.opt,no)
+    AC_CHECK_PROGS(OCAMLOPTDOTOPT,ocp-ocamlopt.opt ocamlopt.opt,no)
     if test "$OCAMLOPTDOTOPT" != no ; then
 	AC_MSG_CHECKING(ocamlc.opt version)
 	TMPVER=`$OCAMLOPTDOTOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
