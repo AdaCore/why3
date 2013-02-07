@@ -1,0 +1,24 @@
+
+theory EuclideanDivTest
+
+  use import int.Int
+  use import int.EuclideanDivision
+
+  goal ok1 : div (-1) (-2) = -1
+  goal ok2 : mod (-1) (-2) = 1
+  goal smoke1 : div (-1) (-2) = 0
+  goal smoke2 : mod (-1) (-2) = -1
+
+end
+
+theory ComputerDivTest
+
+  use import int.Int
+  use import int.ComputerDivision
+
+  goal ok1 : div (-1) (-2) = 0
+  goal ok2 : mod (-1) (-2) = -1
+  goal smoke1 : div (-1) (-2) = -1
+  goal smoke2 : mod (-1) (-2) = 1
+
+end
