@@ -67,6 +67,21 @@ let make_flat_case kn t bl =
   Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
 
 let rec add_quant kn (vl,tl,f) v =
+  (* (vl,tl,f) represents a formula
+        forall vl [tl]. f,
+      on top of that we want to add a quantification for [v].
+      If [v] is of record type (algebraic type with a single constructor), we
+      do not add [v] directly, instead we transform [f] to
+        let v = mk (v1 ... vn) in f
+      and quantify over v1 ... vn.
+      In case any of the vi are also of record type, we do the same.
+      Actually, [add_quant] does *not* quantify, it just adds the let-form
+      above and returns a triple
+      (vl,tl,f) where
+      vl - is the list of variables to quantify
+      tl - triggers
+      f  - formula
+  *)
   let ty = v.vs_ty in
   let cl = match ty.ty_node with
     | Tyapp (ts, _) -> find_constructors kn ts
@@ -74,14 +89,18 @@ let rec add_quant kn (vl,tl,f) v =
   in
   match cl with
     | [ls,_] ->
+        (* there is only one constructor *)
         let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
         let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
         let nvl = List.map mk_v ls.ls_args in
         let t = fs_app ls (List.map t_var nvl) ty in
         let f = t_let_close_simp v t f in
         let tl = tr_map (t_subst_single v t) tl in
+        (* in case any of the fields is also a record, we recurse over the new
+           variables. *)
         List.fold_left (add_quant kn) (vl,tl,f) nvl
     | _ ->
+        (* zero or more than one constructor *)
         (v::vl, tl, f)
 
 let let_map fn env t1 tb =
