@@ -110,7 +110,7 @@ end
 
   let mk_infix e1 op e2 =
     let id = mk_id (infix op) (floc_i 2) in
-    mk_expr (mk_apply_id id [e1; e2])
+    mk_expr (Einfix (e1, id, e2))
 
   let mk_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -1072,11 +1072,13 @@ fun_expr:
 
 expr:
 | expr_arg
-   { $1 }
+   { match $1.expr_desc with (* break the infix relation chain *)
+     | Einfix (l,o,r) -> { $1 with expr_desc = Einnfix (l,o,r) }
+     | _ -> $1 }
 | expr EQUAL expr
    { mk_infix $1 "=" $3 }
 | expr LTGT expr
-   { mk_expr (Enot (mk_infix $1 "=" $3)) }
+   { mk_infix $1 "<>" $3 }
 | expr LARROW expr
     { match $1.expr_desc with
         | Eapply (e11, e12) -> begin match e11.expr_desc with
@@ -1131,9 +1133,9 @@ expr:
      | PPptuple [] -> mk_expr (Elet (id_anonymous (), true,
           { $5 with expr_desc = Ecast ($5, PPTtuple []) }, $7))
      | _ -> Loc.errorm ~loc:(floc_i 3) "`ghost' cannot come before a pattern" }
-| LET lident labels fun_defn IN expr
+| LET lident_rich labels fun_defn IN expr
    { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
-| LET GHOST lident labels fun_defn IN expr
+| LET GHOST lident_rich labels fun_defn IN expr
    { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
 | LET REC list1_rec_defn IN expr
    { mk_expr (Eletrec ($3, $5)) }

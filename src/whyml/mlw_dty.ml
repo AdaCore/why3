@@ -195,6 +195,15 @@ let unify d1 d2 = unify ~weak:false d1 d2
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
+let is_chainable dvty =
+  let rec is_bool = function
+    | Dvar { contents = Dval dty } -> is_bool dty
+    | Dts (ts,_) -> ts_equal ts ts_bool
+    | _ -> false in
+  match dvty with
+    | [t1;t2],t -> is_bool t && not (is_bool t1) && not (is_bool t2)
+    | _ -> false
+
 let vty_of_dvty (argl,res) =
   let vty = VTvalue (ity_of_dity res) in
   let conv a = create_pvsymbol (id_fresh "x") (ity_of_dity a) in

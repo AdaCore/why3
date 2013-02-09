@@ -211,6 +211,8 @@ and expr_desc =
   | Econstant of constant
   | Eident of qualid
   | Eapply of expr * expr
+  | Einfix of expr * ident * expr
+  | Einnfix of expr * ident * expr
   | Efun of binder list * triple
   | Elet of ident * ghost * expr * expr
   | Eletrec of letrec list * expr

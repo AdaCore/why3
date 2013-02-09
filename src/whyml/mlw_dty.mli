@@ -36,6 +36,8 @@ val ts_app: tysymbol -> dity list -> dity
 
 val dity_refresh: dity -> dity (* refresh regions *)
 
+val is_chainable: dvty -> bool (* non-bool * non-bool -> bool *)
+
 exception DTypeMismatch of dity * dity
 
 val unify: dity -> dity -> unit

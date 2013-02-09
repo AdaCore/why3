@@ -254,12 +254,12 @@ let hidden_ls ~loc ls =
 
 (* helper functions for let-expansion *)
 let test_var e = match e.de_desc with
-  | DElocal _ | DEglobal_pv _ -> true
+  | DElocal _ | DEglobal_pv _ | DEconstant _ -> true
   | _ -> false
 
-let mk_var e =
+let mk_var name e =
   if test_var e then e else
-  { de_desc = DElocal "q";
+  { de_desc = DElocal name;
     de_type = e.de_type;
     de_loc  = e.de_loc;
     de_lab  = Slab.empty }
@@ -270,11 +270,11 @@ let mk_id s loc =
 let mk_dexpr desc dvty loc labs =
   { de_desc = desc; de_type = dvty; de_loc = loc; de_lab = labs }
 
-let mk_let ~loc ~uloc e (desc,dvty) =
+let mk_let name ~loc ~uloc e (desc,dvty) =
   if test_var e then desc, dvty else
   let loc = Opt.get_def loc uloc in
   let e1 = mk_dexpr desc dvty loc Slab.empty in
-  DElet (mk_id "q" e.de_loc, false, e, e1), dvty
+  DElet (mk_id name e.de_loc, false, e, e1), dvty
 
 (* patterns *)
 
@@ -294,6 +294,25 @@ let specialize_qualid uc p = match uc_find_ps uc p with
   | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
   | LS ls -> DEglobal_ls ls, Loc.try1 (qloc p) specialize_lsymbol ls
   | XS xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
+
+let chainable_qualid uc p = match uc_find_ps uc p with
+  | PS { ps_aty = { aty_args = [pv1;pv2]; aty_result = VTvalue ity }}
+  | PS { ps_aty = { aty_args = [pv1]; aty_result =
+          VTarrow { aty_args = [pv2]; aty_result = VTvalue ity }}} ->
+      ity_equal ity ity_bool
+      && not (ity_equal pv1.pv_ity ity_bool)
+      && not (ity_equal pv2.pv_ity ity_bool)
+  | LS { ls_args = [ty1;ty2]; ls_value = ty } ->
+      Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
+      && not (ty_equal ty1 ty_bool)
+      && not (ty_equal ty2 ty_bool)
+  | PS _ | LS _ | PL _ | PV _ | XS _ -> false
+
+let chainable_op denv op =
+  op.id = "infix =" || op.id = "infix <>" ||
+  match Mstr.find_opt op.id denv.locals with
+  | Some (_, dvty) -> is_chainable dvty
+  | None -> chainable_qualid denv.uc (Qident op)
 
 let find_xsymbol uc p = match uc_find_ps uc p with
   | XS xs -> xs
@@ -468,6 +487,37 @@ and de_desc denv loc = function
       let e, el = decompose_app [e2] e1 in
       let el = List.map (dexpr denv) el in
       de_app loc (dexpr denv e) el
+  | Ptree.Einfix (e12, op2, e3)
+  | Ptree.Einnfix (e12, op2, e3) ->
+      let mk_bool (d,ty) =
+        let de = mk_dexpr d ty (Opt.get_def loc denv.uloc) Slab.empty in
+        expected_type de dity_bool; de in
+      let make_app de1 op de2 =
+        let id = Ptree.Eident (Qident op) in
+        let e0 = { expr_desc = id; expr_loc = op.id_loc } in
+        de_app loc (dexpr denv e0) [de1; de2] in
+      let make_app de1 op de2 =
+        if op.id <> "infix <>" then make_app de1 op de2 else
+          let de12 = mk_bool (make_app de1 { op with id = "infix =" } de2) in
+          DEnot de12, de12.de_type in
+      let rec make_chain n1 n2 de1 = function
+        | [op,de2] ->
+            make_app de1 op de2
+        | (op,de2) :: ch ->
+            let v = mk_var n1 de2 in
+            let de12 = mk_bool (make_app de1 op v) in
+            let de23 = mk_bool (make_chain n2 n1 v ch) in
+            let d = DElazy (LazyAnd, de12, de23) in
+            mk_let n1 ~loc ~uloc:denv.uloc de2 (d, de12.de_type)
+        | [] -> assert false in
+      let rec get_chain e12 acc = match e12.expr_desc with
+        | Ptree.Einfix (e1, op1, e2) when chainable_op denv op1 ->
+            get_chain e1 ((op1, dexpr denv e2) :: acc)
+        | _ -> e12, acc in
+      let e1, ch = if chainable_op denv op2
+        then get_chain e12 [op2, dexpr denv e3]
+        else e12, [op2, dexpr denv e3] in
+      make_chain "q1 " "q2 " (dexpr denv e1) ch
   | Ptree.Elet (id, gh, e1, e2) ->
       let e1 = dexpr denv e1 in
       let denv = match e1.de_desc with
@@ -526,7 +576,7 @@ and de_desc denv loc = function
       de_app loc (hidden_pl ~loc cs) (List.map get_val pjl)
   | Ptree.Eupdate (e1, fl) when is_pure_record denv.uc fl ->
       let e1 = dexpr denv e1 in
-      let e0 = mk_var e1 in
+      let e0 = mk_var "q " e1 in
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
@@ -537,10 +587,10 @@ and de_desc denv loc = function
             let d, dvty = de_app loc (hidden_ls ~loc pj) [e0] in
             mk_dexpr d dvty loc Slab.empty in
       let res = de_app loc (hidden_ls ~loc cs) (List.map get_val pjl) in
-      mk_let ~loc ~uloc:denv.uloc e1 res
+      mk_let "q " ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr denv e1 in
-      let e0 = mk_var e1 in
+      let e0 = mk_var "q " e1 in
       let fl = List.map (find_prog_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
@@ -550,7 +600,7 @@ and de_desc denv loc = function
             let d, dvty = de_app loc (hidden_pl ~loc pj) [e0] in
             mk_dexpr d dvty loc Slab.empty in
       let res = de_app loc (hidden_pl ~loc cs) (List.map get_val pjl) in
-      mk_let ~loc ~uloc:denv.uloc e1 res
+      mk_let "q " ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eassign (e1, q, e2) ->
       let fl = dexpr denv { expr_desc = Eident q; expr_loc = qloc q } in
       let pl = match fl.de_desc with
