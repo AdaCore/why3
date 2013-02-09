@@ -162,6 +162,8 @@ let () =
   Debug.Args.set_flags_selected ();
   if Debug.Args.option_list () then exit 0
 
+let found_upgraded_prover = ref false
+
 module O =
   struct
      type key = int
@@ -227,7 +229,11 @@ let replace_prover _ _ = false
 
 let uninstalled_prover _eS unknown =
   try
-    Whyconf.get_prover_upgrade_policy config unknown
+    let p =
+      Whyconf.get_prover_upgrade_policy config unknown
+    in
+    if p <> Whyconf.CPU_keep then found_upgraded_prover := true;
+    p
   with Not_found ->
     Whyconf.CPU_keep
 
@@ -335,13 +341,12 @@ let add_to_check_no_smoke config found_obs env_session sched =
     printf " %d/%d " n m;
     if report = [] then
       begin
-        if found_obs then
-          printf "(replay OK, obsolete session updated)@."
-        else
-          printf "(replay OK)@.";
+        printf "(replay OK%s%s)@."
+          (if found_obs then ", obsolete session" else "")
+          (if !found_upgraded_prover then ", upgraded prover" else "");
         if !opt_stats && n<m then print_statistics files;
         if !opt_verbose then eprintf "Everything replayed OK.@.";
-        if found_obs then save ();
+        if found_obs || !found_upgraded_prover then save ();
         exit 0
       end
     else
@@ -431,7 +436,9 @@ let () =
       M.update_session ~allow_obsolete:true session env config
     in
     if !opt_verbose then eprintf " done.@.";
-    if !opt_obsolete_only && not found_obs then
+    if !opt_obsolete_only && not found_obs 
+      (* useless since too early: && not found_uninstalled_prover *)
+    then
       begin
         eprintf "Session is not obsolete, hence not replayed@.";
         printf "@.";
