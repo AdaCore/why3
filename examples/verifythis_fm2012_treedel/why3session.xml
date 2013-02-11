@@ -19,18 +19,18 @@
   version="3.2"/>
  <file
   name="../verifythis_fm2012_treedel.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Memory"
    locfile="../verifythis_fm2012_treedel.mlw"
-   loclnum="9" loccnumb="7" loccnume="13"
+   loclnum="42" loccnumb="7" loccnume="13"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter get_left"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="23" loccnumb="6" loccnume="14"
+    loclnum="56" loccnumb="6" loccnume="14"
     expl="VC for get_left"
     sum="b5175a3787de16d05ce0fb90adf7715c"
     proved="true"
@@ -50,7 +50,7 @@
    <goal
     name="WP_parameter get_right"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="27" loccnumb="6" loccnume="15"
+    loclnum="60" loccnumb="6" loccnume="15"
     expl="VC for get_right"
     sum="27a9da39fadab55c6a833e0dafb0e443"
     proved="true"
@@ -70,7 +70,7 @@
    <goal
     name="WP_parameter get_data"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="31" loccnumb="6" loccnume="14"
+    loclnum="64" loccnumb="6" loccnume="14"
     expl="VC for get_data"
     sum="77819bfc08f5209dc563e4d81a1a974c"
     proved="true"
@@ -91,13 +91,13 @@
   <theory
    name="Treedel"
    locfile="../verifythis_fm2012_treedel.mlw"
-   loclnum="38" loccnumb="7" loccnume="14"
-   verified="false"
+   loclnum="71" loccnumb="7" loccnume="14"
+   verified="true"
    expanded="true">
    <goal
     name="inorder_zip"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="65" loccnumb="8" loccnume="19"
+    loclnum="98" loccnumb="8" loccnume="19"
     sum="9e58b1a0ac813d1cb156465bd483b3b6"
     proved="true"
     expanded="false"
@@ -109,7 +109,7 @@
      <goal
       name="inorder_zip.1"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="65" loccnumb="8" loccnume="19"
+      loclnum="98" loccnumb="8" loccnume="19"
       expl="1."
       sum="4f8861704f70f7e4e36ce61051a56380"
       proved="true"
@@ -122,7 +122,7 @@
        <goal
         name="inorder_zip.1.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="65" loccnumb="8" loccnume="19"
+        loclnum="98" loccnumb="8" loccnume="19"
         expl="1."
         sum="19a8e10a34c97930b46443d73184cba9"
         proved="true"
@@ -140,7 +140,7 @@
        <goal
         name="inorder_zip.1.2"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="65" loccnumb="8" loccnume="19"
+        loclnum="98" loccnumb="8" loccnume="19"
         expl="2."
         sum="b4de059965d0d279fb25933cf770df02"
         proved="true"
@@ -162,7 +162,7 @@
    <goal
     name="WP_parameter left"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="69" loccnumb="12" loccnume="16"
+    loclnum="102" loccnumb="12" loccnume="16"
     expl="VC for left"
     sum="c270c450ae0472d0dac3e2278f02ab88"
     proved="true"
@@ -182,7 +182,7 @@
    <goal
     name="WP_parameter right"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="74" loccnumb="12" loccnume="17"
+    loclnum="107" loccnumb="12" loccnume="17"
     expl="VC for right"
     sum="aad404ea5b9e844f3226612924a1780e"
     proved="true"
@@ -202,16 +202,25 @@
    <goal
     name="main_lemma"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="79" loccnumb="8" loccnume="18"
+    loclnum="112" loccnumb="8" loccnume="18"
     sum="045c865e8ff28d4799b47baeedd4fd15"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="atreeV8V1azipaNodeV5V2V4V6Lamixfix [&lt;-]V0V2amk nodearightamixfix []V0V3arightamixfix []V0V2adataamixfix []V0V2IadistinctainorderV7IatreeV0V1V7LazipaNodeaNodeaEmptyV3V5V2V4V6F">
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="1000"
+     edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="16.89"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter search_tree_delete_min"
     locfile="../verifythis_fm2012_treedel.mlw"
-    loclnum="88" loccnumb="6" loccnume="28"
+    loclnum="121" loccnumb="6" loccnume="28"
     expl="VC for search_tree_delete_min"
     sum="91569afc812057a9c9998241542f6be7"
     proved="true"
@@ -226,7 +235,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.1"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="1. precondition"
       sum="dd778c583120fb642cb96603cf4a40eb"
       proved="true"
@@ -246,7 +255,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.2"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="2. precondition"
       sum="594aba55f92551ede20b16f9310dc13c"
       proved="true"
@@ -266,7 +275,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.3"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="3. precondition"
       sum="b4aff993334e252b1602e5f9bfef876c"
       proved="true"
@@ -286,7 +295,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.4"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="4."
       sum="b11993328606adba30026ea5008176b2"
       proved="true"
@@ -301,7 +310,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.4.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1."
         sum="b11993328606adba30026ea5008176b2"
         proved="true"
@@ -323,7 +332,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.5"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="5. assertion"
       sum="b38028413b036e0a2cb44531f2169470"
       proved="true"
@@ -338,7 +347,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.5.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1. assertion"
         sum="b38028413b036e0a2cb44531f2169470"
         proved="true"
@@ -360,7 +369,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.6"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="6. postcondition"
       sum="deee8431dd2668f2036aa98f3f54835c"
       proved="true"
@@ -375,7 +384,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.6.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1."
         sum="21d9f596f62bea9f23fc702a0727bd75"
         proved="true"
@@ -395,7 +404,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.6.2"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="2."
         sum="79c04db123bf70f0bac28348cf197648"
         proved="true"
@@ -415,7 +424,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.6.3"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="3."
         sum="d3d09c88e030b092e5cf191fd5b894f8"
         proved="true"
@@ -435,7 +444,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.6.4"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="4."
         sum="2467e9b9c30974506548c6ecbf3ce8bb"
         proved="true"
@@ -457,7 +466,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.7"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="7. precondition"
       sum="e7cc2564bc52ecec0d130a56dee88c74"
       proved="true"
@@ -477,7 +486,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.8"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="8. precondition"
       sum="b33ce8b9f5f63fbdebf8adcc2018e963"
       proved="true"
@@ -497,7 +506,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.9"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="9. precondition"
       sum="e8312464e03d0dda0fbfbc6e6feb1240"
       proved="true"
@@ -517,7 +526,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.10"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="10. loop invariant init"
       sum="ebb34e94d0fb3838d884ccf22fba3fc1"
       proved="true"
@@ -532,7 +541,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.10.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1."
         sum="a77ad126dea2f4a6a90868539c8156b8"
         proved="true"
@@ -552,7 +561,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.10.2"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="2."
         sum="f2e82a505736cac39b9115411259bd80"
         proved="true"
@@ -572,7 +581,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.10.3"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="3."
         sum="50d7441f4e7d18b45831303959a12724"
         proved="true"
@@ -592,7 +601,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.10.4"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="4."
         sum="3121234d9107b8ad72b046731c1a4867"
         proved="true"
@@ -612,7 +621,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.10.5"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="5."
         sum="a05bc6a801664ff2677e1036b235ba24"
         proved="true"
@@ -632,7 +641,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.10.6"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="6."
         sum="f42a13d2a0ac1fb0f048c5e3cd81ed78"
         proved="true"
@@ -654,7 +663,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.11"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="11. assertion"
       sum="4b8d4be6a7a754a2b22d34f5901d4573"
       proved="true"
@@ -674,7 +683,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.12"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="12. precondition"
       sum="734c0221f0dce6743687e0649915f30a"
       proved="true"
@@ -702,7 +711,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.13"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="13. precondition"
       sum="90143c89d74d3c02ee6daa39a0d032e9"
       proved="true"
@@ -722,7 +731,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.14"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="14. precondition"
       sum="49ad9ad3862b193fee6af2edbf10bc0a"
       proved="true"
@@ -737,7 +746,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.14.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1. precondition"
         sum="49ad9ad3862b193fee6af2edbf10bc0a"
         proved="true"
@@ -759,7 +768,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.15"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="15. loop invariant preservation"
       sum="79f275334b1b27ce8db7532c31fa899b"
       proved="true"
@@ -774,7 +783,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.15.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1."
         sum="450ce0c9a00e76a0a63a7476112ccdab"
         proved="true"
@@ -794,7 +803,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.15.2"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="2."
         sum="2e5371fc44fbbfd7879aee989c8f3ae1"
         proved="true"
@@ -814,7 +823,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.15.3"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="3."
         sum="664942a6a99cf9692788fc3cef2f837e"
         proved="true"
@@ -834,7 +843,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.15.4"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="4."
         sum="5dc4929a69edf665bbf5a996f0280ca5"
         proved="true"
@@ -854,7 +863,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.15.5"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="5."
         sum="d4b7da6d74a202945bbbdf98fba2eded"
         proved="true"
@@ -874,7 +883,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.15.6"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="6."
         sum="81d25d0d9cac0d1d0021fb6c52f188f4"
         proved="true"
@@ -896,7 +905,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.16"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="16. assertion"
       sum="bca4113e9651a9f669b76b528ba044d4"
       proved="true"
@@ -916,7 +925,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.17"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="17. assertion"
       sum="9b15e16e88ae369c4034c383806689f3"
       proved="true"
@@ -936,7 +945,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.18"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="18. precondition"
       sum="63b4eb0c439ee93172311e29f170d309"
       proved="true"
@@ -956,7 +965,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.19"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="19. precondition"
       sum="bb6391a2f71cd5422483a8d1846a5af6"
       proved="true"
@@ -976,7 +985,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.20"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="20. precondition"
       sum="a48858db913f55d612687476e78030e5"
       proved="true"
@@ -996,7 +1005,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.21"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="21. assertion"
       sum="71f6a99f5d4455823d9abfe7bd73e257"
       proved="true"
@@ -1011,7 +1020,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.21.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1. assertion"
         sum="71f6a99f5d4455823d9abfe7bd73e257"
         proved="true"
@@ -1033,7 +1042,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.22"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="22. precondition"
       sum="75428def7c8c3f85669e6aa138e59d49"
       proved="true"
@@ -1053,7 +1062,7 @@
      <goal
       name="WP_parameter search_tree_delete_min.23"
       locfile="../verifythis_fm2012_treedel.mlw"
-      loclnum="88" loccnumb="6" loccnume="28"
+      loclnum="121" loccnumb="6" loccnume="28"
       expl="23. postcondition"
       sum="1576f78220ecb6258d1c6c3f73b5e9de"
       proved="true"
@@ -1068,7 +1077,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.23.1"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="1."
         sum="6b334f667499c4ea1acaaf13ab9b6059"
         proved="true"
@@ -1088,7 +1097,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.23.2"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="2."
         sum="d9bed08ea0a6336bcda55b9761c938bc"
         proved="true"
@@ -1108,7 +1117,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.23.3"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="3."
         sum="5097560114a248e32ec7fcb79c62c1b7"
         proved="true"
@@ -1128,7 +1137,7 @@
        <goal
         name="WP_parameter search_tree_delete_min.23.4"
         locfile="../verifythis_fm2012_treedel.mlw"
-        loclnum="88" loccnumb="6" loccnume="28"
+        loclnum="121" loccnumb="6" loccnume="28"
         expl="4."
         sum="3589cdddc12e68f4e0d2c6fb1f8921b3"
         proved="true"
