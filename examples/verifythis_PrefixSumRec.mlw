@@ -88,11 +88,12 @@ module PrefixSumRec
 *)
 
   let rec upsweep (left right: int) (a: array int)
-    requires { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
-      is_power_of_2 (right - left) }
+    requires { 0 <= left < right < a.length }
+    requires { -1 <= left - (right - left) }
+    requires { is_power_of_2 (right - left) }
+    ensures { phase1 left right (old a) a }
     ensures { let space = right - left in
-      phase1 left right (old a) a /\
-      a[right] = sum (old a) (left-(right-left)+1) (right+1) /\
+      a[right] = sum (old a) (left-space+1) (right+1) /\
       (forall i: int. i <= left-space -> a[i] = (old a)[i]) /\
       (forall i: int. i > right -> a[i] = (old a)[i]) }
   = 'Init:
@@ -120,13 +121,14 @@ module PrefixSumRec
   (** Second function: complete the partial using the remaining intial
       value and the partial sum already computed *)
   let rec downsweep (left right: int) (ghost a0 : array int) (a : array int)
-    requires { 0 <= left < right < a.length /\ -1 <= left - (right - left) /\
-      is_power_of_2 (right - left) /\
-      a[right] = sum a0 0 (left-(right-left) + 1) /\
-      phase1 left right a0 a }
-    ensures { partial_sum left right a0 a /\
-      (forall i: int. i <= left-(right-left) -> a[i] = (old a)[i]) /\
-      (forall i: int. i > right -> a[i] = (old a)[i]) }
+    requires { 0 <= left < right < a.length }
+    requires { -1 <= left - (right - left) }
+    requires { is_power_of_2 (right - left) }
+    requires { a[right] = sum a0 0 (left-(right-left) + 1) }
+    requires { phase1 left right a0 a }
+    ensures { partial_sum left right a0 a }
+    ensures { forall i: int. i <= left-(right-left) -> a[i] = (old a)[i] }
+    ensures { forall i: int. i > right -> a[i] = (old a)[i] }
   = 'Init:
     let tmp = a[right] in
     assert { a[right] = sum a0 0 (left-(right-left) + 1) };
@@ -147,7 +149,8 @@ module PrefixSumRec
 (** {2 The main procedure} *)
 
   let compute_sums a
-    requires { a.length >= 2 && is_power_of_2 a.length }
+    requires { a.length >= 2 }
+    requires { is_power_of_2 a.length }
     ensures { forall i : int. 0 <= i < a.length -> a[i] = sum (old a) 0 i }
   = let a0 = ghost (copy a) in
     let l = a.length in
