@@ -3,7 +3,6 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
-Require int.MinMax.
 Require map.Map.
 Require map.MapPermut.
 
@@ -100,25 +99,7 @@ Definition lt (a:(array Z)) (x:Z) (y:Z): Prop := let n := (length a) in
   (((x + l)%Z = n) \/ ((get a (x + l)%Z) < (get a (y + l)%Z))%Z)))).
 
 (* Why3 assumption *)
-Definition le (a:(array Z)) (x:Z) (y:Z): Prop := (x = y) \/ (lt a x y).
-
-Axiom lcp_same_index : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
-  (x <= (length a))%Z) -> (is_longest_common_prefix a x x
-  ((length a) - x)%Z).
-
-Axiom le_trans : forall (a:(array Z)) (x:Z) (y:Z) (z:Z), (((0%Z <= x)%Z /\
-  (x <= (length a))%Z) /\ (((0%Z <= y)%Z /\ (y <= (length a))%Z) /\
-  (((0%Z <= z)%Z /\ (z <= (length a))%Z) /\ ((le a x y) /\ (le a y z))))) ->
-  (le a x z).
-
-(* Why3 assumption *)
-Definition sorted_sub (a:(array Z)) (data:(map.Map.map Z Z)) (l:Z)
-  (u:Z): Prop := forall (i1:Z) (i2:Z), (((l <= i1)%Z /\ (i1 <= i2)%Z) /\
-  (i2 < u)%Z) -> (le a (map.Map.get data i1) (map.Map.get data i2)).
-
-(* Why3 assumption *)
-Definition sorted (a:(array Z)) (data:(array Z)): Prop := (sorted_sub a
-  (elts data) 0%Z (length data)).
+Definition range1 (a:(array Z)): Prop := (range (elts a) (length a)).
 
 (* Why3 assumption *)
 Definition exchange {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array a))
@@ -167,6 +148,25 @@ Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
   a)) (a2:(array a)), (array_eq a1 a2) -> (permut a1 a2).
 
 (* Why3 assumption *)
+Definition le (a:(array Z)) (x:Z) (y:Z): Prop := (x = y) \/ (lt a x y).
+
+Axiom lcp_same_index : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
+  (x <= (length a))%Z) -> (is_longest_common_prefix a x x
+  ((length a) - x)%Z).
+
+Axiom le_trans : forall (a:(array Z)) (x:Z) (y:Z) (z:Z), ((le a x y) /\ (le a
+  y z)) -> (le a x z).
+
+(* Why3 assumption *)
+Definition sorted_sub (a:(array Z)) (data:(map.Map.map Z Z)) (l:Z)
+  (u:Z): Prop := forall (i1:Z) (i2:Z), (((l <= i1)%Z /\ (i1 <= i2)%Z) /\
+  (i2 < u)%Z) -> (le a (map.Map.get data i1) (map.Map.get data i2)).
+
+(* Why3 assumption *)
+Definition sorted (a:(array Z)) (data:(array Z)): Prop := (sorted_sub a
+  (elts data) 0%Z (length data)).
+
+(* Why3 assumption *)
 Definition permutation (m:(map.Map.map Z Z)) (u:Z): Prop := (range m u) /\
   (injective m u).
 
@@ -188,9 +188,9 @@ Definition values (v:suffixArray): (array Z) :=
   | (mk_suffixArray x x1) => x
   end.
 
-Axiom permut_permutation : forall (a1:(array Z)) (a2:(array Z)), (permut a1
-  a2) -> ((permutation (elts a1) (length a1)) -> (permutation (elts a2)
-  (length a2))).
+Axiom permut_permutation : forall (a1:(array Z)) (a2:(array Z)), ((permut a1
+  a2) /\ (permutation (elts a1) (length a1))) -> (permutation (elts a2)
+  (length a2)).
 
 Axiom lcp_sym : forall (a:(array Z)) (x:Z) (y:Z) (l:Z), (((0%Z <= x)%Z /\
   (x <= (length a))%Z) /\ ((0%Z <= y)%Z /\ (y <= (length a))%Z)) ->
@@ -223,20 +223,26 @@ Theorem WP_parameter_lrs : forall (a:Z), forall (a1:(map.Map.map Z Z)),
   solStart21 solLength1)))) /\ forall (j:Z) (k:Z) (l:Z), ((((0%Z <= j)%Z /\
   (j < k)%Z) /\ (k < ((a - 1%Z)%Z + 1%Z)%Z)%Z) /\ (is_longest_common_prefix
   a2 (map.Map.get sa3 j) (map.Map.get sa3 k) l)) -> (l <= solLength1)%Z) ->
-  ((surjective sa3 sa2) -> ((forall (j:Z) (k:Z) (l:Z), (((0%Z <= j)%Z /\
-  (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
-  (is_longest_common_prefix a2 (map.Map.get sa3 j) (map.Map.get sa3 k)
-  l)))) -> (l <= solLength1)%Z) -> ((forall (x:Z) (y:Z), (((0%Z <= x)%Z /\
-  (x < y)%Z) /\ (y < a)%Z) -> exists j:Z, exists k:Z, ((0%Z <= j)%Z /\
-  (j < a)%Z) /\ (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\
-  ((x = (map.Map.get sa3 j)) /\ (y = (map.Map.get sa3 k)))))) -> forall (x:Z)
-  (y:Z) (l:Z), ((((0%Z <= x)%Z /\ (x < y)%Z) /\ (y < a)%Z) /\
-  (is_longest_common_prefix a2 x y l)) -> (l <= solLength1)%Z))))).
+  ((forall (j:Z) (k:Z) (l:Z), (((0%Z <= j)%Z /\ (j < a)%Z) /\
+  (((0%Z <= k)%Z /\ (k < a)%Z) /\ ((~ (j = k)) /\ (is_longest_common_prefix
+  a2 (map.Map.get sa3 j) (map.Map.get sa3 k) l)))) -> (l <= solLength1)%Z) ->
+  ((forall (x:Z) (y:Z), (((0%Z <= x)%Z /\ (x < y)%Z) /\ (y < a)%Z) ->
+  exists j:Z, exists k:Z, ((0%Z <= j)%Z /\ (j < a)%Z) /\ (((0%Z <= k)%Z /\
+  (k < a)%Z) /\ ((~ (j = k)) /\ ((x = (map.Map.get sa3 j)) /\
+  (y = (map.Map.get sa3 k)))))) -> forall (x:Z) (y:Z) (l:Z),
+  ((((0%Z <= x)%Z /\ (x < y)%Z) /\ (y < a)%Z) /\ (is_longest_common_prefix a2
+  x y l)) -> (l <= solLength1)%Z)))).
+intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 (((h3,(h4,h5)),(h6,h7)),(h8,h9))
+   solStart h10 solLength h11 solStart2 h12 h13 solStart21 solLength1
+   solStart1 ((((h14,h15),(h16,h17)),((h18,h19),(h20,h21))),h22) h23 h24 x y
+   l (h25,h28).
+(*
 intros a a1 a2 (h1,h2) sa sa1 sa2 sa3 (((h3,(h4,h5)),(h6,h7)),(h8,h9))
    solStart h10 solLength h11 solStart2 h12 h13 solStart21 solLength1
    solStart1 ((((h14,h15),(h16,h17)),((h18,h19),(h20,h21))),h22) h23 h24 h25
    x y l (h26,h29).
-elim (h25 _ _ h26).
+*)
+elim (h24 _ _ h25).
 ae.
 Qed.
 

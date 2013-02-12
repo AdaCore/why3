@@ -453,15 +453,13 @@ lemma le_le_common_prefix:
          solLength := l
       end
     done;
-    (* we state explicitly that sa.suffixes is surjective *)
-    assert { let s = sa.SuffixArray.suffixes in
-             MapInjection.surjective s.elts s.length };
     (** the following assert needs [lcp_sym] lemma *)
     assert { forall j k l:int.
                 0 <= j < a.length /\ 0 <= k < a.length /\ j <> k /\
                  LCP.is_longest_common_prefix a
                  sa.SuffixArray.suffixes[j] sa.SuffixArray.suffixes[k] l ->
               !solLength >= l};
+    (* we state explicitly that sa.suffixes is surjective *)
     assert { forall x y:int.
                 0 <= x < y < a.length ->
                 exists j k : int.
