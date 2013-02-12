@@ -53,15 +53,15 @@ module Memory
   val mem: ref memory
 
   (* accessor functions to ensure safety i.e. no null pointer dereference *)
-  let get_left (p: pointer) =
+  let get_left (p: pointer) : pointer =
     requires { p <> null }
     ensures  { result = !mem[p].left }
     !mem[p].left
-  let get_right (p: pointer) =
+  let get_right (p: pointer) : pointer =
     requires { p <> null }
     ensures  { result = !mem[p].right }
     !mem[p].right
-  let get_data (p: pointer) =
+  let get_data (p: pointer) : int =
     requires { p <> null }
     ensures  { result = !mem[p].data }
     !mem[p].data
@@ -119,7 +119,8 @@ module Treedel
   (* specification is as follows: if t is a tree and its list of pointers
      is x::l then, at the end of execution, its list is l and m = x.data *)
   let search_tree_delete_min
-    (t: pointer) (ghost it: tree pointer) (ghost ot: ref (tree pointer)) =
+    (t: pointer) (ghost it: tree pointer) (ghost ot: ref (tree pointer))
+    : (pointer, int)
     requires { t <> null }
     requires { tree !mem t it }
     requires { distinct (inorder it) }
@@ -127,6 +128,7 @@ module Treedel
                match inorder it with
                | Nil -> false
                | Cons p l -> m = !mem[p].data /\ inorder !ot = l end }
+    =
     let p = ref (get_left t) in
     if !p = null then begin
       let m = get_data t in
