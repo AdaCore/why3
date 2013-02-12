@@ -6,7 +6,7 @@
    Author: Jean-Christophe Filliâtre *)
 
 (*
-Iterative deletion in a binary search tree - 90 minutest
+Iterative deletion in a binary search tree - 90 minutes
 
 
 VERIFICATION TASK
@@ -141,9 +141,9 @@ module Treedel
       let ghost ppr = ref (right it) in
       let ghost subtree = ref (left it) in
       while !tt <> null do
-        invariant { !pp <> null /\ !mem[!pp].left = !p /\
-                    !p <> null /\ !mem[!p].left = !tt /\
-                    let pt = Node !subtree !pp !ppr in
+        invariant { !pp <> null /\ !mem[!pp].left = !p }
+        invariant { !p <> null /\ !mem[!p].left = !tt }
+        invariant { let pt = Node !subtree !pp !ppr in
                     tree !mem !pp pt /\ zip pt !zipper = it }
         assert { tree !mem !p !subtree };
         ghost zipper := Left !zipper !pp !ppr;
