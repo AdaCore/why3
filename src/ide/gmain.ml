@@ -757,8 +757,7 @@ let project_dir, file_to_read =
           in
           Debug.dprintf debug
             "[Info] using '%s' as directory for the project@." d;
-          d, Some (Filename.concat Filename.parent_dir_name
-                     (Filename.basename fname))
+          d, Some fname
         end
     end
   else
@@ -866,20 +865,25 @@ let sched =
 (* add new file from command line *)
 (**********************************)
 
+let open_file f =
+  let f = Sysutil.relativize_filename project_dir f in
+  Debug.dprintf debug "Adding file '%s'@." f;
+  if S.PHstr.mem (env_session()).S.session.S.session_files f then
+    Debug.dprintf debug "[Info] file %s already in database@." f
+  else
+    try
+      Debug.dprintf debug "[Info] adding file %s in database@." f;
+      ignore (M.add_file (env_session()) ?format:!opt_parser f);
+    with e ->
+      let msg =
+        Pp.sprintf_wnl "@[Error while reading file@ '%s':@ %a@]" f
+          Exn_printer.exn_printer e in
+      info_window `ERROR msg
+
 let () =
   match file_to_read with
     | None -> ()
-    | Some fn ->
-        if S.PHstr.mem (env_session()).S.session.S.session_files fn then
-          Debug.dprintf debug "[Info] file %s already in database@." fn
-        else
-          try
-            Debug.dprintf debug "[Info] adding file %s in database@." fn;
-            ignore (M.add_file (env_session()) ?format:!opt_parser fn);
-          with e ->
-            eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
-              Exn_printer.exn_printer e;
-            exit 1
+    | Some fn -> open_file fn
 
 
 (*****************************************************)
@@ -1126,17 +1130,7 @@ let select_file () =
       begin
         match d#filename with
           | None -> ()
-          | Some f ->
-              let f = Sysutil.relativize_filename project_dir f in
-              Debug.dprintf debug "Adding file '%s'@." f;
-              try
-                ignore (M.add_file (env_session()) f)
-              with e ->
-                fprintf str_formatter
-                  "@[Error while reading file@ '%s':@ %a@]" f
-                  Exn_printer.exn_printer e;
-                let msg = flush_str_formatter () in
-                info_window `ERROR msg
+          | Some f -> open_file f
       end
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
