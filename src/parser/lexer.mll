@@ -12,8 +12,7 @@
 {
   open Format
   open Lexing
-  open Term
-   open Parser
+  open Parser
 
   (* lexical errors *)
 

@@ -34,7 +34,9 @@ exception ClashTheory of string
 exception UnboundTheory of qualid
 *)
 exception UnboundTypeVar of string
+(* dead code
 exception UnboundType of string list
+*)
 exception UnboundSymbol of string list
 
 let error = Loc.error
@@ -66,8 +68,10 @@ let () = Exn_printer.register (fun fmt e -> match e with
 *)
   | UnboundTypeVar s ->
       fprintf fmt "unbound type variable '%s" s
+(* dead code
   | UnboundType sl ->
        fprintf fmt "Unbound type '%a'" (print_list dot pp_print_string) sl
+*)
   | UnboundSymbol sl ->
        fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
   | _ -> raise e)
@@ -121,12 +125,16 @@ type denv = {
 let denv_empty = { dvars = Mstr.empty; gvars = Util.const None }
 let denv_empty_with_globals gv = { dvars = Mstr.empty; gvars = gv }
 
+(* dead code
 let mem_var x denv = Mstr.mem x denv.dvars
 let find_var x denv = Mstr.find x denv.dvars
+*)
 let add_var x ty denv = { denv with dvars = Mstr.add x ty denv.dvars }
 
+(* dead code
 let print_denv fmt denv =
   Mstr.iter (fun x ty -> fprintf fmt "%s:%a,@ " x print_dty ty) denv.dvars
+*)
 
 (* parsed types -> intermediate types *)
 
