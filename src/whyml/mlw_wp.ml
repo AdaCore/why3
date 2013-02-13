@@ -123,6 +123,7 @@ let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let expl_assume    = Ident.create_label "expl:assumption"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
+let expl_absurd    = Ident.create_label "expl:unreachable point"
 let expl_type_inv  = Ident.create_label "expl:type invariant"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
@@ -693,7 +694,7 @@ and wp_desc env e q xq = match e.e_node with
       let f = wp_expl expl_assume f in
       wp_implies (wp_label e f) q
   | Eabsurd ->
-      wp_label e t_absurd
+      wp_label e (t_label_add expl_absurd t_absurd)
   | Eany spec ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
@@ -891,7 +892,7 @@ let bool_to_prop env f =
 (* replace t_absurd with t_false *)
 let rec unabsurd f = match f.t_node with
   | Tapp (ls, []) when ls_equal ls ls_absurd ->
-      t_label_copy f t_false
+      t_label_copy f (t_label_add keep_on_simp_label t_false)
   | _ ->
       t_map unabsurd f
 
