@@ -229,7 +229,7 @@ install_no_local::
 	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
-	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
+	cp -f share/emacs/why-mode.el $(DATADIR)/why3/emacs/why-mode.el
 	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
 #	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
 
@@ -1452,7 +1452,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       share/javascript/themes/default/*.gif \
       share/javascript/themes/default/*.png \
       share/javascript/themes/default/*.css \
-      share/emacs/why.el share/lang/*.lang \
+      share/emacs/why-mode.el share/lang/*.lang \
       share/images/icons.rc share/images/*.png share/images/*/*.png \
       share/bash/why3 share/zsh/_why3 share/vim/why3.vim
 
