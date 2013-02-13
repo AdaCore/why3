@@ -26,7 +26,7 @@ let debug = Debug.lookup_flag "ide_info"
 (************************)
 
 let includes = ref []
-let file = ref None
+let files = Queue.create ()
 let opt_parser = ref None
 let opt_version = ref false
 let opt_config = ref None
@@ -72,16 +72,10 @@ let version_msg = sprintf "Why3 IDE, version %s (build date: %s)"
   Config.version Config.builddate
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]"
+  "Usage: %s [options] [<file.why>|<project directory> [<file.why> ...]]"
   (Filename.basename Sys.argv.(0))
 
-let set_file f = match !file with
-  | Some _ ->
-      raise (Arg.Bad "only one parameter")
-  | None ->
-      file := Some f
-
-let () = Arg.parse spec set_file usage_str
+let () = Arg.parse spec (fun f -> Queue.add f files) usage_str
 
 let () =
   if !opt_version then begin
@@ -110,12 +104,7 @@ let () =
       (List.sort Pervasives.compare (Env.list_formats ()))
   end
 
-let fname = match !file with
-  | None ->
-      Arg.usage spec usage_str;
-      exit 1
-  | Some f ->
-      f
+let () = if Queue.is_empty files then begin Arg.usage spec usage_str; exit 1 end
 
 let () =
   Debug.dprintf debug "[Info] Init the GTK interface...@?";
@@ -739,17 +728,19 @@ let () = w#show ()
 (********************)
 
 (** TODO remove that should done only in session *)
-let project_dir, file_to_read =
+let project_dir =
+  let fname = Queue.pop files in
+  (** The remaining files in [files] are going to be open *)
   if Sys.file_exists fname then
     begin
       if Sys.is_directory fname then
         begin
           Debug.dprintf debug
             "[Info] found directory '%s' for the project@." fname;
-          fname, None
+          fname
         end
       else
-        begin
+        if Queue.is_empty files then (* that was the only file *) begin
           Debug.dprintf debug "[Info] found regular file '%s'@." fname;
           let d =
             try Filename.chop_extension fname
@@ -757,11 +748,21 @@ let project_dir, file_to_read =
           in
           Debug.dprintf debug
             "[Info] using '%s' as directory for the project@." d;
-          d, Some fname
+          Queue.push fname files; (** we need to open [fname] *)
+          d
+        end
+        else begin
+          (** The first argument is not a directory and it's not the
+              only file *)
+          Format.eprintf
+            "[Error] @[When@ more@ than@ one@ file@ is@ given@ on@ the@ \
+             command@ line@ the@ first@ one@ must@ be@ the@ directory@ \
+             of@ the@ session.@]@.";
+          Arg.usage spec usage_str; exit 1
         end
     end
   else
-    fname, None
+    fname
 
 let () =
   if not (Sys.file_exists project_dir) then
@@ -880,11 +881,7 @@ let open_file f =
           Exn_printer.exn_printer e in
       info_window `ERROR msg
 
-let () =
-  match file_to_read with
-    | None -> ()
-    | Some fn -> open_file fn
-
+let () = Queue.iter open_file files
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
