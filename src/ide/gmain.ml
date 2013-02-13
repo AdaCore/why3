@@ -564,9 +564,12 @@ let update_task_view a =
         begin
           match a.S.proof_state with
             | S.Interrupted -> "proof not yet scheduled for running"
-            | S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
-            | S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
-            | S.Done ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
+            | S.Unedited ->
+              "Interactive proof, not yet edited. Edit with \"Edit\" button"
+            | S.JustEdited ->
+              "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Done
+                ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
@@ -1263,7 +1266,8 @@ let view_factory = new GMenu.factory view_menu ~accel_group
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._A
-    ~label:"Select all" ~callback:(fun () -> goals_view#selection#select_all ()) ()
+    ~label:"Select all"
+    ~callback:(fun () -> goals_view#selection#select_all ()) ()
 
 let (_ : GMenu.menu_item) =
   view_factory#add_item ~key:GdkKeysyms._plus
