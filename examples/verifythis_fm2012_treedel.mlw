@@ -12,7 +12,7 @@ Iterative deletion in a binary search tree - 90 minutes
 VERIFICATION TASK
 -----------------
 
-Given: a loc t to the root of a non-empty binary search tree (not
+Given: a pointer t to the root of a non-empty binary search tree (not
 necessarily balanced). Verify that the following procedure removes the
 node with the minimal key from the tree. After removal, the data
 structure should again be a binary search tree.
@@ -38,7 +38,7 @@ Note: When implementing in a garbage-collected language, the call to
 dispose() is superfluous.
 *)
 
-(* Why3 has no loc data structures, so we model the heap *)
+(* Why3 has no pointer data structures, so we model the heap *)
 module Memory
 
   use export map.Map
