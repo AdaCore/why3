@@ -21,15 +21,15 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-Axiom pointer : Type.
-Parameter pointer_WhyType : WhyType pointer.
-Existing Instance pointer_WhyType.
+Axiom loc : Type.
+Parameter loc_WhyType : WhyType loc.
+Existing Instance loc_WhyType.
 
-Parameter null: pointer.
+Parameter null: loc.
 
 (* Why3 assumption *)
 Inductive node :=
-  | mk_node : pointer -> pointer -> Z -> node.
+  | mk_node : loc -> loc -> Z -> node.
 Axiom node_WhyType : WhyType node.
 Existing Instance node_WhyType.
 
@@ -39,19 +39,19 @@ Definition data (v:node): Z := match v with
   end.
 
 (* Why3 assumption *)
-Definition right1 (v:node): pointer :=
+Definition right1 (v:node): loc :=
   match v with
   | (mk_node x x1 x2) => x1
   end.
 
 (* Why3 assumption *)
-Definition left1 (v:node): pointer :=
+Definition left1 (v:node): loc :=
   match v with
   | (mk_node x x1 x2) => x
   end.
 
 (* Why3 assumption *)
-Definition memory := (map.Map.map pointer node).
+Definition memory := (map.Map.map loc node).
 
 (* Why3 assumption *)
 Inductive tree
@@ -140,12 +140,12 @@ Axiom distinct_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
   x l1) -> ~ (mem x l2)) -> (distinct (infix_plpl l1 l2)))).
 
 (* Why3 assumption *)
-Inductive tree1 : (map.Map.map pointer node) -> pointer -> (tree
-  pointer) -> Prop :=
-  | leaf : forall (m:(map.Map.map pointer node)), (tree1 m null (Empty :(tree
-      pointer)))
-  | node1 : forall (m:(map.Map.map pointer node)) (p:pointer) (l:(tree
-      pointer)) (r:(tree pointer)), (~ (p = null)) -> ((tree1 m
+Inductive tree1 : (map.Map.map loc node) -> loc -> (tree
+  loc) -> Prop :=
+  | leaf : forall (m:(map.Map.map loc node)), (tree1 m null (Empty :(tree
+      loc)))
+  | node1 : forall (m:(map.Map.map loc node)) (p:loc) (l:(tree
+      loc)) (r:(tree loc)), (~ (p = null)) -> ((tree1 m
       (left1 (map.Map.get m p)) l) -> ((tree1 m (right1 (map.Map.get m p))
       r) -> (tree1 m p (Node l p r)))).
 
@@ -171,9 +171,9 @@ Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(zipper a))
   (x:a) (l:(tree a)) (r:(tree a)), ((inorder (zip (Node l x r)
   z)) = (infix_plpl (inorder l) (Cons x (inorder (zip r z))))).
 
-Axiom main_lemma : forall (m:(map.Map.map pointer node)) (t:pointer)
-  (pp:pointer) (p:pointer) (ppr:(tree pointer)) (pr:(tree pointer))
-  (z:(zipper pointer)), let it := (zip (Node (Node (Empty :(tree pointer)) p
+Axiom main_lemma : forall (m:(map.Map.map loc node)) (t:loc)
+  (pp:loc) (p:loc) (ppr:(tree loc)) (pr:(tree loc))
+  (z:(zipper loc)), let it := (zip (Node (Node (Empty :(tree loc)) p
   pr) pp ppr) z) in ((tree1 m t it) -> ((distinct (inorder it)) -> (tree1
   (map.Map.set m pp (mk_node (right1 (map.Map.get m p))
   (right1 (map.Map.get m pp)) (data (map.Map.get m pp)))) t (zip (Node pr pp
@@ -182,39 +182,39 @@ Axiom main_lemma : forall (m:(map.Map.map pointer node)) (t:pointer)
 Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem WP_parameter_search_tree_delete_min : forall (t:pointer) (it:(tree
-  pointer)), forall (mem1:(map.Map.map pointer node)), (((~ (t = null)) /\
+Theorem WP_parameter_search_tree_delete_min : forall (t:loc) (it:(tree
+  loc)), forall (mem1:(map.Map.map loc node)), (((~ (t = null)) /\
   (tree1 mem1 t it)) /\ (distinct (inorder it))) -> ((~ (t = null)) ->
   ((~ ((left1 (map.Map.get mem1 t)) = null)) -> ((~ ((left1 (map.Map.get mem1
-  t)) = null)) -> ((~ (it = (Empty :(tree pointer)))) -> forall (o:(tree
-  pointer)), match it with
+  t)) = null)) -> ((~ (it = (Empty :(tree loc)))) -> forall (o:(tree
+  loc)), match it with
   | Empty => False
   | (Node _ _ r) => (o = r)
-  end -> ((~ (it = (Empty :(tree pointer)))) -> forall (o1:(tree pointer)),
+  end -> ((~ (it = (Empty :(tree loc)))) -> forall (o1:(tree loc)),
   match it with
   | Empty => False
   | (Node l _ _) => (o1 = l)
-  end -> forall (subtree:(tree pointer)) (ppr:(tree pointer))
-  (zipper1:(zipper pointer)) (tt:pointer) (pp:pointer) (p:pointer),
+  end -> forall (subtree:(tree loc)) (ppr:(tree loc))
+  (zipper1:(zipper loc)) (tt:loc) (pp:loc) (p:loc),
   ((((~ (pp = null)) /\ ((left1 (map.Map.get mem1 pp)) = p)) /\
   ((~ (p = null)) /\ ((left1 (map.Map.get mem1 p)) = tt))) /\ let pt :=
   (Node subtree pp ppr) in ((tree1 mem1 pp pt) /\ ((zip pt
   zipper1) = it))) -> ((tt = null) -> ((tree1 mem1 p subtree) ->
   ((~ (pp = p)) -> ((~ (p = null)) -> ((~ (p = null)) ->
-  forall (tt1:pointer), (tt1 = (right1 (map.Map.get mem1 p))) ->
-  forall (mem2:(map.Map.map pointer node)), (mem2 = (map.Map.set mem1 pp
+  forall (tt1:loc), (tt1 = (right1 (map.Map.get mem1 p))) ->
+  forall (mem2:(map.Map.map loc node)), (mem2 = (map.Map.set mem1 pp
   (mk_node tt1 (right1 (map.Map.get mem1 pp)) (data (map.Map.get mem1
-  pp))))) -> ((~ (subtree = (Empty :(tree pointer)))) -> forall (pl:(tree
-  pointer)),
+  pp))))) -> ((~ (subtree = (Empty :(tree loc)))) -> forall (pl:(tree
+  loc)),
   match subtree with
   | Empty => False
   | (Node l _ _) => (pl = l)
-  end -> ((pl = (Empty :(tree pointer))) -> ((~ (subtree = (Empty :(tree
-  pointer)))) -> forall (o2:(tree pointer)),
+  end -> ((pl = (Empty :(tree loc))) -> ((~ (subtree = (Empty :(tree
+  loc)))) -> forall (o2:(tree loc)),
   match subtree with
   | Empty => False
   | (Node _ _ r) => (o2 = r)
-  end -> forall (ot:(tree pointer)), (ot = (zip o2 (Left zipper1 pp ppr))) ->
+  end -> forall (ot:(tree loc)), (ot = (zip o2 (Left zipper1 pp ppr))) ->
   match (inorder it) with
   | Nil => True
   | (Cons p1 l) => ((inorder ot) = l)
