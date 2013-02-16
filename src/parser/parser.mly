@@ -890,7 +890,11 @@ ident_rich:
 ;
 
 lident_rich:
-| lident                      { $1 }
+| lident        { $1 }
+| lident_op_id  { $1 }
+;
+
+lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 (floc_i 2) }
 | LEFTPAR_STAR_RIGHTPAR       { mk_id (infix "*") (floc ()) }
   /* FIXME: use location of operator star rather than left parenthesis */
@@ -1133,9 +1137,13 @@ expr:
      | PPptuple [] -> mk_expr (Elet (id_anonymous (), true,
           { $5 with expr_desc = Ecast ($5, PPTtuple []) }, $7))
      | _ -> Loc.errorm ~loc:(floc_i 3) "`ghost' cannot come before a pattern" }
-| LET lident_rich labels fun_defn IN expr
+| LET lident labels fun_defn IN expr
    { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
-| LET GHOST lident_rich labels fun_defn IN expr
+| LET lident_op_id labels fun_defn IN expr
+   { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
+| LET GHOST lident labels fun_defn IN expr
+   { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
+| LET GHOST lident_op_id labels fun_defn IN expr
    { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
 | LET REC list1_rec_defn IN expr
    { mk_expr (Eletrec ($3, $5)) }
