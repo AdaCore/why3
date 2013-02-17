@@ -64,8 +64,11 @@ end
 
 (** {2 Euclidean Division}
 
-Division and modulo operators with the convention that division
-     rounds down, and thus modulo is always non-negative
+Division and modulo operators with the convention 
+that modulo is always non-negative.
+
+It implies that division rounds down when divisor is positive, and
+rounds up when divisor is negative.
 
 *)
 
@@ -105,6 +108,13 @@ theory EuclideanDivision
 
   lemma Mod_minus1_left: forall y:int. y > 1 -> mod (-1) y = y - 1
 
+  lemma Div_mult: forall x y z:int [div (x * y + z) x].
+          x > 0 ->
+          div (x * y + z) x = y + div z x
+
+  lemma Mod_mult: forall x y z:int [mod (x * y + z) x].
+          x > 0 ->
+          mod (x * y + z) x = mod z x
 
 end
 

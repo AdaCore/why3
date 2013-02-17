@@ -166,4 +166,30 @@ unfold mod1.
 rewrite Div_minus1_left; auto with zarith.
 Qed.
 
+Require ZArith.Zquot.
+Open Scope Z_scope.
+
+(* Why3 goal *)
+Lemma Div_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
+  ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
+intros x y z h.
+unfold div.
+destruct (Z_le_dec 0 (z mod x)).
+destruct (Z_le_dec 0 ((x*y+z) mod x)).
+rewrite Zmult_comm.
+rewrite Z_div_plus_full_l; auto with zarith.
+generalize (Z_mod_lt (x * y + z) x); auto with zarith.
+generalize (Z_mod_lt z x); auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma Mod_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
+  ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
+intros x y z h.
+unfold mod1.
+rewrite Div_mult.
+ring.
+auto with zarith.
+Qed.
+
 
