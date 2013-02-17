@@ -7,33 +7,37 @@
   version="0.94"/>
  <prover
   id="1"
+  name="Alt-Ergo"
+  version="0.95"/>
+ <prover
+  id="2"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="2"
+  id="3"
   name="Z3"
   version="2.19"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="3.2"/>
  <file
   name="../neg_as_xor.why"
-  verified="false"
-  expanded="false">
+  verified="true"
+  expanded="true">
   <theory
    name="TestNegAsXOR"
    locfile="../neg_as_xor.why"
    loclnum="2" loccnumb="7" loccnume="19"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="Nth_j"
     locfile="../neg_as_xor.why"
     loclnum="13" loccnumb="8" loccnume="13"
     sum="ffa7aadc98c7c81aa8afa142b455755d"
-    proved="false"
-    expanded="false"
+    proved="true"
+    expanded="true"
     shape="ainfix =anthajV0aFalseIainfix &lt;=V0c62Aainfix &lt;=c0V0F">
     <proof
      prover="0"
@@ -42,6 +46,14 @@
      obsolete="false"
      archived="false">
      <result status="timeout" time="5.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.83"/>
     </proof>
    </goal>
    <goal
@@ -78,7 +90,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -86,7 +98,7 @@
      <result status="valid" time="0.69"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
@@ -111,7 +123,7 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -119,7 +131,7 @@
      <result status="valid" time="0.71"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="11"
      memlimit="1000"
      obsolete="false"
@@ -144,7 +156,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -152,7 +164,7 @@
      <result status="valid" time="0.11"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -211,7 +223,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -219,7 +231,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -244,7 +256,7 @@
      <result status="valid" time="0.92"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -252,7 +264,7 @@
      <result status="valid" time="0.71"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
@@ -277,7 +289,7 @@
      <result status="valid" time="0.58"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -285,7 +297,7 @@
      <result status="valid" time="0.72"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
@@ -310,7 +322,7 @@
      <result status="valid" time="1.77"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -318,7 +330,7 @@
      <result status="valid" time="0.97"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
@@ -352,7 +364,7 @@
     expanded="true"
     shape="ainfix =adouble_of_bv64abw_xorV0ajaprefix -.adouble_of_bv64V0Iainfix &lt;aexpV0c2047Aainfix &lt;c0aexpV0F">
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      edited="neg_as_xor_TestNegAsXOR_MainResult_1.v"
