@@ -166,7 +166,6 @@ unfold mod1.
 rewrite Div_minus1_left; auto with zarith.
 Qed.
 
-Require ZArith.Zquot.
 Open Scope Z_scope.
 
 (* Why3 goal *)
