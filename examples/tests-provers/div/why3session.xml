@@ -27,16 +27,52 @@
   version="1.0"/>
  <prover
   id="6"
+  name="Coq"
+  version="8.4"/>
+ <prover
+  id="7"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="8"
+  name="Gappa"
+  version="0.16.0"/>
+ <prover
+  id="9"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="10"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="11"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="12"
   name="Z3"
   version="2.19"/>
  <prover
-  id="7"
+  id="13"
   name="Z3"
   version="3.2"/>
  <prover
-  id="8"
+  id="14"
   name="Z3"
   version="4.2"/>
+ <prover
+  id="15"
+  name="Z3"
+  version="4.3.1"/>
+ <prover
+  id="16"
+  name="Zenon"
+  version="0.7.1"/>
+ <prover
+  id="17"
+  name="iProver"
+  version="0.8.1"/>
  <file
   name="../div.why"
   verified="false"
@@ -45,35 +81,35 @@
    name="EuclideanDivTest"
    locfile="../div.why"
    loclnum="2" loccnumb="7" loccnume="23"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="ok1"
     locfile="../div.why"
     loclnum="7" loccnumb="7" loccnume="10"
-    sum="bd1d5464857216da4e12f229f8c16af3"
+    sum="eda768039e7d01cab7cc352411a0b275"
     proved="true"
-    expanded="true"
-    shape="ainfix =adivaprefix -c1aprefix -c2aprefix -c1">
+    expanded="false"
+    shape="ainfix =adivaprefix -c1c2aprefix -c1">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.11"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="1"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="2"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -81,64 +117,128 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.05"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="4"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.06"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="5"
-     timelimit="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="6"
-     timelimit="5"
+     prover="9"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.09"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="5"
+     prover="10"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.08"/>
+     <result status="unknown" time="3.01"/>
     </proof>
     <proof
-     prover="8"
-     timelimit="5"
+     prover="11"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.14"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.02"/>
     </proof>
    </goal>
    <goal
     name="ok2"
     locfile="../div.why"
     loclnum="8" loccnumb="7" loccnume="10"
-    sum="9e8488ed0545855ca9592335972be12a"
+    sum="b4d2e1617531911467f1b60798813040"
     proved="true"
-    expanded="true"
-    shape="ainfix =amodaprefix -c1aprefix -c2c1">
+    expanded="false"
+    shape="ainfix =amodaprefix -c1c2c1">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -146,7 +246,7 @@
     </proof>
     <proof
      prover="1"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -154,88 +254,7 @@
     </proof>
     <proof
      prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="smoke1"
-    locfile="../div.why"
-    loclnum="9" loccnumb="7" loccnume="13"
-    sum="221247d874c6afe4157d51833127b93a"
-    proved="true"
-    expanded="true"
-    shape="ainfix =adivaprefix -c1aprefix -c2c0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.06"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -243,233 +262,129 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.07"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.06"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.08"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-   </goal>
-   <goal
-    name="smoke2"
-    locfile="../div.why"
-    loclnum="10" loccnumb="7" loccnume="13"
-    sum="b1ddfe4fa8fb15054feea09334b93e53"
-    proved="true"
-    expanded="true"
-    shape="ainfix =amodaprefix -c1aprefix -c2aprefix -c1">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.14"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.08"/>
-    </proof>
-    <proof
      prover="4"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.07"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="5"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.09"/>
-    </proof>
-    <proof
      prover="7"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.18"/>
+     <result status="timeout" time="2.99"/>
     </proof>
     <proof
      prover="8"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
+     edited="div-EuclideanDivTest-ok2_1.gappa"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="ComputerDivTest"
-   locfile="../div.why"
-   loclnum="14" loccnumb="7" loccnume="22"
-   verified="false"
-   expanded="true">
-   <goal
-    name="ok1"
-    locfile="../div.why"
-    loclnum="19" loccnumb="7" loccnume="10"
-    sum="a049c67265c44edafdd75a0224f9a5af"
-    proved="true"
-    expanded="true"
-    shape="ainfix =adivaprefix -c1aprefix -c2c0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="unknown" time="0.00"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
+     prover="9"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="8"
-     timelimit="5"
+     prover="10"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.03"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.03"/>
     </proof>
    </goal>
    <goal
-    name="ok2"
+    name="ok3"
     locfile="../div.why"
-    loclnum="20" loccnumb="7" loccnume="10"
-    sum="1d9061981705a2ad6ecfb97316a16e07"
+    loclnum="9" loccnumb="7" loccnume="10"
+    sum="059232a74443bb19214b21be9c8da104"
     proved="true"
-    expanded="true"
-    shape="ainfix =amodaprefix -c1aprefix -c2aprefix -c1">
+    expanded="false"
+    shape="ainfix =adivaprefix -c1aprefix -c2c1">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -477,7 +392,7 @@
     </proof>
     <proof
      prover="1"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -485,7 +400,1330 @@
     </proof>
     <proof
      prover="2"
-     timelimit="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="5.98"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.81"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="ok4"
+    locfile="../div.why"
+    loclnum="10" loccnumb="7" loccnume="10"
+    sum="88df0cd2db3816d5b578860b5c99c22e"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amodaprefix -c1aprefix -c2c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.03"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="smoke1"
+    locfile="../div.why"
+    loclnum="11" loccnumb="7" loccnume="13"
+    sum="193a748bf5fbe6e02902fc1a40fd9f9c"
+    proved="false"
+    expanded="false"
+    shape="ainfix =adivaprefix -c1c2c0">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.18"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.13"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.04"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.07"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.13"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.13"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.04"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="smoke2"
+    locfile="../div.why"
+    loclnum="12" loccnumb="7" loccnume="13"
+    sum="0ed544c77c77c905e1a3df3f81340665"
+    proved="false"
+    expanded="false"
+    shape="ainfix =amodaprefix -c1c2aprefix -c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.38"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.25"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.10"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.07"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.14"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.14"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="smoke3"
+    locfile="../div.why"
+    loclnum="13" loccnumb="7" loccnume="13"
+    sum="6a4df0cfd27e234f85fdef6b2f35a3a9"
+    proved="false"
+    expanded="false"
+    shape="ainfix =adivaprefix -c1aprefix -c2c0">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     edited="div-EuclideanDivTest-smoke3_2.why"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="3"
+     memlimit="1000"
+     edited="div_EuclideanDivTest_smoke3_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.94"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     edited="div-EuclideanDivTest-smoke3_1.gappa"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="5.98"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.13"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.13"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.11"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.86"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="smoke4"
+    locfile="../div.why"
+    loclnum="14" loccnumb="7" loccnume="13"
+    sum="f7cef8e1ec4ad2c7f55379a201bc33fc"
+    proved="false"
+    expanded="false"
+    shape="ainfix =amodaprefix -c1aprefix -c2aprefix -c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.09"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.04"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.05"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.99"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.07"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.13"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.13"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.08"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ComputerDivTest"
+   locfile="../div.why"
+   loclnum="18" loccnumb="7" loccnume="22"
+   verified="false"
+   expanded="true">
+   <goal
+    name="ok1"
+    locfile="../div.why"
+    loclnum="23" loccnumb="7" loccnume="10"
+    sum="2529a77b6162ca3e4a5299519b11eef7"
+    proved="true"
+    expanded="false"
+    shape="ainfix =adivaprefix -c1c2c0">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.99"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.55"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="ok2"
+    locfile="../div.why"
+    loclnum="24" loccnumb="7" loccnume="10"
+    sum="107a4df841b17b0ab303be4a08c49137"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amodaprefix -c1c2aprefix -c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.01"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.69"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="ok3"
+    locfile="../div.why"
+    loclnum="25" loccnumb="7" loccnume="10"
+    sum="0c11af1682b07e0a35cd3a826f2fe217"
+    proved="true"
+    expanded="false"
+    shape="ainfix =adivaprefix -c1aprefix -c2c0">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.61"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="ok4"
+    locfile="../div.why"
+    loclnum="26" loccnumb="7" loccnume="10"
+    sum="288b2e598e9784af215d522210702360"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amodaprefix -c1aprefix -c2aprefix -c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -493,15 +1731,15 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="4"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -509,15 +1747,7 @@
     </proof>
     <proof
      prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -525,40 +1755,112 @@
     </proof>
     <proof
      prover="7"
-     timelimit="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.99"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="8"
-     timelimit="5"
+     prover="14"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.50"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.05"/>
+    </proof>
    </goal>
    <goal
     name="smoke1"
     locfile="../div.why"
-    loclnum="21" loccnumb="7" loccnume="13"
-    sum="2eff424bf53bf22ef609bdbba225c8a6"
+    loclnum="27" loccnumb="7" loccnume="13"
+    sum="8dab2678fb6b17b04f120cf2a800b225"
     proved="false"
-    expanded="true"
-    shape="ainfix =adivaprefix -c1aprefix -c2aprefix -c1">
+    expanded="false"
+    shape="ainfix =adivaprefix -c1c2aprefix -c1">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.03"/>
+     <result status="unknown" time="0.04"/>
     </proof>
     <proof
      prover="1"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -566,7 +1868,7 @@
     </proof>
     <proof
      prover="2"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -574,15 +1876,306 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.21"/>
+     <result status="unknown" time="0.12"/>
     </proof>
     <proof
      prover="4"
-     timelimit="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.18"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.98"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     edited="div-ComputerDivTest-smoke1_1.gappa"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.88"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="smoke2"
+    locfile="../div.why"
+    loclnum="28" loccnumb="7" loccnume="13"
+    sum="31f2f23c37308bdb010339bdfcd80fc5"
+    proved="false"
+    expanded="false"
+    shape="ainfix =amodaprefix -c1c2c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.13"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.05"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.05"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.06"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.11"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="2.99"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.99"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.69"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="smoke3"
+    locfile="../div.why"
+    loclnum="29" loccnumb="7" loccnume="13"
+    sum="4256bc82692261886dd4582639cda092"
+    proved="false"
+    expanded="false"
+    shape="ainfix =adivaprefix -c1aprefix -c2aprefix -c1">
+    <proof
+     prover="0"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.11"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -590,48 +2183,112 @@
     </proof>
     <proof
      prover="5"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.08"/>
-    </proof>
-    <proof
      prover="7"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
+     <result status="timeout" time="2.98"/>
     </proof>
     <proof
      prover="8"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.80"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.04"/>
     </proof>
    </goal>
    <goal
-    name="smoke2"
+    name="smoke4"
     locfile="../div.why"
-    loclnum="22" loccnumb="7" loccnume="13"
-    sum="ef885cb74e8858ec99889da4535ec992"
+    loclnum="30" loccnumb="7" loccnume="13"
+    sum="ceee47ade94ef36ca047e7eec70f0078"
     proved="false"
-    expanded="true"
+    expanded="false"
     shape="ainfix =amodaprefix -c1aprefix -c2c1">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -639,15 +2296,15 @@
     </proof>
     <proof
      prover="1"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.06"/>
+     <result status="unknown" time="0.05"/>
     </proof>
     <proof
      prover="2"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -655,15 +2312,15 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.15"/>
+     <result status="unknown" time="0.08"/>
     </proof>
     <proof
      prover="4"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -671,35 +2328,99 @@
     </proof>
     <proof
      prover="5"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.08"/>
-    </proof>
-    <proof
      prover="7"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
+     <result status="timeout" time="2.99"/>
     </proof>
     <proof
      prover="8"
-     timelimit="5"
+     timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="3.00"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="13"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="14"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="15"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.12"/>
+    </proof>
+    <proof
+     prover="16"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.66"/>
+    </proof>
+    <proof
+     prover="17"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="3.03"/>
     </proof>
    </goal>
   </theory>
