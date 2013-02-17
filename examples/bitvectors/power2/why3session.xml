@@ -37,14 +37,6 @@
   id="8"
   name="Z3"
   version="3.2"/>
- <prover
-  id="9"
-  name="Z3"
-  version="4.2"/>
- <prover
-  id="10"
-  name="Z3"
-  version="4.3.1"/>
  <file
   name="../power2.why"
   verified="false"
@@ -3232,7 +3224,7 @@
     name="Div_double"
     locfile="../power2.why"
     loclnum="113" loccnumb="8" loccnume="18"
-    sum="54ca81fd8dd2cc7b0616dbb62374c1dc"
+    sum="6f01a44c48ae3d43c3c4f83b1d870e98"
     proved="false"
     expanded="true"
     shape="ainfix =adivV0V1c1Iainfix &lt;V0ainfix *c2V1Aainfix &lt;=V1V0Aainfix &lt;c0V1F">
@@ -3241,9 +3233,9 @@
     name="Div_pow"
     locfile="../power2.why"
     loclnum="116" loccnumb="8" loccnume="15"
-    sum="38721ee10b8925bf9da7fdd92bfcadad"
+    sum="94c0d831a4dcda27b2e02ffd748efbcf"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =adivV0apow2ainfix -V1c1c1Iainfix &lt;V0apow2V1Aainfix &lt;=apow2ainfix -V1c1V0Iainfix &gt;V1c0F">
     <proof
      prover="0"
@@ -3259,7 +3251,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.26"/>
+     <result status="valid" time="0.27"/>
     </proof>
     <proof
      prover="2"
@@ -3290,7 +3282,7 @@
     name="Div_double_neg"
     locfile="../power2.why"
     loclnum="119" loccnumb="8" loccnume="22"
-    sum="973e29204b30d40a7bab41c85eb8f9ff"
+    sum="abb5d03ab24579b6ee213167c0a3133c"
     proved="false"
     expanded="true"
     shape="ainfix =adivV0V1aprefix -c2Iainfix &lt;aprefix -V1c0Aainfix &lt;V0aprefix -V1Aainfix &lt;=ainfix *aprefix -c2V1V0F">
@@ -3299,9 +3291,9 @@
     name="Div_pow2"
     locfile="../power2.why"
     loclnum="122" loccnumb="8" loccnume="16"
-    sum="cf96a17cbeab4ecc0a75f7fc5fc09ad3"
+    sum="2c89cfc95fa863dc50eff7a69b9fa7c8"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =adivV0apow2ainfix -V1c1aprefix -c2Iainfix &lt;V0aprefix -apow2ainfix -V1c1Aainfix &lt;=aprefix -apow2V1V0Iainfix &gt;V1c0F">
     <proof
      prover="0"
@@ -3309,7 +3301,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.13"/>
+     <result status="valid" time="0.21"/>
     </proof>
     <proof
      prover="1"
@@ -3317,7 +3309,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.08"/>
+     <result status="valid" time="0.11"/>
     </proof>
     <proof
      prover="2"
@@ -3348,81 +3340,18 @@
     name="Mod_pow2_gen"
     locfile="../power2.why"
     loclnum="129" loccnumb="8" loccnume="20"
-    sum="b227e85b4b94596b025f86278ff9ea72"
-    proved="false"
+    sum="a7a76c1f697e0c3aa10ef9e6d6a80fc0"
+    proved="true"
     expanded="true"
     shape="ainfix =amodadivainfix +V0apow2V1apow2V2c2amodadivV0apow2V2c2Iainfix &lt;V2V1Aainfix &lt;=c0V2F">
     <proof
-     prover="0"
+     prover="5"
      timelimit="5"
      memlimit="1000"
+     edited="power2_Pow2int_Mod_pow2_gen_1.v"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.99"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.42"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.12"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.13"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.15"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.15"/>
-    </proof>
-    <proof
-     prover="9"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.15"/>
-    </proof>
-    <proof
-     prover="10"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.25"/>
+     <result status="valid" time="1.66"/>
     </proof>
    </goal>
   </theory>
@@ -3804,7 +3733,7 @@
     name="Pow2_int_real"
     locfile="../power2.why"
     loclnum="172" loccnumb="8" loccnume="21"
-    sum="f8f324e29da5b5ef9f7545fe3d8db355"
+    sum="9e92eda5b2e452f62bb3e1c8457a63b2"
     proved="true"
     expanded="false"
     shape="ainfix =apow2V0afrom_intapow2V0Iainfix &gt;=V0c0F">
