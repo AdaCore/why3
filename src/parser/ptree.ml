@@ -43,7 +43,11 @@ type pty =
   | PPTtyapp of qualid * pty list
   | PPTtuple of pty list
 
-type param = ident option * pty
+type ghost = bool
+
+type binder = loc * ident option * ghost * pty option
+type param  = loc * ident option * ghost * pty
+type quvar  = ident * pty option
 
 type pattern =
   { pat_loc : loc; pat_desc : pat_desc }
@@ -71,10 +75,10 @@ and pp_desc =
   | PPbinop of lexpr * pp_binop * lexpr
   | PPunop of pp_unop * lexpr
   | PPif of lexpr * lexpr * lexpr
-  | PPquant of pp_quant * param list * lexpr list list * lexpr
+  | PPquant of pp_quant * quvar list * lexpr list list * lexpr
   | PPnamed of label * lexpr
   | PPlet of ident * lexpr * lexpr
-  | PPeps of ident * pty * lexpr
+  | PPeps of quvar * lexpr
   | PPmatch of lexpr * (pattern * lexpr) list
   | PPcast of lexpr * pty
   | PPtuple of lexpr list
@@ -178,8 +182,6 @@ type loop_annotation = {
 
 type for_direction = To | Downto
 
-type ghost = bool
-
 type pre = lexpr
 type post = loc * (pattern * lexpr) list
 type xpost = loc * (qualid * pattern * lexpr) list
@@ -193,11 +195,9 @@ type spec = {
   sp_variant : variant list;
 }
 
-type binder = ident * ghost * pty option
-
 type type_v =
   | Tpure of pty
-  | Tarrow of binder list * type_c
+  | Tarrow of param list * type_c
 
 and type_c = type_v * spec
 

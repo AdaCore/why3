@@ -337,12 +337,27 @@ let rec trigger_not_a_term_exn = function
   | Loc.Located (_, exn) -> trigger_not_a_term_exn exn
   | _ -> false
 
-let check_quant_linearity uqu =
+let param_tys uc pl =
   let s = ref Sstr.empty in
-  let check id =
-    s := Loc.try3 id.id_loc Sstr.add_new (DuplicateVar id.id) id.id !s
-  in
-  List.iter (fun (idl, _) -> Opt.iter check idl) uqu
+  let ty_of_param (loc,id,gh,ty) =
+    if gh then Loc.errorm ~loc "ghost parameters are not allowed here";
+    Opt.iter (fun { id = id; id_loc = loc } ->
+      s := Loc.try3 loc Sstr.add_new (DuplicateVar id) id !s) id;
+    ty_of_dty (dty uc ty) in
+  List.map ty_of_param pl
+
+let quant_var uc env (id,ty) =
+  let ty = match ty with
+    | None -> Denv.fresh_type_var id.id_loc
+    | Some ty -> dty uc ty in
+  add_var id.id ty env, (id,ty)
+
+let quant_vars uc env qvl =
+  let s = ref Sstr.empty in
+  let add env (({ id = id; id_loc = loc }, _) as qv) =
+    s := Loc.try3 loc Sstr.add_new (DuplicateVar id) id !s;
+    quant_var uc env qv in
+  Lists.map_fold_left add env qvl
 
 let check_highord uc env x tl = match x with
   | Qident { id = x } when Mstr.mem x env.dvars -> true
@@ -445,22 +460,12 @@ and dterm_node ~localize loc uc env = function
       let e3 = dterm ~localize uc env e3 in
       unify_raise ~loc e3.dt_ty e2.dt_ty;
       Tif (dfmla ~localize uc env e1, e2, e3), e2.dt_ty
-  | PPeps (x, ty, e1) ->
-      let ty = dty uc ty in
-      let env = add_var x.id ty env in
+  | PPeps (b, e1) ->
+      let env, (x, ty) = quant_var uc env b in
       let e1 = dfmla ~localize uc env e1 in
       Teps (x, ty, e1), ty
   | PPquant ((PPlambda|PPfunc|PPpred) as q, uqu, trl, a) ->
-      check_quant_linearity uqu;
-      let uquant env (idl,ty) =
-        let ty = dty uc ty in
-        let id = match idl with
-          | Some id -> id
-          | None -> assert false
-        in
-        add_var id.id ty env, (id,ty)
-      in
-      let env, uqu = Lists.map_fold_left uquant env uqu in
+      let env, uqu = quant_vars uc env uqu in
       let trigger e =
         try
           TRterm (dterm ~localize uc env e)
@@ -570,16 +575,7 @@ and dfmla_node ~localize loc uc env = function
       Fif (dfmla ~localize uc env a,
            dfmla ~localize uc env b, dfmla ~localize uc env c)
   | PPquant (q, uqu, trl, a) ->
-      check_quant_linearity uqu;
-      let uquant env (idl,ty) =
-        let ty = dty uc ty in
-        let id = match idl with
-          | Some id -> id
-          | None -> assert false
-        in
-        add_var id.id ty env, (id,ty)
-      in
-      let env, uqu = Lists.map_fold_left uquant env uqu in
+      let env, uqu = quant_vars uc env uqu in
       let trigger e =
         try
           TRterm (dterm ~localize uc env e)
@@ -806,8 +802,7 @@ let add_types dl th =
       | TDalgebraic cl ->
           let ht = Hstr.create 17 in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
-          let param (_,t) = ty_of_dty (dty th' t) in
-          let projection (id,_) fty = match id with
+          let projection (_,id,_,_) fty = match id with
             | None -> None
             | Some id ->
                 try
@@ -823,7 +818,7 @@ let add_types dl th =
                   Some pj
           in
           let constructor (loc, id, pl) =
-            let tyl = List.map param pl in
+            let tyl = param_tys th' pl in
             let pjl = List.map2 projection pl tyl in
             Hstr.replace csymbols id.id loc;
             create_fsymbol (create_user_id id) tyl ty, pjl
@@ -861,7 +856,7 @@ let prepare_typedef td =
                   f_mutable = mut; f_ghost = gh } =
         if mut then errorm ~loc "a logic record field cannot be mutable";
         if gh then errorm ~loc "a logic record field cannot be ghost";
-        Some id, ty
+        loc, Some id, false, ty
       in
       (* constructor for type t is "mk t" (and not String.capitalize t) *)
       let id = { td.td_ident with id = "mk " ^ td.td_ident.id } in
@@ -880,18 +875,17 @@ let add_logics dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
     let id = d.ld_ident.id in
-    let v = create_user_id d.ld_ident in
     let denv = denv_empty in
     Hstr.add denvs id denv;
-    let type_ty (_,t) = ty_of_dty (dty th t) in
-    let pl = List.map type_ty d.ld_params in
+    let v = create_user_id d.ld_ident in
+    let pl = param_tys th d.ld_params in
     let add d = match d.ld_type with
       | None -> (* predicate *)
           let ps = create_psymbol v pl in
           Hstr.add psymbols id ps;
           add_param_decl th ps
       | Some t -> (* function *)
-          let t = type_ty (None, t) in
+          let t = ty_of_dty (dty th t) in
           let fs = create_fsymbol v pl t in
           Hstr.add fsymbols id fs;
           add_param_decl th fs
@@ -902,21 +896,18 @@ let add_logics dl th =
   (* 2. then type-check all definitions *)
   let type_decl d (abst,defn) =
     let id = d.ld_ident.id in
-    check_quant_linearity d.ld_params;
-    let dadd_var denv (x, ty) = match x with
-      | None -> denv
+    let dadd_var denv (_,x,_,ty) = match x with
       | Some id -> add_var id.id (dty th' ty) denv
+      | None -> denv
     in
     let denv = Hstr.find denvs id in
     let denv = List.fold_left dadd_var denv d.ld_params in
-    let create_var (x, _) ty =
+    let create_var (loc,x,_,_) ty =
       let id = match x with
-        | None -> id_fresh "%x"
         | Some id -> create_user_id id
-      in
-      create_vsymbol id ty
-    in
-    let mk_vlist = List.map2 create_var d.ld_params in
+        | None -> id_user "_" loc in
+      create_vsymbol id ty in
+    let mk_vlist tyl = List.map2 create_var d.ld_params tyl in
     match d.ld_type with
     | None -> (* predicate *)
         let ps = Hstr.find psymbols id in
@@ -976,8 +967,7 @@ let add_inductives s dl th =
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
-    let type_ty (_,t) = ty_of_dty (dty th t) in
-    let pl = List.map type_ty d.in_params in
+    let pl = param_tys th d.in_params in
     let ps = create_psymbol v pl in
     Hstr.add psymbols id ps;
     Loc.try2 d.in_loc add_param_decl th ps

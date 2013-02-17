@@ -388,14 +388,20 @@ and dpat_app denv gloc ({ de_loc = loc } as de) ppl dity =
 (* specifications *)
 
 let dbinders denv bl =
-  let hv = Hstr.create 3 in
-  let dbinder (id,gh,pty) (denv,bl,tyl) =
-    if Hstr.mem hv id.id then raise (DuplicateProgVar id.id);
-    Hstr.add hv id.id ();
+  let s = ref Sstr.empty in
+  let dbinder (loc,id,gh,pty) (denv,bl,tyl) =
     let dity = match pty with
       | Some pty -> dity_of_pty denv pty
-      | None -> create_type_variable () in
-    add_var id dity denv, (id,gh,dity)::bl, dity::tyl
+      | None -> create_type_variable ()
+    in
+    let denv, id = match id with
+      | Some ({ id = x; id_loc = loc } as id) ->
+          s := Loc.try3 loc Sstr.add_new (DuplicateProgVar x) x !s;
+          add_var id dity denv, id
+      | None ->
+          denv, { id = "_"; id_loc = loc; id_lab = [] }
+    in
+    denv, (id,gh,dity)::bl, dity::tyl
   in
   List.fold_right dbinder bl (denv,[],[])
 
@@ -443,6 +449,7 @@ and dtype_v denv = function
       let dity = dity_of_pty denv pty in
       DSpecV dity, ([],dity)
   | Tarrow (bl,tyc) ->
+      let bl = List.map (fun (l,i,g,t) -> l,i,g,Some t) bl in
       let denv,bl,tyl = dbinders denv bl in
       let tyc,(argl,res) = dtype_c denv tyc in
       DSpecA (bl,tyc), (tyl @ argl,res)
@@ -1525,7 +1532,7 @@ let add_type_invariant loc uc id params inv =
 
 let look_for_loc tdl s =
   let look_id loc id = if id.id = s then Some id.id_loc else loc in
-  let look_pj loc (id,_) = Opt.fold look_id loc id in
+  let look_pj loc (_,id,_,_) = Opt.fold look_id loc id in
   let look_cs loc (csloc,id,pjl) =
     let loc = if id.id = s then Some csloc else loc in
     List.fold_left look_pj loc pjl in
@@ -1590,7 +1597,8 @@ let add_types ~wp uc tdl =
         | TDabstract -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
-            let cons (_,_,l) = List.exists (fun (_,ty) -> check ty) l in
+            let check (_,_,gh,ty) = gh || check ty in
+            let cons (_,_,l) = List.exists check l in
             td.td_inv <> [] || td.td_vis <> Public || List.exists cons csl
         | TDrecord fl ->
             let field f = f.f_ghost || f.f_mutable || check f.f_pty in
@@ -1626,7 +1634,8 @@ let add_types ~wp uc tdl =
         | TDabstract -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
-            let cons (_,_,l) = List.exists (fun (_,ty) -> check ty) l in
+            let check (_,_,_,ty) = check ty in
+            let cons (_,_,l) = List.exists check l in
             td.td_inv <> [] || List.exists cons csl
         | TDrecord fl ->
             let field f = f.f_mutable || check f.f_pty in
@@ -1692,9 +1701,9 @@ let add_types ~wp uc tdl =
             (* to check projections' types we must fix the tyvars *)
             let add s v = let t = ity_var v in ity_match s t t in
             let sbs = List.fold_left add ity_subst_empty vl in
-            let mk_proj (regs,inv) (id,pty) =
+            let mk_proj (regs,inv) (_loc,id,gh,pty) =
               let ity = parse pty in
-              let fd = mk_field ity false None in
+              let fd = mk_field ity gh None in
               let inv = inv || ity_has_inv ity in
               match id with
               | None ->
@@ -1703,8 +1712,8 @@ let add_types ~wp uc tdl =
               | Some id ->
                   try
                     let fd = Hstr.find projs id.id in
-                    (* TODO: once we have ghost/mutable fields in algebraics,
-                       don't forget to check here that they coincide, too *)
+                    if gh <> fd.fd_ghost then Loc.errorm ~loc:id.id_loc
+                      "this field must be ghost in every constructor";
                     ignore (Loc.try3 id.id_loc ity_match sbs fd.fd_ity ity);
                     (regs, inv), (Some (Denv.create_user_id id), fd)
                   with Not_found ->
@@ -1787,16 +1796,16 @@ let add_types ~wp uc tdl =
           abstr, (ts, Hstr.find predefs x) :: algeb, alias
       | TDalgebraic csl ->
           let projs = Hstr.create 5 in
-          let mk_proj (id,pty) =
+          let mk_proj (_loc,id,gh,pty) =
             let ity = parse pty in
-            let fd = mk_field ity false None in
+            let fd = mk_field ity gh None in
             match id with
             | None -> None, fd
             | Some id ->
                 try
                   let fd = Hstr.find projs id.id in
-                  (* once we have ghost/mutable fields in algebraics,
-                     don't forget to check here that they coincide, too *)
+                  if gh <> fd.fd_ghost then Loc.errorm ~loc:id.id_loc
+                    "this field must be ghost in every constructor";
                   Loc.try2 id.id_loc ity_equal_check fd.fd_ity ity;
                   Some (Denv.create_user_id id), fd
                 with Not_found ->
