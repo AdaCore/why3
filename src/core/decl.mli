@@ -95,7 +95,7 @@ type decl = private {
   d_tag  : Weakhtbl.tag;  (* unique magical tag *)
 }
 
-and decl_node =
+and decl_node = private
   | Dtype  of tysymbol          (* abstract types and aliases *)
   | Ddata  of data_decl list    (* recursive algebraic types *)
   | Dparam of lsymbol           (* abstract functions and predicates *)
