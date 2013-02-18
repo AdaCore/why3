@@ -1,0 +1,40 @@
+theory Ceil
+  use import real.Real
+  use import real.RealInfix
+  use import real.Truncate
+
+  goal ceil_obvious: ceil 0.1 = 1
+
+  lemma unity:
+   forall b: real. b > 0.0 -> b = 1.0 *. b
+
+  lemma unity2:
+   forall b: real. b > 0.0 -> b /. b = (1.0 *. b) /. b
+
+  lemma perm_div:
+   forall a b:real. a > 0.0 /\ b > 0.0 -> (a *. b) /. b = a *. (b /. b)
+
+  lemma perm_div2:
+   forall a b:real. a > 0.0 /\ b > 0.0 -> a *. b /. b = a /. b *. b
+
+  lemma div_mult_perm:
+   forall b: real. b > 0.0 -> (1.0 /. b) *. b = (1.0 *. b) /. b
+
+  lemma b_div_b_is_one:
+    forall b: real. b > 0.0 -> 1.0 = b /. b
+
+  lemma inverse_inverse_is_same:
+    forall b: real. b > 0.0 -> 1.0 = (1.0 /. b) *. b
+
+  lemma inverse_bigger_zero:
+    forall b: real. b > 0.0 -> 1.0 /. b > 0.0
+
+  lemma div_equals_mult_w_inverse:
+    forall a b:real. b > 0.0 -> a /. b = a *. (1.0 /. b)
+
+  lemma mult_bigger_zero:
+    forall a b: real. a > 0.0 /\ b > 0.0 -> a *. b > 0.0
+
+  goal ceil_never_zero:
+    forall a b: real. a > 0.0 /\ b > 0.0 -> ceil (a /. b) <> 0
+end
