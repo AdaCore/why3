@@ -11,6 +11,9 @@ type reason =
    | VC_Discriminant_Check
    | VC_Precondition
    | VC_Postcondition
+   | VC_Contract_Case
+   | VC_Disjoint_Contract_Cases
+   | VC_Complete_Contract_Cases
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -43,6 +46,9 @@ let reason_from_string s =
    | "VC_DISCRIMINANT_CHECK"      -> VC_Discriminant_Check
    | "VC_PRECONDITION"            -> VC_Precondition
    | "VC_POSTCONDITION"           -> VC_Postcondition
+   | "VC_CONTRACT_CASE"           -> VC_Contract_Case
+   | "VC_DISJOINT_CONTRACT_CASES" -> VC_Disjoint_Contract_Cases
+   | "VC_COMPLETE_CONTRACT_CASES" -> VC_Complete_Contract_Cases
    | "VC_LOOP_INVARIANT"          -> VC_Loop_Invariant
    | "VC_LOOP_INVARIANT_INIT"     -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"  -> VC_Loop_Invariant_Preserv
@@ -62,6 +68,9 @@ let string_of_reason s =
    | VC_Discriminant_Check        -> "discriminant check"
    | VC_Precondition              -> "precondition"
    | VC_Postcondition             -> "postcondition"
+   | VC_Contract_Case             -> "contract case"
+   | VC_Disjoint_Contract_Cases   -> "disjoint contract cases"
+   | VC_Complete_Contract_Cases   -> "complete contract cases"
    | VC_Loop_Invariant            -> "loop invariant"
    | VC_Loop_Invariant_Init       -> "loop invariant initialization"
    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
