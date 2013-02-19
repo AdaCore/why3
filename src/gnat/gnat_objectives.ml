@@ -574,7 +574,7 @@ module Save_VCs = struct
 
    let save_trace goal =
       let expl = get_objective goal in
-      let base = Gnat_expl.to_filename expl in
+      let base = Gnat_expl.to_filename ~goal expl in
       let trace_fn = base ^ ".trace" in
       with_fmt_channel trace_fn (fun fmt ->
          List.iter (fun l ->

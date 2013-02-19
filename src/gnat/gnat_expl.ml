@@ -108,14 +108,6 @@ let read_label s =
 
 let get_loc e = e.loc
 
-let to_filename expl =
-   let s = String.copy (string_of_reason expl.reason) in
-   for i = 0 to String.length s - 1 do
-      if s.[i] = ' ' then s.[i] <- '_'
-   done;
-   let l = orig_loc expl.loc in
-   Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) s
-
 let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
 
@@ -213,6 +205,20 @@ let simple_print_expl fmt p =
   | primary :: _ ->
       Format.fprintf fmt "%a:%a" simple_print_loc primary print_reason p.reason
 
+let improve_sloc sloc task =
+   let info = extract_msg (Task.task_goal_fmla task) in
+   let sloc =
+      match info.expl_loc with
+      | No_Sloc -> sloc
+      | VC_Sloc s | Reg_Sloc s -> List.hd s
+   in
+   let msg =
+      match info.expl_msg with
+      | None -> ""
+      | Some s -> s
+   in
+   sloc, msg
+
 let print_simple_proven fmt p =
    match p.loc with
    | [] -> assert false (* the sloc of a VC is never empty *)
@@ -227,17 +233,10 @@ let print_expl proven task fmt p =
          if proven then begin
             print_simple_proven fmt p
          end else begin
-            let g = Task.task_goal_fmla task in
-            let info = extract_msg g in
-            let sloc =
-               match info.expl_loc with
-               | No_Sloc -> primary
-               | VC_Sloc s | Reg_Sloc s -> List.hd s in
+            let sloc, msg = improve_sloc primary task in
             Format.fprintf fmt "%a: %a not proved"
             simple_print_loc sloc print_reason p.reason;
-            match info.expl_msg with
-            | None -> ()
-            | Some s -> Format.fprintf fmt ", requires %s" s
+            if msg <> "" then Format.fprintf fmt ", requires %s" msg
          end;
          List.iter
          (fun secondary_sloc ->
@@ -247,6 +246,19 @@ let print_expl proven task fmt p =
 let print_skipped fmt p =
    Format.fprintf fmt "%a: %a skipped"
      simple_print_loc (List.hd p.loc) print_reason p.reason
+
+let to_filename ?goal expl =
+   let s = String.copy (string_of_reason expl.reason) in
+   for i = 0 to String.length s - 1 do
+      if s.[i] = ' ' then s.[i] <- '_'
+   done;
+   let l = orig_loc expl.loc in
+   let l =
+      match goal with
+      | None -> l
+      | Some g -> let l, _ = improve_sloc l (Session.goal_task g) in l
+   in
+   Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) s
 
 module ExplCmp = struct
    type t = expl

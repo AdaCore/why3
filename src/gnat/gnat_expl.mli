@@ -49,7 +49,7 @@ val print_expl : bool -> Task.task -> Format.formatter -> expl -> unit
 
 val print_skipped : Format.formatter -> expl -> unit
 
-val to_filename : expl -> string
+val to_filename : ?goal:'a Session.goal -> expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
 val mk_expl : reason -> loc -> expl
