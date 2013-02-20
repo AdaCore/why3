@@ -117,3 +117,10 @@ let () = Exn_printer.register
     | _ ->
         raise exn)
 
+let loc lb = extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
+
+let with_location f lb =
+  if Debug.test_flag Debug.stack_trace then f lb else
+    try f lb with
+    | Located _ as e -> raise e
+    | e -> raise (Located (loc lb, e))

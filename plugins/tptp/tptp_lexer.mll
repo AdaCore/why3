@@ -238,16 +238,10 @@ and comment_line = parse
 
 {
 
-  let with_location f lb =
-    if Debug.test_flag Debug.stack_trace then f lb else
-    try f lb with
-      | Loc.Located _ as e -> raise e
-      | e -> raise (Loc.Located (loc lb, e))
-
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    let ast = with_location (tptp_file token) lb in
+    let ast = Loc.with_location (tptp_file token) lb in
     (), Tptp_typing.typecheck env path ast
 
   let _library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
