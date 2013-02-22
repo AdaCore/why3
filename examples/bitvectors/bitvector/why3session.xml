@@ -37,13 +37,13 @@
    name="BitVector"
    locfile="../bitvector.why"
    loclnum="3" loccnumb="7" loccnume="16"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="Nth_bw_xor_v1true"
     locfile="../bitvector.why"
     loclnum="46" loccnumb="8" loccnume="25"
-    sum="10f5b792bf582463d0d58e59cf9fa4a6"
+    sum="8ab21ecf98d452f541b8eb7d5124b37e"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anotbanthV1V2Iainfix =anthV0V2aTrueAainfix &lt;V2asizeAainfix &lt;=c0V2F">
@@ -76,7 +76,7 @@
     name="Nth_bw_xor_v1false"
     locfile="../bitvector.why"
     loclnum="50" loccnumb="8" loccnume="26"
-    sum="442c811ba72eb92d69b94d13448101e2"
+    sum="9d3506cc5d507b27ef36c21e64c6f394"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anthV1V2Iainfix =anthV0V2aFalseAainfix &lt;V2asizeAainfix &lt;=c0V2F">
@@ -101,7 +101,7 @@
     name="Nth_bw_xor_v2true"
     locfile="../bitvector.why"
     loclnum="54" loccnumb="8" loccnume="25"
-    sum="0316258b63daca705db40006d2c64ee9"
+    sum="a1c444f056510ff60acc685ce74fde7e"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anotbanthV0V2Iainfix =anthV1V2aTrueAainfix &lt;V2asizeAainfix &lt;=c0V2F">
@@ -134,7 +134,7 @@
     name="Nth_bw_xor_v2false"
     locfile="../bitvector.why"
     loclnum="58" loccnumb="8" loccnume="26"
-    sum="b4ce040bc55e95fb610ab1970a7cca10"
+    sum="bc8a7c4bde80c78261e3eff1c91e2d53"
     proved="true"
     expanded="false"
     shape="ainfix =anthabw_xorV0V1V2anthV0V2Iainfix =anthV1V2aFalseAainfix &lt;V2asizeAainfix &lt;=c0V2F">
@@ -167,7 +167,7 @@
     name="to_nat_of_zero2"
     locfile="../bitvector.why"
     loclnum="194" loccnumb="8" loccnume="23"
-    sum="dc229a800f0688a2b4561091bf098e5c"
+    sum="f9ed7782c61d349a69282b399dc5a228"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2c0ato_nat_subV0V1c0Iainfix =anthV0V3aFalseIainfix &gt;V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;=V2V1Aainfix &gt;asizeV2F">
@@ -185,7 +185,7 @@
     name="to_nat_of_zero"
     locfile="../bitvector.why"
     loclnum="200" loccnumb="8" loccnume="22"
-    sum="db21f52ebbdce5d68f7ade7bab22eb49"
+    sum="b9471b6011def335b16c605f8147f11b"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2V1c0Iainfix =anthV0V3aFalseIainfix &gt;=V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;asizeV2F">
@@ -203,8 +203,8 @@
     name="to_nat_of_one"
     locfile="../bitvector.why"
     loclnum="205" loccnumb="8" loccnume="21"
-    sum="d0f3f334ff9aa4208fcb9275bed58700"
-    proved="true"
+    sum="8e2f700b9033bfa63444ee9755e06202"
+    proved="false"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2V1ainfix -apow2ainfix +ainfix -V2V1c1c1Iainfix =anthV0V3aTrueIainfix &gt;=V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;=V2V1Aainfix &gt;asizeV2F">
     <proof
@@ -214,14 +214,14 @@
      edited="bitvector_BitVector_to_nat_of_one_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.33"/>
+     <result status="unknown" time="1.23"/>
     </proof>
    </goal>
    <goal
     name="to_nat_sub_footprint"
     locfile="../bitvector.why"
     loclnum="210" loccnumb="8" loccnume="28"
-    sum="eb64885d450d92719446175647ecd865"
+    sum="f7ad8a1b804f5129eb5f1963f56b8e14"
     proved="true"
     expanded="false"
     shape="ainfix =ato_nat_subV0V2V3ato_nat_subV1V2V3Iainfix =anthV0V4anthV1V4Iainfix &lt;=V4V2Aainfix &lt;=V3V4FIainfix &gt;=V3c0Aainfix &gt;asizeV2F">
@@ -239,7 +239,7 @@
     name="nth_from_int_low_even"
     locfile="../bitvector.why"
     loclnum="297" loccnumb="8" loccnume="29"
-    sum="6ff9d16523adfad9200eb17620c479e4"
+    sum="87e232d48297d2cad90e7c7f4ce774a9"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intV0c0aFalseIainfix =amodV0c2c0F">
@@ -272,7 +272,7 @@
     name="nth_from_int_low_odd"
     locfile="../bitvector.why"
     loclnum="300" loccnumb="8" loccnume="28"
-    sum="c95f783131bf812ebf23e03e889dd4f7"
+    sum="ca17f2b1f131e93c5e2bfe678f0a8a84"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intV0c0aTrueIainfix =amodV0c2c0NF">
@@ -305,7 +305,7 @@
     name="nth_from_int_0"
     locfile="../bitvector.why"
     loclnum="303" loccnumb="8" loccnume="22"
-    sum="450e9ffc38f29b601de72ca9bf764349"
+    sum="e6c43852eba46f88d3880bac4d50fc76"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_intc0V0aFalseIainfix &gt;=V0c0Aainfix &gt;asizeV0F">
@@ -338,7 +338,7 @@
     name="nth_from_int2c_low_even"
     locfile="../bitvector.why"
     loclnum="339" loccnumb="8" loccnume="31"
-    sum="a67e28f685d8c01377cf3c72e4533960"
+    sum="b79d2cc77be2fe002c6d949b7e7f787d"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_int2cV0c0aFalseIainfix =amodV0c2c0F">
@@ -371,7 +371,7 @@
     name="nth_from_int2c_low_odd"
     locfile="../bitvector.why"
     loclnum="342" loccnumb="8" loccnume="30"
-    sum="a7d2a84135931c151cd169ad525f2f3f"
+    sum="a0b8dc60aa4a1c336b44f5b3ccc69fd5"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_int2cV0c0aTrueIainfix =amodV0c2c0NF">
@@ -404,7 +404,7 @@
     name="nth_from_int2c_0"
     locfile="../bitvector.why"
     loclnum="345" loccnumb="8" loccnume="24"
-    sum="b42e6d1786c61e5fc1a8d31c361b7bdc"
+    sum="0887eceb37b90aca1a7edac7df5dc322"
     proved="true"
     expanded="false"
     shape="ainfix =anthafrom_int2cc0V0aFalseIainfix &gt;=V0c0Aainfix &gt;asizeV0F">
@@ -437,7 +437,7 @@
     name="nth_from_int2c_plus_pow2"
     locfile="../bitvector.why"
     loclnum="348" loccnumb="8" loccnume="32"
-    sum="dbc847e58ad59aa36e45d5dd9b5d02c8"
+    sum="d460c4b464e10e371a2ab0a4ff65c453"
     proved="true"
     expanded="true"
     shape="ainfix =anthafrom_int2cainfix +V0apow2V2V1anthafrom_int2cV0V1Iainfix &lt;V1ainfix -asizec1Aainfix &lt;V1V2Aainfix &lt;=c0V1F">
@@ -499,7 +499,7 @@
     name="Test1"
     locfile="../bitvector.why"
     loclnum="395" loccnumb="7" loccnume="12"
-    sum="ce2ce300799bdb965c1debde26d90043"
+    sum="08352735564f05358aec393e1b058f5d"
     proved="true"
     expanded="false"
     shape="ainfix =anthV0c1aFalseLabw_andabvzeroabvone">
@@ -540,7 +540,7 @@
     name="Test2"
     locfile="../bitvector.why"
     loclnum="398" loccnumb="7" loccnume="12"
-    sum="e69bfbfd9437fc5fa98991dade29d92d"
+    sum="90968a21079e1076b84ac6f2784bd6a6"
     proved="true"
     expanded="false"
     shape="ainfix =anthV0c15aTrueLalsrabvonec16">
@@ -581,7 +581,7 @@
     name="Test3"
     locfile="../bitvector.why"
     loclnum="401" loccnumb="7" loccnume="12"
-    sum="dbc55c20e78f20492baa795155a330a2"
+    sum="4bd40a55b6ab49d9b48dc84f7994810f"
     proved="true"
     expanded="false"
     shape="ainfix =anthV0c16aFalseLalsrabvonec16">
@@ -630,7 +630,7 @@
     name="Test4"
     locfile="../bitvector.why"
     loclnum="404" loccnumb="7" loccnume="12"
-    sum="599960163ee00d78e83243de258959af"
+    sum="936429e58ed3922b00fbf8f0f9188f74"
     proved="true"
     expanded="false"
     shape="ainfix =anthV0c15aTrueLaasrabvonec16">
@@ -671,7 +671,7 @@
     name="Test5"
     locfile="../bitvector.why"
     loclnum="407" loccnumb="7" loccnume="12"
-    sum="d06d86558af343fa7c4fe4ba11c15eb4"
+    sum="eb4f169f0188e4d1932cb6bce2605a46"
     proved="true"
     expanded="false"
     shape="ainfix =anthV0c16aTrueLaasrabvonec16">
@@ -712,7 +712,7 @@
     name="Test6"
     locfile="../bitvector.why"
     loclnum="410" loccnumb="7" loccnume="12"
-    sum="33960e1b4f4d2649abb26e74117e3968"
+    sum="af6b6491190a9c0d51bc40ccedf405fd"
     proved="true"
     expanded="false"
     shape="ainfix =anthV0c16aFalseLaasralsrabvonec1c16">
@@ -761,7 +761,7 @@
     name="to_nat_0x00000000"
     locfile="../bitvector.why"
     loclnum="413" loccnumb="7" loccnume="24"
-    sum="2a2147936056f15967a89ef3183eda3e"
+    sum="c0f14ea5b73e96d646b592ae8df1795a"
     proved="true"
     expanded="false"
     shape="ainfix =ato_natabvzeroc0">
@@ -802,7 +802,7 @@
     name="to_nat_0x00000001"
     locfile="../bitvector.why"
     loclnum="416" loccnumb="7" loccnume="24"
-    sum="aaf158ae1d7967564f33acd88fd2f5c2"
+    sum="b1b4b0b05bad9c5c11e92b8e89413dd6"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec31c1">
@@ -851,7 +851,7 @@
     name="to_nat_0x00000003"
     locfile="../bitvector.why"
     loclnum="419" loccnumb="7" loccnume="24"
-    sum="8e35f858e591f8d68165f8e1f38b8c78"
+    sum="6b724ade148738cd114251092d56c0ae"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec30c3">
@@ -900,7 +900,7 @@
     name="to_nat_0x00000007"
     locfile="../bitvector.why"
     loclnum="422" loccnumb="7" loccnume="24"
-    sum="238b1d4ee1f09af752da83097c95042d"
+    sum="ecde58e66d8b3837f085a7774f0bc2d7"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec29c7">
@@ -949,7 +949,7 @@
     name="to_nat_0x0000000F"
     locfile="../bitvector.why"
     loclnum="425" loccnumb="7" loccnume="24"
-    sum="0e86471fb1974d4d6d078065f62f07c7"
+    sum="95cc87fc8b8b85165be0cc78b6db971b"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec28c15">
@@ -998,7 +998,7 @@
     name="to_nat_0x0000001F"
     locfile="../bitvector.why"
     loclnum="428" loccnumb="7" loccnume="24"
-    sum="25d64aa4b32ec0d59d887881ff01ae2a"
+    sum="103b916218ce4056e339d8f872c9dd90"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec27c31">
@@ -1047,7 +1047,7 @@
     name="to_nat_0x0000003F"
     locfile="../bitvector.why"
     loclnum="431" loccnumb="7" loccnume="24"
-    sum="c9d83efeac2c89156fa9b7c6743b75cc"
+    sum="b9af458e9a0a50d9f07bcdd5f761cdc4"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec26c63">
@@ -1096,7 +1096,7 @@
     name="to_nat_0x0000007F"
     locfile="../bitvector.why"
     loclnum="434" loccnumb="7" loccnume="24"
-    sum="b55389318cb0b9cebb491f652bfe612a"
+    sum="733893ee02f3bd77bf94e91e8f025072"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec25c127">
@@ -1145,7 +1145,7 @@
     name="to_nat_0x000000FF"
     locfile="../bitvector.why"
     loclnum="437" loccnumb="7" loccnume="24"
-    sum="fb9032ec1855a62e80692f3494230415"
+    sum="89bc6f4f39fbf8377735174a588001df"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec24c255">
@@ -1194,7 +1194,7 @@
     name="to_nat_0x000001FF"
     locfile="../bitvector.why"
     loclnum="440" loccnumb="7" loccnume="24"
-    sum="68890f6764b66e48da5b4fd274ad70ff"
+    sum="b13ac4a15d95962fdadacab481913d98"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec23c511">
@@ -1243,7 +1243,7 @@
     name="to_nat_0x000003FF"
     locfile="../bitvector.why"
     loclnum="443" loccnumb="7" loccnume="24"
-    sum="85e375eefa57df835236993c967d75f4"
+    sum="5b85cdd55d849cdce83901353d896c31"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec22c1023">
@@ -1292,7 +1292,7 @@
     name="to_nat_0x000007FF"
     locfile="../bitvector.why"
     loclnum="446" loccnumb="7" loccnume="24"
-    sum="ddcade331e3aaa51b00e0ebd70c1bcb9"
+    sum="c8d4de9f419c31e205cc17928fad0699"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec21c2047">
@@ -1341,7 +1341,7 @@
     name="to_nat_0x00000FFF"
     locfile="../bitvector.why"
     loclnum="449" loccnumb="7" loccnume="24"
-    sum="d6c6c924faa38161108a4224b58b3778"
+    sum="c11e7b90a986b405eb2df840a8e0c837"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec20c4095">
@@ -1390,7 +1390,7 @@
     name="to_nat_0x00001FFF"
     locfile="../bitvector.why"
     loclnum="452" loccnumb="7" loccnume="24"
-    sum="31f9df54fb06ad7843d197facfd6d335"
+    sum="9c09629c7ca0e9e6ca67d4c34f6d9776"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec19c8191">
@@ -1439,7 +1439,7 @@
     name="to_nat_0x00003FFF"
     locfile="../bitvector.why"
     loclnum="455" loccnumb="7" loccnume="24"
-    sum="0eec72de12288566dfbbfc0b2ba67f95"
+    sum="1946a5599f0693583ef0bd21bd2fe318"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec18c16383">
@@ -1488,7 +1488,7 @@
     name="to_nat_0x00007FFF"
     locfile="../bitvector.why"
     loclnum="458" loccnumb="7" loccnume="24"
-    sum="53d1895b10cbb7e3044fcd24dddf62b9"
+    sum="3548f9080996eedb202c81372178f775"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec17c32767">
@@ -1537,7 +1537,7 @@
     name="to_nat_0x0000FFFF"
     locfile="../bitvector.why"
     loclnum="461" loccnumb="7" loccnume="24"
-    sum="dd17bba43ba5e594474f16177c3d3eb8"
+    sum="51dde141331c21e9b98402b741860df7"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec16c65535">
@@ -1586,7 +1586,7 @@
     name="to_nat_0x0001FFFF"
     locfile="../bitvector.why"
     loclnum="469" loccnumb="7" loccnume="24"
-    sum="128ae654259d40a0ad5eab090cac8f6c"
+    sum="888e978ef3222d82411ed9e538c4027c"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec15c131071">
@@ -1635,7 +1635,7 @@
     name="to_nat_0x0003FFFF"
     locfile="../bitvector.why"
     loclnum="472" loccnumb="7" loccnume="24"
-    sum="0556fc83d263eb9dc1323cb38bc18fdc"
+    sum="72fba2191f650294f3d9d2b3278e464e"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec14c262143">
@@ -1684,7 +1684,7 @@
     name="to_nat_0x0007FFFF"
     locfile="../bitvector.why"
     loclnum="475" loccnumb="7" loccnume="24"
-    sum="56952459947b96157bda91de233856da"
+    sum="f856ef7aedcb4f7fa60dc23fb80e4072"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec13c524287">
@@ -1733,7 +1733,7 @@
     name="to_nat_0x000FFFFF"
     locfile="../bitvector.why"
     loclnum="478" loccnumb="7" loccnume="24"
-    sum="7e48304cc2be7e6231bdff2df715150b"
+    sum="cfc1c408c26fcce4bb83943ca446d12f"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec12c1048575">
@@ -1782,7 +1782,7 @@
     name="to_nat_0x00FFFFFF"
     locfile="../bitvector.why"
     loclnum="481" loccnumb="7" loccnume="24"
-    sum="cd5a3ad387732c62ad859c7650027e6d"
+    sum="cb04b0b1d7d5984c6e71358e9ba56b93"
     proved="false"
     expanded="false"
     shape="ainfix =ato_natalsrabvonec8c16777215">
@@ -1831,7 +1831,7 @@
     name="to_nat_0xFFFFFFFF"
     locfile="../bitvector.why"
     loclnum="484" loccnumb="7" loccnume="24"
-    sum="6704adf50628e9f40558cba1a9e0ae27"
+    sum="a740b4e8b9ade895e4dc66e4453c5497"
     proved="true"
     expanded="false"
     shape="ainfix =ato_natabvonec4294967295">
