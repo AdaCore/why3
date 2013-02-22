@@ -83,6 +83,8 @@ let tag_var = "V"
 let tag_wild = "w"
 let tag_as = "z"
 
+let ident_shape ~push id acc = push id.Ident.id_string acc
+
 let const_shape ~push acc c =
   let b = Buffer.create 17 in
   Format.bprintf b "%a" Pretty.print_const c;
@@ -94,7 +96,7 @@ let rec pat_shape ~(push:string->'a->'a) c m (acc:'a) p : 'a =
     | Pvar _ -> push tag_var acc
     | Papp (f, l) ->
         List.fold_left (pat_shape ~push c m)
-          (push (f.ls_name.Ident.id_string) (push tag_app acc))
+          (ident_shape ~push f.ls_name (push tag_app acc))
           l
     | Pas (p, _) -> push tag_as (pat_shape ~push c m acc p)
     | Por (p, q) ->
@@ -112,7 +114,7 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         push x (push tag_var acc)
     | Tapp (s,l) ->
         List.fold_left fn
-          (push (s.ls_name.Ident.id_string) (push tag_app acc))
+          (ident_shape ~push s.ls_name (push tag_app acc))
           l
     | Tif (f,t1,t2) -> fn (fn (fn (push tag_if acc) f) t1) t2
     | Tcase (t1,bl) ->
@@ -185,17 +187,17 @@ let pr_shape_list fmt t =
 (* shape of a task *)
 
 let param_decl_shape ~(push:string->'a->'a) (acc:'a) ls : 'a =
-  push (ls.ls_name.Ident.id_string) acc
+  ident_shape ~push ls.ls_name acc
 
 let logic_decl_shape ~version ~(push:string->'a->'a) (acc:'a) (ls,def) : 'a =
-  let acc = push (ls.ls_name.Ident.id_string) acc in
+  let acc = ident_shape ~push ls.ls_name acc in
   let vl,t = Decl.open_ls_defn def in
   let c = ref (-1) in
   let m = vl_rename_alpha c Mvs.empty vl in
   t_shape ~version ~push c m acc t
 
 let logic_ind_decl_shape ~version ~(push:string->'a->'a) (acc:'a) (ls,cl) : 'a =
-  let acc = push (ls.ls_name.Ident.id_string) acc in
+  let acc = ident_shape ~push ls.ls_name acc in
   List.fold_right
     (fun (_,t) acc -> t_shape ~version ~push (ref (-1)) Mvs.empty acc t)
     cl acc
@@ -208,16 +210,21 @@ let propdecl_shape ~version ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
     | Decl.Pskip -> tag_Pskip
   in
   let acc = push tag acc in
-  let acc = push n.Decl.pr_name.Ident.id_string acc in
+  let acc = ident_shape ~push n.Decl.pr_name acc in
   t_shape ~version ~push (ref(-1)) Mvs.empty acc t
+
+let constructor_shape ~push (ls, _) acc = ident_shape ~push ls.ls_name acc
+
+let data_decl_shape ~push (tys, cl) acc =
+  List.fold_right (constructor_shape ~push)
+    cl (ident_shape ~push tys.Ty.ts_name acc)
 
 let decl_shape ~version ~(push:string->'a->'a) (acc:'a) d : 'a =
   match d.Decl.d_node with
     | Decl.Dtype _ts ->
         push tag_Dtype acc
     | Decl.Ddata tyl ->
-        List.fold_right
-          (fun _ty acc -> acc)
+        List.fold_right (data_decl_shape ~push)
           tyl (push tag_Ddata acc)
     | Decl.Dparam ls ->
         param_decl_shape ~push (push tag_Dparam acc) ls
