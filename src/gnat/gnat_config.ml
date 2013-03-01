@@ -3,7 +3,7 @@ open Why3
 type report_mode = Fail | Verbose | Detailed
 
 type proof_mode =
-    Normal
+    Then_Split
   | No_WP
   | All_Split
   | Path_WP
@@ -19,7 +19,7 @@ let opt_steps : int option ref = ref None
 let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
-let opt_proof_mode = ref Normal
+let opt_proof_mode = ref Then_Split
 let opt_filename : string option ref = ref None
 let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
@@ -52,10 +52,10 @@ let set_proof_mode s =
       opt_proof_mode := Path_WP
    else if s = "no_split" then
       opt_proof_mode := No_Split
-   else if s <> "normal" then
+   else if s <> "then_split" then
       Gnat_util.abort_with_message
         "argument for option --proof should be one of\
-        (normal|no_wp|all_split|path_wp|no_split)."
+        (then_split|no_wp|all_split|path_wp|no_split)."
 
 let set_prover s =
    opt_prover := Some s
@@ -110,8 +110,7 @@ let options = Arg.align [
    "--report", Arg.String set_report,
           " Set report mode, one of (fail | all | detailed), default is fail";
    "--proof", Arg.String set_proof_mode,
-          " Set proof mode, one of (normal | no_wp | all_split), default is\
-          normal";
+          " Set proof mode, one of (then_split|no_wp|all_split|path_wp|no_split), default is then_split";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given by \"file:line\"";
    "--limit-subp", Arg.String set_limit_subp,

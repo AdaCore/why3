@@ -22,7 +22,7 @@ type report_mode = Fail | Verbose | Detailed
    *)
 
 type proof_mode =
-    Normal
+    Then_Split
   | No_WP
   | All_Split
   | Path_WP
@@ -39,7 +39,7 @@ val report : report_mode
 (* reflects value of option --report, default "Fail" *)
 
 val proof_mode : proof_mode
-(* reflects value of option --proof, default "Normal" *)
+(* reflects value of option --proof, default "Then_Split" *)
 
 val debug : bool
 (* true if option --debug was present *)

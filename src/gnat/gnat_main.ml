@@ -219,7 +219,7 @@ let _ =
    try
       Gnat_objectives.init ();
       match Gnat_config.proof_mode with
-      | Gnat_config.Normal
+      | Gnat_config.Then_Split
       | Gnat_config.Path_WP
       | Gnat_config.No_Split ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
