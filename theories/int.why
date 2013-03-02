@@ -412,6 +412,20 @@ integers greater or equal a given bound.
 
 *)
 
+theory SimpleInduction
+
+  use import Int
+
+  predicate p int
+
+  axiom base: p 0
+
+  axiom induction_step: forall n:int. 0 <= n -> p n -> p (n+1)
+
+  lemma SimpleInduction : forall n:int. 0 <= n -> p n
+
+end
+
 theory Induction
 
   use import Int
