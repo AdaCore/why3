@@ -45,6 +45,7 @@ type lsymbol = {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
+  ls_opaque : Stv.t;
 }
 
 module Lsym = MakeMSHW (struct
@@ -61,14 +62,21 @@ let ls_equal : lsymbol -> lsymbol -> bool = (==)
 
 let ls_hash ls = id_hash ls.ls_name
 
-let create_lsymbol name args value = {
+let check_opaque opaque args value =
+  if Stv.is_empty opaque then opaque else
+  let diff s ty = ty_v_fold (fun s tv -> Stv.remove tv s) s ty in
+  let s = List.fold_left diff (Opt.fold diff opaque value) args in
+  if Stv.is_empty s then opaque else invalid_arg "Term.create_lsymbol"
+
+let create_lsymbol ?(opaque=Stv.empty) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
+  ls_opaque = check_opaque opaque args value;
 }
 
-let create_fsymbol nm al vl = create_lsymbol nm al (Some vl)
-let create_psymbol nm al    = create_lsymbol nm al (None)
+let create_fsymbol ?opaque nm al vl = create_lsymbol ?opaque nm al (Some vl)
+let create_psymbol ?opaque nm al    = create_lsymbol ?opaque nm al (None)
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
@@ -795,9 +803,11 @@ let fs_tuple_ids = Hid.create 17
 
 let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
+  let opaque = Stv.of_list ts.ts_args in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
-  let fs = create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) tl ty in
+  let id = id_fresh ("Tuple" ^ string_of_int n) in
+  let fs = create_fsymbol ~opaque id tl ty in
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
 

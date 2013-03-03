@@ -204,8 +204,12 @@ rule token = parse
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
-  | "'"
-      { QUOTE }
+  | "~'" (lident as id)
+      { OPAQUE_QUOTE_LIDENT id }
+  | "'" (lident as id)
+      { QUOTE_LIDENT id }
+  | "'" (uident as id)
+      { QUOTE_UIDENT id }
   | ","
       { COMMA }
   | "("

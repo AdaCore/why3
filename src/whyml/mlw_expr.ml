@@ -53,7 +53,10 @@ let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
     Opt.iter (fun r -> ity_equal_check fd.fd_ity r.reg_ity) fd.fd_mut;
     ty_of_ity fd.fd_ity in
   let pure_args = List.map ty_of_field args in
-  let ls = create_fsymbol id pure_args (ty_of_field value) in
+  let pure_value = ty_of_field value in
+  (* plsymbols are used for constructors and projections, which are safe *)
+  let opaque = List.fold_left ty_freevars Stv.empty (pure_value::pure_args) in
+  let ls = create_fsymbol ~opaque id pure_args pure_value in
   create_plsymbol_unsafe ls args value ~hidden ~rdonly
 
 let ity_of_ty_opt ty = ity_of_ty (Opt.get_def ty_bool ty)
@@ -571,11 +574,12 @@ let e_plapp pls el ity =
   if pls.pl_rdonly then raise (RdOnlyPLS pls);
   let rec app tl varm ghost eff sbs fdl argl = match fdl, argl with
     | [],[] ->
-        let mut_fold fn eff fd = match fd.fd_mut with
-          | Some r -> fn eff (reg_full_inst sbs r)
-          | None -> eff in
-        let eff = List.fold_left (mut_fold eff_reset) eff pls.pl_args in
-        let eff = mut_fold (eff_read ~ghost) eff pls.pl_value in
+        let mut_fold fn leff fd = Opt.fold fn leff fd.fd_mut in
+        let leff = mut_fold (eff_read ~ghost) eff_empty pls.pl_value in
+        let leff = List.fold_left (mut_fold eff_reset) leff pls.pl_args in
+        let mtv = Mtv.set_diff sbs.ity_subst_tv pls.pl_ls.ls_opaque in
+        let leff = Mtv.fold (fun tv _ e -> eff_compare e tv) mtv leff in
+        let eff = eff_union eff (eff_full_inst sbs leff) in
         let t = match pls.pl_ls.ls_value with
           | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
           | None   -> ps_app pls.pl_ls tl in

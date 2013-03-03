@@ -37,7 +37,7 @@ exception UnboundTypeVar of string
 (* dead code
 exception UnboundType of string list
 *)
-exception UnboundSymbol of string list
+exception UnboundSymbol of qualid
 
 let error = Loc.error
 
@@ -72,8 +72,8 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundType sl ->
        fprintf fmt "Unbound type '%a'" (print_list dot pp_print_string) sl
 *)
-  | UnboundSymbol sl ->
-       fprintf fmt "Unbound symbol '%a'" (print_list dot pp_print_string) sl
+  | UnboundSymbol q ->
+       fprintf fmt "Unbound symbol '%a'" print_qualid q
   | _ -> raise e)
 
 let debug_parse_only = Debug.register_flag "parse_only"
@@ -162,7 +162,7 @@ let find_ns get_id find p ns =
     let r = find ns sl in
     if Debug.test_flag Glob.flag then Glob.use loc (get_id r);
     r
-  with Not_found -> error ~loc (UnboundSymbol sl)
+  with Not_found -> error ~loc (UnboundSymbol p)
 
 let get_id_prop p = p.pr_name
 let find_prop_ns = find_ns get_id_prop ns_find_pr
@@ -194,7 +194,7 @@ let find_namespace q uc = find_namespace_ns q (get_namespace uc)
 *)
 
 let rec dty uc = function
-  | PPTtyvar {id=x} ->
+  | PPTtyvar ({id=x}, _) ->
       create_user_type_var x
   | PPTtyapp (x, p) ->
       let ts = find_tysymbol x uc in
@@ -205,7 +205,7 @@ let rec dty uc = function
       tyapp ts (List.map (dty uc) tyl)
 
 let rec ty_of_pty uc = function
-  | PPTtyvar {id=x} ->
+  | PPTtyvar ({id=x}, _) ->
       ty_var (create_user_tv x)
   | PPTtyapp (x, p) ->
       let ts = find_tysymbol x uc in
@@ -214,6 +214,16 @@ let rec ty_of_pty uc = function
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
       ty_app ts (List.map (ty_of_pty uc) tyl)
+
+let rec opaque_tvs acc = function
+  | Ptree.PPTtyvar (id, true) -> Stv.add (create_user_tv id.id) acc
+  | Ptree.PPTtyvar (_, false) -> acc
+  | Ptree.PPTtyapp (_, pl)
+  | Ptree.PPTtuple pl -> List.fold_left opaque_tvs acc pl
+
+let opaque_tvs args value =
+  let acc = Opt.fold opaque_tvs Stv.empty value in
+  List.fold_left (fun acc (_,_,_,ty) -> opaque_tvs acc ty) acc args
 
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
@@ -671,54 +681,6 @@ and dtype_args ~localize ls loc uc env el tl =
   in
   check_arg (el, tl)
 
-(** Add projection functions for the algebraic types *)
-
-(*
-let add_projection cl p (fs,tyarg,tyval) th =
-  let vs = create_vsymbol (id_fresh p) tyval in
-  let per_cs (_,id,pl) =
-    let cs = find_lsymbol (Qident id) th in
-    let tc = match cs.ls_value with
-      | None -> assert false
-      | Some t -> t
-    in
-    let m = ty_match Mtv.empty tc tyarg in
-    let per_param ty (n,_) = match n with
-      | Some id when id.id = p -> pat_var vs
-      | _ -> pat_wild (ty_inst m ty)
-    in
-    let al = List.map2 per_param cs.ls_args pl in
-    t_close_branch (pat_app cs al tyarg) (t_var vs)
-  in
-  let vs = create_vsymbol (id_fresh "u") tyarg in
-  let t = t_case (t_var vs) (List.map per_cs cl) in
-  let d = make_ls_defn fs [vs] t in
-  add_logic_decl th [d]
-
-let add_projections th d = match d.td_def with
-  | TDabstract | TDalias _ -> th
-  | TDrecord _ -> assert false
-  | TDalgebraic cl ->
-      let per_cs acc (_,id,pl) =
-        let cs = find_lsymbol (Qident id) th in
-        let tc = match cs.ls_value with
-          | None -> assert false
-          | Some t -> t
-        in
-        let per_param acc ty (n,_) = match n with
-          | Some id when not (Mstr.mem id.id acc) ->
-              let fn = create_user_id id in
-              let fs = create_fsymbol fn [tc] ty in
-              Mstr.add id.id (fs,tc,ty) acc
-          | _ -> acc
-        in
-        List.fold_left2 per_param acc cs.ls_args pl
-      in
-      let ps = List.fold_left per_cs Mstr.empty cl in
-      try Mstr.fold (add_projection cl) ps th
-      with e -> raise (Loc.Located (d.td_loc, e))
-*)
-
 (** Typing declarations, that is building environments. *)
 
 open Ptree
@@ -751,7 +713,7 @@ let add_types dl th =
       let ts = match d.td_def with
         | TDalias ty ->
             let rec apply = function
-              | PPTtyvar v ->
+              | PPTtyvar (v, _) ->
                   begin
                     try ty_var (Hstr.find vars v.id)
                     with Not_found -> error ~loc:v.id_loc (UnboundTypeVar v.id)
@@ -801,6 +763,7 @@ let add_types dl th =
       | TDalias _ -> abstr, algeb, ts::alias
       | TDalgebraic cl ->
           let ht = Hstr.create 17 in
+          let opaque = Stv.of_list ts.ts_args in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let projection (_,id,_,_) fty = match id with
             | None -> None
@@ -812,7 +775,7 @@ let add_types dl th =
                   Some pj
                 with Not_found ->
                   let fn = create_user_id id in
-                  let pj = create_fsymbol fn [ty] fty in
+                  let pj = create_fsymbol ~opaque fn [ty] fty in
                   Hstr.replace csymbols id.id id.id_loc;
                   Hstr.replace ht id.id pj;
                   Some pj
@@ -821,7 +784,7 @@ let add_types dl th =
             let tyl = param_tys th' pl in
             let pjl = List.map2 projection pl tyl in
             Hstr.replace csymbols id.id loc;
-            create_fsymbol (create_user_id id) tyl ty, pjl
+            create_fsymbol ~opaque (create_user_id id) tyl ty, pjl
           in
           abstr, (ts, List.map constructor cl) :: algeb, alias
       | TDrecord _ ->
@@ -869,8 +832,7 @@ let env_of_vsymbol_list vl =
   List.fold_left (fun env v -> Mstr.add v.vs_name.id_string v env) Mstr.empty vl
 
 let add_logics dl th =
-  let fsymbols = Hstr.create 17 in
-  let psymbols = Hstr.create 17 in
+  let lsymbols = Hstr.create 17 in
   let denvs = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
@@ -879,18 +841,11 @@ let add_logics dl th =
     Hstr.add denvs id denv;
     let v = create_user_id d.ld_ident in
     let pl = param_tys th d.ld_params in
-    let add d = match d.ld_type with
-      | None -> (* predicate *)
-          let ps = create_psymbol v pl in
-          Hstr.add psymbols id ps;
-          add_param_decl th ps
-      | Some t -> (* function *)
-          let t = ty_of_dty (dty th t) in
-          let fs = create_fsymbol v pl t in
-          Hstr.add fsymbols id fs;
-          add_param_decl th fs
-    in
-    Loc.try1 d.ld_loc add d
+    let ty = Opt.map (fun t -> ty_of_dty (dty th t)) d.ld_type in
+    let opaque = opaque_tvs d.ld_params d.ld_type in
+    let ls = create_lsymbol ~opaque v pl ty in
+    Hstr.add lsymbols id ls;
+    Loc.try2 d.ld_loc add_param_decl th ls
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -907,41 +862,54 @@ let add_logics dl th =
         | Some id -> create_user_id id
         | None -> id_user "_" loc in
       create_vsymbol id ty in
-    let mk_vlist tyl = List.map2 create_var d.ld_params tyl in
-    match d.ld_type with
-    | None -> (* predicate *)
-        let ps = Hstr.find psymbols id in
-        begin match d.ld_def with
-          | None -> ps :: abst, defn
-          | Some f ->
-              let f = dfmla th' denv f in
-              let vl = match ps.ls_value with
-                | None -> mk_vlist ps.ls_args
-                | _ -> assert false
-              in
-              let env = env_of_vsymbol_list vl in
-              abst, make_ls_defn ps vl (fmla env f) :: defn
-        end
-    | Some ty -> (* function *)
-        let fs = Hstr.find fsymbols id in
-        begin match d.ld_def with
-          | None -> fs :: abst, defn
-          | Some t ->
-              let loc = t.pp_loc in
-              let ty = dty th' ty in
-              let t = dterm th' denv t in
-              unify_raise ~loc t.dt_ty ty;
-              let vl = match fs.ls_value with
-                | Some _ -> mk_vlist fs.ls_args
-                | _ -> assert false
-              in
-              let env = env_of_vsymbol_list vl in
-              abst, make_ls_defn fs vl (term env t) :: defn
-        end
+    let ls = Hstr.find lsymbols id in
+    let vl = List.map2 create_var d.ld_params ls.ls_args in
+    let env = env_of_vsymbol_list vl in
+    match d.ld_def, d.ld_type with
+    | None, _ -> ls :: abst, defn
+    | Some e, None -> (* predicate *)
+        let f = dfmla th' denv e in
+        abst, (ls, vl, fmla env f) :: defn
+    | Some e, Some ty -> (* function *)
+        let t = dterm th' denv e in
+        unify_raise ~loc:e.pp_loc t.dt_ty (dty th' ty);
+        abst, (ls, vl, term env t) :: defn
   in
   let abst,defn = List.fold_right type_decl dl ([],[]) in
+  (* 3. detect opacity *)
+  let ldefns defn =
+    let ht = Hls.create 3 in
+    let add_ls (ls,_,_) =
+      let tvs = oty_freevars Stv.empty ls.ls_value in
+      let tvs = List.fold_left ty_freevars tvs ls.ls_args in
+      Hls.replace ht ls tvs in
+    List.iter add_ls defn;
+    let compared s ls args value =
+      let sbs = oty_match Mtv.empty ls.ls_value value in
+      let sbs = List.fold_left2 ty_match sbs ls.ls_args args in
+      let opq = try Hls.find ht ls with Not_found -> ls.ls_opaque in
+      Mtv.fold (fun _ ty s -> ty_freevars s ty) (Mtv.set_diff sbs opq) s in
+    let check_ld fixp (ls,_,t) =
+      let opq = Hls.find ht ls in
+      let npq = Stv.diff opq (t_app_fold compared Stv.empty t) in
+      Hls.replace ht ls npq;
+      fixp && Stv.equal opq npq in
+    let rec fixp () =
+      if not (List.fold_left check_ld true defn) then fixp () in
+    fixp ();
+    let mk_sbs sbs ({ls_name = id} as ls,_,_) =
+      let opaque = Stv.union ls.ls_opaque (Hls.find ht ls) in
+      if Stv.equal ls.ls_opaque opaque then sbs else
+      let nls = create_lsymbol ~opaque (id_clone id) ls.ls_args ls.ls_value in
+      Mls.add ls nls sbs in
+    let sbs = List.fold_left mk_sbs Mls.empty defn in
+    let mk_ld (ls,vl,t) =
+      let get_ls ls = Mls.find_def ls ls sbs in
+      make_ls_defn (get_ls ls) vl (t_s_map (fun ty -> ty) get_ls t) in
+    List.map mk_ld defn
+  in
   let th = List.fold_left add_param_decl th abst in
-  let th = if defn = [] then th else add_logic_decl th defn in
+  let th = if defn = [] then th else add_logic_decl th (ldefns defn) in
   th
 
 let type_term uc gfn t =
@@ -968,7 +936,8 @@ let add_inductives s dl th =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
     let pl = param_tys th d.in_params in
-    let ps = create_psymbol v pl in
+    let opaque = opaque_tvs d.in_params None in
+    let ps = create_psymbol ~opaque v pl in
     Hstr.add psymbols id ps;
     Loc.try2 d.in_loc add_param_decl th ps
   in

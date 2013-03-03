@@ -1,12 +1,35 @@
+module M1 
+  predicate eq (x y : 'a)
+end
+
+module M2
+  predicate my_eq (x : 'a) (y : 'a) = my_eq1 x y
+  with my_eq1 (x : 'a) (y : 'a) = my_eq2 x y
+  with my_eq2 (x : 'a) (y : 'a) = my_eq3 x y
+  with my_eq3 (x : 'a) (y : 'a) = my_eq4 x y
+  with my_eq4 (x : 'a) (y : 'a) = my_eq5 x y
+  with my_eq5 (x : 'a) (y : 'a) = my_eq6 x y
+  with my_eq6 (x : 'a) (y : 'a) = my_eq7 x y
+  with my_eq7 (x : 'a) (y : 'a) = my_eq8 x y
+  with my_eq8 (x : 'a) (y : 'a) = my_eq9 x y
+  with my_eq9 (x : 'a) (y : 'a) = x = y
+  
+  clone M1 with predicate eq = my_eq
+end
+
+
 module TestGhost
   use import int.Int
   use import ref.Ref
 
+  use import M2
+
+  let peq x y = let _ = my_eq x (y : ~'c) in y
+
   let test1 (x: int) =
-    { x = 40 }
     assert { x > 0 };
-    x+2
-    { result = 42 }
+    let r1 = ref x in
+    peq r1 r1
 
 end
 

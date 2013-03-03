@@ -30,11 +30,13 @@ val add_dvty: tvars -> dvty -> tvars
 val add_dvty_vars: tvars -> dvty -> tvars (* add only variables *)
 
 val create_type_variable: unit -> dity
-val create_user_type_variable: Ptree.ident -> dity
+val create_user_type_variable: Ptree.ident -> (* opaque *) bool -> dity
 val its_app: itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
 
 val dity_refresh: dity -> dity (* refresh regions *)
+
+val opaque_tvs: Stv.t -> dity -> Stv.t
 
 val is_chainable: dvty -> bool (* non-bool * non-bool -> bool *)
 

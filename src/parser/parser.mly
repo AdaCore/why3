@@ -65,8 +65,6 @@ end
   let prefix s = "prefix " ^ s
   let mixfix s = "mixfix " ^ s
 
-  let quote id = { id with id = "'" ^ id.id }
-
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
   let add_lab id l = { id with id_lab = l }
@@ -187,6 +185,7 @@ end
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 %token <Loc.position> POSITION
+%token <string> QUOTE_UIDENT QUOTE_LIDENT OPAQUE_QUOTE_LIDENT
 
 /* keywords */
 
@@ -210,8 +209,7 @@ end
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
-%token LARROW LRARROW
-%token OR PRED QUOTE
+%token LARROW LRARROW OR PRED
 %token RIGHTPAR RIGHTSQ
 %token UNDERSCORE
 
@@ -424,8 +422,8 @@ late_invariant:
 ;
 
 type_args:
-| /* epsilon */             { [] }
-| type_var labels type_args { add_lab $1 $2 :: $3 }
+| /* epsilon */                 { [] }
+| quote_lident labels type_args { add_lab $1 $2 :: $3 }
 ;
 
 typedefn:
@@ -592,8 +590,10 @@ primitive_type_arg:
 primitive_type_arg_non_lident:
 | uqualid DOT lident
    { PPTtyapp (Qdot ($1, $3), []) }
-| type_var
-   { PPTtyvar $1 }
+| quote_lident
+   { PPTtyvar ($1, false) }
+| opaque_quote_lident
+   { PPTtyvar ($1, true) }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR
    { PPTtuple ($2 :: $4) }
 | LEFTPAR RIGHTPAR
@@ -605,10 +605,6 @@ primitive_type_arg_non_lident:
 list1_primitive_type_sep_comma:
 | primitive_type                                      { [$1] }
 | primitive_type COMMA list1_primitive_type_sep_comma { $1 :: $3 }
-;
-
-type_var:
-| QUOTE lident { $2 }
 ;
 
 /* Logic expressions */
@@ -697,7 +693,7 @@ lexpr_arg:
 | FALSE             { mk_pp PPfalse }
 | OPPREF lexpr_arg  { mk_l_prefix $1 $2 }
 | lexpr_sub         { $1 }
-| QUOTE uident      { mk_pp (PPvar (Qident (quote $2))) }
+| quote_uident      { mk_pp (PPvar (Qident $1)) }
 ;
 
 lexpr_dot:
@@ -826,8 +822,10 @@ list1_binder:
 ;
 
 binder:
-| type_var
-   { [floc (), None, false, Some (PPTtyvar $1)] }
+| quote_lident
+   { [floc (), None, false, Some (PPTtyvar ($1, false))] }
+| opaque_quote_lident
+   { [floc (), None, false, Some (PPTtyvar ($1, true))] }
 | lqualid_qualified
    { [floc (), None, false, Some (PPTtyapp ($1, []))] }
 | lident labels
@@ -936,6 +934,18 @@ lident:
 
 lident_keyword:
 | MODEL           { "model" }
+;
+
+quote_uident:
+| QUOTE_UIDENT    { mk_id ("'" ^ $1) (floc ()) }
+;
+
+quote_lident:
+| QUOTE_LIDENT    { mk_id $1 (floc ()) }
+;
+
+opaque_quote_lident:
+| OPAQUE_QUOTE_LIDENT { mk_id $1 (floc ()) }
 ;
 
 /* Idents + symbolic operations' names */
@@ -1213,8 +1223,8 @@ expr:
    { mk_expr (Ematch ($2, $5)) }
 | MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END
    { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
-| QUOTE uident COLON expr %prec prec_mark
-   { mk_expr (Emark (quote $2, $4)) }
+| quote_uident COLON expr %prec prec_mark
+   { mk_expr (Emark ($1, $3)) }
 | LOOP loop_annotation expr END
    { mk_expr (Eloop ($2, $3)) }
 | WHILE expr DO loop_annotation expr DONE

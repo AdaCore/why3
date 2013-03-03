@@ -1,0 +1,12 @@
+module T1
+  predicate my_eq (x : 'a) (y : 'a) = my_eq1 x y
+  with my_eq1 (x : 'a) (y : 'a) = my_eq2 x y
+  with my_eq2 (x : 'a) (y : 'a) = x = y
+
+  let my_p_eq (x y : 'b) = my_eq x y
+
+  type t1 model { f1 : int }
+  type t2 = Shell t1
+
+  let test1 (x: t2) = my_p_eq x x
+end

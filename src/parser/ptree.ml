@@ -38,8 +38,10 @@ type qualid =
   | Qident of ident
   | Qdot of qualid * ident
 
+type opacity = bool
+
 type pty =
-  | PPTtyvar of ident
+  | PPTtyvar of ident * opacity
   | PPTtyapp of qualid * pty list
   | PPTtuple of pty list
 

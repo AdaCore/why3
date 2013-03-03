@@ -456,6 +456,9 @@ let () = Exn_printer.register
       fprintf fmt "The type of exception %s has mutable components" id.id_string
   | Mlw_ty.IllegalAlias _reg ->
       fprintf fmt "This application creates an illegal alias"
+  | Mlw_ty.IllegalCompar (tv,_ity) ->
+      fprintf fmt "This application instantiates \
+          a non-opaque type parameter %a with a program type" print_tv tv
   | Mlw_ty.GhostDiverg ->
       fprintf fmt "This ghost expression contains potentially \
         non-terminating loops or function calls"

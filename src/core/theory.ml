@@ -384,7 +384,38 @@ let add_prop uc (_,pr,_) = add_symbol add_pr pr.pr_name pr uc
 
 let create_decl d = mk_tdecl (Decl d)
 
+let check_subst_opacity ls ls' sbs =
+  (* the definition of ls contains ls' instantiated with sbs *)
+  let sbs = Mtv.set_diff sbs ls'.ls_opaque in
+  let check () tv = if Stv.mem tv ls.ls_opaque then
+    Loc.errorm "type parameter '%s is not opaque in symbol `%s'"
+      tv.tv_name.id_string ls.ls_name.id_string in
+  Mtv.iter (fun _ ty -> ty_v_fold check () ty) sbs
+
+let check_decl_opacity d = match d.d_node with
+  (* All lsymbols declared in Ddata are safe, nothing to check.
+     We allow arbitrary ls_opaque in Dparam, but we check that
+     cloning in theories preserves opacity, see cl_init below. *)
+  | Dtype _ | Ddata _ | Dparam _ | Dprop _ -> ()
+  | Dlogic dl ->
+      let check (ols,ld) =
+        let check () ls args value =
+          let sbs = oty_match Mtv.empty ls.ls_value value in
+          let sbs = List.fold_left2 ty_match sbs ls.ls_args args in
+          check_subst_opacity ols ls sbs in
+        if not (Stv.is_empty ols.ls_opaque) then
+          t_app_fold check () (snd (open_ls_defn ld))
+      in
+      List.iter check dl
+  | Dind (_, dl) ->
+      (* TODO: are there safe classes of inductive predicates? *)
+      let check (ls,_) = if not (Stv.is_empty ls.ls_opaque) then
+        Loc.errorm ?loc:ls.ls_name.id_loc
+          "inductive predicates cannot have opaque type parameters" in
+      List.iter check dl
+
 let add_decl uc d =
+  check_decl_opacity d; (* we don't care about tasks *)
   let uc = add_tdecl uc (create_decl d) in
   match d.d_node with
     | Dtype ts  -> add_symbol add_ts ts.ts_name ts uc
@@ -473,9 +504,10 @@ let cl_find_ls cl ls =
   if not (Sid.mem ls.ls_name cl.cl_local) then ls
   else try Mls.find ls cl.ls_table
   with Not_found ->
+    let opaque = ls.ls_opaque in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
-    let ls' = create_lsymbol (id_clone ls.ls_name) ta' vt' in
+    let ls' = create_lsymbol ~opaque (id_clone ls.ls_name) ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 
@@ -513,8 +545,10 @@ let cl_init_ls cl ls ls' =
     | None, None -> Mtv.empty
     | _ -> raise (BadInstance (id, ls'.ls_name))
   in
-  ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
-  with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name)));
+  let sb = try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
+    with Invalid_argument _ -> raise (BadInstance (id, ls'.ls_name))
+  in
+  check_subst_opacity ls ls' sb;
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
 let cl_init_pr cl pr =
@@ -639,7 +673,8 @@ let warn_clone_not_abstract loc th =
         end
       | _ -> ()
     ) th.th_decls;
-    Warning.emit ~loc "cloned theory %a.%s does not contain any abstract symbol; it should be used instead"
+    Warning.emit ~loc "cloned theory %a.%s does not contain \
+        any abstract symbol; it should be used instead"
       (Pp.print_list (Pp.constant_string ".") Pp.string) th.th_path
       th.th_name.id_string
   with Exit -> ()

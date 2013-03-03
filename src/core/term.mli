@@ -38,6 +38,7 @@ type lsymbol = private {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
+  ls_opaque : Stv.t;
 }
 
 module Mls : Extmap.S with type key = lsymbol
@@ -48,9 +49,9 @@ module Wls : Weakhtbl.S with type key = lsymbol
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol : preid -> ty list -> ty option -> lsymbol
-val create_fsymbol : preid -> ty list -> ty -> lsymbol
-val create_psymbol : preid -> ty list -> lsymbol
+val create_lsymbol : ?opaque:Stv.t -> preid -> ty list -> ty option -> lsymbol
+val create_fsymbol : ?opaque:Stv.t -> preid -> ty list -> ty -> lsymbol
+val create_psymbol : ?opaque:Stv.t -> preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 
