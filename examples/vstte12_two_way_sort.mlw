@@ -11,19 +11,13 @@ module TwoWaySort
   use import bool.Bool
   use import ref.Refint
   use import array.Array
+  use import array.ArraySwap
   use import array.ArrayPermut
 
   predicate le (x y: bool) = x = False \/ y = True
 
   predicate sorted (a: array bool) =
     forall i1 i2: int. 0 <= i1 <= i2 < a.length -> le a[i1] a[i2]
-
-  let swap (a: array bool) (i: int) (j: int)
-    requires { 0 <= i < length a /\ 0 <= j < length a }
-    ensures { exchange (old a) a i j }
-  = let v = a[i] in
-    a[i] <- a[j];
-    a[j] <- v
 
   let two_way_sort (a: array bool)
     ensures { sorted a /\ permut (old a) a }
