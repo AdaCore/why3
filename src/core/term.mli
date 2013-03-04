@@ -39,6 +39,7 @@ type lsymbol = private {
   ls_args   : ty list;
   ls_value  : ty option;
   ls_opaque : Stv.t;
+  ls_constr : int;
 }
 
 module Mls : Extmap.S with type key = lsymbol
@@ -49,9 +50,14 @@ module Wls : Weakhtbl.S with type key = lsymbol
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol : ?opaque:Stv.t -> preid -> ty list -> ty option -> lsymbol
-val create_fsymbol : ?opaque:Stv.t -> preid -> ty list -> ty -> lsymbol
-val create_psymbol : ?opaque:Stv.t -> preid -> ty list -> lsymbol
+val create_lsymbol :
+  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty option -> lsymbol
+
+val create_fsymbol :
+  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
+
+val create_psymbol :
+  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 
@@ -63,6 +69,7 @@ exception UncoveredVar of vsymbol
 exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
+exception ConstructorExpected of lsymbol
 
 (** {2 Patterns} *)
 

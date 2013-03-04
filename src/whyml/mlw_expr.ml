@@ -48,7 +48,7 @@ let create_plsymbol_unsafe, restore_pl =
     pl),
   Wls.find ls_to_pls
 
-let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
+let create_plsymbol ?(hidden=false) ?(rdonly=false) ?(constr=0) id args value =
   let ty_of_field fd =
     Opt.iter (fun r -> ity_equal_check fd.fd_ity r.reg_ity) fd.fd_mut;
     ty_of_ity fd.fd_ity in
@@ -56,7 +56,7 @@ let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
   let pure_value = ty_of_field value in
   (* plsymbols are used for constructors and projections, which are safe *)
   let opaque = List.fold_left ty_freevars Stv.empty (pure_value::pure_args) in
-  let ls = create_fsymbol ~opaque id pure_args pure_value in
+  let ls = create_fsymbol ~opaque ~constr id pure_args pure_value in
   create_plsymbol_unsafe ls args value ~hidden ~rdonly
 
 let ity_of_ty_opt ty = ity_of_ty (Opt.get_def ty_bool ty)
@@ -138,6 +138,7 @@ type pre_ppattern =
 
 let make_ppattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
+  let gghost = ref false in
   let find id ghost ity =
     let nm = preid_name id in
     try
@@ -170,6 +171,9 @@ let make_ppattern pp ?(ghost=false) ity =
         ppat_effect  = eff_empty; }
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls);
+        if pls.pl_ls.ls_constr = 0 then
+          raise (Term.ConstructorExpected pls.pl_ls);
+        if ghost && pls.pl_ls.ls_constr > 1 then gghost := true;
         let ityv = pls.pl_value.fd_ity in
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
@@ -183,17 +187,20 @@ let make_ppattern pp ?(ghost=false) ity =
                 { pp with ppat_effect = eff }
             | _, _ -> pp in
         let ppl = try List.map2 mtch pls.pl_args ppl with
-          | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
+          | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
         make_app pls.pl_ls ppl ghost ity
     | PPlapp (ls,ppl) ->
+        if ls.ls_constr = 0 then
+          raise (Term.ConstructorExpected ls);
+        if ghost && ls.ls_constr > 1 then gghost := true;
         let ityv = ity_of_ty_opt ls.ls_value in
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
           make ghost (ity_full_inst sbs (ity_of_ty arg)) pp in
         let ppl = try List.map2 mtch ls.ls_args ppl with
-          | Not_found -> raise (Pattern.ConstructorExpected ls)
+          | Not_found -> raise (Term.ConstructorExpected ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (ls,List.length ls.ls_args,List.length ppl)) in
         make_app ls ppl ghost ity
@@ -212,6 +219,8 @@ let make_ppattern pp ?(ghost=false) ity =
           ppat_effect  = pp.ppat_effect; }
   in
   let pp = make ghost ity pp in
+  let gh = pp.ppat_ghost || !gghost in
+  let pp = { pp with ppat_ghost = gh } in
   Hstr.fold Mstr.add hv Mstr.empty, pp
 
 (** program symbols *)
@@ -636,16 +645,18 @@ let e_case e0 bl =
   let bity = match bl with
     | (_,e)::_ -> ity_of_expr e
     | [] -> raise Term.EmptyCase in
+  let multi_br = List.length bl > 1 in
   let rec branch ghost eff varm = function
     | (pp,e)::bl ->
-        if pp.ppat_ghost <> e0.e_ghost then
+        if e0.e_ghost && not pp.ppat_ghost then
           Loc.errorm "Non-ghost pattern in a ghost position";
         ity_equal_check (ity_of_expr e0) pp.ppat_ity;
         ity_equal_check (ity_of_expr e) bity;
-        let ghost = ghost || e.e_ghost in
         let del_vs vs _ m = Mid.remove vs.vs_name m in
         let bvarm = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_varm in
         let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
+        (* one-branch match is not ghost even if its pattern is ghost *)
+        let ghost = ghost || (multi_br && pp.ppat_ghost) || e.e_ghost in
         branch ghost eff (varmap_union varm bvarm) bl
     | [] ->
         (* the cumulated effect of all branches, w/out e0 *)
@@ -655,9 +666,7 @@ let e_case e0 bl =
         let varm = add_e_vars e0 varm in
         mk_expr (Ecase (e0,bl)) (VTvalue bity) ghost eff varm
   in
-  (* a one-branch match may be not ghost even if the matched expr is *)
-  let ghost = match bl with [_] -> false | _ -> e0.e_ghost in
-  branch ghost eff_empty Mid.empty bl
+  branch false eff_empty Mid.empty bl
 
 (* ghost *)
 

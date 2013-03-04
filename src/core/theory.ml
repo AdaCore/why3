@@ -505,9 +505,11 @@ let cl_find_ls cl ls =
   else try Mls.find ls cl.ls_table
   with Not_found ->
     let opaque = ls.ls_opaque in
+    let constr = ls.ls_constr in
+    let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
-    let ls' = create_lsymbol ~opaque (id_clone ls.ls_name) ta' vt' in
+    let ls' = create_lsymbol ~opaque ~constr id ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
 

@@ -763,6 +763,7 @@ let add_types dl th =
       | TDalias _ -> abstr, algeb, ts::alias
       | TDalgebraic cl ->
           let ht = Hstr.create 17 in
+          let constr = List.length cl in
           let opaque = Stv.of_list ts.ts_args in
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let projection (_,id,_,_) fty = match id with
@@ -784,7 +785,7 @@ let add_types dl th =
             let tyl = param_tys th' pl in
             let pjl = List.map2 projection pl tyl in
             Hstr.replace csymbols id.id loc;
-            create_fsymbol ~opaque (create_user_id id) tyl ty, pjl
+            create_fsymbol ~opaque ~constr (create_user_id id) tyl ty, pjl
           in
           abstr, (ts, List.map constructor cl) :: algeb, alias
       | TDrecord _ ->
@@ -806,11 +807,11 @@ let add_types dl th =
 
 let prepare_typedef td =
   if td.td_model then
-    errorm ~loc:td.td_loc "model types are not allowed in the logic";
+    errorm ~loc:td.td_loc "model types are not allowed in pure theories";
   if td.td_vis <> Public then
-    errorm ~loc:td.td_loc "logic types cannot be abstract or private";
+    errorm ~loc:td.td_loc "pure types cannot be abstract or private";
   if td.td_inv <> [] then
-    errorm ~loc:td.td_loc "logic types cannot have invariants";
+    errorm ~loc:td.td_loc "pure types cannot have invariants";
   match td.td_def with
   | TDabstract | TDalgebraic _ | TDalias _ ->
       td

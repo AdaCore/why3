@@ -21,7 +21,7 @@ module type Action = sig
   val mk_case : term -> branch list -> action
 end
 
-exception ConstructorExpected of lsymbol
+exception ConstructorExpected of lsymbol * ty
 exception NonExhaustive of pattern list
 
 module Compile (X : Action) = struct
@@ -51,7 +51,7 @@ module Compile (X : Action) = struct
             | Pas (p,_) -> populate acc p
             | Por (p,q) -> populate (populate acc p) q
             | Papp (fs,pl) when Sls.mem fs css -> Mls.add fs pl acc
-            | Papp (fs,_) -> raise (ConstructorExpected fs)
+            | Papp (fs,_) -> raise (ConstructorExpected (fs,ty))
           in
           let populate acc (pl,_) = populate acc (List.hd pl) in
           List.fold_left populate Mls.empty rl

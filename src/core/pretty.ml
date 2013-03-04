@@ -524,13 +524,16 @@ let () = Exn_printer.register
       fprintf fmt "Not a function symbol: %a" print_ls ls
   | Term.PredicateSymbolExpected ls ->
       fprintf fmt "Not a predicate symbol: %a" print_ls ls
+  | Term.ConstructorExpected ls ->
+      fprintf fmt "Symbol %a is not a constructor"
+        print_ls ls
   | Term.TermExpected t ->
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
-  | Pattern.ConstructorExpected ls ->
-      fprintf fmt "The symbol %a is not a constructor"
-        print_ls ls
+  | Pattern.ConstructorExpected (ls,ty) ->
+      fprintf fmt "Symbol %a is not a constructor of type %a"
+        print_ls ls print_ty ty
   | Pattern.NonExhaustive pl ->
       fprintf fmt "Pattern not covered by a match:@\n  @[%a@]"
         print_pat (List.hd pl)

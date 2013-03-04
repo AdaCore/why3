@@ -125,7 +125,7 @@ let create_data_decl tdl =
 (*   let syms = ref Sid.empty in *)
   let news = ref Sid.empty in
   let projections = Hstr.create 17 in (* id -> plsymbol *)
-  let build_constructor its res (id,al) =
+  let build_constructor its res cll (id,al) =
     (* check well-formedness *)
     let fds = List.map snd al in
     let tvs = List.fold_right Stv.add its.its_ts.ts_args Stv.empty in
@@ -141,7 +141,7 @@ let create_data_decl tdl =
     List.iter check_arg fds;
     (* build the constructor ps *)
     let hidden = its.its_abst and rdonly = its.its_priv in
-    let cs = create_plsymbol ~hidden ~rdonly id fds res in
+    let cs = create_plsymbol ~hidden ~rdonly ~constr:cll id fds res in
     news := news_id !news cs.pl_ls.ls_name;
     (* build the projections, if any *)
     let build_proj fd id =
@@ -167,10 +167,11 @@ let create_data_decl tdl =
   let build_type (its,cl) =
     Hstr.clear projections;
     news := news_id !news its.its_ts.ts_name;
+    let cll = List.length cl in
     let tvl = List.map ity_var its.its_ts.ts_args in
     let ity = ity_app its tvl its.its_regs in
     let res = { fd_ity = ity; fd_ghost = false; fd_mut = None } in
-    its, List.map (build_constructor its res) cl, null_invariant its
+    its, List.map (build_constructor its res cll) cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
   mk_decl (PDdata tdl) Sid.empty !news

@@ -1867,6 +1867,7 @@ let add_types ~wp uc tdl =
 
   let mk_pure_decl ts csl =
     let pjt = Hstr.create 3 in
+    let constr = List.length csl in
     let opaque = Stv.of_list ts.ts_args in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
     let mk_proj (pj,fd) =
@@ -1881,7 +1882,7 @@ let add_types ~wp uc tdl =
     in
     let mk_constr (id,pjl) =
       let pjl = List.map mk_proj pjl in
-      let cs = create_fsymbol ~opaque id (List.map fst pjl) ty in
+      let cs = create_fsymbol ~opaque ~constr id (List.map fst pjl) ty in
       cs, List.map snd pjl
     in
     List.map mk_constr csl

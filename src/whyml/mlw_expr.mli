@@ -42,7 +42,8 @@ type plsymbol = private {
 val pl_equal : plsymbol -> plsymbol -> bool
 
 val create_plsymbol :
-  ?hidden:bool -> ?rdonly:bool -> preid -> field list -> field -> plsymbol
+  ?hidden:bool -> ?rdonly:bool -> ?constr:int ->
+    preid -> field list -> field -> plsymbol
 
 exception HiddenPLS of plsymbol
 exception RdOnlyPLS of plsymbol
