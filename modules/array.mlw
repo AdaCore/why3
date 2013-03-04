@@ -175,6 +175,24 @@ module ArrayPermut
 
 end
 
+module ArraySwap
+
+  use import int.Int
+  use import Array
+  use import ArrayPermut
+
+  let swap (a:array 'a) (i:int) (j:int) : unit
+    requires { 0 <= i < length a /\ 0 <= j < length a }
+    ensures  { exchange (old a) a i j }
+    =
+    let v = a[i] in
+    begin
+      a[i] <- a[j];
+      a[j] <- v
+    end
+
+end
+
 (** {2 Sum of elements} *)
 
 module ArraySum
