@@ -5,50 +5,57 @@ module ResizableArrayImplem
   use import int.MinMax
   use array.Array as A
 
-  type elt
-  constant dummy: elt
-
-  type rarray = { mutable length: int; mutable data: A.array elt }
+  type rarray 'a =
+    { dummy: 'a; mutable length: int; mutable data: A.array 'a }
     invariant { 0 <= self.length <= A.length self.data }
+    invariant { forall i: int. self.length <= i < A.length self.data ->
+                  A.get self.data i = self.dummy }
 
-  function ([]) (r: rarray) (i: int) : elt = A.get r.data i
-  function ([<-]) (r: rarray) (i: int) (v: elt) : rarray =
+  function ([]) (r: rarray 'a) (i: int) : 'a = A.get r.data i
+  function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a =
     { r with data = A.set r.data i v }
 
-  function make (len: int) : rarray =
-    { length = len; data = A.make len dummy }
+  function make (len: int) (dummy: 'a) : rarray 'a =
+    { dummy = dummy; length = len; data = A.make len dummy }
 
-  let make (len: int)
-    requires { 0 <= len } ensures { result = make len }
-  = { length = len; data = A.make len dummy }
+  let make (len: int) (dummy: 'a) : rarray 'a
+    requires { 0 <= len } ensures { result = make len dummy }
+    =
+    { dummy = dummy; length = len; data = A.make len dummy }
 
-  let ([]) (r: rarray) (i: int)
+  let ([]) (r: rarray 'a) (i: int) : 'a
     requires { 0 <= i < r.length } ensures { result = r[i] }
-  = A.([]) r.data i
+    =
+    A.([]) r.data i
 
-  let ([]<-) (r: rarray) (i: int) (v: elt)
+  let ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
     requires { 0 <= i < r.length } ensures { r = (old r)[i <- v] }
-  = A.([]<-) r.data i v
+    =
+    A.([]<-) r.data i v
 
-  let resize (r: rarray) (len: int)
+  let resize (r: rarray 'a) (len: int) : unit
     requires { 0 <= len }
-    ensures { r.length = len /\
-      forall i: int.
-        0 <= i < min (old r.length) len -> r[i] = (old r)[i] }
-  = let n = A.length r.data in
+    ensures  { r.length = len }
+    ensures  { forall i: int.
+                 0 <= i < min (old r.length) len -> r[i] = (old r)[i] }
+    =
+    let n = A.length r.data in
     if len > n then begin
-      let a = A.make (max len (2 * n)) dummy in
+      let a = A.make (max len (2 * n)) r.dummy in
       A.blit r.data 0 a 0 n;
       r.data <- a
+    end else begin
+      A.fill r.data len (n - len) r.dummy
     end;
     r.length <- len
 
-  let append (r1: rarray) (r2: rarray)
-    ensures { r1.length = old r1.length + r2.length /\
-      forall i: int. 0 <= i < r1.length ->
-        (i < old r1.length  -> r1[i] = (old r1)[i]) /\
-        (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
-  = let n1 = length r1 in
+  let append (r1: rarray 'a) (r2: rarray 'a) : unit
+    ensures { r1.length = old r1.length + r2.length }
+    ensures { forall i: int. 0 <= i < r1.length ->
+               (i < old r1.length  -> r1[i] = (old r1)[i]) /\
+               (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
+    =
+    let n1 = length r1 in
     resize r1 (length r1 + length r2);
     A.blit r2.data 0 r1.data n1 (length r2)
 
@@ -81,11 +88,10 @@ end
 module Test
 
   use import int.Int
-  clone import ResizableArrayImplem
-    with type elt = int, constant dummy = Int.zero
+  use import ResizableArrayImplem
 
   let test1 () =
-    let r = make 10 in
+    let r = make 10 0 in
     assert { r.length = 10 };
     r[0] <- 17;
     resize r 7;
@@ -93,9 +99,9 @@ module Test
     assert { r.length = 7 }
 
   let test2 () =
-    let r1 = make 10 in
+    let r1 = make 10 0 in
     r1[0] <- 17;
-    let r2 = make 10 in
+    let r2 = make 10 0 in
     r2[0] <- 42;
     append r1 r2;
     assert { r1.length = 20 };
