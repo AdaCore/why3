@@ -24,6 +24,7 @@ let opt_filename : string option ref = ref None
 let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
+let opt_show_tag = ref false
 
 let opt_limit_line : Gnat_loc.loc option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -119,6 +120,8 @@ let options = Arg.align [
           " Use prover given in argument instead of Alt-Ergo";
    "--ide-progress-bar", Arg.Set opt_ide_progress_bar,
           " Issue information on number of VCs proved";
+   "--show-tag", Arg.Set opt_show_tag,
+          " Add a unique tag at the end of each error message";
    "--debug", Arg.Set opt_debug,
           " Enable debug mode";
 ]
@@ -203,6 +206,7 @@ let report  = !opt_report
 let proof_mode = !opt_proof_mode
 let debug = !opt_debug
 let force = !opt_force
+let show_tag = !opt_show_tag
 let split_name = "split_goal"
 let limit_line = !opt_limit_line
 

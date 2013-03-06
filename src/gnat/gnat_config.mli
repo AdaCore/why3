@@ -66,5 +66,9 @@ val ide_progress_bar : bool
 (* set if option --ide-progress-bar was given, to issue formatted output on
    current numbers of VCs proved *)
 
+val show_tag : bool
+(* set of option --show-tag was given, to issue a unique tag after each error
+   message *)
+
 val parallel : int
 (* number of parallel processes that can be run in parallel for proving VCs *)

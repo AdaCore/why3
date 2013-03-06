@@ -77,6 +77,25 @@ let string_of_reason s =
    | VC_Loop_Variant              -> "loop variant"
    | VC_Assert                    -> "assertion"
 
+let tag_of_reason s =
+  match s with
+   | VC_Division_Check            -> "division_check"
+   | VC_Index_Check               -> "index_check"
+   | VC_Overflow_Check            -> "overflow_check"
+   | VC_Range_Check               -> "range_check"
+   | VC_Length_Check              -> "length_check"
+   | VC_Discriminant_Check        -> "discriminant_check"
+   | VC_Precondition              -> "precondition"
+   | VC_Postcondition             -> "postcondition"
+   | VC_Contract_Case             -> "contract_case"
+   | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
+   | VC_Complete_Contract_Cases   -> "complete_contract_cases"
+   | VC_Loop_Invariant            -> "loop_invariant"
+   | VC_Loop_Invariant_Init       -> "loop_invariant_initialization"
+   | VC_Loop_Invariant_Preserv    -> "loop_invariant_preservation"
+   | VC_Loop_Variant              -> "loop_variant"
+   | VC_Assert                    -> "assertion"
+
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc
   | Gp_Subp of Gnat_loc.loc
@@ -250,24 +269,23 @@ let print_expl proven task fmt p =
          List.iter
          (fun secondary_sloc ->
             Format.fprintf fmt ", in instantiation at %a"
-              print_line_loc secondary_sloc) secondaries
+              print_line_loc secondary_sloc) secondaries;
+         if Gnat_config.show_tag then
+           Format.fprintf fmt " [%s]" (tag_of_reason p.reason)
 
 let print_skipped fmt p =
    Format.fprintf fmt "%a: %a skipped"
      simple_print_loc (List.hd p.loc) print_reason p.reason
 
 let to_filename ?goal expl =
-   let s = String.copy (string_of_reason expl.reason) in
-   for i = 0 to String.length s - 1 do
-      if s.[i] = ' ' then s.[i] <- '_'
-   done;
+   let tag = tag_of_reason expl.reason in
    let l = orig_loc expl.loc in
    let l =
       match goal with
       | None -> l
       | Some g -> let l, _ = improve_sloc l (Session.goal_task g) in l
    in
-   Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) s
+   Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) tag
 
 module ExplCmp = struct
    type t = expl
