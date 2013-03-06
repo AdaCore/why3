@@ -266,6 +266,169 @@ let task_checksum ?(version=current_shape_version) t =
   Digest.to_hex (Digest.string shape)
 
 
+module Checksum = struct
+
+  let char = Buffer.add_char
+  let int b i = Buffer.add_string b (string_of_int i)
+  let string b s =
+    char b '"'; Buffer.add_string b (String.escaped s); char b '"'
+  let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
+  let list e b l = char b 'l'; List.iter (e b) l; char b 'l'
+
+  let ident_printer = Ident.create_ident_printer []
+  let ident b id = string b (Ident.id_unique ident_printer id)
+
+  let const b c =
+    let buf = Buffer.create 17 in
+    Format.bprintf buf "%a" Pretty.print_const c;
+    char b 'c'; string b (Buffer.contents buf)
+
+  let tvsymbol b tv = ident b tv.Ty.tv_name
+
+  let rec ty b t = match t.Ty.ty_node with
+    | Ty.Tyvar tv -> char b 'v'; tvsymbol b tv
+    | Ty.Tyapp (ts, tyl) -> char b 'a'; ident b ts.Ty.ts_name; list ty b tyl
+
+  (* variable: the type, but not the name (we want alpha-equivalence) *)
+  let vsymbol b vs = ty b vs.vs_ty
+
+  (* start: _ V ident a o *)
+  let rec pat b p = match p.pat_node with
+    | Pwild -> char b '_'
+    | Pvar vs -> char b 'v'; vsymbol b vs
+    | Papp (f, l) -> char b 'a'; ident b f.ls_name; list pat b l
+    | Pas (p, vs) -> char b 's'; pat b p; vsymbol b vs
+    | Por (p, q) -> char b 'o'; pat b p; pat b q
+
+  (* start: c V v i m e F E A O I q l n t f *)
+  let rec term c m b t = match t.t_node with
+    | Tconst c -> const b c
+    | Tvar v ->
+        begin try let x = Mvs.find v m in char b 'V'; int b x
+        with Not_found -> char b 'v'; ident b v.vs_name end
+    | Tapp (s, l) -> char b 'a'; ident b s.ls_name; list (term c m) b l
+    | Tif (f, t1, t2) -> char b 'i'; term c m b f; term c m b t1; term c m b t2
+    | Tcase (t1, bl) ->
+        let branch b br =
+          let p, t2 = t_open_branch br in
+          pat b p;
+          let m = pat_rename_alpha c m p in
+          term c m b t2
+        in
+        char b 'm'; term c m b t1; list branch b bl
+    | Teps bf ->
+        let vs, f = t_open_bound bf in
+        let m = vs_rename_alpha c m vs in
+        char b 'e'; vsymbol b vs; term c m b f
+    | Tquant (q, bf) ->
+        let vl, triggers, f1 = t_open_quant bf in
+        let m = vl_rename_alpha c m vl in
+        char b (match q with Tforall -> 'F' | Texists -> 'E');
+        list vsymbol b vl;
+        list (list (term c m)) b triggers;
+        term c m b f1
+    | Tbinop (o, f, g) ->
+        let tag = match o with
+          | Tand -> 'A'
+          | Tor -> 'O'
+          | Timplies -> 'I'
+          | Tiff -> 'q'
+        in
+        char b tag; term c m b f; term c m b g
+    | Tlet (t1, bt) ->
+        let vs, t2 = t_open_bound bt in
+        char b 'l'; vsymbol b vs; term c m b t1;
+        let m = vs_rename_alpha c m vs in
+        term c m b t2
+    | Tnot f -> char b 'n'; term c m b f
+    | Ttrue -> char b 't'
+    | Tfalse -> char b 'f'
+
+  let tysymbol b ts =
+    ident b ts.Ty.ts_name;
+    list tvsymbol b ts.Ty.ts_args;
+    option ty b ts.Ty.ts_def
+
+  let lsymbol b ls =
+    ident b ls.ls_name;
+    list ty b ls.ls_args;
+    option ty b ls.ls_value;
+    list tvsymbol b (Ty.Stv.elements ls.ls_opaque);
+    int b ls.ls_constr
+
+  (* start: T D R L I P *)
+  let decl b d = match d.Decl.d_node with
+    | Decl.Dtype ts ->
+        (* FIXME: alpha-equivalence for type variables as well *)
+        char b 'T'; tysymbol b ts
+    | Decl.Ddata ddl ->
+        let constructor b (ls, l) = lsymbol b ls; list (option lsymbol) b l in
+        let data_decl b (ts, cl) = tysymbol b ts; list constructor b cl in
+        char b 'D'; list data_decl b ddl
+    | Decl.Dparam ls ->
+        char b 'R'; lsymbol b ls
+    | Decl.Dlogic ldl ->
+        let logic_decl b (ls, defn) =
+          lsymbol b ls;
+          let vl, t = Decl.open_ls_defn defn in
+          let c = ref (-1) in
+          let m = vl_rename_alpha c Mvs.empty vl in
+          list vsymbol b vl; (* FIXME: really needed? (we did lsymbol above) *)
+          term c m b t
+        in
+        char b 'L'; list logic_decl b ldl
+    | Decl.Dind (s, idl) ->
+        let clause b (pr, f) =
+          ident b pr.Decl.pr_name; term (ref (-1)) Mvs.empty b f in
+        let ind_decl b (ls, cl) = lsymbol b ls; list clause b cl in
+        char b 'I'; char b (match s with Decl.Ind -> 'i' | Decl.Coind -> 'c');
+        list ind_decl b idl
+    | Decl.Dprop (k,n,t) ->
+        let tag = match k with
+          | Decl.Plemma -> "PL"
+          | Decl.Paxiom -> "PA"
+          | Decl.Pgoal  -> "PG"
+          | Decl.Pskip  -> "PS"
+        in
+        string b tag;
+        ident b n.Decl.pr_name;
+        term (ref (-1)) Mvs.empty b t
+
+  let meta_arg_type b = function
+    | Theory.MTty       -> char b 'y'
+    | Theory.MTtysymbol -> char b 't'
+    | Theory.MTlsymbol  -> char b 'l'
+    | Theory.MTprsymbol -> char b 'p'
+    | Theory.MTstring   -> char b 's'
+    | Theory.MTint      -> char b 'i'
+
+  let meta b m =
+    string b m.Theory.meta_name;
+    list meta_arg_type b m.Theory.meta_type;
+    char b (if m.Theory.meta_excl then 't' else 'f');
+    string b (string_of_format m.Theory.meta_desc) (* FIXME: necessary? *)
+
+  let meta_arg b = function
+    | Theory.MAty t  -> char b 'y'; ty b t
+    | Theory.MAts ts -> char b 't'; ident b ts.Ty.ts_name
+    | Theory.MAls ls -> char b 'l'; ident b ls.ls_name
+    | Theory.MApr pr -> char b 'p'; ident b pr.Decl.pr_name
+    | Theory.MAstr s -> char b 's'; string b s
+    | Theory.MAint i -> char b 'i'; int b i
+
+  let tdecl b d = match d.Theory.td_node with
+    | Theory.Decl d -> decl b d
+    | Theory.Use _ | Theory.Clone _ -> () (* FIXME: OK? *)
+    | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
+
+  let task t =
+    let b = Buffer.create 257 in
+    Ident.forget_all ident_printer;
+    Task.task_iter (tdecl b) t;
+    Buffer.contents b
+
+end
+
 
 (*************************)
 (**       Pairing       **)
