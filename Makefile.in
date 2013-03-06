@@ -393,7 +393,7 @@ endif
 depend: src/main.dep
 
 clean::
-	rm -f src/main.cm[iox] src/main.annot src/main.o
+	rm -f src/main.cm[iox] src/main.annot src/main.o src/main.dep
 	rm -f bin/why3.byte bin/why3.opt bin/why3
 	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
 
@@ -564,14 +564,14 @@ endif
 
 REPLAYER_FILES = replay
 
-REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
+REPLAYERMODULES = $(addprefix src/why3replayer/, $(REPLAYER_FILES))
 
 REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
 REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
 REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
 
-$(REPLAYERDEP): DEPFLAGS += -I src/ide
-$(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide
+$(REPLAYERDEP): DEPFLAGS += -I src/why3replayer
+$(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/why3replayer
 
 # build targets
 
@@ -598,6 +598,8 @@ endif
 depend: $(REPLAYERDEP)
 
 clean::
+	rm -f src/why3replayer/*.cm[iox] src/why3replayer/*.o
+	rm -f src/why3replayer/*.annot src/why3replayer/*.dep src/why3replayer/*~
 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
 
 install_no_local::
@@ -1167,7 +1169,7 @@ test-api.byte: examples/use_api/use_api.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
 	|| (rm -f test-api.byte; printf "Test of Why API calls failed. Please fix it"; exit 2)
-	@rm -f test-api.byte; 
+	@rm -f test-api.byte;
 
 test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
