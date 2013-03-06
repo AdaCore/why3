@@ -1508,7 +1508,10 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let s, r1, r2 =
         Subst.merge_states s (e1_regs, p.s)
           (e1_regs, wp1.post.s) in
-      let r3 = t_equ (t_var ex_res) (t_var (Mexn.find ex xresult)) in
+      let r3 =
+        (* avoid to introduce useless equation between void terms *)
+        if ty_equal (ty_of_vty e1.e_vty) (ty_tuple []) then t_true
+        else t_equ (t_var ex_res) (t_var (Mexn.find ex xresult)) in
       let ne =
         wp_or (t_and_simp p.ne r1)
               (t_and_simp_l [wp1.post.ne; r2; r3]) in
