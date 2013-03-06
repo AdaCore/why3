@@ -1,0 +1,32 @@
+(* Why driver for SPASS with types (>= 3.8) *)
+
+printer "dfg"
+filename "%f-%t-%g.dfg"
+
+valid   "Proof found"
+invalid "Completion found"
+timeout "Ran out of time"
+timeout "CPU time limit exceeded"
+outofmemory "Out of Memory"
+unknown "No Proof Found" ""
+fail    "Failure.*" "\"\\0\""
+
+time "why3cpulimit time : %s s"
+
+(* to be improved *)
+
+(*transformation "simplify_recursive_definition"*)
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_if"
+transformation "eliminate_let"
+
+theory BuiltIn
+  syntax predicate (=)  "equal(%1, %2)"
+  meta "eliminate_algebraic" "no_index"
+end
+

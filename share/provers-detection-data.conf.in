@@ -198,9 +198,18 @@ exec = "SPASS"
 version_switch = " | grep 'SPASS V'"
 version_regexp = "SPASS V \\([^ \n\t]+\\)"
 version_ok = "3.7"
-# we pass time 0 to why3-cpulimit to avoid race
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -TPTP -PGiven=0 -PProblem=0 -TimeLimit=%t %f"
 driver = "drivers/spass.drv"
+
+[ATP spass]
+name = "Spass"
+exec = "SPASS"
+exec = "SPASS-3.8ds"
+version_switch = " | grep 'SPASS[^ \\n\\t]* V'"
+version_regexp = "SPASS[^ \n\t]* V \\([^ \n\t]+\\)"
+version_ok = "3.8ds"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -Isabelle=1 -PGiven=0 -TimeLimit=%t %f"
+driver = "drivers/spass_types.drv"
 
 [ATP vampire]
 name = "Vampire"
