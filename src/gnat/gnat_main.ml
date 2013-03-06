@@ -117,6 +117,7 @@ let rec handle_vc_result goal result detailed =
          | _ -> ()
          end
    | Gnat_objectives.Not_Proved ->
+         Gnat_objectives.Save_VCs.save_trace goal;
          if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
          begin
             let detailed =
@@ -127,8 +128,7 @@ let rec handle_vc_result goal result detailed =
          end else begin
             print false (Session.goal_task goal)
               (Gnat_objectives.get_objective goal)
-         end;
-         Gnat_objectives.Save_VCs.save_trace goal
+         end
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
