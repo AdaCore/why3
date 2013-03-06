@@ -744,19 +744,29 @@ let e_not e =
     mk_expr (Elogic (t_not f)) e.e_vty e.e_ghost e.e_effect e.e_varm) e
 
 let e_binop op e1 e2 =
-  on_fmla (fun e2 f2 -> on_fmla (fun e1 f1 ->
+  on_fmla (fun e1 f1 -> on_fmla (fun e2 f2 ->
     ity_equal_check (ity_of_expr e1) ity_bool;
     ity_equal_check (ity_of_expr e2) ity_bool;
     let varm = add_e_vars e1 e2.e_varm in
     let eff = eff_union e1.e_effect e2.e_effect in
     let ghost = e1.e_ghost || e2.e_ghost in
-    mk_expr (Elogic (t_binary op f1 f2)) e1.e_vty ghost eff varm) e1) e2
+    mk_expr (Elogic (t_binary op f1 f2)) e1.e_vty ghost eff varm) e2) e1
+
+let rec e_nospec e = match e.e_node with
+  | Elogic _ | Evalue _ -> true
+  | Eif (e1,e2,e3) -> e_nospec e1 && e_nospec e2 && e_nospec e3
+  | Ecase (e1,bl) -> e_nospec e1 && List.for_all (fun (_,e2) -> e_nospec e2) bl
+  | Elet ({let_sym = LetV _; let_expr = e1}, e2) -> e_nospec e1 && e_nospec e2
+  | Eghost e1 -> e_nospec e1
+  | _ -> false
 
 let e_lazy_and e1 e2 =
-  if eff_is_empty e2.e_effect then e_binop Tand e1 e2 else e_if e1 e2 e_false
+  if eff_is_empty e2.e_effect && e_nospec e2
+  then e_binop Tand e1 e2 else e_if e1 e2 e_false
 
 let e_lazy_or e1 e2 =
-  if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
+  if eff_is_empty e2.e_effect && e_nospec e2
+  then e_binop Tor e1 e2 else e_if e1 e_true e2
 
 (* loops *)
 
