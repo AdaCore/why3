@@ -425,7 +425,7 @@ module Checksum = struct
     let b = Buffer.create 257 in
     Ident.forget_all ident_printer;
     Task.task_iter (tdecl b) t;
-    Buffer.contents b
+    Digest.to_hex (Digest.string (Buffer.contents b))
 
 end
 
