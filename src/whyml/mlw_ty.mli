@@ -20,27 +20,26 @@ module rec T : sig
 
   type varset = private {
     vars_tv  : Stv.t;
-    vars_reg : Mreg.Set.t;
+    vars_reg : Sreg.t;
   }
   (* the set of variables, e.g. of an individual type. An individual program
      type can contain type and region variables *)
 
   type varmap = varset Mid.t
 
-  type itysymbol = private {     (* the type of a type symbol *)
-    its_pure : tysymbol;         (* the corresponding pure type *)
-    its_args : tvsymbol list;    (* the set of bound variables *)
-    its_regs : region list;      (* the set of regions *)
-    its_def  : ity option;       (* the definition of the type symbol *)
-    its_inv  : bool;             (* does the type have an invariant? *)
-    its_abst : bool;             (* is the type abstract = does it have a model
-                                    view? *)
-    its_priv : bool;             (* is the type private? *)
+  type itysymbol = private {
+    its_ts   : tysymbol;
+    its_regs : region list;
+    its_def  : ity option;
+    its_inv  : bool;
+    its_abst : bool;
+    its_priv : bool;
   }
 
-  and ity = private {            (* the actual type structure *)
-    ity_node : ity_node;         (* the kind of the type *)
-    ity_vars : varset;           (* the variables bound by the type *)
+  (** ity = individual type in programs, first-order, i.e. no functions *)
+  and ity = private {
+    ity_node : ity_node;
+    ity_vars : varset;
     ity_tag  : Weakhtbl.tag;
   }
 
@@ -52,27 +51,27 @@ module rec T : sig
                               arguments *)
 
   and region = private {
-    reg_name  : ident;               (* the name of the region *)
-    reg_ity   : ity;                 (* the type of the region *)
+    reg_name : ident;
+    reg_ity  : ity;
   }
 
 end
-and Mreg : sig include Map.S with type key = T.region end
+and Mreg : sig include Extmap.S with type key = T.region end
+and Sreg : sig include Extset.S with module M = Mreg end
 
 open T
 
-module Mits : Map.S with type key = itysymbol
-module Sits : Mits.Set
-module Hits : XHashtbl.S with type key = itysymbol
+module Mits : Extmap.S with type key = itysymbol
+module Sits : Extset.S with module M = Mits
+module Hits : Exthtbl.S with type key = itysymbol
 module Wits : Weakhtbl.S with type key = itysymbol
 
-module Mity : Map.S with type key = ity
-module Sity : Mity.Set
-module Hity : XHashtbl.S with type key = ity
+module Mity : Extmap.S with type key = ity
+module Sity : Extset.S with module M = Mity
+module Hity : Exthtbl.S with type key = ity
 module Wity : Weakhtbl.S with type key = ity
 
-module Sreg : Mreg.Set
-module Hreg : XHashtbl.S with type key = region
+module Hreg : Exthtbl.S with type key = region
 module Wreg : Weakhtbl.S with type key = region
 
 val its_equal : itysymbol -> itysymbol -> bool
@@ -91,9 +90,14 @@ exception UnboundRegion of region
 
 val create_region : preid -> ity -> region
 
+
+(** creation of a symbol for type in programs *)
 val create_itysymbol :
   preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
     tvsymbol list -> region list -> ity option -> itysymbol
+
+val restore_its : tysymbol -> itysymbol
+  (* raises Not_found if the argument is not a its_ts *)
 
 val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
@@ -124,9 +128,9 @@ val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
 
 val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
 
-val ity_closed  : ity -> bool
-val ity_pure    : ity -> bool
-val ity_has_inv : ity -> bool
+val ity_closed    : ity -> bool
+val ity_immutable : ity -> bool
+val ity_has_inv   : ity -> bool
 
 (* these functions attend the sub-regions *)
 
@@ -181,7 +185,7 @@ val create_varset : Stv.t -> Sreg.t -> varset
 (* exception symbols *)
 type xsymbol = private {
   xs_name : ident;
-  xs_ity  : ity; (* closed and pure *)
+  xs_ity  : ity; (* closed and immutable *)
 }
 
 val xs_equal : xsymbol -> xsymbol -> bool
@@ -191,8 +195,8 @@ exception MutableException of ident * ity
 
 val create_xsymbol : preid -> ity -> xsymbol
 
-module Mexn: Map.S with type key = xsymbol
-module Sexn: Mexn.Set
+module Mexn: Extmap.S with type key = xsymbol
+module Sexn: Extset.S with module M = Mexn
 
 (** effects *)
 
@@ -272,9 +276,9 @@ type pvsymbol = private { (* a program variable *)
           pv_vtv.vtv_ity.ity_vars plus the region in pv_vtv.vtv_mut. *)
 }
 
-module Mpv : Map.S with type key = pvsymbol
-module Spv : Mpv.Set
-module Hpv : XHashtbl.S with type key = pvsymbol
+module Mpv : Extmap.S with type key = pvsymbol
+module Spv : Extset.S with module M = Mpv
+module Hpv : Exthtbl.S with type key = pvsymbol
 module Wpv : Weakhtbl.S with type key = pvsymbol
 
 val pv_equal : pvsymbol -> pvsymbol -> bool

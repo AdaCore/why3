@@ -248,7 +248,7 @@ let rec ask_yn () =
     | "n" -> false
     | _ -> ask_yn ()
 
-let rec ask_yn_nonblock ~callback =
+let ask_yn_nonblock ~callback =
   let b = Buffer.create 3 in
   let s = String.create 1 in
   Format.printf "(y/n)@.";

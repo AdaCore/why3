@@ -292,8 +292,8 @@ module ExplCmp = struct
    let compare = expl_compare
 end
 
-module MExpl = Stdlib.Map.Make(ExplCmp)
-module SExpl = MExpl.Set
+module MExpl = Extmap.Make(ExplCmp)
+module SExpl = Extset.Make(ExplCmp)
 module HExpl = Hashtbl.Make (struct
    type t = expl
    let equal = expl_equal

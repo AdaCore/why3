@@ -70,13 +70,13 @@ module Pos = struct
   let hash x = Hashtbl.hash (x : t)
 end
 
-module Mpos = Map.Make(Pos)
-module Spos = Mpos.Set
-module Hpos = XHashtbl.Make(Pos)
+module Mpos = Extmap.Make(Pos)
+module Spos = Extset.MakeOfMap(Mpos)
+module Hpos = Exthtbl.Make(Pos)
 
 type meta_args = meta_arg list
 
-module Mmeta_args = Map.Make(struct
+module Mmeta_args = Extmap.Make(struct
   type t = meta_args
 
   let meta_arg_id = function
@@ -100,11 +100,12 @@ module Mmeta_args = Map.Make(struct
 
   let compare = Lists.compare compare_meta_arg
 end)
-module Smeta_args = Mmeta_args.Set
+
+module Smeta_args = Extset.MakeOfMap(Mmeta_args)
 
 type metas_args = Smeta_args.t Mstr.t
 
-module Mmetas_args = Map.Make(struct
+module Mmetas_args = Extmap.Make(struct
   type t = metas_args
   let compare = Mstr.compare Smeta_args.compare
 end)
@@ -1913,14 +1914,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
         read_theory ip formats
   in
   let read_theory ip =
-    if ip.ip_library = [] then
-      match ip.ip_theory with
-        (** Hack?? *)
-      | "BuiltIn" -> Theory.builtin_theory
-      | "Bool" -> Theory.bool_theory
-      (* | "Tuple"??? -> ... *)
-      (* | "Unit" -> ??? *)
-      | s -> Mstr.find s theories
+    if ip.ip_library = [] then Mstr.find ip.ip_theory theories
     else read_theory ip ["why";"whyml"] in
 
   let to_idpos_ts = Mts.fold_left (fun idpos_ts from_ts ip ->

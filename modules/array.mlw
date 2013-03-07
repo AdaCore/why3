@@ -13,6 +13,7 @@ module Array
   use import map.Map as M
 
   type array 'a model { length : int; mutable elts : map int 'a }
+    invariant { 0 <= self.length }
 
   function get (a: array 'a) (i: int) : 'a = M.get a.elts i
 
@@ -61,7 +62,7 @@ module Array
       forall i:int. 0 <= i < length a2 -> result[length a1 + i] = a2[i] }
 
   val sub (a: array 'a) (ofs: int) (len: int) : array 'a
-    requires { 0 <= ofs /\ ofs + len <= length a }
+    requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length a }
     ensures  { length result = len }
     ensures  { forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
 
@@ -70,7 +71,7 @@ module Array
     ensures  { forall i:int. 0 <= i < length result -> result[i] = a[i] }
 
   let fill (a: array 'a) (ofs: int) (len: int) (v: 'a)
-    requires { 0 <= ofs /\ ofs + len <= length a }
+    requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length a }
     ensures  { forall i:int.
       (0 <= i < ofs \/ ofs + len <= i < length a) -> a[i] = (old a)[i] }
     ensures  { forall i:int. ofs <= i < ofs + len -> a[i] = v }
@@ -84,8 +85,8 @@ module Array
 
   val blit (a1: array 'a) (ofs1: int)
                  (a2: array 'a) (ofs2: int) (len: int) : unit writes {a2}
-    requires { 0 <= ofs1 /\ ofs1 + len <= length a1 }
-    requires { 0 <= ofs2 /\ ofs2 + len <= length a2 }
+    requires { 0 <= ofs1 /\ 0 <= len /\ ofs1 + len <= length a1 }
+    requires { 0 <= ofs2 /\             ofs2 + len <= length a2 }
     ensures  { forall i:int.
       (0 <= i < ofs2 \/ ofs2 + len <= i < length a2) -> a2[i] = (old a2)[i] }
     ensures  { forall i:int.
@@ -205,10 +206,24 @@ module NumOfParam
   predicate pr_ (p: param_) (i: int) = let (a, p) = p in pr p i a[i]
   clone import int.NumOfParam with type param = param_, predicate pr = pr_
 
-  (* the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
+  (** the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
   function numof (a: array elt) (p: param) (l u: int) : int = num_of (a, p) l u
 end
 
+(** the number of a[i] such that [l <= i < u] and [a[i] = v] *)
+module NumOfEq
+  use import Array
+
+  type elt
+
+  type param = (array elt, elt)
+  predicate pr (p: param) (i: int) = let (a, v) = p in a[i] = v
+  clone import int.NumOfParam with type param = param, predicate pr = pr
+
+  function numof (a: array elt) (v: elt) (l u: int) : int = num_of (a, v) l u
+end
+
+(** the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
 module NumOf
   use import Array
 
@@ -219,7 +234,6 @@ module NumOf
   predicate pr_ (a: param) (i: int) = pr i a[i]
   clone import int.NumOfParam with type param = param, predicate pr = pr_
 
-  (* the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
   function numof (a: array elt) (l u: int) : int = num_of a l u
 end
 

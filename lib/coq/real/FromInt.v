@@ -5,41 +5,36 @@ Require BuiltIn.
 Require int.Int.
 Require real.Real.
 
-(* Why3 goal *)
-Definition from_int: Z -> R.
-exact IZR.
-Defined.
+(* Why3 comment *)
+(* from_int is replaced with (IZR x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma Zero : ((from_int 0%Z) = 0%R).
+Lemma Zero : ((IZR 0%Z) = 0%R).
 split.
 Qed.
 
 (* Why3 goal *)
-Lemma One : ((from_int 1%Z) = 1%R).
+Lemma One : ((IZR 1%Z) = 1%R).
 split.
 Qed.
 
 (* Why3 goal *)
-Lemma Add : forall (x:Z) (y:Z),
-  ((from_int (x + y)%Z) = ((from_int x) + (from_int y))%R).
+Lemma Add : forall (x:Z) (y:Z), ((IZR (x + y)%Z) = ((IZR x) + (IZR y))%R).
 exact plus_IZR.
 Qed.
 
 (* Why3 goal *)
-Lemma Sub : forall (x:Z) (y:Z),
-  ((from_int (x - y)%Z) = ((from_int x) - (from_int y))%R).
+Lemma Sub : forall (x:Z) (y:Z), ((IZR (x - y)%Z) = ((IZR x) - (IZR y))%R).
 exact minus_IZR.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul : forall (x:Z) (y:Z),
-  ((from_int (x * y)%Z) = ((from_int x) * (from_int y))%R).
+Lemma Mul : forall (x:Z) (y:Z), ((IZR (x * y)%Z) = ((IZR x) * (IZR y))%R).
 exact mult_IZR.
 Qed.
 
 (* Why3 goal *)
-Lemma Neg : forall (x:Z), ((from_int (-x)%Z) = (-(from_int x))%R).
+Lemma Neg : forall (x:Z), ((IZR (-x)%Z) = (-(IZR x))%R).
 exact opp_IZR.
 Qed.
 

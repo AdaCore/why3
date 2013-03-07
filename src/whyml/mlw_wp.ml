@@ -316,7 +316,7 @@ let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
      * region is not in the map), or the vsymbol in the map mreg *)
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
-    if ity_pure ity || not (Mreg.exists check_reg mreg) then t_var vs
+    if ity_immutable ity || not (Mreg.exists check_reg mreg) then t_var vs
     else analyze_var update fs_app env.pure_known env.prog_known vs ity
   in
   update vs (vtv_of_vs vs)
@@ -418,7 +418,7 @@ let get_invariant km t =
     | Tyapp (ts,_) -> ts
     | _ -> assert false in
   let rec find_td = function
-    | (its,_,inv) :: _ when ts_equal ts its.its_pure -> inv
+    | (its,_,inv) :: _ when ts_equal ts its.its_ts -> inv
     | _ :: tdl -> find_td tdl
     | [] -> assert false in
   let pd = Mid.find ts.ts_name km in

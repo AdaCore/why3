@@ -9,18 +9,19 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Debug flag handling *)
 
 type flag
 
 val register_flag : desc:Pp.formatted -> string -> flag
-(** Register a new flag. It is allowed to register twice the same flag *)
+(** register a new flag. It is allowed to register twice the same flag *)
 
 val register_info_flag : desc:Pp.formatted -> string -> flag
-(** Register a new info flag. It is allowed to register twice the same flag.
+(** register a new info flag. It is allowed to register twice the same flag.
     Info flags are set by --debug-all and must not change the behaviour. *)
 
 val list_flags : unit -> (string * flag * bool * Pp.formatted) list
-(** List the known flags *)
+(** list the known flags *)
 
 val lookup_flag : string -> flag
 (** get the flag *)

@@ -21,7 +21,10 @@ val ts_mark : Ty.tysymbol
 val ty_mark : Ty.ty
 
 val fs_at  : Term.lsymbol
+(* unused
 val fs_old : Term.lsymbol
+*)
+val t_at_old : Term.term -> Term.term
 
 val th_mark_at  : Theory.theory
 val th_mark_old : Theory.theory

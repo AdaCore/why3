@@ -5,103 +5,70 @@
 # Useless in this script ?
 # export WHY3LIB=lib
 # export WHY3DATA=.
-
-export WHY3LOADPATH=theories
+# export WHY3LOADPATH=theories
 
 pgm=$1
-pgml=$1
-pgml_options=
 
 goods () {
-    for f in $1/*.why; do
-	echo -n "  "$f"... "
-	base=$1/`basename $f .why`
+    for f in $1/*.[wm][hl][yw] ; do
+	echo -n "  $f... "
 	# running Why
 	if ! $pgm $2 $f > /dev/null 2>&1; then
-	    echo "why FAILED"
-            echo "env: WHY3DATA='$WHY3DATA'"
+	    echo "FAILED!"
+#            echo "env: WHY3DATA='$WHY3DATA'"
             echo "invocation: $pgm $2 $f"
             echo "result:"
 	    $pgm $2 $f
 	    exit 1
 	fi
-	echo "why ok... "
+	echo "ok"
     done
 }
 
 bads () {
-    for f in $1/*.why; do
-	echo -n "  "$f"... "
+    for f in $1/*.[wm][hl][yw] ; do
+	echo -n "  $f... "
 	if $pgm $2 $f > /dev/null 2>&1; then
-	    echo "$pgm $2 $f"
-	    echo "FAILED!"
+	    echo "SHOULD FAIL!"
+#            echo "env: WHY3DATA='$WHY3DATA'"
+            echo "invocation: $pgm $2 $f"
 	    exit 1
-        else
-	    echo "ok"
 	fi
+	echo "ok"
     done
 }
 
 drivers () {
     for f in $1/*.drv; do
         if [ $f = "drivers/ocaml.drv" ]; then continue; fi
-	echo -n "  "$f"... "
+	echo -n "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f - > /dev/null 2>&1; then
 	    echo "why FAILED"
             echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f -
 	    exit 1
 	fi
-	echo "why ok... "
-    done
-}
-
-programs () {
-    for f in $1/*.mlw; do
-	echo -n "  "$f"... "
-	if ! $pgml -L modules $pgml_options $f $2 > /dev/null 2>&1; then
-	    echo
-	    echo "$pgml $pgml_options $f $2"
-	    $pgml -L modules $pgml_options $f $2
-	    echo "FAILED!"
-	    exit 1
-        else
-	    echo "ok"
-	fi
-    done
-}
-
-bad_programs () {
-    for f in $1/*.mlw; do
-	echo -n "  "$f"... "
-	if $pgml -L modules $pgml_options $f > /dev/null 2>&1; then
-	    echo
-	    echo "$pgml $pgml_options $f"
-	    echo "SHOULD FAIL!"
-	    exit 1
-        else
-	    echo "ok"
-	fi
+	echo "ok"
     done
 }
 
 valid_goals () {
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
-	if $pgml -L modules -t 10 -P alt-ergo $f | grep -q -v Valid; then
+	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
-	    echo "$pgml -P alt-ergo $f"
-	    $pgml -L modules -t 10 -P alt-ergo $f
+	    echo "$pgm -P alt-ergo $f"
+	    $pgm -t 10 -P alt-ergo $f
 	    exit 1
        else
 	    echo "ok"
-	fi
+       fi
     done
 }
 
 list_stuff () {
     echo -n "$1 "
-    if $pgml $1 > /dev/null 2>&1; then
+    if $pgm $1 > /dev/null 2>&1; then
         echo "ok"
     else
         echo "$pgm $1 FAIL"
@@ -115,52 +82,63 @@ echo "=== Checking drivers ==="
 drivers drivers
 echo ""
 
-echo "=== Parsing good files  ==="
-goods bench/typing/bad --parse-only
-echo ""
+#echo "=== Parsing good files  ==="
+#goods bench/typing/bad --parse-only
+#goods bench/typing/good --parse-only
+#goods examples/logic --parse-only
+#goods examples/bitvectors "--parse-only -I examples/bitvectors"
+#echo ""
 
 echo "=== Type-checking bad files ==="
+goods bench/typing/bad --parse-only
 bads bench/typing/bad --type-only
-echo ""
-
-echo "=== Type-checking good files ==="
-goods bench/typing/good --type-only
-goods examples --type-only
-goods examples/tptp --type-only
 echo ""
 
 echo "=== Type-checking theories ==="
 goods theories --type-only
 echo ""
 
-echo "=== Parsing programs ==="
-pgml_options=--parse-only
-programs bench/programs/bad-typing
-programs bench/programs/good
-programs examples/programs
+echo "=== Type-checking good files ==="
+goods bench/typing/good --type-only
+goods examples/logic --type-only
+goods examples/bitvectors "--type-only -I examples/bitvectors"
 echo ""
 
-echo "=== Type-checking bad programs ==="
-pgml_options=--type-only
-bad_programs bench/programs/bad-typing
+#echo "=== Parsing goods ==="
+#goods bench/programs/bad-typing --parse-only
+#goods bench/programs/good --parse-only
+#goods examples --parse-only
+#goods examples/in_progress --parse-only
+#goods examples/foveoos11-cm --parse-only
+#goods examples/hoare_logic --parse-only
+#goods examples/vacid_0_binary_heaps "--parse-only -I examples/vacid_0_binary_heaps"
+#echo ""
+
+echo "=== Type-checking bad goods ==="
+goods bench/programs/bad-typing --parse-only
+bads bench/goods/bad-typing --type-only
 echo ""
 
 echo "=== Type-checking modules ==="
-pgml_options=--type-only
-programs modules
+goods modules --type-only
 echo ""
 
-echo "=== Type-checking good programs ==="
-pgml_options=--type-only
-programs bench/programs/good
-programs examples/programs
-echo ""
+#echo "=== Type-checking good goods ==="
+#goods bench/programs/good --type-only
+#goods examples --type-only
+#goods examples/in_progress --type-only
+#goods examples/foveoos11-cm --type-only
+#goods examples/hoare_logic --type-only
+#goods examples/vacid_0_binary_heaps "--type-only -I examples/vacid_0_binary_heaps"
+#echo ""
 
-echo "=== VC generation on good programs ==="
-pgml_options=
-programs bench/programs/good
-programs examples/programs
-programs examples/programs/vacid_0_binary_heaps "-I examples/programs/vacid_0_binary_heaps"
+echo "=== VC generation on good goods ==="
+goods bench/programs/good
+goods examples
+goods examples/in_progress
+goods examples/foveoos11-cm
+goods examples/hoare_logic
+goods examples/vacid_0_binary_heaps "-I examples/vacid_0_binary_heaps"
 echo ""
 
 echo "=== Checking valid goals ==="

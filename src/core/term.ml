@@ -1284,7 +1284,7 @@ let rec t_hash_alpha c m t =
 
 let t_hash_alpha = t_hash_alpha (ref (-1)) Mvs.empty
 
-module Hterm_alpha = XHashtbl.Make (struct
+module Hterm_alpha = Exthtbl.Make (struct
   type t = term
   let equal = t_equal_alpha
   let hash = t_hash_alpha

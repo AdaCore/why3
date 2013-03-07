@@ -5,143 +5,47 @@
   id="0"
   name="Alt-Ergo"
   version="0.94"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="Coq"
-  version="8.3pl4"/>
- <prover
-  id="3"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="4"
-  name="Yices"
-  version="1.0.25"/>
- <prover
-  id="5"
-  name="Z3"
-  version="2.19"/>
  <file
-  name="../sorted_list.why"
+  name="../sorted_list.mlw"
   verified="true"
   expanded="false">
   <theory
-   name="Order"
-   locfile="../sorted_list.why"
-   loclnum="1" loccnumb="7" loccnume="12"
-   verified="true"
-   expanded="true">
-  </theory>
-  <theory
-   name="List"
-   locfile="../sorted_list.why"
-   loclnum="10" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="true">
-  </theory>
-  <theory
-   name="SortedList"
-   locfile="../sorted_list.why"
-   loclnum="20" loccnumb="7" loccnume="17"
+   name="FindInSortedList"
+   locfile="../sorted_list.mlw"
+   loclnum="3" loccnumb="7" loccnume="23"
    verified="true"
    expanded="true">
    <goal
-    name="sorted_inf"
-    locfile="../sorted_list.why"
-    loclnum="33" loccnumb="8" loccnume="18"
-    sum="c325b7d5aaed50a7a293ef09b92526b0"
+    name="Sorted_not_mem"
+    locfile="../sorted_list.mlw"
+    loclnum="9" loccnumb="8" loccnume="22"
+    sum="71548e034f4f5ca3efbe01a9c29c27a3"
     proved="true"
     expanded="true"
-    shape="asortedaConsV0V2IasortedaConsV1V2Iainfix &lt;=V0V1F">
+    shape="amemV0aConsV1V2NIasortedaConsV1V2Iainfix &lt;V0V1F">
     <proof
      prover="0"
-     timelimit="5"
+     timelimit="20"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
-    name="sorted_mem"
-    locfile="../sorted_list.why"
-    loclnum="38" loccnumb="8" loccnume="18"
-    sum="4362710f1aa3a33ed0a0285d93666318"
+    name="WP_parameter find"
+    locfile="../sorted_list.mlw"
+    loclnum="13" loccnumb="10" loccnume="14"
+    expl="VC for find"
+    sum="ca3c481fb06b2bbc64cdccfee2e78a28"
     proved="true"
     expanded="true"
-    shape="ainfix &lt;=V0V2IamemV2V1FIasortedaConsV0V1F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     edited="sorted_list_SortedList_sorted_mem_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.49"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="SortedIntList"
-   locfile="../sorted_list.why"
-   loclnum="45" loccnumb="7" loccnume="20"
-   verified="true"
-   expanded="true">
-   <goal
-    name="sorted123"
-    locfile="../sorted_list.why"
-    loclnum="50" loccnumb="7" loccnume="16"
-    sum="db453eba06bf5592d9d04310e5abf6bb"
-    proved="true"
-    expanded="true"
-    shape="asortedaConsc1aConsc2aConsc3aNil">
+    shape="CV1aNilamemV0V1NaConsVVamemV0V1qainfix =V4aTrueAainfix &gt;V0V2Oainfix =V0V2IamemV0V3qainfix =V4aTrueFAasortedV3IasortedV1F">
+    <label
+     name="expl:VC for find"/>
     <proof
      prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
+     timelimit="20"
      memlimit="0"
      obsolete="false"
      archived="false">

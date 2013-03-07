@@ -21,6 +21,7 @@ open Decl
 open Theory
 open Printer
 open Mlw_ty
+open Mlw_module
 
 let debug =
   Debug.register_info_flag "extraction"
@@ -30,20 +31,20 @@ let clean_fname fname =
   let fname = Filename.basename fname in
   (try Filename.chop_extension fname with _ -> fname)
 
-let modulename ?fname th =
-  let fname = match fname, th.th_path with
+let modulename ?fname path t =
+  let fname = match fname, path with
     | Some fname, _ -> clean_fname fname
-    | None, [] -> assert false
-    | None, path -> String.concat "__" path
+    | None, [] -> "why3"
+    | None, _ -> String.concat "__" path
   in
-  fname ^ "__" ^ th.th_name.Ident.id_string
+  fname ^ "__" ^ t
 
 let extract_filename ?fname th =
-  (modulename ?fname th) ^ ".ml"
+  (modulename ?fname th.th_path th.th_name.Ident.id_string) ^ ".ml"
 
-let modulename path t =
-  String.capitalize
-    (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t)
+(* let modulename path t = *)
+(*   String.capitalize *)
+(*     (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t) *)
 
 (** Printers *)
 
@@ -87,6 +88,7 @@ let forget_all () =
 type info = {
   info_syn: syntax_map;
   current_theory: Theory.theory;
+  current_module: Mlw_module.modul option;
   th_known_map: Decl.known_map;
   mo_known_map: Mlw_decl.known_map;
   fname: string option;
@@ -141,10 +143,14 @@ let print_qident ~sanitizer info fmt id =
     let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
     let s = sanitizer s in
     let s = if is_ocaml_keyword s then s ^ "_renamed" else s in
-    if Sid.mem id info.current_theory.th_local then
+    if Sid.mem id info.current_theory.th_local ||
+       Opt.fold (fun _ m -> Sid.mem id m.mod_local) false info.current_module
+    then
       fprintf fmt "%s" s
     else
-      fprintf fmt "%s.%s" (modulename lp t) s
+      let fname = if lp = [] then info.fname else None in
+      let m = String.capitalize (modulename ?fname lp t) in
+      fprintf fmt "%s.%s" m s
   with Not_found ->
     let s = id_unique ~sanitizer iprinter id in
     fprintf fmt "%s" s
@@ -408,7 +414,8 @@ and print_app pri ls info fmt tl =
   let isconstr = is_constructor info ls in
   let is_field (_, csl) = match csl with
     | [_, pjl] ->
-        List.for_all ((<>) None) pjl && List.exists ((=) (Some ls)) pjl
+        let is_ls = function None -> false | Some ls' -> ls_equal ls ls' in
+        List.for_all ((<>) None) pjl && List.exists is_ls pjl
     | _ -> false in
   let isfield = match Mid.find_opt ls.ls_name info.th_known_map with
     | Some { d_node = Ddata dl } -> not isconstr && List.exists is_field dl
@@ -582,6 +589,7 @@ let extract_theory drv ?old ?fname fmt th =
   let info = {
     info_syn = sm;
     current_theory = th;
+    current_module = None;
     th_known_map = th.th_known;
     mo_known_map = Mid.empty;
     fname = Opt.map clean_fname fname; } in
@@ -599,7 +607,7 @@ open Mlw_expr
 open Mlw_decl
 open Mlw_module
 
-let print_its info fmt ts = print_ts info fmt ts.its_pure
+let print_its info fmt ts = print_ts info fmt ts.its_ts
 let print_pv info fmt pv =
   if pv.pv_vtv.vtv_ghost then
     fprintf fmt "((* ghost %a *))" (print_lident info) pv.pv_vs.vs_name
@@ -642,7 +650,7 @@ let rec print_ity_node inn info fmt ity = match ity.ity_node with
         end
       end
   | Ityapp (ts, tl, _) ->
-      begin match query_syntax info.info_syn ts.its_pure.ts_name with
+      begin match query_syntax info.info_syn ts.its_ts.ts_name with
         | Some s -> syntax_arguments s (print_ity_node true info) fmt tl
         | None -> begin match tl with
             | [] -> print_its info fmt ts
@@ -745,6 +753,8 @@ and print_lexpr pri info fmt e =
   | Eany _ ->
       fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
         (print_vty info) e.e_vty
+  | Ecase (e1, [_,e2]) when vty_ghost e1.e_vty ->
+      print_lexpr pri info fmt e2
   | Ecase (e1, bl) ->
       fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
         (print_expr info) e1 (print_list newline (print_ebranch info)) bl
@@ -859,15 +869,16 @@ let print_type_decl info fmt its = match its.its_def with
   | None ->
       fprintf fmt
         "@[<hov 2>type %a%a (* to be defined (uninterpreted type) *)@]@\n@\n"
-        print_tv_args its.its_args (print_its info) its
+        print_tv_args its.its_ts.ts_args (print_its info) its
   | Some ty ->
       fprintf fmt "@[<hov 2>type %a%a =@ %a@]@\n@\n"
-        print_tv_args its.its_args (print_its info) its (print_ity info) ty
+        print_tv_args its.its_ts.ts_args
+        (print_its info) its (print_ity info) ty
 
 let print_type_decl info fmt its =
-  if has_syntax info its.its_pure.ts_name then
+  if has_syntax info its.its_ts.ts_name then
     fprintf fmt "(* type %a is overridden by driver *)"
-      (print_lident info) its.its_pure.ts_name
+      (print_lident info) its.its_ts.ts_name
   else begin print_type_decl info fmt its; forget_tvs () end
 
 let print_exn_decl info fmt xs =
@@ -910,12 +921,12 @@ let print_pdata_decl info fst fmt (its, csl, _) =
   in
   fprintf fmt "@[<hov 2>%s %a%a =@\n@[<hov>%a@]@]"
     (if fst then "type" else "and")
-    print_tv_args its.its_args (print_its info) its print_defn csl
+    print_tv_args its.its_ts.ts_args (print_its info) its print_defn csl
 
 let print_pdata_decl info first fmt (its, _, _ as d) =
-  if has_syntax info its.its_pure.ts_name then
+  if has_syntax info its.its_ts.ts_name then
     fprintf fmt "(* type %a is overridden by driver *)"
-      (print_lident info) its.its_pure.ts_name
+      (print_lident info) its.its_ts.ts_name
   else begin print_pdata_decl info first fmt d; forget_tvs () end
 
 let is_record = function
@@ -940,7 +951,7 @@ let print_pprojections info fmt (_, csl, _) =
   List.iter print pjl
 
 let print_pprojections info fmt (ts, _, _ as d) =
-  if not (has_syntax info ts.its_pure.ts_name) && not (is_record d) then begin
+  if not (has_syntax info ts.its_ts.ts_name) && not (is_record d) then begin
     print_pprojections info fmt d; forget_tvs ()
   end
 
@@ -978,6 +989,7 @@ let extract_module drv ?old ?fname fmt m =
   let info = {
     info_syn = sm;
     current_theory = th;
+    current_module = Some m;
     th_known_map = th.th_known;
     mo_known_map = m.mod_known;
     fname = Opt.map clean_fname fname; } in

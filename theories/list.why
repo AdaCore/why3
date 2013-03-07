@@ -79,10 +79,10 @@ theory NthLength
   use import int.Int
 
   lemma nth_none_1:
-     forall l: list 'a, i: int. i < 0 -> nth i l  = None
+     forall l: list 'a, i: int. i < 0 -> nth i l = None
 
   lemma nth_none_2:
-     forall l: list 'a, i: int. i >= length l -> nth i l  = None
+     forall l: list 'a, i: int. i >= length l -> nth i l = None
 
   lemma nth_none_3:
      forall l: list 'a, i: int. nth i l = None -> i < 0 \/ i >= length l
@@ -338,6 +338,20 @@ theory Distinct
     forall l1 l2: list 'a.
     distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
     distinct (l1 ++ l2)
+
+end
+
+theory Prefix
+
+  use export List
+  use import int.Int
+
+  function prefix (n: int) (l: list 'a) : list 'a =
+    if n <= 0 then Nil else
+    match l with
+    | Nil -> Nil
+    | Cons x r -> Cons x (prefix (n-1) r)
+    end
 
 end
 

@@ -11,14 +11,14 @@ at URL~\url{http://why3.lri.fr/api/}.
 We assume the reader has a fair knowledge of the OCaml
 language. Notice that the \why library must be installed, see
 Section~\ref{sec:installlib}. The OCaml code given below is available in
-the source distribution as \url{examples/use_api.ml}.
+the source distribution as \verb|examples/use_api/use_api.ml|.
 
 
 \section{Building Propositional Formulas}
 
 The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
-a piece of OCaml code for building the formula $true \lor false$.
+a piece of OCaml code for building the formula $\mathit{true} \lor \mathit{false}$.
 \begin{ocamlcode}
 (* opening the Why3 library *)
 open Why3
@@ -55,7 +55,7 @@ Running the generated executable \texttt{f} results in the following output.
 formula 1 is: true \/ false
 \end{verbatim}
 
-Let's now build a formula with propositional variables: $A \land B
+Let us now build a formula with propositional variables: $A \land B
 \rightarrow A$. Propositional variables must be declared first before
 using them in formulas. This is done as follows.
 \begin{ocamlcode}
@@ -87,12 +87,12 @@ when building those directly using library calls.
 
 \section{Building Tasks}
 
-Let's see how we can call a prover to prove a formula. As said in
+Let us see how we can call a prover to prove a formula. As said in
 previous chapters, a prover must be given a task, so we need to build
 tasks from our formulas. Task can be build incrementally from an empty
 task by adding declaration to it, using the functions
-\texttt{add\_*\_decl} of module \texttt{Task}. For the formula $true \lor
-false$ above, this is done as follows.
+\texttt{add\_*\_decl} of module \texttt{Task}. For the formula $\mathit{true} \lor
+\mathit{false}$ above, this is done as follows.
 \begin{ocamlcode}
 let task1 : Task.task = None (* empty task *)
 let goal_id1 : Decl.prsymbol =
@@ -106,10 +106,9 @@ propositions in a theory or a task. Notice again that the concrete
 syntax of \why requires these symbols to be capitalized, but it is not
 mandatory when using the library. The second argument of
 \texttt{add\_prop\_decl} is the kind of the proposition:
-\texttt{Paxiom}, \texttt{Plemma} or \texttt{Pgoal}
-(notice, however, that lemmas are not allowed in tasks
-and can only be used in theories).
-
+\texttt{Paxiom}, \texttt{Plemma} or \texttt{Pgoal}.
+Notice that lemmas are not allowed in tasks
+and can only be used in theories.
 
 Once a task is built, it can be printed.
 \begin{ocamlcode}
@@ -164,10 +163,9 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 \end{ocamlcode}
 The type \texttt{'a Whyconf.Mprover.t} is a map indexed by provers. A
-provers is a record with a name, a version and an alternative description
-(if someone want to compare different command line options of the same
-provers for example). It's definition is in the module
-\texttt{Whyconf} :
+prover is a record with a name, a version, and an alternative description
+(to differentiate between various configurations of a given prover). Its
+definition is in the module \texttt{Whyconf}:
 \begin{ocamlcode}
 type prover =
     { prover_name : string; (* "Alt-Ergo" *)
@@ -355,7 +353,7 @@ let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 We illustrate now how one can build theories. Building a theory must
 be done by a sequence of calls:
 \begin{itemize}
-\item creating a theory ``under construction'', of type \verb|Theory.theory_uc| ;
+\item creating a theory ``under construction'', of type \verb|Theory.theory_uc|;
 \item adding declarations, one at a time ;
 \item closing the theory under construction, obtaining something of type \verb|Theory.theory|.
 \end{itemize}
@@ -366,7 +364,7 @@ let my_theory : Theory.theory_uc =
   Theory.create_theory (Ident.id_fresh "My_theory")
 \end{ocamlcode}
 
-First let's add the formula 1 above as a goal:
+First let us add the formula 1 above as a goal:
 \begin{ocamlcode}
 let decl_goal1 : Decl.decl =
   Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1 
@@ -483,7 +481,7 @@ One can run provers on those tasks exactly as we did above.
 
 \section{Proof sessions}
 
-See the example \url{examples/create_session.ml} of the distribution for
+See the example \verb|examples/use_api/create_session.ml| of the distribution for
 an illustration on how to manipulate proof sessions from an OCaml program.
 
 

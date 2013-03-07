@@ -98,16 +98,15 @@ name = "CoqIDE"
 
 
 One can use a custom configuration file. \texttt{why3config}
-and other \texttt{why3} tools use priorities for which
-user's configuration file to consider:
-\begin{itemize}
+and other \texttt{why3} tools look for it in the following order:
+\begin{enumerate}
 \item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
 \item the file specified by the environment variable
-  \texttt{WHY3CONFIG} if set.
+  \texttt{WHY3CONFIG} if set,
 \item the file \texttt{\$HOME/.why3.conf}
   (\texttt{\$USERPROFILE/.why3.conf} under Windows) or, in the case of
   local installation, \texttt{why3.conf} in Why3 sources top directory.
-\end{itemize}
+\end{enumerate}
 If none of these files exists, a built-in default configuration is used.
 
 The configuration file is a human-readable text file, which consists
@@ -121,15 +120,16 @@ the example, or it can be composed by a family name and one family
 argument, \texttt{prover} is one family name, \texttt{coq} and
 \texttt{alt-ergo} are the family argument.
 
-Inside a section, one key can be associated with an integer (\eg{} -555),
-a boolean (true, false) or a string (\eg{} "emacs"). One key can appear
-only once except if its a multi-value key. The order of apparition of
-the keys inside a section matter only for the multi-value key.
+Sections contain associations \texttt{key=value}. A value is either
+an integer (\eg{} -555), a boolean (true, false), or a string (\eg{}
+"emacs"). Some specific keys can be attributed multiple values and are
+thus allowed to occur several times inside a given section. In that
+case, the relative order of these associations matter.
 
 \section{Drivers of External Provers}
 \label{sec:drivers}
 
-The drivers of external provers are readable files, in directory
+Drivers of external provers are readable files from directory
 \texttt{drivers}. Experimented users can modify them to change the way
 the external provers are called, in particular which transformations
 are applied to goals.

@@ -678,9 +678,13 @@ function wp (s:stmt) (q:fmla) : fmla =
     end
 
   axiom abstract_effects_writes :
-     forall sigma:env, pi:stack, s:stmt, q:fmla.
-        eval_fmla sigma pi (abstract_effects s q) ->
-        eval_fmla sigma pi (wp s (abstract_effects s q))
+     forall sigma:env, pi:stack, body:stmt, cond:term, inv q:fmla.
+       let f =
+         (abstract_effects body (Fand
+            (Fimplies (Fand (Fterm cond) inv) (wp body inv))
+            (Fimplies (Fand (Fnot (Fterm cond)) inv) q)))
+       in
+       eval_fmla sigma pi f -> eval_fmla sigma pi (wp body f)
 
   lemma monotonicity:
     forall s "induction":stmt, p q:fmla.

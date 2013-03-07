@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* useful option combinators *)
+(** Useful option combinators *)
 
 val get : 'a option -> 'a
 

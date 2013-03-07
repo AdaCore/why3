@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Alt-Ergo"
+  version="0.95"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../zeros.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="SetZeros"
+   locfile="../zeros.mlw"
+   loclnum="2" loccnumb="7" loccnume="15"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter set_zeros"
+    locfile="../zeros.mlw"
+    loclnum="7" loccnumb="6" loccnume="15"
+    expl="VC for set_zeros"
+    sum="a2299813d2448fc625e49f4a13a9283e"
+    proved="true"
+    expanded="true"
+    shape="ainfix =agetV2V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FAainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FAainfix =agetV6V7c0Iainfix &lt;V7ainfix +V5c1Aainfix &lt;=c0V7FIainfix =V6asetV2V5c0Aainfix &lt;=c0V0FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV2V8c0Iainfix &lt;V8V5Aainfix &lt;=c0V8FIainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c0V5FFAainfix =agetV1V9c0Iainfix &lt;V9c0Aainfix &lt;=c0V9FIainfix &lt;=c0ainfix -V0c1Aainfix =agetV1V10c0Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+    <label
+     name="expl:VC for set_zeros"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter set_zeros.1"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="1. postcondition"
+      sum="b6353836dcebd786e522fbd2a79078b3"
+      proved="true"
+      expanded="true"
+      shape="ainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2FIainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.2"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="2. loop invariant init"
+      sum="1a66dfeffcbb5b886c9f76b466a40699"
+      proved="true"
+      expanded="true"
+      shape="ainfix =agetV1V2c0Iainfix &lt;V2c0Aainfix &lt;=c0V2FIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.3"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="3. type invariant"
+      sum="a595bc9e2c553bc341955ad2295c58e0"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.4"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="4. precondition"
+      sum="ed4b6765d2d5b3c03211161a7a87e344"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.5"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="5. loop invariant preservation"
+      sum="27b91f8f9b0d0fb3ebe9544e60903f0d"
+      proved="true"
+      expanded="true"
+      shape="ainfix =agetV4V5c0Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FIainfix =V4asetV2V3c0Aainfix &lt;=c0V0FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =agetV2V6c0Iainfix &lt;V6V3Aainfix &lt;=c0V6FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.6"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="6. type invariant"
+      sum="6c0c02c1066c789b8c311243b2724fa5"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix =agetV2V3c0Iainfix &lt;V3ainfix +ainfix -V0c1c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter set_zeros.7"
+      locfile="../zeros.mlw"
+      loclnum="7" loccnumb="6" loccnume="15"
+      expl="7. postcondition"
+      sum="a8fb892f4fdaaabfb1c8b4d56eb7bbb9"
+      proved="true"
+      expanded="true"
+      shape="ainfix =agetV2V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for set_zeros"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter harness"
+    locfile="../zeros.mlw"
+    loclnum="14" loccnumb="6" loccnume="13"
+    expl="VC for harness"
+    sum="84dd7a636fa66163d84df119817727aa"
+    proved="true"
+    expanded="true"
+    shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Aainfix &gt;=c42c0">
+    <label
+     name="expl:VC for harness"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter harness.1"
+      locfile="../zeros.mlw"
+      loclnum="14" loccnumb="6" loccnume="13"
+      expl="1. precondition"
+      sum="11c01fadb9e3d05d3893a660db3c922d"
+      proved="true"
+      expanded="true"
+      shape="ainfix &gt;=c42c0">
+      <label
+       name="expl:VC for harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.2"
+      locfile="../zeros.mlw"
+      loclnum="14" loccnumb="6" loccnume="13"
+      expl="2. assertion"
+      sum="c650ddf927e5611b2be053ffbd000c01"
+      proved="true"
+      expanded="true"
+      shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
+      <label
+       name="expl:VC for harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter harness.3"
+      locfile="../zeros.mlw"
+      loclnum="14" loccnumb="6" loccnume="13"
+      expl="3. assertion"
+      sum="fc39cf13996585b7b1674143a840922f"
+      proved="true"
+      expanded="true"
+      shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
+      <label
+       name="expl:VC for harness"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

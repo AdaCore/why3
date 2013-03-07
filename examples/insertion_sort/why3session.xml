@@ -1,0 +1,1227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Alt-Ergo"
+  version="0.95"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="5"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../insertion_sort.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="InsertionSort"
+   locfile="../insertion_sort.mlw"
+   loclnum="4" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter insertion_sort"
+    locfile="../insertion_sort.mlw"
+    loclnum="13" loccnumb="6" loccnume="20"
+    expl="VC for insertion_sort"
+    sum="9559c3560d8c43e7e8eb313c398e8c90"
+    proved="true"
+    expanded="true"
+    shape="apermutV2V4Aasorted_subV3c0V0Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Aiainfix &gt;V7c0iainfix &gt;agetV8ainfix -V7c1V6ainfix &lt;V10V7Aainfix &lt;=c0V7Aainfix &lt;V6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FAainfix &lt;=agetV9V12agetV9V13Iainfix =V13V10NIainfix =V12V10NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV9V10V6Aainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FAaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1apermutV2amk arrayV0V14Aasorted_subV14c0ainfix +V5c1Iainfix =V14asetV8V7V6Aainfix &lt;=c0V0FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=agetV8V15V6Iainfix &lt;V15V7Aainfix &lt;=c0V15FAainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0apermutV2amk arrayV0V16Aasorted_subV16c0ainfix +V5c1Iainfix =V16asetV8V7V6Aainfix &lt;=c0V0FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Aainfix &lt;=agetV8V17V6Iainfix &lt;V17V7Aainfix &lt;=c0V17FIainfix &lt;V6agetV8V18Iainfix &lt;=V18V5Aainfix &lt;=ainfix +V7c1V18FAainfix &lt;=agetV8V19agetV8V20Iainfix =V20V7NIainfix =V19V7NIainfix &lt;=V20V5Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix &lt;V6agetV3V21Iainfix &lt;=V21V5Aainfix &lt;=ainfix +V5c1V21FAainfix &lt;=agetV3V22agetV3V23Iainfix =V23V5NIainfix =V22V5NIainfix &lt;=V23V5Aainfix &lt;=V22V23Aainfix &lt;=c0V22FAapermutV2amk arrayV0asetV3V5V6Aainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Aainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FAapermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1AapermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+    <label
+     name="expl:VC for insertion_sort"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter insertion_sort.1"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="1. postcondition"
+      sum="6a706f08b559481abe6e37c6a6d7e1f2"
+      proved="true"
+      expanded="false"
+      shape="apermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.2"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="2. loop invariant init"
+      sum="464ab9b48326a9b93dead7cac6fb3b04"
+      proved="true"
+      expanded="false"
+      shape="apermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.3"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="3. type invariant"
+      sum="542666df2f7803b5543aaf5c00631bdb"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.4"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="4. precondition"
+      sum="a13496cd66b03cb1cdc89f1d9ec8345e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.5"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="5. loop invariant init"
+      sum="014c2c99533a12962529bc8ceff9497c"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.6"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="6. loop invariant init"
+      sum="4c497baeb1f663fe01d8bc7b7b9bf89f"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0asetV3V5V6LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.7"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="7. loop invariant init"
+      sum="dd51eb4f10d1529fc0253104e1b020ba"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV3V7agetV3V8Iainfix =V8V5NIainfix =V7V5NIainfix &lt;=V8V5Aainfix &lt;=V7V8Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.8"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="8. loop invariant init"
+      sum="d77863b099e1ca23e5d30f7a22a43cd2"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V6agetV3V7Iainfix &lt;=V7V5Aainfix &lt;=ainfix +V5c1V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.9"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="9. type invariant"
+      sum="e7f7801acc0517890f6e7ef71b642ed8"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.10"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="10. precondition"
+      sum="1a0a16ba7e8db5aa03dfd48f4256fd10"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.11"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="11. precondition"
+      sum="dfb3a4c70449cd7c09e02536768e2d8b"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.12"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="12. precondition"
+      sum="251f1d276abc9740e9f03367b79f162e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAainfix &lt;=agetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.13"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="13. assertion"
+      sum="8cd266998b7c7b02a56079b397a80566"
+      proved="true"
+      expanded="false"
+      shape="aexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.14"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="14. loop invariant preservation"
+      sum="51e44a0ff61f57eba04c3edccd228157"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.15"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="15. loop invariant preservation"
+      sum="7841af7448ccf0a0091acc3779eec4f1"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0asetV9V10V6Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       edited="insertion_sort_WP_InsertionSort_WP_parameter_insertion_sort_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.61"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.16"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="16. loop invariant preservation"
+      sum="bf4a79ac41434f362f10594d25364a5d"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV9V11agetV9V12Iainfix =V12V10NIainfix =V11V10NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V13Iainfix &lt;=V13V5Aainfix &lt;=ainfix +V7c1V13FAainfix &lt;=agetV8V14agetV8V15Iainfix =V15V7NIainfix =V14V7NIainfix &lt;=V15V5Aainfix &lt;=V14V15Aainfix &lt;=c0V14FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.51"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.17"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="17. loop invariant preservation"
+      sum="a2ab0386a1c7cfbd4e7cc724878e43b3"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V12Iainfix &lt;=V12V5Aainfix &lt;=ainfix +V7c1V12FAainfix &lt;=agetV8V13agetV8V14Iainfix =V14V7NIainfix =V13V7NIainfix &lt;=V14V5Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.18"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="18. loop variant decrease"
+      sum="bf28e30b6f61cb274c4b2e76d17fd130"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V10V7Aainfix &lt;=c0V7Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &gt;agetV8ainfix -V7c1V6Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.19"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="19. assertion"
+      sum="72f45b0623dafa3107528c9be09d0aff"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;agetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.20"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="20. precondition"
+      sum="763ba2e91c52c92b0ada9ee7484bc62f"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;agetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.21"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="21. loop invariant preservation"
+      sum="5ec69528796a7fa28dcd4ea03733072f"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=agetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIainfix &gt;agetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0Iainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.31"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.22"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="22. assertion"
+      sum="d075b3635d1ed8e77dd7445ecaee44fb"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.23"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="23. type invariant"
+      sum="4e938ad64c51fe213a14d88c9240509e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.24"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="24. precondition"
+      sum="5d0407136ffe5e9732c5597cead0f5ba"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=c0V0Iainfix &lt;=agetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIainfix &lt;V6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAainfix &lt;=agetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.25"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="25. loop invariant preservation"
+      sum="7a6842af5a2cefc4a40a0942e37f4639"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix &lt;=agetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIainfix &gt;V7c0NIainfix &lt;V6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAainfix &lt;=agetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.79"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.26"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="26. type invariant"
+      sum="5c1dc21fc23be3c8d47d933f58aa3e56"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Lamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.27"
+      locfile="../insertion_sort.mlw"
+      loclnum="13" loccnumb="6" loccnume="20"
+      expl="27. postcondition"
+      sum="df707525272dae9595bce7d83ef33d4b"
+      proved="true"
+      expanded="false"
+      shape="apermutV2V4Aasorted_subV3c0V0Iainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Lamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
+   name="InsertionSortGen"
+   locfile="../insertion_sort.mlw"
+   loclnum="39" loccnumb="7" loccnume="23"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter insertion_sort"
+    locfile="../insertion_sort.mlw"
+    loclnum="61" loccnumb="6" loccnume="20"
+    expl="VC for insertion_sort"
+    sum="352b7dcc256ec31e394b621d9e4f0839"
+    proved="true"
+    expanded="false"
+    shape="apermutV2V4Aasorted_subV3c0V0Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Aiainfix &gt;V7c0ialeagetV8ainfix -V7c1V6Nainfix &lt;V10V7Aainfix &lt;=c0V7AaleV6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FAaleagetV9V12agetV9V13Iainfix =V13V10NIainfix =V12V10NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV9V10V6Aainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FAaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1apermutV2amk arrayV0V14Aasorted_subV14c0ainfix +V5c1Iainfix =V14asetV8V7V6Aainfix &lt;=c0V0FAainfix &lt;V7V0Aainfix &lt;=c0V7AaleagetV8V15V6Iainfix &lt;V15V7Aainfix &lt;=c0V15FAainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0apermutV2amk arrayV0V16Aasorted_subV16c0ainfix +V5c1Iainfix =V16asetV8V7V6Aainfix &lt;=c0V0FAainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0AaleagetV8V17V6Iainfix &lt;V17V7Aainfix &lt;=c0V17FIaleV6agetV8V18Iainfix &lt;=V18V5Aainfix &lt;=ainfix +V7c1V18FAaleagetV8V19agetV8V20Iainfix =V20V7NIainfix =V19V7NIainfix &lt;=V20V5Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FAaleV6agetV3V21Iainfix &lt;=V21V5Aainfix &lt;=ainfix +V5c1V21FAaleagetV3V22agetV3V23Iainfix =V23V5NIainfix =V22V5NIainfix &lt;=V23V5Aainfix &lt;=V22V23Aainfix &lt;=c0V22FAapermutV2amk arrayV0asetV3V5V6Aainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Aainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FAapermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1AapermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+    <label
+     name="expl:VC for insertion_sort"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter insertion_sort.1"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="1. postcondition"
+      sum="4f13574310c153727c54bee6e9e500a0"
+      proved="true"
+      expanded="false"
+      shape="apermutV2V2Aasorted_subV1c0V0Iainfix &gt;c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.2"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="2. loop invariant init"
+      sum="1030620df81c4ea9bf60d60287daa417"
+      proved="true"
+      expanded="false"
+      shape="apermutV2V2Aasorted_subV1c0c1Iainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.3"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="3. type invariant"
+      sum="0efe6cefec52f10f0bec308f6922ffc6"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.4"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="4. precondition"
+      sum="b31f837bbfb78cd96f32ccd456be7e84"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.5"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="5. loop invariant init"
+      sum="0e5e964370292a23152a9e6a6c5294bf"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V5V5Aainfix &lt;=c0V5LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.6"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="6. loop invariant init"
+      sum="7847e45da06a2c840bf5b64ad2a6e622"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0asetV3V5V6LagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.7"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="7. loop invariant init"
+      sum="55d8d1df085bef317246237c449870c1"
+      proved="true"
+      expanded="false"
+      shape="aleagetV3V7agetV3V8Iainfix =V8V5NIainfix =V7V5NIainfix &lt;=V8V5Aainfix &lt;=V7V8Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.8"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="8. loop invariant init"
+      sum="80b3fd5985668d892083d5c6b30f7a42"
+      proved="true"
+      expanded="false"
+      shape="aleV6agetV3V7Iainfix &lt;=V7V5Aainfix &lt;=ainfix +V5c1V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.9"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="9. type invariant"
+      sum="0d9284ac30f5732e771a8fddfb1ca38d"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.10"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="10. precondition"
+      sum="42a3813c403e6475efb9163b935bef1f"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Iainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.11"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="11. precondition"
+      sum="86ca21a8c9f6341cb91b06dcd14a4300"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.12"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="12. precondition"
+      sum="91897cd0045270102f13477391ab6675"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V9Iainfix &lt;=V9V5Aainfix &lt;=ainfix +V7c1V9FAaleagetV8V10agetV8V11Iainfix =V11V7NIainfix =V10V7NIainfix &lt;=V11V5Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.13"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="13. assertion"
+      sum="119698c5a7e2e73bf1ee96995be1d7a6"
+      proved="true"
+      expanded="false"
+      shape="aexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.14"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="14. loop invariant preservation"
+      sum="f3b626a550801e494b01a3421115a67e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V10V5Aainfix &lt;=c0V10Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.15"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="15. loop invariant preservation"
+      sum="5cb3a360bfd85f0cb82faf763ddef7de"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0asetV9V10V6Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       edited="insertion_sort_InsertionSortGen_WP_parameter_insertion_sort_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.69"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.16"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="16. loop invariant preservation"
+      sum="fdb1c97d293f0f6bfc5bea42ede923e3"
+      proved="true"
+      expanded="false"
+      shape="aleagetV9V11agetV9V12Iainfix =V12V10NIainfix =V11V10NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V13Iainfix &lt;=V13V5Aainfix &lt;=ainfix +V7c1V13FAaleagetV8V14agetV8V15Iainfix =V15V7NIainfix =V14V7NIainfix &lt;=V15V5Aainfix &lt;=V14V15Aainfix &lt;=c0V14FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.63"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.39"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.17"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="17. loop invariant preservation"
+      sum="b1ce1ef53959705071c3ce581377d200"
+      proved="true"
+      expanded="false"
+      shape="aleV6agetV9V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V10c1V11FIainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V12Iainfix &lt;=V12V5Aainfix &lt;=ainfix +V7c1V12FAaleagetV8V13agetV8V14Iainfix =V14V7NIainfix =V13V7NIainfix &lt;=V14V5Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.18"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="18. loop variant decrease"
+      sum="eaae52262f5215bdfc7602da8f104823"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V10V7Aainfix &lt;=c0V7Iainfix =V10ainfix -V7c1FIaexchangeasetV8V7V6asetV9ainfix -V7c1V6ainfix -V7c1V7Iainfix =V9asetV8V7agetV8ainfix -V7c1Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1IaleagetV8ainfix -V7c1V6NIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.19"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="19. assertion"
+      sum="445f4268bbb5b388c28f8aa9a631e25b"
+      proved="true"
+      expanded="false"
+      shape="aleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIaleagetV8ainfix -V7c1V6NNIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.20"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="20. precondition"
+      sum="a3eb92689d91c7b32763b27727a9fe34"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V0Aainfix &lt;=c0V7IaleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIaleagetV8ainfix -V7c1V6NNIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.21"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="21. loop invariant preservation"
+      sum="6a750a3bbea606455bff62563b7541f2"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7IaleagetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIaleagetV8ainfix -V7c1V6NNIainfix &lt;ainfix -V7c1V0Aainfix &lt;=c0ainfix -V7c1Aainfix &lt;=c0V0Iainfix &gt;V7c0IaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.22"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="22. assertion"
+      sum="a94689bfa5fba3a23cb113c74f9d76e0"
+      proved="true"
+      expanded="false"
+      shape="aleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.23"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="23. type invariant"
+      sum="7715480b157718b54dcb0c299de9cfe1"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0IaleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.24"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="24. precondition"
+      sum="2009c403d74e42bab54fd0ba10105551"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=c0V0IaleagetV8V9V6Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &gt;V7c0NIaleV6agetV8V10Iainfix &lt;=V10V5Aainfix &lt;=ainfix +V7c1V10FAaleagetV8V11agetV8V12Iainfix =V12V7NIainfix =V11V7NIainfix &lt;=V12V5Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.25"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="25. loop invariant preservation"
+      sum="14170b429d8d93cc993a4d505a2eee95"
+      proved="true"
+      expanded="false"
+      shape="apermutV2amk arrayV0V9Aasorted_subV9c0ainfix +V5c1Iainfix =V9asetV8V7V6Aainfix &lt;=c0V0FIainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0IaleagetV8V10V6Iainfix &lt;V10V7Aainfix &lt;=c0V10FIainfix &gt;V7c0NIaleV6agetV8V11Iainfix &lt;=V11V5Aainfix &lt;=ainfix +V7c1V11FAaleagetV8V12agetV8V13Iainfix =V13V7NIainfix =V12V7NIainfix &lt;=V13V5Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAapermutV2amk arrayV0asetV8V7V6Aainfix &lt;=V7V5Aainfix &lt;=c0V7FLagetV3V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0V5Iainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c1V5FLamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.26"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="26. type invariant"
+      sum="9626b82c99ea1b1d8118067d9eadb9ab"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Lamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.27"
+      locfile="../insertion_sort.mlw"
+      loclnum="61" loccnumb="6" loccnume="20"
+      expl="27. postcondition"
+      sum="c594de16ea3a9507c9aff758c1ff6b79"
+      proved="true"
+      expanded="false"
+      shape="apermutV2V4Aasorted_subV3c0V0Iainfix &lt;=c0V0IapermutV2V4Aasorted_subV3c0ainfix +ainfix -V0c1c1Lamk arrayV0V3FIainfix &lt;=c1ainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1FF">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

@@ -150,8 +150,19 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
         let td = remove_prop (find_pr th q) in
         add_meta th td (if c then meta_cl else meta)
     | Rmeta (c,s,al) ->
+        let rec ty_of_pty = function
+          | PTyvar x ->
+              Ty.ty_var (Typing.create_user_tv x)
+          | PTyapp ((loc,_) as q,tyl) ->
+              let ts = find_ts th q in
+              let tyl = List.map ty_of_pty tyl in
+              Loc.try2 loc Ty.ty_app ts tyl
+          | PTuple tyl ->
+              let ts = Ty.ts_tuple (List.length tyl) in
+              Ty.ty_app ts (List.map ty_of_pty tyl)
+        in
         let convert = function
-          | PMAts q  -> MAts (find_ts th q)
+          | PMAty ty -> MAty (ty_of_pty ty)
           | PMAfs q  -> MAls (find_fs th q)
           | PMAps q  -> MAls (find_ps th q)
           | PMApr q  -> MApr (find_pr th q)
@@ -238,14 +249,18 @@ let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
 
 exception NoPrinter
 
-let update_task drv task =
-  let task, goal = match task with
+let update_task drv task_orig =
+  (** task_orig is the task for looking for theories
+      task      is the task for adding new metas
+      goal      is the last decl that we want to keep at the end (goal or clone)
+  *)
+  let task, goal = match task_orig with
     | Some { task_decl = g ; task_prev = t } -> t,g
     | None -> raise Task.GoalNotFound
   in
   let task =
     Mid.fold (fun _ (th,s) task ->
-      if Task.on_used_theory th task then
+      if Task.on_used_theory th task_orig then
         Stdecl.fold (fun tdm task ->
           add_tdecl task tdm
         ) s task
@@ -258,7 +273,7 @@ let update_task drv task =
         Stdecl.fold (fun tdm task ->
           add_tdecl task (clone_meta tdm sm)
         ) s task
-      ) task task
+      ) task task_orig
     ) drv.drv_meta_cl task
   in
   add_tdecl task goal

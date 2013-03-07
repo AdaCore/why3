@@ -60,7 +60,7 @@ module Compare_Num =
       | _, RConstDec _ -> 1
   end
 
-module Mnum = Extmap.Map.Make (Compare_Num)
+module Mnum = Extmap.Make (Compare_Num)
 
 let const_replace repl =
   (* the function repl is expected to accept a real constant and return either

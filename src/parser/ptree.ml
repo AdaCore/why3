@@ -87,15 +87,13 @@ type plogic_type =
   | PFunction  of pty list * pty
 
 type use = {
-  use_theory  : qualid;
-  use_as      : string;
-  use_imp_exp : bool option;
-    (* None = export, Some false = default, Some true = import *)
+  use_theory : qualid;
+  use_import : (bool (* import *) * string (* as *)) option;
 }
 
 type clone_subst =
   | CSns    of loc * qualid option * qualid option
-  | CStsym  of loc * qualid * qualid
+  | CStsym  of loc * qualid * ident list * pty
   | CSfsym  of loc * qualid * qualid
   | CSpsym  of loc * qualid * qualid
   | CSlemma of loc * qualid
@@ -148,7 +146,7 @@ type prop_kind =
   | Kaxiom | Klemma | Kgoal
 
 type metarg =
-  | PMAts  of qualid
+  | PMAty  of pty
   | PMAfs  of qualid
   | PMAps  of qualid
   | PMApr  of qualid

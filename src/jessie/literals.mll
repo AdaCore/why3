@@ -56,11 +56,11 @@ let oct_escape = '\\' rO rO? rO?
 (* integer literals, both decimal, hexadecimal and octal *)
 rule integer_literal = parse
   (* hexadecimal *)
-  | '0'['x''X'] (rH+ as d) rIS eof { Term.int_const_hexa d }
+  | '0'['x''X'] (rH+ as d) rIS eof { Number.int_const_hex d }
   (* octal *)
-  | '0' (rO+ as d)         rIS eof { Term.int_const_octal d }
+  | '0' (rO+ as d)         rIS eof { Number.int_const_oct d }
   (* decimal *)
-  | (rD+ as d)             rIS eof { Term.int_const_decimal d }
+  | (rD+ as d)             rIS eof { Number.int_const_dec d }
 (* TODO: character literals
   | ('L'? "'" as prelude) (([^ '\\' '\'' '\n']|("\\"[^ '\n']))+ as content) "'"
       {
@@ -81,7 +81,7 @@ and floating_point_literal = parse
     | (rD+ as i) '.' (rD* as f) (['e' 'E'] (['-' '+']? rD+ as e))?
     | (rD* as i) '.' (rD+ as f) (['e' 'E'] (['-' '+']? rD+ as e))? )
     rFS eof
-      { Term.RConstDecimal (i, f, Opt.map remove_leading_plus e) }
+      { Number.real_const_dec i f (Opt.map remove_leading_plus e) }
 
   (* hexadecimal *)
   | '0'['x''X'] ( (rH* as i) '.' (rH+ as f)
@@ -89,7 +89,7 @@ and floating_point_literal = parse
                 | (rH+ as i) ("" as f) )
     ['p''P'] (('-' rD+) as e | '+'? (rD+ as e) )
     rFS eof
-      { Term.RConstHexa(i, f, e) }
+      { Number.real_const_hex i f (Some e) }
 
   | eof { invalid_arg "floating_point_literal: empty string" }
   | _ as c  { invalid_arg ("floating_point_literal: character '" ^ 

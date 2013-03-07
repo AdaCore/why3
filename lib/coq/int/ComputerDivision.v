@@ -6,22 +6,22 @@ Require BuiltIn.
 Require int.Int.
 Require int.Abs.
 
-(* Why3 goal *)
-Notation div := ZOdiv (only parsing).
+(* Why3 comment *)
+(* div is replaced with (ZOdiv x x1) by the coq driver *)
+
+(* Why3 comment *)
+(* mod1 is replaced with (ZOmod x x1) by the coq driver *)
 
 (* Why3 goal *)
-Notation mod1 := ZOmod (only parsing).
-
-(* Why3 goal *)
-Lemma Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x
-  y))%Z + (mod1 x y))%Z).
+Lemma Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
+  (x = ((y * (ZOdiv x y))%Z + (ZOmod x y))%Z).
 intros x y _.
 apply ZO_div_mod_eq.
 Qed.
 
 (* Why3 goal *)
 Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
-  ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
+  ((0%Z <= (ZOdiv x y))%Z /\ ((ZOdiv x y) <= x)%Z).
 intros x y (Hx,Hy).
 split.
 apply ZO_div_pos with (1 := Hx).
@@ -38,7 +38,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  (((-(Zabs y))%Z < (mod1 x y))%Z /\ ((mod1 x y) < (Zabs y))%Z).
+  (((-(Zabs y))%Z < (ZOmod x y))%Z /\ ((ZOmod x y) < (Zabs y))%Z).
 intros x y Zy.
 destruct (Zle_or_lt 0 x) as [Hx|Hx].
 refine ((fun H => conj (Zlt_le_trans _ 0 _ _ (proj1 H)) (proj2 H)) _).
@@ -52,7 +52,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
-  (0%Z <= (div x y))%Z.
+  (0%Z <= (ZOdiv x y))%Z.
 intros x y (Hx, Hy).
 apply ZO_div_pos with (1 := Hx).
 now apply Zlt_le_weak.
@@ -60,7 +60,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ (0%Z < y)%Z) ->
-  ((div x y) <= 0%Z)%Z.
+  ((ZOdiv x y) <= 0%Z)%Z.
 intros x y (Hx, Hy).
 generalize (ZO_div_pos (-x) y).
 rewrite ZOdiv_opp_l.
@@ -69,21 +69,21 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ ~ (y = 0%Z)) ->
-  (0%Z <= (mod1 x y))%Z.
+  (0%Z <= (ZOmod x y))%Z.
 intros x y (Hx, Zy).
 now apply ZOmod_lt_pos.
 Qed.
 
 (* Why3 goal *)
 Lemma Mod_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ ~ (y = 0%Z)) ->
-  ((mod1 x y) <= 0%Z)%Z.
+  ((ZOmod x y) <= 0%Z)%Z.
 intros x y (Hx, Zy).
 now apply ZOmod_lt_neg.
 Qed.
 
 (* Why3 goal *)
 Lemma Rounds_toward_zero : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
-  ((Zabs ((div x y) * y)%Z) <= (Zabs x))%Z.
+  ((Zabs ((ZOdiv x y) * y)%Z) <= (Zabs x))%Z.
 intros x y Zy.
 rewrite Zmult_comm.
 zify.
@@ -93,30 +93,30 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_1 : forall (x:Z), ((div x 1%Z) = x).
+Lemma Div_1 : forall (x:Z), ((ZOdiv x 1%Z) = x).
 exact ZOdiv_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_1 : forall (x:Z), ((mod1 x 1%Z) = 0%Z).
+Lemma Mod_1 : forall (x:Z), ((ZOmod x 1%Z) = 0%Z).
 exact ZOmod_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((div x
-  y) = 0%Z).
+Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) ->
+  ((ZOdiv x y) = 0%Z).
 exact ZOdiv_small.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((mod1 x
-  y) = x).
+Lemma Mod_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) ->
+  ((ZOmod x y) = x).
 exact ZOmod_small.
 Qed.
 
 (* Why3 goal *)
 Lemma Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
+  (0%Z <= z)%Z)) -> ((ZOdiv ((x * y)%Z + z)%Z x) = (y + (ZOdiv z x))%Z).
 intros x y z (Hx&Hy&Hz).
 rewrite (Zplus_comm y).
 rewrite <- ZO_div_plus.
@@ -131,7 +131,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) -> ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
+  (0%Z <= z)%Z)) -> ((ZOmod ((x * y)%Z + z)%Z x) = (ZOmod z x)).
 intros x y z (Hx&Hy&Hz).
 rewrite Zplus_comm, Zmult_comm.
 apply ZO_mod_plus.

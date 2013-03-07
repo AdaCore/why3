@@ -1,0 +1,1914 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="3"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="4"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="5"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="4.2"/>
+ <file
+  name="../tower_of_hanoi.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="Hanoi"
+   locfile="../tower_of_hanoi.mlw"
+   loclnum="1" loccnumb="7" loccnume="12"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter move"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="25" loccnumb="6" loccnume="10"
+    expl="VC for move"
+    sum="44c7e30e11568ededf3073a035587f13"
+    proved="true"
+    expanded="true"
+    shape="CV3aConsVVainfix =V7aConsV0V2Aainfix =V6V1AasortedV7AasortedV6Iainfix =V7aConsV4V2FIainfix =V6V5FaNilfICV2aNiltaConsVwainfix &gt;V8V0Aainfix =V3aConsV0V1AasortedV2AasortedV3FF">
+    <label
+     name="expl:VC for move"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.18"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter hanoi_rec"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="37" loccnumb="10" loccnume="19"
+    expl="VC for hanoi_rec"
+    sum="c150d1d30ea2393b5aa8e35087a60e62"
+    proved="true"
+    expanded="true"
+    shape="iainfix &gt;V0c0ainfix =V10V2Aainfix =V11aprependV0V3Aainfix =V12V1AasortedV12Iainfix =V12V9Aainfix =V11aprependainfix -V0c1V8Aainfix =V10V2AasortedV11AasortedV10FACV9aNiltaConsVwainfix &gt;V13ainfix -V0c1ACV8aNiltaConsVwainfix &gt;V14ainfix -V0c1Aainfix =V5aprependainfix -V0c1V2Aainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FACV6aNiltaConsVwainfix &gt;V15V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FACV3aNiltaConsVwainfix &gt;V16ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V17ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Aainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0ainfix =V2V2Aainfix =V3aprependV0V3Aainfix =V4V1ICV2aNiltaConsVwainfix &gt;V18V0ACV3aNiltaConsVwainfix &gt;V19V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+    <label
+     name="expl:VC for hanoi_rec"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter hanoi_rec.1"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="1. variant decrease"
+      sum="3f656f32c30d34013bbd8ae3b1473268"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V5V0ACV3aNiltaConsVwainfix &gt;V6V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.2"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="2. precondition"
+      sum="f89080c76b63fdd109c0811265e38571"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V5V0ACV3aNiltaConsVwainfix &gt;V6V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.3"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="3. precondition"
+      sum="19e25771d08eefbcd410deda03025f82"
+      proved="true"
+      expanded="true"
+      shape="CV2aNiltaConsVwainfix &gt;V5ainfix -V0c1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V6V0ACV3aNiltaConsVwainfix &gt;V7V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.4"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="4. precondition"
+      sum="dc11c678c4700f0c21416f11d7698f86"
+      proved="true"
+      expanded="true"
+      shape="CV3aNiltaConsVwainfix &gt;V5ainfix -V0c1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V6V0ACV3aNiltaConsVwainfix &gt;V7V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.5"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="5. type invariant"
+      sum="5043dfde71412176b73d6ced3dcd72b3"
+      proved="true"
+      expanded="true"
+      shape="asortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V8ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V9ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V10V0ACV3aNiltaConsVwainfix &gt;V11V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.6"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="6. precondition"
+      sum="16d8b26de4fc1ff9e963eb8892d90ce1"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V7aConsV0V1IasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V8ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V9ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V10V0ACV3aNiltaConsVwainfix &gt;V11V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.7"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="7. precondition"
+      sum="14fde92eccb1b86936c96402a3ba1b2b"
+      proved="true"
+      expanded="true"
+      shape="CV6aNiltaConsVwainfix &gt;V8V0IasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V9ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V10ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V11V0ACV3aNiltaConsVwainfix &gt;V12V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.51"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.8"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="8. variant decrease"
+      sum="29e8117d6c38bc6d080c9c309b516869"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V10V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V11ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V12ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V13V0ACV3aNiltaConsVwainfix &gt;V14V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.9"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="9. precondition"
+      sum="a42e36f9b07d8a8bde8789fffcafabb8"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V5aprependainfix -V0c1V2Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V10V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V11ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V12ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V13V0ACV3aNiltaConsVwainfix &gt;V14V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.10"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="10. precondition"
+      sum="cd019874269e510b9867ed6180e5e362"
+      proved="true"
+      expanded="true"
+      shape="CV8aNiltaConsVwainfix &gt;V10ainfix -V0c1Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V11V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V12ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V13ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V14V0ACV3aNiltaConsVwainfix &gt;V15V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.11"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="11. precondition"
+      sum="e310a05526a124b2a409e8c34c2ab3d3"
+      proved="true"
+      expanded="true"
+      shape="CV9aNiltaConsVwainfix &gt;V10ainfix -V0c1Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V11V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V12ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V13ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V14V0ACV3aNiltaConsVwainfix &gt;V15V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.12"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="12. type invariant"
+      sum="154da48dcf9545287324a9a7c3287270"
+      proved="true"
+      expanded="true"
+      shape="asortedV12Iainfix =V12V9Aainfix =V11aprependainfix -V0c1V8Aainfix =V10V2AasortedV11AasortedV10FICV9aNiltaConsVwainfix &gt;V13ainfix -V0c1ACV8aNiltaConsVwainfix &gt;V14ainfix -V0c1Aainfix =V5aprependainfix -V0c1V2Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V15V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V16ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V17ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V18V0ACV3aNiltaConsVwainfix &gt;V19V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.13"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="13. postcondition"
+      sum="8f2f23cf409bc84d65b6c2757a38c168"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V12V1IasortedV12Iainfix =V12V9Aainfix =V11aprependainfix -V0c1V8Aainfix =V10V2AasortedV11AasortedV10FICV9aNiltaConsVwainfix &gt;V13ainfix -V0c1ACV8aNiltaConsVwainfix &gt;V14ainfix -V0c1Aainfix =V5aprependainfix -V0c1V2Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V15V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V16ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V17ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V18V0ACV3aNiltaConsVwainfix &gt;V19V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.14"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="14. postcondition"
+      sum="a10a8f942b1651449af069b2c6fc4971"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V11aprependV0V3IasortedV12Iainfix =V12V9Aainfix =V11aprependainfix -V0c1V8Aainfix =V10V2AasortedV11AasortedV10FICV9aNiltaConsVwainfix &gt;V13ainfix -V0c1ACV8aNiltaConsVwainfix &gt;V14ainfix -V0c1Aainfix =V5aprependainfix -V0c1V2Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V15V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V16ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V17ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V18V0ACV3aNiltaConsVwainfix &gt;V19V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.15"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="15. postcondition"
+      sum="1ecd1f3bbbe68f6dbdb64da2be9d658a"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V10V2IasortedV12Iainfix =V12V9Aainfix =V11aprependainfix -V0c1V8Aainfix =V10V2AasortedV11AasortedV10FICV9aNiltaConsVwainfix &gt;V13ainfix -V0c1ACV8aNiltaConsVwainfix &gt;V14ainfix -V0c1Aainfix =V5aprependainfix -V0c1V2Iainfix =V8aConsV0V6Aainfix =V9V1AasortedV8AasortedV9FICV6aNiltaConsVwainfix &gt;V15V0Aainfix =V7aConsV0V1AasortedV6Iainfix =V6V3Aainfix =V5aprependainfix -V0c1V2Aainfix =V7aConsV0V1AasortedV5AasortedV7FICV3aNiltaConsVwainfix &gt;V16ainfix -V0c1ACV2aNiltaConsVwainfix &gt;V17ainfix -V0c1Aainfix =V4aprependainfix -V0c1aConsV0V1Iainfix &gt;V0c0ICV2aNiltaConsVwainfix &gt;V18V0ACV3aNiltaConsVwainfix &gt;V19V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.16"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="16. postcondition"
+      sum="918f0b184c4c2830f2948ebb1fde96b6"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V4V1Iainfix &gt;V0c0NICV2aNiltaConsVwainfix &gt;V5V0ACV3aNiltaConsVwainfix &gt;V6V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.17"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="17. postcondition"
+      sum="0e68928903affe289c3b5f94f90515f8"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V3aprependV0V3Iainfix &gt;V0c0NICV2aNiltaConsVwainfix &gt;V5V0ACV3aNiltaConsVwainfix &gt;V6V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.18"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="37" loccnumb="10" loccnume="19"
+      expl="18. postcondition"
+      sum="0d3ce2a9830089707c3ed67f25c58810"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V2V2Iainfix &gt;V0c0NICV2aNiltaConsVwainfix &gt;V5V0ACV3aNiltaConsVwainfix &gt;V6V0Aainfix =V4aprependV0V1AasortedV2AasortedV3AasortedV4FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter tower_of_hanoi"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="52" loccnumb="6" loccnume="20"
+    expl="VC for tower_of_hanoi"
+    sum="a8a16cdff15404f00e67412cb0ecb07d"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V3aNilAainfix =V5V3Aainfix =V4V2AasortedV3Iainfix =V3V0Aainfix =V4aprependalengthV2V1Aainfix =V5aNilAasortedV4AasortedV5FACV0aNiltaConsVwainfix &gt;V6alengthV2ACV1aNiltaConsVwainfix &gt;V7alengthV2Aainfix =V2aprependalengthV2aNilIainfix =V0aNilAainfix =V1V0Aainfix =V2aprependalengthV2aNilAasortedV0AasortedV1AasortedV2F">
+    <label
+     name="expl:VC for tower_of_hanoi"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ListRevAppend"
+   locfile="../tower_of_hanoi.mlw"
+   loclnum="61" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+   <goal
+    name="rev_append_append_l"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="72" loccnumb="8" loccnume="27"
+    sum="246dc5d9899537f98302c34af1e95a00"
+    proved="true"
+    expanded="true"
+    shape="ainfix =arev_appendainfix ++V0V1V2arev_appendV1arev_appendV0V2F">
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     edited="tower_of_hanoi_ListRevAppend_rev_append_append_l_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.49"/>
+    </proof>
+   </goal>
+   <goal
+    name="rev_append_append_r"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="76" loccnumb="8" loccnume="27"
+    sum="87495686300d29a900096d1e7e0e1eb2"
+    proved="true"
+    expanded="true"
+    shape="ainfix =arev_appendV0ainfix ++V1V2arev_appendarev_appendV1V0V2F">
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     edited="tower_of_hanoi_ListRevAppend_rev_append_append_r_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.51"/>
+    </proof>
+   </goal>
+   <goal
+    name="rev_append_length"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="83" loccnumb="8" loccnume="25"
+    sum="d630d158b7ad7023db58f230f7f40887"
+    proved="true"
+    expanded="true"
+    shape="ainfix =alengtharev_appendV0V1ainfix +alengthV0alengthV1F">
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     edited="tower_of_hanoi_ListRevAppend_rev_append_length_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.51"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ListRevSorted"
+   locfile="../tower_of_hanoi.mlw"
+   loclnum="95" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+   <goal
+    name="rev_append_sorted_incr"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="114" loccnumb="8" loccnume="30"
+    sum="f0b4949972ff4c5892f2c859f32e0f69"
+    proved="true"
+    expanded="true"
+    shape="acompatV0V1AasortedV1AasortedV0qasortedarev_appendV0V1F">
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     edited="tower_of_hanoi_ListRevSorted_rev_append_sorted_incr_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.58"/>
+    </proof>
+   </goal>
+   <goal
+    name="rev_append_sorted_decr"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="119" loccnumb="8" loccnume="30"
+    sum="98177daa5baba6af8f76d29b03b3fac8"
+    proved="true"
+    expanded="true"
+    shape="acompatV1V0AasortedV1AasortedV0qasortedarev_appendV0V1F">
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     edited="tower_of_hanoi_ListRevSorted_rev_append_sorted_decr_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.55"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="Tower_of_Hanoi"
+   locfile="../tower_of_hanoi.mlw"
+   loclnum="135" loccnumb="7" loccnume="21"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter move"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="151" loccnumb="6" loccnume="10"
+    expl="VC for move"
+    sum="3cf315c660be3d20ccf827df4d3489fc"
+    proved="true"
+    expanded="true"
+    shape="CV3aConsVVainfix =V7aConsV0V2Aainfix =V6V1AasortedV7AasortedV6Iainfix =V7aConsV4V2FIainfix =V6V5FaNilfICV2aNiltaConsVwainfix &lt;V0V8Aainfix =V3aConsV0V1AasortedV2AasortedV3FF">
+    <label
+     name="expl:VC for move"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.67"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.24"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter hanoi_rec"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="163" loccnumb="10" loccnume="19"
+    expl="VC for hanoi_rec"
+    sum="0a54f275ec12423702d445ecec1a1cba"
+    proved="true"
+    expanded="true"
+    shape="iainfix &gt;V0c0CV1aConsVVainfix =V13V3Aainfix =V14arev_appendV1V4Aainfix =V15V2AasortedV15Iainfix =V15V12Aainfix =V14arev_appendV7V11Aainfix =V13V3AasortedV14AasortedV13FACV12aConsVVCV7aConsVVainfix &lt;V18V16wtwtACV11aConsVVCV7aConsVVainfix &lt;V22V20wtwtAainfix =V8arev_appendV7V3AasortedV7Aainfix =alengthV7ainfix -V0c1Aainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FACV9aNiltaConsVwainfix &lt;V6V24Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FACV4aConsVVCV7aConsVVainfix &lt;V27V25wtwtACV3aConsVVCV7aConsVVainfix &lt;V31V29wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1Aainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0aNilfainfix =V3V3Aainfix =V4arev_appendV1V4Aainfix =V5V2ICV3aConsVVCV1aConsVVainfix &lt;V35V33wtwtACV4aConsVVCV1aConsVVainfix &lt;V39V37wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+    <label
+     name="expl:VC for hanoi_rec"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter hanoi_rec.1"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="1. variant decrease"
+      sum="e97714fec705d2cfaf2cbac52b2c855e"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V10V8wtwtACV4aConsVVCV1aConsVVainfix &lt;V14V12wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.2"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="2. precondition"
+      sum="d3cf63591934c21f37895bb76f59b98f"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V10V8wtwtACV4aConsVVCV1aConsVVainfix &lt;V14V12wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="3.92"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.3"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="3. precondition"
+      sum="247c48c4d95b5ecbfde707b8def41fff"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix =V5arev_appendV7aConsV6V2aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V10V8wtwtACV4aConsVVCV1aConsVVainfix &lt;V14V12wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.40"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.14"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.4"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="4. precondition"
+      sum="0a16678e03aca02e41d3009cab850c23"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVCV3aConsVVCV7aConsVVainfix &lt;V10V8wtwtaNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V14V12wtwtACV4aConsVVCV1aConsVVainfix &lt;V18V16wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.38"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.5"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="5. precondition"
+      sum="3eedb1a4f116434f0de9f631c698ddc6"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVCV4aConsVVCV7aConsVVainfix &lt;V10V8wtwtaNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V14V12wtwtACV4aConsVVCV1aConsVVainfix &lt;V18V16wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.15"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.38"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.6"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="6. type invariant"
+      sum="e43bad6cd6cd72d01e5a530ef3008343"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V13V11wtwtACV3aConsVVCV7aConsVVainfix &lt;V17V15wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V21V19wtwtACV4aConsVVCV1aConsVVainfix &lt;V25V23wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.7"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="7. precondition"
+      sum="f0b4ff3d8dff11e940e7f902fa04cbc4"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix =V10aConsV6V2IasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V13V11wtwtACV3aConsVVCV7aConsVVainfix &lt;V17V15wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V21V19wtwtACV4aConsVVCV1aConsVVainfix &lt;V25V23wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.8"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="8. precondition"
+      sum="a5519ceb11a37c0be645fc0d944084f3"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVCV9aNiltaConsVwainfix &lt;V6V11IasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V14V12wtwtACV3aConsVVCV7aConsVVainfix &lt;V18V16wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V22V20wtwtACV4aConsVVCV1aConsVVainfix &lt;V26V24wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.9"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="9. variant decrease"
+      sum="bcade33d438ca4dfea69a9b3b9fd510e"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0V0Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V13Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V16V14wtwtACV3aConsVVCV7aConsVVainfix &lt;V20V18wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V24V22wtwtACV4aConsVVCV1aConsVVainfix &lt;V28V26wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.10"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="10. precondition"
+      sum="0be65f982fa44e7b34b2c72dbcde0315"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVasortedV7Aainfix =alengthV7ainfix -V0c1Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V13Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V16V14wtwtACV3aConsVVCV7aConsVVainfix &lt;V20V18wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V24V22wtwtACV4aConsVVCV1aConsVVainfix &lt;V28V26wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.11"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="11. precondition"
+      sum="94cac2599af8b1715ef1595a4e5e9836"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix =V8arev_appendV7V3Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V13Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V16V14wtwtACV3aConsVVCV7aConsVVainfix &lt;V20V18wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V24V22wtwtACV4aConsVVCV1aConsVVainfix &lt;V28V26wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.12"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="12. precondition"
+      sum="b660a20de0639f67b9c39d8c3ba0f3d4"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVCV11aConsVVCV7aConsVVainfix &lt;V15V13wtwtIainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V17Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V20V18wtwtACV3aConsVVCV7aConsVVainfix &lt;V24V22wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V28V26wtwtACV4aConsVVCV1aConsVVainfix &lt;V32V30wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.39"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.44"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.13"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="13. precondition"
+      sum="60cbf3b4e9e10d7e563e318ed631358c"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVCV12aConsVVCV7aConsVVainfix &lt;V15V13wtwtIainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V17Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V20V18wtwtACV3aConsVVCV7aConsVVainfix &lt;V24V22wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V28V26wtwtACV4aConsVVCV1aConsVVainfix &lt;V32V30wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.37"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.28"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.14"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="14. type invariant"
+      sum="23556fad7fa851b8908744e3d7d4c79e"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVasortedV15Iainfix =V15V12Aainfix =V14arev_appendV7V11Aainfix =V13V3AasortedV14AasortedV13FICV12aConsVVCV7aConsVVainfix &lt;V18V16wtwtACV11aConsVVCV7aConsVVainfix &lt;V22V20wtwtAainfix =V8arev_appendV7V3AasortedV7Aainfix =alengthV7ainfix -V0c1Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V24Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V27V25wtwtACV3aConsVVCV7aConsVVainfix &lt;V31V29wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V35V33wtwtACV4aConsVVCV1aConsVVainfix &lt;V39V37wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.15"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="15. postcondition"
+      sum="7cee0cfc230bdde43931eee35c81b4fc"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix =V15V2IasortedV15Iainfix =V15V12Aainfix =V14arev_appendV7V11Aainfix =V13V3AasortedV14AasortedV13FICV12aConsVVCV7aConsVVainfix &lt;V18V16wtwtACV11aConsVVCV7aConsVVainfix &lt;V22V20wtwtAainfix =V8arev_appendV7V3AasortedV7Aainfix =alengthV7ainfix -V0c1Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V24Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V27V25wtwtACV3aConsVVCV7aConsVVainfix &lt;V31V29wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V35V33wtwtACV4aConsVVCV1aConsVVainfix &lt;V39V37wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.16"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="16. postcondition"
+      sum="99ea15aeb030d8f38728adbf2ad35284"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix =V14arev_appendV1V4IasortedV15Iainfix =V15V12Aainfix =V14arev_appendV7V11Aainfix =V13V3AasortedV14AasortedV13FICV12aConsVVCV7aConsVVainfix &lt;V18V16wtwtACV11aConsVVCV7aConsVVainfix &lt;V22V20wtwtAainfix =V8arev_appendV7V3AasortedV7Aainfix =alengthV7ainfix -V0c1Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V24Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V27V25wtwtACV3aConsVVCV7aConsVVainfix &lt;V31V29wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V35V33wtwtACV4aConsVVCV1aConsVVainfix &lt;V39V37wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.56"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.99"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.16"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.17"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="17. postcondition"
+      sum="34d3d3ef02964e787a6c4e73109fd48f"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVainfix =V13V3IasortedV15Iainfix =V15V12Aainfix =V14arev_appendV7V11Aainfix =V13V3AasortedV14AasortedV13FICV12aConsVVCV7aConsVVainfix &lt;V18V16wtwtACV11aConsVVCV7aConsVVainfix &lt;V22V20wtwtAainfix =V8arev_appendV7V3AasortedV7Aainfix =alengthV7ainfix -V0c1Iainfix =V11aConsV6V9Aainfix =V12V2AasortedV11AasortedV12FICV9aNiltaConsVwainfix &lt;V6V24Aainfix =V10aConsV6V2AasortedV9Iainfix =V9V4Aainfix =V8arev_appendV7V3Aainfix =V10aConsV6V2AasortedV8AasortedV10FICV4aConsVVCV7aConsVVainfix &lt;V27V25wtwtACV3aConsVVCV7aConsVVainfix &lt;V31V29wtwtAainfix =V5arev_appendV7aConsV6V2AasortedV7Aainfix =alengthV7ainfix -V0c1aNiltIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V35V33wtwtACV4aConsVVCV1aConsVVainfix &lt;V39V37wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.18"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="18."
+      sum="55cb7f649891f7553ef17394ef5d62b7"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVtaNilfIainfix &gt;V0c0ICV3aConsVVCV1aConsVVainfix &lt;V10V8wtwtACV4aConsVVCV1aConsVVainfix &lt;V14V12wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.19"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="19. postcondition"
+      sum="c6b24a5754fe4107c05f553eba28d301"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V5V2Iainfix &gt;V0c0NICV3aConsVVCV1aConsVVainfix &lt;V8V6wtwtACV4aConsVVCV1aConsVVainfix &lt;V12V10wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.20"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="20. postcondition"
+      sum="0fe83900e8dc35cb29356fd1ea59dcfd"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V4arev_appendV1V4Iainfix &gt;V0c0NICV3aConsVVCV1aConsVVainfix &lt;V8V6wtwtACV4aConsVVCV1aConsVVainfix &lt;V12V10wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hanoi_rec.21"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="163" loccnumb="10" loccnume="19"
+      expl="21. postcondition"
+      sum="5cb85d89e33669d81a7a37ca8f698638"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V3V3Iainfix &gt;V0c0NICV3aConsVVCV1aConsVVainfix &lt;V8V6wtwtACV4aConsVVCV1aConsVVainfix &lt;V12V10wtwtAainfix =V5arev_appendV1V2AasortedV1Aainfix =alengthV1V0AasortedV3AasortedV4AasortedV5FF">
+      <label
+       name="expl:VC for hanoi_rec"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter tower_of_hanoi"
+    locfile="../tower_of_hanoi.mlw"
+    loclnum="180" loccnumb="6" loccnume="20"
+    expl="VC for tower_of_hanoi"
+    sum="d9eb84085dbfed621405d3331d528990"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V3aNilAainfix =V5V3Aainfix =V4V2AasortedV3Iainfix =V3V0Aainfix =V4arev_appendarev_appendV2aNilV1Aainfix =V5aNilAasortedV4AasortedV5FACV0aConsVVCarev_appendV2aNilaConsVVainfix &lt;V8V6wtwtACV1aConsVVCarev_appendV2aNilaConsVVainfix &lt;V12V10wtwtAainfix =V2arev_appendarev_appendV2aNilaNilAasortedarev_appendV2aNilAainfix =alengtharev_appendV2aNilalengthV2Iainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+    <label
+     name="expl:VC for tower_of_hanoi"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter tower_of_hanoi.1"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="1. precondition"
+      sum="3049d1524f80e4e2530490cce7f3f21d"
+      proved="true"
+      expanded="true"
+      shape="asortedarev_appendV2aNilAainfix =alengtharev_appendV2aNilalengthV2Iainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.92"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tower_of_hanoi.2"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="2. precondition"
+      sum="a6573dce9c92a1019fa99e52fb2f6601"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V2arev_appendarev_appendV2aNilaNilIainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tower_of_hanoi.3"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="3. precondition"
+      sum="988f5d9a37a022722057d40efa43399a"
+      proved="true"
+      expanded="true"
+      shape="CV1aConsVVCarev_appendV2aNilaConsVVainfix &lt;V5V3wtwtIainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tower_of_hanoi.4"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="4. precondition"
+      sum="d3269aee6b826ae0407e1068baec18f3"
+      proved="true"
+      expanded="true"
+      shape="CV0aConsVVCarev_appendV2aNilaConsVVainfix &lt;V5V3wtwtIainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tower_of_hanoi.5"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="5. type invariant"
+      sum="4fbbc7d67cdd7e02146b793c9d988288"
+      proved="true"
+      expanded="true"
+      shape="asortedV3Iainfix =V3V0Aainfix =V4arev_appendarev_appendV2aNilV1Aainfix =V5aNilAasortedV4AasortedV5FICV0aConsVVCarev_appendV2aNilaConsVVainfix &lt;V8V6wtwtACV1aConsVVCarev_appendV2aNilaConsVVainfix &lt;V12V10wtwtAainfix =V2arev_appendarev_appendV2aNilaNilAasortedarev_appendV2aNilAainfix =alengtharev_appendV2aNilalengthV2Iainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tower_of_hanoi.6"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="6. postcondition"
+      sum="c3fd53f6f9da8dd904195eec02575077"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V4V2IasortedV3Iainfix =V3V0Aainfix =V4arev_appendarev_appendV2aNilV1Aainfix =V5aNilAasortedV4AasortedV5FICV0aConsVVCarev_appendV2aNilaConsVVainfix &lt;V8V6wtwtACV1aConsVVCarev_appendV2aNilaConsVVainfix &lt;V12V10wtwtAainfix =V2arev_appendarev_appendV2aNilaNilAasortedarev_appendV2aNilAainfix =alengtharev_appendV2aNilalengthV2Iainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter tower_of_hanoi.7"
+      locfile="../tower_of_hanoi.mlw"
+      loclnum="180" loccnumb="6" loccnume="20"
+      expl="7. postcondition"
+      sum="e4555220a97f2ff67289ce6db3e183fb"
+      proved="true"
+      expanded="true"
+      shape="ainfix =V3aNilAainfix =V5V3IasortedV3Iainfix =V3V0Aainfix =V4arev_appendarev_appendV2aNilV1Aainfix =V5aNilAasortedV4AasortedV5FICV0aConsVVCarev_appendV2aNilaConsVVainfix &lt;V8V6wtwtACV1aConsVVCarev_appendV2aNilaConsVVainfix &lt;V12V10wtwtAainfix =V2arev_appendarev_appendV2aNilaNilAasortedarev_appendV2aNilAainfix =alengtharev_appendV2aNilalengthV2Iainfix =V0aNilAainfix =V1V0AasortedV0AasortedV1AasortedV2F">
+      <label
+       name="expl:VC for tower_of_hanoi"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

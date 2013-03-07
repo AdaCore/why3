@@ -54,10 +54,6 @@ run_dir () {
 }
 
 
-echo "=== Logic ==="
-run_dir .
-echo ""
-
 echo "=== Tests Provers ==="
 run_dir tests-provers
 echo ""
@@ -70,15 +66,16 @@ echo "=== BTS ==="
 run_dir bts
 echo ""
 
-echo "=== Programs ==="
-run_dir programs
+echo "=== Logic ==="
+run_dir logic
+run_dir bitvectors "-I bitvectors"
 echo ""
 
-echo "=== Programs in their own subdir ==="
-run_dir programs/vacid_0_binary_heaps "-I programs/vacid_0_binary_heaps"
-run_dir hoare_logic "-I hoare_logic"
-run_dir bitvectors "-I bitvectors"
-run_dir foveoos2011 "-I foveoos2011"
+echo "=== Programs ==="
+run_dir .
+run_dir foveoos11-cm
+run_dir hoare_logic
+run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
 echo ""
 
 echo "Summary: $success/$total"

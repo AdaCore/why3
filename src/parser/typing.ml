@@ -196,6 +196,17 @@ let rec dty uc = function
       let ts = ts_tuple (List.length tyl) in
       tyapp ts (List.map (dty uc) tyl)
 
+let rec ty_of_pty uc = function
+  | PPTtyvar {id=x} ->
+      ty_var (create_user_tv x)
+  | PPTtyapp (p, x) ->
+      let ts = find_tysymbol x uc in
+      let tyl = List.map (ty_of_pty uc) p in
+      Loc.try2 (qloc x) ty_app ts tyl
+  | PPTtuple tyl ->
+      let ts = ts_tuple (List.length tyl) in
+      ty_app ts (List.map (ty_of_pty uc) tyl)
+
 let specialize_lsymbol p uc =
   let s = find_lsymbol p uc in
   let tl,ty = specialize_lsymbol ~loc:(qloc p) s in
@@ -1104,7 +1115,7 @@ let add_decl loc th = function
       add_prop (prop_kind k) loc s f th
   | Meta (id, al) ->
       let convert = function
-        | PMAts q  -> MAts (find_tysymbol q th)
+        | PMAty ty -> MAty (ty_of_pty th ty)
         | PMAfs q  -> MAls (find_fsymbol q th)
         | PMAps q  -> MAls (find_psymbol q th)
         | PMApr q  -> MApr (find_prop q th)
@@ -1125,9 +1136,18 @@ let type_inst th t s =
       let ns1 = Opt.fold find t.th_export p in
       let ns2 = Opt.fold find (get_namespace th) q in
       clone_ns loc t.th_local ns2 ns1 s
-    | CStsym (loc,p,q) ->
+    | CStsym (loc,p,[],PPTtyapp ([],q)) ->
       let ts1 = find_tysymbol_ns p t.th_export in
       let ts2 = find_tysymbol q th in
+      if Mts.mem ts1 s.inst_ts
+      then error ~loc (ClashSymbol ts1.ts_name.id_string);
+      { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
+    | CStsym (loc,p,tvl,pty) ->
+      let ts1 = find_tysymbol_ns p t.th_export in
+      let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
+      let tvl = List.map (fun id -> create_user_tv id.id) tvl in
+      let def = Some (ty_of_pty th pty) in
+      let ts2 = Loc.try3 loc create_tysymbol id tvl def in
       if Mts.mem ts1 s.inst_ts
       then error ~loc (ClashSymbol ts1.ts_name.id_string);
       { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
@@ -1167,12 +1187,12 @@ let add_use_clone env lenv th loc (use, subst) =
     | None -> use_export th t
     | Some s -> clone_export th t (type_inst th t s)
   in
-  let use_or_clone th = match use.use_imp_exp with
-    | Some imp ->
+  let use_or_clone th = match use.use_import with
+    | Some (import, use_as) ->
         (* use T = namespace T use_export T end *)
-        let th = open_namespace th use.use_as in
+        let th = open_namespace th use_as in
         let th = use_or_clone th in
-        close_namespace th imp
+        close_namespace th import
     | None ->
         use_or_clone th
   in

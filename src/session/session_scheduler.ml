@@ -727,16 +727,27 @@ let check_all eS eT ~callback =
 (***********************************)
 
 let rec play_on_goal_and_children eS eT ~timelimit ~memlimit todo l g =
+  let timelimit, memlimit, auto_proved =
+    PHprover.fold (fun _ pa (timelimit, memlimit, _ as acc) ->
+      match pa.proof_edited_as, pa.proof_state with
+        | None, Done { Call_provers.pr_answer = Call_provers.Valid } ->
+            max timelimit pa.proof_timelimit,
+            max memlimit pa.proof_memlimit,
+            true
+        | _ -> acc)
+      g.goal_external_proofs (timelimit, memlimit, false) in
   let callback _key status =
     if not (running status) then Todo._done todo () in
-  List.iter
-    (fun p ->
-      Todo.start todo;
+  if auto_proved then begin
+    List.iter
+      (fun p ->
+        Todo.start todo;
       (* eprintf "todo increased to %d@." todo.Todo.todo; *)
       (* eprintf "prover %a on goal %s@." *)
       (*   Whyconf.print_prover p g.goal_name.Ident.id_string; *)
-      prover_on_goal eS eT ~callback ~timelimit ~memlimit p g)
-    l;
+        prover_on_goal eS eT ~callback ~timelimit ~memlimit p g)
+      l
+  end;
   iter_goal
     (fun _ -> ())
     (iter_transf

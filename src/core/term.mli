@@ -22,9 +22,9 @@ type vsymbol = private {
   vs_ty   : ty;
 }
 
-module Mvs : Map.S with type key = vsymbol
-module Svs : Mvs.Set
-module Hvs : XHashtbl.S with type key = vsymbol
+module Mvs : Extmap.S with type key = vsymbol
+module Svs : Extset.S with module M = Mvs
+module Hvs : Exthtbl.S with type key = vsymbol
 module Wvs : Weakhtbl.S with type key = vsymbol
 
 val vs_equal : vsymbol -> vsymbol -> bool
@@ -40,9 +40,9 @@ type lsymbol = private {
   ls_value  : ty option;
 }
 
-module Mls : Map.S with type key = lsymbol
-module Sls : Mls.Set
-module Hls : XHashtbl.S with type key = lsymbol
+module Mls : Extmap.S with type key = lsymbol
+module Sls : Extset.S with module M = Mls
+module Hls : Exthtbl.S with type key = lsymbol
 module Wls : Weakhtbl.S with type key = lsymbol
 
 val ls_equal : lsymbol -> lsymbol -> bool
@@ -138,9 +138,9 @@ and term_quant
 
 and trigger = term list list
 
-module Mterm : Map.S with type key = term
-module Sterm : Mterm.Set
-module Hterm : XHashtbl.S with type key = term
+module Mterm : Extmap.S with type key = term
+module Sterm : Extset.S with module M = Mterm
+module Hterm : Exthtbl.S with type key = term
 
 val t_equal : term -> term -> bool
 val t_hash : term -> int
@@ -409,7 +409,7 @@ val t_app_fold :
 
 val t_equal_alpha : term -> term -> bool
 
-module Hterm_alpha : XHashtbl.S with type key = term
+module Hterm_alpha : Exthtbl.S with type key = term
 
 (** Subterm occurrence check and replacement *)
 

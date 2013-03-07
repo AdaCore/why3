@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require map.Map.
 
 (* Why3 assumption *)
 Inductive list (a:Type) {a_WT:WhyType a} :=
@@ -60,31 +61,6 @@ Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
 Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
   (l = (infix_plpl l1 (Cons x l2))).
-
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
 
 (* Why3 assumption *)
 Inductive datatype  :=
@@ -206,99 +182,100 @@ Axiom get_vartype_def : forall (i:ident) (pi:(list (ident* datatype)%type)),
   end.
 
 (* Why3 assumption *)
-Definition type_env  := (map mident datatype).
+Definition type_env  := (map.Map.map mident datatype).
 
 (* Why3 assumption *)
-Inductive type_term : (map mident datatype) -> (list (ident* datatype)%type)
-  -> term -> datatype -> Prop :=
-  | Type_value : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:value), (type_term sigma pi (Tvalue v)
+Inductive type_term : (map.Map.map mident datatype) -> (list (ident*
+  datatype)%type) -> term -> datatype -> Prop :=
+  | Type_value : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (v:value), (type_term sigma pi (Tvalue v)
       (type_value v))
-  | Type_var : forall (sigma:(map mident datatype)) (pi:(list (ident*
+  | Type_var : forall (sigma:(map.Map.map mident datatype)) (pi:(list (ident*
       datatype)%type)) (v:ident) (ty:datatype), ((get_vartype v pi) = ty) ->
       (type_term sigma pi (Tvar v) ty)
-  | Type_deref : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:mident) (ty:datatype), ((get sigma v) = ty) ->
-      (type_term sigma pi (Tderef v) ty)
-  | Type_bin : forall (sigma:(map mident datatype)) (pi:(list (ident*
+  | Type_deref : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (v:mident) (ty:datatype), ((map.Map.get sigma
+      v) = ty) -> (type_term sigma pi (Tderef v) ty)
+  | Type_bin : forall (sigma:(map.Map.map mident datatype)) (pi:(list (ident*
       datatype)%type)) (t1:term) (t2:term) (op:operator) (ty1:datatype)
       (ty2:datatype) (ty:datatype), (type_term sigma pi t1 ty1) ->
       ((type_term sigma pi t2 ty2) -> ((type_operator op ty1 ty2 ty) ->
       (type_term sigma pi (Tbin t1 op t2) ty))).
 
 (* Why3 assumption *)
-Inductive type_fmla : (map mident datatype) -> (list (ident* datatype)%type)
-  -> fmla -> Prop :=
-  | Type_term : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (t:term), (type_term sigma pi t TYbool) ->
+Inductive type_fmla : (map.Map.map mident datatype) -> (list (ident*
+  datatype)%type) -> fmla -> Prop :=
+  | Type_term : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (t:term), (type_term sigma pi t TYbool) ->
       (type_fmla sigma pi (Fterm t))
-  | Type_conj : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi f1) ->
-      ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fand f1 f2)))
-  | Type_neg : forall (sigma:(map mident datatype)) (pi:(list (ident*
+  | Type_conj : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi
+      f1) -> ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fand f1 f2)))
+  | Type_neg : forall (sigma:(map.Map.map mident datatype)) (pi:(list (ident*
       datatype)%type)) (f:fmla), (type_fmla sigma pi f) -> (type_fmla sigma
       pi (Fnot f))
-  | Type_implies : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi f1) ->
-      ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fimplies f1 f2)))
-  | Type_let : forall (sigma:(map mident datatype)) (pi:(list (ident*
+  | Type_implies : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (f1:fmla) (f2:fmla), (type_fmla sigma pi
+      f1) -> ((type_fmla sigma pi f2) -> (type_fmla sigma pi (Fimplies f1
+      f2)))
+  | Type_let : forall (sigma:(map.Map.map mident datatype)) (pi:(list (ident*
       datatype)%type)) (x:ident) (t:term) (f:fmla) (ty:datatype),
       (type_term sigma pi t ty) -> ((type_fmla sigma (Cons (x, ty) pi) f) ->
       (type_fmla sigma pi (Flet x t f)))
-  | Type_forall1 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYint)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYint f))
-  | Type_forall2 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYbool)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYbool f))
-  | Type_forall3 : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x, TYunit)
-      pi) f) -> (type_fmla sigma pi (Fforall x TYunit f)).
+  | Type_forall1 : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x,
+      TYint) pi) f) -> (type_fmla sigma pi (Fforall x TYint f))
+  | Type_forall2 : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x,
+      TYbool) pi) f) -> (type_fmla sigma pi (Fforall x TYbool f))
+  | Type_forall3 : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (x:ident) (f:fmla), (type_fmla sigma (Cons (x,
+      TYunit) pi) f) -> (type_fmla sigma pi (Fforall x TYunit f)).
 
 (* Why3 assumption *)
-Inductive type_expr : (map mident datatype) -> (list (ident* datatype)%type)
-  -> expr -> datatype -> Prop :=
-  | Type_Evalue : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:value), (type_expr sigma pi (Evalue v)
+Inductive type_expr : (map.Map.map mident datatype) -> (list (ident*
+  datatype)%type) -> expr -> datatype -> Prop :=
+  | Type_Evalue : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (v:value), (type_expr sigma pi (Evalue v)
       (type_value v))
-  | Type_Evar : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:ident) (ty:datatype), ((get_vartype v pi) = ty) ->
-      (type_expr sigma pi (Evar v) ty)
-  | Type_Ederef : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (v:mident) (ty:datatype), ((get sigma v) = ty) ->
-      (type_expr sigma pi (Ederef v) ty)
-  | Type_Ebinop : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (e1:expr) (e2:expr) (op:operator) (ty1:datatype)
-      (ty2:datatype) (ty:datatype), (type_expr sigma pi e1 ty1) ->
-      ((type_expr sigma pi e2 ty2) -> ((type_operator op ty1 ty2 ty) ->
-      (type_expr sigma pi (Ebin e1 op e2) ty)))
-  | Type_seq : forall (sigma:(map mident datatype)) (pi:(list (ident*
+  | Type_Evar : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (v:ident) (ty:datatype), ((get_vartype v
+      pi) = ty) -> (type_expr sigma pi (Evar v) ty)
+  | Type_Ederef : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (v:mident) (ty:datatype), ((map.Map.get sigma
+      v) = ty) -> (type_expr sigma pi (Ederef v) ty)
+  | Type_Ebinop : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (e1:expr) (e2:expr) (op:operator)
+      (ty1:datatype) (ty2:datatype) (ty:datatype), (type_expr sigma pi e1
+      ty1) -> ((type_expr sigma pi e2 ty2) -> ((type_operator op ty1 ty2
+      ty) -> (type_expr sigma pi (Ebin e1 op e2) ty)))
+  | Type_seq : forall (sigma:(map.Map.map mident datatype)) (pi:(list (ident*
       datatype)%type)) (e1:expr) (e2:expr) (ty:datatype), (type_expr sigma pi
       e1 TYunit) -> ((type_expr sigma pi e2 ty) -> (type_expr sigma pi
       (Eseq e1 e2) ty))
-  | Type_assigns : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:mident) (e:expr) (ty:datatype), ((get sigma
-      x) = ty) -> ((type_expr sigma pi e ty) -> (type_expr sigma pi
-      (Eassign x e) TYunit))
-  | Type_if : forall (sigma:(map mident datatype)) (pi:(list (ident*
+  | Type_assigns : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (x:mident) (e:expr) (ty:datatype),
+      ((map.Map.get sigma x) = ty) -> ((type_expr sigma pi e ty) ->
+      (type_expr sigma pi (Eassign x e) TYunit))
+  | Type_if : forall (sigma:(map.Map.map mident datatype)) (pi:(list (ident*
       datatype)%type)) (t:expr) (e1:expr) (e2:expr) (ty:datatype),
       (type_expr sigma pi t TYbool) -> ((type_expr sigma pi e1 ty) ->
       ((type_expr sigma pi e2 ty) -> (type_expr sigma pi (Eif t e1 e2) ty)))
-  | Type_assert : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (p:fmla), (type_fmla sigma pi p) -> (type_expr sigma
-      pi (Eassert p) TYbool)
-  | Type_while : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (guard:expr) (body:expr) (inv:fmla) (ty:datatype),
-      (type_fmla sigma pi inv) -> ((type_expr sigma pi guard TYbool) ->
-      ((type_expr sigma pi body ty) -> (type_expr sigma pi (Ewhile guard inv
-      body) ty)))
-  | Type_Elet : forall (sigma:(map mident datatype)) (pi:(list (ident*
-      datatype)%type)) (x:ident) (e1:expr) (e2:expr) (ty1:datatype)
+  | Type_assert : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (p:fmla), (type_fmla sigma pi p) ->
+      (type_expr sigma pi (Eassert p) TYbool)
+  | Type_while : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (guard:expr) (body:expr) (inv:fmla)
+      (ty:datatype), (type_fmla sigma pi inv) -> ((type_expr sigma pi guard
+      TYbool) -> ((type_expr sigma pi body ty) -> (type_expr sigma pi
+      (Ewhile guard inv body) ty)))
+  | Type_Elet : forall (sigma:(map.Map.map mident datatype)) (pi:(list
+      (ident* datatype)%type)) (x:ident) (e1:expr) (e2:expr) (ty1:datatype)
       (ty2:datatype), (type_expr sigma pi e1 ty1) -> ((type_expr sigma
       (Cons (x, ty1) pi) e2 ty2) -> (type_expr sigma pi (Elet x e1 e2) ty2)).
 
 (* Why3 assumption *)
-Definition env  := (map mident value).
+Definition env  := (map.Map.map mident value).
 
 (* Why3 assumption *)
 Definition stack  := (list (ident* value)%type).
@@ -335,24 +312,24 @@ Axiom eval_bin_def : forall (x:value) (op:operator) (y:value), match (x,
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_term(sigma:(map mident value)) (pi:(list (ident* value)%type))
-  (t:term) {struct t}: value :=
+Fixpoint eval_term(sigma:(map.Map.map mident value)) (pi:(list (ident*
+  value)%type)) (t:term) {struct t}: value :=
   match t with
   | (Tvalue v) => v
   | (Tvar id) => (get_stack id pi)
-  | (Tderef id) => (get sigma id)
+  | (Tderef id) => (map.Map.get sigma id)
   | (Tbin t1 op t2) => (eval_bin (eval_term sigma pi t1) op (eval_term sigma
       pi t2))
   end.
 
-Axiom eval_bool_term : forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)) (sigmat:(map mident datatype)) (pit:(list (ident*
-  datatype)%type)) (t:term), (type_term sigmat pit t TYbool) ->
+Axiom eval_bool_term : forall (sigma:(map.Map.map mident value)) (pi:(list
+  (ident* value)%type)) (sigmat:(map.Map.map mident datatype)) (pit:(list
+  (ident* datatype)%type)) (t:term), (type_term sigmat pit t TYbool) ->
   exists b:bool, ((eval_term sigma pi t) = (Vbool b)).
 
 (* Why3 assumption *)
-Fixpoint eval_fmla(sigma:(map mident value)) (pi:(list (ident* value)%type))
-  (f:fmla) {struct f}: Prop :=
+Fixpoint eval_fmla(sigma:(map.Map.map mident value)) (pi:(list (ident*
+  value)%type)) (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm t) => ((eval_term sigma pi t) = (Vbool true))
   | (Fand f1 f2) => (eval_fmla sigma pi f1) /\ (eval_fmla sigma pi f2)
@@ -437,50 +414,53 @@ Axiom subst_fresh_term : forall (t:term) (x:ident) (v:ident),
 Axiom subst_fresh : forall (f:fmla) (x:ident) (v:ident), (fresh_in_fmla x
   f) -> ((subst f x v) = f).
 
-Axiom eval_msubst_term : forall (e:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v e) ->
-  ((eval_term sigma pi (msubst_term e x v)) = (eval_term (set sigma x
-  (get_stack v pi)) pi e)).
+Axiom eval_msubst_term : forall (e:term) (sigma:(map.Map.map mident value))
+  (pi:(list (ident* value)%type)) (x:mident) (v:ident), (fresh_in_term v
+  e) -> ((eval_term sigma pi (msubst_term e x
+  v)) = (eval_term (map.Map.set sigma x (get_stack v pi)) pi e)).
 
-Axiom eval_msubst : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v f) ->
-  ((eval_fmla sigma pi (msubst f x v)) <-> (eval_fmla (set sigma x
-  (get_stack v pi)) pi f)).
+Axiom eval_msubst : forall (f:fmla) (sigma:(map.Map.map mident value))
+  (pi:(list (ident* value)%type)) (x:mident) (v:ident), (fresh_in_fmla v
+  f) -> ((eval_fmla sigma pi (msubst f x v)) <->
+  (eval_fmla (map.Map.set sigma x (get_stack v pi)) pi f)).
 
-Axiom eval_swap_term : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
+Axiom eval_swap_term : forall (t:term) (sigma:(map.Map.map mident value))
+  (pi:(list (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
   (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_term sigma
   (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) t) = (eval_term sigma
   (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) t)).
 
-Axiom eval_swap_term_2 : forall (t:term) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (id1:ident) (id2:ident) (v1:value) (v2:value),
-  (~ (id1 = id2)) -> ((eval_term sigma (Cons (id1, v1) (Cons (id2, v2) pi))
-  t) = (eval_term sigma (Cons (id2, v2) (Cons (id1, v1) pi)) t)).
+Axiom eval_swap_term_2 : forall (t:term) (sigma:(map.Map.map mident value))
+  (pi:(list (ident* value)%type)) (id1:ident) (id2:ident) (v1:value)
+  (v2:value), (~ (id1 = id2)) -> ((eval_term sigma (Cons (id1, v1) (Cons (
+  id2, v2) pi)) t) = (eval_term sigma (Cons (id2, v2) (Cons (id1, v1) pi))
+  t)).
 
-Axiom eval_swap : forall (f:fmla) (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
+Axiom eval_swap : forall (f:fmla) (sigma:(map.Map.map mident value))
+  (pi:(list (ident* value)%type)) (l:(list (ident* value)%type)) (id1:ident)
   (id2:ident) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
   (infix_plpl l (Cons (id1, v1) (Cons (id2, v2) pi))) f) <-> (eval_fmla sigma
   (infix_plpl l (Cons (id2, v2) (Cons (id1, v1) pi))) f)).
 
 Axiom eval_swap_2 : forall (f:fmla) (id1:ident) (id2:ident) (v1:value)
-  (v2:value), (~ (id1 = id2)) -> forall (sigma:(map mident value)) (pi:(list
-  (ident* value)%type)), (eval_fmla sigma (Cons (id1, v1) (Cons (id2, v2)
-  pi)) f) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi)) f).
+  (v2:value), (~ (id1 = id2)) -> forall (sigma:(map.Map.map mident value))
+  (pi:(list (ident* value)%type)), (eval_fmla sigma (Cons (id1, v1) (Cons (
+  id2, v2) pi)) f) <-> (eval_fmla sigma (Cons (id2, v2) (Cons (id1, v1) pi))
+  f).
 
-Axiom eval_term_change_free : forall (t:term) (sigma:(map mident value))
-  (pi:(list (ident* value)%type)) (id:ident) (v:value), (fresh_in_term id
-  t) -> ((eval_term sigma (Cons (id, v) pi) t) = (eval_term sigma pi t)).
+Axiom eval_term_change_free : forall (t:term) (sigma:(map.Map.map mident
+  value)) (pi:(list (ident* value)%type)) (id:ident) (v:value),
+  (fresh_in_term id t) -> ((eval_term sigma (Cons (id, v) pi)
+  t) = (eval_term sigma pi t)).
 
 Axiom eval_change_free : forall (f:fmla) (id:ident) (v:value),
-  (fresh_in_fmla id f) -> forall (sigma:(map mident value)) (pi:(list (ident*
-  value)%type)), (eval_fmla sigma (Cons (id, v) pi) f) <-> (eval_fmla sigma
-  pi f).
+  (fresh_in_fmla id f) -> forall (sigma:(map.Map.map mident value)) (pi:(list
+  (ident* value)%type)), (eval_fmla sigma (Cons (id, v) pi) f) <->
+  (eval_fmla sigma pi f).
 
 (* Why3 assumption *)
-Definition valid_fmla(p:fmla): Prop := forall (sigma:(map mident value))
-  (pi:(list (ident* value)%type)), (eval_fmla sigma pi p).
+Definition valid_fmla(p:fmla): Prop := forall (sigma:(map.Map.map mident
+  value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p).
 
 (* Why3 assumption *)
 Fixpoint fresh_in_expr(id:ident) (e:expr) {struct e}: Prop :=
@@ -501,114 +481,117 @@ Fixpoint fresh_in_expr(id:ident) (e:expr) {struct e}: Prop :=
   end.
 
 (* Why3 assumption *)
-Inductive one_step : (map mident value) -> (list (ident* value)%type) -> expr
-  -> (map mident value) -> (list (ident* value)%type) -> expr -> Prop :=
-  | one_step_var : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (v:ident), (one_step sigma pi (Evar v) sigma pi
+Inductive one_step : (map.Map.map mident value) -> (list (ident* value)%type)
+  -> expr -> (map.Map.map mident value) -> (list (ident* value)%type)
+  -> expr -> Prop :=
+  | one_step_var : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (v:ident), (one_step sigma pi (Evar v) sigma pi
       (Evalue (get_stack v pi)))
-  | one_step_deref : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (v:mident), (one_step sigma pi (Ederef v) sigma pi
-      (Evalue (get sigma v)))
-  | one_step_bin_ctxt1 : forall (sigma:(map mident value)) (sigma':(map
-      mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (op:operator) (e1:expr) (e1':expr) (e2:expr),
-      (one_step sigma pi e1 sigma' pi' e1') -> (one_step sigma pi (Ebin e1 op
-      e2) sigma' pi' (Ebin e1' op e2))
-  | one_step_bin_ctxt2 : forall (sigma:(map mident value)) (sigma':(map
-      mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (op:operator) (v1:value) (e2:expr) (e2':expr),
-      (one_step sigma pi e2 sigma' pi' e2') -> (one_step sigma pi
+  | one_step_deref : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (v:mident), (one_step sigma pi (Ederef v) sigma
+      pi (Evalue (map.Map.get sigma v)))
+  | one_step_bin_ctxt1 : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (pi':(list (ident* value)%type)) (op:operator) (e1:expr) (e1':expr)
+      (e2:expr), (one_step sigma pi e1 sigma' pi' e1') -> (one_step sigma pi
+      (Ebin e1 op e2) sigma' pi' (Ebin e1' op e2))
+  | one_step_bin_ctxt2 : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (pi':(list (ident* value)%type)) (op:operator) (v1:value) (e2:expr)
+      (e2':expr), (one_step sigma pi e2 sigma' pi' e2') -> (one_step sigma pi
       (Ebin (Evalue v1) op e2) sigma' pi' (Ebin (Evalue v1) op e2'))
-  | one_step_bin_value : forall (sigma:(map mident value)) (sigma':(map
-      mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (op:operator) (v1:value) (v2:value), (one_step sigma pi
-      (Ebin (Evalue v1) op (Evalue v2)) sigma' pi' (Evalue (eval_bin v1 op
-      v2)))
-  | one_step_assign_ctxt : forall (sigma:(map mident value)) (sigma':(map
-      mident value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (x:mident) (e:expr) (e':expr), (one_step sigma pi e
-      sigma' pi' e') -> (one_step sigma pi (Eassign x e) sigma' pi'
-      (Eassign x e'))
-  | one_step_assign_value : forall (sigma:(map mident value)) (sigma':(map
-      mident value)) (pi:(list (ident* value)%type)) (x:mident) (v:value),
-      (sigma' = (set sigma x v)) -> (one_step sigma pi (Eassign x (Evalue v))
-      sigma' pi (Evalue Vvoid))
-  | one_step_seq_ctxt : forall (sigma:(map mident value)) (sigma':(map mident
-      value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (e1:expr) (e1':expr) (e2:expr), (one_step sigma pi e1
-      sigma' pi' e1') -> (one_step sigma pi (Eseq e1 e2) sigma' pi' (Eseq e1'
-      e2))
-  | one_step_seq_value : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (e:expr), (one_step sigma pi (Eseq (Evalue Vvoid) e)
-      sigma pi e)
-  | one_step_let_ctxt : forall (sigma:(map mident value)) (sigma':(map mident
-      value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (id:ident) (e1:expr) (e1':expr) (e2:expr),
-      (one_step sigma pi e1 sigma' pi' e1') -> (one_step sigma pi (Elet id e1
-      e2) sigma' pi' (Elet id e1' e2))
-  | one_step_let_value : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (id:ident) (v:value) (e:expr), (one_step sigma pi
+  | one_step_bin_value : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (op:operator) (v1:value) (v2:value),
+      (one_step sigma pi (Ebin (Evalue v1) op (Evalue v2)) sigma pi
+      (Evalue (eval_bin v1 op v2)))
+  | one_step_assign_ctxt : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (pi':(list (ident* value)%type)) (x:mident) (e:expr) (e':expr),
+      (one_step sigma pi e sigma' pi' e') -> (one_step sigma pi (Eassign x e)
+      sigma' pi' (Eassign x e'))
+  | one_step_assign_value : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (x:mident) (v:value), (sigma' = (map.Map.set sigma x v)) ->
+      (one_step sigma pi (Eassign x (Evalue v)) sigma' pi (Evalue Vvoid))
+  | one_step_seq_ctxt : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (pi':(list (ident* value)%type)) (e1:expr) (e1':expr) (e2:expr),
+      (one_step sigma pi e1 sigma' pi' e1') -> (one_step sigma pi (Eseq e1
+      e2) sigma' pi' (Eseq e1' e2))
+  | one_step_seq_value : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (e:expr), (one_step sigma pi (Eseq (Evalue Vvoid)
+      e) sigma pi e)
+  | one_step_let_ctxt : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (pi':(list (ident* value)%type)) (id:ident) (e1:expr) (e1':expr)
+      (e2:expr), (one_step sigma pi e1 sigma' pi' e1') -> (one_step sigma pi
+      (Elet id e1 e2) sigma' pi' (Elet id e1' e2))
+  | one_step_let_value : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (id:ident) (v:value) (e:expr), (one_step sigma pi
       (Elet id (Evalue v) e) sigma (Cons (id, v) pi) e)
-  | one_step_if_ctxt : forall (sigma:(map mident value)) (sigma':(map mident
-      value)) (pi:(list (ident* value)%type)) (pi':(list (ident*
-      value)%type)) (e1:expr) (e1':expr) (e2:expr) (e3:expr), (one_step sigma
-      pi e1 sigma' pi' e1') -> (one_step sigma pi (Eif e1 e2 e3) sigma' pi'
-      (Eif e1' e2 e3))
-  | one_step_if_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (e1:expr) (e2:expr), (one_step sigma pi
+  | one_step_if_ctxt : forall (sigma:(map.Map.map mident value))
+      (sigma':(map.Map.map mident value)) (pi:(list (ident* value)%type))
+      (pi':(list (ident* value)%type)) (e1:expr) (e1':expr) (e2:expr)
+      (e3:expr), (one_step sigma pi e1 sigma' pi' e1') -> (one_step sigma pi
+      (Eif e1 e2 e3) sigma' pi' (Eif e1' e2 e3))
+  | one_step_if_true : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (e1:expr) (e2:expr), (one_step sigma pi
       (Eif (Evalue (Vbool true)) e1 e2) sigma pi e1)
-  | one_step_if_false : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (e1:expr) (e2:expr), (one_step sigma pi
+  | one_step_if_false : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (e1:expr) (e2:expr), (one_step sigma pi
       (Eif (Evalue (Vbool false)) e1 e2) sigma pi e2)
-  | one_step_assert : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
-      (Eassert f) sigma pi (Evalue Vvoid))
-  | one_step_while_true : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (cond:expr) (body:expr) (inv:fmla), (eval_fmla sigma pi
-      inv) -> (one_step sigma pi (Ewhile (Evalue (Vbool true)) inv body)
-      sigma pi (Eseq body (Ewhile cond inv body)))
-  | one_step_while_false : forall (sigma:(map mident value)) (pi:(list
-      (ident* value)%type)) (inv:fmla) (body:expr), (eval_fmla sigma pi
-      inv) -> (one_step sigma pi (Ewhile (Evalue (Vbool false)) inv body)
-      sigma pi (Evalue Vvoid)).
+  | one_step_assert : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (f:fmla), (eval_fmla sigma pi f) ->
+      (one_step sigma pi (Eassert f) sigma pi (Evalue Vvoid))
+  | one_step_while_true : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (cond:expr) (body:expr) (inv:fmla),
+      (eval_fmla sigma pi inv) -> (one_step sigma pi
+      (Ewhile (Evalue (Vbool true)) inv body) sigma pi (Eseq body
+      (Ewhile cond inv body)))
+  | one_step_while_false : forall (sigma:(map.Map.map mident value))
+      (pi:(list (ident* value)%type)) (inv:fmla) (body:expr),
+      (eval_fmla sigma pi inv) -> (one_step sigma pi
+      (Ewhile (Evalue (Vbool false)) inv body) sigma pi (Evalue Vvoid)).
 
 (* Why3 assumption *)
-Inductive many_steps : (map mident value) -> (list (ident* value)%type)
-  -> expr -> (map mident value) -> (list (ident* value)%type) -> expr
-  -> Z -> Prop :=
-  | many_steps_refl : forall (sigma:(map mident value)) (pi:(list (ident*
-      value)%type)) (s:expr), (many_steps sigma pi s sigma pi s 0%Z)
-  | many_steps_trans : forall (sigma1:(map mident value)) (sigma2:(map mident
-      value)) (sigma3:(map mident value)) (pi1:(list (ident* value)%type))
-      (pi2:(list (ident* value)%type)) (pi3:(list (ident* value)%type))
-      (s1:expr) (s2:expr) (s3:expr) (n:Z), (one_step sigma1 pi1 s1 sigma2 pi2
-      s2) -> ((many_steps sigma2 pi2 s2 sigma3 pi3 s3 n) ->
-      (many_steps sigma1 pi1 s1 sigma3 pi3 s3 (n + 1%Z)%Z)).
+Inductive many_steps : (map.Map.map mident value) -> (list (ident*
+  value)%type) -> expr -> (map.Map.map mident value) -> (list (ident*
+  value)%type) -> expr -> Z -> Prop :=
+  | many_steps_refl : forall (sigma:(map.Map.map mident value)) (pi:(list
+      (ident* value)%type)) (s:expr), (many_steps sigma pi s sigma pi s 0%Z)
+  | many_steps_trans : forall (sigma1:(map.Map.map mident value))
+      (sigma2:(map.Map.map mident value)) (sigma3:(map.Map.map mident value))
+      (pi1:(list (ident* value)%type)) (pi2:(list (ident* value)%type))
+      (pi3:(list (ident* value)%type)) (s1:expr) (s2:expr) (s3:expr) (n:Z),
+      (0%Z < n)%Z -> ((one_step sigma1 pi1 s1 sigma2 pi2 s2) ->
+      ((many_steps sigma2 pi2 s2 sigma3 pi3 s3 (n - 1%Z)%Z) ->
+      (many_steps sigma1 pi1 s1 sigma3 pi3 s3 n))).
 
-Axiom steps_non_neg : forall (sigma1:(map mident value)) (sigma2:(map mident
-  value)) (pi1:(list (ident* value)%type)) (pi2:(list (ident* value)%type))
-  (s1:expr) (s2:expr) (n:Z), (many_steps sigma1 pi1 s1 sigma2 pi2 s2 n) ->
-  (0%Z <= n)%Z.
+Axiom steps_non_neg : forall (sigma1:(map.Map.map mident value))
+  (sigma2:(map.Map.map mident value)) (pi1:(list (ident* value)%type))
+  (pi2:(list (ident* value)%type)) (s1:expr) (s2:expr) (n:Z),
+  (many_steps sigma1 pi1 s1 sigma2 pi2 s2 n) -> (0%Z <= n)%Z.
 
-Axiom many_steps_seq : forall (sigma1:(map mident value)) (sigma3:(map mident
-  value)) (pi1:(list (ident* value)%type)) (pi3:(list (ident* value)%type))
-  (e1:expr) (e2:expr) (n:Z), (many_steps sigma1 pi1 (Eseq e1 e2) sigma3 pi3
-  (Evalue Vvoid) n) -> exists sigma2:(map mident value), exists pi2:(list
-  (ident* value)%type), exists n1:Z, exists n2:Z, (many_steps sigma1 pi1 e1
-  sigma2 pi2 (Evalue Vvoid) n1) /\ ((many_steps sigma2 pi2 e2 sigma3 pi3
+Axiom many_steps_seq : forall (sigma1:(map.Map.map mident value))
+  (sigma3:(map.Map.map mident value)) (pi1:(list (ident* value)%type))
+  (pi3:(list (ident* value)%type)) (e1:expr) (e2:expr) (n:Z),
+  (many_steps sigma1 pi1 (Eseq e1 e2) sigma3 pi3 (Evalue Vvoid) n) ->
+  exists sigma2:(map.Map.map mident value), exists pi2:(list (ident*
+  value)%type), exists n1:Z, exists n2:Z, (many_steps sigma1 pi1 e1 sigma2
+  pi2 (Evalue Vvoid) n1) /\ ((many_steps sigma2 pi2 e2 sigma3 pi3
   (Evalue Vvoid) n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
 
 (* Why3 assumption *)
-Definition valid_triple(p:fmla) (e:expr) (q:fmla): Prop := forall (sigma:(map
-  mident value)) (pi:(list (ident* value)%type)), (eval_fmla sigma pi p) ->
-  forall (sigma':(map mident value)) (pi':(list (ident* value)%type)) (n:Z),
-  (many_steps sigma pi e sigma' pi' (Evalue Vvoid) n) -> (eval_fmla sigma'
-  pi' q).
+Definition valid_triple(p:fmla) (e:expr) (q:fmla): Prop :=
+  forall (sigma:(map.Map.map mident value)) (pi:(list (ident* value)%type)),
+  (eval_fmla sigma pi p) -> forall (sigma':(map.Map.map mident value))
+  (pi':(list (ident* value)%type)) (n:Z), (many_steps sigma pi e sigma' pi'
+  (Evalue Vvoid) n) -> (eval_fmla sigma' pi' q).
 
 (* Why3 assumption *)
 Definition total_valid_triple(p:fmla) (e:expr) (q:fmla): Prop :=
-  forall (sigma:(map mident value)) (pi:(list (ident* value)%type)),
-  (eval_fmla sigma pi p) -> exists sigma':(map mident value),
+  forall (sigma:(map.Map.map mident value)) (pi:(list (ident* value)%type)),
+  (eval_fmla sigma pi p) -> exists sigma':(map.Map.map mident value),
   exists pi':(list (ident* value)%type), exists n:Z, (many_steps sigma pi e
   sigma' pi' (Evalue Vvoid) n) /\ (eval_fmla sigma' pi' q).
 
@@ -617,16 +600,18 @@ Parameter x: ident.
 Parameter y: mident.
 
 (* Why3 goal *)
-Theorem Test0expr : (one_step (const (Vint 0%Z):(map mident value)) (Cons (x,
-  (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Ederef y)
-  (const (Vint 0%Z):(map mident value)) (Cons (x, (Vint 42%Z)) (Nil :(list
-  (ident* value)%type))) (Evalue (Vint 0%Z))).
+Theorem Test0expr : (one_step (map.Map.const (Vint 0%Z):(map.Map.map mident
+  value)) (Cons (x, (Vint 42%Z)) (Nil :(list (ident* value)%type)))
+  (Ederef y) (map.Map.const (Vint 0%Z):(map.Map.map mident value)) (Cons (x,
+  (Vint 42%Z)) (Nil :(list (ident* value)%type))) (Evalue (Vint 0%Z))).
 simpl.
 pose (pi := (Cons (x, Vint 42) Nil)).
 fold pi.
-assert (h: one_step (const (Vint 0)) pi (Ederef y) 
-(const (Vint 0)) pi (Evalue (get (const (Vint 0)) y))).
+assert (h: one_step (Map.const (Vint 0)) pi (Ederef y) 
+  (Map.const (Vint 0)) pi (Evalue (Map.get (Map.const (Vint 0)) y))).
 apply one_step_deref.
-pattern (get (const (Vint 0)) y); rewrite Const in h.
+pattern (Map.get (Map.const (Vint 0)) y); rewrite Map.Const in h.
 apply h.
 Qed.
+
+

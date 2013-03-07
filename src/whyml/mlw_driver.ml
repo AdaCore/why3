@@ -115,8 +115,19 @@ let load_driver lib file extra_files =
     | Rremovepr (_,q) ->
         ignore (find_pr th q)
     | Rmeta (_,s,al) ->
+        let rec ty_of_pty = function
+          | PTyvar x ->
+              Ty.ty_var (Typing.create_user_tv x)
+          | PTyapp ((loc,_) as q,tyl) ->
+              let ts = find_ts th q in
+              let tyl = List.map ty_of_pty tyl in
+              Loc.try2 loc Ty.ty_app ts tyl
+          | PTuple tyl ->
+              let ts = Ty.ts_tuple (List.length tyl) in
+              Ty.ty_app ts (List.map ty_of_pty tyl)
+        in
         let convert = function
-          | PMAts q  -> MAts (find_ts th q)
+          | PMAty ty -> MAty (ty_of_pty ty)
           | PMAfs q  -> MAls (find_fs th q)
           | PMAps q  -> MAls (find_ps th q)
           | PMApr q  -> MApr (find_pr th q)

@@ -1,0 +1,186 @@
+module Hanoi
+  (* a simple version where the disks are natural numbers from 1 to n *)
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.SortedInt
+
+  type tower = {
+    mutable rod : list int;
+  } invariant {
+    sorted self.rod
+  }
+
+  function prepend (n: int) (s: list int) : list int
+
+  axiom prepend_def_zero :
+    forall s: list int, n: int.
+      n <= 0 -> prepend n s = s
+
+  axiom prepend_def_succ :
+    forall s: list int, n: int.
+      n > 0 -> prepend n s = prepend (n - 1) (Cons n s)
+
+  let move (a b: tower) (ghost n: int) (ghost s: list int)
+    requires { a.rod = Cons n s }
+    requires { match b.rod with Nil -> true | Cons x _ -> x > n end }
+    ensures  { a.rod = s }
+    ensures  { b.rod = Cons n (old b.rod) }
+  = match a.rod with
+    | Cons x r ->
+        a.rod <- r;
+        b.rod <- Cons x b.rod
+    | Nil -> absurd
+    end
+
+  let rec hanoi_rec (a b c: tower) (n: int) (ghost s: list int)
+    requires { a.rod = prepend n s }
+    requires { match b.rod with Nil -> true | Cons x _ -> x > n end }
+    requires { match c.rod with Nil -> true | Cons x _ -> x > n end }
+    variant  { n }
+    ensures  { a.rod = s }
+    ensures  { b.rod = prepend n (old b.rod) }
+    ensures  { c.rod = old c.rod }
+  = if n > 0 then begin
+      let ghost t = c.rod in
+      hanoi_rec a c b (n-1) (Cons n s);
+      move a b n s;
+      hanoi_rec c b a (n-1) t
+    end
+
+  let tower_of_hanoi (a b c: tower)
+    requires { a.rod = prepend (length a.rod) Nil }
+    requires { b.rod = c.rod = Nil }
+    ensures  { b.rod = old a.rod }
+    ensures  { a.rod = c.rod = Nil }
+  = hanoi_rec a b c (length a.rod) Nil
+
+end
+
+theory ListRevAppend
+
+  use import list.List
+  use import list.Append
+
+  function rev_append (s t: list 'a) : list 'a =
+    match s with
+    | Cons x r -> rev_append r (Cons x t)
+    | Nil -> t
+    end
+
+  lemma rev_append_append_l:
+    forall r s t: list 'a.
+      rev_append (r ++ s) t = rev_append s (rev_append r t)
+
+  lemma rev_append_append_r:
+    forall r s t: list 'a.
+      rev_append r (s ++ t) = rev_append (rev_append s r) t
+
+  use import int.Int
+  use import list.Length
+
+  lemma rev_append_length:
+    forall s t: list 'a.
+      length (rev_append s t) = length s + length t
+
+(*
+  use import list.Reverse
+
+  lemma rev_append_rev:
+    forall s: list 'a. reverse s = rev_append s Nil
+*)
+end
+
+theory ListRevSorted
+
+  type t
+  predicate le t t
+  predicate ge (x y: t) = le y x
+
+  use import list.List
+
+  clone list.Sorted as Incr with type t = t, predicate le = le
+  clone list.Sorted as Decr with type t = t, predicate le = ge
+
+  predicate compat (s t: list t) =
+    match s, t with
+    | Cons x _, Cons y _ -> le x y
+    | _, _ -> true
+    end
+
+  use import ListRevAppend
+
+  lemma rev_append_sorted_incr:
+    forall s t: list t.
+      Incr.sorted (rev_append s t) <->
+        Decr.sorted s /\ Incr.sorted t /\ compat s t
+
+  lemma rev_append_sorted_decr:
+    forall s t: list t.
+      Decr.sorted (rev_append s t) <->
+        Incr.sorted s /\ Decr.sorted t /\ compat t s
+
+(*
+  use import list.Reverse
+
+  lemma rev_sorted_incr:
+    forall s: list t. Incr.sorted (reverse s) <-> Decr.sorted s
+
+  lemma rev_sorted_decr:
+    forall s: list t. Decr.sorted (reverse s) <-> Incr.sorted s
+*)
+end
+
+module Tower_of_Hanoi
+  (* a generalized version where the disks are arbitrary integers *)
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+
+  use import ListRevAppend
+  clone import ListRevSorted with type t = int, predicate le = (<)
+
+  type tower = {
+    mutable rod : list int;
+  } invariant {
+    Incr.sorted self.rod
+  }
+
+  let move (a b: tower) (ghost x: int) (ghost s: list int)
+    requires { a.rod = Cons x s }
+    requires { match b.rod with Nil -> true | Cons y _ -> x < y end }
+    ensures  { a.rod = s }
+    ensures  { b.rod = Cons x (old b.rod) }
+  = match a.rod with
+    | Cons x r ->
+        a.rod <- r;
+        b.rod <- Cons x b.rod
+    | Nil -> absurd
+    end
+
+  let rec hanoi_rec (a b c: tower) (n: int) (ghost p s: list int)
+    requires { length p = n /\ Decr.sorted p }
+    requires { a.rod = rev_append p s }
+    requires { compat p b.rod }
+    requires { compat p c.rod }
+    variant  { n }
+    ensures  { a.rod = s }
+    ensures  { b.rod = rev_append p (old b.rod) }
+    ensures  { c.rod = old c.rod }
+  = if n > 0 then begin
+      let ghost t = c.rod in
+      let x,r = match p with Cons x r -> (x,r) | Nil -> absurd end in
+      hanoi_rec a c b (n-1) r (Cons x s);
+      move a b x s;
+      hanoi_rec c b a (n-1) r t
+    end
+
+  let tower_of_hanoi (a b c: tower)
+    requires { b.rod = c.rod = Nil }
+    ensures  { b.rod = old a.rod }
+    ensures  { a.rod = c.rod = Nil }
+  = hanoi_rec a b c (length a.rod) (ghost rev_append a.rod Nil) Nil
+
+end

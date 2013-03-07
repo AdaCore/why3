@@ -1,0 +1,1105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="Alt-Ergo"
+  version="0.95"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="5"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="6"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="7"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="8"
+  name="Z3"
+  version="2.19"/>
+ <file
+  name="../generate_all_trees.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="GenerateAllTrees"
+   locfile="../generate_all_trees.mlw"
+   loclnum="11" loccnumb="7" loccnume="23"
+   verified="true"
+   expanded="true">
+   <goal
+    name="size_nonneg"
+    locfile="../generate_all_trees.mlw"
+    loclnum="28" loccnumb="8" loccnume="19"
+    sum="325bafa76ea374191369e3e62dac092f"
+    proved="true"
+    expanded="true"
+    shape="ainfix &gt;=asizeV0c0F">
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.48"/>
+    </proof>
+   </goal>
+   <goal
+    name="size_left"
+    locfile="../generate_all_trees.mlw"
+    loclnum="30" loccnumb="8" loccnume="17"
+    sum="8930102433a8a6f56c13f6f8bce4c64d"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;asizeV1asizeV0Aainfix =V0aNodeV1V2EIainfix &gt;asizeV0c0F">
+    <proof
+     prover="2"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="all_trees_0"
+    locfile="../generate_all_trees.mlw"
+    loclnum="38" loccnumb="8" loccnume="19"
+    sum="4fbcece4de389c580b2a3e038bbd85ea"
+    proved="true"
+    expanded="true"
+    shape="aall_treesc0aConsaEmptyaNil">
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.49"/>
+    </proof>
+   </goal>
+   <goal
+    name="tree_diff"
+    locfile="../generate_all_trees.mlw"
+    loclnum="40" loccnumb="8" loccnume="17"
+    sum="dd3330003995451ea746a663bb7bc27c"
+    proved="true"
+    expanded="true"
+    shape="ainfix =aNodeV0V2aNodeV1V3NFIainfix =asizeV0asizeV1NF">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter combine"
+    locfile="../generate_all_trees.mlw"
+    loclnum="46" loccnumb="6" loccnume="13"
+    expl="VC for combine"
+    sum="b38b12461f25650b6f96a126ea226cc1"
+    proved="true"
+    expanded="true"
+    shape="ainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EqamemV5V4FAadistinctV4IamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FAadistinctV1ACV11aNilamemV14V3AamemV13V11Aainfix =V12aNodeV13V14EqamemV12aNilFAadistinctaNilaConsVVamemV21V3AamemV20V11Aainfix =V19aNodeV20V21EqamemV19ainfix ++V18V17FAadistinctainfix ++V18V17IamemV23V3Aainfix =V22aNodeV15V23EqamemV22V18FAadistinctV18FAadistinctV3IamemV26V3AamemV25V16Aainfix =V24aNodeV25V26EqamemV24V17FAadistinctV17FAadistinctV16ACV11aNilfaConswVainfix =V27V16ACV28aNilamemV30V28Aainfix =V29aNodeV15V30EqamemV29aNilFAadistinctaNilaConsVVamemV35V28Aainfix =V34aNodeV15V35EqamemV34aConsaNodeV15V31V33FAadistinctaConsaNodeV15V31V33IamemV37V32Aainfix =V36aNodeV15V37EqamemV36V33FAadistinctV33FAadistinctV32ACV28aNilfaConswVainfix =V38V32IadistinctV28FIadistinctV11FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for combine"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter combine.1"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="1. postcondition"
+      sum="76df7c688b612389d685209a345cbdbd"
+      proved="true"
+      expanded="false"
+      shape="CV4aNiladistinctaNilaConsVVtIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.2"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="2. postcondition"
+      sum="589d76adfe49bc75a0dc6eaf5ad83a1b"
+      proved="true"
+      expanded="true"
+      shape="CV4aNilamemV7V3AamemV6V4Aainfix =V5aNodeV6V7EqamemV5aNilFaConsVVtIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.3"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="3. postcondition"
+      sum="e1d578ff891035300e3efe3bf0dcaf52"
+      proved="true"
+      expanded="false"
+      shape="CV4aNiltaConsVVCV7aNiladistinctaNilaConsVVtIadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.4"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="4. postcondition"
+      sum="f525ead4e24ae4984a77cffd298746d0"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNilamemV9V7Aainfix =V8aNodeV5V9EqamemV8aNilFaConsVVtIadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.5"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="5. variant decrease"
+      sum="8f17066f7c3f5c03b81add8c2d873a2b"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNiltaConsVVCV7aNilfaConswVainfix =V10V9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.6"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="6. precondition"
+      sum="633d9c22d79c49f1080d73ac4bd14805"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNiltaConsVVadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.73"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.7"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="7. postcondition"
+      sum="914b294082b211539478defd5149bdcb"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNiltaConsVVadistinctaConsaNodeV5V8V10IamemV12V9Aainfix =V11aNodeV5V12EqamemV11V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.27"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.94"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.8"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="8. postcondition"
+      sum="5d4ba5304ed53bc8aab0f7f62a936415"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EqamemV11aConsaNodeV5V8V10FIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter combine.8.1"
+        locfile="../generate_all_trees.mlw"
+        loclnum="46" loccnumb="6" loccnume="13"
+        expl="1. postcondition"
+        sum="33ecbcf766017937c66c6eb4a3236fee"
+        proved="true"
+        expanded="true"
+        shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV12V7Aainfix =V11aNodeV5V12EIamemV11aConsaNodeV5V8V10FIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for combine"/>
+        <proof
+         prover="5"
+         timelimit="10"
+         memlimit="0"
+         edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.52"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.16"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.22"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter combine.8.2"
+        locfile="../generate_all_trees.mlw"
+        loclnum="46" loccnumb="6" loccnume="13"
+        expl="2. postcondition"
+        sum="05acad704a834a0bde7206b43a8f1c64"
+        proved="true"
+        expanded="true"
+        shape="CV4aNiltaConsVVCV7aNiltaConsVVamemV11aConsaNodeV5V8V10IamemV12V7Aainfix =V11aNodeV5V12EFIamemV14V9Aainfix =V13aNodeV5V14EqamemV13V10FAadistinctV10FIadistinctV9IadistinctV7FIadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for combine"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.84"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter combine.9"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="9. variant decrease"
+      sum="4b42251f943b486876030ec134718785"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVCV4aNilfaConswVainfix =V7V6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.10"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="10. precondition"
+      sum="feadc5edb39c4aac73998c80e6014704"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.19"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.11"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="11. precondition"
+      sum="ddb89a533b5deb9955b6edff5a4b5ff2"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVadistinctV3IamemV10V3AamemV9V6Aainfix =V8aNodeV9V10EqamemV8V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.12"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="12. postcondition"
+      sum="fa591f29254e41d7a58b0a55b387f2ea"
+      proved="true"
+      expanded="false"
+      shape="CV4aNiltaConsVVadistinctainfix ++V8V7IamemV10V3Aainfix =V9aNodeV5V10EqamemV9V8FAadistinctV8FIadistinctV3IamemV13V3AamemV12V6Aainfix =V11aNodeV12V13EqamemV11V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.85"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.13"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="13. postcondition"
+      sum="879b88cf547ed50e38db2b5fbc2df3d9"
+      proved="true"
+      expanded="true"
+      shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EqamemV9ainfix ++V8V7FIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter combine.13.1"
+        locfile="../generate_all_trees.mlw"
+        loclnum="46" loccnumb="6" loccnume="13"
+        expl="1. postcondition"
+        sum="8309451cffe31089624cfaa11e3e82b6"
+        proved="true"
+        expanded="true"
+        shape="CV4aNiltaConsVVamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EIamemV9ainfix ++V8V7FIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for combine"/>
+        <proof
+         prover="8"
+         timelimit="14"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="6.60"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter combine.13.2"
+        locfile="../generate_all_trees.mlw"
+        loclnum="46" loccnumb="6" loccnume="13"
+        expl="2. postcondition"
+        sum="4445741e24f8a4a2c350b738dfb60968"
+        proved="true"
+        expanded="true"
+        shape="CV4aNiltaConsVVamemV9ainfix ++V8V7IamemV11V3AamemV10V4Aainfix =V9aNodeV10V11EFIamemV13V3Aainfix =V12aNodeV5V13EqamemV12V8FAadistinctV8FIadistinctV3IamemV16V3AamemV15V6Aainfix =V14aNodeV15V16EqamemV14V7FAadistinctV7FIadistinctV6IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for combine"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.88"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter combine.14"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="14. precondition"
+      sum="09fd178cd9149d680ccb706cd36464b8"
+      proved="true"
+      expanded="true"
+      shape="adistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.15"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="15. postcondition"
+      sum="152ca81b2c5a7a36352e5aa977c40dde"
+      proved="true"
+      expanded="false"
+      shape="adistinctV4IamemV7V3AamemV6V1Aainfix =V5aNodeV6V7EqamemV5V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter combine.16"
+      locfile="../generate_all_trees.mlw"
+      loclnum="46" loccnumb="6" loccnume="13"
+      expl="16. postcondition"
+      sum="a33b598a9e01999e23a9221943202283"
+      proved="true"
+      expanded="true"
+      shape="ainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EqamemV5V4FIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for combine"/>
+      <transf
+       name="split_goal"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter combine.16.1"
+        locfile="../generate_all_trees.mlw"
+        loclnum="46" loccnumb="6" loccnume="13"
+        expl="1. postcondition"
+        sum="d5b033af15f8148c1e0383d856009832"
+        proved="true"
+        expanded="true"
+        shape="ainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EIamemV5V4FIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for combine"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter combine.16.2"
+        locfile="../generate_all_trees.mlw"
+        loclnum="46" loccnumb="6" loccnume="13"
+        expl="2. postcondition"
+        sum="5eff00417641a755fcfa38fc9e709b44"
+        proved="true"
+        expanded="true"
+        shape="amemV5V4Iainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EFIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for combine"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter all_trees"
+    locfile="../generate_all_trees.mlw"
+    loclnum="74" loccnumb="6" loccnume="15"
+    expl="VC for all_trees"
+    sum="800ed850349cf04f7e82ccc5871cf388"
+    proved="true"
+    expanded="true"
+    shape="aall_treesV3agetV2V3Iainfix &lt;=V3V0Aainfix &lt;=c0V3FAainfix &lt;=c0ainfix +V0c1Iaall_treesV4agetV2V4Iainfix &lt;V4ainfix +V0c1Aainfix &lt;=c0V4FAaall_treesV8agetV7V8Iainfix &lt;V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;asizeV10ainfix +ainfix -V5c1c1Aainfix =asizeV9V5Aainfix =V9aNodeV10V11EqamemV9agetV7V5FAadistinctagetV7V5Aaall_treesV12agetV7V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FAainfix &lt;asizeV17ainfix +V13c1Aainfix =asizeV16V5Aainfix =V16aNodeV17V18EqamemV16agetV15V5FAadistinctagetV15V5Aaall_treesV19agetV15V19Iainfix &lt;V19V5Aainfix &lt;=c0V19FIainfix =V15asetV7V5ainfix ++V14agetV7V5Aainfix &lt;=c0ainfix +V0c1FAainfix &lt;V5ainfix +V0c1Aainfix &lt;=c0V5Iainfix =asizeV22ainfix -ainfix -V5c1V13Aainfix =asizeV21V13Aainfix =V20aNodeV21V22EqamemV20V14FAadistinctV14FAaall_treesainfix -ainfix -V5c1V13agetV7ainfix -ainfix -V5c1V13Aainfix &lt;=c0ainfix -ainfix -V5c1V13Aaall_treesV13agetV7V13Aainfix &lt;=c0V13Aainfix &lt;V13ainfix +V0c1Aainfix &lt;=c0V13Aainfix &lt;ainfix -ainfix -V5c1V13ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V5c1V13Aainfix &lt;V5ainfix +V0c1Aainfix &lt;=c0V5Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV24V13Aainfix =asizeV23V5Aainfix =V23aNodeV24V25EqamemV23agetV7V5FAadistinctagetV7V5Aaall_treesV26agetV7V26Iainfix &lt;V26V5Aainfix &lt;=c0V26FIainfix &lt;=V13ainfix -V5c1Aainfix &lt;=c0V13FFAainfix &lt;asizeV28c0Aainfix =asizeV27V5Aainfix =V27aNodeV28V29EqamemV27agetV6V5FAadistinctagetV6V5Aaall_treesV30agetV6V30Iainfix &lt;V30V5Aainfix &lt;=c0V30FIainfix &lt;=c0ainfix -V5c1Aaall_treesV31agetV6V31Iainfix &lt;V31ainfix +V5c1Aainfix &lt;=c0V31FIainfix &gt;c0ainfix -V5c1Iainfix =V6asetV2V5aNilAainfix &lt;=c0ainfix +V0c1FAainfix &lt;V5ainfix +V0c1Aainfix &lt;=c0V5Aainfix &lt;=c0ainfix +V0c1Iaall_treesV32agetV2V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FIainfix &lt;=V5V0Aainfix &lt;=c1V5FFAaall_treesV33agetV1V33Iainfix &lt;V33c1Aainfix &lt;=c0V33FIainfix &lt;=c1V0Aaall_treesV34agetV1V34Iainfix &lt;=V34V0Aainfix &lt;=c0V34FIainfix &gt;c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FAainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Aainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+    <label
+     name="expl:VC for all_trees"/>
+    <transf
+     name="split_goal"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter all_trees.1"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="1. precondition"
+      sum="810df2c60cf1ab6ddecf2050fbb37b98"
+      proved="true"
+      expanded="true"
+      shape="ainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.2"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="2. precondition"
+      sum="29ea4dd6ed32d08b0668599d4c6b6cf6"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.3"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="3. postcondition"
+      sum="4f1ef2cf1f4e0ee6e641c28d8540b9f9"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV2agetV1V2Iainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &gt;c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.4"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="4. loop invariant init"
+      sum="c55271b883a11332e30c5ddb510bd1f2"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV2agetV1V2Iainfix &lt;V2c1Aainfix &lt;=c0V2FIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.5"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="5. type invariant"
+      sum="94f0e43b4c9383ea3f9766de6c02c9ca"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0ainfix +V0c1Iaall_treesV4agetV2V4Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.6"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="6. precondition"
+      sum="ced67042656b1a22b38cc0642d50fe9f"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix &lt;=c0ainfix +V0c1Iaall_treesV4agetV2V4Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.7"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="7. loop invariant preservation"
+      sum="0010a0dc97c257796e21a0f65e36865f"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV5agetV4V5Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FIainfix &gt;c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV6agetV2V6Iainfix &lt;V6V3Aainfix &lt;=c0V6FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.8"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="8. loop invariant init"
+      sum="fd239e89f0ff6e6b072d7bd730dc4306"
+      proved="true"
+      expanded="false"
+      shape="aall_treesV5agetV4V5Iainfix &lt;V5V3Aainfix &lt;=c0V5FIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV6agetV2V6Iainfix &lt;V6V3Aainfix &lt;=c0V6FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.9"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="9. loop invariant init"
+      sum="e047a2e0b6064cac97be93eff89f43c2"
+      proved="true"
+      expanded="false"
+      shape="adistinctagetV4V3Iainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV5agetV2V5Iainfix &lt;V5V3Aainfix &lt;=c0V5FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.10"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="10. loop invariant init"
+      sum="8bfa029a1512ef9fcb2d1e04f509ee5e"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;asizeV6c0Aainfix =asizeV5V3Aainfix =V5aNodeV6V7EqamemV5agetV4V3FIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV8agetV2V8Iainfix &lt;V8V3Aainfix &lt;=c0V8FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.11"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="11. type invariant"
+      sum="334554e773ddf97b969d4c538ffd8715"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAadistinctagetV5V3Aaall_treesV10agetV5V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.12"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="12. precondition"
+      sum="f1d9754f8f48434830ed040b2d2050a4"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAadistinctagetV5V3Aaall_treesV10agetV5V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.13"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="13. precondition"
+      sum="206f2832ebdb876c80aa9bac9bc2dd51"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAadistinctagetV5V3Aaall_treesV10agetV5V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.14"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="14. precondition"
+      sum="b587ca9063354f457b9d61a683d3ac71"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAadistinctagetV5V3Aaall_treesV10agetV5V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.15"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="15. precondition"
+      sum="cb2ae57199a12999ad59b0a57864d62f"
+      proved="true"
+      expanded="true"
+      shape="aall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV8V6Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAadistinctagetV5V3Aaall_treesV10agetV5V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.16"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="16. precondition"
+      sum="faa4ef48cce8aff73384a3747fbe97a4"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix =asizeV10ainfix -ainfix -V3c1V6Aainfix =asizeV9V6Aainfix =V8aNodeV9V10EqamemV8V7FAadistinctV7FIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV12V6Aainfix =asizeV11V3Aainfix =V11aNodeV12V13EqamemV11agetV5V3FAadistinctagetV5V3Aaall_treesV14agetV5V14Iainfix &lt;V14V3Aainfix &lt;=c0V14FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV15agetV2V15Iainfix &lt;V15V3Aainfix &lt;=c0V15FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.17"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="17. loop invariant preservation"
+      sum="fbde24bbe550356c2d12c70743778fe3"
+      proved="true"
+      expanded="false"
+      shape="aall_treesV9agetV8V9Iainfix &lt;V9V3Aainfix &lt;=c0V9FIainfix =V8asetV5V3ainfix ++V7agetV5V3Aainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix =asizeV12ainfix -ainfix -V3c1V6Aainfix =asizeV11V6Aainfix =V10aNodeV11V12EqamemV10V7FAadistinctV7FIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV14V6Aainfix =asizeV13V3Aainfix =V13aNodeV14V15EqamemV13agetV5V3FAadistinctagetV5V3Aaall_treesV16agetV5V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV17agetV2V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.18"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="18. loop invariant preservation"
+      sum="f5ca8a4abf4a576d3bdbc5042d727995"
+      proved="true"
+      expanded="false"
+      shape="adistinctagetV8V3Iainfix =V8asetV5V3ainfix ++V7agetV5V3Aainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix =asizeV11ainfix -ainfix -V3c1V6Aainfix =asizeV10V6Aainfix =V9aNodeV10V11EqamemV9V7FAadistinctV7FIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV13V6Aainfix =asizeV12V3Aainfix =V12aNodeV13V14EqamemV12agetV5V3FAadistinctagetV5V3Aaall_treesV15agetV5V15Iainfix &lt;V15V3Aainfix &lt;=c0V15FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV16agetV2V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.78"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.19"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="19. loop invariant preservation"
+      sum="c35d4682d9ce2d0ab8e440c4e461579f"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;asizeV10ainfix +V6c1Aainfix =asizeV9V3Aainfix =V9aNodeV10V11EqamemV9agetV8V3FIainfix =V8asetV5V3ainfix ++V7agetV5V3Aainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix =asizeV14ainfix -ainfix -V3c1V6Aainfix =asizeV13V6Aainfix =V12aNodeV13V14EqamemV12V7FAadistinctV7FIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV16V6Aainfix =asizeV15V3Aainfix =V15aNodeV16V17EqamemV15agetV5V3FAadistinctagetV5V3Aaall_treesV18agetV5V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV19agetV2V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="true">
+       <goal
+        name="WP_parameter all_trees.19.1"
+        locfile="../generate_all_trees.mlw"
+        loclnum="74" loccnumb="6" loccnume="15"
+        expl="1. loop invariant preservation"
+        sum="5fabf8157716bb34395ec13f81d6961f"
+        proved="true"
+        expanded="true"
+        shape="ainfix &lt;asizeV10ainfix +V6c1Aainfix =asizeV9V3Aainfix =V9aNodeV10V11EIamemV9agetV8V3FIainfix =V8asetV5V3ainfix ++V7agetV5V3Aainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix =asizeV14ainfix -ainfix -V3c1V6Aainfix =asizeV13V6Aainfix =V12aNodeV13V14EqamemV12V7FAadistinctV7FIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV16V6Aainfix =asizeV15V3Aainfix =V15aNodeV16V17EqamemV15agetV5V3FAadistinctagetV5V3Aaall_treesV18agetV5V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV19agetV2V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+        <label
+         name="expl:VC for all_trees"/>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.44"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="3.29"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.29"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter all_trees.19.2"
+        locfile="../generate_all_trees.mlw"
+        loclnum="74" loccnumb="6" loccnume="15"
+        expl="2. loop invariant preservation"
+        sum="9d70de6ff533f0503ef93da67d894e0f"
+        proved="true"
+        expanded="true"
+        shape="amemV9agetV8V3Iainfix &lt;asizeV10ainfix +V6c1Aainfix =asizeV9V3Aainfix =V9aNodeV10V11EFIainfix =V8asetV5V3ainfix ++V7agetV5V3Aainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Iainfix =asizeV14ainfix -ainfix -V3c1V6Aainfix =asizeV13V6Aainfix =V12aNodeV13V14EqamemV12V7FAadistinctV7FIaall_treesainfix -ainfix -V3c1V6agetV5ainfix -ainfix -V3c1V6Aainfix &lt;=c0ainfix -ainfix -V3c1V6Aaall_treesV6agetV5V6Aainfix &lt;=c0V6Iainfix &lt;V6ainfix +V0c1Aainfix &lt;=c0V6Iainfix &lt;ainfix -ainfix -V3c1V6ainfix +V0c1Aainfix &lt;=c0ainfix -ainfix -V3c1V6Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iainfix &lt;asizeV16V6Aainfix =asizeV15V3Aainfix =V15aNodeV16V17EqamemV15agetV5V3FAadistinctagetV5V3Aaall_treesV18agetV5V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FIainfix &lt;=V6ainfix -V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV19agetV2V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+        <label
+         name="expl:VC for all_trees"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.47"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.20"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="20. loop invariant preservation"
+      sum="68a6c429cf29d661ec875bf1251c6c32"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV6agetV5V6Iainfix &lt;V6ainfix +V3c1Aainfix &lt;=c0V6FIainfix &lt;asizeV8ainfix +ainfix -V3c1c1Aainfix =asizeV7V3Aainfix =V7aNodeV8V9EqamemV7agetV5V3FAadistinctagetV5V3Aaall_treesV10agetV5V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FFIainfix &lt;=c0ainfix -V3c1Iainfix =V4asetV2V3aNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3Aainfix &lt;=c0ainfix +V0c1Iaall_treesV11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FIainfix &lt;=V3V0Aainfix &lt;=c1V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.21"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="21. type invariant"
+      sum="9bed1099b674aec6cd75ad9852bc76d7"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0ainfix +V0c1Iaall_treesV3agetV2V3Iainfix &lt;V3ainfix +V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter all_trees.22"
+      locfile="../generate_all_trees.mlw"
+      loclnum="74" loccnumb="6" loccnume="15"
+      expl="22. postcondition"
+      sum="8fb68a7ab3c19de688f642f576c5b331"
+      proved="true"
+      expanded="true"
+      shape="aall_treesV3agetV2V3Iainfix &lt;=V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0ainfix +V0c1Iaall_treesV4agetV2V4Iainfix &lt;V4ainfix +V0c1Aainfix &lt;=c0V4FFIainfix &lt;=c1V0Iainfix =V1asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0ainfix +V0c1FIainfix &lt;c0ainfix +V0c1Aainfix &lt;=c0c0Iainfix &lt;=c0ainfix +V0c1Iainfix &gt;=ainfix +V0c1c0Iainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for all_trees"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

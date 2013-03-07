@@ -37,6 +37,14 @@ val split_neg_wp : Term.term -> Term.term list
 (** [split_neg_wp] works as [split_neg_right] but stops at
  the `[stop_split]' label and removes the label *)
 
+val split_pos_intro : Term.term -> Term.term list
+(** [split_pos_intro] works as [split_pos_wp] but does not
+ respect the `asym_split' label *)
+
+val split_neg_intro : Term.term -> Term.term list
+(** [split_neg_intro] works as [split_neg_wp] but does not
+ respect the `asym_split' label *)
+
 val split_goal_full : Task.task Trans.tlist
 val split_all_full : Task.task Trans.tlist
 val split_premise_full : Task.task Trans.trans

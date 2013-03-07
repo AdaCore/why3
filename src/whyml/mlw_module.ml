@@ -280,13 +280,13 @@ let add_meta uc m al =
 (** Program decls *)
 
 let add_type uc its =
-  add_symbol add_ts its.its_pure.ts_name (PT its) uc
+  add_symbol add_ts its.its_ts.ts_name (PT its) uc
 
 let add_data uc (its,csl,_) =
   let add_pl uc pl = add_symbol add_ps pl.pl_ls.ls_name (PL pl) uc in
   let add_pj uc pj = Opt.fold add_pl uc pj in
   let add_cs uc (cs,pjl) = List.fold_left add_pj (add_pl uc cs) pjl in
-  let uc = add_symbol add_ts its.its_pure.ts_name (PT its) uc in
+  let uc = add_symbol add_ts its.its_ts.ts_name (PT its) uc in
   if its.its_abst then uc else List.fold_left add_cs uc csl
 
 let add_let uc = function
@@ -324,13 +324,13 @@ let add_pdecl ~wp uc d =
   match d.pd_node with
   | PDtype its ->
       let uc = add_type uc its in
-      add_to_theory Theory.add_ty_decl uc its.its_pure
+      add_to_theory Theory.add_ty_decl uc its.its_ts
   | PDdata dl ->
       let uc = List.fold_left add_data uc dl in
       let projection = Opt.map (fun pls -> pls.pl_ls) in
       let constructor (pls,pjl) = pls.pl_ls, List.map projection pjl in
       let defn cl = List.map constructor cl in
-      let dl = List.map (fun (its,cl,_) -> its.its_pure, defn cl) dl in
+      let dl = List.map (fun (its,cl,_) -> its.its_ts, defn cl) dl in
       add_to_theory Theory.add_data_decl uc dl
   | PDval lv | PDlet { let_sym = lv } ->
       add_let uc lv
@@ -347,7 +347,7 @@ exception TooLateInvariant
 
 let add_invariant uc its p =
   let rec add = function
-    | d :: dl when Mid.mem its.its_pure.ts_name d.pd_news ->
+    | d :: dl when Mid.mem its.its_ts.ts_name d.pd_news ->
         let d = Mlw_decl.add_invariant d its p in d, d :: dl
     | { pd_node = PDtype _ } as d :: dl ->
         let nd, dl = add dl in nd, d :: dl
@@ -361,7 +361,7 @@ let add_invariant uc its p =
 
 let th_unit =
   let ts = create_tysymbol (id_fresh "unit") [] (Some ty_unit) in
-  let uc = create_theory (id_fresh "Unit") in
+  let uc = create_theory ~path:["why3"] (id_fresh "Unit") in
   let uc = Theory.use_export uc (tuple_theory 0) in
   let uc = Theory.add_ty_decl uc ts in
   close_theory uc
@@ -371,7 +371,7 @@ let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
 let mod_prelude env =
   let pd_exit = create_exn_decl xs_exit in
   let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
-  let uc = empty_module env (id_fresh "Prelude") [] in
+  let uc = empty_module env (id_fresh "Prelude") ["why3"] in
   let uc = add_pdecl ~wp:false uc pd_old in
   let uc = add_pdecl ~wp:false uc pd_exit in
   close_module uc
@@ -539,7 +539,7 @@ let clone_export uc m inst =
         with Not_found -> TS ts end
     | PT pt ->
         begin try let pt = Mits.find pt psm.sm_its in
-          store_path uc p pt.its_pure.ts_name; PT pt
+          store_path uc p pt.its_ts.ts_name; PT pt
         with Not_found -> PT pt end in
   let find_prs p def id =
     try let s = Hid.find psh id in match s with

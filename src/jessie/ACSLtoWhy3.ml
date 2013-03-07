@@ -70,6 +70,9 @@ let sub_int : Term.lsymbol = find int_theory "infix -"
 let minus_int : Term.lsymbol = find int_theory "prefix -"
 let mul_int : Term.lsymbol = find int_theory "infix *"
 let ge_int : Term.lsymbol = find int_theory "infix >="
+let le_int : Term.lsymbol = find int_theory "infix <="
+let gt_int : Term.lsymbol = find int_theory "infix >"
+let lt_int : Term.lsymbol = find int_theory "infix <"
 
 (* real.Real theory *)
 let real_type : Ty.ty = Ty.ty_real
@@ -83,21 +86,38 @@ let ge_real : Term.lsymbol = find real_theory "infix >="
 
 (* ref.Ref module *)
 
-let ref_modules, ref_theories = 
+let ref_modules, ref_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
 
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
-let ref_type : Mlw_ty.T.itysymbol = 
+let ref_type : Mlw_ty.T.itysymbol =
   match
     Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
   with
     | Mlw_module.PT itys -> itys
     | Mlw_module.TS _ -> assert false
 
-let ref_fun : Mlw_expr.psymbol = 
+let ref_fun : Mlw_expr.psymbol =
   match
     Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
+  with
+    | Mlw_module.PS p -> p
+    | _ -> assert false
+
+let get_logic_fun : Term.lsymbol =
+  find ref_module.Mlw_module.mod_theory "prefix !"
+
+let get_fun : Mlw_expr.psymbol =
+  match
+    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
+  with
+    | Mlw_module.PS p -> p
+    | _ -> assert false
+
+let set_fun : Mlw_expr.psymbol =
+  match
+    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
   with
     | Mlw_module.PS p -> p
     | _ -> assert false
@@ -113,15 +133,22 @@ let ctype ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit
     | TInt (_, _) -> Mlw_ty.ity_pur Ty.ts_int []
-    | TFloat (_, _)
-    | TPtr (_, _)
-    | TArray (_, _, _, _)
-    | TFun (_, _, _, _)
-    | TNamed (_, _)
-    | TComp (_, _, _)
-    | TEnum (_, _)
-    | TBuiltin_va_list _
-    -> Self.not_yet_implemented "ctype"
+    | TFloat (_, _) -> 
+      Self.not_yet_implemented "ctype TFloat"
+    | TPtr (_, _) -> 
+      Self.not_yet_implemented "ctype TPtr"
+    | TArray (_, _, _, _) -> 
+      Self.not_yet_implemented "ctype TArray"
+    | TFun (_, _, _, _) -> 
+      Self.not_yet_implemented "ctype TFun"
+    | TNamed (_, _) -> 
+      Self.not_yet_implemented "ctype TNamed"
+    | TComp (_, _, _) -> 
+      Self.not_yet_implemented "ctype TComp"
+    | TEnum (_, _) -> 
+      Self.not_yet_implemented "ctype TEnum"
+    | TBuiltin_va_list _ -> 
+      Self.not_yet_implemented "ctype TBuiltin_va_list"
 
 let logic_types = Hashtbl.create 257
 
@@ -152,7 +179,7 @@ let rec logic_type ty =
         try
           let ts = Hashtbl.find logic_types lt.lt_name in
           Ty.ty_app ts (List.map logic_type args)
-        with 
+        with
             Not_found -> Self.fatal "logic type %s not found" lt.lt_name
       end
     | Lvar v -> Ty.ty_var (find_type_var v)
@@ -162,6 +189,36 @@ let rec logic_type ty =
 
 
 
+let any _ty =
+  Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
+
+
+let mk_ref ty =
+    let pv =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
+    in
+    let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
+    Mlw_expr.e_arrow ref_fun vta
+
+let mk_get ref_ty ty =
+    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
+    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
+    Mlw_expr.e_arrow get_fun vta
+
+let mk_set ref_ty ty =
+    (* (:=) has type (r:ref 'a) (v:'a) unit *)
+    let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
+    let pv2 =
+      Mlw_ty.create_pvsymbol (Ident.id_fresh "v") (Mlw_ty.vty_value ty)
+    in
+    let vta =
+      Mlw_ty.vty_arrow [pv1;pv2]
+        (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_unit))
+    in
+    Mlw_expr.e_arrow set_fun vta
+
+
 
 
 
@@ -169,16 +226,16 @@ let rec logic_type ty =
 (* terms *)
 (*********)
 
-let constant c =
+let logic_constant c =
   match c with
-    | Integer(_value,Some s) -> 
-      let c = Literals.integer s in Term.ConstInt c
+    | Integer(_value,Some s) ->
+      let c = Literals.integer s in Number.ConstInt c
     | Integer(_value,None) ->
-      Self.not_yet_implemented "constant Integer None"
+      Self.not_yet_implemented "logic_constant Integer None"
     | LReal(_value,s) ->
-      let c = Literals.floating_point s in Term.ConstReal c
+      let c = Literals.floating_point s in Number.ConstReal c
     | (LStr _|LWStr _|LChr _|LEnum _) ->
-      Self.not_yet_implemented "constant"
+      Self.not_yet_implemented "logic_constant"
 
 let t_app ls args =
   try
@@ -230,7 +287,33 @@ let get_lvar lv =
   try
     Hashtbl.find bound_vars lv.lv_id
   with Not_found ->
-    Self.fatal "variable %d not found" lv.lv_id
+    Self.fatal "logic variable %s (%d) not found" lv.lv_name lv.lv_id
+
+
+let program_vars = Hashtbl.create 257
+
+let create_var_full v =
+  let id = Ident.id_fresh v.vname in
+  let ty = ctype v.vtype in
+  let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
+  let let_defn = Mlw_expr.create_let_defn id def in
+  let vs = match let_defn.Mlw_expr.let_sym with
+    | Mlw_expr.LetV vs -> vs
+    | Mlw_expr.LetA _ -> assert false
+  in
+(*
+  Self.result "create program variable %s (%d)" v.vname v.vid;
+*)
+  Hashtbl.add program_vars v.vid (vs,true,ty);
+  let_defn,vs
+
+let create_var v = fst (create_var_full v)
+
+let get_var v =
+  try
+    Hashtbl.find program_vars v.vid
+  with Not_found ->
+    Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
 let logic_symbols = Hashtbl.create 257
 
@@ -251,30 +334,67 @@ let get_lsymbol li =
   with
       Not_found -> Self.fatal "logic symbol %s not found" li.l_var_info.lv_name
 
-let tlval (host,offset) =
+let result_vsymbol =
+  ref (Term.create_vsymbol (Ident.id_fresh "result") unit_type)
+
+type label = Here | Old | At of string
+
+let tlval ~label (host,offset) =
   match host,offset with
-    | TVar lv, TNoOffset -> Term.t_var (get_lvar lv)
+    | TResult _, TNoOffset -> Term.t_var !result_vsymbol
+    | TVar lv, TNoOffset -> 
+      begin
+        let t =
+          match lv.lv_origin with
+            | None -> Term.t_var (get_lvar lv)
+            | Some v -> 
+              let (v,is_mutable,_ty) = get_var v in
+              if is_mutable then
+                t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
+              else
+                Term.t_var v.Mlw_ty.pv_vs
+        in
+        match label with
+          | Here -> t
+          | Old -> Mlw_wp.t_at_old t
+          | At _lab -> 
+            (* t_app Mlw_wp.fs_at [t; ??? lab] *)
+      Self.not_yet_implemented "tlval TVar/At"
+      end
     | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
       Self.not_yet_implemented "tlval TVar"
-    | ((TResult _|TMem _), _) ->
-      Self.not_yet_implemented "tlval"
+    | TResult _, _ ->
+      Self.not_yet_implemented "tlval Result"
+    | TMem _, _ ->
+      Self.not_yet_implemented "tlval Mem"
 
-let rec term_node t =
+let rec term_node ~label t =
   match t with
-    | TConst cst -> Term.t_const (constant cst)
-    | TLval lv -> tlval lv
-    | TBinOp (op, t1, t2) -> bin (term t1) op (term t2)
-    | TUnOp (op, t) -> unary op (term t)
+    | TConst cst -> Term.t_const (logic_constant cst)
+    | TLval lv -> tlval ~label lv
+    | TBinOp (op, t1, t2) -> bin (term ~label t1) op (term ~label t2)
+    | TUnOp (op, t) -> unary op (term ~label t)
     | TCastE (_, _) -> Self.not_yet_implemented "term_node TCastE"
     | Tapp (li, labels, args) ->
       begin
         match labels with
           | [] ->
             let ls = get_lsymbol li in
-            let args = List.map (fun x -> snd(term x)) args in
+            let args = List.map (fun x -> snd(term ~label x)) args in
             t_app ls args
-          | _ -> 
+          | _ ->
             Self.not_yet_implemented "term_node Tapp with labels"
+      end
+    | Tat (t, lab) ->
+      begin
+        match lab with
+          | LogicLabel(None, "Here") -> snd (term ~label:Here t)
+          | LogicLabel(None, "Old") -> snd (term ~label:Old t)
+          | LogicLabel(None, lab) -> snd (term ~label:(At lab) t)
+          | LogicLabel(Some _, _lab) -> 
+            Self.not_yet_implemented "term_node Tat/LogicLabel/Some"
+          | StmtLabel _ ->
+            Self.not_yet_implemented "term_node Tat/StmtLabel"
       end
     | TSizeOf _
     | TSizeOfE _
@@ -286,7 +406,6 @@ let rec term_node t =
     | Tlambda (_, _)
     | TDataCons (_, _)
     | Tif (_, _, _)
-    | Tat (_, _)
     | Tbase_addr (_, _)
     | Toffset (_, _)
     | Tblock_length (_, _)
@@ -304,7 +423,7 @@ let rec term_node t =
     | Tlet (_, _) ->
       Self.not_yet_implemented "term_node"
 
-and term t = (t.term_type, term_node t.term_node)
+and term ~label t = (t.term_type, term_node ~label t.term_node)
 
 
 
@@ -317,25 +436,29 @@ let rel (ty1,t1) op (ty2,t2) =
     | Req,_,_ -> Term.t_equ t1 t2
     | Rneq,_,_ -> Term.t_neq t1 t2
     | Rge,Linteger,Linteger -> t_app ge_int [t1;t2]
+    | Rle,Linteger,Linteger -> t_app le_int [t1;t2]
+    | Rgt,Linteger,Linteger -> t_app gt_int [t1;t2]
+    | Rlt,Linteger,Linteger -> t_app lt_int [t1;t2]
     | Rge,Lreal,Lreal -> t_app ge_real [t1;t2]
     | Rge,_,_ ->
       Self.not_yet_implemented "rel Rge"
     | (Rlt|Rgt|Rle),_,_ ->
       Self.not_yet_implemented "rel"
 
-let rec predicate p =
+let rec predicate ~label p =
   match p with
     | Pfalse -> Term.t_false
     | Ptrue -> Term.t_true
-    | Prel (op, t1, t2) -> rel (term t1) op (term t2)
+    | Prel (op, t1, t2) -> rel (term ~label t1) op (term ~label t2)
     | Pforall (lv, p) ->
       let l = List.map create_lvar lv in
-      Term.t_forall_close l [] (predicate_named p)
+      Term.t_forall_close l [] (predicate_named ~label p)
     | Pimplies (p1, p2) ->
-      Term.t_implies (predicate_named p1) (predicate_named p2)
+      Term.t_implies (predicate_named ~label p1) (predicate_named ~label p2)
+    | Pand (p1, p2) ->
+      Term.t_and (predicate_named ~label p1) (predicate_named ~label p2)
     | Papp (_, _, _)
     | Pseparated _
-    | Pand (_, _)
     | Por (_, _)
     | Pxor (_, _)
     | Piff (_, _)
@@ -353,7 +476,7 @@ let rec predicate p =
     | Psubtype (_, _) ->
         Self.not_yet_implemented "predicate"
 
-and predicate_named p = predicate p.content
+and predicate_named ~label p = predicate ~label p.content
 
 
 
@@ -417,7 +540,7 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
                   Decl.create_param_decl ls
                 | LBterm d ->
                   let ls,args = create_lsymbol li in
-                  let (_ty,d) = term d in
+                  let (_ty,d) = term ~label:Here d in
                   let def = Decl.make_ls_defn ls args d in
                   Decl.create_logic_decl [def]
                 | _ ->
@@ -440,16 +563,16 @@ let rec logic_decl ~in_axiomatic a _loc (theories,decls) =
               in
               Decl.create_prop_decl
                 (if is_axiom then Decl.Paxiom else Decl.Plemma)
-                pr (predicate_named p)
+                pr (predicate_named ~label:Here p)
             in
             (theories,d::decls)
           | _ ->
             Self.not_yet_implemented "Dlemma with labels or vars"
       end
     | Daxiomatic (name, decls', loc) ->
-      let theories = 
-        add_decls_as_theory theories 
-          (Ident.id_fresh global_logic_decls_theory_name) decls 
+      let theories =
+        add_decls_as_theory theories
+          (Ident.id_fresh global_logic_decls_theory_name) decls
       in
       let (t,decls'') =
         List.fold_left
@@ -481,46 +604,23 @@ let identified_proposition p =
 (* statements *)
 (**************)
 
-let program_vars = Hashtbl.create 257
-
-let any _ty = 
-  Mlw_expr.e_const (Term.ConstInt (Term.int_const_decimal "0")) 
-
-let create_var v =
-  let id = Ident.id_fresh v.vname in
-  let ty = Mlw_ty.vty_value (ctype v.vtype) in
-  let specialize_ref = Mlw_dty.specialize_psymbol ref_fun in
-  let vty =
-    match Mlw_dty.vty_of_dvty specialize_ref with
-      | Mlw_ty.VTarrow vty -> vty
-      | Mlw_ty.VTvalue _ -> assert false
-  in
-  let def = 
-    Mlw_expr.e_app
-      (Mlw_expr.e_arrow ref_fun vty)
-      [any ty] 
-  in
-  let let_defn = Mlw_expr.create_let_defn id def in
-  let vs = match let_defn.Mlw_expr.let_sym with
-    | Mlw_expr.LetV vs -> vs
-    | Mlw_expr.LetA _ -> assert false
-  in
-(*
-  Self.result "create program variable %s (%d)" v.vname v.vid;
-*)
-  Hashtbl.add program_vars v.vid vs;
-  let_defn
-
-let get_var v =
-  try
-    Hashtbl.find program_vars v.vid
-  with Not_found ->
-    Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
 
 let lval (host,offset) =
   match host,offset with
-    | Var v, NoOffset -> Mlw_expr.e_value (get_var v)
+    | Var v, NoOffset ->
+      let v,is_mutable,ty = get_var v in
+      if is_mutable then
+        begin try
+                Mlw_expr.e_app
+                  (mk_get v.Mlw_ty.pv_vtv ty)
+                  [Mlw_expr.e_value v]
+          with e ->
+            Self.fatal "Exception raised during application of !@ %a@."
+              Exn_printer.exn_printer e
+        end
+      else
+        Mlw_expr.e_value v
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
     | Mem _, _ ->
@@ -534,7 +634,7 @@ let seq e1 e2 =
 let annot a e =
   match (Annotations.code_annotation_of_rooted a).annot_content with
   | AAssert ([],pred) ->
-    let p = predicate_named pred in
+    let p = predicate_named ~label:Here pred in
     let a = Mlw_expr.e_assert Mlw_expr.Aassert p in
     seq a e
   | AAssert(_labels,_pred) ->
@@ -552,28 +652,103 @@ let annot a e =
   | APragma _ ->
     Self.not_yet_implemented "annot APragma"
 
-let expr e =
+let loop_annot a =
+  List.fold_left (fun (inv,var) a ->
+    match (Annotations.code_annotation_of_rooted a).annot_content with
+      | AAssert ([],_pred) ->
+        Self.not_yet_implemented "loop_annot AAssert"
+      | AAssert(_labels,_pred) ->
+        Self.not_yet_implemented "loop_annot AAssert"
+      | AStmtSpec _ ->
+        Self.not_yet_implemented "loop_annot AStmtSpec"
+      | AInvariant([],true,p) ->
+        (Term.t_and inv (predicate_named ~label:Here p),var)
+      | AInvariant _ ->
+        Self.not_yet_implemented "loop_annot AInvariant"
+      | AVariant (t, None) ->
+        (inv,(snd (term ~label:Here t),None)::var)
+      | AVariant (_var, Some _) ->
+        Self.not_yet_implemented "loop_annot AVariant/Some"
+      | AAssigns _ ->
+        Self.not_yet_implemented "loop_annot AAssigns"
+      | AAllocation _ ->
+        Self.not_yet_implemented "loop_annot AAllocation"
+      | APragma _ ->
+        Self.not_yet_implemented "loop_annot APragma")
+    (Term.t_true, []) a
+
+let binop op e1 e2 =
+  let ls,ty =
+    match op with
+      | PlusA -> add_int, Mlw_ty.ity_int
+      | MinusA -> sub_int, Mlw_ty.ity_int
+      | Mult -> mul_int, Mlw_ty.ity_int
+      | Lt -> lt_int, Mlw_ty.ity_bool
+      | Le -> le_int, Mlw_ty.ity_bool
+      | Gt | Ge | Eq | Ne ->
+        Self.not_yet_implemented "binop comp"
+      | PlusPI|IndexPI|MinusPI|MinusPP ->
+        Self.not_yet_implemented "binop plus/minus"
+      | Div|Mod ->
+        Self.not_yet_implemented "binop div/mod"
+      | Shiftlt|Shiftrt ->
+        Self.not_yet_implemented "binop shift"
+      | BAnd|BXor|BOr|LAnd|LOr ->
+        Self.not_yet_implemented "binop bool"
+  in
+  Mlw_expr.e_lapp ls [e1;e2] ty
+
+let constant c =
+  match c with
+  | CInt64(_t,_ikind, Some s) ->
+      Number.ConstInt (Literals.integer s)
+  | CInt64(t,_ikind, None) ->
+      Number.ConstInt (Literals.integer (My_bigint.to_string t))
+  | CStr _
+  | CWStr _
+  | CChr _
+  | CReal (_, _, _)
+  | CEnum _ ->
+      Self.not_yet_implemented "constant"
+
+let rec expr e =
   match e.enode with
-    | Const _c -> (* constant c *)
-      Self.not_yet_implemented "expr Const"
+    | Const c -> Mlw_expr.e_const (constant c)
     | Lval lv -> lval lv
+    | BinOp (op, e1, e2, _loc) ->
+      binop op (expr e1) (expr e2)
     | SizeOf _
     | SizeOfE _
     | SizeOfStr _
     | AlignOf _
     | AlignOfE _
     | UnOp (_, _, _)
-    | BinOp (_, _, _, _)
     | CastE (_, _)
     | AddrOf _
     | StartOf _
     | Info (_, _)
       -> Self.not_yet_implemented "expr"
 
+let assignment (lhost,offset) e _loc =
+  match lhost,offset with
+    | Var v , NoOffset ->
+      let v,is_mutable,ty = get_var v in
+      if is_mutable then
+        Mlw_expr.e_app
+          (mk_set v.Mlw_ty.pv_vtv ty)
+          [Mlw_expr.e_value v; expr e]
+      else
+        Self.not_yet_implemented "mutation of formal parameters"
+    | Var _ , Field _ ->
+      Self.not_yet_implemented "assignment Var/Field"
+    | Var _ , Index _ ->
+      Self.not_yet_implemented "assignment Var/Index"
+    | Mem _, _ ->
+      Self.not_yet_implemented "assignment Mem"
+
 let instr i =
   match i with
-  | Set(_lv,_e,_loc) ->
-    Self.not_yet_implemented "instr Set"
+  | Set(lv,e,loc) -> assignment lv e loc
   | Call (_, _, _, _) ->
     Self.not_yet_implemented "instr Call"
   | Asm (_, _, _, _, _, _) ->
@@ -583,31 +758,50 @@ let instr i =
   | Code_annot (_, _) ->
     Self.not_yet_implemented "instr Code_annot"
 
-let stmt s =
+let exc_break =
+  Mlw_ty.create_xsymbol (Ident.id_fresh "Break") Mlw_ty.ity_unit
+
+let rec stmt s =
   match s.skind with
     | Instr i ->
       let annotations = Annotations.code_annot s in
       let e =
         List.fold_right annot annotations (instr i)
       in e
-    | Block _ ->
-      Self.not_yet_implemented "stmt Block"
+    | Block b -> block b
     | Return (None, _loc) ->
       Mlw_expr.e_void
     | Return (Some e, _loc) ->
       expr e
     | Goto (_, _) ->
       Self.not_yet_implemented "stmt Goto"
-    | Break _ ->
-      Self.not_yet_implemented "stmt Break"
+    | Break _loc ->
+      Mlw_expr.e_raise exc_break Mlw_expr.e_void
+        Mlw_ty.ity_unit
     | Continue _ ->
       Self.not_yet_implemented "stmt Continue"
-    | If (_, _, _, _) ->
-      Self.not_yet_implemented "stmt If"
+    | If (c, e1, e2, _loc) ->
+      Mlw_expr.e_if (expr c) (block e1) (block e2)
     | Switch (_, _, _, _) ->
       Self.not_yet_implemented "stmt Switch"
-    | Loop (_, _, _, _, _) ->
-      Self.not_yet_implemented "stmt Loop"
+    | Loop (annots, body, _loc, _continue, _break) ->
+      (*
+        "while (1) body" is translated to
+        try loop
+          try body
+          with Continue -> ()
+        with Break -> ()
+      *)
+      assert (annots = []);
+      let annots = Annotations.code_annot s in
+      let inv, var = loop_annot annots in
+      let v =
+        Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy")
+          (Mlw_ty.vty_value Mlw_ty.ity_unit)
+      in
+      Mlw_expr.e_try
+        (Mlw_expr.e_loop inv var (block body))
+        [exc_break,v,Mlw_expr.e_void]
     | UnspecifiedSequence _ ->
       Self.not_yet_implemented "stmt UnspecifiedSequence"
     | TryFinally (_, _, _) ->
@@ -615,8 +809,14 @@ let stmt s =
     | TryExcept (_, _, _, _) ->
       Self.not_yet_implemented "stmt TryExcept"
 
-let block b =
-  List.fold_right (fun s e -> seq (stmt s) e) b.bstmts Mlw_expr.e_void
+and block b =
+  let rec mk_seq l =
+    match l with
+      | [] -> Mlw_expr.e_void
+      | [s] -> stmt s
+      | s::r -> seq (stmt s) (mk_seq r)
+  in
+  mk_seq b.bstmts
 
 
 
@@ -676,28 +876,41 @@ let fundecl fdec =
   let fun_id = fdec.svar in
   let kf = Globals.Functions.get fun_id in
   Self.log "processing function %a" Kernel_function.pretty kf;
-  let formals = 
+  let args =
     match Kernel_function.get_formals kf with
-      | [] -> [ "_dummy", Mlw_ty.ity_unit ]
-      | l -> List.map (fun v -> (v.vname, ctype v.vtype)) l
+      | [] ->
+        [ Mlw_ty.create_pvsymbol
+            (Ident.id_fresh "_dummy")
+            (Mlw_ty.vty_value Mlw_ty.ity_unit) ]
+      | l ->
+        List.map (fun v ->
+          let ity = ctype v.vtype in
+          let vs =
+            Mlw_ty.create_pvsymbol
+              (Ident.id_fresh v.vname)
+              (Mlw_ty.vty_value ity)
+          in
+          Hashtbl.add program_vars v.vid (vs,false,ity);
+          vs)
+        l
   in
   let body = fdec.sbody in
   let contract = Annotations.funspec kf in
-  let _pre,_post,_ass = extract_simple_contract contract in
-  let _ret_type = ctype (Kernel_function.get_return_type kf) in
-  let args =
-    List.map 
-      (fun (id,ity) -> 
-        Mlw_ty.create_pvsymbol (Ident.id_fresh id) (Mlw_ty.vty_value ity))
-      formals
+  let pre,post,_ass = extract_simple_contract contract in
+  let ret_type = ctype (Kernel_function.get_return_type kf) in
+  let result =
+    Term.create_vsymbol (Ident.id_fresh "result")
+      (Mlw_ty.ty_of_ity ret_type)
   in
-  let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
+  result_vsymbol := result;
   let locals =
     List.map create_var (Kernel_function.get_locals kf)
   in
   let spec = {
-    Mlw_ty.c_pre = Term.t_true;
-    c_post = Term.t_eps (Term.t_close_bound result Term.t_true);
+    Mlw_ty.c_pre = predicate_named ~label:Here pre;
+    c_post = 
+      Term.t_eps 
+        (Term.t_close_bound result (predicate_named ~label:Here post));
     c_xpost = Mlw_ty.Mexn.empty;
     c_effect = Mlw_ty.eff_empty;
     c_variant = [];
@@ -712,7 +925,9 @@ let fundecl fdec =
     l_spec = spec;
   }
   in
-  let def = Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda in
+  let def =
+    Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda
+  in
   Mlw_decl.create_rec_decl [def]
 
 
@@ -746,11 +961,19 @@ let global (theories,lemmas,functions) g =
         { acc with AST.prog_vars =
           (intern_string vi.vname, g)::acc.AST.prog_vars }
 *)
-     Self.not_yet_implemented "WARNING: Variable %s not translated" vi.vname
+     let _,pv = create_var_full vi in
+     let sym = Mlw_expr.LetV pv in
+     (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
 
     | GVarDecl(_funspec,vi,_location) ->
-      Self.error "WARNING: Variable %s not translated" vi.vname;
-      (theories,lemmas,functions)
+      begin match vi.vname with
+        | "Frama_C_bzero" | "Frama_C_copy_block" ->
+          (theories,lemmas,functions)
+        | _ ->
+          let _,pv = create_var_full vi in
+          let sym = Mlw_expr.LetV pv in
+          (theories,lemmas,(Mlw_decl.create_val_decl sym)::functions)
+      end
     | GAnnot (a, loc) ->
       let (t,l) = logic_decl ~in_axiomatic:false a loc (theories,lemmas) in
       (t,l,functions)
@@ -778,39 +1001,48 @@ let add_pdecl m d =
   try
     Mlw_module.add_pdecl ~wp:true m d
   with
-      Not_found -> 
+      Not_found ->
         Self.fatal "add_pdecl %a" (Pp.print_list Pp.comma print_id)
-          (Ident.Sid.elements d.Mlw_decl.pd_news) 
+          (Ident.Sid.elements d.Mlw_decl.pd_news)
 
 let use m th =
   let name = th.Theory.th_name in
   Mlw_module.close_namespace
     (Mlw_module.use_export_theory
-       (Mlw_module.open_namespace m name.Ident.id_string) 
+       (Mlw_module.open_namespace m name.Ident.id_string)
        th)
     true
 
+let use_module m modul =
+  let name = modul.Mlw_module.mod_theory.Theory.th_name in
+  Mlw_module.close_namespace
+    (Mlw_module.use_export
+       (Mlw_module.open_namespace m name.Ident.id_string)
+       modul)
+    true
+
 let prog p =
-  try
+   try
     let theories,decls,functions =
       List.fold_left global ([],[],[]) p.globals
     in
     Self.result "found %d logic decl(s)" (List.length decls);
     let theories =
-      add_decls_as_theory theories 
+      add_decls_as_theory theories
         (Ident.id_fresh global_logic_decls_theory_name) decls
     in
     Self.result "made %d theory(ies)" (List.length theories);
-    let m = Mlw_module.create_module env 
-      (Ident.id_fresh programs_module_name) 
+    let m = Mlw_module.create_module env
+      (Ident.id_fresh programs_module_name)
     in
     let m = use m int_theory in
     let m = use m real_theory in
     let m = List.fold_left use m theories in
+    let m = use_module m ref_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
-  with
-      Decl.UnknownIdent(s) ->
-        Self.fatal "unknown identifier %s" s.Ident.id_string
+  with Exit as e  ->
+    Self.fatal "Exception raised during translation to Why3:@ %a@."
+      Exn_printer.exn_printer e

@@ -333,16 +333,17 @@ use_clone:
 ;
 
 use:
-| imp_exp tqualid
-    { { use_theory = $2; use_as = qualid_last $2; use_imp_exp = $1 } }
-| imp_exp tqualid AS uident
-    { { use_theory = $2; use_as = $4.id; use_imp_exp = $1 } }
+| opt_import tqualid
+    { { use_theory = $2; use_import = Some ($1, qualid_last $2) } }
+| opt_import tqualid AS uident
+    { { use_theory = $2; use_import = Some ($1, $4.id) } }
+| EXPORT tqualid
+    { { use_theory = $2; use_import = None } }
 ;
 
-imp_exp:
-| IMPORT        { Some true }
-| EXPORT        { None }
-| /* epsilon */ { Some false }
+opt_import:
+| /* epsilon */ { false }
+| IMPORT        { true  }
 ;
 
 clone_subst:
@@ -357,7 +358,8 @@ list1_comma_subst:
 
 subst:
 | NAMESPACE ns     EQUAL ns     { CSns   (floc (), $2, $4) }
-| TYPE      qualid EQUAL qualid { CStsym (floc (), $2, $4) }
+| TYPE qualid type_args EQUAL primitive_type
+                                { CStsym (floc (), $2, $3, $5) }
 | CONSTANT  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
 | FUNCTION  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
 | PREDICATE qualid EQUAL qualid { CSpsym (floc (), $2, $4) }
@@ -378,7 +380,8 @@ list1_meta_arg_sep_comma:
 ;
 
 meta_arg:
-| TYPE      qualid { PMAts  $2 }
+| TYPE primitive_type { PMAty $2 }
+| CONSTANT  qualid { PMAfs  $2 }
 | FUNCTION  qualid { PMAfs  $2 }
 | PREDICATE qualid { PMAps  $2 }
 | PROP      qualid { PMApr  $2 }

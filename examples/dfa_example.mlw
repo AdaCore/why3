@@ -1,0 +1,64 @@
+
+module DfaExample
+
+  (** regular expressions on alphabet {0,1} *)
+
+  type char = Zero | One
+
+  clone import regexp.Regexp with type char = char
+
+  (** mutable input stream *)
+
+  use import option.Option
+
+  type stream model { mutable state: list char }
+
+  val input: stream
+
+  val get () : option char writes {input}
+    ensures { match old input.state with
+    | Cons c l -> input.state = l /\ result = Some c
+    | Nil -> old input.state = input.state = Nil /\ result = None end }
+
+  (** 2-state DFA to recognize words ending with a 1, that is (0|1)*1
+
+               --------- 1 -------->
+      +- state 1                    state 2-------+
+      |    ^   <-------- 0 ---------   ^          |
+      +-0--/                           \----- 1 --+
+  *)
+
+  constant r1 : regexp = Concat (Star (Alt (Char Zero) (Char One))) (Char One)
+  constant r2 : regexp = Alt Epsilon r1
+
+  lemma nil_notin_r1: not (mem Nil r1)
+
+  lemma ends_with_one:
+    forall w: list char.
+    mem w r1 <-> exists w': list char. w = w' ++ Cons One Nil
+
+  lemma zero_w_in_r1: forall w: list char. mem w r1 <-> mem (Cons Zero w) r1
+  lemma one_w_in_r1: forall w: list char. mem w r2 <-> mem (Cons One w) r1
+
+  lemma zero_w_in_r2: forall w: list char. mem w r1 <-> mem (Cons Zero w) r2
+  lemma one_w_in_r2: forall w: list char. mem w r2 <-> mem (Cons One w) r2
+
+  let rec astate1 () : bool
+    ensures { result = True <-> input.state = Nil /\ mem (old input.state) r1 }
+    =
+    match get () with
+    | None      -> False
+    | Some Zero -> astate1 ()
+    | Some One  -> astate2 ()
+    end
+
+  with astate2 () : bool
+    ensures { result = True <-> input.state = Nil /\ mem (old input.state) r2 }
+    =
+    match get () with
+    | None      -> True
+    | Some Zero -> astate1 ()
+    | Some One  -> astate2 ()
+    end
+
+end

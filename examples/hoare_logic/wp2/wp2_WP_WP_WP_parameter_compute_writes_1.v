@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require map.Map.
 Require set.Set.
 
 (* Why3 assumption *)
@@ -54,33 +55,8 @@ Inductive value  :=
 Axiom value_WhyType : WhyType value.
 Existing Instance value_WhyType.
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
 (* Why3 assumption *)
-Definition env  := (map Z value).
+Definition env  := (map.Map.map Z value).
 
 Parameter eval_bin: value -> operator -> value -> value.
 
@@ -98,29 +74,30 @@ Axiom eval_bin_def : forall (x:value) (op:operator) (y:value), match (x,
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_term(sigma:(map Z value)) (pi:(map Z value))
+Fixpoint eval_term(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   (t:term) {struct t}: value :=
   match t with
   | (Tconst n) => (Vint n)
-  | (Tvar id) => (get pi id)
-  | (Tderef id) => (get sigma id)
+  | (Tvar id) => (map.Map.get pi id)
+  | (Tderef id) => (map.Map.get sigma id)
   | (Tbin t1 op t2) => (eval_bin (eval_term sigma pi t1) op (eval_term sigma
       pi t2))
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_fmla(sigma:(map Z value)) (pi:(map Z value))
+Fixpoint eval_fmla(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm t) => ((eval_term sigma pi t) = (Vbool true))
   | (Fand f1 f2) => (eval_fmla sigma pi f1) /\ (eval_fmla sigma pi f2)
   | (Fnot f1) => ~ (eval_fmla sigma pi f1)
   | (Fimplies f1 f2) => (eval_fmla sigma pi f1) -> (eval_fmla sigma pi f2)
-  | (Flet x t f1) => (eval_fmla sigma (set pi x (eval_term sigma pi t)) f1)
-  | (Fforall x Tint f1) => forall (n:Z), (eval_fmla sigma (set pi x (Vint n))
-      f1)
-  | (Fforall x Tbool f1) => forall (b:bool), (eval_fmla sigma (set pi x
-      (Vbool b)) f1)
+  | (Flet x t f1) => (eval_fmla sigma (map.Map.set pi x (eval_term sigma pi
+      t)) f1)
+  | (Fforall x Tint f1) => forall (n:Z), (eval_fmla sigma (map.Map.set pi x
+      (Vint n)) f1)
+  | (Fforall x Tbool f1) => forall (b:bool), (eval_fmla sigma (map.Map.set pi
+      x (Vbool b)) f1)
   end.
 
 Parameter subst_term: term -> Z -> Z -> term.
@@ -144,13 +121,14 @@ Fixpoint fresh_in_term(id:Z) (t:term) {struct t}: Prop :=
   | (Tbin t1 _ t2) => (fresh_in_term id t1) /\ (fresh_in_term id t2)
   end.
 
-Axiom eval_subst_term : forall (sigma:(map Z value)) (pi:(map Z value))
-  (e:term) (x:Z) (v:Z), (fresh_in_term v e) -> ((eval_term sigma pi
-  (subst_term e x v)) = (eval_term (set sigma x (get pi v)) pi e)).
+Axiom eval_subst_term : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map
+  Z value)) (e:term) (x:Z) (v:Z), (fresh_in_term v e) -> ((eval_term sigma pi
+  (subst_term e x v)) = (eval_term (map.Map.set sigma x (map.Map.get pi v))
+  pi e)).
 
-Axiom eval_term_change_free : forall (t:term) (sigma:(map Z value)) (pi:(map
-  Z value)) (id:Z) (v:value), (fresh_in_term id t) -> ((eval_term sigma
-  (set pi id v) t) = (eval_term sigma pi t)).
+Axiom eval_term_change_free : forall (t:term) (sigma:(map.Map.map Z value))
+  (pi:(map.Map.map Z value)) (id:Z) (v:value), (fresh_in_term id t) ->
+  ((eval_term sigma (map.Map.set pi id v) t) = (eval_term sigma pi t)).
 
 (* Why3 assumption *)
 Fixpoint fresh_in_fmla(id:Z) (f:fmla) {struct f}: Prop :=
@@ -175,18 +153,20 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   | (Fforall y ty f1) => (Fforall y ty (subst f1 x v))
   end.
 
-Axiom eval_subst : forall (f:fmla) (sigma:(map Z value)) (pi:(map Z value))
-  (x:Z) (v:Z), (fresh_in_fmla v f) -> ((eval_fmla sigma pi (subst f x v)) <->
-  (eval_fmla (set sigma x (get pi v)) pi f)).
+Axiom eval_subst : forall (f:fmla) (sigma:(map.Map.map Z value))
+  (pi:(map.Map.map Z value)) (x:Z) (v:Z), (fresh_in_fmla v f) ->
+  ((eval_fmla sigma pi (subst f x v)) <-> (eval_fmla (map.Map.set sigma x
+  (map.Map.get pi v)) pi f)).
 
-Axiom eval_swap : forall (f:fmla) (sigma:(map Z value)) (pi:(map Z value))
-  (id1:Z) (id2:Z) (v1:value) (v2:value), (~ (id1 = id2)) -> ((eval_fmla sigma
-  (set (set pi id1 v1) id2 v2) f) <-> (eval_fmla sigma (set (set pi id2 v2)
-  id1 v1) f)).
+Axiom eval_swap : forall (f:fmla) (sigma:(map.Map.map Z value))
+  (pi:(map.Map.map Z value)) (id1:Z) (id2:Z) (v1:value) (v2:value),
+  (~ (id1 = id2)) -> ((eval_fmla sigma (map.Map.set (map.Map.set pi id1 v1)
+  id2 v2) f) <-> (eval_fmla sigma (map.Map.set (map.Map.set pi id2 v2) id1
+  v1) f)).
 
-Axiom eval_change_free : forall (f:fmla) (sigma:(map Z value)) (pi:(map Z
-  value)) (id:Z) (v:value), (fresh_in_fmla id f) -> ((eval_fmla sigma (set pi
-  id v) f) <-> (eval_fmla sigma pi f)).
+Axiom eval_change_free : forall (f:fmla) (sigma:(map.Map.map Z value))
+  (pi:(map.Map.map Z value)) (id:Z) (v:value), (fresh_in_fmla id f) ->
+  ((eval_fmla sigma (map.Map.set pi id v) f) <-> (eval_fmla sigma pi f)).
 
 (* Why3 assumption *)
 Inductive stmt  :=
@@ -202,88 +182,94 @@ Existing Instance stmt_WhyType.
 Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
 
 (* Why3 assumption *)
-Inductive one_step : (map Z value) -> (map Z value) -> stmt -> (map Z value)
-  -> (map Z value) -> stmt -> Prop :=
-  | one_step_assign : forall (sigma:(map Z value)) (pi:(map Z value)) (x:Z)
-      (e:term), (one_step sigma pi (Sassign x e) (set sigma x
-      (eval_term sigma pi e)) pi Sskip)
-  | one_step_seq : forall (sigma:(map Z value)) (pi:(map Z value))
-      (sigma':(map Z value)) (pi':(map Z value)) (i1:stmt) (i1':stmt)
-      (i2:stmt), (one_step sigma pi i1 sigma' pi' i1') -> (one_step sigma pi
-      (Sseq i1 i2) sigma' pi' (Sseq i1' i2))
-  | one_step_seq_skip : forall (sigma:(map Z value)) (pi:(map Z value))
-      (i:stmt), (one_step sigma pi (Sseq Sskip i) sigma pi i)
-  | one_step_if_true : forall (sigma:(map Z value)) (pi:(map Z value))
-      (e:term) (i1:stmt) (i2:stmt), ((eval_term sigma pi
+Inductive one_step : (map.Map.map Z value) -> (map.Map.map Z value) -> stmt
+  -> (map.Map.map Z value) -> (map.Map.map Z value) -> stmt -> Prop :=
+  | one_step_assign : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
+      value)) (x:Z) (e:term), (one_step sigma pi (Sassign x e)
+      (map.Map.set sigma x (eval_term sigma pi e)) pi Sskip)
+  | one_step_seq : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
+      value)) (sigma':(map.Map.map Z value)) (pi':(map.Map.map Z value))
+      (i1:stmt) (i1':stmt) (i2:stmt), (one_step sigma pi i1 sigma' pi'
+      i1') -> (one_step sigma pi (Sseq i1 i2) sigma' pi' (Sseq i1' i2))
+  | one_step_seq_skip : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map
+      Z value)) (i:stmt), (one_step sigma pi (Sseq Sskip i) sigma pi i)
+  | one_step_if_true : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map
+      Z value)) (e:term) (i1:stmt) (i2:stmt), ((eval_term sigma pi
       e) = (Vbool true)) -> (one_step sigma pi (Sif e i1 i2) sigma pi i1)
-  | one_step_if_false : forall (sigma:(map Z value)) (pi:(map Z value))
-      (e:term) (i1:stmt) (i2:stmt), ((eval_term sigma pi
+  | one_step_if_false : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map
+      Z value)) (e:term) (i1:stmt) (i2:stmt), ((eval_term sigma pi
       e) = (Vbool false)) -> (one_step sigma pi (Sif e i1 i2) sigma pi i2)
-  | one_step_assert : forall (sigma:(map Z value)) (pi:(map Z value))
-      (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi (Sassert f)
-      sigma pi Sskip)
-  | one_step_while_true : forall (sigma:(map Z value)) (pi:(map Z value))
-      (e:term) (inv:fmla) (i:stmt), (eval_fmla sigma pi inv) ->
-      (((eval_term sigma pi e) = (Vbool true)) -> (one_step sigma pi
-      (Swhile e inv i) sigma pi (Sseq i (Swhile e inv i))))
-  | one_step_while_false : forall (sigma:(map Z value)) (pi:(map Z value))
-      (e:term) (inv:fmla) (i:stmt), (eval_fmla sigma pi inv) ->
-      (((eval_term sigma pi e) = (Vbool false)) -> (one_step sigma pi
-      (Swhile e inv i) sigma pi Sskip)).
+  | one_step_assert : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
+      value)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
+      (Sassert f) sigma pi Sskip)
+  | one_step_while_true : forall (sigma:(map.Map.map Z value))
+      (pi:(map.Map.map Z value)) (e:term) (inv:fmla) (i:stmt),
+      (eval_fmla sigma pi inv) -> (((eval_term sigma pi e) = (Vbool true)) ->
+      (one_step sigma pi (Swhile e inv i) sigma pi (Sseq i (Swhile e inv
+      i))))
+  | one_step_while_false : forall (sigma:(map.Map.map Z value))
+      (pi:(map.Map.map Z value)) (e:term) (inv:fmla) (i:stmt),
+      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
+      e) = (Vbool false)) -> (one_step sigma pi (Swhile e inv i) sigma pi
+      Sskip)).
 
 (* Why3 assumption *)
-Inductive many_steps : (map Z value) -> (map Z value) -> stmt -> (map Z
-  value) -> (map Z value) -> stmt -> Z -> Prop :=
-  | many_steps_refl : forall (sigma:(map Z value)) (pi:(map Z value))
-      (i:stmt), (many_steps sigma pi i sigma pi i 0%Z)
-  | many_steps_trans : forall (sigma1:(map Z value)) (pi1:(map Z value))
-      (sigma2:(map Z value)) (pi2:(map Z value)) (sigma3:(map Z value))
-      (pi3:(map Z value)) (i1:stmt) (i2:stmt) (i3:stmt) (n:Z),
+Inductive many_steps : (map.Map.map Z value) -> (map.Map.map Z value) -> stmt
+  -> (map.Map.map Z value) -> (map.Map.map Z value) -> stmt -> Z -> Prop :=
+  | many_steps_refl : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
+      value)) (i:stmt), (many_steps sigma pi i sigma pi i 0%Z)
+  | many_steps_trans : forall (sigma1:(map.Map.map Z value))
+      (pi1:(map.Map.map Z value)) (sigma2:(map.Map.map Z value))
+      (pi2:(map.Map.map Z value)) (sigma3:(map.Map.map Z value))
+      (pi3:(map.Map.map Z value)) (i1:stmt) (i2:stmt) (i3:stmt) (n:Z),
       (one_step sigma1 pi1 i1 sigma2 pi2 i2) -> ((many_steps sigma2 pi2 i2
       sigma3 pi3 i3 n) -> (many_steps sigma1 pi1 i1 sigma3 pi3 i3
       (n + 1%Z)%Z)).
 
-Axiom steps_non_neg : forall (sigma1:(map Z value)) (pi1:(map Z value))
-  (sigma2:(map Z value)) (pi2:(map Z value)) (i1:stmt) (i2:stmt) (n:Z),
-  (many_steps sigma1 pi1 i1 sigma2 pi2 i2 n) -> (0%Z <= n)%Z.
+Axiom steps_non_neg : forall (sigma1:(map.Map.map Z value)) (pi1:(map.Map.map
+  Z value)) (sigma2:(map.Map.map Z value)) (pi2:(map.Map.map Z value))
+  (i1:stmt) (i2:stmt) (n:Z), (many_steps sigma1 pi1 i1 sigma2 pi2 i2 n) ->
+  (0%Z <= n)%Z.
 
-Axiom many_steps_seq : forall (sigma1:(map Z value)) (pi1:(map Z value))
-  (sigma3:(map Z value)) (pi3:(map Z value)) (i1:stmt) (i2:stmt) (n:Z),
-  (many_steps sigma1 pi1 (Sseq i1 i2) sigma3 pi3 Sskip n) ->
-  exists sigma2:(map Z value), exists pi2:(map Z value), exists n1:Z,
-  exists n2:Z, (many_steps sigma1 pi1 i1 sigma2 pi2 Sskip n1) /\
-  ((many_steps sigma2 pi2 i2 sigma3 pi3 Sskip n2) /\
-  (n = ((1%Z + n1)%Z + n2)%Z)).
-
-(* Why3 assumption *)
-Definition valid_fmla(p:fmla): Prop := forall (sigma:(map Z value)) (pi:(map
-  Z value)), (eval_fmla sigma pi p).
+Axiom many_steps_seq : forall (sigma1:(map.Map.map Z value))
+  (pi1:(map.Map.map Z value)) (sigma3:(map.Map.map Z value))
+  (pi3:(map.Map.map Z value)) (i1:stmt) (i2:stmt) (n:Z), (many_steps sigma1
+  pi1 (Sseq i1 i2) sigma3 pi3 Sskip n) -> exists sigma2:(map.Map.map Z
+  value), exists pi2:(map.Map.map Z value), exists n1:Z, exists n2:Z,
+  (many_steps sigma1 pi1 i1 sigma2 pi2 Sskip n1) /\ ((many_steps sigma2 pi2
+  i2 sigma3 pi3 Sskip n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
 
 (* Why3 assumption *)
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop := forall (sigma:(map
-  Z value)) (pi:(map Z value)), (eval_fmla sigma pi p) -> forall (sigma':(map
-  Z value)) (pi':(map Z value)) (n:Z), (many_steps sigma pi i sigma' pi'
-  Sskip n) -> (eval_fmla sigma' pi' q).
+Definition valid_fmla(p:fmla): Prop := forall (sigma:(map.Map.map Z value))
+  (pi:(map.Map.map Z value)), (eval_fmla sigma pi p).
 
 (* Why3 assumption *)
-Definition assigns(sigma:(map Z value)) (a:(set.Set.set Z)) (sigma':(map Z
-  value)): Prop := forall (i:Z), (~ (set.Set.mem i a)) -> ((get sigma
-  i) = (get sigma' i)).
+Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop :=
+  forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value)),
+  (eval_fmla sigma pi p) -> forall (sigma':(map.Map.map Z value))
+  (pi':(map.Map.map Z value)) (n:Z), (many_steps sigma pi i sigma' pi' Sskip
+  n) -> (eval_fmla sigma' pi' q).
 
-Axiom assigns_refl : forall (sigma:(map Z value)) (a:(set.Set.set Z)),
-  (assigns sigma a sigma).
+(* Why3 assumption *)
+Definition assigns(sigma:(map.Map.map Z value)) (a:(set.Set.set Z))
+  (sigma':(map.Map.map Z value)): Prop := forall (i:Z), (~ (set.Set.mem i
+  a)) -> ((map.Map.get sigma i) = (map.Map.get sigma' i)).
 
-Axiom assigns_trans : forall (sigma1:(map Z value)) (sigma2:(map Z value))
-  (sigma3:(map Z value)) (a:(set.Set.set Z)), ((assigns sigma1 a sigma2) /\
-  (assigns sigma2 a sigma3)) -> (assigns sigma1 a sigma3).
+Axiom assigns_refl : forall (sigma:(map.Map.map Z value)) (a:(set.Set.set
+  Z)), (assigns sigma a sigma).
 
-Axiom assigns_union_left : forall (sigma:(map Z value)) (sigma':(map Z
-  value)) (s1:(set.Set.set Z)) (s2:(set.Set.set Z)), (assigns sigma s1
-  sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
+Axiom assigns_trans : forall (sigma1:(map.Map.map Z value))
+  (sigma2:(map.Map.map Z value)) (sigma3:(map.Map.map Z value))
+  (a:(set.Set.set Z)), ((assigns sigma1 a sigma2) /\ (assigns sigma2 a
+  sigma3)) -> (assigns sigma1 a sigma3).
 
-Axiom assigns_union_right : forall (sigma:(map Z value)) (sigma':(map Z
-  value)) (s1:(set.Set.set Z)) (s2:(set.Set.set Z)), (assigns sigma s2
-  sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
+Axiom assigns_union_left : forall (sigma:(map.Map.map Z value))
+  (sigma':(map.Map.map Z value)) (s1:(set.Set.set Z)) (s2:(set.Set.set Z)),
+  (assigns sigma s1 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
+
+Axiom assigns_union_right : forall (sigma:(map.Map.map Z value))
+  (sigma':(map.Map.map Z value)) (s1:(set.Set.set Z)) (s2:(set.Set.set Z)),
+  (assigns sigma s2 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
 
 (* Why3 assumption *)
 Fixpoint stmt_writes(i:stmt) (w:(set.Set.set Z)) {struct i}: Prop :=
@@ -298,10 +284,10 @@ Fixpoint stmt_writes(i:stmt) (w:(set.Set.set Z)) {struct i}: Prop :=
 Theorem WP_parameter_compute_writes : forall (s:stmt),
   match s with
   | Sskip => True
-  | (Sassign i _) => forall (sigma:(map Z value)) (pi:(map Z value))
-      (sigma':(map Z value)) (pi':(map Z value)) (n:Z), (many_steps sigma pi
-      s sigma' pi' Sskip n) -> (assigns sigma (set.Set.add i
-      (set.Set.empty :(set.Set.set Z))) sigma')
+  | (Sassign i _) => forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
+      value)) (sigma':(map.Map.map Z value)) (pi':(map.Map.map Z value))
+      (n:Z), (many_steps sigma pi s sigma' pi' Sskip n) -> (assigns sigma
+      (set.Set.add i (set.Set.empty :(set.Set.set Z))) sigma')
   | (Sseq s1 s2) => True
   | (Sif _ s1 s2) => True
   | (Swhile _ _ s1) => True
@@ -313,7 +299,7 @@ inversion H; subst; clear H.
 inversion H1; subst; clear H1.
 inversion H2; subst; clear H2.
 rewrite set.Set.add_def1 in H0.
-rewrite Select_neq; auto.
+rewrite Map.Select_neq; auto.
 inversion H.
 Qed.
 

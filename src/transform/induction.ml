@@ -76,8 +76,8 @@ module VsList = Stdlib.OrderedHashedList(struct
   type t = vsymbol
   let tag = vs_hash
 end)
-module Mvsl = Stdlib.Map.Make(VsList)
-module Svsl = Mvsl.Set
+module Mvsl = Extmap.Make(VsList)
+module Svsl = Extset.MakeOfMap(Mvsl)
 
 (* DEBUGGING AND PRINTING *)
 
@@ -467,12 +467,14 @@ let induction_int_lex th_int = function
       with Exit -> [t] end
   | _ -> assert false
 
+(*
 let () =
   Trans.register_env_transform_l "induction_int_lex"
     (fun env ->
       let th_int = Env.find_theory env ["int"] "Int" in
       Trans.store (induction_int_lex th_int))
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ integers."
+*)
 
 (*
 Local Variables:

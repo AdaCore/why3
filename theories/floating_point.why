@@ -224,8 +224,6 @@ theory GenFloatSpecStrict
 
   (** {3 Comparisons} *)
 
-  use import bool.Bool
-
   predicate lt (x:t) (y:t) = value x < value y
 
   predicate gt (x:t) (y:t) = value x > value y
@@ -637,8 +635,6 @@ theory GenFloatSpecMultiRounding
     value r = x /\ exact r = x /\ model r = x
 
   (** {3 Comparisons} *)
-
-  use import bool.Bool
 
   predicate lt (x:t) (y:t) = value x < value y
 

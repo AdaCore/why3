@@ -59,9 +59,9 @@ type prsymbol = private {
   pr_name : ident;
 }
 
-module Mpr : Map.S with type key = prsymbol
-module Spr : Mpr.Set
-module Hpr : XHashtbl.S with type key = prsymbol
+module Mpr : Extmap.S with type key = prsymbol
+module Spr : Extset.S with module M = Mpr
+module Hpr : Exthtbl.S with type key = prsymbol
 module Wpr : Weakhtbl.S with type key = prsymbol
 
 val create_prsymbol : preid -> prsymbol
@@ -103,10 +103,10 @@ and decl_node =
   | Dind   of ind_list          (* (co)inductive predicates *)
   | Dprop  of prop_decl         (* axiom / lemma / goal *)
 
-module Mdecl : Map.S with type key = decl
-module Sdecl : Mdecl.Set
+module Mdecl : Extmap.S with type key = decl
+module Sdecl : Extset.S with module M = Mdecl
 module Wdecl : Weakhtbl.S with type key = decl
-module Hdecl : XHashtbl.S with type key = decl
+module Hdecl : Exthtbl.S with type key = decl
 
 val d_equal : decl -> decl -> bool
 val d_hash : decl -> int

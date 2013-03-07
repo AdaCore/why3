@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* useful list combinators *)
+(** Useful list combinators *)
 
 val rev_map_fold_left :
   ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list

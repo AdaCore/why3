@@ -1,9 +1,9 @@
 Require Import Why3.
+Ltac ae := why3 "alt-ergo".
+
 Require Export ZArith.
 Open Scope Z_scope.
-Require Export List.
-
-Ltac ae := why3 "alt-ergo".
+Require Export Lists.List.
 
 Section S0.
   Variable a:Set->Set.
@@ -44,8 +44,6 @@ Goal (match Leaf with Leaf => 1 | Node z f => 2 end)=1.
 ae.
 Qed.
 
-
-Definition t (a:Type) := list a.
 
 (*
 Inductive foo : Set :=
@@ -128,10 +126,6 @@ Goal True.
 ae.
 Qed.
 
-Goal sorted _ (@nil nat).
-ae.
-Qed.
-
 Parameter p: Z -> Prop.
 
 (* let in *)
@@ -150,11 +144,12 @@ Goal
 ae.
 Qed.
 
-
 (* type definitions *)
 
+Parameter t : Set -> Set.
+
 Inductive foobar : Set :=
-  C : list nat -> foobar.
+  C : t nat -> foobar.
 
 Goal forall x:foobar, x=x.
 intros.

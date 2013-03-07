@@ -1,0 +1,85 @@
+
+(* Insertion sort. *)
+
+module InsertionSort
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.ArraySorted
+  use import array.ArrayPermut
+  use import array.ArrayEq
+
+  let insertion_sort (a: array int) =
+    ensures { sorted a /\ permut (old a) a }
+'L:
+    for i = 1 to length a - 1 do
+      (* a[0..i[ is sorted; now insert a[i] *)
+      invariant { sorted_sub a 0 i /\ permut (at a 'L) a }
+      let v = a[i] in
+      let j = ref i in
+      while !j > 0 && a[!j - 1] > v do
+        invariant { 0 <= !j <= i }
+        invariant { permut (at a 'L) a[!j <- v] }
+        invariant { forall k1 k2: int.
+             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2] }
+        invariant { forall k: int. !j+1 <= k <= i -> v < a[k] }
+        variant { !j }
+'L1:
+        a[!j] <- a[!j - 1];
+        assert { exchange (at a 'L1)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
+        j := !j - 1
+      done;
+      assert { forall k: int. 0 <= k < !j -> a[k] <= v };
+      a[!j] <- v
+    done
+
+end
+
+module InsertionSortGen
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.ArrayPermut
+  use import array.ArrayEq
+
+  clone import map.MapSorted as M
+
+  axiom le_refl: forall x:elt. le x x
+
+  axiom le_asym: forall x y:elt. not (le x y) -> le y x
+
+  axiom le_trans: forall x y z:elt. le x y /\ le y z -> le x z
+
+  predicate sorted_sub (a : array elt) (l u : int) =
+    M.sorted_sub a.elts l u
+
+  predicate sorted (a : array elt) =
+    M.sorted_sub a.elts 0 a.length
+
+  let insertion_sort (a: array elt) =
+    ensures { sorted a /\ permut (old a) a }
+'L:
+    for i = 1 to length a - 1 do
+      (* a[0..i[ is sorted; now insert a[i] *)
+      invariant { sorted_sub a 0 i /\ permut (at a 'L) a }
+      let v = a[i] in
+      let j = ref i in
+      while !j > 0 && not (le a[!j - 1] v) do
+        invariant { 0 <= !j <= i }
+        invariant { permut (at a 'L) a[!j <- v] }
+        invariant { forall k1 k2: int.
+             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> le a[k1] a[k2] }
+        invariant { forall k: int. !j+1 <= k <= i -> le v a[k] }
+        variant { !j }
+'L1:
+        a[!j] <- a[!j - 1];
+        assert { exchange (at a 'L1)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
+        j := !j - 1
+      done;
+      assert { forall k: int. 0 <= k < !j -> le a[k] v };
+      a[!j] <- v
+    done
+
+end

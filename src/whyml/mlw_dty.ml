@@ -90,27 +90,33 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
 
 let its_app s tl =
   let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_args tl
+  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
     with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_args, List.length tl))
-  in
+      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
   match s.its_def with
   | Some ity ->
       snd (ity_inst_fresh mv Mreg.empty ity)
   | None ->
-      let _, rl =
-        Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
+      let _,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
       its_app_real s tl rl
 
-let ts_app ts dl = match ts.ts_def with
+let ts_app ts dl =
+  let add m v t = Mtv.add v t m in
+  let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
+    with Invalid_argument _ ->
+      raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
+  match ts.ts_def with
   | Some ty ->
-      let add m v t = Mtv.add v t m in
-      let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
-        with Invalid_argument _ ->
-          raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
       snd (ity_inst_fresh mv Mreg.empty (ity_of_ty ty))
   | None ->
       ts_app_real ts dl
+
+let rec dity_refresh = function
+  | Dvar { contents = Dtvs _ } as dity -> dity
+  | Dvar { contents = Dval dty } -> dity_refresh dty
+  | Duvar _ as dity -> dity
+  | Dits (its,dl,_) -> its_app its (List.map dity_refresh dl)
+  | Dts (ts,dl) -> ts_app_real ts (List.map dity_refresh dl)
 
 (* unification *)
 
@@ -190,7 +196,6 @@ let unify d1 d2 = unify ~weak:false d1 d2
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let vty_of_dvty (argl,res) =
-  let ity_of_dity dity = ity_of_dity dity in
   let vtv = VTvalue (vty_value (ity_of_dity res)) in
   let conv a = create_pvsymbol (id_fresh "x") (vty_value (ity_of_dity a)) in
   if argl = [] then vtv else VTarrow (vty_arrow (List.map conv argl) vtv)
@@ -201,6 +206,16 @@ let empty_tvars = []
 
 let add_dity tvs dity = dity :: tvs
 let add_dvty tvs (argl,res) = res :: List.rev_append argl tvs
+
+let rec add_dity_vars tvs = function
+  | Dvar { contents = Dtvs _ } as dity -> dity :: tvs
+  | Dvar { contents = Dval dity } -> add_dity_vars tvs dity
+  | Duvar _ as dity -> dity :: tvs
+  | Dits (_,dl,_)
+  | Dts (_,dl) -> List.fold_left add_dity_vars tvs dl
+
+let add_dvty_vars tvs (argl,res) =
+  add_dity_vars (List.fold_left add_dity_vars tvs argl) res
 
 let tv_in_tvars tv tvs =
   try List.iter (occur_check tv) tvs; false with Exit -> true
@@ -293,6 +308,12 @@ let specialize_plsymbol pls =
   List.map conv pls.pl_args, conv pls.pl_value
 
 let dity_of_ty htv hreg vars ty =
+  let rec pure ty = match ty.ty_node with
+    | Tyapp (ts,tl) ->
+        begin try ignore (restore_its ts); false
+        with Not_found -> List.for_all pure tl end
+    | Tyvar _ -> true in
+  if not (pure ty) then raise Exit;
   dity_of_ity htv hreg vars (ity_of_ty ty)
 
 let specialize_lsymbol ls =
@@ -300,6 +321,11 @@ let specialize_lsymbol ls =
   let conv ty = dity_of_ty htv hreg vars_empty ty in
   let ty = Opt.get_def ty_bool ls.ls_value in
   List.map conv ls.ls_args, conv ty
+
+let specialize_lsymbol ls =
+  try specialize_lsymbol ls with Exit ->
+    Loc.errorm "Function symbol `%a' can only be used in specification"
+      Pretty.print_ls ls
 
 (* Pretty-printing *)
 

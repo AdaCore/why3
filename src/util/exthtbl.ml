@@ -36,21 +36,7 @@ sig
   val is_empty : 'a t -> bool
 end
 
-module type Hashtbl =
-sig
-val hash : 'a -> int
-module type S = S
-module type Private = Private
-module Make (X:Hashtbl.HashedType) : S with type key = X.t
-end
-
-module Hashtbl =
-struct
-
 let hash = Hashtbl.hash
-
-module type S = S
-module type Private = Private
 
 module Make (X:Hashtbl.HashedType) : S with type key = X.t =
 struct
@@ -77,5 +63,4 @@ struct
     h'
 
   let is_empty h = length h = 0
-end
 end

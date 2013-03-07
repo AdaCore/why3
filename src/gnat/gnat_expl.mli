@@ -59,7 +59,7 @@ val mk_expl : reason -> loc -> expl
 
 val get_loc : expl -> loc
 
-module MExpl : Stdlib.Map.S with type key = expl
+module MExpl : Extmap.S with type key = expl
 module HExpl : Hashtbl.S with type key = expl
 
 type node_info =

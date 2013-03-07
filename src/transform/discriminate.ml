@@ -65,7 +65,7 @@ module OHTyl = OrderedHashedList(struct
   let tag = ty_hash
 end)
 
-module Mtyl = Stdlib.Map.Make(OHTyl)
+module Mtyl = Extmap.Make(OHTyl)
 
 module Lsmap = struct
 
