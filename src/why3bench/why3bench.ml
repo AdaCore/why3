@@ -16,7 +16,7 @@ open Whyconf
 open Theory
 open Task
 open Driver
-open Trans
+
 module B = Bench
 module C = Call_provers
 

@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Thread
 open Why3
 open Stdlib
 open Env
@@ -74,7 +73,7 @@ open Format
 type callback = tool_id -> prob_id ->
     task -> int ->  proof_attempt_status -> unit
 
-let debug_call = Debug.register_info_flag "call"
+let _debug_call = Debug.register_info_flag "call"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls."
 
 let debug = Debug.register_info_flag "bench_core"
