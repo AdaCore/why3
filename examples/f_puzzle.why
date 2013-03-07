@@ -1,0 +1,33 @@
+
+(* Let f be a function over natural numbers such that, for all n
+     f(f(n)) < f(n)+1
+   Show that f(n)=n for all n. *)
+
+theory Puzzle
+
+  use import int.Int
+
+  function f int: int
+
+  axiom H1: forall n: int. 0 <= n -> 0 <= f n
+  axiom H2: forall n: int. 0 <= n -> f (f n) < f (n+1)
+
+  (* k <= f(n+k) by induction over k *)
+  predicate p (k: int) = forall n: int. 0 <= n -> k <= f (n+k)
+  clone int.SimpleInduction as I1
+    with predicate p = p, lemma base, lemma induction_step
+
+  lemma L3: forall n: int. 0 <= n -> n <= f n && f n <= f (f n)
+  lemma L4: forall n: int. 0 <= n -> f n < f (n+1)
+
+  (* so f is increasing *)
+  predicate p' (k: int) = forall n m: int. 0 <= n <= m <= k -> f n <= f m
+  clone int.SimpleInduction as I2
+    with predicate p = p', lemma base, lemma induction_step
+
+  lemma L5: forall n m: int. 0 <= n <= m -> f n <= f m
+  lemma L6: forall n: int. 0 <= n -> f n < n+1
+
+  goal G: forall n: int. 0 <= n -> f n = n
+
+end

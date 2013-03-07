@@ -121,7 +121,7 @@ theory Bool
    syntax type bool   "bool"
    syntax function True  "true"
    syntax function False "false"
-   meta cloned "encoding_decorate : kept" type bool
+   meta "encoding_decorate : kept" type bool
 end
 theory bool.Bool
    syntax function andb  "(and %1 %2)"
@@ -131,15 +131,6 @@ theory bool.Bool
 end
 *)
 
-
-theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
-end
 
 (*
 Local Variables:

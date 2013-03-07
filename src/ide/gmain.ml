@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,7 +26,7 @@ let debug = Debug.lookup_flag "ide_info"
 (************************)
 
 let includes = ref []
-let file = ref None
+let files = Queue.create ()
 let opt_parser = ref None
 let opt_version = ref false
 let opt_config = ref None
@@ -72,16 +72,10 @@ let version_msg = sprintf "Why3 IDE, version %s (build date: %s)"
   Config.version Config.builddate
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]"
+  "Usage: %s [options] [<file.why>|<project directory> [<file.why> ...]]"
   (Filename.basename Sys.argv.(0))
 
-let set_file f = match !file with
-  | Some _ ->
-      raise (Arg.Bad "only one parameter")
-  | None ->
-      file := Some f
-
-let () = Arg.parse spec set_file usage_str
+let () = Arg.parse spec (fun f -> Queue.add f files) usage_str
 
 let () =
   if !opt_version then begin
@@ -110,12 +104,7 @@ let () =
       (List.sort Pervasives.compare (Env.list_formats ()))
   end
 
-let fname = match !file with
-  | None ->
-      Arg.usage spec usage_str;
-      exit 1
-  | Some f ->
-      f
+let () = if Queue.is_empty files then begin Arg.usage spec usage_str; exit 1 end
 
 let () =
   Debug.dprintf debug "[Info] Init the GTK interface...@?";
@@ -564,9 +553,12 @@ let update_task_view a =
         begin
           match a.S.proof_state with
             | S.Interrupted -> "proof not yet scheduled for running"
-            | S.Unedited -> "Interactive proof, not yet edited. Edit with \"Edit\" button"
-            | S.JustEdited -> "Edited interactive proof. Run it with \"Replay\" button"
-            | S.Done ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
+            | S.Unedited ->
+              "Interactive proof, not yet edited. Edit with \"Edit\" button"
+            | S.JustEdited ->
+              "Edited interactive proof. Run it with \"Replay\" button"
+            | S.Done
+                ({Call_provers.pr_answer = Call_provers.HighFailure} as r) ->
               let b = Buffer.create 37 in
               bprintf b "%a" Call_provers.print_prover_result r;
               Buffer.contents b
@@ -736,17 +728,19 @@ let () = w#show ()
 (********************)
 
 (** TODO remove that should done only in session *)
-let project_dir, file_to_read =
+let project_dir =
+  let fname = Queue.pop files in
+  (** The remaining files in [files] are going to be open *)
   if Sys.file_exists fname then
     begin
       if Sys.is_directory fname then
         begin
           Debug.dprintf debug
             "[Info] found directory '%s' for the project@." fname;
-          fname, None
+          fname
         end
       else
-        begin
+        if Queue.is_empty files then (* that was the only file *) begin
           Debug.dprintf debug "[Info] found regular file '%s'@." fname;
           let d =
             try Filename.chop_extension fname
@@ -754,12 +748,21 @@ let project_dir, file_to_read =
           in
           Debug.dprintf debug
             "[Info] using '%s' as directory for the project@." d;
-          d, Some (Filename.concat Filename.parent_dir_name
-                     (Filename.basename fname))
+          Queue.push fname files; (** we need to open [fname] *)
+          d
+        end
+        else begin
+          (** The first argument is not a directory and it's not the
+              only file *)
+          Format.eprintf
+            "[Error] @[When@ more@ than@ one@ file@ is@ given@ on@ the@ \
+             command@ line@ the@ first@ one@ must@ be@ the@ directory@ \
+             of@ the@ session.@]@.";
+          Arg.usage spec usage_str; exit 1
         end
     end
   else
-    fname, None
+    fname
 
 let () =
   if not (Sys.file_exists project_dir) then
@@ -863,21 +866,22 @@ let sched =
 (* add new file from command line *)
 (**********************************)
 
-let () =
-  match file_to_read with
-    | None -> ()
-    | Some fn ->
-        if S.PHstr.mem (env_session()).S.session.S.session_files fn then
-          Debug.dprintf debug "[Info] file %s already in database@." fn
-        else
-          try
-            Debug.dprintf debug "[Info] adding file %s in database@." fn;
-            ignore (M.add_file (env_session()) ?format:!opt_parser fn);
-          with e ->
-            eprintf "@[Error while reading file@ '%s':@ %a@.@]" fn
-              Exn_printer.exn_printer e;
-            exit 1
+let open_file f =
+  let f = Sysutil.relativize_filename project_dir f in
+  Debug.dprintf debug "Adding file '%s'@." f;
+  if S.PHstr.mem (env_session()).S.session.S.session_files f then
+    Debug.dprintf debug "[Info] file %s already in database@." f
+  else
+    try
+      Debug.dprintf debug "[Info] adding file %s in database@." f;
+      ignore (M.add_file (env_session()) ?format:!opt_parser f);
+    with e ->
+      let msg =
+        Pp.sprintf_wnl "@[Error while reading file@ '%s':@ %a@]" f
+          Exn_printer.exn_printer e in
+      info_window `ERROR msg
 
+let () = Queue.iter open_file files
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
@@ -1123,17 +1127,7 @@ let select_file () =
       begin
         match d#filename with
           | None -> ()
-          | Some f ->
-              let f = Sysutil.relativize_filename project_dir f in
-              Debug.dprintf debug "Adding file '%s'@." f;
-              try
-                ignore (M.add_file (env_session()) f)
-              with e ->
-                fprintf str_formatter
-                  "@[Error while reading file@ '%s':@ %a@]" f
-                  Exn_printer.exn_printer e;
-                let msg = flush_str_formatter () in
-                info_window `ERROR msg
+          | Some f -> open_file f
       end
   | `DELETE_EVENT | `CANCEL -> ()
   end ;
@@ -1263,7 +1257,8 @@ let view_factory = new GMenu.factory view_menu ~accel_group
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._A
-    ~label:"Select all" ~callback:(fun () -> goals_view#selection#select_all ()) ()
+    ~label:"Select all"
+    ~callback:(fun () -> goals_view#selection#select_all ()) ()
 
 let (_ : GMenu.menu_item) =
   view_factory#add_item ~key:GdkKeysyms._plus

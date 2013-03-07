@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -171,23 +171,29 @@ let print_prelude fmt pl =
   print_list nothing println fmt pl
 
 let print_prelude_of_theories th_used fmt pm =
-  List.iter (fun th ->
-    let prel = Mid.find_def [] th.th_name pm in
-    print_prelude fmt prel) th_used
+  let ht = Hid.create 5 in
+  List.iter (fun { th_name = id } ->
+    if not (Hid.mem ht id) then begin
+      print_prelude fmt (Mid.find_def [] id pm);
+      Hid.add ht id () end) th_used
 
 let print_th_prelude task fmt pm =
   let th_used = task_fold (fun acc -> function
-    | { td_node = Clone (th,sm) } when is_empty_sm sm -> th::acc
+    | { td_node = Clone (th,_) } -> th::acc
     | _ -> acc) [] task
   in
   print_prelude_of_theories th_used fmt pm
 
+(*
 let print_prelude_for_theory th fmt pm =
-  let th_used = List.fold_left (fun acc -> function
-    | { td_node = Clone (th,sm) } when is_empty_sm sm -> th::acc
-    | _ -> acc) [] th.th_decls
+  let rec get_th_used acc th = List.fold_left (fun acc -> function
+    | { td_node = Use th } -> th :: get_th_used acc th
+    | { td_node = Clone (th,_) } -> th::acc
+    | _ -> acc) acc th.th_decls
   in
+  let th_used = List.rev (get_th_used [] th) in
   print_prelude_of_theories th_used fmt pm
+*)
 
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol

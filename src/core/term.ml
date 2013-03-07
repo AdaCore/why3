@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -45,6 +45,8 @@ type lsymbol = {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
+  ls_opaque : Stv.t;
+  ls_constr : int;
 }
 
 module Lsym = MakeMSHW (struct
@@ -61,14 +63,26 @@ let ls_equal : lsymbol -> lsymbol -> bool = (==)
 
 let ls_hash ls = id_hash ls.ls_name
 
-let create_lsymbol name args value = {
+let check_opaque opaque args value =
+  if Stv.is_empty opaque then opaque else
+  let diff s ty = ty_v_fold (fun s tv -> Stv.remove tv s) s ty in
+  let s = List.fold_left diff (Opt.fold diff opaque value) args in
+  if Stv.is_empty s then opaque else invalid_arg "Term.create_lsymbol"
+
+let create_lsymbol ?(opaque=Stv.empty) ?(constr=0) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
+  ls_opaque = check_opaque opaque args value;
+  ls_constr = if constr = 0 || (constr > 0 && value <> None)
+              then constr else invalid_arg "Term.create_lsymbol";
 }
 
-let create_fsymbol nm al vl = create_lsymbol nm al (Some vl)
-let create_psymbol nm al    = create_lsymbol nm al (None)
+let create_fsymbol ?opaque ?constr nm al vl =
+  create_lsymbol ?opaque ?constr nm al (Some vl)
+
+let create_psymbol ?opaque ?constr nm al =
+  create_lsymbol ?opaque ?constr nm al None
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
@@ -191,6 +205,7 @@ let pat_any pr pat =
 exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
+exception ConstructorExpected of lsymbol
 
 let pat_app fs pl ty =
   let s = match fs.ls_value with
@@ -201,6 +216,7 @@ let pat_app fs pl ty =
   ignore (try List.fold_left2 mtch s fs.ls_args pl
     with Invalid_argument _ -> raise (BadArity
       (fs, List.length fs.ls_args, List.length pl)));
+  if fs.ls_constr = 0 then raise (ConstructorExpected fs);
   pat_app fs pl ty
 
 let pat_as p v =
@@ -785,8 +801,8 @@ let ps_equ =
 let t_equ t1 t2 = ps_app ps_equ [t1; t2]
 let t_neq t1 t2 = t_not (ps_app ps_equ [t1; t2])
 
-let fs_bool_true  = create_fsymbol (id_fresh "True") [] ty_bool
-let fs_bool_false = create_fsymbol (id_fresh "False") [] ty_bool
+let fs_bool_true  = create_fsymbol ~constr:2 (id_fresh "True")  [] ty_bool
+let fs_bool_false = create_fsymbol ~constr:2 (id_fresh "False") [] ty_bool
 
 let t_bool_true  = fs_app fs_bool_true [] ty_bool
 let t_bool_false = fs_app fs_bool_false [] ty_bool
@@ -795,9 +811,11 @@ let fs_tuple_ids = Hid.create 17
 
 let fs_tuple = Hint.memo 17 (fun n ->
   let ts = ts_tuple n in
+  let opaque = Stv.of_list ts.ts_args in
   let tl = List.map ty_var ts.ts_args in
   let ty = ty_app ts tl in
-  let fs = create_fsymbol (id_fresh ("Tuple" ^ string_of_int n)) tl ty in
+  let id = id_fresh ("Tuple" ^ string_of_int n) in
+  let fs = create_fsymbol ~opaque ~constr:1 id tl ty in
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
 

@@ -138,7 +138,7 @@ module ArrayPermut
 
   use import int.Int
   use import Array
-  clone import map.MapPermut as M
+  use import map.MapPermut as M
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
     M.exchange a1.elts a2.elts i j
@@ -175,12 +175,30 @@ module ArrayPermut
 
 end
 
+module ArraySwap
+
+  use import int.Int
+  use import Array
+  use import ArrayPermut
+
+  let swap (a:array 'a) (i:int) (j:int) : unit
+    requires { 0 <= i < length a /\ 0 <= j < length a }
+    ensures  { exchange (old a) a i j }
+    =
+    let v = a[i] in
+    begin
+      a[i] <- a[j];
+      a[j] <- v
+    end
+
+end
+
 (** {2 Sum of elements} *)
 
 module ArraySum
 
   use import Array
-  clone import map.MapSum as M
+  use import map.MapSum as M
 
   (** [sum a l h] is the sum of [a[i]] for [l <= i < h] *)
   function sum (a: array int) (l h: int) : int = M.sum a.elts l h

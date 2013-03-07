@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -74,6 +74,10 @@ let le_int : Term.lsymbol = find int_theory "infix <="
 let gt_int : Term.lsymbol = find int_theory "infix >"
 let lt_int : Term.lsymbol = find int_theory "infix <"
 
+let computer_div_theory : Theory.theory = 
+  Env.find_theory env ["int"] "ComputerDivision"
+let div_int : Term.lsymbol = find computer_div_theory "div"
+
 (* real.Real theory *)
 let real_type : Ty.ty = Ty.ty_real
 let real_theory : Theory.theory = Env.find_theory env ["real"] "Real"
@@ -106,6 +110,22 @@ let get_fun : Mlw_expr.psymbol =
 let set_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
 
+(* array.Array module *)
+
+let array_modules, array_theories =
+  Env.read_lib_file (Mlw_main.library_of_env env) ["array"]
+
+let array_module : Mlw_module.modul = Stdlib.Mstr.find "Array" array_modules
+
+(*
+let array_type : Mlw_ty.T.itysymbol =
+  match
+    Mlw_module.ns_find_ts array_module.Mlw_module.mod_export ["array"]
+  with
+    | Mlw_module.PT itys -> itys
+    | Mlw_module.TS _ -> assert false
+*)
+
 
 (*********)
 (* types *)
@@ -119,7 +139,8 @@ let ctype ty =
     | TInt (_, _) -> Mlw_ty.ity_pur Ty.ts_int []
     | TFloat (_, _) -> 
       Self.not_yet_implemented "ctype TFloat"
-    | TPtr (_, _) -> 
+    | TPtr(_ty, _attr) -> 
+      (* array_type *)
       Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) -> 
       Self.not_yet_implemented "ctype TArray"
@@ -229,9 +250,17 @@ let bin (ty1,t1) op (ty2,t2) =
       Cil.d_logic_type ty1 Cil.d_logic_type ty2
     | MinusA,_,_ -> Self.not_yet_implemented "bin MinusA"
     | Mult,_,_ -> Self.not_yet_implemented "bin Mult"
-    | ((PlusPI|IndexPI|MinusPI|MinusPP|Div|Mod|Shiftlt|Shiftrt|Lt|Gt|
- Le|Ge|Eq|Ne|BAnd|BXor|BOr|LAnd|LOr),_, _)
-      -> Self.not_yet_implemented "bin"
+    | (PlusPI|IndexPI|MinusPI|MinusPP),_,_
+      -> Self.not_yet_implemented "bin Plus"
+    | Div,Linteger,Linteger -> t_app div_int [t1;t2]
+    | (Div|Mod),_,_
+      -> Self.not_yet_implemented "bin Div/Mod"
+    | (Shiftlt|Shiftrt),_,_
+      -> Self.not_yet_implemented "bin Shift"
+    | (Lt|Gt|Le|Ge|Eq|Ne),_,_
+      -> Self.not_yet_implemented "bin Lt..Ne"
+    | (BAnd|BXor|BOr|LAnd|LOr),_,_
+      -> Self.not_yet_implemented "bin BAnd..LOr"
 
 let unary op (ty,t) =
   match op,ty with

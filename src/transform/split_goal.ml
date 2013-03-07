@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,14 +13,17 @@ open Ident
 open Term
 open Decl
 
-let apply_append fn acc l =
-  List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
+let apply_rev_append fn acc l =
+  List.fold_left (fun l e -> fn e :: l) acc l
+
+let apply_append fn acc l = apply_rev_append fn acc (List.rev l)
 
 let apply_append2 fn acc l1 l2 =
   Lists.fold_product (fun l e1 e2 -> fn e1 e2 :: l)
     acc (List.rev l1) (List.rev l2)
 
-let split_case forig spl c acc tl bl =
+let split_case forig spl pos acc tl bl =
+  let c = if pos then t_true else t_false in
   let bl = List.rev_map t_open_branch_cb bl in
   let bll,_ = List.fold_left (fun (bll,el) (pl,f,close) ->
     let spf = spl [] f in
@@ -31,6 +34,61 @@ let split_case forig spl c acc tl bl =
   in
   let fn bl = t_label_copy forig (t_case tl bl) in
   apply_append fn acc bll
+
+let compiled = Ident.create_label "split_goal: compiled match"
+
+module Compile = Pattern.Compile (struct
+  type action = term
+  type branch = term_branch
+  let mk_let v s t  = t_let_close_simp v s t
+  let mk_branch p t = t_close_branch p t
+  let mk_case t bl  = t_label_add compiled (t_case t bl)
+end)
+
+let split_case_2 kn forig spl pos acc t bl =
+  let vs = create_vsymbol (id_fresh "q") (t_type t) in
+  let tv = t_var vs in
+  let conn f = t_label_copy forig (t_let_close_simp vs t f) in
+  let qn = if pos then t_forall_close_simp else t_exists_close_simp in
+  let jn = if pos then t_implies_simp else t_and_simp in
+  let _, bll = List.fold_left (fun (cseen,acc) b ->
+    let p, f = t_open_branch b in
+    match p.pat_node with
+    | Pwild ->
+        let csl = match p.pat_ty.Ty.ty_node with
+          | Ty.Tyapp (ts,_) -> Decl.find_constructors kn ts
+          | _ -> assert false in
+        let csall = Sls.of_list (List.rev_map fst csl) in
+        let csnew = Sls.diff csall cseen in
+        assert (not (Sls.is_empty csnew));
+        let add_cs cs g =
+          let vl = List.map (create_vsymbol (id_fresh "w")) cs.ls_args in
+          let f = t_equ tv (fs_app cs (List.map t_var vl) p.pat_ty) in
+          t_or_simp g (t_exists_close_simp vl [] f) in
+        let g = Sls.fold add_cs csnew t_false in
+        let conn f = conn (jn g f) in
+        csall, apply_rev_append conn acc (spl [] f)
+    | Papp (cs, pl) ->
+        let vl = List.map (function
+          | {pat_node = Pvar v} -> v | _ -> assert false) pl in
+        let g = t_equ tv (fs_app cs (List.map t_var vl) p.pat_ty) in
+        let conn f = conn (qn vl [] (jn g f)) in
+        assert (not (Sls.mem cs cseen));
+        Sls.add cs cseen, apply_rev_append conn acc (spl [] f)
+    | _ -> assert false) (Sls.empty,[]) bl
+  in
+  List.rev_append bll acc
+
+let split_case_2 kn forig spl pos acc t bl =
+  if Slab.mem compiled forig.t_label then
+    let lab = Slab.remove compiled forig.t_label in
+    let forig = t_label ?loc:forig.t_loc lab forig in
+    split_case_2 kn forig spl pos acc t bl
+  else
+    let mk_b b = let p,f = t_open_branch b in [p], f in
+    let find ts = List.map fst (find_constructors kn ts) in
+    let f = Compile.compile find [t] (List.map mk_b bl) in
+    spl acc f
 
 let asym_split = Term.asym_label
 let stop_split = Ident.create_label "stop_split"
@@ -45,6 +103,7 @@ type split = {
   right_only : bool;
   stop_label : bool;
   respect_as : bool;
+  comp_match : known_map option;
 }
 
 let rec split_pos ro acc f = match f.t_node with
@@ -81,8 +140,10 @@ let rec split_pos ro acc f = match f.t_node with
       let vs,f1,close = t_open_bound_cb fb in
       let fn f1 = t_label_copy f (t_let t (close vs f1)) in
       apply_append fn acc (split_pos ro [] f1)
+  | Tcase (tl,bl) when ro.comp_match <> None ->
+      split_case_2 (Opt.get ro.comp_match) f (split_pos ro) true acc tl bl
   | Tcase (tl,bl) ->
-      split_case f (split_pos ro) t_true acc tl bl
+      split_case f (split_pos ro) true acc tl bl
   | Tquant (Tforall,fq) ->
       let vsl,trl,f1,close = t_open_quant_cb fq in
       let fn f1 = t_label_copy f (t_forall (close vsl trl f1)) in
@@ -122,8 +183,10 @@ and split_neg ro acc f = match f.t_node with
       let vs,f1,close = t_open_bound_cb fb in
       let fn f1 = t_label_copy f (t_let t (close vs f1)) in
       apply_append fn acc (split_neg ro [] f1)
+  | Tcase (tl,bl) when ro.comp_match <> None ->
+      split_case_2 (Opt.get ro.comp_match) f (split_neg ro) false acc tl bl
   | Tcase (tl,bl) ->
-      split_case f (split_neg ro) t_false acc tl bl
+      split_case f (split_neg ro) false acc tl bl
   | Tquant (Texists,fq) ->
       let vsl,trl,f1,close = t_open_quant_cb fq in
       let fn f1 = t_label_copy f (t_exists (close vsl trl f1)) in
@@ -153,10 +216,16 @@ let split_premise ro d = match d.d_node with
   | Dprop (Paxiom,pr,f) ->  split_axiom ro pr f
   | _ -> [d]
 
-let full_split  = { right_only = false; stop_label = false; respect_as = true  }
-let right_split = { right_only = true;  stop_label = false; respect_as = true  }
-let wp_split    = { right_only = true;  stop_label = true;  respect_as = true  }
-let intro_split = { right_only = true;  stop_label = true;  respect_as = false }
+let full_split = {
+  right_only = false;
+  stop_label = false;
+  respect_as = true;
+  comp_match = None;
+}
+
+let right_split = { full_split with right_only = true }
+let wp_split    = { right_split with stop_label = true }
+let intro_split = { wp_split with respect_as = false }
 
 let split_pos_full  = split_pos full_split []
 let split_neg_full  = split_neg full_split []

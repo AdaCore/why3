@@ -133,17 +133,6 @@ theory bool.Bool
 end
 
 
-theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
-end
-
-
-
 theory map.Map
   syntax type map "(-> %1 %2)"
   meta "encoding : lskept" function get

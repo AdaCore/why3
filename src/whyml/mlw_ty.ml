@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -552,6 +552,8 @@ type effect = {
   eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
   eff_resets : region option Mreg.t;
+  eff_compar : Stv.t;
+  eff_diverg : bool;
 }
 
 let eff_empty = {
@@ -562,6 +564,8 @@ let eff_empty = {
   eff_ghostw = Sreg.empty;
   eff_ghostx = Sexn.empty;
   eff_resets = Mreg.empty;
+  eff_compar = Stv.empty;
+  eff_diverg = false;
 }
 
 let eff_is_empty e =
@@ -571,7 +575,20 @@ let eff_is_empty e =
   Sreg.is_empty e.eff_ghostr &&
   Sreg.is_empty e.eff_ghostw &&
   Sexn.is_empty e.eff_ghostx &&
-  Mreg.is_empty e.eff_resets
+  Mreg.is_empty e.eff_resets &&
+  (* eff_compar is not a side effect *)
+  not e.eff_diverg
+
+let eff_equal e1 e2 =
+  Sreg.equal e1.eff_reads  e2.eff_reads  &&
+  Sreg.equal e1.eff_writes e2.eff_writes &&
+  Sexn.equal e1.eff_raises e2.eff_raises &&
+  Sreg.equal e1.eff_ghostr e2.eff_ghostr &&
+  Sreg.equal e1.eff_ghostw e2.eff_ghostw &&
+  Sexn.equal e1.eff_ghostx e2.eff_ghostx &&
+  Mreg.equal (Opt.equal reg_equal) e1.eff_resets e2.eff_resets &&
+  Stv.equal e1.eff_compar e2.eff_compar &&
+  e1.eff_diverg = e2.eff_diverg
 
 let join_reset _key v1 v2 = match v1, v2 with
   | Some r1, Some r2 ->
@@ -589,7 +606,11 @@ let eff_union x y = {
   eff_ghostw = Sreg.union x.eff_ghostw y.eff_ghostw;
   eff_ghostx = Sexn.union x.eff_ghostx y.eff_ghostx;
   eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
+  eff_compar = Stv.union x.eff_compar y.eff_compar;
+  eff_diverg = x.eff_diverg || y.eff_diverg;
 }
+
+exception GhostDiverg
 
 let eff_ghostify e = {
   eff_reads  = Sreg.empty;
@@ -599,6 +620,14 @@ let eff_ghostify e = {
   eff_ghostw = Sreg.union e.eff_writes e.eff_ghostw;
   eff_ghostx = Sexn.union e.eff_raises e.eff_ghostx;
   eff_resets = e.eff_resets;
+  eff_compar = e.eff_compar;
+    (* from the code extraction point of view, we can allow comparing
+       opaque types in the ghost code, as it is never extracted.
+       However, if we consider Coq realisations, we have to treat
+       some pure types (e.g., maps) as opaque, too, and never compare
+       them even in pure formulas. Therefore, we play safe and forbid
+       comparison of opaque types in the ghost code. *)
+  eff_diverg = if e.eff_diverg then raise GhostDiverg else false;
 }
 
 let eff_ghostify gh e = if gh then eff_ghostify e else e
@@ -617,7 +646,12 @@ let eff_raise e ?(ghost=false) x = if ghost
 
 let eff_reset e r = { e with eff_resets = Mreg.add r None e.eff_resets }
 
+let eff_compare e tv = { e with eff_compar = Stv.add tv e.eff_compar }
+
+let eff_diverge e = { e with eff_diverg = true }
+
 exception IllegalAlias of region
+exception IllegalCompar of tvsymbol * ity
 
 let eff_refresh e r u =
   if not (reg_occurs r u.reg_ity.ity_vars) then
@@ -650,8 +684,8 @@ let eff_remove_raise e x = { e with
   eff_ghostx = Sexn.remove x e.eff_ghostx;
 }
 
-let eff_full_inst s e =
-  let s = s.ity_subst_reg in
+let eff_full_inst sbs e =
+  let s = sbs.ity_subst_reg in
   (* modified or reset regions in e *)
   let wr = Mreg.map (Util.const ()) e.eff_resets in
   let wr = Sreg.union e.eff_writes wr in
@@ -670,12 +704,19 @@ let eff_full_inst s e =
   let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
   let add_mreg r v acc =
     Mreg.add (Mreg.find r s) (Opt.map (fun v -> Mreg.find v s) v) acc in
+  (* compute compared type variables *)
+  let add_stv tv acc =
+    let ity = Mtv.find tv sbs.ity_subst_tv in
+    let check () _ = raise (IllegalCompar (tv,ity)) in
+    ity_s_fold check (fun () _ -> ()) () ity;
+    Stv.union acc ity.ity_vars.vars_tv in
   { e with
     eff_reads  = Sreg.fold add_sreg e.eff_reads  Sreg.empty;
     eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
     eff_ghostr = Sreg.fold add_sreg e.eff_ghostr Sreg.empty;
     eff_ghostw = Sreg.fold add_sreg e.eff_ghostw Sreg.empty;
     eff_resets = Mreg.fold add_mreg e.eff_resets Mreg.empty;
+    eff_compar = Stv.fold  add_stv  e.eff_compar Stv.empty;
   }
 
 let eff_filter vars e =
@@ -691,6 +732,7 @@ let eff_filter vars e =
     eff_ghostr = Sreg.filter check e.eff_ghostr;
     eff_ghostw = Sreg.filter check e.eff_ghostw;
     eff_resets = Mreg.mapi_filter reset e.eff_resets;
+    eff_compar = Stv.inter vars.vars_tv e.eff_compar;
   }
 
 let eff_stale_region eff vars =
@@ -758,7 +800,7 @@ let spec_subst sbs c =
     c_letrec  = c.c_letrec;
   }
 
-let spec_filter varm vars c =
+let spec_filter ghost varm vars c =
   let add f s = Mvs.set_union f.t_vars s in
   let vss = add c.c_pre c.c_post.t_vars in
   let vss = Mexn.fold (fun _ -> add) c.c_xpost vss in
@@ -766,7 +808,7 @@ let spec_filter varm vars c =
   let check { vs_name = id } _ = if not (Mid.mem id varm) then
     Loc.errorm "Local variable %s escapes from its scope" id.id_string in
   Mvs.iter check vss;
-  { c with c_effect = eff_filter vars c.c_effect }
+  { c with c_effect = eff_ghostify ghost (eff_filter vars c.c_effect) }
 
 exception UnboundException of xsymbol
 
@@ -906,17 +948,17 @@ let aty_full_inst sbs aty =
 
 (* remove from the given arrow every effect that is covered
    neither by the arrow's aty_vars nor by the given varmap *)
-let rec aty_filter varm vars aty =
+let rec aty_filter ghost varm vars aty =
   let add_m pv m = Mid.add pv.pv_vs.vs_name pv.pv_ity.ity_vars m in
   let add_s pv s = vars_union pv.pv_ity.ity_vars s in
   let varm = List.fold_right add_m aty.aty_args varm in
   let vars = List.fold_right add_s aty.aty_args vars in
   let vty = match aty.aty_result with
-    | VTarrow a -> VTarrow (aty_filter varm vars a)
+    | VTarrow a -> VTarrow (aty_filter ghost varm vars a)
     | VTvalue _ -> aty.aty_result in
   (* reads and writes must come from the context,
      resets may affect the regions in the result *)
-  let spec = spec_filter varm vars aty.aty_spec in
+  let spec = spec_filter ghost varm vars aty.aty_spec in
   let rst = aty.aty_spec.c_effect.eff_resets in
   let spec = if Mreg.is_empty rst then spec else
     let vars = vars_union vars (vty_vars vty) in
@@ -933,8 +975,8 @@ let rec aty_filter varm vars aty =
     | VTarrow _ -> spec in
   vty_arrow_unsafe aty.aty_args spec vty
 
-let aty_filter varm aty =
-  aty_filter varm (vars_merge varm vars_empty) aty
+let aty_filter ?(ghost=false) varm aty =
+  aty_filter ghost varm (vars_merge varm vars_empty) aty
 
 let aty_app aty pv =
   let arg, rest = match aty.aty_args with

@@ -5,12 +5,13 @@
 
 //@ lemma mean: \forall integer x, y; x <= y ==> x <= (x+y)/2 <= y;
 
-/*@ predicate sorted{L}(long *t, integer a, integer b) =
+/* predicate sorted{L}(long *t, integer a, integer b) =
   @    \forall integer i,j; a <= i <= j <= b ==> t[i] <= t[j];
   @*/
 
 /*@ requires n >= 0 && \valid(t+(0..n-1));
-  @ requires sorted(t,0,n-1);
+  @ //requires sorted(t,0,n-1);
+  @ requires \forall integer i,j; 0 <= i <= j < n ==> t[i] <= t[j];
   @ ensures -1 <= \result < n;
   @ ensures \result >= 0 ==> t[\result] == v;
   @ ensures \result == -1 ==>

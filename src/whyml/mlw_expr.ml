@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -48,12 +48,15 @@ let create_plsymbol_unsafe, restore_pl =
     pl),
   Wls.find ls_to_pls
 
-let create_plsymbol ?(hidden=false) ?(rdonly=false) id args value =
+let create_plsymbol ?(hidden=false) ?(rdonly=false) ?(constr=0) id args value =
   let ty_of_field fd =
     Opt.iter (fun r -> ity_equal_check fd.fd_ity r.reg_ity) fd.fd_mut;
     ty_of_ity fd.fd_ity in
   let pure_args = List.map ty_of_field args in
-  let ls = create_fsymbol id pure_args (ty_of_field value) in
+  let pure_value = ty_of_field value in
+  (* plsymbols are used for constructors and projections, which are safe *)
+  let opaque = List.fold_left ty_freevars Stv.empty (pure_value::pure_args) in
+  let ls = create_fsymbol ~opaque ~constr id pure_args pure_value in
   create_plsymbol_unsafe ls args value ~hidden ~rdonly
 
 let ity_of_ty_opt ty = ity_of_ty (Opt.get_def ty_bool ty)
@@ -135,6 +138,7 @@ type pre_ppattern =
 
 let make_ppattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
+  let gghost = ref false in
   let find id ghost ity =
     let nm = preid_name id in
     try
@@ -167,6 +171,9 @@ let make_ppattern pp ?(ghost=false) ity =
         ppat_effect  = eff_empty; }
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls);
+        if pls.pl_ls.ls_constr = 0 then
+          raise (Term.ConstructorExpected pls.pl_ls);
+        if ghost && pls.pl_ls.ls_constr > 1 then gghost := true;
         let ityv = pls.pl_value.fd_ity in
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
@@ -180,17 +187,20 @@ let make_ppattern pp ?(ghost=false) ity =
                 { pp with ppat_effect = eff }
             | _, _ -> pp in
         let ppl = try List.map2 mtch pls.pl_args ppl with
-          | Not_found -> raise (Pattern.ConstructorExpected pls.pl_ls)
+          | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
         make_app pls.pl_ls ppl ghost ity
     | PPlapp (ls,ppl) ->
+        if ls.ls_constr = 0 then
+          raise (Term.ConstructorExpected ls);
+        if ghost && ls.ls_constr > 1 then gghost := true;
         let ityv = ity_of_ty_opt ls.ls_value in
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
           make ghost (ity_full_inst sbs (ity_of_ty arg)) pp in
         let ppl = try List.map2 mtch ls.ls_args ppl with
-          | Not_found -> raise (Pattern.ConstructorExpected ls)
+          | Not_found -> raise (Term.ConstructorExpected ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (ls,List.length ls.ls_args,List.length ppl)) in
         make_app ls ppl ghost ity
@@ -209,6 +219,8 @@ let make_ppattern pp ?(ghost=false) ity =
           ppat_effect  = pp.ppat_effect; }
   in
   let pp = make ghost ity pp in
+  let gh = pp.ppat_ghost || !gghost in
+  let pp = { pp with ppat_ghost = gh } in
   Hstr.fold Mstr.add hv Mstr.empty, pp
 
 (** program symbols *)
@@ -238,7 +250,7 @@ let create_psymbol_real ~poly id ghost aty varm =
   let vars = if poly then vars_empty else aty_vars aty in
   let vars = vars_merge varm vars in
   { ps_name  = id_register id;
-    ps_aty   = aty_filter varm aty;
+    ps_aty   = aty_filter ~ghost varm aty;
     ps_ghost = ghost;
     ps_varm  = varm;
     ps_vars  = vars;
@@ -571,11 +583,12 @@ let e_plapp pls el ity =
   if pls.pl_rdonly then raise (RdOnlyPLS pls);
   let rec app tl varm ghost eff sbs fdl argl = match fdl, argl with
     | [],[] ->
-        let mut_fold fn eff fd = match fd.fd_mut with
-          | Some r -> fn eff (reg_full_inst sbs r)
-          | None -> eff in
-        let eff = List.fold_left (mut_fold eff_reset) eff pls.pl_args in
-        let eff = mut_fold (eff_read ~ghost) eff pls.pl_value in
+        let mut_fold fn leff fd = Opt.fold fn leff fd.fd_mut in
+        let leff = mut_fold (eff_read ~ghost) eff_empty pls.pl_value in
+        let leff = List.fold_left (mut_fold eff_reset) leff pls.pl_args in
+        let mtv = Mtv.set_diff sbs.ity_subst_tv pls.pl_ls.ls_opaque in
+        let leff = Mtv.fold (fun tv _ e -> eff_compare e tv) mtv leff in
+        let eff = eff_union eff (eff_full_inst sbs leff) in
         let t = match pls.pl_ls.ls_value with
           | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
           | None   -> ps_app pls.pl_ls tl in
@@ -632,16 +645,18 @@ let e_case e0 bl =
   let bity = match bl with
     | (_,e)::_ -> ity_of_expr e
     | [] -> raise Term.EmptyCase in
+  let multi_br = List.length bl > 1 in
   let rec branch ghost eff varm = function
     | (pp,e)::bl ->
-        if pp.ppat_ghost <> e0.e_ghost then
+        if e0.e_ghost && not pp.ppat_ghost then
           Loc.errorm "Non-ghost pattern in a ghost position";
         ity_equal_check (ity_of_expr e0) pp.ppat_ity;
         ity_equal_check (ity_of_expr e) bity;
-        let ghost = ghost || e.e_ghost in
         let del_vs vs _ m = Mid.remove vs.vs_name m in
         let bvarm = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_varm in
         let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
+        (* one-branch match is not ghost even if its pattern is ghost *)
+        let ghost = ghost || (multi_br && pp.ppat_ghost) || e.e_ghost in
         branch ghost eff (varmap_union varm bvarm) bl
     | [] ->
         (* the cumulated effect of all branches, w/out e0 *)
@@ -651,9 +666,7 @@ let e_case e0 bl =
         let varm = add_e_vars e0 varm in
         mk_expr (Ecase (e0,bl)) (VTvalue bity) ghost eff varm
   in
-  (* a one-branch match may be not ghost even if the matched expr is *)
-  let ghost = match bl with [_] -> false | _ -> e0.e_ghost in
-  branch ghost eff_empty Mid.empty bl
+  branch false eff_empty Mid.empty bl
 
 (* ghost *)
 
@@ -731,29 +744,40 @@ let e_not e =
     mk_expr (Elogic (t_not f)) e.e_vty e.e_ghost e.e_effect e.e_varm) e
 
 let e_binop op e1 e2 =
-  on_fmla (fun e2 f2 -> on_fmla (fun e1 f1 ->
+  on_fmla (fun e1 f1 -> on_fmla (fun e2 f2 ->
     ity_equal_check (ity_of_expr e1) ity_bool;
     ity_equal_check (ity_of_expr e2) ity_bool;
     let varm = add_e_vars e1 e2.e_varm in
     let eff = eff_union e1.e_effect e2.e_effect in
     let ghost = e1.e_ghost || e2.e_ghost in
-    mk_expr (Elogic (t_binary op f1 f2)) e1.e_vty ghost eff varm) e1) e2
+    mk_expr (Elogic (t_binary op f1 f2)) e1.e_vty ghost eff varm) e2) e1
+
+let rec e_nospec e = match e.e_node with
+  | Elogic _ | Evalue _ -> true
+  | Eif (e1,e2,e3) -> e_nospec e1 && e_nospec e2 && e_nospec e3
+  | Ecase (e1,bl) -> e_nospec e1 && List.for_all (fun (_,e2) -> e_nospec e2) bl
+  | Elet ({let_sym = LetV _; let_expr = e1}, e2) -> e_nospec e1 && e_nospec e2
+  | Eghost e1 -> e_nospec e1
+  | _ -> false
 
 let e_lazy_and e1 e2 =
-  if eff_is_empty e2.e_effect then e_binop Tand e1 e2 else e_if e1 e2 e_false
+  if eff_is_empty e2.e_effect && e_nospec e2
+  then e_binop Tand e1 e2 else e_if e1 e2 e_false
 
 let e_lazy_or e1 e2 =
-  if eff_is_empty e2.e_effect then e_binop Tor e1 e2 else e_if e1 e_true e2
+  if eff_is_empty e2.e_effect && e_nospec e2
+  then e_binop Tor e1 e2 else e_if e1 e_true e2
 
 (* loops *)
 
-let e_loop inv variant e =
+let e_loop inv variant ({e_effect = eff} as e) =
   ity_equal_check (ity_of_expr e) ity_unit;
   let vsset = pre_vars inv Mvs.empty in
   let vsset = variant_vars variant vsset in
   let varm = add_t_vars vsset e.e_varm in
-  check_postexpr e e.e_effect varm;
-  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_ghost e.e_effect varm
+  check_postexpr e eff varm;
+  let eff = if variant = [] then eff_diverge eff else eff in
+  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_ghost eff varm
 
 let e_for_real pv bounds inv e =
   let pvfrom,_,pvto = bounds in
@@ -840,8 +864,10 @@ let e_absurd ity =
 
 (* simple functional definitions *)
 
-let create_fun_defn id ({l_expr = e} as lam) recsyms =
-  let spec = { lam.l_spec with c_effect = e.e_effect } in
+let create_fun_defn id ({l_expr = e; l_spec = c} as lam) recsyms =
+  let eff = if c.c_letrec <> 0 && c.c_variant = []
+    then eff_diverge e.e_effect else e.e_effect in
+  let spec = { c with c_effect = eff } in
   let varm = spec_varmap e.e_varm spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
@@ -869,15 +895,6 @@ let e_rec fdl e =
   mk_expr (Erec (fdl,e)) e.e_vty e.e_ghost e.e_effect varm
 
 (* compute the fixpoint on recursive definitions *)
-
-let eff_equal eff1 eff2 =
-  Sreg.equal eff1.eff_reads  eff2.eff_reads  &&
-  Sreg.equal eff1.eff_writes eff2.eff_writes &&
-  Sexn.equal eff1.eff_raises eff2.eff_raises &&
-  Sreg.equal eff1.eff_ghostr eff2.eff_ghostr &&
-  Sreg.equal eff1.eff_ghostw eff2.eff_ghostw &&
-  Sexn.equal eff1.eff_ghostx eff2.eff_ghostx &&
-  Mreg.equal (Opt.equal reg_equal) eff1.eff_resets eff2.eff_resets
 
 let rec aty_compat a1 a2 =
   assert (List.for_all2 pv_equal a1.aty_args a2.aty_args);
@@ -964,7 +981,8 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   (* check that the all variants use the same order *)
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
-    let res = try List.for_all2 (fun (_,r1) (_,r2) ->
+    let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
+        Opt.equal ty_equal t1.t_ty t2.t_ty &&
         Opt.equal ls_equal r1 r2) vl variant1
       with Invalid_argument _ -> false in
     if not res then Loc.errorm

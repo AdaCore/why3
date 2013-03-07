@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,7 +22,7 @@ module type Action = sig
   val mk_case : term -> branch list -> action
 end
 
-exception ConstructorExpected of lsymbol
+exception ConstructorExpected of lsymbol * ty
 exception NonExhaustive of pattern list
 
 module Compile (X : Action) : sig

@@ -125,7 +125,8 @@ Axiom ks_inversion : forall (n:Z), (0%Z <= n)%Z -> ((n = 0%Z) \/
 Axiom ks_injective : forall (n1:Z) (n2:Z), (0%Z <= n1)%Z -> ((0%Z <= n2)%Z ->
   (((ks n1) = (ks n2)) -> (n1 = n2))).
 
-Require Import Why3. Ltac ae := why3 "alt-ergo".
+Require Import Why3. 
+Ltac ae := why3 "alt-ergo" timelimit 10.
 
 (* Why3 goal *)
 Theorem WP_parameter_reduction3 : forall (t:term), (exists n:Z,

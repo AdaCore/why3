@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,7 +21,7 @@ module type Action = sig
   val mk_case : term -> branch list -> action
 end
 
-exception ConstructorExpected of lsymbol
+exception ConstructorExpected of lsymbol * ty
 exception NonExhaustive of pattern list
 
 module Compile (X : Action) = struct
@@ -51,7 +51,7 @@ module Compile (X : Action) = struct
             | Pas (p,_) -> populate acc p
             | Por (p,q) -> populate (populate acc p) q
             | Papp (fs,pl) when Sls.mem fs css -> Mls.add fs pl acc
-            | Papp (fs,_) -> raise (ConstructorExpected fs)
+            | Papp (fs,_) -> raise (ConstructorExpected (fs,ty))
           in
           let populate acc (pl,_) = populate acc (List.hd pl) in
           List.fold_left populate Mls.empty rl

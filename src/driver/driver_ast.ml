@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,8 +12,6 @@
 type loc = Loc.position
 
 type qualid = loc * string list
-
-type cloned = bool
 
 type pty =
   | PTyvar of string
@@ -30,11 +28,11 @@ type metarg =
 
 type th_rule =
   | Rprelude  of string
-  | Rsyntaxts of cloned * qualid * string
-  | Rsyntaxfs of cloned * qualid * string
-  | Rsyntaxps of cloned * qualid * string
-  | Rremovepr of cloned * qualid
-  | Rmeta     of cloned * string * metarg list
+  | Rsyntaxts of qualid * string
+  | Rsyntaxfs of qualid * string
+  | Rsyntaxps of qualid * string
+  | Rremovepr of qualid
+  | Rmeta     of string * metarg list
 
 type theory_rules = {
   thr_name  : qualid;
@@ -43,8 +41,8 @@ type theory_rules = {
 
 type mo_rule =
   | MRtheory    of th_rule
-  | MRexception of cloned * qualid * string
-  | MRval       of cloned * qualid * string
+  | MRexception of qualid * string
+  | MRval       of qualid * string
 
 type module_rules = {
   mor_name  : qualid;

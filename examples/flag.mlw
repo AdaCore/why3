@@ -5,6 +5,7 @@ module Flag
   use import int.Int
   use import ref.Ref
   use import array.Array
+  use import array.ArraySwap
   use import array.ArrayPermut
 
   type color = Blue | White | Red
@@ -12,15 +13,15 @@ module Flag
   predicate monochrome (a:array color) (i:int) (j:int) (c:color) =
     forall k:int. i <= k < j -> a[k]=c
 
-  let swap (a:array color) (i:int) (j:int) : unit
-    requires { 0 <= i < length a /\ 0 <= j < length a }
-    ensures  { exchange (old a) a i j }
-    =
-    let v = a[i] in
-    begin
-      a[i] <- a[j];
-      a[j] <- v
-    end
+  (* We scan the array from left to right using [i] and we maintain
+     the following invariant, using indices [b] and [r]:
+
+       0         b          i           r
+      +---------+----------+-----------+-------+
+      |  Blue   |  White   |     ?     |  Red  |
+      +---------+----------+-----------+-------+
+
+  *)
 
   let dutch_flag (a:array color) : unit
     ensures  { exists b r: int.

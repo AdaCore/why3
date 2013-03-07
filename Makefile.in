@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -395,7 +395,7 @@ endif
 depend: src/main.dep
 
 clean::
-	rm -f src/main.cm[iox] src/main.annot src/main.o
+	rm -f src/main.cm[iox] src/main.annot src/main.o src/main.dep
 	rm -f bin/why3.byte bin/why3.opt bin/why3
 	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
 
@@ -612,14 +612,14 @@ endif
 
 REPLAYER_FILES = replay
 
-REPLAYERMODULES = $(addprefix src/ide/, $(REPLAYER_FILES))
+REPLAYERMODULES = $(addprefix src/why3replayer/, $(REPLAYER_FILES))
 
 REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
 REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
 REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
 
-$(REPLAYERDEP): DEPFLAGS += -I src/ide
-$(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/ide
+$(REPLAYERDEP): DEPFLAGS += -I src/why3replayer
+$(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/why3replayer
 
 # build targets
 
@@ -646,6 +646,8 @@ endif
 depend: $(REPLAYERDEP)
 
 clean::
+	rm -f src/why3replayer/*.cm[iox] src/why3replayer/*.o
+	rm -f src/why3replayer/*.annot src/why3replayer/*.dep src/why3replayer/*~
 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
 
 install_no_local::
@@ -1217,7 +1219,7 @@ test-api.byte: examples/use_api/use_api.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
 	|| (rm -f test-api.byte; printf "Test of Why API calls failed. Please fix it"; exit 2)
-	@rm -f test-api.byte; 
+	@rm -f test-api.byte;
 
 test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
@@ -1268,7 +1270,7 @@ ifeq (@enable_doc@,yes)
 doc: doc/manual.pdf doc/html/index.html
 
 BNF = qualid label constant operator term type formula theory theory2 \
-	why_file spec expr expr2 module whyml_file
+	why_file spec expr expr2 module whyml_file term_old_at
 BNFTEX = $(addprefix doc/, $(addsuffix _bnf.tex, $(BNF)))
 
 doc/%_bnf.tex: doc/%.bnf doc/bnf
@@ -1605,7 +1607,8 @@ $(DISTRIB_TAR): doc/manual.pdf
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
-	    plugins/*/*.ml* src/tools/cpulimit.c
+	    plugins/*/*.ml* src/tools/cpulimit.c \
+	    examples/use_api/*.ml*
 
 #########
 # myself

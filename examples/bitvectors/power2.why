@@ -83,16 +83,51 @@ theory Pow2int
 
   use import int.EuclideanDivision
 
-  lemma Div_pow: forall x i:int. pow2 (i-1) <= x < pow2 i ->
-		 div x (pow2 (i-1)) = 1
+(*
+  lemma div_uniq:
+    forall x y q:int.
+      y > 0 /\ (exists r:int. x = q*y + r /\ 0 <= r < y) -> div x y = q
 
-  lemma Div_pow2: forall x i:int. -pow2 i <= x < -pow2 (i-1) ->
-  		 div x (pow2 (i-1)) = -2
+  lemma mod_uniq:
+    forall x y r:int.
+      y > 0 /\ (exists q:int. x = q*y + r /\ 0 <= r < y) -> mod x y = r
+
+  lemma Div_double_aux:
+    forall x y:int. 0 < y <= x < 2*y -> 
+      x = 1*y+(x-y) /\ 0 <= x-y < y
+
+  lemma Div_double_aux2:
+    forall x y:int. 0 < y <= x < 2*y -> mod x y = x - y
+*)
+
+(*
+  lemma Div_mult :
+    forall x y q:int. q > 0 -> 
+      0 < q*y <= x < (q+1)*y -> div x y = q
+
+  lemma Div_mult_neg :
+    forall x y q:int. q > 0 ->
+      -(q+1)*y <= x < -q*y < 0 -> div x y = -(q+1)
+*)
+
+  lemma Div_double:
+    forall x y:int. 0 < y <= x < 2*y -> div x y = 1 
+
+  lemma Div_pow: forall x i:int. 
+    i > 0 -> pow2 (i-1) <= x < pow2 i -> div x (pow2 (i-1)) = 1
+
+  lemma Div_double_neg:
+    forall x y:int. -2*y <= x < -y < 0 -> div x y = -2 
+
+  lemma Div_pow2: forall x i:int. 
+    i > 0 -> -pow2 i <= x < -pow2 (i-1) -> div x (pow2 (i-1)) = -2
 
 (*
   lemma Mod_pow2: forall x i:int. mod (x + pow2 i) 2 = mod x 2
 *)
-  lemma Mod_pow2_gen: forall x i k :int. 0 <= k < i -> mod (div (x + pow2 i) (pow2 k)) 2 = mod (div x (pow2 k)) 2
+
+  lemma Mod_pow2_gen: forall x i k :int. 
+    0 <= k < i -> mod (div (x + pow2 i) (pow2 k)) 2 = mod (div x (pow2 k)) 2
 
 end
 
@@ -104,6 +139,7 @@ theory Pow2real
   use import real.RealInfix
 
   function pow2 (i:int) : real
+
   axiom Power_0 : pow2 0 = 1.0
   axiom Power_s : forall n: int. n >= 0 -> pow2 (n+1) = 2.0 *. pow2 n
   axiom Power_p : forall n: int. n <= 0 -> pow2 (n-1) = 0.5 *. pow2 n

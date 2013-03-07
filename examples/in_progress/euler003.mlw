@@ -1,0 +1,56 @@
+(*
+Euler project Problem 3: Largest prime factor
+
+The prime factors of 13195 are 5, 7, 13 and 29.
+
+What is the largest prime factor of the number 600851475143 ?
+
+*)
+
+module PrimeFactor
+
+use import int.ComputerDivision
+use import number.Divisibility
+use import number.Prime
+
+(** returns the smallest divisor of [n] greater or equal to [d] *)
+let rec prim_fact (d n:int) : int
+  requires { 1 <= d <= n }
+  ensures { d <= result <= n }
+  ensures { divides result n }
+  ensures { forall i:int. d <= i < result -> not divides result i }
+  variant { n - d }
+= if d * d > n then n else
+  if mod n d = 0 then d else 
+  prim_fact (d+1) n
+
+exception Exit
+
+use import ref.Ref
+
+let largest_prime_factor (n:int) : int
+  requires { 2 <= n }
+  ensures { prime result }
+  ensures { divides result n }
+  ensures { forall i:int. result < i <= n -> not (prime i /\ divides i n) }
+= let factor = ref 1 in
+  try 
+    while True do
+      invariant { 1 <= !factor < n }
+      invariant { divides !factor n }
+      let d = prim_fact (!factor+1) n in
+      if d = n then raise Exit;
+      factor := d
+    done;
+    absurd
+  with Exit -> !factor
+  end
+
+end
+
+
+(***
+Local Variables:
+compile-command: "why3ide euler003.mlw"
+End:
+*)

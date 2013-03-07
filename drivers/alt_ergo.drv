@@ -6,10 +6,34 @@ theory BuiltIn
   meta "eliminate_algebraic" "keep_enums"
 end
 
+
 theory int.EuclideanDivision
 
-  syntax function div "(%1 / %2)"
-  syntax function mod "(%1 % %2)"
+  (* protection against wrongs semantics for negative arguments *)
+
+  prelude "logic safe_eucl_div: int, int -> int"
+  prelude "axiom safe_eucl_div_def: forall x, y:int. x >= 0 and y > 0 -> safe_eucl_div(x,y) = x / y"
+
+  prelude "logic safe_eucl_mod: int, int -> int"
+  prelude "axiom safe_eucl_mod_def: forall x, y:int. x >= 0 and y > 0 -> safe_eucl_mod(x,y) = x % y"
+
+  syntax function div "safe_eucl_div(%1,%2)"
+  syntax function mod "safe_eucl_mod(%1,%2)"
+
+end
+
+theory int.ComputerDivision
+
+  (* protection against wrongs semantics for negative arguments *)
+
+  prelude "logic safe_comp_div: int, int -> int"
+  prelude "axiom safe_comp_div_def: forall x, y:int. x >= 0 and y > 0 -> safe_comp_div(x,y) = x / y"
+
+  prelude "logic safe_comp_mod: int, int -> int"
+  prelude "axiom safe_comp_mod_def: forall x, y:int. x >= 0 and y > 0 -> safe_comp_mod(x,y) = x % y"
+
+  syntax function div "safe_comp_div(%1,%2)"
+  syntax function mod "safe_comp_mod(%1,%2)"
 
 end
 

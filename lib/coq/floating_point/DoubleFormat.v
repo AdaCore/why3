@@ -11,3 +11,7 @@ exact (t 53 1024).
 Defined.
 
 
+Global Instance double_WhyType : WhyType double.
+Proof.
+apply t_WhyType.
+Qed.

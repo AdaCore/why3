@@ -21,6 +21,14 @@ theory DoubleOfInt
 
   function j : BV32.bv = BV32.from_int 0x43300000
 
+  lemma nth_j1: forall i:int. 0 <= i <= 19 -> BV32.nth j i = False
+  lemma nth_j2: forall i:int. 20 <= i <= 21 -> BV32.nth j i = True
+  lemma nth_j3: forall i:int. 22 <= i <= 23 -> BV32.nth j i = False
+  lemma nth_j4: forall i:int. 24 <= i <= 25 -> BV32.nth j i = True
+  lemma nth_j5: forall i:int. 26 <= i <= 29 -> BV32.nth j i = False
+  lemma nth_j6: BV32.nth j 30 = True
+  lemma nth_j7: BV32.nth j 31 = False
+
   function j' : BV32.bv = BV32.from_int 0x80000000
   lemma jp0_30: forall i:int. 0<=i<30 -> BV32.nth j' i = False
 
@@ -187,7 +195,8 @@ theory DoubleOfInt
   lemma nth_var32to63:
      forall x k:int. 32 <= k <= 63 -> BV64.nth (var x) k = BV32.nth j (k - 32)
 
-  lemma nth_var3: forall x:int. forall i:int. 32 <= i <= 51 -> BV64.nth (var x) i = False
+  lemma nth_var3: forall x i:int. 
+    is_int32 x /\ 32 <= i <= 51 -> BV64.nth (var x) i = False
 
   lemma lemma2 : forall x:int. is_int32 x -> mantissa(var(x)) = Pow2int.pow2 31 + x
 
@@ -195,29 +204,44 @@ theory DoubleOfInt
   (*  lemma 3: for all integer x, exp(var(x)) = 1075                   *)
   (*********************************************************************)
 
-  lemma nth_var4: forall x:int. forall i:int. 52 <= i <= 53 -> BV64.nth (var x) i = True
-  lemma nth_var5: forall x:int. forall i:int. 54 <= i <= 55 -> BV64.nth (var x) i = False
-  lemma nth_var6: forall x:int. forall i:int. 56 <= i <= 57 -> BV64.nth (var x) i = True
-  lemma nth_var7: forall x:int. forall i:int. 58 <= i <= 61 -> BV64.nth (var x) i = False
-  lemma nth_var8: forall x:int. BV64.nth (var x) 62 = True
+  lemma nth_var4: forall x i:int. 
+    is_int32 x /\ 52 <= i <= 53 -> BV64.nth (var x) i = True
 
-  lemma lemma3 : forall x:int. exp(var(x)) = 1075
+  lemma nth_var5: forall x i:int. 
+    is_int32 x /\ 54 <= i <= 55 -> BV64.nth (var x) i = False
+
+  lemma nth_var6: forall x i:int. 
+    is_int32 x /\ 56 <= i <= 57 -> BV64.nth (var x) i = True
+
+  lemma nth_var7: forall x i:int. 
+    is_int32 x /\ 58 <= i <= 61 -> BV64.nth (var x) i = False
+
+  lemma nth_var8: forall x:int. 
+    is_int32 x -> BV64.nth (var x) 62 = True
+
+  lemma lemma3 : 
+    forall x:int. is_int32 x -> exp(var(x)) = 1075
 
   (*********************************************************************)
   (*  lemma 4: for all integer x, sign(var(x)) = false                 *)
   (*********************************************************************)
 
-  lemma nth_var9: forall x:int. BV64.nth (var x) 63 = False
+  lemma nth_var9: 
+    forall x:int. is_int32 x -> BV64.nth (var x) 63 = False
 
- lemma lemma4 : forall x:int. sign(var(x)) = False
+  lemma lemma4 : 
+    forall x:int. is_int32 x -> sign(var(x)) = False
 
   (*********************************************************************)
   (*  lemma 5: for all integer x, var_as_double(x) = 2^52 + 2^31 + x   *)
   (*********************************************************************)
-  lemma sign_var: forall x:int. sign(var(x)) = False
- (*proved by Coq*)
-  lemma var_value0: forall x:int. is_int32(x) ->var_as_double(x) =
-    Pow2real.pow2 (1075 - 1023) *. (1.0 +. (from_int (Pow2int.pow2 31 + x)) *. Pow2real.pow2 (-52))
+  lemma sign_var: forall x:int. 
+    is_int32 x -> sign(var(x)) = False
+
+  (*proved by Coq*)
+  lemma var_value0: forall x:int. is_int32(x) ->
+    var_as_double(x) = Pow2real.pow2 (1075 - 1023) *. 
+      (1.0 +. (from_int (Pow2int.pow2 31 + x)) *. Pow2real.pow2 (-52))
 
 
   lemma from_int_sum : forall x:int. is_int32(x)->

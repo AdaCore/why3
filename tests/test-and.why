@@ -1,10 +1,20 @@
 
 theory And
 
-  predicate a
+  type t1 =
+    | A int real
+    | B real int
+    | C
 
-  predicate b
+  type t2 =
+    | D t1
+    | E int
 
-  goal G1 : a && b
+  goal G : forall x:t2.
+    match x with
+    | D (((A i1 _) as t1) | ((B _ i1) as t1)) -> i1 = 2 /\ t1 <> C
+    | D C -> x = E 1
+    | E i -> i = 5 /\ i = 6
+    end
 
 end

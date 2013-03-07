@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -167,6 +167,8 @@ val create_inst :
   ls    : (lsymbol  * lsymbol)  list ->
   lemma : prsymbol list ->
   goal  : prsymbol list -> th_inst
+
+val warn_clone_not_abstract : Loc.position -> theory -> unit
 
 val clone_theory : ('a -> tdecl -> 'a) -> 'a -> theory -> th_inst -> 'a
 

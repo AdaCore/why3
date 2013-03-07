@@ -11,3 +11,7 @@ exact (t 24 128).
 Defined.
 
 
+Global Instance single_WhyType : WhyType single.
+Proof.
+apply t_WhyType.
+Qed.

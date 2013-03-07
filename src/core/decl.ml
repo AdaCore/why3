@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -423,19 +423,20 @@ let create_data_decl tdl =
   let tss = List.fold_left add Sts.empty tdl in
   let check_proj cs tyv s tya ls = match ls with
     | None -> s
-    | Some ({ ls_args = [ptyv]; ls_value = Some ptya } as ls) ->
+    | Some ({ls_args = [ptyv]; ls_value = Some ptya; ls_constr = 0} as ls) ->
         ty_equal_check tyv ptyv;
         ty_equal_check tya ptya;
         Sls.add_new (DuplicateRecordField (cs,ls)) ls s
     | Some ls -> raise (BadRecordField ls)
   in
-  let check_constr tys ty pjs (syms,news) (fs,pl) =
+  let check_constr tys ty cll pjs (syms,news) (fs,pl) =
     ty_equal_check ty (Opt.get_exn (BadConstructor fs) fs.ls_value);
     let fs_pjs =
       try List.fold_left2 (check_proj fs ty) Sls.empty fs.ls_args pl
       with Invalid_argument _ -> raise (BadConstructor fs) in
     if not (Sls.equal pjs fs_pjs) then
       raise (RecordFieldMissing (fs, Sls.choose (Sls.diff pjs fs_pjs)));
+    if fs.ls_constr <> cll then raise (BadConstructor fs);
     let vs = ty_freevars Stv.empty ty in
     let rec check seen ty = match ty.ty_node with
       | Tyvar v when Stv.mem v vs -> ()
@@ -451,6 +452,7 @@ let create_data_decl tdl =
     syms, news_id news fs.ls_name
   in
   let check_decl (syms,news) (ts,cl) =
+    let cll = List.length cl in
     if cl = [] then raise (EmptyAlgDecl ts);
     if ts.ts_def <> None then raise (IllegalTypeAlias ts);
     let news = news_id news ts.ts_name in
@@ -458,7 +460,7 @@ let create_data_decl tdl =
       (Opt.fold (fun s ls -> Sls.add ls s)) s pl) Sls.empty cl in
     let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
-    List.fold_left (check_constr ts ty pjs) (syms,news) cl
+    List.fold_left (check_constr ts ty cll pjs) (syms,news) cl
   in
   let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
   mk_decl (Ddata tdl) syms news

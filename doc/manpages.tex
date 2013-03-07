@@ -208,7 +208,16 @@ given to the \verb|-o/--output| option.
 
 The basic usage of the GUI is described by the tutorial of
 Section~\ref{sec:gui}. There are no specific command-line options,
-apart from the common options detailed in introduction to this chapter.
+apart from the common options detailed in introduction to this
+chapter. However at least one anonymous argument must be specified on
+the command line. More precisely the first anonymous argument must be
+the directory of the session. If the directory doesn't exists it is
+created. The other arguments should be existing files that are going
+to be added to the session. For convenience an exception is accepted:
+if there is only one anonymous argument it can be an existing file and
+in this case the session directory is choosed be the filename without
+its extension.
+
 We describe the actions of the various menus and buttons of the
 interface.
 \index{why3ide@\texttt{why3ide}}

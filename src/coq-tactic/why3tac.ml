@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -427,7 +427,7 @@ let rec tr_arith_constant dep t = match kind_of_term t with
   | _ ->
       raise NotArithConstant
 
-let body_of_constant c = 
+let body_of_constant c =
   if Reductionops.is_transparent (ConstKey c) then
     CoqCompat.body_of_constant (Global.lookup_constant c)
   else None
@@ -534,6 +534,8 @@ and tr_global_ts dep env r =
             let j = ith_mutual_inductive i j in
             let ts = lookup_table global_ts (IndRef j) in
             let tyj = Ty.ty_app ts (List.map Ty.ty_var ts.Ty.ts_args) in
+            let opaque = Ty.Stv.of_list ts.Ty.ts_args in
+            let constr = Array.length oib.mind_nf_lc in
             let mk_constructor k _tyk = (* k-th constructor *)
               let r = ConstructRef (j, k+1) in
               let ty = Global.type_of_global r in
@@ -548,7 +550,7 @@ and tr_global_ts dep env r =
               let l, _ = decompose_arrows t in
               let l = List.map (tr_type dep' tvm env) l in
               let id = preid_of_id (Nametab.basename_of_global r) in
-              let ls = Term.create_lsymbol id l (Some tyj) in
+              let ls = Term.create_fsymbol ~opaque ~constr id l tyj in
               add_table global_ls r (Some ls);
               add_poly_arity ls vars;
               ls, List.map (fun _ -> None) ls.ls_args

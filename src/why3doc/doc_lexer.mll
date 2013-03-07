@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -273,7 +273,7 @@ and raw_html fmt depth = parse
   | '{'    { fprintf fmt "{"; raw_html fmt (succ depth) lexbuf }
   | '}'    { if depth = 0 then () else
                begin
-                 fprintf fmt "{";
+                 fprintf fmt "}";
                  raw_html fmt (pred depth) lexbuf
                end }
   | _ as c { pp_print_char fmt c; raw_html fmt depth lexbuf }

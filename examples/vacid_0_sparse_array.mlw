@@ -67,7 +67,7 @@ back   +-+-+-+-------------------+
   let test (a: sparse_array 'a) i
     requires { 0 <= i < length a }
     ensures { result=True <-> is_elt a i }
-  = 0 <= a.index[i] && a.index[i] < a.card && a.back[a.index[i]] = i
+  = 0 <= a.index[i] < a.card && a.back[a.index[i]] = i
 
   let get (a: sparse_array 'a) i
     requires { 0 <= i < length a }

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -208,9 +208,12 @@ type effect = private {
   eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
   eff_resets : region option Mreg.t;
+  eff_compar : Stv.t;
+  eff_diverg : bool;
 }
 
 val eff_empty : effect
+val eff_equal : effect -> effect -> bool
 val eff_union : effect -> effect -> effect
 val eff_ghostify : bool -> effect -> effect
 
@@ -222,11 +225,16 @@ val eff_reset : effect -> region -> effect
 val eff_refresh : effect -> region -> region -> effect
 val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
 
+val eff_compare : effect -> tvsymbol -> effect
+val eff_diverge : effect -> effect
+
 val eff_remove_raise : effect -> xsymbol -> effect
 
 val eff_stale_region : effect -> varset -> bool
 
 exception IllegalAlias of region
+exception IllegalCompar of tvsymbol * ity
+exception GhostDiverg
 
 val eff_full_inst : ity_subst -> effect -> effect
 
@@ -308,7 +316,7 @@ val aty_full_inst : ity_subst -> aty -> aty
 
 (* remove from the given arrow every effect that is covered
    neither by the arrow's arguments nor by the given varmap *)
-val aty_filter : varmap -> aty -> aty
+val aty_filter : ?ghost:bool -> varmap -> aty -> aty
 
 (* apply a function specification to a variable argument *)
 val aty_app : aty -> pvsymbol -> spec * bool * vty

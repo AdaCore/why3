@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -165,9 +165,9 @@ let uc_find_ps uc p =
 (** Typing type expressions *)
 
 let rec dity_of_pty denv = function
-  | Ptree.PPTtyvar id ->
-      create_user_type_variable id
-  | Ptree.PPTtyapp (pl, p) ->
+  | Ptree.PPTtyvar (id, op) ->
+      create_user_type_variable id op
+  | Ptree.PPTtyapp (p, pl) ->
       let dl = List.map (dity_of_pty denv) pl in
       begin match uc_find_ts denv.uc p with
         | PT ts -> its_app ts dl
@@ -176,6 +176,9 @@ let rec dity_of_pty denv = function
   | Ptree.PPTtuple pl ->
       let dl = List.map (dity_of_pty denv) pl in
       ts_app (ts_tuple (List.length pl)) dl
+
+let opaque_binders acc args =
+  List.fold_left (fun acc (_,_,dty) -> opaque_tvs acc dty) acc args
 
 (** Typing program expressions *)
 
@@ -208,6 +211,31 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       let labs, loc, d = extract_labels labs loc e in
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> labs, loc, e
+
+(* Hack alert. Since the result type in "let [rec] fn x y : ty = ..."
+   is moved to Ecast and then usually lost in destructive unification,
+   we try to preserve opacity annotations by moving them to binders. *)
+let pass_opacity (e,_) bl =
+  let rec find e = match e.Ptree.expr_desc with
+    | Ptree.Ecast (_, pty) -> Some pty
+    | Ptree.Enamed (_, e) -> find e
+    | _ -> None in
+  match find e with
+  | Some pty ->
+      let ht = Hstr.create 3 in
+      let rec fill = function
+        | Ptree.PPTtyapp (_, pl) | Ptree.PPTtuple pl -> List.iter fill pl
+        | Ptree.PPTtyvar (id, true) -> Hstr.replace ht id.id ()
+        | Ptree.PPTtyvar _ -> () in
+      fill pty;
+      if Hstr.length ht = 0 then bl else
+      let rec pass = function
+        | Ptree.PPTtyvar (id,op) -> Ptree.PPTtyvar (id, op || Hstr.mem ht id.id)
+        | Ptree.PPTtyapp (p, pl) -> Ptree.PPTtyapp (p, List.map pass pl)
+        | Ptree.PPTtuple pl -> Ptree.PPTtuple (List.map pass pl) in
+      List.map (fun (loc,id,gh,pty) -> loc, id, gh, Opt.map pass pty) bl
+  | None ->
+      bl
 
 let rec decompose_app args e = match e.Ptree.expr_desc with
   | Eapply (e1, e2) -> decompose_app (e2 :: args) e1
@@ -254,12 +282,12 @@ let hidden_ls ~loc ls =
 
 (* helper functions for let-expansion *)
 let test_var e = match e.de_desc with
-  | DElocal _ | DEglobal_pv _ -> true
+  | DElocal _ | DEglobal_pv _ | DEconstant _ -> true
   | _ -> false
 
-let mk_var e =
+let mk_var name e =
   if test_var e then e else
-  { de_desc = DElocal "q";
+  { de_desc = DElocal name;
     de_type = e.de_type;
     de_loc  = e.de_loc;
     de_lab  = Slab.empty }
@@ -270,11 +298,11 @@ let mk_id s loc =
 let mk_dexpr desc dvty loc labs =
   { de_desc = desc; de_type = dvty; de_loc = loc; de_lab = labs }
 
-let mk_let ~loc ~uloc e (desc,dvty) =
+let mk_let name ~loc ~uloc e (desc,dvty) =
   if test_var e then desc, dvty else
   let loc = Opt.get_def loc uloc in
   let e1 = mk_dexpr desc dvty loc Slab.empty in
-  DElet (mk_id "q" e.de_loc, false, e, e1), dvty
+  DElet (mk_id name e.de_loc, false, e, e1), dvty
 
 (* patterns *)
 
@@ -294,6 +322,25 @@ let specialize_qualid uc p = match uc_find_ps uc p with
   | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
   | LS ls -> DEglobal_ls ls, Loc.try1 (qloc p) specialize_lsymbol ls
   | XS xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
+
+let chainable_qualid uc p = match uc_find_ps uc p with
+  | PS { ps_aty = { aty_args = [pv1;pv2]; aty_result = VTvalue ity }}
+  | PS { ps_aty = { aty_args = [pv1]; aty_result =
+          VTarrow { aty_args = [pv2]; aty_result = VTvalue ity }}} ->
+      ity_equal ity ity_bool
+      && not (ity_equal pv1.pv_ity ity_bool)
+      && not (ity_equal pv2.pv_ity ity_bool)
+  | LS { ls_args = [ty1;ty2]; ls_value = ty } ->
+      Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
+      && not (ty_equal ty1 ty_bool)
+      && not (ty_equal ty2 ty_bool)
+  | PS _ | LS _ | PL _ | PV _ | XS _ -> false
+
+let chainable_op denv op =
+  op.id = "infix =" || op.id = "infix <>" ||
+  match Mstr.find_opt op.id denv.locals with
+  | Some (_, dvty) -> is_chainable dvty
+  | None -> chainable_qualid denv.uc (Qident op)
 
 let find_xsymbol uc p = match uc_find_ps uc p with
   | XS xs -> xs
@@ -369,14 +416,20 @@ and dpat_app denv gloc ({ de_loc = loc } as de) ppl dity =
 (* specifications *)
 
 let dbinders denv bl =
-  let hv = Hstr.create 3 in
-  let dbinder (id,gh,pty) (denv,bl,tyl) =
-    if Hstr.mem hv id.id then raise (DuplicateProgVar id.id);
-    Hstr.add hv id.id ();
+  let s = ref Sstr.empty in
+  let dbinder (loc,id,gh,pty) (denv,bl,tyl) =
     let dity = match pty with
       | Some pty -> dity_of_pty denv pty
-      | None -> create_type_variable () in
-    add_var id dity denv, (id,gh,dity)::bl, dity::tyl
+      | None -> create_type_variable ()
+    in
+    let denv, id = match id with
+      | Some ({ id = x; id_loc = loc } as id) ->
+          s := Loc.try3 loc Sstr.add_new (DuplicateProgVar x) x !s;
+          add_var id dity denv, id
+      | None ->
+          denv, { id = "_"; id_loc = loc; id_lab = [] }
+    in
+    denv, (id,gh,dity)::bl, dity::tyl
   in
   List.fold_right dbinder bl (denv,[],[])
 
@@ -424,6 +477,7 @@ and dtype_v denv = function
       let dity = dity_of_pty denv pty in
       DSpecV dity, ([],dity)
   | Tarrow (bl,tyc) ->
+      let bl = List.map (fun (l,i,g,t) -> l,i,g,Some t) bl in
       let denv,bl,tyl = dbinders denv bl in
       let tyc,(argl,res) = dtype_c denv tyc in
       DSpecA (bl,tyc), (tyl @ argl,res)
@@ -468,6 +522,37 @@ and de_desc denv loc = function
       let e, el = decompose_app [e2] e1 in
       let el = List.map (dexpr denv) el in
       de_app loc (dexpr denv e) el
+  | Ptree.Einfix (e12, op2, e3)
+  | Ptree.Einnfix (e12, op2, e3) ->
+      let mk_bool (d,ty) =
+        let de = mk_dexpr d ty (Opt.get_def loc denv.uloc) Slab.empty in
+        expected_type de dity_bool; de in
+      let make_app de1 op de2 =
+        let id = Ptree.Eident (Qident op) in
+        let e0 = { expr_desc = id; expr_loc = op.id_loc } in
+        de_app loc (dexpr denv e0) [de1; de2] in
+      let make_app de1 op de2 =
+        if op.id <> "infix <>" then make_app de1 op de2 else
+          let de12 = mk_bool (make_app de1 { op with id = "infix =" } de2) in
+          DEnot de12, de12.de_type in
+      let rec make_chain n1 n2 de1 = function
+        | [op,de2] ->
+            make_app de1 op de2
+        | (op,de2) :: ch ->
+            let v = mk_var n1 de2 in
+            let de12 = mk_bool (make_app de1 op v) in
+            let de23 = mk_bool (make_chain n2 n1 v ch) in
+            let d = DElazy (LazyAnd, de12, de23) in
+            mk_let n1 ~loc ~uloc:denv.uloc de2 (d, de12.de_type)
+        | [] -> assert false in
+      let rec get_chain e12 acc = match e12.expr_desc with
+        | Ptree.Einfix (e1, op1, e2) when chainable_op denv op1 ->
+            get_chain e1 ((op1, dexpr denv e2) :: acc)
+        | _ -> e12, acc in
+      let e1, ch = if chainable_op denv op2
+        then get_chain e12 [op2, dexpr denv e3]
+        else e12, [op2, dexpr denv e3] in
+      make_chain "q1 " "q2 " (dexpr denv e1) ch
   | Ptree.Elet (id, gh, e1, e2) ->
       let e1 = dexpr denv e1 in
       let denv = match e1.de_desc with
@@ -482,7 +567,7 @@ and de_desc denv loc = function
       let e1 = dexpr denv e1 in
       DEletrec (fdl, e1), e1.de_type
   | Ptree.Efun (bl, tr) ->
-      let denv, bl, tyl = dbinders denv bl in
+      let denv, bl, tyl = dbinders denv (pass_opacity tr bl) in
       let tr, (argl, res) = dtriple denv tr in
       DEfun (bl, tr), (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
@@ -526,7 +611,7 @@ and de_desc denv loc = function
       de_app loc (hidden_pl ~loc cs) (List.map get_val pjl)
   | Ptree.Eupdate (e1, fl) when is_pure_record denv.uc fl ->
       let e1 = dexpr denv e1 in
-      let e0 = mk_var e1 in
+      let e0 = mk_var "q " e1 in
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
@@ -537,10 +622,10 @@ and de_desc denv loc = function
             let d, dvty = de_app loc (hidden_ls ~loc pj) [e0] in
             mk_dexpr d dvty loc Slab.empty in
       let res = de_app loc (hidden_ls ~loc cs) (List.map get_val pjl) in
-      mk_let ~loc ~uloc:denv.uloc e1 res
+      mk_let "q " ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr denv e1 in
-      let e0 = mk_var e1 in
+      let e0 = mk_var "q " e1 in
       let fl = List.map (find_prog_field denv.uc) fl in
       let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
@@ -550,7 +635,7 @@ and de_desc denv loc = function
             let d, dvty = de_app loc (hidden_pl ~loc pj) [e0] in
             mk_dexpr d dvty loc Slab.empty in
       let res = de_app loc (hidden_pl ~loc cs) (List.map get_val pjl) in
-      mk_let ~loc ~uloc:denv.uloc e1 res
+      mk_let "q " ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eassign (e1, q, e2) ->
       let fl = dexpr denv { expr_desc = Eident q; expr_loc = qloc q } in
       let pl = match fl.de_desc with
@@ -650,8 +735,8 @@ and dletrec denv fdl =
     add_mono id dvty denv, dvty in
   let denv, dvtyl = Lists.map_fold_left add_one denv fdl in
   (* then unify the binders *)
-  let bind_one (_,_,_,bl,_) (argl,res) =
-    let denv,bl,tyl = dbinders denv bl in
+  let bind_one (_,_,_,bl,tr) (argl,res) =
+    let denv,bl,tyl = dbinders denv (pass_opacity tr bl) in
     List.iter2 unify argl tyl;
     denv,bl,tyl,res in
   let denvl = List.map2 bind_one fdl dvtyl in
@@ -1113,7 +1198,7 @@ let eff_of_deff lenv dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   Mexn.fold add_raise dsp.ds_xpost eff, svs
 
-let check_user_effect lenv e dsp =
+let check_user_effect lenv e otv dsp =
   let acc = eff_empty, Svs.empty in
   let read le eff ?(ghost=false) reg =
     ignore ghost;
@@ -1136,7 +1221,10 @@ let check_user_effect lenv e dsp =
        Sexn.mem xs e.e_effect.eff_ghostx
     then () else Loc.errorm
       "this expression does not raise exception %a" print_xs xs in
-  Mexn.iter check_raise dsp.ds_xpost
+  Mexn.iter check_raise dsp.ds_xpost;
+  let bad_comp tv _ _ = Loc.errorm
+    "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
+  ignore (Mtv.inter bad_comp otv e.e_effect.eff_compar)
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
@@ -1147,8 +1235,8 @@ let spec_of_dspec lenv eff vty dsp = {
   c_letrec  = 0;
 }
 
-let rec type_c lenv pvs vars (dtyv, dsp) =
-  let vty = type_v lenv pvs vars dtyv in
+let rec type_c lenv pvs vars otv (dtyv, dsp) =
+  let vty = type_v lenv pvs vars otv dtyv in
   let eff, esvs = eff_of_deff lenv dsp in
   (* reset every new region in the result *)
   let eff = match vty with
@@ -1162,6 +1250,10 @@ let rec type_c lenv pvs vars (dtyv, dsp) =
     let on_reg r e = if Sreg.mem r writes then e else eff_refresh e r u in
     reg_fold on_reg u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
+  (* eff_compare every type variable not marked as opaque *)
+  let otv = match dtyv with DSpecV v -> opaque_tvs otv v | _ -> otv in
+  let eff = Stv.fold_left eff_compare eff (Stv.diff vars.vars_tv otv) in
+  (* make spec *)
   let spec = spec_of_dspec lenv eff vty dsp in
   if spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a parameter declaration";
@@ -1182,16 +1274,17 @@ let rec type_c lenv pvs vars (dtyv, dsp) =
   (* add the invariants *)
   spec_invariant lenv pvs vty spec, vty
 
-and type_v lenv pvs vars = function
+and type_v lenv pvs vars otv = function
   | DSpecV v ->
       VTvalue (ity_of_dity v)
   | DSpecA (bl,tyc) ->
       let pvl = binders bl in
       let lenv = add_binders lenv pvl in
+      let otv = opaque_binders otv bl in
       let add_pv pv s = vars_union pv.pv_ity.ity_vars s in
       let vars = List.fold_right add_pv pvl vars in
       let pvs = List.fold_right Spv.add pvl pvs in
-      let spec, vty = type_c lenv pvs vars tyc in
+      let spec, vty = type_c lenv pvs vars otv tyc in
       VTarrow (vty_arrow pvl ~spec vty)
 
 (* expressions *)
@@ -1319,7 +1412,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
       if spec.c_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      check_user_effect lenv e1 dsp;
+      check_user_effect lenv e1 Stv.empty dsp;
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
@@ -1375,7 +1468,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let lenv = add_local x.id ld.let_sym lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->
-      let spec, result = type_c lenv Spv.empty vars_empty dtyc in
+      let spec, result = type_c lenv Spv.empty vars_empty Stv.empty dtyc in
       e_any spec result
   | DEghost de1 ->
       e_ghostify true (expr lenv de1)
@@ -1411,8 +1504,9 @@ and expr_rec lenv dfdl =
   let eff = List.fold_left rd_effect eff_empty fdl in
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   let fdl = create_rec_defn (List.map step3 fdl) in
-  let check_user_effect { fun_lambda = l } (_,_,_,_,(de,dsp)) =
-    Loc.try3 de.de_loc check_user_effect lenv l.l_expr dsp in
+  let check_user_effect { fun_lambda = l } (_,_,_,bl,(de,dsp)) =
+    let otv = opaque_binders Stv.empty bl in
+    Loc.try3 de.de_loc check_user_effect lenv l.l_expr otv dsp in
   List.iter2 check_user_effect fdl dfdl;
   fdl
 
@@ -1420,7 +1514,8 @@ and expr_fun lenv x gh bl (_, dsp as tr) =
   let lam = expr_lam lenv gh (binders bl) tr in
   if lam.l_spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a non-recursive definition";
-  check_user_effect lenv lam.l_expr dsp;
+  let otv = opaque_binders Stv.empty bl in
+  check_user_effect lenv lam.l_expr otv dsp;
   let lam =
     if Debug.test_noflag implicit_post || dsp.ds_post <> [] ||
        oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
@@ -1475,7 +1570,7 @@ let add_type_invariant loc uc id params inv =
 
 let look_for_loc tdl s =
   let look_id loc id = if id.id = s then Some id.id_loc else loc in
-  let look_pj loc (id,_) = Opt.fold look_id loc id in
+  let look_pj loc (_,id,_,_) = Opt.fold look_id loc id in
   let look_cs loc (csloc,id,pjl) =
     let loc = if id.id = s then Some csloc else loc in
     List.fold_left look_pj loc pjl in
@@ -1508,7 +1603,7 @@ let add_types ~wp uc tdl =
           | _ -> seen in
         let rec check seen = function
           | PPTtyvar _ -> seen
-          | PPTtyapp (tyl,q) -> List.fold_left check (ts_seen seen q) tyl
+          | PPTtyapp (q,tyl) -> List.fold_left check (ts_seen seen q) tyl
           | PPTtuple tyl -> List.fold_left check seen tyl in
         let seen = match d.td_def with
           | TDabstract | TDalgebraic _ | TDrecord _ -> seen
@@ -1531,7 +1626,7 @@ let add_types ~wp uc tdl =
       in
       let rec check = function
         | PPTtyvar _ -> false
-        | PPTtyapp (tyl,q) -> ts_imp q || List.exists check tyl
+        | PPTtyapp (q,tyl) -> ts_imp q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hstr.replace impures x false;
       let imp =
@@ -1540,7 +1635,8 @@ let add_types ~wp uc tdl =
         | TDabstract -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
-            let cons (_,_,l) = List.exists (fun (_,ty) -> check ty) l in
+            let check (_,_,gh,ty) = gh || check ty in
+            let cons (_,_,l) = List.exists check l in
             td.td_inv <> [] || td.td_vis <> Public || List.exists cons csl
         | TDrecord fl ->
             let field f = f.f_ghost || f.f_mutable || check f.f_pty in
@@ -1567,7 +1663,7 @@ let add_types ~wp uc tdl =
       in
       let rec check = function
         | PPTtyvar _ -> false
-        | PPTtyapp (tyl,q) -> ts_mut q || List.exists check tyl
+        | PPTtyapp (q,tyl) -> ts_mut q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hstr.replace mutables x false;
       let mut =
@@ -1576,7 +1672,8 @@ let add_types ~wp uc tdl =
         | TDabstract -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
-            let cons (_,_,l) = List.exists (fun (_,ty) -> check ty) l in
+            let check (_,_,_,ty) = check ty in
+            let cons (_,_,l) = List.exists check l in
             td.td_inv <> [] || List.exists cons csl
         | TDrecord fl ->
             let field f = f.f_mutable || check f.f_pty in
@@ -1616,10 +1713,10 @@ let add_types ~wp uc tdl =
         | q -> uc_find_ts uc q
       in
       let rec parse = function
-        | PPTtyvar { id = v ; id_loc = loc } ->
+        | PPTtyvar ({ id = v ; id_loc = loc }, _) ->
             let e = Loc.Located (loc, UnboundTypeVar v) in
             ity_var (Mstr.find_exn e v vars)
-        | PPTtyapp (tyl,q) ->
+        | PPTtyapp (q,tyl) ->
             let tyl = List.map parse tyl in
             begin match get_ts q with
               | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
@@ -1642,9 +1739,9 @@ let add_types ~wp uc tdl =
             (* to check projections' types we must fix the tyvars *)
             let add s v = let t = ity_var v in ity_match s t t in
             let sbs = List.fold_left add ity_subst_empty vl in
-            let mk_proj (regs,inv) (id,pty) =
+            let mk_proj (regs,inv) (_loc,id,gh,pty) =
               let ity = parse pty in
-              let fd = mk_field ity false None in
+              let fd = mk_field ity gh None in
               let inv = inv || ity_has_inv ity in
               match id with
               | None ->
@@ -1653,8 +1750,8 @@ let add_types ~wp uc tdl =
               | Some id ->
                   try
                     let fd = Hstr.find projs id.id in
-                    (* TODO: once we have ghost/mutable fields in algebraics,
-                       don't forget to check here that they coincide, too *)
+                    if gh <> fd.fd_ghost then Loc.errorm ~loc:id.id_loc
+                      "this field must be ghost in every constructor";
                     ignore (Loc.try3 id.id_loc ity_match sbs fd.fd_ity ity);
                     (regs, inv), (Some (Denv.create_user_id id), fd)
                   with Not_found ->
@@ -1715,10 +1812,10 @@ let add_types ~wp uc tdl =
       | q -> uc_find_ts uc q
     in
     let rec parse = function
-      | PPTtyvar { id = v ; id_loc = loc } ->
+      | PPTtyvar ({ id = v ; id_loc = loc }, _) ->
           let e = Loc.Located (loc, UnboundTypeVar v) in
           ity_var (Mstr.find_exn e v vars)
-      | PPTtyapp (tyl,q) ->
+      | PPTtyapp (q,tyl) ->
           let tyl = List.map parse tyl in
           begin match get_ts q with
             | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
@@ -1737,16 +1834,16 @@ let add_types ~wp uc tdl =
           abstr, (ts, Hstr.find predefs x) :: algeb, alias
       | TDalgebraic csl ->
           let projs = Hstr.create 5 in
-          let mk_proj (id,pty) =
+          let mk_proj (_loc,id,gh,pty) =
             let ity = parse pty in
-            let fd = mk_field ity false None in
+            let fd = mk_field ity gh None in
             match id with
             | None -> None, fd
             | Some id ->
                 try
                   let fd = Hstr.find projs id.id in
-                  (* once we have ghost/mutable fields in algebraics,
-                     don't forget to check here that they coincide, too *)
+                  if gh <> fd.fd_ghost then Loc.errorm ~loc:id.id_loc
+                    "this field must be ghost in every constructor";
                   Loc.try2 id.id_loc ity_equal_check fd.fd_ity ity;
                   Some (Denv.create_user_id id), fd
                 with Not_found ->
@@ -1770,6 +1867,8 @@ let add_types ~wp uc tdl =
 
   let mk_pure_decl ts csl =
     let pjt = Hstr.create 3 in
+    let constr = List.length csl in
+    let opaque = Stv.of_list ts.ts_args in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
     let mk_proj (pj,fd) =
       let fty = ty_of_ity fd.fd_ity in
@@ -1777,13 +1876,13 @@ let add_types ~wp uc tdl =
         | None -> None
         | Some id ->
             try Hstr.find pjt (preid_name id) with Not_found ->
-            let pj = Some (create_fsymbol id [ty] fty) in
+            let pj = Some (create_fsymbol ~opaque id [ty] fty) in
             Hstr.replace pjt (preid_name id) pj;
             pj
     in
     let mk_constr (id,pjl) =
       let pjl = List.map mk_proj pjl in
-      let cs = create_fsymbol id (List.map fst pjl) ty in
+      let cs = create_fsymbol ~opaque ~constr id (List.map fst pjl) ty in
       cs, List.map snd pjl
     in
     List.map mk_constr csl
@@ -1956,7 +2055,7 @@ let add_pdecl ~wp loc uc = function
       add_pdecl_with_tuples ~wp uc pd
   | Dparam (id, gh, tyv) ->
       let tyv, _ = dtype_v (create_denv uc) tyv in
-      let tyv = type_v (create_lenv uc) Spv.empty vars_empty tyv in
+      let tyv = type_v (create_lenv uc) Spv.empty vars_empty Stv.empty tyv in
       let lv = match tyv with
         | VTvalue v ->
             LetV (create_pvsymbol (Denv.create_user_id id) ~ghost:gh v)
@@ -1979,7 +2078,9 @@ let use_clone_pure lib mth uc loc (use,inst) =
   (* use or clone *)
   let uc = match inst with
     | None -> Theory.use_export uc th
-    | Some inst -> Theory.clone_export uc th (Typing.type_inst uc th inst) in
+    | Some inst ->
+        Theory.warn_clone_not_abstract loc th;
+        Theory.clone_export uc th (Typing.type_inst uc th inst) in
   (* close namespace, if any *)
   match use.use_import with
     | Some (import, _) -> Theory.close_namespace uc import
@@ -2001,8 +2102,10 @@ let use_clone lib mmd mth uc loc (use,inst) =
     | Module m, None -> use_export uc m
     | Theory th, None -> use_export_theory uc th
     | Module m, Some inst ->
+        Theory.warn_clone_not_abstract loc m.mod_theory;
         clone_export uc m (Typing.type_inst (get_theory uc) m.mod_theory inst)
     | Theory th, Some inst ->
+        Theory.warn_clone_not_abstract loc th;
         clone_export_theory uc th (Typing.type_inst (get_theory uc) th inst) in
   (* close namespace, if any *)
   match use.use_import with

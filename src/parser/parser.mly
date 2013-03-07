@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -37,6 +37,17 @@ end
   let floc_ij i j = Loc.extract (loc_ij i j)
 *)
 
+  let pty_of_id i = PPTtyapp (Qident i, [])
+
+  let params_of_binders bl = List.map (function
+    | l, None, _, None -> Loc.errorm ~loc:l "cannot determine the type"
+    | l, Some i, gh, None -> l, None, gh, pty_of_id i
+    | l, i, gh, Some t -> l, i, gh, t) bl
+
+  let quvars_of_lidents ty ll = List.map (function
+    | l, None -> Loc.errorm ~loc:l "anonymous binders are not allowed here"
+    | _, Some i -> i, ty) ll
+
   let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
   let mk_pp d = mk_ppl (floc ()) d
 (* dead code
@@ -53,8 +64,6 @@ end
   let infix  s = "infix "  ^ s
   let prefix s = "prefix " ^ s
   let mixfix s = "mixfix " ^ s
-
-  let quote id = { id with id = "'" ^ id.id }
 
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
@@ -110,7 +119,7 @@ end
 
   let mk_infix e1 op e2 =
     let id = mk_id (infix op) (floc_i 2) in
-    mk_expr (mk_apply_id id [e1; e2])
+    mk_expr (Einfix (e1, id, e2))
 
   let mk_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -176,6 +185,7 @@ end
 %token <Ptree.real_constant> FLOAT
 %token <string> STRING
 %token <Loc.position> POSITION
+%token <string> QUOTE_UIDENT QUOTE_LIDENT OPAQUE_QUOTE_LIDENT
 
 /* keywords */
 
@@ -199,8 +209,7 @@ end
 %token COLON COMMA
 %token DOT EQUAL FUNC LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
-%token LARROW LRARROW
-%token OR PRED QUOTE
+%token LARROW LRARROW OR PRED
 %token RIGHTPAR RIGHTSQ
 %token UNDERSCORE
 
@@ -413,8 +422,8 @@ late_invariant:
 ;
 
 type_args:
-| /* epsilon */             { [] }
-| type_var labels type_args { add_lab $1 $2 :: $3 }
+| /* epsilon */                 { [] }
+| quote_lident labels type_args { add_lab $1 $2 :: $3 }
 ;
 
 typedefn:
@@ -475,7 +484,7 @@ typecases:
 ;
 
 typecase:
-| uident labels params   { (floc (), add_lab $1 $2, $3) }
+| uident labels list0_param   { (floc (), add_lab $1 $2, $3) }
 ;
 
 /* Logic declarations */
@@ -502,26 +511,21 @@ logic_decl_constant:
 ;
 
 logic_decl_function:
-| lident_rich labels params COLON primitive_type logic_def_option
+| lident_rich labels list0_param COLON primitive_type logic_def_option
   { { ld_loc = floc (); ld_ident = add_lab $1 $2;
       ld_params = $3; ld_type = Some $5; ld_def = $6 } }
 ;
 
 logic_decl_predicate:
-| lident_rich labels params logic_def_option
+| lident_rich labels list0_param logic_def_option
   { { ld_loc = floc (); ld_ident = add_lab $1 $2;
       ld_params = $3; ld_type = None; ld_def = $4 } }
 ;
 
 logic_decl:
-| lident_rich labels params logic_type_option logic_def_option
+| lident_rich labels list0_param opt_cast logic_def_option
   { { ld_loc = floc (); ld_ident = add_lab $1 $2;
       ld_params = $3; ld_type = $4; ld_def = $5 } }
-;
-
-logic_type_option:
-| /* epsilon */        { None }
-| COLON primitive_type { Some $2 }
 ;
 
 logic_def_option:
@@ -537,7 +541,7 @@ list1_inductive_decl:
 ;
 
 inductive_decl:
-| lident_rich labels params inddefn
+| lident_rich labels list0_param inddefn
   { { in_loc = floc (); in_ident = add_lab $1 $2;
       in_params = $3; in_def = $4 } }
 ;
@@ -560,12 +564,12 @@ indcase:
 
 primitive_type:
 | primitive_type_arg           { $1 }
-| lqualid primitive_type_args  { PPTtyapp ($2, $1) }
+| lqualid primitive_type_args  { PPTtyapp ($1, $2) }
 ;
 
 primitive_type_non_lident:
 | primitive_type_arg_non_lident           { $1 }
-| uqualid DOT lident primitive_type_args  { PPTtyapp ($4, Qdot ($1, $3)) }
+| uqualid DOT lident primitive_type_args  { PPTtyapp (Qdot ($1, $3), $4) }
 ;
 
 primitive_type_args:
@@ -573,16 +577,23 @@ primitive_type_args:
 | primitive_type_arg primitive_type_args  { $1 :: $2 }
 ;
 
+primitive_type_args_non_lident:
+| primitive_type_arg_non_lident                      { [$1] }
+| primitive_type_arg_non_lident primitive_type_args  { $1 :: $2 }
+;
+
 primitive_type_arg:
-| lident                         { PPTtyapp ([], Qident $1) }
+| lident                         { PPTtyapp (Qident $1, []) }
 | primitive_type_arg_non_lident  { $1 }
 ;
 
 primitive_type_arg_non_lident:
 | uqualid DOT lident
-   { PPTtyapp ([], Qdot ($1, $3)) }
-| type_var
-   { PPTtyvar $1 }
+   { PPTtyapp (Qdot ($1, $3), []) }
+| quote_lident
+   { PPTtyvar ($1, false) }
+| opaque_quote_lident
+   { PPTtyvar ($1, true) }
 | LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR
    { PPTtuple ($2 :: $4) }
 | LEFTPAR RIGHTPAR
@@ -594,10 +605,6 @@ primitive_type_arg_non_lident:
 list1_primitive_type_sep_comma:
 | primitive_type                                      { [$1] }
 | primitive_type COMMA list1_primitive_type_sep_comma { $1 :: $3 }
-;
-
-type_var:
-| QUOTE lident { $2 }
 ;
 
 /* Logic expressions */
@@ -620,7 +627,7 @@ lexpr:
 | lexpr EQUAL lexpr
    { mk_l_infix $1 "=" $3 }
 | lexpr LTGT lexpr
-   { prefix_pp PPnot (mk_l_infix $1 "=" $3) }
+   { mk_l_infix $1 "<>" $3 }
 | lexpr OP1 lexpr
    { mk_l_infix $1 $2 $3 }
 | lexpr OP2 lexpr
@@ -635,7 +642,7 @@ lexpr:
    { mk_pp (PPapp ($1, $2)) }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
-| quant list1_param_var_sep_comma triggers DOT lexpr
+| quant list1_quant_vars triggers DOT lexpr
    { mk_pp (PPquant ($1, $2, $3, $5)) }
 | label lexpr %prec prec_named
    { mk_pp (PPnamed ($1, $2)) }
@@ -651,11 +658,13 @@ lexpr:
 | MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
 | EPSILON lident labels COLON primitive_type DOT lexpr
-   { mk_pp (PPeps (add_lab $2 $3, $5, $7)) }
+   { mk_pp (PPeps ((add_lab $2 $3, Some $5), $7)) }
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
-   { $1 }
+   { match $1.pp_desc with (* break the infix relation chain *)
+     | PPinfix (l,o,r) -> { $1 with pp_desc = PPinnfix (l,o,r) }
+     | _ -> $1 }
 ;
 
 list1_field_value:
@@ -684,7 +693,7 @@ lexpr_arg:
 | FALSE             { mk_pp PPfalse }
 | OPPREF lexpr_arg  { mk_l_prefix $1 $2 }
 | lexpr_sub         { $1 }
-| QUOTE uident      { mk_pp (PPvar (Qident (quote $2))) }
+| quote_uident      { mk_pp (PPvar (Qident $1)) }
 ;
 
 lexpr_dot:
@@ -796,68 +805,115 @@ pat_field:
 | lqualid EQUAL pattern   { ($1, $3) }
 ;
 
-/* Parameters */
+/* Binders */
 
-params:
-| /* epsilon */   { [] }
-| param params    { $1 @ $2 }
+list0_param:
+| /* epsilon */ { [] }
+| list1_param   { $1 }
 ;
 
-param:
-| LEFTPAR param_var RIGHTPAR
-   { $2 }
-| LEFTPAR param_type RIGHTPAR
-   { [None, $2] }
-| LEFTPAR param_type COMMA list1_primitive_type_sep_comma RIGHTPAR
-   { [None, PPTtuple ($2::$4)] }
+list1_param:
+| list1_binder  { params_of_binders $1 }
+;
+
+list1_binder:
+| binder              { $1 }
+| binder list1_binder { $1 @ $2 }
+;
+
+binder:
+| quote_lident
+   { [floc (), None, false, Some (PPTtyvar ($1, false))] }
+| opaque_quote_lident
+   { [floc (), None, false, Some (PPTtyvar ($1, true))] }
+| lqualid_qualified
+   { [floc (), None, false, Some (PPTtyapp ($1, []))] }
+| lident labels
+   { [floc (), Some (add_lab $1 $2), false, None] }
+| UNDERSCORE
+   { Loc.errorm ~loc:(floc ()) "untyped anonymous parameters are not allowed" }
 | LEFTPAR RIGHTPAR
-   { [None, PPTtuple []] }
-| type_var
-   { [None, PPTtyvar $1] }
-| lqualid
-   { [None, PPTtyapp ([], $1)] }
+   { [floc (), None, false, Some (PPTtuple [])] }
+| LEFTPAR binder_in RIGHTPAR
+   { $2 }
+| LEFTPAR GHOST binder_in RIGHTPAR
+   { List.map (fun (l,i,_,t) -> (l,i,true,t)) $3 }
+| LEFTPAR binder_type COMMA list1_primitive_type_sep_comma RIGHTPAR
+   { [floc (), None, false, Some (PPTtuple ($2::$4))] }
 ;
 
-param_type:
-| lident param_type_cont
-   { PPTtyapp ($2, Qident $1) }
-| lident list1_lident param_type_cont
-   { let id2ty i = PPTtyapp ([], Qident i) in
-     PPTtyapp (List.map id2ty $2 @ $3, Qident $1) }
+binder_in:
+| lident labels
+   { [floc (), Some (add_lab $1 $2), false, None] }
+| UNDERSCORE
+   { Loc.errorm ~loc:(floc ()) "untyped anonymous parameters are not allowed" }
+| binder_type_rest
+   { [floc (), None, false, Some $1] }
+| binder_vars COLON primitive_type
+   { List.map (fun (l,v) -> l, v, false, Some $3) $1 }
+;
+
+binder_type:
+| lident            { PPTtyapp (Qident $1, []) }
+| binder_type_rest  { $1 }
+;
+
+binder_type_rest:
+| lident list1_lident
+   { PPTtyapp (Qident $1, List.map pty_of_id $2) }
+| lident list0_lident primitive_type_args_non_lident
+   { PPTtyapp (Qident $1, List.map pty_of_id $2 @ $3) }
 | primitive_type_non_lident
    { $1 }
 ;
 
-param_type_cont:
-| /* epsilon */                                      { [] }
-| primitive_type_arg_non_lident                      { [$1] }
-| primitive_type_arg_non_lident primitive_type_args  { $1 :: $2 }
+binder_vars:
+| list1_lident
+   { List.map (fun id -> id.id_loc, Some id) $1 }
+| list1_lident UNDERSCORE list0_lident_labels
+   { List.map (fun id -> id.id_loc, Some id) $1 @ (floc_i 2, None) :: $3 }
+| lident list1_lident label labels list0_lident_labels
+   { let l = match List.rev ($1 :: $2) with
+       | i :: l -> add_lab i ($3 :: $4) :: l
+       | [] -> assert false in
+     List.fold_left (fun acc id -> (id.id_loc, Some id) :: acc) $5 l }
+| lident label labels list0_lident_labels
+   { ($1.id_loc, Some (add_lab $1 ($2 :: $3))) :: $4 }
+| UNDERSCORE list0_lident_labels
+   { (floc_i 1, None) :: $2 }
 ;
 
-list1_param_var_sep_comma:
-| param_var                                  { $1 }
-| param_var COMMA list1_param_var_sep_comma  { $1 @ $3 }
-;
-
-param_var:
-| list1_lident COLON primitive_type
-   { List.map (fun id -> (Some id, $3)) $1 }
-| list1_lident label labels list0_lident_labels COLON primitive_type
-   { let l = match List.rev $1 with
-       | i :: l -> add_lab i ($2 :: $3) :: l
-       | [] -> assert false
-     in
-     List.map (fun id -> (Some id, $6)) (List.rev_append l $4) }
+list0_lident:
+| /* epsilon */ { [] }
+| list1_lident  { $1 }
 ;
 
 list1_lident:
-| lident               { [$1] }
-| lident list1_lident  { $1 :: $2 }
+| lident list0_lident  { $1 :: $2 }
+;
+
+list1_quant_vars:
+| quant_vars                        { $1 }
+| quant_vars COMMA list1_quant_vars { $1 @ $3 }
+;
+
+quant_vars:
+| list1_lident_labels COLON primitive_type
+   { quvars_of_lidents (Some $3) $1 }
 ;
 
 list0_lident_labels:
-| /* epsilon */                      { [] }
-| lident labels list0_lident_labels  { add_lab $1 $2 :: $3 }
+| /* epsilon */        { [] }
+| list1_lident_labels  { $1 }
+;
+
+list1_lident_labels:
+| lident_labels list0_lident_labels  { $1 :: $2 }
+;
+
+lident_labels:
+| lident labels { floc (), Some (add_lab $1 $2) }
+| UNDERSCORE    { floc (), None }
 ;
 
 /* Idents */
@@ -880,6 +936,18 @@ lident_keyword:
 | MODEL           { "model" }
 ;
 
+quote_uident:
+| QUOTE_UIDENT    { mk_id ("'" ^ $1) (floc ()) }
+;
+
+quote_lident:
+| QUOTE_LIDENT    { mk_id $1 (floc ()) }
+;
+
+opaque_quote_lident:
+| OPAQUE_QUOTE_LIDENT { mk_id $1 (floc ()) }
+;
+
 /* Idents + symbolic operations' names */
 
 ident_rich:
@@ -888,7 +956,11 @@ ident_rich:
 ;
 
 lident_rich:
-| lident                      { $1 }
+| lident        { $1 }
+| lident_op_id  { $1 }
+;
+
+lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 (floc_i 2) }
 | LEFTPAR_STAR_RIGHTPAR       { mk_id (infix "*") (floc ()) }
   /* FIXME: use location of operator star rather than left parenthesis */
@@ -931,6 +1003,10 @@ lqualid:
 /* copy of lqualid to avoid yacc conflicts */
 lqualid_copy:
 | lident              { Qident $1 }
+| uqualid DOT lident  { Qdot ($1, $3) }
+;
+
+lqualid_qualified:
 | uqualid DOT lident  { Qdot ($1, $3) }
 ;
 
@@ -1033,7 +1109,7 @@ type_v:
 ;
 
 arrow_type_v:
-| list1_type_v_param tail_type_c  { Tarrow ($1, $2) }
+| list1_param tail_type_c  { Tarrow ($1, $2) }
 ;
 
 tail_type_c:
@@ -1056,27 +1132,29 @@ list1_rec_defn:
 ;
 
 rec_defn:
-| ghost lident_rich labels list1_type_v_binder opt_cast spec EQUAL spec expr
+| ghost lident_rich labels list1_binder opt_cast spec EQUAL spec expr
    { floc (), add_lab $2 $3, $1, $4, (cast_body $5 $9, spec_union $6 $8) }
 ;
 
 fun_defn:
-| list1_type_v_binder opt_cast spec EQUAL spec expr
+| list1_binder opt_cast spec EQUAL spec expr
    { mk_expr_i 6 (Efun ($1, (cast_body $2 $6, spec_union $3 $5))) }
 ;
 
 fun_expr:
-| FUN list1_type_v_binder spec ARROW spec expr
+| FUN list1_binder spec ARROW spec expr
    { mk_expr (Efun ($2, ($6, spec_union $3 $5))) }
 ;
 
 expr:
 | expr_arg
-   { $1 }
+   { match $1.expr_desc with (* break the infix relation chain *)
+     | Einfix (l,o,r) -> { $1 with expr_desc = Einnfix (l,o,r) }
+     | _ -> $1 }
 | expr EQUAL expr
    { mk_infix $1 "=" $3 }
 | expr LTGT expr
-   { mk_expr (Enot (mk_infix $1 "=" $3)) }
+   { mk_infix $1 "<>" $3 }
 | expr LARROW expr
     { match $1.expr_desc with
         | Eapply (e11, e12) -> begin match e11.expr_desc with
@@ -1133,7 +1211,11 @@ expr:
      | _ -> Loc.errorm ~loc:(floc_i 3) "`ghost' cannot come before a pattern" }
 | LET lident labels fun_defn IN expr
    { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
+| LET lident_op_id labels fun_defn IN expr
+   { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
 | LET GHOST lident labels fun_defn IN expr
+   { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
+| LET GHOST lident_op_id labels fun_defn IN expr
    { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
 | LET REC list1_rec_defn IN expr
    { mk_expr (Eletrec ($3, $5)) }
@@ -1143,8 +1225,8 @@ expr:
    { mk_expr (Ematch ($2, $5)) }
 | MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END
    { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
-| QUOTE uident COLON expr %prec prec_mark
-   { mk_expr (Emark (quote $2, $4)) }
+| quote_uident COLON expr %prec prec_mark
+   { mk_expr (Emark ($1, $3)) }
 | LOOP loop_annotation expr END
    { mk_expr (Eloop ($2, $3)) }
 | WHILE expr DO loop_annotation expr DONE
@@ -1264,34 +1346,6 @@ for_direction:
 | DOWNTO { Downto }
 ;
 
-list1_type_v_binder:
-| type_v_binder                     { $1 }
-| type_v_binder list1_type_v_binder { $1 @ $2 }
-;
-
-list1_type_v_param:
-| type_v_param                    { $1 }
-| type_v_param list1_type_v_param { $1 @ $2 }
-;
-
-type_v_binder:
-| ghost lident labels
-   { [add_lab $2 $3, $1, None] }
-| type_v_param
-   { $1 }
-;
-
-type_v_param:
-| LEFTPAR RIGHTPAR
-   { [id_anonymous (), false, Some (ty_unit ())] }
-| LEFTPAR ghost lidents_lab COLON primitive_type RIGHTPAR
-   { List.map (fun i -> (i, $2, Some $5)) $3 }
-;
-
-lidents_lab:
-| lident labels list0_lident_labels { add_lab $1 $2 :: $3 }
-;
-
 loop_annotation:
 | /* epsilon */
     { { loop_invariant = []; loop_variant = [] } }
@@ -1393,7 +1447,7 @@ single_variant:
 ;
 
 opt_cast:
-| /* epsilon */   { None }
+| /* epsilon */        { None }
 | COLON primitive_type { Some $2 }
 ;
 

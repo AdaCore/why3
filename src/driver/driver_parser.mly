@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -27,7 +27,7 @@
 %token <string> OPERATOR
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
 %token VALID INVALID TIMEOUT OUTOFMEMORY UNKNOWN FAIL TIME
-%token UNDERSCORE LEFTPAR RIGHTPAR CLONED DOT QUOTE EOF
+%token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
 %token BLACKLIST
 %token MODULE EXCEPTION VAL
 %token FUNCTION PREDICATE TYPE PROP FILENAME TRANSFORM PLUGIN
@@ -89,14 +89,14 @@ list0_trule:
 ;
 
 trule:
-| PRELUDE STRING                          { Rprelude  ($2) }
-| SYNTAX cloned TYPE      qualid STRING   { Rsyntaxts ($2, $4, $5) }
-| SYNTAX cloned CONSTANT  qualid STRING   { Rsyntaxfs ($2, $4, $5) }
-| SYNTAX cloned FUNCTION  qualid STRING   { Rsyntaxfs ($2, $4, $5) }
-| SYNTAX cloned PREDICATE qualid STRING   { Rsyntaxps ($2, $4, $5) }
-| REMOVE cloned PROP qualid               { Rremovepr ($2, $4) }
-| META cloned ident meta_args             { Rmeta     ($2, $3, $4) }
-| META cloned STRING meta_args            { Rmeta     ($2, $3, $4) }
+| PRELUDE STRING                   { Rprelude  ($2) }
+| SYNTAX TYPE      qualid STRING   { Rsyntaxts ($3, $4) }
+| SYNTAX CONSTANT  qualid STRING   { Rsyntaxfs ($3, $4) }
+| SYNTAX FUNCTION  qualid STRING   { Rsyntaxfs ($3, $4) }
+| SYNTAX PREDICATE qualid STRING   { Rsyntaxps ($3, $4) }
+| REMOVE PROP qualid               { Rremovepr ($3) }
+| META ident meta_args             { Rmeta     ($2, $3) }
+| META STRING meta_args            { Rmeta     ($2, $3) }
 ;
 
 meta_args:
@@ -111,11 +111,6 @@ meta_arg:
 | PROP      qualid { PMApr  $2 }
 | STRING           { PMAstr $1 }
 | INTEGER          { PMAint $1 }
-;
-
-cloned:
-| /* epsilon */ { false }
-| CLONED        { true  }
 ;
 
 tqualid:
@@ -133,9 +128,6 @@ ident:
 | IDENT     { $1 }
 | SYNTAX    { "syntax" }
 | REMOVE    { "remove" }
-/*
-| CLONED    { "cloned" }
-*/
 | PRELUDE   { "prelude" }
 | PRINTER   { "printer" }
 | VALID     { "valid" }
@@ -218,7 +210,8 @@ file_extract:
 ;
 
 list0_global_theory_module:
-| /* epsilon */      { { fe_global = []; fe_th_rules = []; fe_mo_rules = [] } }
+| /* epsilon */
+    { { fe_global = []; fe_th_rules = []; fe_mo_rules = [] } }
 | global_extract list0_global_theory_module
     { {$2 with fe_global = (loc_i 1, $1) :: ($2.fe_global)} }
 | theory list0_global_theory_module
@@ -244,8 +237,8 @@ list0_mrule:
 ;
 
 mrule:
-| trule                                 { MRtheory $1 }
-| SYNTAX cloned EXCEPTION qualid STRING { MRexception ($2, $4, $5) }
-| SYNTAX cloned VAL qualid STRING       { MRval ($2, $4, $5) }
+| trule                          { MRtheory $1 }
+| SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
+| SYNTAX VAL qualid STRING       { MRval ($3, $4) }
 ;
 

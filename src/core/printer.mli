@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -37,7 +37,6 @@ val list_printers : unit -> (string * Pp.formatted) list
 
 val print_prelude : prelude pp
 val print_th_prelude : task -> prelude_map pp
-val print_prelude_for_theory : theory -> prelude_map pp
 
 val meta_syntax_type : meta
 val meta_syntax_logic : meta

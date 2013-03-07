@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -61,6 +61,19 @@ let rec print_type info fmt ty = match ty.ty_node with
           end
       end
 
+let number_format = {
+  Number.long_int_support = true;
+  Number.dec_int_support = Number.Number_default;
+  Number.hex_int_support = Number.Number_unsupported;
+  Number.oct_int_support = Number.Number_unsupported;
+  Number.bin_int_support = Number.Number_unsupported;
+  Number.def_int_support = Number.Number_unsupported;
+  Number.dec_real_support = Number.Number_default;
+  Number.hex_real_support = Number.Number_unsupported;
+  Number.frac_real_support = Number.Number_unsupported;
+  Number.def_real_support = Number.Number_unsupported;
+}
+
 let rec print_app info fmt ls tl oty =
   match query_syntax info.info_syn ls.ls_name with
   | Some s -> syntax_arguments s (print_term info) fmt tl
@@ -83,18 +96,6 @@ and print_term info fmt t = match t.t_node with
   | Tapp (ls, tl) ->
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
-      let number_format = {
-        Number.long_int_support = true;
-        Number.dec_int_support = Number.Number_default;
-        Number.hex_int_support = Number.Number_unsupported;
-        Number.oct_int_support = Number.Number_unsupported;
-        Number.bin_int_support = Number.Number_unsupported;
-        Number.def_int_support = Number.Number_unsupported;
-        Number.dec_real_support = Number.Number_default;
-        Number.hex_real_support = Number.Number_unsupported;
-        Number.frac_real_support = Number.Number_unsupported;
-        Number.def_real_support = Number.Number_unsupported;
-      } in
       Number.print number_format fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
@@ -226,3 +227,167 @@ let print_task fof _env pr thpr _blacklist ?old:_ fmt task =
 
 let () = register_printer "tptp-tff" (print_task false) ~desc:"TPTP TFF format"
 let () = register_printer "tptp-fof" (print_task true) ~desc:"TPTP FOF format"
+
+
+
+(** DFG input format for SPASS >= 3.8
+    (with the help of Daniel Wand)
+
+    TODO:
+    - type arguments for polymorphic functions and predicates
+    - data types
+  *)
+
+let is_type info d = match d.d_node with
+  | Dtype ts -> query_syntax info.info_syn ts.ts_name = None
+  | Ddata _ -> unsupportedDecl d "no data types"
+  | _ -> false
+let is_function info d = match d.d_node with
+  | Dparam ls ->
+      ls.ls_value <> None && query_syntax info.info_syn ls.ls_name = None
+  | _ -> false
+let is_predicate info d = match d.d_node with
+  | Dparam ls ->
+      ls.ls_value = None &&  query_syntax info.info_syn ls.ls_name = None
+  | _ -> false
+
+let ls_arity fmt d = match d.d_node with
+  | Dparam ls ->
+      let ntv = Stv.cardinal (ls_ty_freevars ls) in
+      let na = List.length ls.ls_args in
+      if ntv = 0 then fprintf fmt "(%a, %d)" print_symbol ls.ls_name na
+      else fprintf fmt "(%a, %d+%d)" print_symbol ls.ls_name ntv na
+  | _ -> assert false
+let type_arity fmt d = match d.d_node with
+  | Dtype ts ->
+      let ntv = List.length ts.ts_args in
+      if ntv = 0 then print_symbol fmt ts.ts_name
+      else fprintf fmt "(%a, %d)" print_symbol ts.ts_name ntv
+  | _ -> assert false
+
+let ls_type kind info fmt d = match d.d_node with
+  | Dparam ls ->
+      fprintf fmt "%s(@[%a" kind print_symbol ls.ls_name;
+      let tvs = ls_ty_freevars ls in
+      if not (Stv.is_empty tvs) then
+        fprintf fmt ", [%a]" (print_list comma print_tvar) (Stv.elements tvs);
+      begin match ls.ls_value, ls.ls_args with
+        | None, [] -> ()
+        | None, _ ->
+            fprintf fmt ", %a" (print_list comma (print_type info)) ls.ls_args
+        | Some ty, [] -> fprintf fmt ", %a" (print_type info) ty
+        | Some ty, _ ->
+            fprintf fmt ", (%a) %a" (print_list comma (print_type info))
+              ls.ls_args (print_type info) ty
+      end;
+      fprintf fmt "@]).@\n";
+      Stv.iter forget_tvar tvs
+  | _ -> assert false
+
+let rec print_app info fmt ls tl oty =
+  match query_syntax info.info_syn ls.ls_name with
+  | Some s -> syntax_arguments s (print_term info) fmt tl
+  | None ->
+      print_symbol fmt ls.ls_name;
+      let sbs = ls_app_inst ls tl oty in
+      if not (Mtv.is_empty sbs) then
+        fprintf fmt "<%a>"
+          (print_iter2 Mtv.iter comma nothing nothing (print_type info)) sbs;
+      if tl <> [] then
+        fprintf fmt "(%a)"
+          (print_list comma (print_term info)) tl
+
+and print_term info fmt t = match t.t_node with
+  | Tvar v ->
+      print_var fmt v
+  | Tapp (ls, tl) ->
+      print_app info fmt ls tl t.t_ty
+  | Tconst c ->
+      Number.print number_format fmt c
+  | Tlet _ -> unsupportedTerm t
+      "DFG does not support let, use eliminate_let"
+  | Tif _ -> unsupportedTerm t
+      "DFG does not support if, use eliminate_if"
+  | Tcase _ -> unsupportedTerm t
+      "TPTP does not support pattern matching, use eliminate_algebraic"
+  | Teps _ -> unsupportedTerm t
+      "TPTP does not support epsilon-terms"
+  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
+
+let rec print_fmla info fmt f = match f.t_node with
+  | Tapp (ls, tl) ->
+      print_app info fmt ls tl f.t_ty
+  | Tbinop (op, f1, f2) ->
+      let s = match op with
+        | Tand -> "and" | Tor -> "or"
+        | Timplies -> "implies" | Tiff -> "equiv" in
+      fprintf fmt "%s(%a,@ %a)" s (print_fmla info) f1 (print_fmla info) f2
+  | Tnot f ->
+      fprintf fmt "not(%a)" (print_fmla info) f
+  | Ttrue ->
+      fprintf fmt "true"
+  | Tfalse ->
+      fprintf fmt "false"
+  | Tquant (q, fq) ->
+      let q = match q with Tforall -> "forall" | Texists -> "exists" in
+      let vl, _tl, f = t_open_quant fq in
+      let print_vsty fmt vs =
+        fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty in
+      fprintf fmt "%s([%a],@ %a)" q
+        (print_list comma print_vsty) vl (print_fmla info) f;
+      List.iter forget_var vl
+  | Tlet _ -> unsupportedTerm f
+      "DFG does not support let, use eliminate_let"
+  | Tif _ -> unsupportedTerm f
+      "DFG does not support if, use eliminate_if"
+  | Tcase _ -> unsupportedTerm f
+      "DFG does not support pattern matching, use eliminate_algebraic"
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+
+let print_axiom info fmt d = match d.d_node with
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
+  | Dprop (Paxiom, pr, f) ->
+      fprintf fmt "@[<hov 2>formula(%a, %a).@]@\n"
+        (print_fmla info) f print_pr pr
+  | _ -> ()
+
+let print_dfg _env pr thpr _blacklist ?old:_ fmt task =
+  forget_all ident_printer;
+  forget_all pr_printer;
+  fprintf fmt "@[begin_problem(why3).@\n@\n";
+  print_prelude fmt pr;
+  print_th_prelude task fmt thpr;
+  fprintf fmt "list_of_descriptions.@\n";
+  fprintf fmt
+    "name({**}). author({**}). status(unknown). description({**}).@\n";
+  fprintf fmt "end_of_list.@\n@\n";
+  let info = { info_syn = get_syntax_map task; info_fof = true } in
+  let dl = Task.task_decls task in
+  let tl = List.filter (is_type info) dl in
+  let fl = List.filter (is_function info) dl in
+  let pl = List.filter (is_predicate info) dl in
+  (* arities *)
+  fprintf fmt "list_of_symbols.@\n";
+  fprintf fmt "functions [@[%a@]].@\n" (print_list comma ls_arity) fl;
+  fprintf fmt "predicates [@[%a@]].@\n" (print_list comma ls_arity) pl;
+  fprintf fmt "sorts [@[%a@]].@\n" (print_list comma type_arity) tl;
+  fprintf fmt "end_of_list.@\n@\n";
+  (* types *)
+  fprintf fmt "list_of_declarations.@\n";
+  List.iter (ls_type "function" info fmt) fl;
+  List.iter (ls_type "predicate" info fmt) pl;
+  fprintf fmt "end_of_list.@\n@\n";
+
+  fprintf fmt "list_of_formulae(axioms).@\n";
+  List.iter (print_axiom info fmt) dl;
+  fprintf fmt "end_of_list.@\n@\n";
+  fprintf fmt "list_of_formulae(conjectures).@\n";
+
+  let f = Task.task_goal_fmla task in
+  fprintf fmt "@[<hov 2>formula(%a, %a)@].@\n" (print_fmla info) f
+    print_pr (Task.task_goal task);
+  fprintf fmt "end_of_list.@\n@\n";
+  fprintf fmt "end_problem.@\n"
+
+let () =
+  register_printer "dfg" print_dfg ~desc:"First-order monomorphic DFG format"

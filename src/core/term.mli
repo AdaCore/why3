@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -38,6 +38,8 @@ type lsymbol = private {
   ls_name   : ident;
   ls_args   : ty list;
   ls_value  : ty option;
+  ls_opaque : Stv.t;
+  ls_constr : int;
 }
 
 module Mls : Extmap.S with type key = lsymbol
@@ -48,9 +50,14 @@ module Wls : Weakhtbl.S with type key = lsymbol
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
-val create_lsymbol : preid -> ty list -> ty option -> lsymbol
-val create_fsymbol : preid -> ty list -> ty -> lsymbol
-val create_psymbol : preid -> ty list -> lsymbol
+val create_lsymbol :
+  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty option -> lsymbol
+
+val create_fsymbol :
+  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
+
+val create_psymbol :
+  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 
@@ -62,6 +69,7 @@ exception UncoveredVar of vsymbol
 exception BadArity of lsymbol * int * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
+exception ConstructorExpected of lsymbol
 
 (** {2 Patterns} *)
 

@@ -179,6 +179,13 @@ is given in Figure~\ref{fig:bnf:spec}.
   \caption{Specification clauses in programs.}
 \label{fig:bnf:spec}
 \end{figure}
+Within specifications, terms are extended with new constructs
+\verb|old| and \verb|at|:
+\begin{center}\framebox{\input{./term_old_at_bnf.tex}}\end{center}
+Within a postcondition, $\verb|old|~t$ refers to the value of term $t$
+in the prestate. Within the scope of a code mark $L$,
+the term $\verb|at|~t~\verb|'|L$ refers to the value of term $t$ at the program
+point corresponding to $L$.
 
 \subsection{Expressions}
 
@@ -195,6 +202,12 @@ Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
   \caption{Syntax for program expressions (part 2).}
 \label{fig:bnf:exprb}
 \end{figure}
+
+In applications, arguments are evaluated from right to left.
+This includes applications of infix operators, with the only exception of
+lazy operators \verb|&&| and \verb+||+ that evaluate from left to
+right, lazily.
+
 
 % In the following we describe the informal semantics of each
 % constructs, and provide the corresponding rule for computing the

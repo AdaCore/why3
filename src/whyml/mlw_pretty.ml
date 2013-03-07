@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -456,6 +456,12 @@ let () = Exn_printer.register
       fprintf fmt "The type of exception %s has mutable components" id.id_string
   | Mlw_ty.IllegalAlias _reg ->
       fprintf fmt "This application creates an illegal alias"
+  | Mlw_ty.IllegalCompar (tv,_ity) ->
+      fprintf fmt "This application instantiates \
+          a non-opaque type parameter %a with a program type" print_tv tv
+  | Mlw_ty.GhostDiverg ->
+      fprintf fmt "This ghost expression contains potentially \
+        non-terminating loops or function calls"
   | Mlw_expr.RdOnlyPLS _ls ->
       fprintf fmt "Cannot construct or modify values of a private type"
   | Mlw_expr.HiddenPLS pl ->

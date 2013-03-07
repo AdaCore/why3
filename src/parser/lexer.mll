@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,8 +12,7 @@
 {
   open Format
   open Lexing
-  open Term
-   open Parser
+  open Parser
 
   (* lexical errors *)
 
@@ -205,8 +204,12 @@ rule token = parse
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
       { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
-  | "'"
-      { QUOTE }
+  | "~'" (lident as id)
+      { OPAQUE_QUOTE_LIDENT id }
+  | "'" (lident as id)
+      { QUOTE_LIDENT id }
+  | "'" (uident as id)
+      { QUOTE_UIDENT id }
   | ","
       { COMMA }
   | "("

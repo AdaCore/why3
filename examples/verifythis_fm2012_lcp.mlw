@@ -1,5 +1,16 @@
-(*
+(**
 
+{1 VerifyThis@fm2012 competition, Challenge 1: Longest Repeated Substring}
+
+{h
+The following is the original description of the verification task,
+reproduced verbatim. A <a
+href="http://fm2012.verifythis.org/challenges">reference
+implementation in Java</a> (based on code by Robert Sedgewick and
+Kevin Wayne) was also given. The Why3 implementation below follows the
+Java implementation as faithfully as possible.
+
+<pre>
 Longest Common Prefix (LCP) - 45 minutes
 
 VERIFICATION TASK
@@ -20,21 +31,15 @@ Pseudocode:
 
     int lcp(int[] a, int x, int y) {
         int l = 0;
-        while (x+l<a.length && y+l<a.length && a[x+l]==a[y+l]) {
+        while (x+l&lt;a.length && y+l&lt;a.length && a[x+l]==a[y+l]) {
             l++;
         }
         return l;
     }
 
 
-
-
-
-
 ADVANCED
 ========
-
-
 
 BACKGROUND
 ----------
@@ -60,7 +65,6 @@ sorted suffix array is:
 
 [3,0,2,1]
 
-
 VERIFICATION TASK
 -----------------
 
@@ -70,50 +74,56 @@ comparison on arrays, a sorting routine, and LCP.
 
 The client code (LRS.java) uses these to solve the LRS problem. Verify
 that it does so correctly.
+</pre>}
 
 *)
 
 
 
-module LCP "longest common prefix"
+(** {2 First module: longest common prefix}
 
-use import int.Int
+    it corresponds to the basic part of the challenge
+
+*)
+
+module LCP
+
+use export int.Int
 use import array.Array
-use import array.ArrayPermut
 
-
-predicate is_common_prefix (a:array int) (x y:int) (l:int) =
+(** [is_common_prefix a x y l] is true when the prefixes of length [l]
+    at respective positions [x] and [y] in array [a] are identical. In
+    other words, the array parts a[x..x+l-1] and a[y..y+l-1] are equal
+    *)
+predicate is_common_prefix (a:array int) (x y l:int) =
   0 <= l /\ x+l <= a.length /\ y+l <= a.length /\
   (forall i:int. 0 <= i < l -> a[x+i] = a[y+i])
 
-lemma common_prefix_eq:
-  forall a:array int, x:int.
-     0 <= x <= a.length -> is_common_prefix a x x (a.length - x)
-
-lemma common_prefix_eq2:
-  forall a:array int, x:int.
-     0 <= x <= a.length -> not (is_common_prefix a x x (a.length - x + 1))
-
-lemma not_common_prefix_if_last_different:
+(** This lemma helps for the proof of [lcp] (but is not mandatory) and
+    is needed later (for [le_trans]) *)
+lemma not_common_prefix_if_last_char_are_different:
   forall a:array int, x y:int, l:int.
-    0 < l /\ x+l < a.length /\ y+l < a.length /\ a[x+(l-1)] <> a[y+(l-1)] ->
-      not is_common_prefix a x y l
+    0 <= l /\ x+l < a.length /\ y+l < a.length /\ a[x+l] <> a[y+l] ->
+      not is_common_prefix a x y (l+1)
 
-(*
-function longest_common_prefix (a:array int) (x y:int) :int
+(** [is_longest_common_prefix a x y l] is true when [l] is the maximal
+    length such that prefixes at positions [x] and [y] in array [a]
+    are identical. *)
+predicate is_longest_common_prefix (a:array int) (x y l:int) =
+  is_common_prefix a x y l /\
+  forall m:int. l < m -> not (is_common_prefix a x y m)
 
-axiom lcp_spec:
-  forall a:array int, x y:int, l:int.
-  0 <= x <= a.length /\ 0 <= y <= a.length ->
-  (l = longest_common_prefix a x y <->
-   is_common_prefix a x y l /\ not is_common_prefix a x y (l+1))
-*)
+(** This lemma helps for proving [lcp] (but again is not mandatory),
+    and is needed for proving [lcp_sym] and [le_trans] lemmas, and the
+    post-condition of [compare] function in the "absurd" case *)
+lemma longest_common_prefix_succ:
+ forall a:array int, x y l:int.
+  is_common_prefix a x y l /\ not (is_common_prefix a x y (l+1)) ->
+  is_longest_common_prefix a x y l
 
-predicate is_longest_common_prefix (a:array int) (x y:int) (l:int) =
-  is_common_prefix a x y l /\ not (is_common_prefix a x y (l+1))
+use export ref.Refint
 
-use import ref.Refint
-
+(** the first function, that compute the longest common prefix *)
 let lcp (a:array int) (x y:int) : int
   requires { 0 <= x <= a.length }
   requires { 0 <= y <= a.length }
@@ -124,104 +134,105 @@ let lcp (a:array int) (x y:int) : int
       invariant { is_common_prefix a x y !l }
       incr l
     done;
-(*
-    assert { is_common_prefix a x y !l };
-    assert { x + !l < n /\ y + !l < n -> a[x + !l] <> a[y + !l] };
-    assert { not is_common_prefix a x y (!l+1) };
-*)
     !l
 
 
-lemma lcp_is_cp :
-  forall a:array int, x y l:int.
-     0 <= x <= a.length /\ 0 <= y <= a.length ->
-     is_longest_common_prefix a x y l ->
-     is_common_prefix a x y l
+end
 
-lemma lcp_eq :
-  forall a:array int, x y l:int.
-     0 <= x <= a.length /\ 0 <= y <= a.length ->
-     is_longest_common_prefix a x y l ->
-     forall i:int. 0 <= i < l -> a[x+i] = a[y+i]
+module LCP_test
 
-lemma lcp_refl :
-  forall a:array int, x:int.
-     0 <= x <= a.length -> is_longest_common_prefix a x x (a.length - x)
+(** test harness for lcp *)
 
-lemma lcp_sym :
-  forall a:array int, x y l:int.
-     0 <= x <= a.length /\ 0 <= y <= a.length ->
-       is_longest_common_prefix a x y l -> is_longest_common_prefix a y x l
+use import array.Array
+use import LCP
 
-let test1 () =
+let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let x = lcp arr 1 2 in
   assert { is_common_prefix arr 1 2 1};
+  assert { not is_common_prefix arr 1 2 2};
   check { x = 1 };
   (* int[] brr = {1,2,3,5}; *)
   let brr = Array.make 4 0 in
   brr[0]<-1; brr[1]<-2; brr[2]<-3; brr[3]<-5;
   let x = lcp brr 1 2 in
   assert { is_common_prefix brr 1 2 0};
+  assert { not is_common_prefix brr 1 2 1};
   check { x = 0 };
   (* int[] crr = {1,2,3,5}; *)
   let crr = Array.make 4 0 in
   crr[0]<-1; crr[1]<-2; crr[2]<-3; crr[3]<-5;
   let x = lcp crr 2 3 in
   assert { is_common_prefix crr 2 3 0};
+  assert { not is_common_prefix crr 2 3 1};
   check { x = 0 };
   (* int[] drr = {1,2,3,3}; *)
   let drr = Array.make 4 0 in
   drr[0]<-1; drr[1]<-2; drr[2]<-3; drr[3]<-3;
   let x = lcp drr 2 3 in
   assert { is_common_prefix drr 2 3 1};
+  assert { not is_common_prefix drr 2 3 2};
   check {x = 1}
 
 
-  predicate le (a : array int) (x y:int) =
+end
+
+(** {2 Second module: sorting suffixes } *)
+module SuffixSort
+
+  use import int.Int
+  use import ref.Refint
+  use import array.Array
+  use LCP
+
+  (** order by prefix *)
+  predicate lt (a : array int) (x y:int) =
      let n = a.length in
      0 <= x <= n /\ 0 <= y <= n /\
-     exists l:int. is_common_prefix a x y l /\
-     (x+l = n \/
-      (x+l < n /\ y+l < n /\ a[x+l] <= a[y+l]))
+     exists l:int. LCP.is_common_prefix a x y l /\
+     (y+l < n /\ (x+l = n \/ a[x+l] < a[y+l]))
 
-  lemma le_refl :
-    forall a:array int, x :int.
-    0 <= x <= a.length -> le a x x
 
-  lemma le_trans :
-    forall a:array int, x y z:int.
-    0 <= x <= a.length /\ 0 <= y <= a.length /\
-    0 <= z <= a.length /\ le a x y /\ le a y z -> le a x z
 
-  lemma le_asym :
-    forall a:array int, x y:int.
-    0 <= x <= a.length /\ 0 <= y <= a.length /\ not (le a x y) -> le a y x
-
+(** comparison function, that decides the order of prefixes *)
 let compare (a:array int) (x y:int) : int
   requires { 0 <= x <= a.length }
   requires { 0 <= y <= a.length }
   ensures { result = 0 -> x = y }
-  ensures { result < 0 -> le a x y }
-  ensures { result > 0 -> le a y x }
+  ensures { result < 0 -> lt a x y }
+  ensures { result > 0 -> lt a y x }
   =
   if x = y then 0 else
   let n = a.length in
-  let l = lcp a x y in
-  assert { is_common_prefix a x y l };
+  let l = LCP.lcp a x y in
   if x + l = n then -1 else
   if y + l = n then 1 else
   if a[x + l] < a[y + l] then -1 else
   if a[x + l] > a[y + l] then 1 else
   absurd
 
-  use map.Map
-  use map.MapPermut
-  use map.MapInjection
 
-  predicate permutation (m:Map.map int int) (u : int) =
-    MapInjection.range m u /\ MapInjection.injective m u
+  use map.MapInjection
+  (** [range a] is true when for each [i], [a[i]] is between [0] at
+      [a.length-1] *)
+  predicate range (a:array int) = MapInjection.range a.elts a.length
+
+  (** for the [permut] predicate (permutation of elements) *)
+  use array.ArrayPermut
+
+  predicate le (a : array int) (x y:int) = x = y \/ lt a x y
+
+  (* needed for le_trans (for cases x = y /\ le y z and le x y /\ y = z) *)
+  lemma lcp_same_index :
+    forall a:array int, x:int.
+      0 <= x <= a.length -> LCP.is_longest_common_prefix a x x (a.length - x)
+
+  lemma le_trans : forall a:array int, x y z:int.
+    le a x y /\ le a y z -> le a x z
+
+  (** spec of sorted in increasing prefix order *)
+  use map.Map
 
   predicate sorted_sub (a:array int) (data:Map.map int int) (l u:int) =
     forall i1 i2 : int. l <= i1 <= i2 < u ->
@@ -230,22 +241,22 @@ let compare (a:array int) (x y:int) : int
   predicate sorted (a : array int) (data:array int) =
     sorted_sub a data.elts 0 data.length
 
-  let sort (a:array int) (data : array int)
+let sort (a:array int) (data : array int)
   requires { data.length = a.length }
-  requires { MapInjection.range data.elts data.length }
+  requires { range data }
   ensures { sorted a data }
-  ensures { permut (old data) data }
+  ensures { ArrayPermut.permut (old data) data }
   =
    'Init:
    for i = 0 to data.length - 1 do
-     invariant { permut (at data 'Init) data   }
+     invariant { ArrayPermut.permut (at data 'Init) data   }
      invariant { sorted_sub a data.elts 0 i  }
-     invariant { MapInjection.range data.elts data.length }
+     invariant { range data }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
-       invariant { MapInjection.range data.elts data.length }
-       invariant { permut (at data 'Init) data   }
+       invariant { range data }
+       invariant { ArrayPermut.permut (at data 'Init) data   }
        invariant { sorted_sub a data.elts 0 !j }
        invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
@@ -255,47 +266,12 @@ let compare (a:array int) (x y:int) : int
        let t = data[!j] in
        data[!j] <- data[b];
        data[b] <- t;
-       assert { exchange (at data 'L) data (!j-1) !j };
+       assert { ArrayPermut.exchange (at data 'L) data (!j-1) !j };
        decr j
-     done
+     done;
+     (* needed to prove the invariant [sorted_sub a data.elts 0 i] *)
+     assert { !j > 0 -> le a data[!j-1] data[!j] }
    done
-
-
-(* additional properties relating le and longest_common_prefix, needed
-   for SuffixArray and LRS
-
-*)
-
-
-(*
-lemma map_permut_permutation :
-  forall m1 m2:Map.map int int, u:int [MapPermut.permut_sub m1 m2 0 u].
-  MapPermut.permut_sub m1 m2 0 u -> map_permutation m1 u -> map_permutation m2 u
-*)
-
-lemma permut_permutation :
-  forall a1 a2:array int.
-  permut a1 a2 -> permutation a1.elts a1.length -> permutation a2.elts a2.length
-
-  use import int.MinMax
-
-(*
-  lemma lcp_le_le_min:
-    forall a:array int, x y z:int [le a x y, le a y z].
-     le a x y /\ le a y z ->
-     longest_common_prefix a x z =
-       min (longest_common_prefix a x y) (longest_common_prefix a y z)
-*)
-  lemma lcp_le_le_aux:
-    forall a:array int, x y z l:int.
-     le a x y /\ le a y z ->
-     is_common_prefix a x z l -> is_common_prefix a y z l
-
-  lemma lcp_le_le:
-    forall a:array int, x y z l m :int.
-     le a x y /\ le a y z ->
-     is_longest_common_prefix a x z l /\ is_longest_common_prefix a y z m
-     -> l <= m
 
 end
 
@@ -304,49 +280,71 @@ end
 
 
 
+(** {2 Third module: Suffix Array Data Structure } *)
+
+
 module SuffixArray
 
 use import int.Int
 use import array.Array
-use import LCP
+use LCP
+use SuffixSort
+use map.Map
+use map.MapInjection
+
+predicate permutation (m:Map.map int int) (u : int) =
+  MapInjection.range m u /\ MapInjection.injective m u
 
 type suffixArray = {
     values : array int;
     suffixes : array int;
 }
-
-use map.MapInjection
-
-predicate inv(s:suffixArray) =
-  s.values.length = s.suffixes.length /\
-  permutation s.suffixes.elts s.suffixes.length /\
-  sorted s.values s.suffixes
+invariant { self.values.length = self.suffixes.length /\
+  permutation self.suffixes.elts self.suffixes.length /\
+  SuffixSort.sorted self.values self.suffixes }
 
 let select (s:suffixArray) (i:int) : int
-  requires { inv s /\ 0 <= i < s.values.length }
+  requires { 0 <= i < s.values.length }
   ensures { result = s.suffixes[i] }
   = s.suffixes[i]
 
+use array.ArrayPermut
+
+(** needed to establish invariant in function [create] *)
+lemma permut_permutation : forall a1 a2:array int.
+  ArrayPermut.permut a1 a2 /\ permutation a1.elts a1.length ->
+    permutation a2.elts a2.length
+
+(** constructor of suffixArray structure *)
 let create (a:array int) : suffixArray
-  ensures { result.values = a /\ inv result }
- =
- let n = a.length in
- let suf = Array.make n 0 in
- for i = 0 to n-1 do
-   invariant { forall j:int. 0 <= j < i -> suf[j] = j }
-   suf[i] <- i done;
- sort a suf;
- { values = a; suffixes = suf }
+  ensures { result.values = a }
+= let n = a.length in
+  let suf = Array.make n 0 in
+  for i = 0 to n-1 do
+    invariant { forall j:int. 0 <= j < i -> suf[j] = j }
+    suf[i] <- i done;
+  SuffixSort.sort a suf;
+  { values = a; suffixes = suf }
 
 let lcp (s:suffixArray) (i:int) : int
-  requires { inv s }
   requires { 0 < i < s.values.length }
-  ensures { is_longest_common_prefix s.values s.suffixes[i-1] s.suffixes[i] result }
-  =
-   LCP.lcp s.values s.suffixes[i] s.suffixes[i-1]
+  ensures { LCP.is_longest_common_prefix s.values
+              s.suffixes[i-1] s.suffixes[i] result }
+= LCP.lcp s.values s.suffixes[i] s.suffixes[i-1]
+
+end
+
+
+
+
+
+module SuffixArray_test
+
+use import array.Array
+use import SuffixArray
 
 (*
-let test2 () =
+let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
   let sa = create arr in
@@ -380,83 +378,104 @@ end
 
 
 
+(** {2 Fourth module: Longest Repeated Substring} *)
 
-
-module LRS "longest repeated substring"
+module LRS
 
   use import int.Int
   use import ref.Ref
   use import array.Array
   use map.MapInjection
   use LCP
+  use SuffixSort
   use SuffixArray
 
-    val solStart : ref int
-    val solLength : ref int
-    val ghost solStart2 : ref int
 
-    let lrs (a:array int) : unit
-      requires { a.length > 0 }
-      ensures { 0 <= !solLength <= a.length }
-      ensures { 0 <= !solStart <= a.length }
-      ensures { 0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
-                LCP.is_longest_common_prefix a !solStart !solStart2 !solLength }
-      ensures { forall x y l:int.
-                  0 <= x < y < a.length /\
-                  LCP.is_longest_common_prefix a x y l ->
-                  !solLength >= l }
-    =
-      let sa = SuffixArray.create a in
-      assert { LCP.permutation sa.SuffixArray.suffixes.elts
-                               sa.SuffixArray.suffixes.length };
-      solStart := 0;
-      solLength := 0;
-      solStart2 := a.length;
-      for i=1 to a.length - 1 do
-        invariant { 0 <= !solLength <= a.length }
-        invariant { 0 <= !solStart <= a.length }
-        invariant {
-             0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
-             LCP.is_longest_common_prefix a !solStart !solStart2 !solLength }
-        invariant { forall j k l:int.
+(** additional properties relating [le] and [longest_common_prefix] *)
+
+(* needed for [lrs] function, last before last assert *)
+lemma lcp_sym :
+  forall a:array int, x y l:int.
+     0 <= x <= a.length /\ 0 <= y <= a.length ->
+       LCP.is_longest_common_prefix a x y l ->
+       LCP.is_longest_common_prefix a y x l
+
+
+(** allows CVC to prove the next lemma *)
+lemma le_le_common_prefix:
+    forall a:array int, x y z l:int.
+     SuffixSort.le a x y /\ SuffixSort.le a y z ->
+     LCP.is_common_prefix a x z l -> LCP.is_common_prefix a y z l
+
+(** proved by Alt-Ergo and CVC. But only by Alt-Ergo if previous lemma is removed *)
+  lemma le_le_longest_common_prefix:
+    forall a:array int, x y z l m :int.
+     SuffixSort.le a x y /\ SuffixSort.le a y z ->
+     LCP.is_longest_common_prefix a x z l /\
+     LCP.is_longest_common_prefix a y z m
+       -> l <= m
+
+
+  val solStart : ref int
+  val solLength : ref int
+  val ghost solStart2 : ref int
+
+  let lrs (a:array int) : unit
+    requires { a.length > 0 }
+    ensures { 0 <= !solLength <= a.length }
+    ensures { 0 <= !solStart <= a.length }
+    ensures { 0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
+              LCP.is_longest_common_prefix a !solStart !solStart2 !solLength }
+    ensures { forall x y l:int.
+                0 <= x < y < a.length /\
+                LCP.is_longest_common_prefix a x y l ->
+                !solLength >= l }
+  =
+    let sa = SuffixArray.create a in
+    solStart := 0;
+    solLength := 0;
+    solStart2 := a.length;
+    for i=1 to a.length - 1 do
+      invariant { 0 <= !solLength <= a.length }
+      invariant { 0 <= !solStart <= a.length }
+      invariant {
+           0 <= !solStart2 <= a.length /\ !solStart <> !solStart2 /\
+           LCP.is_longest_common_prefix a !solStart !solStart2 !solLength }
+      invariant { forall j k l:int.
                   0 <= j < k < i /\
                   LCP.is_longest_common_prefix a
                     sa.SuffixArray.suffixes[j] sa.SuffixArray.suffixes[k] l ->
-
                   !solLength >= l }
-         let l = SuffixArray.lcp sa i in
-         assert { forall j:int. 0 <= j < i ->
-                    LCP.le a sa.SuffixArray.suffixes[j]
-                             sa.SuffixArray.suffixes[i] };
-         assert { forall j m:int. 0 <= j < i /\
-                    LCP.is_longest_common_prefix a
-                             sa.SuffixArray.suffixes[j]
-                             sa.SuffixArray.suffixes[i] m ->
-                  m <= l };
-         assert { forall j k m:int. 0 <= j < k  < i-1 /\
-                    LCP.is_longest_common_prefix a
-                         sa.SuffixArray.suffixes[j]
-                         sa.SuffixArray.suffixes[k] m -> !solLength >= m};
-         if l > !solLength then begin
-            solStart := SuffixArray.select sa i;
-            solStart2 := SuffixArray.select sa (i-1);
-            solLength := l
-         end
-      done;
-      assert { let s = sa.SuffixArray.suffixes in
-               MapInjection.surjective s.elts s.length };
-      assert { forall j k l:int.
-                  0 <= j < a.length /\ 0 <= k < a.length /\ j <> k /\
-                   LCP.is_longest_common_prefix a 
-                    sa.SuffixArray.suffixes[j] sa.SuffixArray.suffixes[k] l ->
-!solLength >= l};
-      assert { forall x y:int.
-                  0 <= x < y < a.length ->
-                  exists j k : int.
+      let l = SuffixArray.lcp sa i in
+      if l > !solLength then begin
+         solStart := SuffixArray.select sa i;
+         solStart2 := SuffixArray.select sa (i-1);
+         solLength := l
+      end
+    done;
+    (** the following assert needs [lcp_sym] lemma *)
+    assert { forall j k l:int.
+                0 <= j < a.length /\ 0 <= k < a.length /\ j <> k /\
+                 LCP.is_longest_common_prefix a
+                 sa.SuffixArray.suffixes[j] sa.SuffixArray.suffixes[k] l ->
+              !solLength >= l};
+    (* we state explicitly that sa.suffixes is surjective *)
+    assert { forall x y:int.
+                0 <= x < y < a.length ->
+                exists j k : int.
                   0 <= j < a.length /\ 0 <= k < a.length /\ j <> k /\
                   x = sa.SuffixArray.suffixes[j] /\
                   y = sa.SuffixArray.suffixes[k] };
-      ()
+    ()
+
+end
+
+
+module LRS_test
+
+use import array.Array
+use import ref.Ref
+use import LRS
 
 (*
   let test () =
@@ -468,5 +487,3 @@ module LRS "longest repeated substring"
 
 end
 
-
-(* Based on code by Robert Sedgewick and Kevin Wayne. *)

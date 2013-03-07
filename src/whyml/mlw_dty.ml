@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2012   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,7 +21,7 @@ open Mlw_expr
 
 type dity =
   | Dvar  of dvar ref
-  | Duvar of tvsymbol
+  | Duvar of tvsymbol * (* opaque *) bool
   | Dits  of itysymbol * dity list * dreg list
   | Dts   of tysymbol  * dity list
 
@@ -42,7 +42,7 @@ let ity_of_dity dity =
     | Dvar { contents = Dtvs _ } ->
         Loc.errorm "undefined type variable"
     | Dvar { contents = Dval dty } -> get_ity dty
-    | Duvar tv -> ity_var tv
+    | Duvar (tv,_) -> ity_var tv
     | Dits (its,dl,rl) ->
         ity_app its (List.map get_ity dl) (List.map get_reg rl)
     | Dts (ts,dl) -> ity_pur ts (List.map get_ity dl)
@@ -53,8 +53,8 @@ let ity_of_dity dity =
   in
   get_ity dity
 
-let create_user_type_variable x =
-  Duvar (Typing.create_user_tv x.id)
+let create_user_type_variable x op =
+  Duvar (Typing.create_user_tv x.id, op)
 
 let create_type_variable () =
   Dvar (ref (Dtvs (create_tvsymbol (id_fresh "a"))))
@@ -118,12 +118,19 @@ let rec dity_refresh = function
   | Dits (its,dl,_) -> its_app its (List.map dity_refresh dl)
   | Dts (ts,dl) -> ts_app_real ts (List.map dity_refresh dl)
 
+let rec opaque_tvs acc = function
+  | Dvar { contents = Dtvs _ } -> acc
+  | Dvar { contents = Dval dty } -> opaque_tvs acc dty
+  | Duvar (tv,true) -> Stv.add tv acc
+  | Duvar (_,false) -> acc
+  | Dits (_,dl,_) | Dts (_,dl) -> List.fold_left opaque_tvs acc dl
+
 (* unification *)
 
 let rec occur_check tv = function
   | Dvar { contents = Dval d } -> occur_check tv d
   | Dits (_,dl,_) | Dts (_,dl) -> List.iter (occur_check tv) dl
-  | Dvar { contents = Dtvs tv' } | Duvar tv' ->
+  | Dvar { contents = Dtvs tv' } | Duvar (tv',_) ->
       if tv_equal tv tv' then raise Exit
 
 let rec occur_check_reg tv = function
@@ -152,7 +159,7 @@ let rec unify ~weak d1 d2 = match d1,d2 with
   | Dvar ({ contents = Dtvs tv } as r), d
   | d, Dvar ({ contents = Dtvs tv } as r) ->
       occur_check tv d; r := Dval d
-  | Duvar tv1, Duvar tv2 when tv_equal tv1 tv2 -> ()
+  | Duvar (tv1,_), Duvar (tv2,_) when tv_equal tv1 tv2 -> ()
   | Dits (its1, dl1, rl1), Dits (its2, dl2, rl2) when its_equal its1 its2 ->
       assert (List.length rl1 = List.length rl2);
       assert (List.length dl1 = List.length dl2);
@@ -195,6 +202,15 @@ let unify d1 d2 = unify ~weak:false d1 d2
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
+let is_chainable dvty =
+  let rec is_bool = function
+    | Dvar { contents = Dval dty } -> is_bool dty
+    | Dts (ts,_) -> ts_equal ts ts_bool
+    | _ -> false in
+  match dvty with
+    | [t1;t2],t -> is_bool t && not (is_bool t1) && not (is_bool t2)
+    | _ -> false
+
 let vty_of_dvty (argl,res) =
   let vty = VTvalue (ity_of_dity res) in
   let conv a = create_pvsymbol (id_fresh "x") (ity_of_dity a) in
@@ -228,7 +244,7 @@ let specialize_scheme tvs (argl,res) =
   let hreg = Htv.create 17 in
   let rec specialize = function
     | Dvar { contents = Dval d } -> specialize d
-    | Dvar { contents = Dtvs tv } | Duvar tv as d ->
+    | Dvar { contents = Dtvs tv } | Duvar (tv,_) as d ->
         if tv_in_tvars tv tvs then d else
         begin try Htv.find htvs tv with Not_found ->
           let v = create_type_variable () in
@@ -332,7 +348,7 @@ let print_dity fmt dity =
   let protect_on x s = if x then "(" ^^ s ^^ ")" else s in
   let rec print_dity inn fmt = function
     | Dvar { contents = Dtvs tv }
-    | Duvar tv ->
+    | Duvar (tv,_) ->
         Pretty.print_tv fmt tv
     | Dvar { contents = Dval dty } ->
         print_dity inn fmt dty
