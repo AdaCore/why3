@@ -350,6 +350,7 @@ let mutable_substitute env (mreg : vsymbol Mreg.t) (f : term) =
      "updating" term. The map [mreg] must already contain fresh variables for
      all regions. *)
   let update_var vs _ = try match update_var env mreg vs with
+  (* ??? is the try-with block needed? *)
     | { t_node = Tvar nv } when vs_equal vs nv -> None
     | t -> Some t
   with Not_found -> None
@@ -371,6 +372,7 @@ let get_var_of_region reg f =
     let test vs _ acc =
       if acc <> None then acc
       else
+        (* ??? is the try-with block needed? *)
         try match (ity_of_vs vs).ity_node with
         | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
         | _ -> acc
@@ -383,6 +385,7 @@ let quantify env (regs : Sreg.t) (f : term) =
    (* ??? refactor this first bit to use [get_var_of_region] *)
   let get_var reg () =
     let test vs _ id =
+      (* ??? is the try-with block needed? *)
       try match (ity_of_vs vs).ity_node with
       | Ityapp (_,_,[r]) when reg_equal r reg -> vs.vs_name
       | _ -> id
@@ -1118,6 +1121,7 @@ end = struct
      Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
 
   let get_region v =
+      (* ??? is the try-with block needed? *)
       try match (ity_of_vs v).ity_node with
       | Ityapp (_,_,[r]) -> Some r
       | _ -> None
