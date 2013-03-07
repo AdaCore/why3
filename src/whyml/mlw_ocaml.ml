@@ -446,7 +446,7 @@ and print_app pri ls info fmt tl =
 
 and print_tnode pri info fmt t = match t.t_node with
   | Tvar v ->
-      let gh = try (restore_pv v).pv_vtv.vtv_ghost with Not_found -> false in
+      let gh = try (restore_pv v).pv_ghost with Not_found -> false in
       if gh then fprintf fmt "()" else print_vs fmt v
   | Tconst c ->
       print_const fmt c
@@ -609,12 +609,12 @@ open Mlw_module
 
 let print_its info fmt ts = print_ts info fmt ts.its_ts
 let print_pv info fmt pv =
-  if pv.pv_vtv.vtv_ghost then
+  if pv.pv_ghost then
     fprintf fmt "((* ghost %a *))" (print_lident info) pv.pv_vs.vs_name
   else
     print_lident info fmt pv.pv_vs.vs_name
 let print_ps info fmt ps =
-  if ps.ps_vta.vta_ghost then
+  if ps.ps_ghost then
     fprintf fmt "((* ghost %a *))" (print_lident info) ps.ps_name
   else
     print_lident info fmt ps.ps_name
@@ -664,21 +664,19 @@ let rec print_ity_node inn info fmt ity = match ity.ity_node with
 
 let print_ity info = print_ity_node false info
 
-let print_vtv info fmt vtv = print_ity info fmt vtv.vtv_ity
-
 let print_pvty info fmt pv =
-  if pv.pv_vtv.vtv_ghost then fprintf fmt "((* ghost *))" else
+  if pv.pv_ghost then fprintf fmt "((* ghost *))" else
   fprintf fmt "@[(%a:@ %a)@]"
-    (print_lident info) pv.pv_vs.vs_name (print_vtv info) pv.pv_vtv
+    (print_lident info) pv.pv_vs.vs_name (print_ity info) pv.pv_ity
 
-let rec print_vta info fmt vta =
-  let print_arg fmt pv = print_vtv info fmt pv.pv_vtv in
-  fprintf fmt "(%a -> %a)" (print_list arrow print_arg) vta.vta_args
-    (print_vty info) vta.vta_result
+let rec print_aty info fmt aty =
+  let print_arg fmt pv = print_ity info fmt pv.pv_ity in
+  fprintf fmt "(%a -> %a)" (print_list Pp.arrow print_arg) aty.aty_args
+    (print_vty info) aty.aty_result
 
 and print_vty info fmt = function
-  | VTvalue vtv -> print_vtv info fmt vtv
-  | VTarrow vta -> print_vta info fmt vta
+  | VTvalue ity -> print_ity info fmt ity
+  | VTarrow aty -> print_aty info fmt aty
 
 let is_letrec = function
   | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
@@ -689,7 +687,7 @@ let ity_mark = ity_pur Mlw_wp.ts_mark []
 let rec print_expr info fmt e = print_lexpr 0 info fmt e
 
 and print_lexpr pri info fmt e =
-  if vty_ghost e.e_vty then
+  if e.e_ghost then
     fprintf fmt "((* ghost *))"
   else match e.e_node with
   | Elogic t ->
@@ -702,14 +700,14 @@ and print_lexpr pri info fmt e =
         | None   -> print_ps info fmt a end
   | Eapp (e,v,_) ->
       fprintf fmt "(%a@ %a)" (print_lexpr pri info) e (print_pv info) v
-  | Elet ({ let_expr = e1 }, e2) when vty_ghost e1.e_vty ->
+  | Elet ({ let_expr = e1 }, e2) when e1.e_ghost ->
       print_expr info fmt e2
   | Elet ({ let_sym = LetV pv }, e2)
-    when ity_equal pv.pv_vtv.vtv_ity ity_mark ->
+    when ity_equal pv.pv_ity ity_mark ->
       print_expr info fmt e2
   | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
     when pv.pv_vs.vs_name.id_string = "_" &&
-         ity_equal pv.pv_vtv.vtv_ity ity_unit ->
+         ity_equal pv.pv_ity ity_unit ->
       fprintf fmt (protect_on (pri > 0) "@[begin %a;@ %a end@]")
         (print_expr info) e1 (print_expr info) e2;
   | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
@@ -753,7 +751,7 @@ and print_lexpr pri info fmt e =
   | Eany _ ->
       fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
         (print_vty info) e.e_vty
-  | Ecase (e1, [_,e2]) when vty_ghost e1.e_vty ->
+  | Ecase (e1, [_,e2]) when e1.e_ghost ->
       print_lexpr pri info fmt e2
   | Ecase (e1, bl) ->
       fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
@@ -761,14 +759,14 @@ and print_lexpr pri info fmt e =
   | Erec (fdl, e) ->
       (* print non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
-        Pervasives.compare ps1.ps_vta.vta_ghost ps2.ps_vta.vta_ghost in
+        Pervasives.compare ps1.ps_ghost ps2.ps_ghost in
       let fdl = List.sort cmp fdl in
       fprintf fmt "@[<v>%a@\nin@\n%a@]"
         (print_list_next newline (print_rec_decl (is_letrec fdl) info)) fdl
         (print_expr info) e
 
 and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
-  if ps.ps_vta.vta_ghost then
+  if ps.ps_ghost then
     fprintf fmt "(* %s %a *)"
       (if fst then if lr then "let rec" else "let" else "with")
       (print_ps info) ps
@@ -815,8 +813,8 @@ let lv_name = function
   | LetA ps -> ps.ps_name
 
 let is_ghost_lv = function
-  | LetV pv -> pv.pv_vtv.vtv_ghost
-  | LetA ps -> ps.ps_vta.vta_ghost
+  | LetV pv -> pv.pv_ghost
+  | LetA ps -> ps.ps_ghost
 
 let print_let_decl info fmt ld =
   if is_ghost_lv ld.let_sym then
@@ -831,23 +829,23 @@ let print_let_decl info fmt ld =
   else
     print_let_decl info fmt ld
 
-let rec extract_vta_args args vta =
-  let new_args = List.map (fun pv -> pv.pv_vs) vta.vta_args in
+let rec extract_aty_args args aty =
+  let new_args = List.map (fun pv -> pv.pv_vs) aty.aty_args in
   let args = List.rev_append new_args args in
-  match vta.vta_result with
-  | VTvalue vtv -> List.rev args, vtv
-  | VTarrow vta -> extract_vta_args args vta
+  match aty.aty_result with
+  | VTvalue ity -> List.rev args, ity
+  | VTarrow aty -> extract_aty_args args aty
 
 let extract_lv_args = function
-  | LetV pv -> [], pv.pv_vtv
-  | LetA ps -> extract_vta_args [] ps.ps_vta
+  | LetV pv -> [], pv.pv_ity
+  | LetA ps -> extract_aty_args [] ps.ps_aty
 
 let print_val_decl info fmt lv =
-  let vars, vtv = extract_lv_args lv in
+  let vars, ity = extract_lv_args lv in
   fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
     (print_lv info) lv
     (print_list space (print_vs_arg info)) vars
-    (print_vtv info) vtv
+    (print_ity info) ity
     to_be_implemented "val";
   forget_vars vars;
   forget_tvs ()
@@ -974,8 +972,8 @@ let pdecl info fmt pd = match pd.pd_node with
       (* print defined, non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
         Pervasives.compare
-          (ps1.ps_vta.vta_ghost || has_syntax info ps1.ps_name)
-          (ps2.ps_vta.vta_ghost || has_syntax info ps2.ps_name) in
+          (ps1.ps_ghost || has_syntax info ps1.ps_name)
+          (ps2.ps_ghost || has_syntax info ps2.ps_name) in
       let fdl = List.sort cmp fdl in
       print_list_next newline (print_rec_decl (is_letrec fdl) info) fmt fdl;
       fprintf fmt "@\n@\n"

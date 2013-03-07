@@ -49,6 +49,7 @@ CC        = gcc
 COQC      = @COQC@
 COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
+FRAMAC_LIBDIR = @FRAMAC_LIBDIR@
 
 DEPFLAGS  = -slash -I lib/why3
 ifeq (@OCAMLBEST@,opt)
@@ -1059,6 +1060,30 @@ opt byte: drivers/pvs-realizations.aux
 clean::
 	rm -f drivers/pvs-realizations.aux
 
+################
+# Jessie3 plugin
+################
+
+ifeq (@enable_frama_c@,yes)
+
+byte: jessie.byte
+opt: jessie.opt
+
+jessie.byte: src/jessie/Makefile lib/why3/why3.cma
+	@$(MAKE) -C src/jessie Jessie3.cma
+
+jessie.opt: src/jessie/Makefile lib/why3/why3.cmxa
+	@$(MAKE) -C src/jessie Jessie3.cmxs
+
+install_no_local::
+	mkdir -p $(FRAMAC_LIBDIR)/plugins/
+	cp -f src/jessie/Jessie3.cm* $(FRAMAC_LIBDIR)/plugins/
+
+clean::
+	$(MAKE) -C src/jessie clean
+
+endif
+
 #######
 # tools
 #######
@@ -1240,8 +1265,7 @@ test-runstrat: test-runstrat.$(OCAMLBEST)
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/manual.pdf
-# doc/manual.html
+doc: doc/manual.pdf doc/html/index.html
 
 BNF = qualid label constant operator term type formula theory theory2 \
 	why_file spec expr expr2 module whyml_file
@@ -1262,6 +1286,8 @@ DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
+ifeq (@enable_html_doc@,yes)
+
 # the dependency on the pdf ensures the bbl was built
 doc/html/manual.html: doc/manual.pdf doc/fix.hva
 	cd doc; rm -rf html; mkdir -p html
@@ -1270,6 +1296,12 @@ doc/html/manual.html: doc/manual.pdf doc/fix.hva
 
 doc/html/index.html: doc/html/manual.html
 	cd doc; $(HACHA) -tocbis -o html/index.html html/manual.html
+
+else
+
+doc/html/manual.html:
+
+endif
 
 clean::
 	cd doc; rm -rf html; $(RUBBER) --pdf --clean manual.tex
@@ -1580,6 +1612,9 @@ headers:
 #########
 
 Makefile: Makefile.in config.status
+	./config.status chmod --file $@
+
+src/jessie/Makefile: src/jessie/Makefile.in config.status
 	./config.status chmod --file $@
 
 src/config.sh: src/config.sh.in config.status

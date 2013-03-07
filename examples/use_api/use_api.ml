@@ -259,8 +259,7 @@ let unit_type = Ty.ty_tuple []
  *)
 let d =
   let args =
-    [Mlw_ty.create_pvsymbol
-        (Ident.id_fresh "_dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
   in
   let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
   let spec = {
@@ -311,34 +310,19 @@ let ref_modules, ref_theories =
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
 let ref_type : Mlw_ty.T.itysymbol =
-  match
-    Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
-  with
-    | Mlw_module.PT itys -> itys
-    | Mlw_module.TS _ -> assert false
+  Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
 
 (* the "ref" function *)
 let ref_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
-
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
 
 (* the "!" function *)
 let get_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
-
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
 
 let d2 =
   let args =
-    [Mlw_ty.create_pvsymbol
-        (Ident.id_fresh "_dummy") (Mlw_ty.vty_value Mlw_ty.ity_unit)]
+    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
   in
   let result = Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int in
   let spec = {
@@ -353,39 +337,22 @@ let d2 =
   let body =
     (* building expression "ref 0" *)
     let e =
-      (* recall that "ref" has type "(v:'a) -> ref 'a". We need to build an
-         instance of it *)
-      (* we first built a dummy effective parameter v of type int *)
-      let pv =
-        Mlw_ty.create_pvsymbol
-          (Ident.id_fresh "v") (Mlw_ty.vty_value Mlw_ty.ity_int)
-      in
+      (* recall that "ref" has polymorphic type "(v:'a) -> ref 'a".
+         We need to build an instance of it *)
       (* we build "ref int" with a *fresh* region *)
       let ity = Mlw_ty.ity_app_fresh ref_type [Mlw_ty.ity_int] in
-      (* we build the type "(v:int) -> ref <fresh region> int)" *)
-      let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
       (* e1 : the appropriate instance of "ref" *)
-      let e1 = Mlw_expr.e_arrow ref_fun vta in
+      let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
       (* we apply it to 0 *)
       let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
       Mlw_expr.e_app e1 [c0]
     in
     (* building the first part of the let x = ref 0 *)
-    let letdef = Mlw_expr.create_let_defn (Ident.id_fresh "x") e in
-    (* get back the variable x *)
-    let var_x = match letdef.Mlw_expr.let_sym with
-      | Mlw_expr.LetV vs -> vs
-      | Mlw_expr.LetA _ -> assert false
-    in
+    let letdef, var_x = Mlw_expr.create_let_pv_defn (Ident.id_fresh "x") e in
     (* building expression "!x" *)
     let bang_x =
       (* recall that "!" as type "ref 'a -> 'a" *)
-      (* we build a dummy parameter r of the same type as x *)
-      let vta =
-        Mlw_ty.vty_arrow [var_x]
-          (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_int))
-      in
-      let e1 = Mlw_expr.e_arrow get_fun vta in
+      let e1 = Mlw_expr.e_arrow get_fun [var_x.Mlw_ty.pv_ity] Mlw_ty.ity_int in
       Mlw_expr.e_app e1 [Mlw_expr.e_value var_x]
     in
     (* the complete body *)

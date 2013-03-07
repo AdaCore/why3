@@ -1,5 +1,6 @@
-FRAMAC_SHARE    := $(shell frama-c -print-path)
-FRAMAC_LIBDIR   := $(shell frama-c -print-libpath)
+FRAMAC_SHARE  = @FRAMAC_SHARE@
+FRAMAC_LIBDIR = @FRAMAC_LIBDIR@
+
 PLUGIN_NAME     := Jessie3
 PLUGIN_CMO      := literals ACSLtoWhy3 register
 
@@ -19,6 +20,9 @@ OCAMLLEX  = @OCAMLLEX@
 
 literals.ml: literals.mll
 	$(OCAMLLEX) $<
+
+$(addsuffix .cmo, $(PLUGIN_CMO)): $(WHYLIB)/why3.cmi
+$(addsuffix .cmx, $(PLUGIN_CMO)): $(WHYLIB)/why3.cmi $(WHYLIB)/why3.cmx
 
 include $(FRAMAC_SHARE)/Makefile.dynamic
 

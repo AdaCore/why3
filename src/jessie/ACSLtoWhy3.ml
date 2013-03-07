@@ -92,35 +92,19 @@ let ref_modules, ref_theories =
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
 let ref_type : Mlw_ty.T.itysymbol =
-  match
-    Mlw_module.ns_find_ts ref_module.Mlw_module.mod_export ["ref"]
-  with
-    | Mlw_module.PT itys -> itys
-    | Mlw_module.TS _ -> assert false
+  Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
 
 let ref_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
 
 let get_logic_fun : Term.lsymbol =
   find ref_module.Mlw_module.mod_theory "prefix !"
 
 let get_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
 
 let set_fun : Mlw_expr.psymbol =
-  match
-    Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
-  with
-    | Mlw_module.PS p -> p
-    | _ -> assert false
+  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
 
 
 (*********)
@@ -192,31 +176,16 @@ let rec logic_type ty =
 let any _ty =
   Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
 
-
 let mk_ref ty =
-    let pv =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "a") (Mlw_ty.vty_value ty)
-    in
-    let ity = Mlw_ty.ity_app_fresh ref_type [ty] in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ity)) in
-    Mlw_expr.e_arrow ref_fun vta
+    let ref_ty = Mlw_ty.ity_app_fresh ref_type [ty] in
+    Mlw_expr.e_arrow ref_fun [ty] ref_ty
 
 let mk_get ref_ty ty =
-    let pv = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let vta = Mlw_ty.vty_arrow [pv] (Mlw_ty.VTvalue (Mlw_ty.vty_value ty)) in
-    Mlw_expr.e_arrow get_fun vta
+    Mlw_expr.e_arrow get_fun [ref_ty] ty
 
 let mk_set ref_ty ty =
     (* (:=) has type (r:ref 'a) (v:'a) unit *)
-    let pv1 = Mlw_ty.create_pvsymbol (Ident.id_fresh "r") ref_ty in
-    let pv2 =
-      Mlw_ty.create_pvsymbol (Ident.id_fresh "v") (Mlw_ty.vty_value ty)
-    in
-    let vta =
-      Mlw_ty.vty_arrow [pv1;pv2]
-        (Mlw_ty.VTvalue (Mlw_ty.vty_value Mlw_ty.ity_unit))
-    in
-    Mlw_expr.e_arrow set_fun vta
+    Mlw_expr.e_arrow set_fun [ref_ty; ty] Mlw_ty.ity_unit
 
 
 
@@ -296,11 +265,7 @@ let create_var_full v =
   let id = Ident.id_fresh v.vname in
   let ty = ctype v.vtype in
   let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
-  let let_defn = Mlw_expr.create_let_defn id def in
-  let vs = match let_defn.Mlw_expr.let_sym with
-    | Mlw_expr.LetV vs -> vs
-    | Mlw_expr.LetA _ -> assert false
-  in
+  let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
 (*
   Self.result "create program variable %s (%d)" v.vname v.vid;
 *)
@@ -613,7 +578,7 @@ let lval (host,offset) =
       if is_mutable then
         begin try
                 Mlw_expr.e_app
-                  (mk_get v.Mlw_ty.pv_vtv ty)
+                  (mk_get v.Mlw_ty.pv_ity ty)
                   [Mlw_expr.e_value v]
           with e ->
             Self.fatal "Exception raised during application of !@ %a@."
@@ -735,7 +700,7 @@ let assignment (lhost,offset) e _loc =
       let v,is_mutable,ty = get_var v in
       if is_mutable then
         Mlw_expr.e_app
-          (mk_set v.Mlw_ty.pv_vtv ty)
+          (mk_set v.Mlw_ty.pv_ity ty)
           [Mlw_expr.e_value v; expr e]
       else
         Self.not_yet_implemented "mutation of formal parameters"
@@ -796,8 +761,7 @@ let rec stmt s =
       let annots = Annotations.code_annot s in
       let inv, var = loop_annot annots in
       let v =
-        Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy")
-          (Mlw_ty.vty_value Mlw_ty.ity_unit)
+        Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit
       in
       Mlw_expr.e_try
         (Mlw_expr.e_loop inv var (block body))
@@ -879,16 +843,12 @@ let fundecl fdec =
   let args =
     match Kernel_function.get_formals kf with
       | [] ->
-        [ Mlw_ty.create_pvsymbol
-            (Ident.id_fresh "_dummy")
-            (Mlw_ty.vty_value Mlw_ty.ity_unit) ]
+        [ Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit ]
       | l ->
         List.map (fun v ->
           let ity = ctype v.vtype in
           let vs =
-            Mlw_ty.create_pvsymbol
-              (Ident.id_fresh v.vname)
-              (Mlw_ty.vty_value ity)
+            Mlw_ty.create_pvsymbol (Ident.id_fresh v.vname) ity
           in
           Hashtbl.add program_vars v.vid (vs,false,ity);
           vs)

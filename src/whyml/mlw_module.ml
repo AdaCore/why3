@@ -105,9 +105,30 @@ let rec ns_find get_map ns = function
   | [a]  -> Mstr.find a (get_map ns)
   | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
-let ns_find_ts = ns_find (fun ns -> ns.ns_ts)
-let ns_find_ps = ns_find (fun ns -> ns.ns_ps)
-let ns_find_ns = ns_find (fun ns -> ns.ns_ns)
+let ns_find_type_symbol = ns_find (fun ns -> ns.ns_ts)
+let ns_find_prog_symbol = ns_find (fun ns -> ns.ns_ps)
+let ns_find_ns          = ns_find (fun ns -> ns.ns_ns)
+
+let ns_find_its ns s = match ns_find_type_symbol ns s with
+  | PT its -> its | _ -> raise Not_found
+
+let ns_find_ts ns s = match ns_find_type_symbol ns s with
+  | TS ts -> ts | _ -> raise Not_found
+
+let ns_find_pv ns s = match ns_find_prog_symbol ns s with
+  | PV pv -> pv | _ -> raise Not_found
+
+let ns_find_ps ns s = match ns_find_prog_symbol ns s with
+  | PS ps -> ps | _ -> raise Not_found
+
+let ns_find_pl ns s = match ns_find_prog_symbol ns s with
+  | PL pl -> pl | _ -> raise Not_found
+
+let ns_find_xs ns s = match ns_find_prog_symbol ns s with
+  | XS xs -> xs | _ -> raise Not_found
+
+let ns_find_ls ns s = match ns_find_prog_symbol ns s with
+  | LS ls -> ls | _ -> raise Not_found
 
 (** Module *)
 
@@ -299,6 +320,14 @@ let add_rec uc { fun_ps = ps } =
 let add_exn uc xs =
   add_symbol add_ps xs.xs_name (XS xs) uc
 
+let pdecl_ns uc d = match d.pd_node with
+  | PDtype its -> add_type uc its
+  | PDdata tdl -> List.fold_left add_data uc tdl
+  | PDval lv | PDlet { let_sym = lv } -> add_let uc lv
+  | PDrec fdl -> List.fold_left add_rec uc fdl
+  | PDexn xs -> add_exn uc xs
+
+(* FIXME: move the choice to Mlw_wp and make it dynamic, not start-time *)
 let if_fast_wp f1 f2 x = if Debug.test_flag Mlw_wp.fast_wp then f1 x else f2 x
 let wp_val = if_fast_wp Mlw_wp.fast_wp_val Mlw_wp.wp_val
 let wp_let = if_fast_wp Mlw_wp.fast_wp_let Mlw_wp.wp_let
@@ -310,34 +339,29 @@ let pdecl_vc env km th d = match d.pd_node with
   | PDlet ld -> wp_let env km th ld
   | PDrec rd -> wp_rec env km th rd
 
+let pdecl_vc uc d = add_to_theory (pdecl_vc uc.muc_env uc.muc_known) uc d
+
+let pure_data_decl tdl =
+  let proj pj = Opt.map (fun pls -> pls.pl_ls) pj in
+  let cons (pls,pjl) = pls.pl_ls, List.map proj pjl in
+  let defn (its,csl,_) = its.its_ts, List.map cons csl in
+  List.map defn tdl
+
+let pdecl_pure th d = match d.pd_node with
+  | PDtype its -> Theory.add_ty_decl th its.its_ts
+  | PDdata tdl -> Theory.add_data_decl th (pure_data_decl tdl)
+  | PDval _ | PDlet _ | PDrec _ | PDexn _ -> th
+
 let add_pdecl ~wp uc d =
   let uc = { uc with
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news }
   in
-  let uc =
-    if not wp then uc else
-    let th = pdecl_vc uc.muc_env uc.muc_known uc.muc_theory d in
-    { uc with muc_theory = th }
-  in
-  match d.pd_node with
-  | PDtype its ->
-      let uc = add_type uc its in
-      add_to_theory Theory.add_ty_decl uc its.its_ts
-  | PDdata dl ->
-      let uc = List.fold_left add_data uc dl in
-      let projection = Opt.map (fun pls -> pls.pl_ls) in
-      let constructor (pls,pjl) = pls.pl_ls, List.map projection pjl in
-      let defn cl = List.map constructor cl in
-      let dl = List.map (fun (its,cl,_) -> its.its_ts, defn cl) dl in
-      add_to_theory Theory.add_data_decl uc dl
-  | PDval lv | PDlet { let_sym = lv } ->
-      add_let uc lv
-  | PDrec fdl ->
-      List.fold_left add_rec uc fdl
-  | PDexn xs ->
-      add_exn uc xs
+  let uc = pdecl_ns uc d in
+  let uc = if wp then pdecl_vc uc d else uc in
+  let uc = add_to_theory pdecl_pure uc d in
+  uc
 
 (* we can safely add a new type invariant as long as
    the type was introduced in the last program decl,
@@ -416,10 +440,9 @@ let clone_export uc m inst =
     let nr = create_region (id_clone r.reg_name) (conv_ity r.reg_ity) in
     Hreg.replace regh r nr;
     nr in
-  let conv_vtv v =
-    vty_value ~ghost:v.vtv_ghost (conv_ity v.vtv_ity) in
   let conv_pv pv =
-    create_pvsymbol (id_clone pv.pv_vs.vs_name) (conv_vtv pv.pv_vtv) in
+    create_pvsymbol (id_clone pv.pv_vs.vs_name)
+      ~ghost:pv.pv_ghost (conv_ity pv.pv_ity) in
   let psh = Hid.create 3 in
   let conv_xs xs = try match Hid.find psh xs.xs_name with
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
@@ -448,15 +471,15 @@ let clone_export uc m inst =
     c_effect  = conv_eff c.c_effect;
     c_variant = List.map (conv_vari mv) c.c_variant;
     c_letrec  = 0; } in
-  let rec conv_vta mv a =
-    let args = List.map conv_pv a.vta_args in
+  let rec conv_aty mv a =
+    let args = List.map conv_pv a.aty_args in
     let add mv pv npv = Mvs.add pv.pv_vs npv.pv_vs mv in
-    let mv = List.fold_left2 add mv a.vta_args args in
-    let spec = conv_spec mv a.vta_spec in
-    let vty = match a.vta_result with
-      | VTarrow a -> VTarrow (conv_vta mv a)
-      | VTvalue v -> VTvalue (conv_vtv v) in
-    vty_arrow args ~spec ~ghost:a.vta_ghost vty in
+    let mv = List.fold_left2 add mv a.aty_args args in
+    let spec = conv_spec mv a.aty_spec in
+    let vty = match a.aty_result with
+      | VTarrow a -> VTarrow (conv_aty mv a)
+      | VTvalue v -> VTvalue (conv_ity v) in
+    vty_arrow args ~spec vty in
   let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
@@ -483,8 +506,8 @@ let clone_export uc m inst =
         mvs := Mvs.add pv.pv_vs npv.pv_vs !mvs;
         add_pdecl uc (create_val_decl (LetV npv))
     | PDval (LetA ps) ->
-        let vta = conv_vta !mvs ps.ps_vta in
-        let nps = create_psymbol (id_clone ps.ps_name) vta in
+        let aty = conv_aty !mvs ps.ps_aty in
+        let nps = create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost aty in
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec fdl ->
@@ -510,10 +533,10 @@ let clone_export uc m inst =
             end in
         let conv_fd uc { fun_ps = ps } =
           let id = id_clone ps.ps_name in
-          let vta = conv_vta !mvs ps.ps_vta in
+          let aty = conv_aty !mvs ps.ps_aty in
           (* we must retrieve all pvsymbols and psymbols in ps.ps_varm *)
           let pvs,pss = Mid.fold add_id ps.ps_varm (Spv.empty,Sps.empty) in
-          let nps = create_psymbol_extra id vta pvs pss in
+          let nps = create_psymbol_extra id ~ghost:ps.ps_ghost aty pvs pss in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
         List.fold_left conv_fd uc fdl

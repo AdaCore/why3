@@ -61,7 +61,8 @@ val pl_clone : Theory.symbol_map -> symbol_map
 
 type ppattern = private {
   ppat_pattern : pattern;
-  ppat_vtv     : vty_value;
+  ppat_ity     : ity;
+  ppat_ghost   : bool;
   ppat_effect  : effect;
 }
 
@@ -73,7 +74,8 @@ type pre_ppattern =
   | PPor   of pre_ppattern * pre_ppattern
   | PPas   of pre_ppattern * preid
 
-val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
+val make_ppattern :
+  pre_ppattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * ppattern
 
 (** program symbols *)
 
@@ -83,12 +85,13 @@ val make_ppattern : pre_ppattern -> vty_value -> pvsymbol Mstr.t * ppattern
 
 type psymbol = private {
   ps_name  : ident;
-  ps_vta   : vty_arrow;
+  ps_aty   : aty;
+  ps_ghost : bool;
   ps_varm  : varmap;
   ps_vars  : varset;
   (* this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
-     and region in ps_vta is generalized and can be instantiated. *)
+     and region in ps_aty is generalized and can be instantiated. *)
   ps_subst : ity_subst;
   (* this substitution instantiates every type variable and region
      in ps_vars to itself *)
@@ -101,9 +104,10 @@ module Wps : Weakhtbl.S with type key = psymbol
 
 val ps_equal : psymbol -> psymbol -> bool
 
-val create_psymbol : preid -> vty_arrow -> psymbol
+val create_psymbol : preid -> ?ghost:bool -> aty -> psymbol
 
-val create_psymbol_extra : preid -> vty_arrow -> Spv.t -> Sps.t -> psymbol
+val create_psymbol_extra :
+  preid -> ?ghost:bool -> aty -> Spv.t -> Sps.t -> psymbol
 
 val spec_pvset : Spv.t -> spec -> Spv.t
 val ps_pvset : Spv.t -> psymbol -> Spv.t
@@ -125,6 +129,7 @@ type let_sym =
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
+  e_ghost  : bool;
   e_effect : effect;
   e_varm   : varmap;
   e_label  : Slab.t;
@@ -183,21 +188,20 @@ val e_label_add : label -> expr -> expr
 val e_label_copy : expr -> expr -> expr
 
 val e_value : pvsymbol -> expr
-val e_arrow : psymbol -> vty_arrow -> expr
-(** [e_arrow p ty] instantiates the program function symbol [p] into a
-    program expression having the given value type [ty], instantiating
-    appropriately the type variables and region variables. The
-    resulting expression can be applied to arguments using [e_app]
-    given below.
 
-    See also [examples/use_api/use_api.ml]
-*)
+val e_arrow : psymbol -> ity list -> ity -> expr
+(** [e_arrow p argl res] instantiates the program function symbol [p]
+    into a program expression having the given types of the arguments
+    and the result. The resulting expression can be applied to
+    arguments using [e_app] given below.
+
+    See also [examples/use_api/use_api.ml] *)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
 
-val vtv_of_expr : expr -> vty_value
-val vta_of_expr : expr -> vty_arrow
+val ity_of_expr : expr -> ity
+val aty_of_expr : expr -> aty
 
 exception GhostWrite of expr * region
 exception GhostRaise of expr * xsymbol
@@ -213,7 +217,10 @@ val e_app : expr -> expr list -> expr
 val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
 
-val create_let_defn : preid -> expr -> let_defn
+val create_let_defn    : preid -> expr -> let_defn
+val create_let_pv_defn : preid -> expr -> let_defn * pvsymbol
+val create_let_ps_defn : preid -> expr -> let_defn * psymbol
+
 val create_fun_defn : preid -> lambda -> fun_defn
 val create_rec_defn : (psymbol * lambda) list -> fun_defn list
 

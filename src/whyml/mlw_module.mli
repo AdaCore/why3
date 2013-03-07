@@ -37,9 +37,18 @@ type namespace = {
   ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
-val ns_find_ts : namespace -> string list -> type_symbol
-val ns_find_ps : namespace -> string list -> prog_symbol
-val ns_find_ns : namespace -> string list -> namespace
+val ns_find_type_symbol : namespace -> string list -> type_symbol
+val ns_find_prog_symbol : namespace -> string list -> prog_symbol
+
+val ns_find_its : namespace -> string list -> itysymbol
+val ns_find_ts  : namespace -> string list -> tysymbol
+val ns_find_pv  : namespace -> string list -> pvsymbol
+val ns_find_ps  : namespace -> string list -> psymbol
+val ns_find_pl  : namespace -> string list -> plsymbol
+val ns_find_xs  : namespace -> string list -> xsymbol
+val ns_find_ls  : namespace -> string list -> lsymbol
+
+val ns_find_ns  : namespace -> string list -> namespace
 
 (** Module *)
 
