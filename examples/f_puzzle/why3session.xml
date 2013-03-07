@@ -4,19 +4,15 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
-  name="Alt-Ergo"
-  version="0.95"/>
- <prover
-  id="2"
   name="Spass"
   version="3.7"/>
  <prover
-  id="3"
+  id="2"
   name="Z3"
-  version="3.2"/>
+  version="4.2"/>
  <file
   name="../f_puzzle.why"
   verified="true"
@@ -29,60 +25,101 @@
    expanded="true">
    <goal
     name="base"
-    locfile="../../share/theories/int.why"
+    locfile="../share/theories/int.why"
     loclnum="421" loccnumb="8" loccnume="12"
     sum="ed78c9fb65e77c70c6620657d70585f3"
     proved="true"
     expanded="true"
     shape="apc0">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="induction_step"
-    locfile="../../share/theories/int.why"
+    locfile="../share/theories/int.why"
     loclnum="423" loccnumb="8" loccnume="22"
     sum="245c3be7001b98c7db290e437e6be588"
     proved="true"
     expanded="true"
     shape="apainfix +V0c1IapV0Iainfix &lt;=c0V0F">
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
+     <result status="valid" time="0.40"/>
     </proof>
    </goal>
    <goal
     name="L3"
     locfile="../f_puzzle.why"
     loclnum="20" loccnumb="8" loccnume="10"
-    sum="58bd5c2b0f5c1d9c12651652ffebfd10"
+    sum="320ccad74ab58c9070fc26756e914079"
     proved="true"
     expanded="true"
-    shape="ainfix &lt;=V0afV0Iainfix &lt;=c0V0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
+    shape="ainfix &lt;=afV0afafV0Aainfix &lt;=V0afV0Iainfix &lt;=c0V0F">
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="L3.1"
+      locfile="../f_puzzle.why"
+      loclnum="20" loccnumb="8" loccnume="10"
+      expl="1."
+      sum="58bd5c2b0f5c1d9c12651652ffebfd10"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=V0afV0Iainfix &lt;=c0V0F">
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal
+      name="L3.2"
+      locfile="../f_puzzle.why"
+      loclnum="20" loccnumb="8" loccnume="10"
+      expl="2."
+      sum="bf62bde0c14e77e67078c4d0eb67c0f8"
+      proved="true"
+      expanded="true"
+      shape="ainfix &lt;=afV0afafV0Iainfix &lt;=V0afV0Iainfix &lt;=c0V0F">
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.00"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="L4"
     locfile="../f_puzzle.why"
-    loclnum="22" loccnumb="8" loccnume="10"
-    sum="c4aa04ae9120b08b2384cbfebd9f02bd"
+    loclnum="21" loccnumb="8" loccnume="10"
+    sum="84495c757e3fd1a421e984c242b8825a"
     proved="true"
     expanded="true"
     shape="ainfix &lt;afV0afainfix +V0c1Iainfix &lt;=c0V0F">
@@ -92,65 +129,65 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="base"
-    locfile="../../share/theories/int.why"
+    locfile="../share/theories/int.why"
     loclnum="421" loccnumb="8" loccnume="12"
-    sum="dcdb5e521974a78d89381bcd99c2076a"
+    sum="d5b604c865157ae8a5c32f78f7dafef1"
     proved="true"
     expanded="true"
     shape="ap&apos;c0">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="induction_step"
-    locfile="../../share/theories/int.why"
+    locfile="../share/theories/int.why"
     loclnum="423" loccnumb="8" loccnume="22"
-    sum="2f88f4598c42a29ff1753666b723745e"
+    sum="e4b047731b0f69b44da2e6677314eefc"
     proved="true"
     expanded="true"
     shape="ap&apos;ainfix +V0c1Iap&apos;V0Iainfix &lt;=c0V0F">
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="L4cor"
-    locfile="../f_puzzle.why"
-    loclnum="28" loccnumb="8" loccnume="13"
-    sum="1e8c64e74d3ab2a23f4359575310b094"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=afV0afV1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
-    <proof
-     prover="2"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="1.45"/>
     </proof>
    </goal>
    <goal
     name="L5"
     locfile="../f_puzzle.why"
-    loclnum="30" loccnumb="8" loccnume="10"
-    sum="77670682cc8babaa2a551be587eb4fb8"
+    loclnum="28" loccnumb="8" loccnume="10"
+    sum="08dffc6286c72a5a4166b5daab77ed17"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=afV0afV1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="L6"
+    locfile="../f_puzzle.why"
+    loclnum="29" loccnumb="8" loccnume="10"
+    sum="6e7f311ab2b8f997ae40a4dd3317e407"
     proved="true"
     expanded="true"
     shape="ainfix &lt;afV0ainfix +V0c1Iainfix &lt;=c0V0F">
@@ -160,24 +197,24 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal
     name="G"
     locfile="../f_puzzle.why"
-    loclnum="32" loccnumb="7" loccnume="8"
-    sum="74e23d8234ec2dc48c6b0e54f7801f2f"
+    loclnum="31" loccnumb="7" loccnume="8"
+    sum="a57206547bf3945257aaa7c1d643483a"
     proved="true"
     expanded="true"
     shape="ainfix =afV0V0Iainfix &lt;=c0V0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
