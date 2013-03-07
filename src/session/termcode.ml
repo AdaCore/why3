@@ -269,11 +269,11 @@ let task_checksum ?(version=current_shape_version) t =
 module Checksum = struct
 
   let char = Buffer.add_char
-  let int b i = Buffer.add_string b (string_of_int i)
+  let int b i = char b 'i'; Buffer.add_string b (string_of_int i)
   let string b s =
     char b '"'; Buffer.add_string b (String.escaped s); char b '"'
   let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
-  let list e b l = char b 'l'; List.iter (e b) l; char b 'l'
+  let list e b l = char b '['; List.iter (e b) l; char b ']'
 
   let ident_printer = Ident.create_ident_printer []
   let ident b id = string b (Ident.id_unique ident_printer id)
@@ -281,7 +281,7 @@ module Checksum = struct
   let const b c =
     let buf = Buffer.create 17 in
     Format.bprintf buf "%a" Pretty.print_const c;
-    char b 'c'; string b (Buffer.contents buf)
+    string b (Buffer.contents buf)
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -429,6 +429,7 @@ module Checksum = struct
 
 end
 
+let task_checksum ?(version=0) t = ignore version; Checksum.task t
 
 (*************************)
 (**       Pairing       **)
@@ -777,5 +778,48 @@ let associate (old_goals : Old.t list) new_goals =
   Array.fold_right
     (fun (i,g) res -> (g, pairing_array.(i), obsolete_array.(i))::res)
     new_goals_array []
+
+end
+
+module AssoMake2 (Old : S) (New : S) = struct
+
+  type any_goal = Old of Old.t | New of New.t
+
+  open Ident
+
+  let associate oldgoals newgoals =
+    (* set up an array [result] containing the solution
+       [new_goal_index g] returns the index of goal [g] in that array *)
+    let new_goal_index = Hid.create 17 in
+    let result =
+      let make i newg =
+        Hid.add new_goal_index (New.name newg) i; (newg, None, false) in
+      Array.mapi make (Array.of_list newgoals) in
+    let new_goal_index newg =
+      try Hid.find new_goal_index (New.name newg)
+      with Not_found -> assert false in
+    (* phase 1: pair goals with identical checksums *)
+    let old_checksums = Hashtbl.create 17 in
+    let add oldg = Hashtbl.add old_checksums (Old.checksum oldg) oldg in
+    List.iter add oldgoals;
+    let collect acc newg =
+      let c = New.checksum newg in
+      try
+        let oldg = Hashtbl.find old_checksums c in
+        Hashtbl.remove old_checksums c;
+        result.(new_goal_index newg) <- (newg, Some oldg, true);
+        acc
+      with Not_found ->
+        New newg :: acc
+    in
+    let newgoals = List.fold_left collect [] newgoals in
+    let _allgoals =
+      Hashtbl.fold (fun _ oldg acc -> Old oldg :: acc) old_checksums newgoals in
+    Hashtbl.clear old_checksums;
+    (* phase 2: pair goals according to shapes *)
+    (* let compare (sh1, _) (sh2, _) = Pervasives.compare sh1 sh2 in *)
+    (* let allgoals = List.sort compare allgoals in *)
+    (* assert false *)
+    Array.to_list result
 
 end

@@ -73,3 +73,8 @@ module AssoMake (Old : S) (New : S) : sig
         than [n]. The new thing [o] has a shape similar to [n]
         - [None]  no old thing were similar enough. *)
 end
+
+module AssoMake2 (Old : S) (New : S) : sig
+  val associate : Old.t list -> New.t list -> (New.t * Old.t option *bool) list
+    (* note: in the output, goals appear in the same order as in [newgoals] *)
+end
