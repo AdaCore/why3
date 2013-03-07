@@ -174,97 +174,6 @@ let t_shape_buf ?(version=current_shape_version) t =
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () t in
   Buffer.contents b
 
-(*
-let t_shape_list t =
-  let push t l = t::l in
-  List.rev (t_shape ~push (ref (-1)) Mvs.empty [] t)
-
-let pr_shape_list fmt t =
-  List.iter (fun s -> Format.fprintf fmt "%s" s) (t_shape_list t)
-
-*)
-
-(* shape of a task *)
-
-let param_decl_shape ~(push:string->'a->'a) (acc:'a) ls : 'a =
-  ident_shape ~push ls.ls_name acc
-
-let logic_decl_shape ~version ~(push:string->'a->'a) (acc:'a) (ls,def) : 'a =
-  let acc = ident_shape ~push ls.ls_name acc in
-  let vl,t = Decl.open_ls_defn def in
-  let c = ref (-1) in
-  let m = vl_rename_alpha c Mvs.empty vl in
-  t_shape ~version ~push c m acc t
-
-let logic_ind_decl_shape ~version ~(push:string->'a->'a) (acc:'a) (ls,cl) : 'a =
-  let acc = ident_shape ~push ls.ls_name acc in
-  List.fold_right
-    (fun (_,t) acc -> t_shape ~version ~push (ref (-1)) Mvs.empty acc t)
-    cl acc
-
-let propdecl_shape ~version ~(push:string->'a->'a) (acc:'a) (k,n,t) : 'a =
-  let tag = match k with
-    | Decl.Plemma -> tag_Plemma
-    | Decl.Paxiom -> tag_Paxiom
-    | Decl.Pgoal -> tag_Pgoal
-    | Decl.Pskip -> tag_Pskip
-  in
-  let acc = push tag acc in
-  let acc = ident_shape ~push n.Decl.pr_name acc in
-  t_shape ~version ~push (ref(-1)) Mvs.empty acc t
-
-let constructor_shape ~push (ls, _) acc = ident_shape ~push ls.ls_name acc
-
-let data_decl_shape ~push (tys, cl) acc =
-  List.fold_right (constructor_shape ~push)
-    cl (ident_shape ~push tys.Ty.ts_name acc)
-
-let decl_shape ~version ~(push:string->'a->'a) (acc:'a) d : 'a =
-  match d.Decl.d_node with
-    | Decl.Dtype _ts ->
-        push tag_Dtype acc
-    | Decl.Ddata tyl ->
-        List.fold_right (data_decl_shape ~push)
-          tyl (push tag_Ddata acc)
-    | Decl.Dparam ls ->
-        param_decl_shape ~push (push tag_Dparam acc) ls
-    | Decl.Dlogic ldl ->
-        List.fold_right
-          (fun d acc -> logic_decl_shape ~version ~push acc d)
-          ldl (push tag_Dlogic acc)
-    | Decl.Dind (_, idl) ->
-        List.fold_right
-          (fun d acc -> logic_ind_decl_shape ~version ~push acc d)
-          idl (push tag_Dind acc)
-    | Decl.Dprop pdecl ->
-        propdecl_shape ~version ~push (push tag_Dprop acc) pdecl
-
-let tdecl_shape ~version ~(push:string->'a->'a) (acc:'a) t : 'a =
-  match t.Theory.td_node with
-    | Theory.Decl d -> decl_shape ~version ~push (push tag_tDecl acc) d
-    | Theory.Meta _ -> push tag_tMeta acc
-    | Theory.Clone _ -> push tag_tClone acc
-    | Theory.Use _ -> push tag_tUse acc
-
-let rec task_shape ~version ~(push:string->'a->'a) (acc:'a) t : 'a =
-  match t with
-    | None -> acc
-    | Some t ->
-     task_shape ~version ~push (tdecl_shape ~version ~push acc t.Task.task_decl)
-          t.Task.task_prev
-
-
-(* checksum of a task
-   it is the MD5 digest of the shape
-*)
-
-let task_checksum ?(version=current_shape_version) t =
-  let b = Buffer.create 257 in
-  let push t () = Buffer.add_string b t in
-  let () = task_shape ~version ~push () t in
-  let shape = Buffer.contents b in
-  Digest.to_hex (Digest.string shape)
-
 
 module Checksum = struct
 
@@ -422,10 +331,11 @@ module Checksum = struct
     | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
 
   let task t =
-    let b = Buffer.create 257 in
+    let b = Buffer.create 8192 in
     Ident.forget_all ident_printer;
     Task.task_iter (tdecl b) t;
-    Digest.to_hex (Digest.string (Buffer.contents b))
+    let s = Buffer.contents b in
+    Digest.to_hex (Digest.string s)
 
 end
 
