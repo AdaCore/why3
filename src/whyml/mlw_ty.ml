@@ -787,22 +787,11 @@ let spec_check c ty =
 type vty_value = {
   vtv_ity   : ity;
   vtv_ghost : bool;
-  vtv_mut   : region option;
 }
 
-let vty_value ?(ghost=false) ?mut ity =
-  Opt.iter (fun r -> ity_equal_check ity r.reg_ity) mut;
-  { vtv_ity   = ity;
-    vtv_ghost = ghost;
-    vtv_mut   = mut }
+let vty_value ?(ghost=false) ity = { vtv_ity = ity; vtv_ghost = ghost }
 
-let vtv_vars {vtv_ity = {ity_vars = vars}; vtv_mut = mut} = match mut with
-  | Some r -> { vars with vars_reg = Sreg.add r vars.vars_reg }
-  | None   -> vars
-
-let vtv_unmut vtv =
-  if vtv.vtv_mut = None then vtv else
-    vty_value ~ghost:vtv.vtv_ghost vtv.vtv_ity
+let vtv_vars vtv = vtv.vtv_ity.ity_vars
 
 type pvsymbol = {
   pv_vs   : vsymbol;
@@ -883,16 +872,8 @@ let vty_arrow argl ?spec ?(ghost=false) vty =
   let exn = Invalid_argument "Mlw.vty_arrow" in
   (* the arguments must be all distinct *)
   if argl = [] then raise exn;
-  let add_arg pvs pv =
-    (* mutable arguments are rejected outright *)
-    if pv.pv_vtv.vtv_mut <> None then raise exn;
-    Spv.add_new exn pv pvs in
+  let add_arg pvs pv = Spv.add_new exn pv pvs in
   ignore (List.fold_left add_arg Spv.empty argl);
-  (* only projections may return mutable values *)
-  begin match vty with
-    | VTvalue { vtv_mut = Some _ } -> raise exn
-    | _ -> ()
-  end;
   let spec = match spec with
     | Some spec -> spec_check spec vty; spec
     | None -> spec_empty (ty_of_vty vty) in

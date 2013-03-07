@@ -258,15 +258,12 @@ type spec = {
 
 (** program variables *)
 
-type vty_value = private {         (* the type of a program variable *)
-  vtv_ity   : ity;                 (* the underlying program type *)
-  vtv_ghost : bool;                (* am I a ghost variable? *)
-  vtv_mut   : region option;       (* if this field is not None *)
+type vty_value = private {
+  vtv_ity   : ity;
+  vtv_ghost : bool;
 }
 
-val vty_value : ?ghost:bool -> ?mut:region -> ity -> vty_value
-
-val vtv_unmut : vty_value -> vty_value (* remove mutability *)
+val vty_value : ?ghost:bool -> ity -> vty_value
 
 type pvsymbol = private { (* a program variable *)
   pv_vs   : vsymbol;      (* the variable symbol *)

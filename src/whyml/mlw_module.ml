@@ -417,11 +417,7 @@ let clone_export uc m inst =
     Hreg.replace regh r nr;
     nr in
   let conv_vtv v =
-    let ghost = v.vtv_ghost in
-    let mut, ity = match v.vtv_mut with
-      | Some r -> let r = conv_reg r in Some r, r.reg_ity
-      | None   -> None, conv_ity v.vtv_ity in
-    vty_value ~ghost ?mut ity in
+    vty_value ~ghost:v.vtv_ghost (conv_ity v.vtv_ity) in
   let conv_pv pv =
     create_pvsymbol (id_clone pv.pv_vs.vs_name) (conv_vtv pv.pv_vtv) in
   let psh = Hid.create 3 in

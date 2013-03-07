@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Stdlib
 open Ident
 open Ty
 open Term
@@ -109,7 +110,9 @@ let create_ty_decl its =
   if its.its_def = None then invalid_arg "Mlw_decl.create_ty_decl";
   mk_decl (PDtype its) Sid.empty news
 
-type pre_constructor = preid * (pvsymbol * bool) list
+type pre_field = preid option * field
+
+type pre_constructor = preid * pre_field list
 
 type pre_data_decl = itysymbol * pre_constructor list
 
@@ -121,10 +124,10 @@ let null_invariant { its_ts = ts } =
 let create_data_decl tdl =
 (*   let syms = ref Sid.empty in *)
   let news = ref Sid.empty in
-  let projections = Hid.create 17 in (* id -> plsymbol *)
-  let build_constructor its (id,al) =
+  let projections = Hstr.create 17 in (* id -> plsymbol *)
+  let build_constructor its res (id,al) =
     (* check well-formedness *)
-    let vtvs = List.map (fun (pv,_) -> pv.pv_vtv) al in
+    let fds = List.map snd al in
     let tvs = List.fold_right Stv.add its.its_ts.ts_args Stv.empty in
     let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
     let check_vars { vars_tv = atvs; vars_reg = aregs } =
@@ -132,36 +135,42 @@ let create_data_decl tdl =
         raise (UnboundTypeVar (Stv.choose (Stv.diff atvs tvs)));
       if not (Sreg.subset aregs regs) then
         raise (UnboundRegion (Sreg.choose (Sreg.diff aregs regs))) in
-    let check_arg vtv = match vtv.vtv_mut with
+    let check_arg fd = match fd.fd_mut with
       | Some r -> if not (Sreg.mem r regs) then raise (UnboundRegion r)
-      | None -> check_vars vtv.vtv_ity.ity_vars in
-    List.iter check_arg vtvs;
+      | None -> check_vars fd.fd_ity.ity_vars in
+    List.iter check_arg fds;
     (* build the constructor ps *)
-    let hidden = its.its_abst in
-    let rdonly = its.its_priv in
-    let tvl = List.map ity_var its.its_ts.ts_args in
-    let res = vty_value (ity_app its tvl its.its_regs) in
-    let pls = create_plsymbol ~hidden ~rdonly id vtvs res in
-    news := news_id !news pls.pl_ls.ls_name;
+    let hidden = its.its_abst and rdonly = its.its_priv in
+    let cs = create_plsymbol ~hidden ~rdonly id fds res in
+    news := news_id !news cs.pl_ls.ls_name;
     (* build the projections, if any *)
-    let build_proj id vtv =
-      try Hid.find projections id with Not_found ->
-      let pls = create_plsymbol ~hidden (id_clone id) [res] vtv in
-      news := news_id !news pls.pl_ls.ls_name;
-      Hid.add projections id pls;
-      pls
+    let build_proj fd id =
+      try
+        let pj = Hstr.find projections (preid_name id) in
+        ity_equal_check pj.pl_value.fd_ity fd.fd_ity;
+        begin match pj.pl_value.fd_mut, fd.fd_mut with
+          | None, None -> ()
+          | Some r1, Some r2 -> reg_equal_check r1 r2
+          | _,_ -> invalid_arg "Mlw_decl.create_data_decl"
+        end;
+        if pj.pl_value.fd_ghost <> fd.fd_ghost then
+          invalid_arg "Mlw_decl.create_data_decl";
+        pj
+      with Not_found ->
+        let pj = create_plsymbol ~hidden id [res] fd in
+        news := news_id !news pj.pl_ls.ls_name;
+        Hstr.add projections (preid_name id) pj;
+        pj
     in
-    let build_proj (pv,pj) =
-      let vtv = pv.pv_vtv in
-(*       syms := ity_s_fold syms_its syms_ts !syms vtv.vtv_ity; *)
-      if pj then Some (build_proj pv.pv_vs.vs_name vtv) else None
-    in
-    pls, List.map build_proj al
+    cs, List.map (fun (id,fd) -> Opt.map (build_proj fd) id) al
   in
   let build_type (its,cl) =
-    Hid.clear projections;
+    Hstr.clear projections;
     news := news_id !news its.its_ts.ts_name;
-    its, List.map (build_constructor its) cl, null_invariant its
+    let tvl = List.map ity_var its.its_ts.ts_args in
+    let ity = ity_app its tvl its.its_regs in
+    let res = { fd_ity = ity; fd_ghost = false; fd_mut = None } in
+    its, List.map (build_constructor its res) cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
   mk_decl (PDdata tdl) Sid.empty !news
@@ -238,8 +247,6 @@ let create_rec_decl fdl =
 let create_val_decl lv =
   let news = letvar_news lv in
   let news, syms = match lv with
-    | LetV { pv_vtv = { vtv_mut = Some _ }} ->
-        Loc.errorm "abstract parameters cannot be mutable"
     | LetV pv -> new_regs vars_empty news pv.pv_vars, Sid.empty
     | LetA ps -> news, Mid.map (fun _ -> ()) ps.ps_varm in
 (*
@@ -349,7 +356,10 @@ let inst_constructors lkn kn ity = match ity.ity_node with
       if csl = [] || is_rec then raise (NonupdatableType ity);
       let base = ity_pur ts (List.map ity_var ts.ts_args) in
       let sbs = ity_match ity_subst_empty base ity in
-      let subst ty = vty_value (ity_full_inst sbs (ity_of_ty ty)) in
+      let subst ty = {
+        fd_ity   = ity_full_inst sbs (ity_of_ty ty);
+        fd_ghost = false;
+        fd_mut   = None; } in
       List.map (fun (cs,_) -> cs, List.map subst cs.ls_args) csl
   | Ityapp (its,_,_) ->
       let csl = find_constructors kn its in
@@ -359,21 +369,21 @@ let inst_constructors lkn kn ity = match ity.ity_node with
       let args = List.map ity_var its.its_ts.ts_args in
       let base = ity_app its args its.its_regs in
       let sbs = ity_match ity_subst_empty base ity in
-      let subst vtv =
-        let ghost = vtv.vtv_ghost in
-        let mut = Opt.map (reg_full_inst sbs) vtv.vtv_mut in
-        vty_value ~ghost ?mut (ity_full_inst sbs vtv.vtv_ity) in
+      let subst fd = {
+        fd_ity   = ity_full_inst sbs fd.fd_ity;
+        fd_ghost = fd.fd_ghost;
+        fd_mut   = Opt.map (reg_full_inst sbs) fd.fd_mut; } in
       List.map (fun (cs,_) -> cs.pl_ls, List.map subst cs.pl_args) csl
   | Ityvar _ ->
       invalid_arg "Mlw_decl.inst_constructors"
 
 let check_ghost lkn kn d =
   let rec access regs ity =
-    let check vtv = match vtv.vtv_mut with
-      | _ when vtv.vtv_ghost -> ()
+    let check fd = match fd.fd_mut with
+      | _ when fd.fd_ghost -> ()
       | Some r when Sreg.mem r regs -> raise (GhostWrite (e_void, r))
-      | _ -> access regs vtv.vtv_ity in
-    let check (_cs,vtvl) = List.iter check vtvl in
+      | _ -> access regs fd.fd_ity in
+    let check (_cs,fdl) = List.iter check fdl in
     let occurs r = reg_occurs r ity.ity_vars in
     if not (Sreg.exists occurs regs) then () else
     List.iter check (inst_constructors lkn kn ity)

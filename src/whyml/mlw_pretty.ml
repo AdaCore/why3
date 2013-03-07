@@ -136,8 +136,8 @@ and print_vty fmt = function
   | VTarrow vta -> print_vta fmt vta
   | VTvalue vtv -> print_vtv fmt vtv
 
-let print_pvty fmt pv = fprintf fmt "@[%a%a:@,%a@]"
-  print_pv pv print_reg_opt pv.pv_vtv.vtv_mut print_vtv pv.pv_vtv
+let print_pvty fmt pv = fprintf fmt "@[%a:@,%a@]"
+  print_pv pv print_vtv pv.pv_vtv
 
 let print_psty fmt ps =
   let print_tvs fmt tvs = if not (Stv.is_empty tvs) then
@@ -285,9 +285,9 @@ and print_enode pri fmt e = match e.e_node with
   | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_expr e0 print_expr e1 print_expr e2
-  | Eassign (e,r,pv) ->
-      fprintf fmt (protect_on (pri > 0) "%a <%a> <- %a")
-        print_expr e print_regty r print_pv pv
+  | Eassign (pl,e,r,pv) ->
+      fprintf fmt (protect_on (pri > 0) "%a.%a <%a> <- %a")
+        print_expr e print_ls pl.pl_ls print_regty r print_pv pv
   | Ecase (e0,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         print_expr e0 (print_list newline print_branch) bl
@@ -350,25 +350,24 @@ let print_ty_arg fmt ty =
   fprintf fmt "@ %a" (print_ity_node ity_subst_empty true) ty
 
 let print_constr fmt (cs,pjl) =
-  let print_pj fmt (vtv,pj) = match pj with
+  let print_pj fmt (fd,pj) = match pj with
     | Some { pl_ls = ls } ->
         fprintf fmt "@ (%s%s%a%a:@,%a)"
-          (if vtv.vtv_ghost then "ghost " else "")
-          (if vtv.vtv_mut <> None then "mutable " else "")
-          print_ls ls print_reg_opt vtv.vtv_mut print_ity vtv.vtv_ity
-    | None when vtv.vtv_ghost || vtv.vtv_mut <> None ->
+          (if fd.fd_ghost then "ghost " else "")
+          (if fd.fd_mut <> None then "mutable " else "")
+          print_ls ls print_reg_opt fd.fd_mut print_ity fd.fd_ity
+    | None when fd.fd_ghost || fd.fd_mut <> None ->
         fprintf fmt "@ (%s%s%a@ %a)"
-          (if vtv.vtv_ghost then "ghost" else "")
-          (if vtv.vtv_mut <> None then "mutable " else "")
-          print_reg_opt vtv.vtv_mut
-          print_ity vtv.vtv_ity
+          (if fd.fd_ghost then "ghost" else "")
+          (if fd.fd_mut <> None then "mutable " else "")
+          print_reg_opt fd.fd_mut print_ity fd.fd_ity
     | None ->
-        print_ty_arg fmt vtv.vtv_ity
+        print_ty_arg fmt fd.fd_ity
   in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs.pl_ls
     print_ident_labels cs.pl_ls.ls_name
     (print_list nothing print_pj)
-    (List.map2 (fun vtv pj -> (vtv,pj)) cs.pl_args pjl)
+    (List.map2 (fun fd pj -> (fd,pj)) cs.pl_args pjl)
 
 let print_head fst fmt ts =
   fprintf fmt "%s %s%s%a%a <%a>%a"
@@ -461,10 +460,10 @@ let () = Exn_printer.register
   | Mlw_ty.IllegalAlias _reg ->
       fprintf fmt "This application creates an illegal alias"
   | Mlw_expr.RdOnlyPLS _ls ->
-      fprintf fmt "Cannot construct values of a private type"
-  | Mlw_expr.HiddenPLS ls ->
+      fprintf fmt "Cannot construct or modify values of a private type"
+  | Mlw_expr.HiddenPLS pl ->
       fprintf fmt "'%a' is a constructor/field of an abstract type \
-      and cannot be used in a program" print_ls ls;
+        and cannot be used in a program" print_ls pl.pl_ls;
   | Mlw_expr.GhostWrite (_e, _reg) ->
       fprintf fmt
         "This expression performs a ghost write in a non-ghost location"

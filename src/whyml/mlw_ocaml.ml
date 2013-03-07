@@ -720,9 +720,9 @@ and print_lexpr pri info fmt e =
       fprintf fmt (protect_on (pri > 0)
                      "@[<hv>if %a@ @[<hov 2>then %a@]@ @[<hov 2>else %a@]@]")
         (print_expr info) e0 (print_expr info) e1 (print_expr info) e2
-  | Eassign (e,_,pv) ->
-      fprintf fmt (protect_on (pri > 0) "%a <- %a")
-        (print_expr info) e (print_pv info) pv
+  | Eassign (pl,e,_,pv) ->
+      fprintf fmt (protect_on (pri > 0) "%a.%a <- %a")
+        (print_expr info) e (print_ls info) pl.pl_ls (print_pv info) pv
   | Eloop (_,_,e) ->
       fprintf fmt "@[while true do@ %a@ done@]" (print_expr info) e
   | Efor (pv,(pvfrom,dir,pvto),_,e) ->
@@ -895,21 +895,23 @@ let print_exn_decl info fmt xs =
   else
     print_exn_decl info fmt xs
 
+let print_field info fmt fd =
+  if fd.fd_ghost then fprintf fmt "unit" else print_ity info fmt fd.fd_ity
+
 let print_pconstr info fmt (cs,_) = match cs.pl_args with
   | [] ->
       fprintf fmt "@[<hov 4>| %a@]" (print_cs info) cs.pl_ls
   | tl ->
-      let print_vtv fmt vtv =
-        if vtv.vtv_ghost then fprintf fmt "unit" else print_vtv info fmt vtv in
       fprintf fmt "@[<hov 4>| %a of %a@]" (print_cs info) cs.pl_ls
-        (print_list star print_vtv) tl
+        (print_list star (print_field info)) tl
 
 let print_pdata_decl info fst fmt (its, csl, _) =
   let print_default () = print_list newline (print_pconstr info) fmt csl in
-  let print_field fmt (ls, vtv) =
-    fprintf fmt "%s%a: "
-      (if vtv.vtv_mut <> None then "mutable " else "") (print_ls info) ls;
-    if vtv.vtv_ghost then fprintf fmt "unit" else print_vtv info fmt vtv in
+  let print_field fmt (ls, fd) =
+    fprintf fmt "%s%a: %a"
+      (if fd.fd_mut <> None then "mutable " else "")
+      (print_ls info) ls (print_field info) fd
+  in
   let print_defn fmt = function
     | [cs, _] ->
         let pjl = get_record info cs.pl_ls in

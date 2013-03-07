@@ -75,10 +75,10 @@ let t_absurd  = ps_app ls_absurd []
 let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
 
-let vtv_of_vs (vs : vsymbol) =
-  (* return the type of the program variable that corresponds to [vs] *)
-  (* any vs in post/xpost is either a pvsymbol or a fresh mark *)
-  try (restore_pv vs).pv_vtv with Not_found -> vtv_mark
+(* any vs in post/xpost is either a pvsymbol or a fresh mark *)
+let ity_of_vs vs =
+  if Ty.ty_equal vs.vs_ty ty_mark then vtv_mark.vtv_ity
+  else (restore_pv vs).pv_vtv.vtv_ity
 
 (* replace every occurrence of [old(t)] with [at(t,'old)] *)
 let rec remove_old f = match f.t_node with
@@ -287,28 +287,17 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 (** Reconstruct pure values after writes *)
 
 let analyze_var fn_down fn_join lkm km vs ity =
-   (* create a term of the form:
-        match vs with
-        (| Cons (x1 ... xn) -> fn_join x1' ... xn')*
-      where the x1' are obtained by a call to fn_down (supposedly a recursive
-      call) on x1 and its type *)
-  let branch (cs,vtvl) =
-    let mk_var vtv = create_vsymbol (id_fresh "y") (ty_of_ity vtv.vtv_ity) in
-    let vars = List.map mk_var vtvl in
-     let args = List.map2 fn_down vars vtvl in
-    let t = fn_join cs args  vs.vs_ty in
+  let branch (cs,fdl) =
+    let mk_var fd = create_vsymbol (id_fresh "y") (ty_of_ity fd.fd_ity) in
+    let vars = List.map mk_var fdl in
+    let t = fn_join cs (List.map2 fn_down vars fdl) vs.vs_ty in
     let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
     t_close_branch pat t in
-  let constructors = Mlw_decl.inst_constructors lkm km ity in
-  t_case (t_var vs) (List.map branch constructors)
+  let csl = Mlw_decl.inst_constructors lkm km ity in
+  t_case (t_var vs) (List.map branch csl)
 
-let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
-   (* [mreg] is expected to contain fresh names for all to-be-updated regions.
-      this function does nothing (ie returns the term [vs]) when [vs]
-      corresponds to a program variable whose type does not contain any region
-      in [mreg]. In the other case, this function builds a new term, replacing
-      all touched regions by fresh variables. *)
-  let rec update vs { vtv_ity = ity; vtv_mut = mut } =
+let update_var env mreg vs =
+  let rec update vs { fd_ity = ity; fd_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
     let vs = Opt.fold (fun _ -> get_vs) vs mut in
@@ -317,9 +306,8 @@ let update_var env (mreg : vsymbol Mreg.t) (vs : vsymbol) : term =
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_immutable ity || not (Mreg.exists check_reg mreg) then t_var vs
-    else analyze_var update fs_app env.pure_known env.prog_known vs ity
-  in
-  update vs (vtv_of_vs vs)
+    else analyze_var update fs_app env.pure_known env.prog_known vs ity in
+  update vs { fd_ity = ity_of_vs vs; fd_ghost = false; fd_mut = None }
 
 let rec subst_at_now now (m : vsymbol Mvs.t) (t : term) =
    (* if [now] is true, apply the substitution, except when they are protected
@@ -361,9 +349,11 @@ let mutable_substitute env (mreg : vsymbol Mreg.t) (f : term) =
   (* Replace every occurrence of a mutable variable in [f] by an appropriate
      "updating" term. The map [mreg] must already contain fresh variables for
      all regions. *)
-  let update_var vs _ = match update_var env mreg vs with
+  let update_var vs _ = try match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
-    | t -> Some t in
+    | t -> Some t
+  with Not_found -> None
+  in
   (*   print_region_map mreg; *)
   let vars = Mvs.mapi_filter update_var f.t_vars in
   (* [vars] now is a mapping from the relevant symbols of [f] to their
@@ -381,11 +371,10 @@ let get_var_of_region reg f =
     let test vs _ acc =
       if acc <> None then acc
       else
-      (* this does the actual comparison *)
-         match vtv_of_vs vs with
-         | { vtv_ity = { ity_node = Ityapp (_,_,[r]) }}
-         | { vtv_mut = Some r } when reg_equal r reg -> Some vs
-         | _ -> acc
+        try match (ity_of_vs vs).ity_node with
+        | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
+        | _ -> acc
+        with Not_found -> acc
     in
     Mvs.fold test f.t_vars None
 
@@ -393,15 +382,12 @@ let quantify env (regs : Sreg.t) (f : term) =
    (* quantify formula [f] over all variables in the regions [regs] *)
    (* ??? refactor this first bit to use [get_var_of_region] *)
   let get_var reg () =
-     (* for each free variable in [f], compare its region with [reg];
-        if it matches, return the variable as the one that corresponds to the
-        region *)
     let test vs _ id =
-       (* this does the actual comparison *)
-      match vtv_of_vs vs with
-      | { vtv_ity = { ity_node = Ityapp (_,_,[r]) }}
-      | { vtv_mut = Some r } when reg_equal r reg -> vs.vs_name
-      | _ -> id in
+      try match (ity_of_vs vs).ity_node with
+      | Ityapp (_,_,[r]) when reg_equal r reg -> vs.vs_name
+      | _ -> id
+      with Not_found -> id
+    in
     let id = Mvs.fold test f.t_vars reg.reg_name in
     mk_var id model1_lab (ty_of_ity reg.reg_ity)
   in
@@ -433,7 +419,7 @@ let ps_inv = Term.create_psymbol (id_fresh "inv")
   [ty_var (create_tvsymbol (id_fresh "a"))]
 
 let full_invariant lkm km vs ity =
-  let rec update vs { vtv_ity = ity } =
+  let rec update vs { fd_ity = ity } =
     if not (ity_has_inv ity) then t_true else
     (* what is our current invariant? *)
     let f = match ity.ity_node with
@@ -448,7 +434,7 @@ let full_invariant lkm km vs ity =
     (* put everything together *)
     wp_and ~sym:true f g
   in
-  update vs (vty_value ity)
+  update vs { fd_ity = ity; fd_ghost = false; fd_mut = None }
 
 (** Value tracking *)
 
@@ -783,19 +769,30 @@ and wp_desc env e q xq = match e.e_node with
       let w1 = backstep (wp_expr env e1) spec.c_post spec.c_xpost in
       let w2 = wp_abstract env e1.e_effect spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p (wp_and ~sym:true (wp_label e w1) w2)
-  | Eassign (e1, reg, pv) ->
+  | Eassign (pl, e1, reg, pv) ->
+      (* if we create an intermediate variable npv to represent e1
+         in the post-condition of the assign, the call to wp_abstract
+         will have to update this variable separately (in addition to
+         all existing variables in q that require update), creating
+         duplication.  To avoid it, we try to detect whether the value
+         of e1 can be represented by an existing pure term that can
+         be reused in the post-condition. *)
       let rec get_term d = match d.e_node with
-        | Elogic t -> t
-        | Evalue v -> t_var v.pv_vs
         | Eghost e | Elet (_,e) | Erec (_,e) -> get_term e
-        | _ -> Loc.errorm ?loc:e.e_loc
-            "Cannot compute the WP for this assignment"
+        | Evalue v -> vs_result e1, t_var v.pv_vs
+        | Elogic t -> vs_result e1, t
+        | _ ->
+            let id = id_fresh ?loc:e1.e_loc "o" in
+            (* must be a pvsymbol or restore_pv will fail *)
+            let npv = create_pvsymbol id (vtv_of_expr e1) in
+            npv.pv_vs, t_var npv.pv_vs
       in
-      let f = t_equ (get_term e1) (t_var pv.pv_vs) in
-      let c_q = create_unit_post f in
+      let res, t = get_term e1 in
+      let t = fs_app pl.pl_ls [t] pv.pv_vs.vs_ty in
+      let c_q = create_unit_post (t_equ t (t_var pv.pv_vs)) in
       let eff = eff_write eff_empty reg in
       let w = wp_abstract env eff c_q Mexn.empty q xq in
-      let q = create_post (vs_result e1) w in
+      let q = create_post res w in
       wp_label e (wp_expr env e1 q xq)
   | Eloop (inv, varl, e1) ->
       (* TODO: what do we do about well-foundness? *)
@@ -1120,10 +1117,10 @@ end = struct
      Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
 
   let get_region v =
-    match vtv_of_vs v with
-      | {vtv_ity = {ity_node = Ityapp (_,_,[r]) }}
-      | { vtv_mut = Some r} -> Some r
+      try match (ity_of_vs v).ity_node with
+      | Ityapp (_,_,[r]) -> Some r
       | _ -> None
+      with Not_found -> None
 
   let term env sub t =
      let mreg = Mreg.mapi_filter (fun reg vr ->

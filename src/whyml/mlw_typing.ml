@@ -220,7 +220,7 @@ let parse_record uc fll =
     | [] -> raise EmptyRecord
     | (pl,_)::_ -> pl in
   let its = match pl.pl_args with
-    | [{ vtv_ity = { ity_node = Ityapp (its,_,_) }}] -> its
+    | [{ fd_ity = { ity_node = Ityapp (its,_,_) }}] -> its
     | _ -> raise (BadRecordField pl.pl_ls) in
   let cs, pjl = match find_constructors (get_known uc) its with
     | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField pl.pl_ls)) pjl
@@ -552,14 +552,19 @@ and de_desc denv loc = function
       let res = de_app loc (hidden_pl ~loc cs) (List.map get_val pjl) in
       mk_let ~loc ~uloc:denv.uloc e1 res
   | Ptree.Eassign (e1, q, e2) ->
-      let fl = { expr_desc = Eident q; expr_loc = loc } in
-      let e1 = { expr_desc = Eapply (fl,e1); expr_loc = loc } in
+      let fl = dexpr denv { expr_desc = Eident q; expr_loc = qloc q } in
+      let pl = match fl.de_desc with
+        | DEglobal_pl pl -> pl
+        | _ -> Loc.errorm ~loc:(qloc q) "%a is not a field name" print_qualid q
+      in
       let e1 = dexpr denv e1 in
       let e2 = dexpr denv e2 in
+      let d, ty = de_app loc fl [e1] in
+      let e0 = mk_dexpr d ty loc Slab.empty in
       let res = create_type_variable () in
-      expected_type e1 res;
+      expected_type e0 res;
       expected_type_weak e2 res;
-      DEassign (e1, e2), ([], dity_unit)
+      DEassign (pl, e1, e2), ([], dity_unit)
   | Ptree.Econstant (Number.ConstInt _ as c) ->
       DEconstant c, ([], dity_int)
   | Ptree.Econstant (Number.ConstReal _ as c) ->
@@ -752,13 +757,12 @@ and re_desc denv de = match de.de_desc with
       let denv = List.fold_left add_one denv fdl in
       let e1 = rexpr denv e1 in
       DEletrec (fdl, e1), e1.de_type
-  | DEassign (e1, e2) ->
+  | DEassign (pl, e1, e2) ->
       let e1 = rexpr denv e1 in
       let e2 = rexpr denv e2 in
-      let res = create_type_variable () in
-      expected_type e1 res;
-      expected_type_weak e2 res;
-      DEassign (e1, e2), ([], dity_unit)
+      (* no need to weakly reunify e1.pl with e2,
+         since both dexprs retain their "pure" types *)
+      DEassign (pl, e1, e2), ([], dity_unit)
   | DEif (e1, e2, e3) ->
       let e1 = rexpr denv e1 in
       expected_type e1 dity_bool;
@@ -1029,28 +1033,31 @@ let add_binders lenv pvl =
   let add lenv pv = add_local pv.pv_vs.vs_name.id_string (LetV pv) lenv in
   List.fold_left add lenv pvl
 
+let mk_field ity gh mut = { fd_ity = ity; fd_ghost = gh; fd_mut = mut }
+let fd_of_pv pv = mk_field pv.pv_vtv.vtv_ity pv.pv_vtv.vtv_ghost None
+
 (* TODO: devise a good grammar for effect expressions *)
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
   | Ptree.PPvar (Ptree.Qident {id=x}) when Mstr.mem x lenv.let_vars ->
       begin match Mstr.find x lenv.let_vars with
-        | LetV pv -> pv.pv_vs, pv.pv_vtv
+        | LetV pv -> pv.pv_vs, fd_of_pv pv
         | LetA _ -> errorm ~loc "'%s' must be a first-order value" x
       end
   | Ptree.PPvar p ->
       begin match uc_find_ps lenv.mod_uc p with
-        | PV pv -> pv.pv_vs, pv.pv_vtv
+        | PV pv -> pv.pv_vs, fd_of_pv pv
         | _ -> errorm ~loc:(qloc p) "'%a' must be a variable" print_qualid p
       end
   | Ptree.PPapp (p, [le]) ->
-      let vs, vtv = get_eff_expr lenv le in
+      let vs, fda = get_eff_expr lenv le in
       let quit () = errorm ~loc:le.pp_loc "This expression is not a record" in
-      let pjm = match vtv.vtv_ity.ity_node with
+      let pjm = match fda.fd_ity.ity_node with
         | Ityapp (its,_,_) ->
             let pjl = match find_constructors (get_known lenv.mod_uc) its with
               | (_,pjl)::_ -> pjl | _ -> quit () in
             let add_pj m pj = match pj with
-              | Some { pl_ls = ls; pl_args = [vtva]; pl_value = vtvv } ->
-                  Mls.add ls (vtva.vtv_ity, vtvv) m
+              | Some { pl_ls = ls; pl_args = [fda]; pl_value = fdv } ->
+                  Mls.add ls (fda.fd_ity, fdv) m
               | Some _ -> assert false
               | None -> m in
             List.fold_left add_pj Mls.empty pjl
@@ -1060,40 +1067,41 @@ let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
               | (_,pjl)::_ -> pjl | _ -> quit () in
             let add_pj m pj = match pj with
               | Some ({ ls_args = [tya]; ls_value = Some tyv } as ls) ->
-                  Mls.add ls (ity_of_ty tya, vty_value (ity_of_ty tyv)) m
+                  let fdv = mk_field (ity_of_ty tyv) false None in
+                  Mls.add ls (ity_of_ty tya, fdv) m
               | Some _ -> assert false
               | None -> m in
             List.fold_left add_pj Mls.empty pjl
         | _ -> quit ()
       in
-      let itya, vtvv =
+      let itya, fdv =
         try Mls.find (uc_find_ls lenv.mod_uc p) pjm with Not_found ->
           errorm ~loc:(qloc p) "'%a' must be a field name" print_qualid p in
-      let sbs = unify_loc (ity_match ity_subst_empty) loc itya vtv.vtv_ity in
-      let mut = Opt.map (reg_full_inst sbs) vtvv.vtv_mut in
-      let ghost = vtv.vtv_ghost || vtvv.vtv_ghost in
-      vs, vty_value ~ghost ?mut (ity_full_inst sbs vtvv.vtv_ity)
+      let sbs = unify_loc (ity_match ity_subst_empty) loc itya fda.fd_ity in
+      let mut = Opt.map (reg_full_inst sbs) fdv.fd_mut in
+      let ghost = fda.fd_ghost || fdv.fd_ghost in
+      vs, mk_field (ity_full_inst sbs fdv.fd_ity) ghost mut
   | Ptree.PPcast (e,_) | Ptree.PPnamed (_,e) ->
       get_eff_expr lenv e
   | _ ->
       errorm ~loc "unsupported effect expression"
 
 let get_eff_regs lenv fn (eff,svs) le =
-  let vs, vtv = get_eff_expr lenv le in
-  match vtv.vtv_mut, vtv.vtv_ity.ity_node with
+  let vs, fd = get_eff_expr lenv le in
+  match fd.fd_mut, fd.fd_ity.ity_node with
   | Some reg, _ ->
-      fn eff ?ghost:(Some vtv.vtv_ghost) reg, Svs.add vs svs
+      fn eff ?ghost:(Some fd.fd_ghost) reg, Svs.add vs svs
   | None, Ityapp (its,_,(_::_ as regl)) ->
       let csl = find_constructors (get_known lenv.mod_uc) its in
-      let add_arg ((ngr,ghr) as regs) vtv = match vtv.vtv_mut with
-        | Some r when vtv.vtv_ghost -> ngr, Sreg.add r ghr
-        | Some r                    -> Sreg.add r ngr, ghr
+      let add_arg ((ngr,ghr) as regs) fd = match fd.fd_mut with
+        | Some r when fd.fd_ghost -> ngr, Sreg.add r ghr
+        | Some r                  -> Sreg.add r ngr, ghr
         | None -> regs in
       let add_cs regs (cs,_) = List.fold_left add_arg regs cs.pl_args in
       let ngr, ghr = List.fold_left add_cs (Sreg.empty,Sreg.empty) csl in
       let add_reg eff reg0 reg =
         let eff = if not (Sreg.mem reg0 ngr) then eff else
-          fn eff ?ghost:(Some vtv.vtv_ghost) reg in
+          fn eff ?ghost:(Some fd.fd_ghost) reg in
         let eff = if not (Sreg.mem reg0 ghr) then eff else
           fn eff ?ghost:(Some true) reg in
         eff in
@@ -1210,7 +1218,7 @@ let e_app_gh e el =
   e_app e (ghostify (decomp e.e_vty, el))
 
 let e_plapp_gh pl el ity =
-  let ghostify vtv e = e_ghostify vtv.vtv_ghost e in
+  let ghostify fd e = e_ghostify fd.fd_ghost e in
   e_plapp pl (List.map2 ghostify pl.pl_args el) ity
 
 let rec expr lenv de =
@@ -1254,11 +1262,11 @@ and expr_desc lenv loc de = match de.de_desc with
         let lenv = add_local x.id def1.let_sym lenv in
         let e2 = expr lenv de2 in
         let ghost_unit = match e2.e_vty with
-          | VTvalue { vtv_ghost = true; vtv_mut = None; vtv_ity = ity } ->
+          | VTvalue { vtv_ghost = true; vtv_ity = ity } ->
               ity_equal ity ity_unit
           | _ -> false in
         let e2 =
-          if ghost_unit (* e2 is immutable ghost unit *)
+          if ghost_unit (* e2 is ghost unit *)
              && not (vty_ghost e1.e_vty) (* and e1 is non-ghost *)
              && not (Mid.mem name e2.e_varm) (* and x doesn't occur in e2 *)
           then e_let (create_let_defn (id_fresh "gh") e2) e_void else e2 in
@@ -1299,8 +1307,8 @@ and expr_desc lenv loc de = match de.de_desc with
       e_lapp ls [] (ity_of_dity (snd de.de_type))
   | DEif (de1, de2, de3) ->
       e_if (expr lenv de1) (expr lenv de2) (expr lenv de3)
-  | DEassign (de1, de2) ->
-      e_assign (expr lenv de1) (expr lenv de2)
+  | DEassign (pl, de1, de2) ->
+      e_assign pl (expr lenv de1) (expr lenv de2)
   | DEconstant c ->
       e_const c
   | DElazy (LazyAnd, de1, de2) ->
@@ -1647,24 +1655,23 @@ let add_types ~wp uc tdl =
             let sbs = List.fold_left add ity_subst_empty vl in
             let mk_proj (regs,inv) (id,pty) =
               let ity = parse pty in
-              let vtv = vty_value ity in
+              let fd = mk_field ity false None in
               let inv = inv || ity_has_inv ity in
               match id with
-                | None ->
-                    let pv = create_pvsymbol (id_fresh "pj") vtv in
-                    (Sreg.union regs ity.ity_vars.vars_reg, inv), (pv, false)
-                | Some id ->
-                    try
-                      let pv = Hstr.find projs id.id in
-                      let ty = pv.pv_vtv.vtv_ity in
-                      (* TODO: once we have ghost/mutable fields in algebraics,
-                         don't forget to check here that they coincide, too *)
-                      ignore (Loc.try3 id.id_loc ity_match sbs ty ity);
-                      (regs, inv), (pv, true)
-                    with Not_found ->
-                      let pv = create_pvsymbol (Denv.create_user_id id) vtv in
-                      Hstr.replace projs id.id pv;
-                      (Sreg.union regs ity.ity_vars.vars_reg, inv), (pv, true)
+              | None ->
+                  let regs = Sreg.union regs ity.ity_vars.vars_reg in
+                  (regs, inv), (None, fd)
+              | Some id ->
+                  try
+                    let fd = Hstr.find projs id.id in
+                    (* TODO: once we have ghost/mutable fields in algebraics,
+                       don't forget to check here that they coincide, too *)
+                    ignore (Loc.try3 id.id_loc ity_match sbs fd.fd_ity ity);
+                    (regs, inv), (Some (Denv.create_user_id id), fd)
+                  with Not_found ->
+                    Hstr.replace projs id.id fd;
+                    let regs = Sreg.union regs ity.ity_vars.vars_reg in
+                    (regs, inv), (Some (Denv.create_user_id id), fd)
             in
             let mk_constr s (_loc,cid,pjl) =
               let s,pjl = Lists.map_fold_left mk_proj s pjl in
@@ -1677,7 +1684,6 @@ let add_types ~wp uc tdl =
             PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
         | TDrecord fl when Hstr.find mutables x ->
             let mk_field (regs,inv) f =
-              let ghost = f.f_ghost in
               let ity = parse f.f_pty in
               let inv = inv || ity_has_inv ity in
               let fid = Denv.create_user_id f.f_ident in
@@ -1687,8 +1693,7 @@ let add_types ~wp uc tdl =
               else
                 Sreg.union regs ity.ity_vars.vars_reg, None
               in
-              let vtv = vty_value ?mut ~ghost ity in
-              (regs, inv), (create_pvsymbol fid vtv, true)
+              (regs, inv), (Some fid, mk_field ity f.f_ghost mut)
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),pjl = Lists.map_fold_left mk_field init fl in
@@ -1745,22 +1750,19 @@ let add_types ~wp uc tdl =
           let projs = Hstr.create 5 in
           let mk_proj (id,pty) =
             let ity = parse pty in
-            let vtv = vty_value ity in
+            let fd = mk_field ity false None in
             match id with
-              | None ->
-                  create_pvsymbol (id_fresh "pj") vtv, false
-              | Some id ->
-                  try
-                    let pv = Hstr.find projs id.id in
-                    let ty = pv.pv_vtv.vtv_ity in
-                    (* once we have ghost/mutable fields in algebraics,
-                       don't forget to check here that they coincide, too *)
-                    Loc.try2 id.id_loc ity_equal_check ty ity;
-                    pv, true
-                  with Not_found ->
-                    let pv = create_pvsymbol (Denv.create_user_id id) vtv in
-                    Hstr.replace projs id.id pv;
-                    pv, true
+            | None -> None, fd
+            | Some id ->
+                try
+                  let fd = Hstr.find projs id.id in
+                  (* once we have ghost/mutable fields in algebraics,
+                     don't forget to check here that they coincide, too *)
+                  Loc.try2 id.id_loc ity_equal_check fd.fd_ity ity;
+                  Some (Denv.create_user_id id), fd
+                with Not_found ->
+                  Hstr.replace projs id.id fd;
+                  Some (Denv.create_user_id id), fd
           in
           let mk_constr (_loc,cid,pjl) =
             Denv.create_user_id cid, List.map mk_proj pjl in
@@ -1768,8 +1770,7 @@ let add_types ~wp uc tdl =
       | TDrecord fl ->
           let mk_field f =
             let fid = Denv.create_user_id f.f_ident in
-            let vtv = vty_value ~ghost:f.f_ghost (parse f.f_pty) in
-            create_pvsymbol fid vtv, true in
+            Some fid, mk_field (parse f.f_pty) f.f_ghost None in
           let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
           let csl = [Denv.create_user_id cid, List.map mk_field fl] in
           abstr, (ts, csl) :: algeb, alias
@@ -1779,16 +1780,17 @@ let add_types ~wp uc tdl =
   (* create pure type declarations *)
 
   let mk_pure_decl ts csl =
-    let pjt = Hvs.create 3 in
+    let pjt = Hstr.create 3 in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
-    let mk_proj (pv,f) =
-      let vs = pv.pv_vs in
-      if f then try vs.vs_ty, Some (Hvs.find pjt vs) with Not_found ->
-        let pj = create_fsymbol (id_clone vs.vs_name) [ty] vs.vs_ty in
-        Hvs.replace pjt vs pj;
-        vs.vs_ty, Some pj
-      else
-        vs.vs_ty, None
+    let mk_proj (pj,fd) =
+      let fty = ty_of_ity fd.fd_ity in
+      fty, match pj with
+        | None -> None
+        | Some id ->
+            try Hstr.find pjt (preid_name id) with Not_found ->
+            let pj = Some (create_fsymbol id [ty] fty) in
+            Hstr.replace pjt (preid_name id) pj;
+            pj
     in
     let mk_constr (id,pjl) =
       let pjl = List.map mk_proj pjl in
