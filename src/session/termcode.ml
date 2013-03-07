@@ -693,9 +693,44 @@ end
 
 module AssoMake2 (Old : S) (New : S) = struct
 
-  type any_goal = Old of Old.t | New of New.t
+  let rec lcp n s1 s2 =
+    if String.length s1 <= n || String.length s2 <= n then n
+    else if s1.[n] = s2.[n] then lcp (n+1) s1 s2 else n
+  let lcp = lcp 0
 
   open Ident
+
+  type any_goal = Old of Old.t | New of New.t
+
+  (* doubly linked lists *)
+
+  type node = {
+    mutable  prev: node;
+            shape: string;
+              elt: any_goal;
+    mutable valid: bool;
+    mutable  next: node;
+  }
+
+  let mk_node g =
+    let s = match g with Old g -> Old.shape g | New g -> New.shape g in
+    let rec n = { prev = n; shape = s; elt = g; next = n; valid = true } in n
+
+  let rec iter_pairs f = function
+    | [] | [_] -> ()
+    | x :: (y :: _ as l) -> f x y; iter_pairs f l
+
+  let build_list = iter_pairs (fun x y -> x.next <- y; y.prev <- x)
+
+  (* priority queues for pairs of nodes *)
+
+  module E = struct
+    type t = int * (node * node)
+    let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
+  end
+  module PQ = Pqueue.Make(E)
+
+  let dprintf = Debug.dprintf debug
 
   let associate oldgoals newgoals =
     (* set up an array [result] containing the solution
@@ -717,19 +752,41 @@ module AssoMake2 (Old : S) (New : S) = struct
       try
         let oldg = Hashtbl.find old_checksums c in
         Hashtbl.remove old_checksums c;
-        result.(new_goal_index newg) <- (newg, Some oldg, true);
+        result.(new_goal_index newg) <- (newg, Some oldg, false);
         acc
       with Not_found ->
-        New newg :: acc
+        mk_node (New newg) :: acc
     in
     let newgoals = List.fold_left collect [] newgoals in
-    let _allgoals =
-      Hashtbl.fold (fun _ oldg acc -> Old oldg :: acc) old_checksums newgoals in
+    let add _ oldg acc = mk_node (Old oldg) :: acc in
+    let allgoals = Hashtbl.fold add old_checksums newgoals in
     Hashtbl.clear old_checksums;
     (* phase 2: pair goals according to shapes *)
-    (* let compare (sh1, _) (sh2, _) = Pervasives.compare sh1 sh2 in *)
-    (* let allgoals = List.sort compare allgoals in *)
-    (* assert false *)
+    let compare e1 e2 = Pervasives.compare e1.shape e2.shape in
+    let allgoals = List.sort compare allgoals in
+    build_list allgoals;
+    if allgoals <> [] then begin
+      let dummy = let n = List.hd allgoals (* safe *) in 0, (n, n) in
+      let pq = PQ.create ~dummy in
+      let add x y = match x.elt, y.elt with
+        | Old _, New _ | New _, Old _ -> PQ.add pq (lcp x.shape y.shape, (x, y))
+        | Old _, Old _ | New _, New _ -> () in
+      iter_pairs add allgoals;
+      (* FIXME: exit earlier, as soon as we get min(old,new) pairs *)
+      while not (PQ.is_empty pq) do
+        let _, (x, y) = PQ.extract_min pq in
+        if x.valid && y.valid then begin
+          x.valid <- false; y.valid <- false;
+          let o, n = match x.elt, y.elt with
+            | New n, Old o | Old o, New n -> o, n | _ -> assert false in
+          dprintf "[assoc] new pairing@.";
+          result.(new_goal_index n) <- n, Some o, true;
+          if x.prev != x && y.next != y then add x.prev y.next;
+          if x.prev != x then x.prev.next <- y.next else y.next.prev <- y.next;
+          if y.next != y then y.next.prev <- x.prev else x.prev.next <- x.prev
+        end
+      done
+    end;
     Array.to_list result
 
 end

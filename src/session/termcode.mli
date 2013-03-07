@@ -67,9 +67,9 @@ module AssoMake (Old : S) (New : S) : sig
   val associate : Old.t list -> New.t list -> (New.t * Old.t option *bool) list
     (** associate the new things {New.t} to old things {Old.t}.
         (n,o,b) means if [o,b] is:
-        - [Some o, true] the old thing [o] have the same checksum that the new
+        - [Some o, false] the old thing [o] have the same checksum that the new
           thing [n].
-        - [Some o, false] no old things have the same checksum
+        - [Some o, true] no old things have the same checksum
         than [n]. The new thing [o] has a shape similar to [n]
         - [None]  no old thing were similar enough. *)
 end
