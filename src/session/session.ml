@@ -1805,7 +1805,7 @@ end = struct
     let name g     = g.goal_name
   end
 
-  module AssoGoals = Tc.AssoMake(FromGoal)(ToGoal)
+  module AssoGoals = Tc.AssoMake2(FromGoal)(ToGoal)
   open ToGoal
   open FromGoal
 
