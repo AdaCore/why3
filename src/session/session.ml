@@ -1781,7 +1781,7 @@ let print_external_proof fmt p =
 
 module AssoGoals : sig
   val associate : 'a goal list -> 'b goal list ->
-    ('b goal * ('a goal option) * bool) list
+    ('b goal * ('a goal * bool) option) list
 end = struct
 (** When Why3 will require 3.12 put all of that in a function using
     explicit type argument "(type t)" and remove all the Obj.magic *)
@@ -1805,19 +1805,19 @@ end = struct
     let name g     = g.goal_name
   end
 
-  module AssoGoals = Tc.AssoMake2(FromGoal)(ToGoal)
+  module AssoGoals = Tc.Pairing(FromGoal)(ToGoal)
   open ToGoal
   open FromGoal
 
   let associate (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
-      ('tto goal * ('ffrom goal option) * bool) list =
+      ('tto goal * ('ffrom goal * bool) option) list =
     let from_goals : ffrom goal list =
       Obj.magic (from_goals : 'ffrom goal list) in
     let to_goals   : tto goal list =
       Obj.magic (to_goals : 'tto goal list) in
-    let associated : (tto goal * (ffrom goal option) * bool) list =
+    let associated : (tto goal * (ffrom goal * bool) option) list =
       AssoGoals.associate from_goals to_goals in
-    (Obj.magic associated : ('tto goal * ('ffrom goal option) * bool) list)
+    (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
 
 end
 
@@ -1881,9 +1881,9 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
         env.session.session_shape_version;
       AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
     List.iter (function
-    | (to_goal, Some from_goal, obsolete) ->
+    | (to_goal, Some (from_goal, obsolete)) ->
       merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
-    | (_, None, _) -> ()
+    | (_, None) -> ()
     ) associated
   with Exit -> ()
 
@@ -2270,9 +2270,9 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
       env.session.session_shape_version;
     AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
-  | (to_goal, Some from_goal, _obsolete) ->
+  | (to_goal, Some (from_goal, _obsolete)) ->
     add_goal_to_parent ~keygen env from_goal to_goal
-  | (_, None, _) -> ()
+  | (_, None) -> ()
   ) associated;
   to_transf
 
