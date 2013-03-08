@@ -173,18 +173,17 @@ Theorem WP_parameter_shuffle : forall (b:(list Z)) (a:(list Z)),
   forall (result:bool), ((result = true) <-> (a1 = (Nil :(list Z)))) ->
   ((~ (result = true)) -> forall (o:bool), ((o = true) <-> (a1 = (Nil :(list
   Z)))) -> ((~ (o = true)) -> forall (result1:bool), ((result1 = true) <->
-  (b1 = (Nil :(list Z)))) -> ((~ (result1 = true)) -> forall (result2:bool),
-  (result2 = true) -> forall (a2:(list Z)), forall (o1:Z),
+  (b1 = (Nil :(list Z)))) -> ((result1 = true) -> forall (a2:(list Z)),
+  forall (o1:Z),
   match a1 with
   | Nil => False
   | (Cons x t1) => (o1 = x) /\ (a2 = t1)
   end -> forall (c2:(list Z)), (c2 = (Cons o1 c1)) -> exists a':(list Z),
   exists b':(list Z), ((reverse a) = (infix_plpl (reverse a2) a')) /\
   (((reverse b) = (infix_plpl (reverse b1) b')) /\ (shuffle a' b' c2))))).
-intros b a c h1 c1 b1 a1 (a',(b',(h2,(h3,h4)))) result h5 h6 o h7 h8
-   result1 h9 h10 result2 h11 a2 o1 h12 c2 h13. 
-exists (Cons o1 a'); exists b'; 
-why3 "Alt-Ergo,0.95,".
+intros b a c h1 c1 b1 a1 (a',(b',(h2,(h3,h4)))) result h5 h6 o h7 h8 result1
+h9 h10 a2 o1 h11 c2 h12.
+exists (Cons o1 a'); exists b'; why3 "Alt-Ergo,0.95.1,".
 Qed.
 
 
