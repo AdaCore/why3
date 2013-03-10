@@ -74,14 +74,15 @@
 
 ==================== Roadmap for release 0.81 ========================
 
-scheduled on ? 2012
+scheduled on March 2013
 
 == New Features to announce ==
 
   o [why3ide] allow several files on the command-line
   o [ocaml API] incompatible changes in Set/Map/Hashtbl modules
+  o [ocaml API] examples in the manual extended to API for Why3ml programs
   o [prover] fixed Coq 8.4 support for theory real.Trigonometry
-  o [prover] support for Gappa 0.16.4
+  o [prover] support for Gappa up to 0.16.5
   o [prover] support for Z3 4.2, 4.3.*
   o [prover] support for Alt-Ergo 0.95
   o [prover] support for CVC4
@@ -99,7 +100,7 @@ scheduled on ? 2012
 * check that nightly bench is OK
 * check that "make xml-validate" is OK
   (see below : copy the dtd on the web)
-* put 0.80 in file Version
+* put 0.81 in file Version
 * check headers
 * check the file CHANGES, add the release date
 * manual in PDF: check that macro \todo is commented out
@@ -131,10 +132,14 @@ scheduled on ? 2012
       /users/www-perso/projets/why3/api
    PROBLEME avec style.css
  - update the main HTML page (sources are in why3-papers/www)
+ - add links to extra resources like
+   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
+   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
-* produce the Why3 part of ProVal gallery
+* produce the Why3 part of Toccatal gallery
   -> add also a tar.gz and a ZIP file of it (this is done by doing
   "make gallery-files" in the sources of the web pages)
 * Announce the distrib
@@ -440,10 +445,6 @@ See manual Section xx
  - API doc, produced using ocamldoc (make apidoc), to http://why3.lri.fr/api/
     Note: check that URL of API doc is correct in doc/api.tex line 9.
  - update the main HTML page (sources are in why3-papers/www)
- - add links to extra resources like
-   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
-   http://proval.lri.fr/gallery/index.en.html
-   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
 
 * produce the Why3 part of ProVal gallery ?
 * Announce the distrib
