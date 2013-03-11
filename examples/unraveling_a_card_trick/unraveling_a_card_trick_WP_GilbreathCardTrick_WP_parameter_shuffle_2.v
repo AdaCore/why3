@@ -184,7 +184,7 @@ Theorem WP_parameter_shuffle : forall (b:(list Z)) (a:(list Z)),
 intros b a c h1 c1 b1 a1 (a',(b',(h2,(h3,h4)))) result h5 h6 o h7 h8
    result1 h9 h10 result2 h11 a2 o1 h12 c2 h13. 
 exists (Cons o1 a'); exists b'; 
-why3 "Alt-Ergo,0.95,".
+why3 "Alt-Ergo,0.95.1,".
 Qed.
 
 
