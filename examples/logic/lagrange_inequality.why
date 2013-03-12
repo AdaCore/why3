@@ -50,9 +50,9 @@ theory CauchySchwarzInequality
   lemma norm_pos :
      forall x1 x2:real. norm x1 x2 >= 0.0
 
-  (** lemma to help the next one *)
+  (** 2 lemmas to help the next one *)
   lemma sqr_le_sqrt :
-    forall x y:real. 0.0 <= x /\ 0.0 <= sqr x <= y -> x <= sqrt y
+    forall x y:real. sqr x <= y -> x <= sqrt y
 
   lemma CauchySchwarz:
      forall x1 x2 y1 y2 : real.
