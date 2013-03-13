@@ -315,7 +315,13 @@ let add_inversion (state,task) ts ty csl =
     let app pj = t_app_infer pj [ax_hd] in
     t_equ ax_hd (fs_app cs (List.map app pjl) ty) in
   let ax_f = Lists.map_join_left mk_cs t_or csl in
-  let ax_f = t_forall_close [ax_vs] [] ax_f in
+  (* define all accesses to fields as potential triggers *)
+  let mk_tr (cs,_) =
+    let pjl = Mls.find cs state.pj_map in
+    let app pj = t_app_infer pj [ax_hd] in
+    List.map app pjl in
+  let ax_tr = List.map (fun x -> [x]) (Lists.map_join_left mk_tr (@) csl) in
+  let ax_f = t_forall_close [ax_vs] ax_tr ax_f in
   state, add_prop_decl task Paxiom ax_pr ax_f
 
 let add_type (state,task) (ts,csl) =
