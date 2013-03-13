@@ -1268,7 +1268,7 @@ endif
 # API DOC
 ##########
 
-.PHONY: apidoc
+.PHONY: apidoc apidot
 
 MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
@@ -1283,15 +1283,31 @@ MODULESTODOC = \
 
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
-apidoc: $(FILESTODOC)
+doc/apidoc:
 	mkdir -p doc/apidoc
+
+apidoc: doc/apidoc $(FILESTODOC)
 	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
 		-keep-code $(INCLUDES) \
 		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
 
-# could we include also the dependency graph ?
-# $(OCAMLDOC) -o doc/apidoc/dg.dot -dot $(INCLUDES) \
-# 	$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+# could we include also the dependency graph ? -- someone
+# At least we can give a way to create it -- francois
+
+apidot: doc/apidoc/dg.svg doc/apidoc/dg.png
+
+#The sed remove configuration for dot that gives bad result
+doc/apidoc/dg.dot: doc/apidoc $(FILESTODOC)
+	$(OCAMLDOC) -o doc/apidoc/dg.dot.tmp -dot $(INCLUDES) \
+		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+	sed -e "s/  \(size\|ratio\|rotate\|fontsize\).*$$//" doc/apidoc/dg.dot.tmp > doc/apidoc/dg.dot
+	rm -f doc/apidoc/dg.dot.tmp
+
+doc/apidoc/dg.svg: doc/apidoc/dg.dot
+	dot -T svg $< > $@
+
+doc/apidoc/dg.png: doc/apidoc/dg.dot
+	dot -T png $< > $@
 
 # what is this ? api doc is in why3.lri.fr/api instead...
 # install_apidoc: apidoc
