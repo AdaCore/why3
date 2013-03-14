@@ -52,7 +52,7 @@ end
 module Make(X: Set.OrderedType) = struct
   type elt = X.t
   type t = elt RA.t
-  let create ~dummy = RA.make 16 dummy
+  let create ~dummy = RA.make 0 dummy
   let is_empty h = RA.length h = 0
   let clear h = RA.resize h 0
 

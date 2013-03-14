@@ -370,7 +370,7 @@ module Pairing(Old: S)(New: S) = struct
 
   type any_goal = Old of Old.t | New of New.t
 
-  (* doubly linked lists *)
+  (* doubly linked lists; left and right bounds point to themselves *)
 
   type node = {
     mutable  prev: node;
@@ -389,6 +389,13 @@ module Pairing(Old: S)(New: S) = struct
     | x :: (y :: _ as l) -> f x y; iter_pairs f l
 
   let build_list = iter_pairs (fun x y -> x.next <- y; y.prev <- x)
+
+  let remove x =
+    x.valid <- false;
+    let p = x.prev and n = x.next in
+    if p == x then n.prev <- n (* left bound *)
+    else if n == x then p.next <- p (* right bound *)
+    else begin p.next <- n; n.prev <- p end
 
   (* priority queues for pairs of nodes *)
 
@@ -444,14 +451,13 @@ module Pairing(Old: S)(New: S) = struct
       while not (PQ.is_empty pq) do
         let _, (x, y) = PQ.extract_min pq in
         if x.valid && y.valid then begin
-          x.valid <- false; y.valid <- false;
           let o, n = match x.elt, y.elt with
             | New n, Old o | Old o, New n -> o, n | _ -> assert false in
           dprintf "[assoc] new pairing@.";
           result.(new_goal_index n) <- n, Some (o, true);
           if x.prev != x && y.next != y then add x.prev y.next;
-          if x.prev != x then x.prev.next <- y.next else y.next.prev <- y.next;
-          if y.next != y then y.next.prev <- x.prev else x.prev.next <- x.prev
+          remove x;
+          remove y
         end
       done
     end;
