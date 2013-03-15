@@ -44,7 +44,9 @@ let ident_printer =
        (** div and mod are builtin *)
       "div";"mod";
       (** distinct is builtin in some provers *)
-      "distinct"
+      "distinct";
+      (** CVC4 built-in symbols *)
+      "concat";
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
