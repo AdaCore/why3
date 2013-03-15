@@ -149,13 +149,20 @@ Axiom pow2_62 : ((pow2 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
-Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
-  (x < (pow2 i))%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = 1%Z).
+Axiom Div_double : forall (x:Z) (y:Z), (((0%Z < y)%Z /\ (y <= x)%Z) /\
+  (x < (2%Z * y)%Z)%Z) -> ((int.EuclideanDivision.div x y) = 1%Z).
 
-Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
-  (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+Axiom Div_pow : forall (x:Z) (i:Z), (0%Z < i)%Z ->
+  ((((pow2 (i - 1%Z)%Z) <= x)%Z /\ (x < (pow2 i))%Z) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = 1%Z)).
+
+Axiom Div_double_neg : forall (x:Z) (y:Z), (((((-2%Z)%Z * y)%Z <= x)%Z /\
+  (x < (-y)%Z)%Z) /\ ((-y)%Z < 0%Z)%Z) -> ((int.EuclideanDivision.div x
+  y) = (-2%Z)%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), (0%Z < i)%Z ->
+  ((((-(pow2 i))%Z <= x)%Z /\ (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z)).
 
 Axiom Mod_pow2_gen : forall (x:Z) (i:Z) (k:Z), ((0%Z <= k)%Z /\ (k < i)%Z) ->
   ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div (x + (pow2 i))%Z
@@ -282,7 +289,7 @@ Axiom to_nat_of_one : forall (b:bv) (i:Z) (j:Z), (((j < size)%Z /\
   i) = ((pow2 ((j - i)%Z + 1%Z)%Z) - 1%Z)%Z)).
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.94" timelimit 5.
+Ltac ae := why3 "alt-ergo" timelimit 5.
 Open Scope Z_scope.
 
 (* Why3 goal *)
@@ -306,7 +313,7 @@ destruct h.
 rewrite to_nat_sub_zero; auto with zarith.
 ae.
 rewrite to_nat_sub_one; auto with zarith.
-ae.
+why3 "alt-ergo" timelimit 15.
 Qed.
 
 

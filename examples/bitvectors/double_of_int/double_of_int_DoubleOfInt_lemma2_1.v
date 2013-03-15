@@ -5,6 +5,7 @@ Require BuiltIn.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
+Require bool.Bool.
 Require real.Real.
 Require real.RealInfix.
 Require real.FromInt.
@@ -151,13 +152,20 @@ Axiom pow2_62 : ((pow2 62%Z) = 4611686018427387904%Z).
 
 Axiom pow2_63 : ((pow2 63%Z) = 9223372036854775808%Z).
 
-Axiom Div_pow : forall (x:Z) (i:Z), (((pow2 (i - 1%Z)%Z) <= x)%Z /\
-  (x < (pow2 i))%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = 1%Z).
+Axiom Div_double : forall (x:Z) (y:Z), (((0%Z < y)%Z /\ (y <= x)%Z) /\
+  (x < (2%Z * y)%Z)%Z) -> ((int.EuclideanDivision.div x y) = 1%Z).
 
-Axiom Div_pow2 : forall (x:Z) (i:Z), (((-(pow2 i))%Z <= x)%Z /\
-  (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) -> ((int.EuclideanDivision.div x
-  (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z).
+Axiom Div_pow : forall (x:Z) (i:Z), (0%Z < i)%Z ->
+  ((((pow2 (i - 1%Z)%Z) <= x)%Z /\ (x < (pow2 i))%Z) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = 1%Z)).
+
+Axiom Div_double_neg : forall (x:Z) (y:Z), (((((-2%Z)%Z * y)%Z <= x)%Z /\
+  (x < (-y)%Z)%Z) /\ ((-y)%Z < 0%Z)%Z) -> ((int.EuclideanDivision.div x
+  y) = (-2%Z)%Z).
+
+Axiom Div_pow2 : forall (x:Z) (i:Z), (0%Z < i)%Z ->
+  ((((-(pow2 i))%Z <= x)%Z /\ (x < (-(pow2 (i - 1%Z)%Z))%Z)%Z) ->
+  ((int.EuclideanDivision.div x (pow2 (i - 1%Z)%Z)) = (-2%Z)%Z)).
 
 Axiom Mod_pow2_gen : forall (x:Z) (i:Z) (k:Z), ((0%Z <= k)%Z /\ (k < i)%Z) ->
   ((int.EuclideanDivision.mod1 (int.EuclideanDivision.div (x + (pow2 i))%Z
@@ -223,7 +231,7 @@ Axiom Nth_one : forall (n:Z), ((0%Z <= n)%Z /\ (n < 32%Z)%Z) -> ((nth bvone
   n) = true).
 
 (* Why3 assumption *)
-Definition eq(v1:bv) (v2:bv): Prop := forall (n:Z), ((0%Z <= n)%Z /\
+Definition eq (v1:bv) (v2:bv): Prop := forall (n:Z), ((0%Z <= n)%Z /\
   (n < 32%Z)%Z) -> ((nth v1 n) = (nth v2 n)).
 
 Axiom extensionality : forall (v1:bv) (v2:bv), (eq v1 v2) -> (v1 = v2).
@@ -397,7 +405,7 @@ Axiom Nth_one1 : forall (n:Z), ((0%Z <= n)%Z /\ (n < 64%Z)%Z) ->
   ((nth1 bvone1 n) = true).
 
 (* Why3 assumption *)
-Definition eq1(v1:bv1) (v2:bv1): Prop := forall (n:Z), ((0%Z <= n)%Z /\
+Definition eq1 (v1:bv1) (v2:bv1): Prop := forall (n:Z), ((0%Z <= n)%Z /\
   (n < 64%Z)%Z) -> ((nth1 v1 n) = (nth1 v2 n)).
 
 Axiom extensionality1 : forall (v1:bv1) (v2:bv1), (eq1 v1 v2) -> (v1 = v2).
@@ -585,6 +593,25 @@ Axiom double_of_bv64_value : forall (b:bv1), ((0%Z < (to_nat_sub1 b 62%Z
   62%Z 52%Z) - 1023%Z)%Z))%R * (1%R + ((IZR (to_nat_sub1 b 51%Z
   0%Z)) * (pow21 (-52%Z)%Z))%R)%R)%R).
 
+Axiom nth_j1 : forall (i:Z), ((0%Z <= i)%Z /\ (i <= 19%Z)%Z) ->
+  ((nth (from_int 1127219200%Z) i) = false).
+
+Axiom nth_j2 : forall (i:Z), ((20%Z <= i)%Z /\ (i <= 21%Z)%Z) ->
+  ((nth (from_int 1127219200%Z) i) = true).
+
+Axiom nth_j3 : forall (i:Z), ((22%Z <= i)%Z /\ (i <= 23%Z)%Z) ->
+  ((nth (from_int 1127219200%Z) i) = false).
+
+Axiom nth_j4 : forall (i:Z), ((24%Z <= i)%Z /\ (i <= 25%Z)%Z) ->
+  ((nth (from_int 1127219200%Z) i) = true).
+
+Axiom nth_j5 : forall (i:Z), ((26%Z <= i)%Z /\ (i <= 29%Z)%Z) ->
+  ((nth (from_int 1127219200%Z) i) = false).
+
+Axiom nth_j6 : ((nth (from_int 1127219200%Z) 30%Z) = true).
+
+Axiom nth_j7 : ((nth (from_int 1127219200%Z) 31%Z) = false).
+
 Axiom jp0_30 : forall (i:Z), ((0%Z <= i)%Z /\ (i < 30%Z)%Z) ->
   ((nth (from_int 2147483648%Z) i) = false).
 
@@ -653,16 +680,17 @@ Axiom const_value : ((double_of_bv64 (concat (from_int 1127219200%Z)
   (from_int 2147483648%Z))) = ((pow21 52%Z) + (pow21 31%Z))%R).
 
 (* Why3 assumption *)
-Definition jpxor(i:Z): bv := (bw_xor (from_int 2147483648%Z) (from_int2c i)).
+Definition jpxor (i:Z): bv := (bw_xor (from_int 2147483648%Z)
+  (from_int2c i)).
 
 (* Why3 assumption *)
-Definition var(i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
+Definition var (i:Z): bv1 := (concat (from_int 1127219200%Z) (jpxor i)).
 
 (* Why3 assumption *)
-Definition var_as_double(x:Z): R := (double_of_bv64 (var x)).
+Definition var_as_double (x:Z): R := (double_of_bv64 (var x)).
 
 (* Why3 assumption *)
-Definition is_int32(x:Z): Prop := ((-(pow2 31%Z))%Z <= x)%Z /\
+Definition is_int32 (x:Z): Prop := ((-(pow2 31%Z))%Z <= x)%Z /\
   (x < (pow2 31%Z))%Z.
 
 Axiom nth_0_30 : forall (x:Z), forall (i:Z), ((is_int32 x) /\
@@ -719,16 +747,17 @@ Axiom to_nat_var_0_31 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x)
 Axiom nth_var32to63 : forall (x:Z) (k:Z), ((32%Z <= k)%Z /\ (k <= 63%Z)%Z) ->
   ((nth1 (var x) k) = (nth (from_int 1127219200%Z) (k - 32%Z)%Z)).
 
-Axiom nth_var3 : forall (x:Z), forall (i:Z), ((32%Z <= i)%Z /\
-  (i <= 51%Z)%Z) -> ((nth1 (var x) i) = false).
+Axiom nth_var3 : forall (x:Z) (i:Z), ((is_int32 x) /\ ((32%Z <= i)%Z /\
+  (i <= 51%Z)%Z)) -> ((nth1 (var x) i) = false).
 
 Open Scope Z_scope.
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.94" timelimit 30.
+Ltac ae := why3 "alt-ergo" timelimit 30.
 
 (* Why3 goal *)
 Theorem lemma2 : forall (x:Z), (is_int32 x) -> ((to_nat_sub1 (var x) 51%Z
   0%Z) = ((pow2 31%Z) + x)%Z).
+(* Why3 intros x h1. *)
 intros.
 rewrite to_nat_of_zero21 with (i:=31);auto with zarith.
 ae.

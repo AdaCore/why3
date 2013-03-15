@@ -4,19 +4,19 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
   name="CVC3"
   version="2.4.1"/>
  <prover
   id="2"
-  name="Coq"
-  version="8.3pl4"/>
+  name="CVC4"
+  version="1.0"/>
  <prover
   id="3"
-  name="Simplify"
-  version="1.5.4"/>
+  name="Coq"
+  version="8.3pl4"/>
  <prover
   id="4"
   name="Yices"
@@ -24,11 +24,11 @@
  <prover
   id="5"
   name="Z3"
-  version="2.19"/>
+  version="4.3.1"/>
  <file
   name="../sorted_list.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Order"
    locfile="../sorted_list.why"
@@ -58,20 +58,12 @@
     expanded="true"
     shape="asortedaConsV0V2IasortedaConsV1V2Iainfix &lt;=V0V1F">
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-    <proof
      prover="5"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -83,7 +75,7 @@
     expanded="true"
     shape="ainfix &lt;=V0V2IamemV2V1FIasortedaConsV0V1F">
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      edited="sorted_list_SortedList_sorted_mem_1.v"
@@ -110,7 +102,7 @@
     <proof
      prover="0"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -124,12 +116,12 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="4"
@@ -142,10 +134,10 @@
     <proof
      prover="5"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>

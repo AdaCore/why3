@@ -4,33 +4,29 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
   version="0.95.1"/>
  <prover
-  id="2"
+  id="1"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="3"
+  id="2"
   name="CVC4"
   version="1.0"/>
  <prover
-  id="4"
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="5"
+  id="4"
   name="Z3"
   version="2.19"/>
  <prover
-  id="6"
+  id="5"
   name="Z3"
   version="3.2"/>
  <prover
-  id="7"
+  id="6"
   name="Z3"
   version="4.3.1"/>
  <file
@@ -210,7 +206,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -270,7 +266,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -330,7 +326,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -338,7 +334,15 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -347,14 +351,6 @@
       </proof>
       <proof
        prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="7"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -374,7 +370,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="17"
        memlimit="1000"
        obsolete="false"
@@ -382,7 +378,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="17"
        memlimit="1000"
        obsolete="false"
@@ -422,7 +418,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -522,7 +518,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -530,7 +526,7 @@
        <result status="valid" time="0.28"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -538,7 +534,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="5"
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -558,7 +554,7 @@
       <label
        name="expl:VC for distance"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="17"
        memlimit="1000"
        obsolete="false"
@@ -566,7 +562,7 @@
        <result status="valid" time="0.06"/>
       </proof>
       <proof
-       prover="6"
+       prover="5"
        timelimit="17"
        memlimit="1000"
        obsolete="false"
@@ -656,7 +652,7 @@
           <label
            name="expl:VC for distance"/>
           <proof
-           prover="4"
+           prover="3"
            timelimit="10"
            memlimit="0"
            edited="distance_Distance_WP_parameter_distance_1.v"

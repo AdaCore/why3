@@ -4,19 +4,19 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
   version="0.95.1"/>
  <prover
-  id="2"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="3"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.0"/>
  <prover
   id="4"
   name="Coq"
@@ -24,48 +24,48 @@
  <prover
   id="5"
   name="Eprover"
-  version="1.4"/>
+  version="1.6"/>
  <prover
   id="6"
   name="Gappa"
   version="0.16.6"/>
  <prover
   id="7"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="8"
   name="Spass"
   version="3.7"/>
  <prover
-  id="9"
+  id="8"
   name="Vampire"
   version="0.6"/>
  <prover
-  id="10"
+  id="9"
   name="Yices"
   version="1.0.38"/>
  <prover
-  id="11"
+  id="10"
   name="Z3"
   version="2.19"/>
  <prover
-  id="12"
+  id="11"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="12"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../test_harness.mlw"
   verified="true"
   expanded="false">
   <theory
    name="TestHarness"
-   locfile="../test_harness.mlw"
+   locfile="../../test_harness.mlw"
    loclnum="2" loccnumb="7" loccnume="18"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter testHarness"
-    locfile="../test_harness.mlw"
+    locfile="../../test_harness.mlw"
     loclnum="15" loccnumb="4" loccnume="15"
     expl="VC for testHarness"
     sum="6172465651d36ad658ffe5b572770ad9"
@@ -80,7 +80,7 @@
      expanded="false">
      <goal
       name="WP_parameter testHarness.1"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="1. precondition"
       sum="b0d2b08adfdcb4985ae408fcf05aa100"
@@ -98,7 +98,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -114,7 +114,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="13"
        memlimit="0"
        obsolete="false"
@@ -122,7 +122,7 @@
        <result status="valid" time="6.13"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -130,7 +130,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -140,7 +140,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.2"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="2. precondition"
       sum="d637d70856670e31c5595ee33aba5fbd"
@@ -158,7 +158,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -174,7 +174,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -182,7 +182,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -192,7 +192,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.3"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="3. precondition"
       sum="212fdd5b2cd1eae47b1f88641555e9aa"
@@ -210,7 +210,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -226,7 +226,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -234,7 +234,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -244,7 +244,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.4"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="4. precondition"
       sum="11f5d719d4c5092a0d3d5a230603a079"
@@ -262,7 +262,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -278,7 +278,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -286,7 +286,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -296,7 +296,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.5"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="5. precondition"
       sum="9859fb38fb435bc18e5e2ff717f8cbda"
@@ -314,7 +314,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -330,7 +330,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -338,7 +338,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -348,7 +348,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.6"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="6. assertion"
       sum="e6582e123aabedfaffa67bec761a9d5d"
@@ -366,7 +366,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -376,7 +376,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.7"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="7. assertion"
       sum="2f9a2edbf1086a49c2dba1dbdda4d998"
@@ -386,7 +386,7 @@
       <label
        name="expl:VC for testHarness"/>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -396,7 +396,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.8"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="8. assertion"
       sum="bbb6abfb9ef832f845dcc9e8ab541724"
@@ -414,7 +414,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -422,7 +422,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -430,7 +430,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="12"
        memlimit="0"
        obsolete="false"
@@ -440,7 +440,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.9"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="9. assertion"
       sum="2b87fc04cdae4f95d4457d0597d0064a"
@@ -458,7 +458,7 @@
        <result status="valid" time="0.46"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -466,7 +466,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -476,7 +476,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.10"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="10. assertion"
       sum="6f696953568b769bcebba22b5d9821fc"
@@ -494,7 +494,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -502,7 +502,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -512,7 +512,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.11"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="11. assertion"
       sum="3842fe6d65b6e2829531598ca5518cb3"
@@ -522,7 +522,7 @@
       <label
        name="expl:VC for testHarness"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -530,7 +530,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -540,7 +540,7 @@
      </goal>
      <goal
       name="WP_parameter testHarness.12"
-      locfile="../test_harness.mlw"
+      locfile="../../test_harness.mlw"
       loclnum="15" loccnumb="4" loccnume="15"
       expl="12. assertion"
       sum="f477645ff212792a48ea38eaad625883"
@@ -550,7 +550,7 @@
       <label
        name="expl:VC for testHarness"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -558,7 +558,7 @@
        <result status="valid" time="0.06"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -576,20 +576,20 @@
   expanded="false">
   <theory
    name="Elements"
-   locfile="../elements.why"
+   locfile="../../elements.why"
    loclnum="1" loccnumb="7" loccnume="15"
    verified="true"
    expanded="false">
    <goal
     name="Elements_singleton"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="19" loccnumb="6" loccnume="24"
     sum="ebd9bf1b516b5c8575918fc18d2381e1"
     proved="true"
     expanded="false"
     shape="ainfix =aelementsV0V1V2asingletonamixfix []V0V1Iainfix =V2ainfix +V1c1F">
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -599,7 +599,7 @@
    </goal>
    <goal
     name="Elements_union"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="23" loccnumb="6" loccnume="20"
     sum="f722d97b017b5ca9e72c993227d8d1ac"
     proved="true"
@@ -617,7 +617,7 @@
    </goal>
    <goal
     name="Elements_add1"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="27" loccnumb="6" loccnume="19"
     sum="f973b5372067c163b83988565f75c05e"
     proved="true"
@@ -633,7 +633,7 @@
      <result status="valid" time="0.54"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -643,7 +643,7 @@
    </goal>
    <goal
     name="Elements_remove_last"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="31" loccnumb="6" loccnume="26"
     sum="24d8b49541add3ba1d713083416dfbca"
     proved="true"
@@ -658,7 +658,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -674,7 +674,7 @@
      <result status="valid" time="5.82"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -684,7 +684,7 @@
    </goal>
    <goal
     name="Occ_elements"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="35" loccnumb="6" loccnume="18"
     sum="9bdc9e8ff803c4353a957850d1c93df8"
     proved="true"
@@ -702,7 +702,7 @@
    </goal>
    <goal
     name="Elements_set_outside"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="39" loccnumb="6" loccnume="26"
     sum="9c552ddcf6d87560ce3ee4fd73f5d8f7"
     proved="true"
@@ -720,7 +720,7 @@
    </goal>
    <goal
     name="Elements_set_inside"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="43" loccnumb="6" loccnume="25"
     sum="dea0ba2feb5e491dfb02f5ba50e4e9d3"
     proved="true"
@@ -738,7 +738,7 @@
    </goal>
    <goal
     name="Elements_set_inside2"
-    locfile="../elements.why"
+    locfile="../../elements.why"
     loclnum="48" loccnumb="6" loccnume="26"
     sum="d0bd5084464ea0ea1e11ba73e6716414"
     proved="true"
@@ -753,7 +753,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -769,13 +769,13 @@
   expanded="false">
   <theory
    name="Bag_integers"
-   locfile="../bag_of_integers.why"
+   locfile="../../bag_of_integers.why"
    loclnum="1" loccnumb="7" loccnume="19"
    verified="true"
    expanded="false">
    <goal
     name="Min_bag_union1"
-    locfile="../bag_of_integers.why"
+    locfile="../../bag_of_integers.why"
     loclnum="16" loccnumb="6" loccnume="20"
     sum="9a197a556ea1d515c8f161752968e1a1"
     proved="true"
@@ -799,14 +799,6 @@
     </proof>
     <proof
      prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="8"
      timelimit="39"
      memlimit="0"
      obsolete="false"
@@ -814,7 +806,7 @@
      <result status="valid" time="18.95"/>
     </proof>
     <proof
-     prover="9"
+     prover="8"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -822,7 +814,7 @@
      <result status="valid" time="1.35"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -830,7 +822,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="12"
+     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -840,7 +832,7 @@
    </goal>
    <goal
     name="Min_bag_union2"
-    locfile="../bag_of_integers.why"
+    locfile="../../bag_of_integers.why"
     loclnum="19" loccnumb="6" loccnume="20"
     sum="bb882da2a428b29144afa835fc4eb8a2"
     proved="true"
@@ -855,7 +847,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -871,7 +863,7 @@
      <result status="valid" time="0.78"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -879,7 +871,7 @@
      <result status="valid" time="0.65"/>
     </proof>
     <proof
-     prover="9"
+     prover="8"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -887,7 +879,7 @@
      <result status="valid" time="0.10"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -903,13 +895,13 @@
   expanded="false">
   <theory
    name="Implementation"
-   locfile="../heap_implem.mlw"
+   locfile="../../heap_implem.mlw"
    loclnum="2" loccnumb="7" loccnume="21"
    verified="true"
    expanded="false">
    <goal
     name="Is_heap_min"
-    locfile="../heap_implem.mlw"
+    locfile="../../heap_implem.mlw"
     loclnum="13" loccnumb="6" loccnume="17"
     sum="b29ae0edb08222efddee93fd665fe0df"
     proved="true"
@@ -927,7 +919,7 @@
    </goal>
    <goal
     name="WP_parameter create"
-    locfile="../heap_implem.mlw"
+    locfile="../../heap_implem.mlw"
     loclnum="20" loccnumb="4" loccnume="10"
     expl="VC for create"
     sum="dd51d151a369d75b9a5002a957ac25aa"
@@ -945,7 +937,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -961,7 +953,7 @@
      <result status="valid" time="0.22"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="15"
      memlimit="0"
      obsolete="false"
@@ -969,7 +961,7 @@
      <result status="valid" time="7.39"/>
     </proof>
     <proof
-     prover="9"
+     prover="8"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -977,7 +969,7 @@
      <result status="valid" time="0.47"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -987,7 +979,7 @@
    </goal>
    <goal
     name="WP_parameter insert"
-    locfile="../heap_implem.mlw"
+    locfile="../../heap_implem.mlw"
     loclnum="26" loccnumb="4" loccnume="10"
     expl="VC for insert"
     sum="5a278b89f348cd7ceda5dac3b442457f"
@@ -1002,7 +994,7 @@
      expanded="false">
      <goal
       name="WP_parameter insert.1"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="1. loop invariant init"
       sum="ee030d04aaa13d13048979986323f939"
@@ -1020,7 +1012,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="30"
        memlimit="0"
        obsolete="false"
@@ -1028,7 +1020,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1036,7 +1028,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1044,7 +1036,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="30"
        memlimit="0"
        obsolete="false"
@@ -1052,7 +1044,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="12"
+       prover="11"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1062,7 +1054,7 @@
      </goal>
      <goal
       name="WP_parameter insert.2"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="2. assertion"
       sum="fa421714a043b8d1c83a61a90967da32"
@@ -1080,7 +1072,7 @@
        <result status="valid" time="2.60"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -1090,7 +1082,7 @@
      </goal>
      <goal
       name="WP_parameter insert.3"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="3. assertion"
       sum="59f11d5db65ba149133ccafcac84259a"
@@ -1108,7 +1100,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1118,7 +1110,7 @@
      </goal>
      <goal
       name="WP_parameter insert.4"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="4. postcondition"
       sum="13de84fba76857ffbe3a306046c4c91e"
@@ -1133,7 +1125,7 @@
        expanded="false">
        <goal
         name="WP_parameter insert.4.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="1."
         sum="ecd2cb134b028ff1e28367466b45d598"
@@ -1153,7 +1145,7 @@
        </goal>
        <goal
         name="WP_parameter insert.4.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="2."
         sum="10108b2adf02874ad7101136f1721d95"
@@ -1171,7 +1163,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -1179,7 +1171,7 @@
          <result status="valid" time="0.23"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1187,7 +1179,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="12"
+         prover="11"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -1199,7 +1191,7 @@
      </goal>
      <goal
       name="WP_parameter insert.5"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="5. loop invariant preservation"
       sum="e8841e211d78887fe0bc9f7c5bc78392"
@@ -1214,7 +1206,7 @@
        expanded="false">
        <goal
         name="WP_parameter insert.5.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="1."
         sum="ad720e7a1b69a697a59b47f7df30316e"
@@ -1232,7 +1224,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1240,7 +1232,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1248,7 +1240,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1258,7 +1250,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="2."
         sum="ca563603244330de65ea5562c13f255a"
@@ -1276,7 +1268,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1292,7 +1284,7 @@
          <result status="valid" time="0.22"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1300,7 +1292,7 @@
          <result status="valid" time="0.18"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -1308,7 +1300,7 @@
          <result status="valid" time="0.80"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1316,7 +1308,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1326,7 +1318,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="3."
         sum="b637bb8f1d8234ba645d7d4a6be43f2f"
@@ -1344,7 +1336,7 @@
          <result status="valid" time="0.07"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1352,7 +1344,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1360,7 +1352,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1370,7 +1362,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.4"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="4."
         sum="7fe03725ea209fda8b7aa569b801b183"
@@ -1388,7 +1380,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1396,7 +1388,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1404,7 +1396,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1414,7 +1406,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.5"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="5."
         sum="ffc7a5da68b2ebad087ecf037d658411"
@@ -1432,7 +1424,7 @@
          <result status="valid" time="2.59"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1442,7 +1434,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.6"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="6."
         sum="e3128d3c3fb63631f183c4f072acab81"
@@ -1460,7 +1452,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1468,7 +1460,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1478,7 +1470,7 @@
        </goal>
        <goal
         name="WP_parameter insert.5.7"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="7."
         sum="bd4c0d2b3655e32f718df7556e602d2a"
@@ -1496,7 +1488,7 @@
          <result status="valid" time="0.11"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1504,7 +1496,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1516,7 +1508,7 @@
      </goal>
      <goal
       name="WP_parameter insert.6"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="6. loop variant decrease"
       sum="a46302ebe0b63ec46a8efe3c05b1dfbc"
@@ -1534,7 +1526,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="30"
        memlimit="0"
        obsolete="false"
@@ -1550,7 +1542,7 @@
        <result status="valid" time="0.20"/>
       </proof>
       <proof
-       prover="8"
+       prover="7"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1558,7 +1550,7 @@
        <result status="valid" time="0.07"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -1566,7 +1558,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1574,7 +1566,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="30"
        memlimit="0"
        obsolete="false"
@@ -1584,7 +1576,7 @@
      </goal>
      <goal
       name="WP_parameter insert.7"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="7. assertion"
       sum="b8ced627599afe842f3989a78e0bd334"
@@ -1602,7 +1594,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="30"
        memlimit="0"
        obsolete="false"
@@ -1610,7 +1602,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="15"
        memlimit="1000"
        obsolete="false"
@@ -1618,7 +1610,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="12"
+       prover="11"
        timelimit="15"
        memlimit="1000"
        obsolete="false"
@@ -1628,7 +1620,7 @@
      </goal>
      <goal
       name="WP_parameter insert.8"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="8. assertion"
       sum="664f1df62df7546c39685659fef4e3ce"
@@ -1646,7 +1638,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -1654,7 +1646,7 @@
        <result status="valid" time="0.18"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1662,7 +1654,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -1672,7 +1664,7 @@
      </goal>
      <goal
       name="WP_parameter insert.9"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="26" loccnumb="4" loccnume="10"
       expl="9. postcondition"
       sum="96ac74c55ae60bced6ea456de9d62646"
@@ -1687,7 +1679,7 @@
        expanded="false">
        <goal
         name="WP_parameter insert.9.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="1."
         sum="44d68c0b6fee3226df73b188c2dd7ca7"
@@ -1705,7 +1697,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -1715,7 +1707,7 @@
        </goal>
        <goal
         name="WP_parameter insert.9.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="26" loccnumb="4" loccnume="10"
         expl="2."
         sum="850ed8552e7b93a77814ee57e6217d37"
@@ -1733,7 +1725,7 @@
          <result status="valid" time="0.15"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1741,7 +1733,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1749,7 +1741,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -1763,7 +1755,7 @@
    </goal>
    <goal
     name="WP_parameter extractMin"
-    locfile="../heap_implem.mlw"
+    locfile="../../heap_implem.mlw"
     loclnum="58" loccnumb="4" loccnume="14"
     expl="VC for extractMin"
     sum="200d543d1745dde19628dd2b1ae0f26d"
@@ -1778,7 +1770,7 @@
      expanded="false">
      <goal
       name="WP_parameter extractMin.1"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="1. assertion"
       sum="9e0c9f30842a7e8918e56f0494984897"
@@ -1796,7 +1788,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -1804,7 +1796,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -1812,7 +1804,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -1822,7 +1814,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.2"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="2. assertion"
       sum="7af660a2ba7f9c35c5158ba6bd89f35b"
@@ -1843,7 +1835,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.3"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="3. loop invariant init"
       sum="c0e3ccdc32c528b4f5cc4dcfebc05870"
@@ -1858,7 +1850,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.3.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="8002ab0e7d9540e6c50267be42dc5104"
@@ -1876,7 +1868,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1892,7 +1884,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1900,7 +1892,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1910,7 +1902,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.3.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="65ccecb66e32782748c1e3bb827aa99b"
@@ -1928,7 +1920,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1944,7 +1936,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1952,7 +1944,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1962,7 +1954,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.3.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="dfcb6e5c9666aff6f1d4ae4bdabb2fab"
@@ -1980,7 +1972,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1988,7 +1980,7 @@
          <result status="valid" time="0.13"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -1998,7 +1990,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.3.4"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="4."
         sum="2196b6aeb680bc0c57e795bdfb97f0d1"
@@ -2016,7 +2008,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -2024,7 +2016,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -2032,7 +2024,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -2042,7 +2034,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.3.5"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="5."
         sum="0920b5132da9089d5a83b553fc19ce1e"
@@ -2060,7 +2052,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2068,7 +2060,7 @@
          <result status="valid" time="0.16"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2076,7 +2068,7 @@
          <result status="valid" time="1.15"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2086,7 +2078,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.3.6"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="6."
         sum="52842d212670873eabd0dc042d7d5589"
@@ -2104,7 +2096,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2120,7 +2112,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2128,7 +2120,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2140,7 +2132,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.4"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="4. assertion"
       sum="e9f69b656dcb4441ef8fe78bbb54d13b"
@@ -2160,7 +2152,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.5"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="5. assertion"
       sum="e0fe544c8bc75a00d34f08854f714ec6"
@@ -2178,7 +2170,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -2186,7 +2178,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -2196,7 +2188,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.6"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="6. assertion"
       sum="1209ef8676eeb0e2b2f2508405bee451"
@@ -2206,7 +2198,7 @@
       <label
        name="expl:VC for extractMin"/>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -2216,7 +2208,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.7"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="7. postcondition"
       sum="04b3a419c01c055997885af6ab71e464"
@@ -2231,7 +2223,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.7.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="19bfcd62ca06526c1fb8a6a6a47e8941"
@@ -2249,7 +2241,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2259,7 +2251,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.7.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="ed912808515a9db89ae57cbbf4036e84"
@@ -2269,7 +2261,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2277,7 +2269,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="12"
+         prover="11"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2287,7 +2279,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.7.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="be65052317f1026ca5e193dcd58574b2"
@@ -2297,7 +2289,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2305,7 +2297,7 @@
          <result status="valid" time="0.16"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2313,7 +2305,7 @@
          <result status="valid" time="0.17"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2325,7 +2317,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.8"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="8. postcondition"
       sum="09cec8901b4d9bf78e72932e67195769"
@@ -2343,7 +2335,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -2367,7 +2359,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="8"
+       prover="7"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -2375,7 +2367,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -2383,7 +2375,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -2391,7 +2383,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -2401,7 +2393,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.9"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="9. assertion"
       sum="ead1168574c588c4236bafb206ca32df"
@@ -2421,7 +2413,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.10"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="10. assertion"
       sum="5a3d73fdcd9085033d55c60908274fee"
@@ -2441,7 +2433,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.11"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="11. assertion"
       sum="0ed49bb8757879c91937cd8759f1a015"
@@ -2451,7 +2443,7 @@
       <label
        name="expl:VC for extractMin"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -2459,7 +2451,7 @@
        <result status="valid" time="0.12"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -2469,7 +2461,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.12"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="12. postcondition"
       sum="7ac5b9ca8454018632dbfc059a8285cd"
@@ -2484,7 +2476,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.12.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="593e3419969f29faf2f3f18b15bbf632"
@@ -2502,7 +2494,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2510,7 +2502,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2520,7 +2512,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.12.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="e2cb0b5d5ccc213aeb220b6756bff3a1"
@@ -2530,7 +2522,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2546,7 +2538,7 @@
          <result status="valid" time="0.23"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2554,7 +2546,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2564,7 +2556,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.12.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="42ae524efba0491e233ecbf8e8e6cb4d"
@@ -2574,7 +2566,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2582,7 +2574,7 @@
          <result status="valid" time="0.17"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2590,7 +2582,7 @@
          <result status="valid" time="1.12"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2602,7 +2594,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.13"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="13. postcondition"
       sum="a14167eb9601e0353fc23eef228bcf39"
@@ -2617,7 +2609,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.13.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="fa71ddcabaebff4337d7b8dedb42d5f8"
@@ -2635,7 +2627,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2643,7 +2635,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2651,7 +2643,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2659,7 +2651,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="12"
+         prover="11"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2669,7 +2661,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.13.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="883510e2e9f3371bbd3600fe4a0824db"
@@ -2687,7 +2679,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2703,7 +2695,15 @@
          <result status="valid" time="0.20"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
+         timelimit="10"
+         memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2712,14 +2712,6 @@
         </proof>
         <proof
          prover="10"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof
-         prover="11"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2729,7 +2721,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.13.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="4dee9475c1e8750feba404e476317977"
@@ -2747,7 +2739,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2755,7 +2747,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2763,7 +2755,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="12"
+         prover="11"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -2775,7 +2767,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.14"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="14. loop invariant preservation"
       sum="da03002b5381e43928e11007fe22826c"
@@ -2790,7 +2782,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.14.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="b163977dc29523be64df5459a05dec78"
@@ -2808,7 +2800,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2816,7 +2808,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2824,7 +2816,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2834,7 +2826,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.14.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="1437ba2699bd3b386d3b23bcb7f66ca3"
@@ -2852,7 +2844,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2876,7 +2868,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2884,7 +2876,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -2892,7 +2884,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2900,7 +2892,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2910,7 +2902,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.14.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="b2693d5d232759ed21e7607ceecee0be"
@@ -2920,7 +2912,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="52"
          memlimit="0"
          obsolete="false"
@@ -2930,7 +2922,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.14.4"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="4."
         sum="756a16a1a79f19a56fb7d27993c02e68"
@@ -2948,7 +2940,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2956,7 +2948,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2964,7 +2956,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -2974,7 +2966,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.14.5"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="5."
         sum="60fd3b4984cf1e055d0555670393f490"
@@ -2992,7 +2984,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3000,7 +2992,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3010,7 +3002,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.14.6"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="6."
         sum="170b56e78a32e4c9ab0e4e5e8fbca222"
@@ -3028,7 +3020,7 @@
          <result status="valid" time="1.44"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3036,7 +3028,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3048,7 +3040,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.15"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="15. loop variant decrease"
       sum="575cbb27085d6050130c106e2fa7685e"
@@ -3066,7 +3058,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3074,7 +3066,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -3082,7 +3074,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3092,7 +3084,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.16"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="16. assertion"
       sum="ca8e4a189108c2bc60d5fddfa2f7f69a"
@@ -3112,7 +3104,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.17"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="17. assertion"
       sum="00f41cd98a22df20d17e0697eb9dd66d"
@@ -3132,7 +3124,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.18"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="18. assertion"
       sum="5000e654bccd94cdee926893fd9f046d"
@@ -3142,7 +3134,7 @@
       <label
        name="expl:VC for extractMin"/>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3152,7 +3144,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.19"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="19. postcondition"
       sum="233fec8f10bf414039e14e7d342c9857"
@@ -3167,7 +3159,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.19.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="7597c557c8e075a5947a72aae91567a7"
@@ -3185,7 +3177,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3193,7 +3185,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3203,7 +3195,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.19.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="138605d998851a7578b7aa855bcd0e41"
@@ -3213,7 +3205,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3229,7 +3221,7 @@
          <result status="valid" time="0.22"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3237,7 +3229,7 @@
          <result status="valid" time="0.07"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3245,7 +3237,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3255,7 +3247,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.19.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="b0cadacc99d9401721869f634151f732"
@@ -3265,7 +3257,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3273,7 +3265,7 @@
          <result status="valid" time="0.18"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3281,7 +3273,7 @@
          <result status="valid" time="1.16"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3293,7 +3285,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.20"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="20. postcondition"
       sum="b50dd62e1118a5ca4c52b52dce7ac680"
@@ -3311,7 +3303,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3319,7 +3311,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -3327,7 +3319,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3337,7 +3329,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.21"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="21. loop invariant preservation"
       sum="bf42db921455fa03999a1f57e9923bf4"
@@ -3352,7 +3344,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.21.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="e9823e8c9385aba3e036c2ea5578d0f7"
@@ -3370,7 +3362,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3378,7 +3370,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3386,7 +3378,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3396,7 +3388,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.21.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="e7c4b626d8273e46566188d775495ceb"
@@ -3414,7 +3406,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3438,7 +3430,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3446,7 +3438,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -3454,7 +3446,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3462,7 +3454,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3472,7 +3464,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.21.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="0779fc0e979a39d5e09016c5a7e3b492"
@@ -3482,7 +3474,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="60"
          memlimit="0"
          obsolete="false"
@@ -3492,7 +3484,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.21.4"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="4."
         sum="5482a4f1ada94c0dc140191a06cd2e3c"
@@ -3510,7 +3502,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3518,7 +3510,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3526,7 +3518,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3536,7 +3528,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.21.5"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="5."
         sum="c20c93851af6d0f84da56c4151f028b8"
@@ -3554,7 +3546,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3562,7 +3554,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3572,7 +3564,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.21.6"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="6."
         sum="3643ff72c43a8d52199c93a6fbe3cf96"
@@ -3590,7 +3582,7 @@
          <result status="valid" time="0.77"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3598,7 +3590,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3610,7 +3602,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.22"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="22. loop variant decrease"
       sum="ce7f4d7a7340d6e31e3fdac4d3b3cc3f"
@@ -3628,7 +3620,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3636,7 +3628,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -3644,7 +3636,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3654,7 +3646,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.23"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="23. assertion"
       sum="bdc5258f794d1c7a24851b26eb0b85d8"
@@ -3674,7 +3666,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.24"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="24. assertion"
       sum="ba43febc3a2fafc35ef5ca3cbec6f47e"
@@ -3692,7 +3684,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -3700,7 +3692,7 @@
        <result status="valid" time="0.07"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -3710,7 +3702,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.25"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="25. assertion"
       sum="33c62caf75aaf40cef864e796c8fcd00"
@@ -3720,7 +3712,7 @@
       <label
        name="expl:VC for extractMin"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="12"
        memlimit="0"
        obsolete="false"
@@ -3728,7 +3720,7 @@
        <result status="valid" time="5.70"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -3738,7 +3730,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.26"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="26. postcondition"
       sum="c56aeb57e44eda1029efb4275ed86d45"
@@ -3753,7 +3745,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.26.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="8eaeccf0b53445b12796bba483ccdfae"
@@ -3771,7 +3763,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -3781,7 +3773,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.26.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="0a0512f2ff0d1517c728e6fcfee91005"
@@ -3791,7 +3783,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -3799,7 +3791,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="12"
+         prover="11"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -3809,7 +3801,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.26.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="4554035d1c42efa1e4c5cd3ac7866efc"
@@ -3819,7 +3811,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -3827,7 +3819,7 @@
          <result status="valid" time="0.18"/>
         </proof>
         <proof
-         prover="3"
+         prover="2"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -3835,7 +3827,7 @@
          <result status="valid" time="0.20"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="15"
          memlimit="1000"
          obsolete="false"
@@ -3847,7 +3839,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.27"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="27. postcondition"
       sum="efd96b3a4f7afed2c3d90cc94bfec39b"
@@ -3862,7 +3854,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.27.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="bf43d9644e55125530c46403bcc2c1ce"
@@ -3880,7 +3872,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3904,7 +3896,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3912,7 +3904,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -3920,7 +3912,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3928,7 +3920,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3938,7 +3930,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.27.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="3a40018967fed846ff2cd4e2d73c5de1"
@@ -3956,7 +3948,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -3980,7 +3972,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3988,7 +3980,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -3996,7 +3988,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4004,7 +3996,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4014,7 +4006,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.27.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="25bdda0f5f947a5320a62f7aea281acc"
@@ -4032,7 +4024,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4056,7 +4048,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4064,7 +4056,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -4072,7 +4064,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4080,7 +4072,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4092,7 +4084,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.28"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="28. loop invariant preservation"
       sum="97ba1cb00abbaeb21b3ebad5eda5af07"
@@ -4107,7 +4099,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.28.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="7cf88e07fddb2b2f6ade157c4c32a1c1"
@@ -4125,7 +4117,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4133,7 +4125,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4141,7 +4133,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4151,7 +4143,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.28.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="3b7a71e3757544a50b652f3f3ab26e26"
@@ -4169,7 +4161,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4193,7 +4185,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4201,7 +4193,7 @@
          <result status="valid" time="0.07"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -4209,7 +4201,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4217,7 +4209,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4227,7 +4219,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.28.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="a971a1c1e45e88847ff67f6192e63bcc"
@@ -4237,7 +4229,7 @@
         <label
          name="expl:VC for extractMin"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="300"
          memlimit="1000"
          obsolete="false"
@@ -4247,7 +4239,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.28.4"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="4."
         sum="e2650a2d5a48b65ede59d83fc4eb78d8"
@@ -4265,7 +4257,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4273,7 +4265,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4281,7 +4273,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4291,7 +4283,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.28.5"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="5."
         sum="e343594c67dc1ad5a68bf1d760b533b4"
@@ -4309,7 +4301,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4319,7 +4311,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.28.6"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="6."
         sum="9025a47268183a3d6751e6a7a817fe72"
@@ -4337,7 +4329,7 @@
          <result status="valid" time="0.75"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4345,7 +4337,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4357,7 +4349,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.29"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="29. loop variant decrease"
       sum="380652dd58eee198822cd8eb68054cd3"
@@ -4375,7 +4367,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4383,7 +4375,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4391,7 +4383,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4401,7 +4393,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.30"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="30. assertion"
       sum="f002cb20024102fdd869806d9bb383b7"
@@ -4419,7 +4411,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4427,7 +4419,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4435,7 +4427,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4445,7 +4437,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.31"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="31. assertion"
       sum="ff6a8b92338bd5585177441d41fbcf18"
@@ -4463,7 +4455,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4487,7 +4479,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="8"
+       prover="7"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4495,7 +4487,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -4503,7 +4495,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4511,7 +4503,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4521,7 +4513,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.32"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="32. assertion"
       sum="e581935cb256d78a474c61e409f16b8b"
@@ -4539,7 +4531,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="47"
        memlimit="0"
        obsolete="false"
@@ -4563,7 +4555,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="8"
+       prover="7"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4571,7 +4563,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -4579,7 +4571,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4587,7 +4579,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4597,7 +4589,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.33"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="33. assertion"
       sum="b6b49a0171c2c827466d55f85814bc96"
@@ -4615,7 +4607,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4639,7 +4631,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="8"
+       prover="7"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4647,7 +4639,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -4655,7 +4647,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4663,7 +4655,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4673,7 +4665,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.34"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="34. postcondition"
       sum="86ae72b8ba935bb767e8dd11a6ad1a74"
@@ -4691,7 +4683,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="15"
        memlimit="1000"
        obsolete="false"
@@ -4699,7 +4691,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="12"
+       prover="11"
        timelimit="15"
        memlimit="1000"
        obsolete="false"
@@ -4709,7 +4701,7 @@
      </goal>
      <goal
       name="WP_parameter extractMin.35"
-      locfile="../heap_implem.mlw"
+      locfile="../../heap_implem.mlw"
       loclnum="58" loccnumb="4" loccnume="14"
       expl="35. postcondition"
       sum="252d552bac8de5e3e35fe610678743b0"
@@ -4724,7 +4716,7 @@
        expanded="false">
        <goal
         name="WP_parameter extractMin.35.1"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="1."
         sum="1a9d3961d97a0df8e52122750a6d727c"
@@ -4742,7 +4734,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4750,7 +4742,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4760,7 +4752,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.35.2"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="2."
         sum="f16bee779d5be92203e7794da326af45"
@@ -4778,7 +4770,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4794,7 +4786,7 @@
          <result status="valid" time="0.25"/>
         </proof>
         <proof
-         prover="8"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4802,7 +4794,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4810,7 +4802,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4820,7 +4812,7 @@
        </goal>
        <goal
         name="WP_parameter extractMin.35.3"
-        locfile="../heap_implem.mlw"
+        locfile="../../heap_implem.mlw"
         loclnum="58" loccnumb="4" loccnume="14"
         expl="3."
         sum="47a4a02488ff6dc8507f47880f37c370"
@@ -4838,7 +4830,7 @@
          <result status="valid" time="0.07"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4846,7 +4838,7 @@
          <result status="valid" time="0.06"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -4854,7 +4846,7 @@
          <result status="valid" time="0.80"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -4874,7 +4866,7 @@
   expanded="false">
   <theory
    name="AbstractHeap"
-   locfile="../abstract_heap.mlw"
+   locfile="../../abstract_heap.mlw"
    loclnum="2" loccnumb="7" loccnume="19"
    verified="true"
    expanded="false">
@@ -4886,13 +4878,13 @@
   expanded="false">
   <theory
    name="HeapSort"
-   locfile="../heapsort.mlw"
+   locfile="../../heapsort.mlw"
    loclnum="2" loccnumb="7" loccnume="15"
    verified="true"
    expanded="false">
    <goal
     name="Min_of_sorted"
-    locfile="../heapsort.mlw"
+    locfile="../../heapsort.mlw"
     loclnum="15" loccnumb="6" loccnume="19"
     sum="49774f39f5fc555601196529894f04bc"
     proved="true"
@@ -4910,7 +4902,7 @@
    </goal>
    <goal
     name="WP_parameter heapSort"
-    locfile="../heapsort.mlw"
+    locfile="../../heapsort.mlw"
     loclnum="22" loccnumb="4" loccnume="12"
     expl="VC for heapSort"
     sum="6ecb6d5ca043327bcf0a307f9b15121c"
@@ -4925,7 +4917,7 @@
      expanded="false">
      <goal
       name="WP_parameter heapSort.1"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="1. precondition"
       sum="e7ca57a65e1a320f578060997328b6ad"
@@ -4943,7 +4935,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4951,7 +4943,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -4959,7 +4951,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4969,7 +4961,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.2"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="2. postcondition"
       sum="4036e19651e09bac2bab20db935467fa"
@@ -4987,7 +4979,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -4995,7 +4987,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5005,7 +4997,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.3"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="3. loop invariant init"
       sum="eb00992d2cd15e0113b9329ebe5c4823"
@@ -5020,7 +5012,7 @@
        expanded="false">
        <goal
         name="WP_parameter heapSort.3.1"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="1."
         sum="08cef653d22d44cabd9ca9b421cddb20"
@@ -5038,7 +5030,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5046,7 +5038,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5054,7 +5046,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5064,7 +5056,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.3.2"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="2."
         sum="cfd30585bc4b57f70af48d1465903a5c"
@@ -5082,7 +5074,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5092,7 +5084,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.3.3"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="3."
         sum="6750e325e3b98b27c93bd3edbf1c957e"
@@ -5110,7 +5102,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5118,7 +5110,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -5126,7 +5118,7 @@
          <result status="valid" time="0.27"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5134,7 +5126,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5144,7 +5136,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.3.4"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="4."
         sum="25aa5b3d4d9c8a49d7fdec67177c0a91"
@@ -5162,7 +5154,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5170,7 +5162,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5178,7 +5170,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5188,7 +5180,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.3.5"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="5."
         sum="1b1b07a398bf79b2c7245cfb60cefab0"
@@ -5208,7 +5200,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.3.6"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="6."
         sum="a33f668c372b2c917a8e2bfb1a9de423"
@@ -5226,7 +5218,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5234,7 +5226,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5242,7 +5234,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5254,7 +5246,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.4"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="4. precondition"
       sum="b366c4ee366414ad1539820d6a2c1009"
@@ -5274,7 +5266,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.5"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="5. type invariant"
       sum="a3c2b6d8a17628d44a79dc1ddf0dbdac"
@@ -5284,7 +5276,7 @@
       <label
        name="expl:VC for heapSort"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -5294,7 +5286,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.6"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="6. precondition"
       sum="90248e2c04480ba60ea6e9fdfa77c910"
@@ -5314,7 +5306,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.7"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="7. assertion"
       sum="0bf77aefaa4a5ac857756dd956ff5495"
@@ -5334,7 +5326,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.8"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="8. loop invariant preservation"
       sum="931188f0dfe11ba4e49aa2919aa39588"
@@ -5352,7 +5344,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5368,7 +5360,7 @@
        <result status="valid" time="0.19"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -5378,7 +5370,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.9"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="9. type invariant"
       sum="f6eba711dab4a338c27ece50141ae022"
@@ -5388,7 +5380,7 @@
       <label
        name="expl:VC for heapSort"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -5398,7 +5390,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.10"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="10. postcondition"
       sum="8e0d9cf3c3f9f10a56751dbabb21108b"
@@ -5416,7 +5408,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5432,7 +5424,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -5440,7 +5432,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5450,7 +5442,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.11"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="11. loop invariant init"
       sum="5eabda3abe3abdb3faa0942aac2a49cb"
@@ -5468,7 +5460,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5476,7 +5468,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -5484,7 +5476,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5494,7 +5486,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.12"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="12. precondition"
       sum="d48dd0f80d5757667b81ee35cd3ca083"
@@ -5514,7 +5506,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.13"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="13. loop invariant preservation"
       sum="e1de346b58eba1edb6126ea12e76bc83"
@@ -5529,7 +5521,7 @@
        expanded="false">
        <goal
         name="WP_parameter heapSort.13.1"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="1."
         sum="6cd79d2871b4304666c0aed4b2fb5d84"
@@ -5547,7 +5539,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5563,7 +5555,7 @@
          <result status="valid" time="0.44"/>
         </proof>
         <proof
-         prover="9"
+         prover="8"
          timelimit="5"
          memlimit="0"
          obsolete="false"
@@ -5571,7 +5563,7 @@
          <result status="valid" time="0.84"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5579,7 +5571,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5589,7 +5581,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.13.2"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="2."
         sum="ba50b2a388458a9fcc84f09746db21cc"
@@ -5599,7 +5591,7 @@
         <label
          name="expl:VC for heapSort"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5609,7 +5601,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.13.3"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="3."
         sum="9a6f23486244d6886b189f3712c18af7"
@@ -5627,7 +5619,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5635,7 +5627,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="16"
          memlimit="0"
          obsolete="false"
@@ -5643,7 +5635,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5653,7 +5645,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.13.4"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="4."
         sum="98e4da6112ac259d638b25f729d799be"
@@ -5671,7 +5663,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="2"
+         prover="1"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5679,7 +5671,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="10"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5687,7 +5679,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="0"
          obsolete="false"
@@ -5699,7 +5691,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.14"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="14. postcondition"
       sum="948097f43c7224a748f75c57fc25c770"
@@ -5717,7 +5709,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5725,7 +5717,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5735,7 +5727,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.15"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="15. loop invariant init"
       sum="d080e78953863df84ed465f372f4c765"
@@ -5753,7 +5745,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5761,7 +5753,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -5769,7 +5761,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -5779,7 +5771,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.16"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="16. precondition"
       sum="30d2667e589f574a9e6f11d534ff6037"
@@ -5799,7 +5791,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.17"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="17. type invariant"
       sum="0f5bac64c12df9392b0c5d964f3a74e5"
@@ -5809,7 +5801,7 @@
       <label
        name="expl:VC for heapSort"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -5819,7 +5811,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.18"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="18. precondition"
       sum="a92e9716e19a57478e715f11f0c7d0bf"
@@ -5839,7 +5831,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.19"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="19. assertion"
       sum="879e569b774a7176de175f474f8463af"
@@ -5849,7 +5841,7 @@
       <label
        name="expl:VC for heapSort"/>
       <proof
-       prover="12"
+       prover="11"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -5859,7 +5851,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.20"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="20. loop invariant preservation"
       sum="501c533897d7ccea1a31875f1be95c05"
@@ -5874,7 +5866,7 @@
        expanded="false">
        <goal
         name="WP_parameter heapSort.20.1"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="1."
         sum="b29e31bdbd7b496e27bc8cf1cffaff06"
@@ -5894,7 +5886,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.20.2"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="2."
         sum="260c09ca742a07f857db821e73c79bba"
@@ -5914,7 +5906,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.20.3"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="3."
         sum="cc682072a7df258579a6f72ff3ff4efd"
@@ -5934,7 +5926,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.20.4"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="4."
         sum="60df91cdc6e55b050ee30401a2b9be4d"
@@ -5944,7 +5936,7 @@
         <label
          name="expl:VC for heapSort"/>
         <proof
-         prover="11"
+         prover="10"
          timelimit="3"
          memlimit="1000"
          obsolete="false"
@@ -5952,7 +5944,7 @@
          <result status="valid" time="0.05"/>
         </proof>
         <proof
-         prover="12"
+         prover="11"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -5962,7 +5954,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.20.5"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="5."
         sum="204263f1b82c6def9a3557cbfe778123"
@@ -5982,7 +5974,7 @@
        </goal>
        <goal
         name="WP_parameter heapSort.20.6"
-        locfile="../heapsort.mlw"
+        locfile="../../heapsort.mlw"
         loclnum="22" loccnumb="4" loccnume="12"
         expl="6."
         sum="c98b6f2c69c05925342140edbad653af"
@@ -6004,7 +5996,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.21"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="21. type invariant"
       sum="f15b9003232a4c152e766cf2262e4285"
@@ -6014,7 +6006,7 @@
       <label
        name="expl:VC for heapSort"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -6024,7 +6016,7 @@
      </goal>
      <goal
       name="WP_parameter heapSort.22"
-      locfile="../heapsort.mlw"
+      locfile="../../heapsort.mlw"
       loclnum="22" loccnumb="4" loccnume="12"
       expl="22. postcondition"
       sum="5d0650b6c009d03596eb1f1cac9f158b"
@@ -6042,7 +6034,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="2"
+       prover="1"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -6050,7 +6042,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="10"
+       prover="9"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -6058,7 +6050,7 @@
        <result status="valid" time="1.10"/>
       </proof>
       <proof
-       prover="11"
+       prover="10"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -6076,13 +6068,13 @@
   expanded="false">
   <theory
    name="Model"
-   locfile="../heap_model.why"
+   locfile="../../heap_model.why"
    loclnum="1" loccnumb="7" loccnume="12"
    verified="true"
    expanded="false">
    <goal
     name="Model_empty"
-    locfile="../heap_model.why"
+    locfile="../../heap_model.why"
     loclnum="13" loccnumb="6" loccnume="17"
     sum="0923329b41b97e08fdc343878c36108b"
     proved="true"
@@ -6097,7 +6089,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6113,7 +6105,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6121,7 +6113,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="9"
+     prover="8"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6129,7 +6121,7 @@
      <result status="valid" time="0.16"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6137,7 +6129,7 @@
      <result status="valid" time="0.17"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6147,7 +6139,7 @@
    </goal>
    <goal
     name="Model_singleton"
-    locfile="../heap_model.why"
+    locfile="../../heap_model.why"
     loclnum="16" loccnumb="6" loccnume="21"
     sum="88e6a486c3e9d25c3376d852d9fb487e"
     proved="true"
@@ -6162,7 +6154,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6178,7 +6170,7 @@
      <result status="valid" time="7.71"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6186,7 +6178,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="9"
+     prover="8"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6194,7 +6186,7 @@
      <result status="valid" time="0.55"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6202,7 +6194,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6212,7 +6204,7 @@
    </goal>
    <goal
     name="Model_set"
-    locfile="../heap_model.why"
+    locfile="../../heap_model.why"
     loclnum="18" loccnumb="6" loccnume="15"
     sum="7c74fa72e8609a49ce86b987d5020868"
     proved="true"
@@ -6230,14 +6222,14 @@
    </goal>
    <goal
     name="Model_add_last"
-    locfile="../heap_model.why"
+    locfile="../../heap_model.why"
     loclnum="24" loccnumb="6" loccnume="20"
     sum="4f6ca21314cf9969014c077023383314"
     proved="true"
     expanded="false"
     shape="ainfix =amodelaTuple2V0ainfix +V1c1aaddamixfix []V0V1amodelaTuple2V0V1Iainfix &gt;=V1c0F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6245,7 +6237,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6253,7 +6245,7 @@
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6269,13 +6261,13 @@
   expanded="false">
   <theory
    name="Heap"
-   locfile="../heap.why"
+   locfile="../../heap.why"
    loclnum="3" loccnumb="7" loccnume="11"
    verified="true"
    expanded="false">
    <goal
     name="Parent_inf"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="12" loccnumb="6" loccnume="16"
     sum="c5bddb7692e4be5e85e44abd7fab0612"
     proved="true"
@@ -6290,7 +6282,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6298,7 +6290,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6307,14 +6299,6 @@
     </proof>
     <proof
      prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6324,7 +6308,7 @@
    </goal>
    <goal
     name="Left_sup"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="13" loccnumb="6" loccnume="14"
     sum="ad348a4081bbe52c163416ab5270c15e"
     proved="true"
@@ -6339,7 +6323,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6347,7 +6331,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6356,14 +6340,6 @@
     </proof>
     <proof
      prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6373,7 +6349,7 @@
    </goal>
    <goal
     name="Right_sup"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="14" loccnumb="6" loccnume="15"
     sum="3b46b31dfcbb0b3190e4466b290a6471"
     proved="true"
@@ -6388,7 +6364,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6396,7 +6372,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6405,14 +6381,6 @@
     </proof>
     <proof
      prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6422,7 +6390,7 @@
    </goal>
    <goal
     name="Parent_right"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="15" loccnumb="6" loccnume="18"
     sum="56912ec60c6410d85d6e28e3ef51691b"
     proved="true"
@@ -6437,7 +6405,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6445,7 +6413,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6454,14 +6422,6 @@
     </proof>
     <proof
      prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6471,7 +6431,7 @@
    </goal>
    <goal
     name="Parent_left"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="16" loccnumb="6" loccnume="17"
     sum="0bebcb65a27f2e2c6111b2e1fe2c64f4"
     proved="true"
@@ -6486,7 +6446,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6494,15 +6454,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6510,7 +6462,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6520,7 +6472,7 @@
    </goal>
    <goal
     name="Inf_parent"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="17" loccnumb="6" loccnume="16"
     sum="9d280c398de6ad4e01d8b7234a507cee"
     proved="true"
@@ -6535,7 +6487,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6543,7 +6495,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6552,14 +6504,6 @@
     </proof>
     <proof
      prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6569,7 +6513,7 @@
    </goal>
    <goal
     name="Child_parent"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="18" loccnumb="6" loccnume="18"
     sum="ee79c9e59948fe7f2c9b84d5f7fd379f"
     proved="true"
@@ -6584,7 +6528,7 @@
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6592,15 +6536,7 @@
      <result status="valid" time="1.61"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.24"/>
-    </proof>
-    <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6608,7 +6544,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6618,7 +6554,7 @@
    </goal>
    <goal
     name="Parent_pos"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="20" loccnumb="6" loccnume="16"
     sum="109db23d60037862ec8ec436a57475e4"
     proved="true"
@@ -6635,47 +6571,39 @@
     <proof
      prover="2"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="17"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="7.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
+     prover="3"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="9"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="Is_heap_when_no_element"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="39" loccnumb="6" loccnume="29"
     sum="800cc0bf927139219f73e40541da9982"
     proved="true"
@@ -6690,7 +6618,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6698,7 +6626,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6707,14 +6635,6 @@
     </proof>
     <proof
      prover="10"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6724,7 +6644,7 @@
    </goal>
    <goal
     name="Is_heap_sub"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="42" loccnumb="6" loccnume="17"
     sum="780c39865916ead73e2a759691fea23a"
     proved="true"
@@ -6739,7 +6659,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6747,15 +6667,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6765,7 +6677,7 @@
    </goal>
    <goal
     name="Is_heap_sub2"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="47" loccnumb="6" loccnume="18"
     sum="15f5f696a34967c20cd4e9c6a08d3d6f"
     proved="true"
@@ -6780,7 +6692,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6788,15 +6700,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6806,7 +6710,7 @@
    </goal>
    <goal
     name="Is_heap_when_node_modified"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="52" loccnumb="6" loccnume="32"
     sum="fc1d9af2cf3b97e2d8021a4a69711bb7"
     proved="true"
@@ -6821,7 +6725,7 @@
      <result status="valid" time="0.70"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6829,7 +6733,7 @@
      <result status="valid" time="0.30"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6837,7 +6741,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6847,14 +6751,14 @@
    </goal>
    <goal
     name="Is_heap_add_last"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="60" loccnumb="6" loccnume="22"
     sum="394e0c12fee2938c2a8ee72f73c17b58"
     proved="true"
     expanded="false"
     shape="ais_heap_arrayamixfix [&lt;-]V0V1V2c0ainfix +V1c1Iainfix &gt;=V2amixfix []V0aparentV1Aais_heap_arrayV0c0V1Iainfix &gt;V1c0F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6862,7 +6766,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="17"
      memlimit="0"
      obsolete="false"
@@ -6870,7 +6774,7 @@
      <result status="valid" time="8.24"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6880,14 +6784,14 @@
    </goal>
    <goal
     name="Parent_inf_el"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="65" loccnumb="6" loccnume="19"
     sum="a83136b6ec020ba943818185b5b2bad2"
     proved="true"
     expanded="false"
     shape="ainfix &lt;=amixfix []V0aparentV2amixfix []V0V2Iainfix &lt;V2V1Aainfix &lt;c0V2FIais_heap_arrayV0c0V1F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6903,7 +6807,7 @@
      <result status="valid" time="5.52"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6911,7 +6815,7 @@
      <result status="valid" time="0.09"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6919,7 +6823,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6929,7 +6833,7 @@
    </goal>
    <goal
     name="Left_sup_el"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="70" loccnumb="6" loccnume="17"
     sum="200690683272f0a55717b646db801101"
     proved="true"
@@ -6944,7 +6848,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6960,15 +6864,7 @@
      <result status="valid" time="5.33"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="9"
+     prover="8"
      timelimit="14"
      memlimit="0"
      obsolete="false"
@@ -6976,7 +6872,7 @@
      <result status="valid" time="6.44"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -6984,7 +6880,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -6994,7 +6890,7 @@
    </goal>
    <goal
     name="Right_sup_el"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="76" loccnumb="6" loccnume="18"
     sum="4d3db24f8b6f856fa15e717e161b7890"
     proved="true"
@@ -7009,7 +6905,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -7025,15 +6921,7 @@
      <result status="valid" time="4.47"/>
     </proof>
     <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="9"
+     prover="8"
      timelimit="14"
      memlimit="0"
      obsolete="false"
@@ -7041,7 +6929,7 @@
      <result status="valid" time="6.53"/>
     </proof>
     <proof
-     prover="10"
+     prover="9"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -7049,7 +6937,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="11"
+     prover="10"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -7059,7 +6947,7 @@
    </goal>
    <goal
     name="Is_heap_relation"
-    locfile="../heap.why"
+    locfile="../../heap.why"
     loclnum="82" loccnumb="6" loccnume="22"
     sum="bf08c841c8f2d62bb1a40deabda16c9d"
     proved="true"

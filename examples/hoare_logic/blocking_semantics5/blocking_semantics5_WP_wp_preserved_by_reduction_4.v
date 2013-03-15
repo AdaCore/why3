@@ -526,7 +526,7 @@ Axiom distrib_conj : forall (s:stmt) (sigma:(map.Map.map mident value))
   (Fand p q))).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 2.
+Ltac ae := why3 "alt-ergo" timelimit 10.
 
 (* Why3 goal *)
 Theorem wp_preserved_by_reduction : forall (sigma:(map.Map.map mident value))
@@ -534,7 +534,7 @@ Theorem wp_preserved_by_reduction : forall (sigma:(map.Map.map mident value))
   (pi':(list (ident* value)%type)) (s:stmt) (s':stmt), (one_step sigma pi s
   sigma' pi' s') -> forall (q:fmla), (eval_fmla sigma pi (wp s q)) ->
   (eval_fmla sigma' pi' (wp s' q)).
-(* intros sigma sigma' pi pi' s s' h1 q h2. *)
+(* Why3 intros sigma sigma' pi pi' s s' h1 q h2. *)
 intros sigma sigma' pi pi' s s' h1.
 induction h1; try (simpl; intro; ae).
 (* case while true do ... *)

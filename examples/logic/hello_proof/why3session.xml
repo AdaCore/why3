@@ -4,15 +4,11 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
   name="Coq"
   version="8.3pl4"/>
- <prover
-  id="2"
-  name="Simplify"
-  version="1.5.4"/>
  <file
   name="../hello_proof.why"
   verified="false"
@@ -34,9 +30,9 @@
     expanded="true"
     shape="t">
     <proof
-     prover="2"
-     timelimit="4"
-     memlimit="0"
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -58,14 +54,6 @@
      archived="false">
      <result status="unknown" time="0.00"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="4"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
     <transf
      name="split_goal"
      proved="false"
@@ -81,8 +69,8 @@
       shape="fIt">
       <proof
        prover="0"
-       timelimit="4"
-       memlimit="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="unknown" time="0.00"/>
@@ -94,15 +82,7 @@
        edited="hello_proof_HelloProof_G2_1.v"
        obsolete="false"
        archived="false">
-       <result status="unknown" time="0.43"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="4"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.00"/>
+       <result status="unknown" time="0.44"/>
       </proof>
      </goal>
      <goal
@@ -116,16 +96,8 @@
       shape="fOt">
       <proof
        prover="0"
-       timelimit="4"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="4"
-       memlimit="0"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.00"/>
@@ -148,14 +120,6 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="4"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
   </theory>

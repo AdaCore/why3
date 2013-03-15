@@ -170,7 +170,7 @@ Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(zipper a))
 (** The proof starts here *)
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 10.
+Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 20.
 
 Lemma distinct1:
   forall (p pp: loc) (pr ppr: tree loc),
@@ -299,7 +299,7 @@ Theorem main_lemma : forall (m:(map.Map.map loc node)) (t:loc) (pp:loc)
   it) -> ((distinct (inorder it)) -> (istree (map.Map.set m pp
   (mk_node (right1 (map.Map.get m p)) (right1 (map.Map.get m pp))
   (data (map.Map.get m pp)))) t (zip (Node pr pp ppr) z)))).
-(* intros m t pp p ppr pr z it h1 h2. *)
+(* Why3 intros m t pp p ppr pr z it h1 h2. *)
 intros m t pp p ppr pr z it h1 h2.
 pose (m' := (Map.set m pp
      (mk_node (right1 (Map.get m p)) (right1 (Map.get m pp))
