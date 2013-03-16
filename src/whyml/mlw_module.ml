@@ -404,6 +404,7 @@ let mod_prelude =
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
+  let m = use_export_theory m builtin_theory in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m unit_theory in
   let m = use_export m (mod_prelude env) in
