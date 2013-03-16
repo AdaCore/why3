@@ -607,7 +607,7 @@ and save_meta_args fmt s l =
       fprintf fmt "@\n@[<v 1><meta_arg_int@ val=\"%i\"/>@]" i
   in
   List.iter (save_meta_arg fmt) l;
-  fprintf fmt "@]@\n</meta_args>"
+  fprintf fmt "@]@\n</meta>"
 
 and save_ty fmt ty =
   match ty.ty_node with
