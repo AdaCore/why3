@@ -1504,18 +1504,15 @@ and expr_rec lenv dfdl =
   let eff = List.fold_left rd_effect eff_empty fdl in
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   let fdl = create_rec_defn (List.map step3 fdl) in
-  let check_user_effect { fun_lambda = l } (_,_,_,bl,(de,dsp)) =
-    let otv = opaque_binders Stv.empty bl in
-    Loc.try3 de.de_loc check_user_effect lenv l.l_expr otv dsp in
-  List.iter2 check_user_effect fdl dfdl;
+  let step4 fd (_,_,_,bl,tr) = check_effects lenv fd.fun_lambda bl tr in
+  List.iter2 step4 fdl dfdl;
   fdl
 
 and expr_fun lenv x gh bl (_, dsp as tr) =
   let lam = expr_lam lenv gh (binders bl) tr in
   if lam.l_spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a non-recursive definition";
-  let otv = opaque_binders Stv.empty bl in
-  check_user_effect lenv lam.l_expr otv dsp;
+  check_effects lenv lam bl tr;
   let lam =
     if Debug.test_noflag implicit_post || dsp.ds_post <> [] ||
        oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
@@ -1539,6 +1536,11 @@ and expr_lam lenv gh pvl (de, dsp) =
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
+
+and check_effects lenv lam bl (de, dsp) =
+  let otv = opaque_binders Stv.empty bl in
+  let lenv = add_binders lenv lam.l_args in
+  Loc.try3 de.de_loc check_user_effect lenv lam.l_expr otv dsp
 
 (** Type declaration *)
 
