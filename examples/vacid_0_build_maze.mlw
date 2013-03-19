@@ -1,29 +1,30 @@
 
-theory UnionFind
+theory UnionFind_pure
 
   use import int.Int
 
-  type uf
+  type uf_pure
 
-  predicate repr uf int int
-  function size uf : int
-  function num uf : int
+  predicate repr uf_pure int int
+  function size uf_pure : int
+  function num uf_pure : int
 
   axiom Repr_function_1:
-    forall u:uf, x:int.
+    forall u:uf_pure, x:int.
     0 <= x < size u -> exists y:int. 0 <= y < size u /\ repr u x y
+
   axiom Repr_function_2:
-    forall u:uf, x y z:int.
+    forall u:uf_pure, x y z:int.
     0 <= x < size u -> repr u x y -> repr u x z -> y = z
 
-  predicate same (u:uf) (x y:int) =
-     forall r:int. repr u x r <-> repr u y r
+  predicate same (u:uf_pure) (x y:int) =
+    forall r:int. repr u x r <-> repr u y r
 
-  predicate same_reprs (u1 u2 : uf) =
+  predicate same_reprs (u1 u2 : uf_pure) =
      forall x r:int. repr u1 x r <-> repr u2 x r
 
   axiom OneClass :
-    forall u:uf. num u = 1 ->
+    forall u:uf_pure. num u = 1 ->
     forall x y:int. 0 <= x < size u -> 0 <= y < size u -> same u x y
 
 end
@@ -31,32 +32,35 @@ end
 module UnionFind_sig
 
   use import int.Int
-  use import ref.Ref
+  use export UnionFind_pure
 
-  use export UnionFind
+  type uf model { mutable state : uf_pure }
 
-  val create (n:int) : ref uf
+  val create (n:int) : uf
     requires { 0 <= n }
-    ensures { num !result = n /\ size !result = n /\
-      forall x:int. 0 <= x < n -> repr !result x x }
+    ensures { num result.state = n /\ size result.state = n /\
+      forall x:int. 0 <= x < n -> repr result.state x x }
 
-  val find (u:ref uf) (x:int) : int writes {u}
-    requires { 0 <= x < size !u }
-    ensures { repr !u x result /\
-      size !u = size (old !u) /\ num !u = num (old !u) /\
-      same_reprs !u (old !u) }
+  val find (u:uf) (x:int) : int writes {u}
+    requires { 0 <= x < size u.state }
+    ensures { repr u.state x result /\
+      size u.state = size (old u.state) /\
+      num u.state = num (old u.state) /\
+      same_reprs u.state (old u.state) }
 
-  val union (u:ref uf) (a:int) (b:int) : unit writes {u}
-    requires { 0 <= a < size !u /\ 0 <= b < size !u /\ not same !u a b }
-    ensures { same !u a b /\
-      size !u = size (old !u) /\ num !u = num (old !u) - 1 /\
-      forall x y:int. 0 <= x < size !u -> 0 <= y < size !u ->
-         same !u x y <->
-         same (old !u) x y \/
-         same (old !u) x a /\ same (old !u) b y \/
-         same (old !u) x b /\ same (old !u) a y }
+  val union (u:uf) (a:int) (b:int) : unit writes {u}
+    requires { 0 <= a < size u.state /\
+               0 <= b < size u.state /\ not same u.state a b }
+    ensures { same u.state a b /\
+      size u.state = size (old u.state) /\
+      num u.state = num (old u.state) - 1 /\
+      forall x y:int. 0 <= x < size u.state -> 0 <= y < size u.state ->
+        same u.state x y <->
+        same (old u.state) x y \/
+        same (old u.state) x a /\ same (old u.state) b y \/
+        same (old u.state) x b /\ same (old u.state) a y }
 
-  val get_num_classes (u:ref uf) : int reads {u} ensures { result = num !u }
+  val get_num_classes (u:uf) : int reads {u} ensures { result = num u.state }
 
 end
 
@@ -74,19 +78,12 @@ theory Graph
 
 end
 
-theory Graph_int
-
-  clone export Graph with type vertex = int
-
-end
-
 module Graph_sig
 
   use import int.Int
   use import ref.Ref
 
-  (* clone export Graph with type vertex = int *)
-  use export Graph_int
+  clone export Graph with type vertex = int
 
   val graph : ref graph
 
@@ -96,10 +93,10 @@ module Graph_sig
     requires { not path !graph a b }
     ensures { !num_edges = old !num_edges + 1 /\
       (forall x y:int.
-          path !graph x y <->
-          path (old !graph) x y \/
-          path (old !graph) x a /\ path (old !graph) b y \/
-          path (old !graph) x b /\ path (old !graph) a y) }
+        path !graph x y <->
+        path (old !graph) x y \/
+        path (old !graph) x a /\ path (old !graph) b y \/
+        path (old !graph) x b /\ path (old !graph) a y) }
 
 end
 
@@ -116,18 +113,19 @@ module BuildMaze
   lemma Ineq1 :
     forall n x y:int. 0 <= n -> 0 <= x < n -> 0 <= y < n -> 0 <= x*n+y < n*n
 
-  let add_edge_and_union (u: ref uf) (a:int) (b:int)
-    requires { 0 <= a < size !u /\ 0 <= b < size !u /\
-      not same !u a b /\ not path !graph a b /\
+  let add_edge_and_union (u: uf) (a:int) (b:int)
+    requires { 0 <= a < size u.state /\ 0 <= b < size u.state /\
+      not same u.state a b /\ not path !graph a b /\
       forall x y:int.
-        0 <= x < size !u -> 0 <= y < size !u ->
-        same !u x y <-> path !graph x y }
+        0 <= x < size u.state -> 0 <= y < size u.state ->
+        same u.state x y <-> path !graph x y }
     ensures { !num_edges = old !num_edges + 1 /\
-      same !u a b /\
-      size !u = size (old !u) /\ num !u = num (old !u) - 1 /\
+      same u.state a b /\
+      size u.state = size (old u.state) /\
+      num u.state = num (old u.state) - 1 /\
       (forall x y:int.
-         0 <= x < size !u -> 0 <= y < size !u ->
-         same !u x y <-> path !graph x y) }
+         0 <= x < size u.state -> 0 <= y < size u.state ->
+         same u.state x y <-> path !graph x y) }
   = add_edge a b;
     union u a b
 
@@ -138,12 +136,13 @@ let build_maze (n:int)
     forall x y:int. 0 <= x < n*n -> 0 <= y < n*n -> path !graph x y }
   = let u = create (n*n) in
     assert { forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
-             same !u x y -> (repr !u x y && repr !u x x && x = y) };
+      same u.state x y -> (repr u.state x y && repr u.state x x && x = y) };
     while get_num_classes u > 1 do
       invariant {
-          1 <= num !u /\ num !u + !num_edges = size !u = n*n /\
-          forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
-                          (same !u x y <-> path !graph x y) }
+        1 <= num u.state /\
+        num u.state + !num_edges = size u.state = n*n /\
+        forall x y:int. 0 <= x < n*n -> 0 <= y < n*n ->
+                        (same u.state x y <-> path !graph x y) }
       let x = rand n in
       let y = rand n in
       let d = rand 2 in

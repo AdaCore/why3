@@ -12,57 +12,50 @@
  <prover
   id="2"
   name="Z3"
-  version="4.3.1"/>
+  version="4.2"/>
  <file
   name="../vacid_0_build_maze.mlw"
   verified="true"
   expanded="true">
   <theory
-   name="UnionFind"
+   name="UnionFind_pure"
    locfile="../vacid_0_build_maze.mlw"
-   loclnum="2" loccnumb="7" loccnume="16"
+   loclnum="2" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="UnionFind_sig"
    locfile="../vacid_0_build_maze.mlw"
-   loclnum="31" loccnumb="7" loccnume="20"
+   loclnum="32" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Graph"
    locfile="../vacid_0_build_maze.mlw"
-   loclnum="63" loccnumb="7" loccnume="12"
-   verified="true"
-   expanded="true">
-  </theory>
-  <theory
-   name="Graph_int"
-   locfile="../vacid_0_build_maze.mlw"
-   loclnum="77" loccnumb="7" loccnume="16"
+   loclnum="64" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="Graph_sig"
    locfile="../vacid_0_build_maze.mlw"
-   loclnum="83" loccnumb="7" loccnume="16"
+   loclnum="78" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
   </theory>
   <theory
    name="BuildMaze"
    locfile="../vacid_0_build_maze.mlw"
-   loclnum="106" loccnumb="7" loccnume="16"
+   loclnum="100" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <goal
     name="Ineq1"
     locfile="../vacid_0_build_maze.mlw"
-    loclnum="116" loccnumb="8" loccnume="13"
-    sum="296f7be2946d7506596e15f248afc703"
+    loclnum="110" loccnumb="8" loccnume="13"
+    sum="3eaa4d824439d7c498954baf97a7c829"
     proved="true"
     expanded="false"
     shape="ainfix &lt;ainfix +ainfix *V1V0V2ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V1V0V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V1V0Aainfix &lt;=c0V1Iainfix &lt;=c0V0F">
@@ -73,9 +66,9 @@
      <goal
       name="Ineq1.1"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="116" loccnumb="8" loccnume="13"
+      loclnum="110" loccnumb="8" loccnume="13"
       expl="1."
-      sum="7b7588411ecf2ffbe6e7248a6e7935a3"
+      sum="b5abf29652bccb6074393479fe34f687"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0ainfix +ainfix *V1V0V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V1V0Aainfix &lt;=c0V1Iainfix &lt;=c0V0F">
@@ -91,9 +84,9 @@
      <goal
       name="Ineq1.2"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="116" loccnumb="8" loccnume="13"
+      loclnum="110" loccnumb="8" loccnume="13"
       expl="2."
-      sum="617cee004edfc4b884b9d0c2d99917ee"
+      sum="3c93bc80fc536500f1d33200221973e6"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +ainfix *V1V0V2ainfix *V0V0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V1V0Aainfix &lt;=c0V1Iainfix &lt;=c0V0F">
@@ -103,7 +96,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.42"/>
       </proof>
      </goal>
     </transf>
@@ -111,9 +104,9 @@
    <goal
     name="WP_parameter add_edge_and_union"
     locfile="../vacid_0_build_maze.mlw"
-    loclnum="119" loccnumb="6" loccnume="24"
+    loclnum="113" loccnumb="6" loccnume="24"
     expl="VC for add_edge_and_union"
-    sum="5af461b260f024d533967bc4bf2a1106"
+    sum="8f6506de4e168488faa468fe3ed8f9ae"
     proved="true"
     expanded="false"
     shape="apathV6V8V9qasameV7V8V9Iainfix &lt;V9asizeV7Aainfix &lt;=c0V9Iainfix &lt;V8asizeV7Aainfix &lt;=c0V8FAainfix =anumV7ainfix -anumV2c1Aainfix =asizeV7asizeV2AasameV7V0V1Aainfix =V5ainfix +V3c1IasameV2V0V11AasameV2V10V1OasameV2V1V11AasameV2V10V0OasameV2V10V11qasameV7V10V11Iainfix &lt;V11asizeV7Aainfix &lt;=c0V11Iainfix &lt;V10asizeV7Aainfix &lt;=c0V10FAainfix =anumV7ainfix -anumV2c1Aainfix =asizeV7asizeV2AasameV7V0V1FAasameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0IapathV4V0V13AapathV4V12V1OapathV4V1V13AapathV4V12V0OapathV4V12V13qapathV6V12V13FAainfix =V5ainfix +V3c1FAapathV4V0V1NIapathV4V14V15qasameV2V14V15Iainfix &lt;V15asizeV2Aainfix &lt;=c0V15Iainfix &lt;V14asizeV2Aainfix &lt;=c0V14FAapathV4V0V1NAasameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0FF">
@@ -126,9 +119,9 @@
      <goal
       name="WP_parameter add_edge_and_union.1"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="119" loccnumb="6" loccnume="24"
+      loclnum="113" loccnumb="6" loccnume="24"
       expl="1. precondition"
-      sum="86ed15c0d8cab5ffe5b0e6cc2fd7b19d"
+      sum="d206e4e54e5c9d53f503eace29bc61c0"
       proved="true"
       expanded="false"
       shape="apathV4V0V1NIapathV4V5V6qasameV2V5V6Iainfix &lt;V6asizeV2Aainfix &lt;=c0V6Iainfix &lt;V5asizeV2Aainfix &lt;=c0V5FAapathV4V0V1NAasameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0FF">
@@ -146,9 +139,9 @@
      <goal
       name="WP_parameter add_edge_and_union.2"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="119" loccnumb="6" loccnume="24"
+      loclnum="113" loccnumb="6" loccnume="24"
       expl="2. precondition"
-      sum="02d16628f91a8063fb0b616f620a9f89"
+      sum="e71629ca482b75ad9986fa0d036bf75a"
       proved="true"
       expanded="false"
       shape="asameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0IapathV4V0V8AapathV4V7V1OapathV4V1V8AapathV4V7V0OapathV4V7V8qapathV6V7V8FAainfix =V5ainfix +V3c1FIapathV4V0V1NIapathV4V9V10qasameV2V9V10Iainfix &lt;V10asizeV2Aainfix &lt;=c0V10Iainfix &lt;V9asizeV2Aainfix &lt;=c0V9FAapathV4V0V1NAasameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0FF">
@@ -166,9 +159,9 @@
      <goal
       name="WP_parameter add_edge_and_union.3"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="119" loccnumb="6" loccnume="24"
+      loclnum="113" loccnumb="6" loccnume="24"
       expl="3. postcondition"
-      sum="4ab69cfd01b6133cc176ac413c7afb4d"
+      sum="72c8e946daf92c6320e2509ae2b10c7d"
       proved="true"
       expanded="false"
       shape="apathV6V8V9qasameV7V8V9Iainfix &lt;V9asizeV7Aainfix &lt;=c0V9Iainfix &lt;V8asizeV7Aainfix &lt;=c0V8FAainfix =anumV7ainfix -anumV2c1Aainfix =asizeV7asizeV2AasameV7V0V1Aainfix =V5ainfix +V3c1IasameV2V0V11AasameV2V10V1OasameV2V1V11AasameV2V10V0OasameV2V10V11qasameV7V10V11Iainfix &lt;V11asizeV7Aainfix &lt;=c0V11Iainfix &lt;V10asizeV7Aainfix &lt;=c0V10FAainfix =anumV7ainfix -anumV2c1Aainfix =asizeV7asizeV2AasameV7V0V1FIasameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0IapathV4V0V13AapathV4V12V1OapathV4V1V13AapathV4V12V0OapathV4V12V13qapathV6V12V13FAainfix =V5ainfix +V3c1FIapathV4V0V1NIapathV4V14V15qasameV2V14V15Iainfix &lt;V15asizeV2Aainfix &lt;=c0V15Iainfix &lt;V14asizeV2Aainfix &lt;=c0V14FAapathV4V0V1NAasameV2V0V1NAainfix &lt;V1asizeV2Aainfix &lt;=c0V1Aainfix &lt;V0asizeV2Aainfix &lt;=c0V0FF">
@@ -180,7 +173,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.73"/>
+       <result status="valid" time="4.25"/>
       </proof>
      </goal>
     </transf>
@@ -188,9 +181,9 @@
    <goal
     name="WP_parameter build_maze"
     locfile="../vacid_0_build_maze.mlw"
-    loclnum="134" loccnumb="4" loccnume="14"
+    loclnum="128" loccnumb="4" loccnume="14"
     expl="VC for build_maze"
-    sum="85862ac15a2e55aacf89eab486eab149"
+    sum="cff6a3f0c02e64acea00d2d46f17f3c6"
     proved="true"
     expanded="true"
     shape="iainfix &gt;anumV4c1iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0iainfix =V13V11NapathV16V17V18qasameV14V17V18Iainfix &lt;V18ainfix *V0V0Aainfix &lt;=c0V18Iainfix &lt;V17ainfix *V0V0Aainfix &lt;=c0V17FAainfix =asizeV14ainfix *V0V0Aainfix =ainfix +anumV14V15asizeV14Aainfix &lt;=c1anumV14IapathV16V19V20qasameV14V19V20Iainfix &lt;V20asizeV14Aainfix &lt;=c0V20Iainfix &lt;V19asizeV14Aainfix &lt;=c0V19FAainfix =anumV14ainfix -anumV12c1Aainfix =asizeV14asizeV12AasameV14ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix =V15ainfix +V5c1FAapathV6V21V22qasameV12V21V22Iainfix &lt;V22asizeV12Aainfix &lt;=c0V22Iainfix &lt;V21asizeV12Aainfix &lt;=c0V21FAapathV6ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1NAasameV12ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1NAainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV12Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix &lt;ainfix +ainfix *V8V0V7asizeV12Aainfix &lt;=c0ainfix +ainfix *V8V0V7apathV6V23V24qasameV12V23V24Iainfix &lt;V24ainfix *V0V0Aainfix &lt;=c0V24Iainfix &lt;V23ainfix *V0V0Aainfix &lt;=c0V23FAainfix =asizeV12ainfix *V0V0Aainfix =ainfix +anumV12V5asizeV12Aainfix &lt;=c1anumV12Iasame_reprsV12V10Aainfix =anumV12anumV10Aainfix =asizeV12asizeV10AareprV12ainfix +ainfix *V8V0V7V13FFAainfix &lt;ainfix +ainfix *V8V0V7asizeV10Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iasame_reprsV10V4Aainfix =anumV10anumV4Aainfix =asizeV10asizeV4AareprV10ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1V11FFAainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV4Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7apathV6V25V26qasameV4V25V26Iainfix &lt;V26ainfix *V0V0Aainfix &lt;=c0V26Iainfix &lt;V25ainfix *V0V0Aainfix &lt;=c0V25FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4Iainfix &lt;V9c2Aainfix &lt;=c0V9FAainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FAainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FAainfix &lt;c0V0apathV6V27V28Iainfix &lt;V28ainfix *V0V0Aainfix &lt;=c0V28Iainfix &lt;V27ainfix *V0V0Aainfix &lt;=c0V27FAainfix =V5ainfix -ainfix *V0V0c1IapathV6V29V30qasameV4V29V30Iainfix &lt;V30ainfix *V0V0Aainfix &lt;=c0V30Iainfix &lt;V29ainfix *V0V0Aainfix &lt;=c0V29FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FAapathV2V31V32qasameV3V31V32Iainfix &lt;V32ainfix *V0V0Aainfix &lt;=c0V32Iainfix &lt;V31ainfix *V0V0Aainfix &lt;=c0V31FAainfix =asizeV3ainfix *V0V0Aainfix =ainfix +anumV3V1asizeV3Aainfix &lt;=c1anumV3Aainfix =V33V34AareprV3V33V33AareprV3V33V34IasameV3V33V34Iainfix &lt;V34ainfix *V0V0Aainfix &lt;=c0V34Iainfix &lt;V33ainfix *V0V0Aainfix &lt;=c0V33FIareprV3V35V35Iainfix &lt;V35ainfix *V0V0Aainfix &lt;=c0V35FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FAainfix &lt;=c0ainfix *V0V0IapathV2V36V37qainfix =V36V37FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -203,9 +196,9 @@
      <goal
       name="WP_parameter build_maze.1"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="1. precondition"
-      sum="dbd9d66ed34573265cf03c1723fe3194"
+      sum="1f45d8714783e1f89fba5d3245130d83"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0ainfix *V0V0IapathV2V3V4qainfix =V3V4FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -223,9 +216,9 @@
      <goal
       name="WP_parameter build_maze.2"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="2. assertion"
-      sum="ba6f9bb547e3b05840ec2ac44c4e2d21"
+      sum="6722e53803d71cb0180cee244d31c6f7"
       proved="true"
       expanded="false"
       shape="ainfix =V4V5AareprV3V4V4AareprV3V4V5IasameV3V4V5Iainfix &lt;V5ainfix *V0V0Aainfix &lt;=c0V5Iainfix &lt;V4ainfix *V0V0Aainfix &lt;=c0V4FIareprV3V6V6Iainfix &lt;V6ainfix *V0V0Aainfix &lt;=c0V6FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V7V8qainfix =V7V8FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -243,9 +236,9 @@
      <goal
       name="WP_parameter build_maze.3"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="3. loop invariant init"
-      sum="245a025c34e8959d939159284c2bc33e"
+      sum="a45d9a509745259fa4e46072f5c19b00"
       proved="true"
       expanded="false"
       shape="apathV2V4V5qasameV3V4V5Iainfix &lt;V5ainfix *V0V0Aainfix &lt;=c0V5Iainfix &lt;V4ainfix *V0V0Aainfix &lt;=c0V4FAainfix =asizeV3ainfix *V0V0Aainfix =ainfix +anumV3V1asizeV3Aainfix &lt;=c1anumV3Iainfix =V6V7AareprV3V6V6AareprV3V6V7IasameV3V6V7Iainfix &lt;V7ainfix *V0V0Aainfix &lt;=c0V7Iainfix &lt;V6ainfix *V0V0Aainfix &lt;=c0V6FIareprV3V8V8Iainfix &lt;V8ainfix *V0V0Aainfix &lt;=c0V8FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V9V10qainfix =V9V10FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -263,9 +256,9 @@
      <goal
       name="WP_parameter build_maze.4"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="4. precondition"
-      sum="91fb770767f9de10868e59232a3f4b3f"
+      sum="ffb983295548a7ecd15f324e5657dcc6"
       proved="true"
       expanded="false"
       shape="ainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V7V8qasameV4V7V8Iainfix &lt;V8ainfix *V0V0Aainfix &lt;=c0V8Iainfix &lt;V7ainfix *V0V0Aainfix &lt;=c0V7FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V9V10AareprV3V9V9AareprV3V9V10IasameV3V9V10Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10Iainfix &lt;V9ainfix *V0V0Aainfix &lt;=c0V9FIareprV3V11V11Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V12V13qainfix =V12V13FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -283,9 +276,9 @@
      <goal
       name="WP_parameter build_maze.5"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="5. precondition"
-      sum="9a066f1317880c0f91febe2d9c18bdaf"
+      sum="a9b718d2e7c07ef13ebce9760ad87a73"
       proved="true"
       expanded="false"
       shape="ainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V8V9qasameV4V8V9Iainfix &lt;V9ainfix *V0V0Aainfix &lt;=c0V9Iainfix &lt;V8ainfix *V0V0Aainfix &lt;=c0V8FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V10V11AareprV3V10V10AareprV3V10V11IasameV3V10V11Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10FIareprV3V12V12Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V13V14qainfix =V13V14FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -303,9 +296,9 @@
      <goal
       name="WP_parameter build_maze.6"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="6. precondition"
-      sum="04d5d95a944e56fb4ba7bd6878059a33"
+      sum="4014804e04a1a87012f0b58796a4bea5"
       proved="true"
       expanded="false"
       shape="ainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V9V10qasameV4V9V10Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10Iainfix &lt;V9ainfix *V0V0Aainfix &lt;=c0V9FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V11V12AareprV3V11V11AareprV3V11V12IasameV3V11V12Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11FIareprV3V13V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V14V15qainfix =V14V15FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -323,9 +316,9 @@
      <goal
       name="WP_parameter build_maze.7"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="7. assertion"
-      sum="9a1a77493c9be35a09b363fd93f30f02"
+      sum="74f81959a795a1b9cc4d5043a1c7c2a7"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V10V11qasameV4V10V11Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V12V13AareprV3V12V12AareprV3V12V13IasameV3V12V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12FIareprV3V14V14Iainfix &lt;V14ainfix *V0V0Aainfix &lt;=c0V14FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V15V16qainfix =V15V16FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -343,11 +336,11 @@
      <goal
       name="WP_parameter build_maze.8"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="8. assertion"
-      sum="8640c298c192ad8e055a3d7ebb3dcb14"
+      sum="ae504ba54ef75b8fe7d63ff62cfe2395"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="ainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V10V11qasameV4V10V11Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V12V13AareprV3V12V12AareprV3V12V13IasameV3V12V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12FIareprV3V14V14Iainfix &lt;V14ainfix *V0V0Aainfix &lt;=c0V14FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V15V16qainfix =V15V16FAainfix =V1c0Aainfix &lt;=c1V0FF">
       <label
        name="expl:VC for build_maze"/>
@@ -363,9 +356,9 @@
      <goal
       name="WP_parameter build_maze.9"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="9. precondition"
-      sum="374e0a52d35f06e9c33d5a2d9073a5cd"
+      sum="9f178eb9f7b248bb7b4056cf068eefe9"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV4Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V10V11qasameV4V10V11Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V12V13AareprV3V12V12AareprV3V12V13IasameV3V12V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12FIareprV3V14V14Iainfix &lt;V14ainfix *V0V0Aainfix &lt;=c0V14FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V15V16qainfix =V15V16FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -377,15 +370,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.30"/>
+       <result status="valid" time="0.65"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_maze.10"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="10. precondition"
-      sum="e89835d9f5b20f732e77f46205abdbb6"
+      sum="07767f8e610096dffc4a182b71016abe"
       proved="true"
       expanded="false"
       shape="ainfix &lt;ainfix +ainfix *V8V0V7asizeV10Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iasame_reprsV10V4Aainfix =anumV10anumV4Aainfix =asizeV10asizeV4AareprV10ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1V11FFIainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV4Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V12V13qasameV4V12V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V14V15AareprV3V14V14AareprV3V14V15IasameV3V14V15Iainfix &lt;V15ainfix *V0V0Aainfix &lt;=c0V15Iainfix &lt;V14ainfix *V0V0Aainfix &lt;=c0V14FIareprV3V16V16Iainfix &lt;V16ainfix *V0V0Aainfix &lt;=c0V16FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V17V18qainfix =V17V18FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -403,9 +396,9 @@
      <goal
       name="WP_parameter build_maze.11"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="11. precondition"
-      sum="a4880edba035e13edcb526de470bd0db"
+      sum="1d19c44ae7129e8e0904f0528a65faac"
       proved="true"
       expanded="false"
       shape="apathV6V14V15qasameV12V14V15Iainfix &lt;V15asizeV12Aainfix &lt;=c0V15Iainfix &lt;V14asizeV12Aainfix &lt;=c0V14FAapathV6ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1NAasameV12ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1NAainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV12Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix &lt;ainfix +ainfix *V8V0V7asizeV12Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix =V13V11NIasame_reprsV12V10Aainfix =anumV12anumV10Aainfix =asizeV12asizeV10AareprV12ainfix +ainfix *V8V0V7V13FFIainfix &lt;ainfix +ainfix *V8V0V7asizeV10Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iasame_reprsV10V4Aainfix =anumV10anumV4Aainfix =asizeV10asizeV4AareprV10ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1V11FFIainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV4Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V16V17qasameV4V16V17Iainfix &lt;V17ainfix *V0V0Aainfix &lt;=c0V17Iainfix &lt;V16ainfix *V0V0Aainfix &lt;=c0V16FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V18V19AareprV3V18V18AareprV3V18V19IasameV3V18V19Iainfix &lt;V19ainfix *V0V0Aainfix &lt;=c0V19Iainfix &lt;V18ainfix *V0V0Aainfix &lt;=c0V18FIareprV3V20V20Iainfix &lt;V20ainfix *V0V0Aainfix &lt;=c0V20FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V21V22qainfix =V21V22FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -417,15 +410,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.67"/>
+       <result status="valid" time="3.29"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_maze.12"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="12. loop invariant preservation"
-      sum="8865af8626404647cfdfa13d0d764883"
+      sum="433b85dd9ccb795c1caf2e68395c3b7c"
       proved="true"
       expanded="false"
       shape="apathV16V17V18qasameV14V17V18Iainfix &lt;V18ainfix *V0V0Aainfix &lt;=c0V18Iainfix &lt;V17ainfix *V0V0Aainfix &lt;=c0V17FAainfix =asizeV14ainfix *V0V0Aainfix =ainfix +anumV14V15asizeV14Aainfix &lt;=c1anumV14IapathV16V19V20qasameV14V19V20Iainfix &lt;V20asizeV14Aainfix &lt;=c0V20Iainfix &lt;V19asizeV14Aainfix &lt;=c0V19FAainfix =anumV14ainfix -anumV12c1Aainfix =asizeV14asizeV12AasameV14ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix =V15ainfix +V5c1FIapathV6V21V22qasameV12V21V22Iainfix &lt;V22asizeV12Aainfix &lt;=c0V22Iainfix &lt;V21asizeV12Aainfix &lt;=c0V21FAapathV6ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1NAasameV12ainfix +ainfix *V8V0V7ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1NAainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV12Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Aainfix &lt;ainfix +ainfix *V8V0V7asizeV12Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix =V13V11NIasame_reprsV12V10Aainfix =anumV12anumV10Aainfix =asizeV12asizeV10AareprV12ainfix +ainfix *V8V0V7V13FFIainfix &lt;ainfix +ainfix *V8V0V7asizeV10Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iasame_reprsV10V4Aainfix =anumV10anumV4Aainfix =asizeV10asizeV4AareprV10ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1V11FFIainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV4Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V23V24qasameV4V23V24Iainfix &lt;V24ainfix *V0V0Aainfix &lt;=c0V24Iainfix &lt;V23ainfix *V0V0Aainfix &lt;=c0V23FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V25V26AareprV3V25V25AareprV3V25V26IasameV3V25V26Iainfix &lt;V26ainfix *V0V0Aainfix &lt;=c0V26Iainfix &lt;V25ainfix *V0V0Aainfix &lt;=c0V25FIareprV3V27V27Iainfix &lt;V27ainfix *V0V0Aainfix &lt;=c0V27FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V28V29qainfix =V28V29FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -437,15 +430,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.50"/>
+       <result status="valid" time="1.14"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_maze.13"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="13. loop invariant preservation"
-      sum="b64c8618316fc71a4afbf49999cf1ddc"
+      sum="bd1c628b4ef154780f3f286088f12f1b"
       proved="true"
       expanded="false"
       shape="apathV6V14V15qasameV12V14V15Iainfix &lt;V15ainfix *V0V0Aainfix &lt;=c0V15Iainfix &lt;V14ainfix *V0V0Aainfix &lt;=c0V14FAainfix =asizeV12ainfix *V0V0Aainfix =ainfix +anumV12V5asizeV12Aainfix &lt;=c1anumV12Iainfix =V13V11NNIasame_reprsV12V10Aainfix =anumV12anumV10Aainfix =asizeV12asizeV10AareprV12ainfix +ainfix *V8V0V7V13FFIainfix &lt;ainfix +ainfix *V8V0V7asizeV10Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iasame_reprsV10V4Aainfix =anumV10anumV4Aainfix =asizeV10asizeV4AareprV10ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1V11FFIainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1asizeV4Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *iainfix =V9c0ainfix +V7c1V7V0iainfix =V9c0V8ainfix +V8c1Iainfix &lt;ainfix +ainfix *V8V0V7ainfix *V0V0Aainfix &lt;=c0ainfix +ainfix *V8V0V7Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0Iainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V16V17qasameV4V16V17Iainfix &lt;V17ainfix *V0V0Aainfix &lt;=c0V17Iainfix &lt;V16ainfix *V0V0Aainfix &lt;=c0V16FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V18V19AareprV3V18V18AareprV3V18V19IasameV3V18V19Iainfix &lt;V19ainfix *V0V0Aainfix &lt;=c0V19Iainfix &lt;V18ainfix *V0V0Aainfix &lt;=c0V18FIareprV3V20V20Iainfix &lt;V20ainfix *V0V0Aainfix &lt;=c0V20FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V21V22qainfix =V21V22FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -457,15 +450,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.49"/>
+       <result status="valid" time="1.09"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter build_maze.14"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="14. loop invariant preservation"
-      sum="c689fb107fcf4602096278d3e2bc9fd6"
+      sum="d3412452bd7ec8e5121155847fdd821e"
       proved="true"
       expanded="false"
       shape="apathV6V10V11qasameV4V10V11Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4Iainfix &lt;iainfix =V9c0V8ainfix +V8c1V0Aainfix &lt;iainfix =V9c0ainfix +V7c1V7V0NIainfix &lt;V9c2Aainfix &lt;=c0V9FIainfix &lt;c0c2Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;c0V0Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix &lt;c0V0Iainfix &gt;anumV4c1IapathV6V12V13qasameV4V12V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V14V15AareprV3V14V14AareprV3V14V15IasameV3V14V15Iainfix &lt;V15ainfix *V0V0Aainfix &lt;=c0V15Iainfix &lt;V14ainfix *V0V0Aainfix &lt;=c0V14FIareprV3V16V16Iainfix &lt;V16ainfix *V0V0Aainfix &lt;=c0V16FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V17V18qainfix =V17V18FAainfix =V1c0Aainfix &lt;=c1V0FF">
@@ -483,9 +476,9 @@
      <goal
       name="WP_parameter build_maze.15"
       locfile="../vacid_0_build_maze.mlw"
-      loclnum="134" loccnumb="4" loccnume="14"
+      loclnum="128" loccnumb="4" loccnume="14"
       expl="15. postcondition"
-      sum="85603788cd071284d4415cf8ba30a4ee"
+      sum="9849a30773cf645d285ecd904481c00c"
       proved="true"
       expanded="false"
       shape="apathV6V7V8Iainfix &lt;V8ainfix *V0V0Aainfix &lt;=c0V8Iainfix &lt;V7ainfix *V0V0Aainfix &lt;=c0V7FAainfix =V5ainfix -ainfix *V0V0c1Iainfix &gt;anumV4c1NIapathV6V9V10qasameV4V9V10Iainfix &lt;V10ainfix *V0V0Aainfix &lt;=c0V10Iainfix &lt;V9ainfix *V0V0Aainfix &lt;=c0V9FAainfix =asizeV4ainfix *V0V0Aainfix =ainfix +anumV4V5asizeV4Aainfix &lt;=c1anumV4FIainfix =V11V12AareprV3V11V11AareprV3V11V12IasameV3V11V12Iainfix &lt;V12ainfix *V0V0Aainfix &lt;=c0V12Iainfix &lt;V11ainfix *V0V0Aainfix &lt;=c0V11FIareprV3V13V13Iainfix &lt;V13ainfix *V0V0Aainfix &lt;=c0V13FAainfix =asizeV3ainfix *V0V0Aainfix =anumV3ainfix *V0V0FIainfix &lt;=c0ainfix *V0V0IapathV2V14V15qainfix =V14V15FAainfix =V1c0Aainfix &lt;=c1V0FF">
