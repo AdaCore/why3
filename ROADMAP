@@ -81,12 +81,12 @@ scheduled on March 2013
   o [why3ide] allow several files on the command-line
   o [ocaml API] incompatible changes in Set/Map/Hashtbl modules
   o [ocaml API] examples in the manual extended to API for Why3ml programs
-  o [prover] fixed Coq 8.4 support for theory real.Trigonometry
-  o [prover] support for Gappa up to 0.16.5
-  o [prover] support for Z3 4.2, 4.3.*
-  o [prover] support for Alt-Ergo 0.95
-  o [prover] support for CVC4
   o [stdlib] fixed inconsistency in map.MapPermut theory
+  o [prover] fixed Coq 8.4 support for theory real.Trigonometry
+  o [prover] support for Gappa up to 0.16.6
+  o [prover] support for Z3 4.2, 4.3.*
+  o [prover] support for Alt-Ergo 0.95.1
+  o [prover] support for CVC4
   o [prover] support for PVS 6
   o [prover] experimental support for mathematica
   o [prover] experimental support for MathSAT5
@@ -107,7 +107,7 @@ scheduled on March 2013
     in ./macros.tex, and then "make doc"
 * manual in HTML: "make doc/html/index.html"
 * do "make distrib"
-* test the distrib why3-0.81.tar.gz
+* test distrib/why3-0.81.tar.gz
 * make a last commit:
  - add tag 0.81 to the git repository, using git tag 0.81
  - do not forget to push it using git push --tags
@@ -131,7 +131,7 @@ scheduled on March 2013
     ln -s /users/www-perso/projets/why3/api-0.81 \
       /users/www-perso/projets/why3/api
    PROBLEME avec style.css
- - update the main HTML page (sources are in why3-papers/www)
+ - update the main HTML page (sources are in repository why3-www)
  - add links to extra resources like
    http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
    page du cours de l'X (in french ? using Krakatoa/why3 bridge)
@@ -139,9 +139,9 @@ scheduled on March 2013
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
-* produce the Why3 part of Toccatal gallery
+* produce the Why3 part of Toccata gallery
   -> add also a tar.gz and a ZIP file of it (this is done by doing
-  "make gallery-files" in the sources of the web pages)
+  "make gallery-files" in the sources of the Toccata web pages)
 * Announce the distrib
  - What to put in the announcement: see New Features above
 * The next commit : add +git to the version in file Version
