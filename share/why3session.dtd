@@ -55,23 +55,22 @@
 <!ELEMENT label EMPTY>
 <!ATTLIST label name CDATA #REQUIRED>
 
-<!ELEMENT metas (ts_pos*, ls_pos*, pr_pos*, meta_args*,goal)>
+<!ELEMENT metas (ts_pos*,ls_pos*,pr_pos*,meta_args*,goal)>
 <!ATTLIST metas proved CDATA #REQUIRED>
 <!ATTLIST metas expanded CDATA #IMPLIED>
 
-<!ELEMENT ts_pos (ip_library+,ip_qualid+)>
+<!ELEMENT ts_pos (ip_library*,ip_qualid+)>
 <!ATTLIST ts_pos name CDATA #REQUIRED>
 <!ATTLIST ts_pos arity CDATA #REQUIRED>
 <!ATTLIST ts_pos id CDATA #REQUIRED>
 <!ATTLIST ts_pos ip_theory CDATA #REQUIRED>
 
-
-<!ELEMENT ls_pos (ip_library+,ip_qualid+)>
+<!ELEMENT ls_pos (ip_library*,ip_qualid+)>
 <!ATTLIST ls_pos name CDATA #REQUIRED>
 <!ATTLIST ls_pos id CDATA #REQUIRED>
 <!ATTLIST ls_pos ip_theory CDATA #REQUIRED>
 
-<!ELEMENT pr_pos (ip_library+,ip_qualid+)>
+<!ELEMENT pr_pos (ip_library*,ip_qualid+)>
 <!ATTLIST pr_pos name CDATA #REQUIRED>
 <!ATTLIST pr_pos id CDATA #REQUIRED>
 <!ATTLIST pr_pos ip_theory CDATA #REQUIRED>
