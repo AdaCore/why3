@@ -147,19 +147,10 @@ module HashtblImpl
     h.size <- h.size + 1;
     h.view <- Map.set h.view k (Some v)
 
-end
-
-module Bad
-
-  use import HashtblImpl
-  use import list.List
-  use import array.Array
-
 (*
-  let bad (h: t 'a) : unit =
+  let alias (h: t int) (k: key) : unit =
     let old_data = h.data in
-    resize h;
+    add h k 42;
     old_data[0] <- Nil
 *)
-
 end
