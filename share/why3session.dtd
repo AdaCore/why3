@@ -55,7 +55,7 @@
 <!ELEMENT label EMPTY>
 <!ATTLIST label name CDATA #REQUIRED>
 
-<!ELEMENT metas (ts_pos*,ls_pos*,pr_pos*,meta_args*,goal)>
+<!ELEMENT metas (ts_pos*,ls_pos*,pr_pos*,meta*,goal)>
 <!ATTLIST metas proved CDATA #REQUIRED>
 <!ATTLIST metas expanded CDATA #IMPLIED>
 
@@ -93,17 +93,17 @@
 <!ELEMENT ty_app (ty_var*,ty_app*)>
 <!ATTLIST ty_app id CDATA #REQUIRED>
 
-<!ELEMENT meta_args_ts EMPTY>
-<!ATTLIST meta_args_ts id CDATA #REQUIRED>
+<!ELEMENT meta_arg_ts EMPTY>
+<!ATTLIST meta_arg_ts id CDATA #REQUIRED>
 
-<!ELEMENT meta_args_ls EMPTY>
-<!ATTLIST meta_args_ls id CDATA #REQUIRED>
+<!ELEMENT meta_arg_ls EMPTY>
+<!ATTLIST meta_arg_ls id CDATA #REQUIRED>
 
-<!ELEMENT meta_args_pr EMPTY>
-<!ATTLIST meta_args_pr id CDATA #REQUIRED>
+<!ELEMENT meta_arg_pr EMPTY>
+<!ATTLIST meta_arg_pr id CDATA #REQUIRED>
 
-<!ELEMENT meta_args_str EMPTY>
-<!ATTLIST meta_args_str val CDATA #REQUIRED>
+<!ELEMENT meta_arg_str EMPTY>
+<!ATTLIST meta_arg_str val CDATA #REQUIRED>
 
-<!ELEMENT meta_args_int EMPTY>
-<!ATTLIST meta_args_int val CDATA #REQUIRED>
+<!ELEMENT meta_arg_int EMPTY>
+<!ATTLIST meta_arg_int val CDATA #REQUIRED>
