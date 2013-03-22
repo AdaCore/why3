@@ -1080,9 +1080,9 @@ new_pdecl:
 ;
 
 pdecl:
-| LET ghost lident_rich labels fun_defn
+| LET top_ghost lident_rich labels fun_defn
     { Dlet (add_lab $3 $4, $2, $5) }
-| LET ghost lident_rich labels EQUAL fun_expr
+| LET top_ghost lident_rich labels EQUAL fun_expr
     { Dlet (add_lab $3 $4, $2, $6) }
 | LET REC list1_rec_defn
     { Dletrec $3 }
@@ -1130,7 +1130,7 @@ list1_rec_defn:
 ;
 
 rec_defn:
-| ghost lident_rich labels list1_binder opt_cast spec EQUAL spec expr
+| top_ghost lident_rich labels list1_binder opt_cast spec EQUAL spec expr
    { floc (), add_lab $2 $3, $1, $4, (cast_body $5 $9, spec_union $6 $8) }
 ;
 
@@ -1452,6 +1452,12 @@ opt_cast:
 ghost:
 | /* epsilon */ { false }
 | GHOST         { true }
+;
+
+top_ghost:
+| /* epsilon */ { Gnone }
+| GHOST         { Gghost }
+| LEMMA         { Glemma }
 ;
 
 /*

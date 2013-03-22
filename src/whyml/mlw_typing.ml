@@ -484,6 +484,13 @@ and dtype_v denv = function
 
 (* expressions *)
 
+let add_lemma_label ~top id = function
+  | Gnone -> id, false
+  | Gghost -> id, true
+  | Glemma when not top ->
+      errorm ~loc:id.id_loc "lemma functions are only allowed at toplevel"
+  | Glemma -> { id with id_lab = Lstr Mlw_wp.lemma_label :: id.id_lab }, true
+
 let de_unit ~loc = hidden_ls ~loc Mlw_expr.fs_void
 
 let de_app _loc e el =
@@ -561,7 +568,7 @@ and de_desc denv loc = function
       let e2 = dexpr denv e2 in
       DElet (id, gh, e1, e2), e2.de_type
   | Ptree.Eletrec (fdl, e1) ->
-      let fdl = dletrec denv fdl in
+      let fdl = dletrec ~top:false denv fdl in
       let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
       let denv = List.fold_left add_one denv fdl in
       let e1 = dexpr denv e1 in
@@ -727,7 +734,7 @@ and de_desc denv loc = function
       expected_type e1 dity_unit;
       DEfor (id, efrom, dir, eto, inv, e1), e1.de_type
 
-and dletrec denv fdl =
+and dletrec ~top denv fdl =
   (* add all functions into the environment *)
   let add_one denv (_,id,_,bl,_) =
     let argl = List.map (fun _ -> create_type_variable ()) bl in
@@ -742,6 +749,7 @@ and dletrec denv fdl =
   let denvl = List.map2 bind_one fdl dvtyl in
   (* then type-check the bodies *)
   let type_one (loc,id,gh,_,tr) (denv,bl,tyl,tyv) =
+    let id, gh = add_lemma_label ~top id gh in
     let tr, (argl, res) = dtriple denv tr in
     if argl <> [] then errorm ~loc
       "The body of a recursive function must be a first-order value";
@@ -943,8 +951,8 @@ and rletrec denv fdl =
 let dexpr denv e =
   rexpr denv (dexpr denv e)
 
-let dletrec denv fdl =
-  rletrec denv (dletrec denv fdl)
+let dletrec ~top denv fdl =
+  rletrec denv (dletrec ~top denv fdl)
 
 (** stage 2 *)
 
@@ -2031,6 +2039,7 @@ let add_decl ~wp loc uc d =
 
 let add_pdecl ~wp loc uc = function
   | Dlet (id, gh, e) ->
+      let id, gh = add_lemma_label ~top:true id gh in
       let e = dexpr (create_denv uc) e in
       let pd = match e.de_desc with
         | DEfun (bl, tr) ->
@@ -2044,7 +2053,7 @@ let add_pdecl ~wp loc uc = function
             create_let_decl def in
       add_pdecl_with_tuples ~wp uc pd
   | Dletrec fdl ->
-      let fdl = dletrec (create_denv uc) fdl in
+      let fdl = dletrec ~top:true (create_denv uc) fdl in
       let fdl = expr_rec (create_lenv uc) fdl in
       let pd = create_rec_decl fdl in
       add_pdecl_with_tuples ~wp uc pd

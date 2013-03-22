@@ -579,6 +579,15 @@ let eff_is_empty e =
   (* eff_compar is not a side effect *)
   not e.eff_diverg
 
+let eff_is_read_only e =
+  Sreg.is_empty e.eff_writes &&
+  Sexn.is_empty e.eff_raises &&
+  Sreg.is_empty e.eff_ghostw &&
+  Sexn.is_empty e.eff_ghostx &&
+  Mreg.is_empty e.eff_resets &&
+  (* eff_compar is not a side effect *)
+  not e.eff_diverg
+
 let eff_equal e1 e2 =
   Sreg.equal e1.eff_reads  e2.eff_reads  &&
   Sreg.equal e1.eff_writes e2.eff_writes &&

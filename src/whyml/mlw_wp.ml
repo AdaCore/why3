@@ -28,6 +28,8 @@ let no_track = Debug.register_flag "wp_no_track"
 let no_eval = Debug.register_flag "wp_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
+let lemma_label = Ident.create_label "why3:lemma"
+
 (** Marks *)
 
 let ts_mark = create_tysymbol (id_fresh "'mark") [] None
@@ -1134,3 +1136,50 @@ let fast_wp_rec env km th fdl =
   List.fold_left2 add_one th fdl fl
 
 let fast_wp_val _env _km th _lv = th
+
+
+(* Select either traditional or fast WP *)
+let if_fast_wp f1 f2 x = if Debug.test_flag fast_wp then f1 x else f2 x
+let wp_val = if_fast_wp fast_wp_val wp_val
+let wp_let = if_fast_wp fast_wp_let wp_let
+let wp_rec = if_fast_wp fast_wp_rec wp_rec
+
+
+(* Lemma functions *)
+
+let wp_val ~wp env kn th ls = if wp then wp_val env kn th ls else th
+let wp_let ~wp env kn th ld = if wp then wp_let env kn th ld else th
+
+let wp_rec ~wp env kn th fdl =
+  let th = if wp then wp_rec env kn th fdl else th in
+  let add_one th { fun_ps = ps; fun_lambda = l } =
+    let name = ps.ps_name in
+    if Slab.mem lemma_label name.id_label then
+      let loc = name.id_loc in
+      let spec = ps.ps_aty.aty_spec in
+      if not (eff_is_read_only spec.c_effect) then
+        Loc.errorm ?loc "lemma functions can not have effects";
+      if not (ity_equal (ity_of_expr l.l_expr) ity_unit) then
+        Loc.errorm ?loc "lemma functions must return unit";
+      let env = mk_env env kn th in
+      let lab = fresh_mark () in
+      let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
+      let subst = List.fold_left add_arg ps.ps_subst l.l_args in
+      let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
+      let args = List.map (fun pv -> pv.pv_vs) l.l_args in
+      let q = old_mark lab spec.c_post in
+      let f = wp_expr env e_void q Mexn.empty in
+      let f = wp_implies spec.c_pre (erase_mark lab f) in
+      let f = wp_forall args (quantify env regs f) in
+      let f = t_forall_close (Mvs.keys f.t_vars) [] f in
+      let lkn = Theory.get_known th in
+      let f = if Debug.test_flag no_track then f else track_values lkn kn f in
+      let f = if Debug.test_flag no_eval then f else
+        Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkn f in
+      let pr = create_prsymbol (id_clone name) in
+      let d = create_prop_decl Paxiom pr f in
+      Theory.add_decl th d
+    else
+      th
+  in
+  List.fold_left add_one th fdl

@@ -17,6 +17,8 @@ open Mlw_expr
 
 (** WP-only builtins *)
 
+val lemma_label : Ident.label
+
 val ts_mark : Ty.tysymbol
 val ty_mark : Ty.ty
 
@@ -39,16 +41,11 @@ val full_invariant :
 
 (** Weakest preconditions *)
 
-val wp_val: Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
-val wp_let: Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
-val wp_rec: Env.env -> known_map -> theory_uc -> fun_defn list -> theory_uc
+val wp_val:
+  wp:bool -> Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
+val wp_let:
+  wp:bool -> Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
+val wp_rec:
+  wp:bool -> Env.env -> known_map -> theory_uc -> fun_defn list -> theory_uc
 
-
-(** Efficient weakest preconditions *)
-
-val fast_wp: Debug.flag
-
-val fast_wp_val: Env.env -> known_map -> theory_uc -> let_sym  -> theory_uc
-val fast_wp_let: Env.env -> known_map -> theory_uc -> let_defn -> theory_uc
-val fast_wp_rec: Env.env -> known_map -> theory_uc -> fun_defn list -> theory_uc
 
