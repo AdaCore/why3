@@ -1084,8 +1084,6 @@ pdecl:
     { Dlet (add_lab $3 $4, $2, $5) }
 | LET ghost lident_rich labels EQUAL fun_expr
     { Dlet (add_lab $3 $4, $2, $6) }
-| LET ghost lident_rich labels EQUAL qualid
-    { Dlet (add_lab $3 $4, $2, mk_expr_i 5 (Eident $6)) }
 | LET REC list1_rec_defn
     { Dletrec $3 }
 | VAL ghost lident_rich labels type_v
