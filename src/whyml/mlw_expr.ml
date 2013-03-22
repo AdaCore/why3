@@ -868,6 +868,7 @@ let create_fun_defn id ({l_expr = e; l_spec = c} as lam) recsyms =
   let eff = if c.c_letrec <> 0 && c.c_variant = []
     then eff_diverge e.e_effect else e.e_effect in
   let spec = { c with c_effect = eff } in
+  let lam = { lam with l_spec = spec } in
   let varm = spec_varmap e.e_varm spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
