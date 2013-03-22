@@ -47,7 +47,8 @@ run_dir () {
     echo '</ul>' >> $HTML
 }
 
-echo "=== Tests Provers ==="
+echo "=== Tests ==="
+run_dir tests
 run_dir tests-provers
 echo ""
 

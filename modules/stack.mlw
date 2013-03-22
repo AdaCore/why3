@@ -50,27 +50,3 @@ module Stack
     ensures { result = L.length s.elts }
 
 end
-
-module Test
-
-  use import int.Int
-  use import list.List
-  use import Stack
-
-  let test0 () =
-    let s = Stack.create () : Stack.t 'a in
-    assert { s.elts = Nil };
-    let b = Stack.is_empty s in
-    assert { b = True };
-    let n = Stack.length s in
-    assert { n = 0 }
-
-  let test1 () =
-    let s = Stack.create () in
-    Stack.push 1 s;
-    let x = Stack.top s in assert { x = 1 };
-    Stack.push 2 s;
-    let x = Stack.top s in assert { x = 2 };
-    ()
-
-end

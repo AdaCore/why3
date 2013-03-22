@@ -208,27 +208,3 @@ theory BV32
   clone export BitVector with constant size = size
 
 end
-
-theory TestBv32
-
-  use import BV32
-
-  lemma Test1:
-    let b = bw_and bvzero bvone in nth b 1 = False
-
-  lemma Test2:
-    let b = lsr bvone 16 in nth b 15 = True
-
-  lemma Test3:
-    let b = lsr bvone 16 in nth b 16 = False
-
-  lemma Test4:
-    let b = asr bvone 16 in nth b 15 = True
-
-  lemma Test5:
-    let b = asr bvone 16 in nth b 16 = True
-
-  lemma Test6:
-    let b = asr (lsr bvone 1) 16 in nth b 16 = False
-
-end

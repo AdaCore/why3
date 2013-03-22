@@ -1,0 +1,37 @@
+module TestArray
+
+  use import int.Int
+  use import array.Array
+
+  let test_append () =
+    let a1 = make 17 2 in
+    assert { a1[3] = 2 };
+    a1[3] <- 4;
+    assert { a1[3] = 4 };
+    let a2 = make 25 3 in
+    assert { a2[0] = 3 }; (* needed to prove a[17]=3 below *)
+    let a  = append a1 a2 in
+    assert { length a = 42 };
+    assert { a[3] = 4 };
+    assert { a[17] = 3 };
+    ()
+
+  let test_fill () =
+    let a = make 17 True in
+    fill a 10 4 False;
+    assert { a[9] = True };
+    assert { a[10] = False };
+    assert { a[14] = True }
+
+  let test_blit () =
+    let a1 = make 17 True in
+    let a2 = make 25 False in
+    blit a1 10 a2 17 7;
+    assert { a1[10] = True  };
+    assert { a2[16] = False };
+    assert { a2[17] = True  };
+    assert { a2[23] = True  };
+    assert { a2[24] = False }
+
+end
+

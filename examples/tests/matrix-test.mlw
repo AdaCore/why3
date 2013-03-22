@@ -1,0 +1,16 @@
+module TestMatrix
+
+  use import int.Int
+  use import matrix.Syntax
+
+  let test1 () =
+    let m1 = make 3 3 2 in
+    assert { m1[(0,0)] = 2 };
+    m1[(0,0)] <- 4;
+    assert { m1[(0,0)] = 4 };
+    assert { m1[(0,1)] = 2 };
+    assert { m1[(1,0)] = 2 };
+    ()
+
+end
+

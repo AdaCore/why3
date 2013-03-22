@@ -1,0 +1,13 @@
+module Test
+
+  use import random.Random
+
+  let test1 () =
+    init 42;
+    let x = random_int 10 in
+    init 42;
+    let y = random_int 10 in
+    assert { x = y }
+
+end
+
