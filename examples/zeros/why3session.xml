@@ -4,17 +4,13 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
-  name="Alt-Ergo"
-  version="0.95"/>
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="3"
   name="Z3"
   version="2.19"/>
  <file
@@ -32,7 +28,7 @@
     locfile="../zeros.mlw"
     loclnum="7" loccnumb="6" loccnume="15"
     expl="VC for set_zeros"
-    sum="6a5e97b82c05e8862af2b50f4bf882a7"
+    sum="7bb15f7a1222aba310eb57b44c57986a"
     proved="true"
     expanded="true"
     shape="ainfix =agetV2V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FAainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FAainfix =agetV6V7c0Iainfix &lt;V7ainfix +V5c1Aainfix &lt;=c0V7FIainfix =V6asetV2V5c0Aainfix &lt;=c0V0FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV2V8c0Iainfix &lt;V8V5Aainfix &lt;=c0V8FIainfix &lt;=V5ainfix -V0c1Aainfix &lt;=c0V5FFAainfix =agetV1V9c0Iainfix &lt;V9c0Aainfix &lt;=c0V9FIainfix &lt;=c0ainfix -V0c1Aainfix =agetV1V10c0Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0FF">
@@ -47,7 +43,7 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="1. postcondition"
-      sum="e1290d48c7d7d301ee167d38c19af27e"
+      sum="0bdf340e1c8aea2efa133d55d421332b"
       proved="true"
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2FIainfix &gt;c0ainfix -V0c1Iainfix &lt;=c0V0FF">
@@ -67,7 +63,7 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="2. loop invariant init"
-      sum="b471ac72838dcbb0494e2a1dbca83596"
+      sum="9d224094b000567c31b2e6ada82477d6"
       proved="true"
       expanded="true"
       shape="ainfix =agetV1V2c0Iainfix &lt;V2c0Aainfix &lt;=c0V2FIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
@@ -87,14 +83,14 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="3. type invariant"
-      sum="c239b66eda2be0e17cd4d72757cea9b0"
+      sum="4751a76d35ac4f3e5b93bd27fed5a9fb"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -107,7 +103,7 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="4. precondition"
-      sum="b050ee64f62ba8a94386b1f5ffd18b93"
+      sum="c1eb6136bd5bb5eec9299f498180aee9"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
@@ -127,14 +123,14 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="5. loop invariant preservation"
-      sum="dcd9ab0648f9d6807407f3d9df552e9b"
+      sum="8cc30c483dc0fda5362aae8e17d326e7"
       proved="true"
       expanded="true"
       shape="ainfix =agetV4V5c0Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FIainfix =V4asetV2V3c0Aainfix &lt;=c0V0FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =agetV2V6c0Iainfix &lt;V6V3Aainfix &lt;=c0V6FIainfix &lt;=V3ainfix -V0c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -142,7 +138,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -155,14 +151,14 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="6. type invariant"
-      sum="2b8e252bb55066d7d8f0843c27e51299"
+      sum="90f9782f51c19d6fa145a9572c148c0f"
       proved="true"
       expanded="false"
       shape="ainfix &lt;=c0V0Iainfix =agetV2V3c0Iainfix &lt;V3ainfix +ainfix -V0c1c1Aainfix &lt;=c0V3FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -175,7 +171,7 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="7. postcondition"
-      sum="21bcee2cfc7870c4aa904617833dcd72"
+      sum="22fb2ce4597f8e2881bb424e4891d048"
       proved="true"
       expanded="true"
       shape="ainfix =agetV2V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Iainfix =agetV2V4c0Iainfix &lt;V4ainfix +ainfix -V0c1c1Aainfix &lt;=c0V4FFIainfix &lt;=c0ainfix -V0c1Iainfix &lt;=c0V0FF">
@@ -197,7 +193,7 @@
     locfile="../zeros.mlw"
     loclnum="14" loccnumb="6" loccnume="13"
     expl="VC for harness"
-    sum="71f826763730347fee4d3e1dde1f74e0"
+    sum="fe64b5062368855ad30273124578b762"
     proved="true"
     expanded="true"
     shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Aainfix &gt;=c42c0">
@@ -212,7 +208,7 @@
       locfile="../zeros.mlw"
       loclnum="14" loccnumb="6" loccnume="13"
       expl="1. precondition"
-      sum="408127fb72d7d173f8dcb324640887c3"
+      sum="12a5f39f1b0fda85a0027703fc9b5525"
       proved="true"
       expanded="true"
       shape="ainfix &gt;=c42c0">
@@ -232,7 +228,7 @@
       locfile="../zeros.mlw"
       loclnum="14" loccnumb="6" loccnume="13"
       expl="2. assertion"
-      sum="35282b341674a947c8641167a8c32ecf"
+      sum="9b10c89600170a5507f86a1d80b35298"
       proved="true"
       expanded="true"
       shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
@@ -252,7 +248,7 @@
       locfile="../zeros.mlw"
       loclnum="14" loccnumb="6" loccnume="13"
       expl="3. assertion"
-      sum="520ce2311a737cfce54579a5d19fba59"
+      sum="b38fe0b5f5828501c8dc89547228a1c4"
       proved="true"
       expanded="true"
       shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">

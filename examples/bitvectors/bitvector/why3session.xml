@@ -4,19 +4,19 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
-  name="Alt-Ergo"
-  version="0.95"/>
- <prover
-  id="2"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="3"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.0"/>
  <prover
   id="4"
   name="Coq"
@@ -29,6 +29,10 @@
   id="6"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../bitvector.why"
   verified="false"
@@ -43,9 +47,9 @@
     name="Nth_bw_xor_v1true"
     locfile="../bitvector.why"
     loclnum="46" loccnumb="8" loccnume="25"
-    sum="8ab21ecf98d452f541b8eb7d5124b37e"
+    sum="53e58804e10b8d4df248321a9d6c4661"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthabw_xorV0V1V2anotbanthV1V2Iainfix =anthV0V2aTrueAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
      prover="0"
@@ -56,7 +60,7 @@
      <result status="valid" time="0.43"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -64,7 +68,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -76,12 +80,12 @@
     name="Nth_bw_xor_v1false"
     locfile="../bitvector.why"
     loclnum="50" loccnumb="8" loccnume="26"
-    sum="9d3506cc5d507b27ef36c21e64c6f394"
+    sum="bf394e000fa96cdd4c2837f964d0a1d4"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthabw_xorV0V1V2anthV1V2Iainfix =anthV0V2aFalseAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -89,7 +93,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -101,9 +105,9 @@
     name="Nth_bw_xor_v2true"
     locfile="../bitvector.why"
     loclnum="54" loccnumb="8" loccnume="25"
-    sum="a1c444f056510ff60acc685ce74fde7e"
+    sum="a808dd1d431a058733708cf59599d4b1"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthabw_xorV0V1V2anotbanthV0V2Iainfix =anthV1V2aTrueAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
      prover="0"
@@ -114,7 +118,7 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -122,7 +126,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -134,9 +138,9 @@
     name="Nth_bw_xor_v2false"
     locfile="../bitvector.why"
     loclnum="58" loccnumb="8" loccnume="26"
-    sum="bc8a7c4bde80c78261e3eff1c91e2d53"
+    sum="1220edc74a31c7f4e0eb997e8f04c2e3"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthabw_xorV0V1V2anthV0V2Iainfix =anthV1V2aFalseAainfix &lt;V2asizeAainfix &lt;=c0V2F">
     <proof
      prover="0"
@@ -147,7 +151,7 @@
      <result status="valid" time="0.43"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -155,7 +159,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -167,9 +171,9 @@
     name="to_nat_of_zero2"
     locfile="../bitvector.why"
     loclnum="194" loccnumb="8" loccnume="23"
-    sum="f9ed7782c61d349a69282b399dc5a228"
+    sum="d156e2f5636b8a71a20c8c806a304b4c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_nat_subV0V2c0ato_nat_subV0V1c0Iainfix =anthV0V3aFalseIainfix &gt;V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;=V2V1Aainfix &gt;asizeV2F">
     <proof
      prover="4"
@@ -185,27 +189,27 @@
     name="to_nat_of_zero"
     locfile="../bitvector.why"
     loclnum="200" loccnumb="8" loccnume="22"
-    sum="b9471b6011def335b16c605f8147f11b"
+    sum="23b2730352f45a6f7a4d2778e0ca84da"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_nat_subV0V2V1c0Iainfix =anthV0V3aFalseIainfix &gt;=V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;asizeV2F">
     <proof
      prover="4"
-     timelimit="5"
+     timelimit="30"
      memlimit="1000"
      edited="bitvector_BitVector_to_nat_of_zero_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.59"/>
+     <result status="valid" time="1.65"/>
     </proof>
    </goal>
    <goal
     name="to_nat_of_one"
     locfile="../bitvector.why"
     loclnum="205" loccnumb="8" loccnume="21"
-    sum="8e2f700b9033bfa63444ee9755e06202"
+    sum="9373f8a04229d414ec7ff8f228aed4dc"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_nat_subV0V2V1ainfix -apow2ainfix +ainfix -V2V1c1c1Iainfix =anthV0V3aTrueIainfix &gt;=V3V1Aainfix &gt;=V2V3FIainfix &gt;=V1c0Aainfix &gt;=V2V1Aainfix &gt;asizeV2F">
     <proof
      prover="4"
@@ -221,9 +225,9 @@
     name="to_nat_sub_footprint"
     locfile="../bitvector.why"
     loclnum="210" loccnumb="8" loccnume="28"
-    sum="f7ad8a1b804f5129eb5f1963f56b8e14"
+    sum="435e3e4ecf3485b43e8860f32618bf83"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_nat_subV0V2V3ato_nat_subV1V2V3Iainfix =anthV0V4anthV1V4Iainfix &lt;=V4V2Aainfix &lt;=V3V4FIainfix &gt;=V3c0Aainfix &gt;asizeV2F">
     <proof
      prover="4"
@@ -232,16 +236,16 @@
      edited="bitvector_BitVector_to_nat_sub_footprint_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.98"/>
+     <result status="valid" time="8.33"/>
     </proof>
    </goal>
    <goal
     name="nth_from_int_low_even"
     locfile="../bitvector.why"
     loclnum="297" loccnumb="8" loccnume="29"
-    sum="87e232d48297d2cad90e7c7f4ce774a9"
+    sum="c99872abd1693de3e791315637958028"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthafrom_intV0c0aFalseIainfix =amodV0c2c0F">
     <proof
      prover="0"
@@ -252,7 +256,7 @@
      <result status="valid" time="1.48"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -260,7 +264,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -272,9 +276,9 @@
     name="nth_from_int_low_odd"
     locfile="../bitvector.why"
     loclnum="300" loccnumb="8" loccnume="28"
-    sum="ca17f2b1f131e93c5e2bfe678f0a8a84"
+    sum="5ba069364e621f358bd4b1ae2f8a85e8"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthafrom_intV0c0aTrueIainfix =amodV0c2c0NF">
     <proof
      prover="0"
@@ -285,7 +289,7 @@
      <result status="valid" time="1.38"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -293,7 +297,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -305,9 +309,9 @@
     name="nth_from_int_0"
     locfile="../bitvector.why"
     loclnum="303" loccnumb="8" loccnume="22"
-    sum="e6c43852eba46f88d3880bac4d50fc76"
+    sum="4f4ca051d0110e81f9581393f17470dd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthafrom_intc0V0aFalseIainfix &gt;=V0c0Aainfix &gt;asizeV0F">
     <proof
      prover="0"
@@ -318,7 +322,7 @@
      <result status="valid" time="0.90"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -326,7 +330,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -338,9 +342,9 @@
     name="nth_from_int2c_low_even"
     locfile="../bitvector.why"
     loclnum="339" loccnumb="8" loccnume="31"
-    sum="b79d2cc77be2fe002c6d949b7e7f787d"
+    sum="b866ee56f1658f2d98541f4b1bc1c1a3"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthafrom_int2cV0c0aFalseIainfix =amodV0c2c0F">
     <proof
      prover="0"
@@ -351,7 +355,7 @@
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -359,7 +363,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -371,9 +375,9 @@
     name="nth_from_int2c_low_odd"
     locfile="../bitvector.why"
     loclnum="342" loccnumb="8" loccnume="30"
-    sum="a0b8dc60aa4a1c336b44f5b3ccc69fd5"
+    sum="8b19ddd5f199b706f7b68ffb45e0842b"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthafrom_int2cV0c0aTrueIainfix =amodV0c2c0NF">
     <proof
      prover="0"
@@ -384,7 +388,7 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -392,7 +396,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -404,9 +408,9 @@
     name="nth_from_int2c_0"
     locfile="../bitvector.why"
     loclnum="345" loccnumb="8" loccnume="24"
-    sum="0887eceb37b90aca1a7edac7df5dc322"
+    sum="a137c88797c200ebb9bf5512c4718b85"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthafrom_int2cc0V0aFalseIainfix &gt;=V0c0Aainfix &gt;asizeV0F">
     <proof
      prover="0"
@@ -417,7 +421,7 @@
      <result status="valid" time="1.16"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -425,7 +429,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -437,25 +441,17 @@
     name="nth_from_int2c_plus_pow2"
     locfile="../bitvector.why"
     loclnum="348" loccnumb="8" loccnume="32"
-    sum="d460c4b464e10e371a2ab0a4ff65c453"
+    sum="3319b0a7a2361dd5f87324a9ed2fe9eb"
     proved="true"
     expanded="true"
     shape="ainfix =anthafrom_int2cainfix +V0apow2V2V1anthafrom_int2cV0V1Iainfix &lt;V1ainfix -asizec1Aainfix &lt;V1V2Aainfix &lt;=c0V1F">
     <proof
      prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="1"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.72"/>
     </proof>
     <proof
      prover="4"
@@ -499,20 +495,20 @@
     name="Test1"
     locfile="../bitvector.why"
     loclnum="395" loccnumb="7" loccnume="12"
-    sum="08352735564f05358aec393e1b058f5d"
+    sum="8ca982f7c97235b837f631800ad9a153"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthV0c1aFalseLabw_andabvzeroabvone">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.12"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -520,7 +516,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -528,6 +524,14 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="3"
      memlimit="1000"
@@ -535,25 +539,33 @@
      archived="false">
      <result status="valid" time="0.51"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.58"/>
+    </proof>
    </goal>
    <goal
     name="Test2"
     locfile="../bitvector.why"
     loclnum="398" loccnumb="7" loccnume="12"
-    sum="90968a21079e1076b84ac6f2784bd6a6"
+    sum="e18d87a84b50a7b5279db22c6e858e28"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthV0c15aTrueLalsrabvonec16">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -561,7 +573,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -569,6 +581,14 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="3"
      memlimit="1000"
@@ -576,15 +596,31 @@
      archived="false">
      <result status="valid" time="0.51"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.58"/>
+    </proof>
    </goal>
    <goal
     name="Test3"
     locfile="../bitvector.why"
     loclnum="401" loccnumb="7" loccnume="12"
-    sum="4bd40a55b6ab49d9b48dc84f7994810f"
+    sum="f10855670856a1e73df89f129e74e669"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthV0c16aFalseLalsrabvonec16">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
@@ -603,11 +639,11 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="5"
@@ -625,15 +661,31 @@
      archived="false">
      <result status="valid" time="0.11"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.12"/>
+    </proof>
    </goal>
    <goal
     name="Test4"
     locfile="../bitvector.why"
     loclnum="404" loccnumb="7" loccnume="12"
-    sum="936429e58ed3922b00fbf8f0f9188f74"
+    sum="b3caefd0eea7e78a7462987f35dbf86c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthV0c15aTrueLaasrabvonec16">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
@@ -648,15 +700,15 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.07"/>
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.07"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
      prover="5"
@@ -666,25 +718,33 @@
      archived="false">
      <result status="valid" time="0.50"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.62"/>
+    </proof>
    </goal>
    <goal
     name="Test5"
     locfile="../bitvector.why"
     loclnum="407" loccnumb="7" loccnume="12"
-    sum="eb4f169f0188e4d1932cb6bce2605a46"
+    sum="772e20486de33a2bf0dc0337d0de452a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthV0c16aTrueLaasrabvonec16">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -692,12 +752,20 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="5"
@@ -707,25 +775,33 @@
      archived="false">
      <result status="valid" time="0.49"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.62"/>
+    </proof>
    </goal>
    <goal
     name="Test6"
     locfile="../bitvector.why"
     loclnum="410" loccnumb="7" loccnume="12"
-    sum="af6b6491190a9c0d51bc40ccedf405fd"
+    sum="649861c98f72e9078c093b63dda31a33"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =anthV0c16aFalseLaasralsrabvonec1c16">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -733,12 +809,20 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
     </proof>
     <proof
      prover="5"
@@ -756,25 +840,33 @@
      archived="false">
      <result status="valid" time="2.94"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.61"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00000000"
     locfile="../bitvector.why"
     loclnum="413" loccnumb="7" loccnume="24"
-    sum="c0f14ea5b73e96d646b592ae8df1795a"
+    sum="813ca80133bac21f134cb86893ac651a"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natabvzeroc0">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -782,12 +874,20 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.12"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
      prover="5"
@@ -797,25 +897,33 @@
      archived="false">
      <result status="valid" time="0.53"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.65"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00000001"
     locfile="../bitvector.why"
     loclnum="416" loccnumb="7" loccnume="24"
-    sum="b1b4b0b05bad9c5c11e92b8e89413dd6"
+    sum="cdc3bb44ec1e914c580895738d933209"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec31c1">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.97"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -823,12 +931,20 @@
      <result status="timeout" time="3.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.21"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
     </proof>
     <proof
      prover="5"
@@ -846,25 +962,33 @@
      archived="false">
      <result status="timeout" time="3.11"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00000003"
     locfile="../bitvector.why"
     loclnum="419" loccnumb="7" loccnume="24"
-    sum="6b724ade148738cd114251092d56c0ae"
+    sum="a6d3eb1bae7148aa14c8b56a4e26e4e9"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec30c3">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.95"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -872,12 +996,20 @@
      <result status="timeout" time="3.25"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.06"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.06"/>
     </proof>
     <proof
      prover="5"
@@ -895,25 +1027,33 @@
      archived="false">
      <result status="timeout" time="3.06"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00000007"
     locfile="../bitvector.why"
     loclnum="422" loccnumb="7" loccnume="24"
-    sum="ecde58e66d8b3837f085a7774f0bc2d7"
+    sum="72c8e928d145d6c0c07c07129f023b82"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec29c7">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.97"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -921,12 +1061,20 @@
      <result status="timeout" time="3.08"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.38"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.01"/>
     </proof>
     <proof
      prover="5"
@@ -944,22 +1092,38 @@
      archived="false">
      <result status="timeout" time="3.28"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0000000F"
     locfile="../bitvector.why"
     loclnum="425" loccnumb="7" loccnume="24"
-    sum="95cc87fc8b8b85165be0cc78b6db971b"
+    sum="886162ab4143bd7ac4cb929f355d92f3"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec28c15">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.98"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="3.03"/>
     </proof>
     <proof
      prover="2"
@@ -971,11 +1135,11 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.03"/>
+     <result status="timeout" time="5.11"/>
     </proof>
     <proof
      prover="5"
@@ -993,25 +1157,33 @@
      archived="false">
      <result status="timeout" time="3.03"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0000001F"
     locfile="../bitvector.why"
     loclnum="428" loccnumb="7" loccnume="24"
-    sum="103b916218ce4056e339d8f872c9dd90"
+    sum="4136d135fa07d66748625c97b1bdef6f"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec27c31">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.93"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1019,12 +1191,20 @@
      <result status="timeout" time="3.04"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.24"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.01"/>
     </proof>
     <proof
      prover="5"
@@ -1042,25 +1222,33 @@
      archived="false">
      <result status="timeout" time="3.14"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0000003F"
     locfile="../bitvector.why"
     loclnum="431" loccnumb="7" loccnume="24"
-    sum="b9af458e9a0a50d9f07bcdd5f761cdc4"
+    sum="a0f6c93ee8ebafe11642fb70f9b82727"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec26c63">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1068,7 +1256,7 @@
      <result status="timeout" time="3.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1076,6 +1264,14 @@
      <result status="timeout" time="3.11"/>
     </proof>
     <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.13"/>
+    </proof>
+    <proof
      prover="5"
      timelimit="3"
      memlimit="1000"
@@ -1090,26 +1286,34 @@
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
     </proof>
    </goal>
    <goal
     name="to_nat_0x0000007F"
     locfile="../bitvector.why"
     loclnum="434" loccnumb="7" loccnume="24"
-    sum="733893ee02f3bd77bf94e91e8f025072"
+    sum="8b2c3f3c67538b642005612c5c7eefc0"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec25c127">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.94"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1117,12 +1321,20 @@
      <result status="timeout" time="3.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.05"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
     </proof>
     <proof
      prover="5"
@@ -1140,25 +1352,33 @@
      archived="false">
      <result status="timeout" time="3.05"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.24"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x000000FF"
     locfile="../bitvector.why"
     loclnum="437" loccnumb="7" loccnume="24"
-    sum="89bc6f4f39fbf8377735174a588001df"
+    sum="b317bff19fcb71bafd2377495e16a27e"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec24c255">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1166,12 +1386,20 @@
      <result status="timeout" time="3.05"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.16"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
     </proof>
     <proof
      prover="5"
@@ -1189,25 +1417,33 @@
      archived="false">
      <result status="timeout" time="3.06"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.13"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x000001FF"
     locfile="../bitvector.why"
     loclnum="440" loccnumb="7" loccnume="24"
-    sum="b13ac4a15d95962fdadacab481913d98"
+    sum="654c217e015a98496e444214757644b3"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec23c511">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1215,12 +1451,20 @@
      <result status="timeout" time="3.34"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.39"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
     </proof>
     <proof
      prover="5"
@@ -1238,25 +1482,33 @@
      archived="false">
      <result status="timeout" time="3.29"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x000003FF"
     locfile="../bitvector.why"
     loclnum="443" loccnumb="7" loccnume="24"
-    sum="5b85cdd55d849cdce83901353d896c31"
+    sum="1f69b4f8c9ff9713e5b1e62b856d28bc"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec22c1023">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1264,12 +1516,20 @@
      <result status="timeout" time="3.30"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.08"/>
     </proof>
     <proof
      prover="5"
@@ -1287,25 +1547,33 @@
      archived="false">
      <result status="timeout" time="3.41"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.10"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x000007FF"
     locfile="../bitvector.why"
     loclnum="446" loccnumb="7" loccnume="24"
-    sum="c8d4de9f419c31e205cc17928fad0699"
+    sum="3e6e57e66f5027d58edd46434e12b619"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec21c2047">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.96"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1313,12 +1581,20 @@
      <result status="timeout" time="3.20"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.10"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.07"/>
     </proof>
     <proof
      prover="5"
@@ -1336,25 +1612,33 @@
      archived="false">
      <result status="timeout" time="3.10"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.06"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00000FFF"
     locfile="../bitvector.why"
     loclnum="449" loccnumb="7" loccnume="24"
-    sum="c11e7b90a986b405eb2df840a8e0c837"
+    sum="7751ea31eeccc72d2aeb067f42187462"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec20c4095">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1362,12 +1646,20 @@
      <result status="timeout" time="3.19"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.09"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.08"/>
     </proof>
     <proof
      prover="5"
@@ -1385,22 +1677,38 @@
      archived="false">
      <result status="timeout" time="3.09"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.06"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00001FFF"
     locfile="../bitvector.why"
     loclnum="452" loccnumb="7" loccnume="24"
-    sum="9c09629c7ca0e9e6ca67d4c34f6d9776"
+    sum="e86b844191805b830fea544aade9828e"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec19c8191">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.97"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="3.07"/>
     </proof>
     <proof
      prover="2"
@@ -1412,11 +1720,11 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.07"/>
+     <result status="timeout" time="5.08"/>
     </proof>
     <proof
      prover="5"
@@ -1434,25 +1742,33 @@
      archived="false">
      <result status="timeout" time="3.07"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.06"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00003FFF"
     locfile="../bitvector.why"
     loclnum="455" loccnumb="7" loccnume="24"
-    sum="1946a5599f0693583ef0bd21bd2fe318"
+    sum="21ac49f1394df6e576a49a75ab496171"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec18c16383">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="4.92"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1460,12 +1776,20 @@
      <result status="timeout" time="3.35"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.25"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.08"/>
     </proof>
     <proof
      prover="5"
@@ -1483,22 +1807,38 @@
      archived="false">
      <result status="timeout" time="3.35"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.15"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00007FFF"
     locfile="../bitvector.why"
     loclnum="458" loccnumb="7" loccnume="24"
-    sum="3548f9080996eedb202c81372178f775"
+    sum="a9c264fde6074e3aac4bc133cc983eed"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec17c32767">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.94"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="3.10"/>
     </proof>
     <proof
      prover="2"
@@ -1510,11 +1850,11 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.10"/>
+     <result status="timeout" time="5.06"/>
     </proof>
     <proof
      prover="5"
@@ -1532,22 +1872,38 @@
      archived="false">
      <result status="timeout" time="3.01"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.06"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0000FFFF"
     locfile="../bitvector.why"
     loclnum="461" loccnumb="7" loccnume="24"
-    sum="51dde141331c21e9b98402b741860df7"
+    sum="49cd8e54312fbb4fdd3cc0f13067ecea"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec16c65535">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.97"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="3.03"/>
     </proof>
     <proof
      prover="2"
@@ -1559,11 +1915,11 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.03"/>
+     <result status="timeout" time="5.06"/>
     </proof>
     <proof
      prover="5"
@@ -1581,22 +1937,38 @@
      archived="false">
      <result status="timeout" time="3.13"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.10"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0001FFFF"
     locfile="../bitvector.why"
     loclnum="469" loccnumb="7" loccnume="24"
-    sum="888e978ef3222d82411ed9e538c4027c"
+    sum="401859db95e35534426f0eb17899f1ae"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec15c131071">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.98"/>
+    </proof>
     <proof
      prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="3.01"/>
     </proof>
     <proof
      prover="2"
@@ -1608,11 +1980,11 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="3.01"/>
+     <result status="timeout" time="5.03"/>
     </proof>
     <proof
      prover="5"
@@ -1630,25 +2002,33 @@
      archived="false">
      <result status="timeout" time="3.10"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0003FFFF"
     locfile="../bitvector.why"
     loclnum="472" loccnumb="7" loccnume="24"
-    sum="72fba2191f650294f3d9d2b3278e464e"
+    sum="c294e42a103537210fd5976ef5f60561"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec14c262143">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.95"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1656,12 +2036,20 @@
      <result status="timeout" time="3.11"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.42"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
     </proof>
     <proof
      prover="5"
@@ -1679,25 +2067,33 @@
      archived="false">
      <result status="timeout" time="3.43"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.04"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x0007FFFF"
     locfile="../bitvector.why"
     loclnum="475" loccnumb="7" loccnume="24"
-    sum="f856ef7aedcb4f7fa60dc23fb80e4072"
+    sum="fb82548bc422cff14683cc4337c5dc36"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec13c524287">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1705,12 +2101,20 @@
      <result status="timeout" time="3.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.06"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
     </proof>
     <proof
      prover="5"
@@ -1728,25 +2132,33 @@
      archived="false">
      <result status="timeout" time="3.09"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.05"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x000FFFFF"
     locfile="../bitvector.why"
     loclnum="478" loccnumb="7" loccnume="24"
-    sum="cfc1c408c26fcce4bb83943ca446d12f"
+    sum="e3796a78df20a9ddc4a687469e35643a"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec12c1048575">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.99"/>
+     <result status="timeout" time="4.92"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1754,12 +2166,20 @@
      <result status="timeout" time="3.10"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.20"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.13"/>
     </proof>
     <proof
      prover="5"
@@ -1777,25 +2197,33 @@
      archived="false">
      <result status="timeout" time="3.28"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.12"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0x00FFFFFF"
     locfile="../bitvector.why"
     loclnum="481" loccnumb="7" loccnume="24"
-    sum="cb04b0b1d7d5984c6e71358e9ba56b93"
+    sum="07bff5ca4be98d94c771f1202a8318a2"
     proved="false"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natalsrabvonec8c16777215">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="2.98"/>
+     <result status="timeout" time="4.97"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1803,12 +2231,20 @@
      <result status="timeout" time="3.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="timeout" time="3.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.03"/>
     </proof>
     <proof
      prover="5"
@@ -1826,25 +2262,33 @@
      archived="false">
      <result status="timeout" time="3.12"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.12"/>
+    </proof>
    </goal>
    <goal
     name="to_nat_0xFFFFFFFF"
     locfile="../bitvector.why"
     loclnum="484" loccnumb="7" loccnume="24"
-    sum="a740b4e8b9ade895e4dc66e4453c5497"
+    sum="957cdbd21001b18cf822e57088b1da1f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =ato_natabvonec4294967295">
     <proof
-     prover="1"
-     timelimit="3"
+     prover="0"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1852,12 +2296,28 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.12"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.10"/>
     </proof>
    </goal>
   </theory>

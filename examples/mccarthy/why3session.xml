@@ -4,17 +4,13 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
   name="CVC3"
-  version="2.2"/>
+  version="2.4.1"/>
  <prover
   id="2"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
-  id="3"
   name="Z3"
   version="2.19"/>
  <file
@@ -32,7 +28,7 @@
     locfile="../mccarthy.mlw"
     loclnum="10" loccnumb="10" loccnume="13"
     expl="VC for f91"
-    sum="c4a293648c252efdc72f62e6b2fc78ef"
+    sum="6c019ca2657aef6854bcd25744e5a8d8"
     proved="true"
     expanded="true"
     shape="iainfix &lt;=V0c100ainfix =iainfix &lt;=V1c100c91ainfix -V1c10iainfix &lt;=V0c100c91ainfix -V0c10Aainfix &lt;ainfix -c101V1ainfix -c101V0Aainfix &lt;=c0ainfix -c101V0Liainfix &lt;=ainfix +V0c11c100c91ainfix -ainfix +V0c11c10Aainfix &lt;ainfix -c101ainfix +V0c11ainfix -c101V0Aainfix &lt;=c0ainfix -c101V0ainfix =ainfix -V0c10iainfix &lt;=V0c100c91ainfix -V0c10F">
@@ -60,14 +56,6 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
@@ -76,7 +64,7 @@
     locfile="../mccarthy.mlw"
     loclnum="27" loccnumb="6" loccnume="16"
     expl="VC for f91_nonrec"
-    sum="7e922eb20d8f875ce109f8979d5686bc"
+    sum="b5aba314736c3d91fa0f2285aef46ebb"
     proved="true"
     expanded="true"
     shape="iainfix &gt;V2c0iainfix &gt;V1c100ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =ainfix +ainfix -c101V1ainfix *c10V2ainfix +ainfix -c101V3ainfix *c10V4Oainfix &lt;ainfix +ainfix -c101V3ainfix *c10V4ainfix +ainfix -c101V1ainfix *c10V2Aainfix &lt;=c0ainfix +ainfix -c101V1ainfix *c10V2Aainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10Fainfix &lt;V6V2Aainfix &lt;=c0V2Aainfix =ainfix +ainfix -c101V1ainfix *c10V2ainfix +ainfix -c101V5ainfix *c10V6Oainfix &lt;ainfix +ainfix -c101V5ainfix *c10V6ainfix +ainfix -c101V1ainfix *c10V2Aainfix &lt;=c0ainfix +ainfix -c101V1ainfix *c10V2Aainfix =aiterV6V5afV0Aainfix &gt;=V6c0Iainfix =V6ainfix +V2c1FIainfix =V5ainfix +V1c11Fainfix =V1afV0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FAainfix =aiterc1V0afV0Aainfix &gt;=c1c0F">
@@ -91,7 +79,7 @@
       locfile="../mccarthy.mlw"
       loclnum="27" loccnumb="6" loccnume="16"
       expl="1. loop invariant init"
-      sum="1d55b880de4875767030345c6b627067"
+      sum="b5e5a69133dbc5d621c1d934e6b1cbce"
       proved="true"
       expanded="true"
       shape="ainfix =aiterc1V0afV0Aainfix &gt;=c1c0F">
@@ -114,7 +102,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -127,7 +115,7 @@
       locfile="../mccarthy.mlw"
       loclnum="27" loccnumb="6" loccnume="16"
       expl="2. loop invariant preservation"
-      sum="52b55cbf3c0d79abdf5dc4d8179ad739"
+      sum="efd4b45b43afcbf26ba636c3038dec44"
       proved="true"
       expanded="true"
       shape="ainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix &gt;V1c100Iainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FF">
@@ -150,7 +138,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -163,7 +151,7 @@
       locfile="../mccarthy.mlw"
       loclnum="27" loccnumb="6" loccnume="16"
       expl="3. loop variant decrease"
-      sum="588faf31c57856c7f4fef3cd8e52948d"
+      sum="578c1fbf5b6bf4eae65a0508e1c9f82d"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =ainfix +ainfix -c101V1ainfix *c10V2ainfix +ainfix -c101V3ainfix *c10V4Oainfix &lt;ainfix +ainfix -c101V3ainfix *c10V4ainfix +ainfix -c101V1ainfix *c10V2Aainfix &lt;=c0ainfix +ainfix -c101V1ainfix *c10V2Iainfix =V4ainfix -V2c1FIainfix =V3ainfix -V1c10FIainfix &gt;V1c100Iainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FF">
@@ -186,7 +174,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -199,7 +187,7 @@
       locfile="../mccarthy.mlw"
       loclnum="27" loccnumb="6" loccnume="16"
       expl="4. loop invariant preservation"
-      sum="51e5c547d5600aa7abfd46fa95f50dc7"
+      sum="0731d40d1ac4b548210bb087a7cf0efa"
       proved="true"
       expanded="true"
       shape="ainfix =aiterV4V3afV0Aainfix &gt;=V4c0Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix &gt;V1c100NIainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FF">
@@ -222,7 +210,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -235,7 +223,7 @@
       locfile="../mccarthy.mlw"
       loclnum="27" loccnumb="6" loccnume="16"
       expl="5. loop variant decrease"
-      sum="cab65419e8b061ae2f667035b24c1b8c"
+      sum="35ef1464bc46f04f17aab7230a0814c6"
       proved="true"
       expanded="true"
       shape="ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =ainfix +ainfix -c101V1ainfix *c10V2ainfix +ainfix -c101V3ainfix *c10V4Oainfix &lt;ainfix +ainfix -c101V3ainfix *c10V4ainfix +ainfix -c101V1ainfix *c10V2Aainfix &lt;=c0ainfix +ainfix -c101V1ainfix *c10V2Iainfix =V4ainfix +V2c1FIainfix =V3ainfix +V1c11FIainfix &gt;V1c100NIainfix &gt;V2c0Iainfix =aiterV2V1afV0Aainfix &gt;=V2c0FF">
@@ -258,7 +246,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -271,7 +259,7 @@
       locfile="../mccarthy.mlw"
       loclnum="27" loccnumb="6" loccnume="16"
       expl="6. postcondition"
-      sum="38354dcf70a1b03a12b23a2e5541ee21"
+      sum="9c4e49631c7c3894c308729b1702afa8"
       proved="true"
       expanded="true"
       shape="ainfix =V1afV0Iainfix &gt;V2c0NIainfix =aiterV2V1afV0Aainfix &gt;=V2c0FF">
@@ -294,7 +282,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"

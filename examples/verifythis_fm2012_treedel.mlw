@@ -99,14 +99,16 @@ module Treedel
      forall z "induction": zipper 'a, x: 'a, l r: tree 'a.
      inorder (zip (Node l x r) z) = inorder l ++ Cons x (inorder (zip r z))
 
-  let ghost left (t: tree loc) =
+  let ghost left (t: tree loc) : tree loc
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node l _ _ -> result = l end }
+  =
      match t with Empty -> absurd | Node l _ _ -> l end
 
-  let ghost right (t: tree loc) =
+  let ghost right (t: tree loc) : tree loc
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node _ _ r -> result = r end }
+  =
      match t with Empty -> absurd | Node _ _ r -> r end
 
   lemma main_lemma:

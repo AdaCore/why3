@@ -383,13 +383,6 @@ let add_invariant uc its p =
 
 (* create module *)
 
-let th_unit =
-  let ts = create_tysymbol (id_fresh "unit") [] (Some ty_unit) in
-  let uc = create_theory ~path:["why3"] (id_fresh "Unit") in
-  let uc = Theory.use_export uc (tuple_theory 0) in
-  let uc = Theory.add_ty_decl uc ts in
-  close_theory uc
-
 let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
 
 let mod_prelude env =
@@ -411,8 +404,9 @@ let mod_prelude =
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
+  let m = use_export_theory m builtin_theory in
   let m = use_export_theory m bool_theory in
-  let m = use_export_theory m th_unit in
+  let m = use_export_theory m unit_theory in
   let m = use_export m (mod_prelude env) in
   m
 

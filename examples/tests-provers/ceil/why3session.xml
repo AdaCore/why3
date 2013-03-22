@@ -8,7 +8,7 @@
  <prover
   id="1"
   name="Alt-Ergo"
-  version="0.95"/>
+  version="0.95.1"/>
  <prover
   id="2"
   name="CVC3"
@@ -28,7 +28,7 @@
  <prover
   id="6"
   name="Z3"
-  version="4.2"/>
+  version="4.3.1"/>
  <file
   name="../ceil.why"
   verified="true"
@@ -43,9 +43,9 @@
     name="ceil_obvious"
     locfile="../ceil.why"
     loclnum="6" loccnumb="7" loccnume="19"
-    sum="49526ea2821e8c5d8d98d3fda2ed3620"
+    sum="5d7ae03e2fb978f5e79098bfb99e273c"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aceilc0.1c1">
     <proof
      prover="0"
@@ -92,9 +92,9 @@
     name="unity"
     locfile="../ceil.why"
     loclnum="8" loccnumb="8" loccnume="13"
-    sum="83e246df0203d223db3aefeea911e5ca"
+    sum="6f2fce0e29d025cc79acdb185a78d9c5"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =V0ainfix *.c1.0V0Iainfix &gt;V0c0.0F">
     <proof
      prover="0"
@@ -157,9 +157,9 @@
     name="unity2"
     locfile="../ceil.why"
     loclnum="11" loccnumb="8" loccnume="14"
-    sum="6a645e9e1ee717bd4df95a3318083c3c"
+    sum="e6bddb58678504412cdcfd44757235c7"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =ainfix /.V0V0ainfix /.ainfix *.c1.0V0V0Iainfix &gt;V0c0.0F">
     <proof
      prover="0"
@@ -222,7 +222,7 @@
     name="perm_div"
     locfile="../ceil.why"
     loclnum="14" loccnumb="8" loccnume="16"
-    sum="d949fb1798189bda1fbf7cd1e62e06ac"
+    sum="4d10f347051b58c44c4daf24f04225b0"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix /.ainfix *.V0V1V1ainfix *.V0ainfix /.V1V1Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
@@ -272,14 +272,14 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="timeout" time="5.07"/>
     </proof>
    </goal>
    <goal
     name="perm_div2"
     locfile="../ceil.why"
     loclnum="17" loccnumb="8" loccnume="17"
-    sum="872f7e516c036f14e8c5f228a5a093b0"
+    sum="409dd5c47f454e96af2ea7e3603a99c1"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix /.ainfix *.V0V1V1ainfix *.ainfix /.V0V1V1Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
@@ -312,9 +312,9 @@
     name="div_mult_perm"
     locfile="../ceil.why"
     loclnum="20" loccnumb="8" loccnume="21"
-    sum="64d37d10f94221cdda1c2603e670e505"
+    sum="63ee1b0ed7b2de597073e32ac31bc2f0"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =ainfix *.ainfix /.c1.0V0V0ainfix /.ainfix *.c1.0V0V0Iainfix &gt;V0c0.0F">
     <proof
      prover="0"
@@ -361,9 +361,9 @@
     name="b_div_b_is_one"
     locfile="../ceil.why"
     loclnum="23" loccnumb="8" loccnume="22"
-    sum="ae8bd6bcd64c57f3d58abe4b8f6cff18"
+    sum="4a99b07eae825a934eb021fecc986ff4"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =c1.0ainfix /.V0V0Iainfix &gt;V0c0.0F">
     <proof
      prover="2"
@@ -410,9 +410,9 @@
     name="inverse_inverse_is_same"
     locfile="../ceil.why"
     loclnum="26" loccnumb="8" loccnume="31"
-    sum="1e7431cf867c84c7f705f0170ec519b3"
+    sum="be8a2cdb56e4f9a19e1a7719e86ac4ef"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =c1.0ainfix *.ainfix /.c1.0V0V0Iainfix &gt;V0c0.0F">
     <proof
      prover="0"
@@ -459,9 +459,9 @@
     name="inverse_bigger_zero"
     locfile="../ceil.why"
     loclnum="29" loccnumb="8" loccnume="27"
-    sum="413ddb1462a62e9dc7351da240bc534c"
+    sum="2d35707d8fa907524579bf952c32b285"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix &gt;ainfix /.c1.0V0c0.0Iainfix &gt;V0c0.0F">
     <proof
      prover="0"
@@ -508,9 +508,9 @@
     name="div_equals_mult_w_inverse"
     locfile="../ceil.why"
     loclnum="32" loccnumb="8" loccnume="33"
-    sum="474f333e20af5b5c795f9d2332ef5f34"
+    sum="2b3e59266e02873a134e072cd678a2ab"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =ainfix /.V0V1ainfix *.V0ainfix /.c1.0V1Iainfix &gt;V1c0.0F">
     <proof
      prover="0"
@@ -549,9 +549,9 @@
     name="mult_bigger_zero"
     locfile="../ceil.why"
     loclnum="35" loccnumb="8" loccnume="24"
-    sum="83d5b29259f6af57da459896cf946c6a"
+    sum="ab037828b0ffcccefc46c8d34c3626fd"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix &gt;ainfix *.V0V1c0.0Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
     <proof
      prover="0"
@@ -614,9 +614,9 @@
     name="ceil_never_zero"
     locfile="../ceil.why"
     loclnum="38" loccnumb="7" loccnume="22"
-    sum="cd711792c9e5a1c483baeb01698f56b9"
+    sum="71e747ff92d8a0c977aa9dd9f032d73a"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aceilainfix /.V0V1c0NIainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
     <proof
      prover="0"

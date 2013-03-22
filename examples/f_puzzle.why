@@ -5,17 +5,29 @@
 
 theory Puzzle
 
-  use import int.Int
+  use export int.Int
 
   function f int: int
 
   axiom H1: forall n: int. 0 <= n -> 0 <= f n
   axiom H2: forall n: int. 0 <= n -> f (f n) < f (n+1)
 
-  (* k <= f(n+k) by induction over k *)
+end
+
+theory Step1 (* k <= f(n+k) by induction over k *)
+
+  use import Puzzle
+
   predicate p (k: int) = forall n: int. 0 <= n -> k <= f (n+k)
   clone int.SimpleInduction as I1
     with predicate p = p, lemma base, lemma induction_step
+
+end
+
+theory Solution
+
+  use import Puzzle
+  use import Step1
 
   lemma L3: forall n: int. 0 <= n -> n <= f n && f n <= f (f n)
   lemma L4: forall n: int. 0 <= n -> f n < f (n+1)

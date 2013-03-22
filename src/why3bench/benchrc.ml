@@ -13,7 +13,6 @@ open Format
 open Bench
 open Why3
 open Stdlib
-open Theory
 
 
 type id_tool = (string * string)

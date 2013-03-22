@@ -167,6 +167,7 @@ let read_lib_file lib path =
 let get_builtin s =
   if s = builtin_theory.th_name.id_string then builtin_theory else
   if s = bool_theory.th_name.id_string then bool_theory else
+  if s = unit_theory.th_name.id_string then unit_theory else
   if s = highord_theory.th_name.id_string then highord_theory else
   match tuple_theory_name s with
   | Some n -> tuple_theory n

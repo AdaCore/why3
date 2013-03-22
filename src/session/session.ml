@@ -558,26 +558,25 @@ and save_metas provers fmt _ m =
   fprintf fmt "@\n@[<v 1><metas@ proved=\"%b\"@ expanded=\"%b\">"
     m.metas_verified m.metas_expanded;
   let save_pos fmt pos =
-    fprintf fmt "@\n@[<v 1>ip_theory=\"%a\">" save_string pos.ip_theory;
+    fprintf fmt "ip_theory=\"%a\">" save_string pos.ip_theory;
     List.iter (fprintf fmt "@\n@[<v 1><ip_library@ name=\"%a\"/>@]" save_string)
       pos.ip_library;
     List.iter (fprintf fmt "@\n@[<v 1><ip_qualid@ name=\"%a\"/>@]" save_string)
       pos.ip_qualid;
-    fprintf fmt "@]";
   in
   let save_ts_pos fmt ts pos =
     fprintf fmt "@\n@[<v 1><ts_pos@ name=\"%a\"@ arity=\"%i\"@ \
-    id=\"%i\"@ %a</ts_pos>@]"
+    id=\"%i\"@ %a@]@\n</ts_pos>"
       save_string ts.ts_name.id_string (List.length ts.ts_args)
       (ts_hash ts) save_pos pos in
   let save_ls_pos fmt ls pos =
     (** TODO: add the signature? *)
-    fprintf fmt "@\n@[<v 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a</ls_pos>@]"
+    fprintf fmt "@\n@[<v 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</ls_pos>"
       save_string ls.ls_name.id_string
       (ls_hash ls) save_pos pos
   in
   let save_pr_pos fmt pr pos =
-    fprintf fmt "@\n@[<v 1><pr_pos@ name=\"%a\"@ id=\"%i\"@ %a</pr_pos>@]"
+    fprintf fmt "@\n@[<v 1><pr_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</pr_pos>"
       save_string pr.pr_name.id_string
       (pr_hash pr) save_pos pos
   in
@@ -607,7 +606,7 @@ and save_meta_args fmt s l =
       fprintf fmt "@\n@[<v 1><meta_arg_int@ val=\"%i\"/>@]" i
   in
   List.iter (save_meta_arg fmt) l;
-  fprintf fmt "@]@\n</meta_args>"
+  fprintf fmt "@]@\n</meta>"
 
 and save_ty fmt ty =
   match ty.ty_node with
@@ -1781,7 +1780,7 @@ let print_external_proof fmt p =
 
 module AssoGoals : sig
   val associate : 'a goal list -> 'b goal list ->
-    ('b goal * ('a goal option) * bool) list
+    ('b goal * ('a goal * bool) option) list
 end = struct
 (** When Why3 will require 3.12 put all of that in a function using
     explicit type argument "(type t)" and remove all the Obj.magic *)
@@ -1805,19 +1804,19 @@ end = struct
     let name g     = g.goal_name
   end
 
-  module AssoGoals = Tc.AssoMake(FromGoal)(ToGoal)
+  module AssoGoals = Tc.Pairing(FromGoal)(ToGoal)
   open ToGoal
   open FromGoal
 
   let associate (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
-      ('tto goal * ('ffrom goal option) * bool) list =
+      ('tto goal * ('ffrom goal * bool) option) list =
     let from_goals : ffrom goal list =
       Obj.magic (from_goals : 'ffrom goal list) in
     let to_goals   : tto goal list =
       Obj.magic (to_goals : 'tto goal list) in
-    let associated : (tto goal * (ffrom goal option) * bool) list =
+    let associated : (tto goal * (ffrom goal * bool) option) list =
       AssoGoals.associate from_goals to_goals in
-    (Obj.magic associated : ('tto goal * ('ffrom goal option) * bool) list)
+    (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
 
 end
 
@@ -1881,14 +1880,14 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
         env.session.session_shape_version;
       AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
     List.iter (function
-    | (to_goal, Some from_goal, obsolete) ->
+    | (to_goal, Some (from_goal, obsolete)) ->
       merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
-    | (_, None, _) -> ()
+    | (_, None) -> ()
     ) associated
   with Exit -> ()
 
 
-(** convert the ident from the olf task to the ident at the same
+(** convert the ident from the old task to the ident at the same
     position in the new task *)
 and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
   (** Find in the new task the new symbol (ts,ls,pr) *)
@@ -1907,11 +1906,9 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
   let rec read_theory ip = function
     | [] -> raise (Env.LibFileNotFound ip.ip_library)
     | format::formats ->
-      try
-        Env.read_theory ~format env.env
-          ip.ip_library ip.ip_theory
-      with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
-        read_theory ip formats
+        try Env.read_theory ~format env.env ip.ip_library ip.ip_theory
+        with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
+          read_theory ip formats
   in
   let read_theory ip =
     if ip.ip_library = [] then Mstr.find ip.ip_theory theories
@@ -2270,9 +2267,9 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
       env.session.session_shape_version;
     AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
-  | (to_goal, Some from_goal, _obsolete) ->
+  | (to_goal, Some (from_goal, _obsolete)) ->
     add_goal_to_parent ~keygen env from_goal to_goal
-  | (_, None, _) -> ()
+  | (_, None) -> ()
   ) associated;
   to_transf
 

@@ -108,7 +108,7 @@ LIBGENERATED = src/util/config.ml src/util/rc.ml src/parser/lexer.ml \
 
 LIB_UTIL = config util opt lists strings extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp debug loc print_tree \
-	   cmdline warning sysutil rc plugin number
+	   cmdline warning sysutil rc plugin number pqueue
 
 LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
 
@@ -495,6 +495,11 @@ gallery::
 xml-validate:
 	@for x in `find examples/ -name why3session.xml`; do \
 	  xmllint --noout --valid $$x 2>&1 | head -1; \
+	done
+
+xml-validate-local:
+	@for x in `find examples/ -name why3session.xml`; do \
+	  xmllint --noout --dtdvalid share/why3session.dtd $$x 2>&1 | head -1; \
 	done
 
 ########

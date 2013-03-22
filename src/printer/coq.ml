@@ -428,9 +428,15 @@ let read_comment =
     done;
     name
 
+let read_until re s i ch =
+  if not (Str.string_match re s i) then
+    while not (Str.string_match re (input_line ch) 0) do () done
+
 let read_old_proof =
   let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\|Variable\\|Hypothesis\\)[ ]+\\([^ :(.]+\\)" in
   let def_end = Str.regexp ".*[.]$" in
+  let old_intros = Str.regexp "^ *([*] Why3 intros " in
+  let old_end = Str.regexp ".*[*])" in
   let qed = Str.regexp "\\(Qed\\|Defined\\|Save\\|Admitted\\)[.]" in
   fun ch ->
   try
@@ -439,8 +445,7 @@ let read_old_proof =
     if not (Str.string_match def s 0) then raise (StringValue s);
     let kind = Str.matched_group 1 s in
     let name = Str.matched_group 2 s in
-    if not (Str.string_match def_end s (Str.match_end ())) then
-      while not (Str.string_match def_end (input_line ch) 0) do () done;
+    read_until def_end s (Str.match_end ()) ch;
     match kind with
     | "Variable" | "Hypothesis" -> Axiom name
     | _  ->
@@ -448,7 +453,13 @@ let read_old_proof =
         if kind = "Notation" then Notation
         else begin
           start := pos_in ch;
-          while not (Str.string_match qed (input_line ch) 0) do () done;
+          let s = input_line ch in
+          if Str.string_match old_intros s 0 then begin
+            read_until old_end s (Str.match_end ()) ch;
+            start := pos_in ch;
+            read_until qed (input_line ch) 0 ch
+          end else
+            read_until qed s 0 ch;
           Vernacular
         end in
       let len = pos_in ch - !start in
@@ -620,18 +631,14 @@ let print_empty_proof fmt def =
       fprintf fmt "@\n";
       fprintf fmt "Defined.@\n"
 
-let old_intros = Str.regexp "^ *([*] intros "
-
 let print_previous_proof def info fmt previous =
   match previous with
   | None ->
     print_empty_proof fmt def
   | Some (Query (_,Vernacular,c)) ->
     begin match def with
-    | Some (p, f) ->
-      if not info.realization && need_intros p f &&
-         not (Str.string_match old_intros c 0)
-      then fprintf fmt "@[(* %a *)@]@\n" (fun fmt f -> intros fmt p f) f
+    | Some (p, f) when not info.realization && need_intros p f ->
+        fprintf fmt "@[(* Why3 %a *)@]@\n" (fun fmt f -> intros fmt p f) f
     | _ -> ()
     end;
     fprintf fmt "%s" c

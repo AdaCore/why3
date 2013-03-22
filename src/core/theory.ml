@@ -848,6 +848,13 @@ let tuple_theory = Hint.memo 17 (fun n ->
   let uc = add_data_decl uc [ts, [fs,pl]] in
   close_theory uc)
 
+let unit_theory =
+  let uc = empty_theory (id_fresh "Unit") ["why3"] in
+  let ts = create_tysymbol (id_fresh "unit") [] (Some (ty_tuple [])) in
+  let uc = use_export uc (tuple_theory 0) in
+  let uc = add_ty_decl uc ts in
+  close_theory uc
+
 let tuple_theory_name s =
   let l = String.length s in
   if l < 6 then None else

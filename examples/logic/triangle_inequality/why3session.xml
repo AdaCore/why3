@@ -8,7 +8,7 @@
  <prover
   id="1"
   name="Alt-Ergo"
-  version="0.95"/>
+  version="0.95.1"/>
  <prover
   id="2"
   name="CVC3"
@@ -19,12 +19,20 @@
   version="2.4.1"/>
  <prover
   id="4"
-  name="Z3"
-  version="2.19"/>
+  name="CVC4"
+  version="1.0"/>
  <prover
   id="5"
+  name="Coq"
+  version="8.3pl4"/>
+ <prover
+  id="6"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../triangle_inequality.why"
   verified="true"
@@ -39,34 +47,34 @@
     name="norm2_pos"
     locfile="../triangle_inequality.why"
     loclnum="30" loccnumb="8" loccnume="17"
-    sum="76cb925d3fd001024ee55e3bd1635962"
+    sum="c6713b13328556e5aa44d719637857fd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &gt;=anorm2V0V1c0.0F">
     <proof
-     prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
+     prover="6"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="p_expr"
     locfile="../triangle_inequality.why"
     loclnum="43" loccnumb="8" loccnume="14"
-    sum="42b2c0ff1ca0582f8cf5fd1cd988d1f8"
+    sum="4bf0d64706cccba6fae9418c1f312b1e"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =apV0V1V2V3V4anorm2ainfix +V0ainfix *V4V2ainfix +V1ainfix *V4V3F">
     <proof
      prover="2"
@@ -77,7 +85,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
+     prover="6"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -85,8 +93,8 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="3"
+     prover="7"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -97,21 +105,13 @@
     name="p_pos"
     locfile="../triangle_inequality.why"
     loclnum="47" loccnumb="8" loccnume="13"
-    sum="1363c1076109399bb5a7b0bdbad42ba9"
+    sum="413f527f7a1f078e776361e34265b599"
     proved="true"
     expanded="true"
     shape="ainfix &gt;=apV0V1V2V3V4c0.0F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -127,23 +127,31 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="mul_div_simpl"
     locfile="../triangle_inequality.why"
     loclnum="50" loccnumb="8" loccnume="21"
-    sum="e714c31ede6847ce2b47da9a53d97eb8"
+    sum="7c12c76d0cba448a0ea74c1dfec0355f"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix *ainfix /V0V1V1V0Iainfix =V1c0.0NF">
     <proof
-     prover="4"
+     prover="6"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -151,106 +159,748 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="3"
+     prover="7"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="p_val_part"
     locfile="../triangle_inequality.why"
     loclnum="53" loccnumb="8" loccnume="18"
-    sum="708a8affda43419fe72638239e14ff90"
+    sum="11d139637d632ac25bd8dc69ed550f97"
     proved="true"
     expanded="true"
     shape="ainfix =apV0V1V2V3aprefix -ainfix /adotV0V1V2V3anorm2V2V3ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
     <proof
      prover="0"
      timelimit="5"
-     memlimit="4000"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.98"/>
+     <result status="valid" time="0.88"/>
     </proof>
-    <transf
-     name="inline_goal"
+    <metas
      proved="true"
      expanded="true">
+     <ts_pos
+      name="int"
+      arity="0"
+      id="1"
+      ip_theory="BuiltIn">
+      <ip_library
+       name="why3"/>
+      <ip_qualid
+       name="int"/>
+     </ts_pos>
+     <ls_pos
+      name="infix ="
+      id="10"
+      ip_theory="BuiltIn">
+      <ip_library
+       name="why3"/>
+      <ip_qualid
+       name="infix ="/>
+     </ls_pos>
+     <ls_pos
+      name="one"
+      id="131"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="one"/>
+     </ls_pos>
+     <ls_pos
+      name="infix &lt;"
+      id="132"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="infix &lt;"/>
+     </ls_pos>
+     <ls_pos
+      name="infix &lt;="
+      id="144"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="infix &lt;="/>
+     </ls_pos>
+     <ls_pos
+      name="infix +"
+      id="1232"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="infix +"/>
+     </ls_pos>
+     <ls_pos
+      name="prefix -"
+      id="1233"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="prefix -"/>
+     </ls_pos>
+     <ls_pos
+      name="infix *"
+      id="1234"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="infix *"/>
+     </ls_pos>
+     <ls_pos
+      name="inv"
+      id="1300"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="inv"/>
+     </ls_pos>
+     <ls_pos
+      name="infix &gt;="
+      id="1357"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="infix &gt;="/>
+     </ls_pos>
+     <ls_pos
+      name="sqrt"
+      id="2564"
+      ip_theory="Square">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="sqrt"/>
+     </ls_pos>
+     <pr_pos
+      name="Assoc"
+      id="1235"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CommutativeGroup"/>
+      <ip_qualid
+       name="Assoc"/>
+     </pr_pos>
+     <pr_pos
+      name="Unit_def_l"
+      id="1242"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CommutativeGroup"/>
+      <ip_qualid
+       name="Unit_def_l"/>
+     </pr_pos>
+     <pr_pos
+      name="Unit_def_r"
+      id="1245"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CommutativeGroup"/>
+      <ip_qualid
+       name="Unit_def_r"/>
+     </pr_pos>
+     <pr_pos
+      name="Inv_def_l"
+      id="1248"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CommutativeGroup"/>
+      <ip_qualid
+       name="Inv_def_l"/>
+     </pr_pos>
+     <pr_pos
+      name="Inv_def_r"
+      id="1251"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CommutativeGroup"/>
+      <ip_qualid
+       name="Inv_def_r"/>
+     </pr_pos>
+     <pr_pos
+      name="Comm"
+      id="1254"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CommutativeGroup"/>
+      <ip_qualid
+       name="Comm"/>
+      <ip_qualid
+       name="Comm"/>
+     </pr_pos>
+     <pr_pos
+      name="Assoc"
+      id="1259"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Assoc"/>
+      <ip_qualid
+       name="Assoc"/>
+     </pr_pos>
+     <pr_pos
+      name="Mul_distr_l"
+      id="1266"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Mul_distr_l"/>
+     </pr_pos>
+     <pr_pos
+      name="Mul_distr_r"
+      id="1273"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Mul_distr_r"/>
+     </pr_pos>
+     <pr_pos
+      name="Comm"
+      id="1291"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Comm"/>
+      <ip_qualid
+       name="Comm"/>
+     </pr_pos>
+     <pr_pos
+      name="Unitary"
+      id="1296"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Unitary"/>
+     </pr_pos>
+     <pr_pos
+      name="NonTrivialRing"
+      id="1299"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="NonTrivialRing"/>
+     </pr_pos>
+     <pr_pos
+      name="Inverse"
+      id="1301"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Inverse"/>
+     </pr_pos>
+     <pr_pos
+      name="add_div"
+      id="1315"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="add_div"/>
+     </pr_pos>
+     <pr_pos
+      name="sub_div"
+      id="1322"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="sub_div"/>
+     </pr_pos>
+     <pr_pos
+      name="neg_div"
+      id="1329"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="neg_div"/>
+     </pr_pos>
+     <pr_pos
+      name="assoc_div_mul"
+      id="1341"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="assoc_div_mul"/>
+     </pr_pos>
+     <pr_pos
+      name="assoc_div_div"
+      id="1348"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="assoc_div_div"/>
+     </pr_pos>
+     <pr_pos
+      name="Refl"
+      id="1366"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Refl"/>
+     </pr_pos>
+     <pr_pos
+      name="Trans"
+      id="1369"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Trans"/>
+     </pr_pos>
+     <pr_pos
+      name="Antisymm"
+      id="1376"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Antisymm"/>
+     </pr_pos>
+     <pr_pos
+      name="Total"
+      id="1381"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Total"/>
+     </pr_pos>
+     <pr_pos
+      name="ZeroLessOne"
+      id="1386"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="ZeroLessOne"/>
+     </pr_pos>
+     <pr_pos
+      name="CompatOrderAdd"
+      id="1387"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CompatOrderAdd"/>
+     </pr_pos>
+     <pr_pos
+      name="CompatOrderMult"
+      id="1394"
+      ip_theory="Real">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="CompatOrderMult"/>
+     </pr_pos>
+     <pr_pos
+      name="Sqrt_positive"
+      id="2566"
+      ip_theory="Square">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Sqrt_positive"/>
+     </pr_pos>
+     <pr_pos
+      name="Sqrt_square"
+      id="2569"
+      ip_theory="Square">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Sqrt_square"/>
+     </pr_pos>
+     <pr_pos
+      name="Square_sqrt"
+      id="2572"
+      ip_theory="Square">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Square_sqrt"/>
+     </pr_pos>
+     <pr_pos
+      name="Sqrt_mul"
+      id="2575"
+      ip_theory="Square">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Sqrt_mul"/>
+     </pr_pos>
+     <pr_pos
+      name="Sqrt_le"
+      id="2580"
+      ip_theory="Square">
+      <ip_library
+       name="real"/>
+      <ip_qualid
+       name="Sqrt_le"/>
+     </pr_pos>
+     <pr_pos
+      name="norm2_pos"
+      id="2841"
+      ip_theory="CauchySchwarzInequality">
+      <ip_qualid
+       name="norm2_pos"/>
+     </pr_pos>
+     <pr_pos
+      name="p_expr"
+      id="2867"
+      ip_theory="CauchySchwarzInequality">
+      <ip_qualid
+       name="p_expr"/>
+     </pr_pos>
+     <pr_pos
+      name="p_pos"
+      id="2878"
+      ip_theory="CauchySchwarzInequality">
+      <ip_qualid
+       name="p_pos"/>
+     </pr_pos>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="10"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="131"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="132"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="144"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="1232"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="1233"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="1234"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="1300"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="1357"/>
+     </meta>
+     <meta
+      name="remove_logic">
+      <meta_arg_ls
+       id="2564"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1235"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1242"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1245"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1248"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1251"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1254"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1259"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1266"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1273"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1291"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1296"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1299"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1301"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1315"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1322"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1329"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1341"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1348"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1366"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1369"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1376"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1381"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1386"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1387"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="1394"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2566"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2569"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2572"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2575"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2580"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2841"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2867"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2878"/>
+     </meta>
+     <meta
+      name="remove_type">
+      <meta_arg_ts
+       id="1"/>
+     </meta>
      <goal
-      name="p_val_part.1"
+      name="p_val_part"
       locfile="../triangle_inequality.why"
       loclnum="53" loccnumb="8" loccnume="18"
-      expl="1."
-      sum="a907e94451b36c770e40f9fa7568d2c7"
+      sum="375fdd7abab36ab349b724a948c45832"
       proved="true"
       expanded="true"
-      shape="ainfix =ainfix +ainfix +anorm2V0V1ainfix *ainfix *c2.0aprefix -ainfix /adotV0V1V2V3anorm2V2V3adotV0V1V2V3ainfix *asqraprefix -ainfix /adotV0V1V2V3anorm2V2V3anorm2V2V3ainfix +anorm2V0V1aprefix -ainfix /asqradotV0V1V2V3anorm2V2V3Iainfix &lt;c0.0anorm2V2V3F">
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="4000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.33"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="30"
-       memlimit="4000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.63"/>
-      </proof>
+      shape="ainfix =apV0V1V2V3aprefix -ainfix /adotV0V1V2V3anorm2V2V3ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
+      <transf
+       name="eliminate_builtin"
+       proved="true"
+       expanded="true">
+       <goal
+        name="p_val_part.1"
+        locfile="../triangle_inequality.why"
+        loclnum="53" loccnumb="8" loccnume="18"
+        expl="1."
+        sum="6de5bfb0907f1e0569a5d0e2161786b9"
+        proved="true"
+        expanded="true"
+        shape="ainfix =apV0V1V2V3aprefix -ainfix /adotV0V1V2V3anorm2V2V3ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.10"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="45"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="32.03"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+       </goal>
+      </transf>
      </goal>
-    </transf>
+    </metas>
    </goal>
    <goal
     name="p_val_part_pos"
     locfile="../triangle_inequality.why"
     loclnum="59" loccnumb="8" loccnume="22"
-    sum="902cc117d299a2301fdfce3240def934"
+    sum="85bc73eb1e3dcd9e39d84419a6e3cd1b"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &gt;=ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="p_val_part_pos_aux"
-    locfile="../triangle_inequality.why"
-    loclnum="64" loccnumb="8" loccnume="26"
-    sum="9bce2e4aa7069267c00b2837ee577532"
-    proved="true"
-    expanded="false"
-    shape="ainfix &gt;=ainfix *anorm2V2V3apV0V1V2V3ainfix /aprefix -adotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
-    <proof
-     prover="0"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="p_val_part_pos_aux"
+    locfile="../triangle_inequality.why"
+    loclnum="64" loccnumb="8" loccnume="26"
+    sum="6dafe957c05d4d4481fbcdae0f95cf60"
+    proved="true"
+    expanded="true"
+    shape="ainfix &gt;=ainfix *anorm2V2V3apV0V1V2V3ainfix /aprefix -adotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
+    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -261,46 +911,31 @@
     name="CauchySchwarz_aux_non_null"
     locfile="../triangle_inequality.why"
     loclnum="69" loccnumb="8" loccnume="34"
-    sum="3bad2dbfcdca2527d6a6f5c32c775c7a"
+    sum="0efbf4657fbbb30ead5ffc3323d2d94c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
     <proof
-     prover="0"
+     prover="5"
      timelimit="5"
      memlimit="1000"
+     edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_aux_non_null_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.39"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.80"/>
+     <result status="valid" time="0.65"/>
     </proof>
    </goal>
    <goal
     name="norm_null"
     locfile="../triangle_inequality.why"
     loclnum="74" loccnumb="8" loccnume="17"
-    sum="6dc7c1095220ea980dbca0d8aa628587"
+    sum="7e3a265b12669732a872b760314d15c6"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =V1c0.0Oainfix =V0c0.0Iainfix =anorm2V0V1c0.0F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -311,21 +946,13 @@
     name="CauchySchwarz_aux_null"
     locfile="../triangle_inequality.why"
     loclnum="78" loccnumb="8" loccnume="30"
-    sum="5b8ea3e101c1379e7ad441c17ed8d18a"
+    sum="d92ffa92c844a0e219a5c060906924ce"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3Iainfix =anorm2V2V3c0.0F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -341,48 +968,40 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
+     prover="6"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.28"/>
     </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="CauchySchwarz_aux"
     locfile="../triangle_inequality.why"
     loclnum="83" loccnumb="8" loccnume="25"
-    sum="f98aebd8656d073c9b0672c270bea7ac"
+    sum="f503826c0855b489c83cd9b2d32a2476"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -398,7 +1017,7 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -406,32 +1025,24 @@
     </proof>
     <proof
      prover="4"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.16"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="norm_pos"
     locfile="../triangle_inequality.why"
     loclnum="91" loccnumb="8" loccnume="16"
-    sum="5ac098a76c92a77b81414fda62d58628"
+    sum="c871e0a08e431eca5ac7303db17208de"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &gt;=anormV0V1c0.0F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -447,7 +1058,7 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -455,6 +1066,14 @@
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -462,33 +1081,25 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="3"
+     prover="7"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="sqr_le_sqrt"
     locfile="../triangle_inequality.why"
     loclnum="95" loccnumb="8" loccnume="19"
-    sum="c115b360b8b52f71b86301cc73f27275"
+    sum="110ea3076bceb5ffe4e2a9d8d28e19e8"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=V0asqrtV1Iainfix &lt;=asqrV0V1Aainfix &lt;=c0.0asqrV0Aainfix &lt;=c0.0V0F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -499,25 +1110,18 @@
     name="CauchySchwarz"
     locfile="../triangle_inequality.why"
     loclnum="99" loccnumb="8" loccnume="21"
-    sum="0e271f0352943fccc6eff4dbe26df0ac"
+    sum="d1d9abeb8d1e95a154667e2755e33e42"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=adotV0V1V2V3ainfix *anormV0V1anormV2V3F">
     <proof
-     prover="0"
-     timelimit="3"
+     prover="5"
+     timelimit="5"
      memlimit="1000"
+     edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.20"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.19"/>
+     <result status="valid" time="0.68"/>
     </proof>
    </goal>
   </theory>
@@ -531,38 +1135,38 @@
     name="triangle_aux"
     locfile="../triangle_inequality.why"
     loclnum="118" loccnumb="8" loccnume="20"
-    sum="42170f0ebaf7243bb1407f07705781ed"
+    sum="184aec3bef26362dc011f2281c2f365e"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=anorm2ainfix +V0V2ainfix +V1V3asqrainfix +anormV0V1anormV2V3F">
     <proof
      prover="4"
-     timelimit="30"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="4.62"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="sqr_sqrt_le"
     locfile="../triangle_inequality.why"
     loclnum="123" loccnumb="8" loccnume="19"
-    sum="7e3031e53ff2f0f33205257de5642a86"
+    sum="402ac12c4d8ec94ad412037107baaca3"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=asqrtV0V1Iainfix &lt;=V0asqrV1Aainfix &lt;=c0.0V0Aainfix &lt;=c0.0V1F">
     <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
      prover="1"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -578,7 +1182,7 @@
     </proof>
     <proof
      prover="3"
-     timelimit="3"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
@@ -589,25 +1193,18 @@
     name="triangle"
     locfile="../triangle_inequality.why"
     loclnum="126" loccnumb="8" loccnume="16"
-    sum="e59da4de6697d01b11dc130a93604b8e"
+    sum="f960411051796024f2c2d99e8223d6cd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=anormainfix +V0V2ainfix +V1V3ainfix +anormV0V1anormV2V3F">
     <proof
-     prover="0"
-     timelimit="3"
+     prover="5"
+     timelimit="5"
      memlimit="1000"
+     edited="triangle_inequality_TriangleInequality_triangle_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
+     <result status="valid" time="0.64"/>
     </proof>
    </goal>
   </theory>

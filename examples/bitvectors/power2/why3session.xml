@@ -4,37 +4,33 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
-  name="Alt-Ergo"
-  version="0.95"/>
- <prover
-  id="2"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="3"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="4"
+  id="3"
   name="CVC4"
   version="1.0"/>
  <prover
-  id="5"
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="6"
+  id="5"
   name="Gappa"
-  version="0.16.1"/>
+  version="0.16.6"/>
  <prover
-  id="7"
+  id="6"
   name="Z3"
   version="2.19"/>
  <prover
-  id="8"
+  id="7"
   name="Z3"
   version="3.2"/>
  <file
@@ -51,12 +47,20 @@
     name="Power_1"
     locfile="../power2.why"
     loclnum="11" loccnumb="8" loccnume="15"
-    sum="421028680a47ef78f35acf6a8c694fbe"
+    sum="652be09a0348cbca5f46ffa111113c88"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c1c2">
     <proof
      prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -72,7 +76,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -87,25 +91,17 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="Power_sum"
     locfile="../power2.why"
     loclnum="13" loccnumb="8" loccnume="17"
-    sum="a9bbc53f21d17f380a6d927f99da28c6"
+    sum="764fa7e1c7c30b6818931dc183e8e692"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix +V0V1ainfix *apow2V0apow2V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2int_Power_sum_1.v"
@@ -118,12 +114,12 @@
     name="pow2pos"
     locfile="../power2.why"
     loclnum="16" loccnumb="8" loccnume="15"
-    sum="17f95139bf26aae00681c977c07528ac"
+    sum="f17efc18b7f8c05b44d0004ca4af67c2"
     proved="true"
     expanded="false"
     shape="ainfix &gt;apow2V0c0Iainfix &gt;=V0c0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2int_pow2pos_1.v"
@@ -136,7 +132,7 @@
     name="pow2_0"
     locfile="../power2.why"
     loclnum="18" loccnumb="8" loccnume="14"
-    sum="53493dd237507bcebeacee710ae5b918"
+    sum="1f56df026c275180b747ae28cba60a95"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c0c1">
@@ -149,6 +145,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -157,7 +161,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -180,20 +184,12 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="pow2_1"
     locfile="../power2.why"
     loclnum="19" loccnumb="8" loccnume="14"
-    sum="614fabe538e99537291c9fa6bd0480ca"
+    sum="11b83297c90e41390a5d1c227df5c1b9"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c1c2">
@@ -206,6 +202,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -214,7 +218,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="5"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -237,20 +241,12 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="pow2_2"
     locfile="../power2.why"
     loclnum="20" loccnumb="8" loccnume="14"
-    sum="f606e6fe66d963b3c0d89c163f1a534c"
+    sum="706ca8a1f35de743c88852987057b892"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c2c4">
@@ -263,7 +259,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -271,7 +267,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -279,7 +275,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -287,7 +283,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -299,7 +295,7 @@
     name="pow2_3"
     locfile="../power2.why"
     loclnum="21" loccnumb="8" loccnume="14"
-    sum="a6fdf40cdc43b7229ee65548748f5510"
+    sum="9b36d1a914eb57229fe561d0591e9dcc"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c3c8">
@@ -312,6 +308,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -320,7 +324,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -335,20 +339,12 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="pow2_4"
     locfile="../power2.why"
     loclnum="22" loccnumb="8" loccnume="14"
-    sum="dff5e9d5037663c9a27af3087c941c99"
+    sum="edf4d12e871043d7e1e6cbafa0c7045a"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c4c16">
@@ -361,7 +357,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -369,7 +365,15 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -382,14 +386,6 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
@@ -397,7 +393,7 @@
     name="pow2_5"
     locfile="../power2.why"
     loclnum="23" loccnumb="8" loccnume="14"
-    sum="956d9907e8dfd3c1c116f91e0fbac3dd"
+    sum="17ec842abdf5ec97133b9dfdd98bc37b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c5c32">
@@ -410,6 +406,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -418,15 +422,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -434,7 +430,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -446,7 +442,7 @@
     name="pow2_6"
     locfile="../power2.why"
     loclnum="24" loccnumb="8" loccnume="14"
-    sum="9770cc2e80a053d5e4f24f17c5433273"
+    sum="5dd624c134ebd2345298114e506bc5f3"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c6c64">
@@ -459,6 +455,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -467,15 +471,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -483,7 +479,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -495,7 +491,7 @@
     name="pow2_7"
     locfile="../power2.why"
     loclnum="25" loccnumb="8" loccnume="14"
-    sum="56ebed4a17dc3947565c8b1aaa981f57"
+    sum="8683d0368d867cfa924399cf90752843"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c7c128">
@@ -508,6 +504,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -516,15 +520,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -532,7 +528,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -544,7 +540,7 @@
     name="pow2_8"
     locfile="../power2.why"
     loclnum="26" loccnumb="8" loccnume="14"
-    sum="b3575673bfe03e372f3b0d97e06a420d"
+    sum="bb5721992956fde9da8be871bae5d510"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c8c256">
@@ -557,6 +553,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -565,15 +569,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -581,7 +577,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -593,7 +589,7 @@
     name="pow2_9"
     locfile="../power2.why"
     loclnum="27" loccnumb="8" loccnume="14"
-    sum="5ca4bd813a47e2738e8161ee7906fe5a"
+    sum="f9d23afea5405a9ab099648558a57da2"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c9c512">
@@ -606,6 +602,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -614,15 +618,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -630,7 +626,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -642,7 +638,7 @@
     name="pow2_10"
     locfile="../power2.why"
     loclnum="28" loccnumb="8" loccnume="15"
-    sum="a5e2bddc2e35cba11e5f053d32e87556"
+    sum="74188429854a9ec9680cd860aacc9994"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c10c1024">
@@ -655,7 +651,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -663,7 +659,15 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -678,20 +682,12 @@
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
    </goal>
    <goal
     name="pow2_11"
     locfile="../power2.why"
     loclnum="29" loccnumb="8" loccnume="15"
-    sum="6cef55d6868e2a92897d3f5a181b98ff"
+    sum="4df862ea08e099e0daf40510bbc46e81"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c11c2048">
@@ -704,6 +700,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -712,15 +716,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -728,7 +724,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -740,7 +736,7 @@
     name="pow2_12"
     locfile="../power2.why"
     loclnum="30" loccnumb="8" loccnume="15"
-    sum="3ab0ccc7e263509616ee33fd56880ad7"
+    sum="5e18018df35c46ed03f69c8913534bf4"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c12c4096">
@@ -753,7 +749,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -761,7 +757,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -769,7 +765,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -777,7 +773,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -789,7 +785,7 @@
     name="pow2_13"
     locfile="../power2.why"
     loclnum="31" loccnumb="8" loccnume="15"
-    sum="0f3ae15eb07667a860f4d89028951335"
+    sum="63f887c0001aecbaf170c20e6a8f9cf8"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c13c8192">
@@ -802,6 +798,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -810,15 +814,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -826,7 +822,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -838,7 +834,7 @@
     name="pow2_14"
     locfile="../power2.why"
     loclnum="32" loccnumb="8" loccnume="15"
-    sum="c0ba36b9e82b7d7809c045bd06e2e8b0"
+    sum="0e16ff0facab5fcfbe53a3ebb1efc6a5"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c14c16384">
@@ -851,7 +847,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -859,7 +855,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -867,7 +863,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -875,7 +871,7 @@
      <result status="valid" time="0.09"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -887,7 +883,7 @@
     name="pow2_15"
     locfile="../power2.why"
     loclnum="33" loccnumb="8" loccnume="15"
-    sum="4ef4a388953571887d1c22838e47f88c"
+    sum="273946ccf8f0bff97c8a4f258c033e56"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c15c32768">
@@ -900,6 +896,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -908,15 +912,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -924,7 +920,7 @@
      <result status="valid" time="0.10"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -936,7 +932,7 @@
     name="pow2_16"
     locfile="../power2.why"
     loclnum="34" loccnumb="8" loccnume="15"
-    sum="90991a2dd9320cb8fa56bf40fbff163b"
+    sum="9268457cb108a11fbe6919e01a81cc4f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c16c65536">
@@ -949,7 +945,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -957,7 +953,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -965,7 +961,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -973,7 +969,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -985,7 +981,7 @@
     name="pow2_17"
     locfile="../power2.why"
     loclnum="35" loccnumb="8" loccnume="15"
-    sum="ee78779debaa08c4fec5dcbd795e935d"
+    sum="b448d71f128abb2464a9ed9ac75ab2cf"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c17c131072">
@@ -998,6 +994,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1006,15 +1010,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1022,7 +1018,7 @@
      <result status="valid" time="0.12"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1034,7 +1030,7 @@
     name="pow2_18"
     locfile="../power2.why"
     loclnum="36" loccnumb="8" loccnume="15"
-    sum="9fc0938228dec9953405d120051bc2b6"
+    sum="58bfebbb7162a447927882c3395bd7ff"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c18c262144">
@@ -1047,7 +1043,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1055,7 +1051,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1063,7 +1059,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1071,7 +1067,7 @@
      <result status="valid" time="0.15"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1083,7 +1079,7 @@
     name="pow2_19"
     locfile="../power2.why"
     loclnum="37" loccnumb="8" loccnume="15"
-    sum="d57cc5110e4a71128791289b5eedafca"
+    sum="06899a8eab0b367108b6e08c2fe1e441"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c19c524288">
@@ -1096,6 +1092,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1104,15 +1108,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1120,7 +1116,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1132,7 +1128,7 @@
     name="pow2_20"
     locfile="../power2.why"
     loclnum="38" loccnumb="8" loccnume="15"
-    sum="e91131a6cd6b954eac8084d77718a315"
+    sum="dbd4225d08f95a74517d8a68e490e312"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c20c1048576">
@@ -1145,7 +1141,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1153,7 +1149,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1161,7 +1157,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1169,7 +1165,7 @@
      <result status="valid" time="0.17"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1181,7 +1177,7 @@
     name="pow2_21"
     locfile="../power2.why"
     loclnum="39" loccnumb="8" loccnume="15"
-    sum="f0a01b9be4a318a58076fc47ad47d69d"
+    sum="aff6470e9fd7d89fb704289391e185da"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c21c2097152">
@@ -1194,6 +1190,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1202,15 +1206,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1218,7 +1214,7 @@
      <result status="valid" time="0.19"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1230,7 +1226,7 @@
     name="pow2_22"
     locfile="../power2.why"
     loclnum="40" loccnumb="8" loccnume="15"
-    sum="63018db753a5b521b7c3277afe1f1eaf"
+    sum="3746f7f9370fcaac6333fa80bd680bf9"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c22c4194304">
@@ -1243,7 +1239,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1251,7 +1247,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1259,7 +1255,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1267,7 +1263,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1279,7 +1275,7 @@
     name="pow2_23"
     locfile="../power2.why"
     loclnum="41" loccnumb="8" loccnume="15"
-    sum="a2ec34290b335211cf519cc363f1ff7d"
+    sum="c38559582d43a94c72a8a95d209cfb96"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c23c8388608">
@@ -1292,6 +1288,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1300,15 +1304,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1316,7 +1312,7 @@
      <result status="valid" time="0.24"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1328,7 +1324,7 @@
     name="pow2_24"
     locfile="../power2.why"
     loclnum="42" loccnumb="8" loccnume="15"
-    sum="ce4ae69b618129061d357432ebe7f1eb"
+    sum="6706e2477e0463069ebc8f3021617102"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c24c16777216">
@@ -1341,7 +1337,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1349,7 +1345,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1357,7 +1353,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1365,7 +1361,7 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1377,7 +1373,7 @@
     name="pow2_25"
     locfile="../power2.why"
     loclnum="43" loccnumb="8" loccnume="15"
-    sum="fee107003ec360f7edb3ce6e49109d33"
+    sum="c555e8f95cdb82269d4f6e82714119bf"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c25c33554432">
@@ -1390,6 +1386,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1398,15 +1402,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1414,7 +1410,7 @@
      <result status="valid" time="0.29"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1426,7 +1422,7 @@
     name="pow2_26"
     locfile="../power2.why"
     loclnum="44" loccnumb="8" loccnume="15"
-    sum="58f03efd163cd5dfbdcb5912e70f8256"
+    sum="20726fb7c08f28264e74f81b68327694"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c26c67108864">
@@ -1439,7 +1435,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1447,7 +1443,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1455,7 +1451,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1463,7 +1459,7 @@
      <result status="valid" time="0.07"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1475,7 +1471,7 @@
     name="pow2_27"
     locfile="../power2.why"
     loclnum="45" loccnumb="8" loccnume="15"
-    sum="b5ad4748bd530336d8967c966634a764"
+    sum="e42bde2e37fde55eb5b3cee80ae76ba7"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c27c134217728">
@@ -1488,6 +1484,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1496,15 +1500,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1512,7 +1508,7 @@
      <result status="valid" time="0.36"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1524,7 +1520,7 @@
     name="pow2_28"
     locfile="../power2.why"
     loclnum="46" loccnumb="8" loccnume="15"
-    sum="74d2708fff72ea9849e212764a0c1e40"
+    sum="bacf47aca5e26d2ee868c9b58a0735aa"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c28c268435456">
@@ -1537,7 +1533,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1545,7 +1541,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1553,7 +1549,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1561,7 +1557,7 @@
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1573,7 +1569,7 @@
     name="pow2_29"
     locfile="../power2.why"
     loclnum="47" loccnumb="8" loccnume="15"
-    sum="fa9007aecb8d5dac32e391225baa99ed"
+    sum="024cb713c9208be37f5a515142315500"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c29c536870912">
@@ -1586,7 +1582,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1594,7 +1590,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1602,7 +1598,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1610,7 +1606,7 @@
      <result status="valid" time="0.09"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1622,7 +1618,7 @@
     name="pow2_30"
     locfile="../power2.why"
     loclnum="48" loccnumb="8" loccnume="15"
-    sum="620dd365c21b025ec25b7508e6d07959"
+    sum="7348715b89cf52652eae052c3f0bc480"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c30c1073741824">
@@ -1635,7 +1631,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1643,7 +1639,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1651,7 +1647,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1659,7 +1655,7 @@
      <result status="valid" time="0.09"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1671,7 +1667,7 @@
     name="pow2_31"
     locfile="../power2.why"
     loclnum="49" loccnumb="8" loccnume="15"
-    sum="076922a13cee83466bb02789f4abee08"
+    sum="2bbec7222ea3f2950897e1d63c0906d3"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c31c2147483648">
@@ -1684,6 +1680,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1692,15 +1696,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1708,7 +1704,7 @@
      <result status="valid" time="0.47"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1720,7 +1716,7 @@
     name="pow2_32"
     locfile="../power2.why"
     loclnum="50" loccnumb="8" loccnume="15"
-    sum="3ebe985720b88f80d62bbc3c62cb3ecd"
+    sum="faf6751ad32d85206b6723ecb91cad3b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c32c4294967296">
@@ -1733,7 +1729,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1741,7 +1737,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1749,7 +1745,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1757,7 +1753,7 @@
      <result status="valid" time="0.49"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1769,7 +1765,7 @@
     name="pow2_33"
     locfile="../power2.why"
     loclnum="51" loccnumb="8" loccnume="15"
-    sum="2cef5c2538e6544aec22c9680b64b766"
+    sum="2386f7b47cd0695599c554d649723fcf"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c33c8589934592">
@@ -1782,6 +1778,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1790,15 +1794,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1806,7 +1802,7 @@
      <result status="valid" time="0.53"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1818,7 +1814,7 @@
     name="pow2_34"
     locfile="../power2.why"
     loclnum="52" loccnumb="8" loccnume="15"
-    sum="146b31de360786563048e7f8f646b6f4"
+    sum="67c3245f9abfd69ffd1cd7ef738c26db"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c34c17179869184">
@@ -1831,7 +1827,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1839,7 +1835,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1847,7 +1843,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1855,7 +1851,7 @@
      <result status="valid" time="0.59"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1867,7 +1863,7 @@
     name="pow2_35"
     locfile="../power2.why"
     loclnum="53" loccnumb="8" loccnume="15"
-    sum="cf3582511c3241599eae7bad138af376"
+    sum="17cc018ad088c197a0ce636c0f6d4733"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c35c34359738368">
@@ -1880,6 +1876,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1888,15 +1892,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1904,7 +1900,7 @@
      <result status="valid" time="0.62"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1916,7 +1912,7 @@
     name="pow2_36"
     locfile="../power2.why"
     loclnum="54" loccnumb="8" loccnume="15"
-    sum="57c6b5c15c5f62fa7bd7608f50e29f12"
+    sum="b8c94b91feccc5c5f8c70b6369dba703"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c36c68719476736">
@@ -1929,7 +1925,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1937,7 +1933,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1945,7 +1941,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1953,7 +1949,7 @@
      <result status="valid" time="0.69"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1965,7 +1961,7 @@
     name="pow2_37"
     locfile="../power2.why"
     loclnum="55" loccnumb="8" loccnume="15"
-    sum="ae24c085a2353f7d74b4b05f21912521"
+    sum="4b3fcb23b4c40a00916a70ce550bfe08"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c37c137438953472">
@@ -1978,6 +1974,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -1986,15 +1990,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2002,7 +1998,7 @@
      <result status="valid" time="0.74"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2014,7 +2010,7 @@
     name="pow2_38"
     locfile="../power2.why"
     loclnum="56" loccnumb="8" loccnume="15"
-    sum="d2056dc8007f5beabd474936088dd85e"
+    sum="d42f2cfc2da997912eb5fde9d57a047d"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c38c274877906944">
@@ -2027,7 +2023,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2035,7 +2031,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2043,7 +2039,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2051,7 +2047,7 @@
      <result status="valid" time="0.77"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2063,7 +2059,7 @@
     name="pow2_39"
     locfile="../power2.why"
     loclnum="57" loccnumb="8" loccnume="15"
-    sum="5d510e49dd8df57f11a984a7fbb3759b"
+    sum="05ec6157b36c09cd43197d91f484068d"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c39c549755813888">
@@ -2076,6 +2072,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2084,15 +2088,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2100,7 +2096,7 @@
      <result status="valid" time="0.83"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2112,7 +2108,7 @@
     name="pow2_40"
     locfile="../power2.why"
     loclnum="58" loccnumb="8" loccnume="15"
-    sum="7e1df3dc08299f023abc368b1e1c1ff7"
+    sum="2713131b1803cef11301cf2c27485dae"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c40c1099511627776">
@@ -2125,7 +2121,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2133,7 +2129,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2141,7 +2137,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2149,7 +2145,7 @@
      <result status="valid" time="0.86"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2161,7 +2157,7 @@
     name="pow2_41"
     locfile="../power2.why"
     loclnum="59" loccnumb="8" loccnume="15"
-    sum="ca423f9c59860a21e9cafe7d3330efbd"
+    sum="cc04ab9ace073b02ff14b3347713e724"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c41c2199023255552">
@@ -2174,6 +2170,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2182,15 +2186,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2198,7 +2194,7 @@
      <result status="valid" time="0.95"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2210,7 +2206,7 @@
     name="pow2_42"
     locfile="../power2.why"
     loclnum="60" loccnumb="8" loccnume="15"
-    sum="34ad463bb78335a599ca1385669c8427"
+    sum="de7ad5f025b2a0b4ab2f84801848716e"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c42c4398046511104">
@@ -2223,7 +2219,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2231,7 +2227,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2239,7 +2235,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2247,7 +2243,7 @@
      <result status="valid" time="0.95"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2259,7 +2255,7 @@
     name="pow2_43"
     locfile="../power2.why"
     loclnum="61" loccnumb="8" loccnume="15"
-    sum="457563eb3508be9184d481ca8963dd65"
+    sum="0cd3ad6a5e1b83b7fabc0c2555f35adb"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c43c8796093022208">
@@ -2272,6 +2268,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2280,15 +2284,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2296,7 +2292,7 @@
      <result status="valid" time="1.04"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2308,7 +2304,7 @@
     name="pow2_44"
     locfile="../power2.why"
     loclnum="62" loccnumb="8" loccnume="15"
-    sum="131bd0553478791698f7e406cbe843a9"
+    sum="d7b1a1a191b9ae2ed5b1f71b29956b4d"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c44c17592186044416">
@@ -2321,7 +2317,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2329,7 +2325,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2337,7 +2333,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2345,7 +2341,7 @@
      <result status="valid" time="1.09"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2357,7 +2353,7 @@
     name="pow2_45"
     locfile="../power2.why"
     loclnum="63" loccnumb="8" loccnume="15"
-    sum="d6f9bd2c562d761450a08b43de6b5151"
+    sum="63b09f7815176325ee68de7ecd2432ea"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c45c35184372088832">
@@ -2370,6 +2366,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2378,15 +2382,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2394,7 +2390,7 @@
      <result status="valid" time="1.17"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2406,7 +2402,7 @@
     name="pow2_46"
     locfile="../power2.why"
     loclnum="64" loccnumb="8" loccnume="15"
-    sum="454796b2a18cdecb67f9547d7a4451ca"
+    sum="efe08901220c67bbbf2d7d628e50fccf"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c46c70368744177664">
@@ -2419,7 +2415,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2427,7 +2423,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2435,7 +2431,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2443,7 +2439,7 @@
      <result status="valid" time="1.24"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2455,7 +2451,7 @@
     name="pow2_47"
     locfile="../power2.why"
     loclnum="65" loccnumb="8" loccnume="15"
-    sum="4ebd7aae47576f237c8949274007272c"
+    sum="fd9f88797eb627f2de1cb9cbba8fe16a"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c47c140737488355328">
@@ -2468,6 +2464,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2476,15 +2480,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2492,7 +2488,7 @@
      <result status="valid" time="1.31"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2504,7 +2500,7 @@
     name="pow2_48"
     locfile="../power2.why"
     loclnum="66" loccnumb="8" loccnume="15"
-    sum="998ee6af448a984af47d7acdec28583d"
+    sum="d116ee7f6ca8568ca587435b995d797e"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c48c281474976710656">
@@ -2517,7 +2513,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2525,7 +2521,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2533,7 +2529,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2541,7 +2537,7 @@
      <result status="valid" time="1.34"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2553,7 +2549,7 @@
     name="pow2_49"
     locfile="../power2.why"
     loclnum="67" loccnumb="8" loccnume="15"
-    sum="ee413dea157e5f182525e112e637ac89"
+    sum="626f6e740fbd6cdc3c0fdd0004cf49d6"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c49c562949953421312">
@@ -2566,6 +2562,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2574,15 +2578,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2590,7 +2586,7 @@
      <result status="valid" time="1.47"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2602,7 +2598,7 @@
     name="pow2_50"
     locfile="../power2.why"
     loclnum="68" loccnumb="8" loccnume="15"
-    sum="fb94539efc5137a2fdda30f11282d36d"
+    sum="cb891dc9d61654a1f32063c56b74b042"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c50c1125899906842624">
@@ -2615,7 +2611,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2623,7 +2619,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2631,7 +2627,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2639,7 +2635,7 @@
      <result status="valid" time="1.50"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -2651,7 +2647,7 @@
     name="pow2_51"
     locfile="../power2.why"
     loclnum="69" loccnumb="8" loccnume="15"
-    sum="5580980f9de624a8d17225609b597d60"
+    sum="c82564a3da1ff496c889e891ecef9914"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c51c2251799813685248">
@@ -2664,6 +2660,14 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2672,15 +2676,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2688,7 +2684,7 @@
      <result status="valid" time="1.65"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -2700,7 +2696,7 @@
     name="pow2_52"
     locfile="../power2.why"
     loclnum="70" loccnumb="8" loccnume="15"
-    sum="771dc19c3220ac9c160f17ba6b2b7f6e"
+    sum="3ec5cce3242565d88eb0c1d6d007fbbf"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c52c4503599627370496">
@@ -2713,7 +2709,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2721,7 +2717,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2729,7 +2725,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2737,7 +2733,7 @@
      <result status="valid" time="1.67"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="8"
      memlimit="1000"
      obsolete="false"
@@ -2749,7 +2745,7 @@
     name="pow2_53"
     locfile="../power2.why"
     loclnum="71" loccnumb="8" loccnume="15"
-    sum="0639d0b05e867b00f8e462761a701805"
+    sum="5c9af4244f8f8cde33f220d689e9b63f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c53c9007199254740992">
@@ -2762,6 +2758,14 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2770,15 +2774,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -2786,7 +2782,7 @@
      <result status="valid" time="1.79"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="9"
      memlimit="1000"
      obsolete="false"
@@ -2798,7 +2794,7 @@
     name="pow2_54"
     locfile="../power2.why"
     loclnum="72" loccnumb="8" loccnume="15"
-    sum="9a90e9abdbf266c482bfe98b21124a75"
+    sum="19854b9dafa439e40da65b95ddb1d7ab"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c54c18014398509481984">
@@ -2811,7 +2807,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2819,7 +2815,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2827,7 +2823,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -2835,7 +2831,7 @@
      <result status="valid" time="1.87"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="9"
      memlimit="1000"
      obsolete="false"
@@ -2847,7 +2843,7 @@
     name="pow2_55"
     locfile="../power2.why"
     loclnum="73" loccnumb="8" loccnume="15"
-    sum="d8b69014458a33ca75c1c48def1f59d0"
+    sum="ff43d66aac91565c96fec3c8116fbaa4"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c55c36028797018963968">
@@ -2860,6 +2856,14 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2868,15 +2872,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -2884,7 +2880,7 @@
      <result status="valid" time="1.77"/>
     </proof>
     <proof
-     prover="8"
+     prover="7"
      timelimit="11"
      memlimit="1000"
      obsolete="false"
@@ -2896,7 +2892,7 @@
     name="pow2_56"
     locfile="../power2.why"
     loclnum="74" loccnumb="8" loccnume="15"
-    sum="a519802584150cd1e9ebd270ddfb93f5"
+    sum="b897a625b87d0ee742771ecf77862685"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c56c72057594037927936">
@@ -2909,7 +2905,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2917,7 +2913,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2925,7 +2921,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -2937,7 +2933,7 @@
     name="pow2_57"
     locfile="../power2.why"
     loclnum="75" loccnumb="8" loccnume="15"
-    sum="241bf1766e36b6f42f2f8f09181c869d"
+    sum="b11b3941dae2cdcba3b537d796147fd4"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c57c144115188075855872">
@@ -2950,6 +2946,14 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -2958,15 +2962,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -2978,7 +2974,7 @@
     name="pow2_58"
     locfile="../power2.why"
     loclnum="76" loccnumb="8" loccnume="15"
-    sum="1b958d5a9cd31030b704908eef444b5b"
+    sum="2af66897cc4e532861997d305e7122c2"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c58c288230376151711744">
@@ -2991,7 +2987,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2999,7 +2995,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3007,7 +3003,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="7"
      memlimit="1000"
      obsolete="false"
@@ -3019,7 +3015,7 @@
     name="pow2_59"
     locfile="../power2.why"
     loclnum="77" loccnumb="8" loccnume="15"
-    sum="50ab274bbe030a9c2998bf9512268fac"
+    sum="aff7781310fca2edaf9ccbd8205616ba"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c59c576460752303423488">
@@ -3032,6 +3028,14 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -3040,15 +3044,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="8"
      memlimit="1000"
      obsolete="false"
@@ -3060,7 +3056,7 @@
     name="pow2_60"
     locfile="../power2.why"
     loclnum="78" loccnumb="8" loccnume="15"
-    sum="15ebf8561e3e709da62c41c317ffa632"
+    sum="beb1ba569837aef0167a53423282c888"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c60c1152921504606846976">
@@ -3073,7 +3069,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3081,7 +3077,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3089,7 +3085,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="8"
      memlimit="1000"
      obsolete="false"
@@ -3101,7 +3097,7 @@
     name="pow2_61"
     locfile="../power2.why"
     loclnum="79" loccnumb="8" loccnume="15"
-    sum="68c1118f8cc06c4f5e85743edb5a35d0"
+    sum="9b3afaf4dc164b28b59402e65f67a29b"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c61c2305843009213693952">
@@ -3114,6 +3110,14 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -3122,15 +3126,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="8"
      memlimit="1000"
      obsolete="false"
@@ -3142,7 +3138,7 @@
     name="pow2_62"
     locfile="../power2.why"
     loclnum="80" loccnumb="8" loccnume="15"
-    sum="564569d4dcc653705129d8f986bb0fae"
+    sum="06c4560e88ebf5e793cdec7d7b8ee26a"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c62c4611686018427387904">
@@ -3155,7 +3151,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3163,7 +3159,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3171,7 +3167,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="9"
      memlimit="1000"
      obsolete="false"
@@ -3183,7 +3179,7 @@
     name="pow2_63"
     locfile="../power2.why"
     loclnum="81" loccnumb="8" loccnume="15"
-    sum="c27589f9613a9d374e525b05795a1781"
+    sum="4548031a3f3069bdf46d041e9b5eb1ec"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c63c9223372036854775808">
@@ -3196,6 +3192,14 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -3204,27 +3208,19 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="9"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.61"/>
+     <result status="valid" time="3.03"/>
     </proof>
    </goal>
    <goal
     name="Div_double"
     locfile="../power2.why"
     loclnum="113" loccnumb="8" loccnume="18"
-    sum="6f01a44c48ae3d43c3c4f83b1d870e98"
+    sum="2f350875bfe3a071e78d6a48114c921f"
     proved="false"
     expanded="true"
     shape="ainfix =adivV0V1c1Iainfix &lt;V0ainfix *c2V1Aainfix &lt;=V1V0Aainfix &lt;c0V1F">
@@ -3233,7 +3229,7 @@
     name="Div_pow"
     locfile="../power2.why"
     loclnum="116" loccnumb="8" loccnume="15"
-    sum="94c0d831a4dcda27b2e02ffd748efbcf"
+    sum="f87bc45b6936c44a038fd13c41e7daef"
     proved="true"
     expanded="false"
     shape="ainfix =adivV0apow2ainfix -V1c1c1Iainfix &lt;V0apow2V1Aainfix &lt;=apow2ainfix -V1c1V0Iainfix &gt;V1c0F">
@@ -3243,7 +3239,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.38"/>
+     <result status="valid" time="0.27"/>
     </proof>
     <proof
      prover="1"
@@ -3251,7 +3247,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.27"/>
+     <result status="valid" time="0.06"/>
     </proof>
     <proof
      prover="2"
@@ -3259,18 +3255,10 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3282,7 +3270,7 @@
     name="Div_double_neg"
     locfile="../power2.why"
     loclnum="119" loccnumb="8" loccnume="22"
-    sum="abb5d03ab24579b6ee213167c0a3133c"
+    sum="fbcc224d499a7e2680d8b162ee4606eb"
     proved="false"
     expanded="true"
     shape="ainfix =adivV0V1aprefix -c2Iainfix &lt;aprefix -V1c0Aainfix &lt;V0aprefix -V1Aainfix &lt;=ainfix *aprefix -c2V1V0F">
@@ -3291,7 +3279,7 @@
     name="Div_pow2"
     locfile="../power2.why"
     loclnum="122" loccnumb="8" loccnume="16"
-    sum="2c89cfc95fa863dc50eff7a69b9fa7c8"
+    sum="3473fb4ba7c5534349369f10100323f6"
     proved="true"
     expanded="false"
     shape="ainfix =adivV0apow2ainfix -V1c1aprefix -c2Iainfix &lt;V0aprefix -apow2ainfix -V1c1Aainfix &lt;=aprefix -apow2V1V0Iainfix &gt;V1c0F">
@@ -3301,7 +3289,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.21"/>
+     <result status="valid" time="0.11"/>
     </proof>
     <proof
      prover="1"
@@ -3309,7 +3297,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.12"/>
     </proof>
     <proof
      prover="2"
@@ -3317,18 +3305,10 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3340,12 +3320,12 @@
     name="Mod_pow2_gen"
     locfile="../power2.why"
     loclnum="129" loccnumb="8" loccnume="20"
-    sum="a7a76c1f697e0c3aa10ef9e6d6a80fc0"
+    sum="8ae8e6e818fb87fba1bc92ff244097b4"
     proved="true"
     expanded="true"
     shape="ainfix =amodadivainfix +V0apow2V1apow2V2c2amodadivV0apow2V2c2Iainfix &lt;V2V1Aainfix &lt;=c0V2F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2int_Mod_pow2_gen_1.v"
@@ -3365,7 +3345,7 @@
     name="Power_s_all"
     locfile="../power2.why"
     loclnum="147" loccnumb="8" loccnume="19"
-    sum="540a012f29d395e1f67523caae2d4923"
+    sum="1f5a006e7aa204e3dd39632674cc807a"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix +V0c1ainfix *.c2.0apow2V0F">
@@ -3378,97 +3358,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_p_all"
-    locfile="../power2.why"
-    loclnum="149" loccnumb="8" loccnume="19"
-    sum="53fc9fb2a5e175d56996d0635691dc85"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2ainfix -V0c1ainfix *.c0.5apow2V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_1_2"
-    locfile="../power2.why"
-    loclnum="151" loccnumb="8" loccnume="17"
-    sum="58a5fcfa89f1eaddbea6f06c158fd109"
-    proved="true"
-    expanded="false"
-    shape="ainfix =c0.5ainfix /.c1.0c2.0">
-    <proof
-     prover="0"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3477,14 +3367,6 @@
     </proof>
     <proof
      prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3507,8 +3389,106 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+   </goal>
+   <goal
+    name="Power_p_all"
+    locfile="../power2.why"
+    loclnum="149" loccnumb="8" loccnume="19"
+    sum="eed166fa528d8cd41a4ddc9c0659203a"
+    proved="true"
+    expanded="false"
+    shape="ainfix =apow2ainfix -V0c1ainfix *.c0.5apow2V0F">
     <proof
-     prover="8"
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="Power_1_2"
+    locfile="../power2.why"
+    loclnum="151" loccnumb="8" loccnume="17"
+    sum="84527e86834c27e6163ad596ade7db08"
+    proved="true"
+    expanded="false"
+    shape="ainfix =c0.5ainfix /.c1.0c2.0">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3520,7 +3500,7 @@
     name="Power_1"
     locfile="../power2.why"
     loclnum="153" loccnumb="8" loccnume="15"
-    sum="bab6099bb4a6d3e19f429b8e4ea83c2f"
+    sum="b37833d7b428de47ffe5fbd646c08083"
     proved="true"
     expanded="false"
     shape="ainfix =apow2c1c2.0">
@@ -3533,6 +3513,14 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -3541,7 +3529,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3556,20 +3544,12 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="Power_neg1"
     locfile="../power2.why"
     loclnum="155" loccnumb="8" loccnume="18"
-    sum="cff35c92ae118352632ac39f7cdbd6d2"
+    sum="77c20f7dba2747267d44617d4e5ecb61"
     proved="true"
     expanded="false"
     shape="ainfix =apow2aprefix -c1c0.5">
@@ -3582,6 +3562,14 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
      prover="2"
      timelimit="5"
      memlimit="1000"
@@ -3590,7 +3578,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3605,25 +3593,17 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
    </goal>
    <goal
     name="Power_non_null_aux"
     locfile="../power2.why"
     loclnum="157" loccnumb="8" loccnume="26"
-    sum="5b8a2fe88e1fd4fa57523954f886e5eb"
+    sum="a7634a32e42d5449193f342b1000d24e"
     proved="true"
     expanded="false"
     shape="ainfix =apow2V0c0.0NIainfix &gt;=V0c0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2real_Power_non_null_aux_1.v"
@@ -3636,12 +3616,12 @@
     name="Power_neg_aux"
     locfile="../power2.why"
     loclnum="159" loccnumb="8" loccnume="21"
-    sum="6df92634a1ce100b43e46f90b24d3f00"
+    sum="d2cb9e2215c1b2cbe66e1935126c365f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0Iainfix &gt;=V0c0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2real_Power_neg_aux_1.v"
@@ -3654,12 +3634,12 @@
     name="Power_non_null"
     locfile="../power2.why"
     loclnum="161" loccnumb="8" loccnume="22"
-    sum="e3d8501f5c7f8d58c950ef51dc5f1613"
+    sum="d4b7668e1eb8a4a2f94103ecc5199abb"
     proved="true"
     expanded="false"
     shape="ainfix =apow2V0c0.0NF">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2real_Power_non_null_1.v"
@@ -3672,7 +3652,7 @@
     name="Power_neg"
     locfile="../power2.why"
     loclnum="163" loccnumb="8" loccnume="17"
-    sum="a09a27dfe6988ffdcd8c9fb69c50759f"
+    sum="d6c035da6064f24830988b1eb0cdf76f"
     proved="true"
     expanded="false"
     shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0F">
@@ -3685,7 +3665,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -3697,12 +3677,12 @@
     name="Power_sum_aux"
     locfile="../power2.why"
     loclnum="165" loccnumb="8" loccnume="21"
-    sum="bd83b991fcc2a13077f0496f3a440f06"
+    sum="5c3ac730bcc63301a7eea4376cca0748"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1Iainfix &gt;=V1c0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2real_Power_sum_aux_1.v"
@@ -3715,12 +3695,12 @@
     name="Power_sum"
     locfile="../power2.why"
     loclnum="167" loccnumb="8" loccnume="17"
-    sum="a105cab2179ee94fa75917bb9cf6400f"
+    sum="d295c19759a7b7f92dc491a6245a0189"
     proved="true"
     expanded="false"
     shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2real_Power_sum_1.v"
@@ -3733,12 +3713,12 @@
     name="Pow2_int_real"
     locfile="../power2.why"
     loclnum="172" loccnumb="8" loccnume="21"
-    sum="9e92eda5b2e452f62bb3e1c8457a63b2"
+    sum="652f8ee44541e754a543c239c52365c9"
     proved="true"
     expanded="false"
     shape="ainfix =apow2V0afrom_intapow2V0Iainfix &gt;=V0c0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="power2_Pow2real_Pow2_int_real_1.v"

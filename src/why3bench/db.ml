@@ -147,7 +147,6 @@ let stmt_column_TEXT stmt i msg =
   match Sqlite3.column stmt i with
     | Sqlite3.Data.TEXT i -> i
     | _ -> failwith msg
-*)
 
 let stmt_column_int stmt i msg =
   match Sqlite3.column stmt i with
@@ -156,6 +155,7 @@ let stmt_column_int stmt i msg =
 
 let int64_from_bool b =
   if b then 1L else 0L
+*)
 
 let bool_from_int64 i =
   if i=0L then false else

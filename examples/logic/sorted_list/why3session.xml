@@ -4,31 +4,31 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
   name="CVC3"
-  version="2.2"/>
+  version="2.4.1"/>
  <prover
   id="2"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="3"
-  name="Simplify"
-  version="1.5.4"/>
- <prover
   id="4"
   name="Yices"
-  version="1.0.25"/>
+  version="1.0.38"/>
  <prover
   id="5"
   name="Z3"
-  version="2.19"/>
+  version="4.3.1"/>
  <file
   name="../sorted_list.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Order"
    locfile="../sorted_list.why"
@@ -53,37 +53,29 @@
     name="sorted_inf"
     locfile="../sorted_list.why"
     loclnum="33" loccnumb="8" loccnume="18"
-    sum="7e50db4981ef6afc43cae9ba6ef76c1c"
+    sum="7fc1c162f0be2c788f0c3a2523d4530c"
     proved="true"
     expanded="true"
     shape="asortedaConsV0V2IasortedaConsV1V2Iainfix &lt;=V0V1F">
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-    <proof
      prover="5"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="sorted_mem"
     locfile="../sorted_list.why"
     loclnum="38" loccnumb="8" loccnume="18"
-    sum="f407e58ed8a0248e2d7ee156a394c88e"
+    sum="14cadc7ff359d1a5ec619e433748153b"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=V0V2IamemV2V1FIasortedaConsV0V1F">
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="0"
      edited="sorted_list_SortedList_sorted_mem_1.v"
@@ -103,14 +95,14 @@
     name="sorted123"
     locfile="../sorted_list.why"
     loclnum="50" loccnumb="7" loccnume="16"
-    sum="b52e1ff4adc377187963ad58ce0fcf52"
+    sum="a56d08c6d7aa450f1a14434626228155"
     proved="true"
     expanded="true"
     shape="asortedaConsc1aConsc2aConsc3aNil">
     <proof
      prover="0"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
@@ -124,12 +116,12 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="4"
@@ -142,10 +134,10 @@
     <proof
      prover="5"
      timelimit="5"
-     memlimit="0"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
