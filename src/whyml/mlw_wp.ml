@@ -150,23 +150,27 @@ let wp_let v t f = t_let_close_simp v t f
 
 let wp_forall vl f = t_forall_close_simp vl [] f
 
+let is_equality_for v f = match f.t_node with
+  | Tapp (ps, [{ t_node = Tvar u }; t])
+    when ls_equal ps ps_equ && vs_equal u v && not (Mvs.mem v t.t_vars) ->
+      Some t
+  | _ ->
+      None
+
 let wp_forall_post v p f =
   (* we optimize for the case when a postcondition
      is of the form (... /\ result = t /\ ...) *)
   let rec down p = match p.t_node with
     | Tbinop (Tand,l,r) ->
-        begin match down l with
-          | None, _ ->
-              let t, r = down r in
-              t, t_label_copy p (t_and_simp l r)
-          | t, l ->
-              t, t_label_copy p (t_and_simp l r)
-        end
-    | Tapp (ps,[{t_node = Tvar u};t])
-      when ls_equal ps ps_equ && vs_equal u v && not (Mvs.mem v t.t_vars) ->
-        Some t, t_true
+        let t, l, r =
+          let t, l = down l in
+          if t <> None then t, l, r else
+            let t, r = down r in t, l, r
+        in
+        t, if t = None then p else t_label_copy p (t_and_simp l r)
     | _ ->
-        None, p
+        let t = is_equality_for v p in
+        t, if t = None then p else t_true
   in
   if ty_equal v.vs_ty ty_unit then
     t_subst_single v t_void (wp_implies p f)
@@ -174,15 +178,21 @@ let wp_forall_post v p f =
     | Some t, p -> wp_let v t (wp_implies p f)
     | _ -> wp_forall [v] (wp_implies p f)
 
-(* regs_of_reads, and therefore regs_of_effect, only take into account
-   reads in program expressions and ignore the variables in specification *)
-(* dead code
-let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
-*)
+let t_and_subst v t1 t2 =
+  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
+     definition. Otherwise return [t1 /\ t2] *)
+  match is_equality_for v t1 with
+  | Some def -> t_subst_single v def t2
+  | None -> t_and_simp t1 t2
+
+let t_implies_subst v t1 t2 =
+  (* if [t1] defines variable [v], return [t2] with [v] replaced by its
+     definition. Otherwise return [t1 -> t2] *)
+  match is_equality_for v t1 with
+  | Some def -> t_subst_single v def t2
+  | None -> t_implies_simp t1 t2
+
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
-(* dead code
-let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
-*)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let open_post q =
@@ -264,17 +274,45 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
+let model1_lab = Slab.singleton (create_label "model:1")
+let model2_lab = Slab.singleton (create_label "model:quantify(2)")
+let model3_lab = Slab.singleton (create_label "model:cond")
+
+let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
+
+(* replace "contemporary" variables with fresh ones *)
+let rec subst_at_now now mvs t = match t.t_node with
+  | Tvar vs when now ->
+      begin try t_var (Mvs.find vs mvs) with Not_found -> t end
+  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
+  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
+      let now = match mark.t_node with
+        | Tvar vs when vs_equal vs vs_old -> assert false
+        | Tapp (ls,[]) when ls_equal ls fs_now -> true
+        | _ -> false in
+      t_map (subst_at_now now mvs) t
+  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+      (* do not open unless necessary *)
+      let mvs = Mvs.set_inter mvs t.t_vars in
+      if Mvs.is_empty mvs then t else
+      t_map (subst_at_now now mvs) t
+  | _ ->
+      t_map (subst_at_now now mvs) t
+
+(* generic expansion of an algebraic type value *)
 let analyze_var fn_down fn_join lkm km vs ity =
+  let var_of_fd fd =
+    create_vsymbol (id_fresh "y") (ty_of_ity fd.fd_ity) in
   let branch (cs,fdl) =
-    let mk_var fd = create_vsymbol (id_fresh "y") (ty_of_ity fd.fd_ity) in
-    let vars = List.map mk_var fdl in
-    let t = fn_join cs (List.map2 fn_down vars fdl) vs.vs_ty in
-    let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
+    let vl = List.map var_of_fd fdl in
+    let pat = pat_app cs (List.map pat_var vl) vs.vs_ty in
+    let t = fn_join cs (List.map2 fn_down vl fdl) vs.vs_ty in
     t_close_branch pat t in
   let csl = Mlw_decl.inst_constructors lkm km ity in
   t_case (t_var vs) (List.map branch csl)
 
-let update_var env mreg vs =
+(* given a map of modified regions, construct the updated value of [vs] *)
+let update_var env (mreg : vsymbol Mreg.t) vs =
   let rec update vs { fd_ity = ity; fd_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
@@ -285,67 +323,38 @@ let update_var env mreg vs =
     else analyze_var update fs_app env.pure_known env.prog_known vs ity in
   update vs { fd_ity = ity_of_vs vs; fd_ghost = false; fd_mut = None }
 
-(* substitute the updated values in the "contemporary" variables *)
-let rec subst_at_now now m t = match t.t_node with
-  | Tvar vs when now ->
-      begin try t_var (Mvs.find vs m) with Not_found -> t end
-  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
-  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
-      let now = match mark.t_node with
-        | Tvar vs when vs_equal vs vs_old -> assert false
-        | Tapp (ls,[]) when ls_equal ls fs_now -> true
-        | _ -> false in
-      t_map (subst_at_now now m) t
-  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
-      (* do not open unless necessary *)
-      let m = Mvs.set_inter m t.t_vars in
-      if Mvs.is_empty m then t else
-      t_map (subst_at_now now m) t
-  | _ ->
-      t_map (subst_at_now now m) t
-
-(* quantify over all references in eff
-   eff : effect
-   f   : formula
-
-   let eff = { rho1, ..., rhon }
-   we collect in vars all variables involving these regions
-   let vars = { v1, ..., vm }
-
-     forall r1:ty(rho1). ... forall rn:ty(rhon).
-     let v'1 = update v1 r1...rn in
-     ...
-     let v'm = update vm r1...rn in
-     f[vi <- v'i]
-*)
-
-let model1_lab = Slab.singleton (create_label "model:1")
-let model2_lab = Slab.singleton (create_label "model:quantify(2)")
-let model3_lab = Slab.singleton (create_label "model:cond")
-
-let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
-
-let quantify env regs f =
-  (* mreg : updated region -> vs *)
-  let get_var reg () =
-    let test vs _ id = match (ity_of_vs vs).ity_node with
-      | Ityapp (_,_,[r]) when reg_equal r reg -> vs.vs_name
-      | _ -> id in
-    let id = Mvs.fold test f.t_vars reg.reg_name in
-    mk_var id model1_lab (ty_of_ity reg.reg_ity)
-  in
-  let mreg = Mreg.mapi get_var regs in
-  (* update all program variables involving these regions *)
-  let update_var vs _ = match update_var env mreg vs with
+(* given a map of modified regions, update every affected variable in [f] *)
+let update_term env (mreg : vsymbol Mreg.t) f =
+  (* [vars] : modified variable -> updated value *)
+  let update vs _ = match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
     | t -> Some t in
-  let vars = Mvs.mapi_filter update_var f.t_vars in
-  (* vv' : old vs -> new vs *)
+  let vars = Mvs.mapi_filter update f.t_vars in
+  (* [vv'] : modified variable -> fresh variable *)
   let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
   let vv' = Mvs.mapi new_var vars in
-  (* quantify *)
+  (* update modified variables *)
   let update v t f = wp_let (Mvs.find v vv') t f in
-  let f = Mvs.fold update vars (subst_at_now true vv' f) in
+  Mvs.fold update vars (subst_at_now true vv' f)
+
+(* look for a variable with a single region equal to [reg] *)
+let var_of_region reg f =
+  let test vs _ _ = match (ity_of_vs vs).ity_node with
+    | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
+    | _ -> None in
+  Mvs.fold test f.t_vars None
+
+let quantify env regs f =
+  (* mreg : modified region -> vs *)
+  let get_var reg () =
+    let ty = ty_of_ity reg.reg_ity in
+    let id = match var_of_region reg f with
+      | Some vs -> vs.vs_name
+      | None -> reg.reg_name in
+    mk_var id model1_lab ty in
+  let mreg = Mreg.mapi get_var regs in
+  (* quantify over the modified resions *)
+  let f = update_term env mreg f in
   wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Invariants *)
