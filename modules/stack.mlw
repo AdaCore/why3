@@ -39,7 +39,7 @@ module Stack
 
   val clear (s: t 'a) : unit writes {s} ensures { s.elts = Nil }
 
-  val copy (s: t 'a) : t 'a ensures { result = s }
+  val copy (s: t 'a) : t 'a reads {s} ensures { result = s }
 
   val is_empty (s: t 'a) : bool reads {s}
     ensures { result = True <-> s.elts = Nil }

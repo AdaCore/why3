@@ -31,19 +31,7 @@ open Mlw_dty
 
 exception DuplicateProgVar of string
 exception DuplicateTypeVar of string
-(*
-exception PredicateExpected
-exception TermExpected
-exception FSymExpected of lsymbol
-exception PSymExpected of lsymbol
-exception ClashTheory of string
-exception UnboundTheory of qualid
-exception UnboundType of string list
-*)
 exception UnboundTypeVar of string
-(* unused
-exception UnboundSymbol of qualid
-*)
 
 let error = Loc.error
 let errorm = Loc.errorm
@@ -56,32 +44,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "Type parameter %s is used twice" s
   | DuplicateProgVar s ->
       Format.fprintf fmt "Parameter %s is used twice" s
+  | UnboundTypeVar s ->
+      Format.fprintf fmt "Unbound type variable '%s" s
   | TooLateInvariant ->
       Format.fprintf fmt
         "Cannot add a type invariant after another program declaration"
-(*
-  | PredicateExpected ->
-      Format.fprintf fmt "syntax error: predicate expected"
-  | TermExpected ->
-      Format.fprintf fmt "syntax error: term expected"
-  | FSymExpected ls ->
-      Format.fprintf fmt "%a is not a function symbol" Pretty.print_ls ls
-  | PSymExpected ls ->
-      Format.fprintf fmt "%a is not a predicate symbol" Pretty.print_ls ls
-  | ClashTheory s ->
-      Format.fprintf fmt "Clash with previous theory %s" s
-  | UnboundTheory q ->
-      Format.fprintf fmt "unbound theory %a" print_qualid q
-  | UnboundType sl ->
-      Format.fprintf fmt "Unbound type '%a'"
-        (Pp.print_list Pp.dot Pp.pp_print_string) sl
-*)
-  | UnboundTypeVar s ->
-      Format.fprintf fmt "Unbound type variable '%s" s
-(* unused
-  | UnboundSymbol q ->
-      Format.fprintf fmt "Unbound symbol '%a'" print_qualid q
-*)
   | _ -> raise e)
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
@@ -1198,33 +1165,68 @@ let eff_of_deff lenv dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   Mexn.fold add_raise dsp.ds_xpost eff, svs
 
-let check_user_effect lenv e otv dsp =
+exception Found of Loc.position option
+
+let check_user_effect lenv e eeff otv dsp =
+  let has_read reg eff =
+    Sreg.mem reg eff.eff_reads || Sreg.mem reg eff.eff_ghostr in
+  let has_write reg eff =
+    Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
+  let has_raise xs eff =
+    Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
+  (* check that every user effect actually happens *)
   let acc = eff_empty, Svs.empty in
-  let read le eff ?(ghost=false) reg =
-    ignore ghost;
-    if Sreg.mem reg e.e_effect.eff_reads ||
-       Sreg.mem reg e.e_effect.eff_ghostr
-    then eff else Loc.errorm ~loc:le.pp_loc
+  let read le ueff ?ghost reg =
+    if has_read reg eeff then eff_read ?ghost ueff reg
+    else Loc.errorm ~loc:le.pp_loc
       "this read effect never happens in the expression" in
-  let check_read e = ignore (get_eff_regs lenv (read e) acc e) in
-  List.iter check_read dsp.ds_reads;
-  let write le eff ?(ghost=false) reg =
-    ignore ghost;
-    if Sreg.mem reg e.e_effect.eff_writes ||
-       Sreg.mem reg e.e_effect.eff_ghostw
-    then eff else Loc.errorm ~loc:le.pp_loc
+  let add_read acc e = get_eff_regs lenv (read e) acc e in
+  let acc = List.fold_left add_read acc dsp.ds_reads in
+  let ueff_ro = not (eff_is_empty (fst acc)) in
+  let write le ueff ?ghost reg =
+    if has_write reg eeff then eff_write ?ghost ueff reg
+    else Loc.errorm ~loc:le.pp_loc
       "this write effect never happens in the expression" in
-  let check_write e = ignore (get_eff_regs lenv (write e) acc e) in
-  List.iter check_write dsp.ds_writes;
-  let check_raise xs _ =
-    if Sexn.mem xs e.e_effect.eff_raises ||
-       Sexn.mem xs e.e_effect.eff_ghostx
-    then () else Loc.errorm
+  let add_write acc e = get_eff_regs lenv (write e) acc e in
+  let ueff, _ = List.fold_left add_write acc dsp.ds_writes in
+  let ueff_rw = not (eff_is_empty ueff) in
+  let add_raise xs _ ueff =
+    if has_raise xs eeff then eff_raise ueff xs
+    else Loc.errorm
       "this expression does not raise exception %a" print_xs xs in
-  Mexn.iter check_raise dsp.ds_xpost;
-  let bad_comp tv _ _ = Loc.errorm
-    "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
-  ignore (Mtv.inter bad_comp otv e.e_effect.eff_compar)
+  let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
+  (* check that every computed effect is listed *)
+  let read reg =
+    let rec find_read () e = e_fold find_read () e;
+      if has_read reg e.e_effect then raise (Found e.e_loc) in
+    if not (has_read reg ueff) then Loc.errorm
+      ?loc:(try find_read () e; None with Found loc -> loc)
+      "this expression produces an unlisted read effect" in
+  if ueff_ro then Sreg.iter read eeff.eff_reads;
+  if ueff_ro then Sreg.iter read eeff.eff_ghostr;
+  let write reg =
+    let rec find_write () e = e_fold find_write () e;
+      if has_write reg e.e_effect then raise (Found e.e_loc) in
+    if not (has_write reg ueff) then Loc.errorm
+      ?loc:(try find_write () e; None with Found loc -> loc)
+      "this expression produces an unlisted write effect" in
+  if ueff_rw then Sreg.iter write eeff.eff_writes;
+  if ueff_rw then Sreg.iter write eeff.eff_ghostw;
+  let raize xs =
+    let rec find_raise () e = e_fold find_raise () e;
+      if has_raise xs e.e_effect then raise (Found e.e_loc) in
+    if not (has_raise xs ueff) then Loc.errorm
+      ?loc:(try find_raise () e; None with Found loc -> loc)
+      "this expression raises unlisted exception %a" print_xs xs in
+  Sexn.iter raize eeff.eff_raises;
+  Sexn.iter raize eeff.eff_ghostx;
+  (* check that we don't look inside opaque type variables *)
+  let bad_comp tv _ _ =
+    let rec find_compar () e = e_fold find_compar () e;
+      if Stv.mem tv e.e_effect.eff_compar then raise (Found e.e_loc) in
+    Loc.errorm ?loc:(try find_compar () e; None with Found loc -> loc)
+      "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
+  ignore (Mtv.inter bad_comp otv eeff.eff_compar)
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
@@ -1412,7 +1414,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
       if spec.c_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      check_user_effect lenv e1 Stv.empty dsp;
+      check_user_effect lenv e1 e1.e_effect Stv.empty dsp;
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
@@ -1504,7 +1506,7 @@ and expr_rec lenv dfdl =
   let eff = List.fold_left rd_effect eff_empty fdl in
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   let fdl = create_rec_defn (List.map step3 fdl) in
-  let step4 fd (_,_,_,bl,tr) = check_effects lenv fd.fun_lambda bl tr in
+  let step4 fd (_,_,_,bl,tr) = check_effects lenv fd bl tr in
   List.iter2 step4 fdl dfdl;
   fdl
 
@@ -1512,7 +1514,6 @@ and expr_fun lenv x gh bl (_, dsp as tr) =
   let lam = expr_lam lenv gh (binders bl) tr in
   if lam.l_spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a non-recursive definition";
-  check_effects lenv lam bl tr;
   let lam =
     if Debug.test_noflag implicit_post || dsp.ds_post <> [] ||
        oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
@@ -1527,7 +1528,9 @@ and expr_fun lenv x gh bl (_, dsp as tr) =
         { lam with l_spec = spec } in
   let pvs = l_pvset Spv.empty lam in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
-  create_fun_defn (Denv.create_user_id x) lam
+  let fd = create_fun_defn (Denv.create_user_id x) lam in
+  check_effects lenv fd bl tr;
+  fd
 
 and expr_lam lenv gh pvl (de, dsp) =
   let lenv = add_binders lenv pvl in
@@ -1537,10 +1540,12 @@ and expr_lam lenv gh pvl (de, dsp) =
   let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
 
-and check_effects lenv lam bl (de, dsp) =
+and check_effects lenv fd bl (de, dsp) =
+  let lam = fd.fun_lambda in
   let otv = opaque_binders Stv.empty bl in
   let lenv = add_binders lenv lam.l_args in
-  Loc.try3 de.de_loc check_user_effect lenv lam.l_expr otv dsp
+  let eff = fd.fun_ps.ps_aty.aty_spec.c_effect in
+  Loc.try3 de.de_loc check_user_effect lenv lam.l_expr eff otv dsp
 
 (** Type declaration *)
 

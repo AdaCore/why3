@@ -10,6 +10,19 @@ version 0.81, March ??, 2013
   o [prover] support for CVC4
   o [prover] support for mathematica
   o [prover] support for MathSAT5
+  o [logic] accept type expressions in clone substitutions
+  o [whyml] support for relation chains (e.g., "e1 = e2 < e3")
+  * [whyml] every exception raised in a function must be listed
+    in as "raises { ... }" clause. A postcondition may be omitted
+    and equals to "true" by default.
+  * [whyml] if a function definition contains a "writes { ... }"
+    clause, then every write effect must be listed. If a function
+    definition contains a "reads { ... }" clause, then every read
+    _and_ write effect must be listed.
+  * [drivers] syntax rules, metas, and preludes are inherited
+    through cloning. Keyword "cloned" becomes unnecessary and
+    is not accepted anymore.
+
 
 version 0.80, Oct 31, 2012
 ==========================

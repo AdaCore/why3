@@ -143,6 +143,7 @@ module ZipperBasedTermination
 
   let rec tc (left: list (int, tree)) (right: list (int, tree)) : tree
     variant { length left + length right, length right }
+    raises  { Failure }
   = match left, right with
     | _, Nil ->
         raise Failure

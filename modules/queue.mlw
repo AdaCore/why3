@@ -5,7 +5,7 @@ module Queue
 
   use import list.List
   use import list.Append
-  use import list.Length
+  use import list.Length as L
 
   type t 'a model { mutable elts: list 'a }
 
@@ -26,6 +26,16 @@ module Queue
       | Cons x _ -> result = x end }
     raises  { Empty -> q.elts = Nil }
 
+  val safe_pop (q: t 'a) : 'a writes {q}
+    requires { q.elts <> Nil }
+    ensures { match old q.elts with Nil -> false
+      | Cons x t -> result = x /\ q.elts = t end }
+
+  val safe_peek (q: t 'a) : 'a reads {q}
+    requires { q.elts <> Nil }
+    ensures { match q.elts with Nil -> false
+      | Cons x _ -> result = x end }
+
   val clear (q: t 'a) : unit writes {q} ensures { q.elts = Nil }
 
   val copy (q: t 'a) : t 'a reads {q} ensures { result = q }
@@ -33,7 +43,10 @@ module Queue
   val is_empty (q: t 'a) : bool reads {q}
     ensures { result = True <-> q.elts = Nil }
 
-  val length (q: t 'a) : int reads {q} ensures { result = length q.elts }
+  function length (q: t 'a) : int = L.length q.elts
+
+  val length (q: t 'a) : int reads {q}
+    ensures { result = L.length q.elts }
 
 end
 

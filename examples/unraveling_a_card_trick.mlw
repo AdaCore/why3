@@ -74,18 +74,20 @@ module GilbreathCardTrick
       shuffle (reverse (old a.elts)) (reverse (old b.elts)) result.elts }
   = 'Init:
     let c = create () in
+    let ghost a' = create () in
+    let ghost b' = create () in
     while not (is_empty a && is_empty b) do
-      invariant {
-        exists a' b': list int.
-          reverse (at a.elts 'Init) = reverse a.elts ++ a' /\
-          reverse (at b.elts 'Init) = reverse b.elts ++ b' /\
-          shuffle a' b' c.elts
-      }
-      variant { length a + length b }
-      if not (is_empty a) && (is_empty b || any bool) then
-        push (pop a) c
-      else
-        push (pop b) c
+      invariant { reverse (at a.elts 'Init) = reverse a.elts ++ a'.elts }
+      invariant { reverse (at b.elts 'Init) = reverse b.elts ++ b'.elts }
+      invariant { shuffle a'.elts b'.elts c.elts }
+      variant   { length a + length b }
+      if not (is_empty a) && (is_empty b || any bool) then begin
+        ghost (push (safe_top a) a');
+        push (safe_pop a) c
+      end else begin
+        ghost (push (safe_top b) b');
+        push (safe_pop b) c
+      end
     done;
     c
 
@@ -99,7 +101,7 @@ module GilbreathCardTrick
     for i = 1 to cut do
       invariant { length a = n*m-i+1 /\ length d_ = i-1 /\
                   at a.elts 'Init = reverse d_.elts ++ a.elts }
-      push (pop a) d_
+      push (safe_pop a) d_
     done;
     assert { at a.elts 'Init = reverse d_.elts ++ a.elts };
     (* then suffle c (that is a) and d_ to get b *)
