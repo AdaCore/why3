@@ -44,10 +44,23 @@ val report_position : formatter -> position -> unit
 
 exception Located of position * exn
 
-val try1: position -> ('a -> 'b) -> 'a -> 'b
-val try2: position -> ('a -> 'b -> 'c) -> 'a -> 'b -> 'c
-val try3: position -> ('a -> 'b -> 'c -> 'd) -> 'a -> 'b -> 'c -> 'd
-val try4: position -> ('a -> 'b -> 'c -> 'd -> 'e) -> 'a -> 'b -> 'c -> 'd -> 'e
+val try1: position -> ('a -> 'b) -> ('a -> 'b)
+val try2: position -> ('a -> 'b -> 'c) -> ('a -> 'b -> 'c)
+val try3: position -> ('a -> 'b -> 'c -> 'd) -> ('a -> 'b -> 'c -> 'd)
+
+val try4: position ->
+  ('a -> 'b -> 'c -> 'd -> 'e) -> ('a -> 'b -> 'c -> 'd -> 'e)
+
+val try5: position ->
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f) -> ('a -> 'b -> 'c -> 'd -> 'e -> 'f)
+
+val try6: position ->
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g) ->
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g)
+
+val try7: position ->
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h) ->
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h)
 
 val error: ?loc:position -> exn -> 'a
 

@@ -441,6 +441,34 @@ let l_pvset pvs lam =
   let pvs = spec_pvset pvs lam.l_spec in
   List.fold_right Spv.remove lam.l_args pvs
 
+(* fold *)
+
+let e_fold fn acc e = match e.e_node with
+  | Elet (ld,e) -> fn (fn acc ld.let_expr) e
+  | Erec (fdl,e) ->
+      let fn_fd acc fd = fn acc fd.fun_lambda.l_expr in
+      fn (List.fold_left fn_fd acc fdl) e
+  | Ecase (e,bl) ->
+      let fnbr acc (_,e) = fn acc e in
+      List.fold_left fnbr (fn acc e) bl
+  | Etry (e,bl) ->
+      let fn_br acc (_,_,e) = fn acc e in
+      List.fold_left fn_br (fn acc e) bl
+  | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
+  | Eapp (e,_,_) | Eassign (_,e,_,_) | Eghost e
+  | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
+  | Eabstr (e,_) -> fn acc e
+  | Elogic _ | Evalue _ | Earrow _
+  | Eany _ | Eassert _ | Eabsurd -> acc
+
+exception Found of expr
+
+let e_find pr e =
+  let rec find () e =
+    e_fold find () e;
+    if pr e then raise (Found e) in
+  try find () e; raise Not_found with Found e -> e
+
 (* check admissibility of consecutive events *)
 
 exception StaleRegion of expr * ident
@@ -1010,25 +1038,7 @@ let create_fun_defn id lam =
   if lam.l_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.create_fun_defn";
   create_fun_defn id lam Sid.empty
 
-(* fold *)
-
-let e_fold fn acc e = match e.e_node with
-  | Elet (ld,e) -> fn (fn acc ld.let_expr) e
-  | Erec (fdl,e) ->
-      let fn_fd acc fd = fn acc fd.fun_lambda.l_expr in
-      fn (List.fold_left fn_fd acc fdl) e
-  | Ecase (e,bl) ->
-      let fnbr acc (_,e) = fn acc e in
-      List.fold_left fnbr (fn acc e) bl
-  | Etry (e,bl) ->
-      let fn_br acc (_,_,e) = fn acc e in
-      List.fold_left fn_br (fn acc e) bl
-  | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
-  | Eapp (e,_,_) | Eassign (_,e,_,_) | Eghost e
-  | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
-  | Eabstr (e,_) -> fn acc e
-  | Elogic _ | Evalue _ | Earrow _
-  | Eany _ | Eassert _ | Eabsurd -> acc
+(* expr to term *)
 
 let spec_purify sp =
   let vs, f = Mlw_ty.open_post sp.c_post in

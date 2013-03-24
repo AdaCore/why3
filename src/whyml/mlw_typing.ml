@@ -1165,8 +1165,6 @@ let eff_of_deff lenv dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   Mexn.fold add_raise dsp.ds_xpost eff, svs
 
-exception Found of Loc.position option
-
 let check_user_effect lenv e eeff otv dsp =
   let has_read reg eff =
     Sreg.mem reg eff.eff_reads || Sreg.mem reg eff.eff_ghostr in
@@ -1192,40 +1190,35 @@ let check_user_effect lenv e eeff otv dsp =
   let ueff_rw = not (eff_is_empty ueff) in
   let add_raise xs _ ueff =
     if has_raise xs eeff then eff_raise ueff xs
-    else Loc.errorm
+    else Loc.errorm ?loc:e.e_loc
       "this expression does not raise exception %a" print_xs xs in
   let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
   (* check that every computed effect is listed *)
-  let read reg =
-    let rec find_read () e = e_fold find_read () e;
-      if has_read reg e.e_effect then raise (Found e.e_loc) in
-    if not (has_read reg ueff) then Loc.errorm
-      ?loc:(try find_read () e; None with Found loc -> loc)
-      "this expression produces an unlisted read effect" in
+  let read reg = if not (has_read reg ueff) then
+    let loc = (e_find (fun e ->
+      e.e_loc <> None && has_read reg e.e_effect) e).e_loc in
+    Loc.errorm ?loc "this expression produces an unlisted read effect" in
   if ueff_ro then Sreg.iter read eeff.eff_reads;
   if ueff_ro then Sreg.iter read eeff.eff_ghostr;
-  let write reg =
-    let rec find_write () e = e_fold find_write () e;
-      if has_write reg e.e_effect then raise (Found e.e_loc) in
-    if not (has_write reg ueff) then Loc.errorm
-      ?loc:(try find_write () e; None with Found loc -> loc)
-      "this expression produces an unlisted write effect" in
+  let write reg = if not (has_write reg ueff) then
+    let loc = (e_find (fun e ->
+      e.e_loc <> None && has_write reg e.e_effect) e).e_loc in
+    Loc.errorm ?loc "this expression produces an unlisted write effect" in
   if ueff_rw then Sreg.iter write eeff.eff_writes;
   if ueff_rw then Sreg.iter write eeff.eff_ghostw;
-  let raize xs =
-    let rec find_raise () e = e_fold find_raise () e;
-      if has_raise xs e.e_effect then raise (Found e.e_loc) in
-    if not (has_raise xs ueff) then Loc.errorm
-      ?loc:(try find_raise () e; None with Found loc -> loc)
-      "this expression raises unlisted exception %a" print_xs xs in
+  let raize xs = if not (has_raise xs ueff) then
+    let loc = (e_find (fun e ->
+      e.e_loc <> None && has_raise xs e.e_effect) e).e_loc in
+    Loc.errorm ?loc "this expression raises unlisted exception %a" print_xs xs
+  in
   Sexn.iter raize eeff.eff_raises;
   Sexn.iter raize eeff.eff_ghostx;
   (* check that we don't look inside opaque type variables *)
   let bad_comp tv _ _ =
-    let rec find_compar () e = e_fold find_compar () e;
-      if Stv.mem tv e.e_effect.eff_compar then raise (Found e.e_loc) in
-    Loc.errorm ?loc:(try find_compar () e; None with Found loc -> loc)
-      "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
+    let loc = (e_find (fun e ->
+      e.e_loc <> None && Stv.mem tv e.e_effect.eff_compar) e).e_loc in
+    Loc.errorm ?loc "type parameter %a is not opaque in this expression"
+      Pretty.print_tv tv in
   ignore (Mtv.inter bad_comp otv eeff.eff_compar)
 
 let spec_of_dspec lenv eff vty dsp = {
@@ -1545,7 +1538,7 @@ and check_effects lenv fd bl (de, dsp) =
   let otv = opaque_binders Stv.empty bl in
   let lenv = add_binders lenv lam.l_args in
   let eff = fd.fun_ps.ps_aty.aty_spec.c_effect in
-  Loc.try3 de.de_loc check_user_effect lenv lam.l_expr eff otv dsp
+  Loc.try5 de.de_loc check_user_effect lenv lam.l_expr eff otv dsp
 
 (** Type declaration *)
 
@@ -2095,7 +2088,7 @@ let use_clone_pure lib mth uc loc (use,inst) =
 
 let use_clone_pure lib mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (use_clone_pure lib mth) uc loc use
+  Loc.try5 loc use_clone_pure lib mth uc loc use
 
 let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
@@ -2121,7 +2114,7 @@ let use_clone lib mmd mth uc loc (use,inst) =
 
 let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (use_clone lib mmd mth) uc loc use
+  Loc.try6 loc use_clone lib mmd mth uc loc use
 
 let close_theory (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
@@ -2177,7 +2170,7 @@ let open_file, close_file =
       open_module = open_module;
       close_module = close_module;
       open_namespace = open_namespace;
-      close_namespace = (fun loc -> Loc.try1 loc close_namespace);
+      close_namespace = (fun loc imp -> Loc.try1 loc close_namespace imp);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
       use_clone = use_clone; }
