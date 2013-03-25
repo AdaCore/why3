@@ -429,12 +429,13 @@ gallery::
 	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
 	  f=`basename $$d`; \
+	  why3session html $$x; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
-	  cp examples/$$f.mlw $(GALLERYDIR)/$$f/; \
+	  cp examples/$$f.mlw examples/$$f/$$f.html $(GALLERYDIR)/$$f/; \
 	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
 	  cd examples/; \
-	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f; \
+	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f/$$f.html  $$f; \
 	  cd ..; \
 	done
 
