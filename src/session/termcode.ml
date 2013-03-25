@@ -174,14 +174,13 @@ module Checksum = struct
   let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
   let list e b l = char b '['; List.iter (e b) l; char b ']'
 
-  (* let ident_printer = Ident.create_ident_printer [] *)
-  (* let ident b id = string b (Ident.id_unique ident_printer id) *)
-  let hident = Ident.Hid.create 17
-  let ident =
+  let ident, clear_ident =
+    let hident = Ident.Hid.create 17 in
     let c = ref 0 in
-    fun b id ->
+    (fun b id ->
       int b (try Ident.Hid.find hident id
-        with Not_found -> incr c; Ident.Hid.add hident id !c; !c)
+        with Not_found -> incr c; Ident.Hid.add hident id !c; !c)),
+    (fun () -> Ident.Hid.clear hident; c := 0)
 
   let const b c =
     let buf = Buffer.create 17 in
@@ -319,9 +318,8 @@ module Checksum = struct
 
   let task t =
     let b = Buffer.create 8192 in
-    (* Ident.forget_all ident_printer; *)
     Task.task_iter (tdecl b) t;
-    Ident.Hid.clear hident;
+    clear_ident ();
     let s = Buffer.contents b in
     Digest.to_hex (Digest.string s)
 
