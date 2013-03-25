@@ -120,9 +120,6 @@ scheduled on March 2013
 * manual in HTML: "make doc/html/index.html"
 * do "make distrib"
 * test distrib/why3-0.81.tar.gz
-* make a last commit:
- - add tag 0.81 to the git repository, using git tag 0.81
- - do not forget to push it using git push --tags
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
   ~filliatr/ARCHIVE/www/why)
@@ -162,6 +159,14 @@ scheduled on March 2013
 
  - make everything writeable for the group
    chmod -R g+w /users/www-perso/projets/why3
+
+* make a last commit:
+ - git commit -m "release 0.81"
+ - add tag 0.81 to the git repository, using
+   git tag 0.81
+ - do not forget to push it using
+   git push
+   git push --tags
 
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
