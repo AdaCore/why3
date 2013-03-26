@@ -20,47 +20,17 @@
 open Why3
 open Term
 
-type vc_info =
-   { expl : Gnat_expl.expl option; trace : Gnat_loc.loc list }
-(* The VC information that has been found in a VC *)
-
-let rec search_labels acc f =
-   (* This function takes a VC formula, and returns the VC info found in that
-      formula. The argument "acc" will be enriched at each node. *)
-   let acc =
+let search_labels =
+  (* fold over the term to find the explanation *)
+  let rec search_labels acc f =
+    let acc =
       match Gnat_expl.extract_explanation f.t_label with
-      | Gnat_expl.Expl e ->
-            begin match acc.expl with
-            | Some e_old ->
-                  { expl = Some e;
-                    trace = Gnat_expl.get_loc e_old :: acc.trace }
-            | None -> { expl = Some e; trace = acc.trace }
-            end
-      | Gnat_expl.Sloc s -> { acc with trace = s :: acc.trace }
-      | Gnat_expl.No_Info -> acc in
-   match f.t_node with
-   | Ttrue | Tfalse | Tconst _ | Tvar _ | Tapp _  -> acc
-   | Tif (c,t1,t2) ->
-         search_labels (search_labels (search_labels acc c) t1) t2
-   | Tcase (c, tbl) ->
-         List.fold_left (fun acc b ->
-            let _, t = t_open_branch b in
-            search_labels acc t) (search_labels acc c) tbl
-   | Tnot t -> search_labels acc t
-   | Tbinop (Timplies,t1,t2) ->
-         search_labels (search_labels acc t1) t2
-   | Tbinop (_,t1,t2) -> search_labels (search_labels acc t1) t2
-   | Tlet (_,tb) | Teps tb ->
-         let _, t = t_open_bound tb in
-         search_labels acc t
-   | Tquant (_,tq) ->
-         let _,_,t = t_open_quant tq in
-         search_labels acc t
-
-let search_labels f =
-   (* This is a wrapper around the previous function, with an empty vc_info as
-      accumulator *)
-   search_labels { expl = None; trace = [] } f
+      | Gnat_expl.Expl e -> Some e
+      | _ -> acc
+    in
+    t_fold search_labels acc f
+  in
+  search_labels None
 
 let print ?(endline=true) b task expl =
    (* Print a positive or negative message for objectives *)
@@ -93,13 +63,13 @@ let register_goal goal =
    let task = Session.goal_task goal in
    let fml = Task.task_goal_fmla task in
    match is_trivial fml, search_labels fml with
-   | true, { expl = None } ->
+   | true, None ->
          Gnat_objectives.set_not_interesting goal
-   | _, { expl = None } ->
+   | _, None ->
          Gnat_util.abort_with_message
          "Task has no tracability label."
-   | _, { expl = Some e ; trace = l } ->
-         Gnat_objectives.add_to_objective e goal l
+   | _, Some e ->
+       Gnat_objectives.add_to_objective e goal
 
 let rec handle_vc_result goal result detailed =
    (* This function is called when the prover has returned from a VC.
@@ -117,7 +87,9 @@ let rec handle_vc_result goal result detailed =
          | _ -> ()
          end
    | Gnat_objectives.Not_Proved ->
-         Gnat_objectives.Save_VCs.save_trace goal;
+         if Gnat_config.proof_mode = Gnat_config.Then_Split then begin
+            Gnat_objectives.Save_VCs.save_trace goal
+         end;
          if Gnat_config.report = Gnat_config.Detailed && detailed <> None then
          begin
             let detailed =

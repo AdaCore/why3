@@ -24,8 +24,6 @@ type objective = Gnat_expl.expl
 (* an objective is identified by its explanation, which contains the source
    location and the kind of the check *)
 
-type trace = Gnat_loc.loc list
-
 type key = int
 
 type goal = key Session.goal
@@ -36,8 +34,8 @@ type subp
 (* various possibilities to add objectives and goals to the database, and the
    "interesting" bit *)
 
-val add_to_objective : objective -> goal -> trace -> unit
-(* register the goal with the given objective and trace. If this is the
+val add_to_objective : objective -> goal -> unit
+(* register the goal with the given objective. If this is the
    first time we register a goal for given objective, the objective is
    registered as well. Only do the registering if the objective is to de
    discharged (ie, if the --limit-subp / --limit-line directives apply). *)
@@ -53,13 +51,8 @@ val is_not_interesting : goal -> bool
 val is_interesting : goal -> bool
 (* query the "interesting" bit *)
 
-(* Accessor functions for objectives and trace *)
-
 val get_objective : goal -> objective
 (* get the objective associated with a goal *)
-
-val get_trace : goal -> trace
-(* get the trace of a given goal *)
 
 (* Scheduling and proof *)
 val next : objective -> goal option

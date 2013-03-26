@@ -100,8 +100,6 @@ let explmap : objective_rec Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
 let goalmap : Gnat_expl.expl GoalMap.t = GoalMap.create 17
 (* maps goals to their objectives *)
 
-let tracemap : trace GoalMap.t = GoalMap.create 17
-
 let total_nb_goals : int ref = ref 0
 let nb_objectives : int ref = ref 0
 let nb_goals_done : int ref = ref 0
@@ -111,7 +109,6 @@ let not_interesting : GoalSet.t = GoalSet.empty ()
 let clear () =
    Gnat_expl.HExpl.clear explmap;
    GoalMap.clear goalmap;
-   GoalMap.clear tracemap;
    GoalSet.reset not_interesting;
    total_nb_goals := 0;
    nb_objectives := 0;
@@ -126,7 +123,7 @@ let find e =
       incr nb_objectives;
       r
 
-let add_to_objective ex go trace_list =
+let add_to_objective ex go =
    let filter =
       match Gnat_config.limit_line with
       | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
@@ -138,19 +135,15 @@ let add_to_objective ex go trace_list =
       let obj = find ex in
       GoalSet.add obj.to_be_scheduled go;
       GoalSet.add obj.to_be_proved go;
-      GoalMap.add tracemap go trace_list
    end
 
 let add_objective e = ignore (find e)
 
 let get_objective goal = GoalMap.find goalmap goal
 
-let get_trace goal = GoalMap.find tracemap goal
-
 let add_clone derive goal =
    let obj = get_objective derive in
-   let trace = get_trace derive in
-   add_to_objective obj goal trace
+   add_to_objective obj goal
 
 let set_not_interesting x = GoalSet.add not_interesting x
 let is_not_interesting x = GoalSet.mem not_interesting x
@@ -572,16 +565,30 @@ module Save_VCs = struct
       with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
       Format.printf "saved VC to %s@." vc_fn
 
+   let compute_trace =
+     let rec compute_trace acc f =
+       let acc = Term.t_fold compute_trace acc f in
+       match Gnat_expl.extract_explanation f.Term.t_label with
+       (* it should be enough to look at the "sloc"s here, and not take into
+          account the explanations. *)
+       | Gnat_expl.Sloc loc -> loc :: acc
+       | _ -> acc
+     in
+     fun goal ->
+       let f = Task.task_goal_fmla (Session.goal_task goal) in
+       compute_trace [] f
+
    let save_trace goal =
       let expl = get_objective goal in
       let base = Gnat_expl.to_filename ~goal expl in
-      let trace = get_trace goal in
-      if trace <> [] then
+      let trace = compute_trace goal in
+      if trace <> [] then begin
         let trace_fn = base ^ ".trace" in
         with_fmt_channel trace_fn (fun fmt ->
            List.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
              (Gnat_loc.orig_loc l)) trace)
+      end
 
 end
 
