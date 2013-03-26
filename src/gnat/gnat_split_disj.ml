@@ -28,7 +28,8 @@ let rec collect_cases acc f =
   | Tif (fif,fthen,felse) ->
       let acc1 = collect_cases acc fthen in
       let acc2 = collect_cases acc felse in
-      join_and fif acc1 @ join_and (t_not fif) acc2
+      join_and (t_label_copy f fif) acc1 @
+      join_and (t_label_copy f (t_not fif)) acc2
 
 let rec split f =
   match f.t_node with
