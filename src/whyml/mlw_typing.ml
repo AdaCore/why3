@@ -978,26 +978,22 @@ let reset_vars eff pvs =
 
 (* add dummy postconditions for uncovered exceptions *)
 let complete_xpost eff xq =
-  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
-  let check xs _ = Loc.errorm
-    "this expression does not raise exception %a" print_xs xs in
-  Mexn.iter check (Mexn.set_diff xq xe);
   let dummy { xs_ity = ity } () =
     let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
     Mlw_ty.create_post v t_true in
+  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
   Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xe xq))
 
 let spec_invariant lenv pvs vty spec =
   let ity = ity_of_vty vty in
   let pvs = spec_pvset pvs spec in
   let rvs = reset_vars spec.c_effect pvs in
-  let xpost = complete_xpost spec.c_effect spec.c_xpost in
   let pinv,qinv = env_invariant lenv spec.c_effect pvs in
   let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { spec with c_pre   = t_and_asym_simp pinv spec.c_pre;
               c_post  = post_inv ity spec.c_post;
-              c_xpost = Mexn.mapi xpost_inv xpost }
+              c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
 let abstr_invariant lenv e spec0 =
   let pvs = e_pvset Spv.empty e in
@@ -1010,6 +1006,12 @@ let lambda_invariant lenv pvs eff lam =
   let pvs = List.fold_right Spv.add lam.l_args pvs in
   let spec = { lam.l_spec with c_effect = eff } in
   let spec = spec_invariant lenv pvs lam.l_expr.e_vty spec in
+  (* we add dummy xposts for uncovered exceptions to silence
+     Mlw_ty.spec_check, but we do another proper check later
+     in check_user_effect, which will give us a precise
+     location of the exception-raising sub-expression *)
+  let xpost = complete_xpost eff spec.c_xpost in
+  let spec = { spec with c_xpost = xpost } in
   { lam with l_spec = spec }
 
 (* specification handling *)
@@ -1165,7 +1167,11 @@ let eff_of_deff lenv dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   Mexn.fold add_raise dsp.ds_xpost eff, svs
 
-let check_user_effect lenv e eeff otv dsp =
+let e_find_loc pr e =
+  try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
+  with Not_found -> None
+
+let check_user_effect lenv e eeff full_xpost dsp =
   let has_read reg eff =
     Sreg.mem reg eff.eff_reads || Sreg.mem reg eff.eff_ghostr in
   let has_write reg eff =
@@ -1194,32 +1200,31 @@ let check_user_effect lenv e eeff otv dsp =
       "this expression does not raise exception %a" print_xs xs in
   let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
   (* check that every computed effect is listed *)
-  let read reg = if not (has_read reg ueff) then
-    let loc = (e_find (fun e ->
-      e.e_loc <> None && has_read reg e.e_effect) e).e_loc in
-    Loc.errorm ?loc "this expression produces an unlisted read effect" in
-  if ueff_ro then Sreg.iter read eeff.eff_reads;
-  if ueff_ro then Sreg.iter read eeff.eff_ghostr;
-  let write reg = if not (has_write reg ueff) then
-    let loc = (e_find (fun e ->
-      e.e_loc <> None && has_write reg e.e_effect) e).e_loc in
-    Loc.errorm ?loc "this expression produces an unlisted write effect" in
-  if ueff_rw then Sreg.iter write eeff.eff_writes;
-  if ueff_rw then Sreg.iter write eeff.eff_ghostw;
-  let raize xs = if not (has_raise xs ueff) then
-    let loc = (e_find (fun e ->
-      e.e_loc <> None && has_raise xs e.e_effect) e).e_loc in
-    Loc.errorm ?loc "this expression raises unlisted exception %a" print_xs xs
-  in
-  Sexn.iter raize eeff.eff_raises;
-  Sexn.iter raize eeff.eff_ghostx;
+  let check_read reg = if not (has_read reg ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_read reg e.e_effect) e)
+      "this expression produces an unlisted read effect" in
+  if ueff_ro then Sreg.iter check_read eeff.eff_reads;
+  if ueff_ro then Sreg.iter check_read eeff.eff_ghostr;
+  let check_write reg = if not (has_write reg ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
+      "this expression produces an unlisted write effect" in
+  if ueff_rw then Sreg.iter check_write eeff.eff_writes;
+  if ueff_rw then Sreg.iter check_write eeff.eff_ghostw;
+  let check_raise xs = if not (has_raise xs ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
+      "this expression raises unlisted exception %a" print_xs xs in
+  if full_xpost then Sexn.iter check_raise eeff.eff_raises;
+  if full_xpost then Sexn.iter check_raise eeff.eff_ghostx
+
+let check_lambda_effect lenv ({fun_lambda = lam} as fd) bl dsp =
+  let lenv = add_binders lenv lam.l_args in
+  let eeff = fd.fun_ps.ps_aty.aty_spec.c_effect in
+  check_user_effect lenv lam.l_expr eeff true dsp;
   (* check that we don't look inside opaque type variables *)
-  let bad_comp tv _ _ =
-    let loc = (e_find (fun e ->
-      e.e_loc <> None && Stv.mem tv e.e_effect.eff_compar) e).e_loc in
-    Loc.errorm ?loc "type parameter %a is not opaque in this expression"
-      Pretty.print_tv tv in
-  ignore (Mtv.inter bad_comp otv eeff.eff_compar)
+  let bad_comp tv _ _ = Loc.errorm
+    ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
+    "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
+  ignore (Mtv.inter bad_comp (opaque_binders Stv.empty bl) eeff.eff_compar)
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
@@ -1407,7 +1412,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
       if spec.c_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      check_user_effect lenv e1 e1.e_effect Stv.empty dsp;
+      check_user_effect lenv e1 e1.e_effect false dsp;
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
@@ -1499,11 +1504,12 @@ and expr_rec lenv dfdl =
   let eff = List.fold_left rd_effect eff_empty fdl in
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   let fdl = create_rec_defn (List.map step3 fdl) in
-  let step4 fd (_,_,_,bl,tr) = check_effects lenv fd bl tr in
+  let step4 fd (_,_,_,bl,(de,dsp)) =
+    Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp in
   List.iter2 step4 fdl dfdl;
   fdl
 
-and expr_fun lenv x gh bl (_, dsp as tr) =
+and expr_fun lenv x gh bl (de, dsp as tr) =
   let lam = expr_lam lenv gh (binders bl) tr in
   if lam.l_spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a non-recursive definition";
@@ -1522,7 +1528,7 @@ and expr_fun lenv x gh bl (_, dsp as tr) =
   let pvs = l_pvset Spv.empty lam in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   let fd = create_fun_defn (Denv.create_user_id x) lam in
-  check_effects lenv fd bl tr;
+  Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
   fd
 
 and expr_lam lenv gh pvl (de, dsp) =
@@ -1532,13 +1538,6 @@ and expr_lam lenv gh pvl (de, dsp) =
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
-
-and check_effects lenv fd bl (de, dsp) =
-  let lam = fd.fun_lambda in
-  let otv = opaque_binders Stv.empty bl in
-  let lenv = add_binders lenv lam.l_args in
-  let eff = fd.fun_ps.ps_aty.aty_spec.c_effect in
-  Loc.try5 de.de_loc check_user_effect lenv lam.l_expr eff otv dsp
 
 (** Type declaration *)
 

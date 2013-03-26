@@ -877,9 +877,10 @@ let e_any spec vty =
   aty_check (vars_merge varm vars_empty) aty;
   mk_expr (Eany spec) vty false spec.c_effect varm
 
-let e_abstract e spec =
+let e_abstract ({ e_effect = eff } as e) spec =
   if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_abstract";
-  spec_check { spec with c_effect = e.e_effect } e.e_vty;
+  let spec = { spec with c_effect = eff } in
+  spec_check ~full_xpost:false spec e.e_vty;
   let varm = spec_varmap e.e_varm spec in
   mk_expr (Eabstr (e,spec)) e.e_vty e.e_ghost e.e_effect varm
 
@@ -896,6 +897,7 @@ let create_fun_defn id ({l_expr = e; l_spec = c} as lam) recsyms =
   let eff = if c.c_letrec <> 0 && c.c_variant = []
     then eff_diverge e.e_effect else e.e_effect in
   let spec = { c with c_effect = eff } in
+  let lam = { lam with l_spec = spec } in
   let varm = spec_varmap e.e_varm spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
