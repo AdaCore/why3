@@ -821,10 +821,12 @@ let spec_check ~full_xpost c ty =
     | Some ps -> ignore (ps_app ps [t;t])
     | None -> ignore (t_type t) in
   List.iter check_variant c.c_variant;
-  if full_xpost then
-    let sexn = Sexn.union c.c_effect.eff_raises c.c_effect.eff_ghostx in
-    if not (Sexn.is_empty (Mexn.set_diff sexn c.c_xpost)) then
-      raise (UnboundException (Sexn.choose sexn))
+  if full_xpost && not (Mexn.set_submap c.c_effect.eff_raises c.c_xpost) then
+    raise (UnboundException
+      (Sexn.choose (Mexn.set_diff c.c_effect.eff_raises c.c_xpost)));
+  if full_xpost && not (Mexn.set_submap c.c_effect.eff_ghostx c.c_xpost) then
+    raise (UnboundException
+      (Sexn.choose (Mexn.set_diff c.c_effect.eff_ghostx c.c_xpost)))
 
 (** program variables *)
 
