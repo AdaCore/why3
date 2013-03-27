@@ -1401,7 +1401,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           call_post
           xpost in
         let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
-        let ne = t_and_simp wp1.post.ne post.ne in
+        let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
         let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
           let p2_effect = Sreg.union e1_regs call_regs in
           let p1 = get_exn e1_regs ex wp1.exn in
@@ -1442,8 +1442,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                                 (p2_effect, p2.s) in
         { s = s;
           ne =
-            wp_or (t_and_simp p1.ne r1)
-                  (t_and_simp_l [p2.ne; r2; wp1.post.ne])
+            wp_label e
+            (wp_or (t_and_simp p1.ne r1)
+                  (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
         }) in
       { ok = ok;
         post = { ne = ne; s = wp2.post.s };
@@ -1494,7 +1495,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             t_and_subst cond_res wp1.post.ne
                 (t_and_simp_l [t_not test; post3.ne; q23; r3]) in
           let ne = wp_ors [first_case; second_case; third_case] in
-          { ne = ne; s = s' }) in
+          { ne = wp_label e ne; s = s' }) in
       { ok = ok;
         post = { ne = ne; s = state };
         exn = xne }

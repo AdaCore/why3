@@ -22,9 +22,9 @@ let rec collect_cases acc f =
       (* ??? We should split pattern matching, just as we do for Tif *)
       join_and f acc
   | Tbinop (Tor, f1, f2) ->
-      collect_cases acc f1 @ collect_cases acc f2
+      List.map (t_label_copy f) (collect_cases acc f1 @ collect_cases acc f2)
   | Tbinop (Tand, f1, f2) ->
-      collect_cases (collect_cases acc f1) f2
+      List.map (t_label_copy f) (collect_cases (collect_cases acc f1) f2)
   | Tif (fif,fthen,felse) ->
       let acc1 = collect_cases acc fthen in
       let acc2 = collect_cases acc felse in
