@@ -302,20 +302,15 @@ and string = parse
       { Buffer.add_char string_buf c; string lexbuf }
 
 {
-  let with_location f lb =
-    if Debug.test_flag Debug.stack_trace then f lb else
-    try f lb with
-      | Loc.Located _ as e -> raise e
-      | e -> raise (Loc.Located (loc lb, e))
 
   let parse_logic_file env path lb =
     open_file token (Lexing.from_string "") (Typing.open_file env path);
-    with_location (logic_file token) lb;
+    Loc.with_location (logic_file token) lb;
     Typing.close_file ()
 
   let parse_program_file inc lb =
     open_file token (Lexing.from_string "") inc;
-    with_location (program_file token) lb
+    Loc.with_location (program_file token) lb
 
   let token_counter lb =
     let rec loop in_annot a p =

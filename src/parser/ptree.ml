@@ -46,6 +46,7 @@ type pty =
   | PPTtuple of pty list
 
 type ghost = bool
+type top_ghost = Gnone | Gghost | Glemma
 
 type binder = loc * ident option * ghost * pty option
 type param  = loc * ident option * ghost * pty
@@ -242,12 +243,12 @@ and expr_desc =
   | Eabstract of triple
   | Enamed of label * expr
 
-and letrec = loc * ident * ghost * binder list * triple
+and letrec = loc * ident * top_ghost * binder list * triple
 
 and triple = expr * spec
 
 type pdecl =
-  | Dlet of ident * ghost * expr
+  | Dlet of ident * top_ghost * expr
   | Dletrec of letrec list
   | Dparam of ident * ghost * type_v
   | Dexn of ident * pty
