@@ -1,0 +1,55 @@
+module Test
+
+  use import list.List
+  use import pqueue.Pqueue as P
+
+  function v1 : elt
+  function v2 : elt
+  axiom values: rel v2 v1 /\ v1 <> v2
+
+  let test0 () =
+    let s = P.create () : P.t in
+    assert { s.elts = Nil };
+    let b = P.is_empty s in
+    assert { b = True };
+    let n = P.length s in
+    assert { n = 0 }
+
+  let test1 () =
+    raises { P.Empty }
+    let s = P.create () in
+    P.push v1 s;
+    let x = P.peek s in assert { x = v1 };
+    P.push v2 s;
+    let x = P.peek s in assert { x = v2 };
+    ()
+
+end
+
+module TestNoDup
+
+  use import set.Fset
+  use import pqueue.PqueueNoDup as P
+
+  function v1 : elt
+  function v2 : elt
+  axiom values: rel v2 v1 /\ v1 <> v2
+
+  let test0 () =
+    let s = P.create () : P.t in
+    assert { s.elts = empty };
+    let b = P.is_empty s in
+    assert { b = True };
+    let n = P.length s in
+    assert { n = 0 }
+
+  let test1 () =
+    raises { P.Empty }
+    let s = P.create () in
+    P.push v1 s;
+    let x = P.peek s in assert { x = v1 };
+    P.push v2 s;
+    let x = P.peek s in assert { x = v2 };
+    ()
+
+end

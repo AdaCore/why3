@@ -222,6 +222,7 @@ end
 /* Precedences */
 
 %nonassoc prec_mark
+%nonassoc prec_fun
 %nonassoc IN
 %right SEMICOLON
 %nonassoc prec_no_else
@@ -1140,7 +1141,7 @@ fun_defn:
 ;
 
 fun_expr:
-| FUN list1_binder spec ARROW spec expr
+| FUN list1_binder spec ARROW spec expr %prec prec_fun
    { mk_expr (Efun ($2, ($6, spec_union $3 $5))) }
 ;
 

@@ -14,8 +14,7 @@ module T
 
   exception MyExc
 
- let rec f (x:t) : t = raise MyExc
-
- with g  (x:t) : t ensures { true } = f x
+  let rec f (x:t) : t raises { MyExc } = raise MyExc
+  with g  (x:t) : t raises { MyExc } ensures { true } = f x
 end
 

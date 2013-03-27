@@ -267,4 +267,6 @@ val e_absurd : ity -> expr
 
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 
+val e_find : (expr -> bool) -> expr -> expr
+
 val e_purify : expr -> term option

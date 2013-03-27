@@ -78,6 +78,18 @@ scheduled on March 2013
 
 == New Features to announce ==
 
+  o [logic] accept type expressions in clone substitutions
+  o [whyml] support for relation chains (e.g., "e1 = e2 < e3")
+  * [whyml] every exception raised in a function must be listed
+    in as "raises { ... }" clause. A postcondition may be omitted
+    and equals to "true" by default.
+  * [whyml] if a function definition contains a "writes { ... }"
+    clause, then every write effect must be listed. If a function
+    definition contains a "reads { ... }" clause, then every read
+    _and_ write effect must be listed.
+  * [drivers] syntax rules, metas, and preludes are inherited
+    through cloning. Keyword "cloned" becomes unnecessary and
+    is not accepted anymore.
   o [why3ide] allow several files on the command-line
   o [ocaml API] incompatible changes in Set/Map/Hashtbl modules
   o [ocaml API] examples in the manual extended to API for Why3ml programs
@@ -108,20 +120,26 @@ scheduled on March 2013
 * manual in HTML: "make doc/html/index.html"
 * do "make distrib"
 * test distrib/why3-0.81.tar.gz
-* make a last commit:
- - add tag 0.81 to the git repository, using git tag 0.81
- - do not forget to push it using git push --tags
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
   ~filliatr/ARCHIVE/www/why)
 * put on the web page
  - why3-0.81.tar.gz
+   cp distrib/why3-0.81.tar.gz /users/www-perso/projets/why3/download
+
+ - the manual in PDF
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.81.pdf
+
  - the HTML version of the manual (content of doc/html)
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.81
+
  - why3session.dtd
+   cp share/why3session.dtd /users/www-perso/projets/why3/
+
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    make stdlibdoc
    cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.81
-   rm /users/www-perso/projets/why3/stdlib)
+   rm /users/www-perso/projets/why3/stdlib
    ln -s /users/www-perso/projets/why3/stdlib-0.81 \
             /users/www-perso/projets/why3/stdlib
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
@@ -132,9 +150,23 @@ scheduled on March 2013
       /users/www-perso/projets/why3/api
    PROBLEME avec style.css
  - update the main HTML page (sources are in repository why3-www)
+   edit index.html
+   make export
+
  - add links to extra resources like
    http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
    page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
+ - make everything writeable for the group
+   chmod -R g+w /users/www-perso/projets/why3
+
+* make a last commit:
+ - git commit -m "release 0.81"
+ - add tag 0.81 to the git repository, using
+   git tag 0.81
+ - do not forget to push it using
+   git push
+   git push --tags
 
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1

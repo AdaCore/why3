@@ -441,6 +441,34 @@ let l_pvset pvs lam =
   let pvs = spec_pvset pvs lam.l_spec in
   List.fold_right Spv.remove lam.l_args pvs
 
+(* fold *)
+
+let e_fold fn acc e = match e.e_node with
+  | Elet (ld,e) -> fn (fn acc ld.let_expr) e
+  | Erec (fdl,e) ->
+      let fn_fd acc fd = fn acc fd.fun_lambda.l_expr in
+      fn (List.fold_left fn_fd acc fdl) e
+  | Ecase (e,bl) ->
+      let fnbr acc (_,e) = fn acc e in
+      List.fold_left fnbr (fn acc e) bl
+  | Etry (e,bl) ->
+      let fn_br acc (_,_,e) = fn acc e in
+      List.fold_left fn_br (fn acc e) bl
+  | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
+  | Eapp (e,_,_) | Eassign (_,e,_,_) | Eghost e
+  | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
+  | Eabstr (e,_) -> fn acc e
+  | Elogic _ | Evalue _ | Earrow _
+  | Eany _ | Eassert _ | Eabsurd -> acc
+
+exception Found of expr
+
+let e_find pr e =
+  let rec find () e =
+    e_fold find () e;
+    if pr e then raise (Found e) in
+  try find () e; raise Not_found with Found e -> e
+
 (* check admissibility of consecutive events *)
 
 exception StaleRegion of expr * ident
@@ -849,9 +877,10 @@ let e_any spec vty =
   aty_check (vars_merge varm vars_empty) aty;
   mk_expr (Eany spec) vty false spec.c_effect varm
 
-let e_abstract e spec =
+let e_abstract ({ e_effect = eff } as e) spec =
   if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_abstract";
-  spec_check { spec with c_effect = e.e_effect } e.e_vty;
+  let spec = { spec with c_effect = eff } in
+  spec_check ~full_xpost:false spec e.e_vty;
   let varm = spec_varmap e.e_varm spec in
   mk_expr (Eabstr (e,spec)) e.e_vty e.e_ghost e.e_effect varm
 
@@ -868,6 +897,7 @@ let create_fun_defn id ({l_expr = e; l_spec = c} as lam) recsyms =
   let eff = if c.c_letrec <> 0 && c.c_variant = []
     then eff_diverge e.e_effect else e.e_effect in
   let spec = { c with c_effect = eff } in
+  let lam = { lam with l_spec = spec } in
   let varm = spec_varmap e.e_varm spec in
   let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
   let varm = List.fold_left del_pv varm lam.l_args in
@@ -1010,25 +1040,7 @@ let create_fun_defn id lam =
   if lam.l_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.create_fun_defn";
   create_fun_defn id lam Sid.empty
 
-(* fold *)
-
-let e_fold fn acc e = match e.e_node with
-  | Elet (ld,e) -> fn (fn acc ld.let_expr) e
-  | Erec (fdl,e) ->
-      let fn_fd acc fd = fn acc fd.fun_lambda.l_expr in
-      fn (List.fold_left fn_fd acc fdl) e
-  | Ecase (e,bl) ->
-      let fnbr acc (_,e) = fn acc e in
-      List.fold_left fnbr (fn acc e) bl
-  | Etry (e,bl) ->
-      let fn_br acc (_,_,e) = fn acc e in
-      List.fold_left fn_br (fn acc e) bl
-  | Eif (e1,e2,e3) -> fn (fn (fn acc e1) e2) e3
-  | Eapp (e,_,_) | Eassign (_,e,_,_) | Eghost e
-  | Eloop (_,_,e) | Efor (_,_,_,e) | Eraise (_,e)
-  | Eabstr (e,_) -> fn acc e
-  | Elogic _ | Evalue _ | Earrow _
-  | Eany _ | Eassert _ | Eabsurd -> acc
+(* expr to term *)
 
 let spec_purify sp =
   let vs, f = Mlw_ty.open_post sp.c_post in

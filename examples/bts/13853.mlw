@@ -13,8 +13,7 @@ use import int.Int
 
 exception MyExc
 
-let rec f (x:int) : int = raises { MyExc } raise MyExc
-
-with    g (x:int) : int = raises { MyExc } f x
+let rec f (x:int) : int raises { MyExc } = raise MyExc
+with    g (x:int) : int raises { MyExc } = f x
 
 end

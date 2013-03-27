@@ -1,0 +1,26 @@
+module TestHashtbl
+
+  use import int.Int
+  use import list.List
+  use import hashtbl.Hashtbl
+
+  function k1: key
+  function k2: key
+  function k3: key
+  axiom kdiff : k1 <> k2 /\ k1 <> k3 /\ k2 <> k3
+
+  let test1 () =
+    let h = create 17 in
+    add h k1 True;
+    assert { h[k1] = Cons True Nil };
+    assert { h[k2] = Nil };
+    let v1 = find h k1 in
+    assert { v1 = True };
+    add h k1 False;
+    assert { h[k1] = Cons False (Cons True Nil) };
+    replace h k1 True;
+    assert { h[k1] = Cons True (Cons True Nil) }
+
+end
+
+

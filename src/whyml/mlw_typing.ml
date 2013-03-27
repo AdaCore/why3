@@ -31,19 +31,7 @@ open Mlw_dty
 
 exception DuplicateProgVar of string
 exception DuplicateTypeVar of string
-(*
-exception PredicateExpected
-exception TermExpected
-exception FSymExpected of lsymbol
-exception PSymExpected of lsymbol
-exception ClashTheory of string
-exception UnboundTheory of qualid
-exception UnboundType of string list
-*)
 exception UnboundTypeVar of string
-(* unused
-exception UnboundSymbol of qualid
-*)
 
 let error = Loc.error
 let errorm = Loc.errorm
@@ -56,32 +44,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "Type parameter %s is used twice" s
   | DuplicateProgVar s ->
       Format.fprintf fmt "Parameter %s is used twice" s
+  | UnboundTypeVar s ->
+      Format.fprintf fmt "Unbound type variable '%s" s
   | TooLateInvariant ->
       Format.fprintf fmt
         "Cannot add a type invariant after another program declaration"
-(*
-  | PredicateExpected ->
-      Format.fprintf fmt "syntax error: predicate expected"
-  | TermExpected ->
-      Format.fprintf fmt "syntax error: term expected"
-  | FSymExpected ls ->
-      Format.fprintf fmt "%a is not a function symbol" Pretty.print_ls ls
-  | PSymExpected ls ->
-      Format.fprintf fmt "%a is not a predicate symbol" Pretty.print_ls ls
-  | ClashTheory s ->
-      Format.fprintf fmt "Clash with previous theory %s" s
-  | UnboundTheory q ->
-      Format.fprintf fmt "unbound theory %a" print_qualid q
-  | UnboundType sl ->
-      Format.fprintf fmt "Unbound type '%a'"
-        (Pp.print_list Pp.dot Pp.pp_print_string) sl
-*)
-  | UnboundTypeVar s ->
-      Format.fprintf fmt "Unbound type variable '%s" s
-(* unused
-  | UnboundSymbol q ->
-      Format.fprintf fmt "Unbound symbol '%a'" print_qualid q
-*)
   | _ -> raise e)
 
 (* TODO: let type_only = Debug.test_flag Typing.debug_type_only in *)
@@ -1011,26 +978,22 @@ let reset_vars eff pvs =
 
 (* add dummy postconditions for uncovered exceptions *)
 let complete_xpost eff xq =
-  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
-  let check xs _ = Loc.errorm
-    "this expression does not raise exception %a" print_xs xs in
-  Mexn.iter check (Mexn.set_diff xq xe);
   let dummy { xs_ity = ity } () =
     let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
     Mlw_ty.create_post v t_true in
+  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
   Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xe xq))
 
 let spec_invariant lenv pvs vty spec =
   let ity = ity_of_vty vty in
   let pvs = spec_pvset pvs spec in
   let rvs = reset_vars spec.c_effect pvs in
-  let xpost = complete_xpost spec.c_effect spec.c_xpost in
   let pinv,qinv = env_invariant lenv spec.c_effect pvs in
   let post_inv = post_invariant lenv rvs qinv in
   let xpost_inv xs q = post_inv xs.xs_ity q in
   { spec with c_pre   = t_and_asym_simp pinv spec.c_pre;
               c_post  = post_inv ity spec.c_post;
-              c_xpost = Mexn.mapi xpost_inv xpost }
+              c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
 let abstr_invariant lenv e spec0 =
   let pvs = e_pvset Spv.empty e in
@@ -1043,6 +1006,12 @@ let lambda_invariant lenv pvs eff lam =
   let pvs = List.fold_right Spv.add lam.l_args pvs in
   let spec = { lam.l_spec with c_effect = eff } in
   let spec = spec_invariant lenv pvs lam.l_expr.e_vty spec in
+  (* we add dummy xposts for uncovered exceptions to silence
+     Mlw_ty.spec_check, but we do another proper check later
+     in check_user_effect, which will give us a precise
+     location of the exception-raising sub-expression *)
+  let xpost = complete_xpost eff spec.c_xpost in
+  let spec = { spec with c_xpost = xpost } in
   { lam with l_spec = spec }
 
 (* specification handling *)
@@ -1198,33 +1167,64 @@ let eff_of_deff lenv dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   Mexn.fold add_raise dsp.ds_xpost eff, svs
 
-let check_user_effect lenv e otv dsp =
+let e_find_loc pr e =
+  try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
+  with Not_found -> None
+
+let check_user_effect lenv e eeff full_xpost dsp =
+  let has_read reg eff =
+    Sreg.mem reg eff.eff_reads || Sreg.mem reg eff.eff_ghostr in
+  let has_write reg eff =
+    Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
+  let has_raise xs eff =
+    Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
+  (* check that every user effect actually happens *)
   let acc = eff_empty, Svs.empty in
-  let read le eff ?(ghost=false) reg =
-    ignore ghost;
-    if Sreg.mem reg e.e_effect.eff_reads ||
-       Sreg.mem reg e.e_effect.eff_ghostr
-    then eff else Loc.errorm ~loc:le.pp_loc
+  let read le ueff ?ghost reg =
+    if has_read reg eeff then eff_read ?ghost ueff reg
+    else Loc.errorm ~loc:le.pp_loc
       "this read effect never happens in the expression" in
-  let check_read e = ignore (get_eff_regs lenv (read e) acc e) in
-  List.iter check_read dsp.ds_reads;
-  let write le eff ?(ghost=false) reg =
-    ignore ghost;
-    if Sreg.mem reg e.e_effect.eff_writes ||
-       Sreg.mem reg e.e_effect.eff_ghostw
-    then eff else Loc.errorm ~loc:le.pp_loc
+  let add_read acc e = get_eff_regs lenv (read e) acc e in
+  let acc = List.fold_left add_read acc dsp.ds_reads in
+  let ueff_ro = not (eff_is_empty (fst acc)) in
+  let write le ueff ?ghost reg =
+    if has_write reg eeff then eff_write ?ghost ueff reg
+    else Loc.errorm ~loc:le.pp_loc
       "this write effect never happens in the expression" in
-  let check_write e = ignore (get_eff_regs lenv (write e) acc e) in
-  List.iter check_write dsp.ds_writes;
-  let check_raise xs _ =
-    if Sexn.mem xs e.e_effect.eff_raises ||
-       Sexn.mem xs e.e_effect.eff_ghostx
-    then () else Loc.errorm
+  let add_write acc e = get_eff_regs lenv (write e) acc e in
+  let ueff, _ = List.fold_left add_write acc dsp.ds_writes in
+  let ueff_rw = not (eff_is_empty ueff) in
+  let add_raise xs _ ueff =
+    if has_raise xs eeff then eff_raise ueff xs
+    else Loc.errorm ?loc:e.e_loc
       "this expression does not raise exception %a" print_xs xs in
-  Mexn.iter check_raise dsp.ds_xpost;
+  let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
+  (* check that every computed effect is listed *)
+  let check_read reg = if not (has_read reg ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_read reg e.e_effect) e)
+      "this expression produces an unlisted read effect" in
+  if ueff_ro then Sreg.iter check_read eeff.eff_reads;
+  if ueff_ro then Sreg.iter check_read eeff.eff_ghostr;
+  let check_write reg = if not (has_write reg ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
+      "this expression produces an unlisted write effect" in
+  if ueff_rw then Sreg.iter check_write eeff.eff_writes;
+  if ueff_rw then Sreg.iter check_write eeff.eff_ghostw;
+  let check_raise xs = if not (has_raise xs ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
+      "this expression raises unlisted exception %a" print_xs xs in
+  if full_xpost then Sexn.iter check_raise eeff.eff_raises;
+  if full_xpost then Sexn.iter check_raise eeff.eff_ghostx
+
+let check_lambda_effect lenv ({fun_lambda = lam} as fd) bl dsp =
+  let lenv = add_binders lenv lam.l_args in
+  let eeff = fd.fun_ps.ps_aty.aty_spec.c_effect in
+  check_user_effect lenv lam.l_expr eeff true dsp;
+  (* check that we don't look inside opaque type variables *)
   let bad_comp tv _ _ = Loc.errorm
+    ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
     "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
-  ignore (Mtv.inter bad_comp otv e.e_effect.eff_compar)
+  ignore (Mtv.inter bad_comp (opaque_binders Stv.empty bl) eeff.eff_compar)
 
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
@@ -1412,7 +1412,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
       if spec.c_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      check_user_effect lenv e1 Stv.empty dsp;
+      check_user_effect lenv e1 e1.e_effect false dsp;
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
@@ -1504,15 +1504,15 @@ and expr_rec lenv dfdl =
   let eff = List.fold_left rd_effect eff_empty fdl in
   let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
   let fdl = create_rec_defn (List.map step3 fdl) in
-  let step4 fd (_,_,_,bl,tr) = check_effects lenv fd.fun_lambda bl tr in
+  let step4 fd (_,_,_,bl,(de,dsp)) =
+    Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp in
   List.iter2 step4 fdl dfdl;
   fdl
 
-and expr_fun lenv x gh bl (_, dsp as tr) =
+and expr_fun lenv x gh bl (de, dsp as tr) =
   let lam = expr_lam lenv gh (binders bl) tr in
   if lam.l_spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a non-recursive definition";
-  check_effects lenv lam bl tr;
   let lam =
     if Debug.test_noflag implicit_post || dsp.ds_post <> [] ||
        oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
@@ -1527,7 +1527,9 @@ and expr_fun lenv x gh bl (_, dsp as tr) =
         { lam with l_spec = spec } in
   let pvs = l_pvset Spv.empty lam in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
-  create_fun_defn (Denv.create_user_id x) lam
+  let fd = create_fun_defn (Denv.create_user_id x) lam in
+  Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
+  fd
 
 and expr_lam lenv gh pvl (de, dsp) =
   let lenv = add_binders lenv pvl in
@@ -1536,11 +1538,6 @@ and expr_lam lenv gh pvl (de, dsp) =
     errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
-
-and check_effects lenv lam bl (de, dsp) =
-  let otv = opaque_binders Stv.empty bl in
-  let lenv = add_binders lenv lam.l_args in
-  Loc.try3 de.de_loc check_user_effect lenv lam.l_expr otv dsp
 
 (** Type declaration *)
 
@@ -2090,7 +2087,7 @@ let use_clone_pure lib mth uc loc (use,inst) =
 
 let use_clone_pure lib mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (use_clone_pure lib mth) uc loc use
+  Loc.try5 loc use_clone_pure lib mth uc loc use
 
 let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
@@ -2116,7 +2113,7 @@ let use_clone lib mmd mth uc loc (use,inst) =
 
 let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (use_clone lib mmd mth) uc loc use
+  Loc.try6 loc use_clone lib mmd mth uc loc use
 
 let close_theory (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
@@ -2172,7 +2169,7 @@ let open_file, close_file =
       open_module = open_module;
       close_module = close_module;
       open_namespace = open_namespace;
-      close_namespace = (fun loc -> Loc.try1 loc close_namespace);
+      close_namespace = (fun loc imp -> Loc.try1 loc close_namespace imp);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
       use_clone = use_clone; }

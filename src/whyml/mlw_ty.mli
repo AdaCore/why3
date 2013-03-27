@@ -322,7 +322,7 @@ val aty_filter : ?ghost:bool -> varmap -> aty -> aty
 val aty_app : aty -> pvsymbol -> spec * bool * vty
 
 (* verify that the spec corresponds to the result type *)
-val spec_check : spec -> vty -> unit
+val spec_check : ?full_xpost:bool -> spec -> vty -> unit
 
 (* convert arrows to the unit type *)
 val ity_of_vty : vty -> ity

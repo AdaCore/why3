@@ -812,7 +812,7 @@ let spec_filter ghost varm vars c =
 
 exception UnboundException of xsymbol
 
-let spec_check c ty =
+let spec_check ~full_xpost c ty =
   if c.c_pre.t_ty <> None then
     Loc.error ?loc:c.c_pre.t_loc (Term.FmlaExpected c.c_pre);
   check_post ty c.c_post;
@@ -821,10 +821,12 @@ let spec_check c ty =
     | Some ps -> ignore (ps_app ps [t;t])
     | None -> ignore (t_type t) in
   List.iter check_variant c.c_variant;
-  let sexn = Sexn.union c.c_effect.eff_raises c.c_effect.eff_ghostx in
-  let sexn = Mexn.set_diff sexn c.c_xpost in
-  if not (Sexn.is_empty sexn) then
-    raise (UnboundException (Sexn.choose sexn))
+  if full_xpost && not (Mexn.set_submap c.c_effect.eff_raises c.c_xpost) then
+    raise (UnboundException
+      (Sexn.choose (Mexn.set_diff c.c_effect.eff_raises c.c_xpost)));
+  if full_xpost && not (Mexn.set_submap c.c_effect.eff_ghostx c.c_xpost) then
+    raise (UnboundException
+      (Sexn.choose (Mexn.set_diff c.c_effect.eff_ghostx c.c_xpost)))
 
 (** program variables *)
 
@@ -889,7 +891,8 @@ let ty_of_vty = function
   | VTvalue ity -> ty_of_ity ity
   | VTarrow _   -> ty_unit
 
-let spec_check spec vty = spec_check spec (ty_of_vty vty)
+let spec_check ?(full_xpost=true) spec vty =
+  spec_check ~full_xpost spec (ty_of_vty vty)
 
 let vty_arrow_unsafe argl spec vty = {
   aty_args   = argl;

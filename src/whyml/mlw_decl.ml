@@ -196,6 +196,8 @@ let add_invariant pd its p =
     | _ -> invalid_arg "Mlw_decl.add_invariant"
 
 let check_vars vars =
+  (* The error message for UnboundTypeVar is misleading here.
+     We forbid non-generalizable type variables in toplevel symbols *)
   if not (Stv.is_empty vars.vars_tv) then
     raise (UnboundTypeVar (Stv.choose vars.vars_tv))
 

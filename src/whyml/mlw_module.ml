@@ -477,7 +477,7 @@ let clone_export uc m inst =
   let mvs = ref (Mvs.singleton Mlw_wp.pv_old.pv_vs Mlw_wp.pv_old.pv_vs) in
   let add_pdecl uc d = { uc with
     muc_decls = d :: uc.muc_decls;
-    muc_known = known_add_decl (Theory.get_known uc.muc_theory) uc.muc_known d;
+    muc_known = known_add_decl (Theory.get_known nth) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news } in
   let add_pd uc pd = match pd.pd_node with
     | PDtype its ->

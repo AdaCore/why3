@@ -53,8 +53,8 @@ run_dir () {
     done
 }
 
-
-echo "=== Tests Provers ==="
+echo "=== Tests ==="
+run_dir tests
 run_dir tests-provers
 echo ""
 

@@ -78,67 +78,39 @@ list_stuff () {
 }
 
 
-echo "=== Checking drivers ==="
-drivers drivers
+echo "=== Checking theories ==="
+goods theories
 echo ""
 
-#echo "=== Parsing good files  ==="
-#goods bench/typing/bad --parse-only
-#goods bench/typing/good --parse-only
-#goods examples/logic --parse-only
-#goods examples/bitvectors "--parse-only -I examples/bitvectors"
-#echo ""
+echo "=== Checking modules ==="
+goods modules
+echo ""
 
-echo "=== Type-checking bad files ==="
+echo "=== Checking bad files ==="
 goods bench/typing/bad --parse-only
-bads bench/typing/bad --type-only
-echo ""
-
-echo "=== Type-checking theories ==="
-goods theories --type-only
-echo ""
-
-echo "=== Type-checking good files ==="
-goods bench/typing/good --type-only
-goods examples/logic --type-only
-goods examples/bitvectors "--type-only -I examples/bitvectors"
-echo ""
-
-#echo "=== Parsing programs ==="
-#goods bench/programs/bad-typing --parse-only
-#goods bench/programs/good --parse-only
-#goods examples --parse-only
-#goods examples/in_progress --parse-only
-#goods examples/foveoos11-cm --parse-only
-#goods examples/hoare_logic --parse-only
-#goods examples/vacid_0_binary_heaps "--parse-only -I examples/vacid_0_binary_heaps"
-#echo ""
-
-echo "=== Type-checking bad programs ==="
 goods bench/programs/bad-typing --parse-only
+bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
 echo ""
 
-echo "=== Type-checking modules ==="
-goods modules --type-only
-echo ""
-
-#echo "=== Type-checking good programs ==="
-#goods bench/programs/good --type-only
-#goods examples --type-only
-#goods examples/in_progress --type-only
-#goods examples/foveoos11-cm --type-only
-#goods examples/hoare_logic --type-only
-#goods examples/vacid_0_binary_heaps "--type-only -I examples/vacid_0_binary_heaps"
-#echo ""
-
-echo "=== VC generation on good programs ==="
+echo "=== Checking good files ==="
+goods bench/typing/good
 goods bench/programs/good
+goods examples/bts
+goods examples/tests
+goods examples/tests-provers
+goods examples/check-builtin
+goods examples/logic
 goods examples
-goods examples/in_progress
 goods examples/foveoos11-cm
 goods examples/hoare_logic
 goods examples/vacid_0_binary_heaps "-I examples/vacid_0_binary_heaps"
+goods examples/bitvectors "-I examples/bitvectors"
+goods examples/in_progress
+echo ""
+
+echo "=== Checking drivers ==="
+drivers drivers
 echo ""
 
 echo "=== Checking valid goals ==="

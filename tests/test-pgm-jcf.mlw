@@ -1,4 +1,28 @@
-module M1 
+module TestAbstr
+  use import int.Int
+  use import ref.Ref
+
+  exception E1 int
+  exception E2 int
+
+  let test (r : ref int) (z : int)
+    ensures { !r = 3 /\ result > 0 }
+    raises  { E1 x -> !r = 1 /\ x < 0 }
+    raises  { E2 x -> !r = 3 /\ x = 0 }
+  =
+    r := 1;
+    abstract begin
+      if z < 0 then raise (E1 z);
+      r := !r + 2;
+      if z = 0 then raise (E2 z)
+    end
+    ensures { !r = 3 }
+    raises { E1 x -> x = 5 };
+    if z = 42 then 41 else z
+
+end
+
+module M1
   predicate eq (x y : 'a)
 end
 
@@ -13,7 +37,7 @@ module M2
   with my_eq7 (x : 'a) (y : 'a) = my_eq8 x y
   with my_eq8 (x : 'a) (y : 'a) = my_eq9 x y
   with my_eq9 (x : 'a) (y : 'a) = x = y
-  
+
   clone M1 with predicate eq = my_eq
 end
 
@@ -30,7 +54,6 @@ module TestGhost
     assert { x > 0 };
     let r1 = ref x in
     peq r1 r1
-
 end
 
 

@@ -146,29 +146,3 @@ module Buffer
   *)
 
 end
-
-(***
-module Test
-
-  use Char
-  use String
-  use Buffer
-
-  let test1 () =
-    let b = Buffer.create 1024 in
-    let c = Char.chr 65 in
-    Buffer.add_char b c;
-    let s = String.create 100 in
-    Buffer.add_string b s;
-    assert { S.length b = 101 }
-
-  let test2 () =
-    let s = String.make 100 (Char.chr 65) in
-    assert { S.get s 42 = 65 }; (* 'A' *)
-    let c = Char.lowercase (String.get s 42) in
-    assert { c = 97 }; (* 'a' *)
-    let u = String.lowercase s in
-    assert { S.get u 41 = 97 }
-
-end
-***)

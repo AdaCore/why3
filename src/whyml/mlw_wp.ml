@@ -769,8 +769,13 @@ and wp_desc env e q xq = match e.e_node with
       wp_expr env e1 q xq (* FIXME? should (wp_label e) rather be here? *)
   | Eabstr (e1, spec) ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
-      let w1 = backstep (wp_expr env e1) spec.c_post spec.c_xpost in
-      let w2 = wp_abstract env e1.e_effect spec.c_post spec.c_xpost q xq in
+      (* every exception uncovered in spec is passed to xq *)
+      let c_xq = Mexn.set_union spec.c_xpost xq in
+      let w1 = backstep (wp_expr env e1) spec.c_post c_xq in
+      (* so that now we don't need to prove these exceptions again *)
+      let lost = Mexn.set_diff (exns_of_raises e1.e_effect) spec.c_xpost in
+      let c_eff = Sexn.fold_left eff_remove_raise e1.e_effect lost in
+      let w2 = wp_abstract env c_eff spec.c_post spec.c_xpost q xq in
       wp_and ~sym:false p (wp_and ~sym:true (wp_label e w1) w2)
   | Eassign (pl, e1, reg, pv) ->
       (* if we create an intermediate variable npv to represent e1

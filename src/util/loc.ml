@@ -89,6 +89,20 @@ let try4 loc f x y z t =
   if Debug.test_flag Debug.stack_trace then f x y z t else
   try f x y z t with Located _ as e -> raise e | e -> raise (Located (loc, e))
 
+let try5 loc f x y z t u =
+  if Debug.test_flag Debug.stack_trace then f x y z t u else
+  try f x y z t u with Located _ as e -> raise e | e -> raise (Located (loc, e))
+
+let try6 loc f x y z t u v =
+  if Debug.test_flag Debug.stack_trace then f x y z t u v else
+  try f x y z t u v with
+    Located _ as e -> raise e | e -> raise (Located (loc, e))
+
+let try7 loc f x y z t u v w =
+  if Debug.test_flag Debug.stack_trace then f x y z t u v w else
+  try f x y z t u v w with
+    Located _ as e -> raise e | e -> raise (Located (loc, e))
+
 let error ?loc e = match loc with
   | None -> raise e
   | Some loc -> raise (Located (loc, e))
