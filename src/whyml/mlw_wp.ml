@@ -1578,6 +1578,17 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let xpost = Mexn.map (fun p ->
         { s = wp1.post.s;
           ne = p }) spec.c_xpost in
+      (* We allow the xpost of the "abstract" to be incomplete; we fill in the
+         holes here *)
+      let xpost =
+        Mexn.fold (fun ex { ne = post; s = s } acc ->
+          if Mexn.mem ex acc then acc
+          else
+            let post =
+              { ne = create_post (Mexn.find ex xresult) post;
+                s = s } in
+            Mexn.add ex post acc)
+        wp1.exn xpost in
       let abstr_post = { s = wp1.post.s; ne = spec.c_post } in
       let post, xpost =
         adapt_post_to_state_pair env s r abstr_post xpost in
