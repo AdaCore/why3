@@ -473,7 +473,6 @@ let e_find pr e =
 
 exception StaleRegion of expr * ident
 exception GhostWrite of expr * region
-exception GhostRaise of expr * xsymbol
 
 let check_reset e varm =
   (* If we reset a region, then it may only occur in the later code
@@ -499,15 +498,16 @@ let check_postexpr e eff varm =
 
 (* smart constructors *)
 
-let mk_expr node vty ghost eff varm = {
-  e_node   = node;
-  e_vty    = vty;
-  e_ghost  = ghost;
-  e_effect = eff_ghostify ghost eff;
-  e_varm   = varm;
-  e_label  = Slab.empty;
-  e_loc    = None;
-}
+let mk_expr node vty ghost eff varm =
+  let ghost = ghost || not (Sexn.is_empty eff.eff_ghostx) in
+  let eff = eff_ghostify ghost eff in
+  { e_node   = node;
+    e_vty    = vty;
+    e_ghost  = ghost;
+    e_effect = eff;
+    e_varm   = varm;
+    e_label  = Slab.empty;
+    e_loc    = None; }
 
 (* program variables and program symbols *)
 
@@ -853,11 +853,7 @@ let e_try e0 bl =
         let eff = eff_ghostify ghost eff in
         check_postexpr e0 eff varm; (* cumulated varmap *)
         (* remove from e0.e_effect the catched exceptions *)
-        let remove eff0 (xs,_,_) =
-          (* we catch in a ghost exception in a non-ghost code *)
-          if not ghost && Sexn.mem xs eff0.eff_ghostx then
-            Loc.error ?loc:e0.e_loc (GhostRaise (e0,xs));
-          eff_remove_raise eff0 xs in
+        let remove eff0 (xs,_,_) = eff_remove_raise eff0 xs in
         let eff0 = List.fold_left remove e0.e_effect bl in
         (* total effect and varmap *)
         let eff = eff_union eff0 eff in

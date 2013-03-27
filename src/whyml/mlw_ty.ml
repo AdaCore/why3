@@ -817,6 +817,8 @@ let spec_filter ghost varm vars c =
   let check { vs_name = id } _ = if not (Mid.mem id varm) then
     Loc.errorm "Local variable %s escapes from its scope" id.id_string in
   Mvs.iter check vss;
+  if not ghost && not (Sexn.is_empty c.c_effect.eff_ghostx) then
+    Loc.errorm "Only ghost functions may raise ghost exceptions";
   { c with c_effect = eff_ghostify ghost (eff_filter vars c.c_effect) }
 
 exception UnboundException of xsymbol

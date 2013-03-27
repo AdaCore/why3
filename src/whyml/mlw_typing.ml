@@ -1371,7 +1371,7 @@ and expr_desc lenv loc de = match de.de_desc with
         | _ -> mk_expr e1 in
       begin match e1.e_vty with
         | VTarrow _ when e1.e_ghost && not gh ->
-            errorm ~loc "%s must be a ghost function" x.id
+            Loc.errorm ~loc "%s must be a ghost function" x.id
         | VTarrow _ -> flatten e1
         | VTvalue _ -> mk_expr e1
       end;
@@ -1466,11 +1466,6 @@ and expr_desc lenv loc de = match de.de_desc with
             xs, pv, e_case (e_value pv) (List.rev bl)
       in
       e_try e1 (List.rev_map mk_branch xsl)
-  (* We push ghost down in order to safely capture even non-ghost
-     raises of the inner expression in "ghost try e1 with ..." *)
-  | DEghost ({ de_desc = DEtry (de2, bl) } as de1) ->
-      let de2 = { de1 with de_desc = DEghost de2 } in
-      expr lenv { de1 with de_desc = DEtry (de2, bl) }
   | DEmark (x, de1) ->
       let ld = create_let_defn (Denv.create_user_id x) e_now in
       let lenv = add_local x.id ld.let_sym lenv in
@@ -1543,7 +1538,7 @@ and expr_lam lenv gh pvl (de, dsp) =
   let lenv = add_binders lenv pvl in
   let e = e_ghostify gh (expr lenv de) in
   if not gh && e.e_ghost then
-    errorm ~loc:de.de_loc "ghost body in a non-ghost function";
+    Loc.errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
 
