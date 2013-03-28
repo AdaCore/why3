@@ -393,8 +393,6 @@ let check_ghost lkn kn d =
   in
   let rec check pvs aty =
     let eff = aty.aty_spec.c_effect in
-    if not (Sexn.is_empty eff.eff_ghostx) then
-      raise (GhostRaise (e_void, Sexn.choose eff.eff_ghostx));
     let pvs = List.fold_right Spv.add aty.aty_args pvs in
     let test pv =
       if pv.pv_ghost then () else

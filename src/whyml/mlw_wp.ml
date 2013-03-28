@@ -28,6 +28,8 @@ let no_track = Debug.register_flag "wp_no_track"
 let no_eval = Debug.register_flag "wp_no_eval"
   ~desc:"Do@ not@ simplify@ pattern@ matching@ on@ record@ datatypes@ in@ VCs."
 
+let lemma_label = Ident.create_label "why3:lemma"
+
 (** Marks *)
 
 let ts_mark = create_tysymbol (id_fresh "'mark") [] None
@@ -148,39 +150,33 @@ let wp_let v t f = t_let_close_simp v t f
 
 let wp_forall vl f = t_forall_close_simp vl [] f
 
+let is_equality_for v f = match f.t_node with
+  | Tapp (ps, [{ t_node = Tvar u }; t])
+    when ls_equal ps ps_equ && vs_equal u v && not (Mvs.mem v t.t_vars) ->
+      Some t
+  | _ ->
+      None
+
 let wp_forall_post v p f =
   (* we optimize for the case when a postcondition
      is of the form (... /\ result = t /\ ...) *)
   let rec down p = match p.t_node with
     | Tbinop (Tand,l,r) ->
-        begin match down l with
-          | None, _ ->
-              let t, r = down r in
-              t, t_label_copy p (t_and_simp l r)
-          | t, l ->
-              t, t_label_copy p (t_and_simp l r)
-        end
-    | Tapp (ps,[{t_node = Tvar u};t])
-      when ls_equal ps ps_equ && vs_equal u v && not (Mvs.mem v t.t_vars) ->
-        Some t, t_true
+        let t, l, r =
+          let t, l = down l in
+          if t <> None then t, l, r else
+            let t, r = down r in t, l, r
+        in
+        t, if t = None then p else t_label_copy p (t_and_simp l r)
     | _ ->
-        None, p
+        let t = is_equality_for v p in
+        t, if t = None then p else t_true
   in
   if ty_equal v.vs_ty ty_unit then
     t_subst_single v t_void (wp_implies p f)
   else match down p with
     | Some t, p -> wp_let v t (wp_implies p f)
     | _ -> wp_forall [v] (wp_implies p f)
-
-let is_equality_for v t =
-  (* check whether [t] is an equality defining variable [v], that is, of the
-     form [ x = def] for some term [def]. If so, return [Some def], otherwise
-     return [None] *)
-  match t.t_node with
-  | Tapp (ls, [ { t_node = Tvar eq_v } ; t2 ])
-          when ls_equal ls ps_equ && vs_equal eq_v v ->
-            Some t2
-  | _ -> None
 
 let t_and_subst v t1 t2 =
   (* if [t1] defines variable [v], return [t2] with [v] replaced by its
@@ -196,15 +192,7 @@ let t_implies_subst v t1 t2 =
   | Some def -> t_subst_single v def t2
   | None -> t_implies_simp t1 t2
 
-(* regs_of_reads, and therefore regs_of_effect, only take into account
-   reads in program expressions and ignore the variables in specification *)
-(* dead code
-let regs_of_reads  eff = Sreg.union eff.eff_reads eff.eff_ghostr
-*)
 let regs_of_writes eff = Sreg.union eff.eff_writes eff.eff_ghostw
-(* dead code
-let regs_of_effect eff = Sreg.union (regs_of_reads eff) (regs_of_writes eff)
-*)
 let exns_of_raises eff = Sexn.union eff.eff_raises eff.eff_ghostx
 
 let open_post q =
@@ -286,17 +274,45 @@ let expl_loopvar = Slab.add Split_goal.stop_split (Slab.singleton expl_loopvar)
 
 (** Reconstruct pure values after writes *)
 
+let model1_lab = Slab.singleton (create_label "model:1")
+let model2_lab = Slab.singleton (create_label "model:quantify(2)")
+let model3_lab = Slab.singleton (create_label "model:cond")
+
+let mk_var id label ty = create_vsymbol (id_clone ~label id) ty
+
+(* replace "contemporary" variables with fresh ones *)
+let rec subst_at_now now mvs t = match t.t_node with
+  | Tvar vs when now ->
+      begin try t_var (Mvs.find vs mvs) with Not_found -> t end
+  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
+  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
+      let now = match mark.t_node with
+        | Tvar vs when vs_equal vs vs_old -> assert false
+        | Tapp (ls,[]) when ls_equal ls fs_now -> true
+        | _ -> false in
+      t_map (subst_at_now now mvs) t
+  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+      (* do not open unless necessary *)
+      let mvs = Mvs.set_inter mvs t.t_vars in
+      if Mvs.is_empty mvs then t else
+      t_map (subst_at_now now mvs) t
+  | _ ->
+      t_map (subst_at_now now mvs) t
+
+(* generic expansion of an algebraic type value *)
 let analyze_var fn_down fn_join lkm km vs ity =
+  let var_of_fd fd =
+    create_vsymbol (id_fresh "y") (ty_of_ity fd.fd_ity) in
   let branch (cs,fdl) =
-    let mk_var fd = create_vsymbol (id_fresh "y") (ty_of_ity fd.fd_ity) in
-    let vars = List.map mk_var fdl in
-    let t = fn_join cs (List.map2 fn_down vars fdl) vs.vs_ty in
-    let pat = pat_app cs (List.map pat_var vars) vs.vs_ty in
+    let vl = List.map var_of_fd fdl in
+    let pat = pat_app cs (List.map pat_var vl) vs.vs_ty in
+    let t = fn_join cs (List.map2 fn_down vl fdl) vs.vs_ty in
     t_close_branch pat t in
   let csl = Mlw_decl.inst_constructors lkm km ity in
   t_case (t_var vs) (List.map branch csl)
 
-let update_var env mreg vs =
+(* given a map of modified regions, construct the updated value of [vs] *)
+let update_var env (mreg : vsymbol Mreg.t) vs =
   let rec update vs { fd_ity = ity; fd_mut = mut } =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
@@ -309,94 +325,40 @@ let update_var env mreg vs =
     else analyze_var update fs_app env.pure_known env.prog_known vs ity in
   update vs { fd_ity = ity_of_vs vs; fd_ghost = false; fd_mut = None }
 
-let rec subst_at_now now (m : vsymbol Mvs.t) (t : term) =
-   (* if [now] is true, apply the substitution, except when they are protected
-      by labels other than [fs_now] *)
-   match t.t_node with
-  | Tvar vs when now ->
-      begin try t_var (Mvs.find vs m) with Not_found -> t end
-  | Tapp (ls, _) when ls_equal ls fs_old -> assert false
-  | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
-      let now = match mark.t_node with
-        | Tvar vs when vs_equal vs vs_old -> assert false
-        | Tapp (ls,[]) when ls_equal ls fs_now -> true
-        | _ -> false in
-      t_map (subst_at_now now m) t
-  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
-      (* do not open unless necessary *)
-      let m = Mvs.set_inter m t.t_vars in
-      if Mvs.is_empty m then t else
-      t_map (subst_at_now now m) t
-  | _ ->
-      t_map (subst_at_now now m) t
-
-let model1_lab = Slab.singleton (create_label "model:1")
-let model2_lab = Slab.singleton (create_label "model:quantify(2)")
-let model3_lab = Slab.singleton (create_label "model:cond")
-
-let mk_var id label ty : vsymbol = create_vsymbol (id_clone ~label id) ty
-
-let print_region_map mreg =
-   Format.printf "{ ";
-   Mreg.iter (fun k v ->
-      Format.printf "%a |-> %a (%a)@ ;"
-         Mlw_pretty.print_reg k
-         Pretty.print_vs v
-         Pretty.print_ty v.vs_ty) mreg;
-   Format.printf " }@."
-
-let mutable_substitute env (mreg : vsymbol Mreg.t) (f : term) =
-  (* Replace every occurrence of a mutable variable in [f] by an appropriate
-     "updating" term. The map [mreg] must already contain fresh variables for
-     all regions. *)
-  let update_var vs _ = try match update_var env mreg vs with
-  (* ??? is the try-with block needed? *)
+(* given a map of modified regions, update every affected variable in [f] *)
+let update_term env (mreg : vsymbol Mreg.t) f =
+  (* [vars] : modified variable -> updated value *)
+  let update vs _ = match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
-    | t -> Some t
-  with Not_found -> None
-  in
-  (*   print_region_map mreg; *)
-  let vars = Mvs.mapi_filter update_var f.t_vars in
-  (* [vars] now is a mapping from the relevant symbols of [f] to their
-     "update" (see [update_var]) *)
+    | t -> Some t in
+  let vars = Mvs.mapi_filter update f.t_vars in
+  (* [vv'] : modified variable -> fresh variable *)
   let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
   let vv' = Mvs.mapi new_var vars in
-  (* [vv'] is now a mapping from the relevant symbols in f to fresh symbols *)
+  (* update modified variables *)
   let update v t f = wp_let (Mvs.find v vv') t f in
   Mvs.fold update vars (subst_at_now true vv' f)
 
-let get_var_of_region reg f =
-   (* If term [f] has a variable [v] that belongs to region [reg],
-      return [Some v], else return [None]
-   *)
-    let test vs _ acc =
-      if acc <> None then acc
-      else
-        (* ??? is the try-with block needed? *)
-        try match (ity_of_vs vs).ity_node with
-        | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
-        | _ -> acc
-        with Not_found -> acc
-    in
-    Mvs.fold test f.t_vars None
+(* look for a variable with a single region equal to [reg] *)
+let var_of_region reg f =
+  let test vs _ _ =
+    Format.printf "   [var_of_region] scanning variable %a@." Pretty.print_vs vs;
+    match (ity_of_vs vs).ity_node with
+    | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
+    | _ -> None in
+  Mvs.fold test f.t_vars None
 
-let quantify env (regs : Sreg.t) (f : term) =
-   (* quantify formula [f] over all variables in the regions [regs] *)
-   (* ??? refactor this first bit to use [get_var_of_region] *)
+let quantify env regs f =
+  (* mreg : modified region -> vs *)
   let get_var reg () =
-    let test vs _ id =
-      (* ??? is the try-with block needed? *)
-      try match (ity_of_vs vs).ity_node with
-      | Ityapp (_,_,[r]) when reg_equal r reg -> vs.vs_name
-      | _ -> id
-      with Not_found -> id
-    in
-    let id = Mvs.fold test f.t_vars reg.reg_name in
-    mk_var id model1_lab (ty_of_ity reg.reg_ity)
-  in
+    let ty = ty_of_ity reg.reg_ity in
+    let id = match var_of_region reg f with
+      | Some vs -> vs.vs_name
+      | None -> reg.reg_name in
+    mk_var id model1_lab ty in
   let mreg = Mreg.mapi get_var regs in
-  (* [mreg] now maps each region to a fresh variable *)
-  let f = mutable_substitute env mreg f in
+  (* quantify over the modified resions *)
+  let f = update_term env mreg f in
   wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Invariants *)
@@ -1123,41 +1085,40 @@ end = struct
   let empty = Mreg.empty
 
   let refresh regset s =
-     Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
-
-  let get_region v =
-      (* ??? is the try-with block needed? *)
-      try match (ity_of_vs v).ity_node with
-      | Ityapp (_,_,[r]) -> Some r
-      | _ -> None
-      with Not_found -> None
+    Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
 
   let term env sub t =
-     let mreg = Mreg.mapi_filter (fun reg vr ->
-        match !vr with
-        | Some _ -> !vr
-        | None ->
-              match get_var_of_region reg t with
-              | Some v ->
-                    let v' = name_from_region ~id:v.vs_name reg in
-                    vr := Some v';
-                    !vr
-              | None -> None) sub in
-     let r = mutable_substitute env mreg t in
-     r
+    let mreg = Mreg.mapi_filter (fun reg vr ->
+      match !vr with
+      | Some _ -> !vr
+      | None ->
+          Format.printf "  calling var_of_region ...@.";
+          let r =
+            match var_of_region reg t with
+            | Some v ->
+                let v' = name_from_region ~id:v.vs_name reg in
+                vr := Some v';
+                !vr
+            | None -> None
+          in
+          Format.printf "  . OK.@.";
+          r
+
+    ) sub in
+    let r = update_term env mreg t in
+    r
 
   let show_state fmt s =
-     Format.fprintf fmt "{ ";
-     Mreg.iter (fun k rv ->
-        match !rv with
-        | Some v ->
-            Format.fprintf fmt " %a |-> %a; @ "
-              Mlw_pretty.print_reg k Pretty.print_vs v;
-
-        | None ->
-            Format.fprintf fmt " %a |-> _; @  "
-              Mlw_pretty.print_reg k) s;
-     Format.fprintf fmt "}"
+    Format.fprintf fmt "{ ";
+    Mreg.iter (fun k rv ->
+      match !rv with
+      | Some v ->
+          Format.fprintf fmt " %a |-> %a; @ "
+            Mlw_pretty.print_reg k Pretty.print_vs v;
+      | None ->
+          Format.fprintf fmt " %a |-> _; @  "
+            Mlw_pretty.print_reg k) s;
+    Format.fprintf fmt "}"
 
   (* Update the name of region [reg] in substitution [s], possibly based on
      the provided [hint], and return a variable of that name. *)
@@ -1174,26 +1135,25 @@ end = struct
     let all_regs = Sreg.union reg1 reg2 in
     Sreg.fold
       (fun reg (s, f1, f2) ->
-         (* If both branches modify region [reg], pick the name from [s2], and
-            add the necessary equations to [f1]. Otherwise, pick the name from
-            the branch that modifies [reg], and add the necessary equations to
-            the formula for the other branch.*)
-         if Sreg.mem reg reg1 && Sreg.mem reg reg2 then begin
-           Mreg.add reg (Mreg.find reg s2) s,
-           t_and_simp f1 (t_equ (region_name reg s2) (region_name reg s1)),
-           f2
-         end else if Sreg.mem reg reg2 then begin
-           Mreg.add reg (Mreg.find reg s2) s,
-           t_and_simp f1 (t_equ (region_name reg s2)
-                            (region_name ~hint:s2 reg base)),
-           f2
-         end else begin
-           Mreg.add reg (Mreg.find reg s1) s,
-           f1,
-           t_and_simp f2 (t_equ (region_name reg s1)
-                            (region_name ~hint:s1 reg base))
-         end) all_regs (base, t_true, t_true)
-
+        (* If both branches modify region [reg], pick the name from [s2], and
+           add the necessary equations to [f1]. Otherwise, pick the name from
+           the branch that modifies [reg], and add the necessary equations to
+           the formula for the other branch.*)
+        if Sreg.mem reg reg1 && Sreg.mem reg reg2 then begin
+          Mreg.add reg (Mreg.find reg s2) s,
+          t_and_simp f1 (t_equ (region_name reg s2) (region_name reg s1)),
+          f2
+        end else if Sreg.mem reg reg2 then begin
+          Mreg.add reg (Mreg.find reg s2) s,
+          t_and_simp f1 (t_equ (region_name reg s2)
+                          (region_name ~hint:s2 reg base)),
+          f2
+        end else begin
+          Mreg.add reg (Mreg.find reg s1) s,
+          f1,
+          t_and_simp f2 (t_equ (region_name reg s1)
+                          (region_name ~hint:s1 reg base))
+        end) all_regs (base, t_true, t_true)
 end
 
 let fastwp_or_label = Ident.create_label "fastwp:or"
@@ -1230,10 +1190,11 @@ type fast_wp_exn_map = fwp_post Mexn.t
      the output state, and contain the output state, in case an exception is
      raised.
 *)
-type fast_wp_result =
-   { ok   : term;
-     post : fwp_post;
-     exn  : fast_wp_exn_map }
+type fast_wp_result = {
+  ok   : term;
+  post : fwp_post;
+  exn  : fast_wp_exn_map
+}
 
 (* Create a formula expressing that "n" implies "q", and for each exception
    "xn" implies "xq", quantifying over the result names. *)
@@ -1255,25 +1216,32 @@ let adapt_single_post_to_state_pair ?lab env prestate result_var post =
   let lab = match lab with | None -> fresh_mark () | Some lab -> lab in
   (* get the result var of the post *)
   let res, ne = open_post post.ne in
-  (* substitute for given result var, and replace 'old *)
-  let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
   (* apply the poststate *)
+  Format.printf " apply the poststate to %a@." Pretty.print_term ne;
   let ne = Subst.term env post.s ne in
+  (* substitute for given result var, and replace 'old *)
+  Format.printf " replace old + result to %a@." Pretty.print_term ne;
+  let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
   (* remove the label that protected "old" variables *)
+  Format.printf " erase tmp label in %a@." Pretty.print_term ne;
   let ne = erase_mark lab ne in
   (* apply the prestate = replace previously "old" variables *)
+  Format.printf " apply prestate to %a@." Pretty.print_term ne;
   { post with ne = Subst.term env prestate ne }
 
 (* Given normal and exceptional [post,xpost], each with its
    own poststate, place all [(x)post.ne] in the prestate/poststate pair defined
    by [prestate] and [(x)post.s].*)
-let adapt_post_to_state_pair ?lab
-   env prestate result_vars post (xpost : fast_wp_exn_map)
-   : fwp_post * fast_wp_exn_map =
+let adapt_post_to_state_pair
+    ?lab env prestate result_vars post (xpost : fast_wp_exn_map)
+    : fwp_post * fast_wp_exn_map =
   let result, xresult = result_vars in
   let f = adapt_single_post_to_state_pair ?lab env prestate in
-  f result post,
-  Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost
+  Format.printf "before adapting post@.";
+  let a = f result post in
+  Format.printf "before adapting xpost@.";
+  let b = Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost in
+  a, b
 
 let either_state base (reg1, s1, f1) (reg2, s2, f2) =
   (* Starting from a base state, and two branches identified by their
@@ -1289,15 +1257,10 @@ let get_exn reg ex xmap =
 
 let all_exns xmap_list =
   let add_elt k _ acc = Sexn.add k acc in
-  List.fold_left (fun acc map ->
-    Mexn.fold add_elt map acc)
-    Sexn.empty
-    xmap_list
+  List.fold_left (fun acc m -> Mexn.fold add_elt m acc) Sexn.empty xmap_list
 
 let iter_exns exns f =
-  Sexn.fold (fun x acc ->
-    let v = f x in
-    Mexn.add x v acc) exns Mexn.empty
+  Sexn.fold (fun x acc -> let v = f x in Mexn.add x v acc) exns Mexn.empty
 
 let iter_all_exns xmap_list f =
   iter_exns (all_exns xmap_list) f
@@ -1342,7 +1305,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
     : fast_wp_result =
   let result, xresult = r in
   match e.e_node with
-    | Elogic t ->
+  | Elogic t ->
       (* OK: true *)
       (* NE: result = t *)
       let t = wp_label e t in
@@ -1448,8 +1411,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         { s = s;
           ne =
             wp_label e
-            (wp_or (t_and_simp p1.ne r1)
-                  (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
+              (wp_or (t_and_simp p1.ne r1)
+                    (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
         }) in
       { ok = ok;
         post = { ne = ne; s = wp2.post.s };
@@ -1716,3 +1679,50 @@ let fast_wp_rec env km th fdl =
   List.fold_left2 add_one th fdl fl
 
 let fast_wp_val _env _km th _lv = th
+
+
+(* Select either traditional or fast WP *)
+let if_fast_wp f1 f2 x = if Debug.test_flag fast_wp then f1 x else f2 x
+let wp_val = if_fast_wp fast_wp_val wp_val
+let wp_let = if_fast_wp fast_wp_let wp_let
+let wp_rec = if_fast_wp fast_wp_rec wp_rec
+
+
+(* Lemma functions *)
+
+let wp_val ~wp env kn th ls = if wp then wp_val env kn th ls else th
+let wp_let ~wp env kn th ld = if wp then wp_let env kn th ld else th
+
+let wp_rec ~wp env kn th fdl =
+  let th = if wp then wp_rec env kn th fdl else th in
+  let add_one th { fun_ps = ps; fun_lambda = l } =
+    let name = ps.ps_name in
+    if Slab.mem lemma_label name.id_label then
+      let loc = name.id_loc in
+      let spec = ps.ps_aty.aty_spec in
+      if not (eff_is_read_only spec.c_effect) then
+        Loc.errorm ?loc "lemma functions can not have effects";
+      if not (ity_equal (ity_of_expr l.l_expr) ity_unit) then
+        Loc.errorm ?loc "lemma functions must return unit";
+      let env = mk_env env kn th in
+      let lab = fresh_mark () in
+      let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
+      let subst = List.fold_left add_arg ps.ps_subst l.l_args in
+      let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
+      let args = List.map (fun pv -> pv.pv_vs) l.l_args in
+      let q = old_mark lab spec.c_post in
+      let f = wp_expr env e_void q Mexn.empty in
+      let f = wp_implies spec.c_pre (erase_mark lab f) in
+      let f = wp_forall args (quantify env regs f) in
+      let f = t_forall_close (Mvs.keys f.t_vars) [] f in
+      let lkn = Theory.get_known th in
+      let f = if Debug.test_flag no_track then f else track_values lkn kn f in
+      let f = if Debug.test_flag no_eval then f else
+        Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkn f in
+      let pr = create_prsymbol (id_clone name) in
+      let d = create_prop_decl Paxiom pr f in
+      Theory.add_decl th d
+    else
+      th
+  in
+  List.fold_left add_one th fdl

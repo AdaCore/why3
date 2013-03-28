@@ -30,5 +30,3 @@ val comment : Lexing.lexbuf -> unit
 val string : Lexing.lexbuf -> string
 
 val remove_leading_plus : string -> string
-
-val with_location : (Lexing.lexbuf -> 'a) -> Lexing.lexbuf -> 'a

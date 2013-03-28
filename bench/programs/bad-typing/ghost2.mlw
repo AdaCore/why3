@@ -1,0 +1,16 @@
+module TestGhost
+  use import int.Int
+  use import list.List
+  use import ref.Ref
+
+  type t = { f1 : int; ghost f2 : int }
+
+  exception Found int
+
+  let test1 (x: int) (y: t)
+    ensures { result = y.f1 }
+  =
+    try raise (Found y.f2) with
+      Found _ -> y.f1
+    end
+end

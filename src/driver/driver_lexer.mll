@@ -107,10 +107,6 @@ rule token = parse
       { raise (IllegalCharacter c) }
 
 {
-  let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
-
-  let with_location f lb =
-    try f lb with e -> raise (Loc.Located (loc lb, e))
 
   let parse_file_gen parse input_lexbuf lexbuf =
     let s = Stack.create () in
@@ -130,7 +126,7 @@ rule token = parse
         | _ -> tok in
     let lex_dumb = Lexing.from_function (fun _ _ -> assert false) in
     Loc.transfer_loc lexbuf lex_dumb;
-    with_location (parse multifile) lex_dumb
+    Loc.with_location (parse multifile) lex_dumb
 
   let parse_file = parse_file_gen Driver_parser.file
   let parse_file_extract = parse_file_gen Driver_parser.file_extract

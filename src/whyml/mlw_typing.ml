@@ -451,6 +451,13 @@ and dtype_v denv = function
 
 (* expressions *)
 
+let add_lemma_label ~top id = function
+  | Gnone -> id, false
+  | Gghost -> id, true
+  | Glemma when not top ->
+      errorm ~loc:id.id_loc "lemma functions are only allowed at toplevel"
+  | Glemma -> { id with id_lab = Lstr Mlw_wp.lemma_label :: id.id_lab }, true
+
 let de_unit ~loc = hidden_ls ~loc Mlw_expr.fs_void
 
 let de_app _loc e el =
@@ -528,7 +535,7 @@ and de_desc denv loc = function
       let e2 = dexpr denv e2 in
       DElet (id, gh, e1, e2), e2.de_type
   | Ptree.Eletrec (fdl, e1) ->
-      let fdl = dletrec denv fdl in
+      let fdl = dletrec ~top:false denv fdl in
       let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
       let denv = List.fold_left add_one denv fdl in
       let e1 = dexpr denv e1 in
@@ -694,7 +701,7 @@ and de_desc denv loc = function
       expected_type e1 dity_unit;
       DEfor (id, efrom, dir, eto, inv, e1), e1.de_type
 
-and dletrec denv fdl =
+and dletrec ~top denv fdl =
   (* add all functions into the environment *)
   let add_one denv (_,id,_,bl,_) =
     let argl = List.map (fun _ -> create_type_variable ()) bl in
@@ -709,6 +716,7 @@ and dletrec denv fdl =
   let denvl = List.map2 bind_one fdl dvtyl in
   (* then type-check the bodies *)
   let type_one (loc,id,gh,_,tr) (denv,bl,tyl,tyv) =
+    let id, gh = add_lemma_label ~top id gh in
     let tr, (argl, res) = dtriple denv tr in
     if argl <> [] then errorm ~loc
       "The body of a recursive function must be a first-order value";
@@ -910,8 +918,8 @@ and rletrec denv fdl =
 let dexpr denv e =
   rexpr denv (dexpr denv e)
 
-let dletrec denv fdl =
-  rletrec denv (dletrec denv fdl)
+let dletrec ~top denv fdl =
+  rletrec denv (dletrec ~top denv fdl)
 
 (** stage 2 *)
 
@@ -1363,7 +1371,7 @@ and expr_desc lenv loc de = match de.de_desc with
         | _ -> mk_expr e1 in
       begin match e1.e_vty with
         | VTarrow _ when e1.e_ghost && not gh ->
-            errorm ~loc "%s must be a ghost function" x.id
+            Loc.errorm ~loc "%s must be a ghost function" x.id
         | VTarrow _ -> flatten e1
         | VTvalue _ -> mk_expr e1
       end;
@@ -1458,11 +1466,6 @@ and expr_desc lenv loc de = match de.de_desc with
             xs, pv, e_case (e_value pv) (List.rev bl)
       in
       e_try e1 (List.rev_map mk_branch xsl)
-  (* We push ghost down in order to safely capture even non-ghost
-     raises of the inner expression in "ghost try e1 with ..." *)
-  | DEghost ({ de_desc = DEtry (de2, bl) } as de1) ->
-      let de2 = { de1 with de_desc = DEghost de2 } in
-      expr lenv { de1 with de_desc = DEtry (de2, bl) }
   | DEmark (x, de1) ->
       let ld = create_let_defn (Denv.create_user_id x) e_now in
       let lenv = add_local x.id ld.let_sym lenv in
@@ -1535,7 +1538,7 @@ and expr_lam lenv gh pvl (de, dsp) =
   let lenv = add_binders lenv pvl in
   let e = e_ghostify gh (expr lenv de) in
   if not gh && e.e_ghost then
-    errorm ~loc:de.de_loc "ghost body in a non-ghost function";
+    Loc.errorm ~loc:de.de_loc "ghost body in a non-ghost function";
   let spec = spec_of_dspec lenv e.e_effect e.e_vty dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }
 
@@ -2030,6 +2033,7 @@ let add_decl ~wp loc uc d =
 
 let add_pdecl ~wp loc uc = function
   | Dlet (id, gh, e) ->
+      let id, gh = add_lemma_label ~top:true id gh in
       let e = dexpr (create_denv uc) e in
       let pd = match e.de_desc with
         | DEfun (bl, tr) ->
@@ -2043,7 +2047,7 @@ let add_pdecl ~wp loc uc = function
             create_let_decl def in
       add_pdecl_with_tuples ~wp uc pd
   | Dletrec fdl ->
-      let fdl = dletrec (create_denv uc) fdl in
+      let fdl = dletrec ~top:true (create_denv uc) fdl in
       let fdl = expr_rec (create_lenv uc) fdl in
       let pd = create_rec_decl fdl in
       add_pdecl_with_tuples ~wp uc pd

@@ -579,6 +579,15 @@ let eff_is_empty e =
   (* eff_compar is not a side effect *)
   not e.eff_diverg
 
+let eff_is_read_only e =
+  Sreg.is_empty e.eff_writes &&
+  Sexn.is_empty e.eff_raises &&
+  Sreg.is_empty e.eff_ghostw &&
+  Sexn.is_empty e.eff_ghostx &&
+  Mreg.is_empty e.eff_resets &&
+  (* eff_compar is not a side effect *)
+  not e.eff_diverg
+
 let eff_equal e1 e2 =
   Sreg.equal e1.eff_reads  e2.eff_reads  &&
   Sreg.equal e1.eff_writes e2.eff_writes &&
@@ -808,6 +817,8 @@ let spec_filter ghost varm vars c =
   let check { vs_name = id } _ = if not (Mid.mem id varm) then
     Loc.errorm "Local variable %s escapes from its scope" id.id_string in
   Mvs.iter check vss;
+  if not ghost && not (Sexn.is_empty c.c_effect.eff_ghostx) then
+    Loc.errorm "Only ghost functions may raise ghost exceptions";
   { c with c_effect = eff_ghostify ghost (eff_filter vars c.c_effect) }
 
 exception UnboundException of xsymbol

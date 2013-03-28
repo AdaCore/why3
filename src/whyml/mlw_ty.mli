@@ -241,6 +241,7 @@ val eff_full_inst : ity_subst -> effect -> effect
 val eff_filter : varset -> effect -> effect
 
 val eff_is_empty : effect -> bool
+val eff_is_read_only: effect -> bool
 
 (** specification *)
 

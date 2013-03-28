@@ -327,19 +327,14 @@ let pdecl_ns uc d = match d.pd_node with
   | PDrec fdl -> List.fold_left add_rec uc fdl
   | PDexn xs -> add_exn uc xs
 
-(* FIXME: move the choice to Mlw_wp and make it dynamic, not start-time *)
-let if_fast_wp f1 f2 x = if Debug.test_flag Mlw_wp.fast_wp then f1 x else f2 x
-let wp_val = if_fast_wp Mlw_wp.fast_wp_val Mlw_wp.wp_val
-let wp_let = if_fast_wp Mlw_wp.fast_wp_let Mlw_wp.wp_let
-let wp_rec = if_fast_wp Mlw_wp.fast_wp_rec Mlw_wp.wp_rec
-
-let pdecl_vc env km th d = match d.pd_node with
+let pdecl_vc ~wp env km th d = match d.pd_node with
   | PDtype _ | PDdata _ | PDexn _ -> th
-  | PDval lv -> wp_val env km th lv
-  | PDlet ld -> wp_let env km th ld
-  | PDrec rd -> wp_rec env km th rd
+  | PDval lv -> Mlw_wp.wp_val ~wp env km th lv
+  | PDlet ld -> Mlw_wp.wp_let ~wp env km th ld
+  | PDrec rd -> Mlw_wp.wp_rec ~wp env km th rd
 
-let pdecl_vc uc d = add_to_theory (pdecl_vc uc.muc_env uc.muc_known) uc d
+let pdecl_vc ~wp uc d =
+  add_to_theory (pdecl_vc ~wp uc.muc_env uc.muc_known) uc d
 
 let pure_data_decl tdl =
   let proj pj = Opt.map (fun pls -> pls.pl_ls) pj in
@@ -359,7 +354,7 @@ let add_pdecl ~wp uc d =
     muc_local = Sid.union uc.muc_local d.pd_news }
   in
   let uc = pdecl_ns uc d in
-  let uc = if wp then pdecl_vc uc d else uc in
+  let uc = pdecl_vc ~wp uc d in
   let uc = add_to_theory pdecl_pure uc d in
   uc
 
