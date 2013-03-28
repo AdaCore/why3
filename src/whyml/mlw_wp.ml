@@ -339,9 +339,9 @@ let update_term env (mreg : vsymbol Mreg.t) f =
 
 (* look for a variable with a single region equal to [reg] *)
 let var_of_region reg f =
-  let test vs _ _ = match (ity_of_vs vs).ity_node with
+  let test vs _ acc = match (ity_of_vs vs).ity_node with
     | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
-    | _ -> None in
+    | _ -> acc in
   Mvs.fold test f.t_vars None
 
 let quantify env regs f =
