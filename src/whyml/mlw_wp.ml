@@ -1087,19 +1087,35 @@ end = struct
   let refresh regset s =
     Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
 
+  let print_opt_name fmt name =
+    match !name with
+    | None -> Format.fprintf fmt "<>"
+    | Some x -> Pretty.print_term fmt x
+
+  let print_subst fmt sub =
+    Format.fprintf fmt "{ ";
+    Mreg.iter (fun k v -> Format.fprintf fmt "%a |-> %a,@ ") sub;
+    Format.fprintf fmt " }"
+
   let term env sub t =
+
     let mreg = Mreg.mapi_filter (fun reg vr ->
       match !vr with
       | Some _ -> !vr
       | None ->
           Format.printf "  calling var_of_region ...@.";
           let r =
+            try
             match var_of_region reg t with
             | Some v ->
                 let v' = name_from_region ~id:v.vs_name reg in
                 vr := Some v';
                 !vr
-            | None -> None
+            | None ->
+                (* it is correct to return [None] here, because if
+                  * [var_of_region] does not return anything, the corresponding
+                  * region is not in the term! *)
+                None
           in
           Format.printf "  . OK.@.";
           r
