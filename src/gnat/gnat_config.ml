@@ -1,6 +1,6 @@
 open Why3
 
-type report_mode = Fail | Verbose | Detailed
+type report_mode = Fail | Fail_And_Proved | Detailed
 
 type proof_mode =
     Then_Split
@@ -9,11 +9,16 @@ type proof_mode =
   | Path_WP
   | No_Split
 
+type verbosity =
+  | Normal
+  | Quiet
+  | Verbose
+
 let gnatprove_why3conf_file = "why3.conf"
 
 let default_timeout = 1
 
-let opt_verbose = ref false
+let opt_verbose = ref Normal
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_report = ref Fail
@@ -39,7 +44,7 @@ let set_report s =
    if s = "detailed" then
       opt_report := Detailed
    else if s = "all" then
-      opt_report := Verbose
+      opt_report := Fail_And_Proved
    else if s <> "fail" then
       Gnat_util.abort_with_message
         "argument for option --report should be one of (fail|all|detailed)."
@@ -91,9 +96,12 @@ let usage_msg =
   "Usage: gnatwhy3 [options] file"
 
 let options = Arg.align [
-   "-v", Arg.Set opt_verbose, " Output extra verbose information";
-   "--verbose", Arg.Set opt_verbose, " Output extra verbose information";
-
+   "-v", Arg.Unit (fun () -> opt_verbose := Verbose),
+         " Output extra verbose information";
+   "--verbose", Arg.Unit (fun () -> opt_verbose := Verbose),
+         " Output extra verbose information";
+   "--quiet", Arg.Unit (fun () -> opt_verbose := Quiet),
+         " Be quiet";
    "-t", Arg.Int set_timeout,
           " Set the timeout in seconds (default is 1 second)";
    "--timeout", Arg.Int set_timeout,
