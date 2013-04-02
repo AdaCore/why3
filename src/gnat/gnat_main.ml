@@ -82,7 +82,7 @@ let rec handle_vc_result goal result detailed =
    match status with
    | Gnat_objectives.Proved ->
          begin match Gnat_config.report with
-         | (Gnat_config.Verbose | Gnat_config.Detailed) ->
+         | (Gnat_config.Fail_And_Proved | Gnat_config.Detailed) ->
                print true (Session.goal_task goal) obj
          | _ -> ()
          end
@@ -115,7 +115,7 @@ and interpret_result pa pas =
          let answer = r.Call_provers.pr_answer in
          if answer = Call_provers.HighFailure then begin
             Format.eprintf "An error occured when calling alt-ergo@.";
-            if Gnat_config.verbose then begin
+            if Gnat_config.verbose = Gnat_config.Verbose then begin
                Format.eprintf "%s@." r.Call_provers.pr_output
             end;
          end;
@@ -161,7 +161,7 @@ let normal_handle_one_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
       Gnat_objectives.init_subp_vcs subp;
       Gnat_objectives.iter_leaf_goals ~subp register_goal;
-      Gnat_objectives.stat ();
+      Gnat_objectives.stat subp;
       Gnat_objectives.iter (fun obj ->
       if Gnat_objectives.objective_status obj =
          Gnat_objectives.Proved then begin

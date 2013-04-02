@@ -117,7 +117,6 @@ let clear () =
 let find e =
    try Gnat_expl.HExpl.find explmap e
    with Not_found ->
-      incr nb_objectives;
       let r = empty_objective () in
       Gnat_expl.HExpl.add explmap e r;
       incr nb_objectives;
@@ -320,10 +319,27 @@ let get_num_goals () =
 let get_num_goals_done () =
    !nb_goals_done
 
-let stat () =
-   if Gnat_config.verbose then begin
-      Format.printf "Obtained %d proof objectives and %d VCs@."
-      !nb_objectives ! total_nb_goals
+exception Found_Name of string
+
+let extract_subp_name subp =
+  (* given a top-level goal that corresponds to an Ada subprogram, extract the
+     subprogram name *)
+   let task = Session.goal_task subp in
+   let goal_ident = (Task.task_goal task).Decl.pr_name in
+   let label_set = goal_ident.Ident.id_label in
+   try
+     Ident.Slab.iter (fun lab ->
+       let s = lab.Ident.lab_string in
+       if Strings.starts_with s "GP_Pretty_Ada:" then
+         raise (Found_Name (String.sub s 14 (String.length s - 14)))
+       ) label_set;
+     assert false (* There must always be a label *)
+   with Found_Name s -> s
+
+let stat subp =
+   if Gnat_config.verbose <> Gnat_config.Quiet then begin
+     let subp_name = extract_subp_name subp in
+      Format.printf "analyzing %s, %d checks@." subp_name !nb_objectives
    end
 
 module Base_Sched = Session_scheduler.Base_scheduler (struct end)

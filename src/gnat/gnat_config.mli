@@ -12,10 +12,15 @@ val prover : Whyconf.config_prover
 val timeout : int
 (* value of the -t/--timeout option, default value 10 *)
 
-val verbose : bool
+type verbosity =
+  | Normal
+  | Quiet
+  | Verbose
+
+val verbose : verbosity
 (* true if option -v/--verbose was present *)
 
-type report_mode = Fail | Verbose | Detailed
+type report_mode = Fail | Fail_And_Proved | Detailed
 (* In mode fail, only print failed proof objectives.
    In mode verbose, print all proof objectives.
    In mode detailed, additionally print if VC was timeout or if prover stopped.

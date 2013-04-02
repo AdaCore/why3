@@ -96,7 +96,7 @@ val goal_has_been_tried : goal -> bool
 val objective_status : objective -> status
 (* query the status of the objective *)
 
-val stat : unit -> unit
+val stat : subp -> unit
 (* print statistics *)
 
 val get_num_goals : unit -> int
