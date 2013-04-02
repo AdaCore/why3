@@ -1,0 +1,1590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../simple_priority_queue.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="SimplePrioriyQueue"
+   locfile="../simple_priority_queue.mlw"
+   loclnum="5" loccnumb="7" loccnume="25"
+   verified="false"
+   expanded="true">
+   <goal
+    name="numof_occ"
+    locfile="../simple_priority_queue.mlw"
+    loclnum="30" loccnumb="8" loccnume="17"
+    sum="2b633553a74b3f86b5c63e1e83cd6430"
+    proved="false"
+    expanded="false"
+    shape="ainfix =amixfix []V0V4V1Aainfix &lt;V4V3Aainfix &lt;=V2V4Eqainfix &gt;anumofV0V1V2V3c0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.02"/>
+    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="false">
+     <goal
+      name="numof_occ.1"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="30" loccnumb="8" loccnume="17"
+      expl="1."
+      sum="450602af3681bbdd5f46b944db3dc59b"
+      proved="false"
+      expanded="false"
+      shape="ainfix =amixfix []V0V4V1Aainfix &lt;V4V3Aainfix &lt;=V2V4EIainfix &gt;anumofV0V1V2V3c0F">
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="numof_occ.2"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="30" loccnumb="8" loccnume="17"
+      expl="2."
+      sum="bcc86f4be3bf91351f303ad9e18cc850"
+      proved="false"
+      expanded="false"
+      shape="ainfix &gt;anumofV0V1V2V3c0Iainfix =amixfix []V0V4V1Aainfix &lt;V4V3Aainfix &lt;=V2V4EF">
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="10.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="10.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="10.07"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="numof_add"
+    locfile="../simple_priority_queue.mlw"
+    loclnum="34" loccnumb="8" loccnume="17"
+    sum="5bb2729a1fd4f4108164afe3a6ae95de"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anumofV0V1V2ainfix +V3c1ainfix +c1anumofV0V1V2V3Iainfix =V1amixfix []V0V3Iainfix &lt;=V2V3F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter create"
+    locfile="../simple_priority_queue.mlw"
+    loclnum="38" loccnumb="6" loccnume="12"
+    expl="VC for create"
+    sum="838b0714e9cd1d0c7588c6f42cff3034"
+    proved="true"
+    expanded="false"
+    shape="ainfix =c0c0Aainfix &lt;=apriorityV2apriorityagetaconstV1c0IamemV2aempty_bagFIainfix &gt;c0c0Aainfix =anum_ofaTuple2amk arrayV0aconstV1V3c0c0anb_occV3aempty_bagFAainfix &lt;c0c0Aainfix &lt;=c0c0Oainfix =c0c0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Aainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for create"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter add"
+    locfile="../simple_priority_queue.mlw"
+    loclnum="47" loccnumb="6" loccnume="9"
+    expl="VC for add"
+    sum="b86ef5df3ccc7218f0b42c043abb60a6"
+    proved="false"
+    expanded="true"
+    shape="iainfix =V4c0ainfix =V9aaddV1V2Aainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV6V7IamemV10V9FIainfix &gt;V8c0Aainfix =anum_ofaTuple2amk arrayV0V6V11c0V8anb_occV11V9FAainfix &lt;V7V8Aainfix &lt;=c0V7Oainfix =V8c0Aainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0Fiainfix &gt;apriorityV1apriorityagetV6V3ainfix =V14aaddV1V2Aainfix &lt;=apriorityV15apriorityagetV6V12IamemV15V14FIainfix &gt;V13c0Aainfix =anum_ofaTuple2amk arrayV0V6V16c0V13anb_occV16V14FAainfix &lt;V12V13Aainfix &lt;=c0V12Oainfix =V13c0Aainfix &lt;=V13V0Aainfix &lt;=c0V13Iainfix =V14aaddV1V2FIainfix =V13ainfix +V4c1FIainfix =V12V4Fainfix =V18aaddV1V2Aainfix &lt;=apriorityV19apriorityagetV6V3IamemV19V18FIainfix &gt;V17c0Aainfix =anum_ofaTuple2amk arrayV0V6V20c0V17anb_occV20V18FAainfix &lt;V3V17Aainfix &lt;=c0V3Oainfix =V17c0Aainfix &lt;=V17V0Aainfix &lt;=c0V17Iainfix =V18aaddV1V2FIainfix =V17ainfix +V4c1FAainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FAainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV21apriorityagetV5V3IamemV21V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V22c0V4anb_occV22V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+    <label
+     name="expl:VC for add"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.00"/>
+    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter add.1"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="1. precondition"
+      sum="fe684cf448a59f270fb4658d1cf7a40e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV6apriorityagetV5V3IamemV6V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V7c0V4anb_occV7V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.2"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="2. type invariant"
+      sum="9c2a50549633176d3dac01d0414ba2e3"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0FIainfix =V4c0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.3"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="3. type invariant"
+      sum="c2374d38be351d31eaab259f1cbdf659"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V8Aainfix &lt;=c0V7Oainfix =V8c0Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0FIainfix =V4c0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.4"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="4. type invariant"
+      sum="ce5354e8350bfaff5dec36f9a8eb8713"
+      proved="false"
+      expanded="true"
+      shape="ainfix =anum_ofaTuple2amk arrayV0V6V10c0V8anb_occV10V9FIainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0FIainfix =V4c0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV5V3IamemV11V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V12c0V4anb_occV12V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.06"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.5"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="5. type invariant"
+      sum="4f5bf9faeee0ca641c1f44d04d347e49"
+      proved="false"
+      expanded="true"
+      shape="ainfix &lt;=apriorityV10apriorityagetV6V7IamemV10V9FIainfix &gt;V8c0Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0FIainfix =V4c0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV5V3IamemV11V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V12c0V4anb_occV12V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.07"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.6"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="6. type invariant"
+      sum="e12383f1d8a1cb438de4211bcc4383ec"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0FIainfix =V4c0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.7"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="7. postcondition"
+      sum="c85d0ed4075b4b8ae496820cd22dfadd"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V9aaddV1V2Iainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV6V7IamemV10V9FIainfix &gt;V8c0Aainfix =anum_ofaTuple2amk arrayV0V6V11c0V8anb_occV11V9FAainfix &lt;V7V8Aainfix &lt;=c0V7Oainfix =V8c0Aainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7c0FIainfix =V4c0Iainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV12apriorityagetV5V3IamemV12V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V13c0V4anb_occV13V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.8"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="8. type invariant"
+      sum="b8c986e75f3cc8c88bacc1b4f4a08840"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV7apriorityagetV5V3IamemV7V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V8c0V4anb_occV8V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.9"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="9. precondition"
+      sum="201cedb1919dfc2eb89f6bd6b514bb46"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV7apriorityagetV5V3IamemV7V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V8c0V4anb_occV8V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.10"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="10. type invariant"
+      sum="ec9d1160526c27cf91ac34ce40f4198a"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7V4FIainfix &gt;apriorityV1apriorityagetV6V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.11"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="11. type invariant"
+      sum="18e19c165334ace810e598ac6d982478"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V7V8Aainfix &lt;=c0V7Oainfix =V8c0Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7V4FIainfix &gt;apriorityV1apriorityagetV6V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.12"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="12. type invariant"
+      sum="9d5418f7886886a28779401504350fb4"
+      proved="false"
+      expanded="true"
+      shape="ainfix =anum_ofaTuple2amk arrayV0V6V10c0V8anb_occV10V9FIainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7V4FIainfix &gt;apriorityV1apriorityagetV6V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV5V3IamemV11V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V12c0V4anb_occV12V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.13"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="13. type invariant"
+      sum="9532f3ded1a184dd820808f50c6d725d"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV10apriorityagetV6V7IamemV10V9FIainfix &gt;V8c0Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7V4FIainfix &gt;apriorityV1apriorityagetV6V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV5V3IamemV11V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V12c0V4anb_occV12V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.14"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="14. postcondition"
+      sum="ec49e2407445b6731741a7a10578a365"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V9aaddV1V2Iainfix &lt;=apriorityV10apriorityagetV6V7IamemV10V9FIainfix &gt;V8c0Aainfix =anum_ofaTuple2amk arrayV0V6V11c0V8anb_occV11V9FAainfix &lt;V7V8Aainfix &lt;=c0V7Oainfix =V8c0Aainfix &lt;=V8V0Aainfix &lt;=c0V8Iainfix =V9aaddV1V2FIainfix =V8ainfix +V4c1FIainfix =V7V4FIainfix &gt;apriorityV1apriorityagetV6V3Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV12apriorityagetV5V3IamemV12V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V13c0V4anb_occV13V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.15"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="15. type invariant"
+      sum="85b10979da0a9fbd4607c0558887b144"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V7V0Aainfix &lt;=c0V7Iainfix =V8aaddV1V2FIainfix =V7ainfix +V4c1FIainfix &gt;apriorityV1apriorityagetV6V3NIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV5V3IamemV9V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V10c0V4anb_occV10V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.16"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="16. type invariant"
+      sum="c309688b23ec7b34b5f628f6f17b3217"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V3V7Aainfix &lt;=c0V3Oainfix =V7c0Iainfix =V8aaddV1V2FIainfix =V7ainfix +V4c1FIainfix &gt;apriorityV1apriorityagetV6V3NIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV5V3IamemV9V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V10c0V4anb_occV10V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.17"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="17. type invariant"
+      sum="1d4f3ad768c523e01bb70d268f99a42b"
+      proved="false"
+      expanded="true"
+      shape="ainfix =anum_ofaTuple2amk arrayV0V6V9c0V7anb_occV9V8FIainfix =V8aaddV1V2FIainfix =V7ainfix +V4c1FIainfix &gt;apriorityV1apriorityagetV6V3NIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.18"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="18. type invariant"
+      sum="33fac1fc55eac7aae117461b38ae5395"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV9apriorityagetV6V3IamemV9V8FIainfix &gt;V7c0Iainfix =V8aaddV1V2FIainfix =V7ainfix +V4c1FIainfix &gt;apriorityV1apriorityagetV6V3NIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV5V3IamemV10V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V11c0V4anb_occV11V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.19"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="47" loccnumb="6" loccnume="9"
+      expl="19. postcondition"
+      sum="71aef9abe2baf208215230e6cf7d1fc4"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V8aaddV1V2Iainfix &lt;=apriorityV9apriorityagetV6V3IamemV9V8FIainfix &gt;V7c0Aainfix =anum_ofaTuple2amk arrayV0V6V10c0V7anb_occV10V8FAainfix &lt;V3V7Aainfix &lt;=c0V3Oainfix =V7c0Aainfix &lt;=V7V0Aainfix &lt;=c0V7Iainfix =V8aaddV1V2FIainfix =V7ainfix +V4c1FIainfix &gt;apriorityV1apriorityagetV6V3NIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0Iainfix =V4c0NIainfix =V6asetV5V4V1Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix =V4V0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV5V3IamemV11V2FIainfix &gt;V4c0Aainfix =anum_ofaTuple2amk arrayV0V5V12c0V4anb_occV12V2FAainfix &lt;V3V4Aainfix &lt;=c0V3Oainfix =V4c0Aainfix &lt;=V4V0Aainfix &lt;=c0V4FF">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter highest"
+    locfile="../simple_priority_queue.mlw"
+    loclnum="59" loccnumb="6" loccnume="13"
+    expl="VC for highest"
+    sum="db966e14518e67ec8b4f2d236dbc2e0b"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=apriorityV6apriorityV5IamemV6V1FAamemV5V1LagetV4V2Aainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV7apriorityagetV4V2IamemV7V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V8c0V3anb_occV8V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+    <label
+     name="expl:VC for highest"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter highest.1"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="59" loccnumb="6" loccnume="13"
+      expl="1. precondition"
+      sum="b575d78933e80fb6f0b78c3798c02fc5"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV5apriorityagetV4V2IamemV5V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V6c0V3anb_occV6V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for highest"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter highest.2"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="59" loccnumb="6" loccnume="13"
+      expl="2. postcondition"
+      sum="796cdf32623500725d5a41401f8abab6"
+      proved="true"
+      expanded="false"
+      shape="amemV5V1LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV6apriorityagetV4V2IamemV6V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V7c0V3anb_occV7V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for highest"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter highest.3"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="59" loccnumb="6" loccnume="13"
+      expl="3. postcondition"
+      sum="27c2b99d2d182d73c0aa647ae051a35b"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV6apriorityV5IamemV6V1FLagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV7apriorityagetV4V2IamemV7V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V8c0V3anb_occV8V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for highest"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter remove"
+    locfile="../simple_priority_queue.mlw"
+    loclnum="65" loccnumb="6" loccnume="12"
+    expl="VC for remove"
+    sum="ed2990ca301ba72d2948aa570131d499"
+    proved="false"
+    expanded="true"
+    shape="iainfix &gt;V5c0ainfix &lt;=apriorityV12apriorityV6IamemV12V11FAamemV6V11Aainfix =V1aaddV6V11Aainfix &lt;=apriorityV13apriorityagetV7V10IamemV13V11FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V14c0V5anb_occV14V11FAainfix &lt;V10V5Aainfix &lt;=c0V10Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V15apriorityagetV7V10Iainfix &lt;V15ainfix +ainfix -V5c1c1Aainfix &lt;=c0V15FAainfix &lt;V10V5Aainfix &lt;=c0V10Aiainfix &gt;apriorityV17V9ainfix &lt;=apriorityagetV7V20apriorityagetV7V18Iainfix &lt;V20ainfix +V16c1Aainfix &lt;=c0V20FAainfix &lt;V18V5Aainfix &lt;=c0V18Iainfix =V19apriorityV17FIainfix =V18V16Fainfix &lt;=apriorityagetV7V21apriorityagetV7V10Iainfix &lt;V21ainfix +V16c1Aainfix &lt;=c0V21FAainfix &lt;V10V5Aainfix &lt;=c0V10LagetV7V16Aainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix &lt;=apriorityagetV7V22apriorityagetV7V10Iainfix &lt;V22V16Aainfix &lt;=c0V22FAainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;=V16ainfix -V5c1Aainfix &lt;=c1V16FFAainfix &lt;=apriorityagetV7V23apriorityagetV7V8Iainfix &lt;V23c1Aainfix &lt;=c0V23FAainfix &lt;V8V5Aainfix &lt;=c0V8Iainfix &lt;=c1ainfix -V5c1Aainfix &lt;=apriorityV25apriorityV6IamemV25V24FAamemV6V24Aainfix =V1aaddV6V24Aainfix &lt;=apriorityV26apriorityagetV7V8IamemV26V24FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V27c0V5anb_occV27V24FAainfix &lt;V8V5Aainfix &lt;=c0V8Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V24adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FAainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0ainfix &lt;=apriorityV29apriorityV6IamemV29V28FAamemV6V28Aainfix =V1aaddV6V28Aainfix &lt;=c0V0Aainfix &lt;=apriorityV30apriorityagetV7V2IamemV30V28FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V31c0V5anb_occV31V28FAainfix &lt;V2V5Aainfix &lt;=c0V2Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V28adiffV1asingletonV6FIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FAainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Aainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV32apriorityagetV4V2IamemV32V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V33c0V3anb_occV33V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+    <label
+     name="expl:VC for remove"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.01"/>
+    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter remove.1"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="1. precondition"
+      sum="426d9029b198eb1ba72e2024dd185ee4"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV6apriorityagetV4V2IamemV6V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V7c0V3anb_occV7V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.2"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="2. precondition"
+      sum="6dfe324655435e29b48237d2d7b174b2"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV7apriorityagetV4V2IamemV7V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V8c0V3anb_occV8V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.3"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="3. precondition"
+      sum="bdbe8e911c28675b6b5e2c52d09ca078"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV7apriorityagetV4V2IamemV7V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V8c0V3anb_occV8V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.4"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="4. type invariant"
+      sum="aef2ce4d25bdcd88b36493987526a44f"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV8apriorityagetV4V2IamemV8V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V9c0V3anb_occV9V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.5"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="5. precondition"
+      sum="18d9828e366a26271d82fd868d83dd85"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV8apriorityagetV4V2IamemV8V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V9c0V3anb_occV9V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.6"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="6. type invariant"
+      sum="e4eb3c6de038ef735852c4eb546de9be"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV4V2IamemV10V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V11c0V3anb_occV11V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.7"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="7. type invariant"
+      sum="dcb8fd2a382323c4edd0085c95d9b5e4"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V8V5Aainfix &lt;=c0V8Oainfix =V5c0Iainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV4V2IamemV10V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V11c0V3anb_occV11V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.8"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="8. type invariant"
+      sum="f1f3ed5bbbd6ce3389da653bf0d3824c"
+      proved="false"
+      expanded="false"
+      shape="ainfix =anum_ofaTuple2amk arrayV0V7V10c0V5anb_occV10V9FIainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV4V2IamemV11V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V12c0V3anb_occV12V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.16"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.9"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="9. type invariant"
+      sum="685e2bd02ab12fad5634fc55fc19842d"
+      proved="false"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV10apriorityagetV7V8IamemV10V9FIainfix &gt;V5c0Iainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV4V2IamemV11V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V12c0V3anb_occV12V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.05"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.10"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="10. postcondition"
+      sum="e23d7bd3402564fae1b50a7a0042db18"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V1aaddV6V9Iainfix &lt;=apriorityV10apriorityagetV7V8IamemV10V9FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V11c0V5anb_occV11V9FAainfix &lt;V8V5Aainfix &lt;=c0V8Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV12apriorityagetV4V2IamemV12V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V13c0V3anb_occV13V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.11"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="11. postcondition"
+      sum="4b84bb5fb23f55b8de4e63842b841b94"
+      proved="false"
+      expanded="false"
+      shape="amemV6V9Iainfix &lt;=apriorityV10apriorityagetV7V8IamemV10V9FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V11c0V5anb_occV11V9FAainfix &lt;V8V5Aainfix &lt;=c0V8Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV12apriorityagetV4V2IamemV12V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V13c0V3anb_occV13V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.08"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.12"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="12. postcondition"
+      sum="be4de160506dfe1b5a9fc75e7afdbbc4"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV10apriorityV6IamemV10V9FIainfix &lt;=apriorityV11apriorityagetV7V8IamemV11V9FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V12c0V5anb_occV12V9FAainfix &lt;V8V5Aainfix &lt;=c0V8Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V9adiffV1asingletonV6FIainfix &gt;c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV13apriorityagetV4V2IamemV13V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V14c0V3anb_occV14V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.13"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="13. loop invariant init"
+      sum="23a3602e22b545ed61376ebfe1758d89"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V8V5Aainfix &lt;=c0V8Iainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV4V2IamemV9V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V10c0V3anb_occV10V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.14"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="14. loop invariant init"
+      sum="63b20a33c46e825359509a72c94076b8"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityagetV7V9apriorityagetV7V8Iainfix &lt;V9c1Aainfix &lt;=c0V9FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV4V2IamemV10V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V11c0V3anb_occV11V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.15"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="15. precondition"
+      sum="01427185224e9e10c63a1eb425e7b7c2"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V11V0Aainfix &lt;=c0V11Iainfix &lt;=apriorityagetV7V12apriorityagetV7V10Iainfix &lt;V12V11Aainfix &lt;=c0V12FAainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;=V11ainfix -V5c1Aainfix &lt;=c1V11FFIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV13apriorityagetV4V2IamemV13V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V14c0V3anb_occV14V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.16"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="16. loop invariant preservation"
+      sum="77a78197647b4cf4e10744831101f5c0"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V13V5Aainfix &lt;=c0V13Iainfix =V14apriorityV12FIainfix =V13V11FIainfix &gt;apriorityV12V9LagetV7V11Iainfix &lt;V11V0Aainfix &lt;=c0V11Iainfix &lt;=apriorityagetV7V15apriorityagetV7V10Iainfix &lt;V15V11Aainfix &lt;=c0V15FAainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;=V11ainfix -V5c1Aainfix &lt;=c1V11FFIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV16apriorityagetV4V2IamemV16V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V17c0V3anb_occV17V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.17"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="17. loop invariant preservation"
+      sum="5d2e979dafb6a5fc1b3354c370867c82"
+      proved="false"
+      expanded="true"
+      shape="ainfix &lt;=apriorityagetV7V15apriorityagetV7V13Iainfix &lt;V15ainfix +V11c1Aainfix &lt;=c0V15FIainfix =V14apriorityV12FIainfix =V13V11FIainfix &gt;apriorityV12V9LagetV7V11Iainfix &lt;V11V0Aainfix &lt;=c0V11Iainfix &lt;=apriorityagetV7V16apriorityagetV7V10Iainfix &lt;V16V11Aainfix &lt;=c0V16FAainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;=V11ainfix -V5c1Aainfix &lt;=c1V11FFIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV17apriorityagetV4V2IamemV17V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V18c0V3anb_occV18V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.19"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.07"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.18"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="18. loop invariant preservation"
+      sum="3ecc7b46c72627da89340d1fa72af82d"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &gt;apriorityV12V9NLagetV7V11Iainfix &lt;V11V0Aainfix &lt;=c0V11Iainfix &lt;=apriorityagetV7V13apriorityagetV7V10Iainfix &lt;V13V11Aainfix &lt;=c0V13FAainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;=V11ainfix -V5c1Aainfix &lt;=c1V11FFIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV14apriorityagetV4V2IamemV14V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V15c0V3anb_occV15V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.19"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="19. loop invariant preservation"
+      sum="4b445fde3d14cadec6790db213ede38a"
+      proved="false"
+      expanded="true"
+      shape="ainfix &lt;=apriorityagetV7V13apriorityagetV7V10Iainfix &lt;V13ainfix +V11c1Aainfix &lt;=c0V13FIainfix &gt;apriorityV12V9NLagetV7V11Iainfix &lt;V11V0Aainfix &lt;=c0V11Iainfix &lt;=apriorityagetV7V14apriorityagetV7V10Iainfix &lt;V14V11Aainfix &lt;=c0V14FAainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;=V11ainfix -V5c1Aainfix &lt;=c1V11FFIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV15apriorityagetV4V2IamemV15V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V16c0V3anb_occV16V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.14"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.11"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.20"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="20. type invariant"
+      sum="ef046b20a126e6482dc590aad2411b8e"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V12apriorityagetV7V10Iainfix &lt;V12ainfix +ainfix -V5c1c1Aainfix &lt;=c0V12FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV13apriorityagetV4V2IamemV13V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V14c0V3anb_occV14V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.21"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="21. type invariant"
+      sum="64f3909fc1233f63826bfc531f25a242"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V10V5Aainfix &lt;=c0V10Oainfix =V5c0Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V12apriorityagetV7V10Iainfix &lt;V12ainfix +ainfix -V5c1c1Aainfix &lt;=c0V12FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV13apriorityagetV4V2IamemV13V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V14c0V3anb_occV14V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.22"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="22. type invariant"
+      sum="836d48d10263681fcda23294138a5f50"
+      proved="false"
+      expanded="false"
+      shape="ainfix =anum_ofaTuple2amk arrayV0V7V12c0V5anb_occV12V11FIainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V13apriorityagetV7V10Iainfix &lt;V13ainfix +ainfix -V5c1c1Aainfix &lt;=c0V13FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV14apriorityagetV4V2IamemV14V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V15c0V3anb_occV15V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.08"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.23"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="23. type invariant"
+      sum="ce98162d1b763a3e67b6946eac7a7b67"
+      proved="false"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV12apriorityagetV7V10IamemV12V11FIainfix &gt;V5c0Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V13apriorityagetV7V10Iainfix &lt;V13ainfix +ainfix -V5c1c1Aainfix &lt;=c0V13FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV14apriorityagetV4V2IamemV14V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V15c0V3anb_occV15V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.08"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.24"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="24. postcondition"
+      sum="0e9fb4cb04a5e98f39da1c0a154e72b5"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V1aaddV6V11Iainfix &lt;=apriorityV12apriorityagetV7V10IamemV12V11FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V13c0V5anb_occV13V11FAainfix &lt;V10V5Aainfix &lt;=c0V10Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V14apriorityagetV7V10Iainfix &lt;V14ainfix +ainfix -V5c1c1Aainfix &lt;=c0V14FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV15apriorityagetV4V2IamemV15V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V16c0V3anb_occV16V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.25"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="25. postcondition"
+      sum="15757f0bb21f98b992311dbda2d6eb91"
+      proved="false"
+      expanded="false"
+      shape="amemV6V11Iainfix &lt;=apriorityV12apriorityagetV7V10IamemV12V11FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V13c0V5anb_occV13V11FAainfix &lt;V10V5Aainfix &lt;=c0V10Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V14apriorityagetV7V10Iainfix &lt;V14ainfix +ainfix -V5c1c1Aainfix &lt;=c0V14FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV15apriorityagetV4V2IamemV15V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V16c0V3anb_occV16V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.26"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="26. postcondition"
+      sum="97268f5a5af9ffad662224294bd1503d"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV12apriorityV6IamemV12V11FIainfix &lt;=apriorityV13apriorityagetV7V10IamemV13V11FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V14c0V5anb_occV14V11FAainfix &lt;V10V5Aainfix &lt;=c0V10Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V11adiffV1asingletonV6FIainfix &lt;=apriorityagetV7V15apriorityagetV7V10Iainfix &lt;V15ainfix +ainfix -V5c1c1Aainfix &lt;=c0V15FAainfix &lt;V10V5Aainfix &lt;=c0V10FIainfix &lt;=c1ainfix -V5c1Iainfix =V8c0FIainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0V0Iainfix &gt;V5c0Iainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV16apriorityagetV4V2IamemV16V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V17c0V3anb_occV17V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.27"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="27. type invariant"
+      sum="91e6608676694e8718fea2dd3702b682"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV4V2IamemV9V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V10c0V3anb_occV10V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.28"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="28. type invariant"
+      sum="37cd7003859ea8bc2760acaed8166b74"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;V2V5Aainfix &lt;=c0V2Oainfix =V5c0Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV4V2IamemV9V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V10c0V3anb_occV10V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.29"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="29. type invariant"
+      sum="cf8028e92448ff70c8f6661435c4d7fd"
+      proved="false"
+      expanded="false"
+      shape="ainfix =anum_ofaTuple2amk arrayV0V7V9c0V5anb_occV9V8FIainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV4V2IamemV10V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V11c0V3anb_occV11V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.06"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.30"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="30. type invariant"
+      sum="b4cc1a2e923584d8161f49e48f627422"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV9apriorityagetV7V2IamemV9V8FIainfix &gt;V5c0Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV4V2IamemV10V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V11c0V3anb_occV11V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.31"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="31. type invariant"
+      sum="d6152d21c42ec96eb8950daf81e04995"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=c0V0Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV4V2IamemV9V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V10c0V3anb_occV10V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.32"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="32. postcondition"
+      sum="3f10ab663daec85991e801726609a4ad"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V1aaddV6V8Iainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV7V2IamemV9V8FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V10c0V5anb_occV10V8FAainfix &lt;V2V5Aainfix &lt;=c0V2Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV4V2IamemV11V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V12c0V3anb_occV12V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.33"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="33. postcondition"
+      sum="a95708b525361a9f1bc365c89f77b453"
+      proved="false"
+      expanded="false"
+      shape="amemV6V8Iainfix &lt;=c0V0Aainfix &lt;=apriorityV9apriorityagetV7V2IamemV9V8FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V10c0V5anb_occV10V8FAainfix &lt;V2V5Aainfix &lt;=c0V2Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV11apriorityagetV4V2IamemV11V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V12c0V3anb_occV12V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.07"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove.34"
+      locfile="../simple_priority_queue.mlw"
+      loclnum="65" loccnumb="6" loccnume="12"
+      expl="34. postcondition"
+      sum="dc0b87736745f104fdda0043bc9e6642"
+      proved="true"
+      expanded="false"
+      shape="ainfix &lt;=apriorityV9apriorityV6IamemV9V8FIainfix &lt;=c0V0Aainfix &lt;=apriorityV10apriorityagetV7V2IamemV10V8FIainfix &gt;V5c0Aainfix =anum_ofaTuple2amk arrayV0V7V11c0V5anb_occV11V8FAainfix &lt;V2V5Aainfix &lt;=c0V2Oainfix =V5c0Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V8adiffV1asingletonV6FIainfix &gt;V5c0NIainfix =V7asetV4V2agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V5V0Aainfix &lt;=c0V5LagetV4V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V5ainfix -V3c1FIainfix =V3c0NAainfix &lt;=c0V0Aainfix &lt;=apriorityV12apriorityagetV4V2IamemV12V1FIainfix &gt;V3c0Aainfix =anum_ofaTuple2amk arrayV0V4V13c0V3anb_occV13V1FAainfix &lt;V2V3Aainfix &lt;=c0V2Oainfix =V3c0Aainfix &lt;=V3V0Aainfix &lt;=c0V3FF">
+      <label
+       name="expl:VC for remove"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

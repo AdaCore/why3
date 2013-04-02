@@ -99,7 +99,7 @@ version_regexp = "This is CVC3 version \\([^ \n]+\\)"
 version_ok  = "2.4.1"
 version_old = "2.4"
 # the -timeout option is unreliable in CVC3 2.4.1
-command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e -seed 42 %f"
 driver = "drivers/cvc3.drv"
 
 # CVC3 versions 2.x
@@ -113,7 +113,7 @@ version_regexp = "This is CVC3 version \\([^ \n]+\\)"
 version_old = "2.2"
 version_old = "2.1"
 # we pass time 0 to why3-cpulimit to avoid race
-command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -timeout %t %f"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e  -seed 42 -timeout %t %f"
 driver = "drivers/cvc3.drv"
 
 [ATP yices]

@@ -341,11 +341,9 @@ let update_term env (mreg : vsymbol Mreg.t) f =
 
 (* look for a variable with a single region equal to [reg] *)
 let var_of_region reg f =
-  let test vs _ _ =
-    Format.printf "   [var_of_region] scanning variable %a@." Pretty.print_vs vs;
-    match (ity_of_vs vs).ity_node with
+  let test vs _ acc = match (ity_of_vs vs).ity_node with
     | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
-    | _ -> None in
+    | _ -> acc in
   Mvs.fold test f.t_vars None
 
 let quantify env regs f =
@@ -1087,25 +1085,12 @@ end = struct
   let refresh regset s =
     Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
 
-  let print_opt_name fmt name =
-    match !name with
-    | None -> Format.fprintf fmt "<>"
-    | Some x -> Pretty.print_term fmt x
-
-  let print_subst fmt sub =
-    Format.fprintf fmt "{ ";
-    Mreg.iter (fun k v -> Format.fprintf fmt "%a |-> %a,@ ") sub;
-    Format.fprintf fmt " }"
-
   let term env sub t =
 
     let mreg = Mreg.mapi_filter (fun reg vr ->
       match !vr with
       | Some _ -> !vr
       | None ->
-          Format.printf "  calling var_of_region ...@.";
-          let r =
-            try
             match var_of_region reg t with
             | Some v ->
                 let v' = name_from_region ~id:v.vs_name reg in
@@ -1116,25 +1101,10 @@ end = struct
                   * [var_of_region] does not return anything, the corresponding
                   * region is not in the term! *)
                 None
-          in
-          Format.printf "  . OK.@.";
-          r
 
     ) sub in
     let r = update_term env mreg t in
     r
-
-  let show_state fmt s =
-    Format.fprintf fmt "{ ";
-    Mreg.iter (fun k rv ->
-      match !rv with
-      | Some v ->
-          Format.fprintf fmt " %a |-> %a; @ "
-            Mlw_pretty.print_reg k Pretty.print_vs v;
-      | None ->
-          Format.fprintf fmt " %a |-> _; @  "
-            Mlw_pretty.print_reg k) s;
-    Format.fprintf fmt "}"
 
   (* Update the name of region [reg] in substitution [s], possibly based on
      the provided [hint], and return a variable of that name. *)
@@ -1233,16 +1203,12 @@ let adapt_single_post_to_state_pair ?lab env prestate result_var post =
   (* get the result var of the post *)
   let res, ne = open_post post.ne in
   (* apply the poststate *)
-  Format.printf " apply the poststate to %a@." Pretty.print_term ne;
   let ne = Subst.term env post.s ne in
   (* substitute for given result var, and replace 'old *)
-  Format.printf " replace old + result to %a@." Pretty.print_term ne;
   let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
   (* remove the label that protected "old" variables *)
-  Format.printf " erase tmp label in %a@." Pretty.print_term ne;
   let ne = erase_mark lab ne in
   (* apply the prestate = replace previously "old" variables *)
-  Format.printf " apply prestate to %a@." Pretty.print_term ne;
   { post with ne = Subst.term env prestate ne }
 
 (* Given normal and exceptional [post,xpost], each with its
@@ -1253,9 +1219,7 @@ let adapt_post_to_state_pair
     : fwp_post * fast_wp_exn_map =
   let result, xresult = result_vars in
   let f = adapt_single_post_to_state_pair ?lab env prestate in
-  Format.printf "before adapting post@.";
   let a = f result post in
-  Format.printf "before adapting xpost@.";
   let b = Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost in
   a, b
 

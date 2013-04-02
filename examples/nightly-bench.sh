@@ -32,6 +32,7 @@ notify() {
 
 
 echo "== Why3 bench on $DATE ==" > $REPORT
+echo "Starting time (UTC): "`date --utc +%H:%M` >> $REPORT
 
 # configuration
 autoconf
@@ -94,6 +95,8 @@ fi
 
 # store the state for this day
 cp $OUT $REPORTDIR/regtests-$DATE
+
+echo "Ending time (UTC): "`date --utc +%H:%M` >> $REPORT
 
 # output the diff against previous run
 diff -u $PREVIOUS $OUT &> $DIFF
