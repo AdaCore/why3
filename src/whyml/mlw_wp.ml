@@ -326,11 +326,15 @@ let update_var env (mreg : vsymbol Mreg.t) vs =
   update vs { fd_ity = ity_of_vs vs; fd_ghost = false; fd_mut = None }
 
 (* given a map of modified regions, update every affected variable in [f] *)
-let update_term env (mreg : vsymbol Mreg.t) f =
+let update_term ?(allow_non_prog_vars=false) env (mreg : vsymbol Mreg.t) f =
   (* [vars] : modified variable -> updated value *)
-  let update vs _ = match update_var env mreg vs with
+  let update vs _ =
+    try match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
-    | t -> Some t in
+    | t -> Some t
+    with Not_found ->
+      if allow_non_prog_vars then None else raise Not_found
+  in
   let vars = Mvs.mapi_filter update f.t_vars in
   (* [vv'] : modified variable -> fresh variable *)
   let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
@@ -340,23 +344,27 @@ let update_term env (mreg : vsymbol Mreg.t) f =
   Mvs.fold update vars (subst_at_now true vv' f)
 
 (* look for a variable with a single region equal to [reg] *)
-let var_of_region reg f =
-  let test vs _ acc = match (ity_of_vs vs).ity_node with
+let var_of_region ?(allow_non_prog_vars=false) reg f =
+  let test vs _ acc =
+    try match (ity_of_vs vs).ity_node with
     | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
-    | _ -> acc in
+    | _ -> acc
+    with Not_found ->
+      if allow_non_prog_vars then acc else raise Not_found
+  in
   Mvs.fold test f.t_vars None
 
-let quantify env regs f =
+let quantify ?allow_non_prog_vars env regs f =
   (* mreg : modified region -> vs *)
   let get_var reg () =
     let ty = ty_of_ity reg.reg_ity in
-    let id = match var_of_region reg f with
+    let id = match var_of_region ?allow_non_prog_vars reg f with
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
     mk_var id model1_lab ty in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
-  let f = update_term env mreg f in
+  let f = update_term ?allow_non_prog_vars env mreg f in
   wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Invariants *)
@@ -1091,19 +1099,19 @@ end = struct
       match !vr with
       | Some _ -> !vr
       | None ->
-            match var_of_region reg t with
+            match var_of_region ~allow_non_prog_vars:true reg t with
             | Some v ->
                 let v' = name_from_region ~id:v.vs_name reg in
                 vr := Some v';
                 !vr
             | None ->
                 (* it is correct to return [None] here, because if
-                  * [var_of_region] does not return anything, the corresponding
-                  * region is not in the term! *)
+                   [var_of_region] does not return anything, the
+                   corresponding region is not in the term! *)
                 None
 
     ) sub in
-    let r = update_term env mreg t in
+    let r = update_term ~allow_non_prog_vars:true env mreg t in
     r
 
   (* Update the name of region [reg] in substitution [s], possibly based on
@@ -1634,7 +1642,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
      t_and_simp res.ok
      (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
   let f = wp_implies pre f in
-  wp_forall args (quantify env regs f)
+  wp_forall args (quantify ~allow_non_prog_vars:true env regs f)
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
