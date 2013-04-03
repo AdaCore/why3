@@ -96,9 +96,9 @@ endif
 .PHONY: byte opt clean depend all install install_local install_no_local
 .PHONY: plugins plugins.byte plugins.opt
 
-#############
-# Why library
-#############
+##############
+# Why3 library
+##############
 
 LIBGENERATED = src/util/config.ml src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
@@ -215,6 +215,7 @@ install_no_local::
 	mkdir -p $(DATADIR)/why3/images/boomy
 	mkdir -p $(DATADIR)/why3/images/fatcow
 	mkdir -p $(DATADIR)/why3/emacs
+	mkdir -p $(DATADIR)/why3/vim
 	mkdir -p $(DATADIR)/why3/lang
 	mkdir -p $(DATADIR)/why3/theories
 	mkdir -p $(DATADIR)/why3/modules
@@ -229,9 +230,10 @@ install_no_local::
 	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
-	cp -f share/emacs/why.el $(DATADIR)/why3/emacs/why.el
-	cp -f share/lang/why.lang $(DATADIR)/why3/lang/why.lang
-#	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
+	cp -f share/emacs/why3.el $(DATADIR)/why3/emacs/why3.el
+	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
+	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
+	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
 
 install_no_local_lib::
 	rm -rf $(OCAMLLIB)/why3
@@ -241,8 +243,8 @@ install_no_local_lib::
 
 ifeq (@enable_local@,yes)
 install install-lib:
-	@echo "Why is configured in local installation mode."
-	@echo "To install Why, run ./configure --disable-local ; make ; make install"
+	@echo "Why3 is configured in local installation mode."
+	@echo "To install Why3, run ./configure --disable-local ; make ; make install"
 else
 install: clean_old_install install_no_local
 install-lib: install_no_local_lib
@@ -251,7 +253,7 @@ endif
 install-all: install install-lib
 
 ##################
-# Why plugins
+# Why3 plugins
 ##################
 
 PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
@@ -499,7 +501,7 @@ clean::
 
 local_config: bin/why3config.@OCAMLBEST@
 	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
-		--detect --conf_file why.conf
+		--detect --conf_file why3.conf
 
 install_no_local::
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
@@ -1174,14 +1176,14 @@ testl-type: bin/why3.byte
 test-api.byte: examples/use_api/use_api.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
-	|| (rm -f test-api.byte; printf "Test of Why API calls failed. Please fix it"; exit 2)
+	|| (rm -f test-api.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api.byte;
 
 test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
 	&& ./test-api.opt) \
-	|| (rm -f test-api.opt; printf "Test of Why API calls failed. Please fix it"; exit 2)
+	|| (rm -f test-api.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api.opt
 
 #test-shape: lib/why3/why3.cma
@@ -1191,7 +1193,7 @@ test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
 	|| (rm -f why3session.xml;  \
-	printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
+	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
 test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
@@ -1199,7 +1201,7 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
 	&& ./test-session.opt) \
 	|| (rm -f test-session.opt why3session.xml; \
-	printf "Test of Why API calls for Session module failed. Please fix it"; exit 2)
+	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml
 
 
@@ -1479,7 +1481,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       share/javascript/themes/default/*.gif \
       share/javascript/themes/default/*.png \
       share/javascript/themes/default/*.css \
-      share/emacs/why.el share/lang/*.lang \
+      share/emacs/why3.el share/lang/*.lang \
       share/images/icons.rc share/images/*.png share/images/*/*.png \
       share/bash/why3 share/zsh/_why3 share/vim/why3.vim
 
@@ -1631,9 +1633,9 @@ depend:
 	rm -f $^
 	$(MAKE) $^
 
-#################################################################
-# Building the Why platform with ocamlbuild (OCaml 3.10 needed) #
-#################################################################
+##################################################################
+# Building the Why3 platform with ocamlbuild (OCaml 3.10 needed) #
+##################################################################
 
 # There used to be targets here but they are no longer useful.
 
