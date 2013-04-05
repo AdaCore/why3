@@ -27,7 +27,11 @@ let exi vl (_,f) =
     | Tapp (_,tl) ->
         let marry acc v t = t_and_simp acc (t_equ v t) in
         List.fold_left2 marry t_true vl tl
-    | _ -> assert false
+    | Tlet (t, tb) ->
+        let v, f = t_open_bound tb in
+        t_let_close v t (descend f)
+    | _ ->
+        assert false (* ensured by Decl.create_ind_decl *)
   in
   descend f
 
