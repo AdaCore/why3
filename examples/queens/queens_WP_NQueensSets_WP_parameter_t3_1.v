@@ -6,7 +6,7 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 Axiom set : forall (a:Type) {a_WT:WhyType a}, Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
@@ -15,15 +15,15 @@ Existing Instance set_WhyType.
 Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
   a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
 
 Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
 
 (* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set a)): Prop :=
-  forall (x:a), (mem x s1) -> (mem x s2).
+Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
+  a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
 
 Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (subset s s).
@@ -35,7 +35,7 @@ Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
 Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set a)): Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
   forall (x:a), ~ (mem x s).
 
 Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set
@@ -148,7 +148,7 @@ Existing Instance ref_WhyType.
 Implicit Arguments mk_ref [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
@@ -156,37 +156,37 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
 Parameter n: Z.
 
 (* Why3 assumption *)
-Definition solution  := (map.Map.map Z Z).
+Definition solution := (map.Map.map Z Z).
 
 (* Why3 assumption *)
-Definition eq_prefix {a:Type} {a_WT:WhyType a}(t:(map.Map.map Z a))
+Definition eq_prefix {a:Type} {a_WT:WhyType a} (t:(map.Map.map Z a))
   (u:(map.Map.map Z a)) (i:Z): Prop := forall (k:Z), ((0%Z <= k)%Z /\
   (k < i)%Z) -> ((map.Map.get t k) = (map.Map.get u k)).
 
 (* Why3 assumption *)
-Definition partial_solution(k:Z) (s:(map.Map.map Z Z)): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < k)%Z) -> (((0%Z <= (map.Map.get s i))%Z /\
-  ((map.Map.get s i) < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) ->
-  ((~ ((map.Map.get s i) = (map.Map.get s j))) /\ ((~ (((map.Map.get s
-  i) - (map.Map.get s j))%Z = (i - j)%Z)) /\ ~ (((map.Map.get s
-  i) - (map.Map.get s j))%Z = (j - i)%Z)))).
+Definition partial_solution (k:Z) (s:(map.Map.map Z Z)): Prop :=
+  forall (i:Z), ((0%Z <= i)%Z /\ (i < k)%Z) -> (((0%Z <= (map.Map.get s
+  i))%Z /\ ((map.Map.get s i) < n)%Z) /\ forall (j:Z), ((0%Z <= j)%Z /\
+  (j < i)%Z) -> ((~ ((map.Map.get s i) = (map.Map.get s j))) /\
+  ((~ (((map.Map.get s i) - (map.Map.get s j))%Z = (i - j)%Z)) /\
+  ~ (((map.Map.get s i) - (map.Map.get s j))%Z = (j - i)%Z)))).
 
 Axiom partial_solution_eq_prefix : forall (u:(map.Map.map Z Z))
   (t:(map.Map.map Z Z)) (k:Z), (partial_solution k t) -> ((eq_prefix t u
   k) -> (partial_solution k u)).
 
 (* Why3 assumption *)
-Definition lt_sol(s1:(map.Map.map Z Z)) (s2:(map.Map.map Z Z)): Prop :=
+Definition lt_sol (s1:(map.Map.map Z Z)) (s2:(map.Map.map Z Z)): Prop :=
   exists i:Z, ((0%Z <= i)%Z /\ (i < n)%Z) /\ ((eq_prefix s1 s2 i) /\
   ((map.Map.get s1 i) < (map.Map.get s2 i))%Z).
 
 (* Why3 assumption *)
-Definition solutions  := (map.Map.map Z (map.Map.map Z Z)).
+Definition solutions := (map.Map.map Z (map.Map.map Z Z)).
 
 (* Why3 assumption *)
-Definition sorted(s:(map.Map.map Z (map.Map.map Z Z))) (a:Z) (b:Z): Prop :=
-  forall (i:Z) (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\ (j < b)%Z) ->
-  (lt_sol (map.Map.get s i) (map.Map.get s j)).
+Definition sorted (s:(map.Map.map Z (map.Map.map Z Z))) (a:Z) (b:Z): Prop :=
+  forall (i:Z) (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\ (j < b)%Z) -> (lt_sol
+  (map.Map.get s i) (map.Map.get s j)).
 
 Axiom no_duplicate : forall (s:(map.Map.map Z (map.Map.map Z Z))) (a:Z)
   (b:Z), (sorted s a b) -> forall (i:Z) (j:Z), (((a <= i)%Z /\ (i < j)%Z) /\
@@ -212,23 +212,24 @@ Theorem WP_parameter_t3 : forall (a:(set Z)) (b:(set Z)) (c:(set Z)),
   t k1) /\ (mem (map.Map.get t k1) (diff (diff (diff a b) c) e)))) <->
   exists i:Z, ((s <= i)%Z /\ (i < s1)%Z) /\ (eq_prefix t (map.Map.get sol1 i)
   n)) /\ ((eq_prefix col col1 k1) /\ (eq_prefix sol sol1 s))))))))) ->
-  ((~ (is_empty e)) -> forall (col2:(map.Map.map Z Z)),
-  (col2 = (map.Map.set col1 k1 (min_elt e))) -> forall (k2:Z),
+  ((~ (is_empty e)) -> let d := (min_elt e) in forall (col2:(map.Map.map Z
+  Z)), (col2 = (map.Map.set col1 k1 d)) -> forall (k2:Z),
   (k2 = (k1 + 1%Z)%Z) -> forall (i:Z), (((0%Z <= i)%Z /\ (i < n)%Z) /\
   forall (j:Z), ((0%Z <= j)%Z /\ (j < k2)%Z) -> ~ ((map.Map.get col2
-  j) = i)) -> (mem i (remove (min_elt e) a)))).
-Proof.
-intuition.
+  j) = i)) -> (mem i (remove d a)))).
+intros a b c s sol k col (h1,(h2,(h3,(h4,(h5,(h6,h7)))))) h8 f e s1
+        sol1 k1 col1 ((h9,h10),(h11,(h12,(h13,(h14,(h15,(h16,(h17,h18))))))))
+        h19 d col2 h20 k2 h21 i ((h22,h23),h24).
 generalize (remove_def1 i (min_elt e) a); intuition.
 assert (case: (i = min_elt e \/ i<> min_elt e)%Z) by omega. destruct case.
-elim H22 with k1.
+elim h24 with k1.
 omega.
 subst col2; rewrite Map.Select_eq; auto.
-apply H21; auto.
-destruct (H3 i) as (_,h); apply h; intuition.
-apply H22 with j; try omega.
+apply H; auto.
+destruct (h4 i) as (_,h); apply h; intuition.
+apply h24 with j; try omega.
 subst col2; rewrite Map.Select_neq; try omega.
-rewrite <- H16; try omega.
+rewrite <- h17; try omega.
 Qed.
 
 

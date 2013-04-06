@@ -7,7 +7,7 @@ Require int.Abs.
 Require int.EuclideanDivision.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 Parameter fib: Z -> Z.
 
@@ -19,33 +19,33 @@ Axiom fibn : forall (n:Z), (2%Z <= n)%Z ->
   ((fib n) = ((fib (n - 1%Z)%Z) + (fib (n - 2%Z)%Z))%Z).
 
 (* Why3 assumption *)
-Inductive t  :=
-  | mk_t : Z -> Z -> Z -> Z -> t .
+Inductive t :=
+  | mk_t : Z -> Z -> Z -> Z -> t.
 Axiom t_WhyType : WhyType t.
 Existing Instance t_WhyType.
 
 (* Why3 assumption *)
-Definition a22(v:t): Z := match v with
+Definition a22 (v:t): Z := match v with
   | (mk_t x x1 x2 x3) => x3
   end.
 
 (* Why3 assumption *)
-Definition a21(v:t): Z := match v with
+Definition a21 (v:t): Z := match v with
   | (mk_t x x1 x2 x3) => x2
   end.
 
 (* Why3 assumption *)
-Definition a12(v:t): Z := match v with
+Definition a12 (v:t): Z := match v with
   | (mk_t x x1 x2 x3) => x1
   end.
 
 (* Why3 assumption *)
-Definition a11(v:t): Z := match v with
+Definition a11 (v:t): Z := match v with
   | (mk_t x x1 x2 x3) => x
   end.
 
 (* Why3 assumption *)
-Definition mult(x:t) (y:t): t :=
+Definition mult (x:t) (y:t): t :=
   (mk_t (((a11 x) * (a11 y))%Z + ((a12 x) * (a21 y))%Z)%Z
   (((a11 x) * (a12 y))%Z + ((a12 x) * (a22 y))%Z)%Z
   (((a21 x) * (a11 y))%Z + ((a22 x) * (a21 y))%Z)%Z
@@ -83,20 +83,21 @@ Axiom Power_mult2 : forall (x:t) (y:t) (n:Z), (0%Z <= n)%Z -> ((power (mult x
 
 (* Why3 goal *)
 Theorem WP_parameter_logfib : forall (n:Z), (0%Z <= n)%Z -> ((~ (n = 0%Z)) ->
-  ((0%Z <= (int.EuclideanDivision.div n 2%Z))%Z -> forall (result:Z)
-  (result1:Z), ((power (mk_t 1%Z 1%Z 1%Z 0%Z) (int.EuclideanDivision.div n
-  2%Z)) = (mk_t (result + result1)%Z result1 result1 result)) ->
-  ((((int.EuclideanDivision.mod1 n 2%Z) = 0%Z) -> let a :=
-  ((result * result)%Z + (result1 * result1)%Z)%Z in let b :=
-  (result1 * (result + (result + result1)%Z)%Z)%Z in ((power (mk_t 1%Z 1%Z
-  1%Z 0%Z) n) = (mk_t (a + b)%Z b b a))) /\
-  ((~ ((int.EuclideanDivision.mod1 n 2%Z) = 0%Z)) -> let a :=
-  (result1 * (result + (result + result1)%Z)%Z)%Z in let b :=
-  (((result + result1)%Z * (result + result1)%Z)%Z + (result1 * result1)%Z)%Z in
-  ((power (mk_t 1%Z 1%Z 1%Z 0%Z) n) = (mk_t (a + b)%Z b b a)))))).
+  let o := (int.EuclideanDivision.div n 2%Z) in ((0%Z <= o)%Z ->
+  forall (result:Z) (result1:Z), ((power (mk_t 1%Z 1%Z 1%Z 0%Z)
+  o) = (mk_t (result + result1)%Z result1 result1 result)) -> let c :=
+  (result + result1)%Z in ((((int.EuclideanDivision.mod1 n 2%Z) = 0%Z) ->
+  let a := ((result * result)%Z + (result1 * result1)%Z)%Z in let b :=
+  (result1 * (result + c)%Z)%Z in ((power (mk_t 1%Z 1%Z 1%Z 0%Z)
+  n) = (mk_t (a + b)%Z b b a))) /\ ((~ ((int.EuclideanDivision.mod1 n
+  2%Z) = 0%Z)) -> let a := (result1 * (result + c)%Z)%Z in let b :=
+  ((c * c)%Z + (result1 * result1)%Z)%Z in ((power (mk_t 1%Z 1%Z 1%Z 0%Z)
+  n) = (mk_t (a + b)%Z b b a)))))).
+(* Why3 intros n h1 h2 o h3 result result1 h4 c. *)
 (* YOU MAY EDIT THE PROOF BELOW *)
 Import EuclideanDivision.
 intros.
+subst o c.
 assert (h: (2 <> 0)%Z) by omega.
 generalize (Div_mod n 2 h)%Z.
 intuition.

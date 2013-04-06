@@ -10,7 +10,7 @@ Require int.ComputerDivision.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 Axiom bag : forall (a:Type) {a_WT:WhyType a}, Type.
 Parameter bag_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (bag a).
@@ -22,11 +22,11 @@ Axiom occ_non_negative : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a))
   (x:a), (0%Z <= (nb_occ x b))%Z.
 
 (* Why3 assumption *)
-Definition mem {a:Type} {a_WT:WhyType a}(x:a) (b:(bag a)): Prop :=
+Definition mem {a:Type} {a_WT:WhyType a} (x:a) (b:(bag a)): Prop :=
   (0%Z < (nb_occ x b))%Z.
 
 (* Why3 assumption *)
-Definition eq_bag {a:Type} {a_WT:WhyType a}(a1:(bag a)) (b:(bag a)): Prop :=
+Definition eq_bag {a:Type} {a_WT:WhyType a} (a1:(bag a)) (b:(bag a)): Prop :=
   forall (x:a), ((nb_occ x a1) = (nb_occ x b)).
 
 Axiom bag_extensionality : forall {a:Type} {a_WT:WhyType a}, forall (a1:(bag
@@ -74,7 +74,7 @@ Axiom bag_simpl_left : forall {a:Type} {a_WT:WhyType a}, forall (a1:(bag a))
   (b:(bag a)) (c:(bag a)), ((union a1 b) = (union a1 c)) -> (b = c).
 
 (* Why3 assumption *)
-Definition add {a:Type} {a_WT:WhyType a}(x:a) (b:(bag a)): (bag a) :=
+Definition add {a:Type} {a_WT:WhyType a} (x:a) (b:(bag a)): (bag a) :=
   (union (singleton x) b).
 
 Axiom occ_add_eq : forall {a:Type} {a_WT:WhyType a}, forall (b:(bag a)) (x:a)
@@ -174,13 +174,13 @@ Axiom Elements_set_inside2 : forall {a:Type} {a_WT:WhyType a},
   (diff (elements a1 i n) (singleton (map.Map.get a1 j))))).
 
 (* Why3 assumption *)
-Definition left1(i:Z): Z := ((2%Z * i)%Z + 1%Z)%Z.
+Definition left1 (i:Z): Z := ((2%Z * i)%Z + 1%Z)%Z.
 
 (* Why3 assumption *)
-Definition right1(i:Z): Z := ((2%Z * i)%Z + 2%Z)%Z.
+Definition right1 (i:Z): Z := ((2%Z * i)%Z + 2%Z)%Z.
 
 (* Why3 assumption *)
-Definition parent(i:Z): Z := (ZOdiv (i - 1%Z)%Z 2%Z).
+Definition parent (i:Z): Z := (ZOdiv (i - 1%Z)%Z 2%Z).
 
 Axiom Parent_inf : forall (i:Z), (0%Z < i)%Z -> ((parent i) < i)%Z.
 
@@ -201,23 +201,23 @@ Axiom Child_parent : forall (i:Z), (0%Z < i)%Z ->
 Axiom Parent_pos : forall (j:Z), (0%Z < j)%Z -> (0%Z <= (parent j))%Z.
 
 (* Why3 assumption *)
-Definition parentChild(i:Z) (j:Z): Prop := ((0%Z <= i)%Z /\ (i < j)%Z) ->
+Definition parentChild (i:Z) (j:Z): Prop := ((0%Z <= i)%Z /\ (i < j)%Z) ->
   ((j = (left1 i)) \/ (j = (right1 i))).
 
 (* Why3 assumption *)
-Definition map  := (map.Map.map Z Z).
+Definition map := (map.Map.map Z Z).
 
 (* Why3 assumption *)
-Definition logic_heap  := ((map.Map.map Z Z)* Z)%type.
+Definition logic_heap := ((map.Map.map Z Z)* Z)%type.
 
 (* Why3 assumption *)
-Definition is_heap_array(a:(map.Map.map Z Z)) (idx:Z) (sz:Z): Prop :=
+Definition is_heap_array (a:(map.Map.map Z Z)) (idx:Z) (sz:Z): Prop :=
   (0%Z <= idx)%Z -> forall (i:Z) (j:Z), (((idx <= i)%Z /\ (i < j)%Z) /\
   (j < sz)%Z) -> ((parentChild i j) -> ((map.Map.get a i) <= (map.Map.get a
   j))%Z).
 
 (* Why3 assumption *)
-Definition is_heap(h:((map.Map.map Z Z)* Z)%type): Prop :=
+Definition is_heap (h:((map.Map.map Z Z)* Z)%type): Prop :=
   match h with
   | (a, sz) => (0%Z <= sz)%Z /\ (is_heap_array a 0%Z sz)
   end.
@@ -225,9 +225,9 @@ Definition is_heap(h:((map.Map.map Z Z)* Z)%type): Prop :=
 Axiom Is_heap_when_no_element : forall (a:(map.Map.map Z Z)) (idx:Z) (n:Z),
   ((0%Z <= n)%Z /\ (n <= idx)%Z) -> (is_heap_array a idx n).
 
-Axiom Is_heap_sub : forall (a:(map.Map.map Z Z)) (i:Z) (n:Z),
-  (is_heap_array a i n) -> forall (j:Z), ((i <= j)%Z /\ (j <= n)%Z) ->
-  (is_heap_array a i j).
+Axiom Is_heap_sub : forall (a:(map.Map.map Z Z)) (i:Z) (n:Z), (is_heap_array
+  a i n) -> forall (j:Z), ((i <= j)%Z /\ (j <= n)%Z) -> (is_heap_array a i
+  j).
 
 Axiom Is_heap_sub2 : forall (a:(map.Map.map Z Z)) (n:Z), (is_heap_array a 0%Z
   n) -> forall (j:Z), ((0%Z <= j)%Z /\ (j <= n)%Z) -> (is_heap_array a j n).
@@ -261,7 +261,7 @@ Axiom Is_heap_relation : forall (a:(map.Map.map Z Z)) (n:Z), (0%Z < n)%Z ->
   ((map.Map.get a 0%Z) <= (map.Map.get a j))%Z)).
 
 (* Why3 assumption *)
-Definition model(h:((map.Map.map Z Z)* Z)%type): (bag Z) :=
+Definition model (h:((map.Map.map Z Z)* Z)%type): (bag Z) :=
   match h with
   | (a, n) => (elements a 0%Z n)
   end.
@@ -304,21 +304,20 @@ Existing Instance ref_WhyType.
 Implicit Arguments mk_ref [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
 
 
-
 (* Why3 goal *)
 Theorem WP_parameter_extractMin : forall (this:(map.Map.map Z Z)) (this1:Z),
   ((~ ((elements this 0%Z this1) = (empty_bag :(bag Z)))) /\ (is_heap (this,
-  this1))) -> ((0%Z < this1)%Z -> ((0%Z < (this1 - 1%Z)%Z)%Z ->
-  (0%Z < (nb_occ (map.Map.get this (this1 - 1%Z)%Z) (diff (elements this 0%Z
-  this1) (singleton (map.Map.get this 0%Z)))))%Z)).
-Proof.
-intros a n _ _ Hn_pos.
+  this1))) -> ((0%Z < this1)%Z -> let n' := (this1 - 1%Z)%Z in
+  ((0%Z < n')%Z -> (0%Z < (nb_occ (map.Map.get this n') (diff (elements this
+  0%Z this1) (singleton (map.Map.get this 0%Z)))))%Z)).
+intros a n _ _ n' Hn_pos.
+subst n'.
 rewrite Elements_add1; auto with zarith.
 rewrite Diff_add.
 rewrite Elements_add; auto with zarith.

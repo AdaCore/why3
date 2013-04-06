@@ -7,10 +7,11 @@ Require int.MinMax.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 (* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
+Inductive list
+  (a:Type) {a_WT:WhyType a} :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
 Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
@@ -19,7 +20,7 @@ Implicit Arguments Nil [[a] [a_WT]].
 Implicit Arguments Cons [[a] [a_WT]].
 
 (* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
+Fixpoint length {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Z :=
   match l with
   | Nil => 0%Z
   | (Cons _ r) => (1%Z + (length r))%Z
@@ -36,7 +37,7 @@ Parameter char_WhyType : WhyType char.
 Existing Instance char_WhyType.
 
 (* Why3 assumption *)
-Definition word  := (list char).
+Definition word := (list char).
 
 (* Why3 assumption *)
 Inductive dist : (list char) -> (list char) -> Z -> Prop :=
@@ -49,11 +50,11 @@ Inductive dist : (list char) -> (list char) -> Z -> Prop :=
       w2 n) -> forall (a:char), (dist (Cons a w1) (Cons a w2) n).
 
 (* Why3 assumption *)
-Definition min_dist(w1:(list char)) (w2:(list char)) (n:Z): Prop := (dist w1
+Definition min_dist (w1:(list char)) (w2:(list char)) (n:Z): Prop := (dist w1
   w2 n) /\ forall (m:Z), (dist w1 w2 m) -> (n <= m)%Z.
 
 (* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
+Fixpoint infix_plpl {a:Type} {a_WT:WhyType a} (l1:(list a)) (l2:(list
   a)) {struct l1}: (list a) :=
   match l1 with
   | Nil => l2
@@ -72,7 +73,7 @@ Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
   l2)) = ((length l1) + (length l2))%Z).
 
 (* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
+Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a) (l:(list a)) {struct l}: Prop :=
   match l with
   | Nil => False
   | (Cons y r) => (x = y) \/ (mem x r)
@@ -87,14 +88,14 @@ Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
   (l = (infix_plpl l1 (Cons x l2))).
 
 (* Why3 assumption *)
-Fixpoint last_char(a:char) (u:(list char)) {struct u}: char :=
+Fixpoint last_char (a:char) (u:(list char)) {struct u}: char :=
   match u with
   | Nil => a
   | (Cons c u') => (last_char c u')
   end.
 
 (* Why3 assumption *)
-Fixpoint but_last(a:char) (u:(list char)) {struct u}: (list char) :=
+Fixpoint but_last (a:char) (u:(list char)) {struct u}: (list char) :=
   match u with
   | Nil => (Nil :(list char))
   | (Cons c u') => (Cons a (but_last c u'))
@@ -151,40 +152,41 @@ Existing Instance ref_WhyType.
 Implicit Arguments mk_ref [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
 
 (* Why3 assumption *)
-Inductive array (a:Type) {a_WT:WhyType a} :=
+Inductive array
+  (a:Type) {a_WT:WhyType a} :=
   | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a} (v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition length1 {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
+Definition length1 {a:Type} {a_WT:WhyType a} (v:(array a)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
   (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
   a) := (mk_array (length1 a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
+Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (array a) :=
   (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 Parameter suffix: (array char) -> Z -> (list char).
@@ -200,7 +202,7 @@ Axiom suffix_length : forall (a:(array char)) (i:Z), ((0%Z <= i)%Z /\
   (i <= (length1 a))%Z) -> ((length (suffix a i)) = ((length1 a) - i)%Z).
 
 (* Why3 assumption *)
-Definition min_suffix(a1:(array char)) (a2:(array char)) (i:Z) (j:Z)
+Definition min_suffix (a1:(array char)) (a2:(array char)) (i:Z) (j:Z)
   (n:Z): Prop := (min_dist (suffix a1 i) (suffix a2 j) n).
 
 Require Import Why3.
@@ -211,22 +213,25 @@ Open Scope Z_scope.
 Theorem WP_parameter_distance : forall (w1:Z) (w2:Z),
   forall (w21:(map.Map.map Z char)) (w11:(map.Map.map Z char)), let w22 :=
   (mk_array w2 w21) in let w12 := (mk_array w1 w11) in (((0%Z <= w1)%Z /\
-  (0%Z <= w2)%Z) -> ((0%Z <= (w2 + 1%Z)%Z)%Z -> ((0%Z <= (w2 + 1%Z)%Z)%Z ->
-  ((0%Z <= w2)%Z -> forall (t:(map.Map.map Z Z)), (forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> ((map.Map.get t
-  j) = (w2 - j)%Z)) -> ((0%Z <= (w1 - 1%Z)%Z)%Z -> forall (t1:(map.Map.map Z
-  Z)), forall (i:Z), ((i <= (w1 - 1%Z)%Z)%Z /\ (0%Z <= i)%Z) ->
-  ((forall (j:Z), ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist (suffix w12
-  (i + 1%Z)%Z) (suffix w22 j) (map.Map.get t1 j))) ->
-  (((0%Z <= (w2 + 1%Z)%Z)%Z /\ ((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z)) ->
-  (((0%Z <= w2)%Z /\ (w2 < (w2 + 1%Z)%Z)%Z) -> (((0%Z <= w2)%Z /\
-  (w2 < (w2 + 1%Z)%Z)%Z) -> forall (t2:(map.Map.map Z Z)),
-  ((0%Z <= (w2 + 1%Z)%Z)%Z /\ (t2 = (map.Map.set t1 w2 ((map.Map.get t1
+  (0%Z <= w2)%Z) -> let o := (w2 + 1%Z)%Z in ((0%Z <= o)%Z ->
+  ((0%Z <= o)%Z -> ((0%Z <= w2)%Z -> forall (t:(map.Map.map Z Z)),
+  (forall (j:Z), ((0%Z <= j)%Z /\ (j < (w2 + 1%Z)%Z)%Z) -> ((map.Map.get t
+  j) = (w2 - j)%Z)) -> let o1 := (w1 - 1%Z)%Z in ((0%Z <= o1)%Z ->
+  forall (t1:(map.Map.map Z Z)), forall (i:Z), ((i <= o1)%Z /\
+  (0%Z <= i)%Z) -> ((forall (j:Z), ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist
+  (suffix w12 (i + 1%Z)%Z) (suffix w22 j) (map.Map.get t1 j))) ->
+  (((0%Z <= o)%Z /\ ((0%Z <= w2)%Z /\ (w2 < o)%Z)) -> (((0%Z <= w2)%Z /\
+  (w2 < o)%Z) -> (((0%Z <= w2)%Z /\ (w2 < o)%Z) -> forall (t2:(map.Map.map Z
+  Z)), ((0%Z <= o)%Z /\ (t2 = (map.Map.set t1 w2 ((map.Map.get t1
   w2) + 1%Z)%Z))) -> (((w2 - 1%Z)%Z < 0%Z)%Z -> forall (j:Z),
   ((0%Z <= j)%Z /\ (j <= w2)%Z) -> (min_dist (suffix w12
   ((i - 1%Z)%Z + 1%Z)%Z) (suffix w22 j) (map.Map.get t2 j)))))))))))).
-intros w1 w2 w21 w11 w22 w12 (h1,h2) h3 h4 _ t h5 h6 t1 i (h7,h8) h9 (h10,h11)
+(* Why3 intros w1 w2 w21 w11 w22 w12 (h1,h2) o h3 h4 h5 t h6 o1 h7 t1 i
+        (h8,h9) h10 (h11,(h12,h13)) (h14,h15) (h16,h17) t2 (h18,h19) h20 j
+        (h21,h22). *)
+intros w1 w2 w21 w11 w22 w12 (h1,h2) o h3 h4 _ t h5 o1 h6 t1 i (h7,h8) h9 (h10,h11)
 (h12,h13) (h14,h15) t2 h16 h17 j (h18,h19).
+subst o o1.
 replace (i-1+1) with i by omega.
 rewrite suffix_cons.
 assert (h : length1 w22 = j) by ae.

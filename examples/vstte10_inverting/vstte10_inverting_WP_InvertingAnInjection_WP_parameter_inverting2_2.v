@@ -6,51 +6,52 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 (* Why3 assumption *)
-Inductive array (a:Type) {a_WT:WhyType a} :=
+Inductive array
+  (a:Type) {a_WT:WhyType a} :=
   | mk_array : Z -> (map.Map.map Z a) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map.Map.map Z a) :=
+Definition elts {a:Type} {a_WT:WhyType a} (v:(array a)): (map.Map.map Z a) :=
   match v with
   | (mk_array x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
+Definition length {a:Type} {a_WT:WhyType a} (v:(array a)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
+Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
   (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
+Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
   a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
 
 (* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a}(n:Z) (v:a): (array a) :=
+Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (array a) :=
   (mk_array n (map.Map.const v:(map.Map.map Z a))).
 
 (* Why3 assumption *)
-Definition injective(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
+Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
   ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
 
 (* Why3 assumption *)
-Definition surjective(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
   ((map.Map.get a j) = i).
 
 (* Why3 assumption *)
-Definition range(a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+Definition range (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
   ((map.Map.get a i) < n)%Z).
 
@@ -58,21 +59,22 @@ Axiom injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
   n) -> ((range a n) -> (surjective a n)).
 
 (* Why3 assumption *)
-Definition injective1(a:(array Z)) (n:Z): Prop := (injective (elts a) n).
+Definition injective1 (a:(array Z)) (n:Z): Prop := (injective (elts a) n).
 
 (* Why3 assumption *)
-Definition surjective1(a:(array Z)) (n:Z): Prop := (surjective (elts a) n).
+Definition surjective1 (a:(array Z)) (n:Z): Prop := (surjective (elts a) n).
 
 (* Why3 assumption *)
-Definition range1(a:(array Z)) (n:Z): Prop := (range (elts a) n).
+Definition range1 (a:(array Z)) (n:Z): Prop := (range (elts a) n).
 
 (* Why3 goal *)
 Theorem WP_parameter_inverting2 : forall (a:Z) (n:Z), forall (a1:(map.Map.map
   Z Z)), ((0%Z <= a)%Z /\ ((n = a) /\ ((injective a1 n) /\ (range a1 n)))) ->
-  ((0%Z <= n)%Z -> ((0%Z <= n)%Z -> ((0%Z <= (n - 1%Z)%Z)%Z ->
+  ((0%Z <= n)%Z -> ((0%Z <= n)%Z -> let o := (n - 1%Z)%Z in ((0%Z <= o)%Z ->
   forall (b:(map.Map.map Z Z)), (forall (j:Z), ((0%Z <= j)%Z /\
-  (j < ((n - 1%Z)%Z + 1%Z)%Z)%Z) -> ((map.Map.get b (map.Map.get a1
-  j)) = j)) -> ((0%Z <= n)%Z -> (injective b n))))).
+  (j < (o + 1%Z)%Z)%Z) -> ((map.Map.get b (map.Map.get a1 j)) = j)) ->
+  ((0%Z <= n)%Z -> (injective b n))))).
+(* Why3 intros a n a1 (h1,(h2,(h3,h4))) h5 h6 o h7 b h8 h9. *)
 (* YOU MAY EDIT THE PROOF BELOW *)
 intuition.
 intuition.
@@ -84,8 +86,8 @@ generalize (H11 i H8); unfold get; simpl; intros (i1, (Hi1,Hi2)).
 generalize (H11 j H9); unfold get; simpl; intros (j1, (Hj1,Hj2)).
 rewrite <- Hi2.
 rewrite <- Hj2.
-rewrite H5; try omega.
-rewrite H5; try omega.
+rewrite H6; try omega.
+rewrite H6; try omega.
 intro.
 apply H10.
 subst.

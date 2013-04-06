@@ -125,7 +125,6 @@ Definition size {a:Type} {a_WT:WhyType a} (v:(t a)): Z :=
   | (mk_t x x1 x2) => x
   end.
 
-
 Require Import Why3. Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 3.
 
 (* Why3 goal *)
@@ -144,17 +143,20 @@ Theorem WP_parameter_add : forall {a:Type} {a_WT:WhyType a}, forall (k:key)
   (v1:a), (good_data k1 v1 rho5 (mk_array rho3 rho6))) /\ (0%Z <= rho3)%Z) /\
   (((map.Map.get rho5 k) = (None :(option a))) /\ forall (k':key),
   (~ (k' = k)) -> ((map.Map.get rho5 k') = (map.Map.get rho k')))) ->
-  (((0%Z <= (bucket k rho3))%Z /\ ((bucket k rho3) < rho3)%Z) ->
-  (((0%Z <= (bucket k rho3))%Z /\ ((bucket k rho3) < rho3)%Z) ->
-  forall (o:(map.Map.map Z (list (key* a)%type))), ((0%Z <= rho3)%Z /\
-  (o = (map.Map.set rho6 (bucket k rho3) (Cons (k, v) (map.Map.get rho6
-  (bucket k rho3)))))) -> forall (rho8:Z), (rho8 = (rho7 + 1%Z)%Z) ->
+  let i := (bucket k rho3) in (((0%Z <= i)%Z /\ (i < rho3)%Z) ->
+  (((0%Z <= i)%Z /\ (i < rho3)%Z) -> forall (o:(map.Map.map Z (list (key*
+  a)%type))), ((0%Z <= rho3)%Z /\ (o = (map.Map.set rho6 i (Cons (k, v)
+  (map.Map.get rho6 i))))) -> forall (rho8:Z), (rho8 = (rho7 + 1%Z)%Z) ->
   forall (rho9:(map.Map.map key (option a))), (rho9 = (map.Map.set rho5 k
-  (Some v))) -> forall (i:Z), ((0%Z <= i)%Z /\ (i < rho3)%Z) -> (good_hash
-  (mk_array rho3 o) i))).
+  (Some v))) -> forall (i1:Z), ((0%Z <= i1)%Z /\ (i1 < rho3)%Z) -> (good_hash
+  (mk_array rho3 o) i1))).
+(* Why3 intros a a_WT k v rho rho1 rho2 (((h1,h2),h3),h4) rho3 rho4
+        (((h5,h6),h7),h8) rho5 rho6 rho7 ((((h9,h10),h11),h12),(h13,h14)) i
+        (h15,h16) (h17,h18) o (h19,h20) rho8 h21 rho9 h22 i1 (h23,h24). *)
 intros a a_WT k v rho rho1 rho2 (((h1,h2),h3),h4) rho3 rho4 (((h5,h6),h7),h8)
-rho5 rho6 rho7 ((((h9,h10),h11),h12),(h13,h14)) (h15,h16) (h17,h18) o
+rho5 rho6 rho7 ((((h9,h10),h11),h12),(h13,h14)) i1 (h15,h16) (h17,h18) o
 (h19,h20) rho8 h21 rho9 h22 i (h23,h24).
+subst i1.
 unfold good_hash in *.
 clear h11.
 generalize (h10 i (conj h23 h24)); clear h10; intro h10.
