@@ -1004,7 +1004,7 @@ let spec_invariant lenv pvs vty spec =
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
 let abstr_invariant lenv e spec0 =
-  let pvs = e_pvset Spv.empty e in
+  let pvs = e.e_syms.syms_pv in
   let spec = { spec0 with c_effect = e.e_effect } in
   let spec = spec_invariant lenv pvs e.e_vty spec in
   (* we do not require invariants on free variables *)
@@ -1246,17 +1246,10 @@ let spec_of_dspec lenv eff vty dsp = {
 let rec type_c lenv pvs vars otv (dtyv, dsp) =
   let vty = type_v lenv pvs vars otv dtyv in
   let eff, esvs = eff_of_deff lenv dsp in
-  (* reset every new region in the result *)
-  let eff = match vty with
-    | VTvalue v ->
-        let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
-        reg_fold on_reg v.ity_vars eff
-    | VTarrow _ -> eff in
-  (* refresh every unmodified subregion of a modified region *)
+  (* refresh every subregion of a modified region *)
   let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
   let check u eff =
-    let on_reg r e = if Sreg.mem r writes then e else eff_refresh e r u in
-    reg_fold on_reg u.reg_ity.ity_vars eff in
+    reg_fold (fun r e -> eff_refresh e r u) u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
   (* eff_compare every type variable not marked as opaque *)
   let otv = match dtyv with DSpecV v -> opaque_tvs otv v | _ -> otv in
@@ -1350,22 +1343,24 @@ and expr_desc lenv loc de = match de.de_desc with
       let e1 = e_ghostify gh (expr lenv de1) in
       let mk_expr e1 =
         let def1 = create_let_defn (Denv.create_user_id x) e1 in
-        let name = match def1.let_sym with
-          | LetA ps -> ps.ps_name | LetV pv -> pv.pv_vs.vs_name in
         let lenv = add_local x.id def1.let_sym lenv in
         let e2 = expr lenv de2 in
         let e2_unit = match e2.e_vty with
           | VTvalue ity -> ity_equal ity ity_unit
           | _ -> false in
+        let x_in_e2 = match def1.let_sym with
+          | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
+          | LetA ps -> Sps.mem ps e2.e_syms.syms_ps in
         let e2 =
-          if e2_unit (* e2 is ghost unit *)
+          if e2_unit (* e2 is unit *)
              && e2.e_ghost (* and e2 is ghost *)
              && not e1.e_ghost (* and e1 is non-ghost *)
-             && not (Mid.mem name e2.e_varm) (* and x doesn't occur in e2 *)
-          then e_let (create_let_defn (id_fresh "gh") e2) e_void else e2 in
+             && not x_in_e2 (* and x doesn't occur in e2 *)
+          then e_let (create_let_defn (id_fresh "gh") e2) e_void
+          else e2 in
         e_let def1 e2 in
       let rec flatten e1 = match e1.e_node with
-        | Elet (ld,_) (* can't let a non-ghost expr from a ghost one *)
+        | Elet (ld,_) (* can't let a non-ghost expr escape from a ghost one *)
           when gh && not ld.let_expr.e_ghost -> mk_expr e1
         | Elet (ld,e1) -> e_let ld (flatten e1)
         | _ -> mk_expr e1 in
@@ -1495,13 +1490,15 @@ and expr_rec lenv dfdl =
   let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
     let pvl = binders bl in
     let aty = vty_arrow pvl (vty_of_dvty de.de_type) in
-    let aty = aty_filter Mid.empty aty (* add reset effects *) in
     let ps = create_psymbol (Denv.create_user_id id) ~ghost:gh aty in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
   let fdl = List.map step2 fdl in
-  let rd_pvset pvs (_, lam) = l_pvset pvs lam in
+  let rd_pvset pvs (_, lam) =
+    let s = spec_pvset lam.l_expr.e_syms.syms_pv lam.l_spec in
+    let s = List.fold_right Spv.remove lam.l_args s in
+    Spv.union pvs s in
   let pvs = List.fold_left rd_pvset Spv.empty fdl in
   let rd_effect eff (_, lam) = eff_union eff lam.l_expr.e_effect in
   let eff = List.fold_left rd_effect eff_empty fdl in
@@ -1528,7 +1525,8 @@ and expr_fun lenv x gh bl (de, dsp as tr) =
         let post = Mlw_ty.create_post vs f in
         let spec = { lam.l_spec with c_post = post } in
         { lam with l_spec = spec } in
-  let pvs = l_pvset Spv.empty lam in
+  let pvs = spec_pvset lam.l_expr.e_syms.syms_pv lam.l_spec in
+  let pvs = List.fold_right Spv.remove lam.l_args pvs in
   let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
   let fd = create_fun_defn (Denv.create_user_id x) lam in
   Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;

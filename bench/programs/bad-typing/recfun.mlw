@@ -1,0 +1,16 @@
+module M
+
+  use import int.Int
+  use import ref.Ref
+
+  val x : ref int
+
+  let rec f5 (a b:ref int) variant { !a }
+    requires { !a >= 0 } ensures { result = old !a + old !b }
+    = if !a = 0 then !b else begin a := !a - 1; b := !b + 1; f5 a b end
+
+  (* partial application with non-generalizable effects is forbidden *)
+
+  let test_f5 () requires { !x >= 0 } ensures { result = old !x }
+    = let b = ref 0 in let f = f5 x in f b
+  end

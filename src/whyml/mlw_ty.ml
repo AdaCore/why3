@@ -23,8 +23,6 @@ module rec T : sig
     vars_reg : Reg.S.t;
   }
 
-  type varmap = varset Mid.t
-
   type itysymbol = {
     its_ts   : tysymbol;
     its_regs : region list;
@@ -56,8 +54,6 @@ end = struct
     vars_tv  : Stv.t;
     vars_reg : Reg.S.t;
   }
-
-  type varmap = varset Mid.t
 
   type itysymbol = {
     its_ts   : tysymbol;
@@ -117,13 +113,6 @@ let vars_empty = { vars_tv = Stv.empty ; vars_reg = Sreg.empty }
 let vars_union s1 s2 = {
   vars_tv  = Stv.union s1.vars_tv s2.vars_tv;
   vars_reg = Sreg.union s1.vars_reg s2.vars_reg;
-}
-
-let vars_merge = Mid.fold (fun _ -> vars_union)
-
-let create_varset tvs regs = {
-  vars_tv = Sreg.fold (fun r -> Stv.union r.reg_ity.ity_vars.vars_tv) regs tvs;
-  vars_reg = regs;
 }
 
 (* value type symbols *)
@@ -809,14 +798,17 @@ let spec_subst sbs c =
     c_letrec  = c.c_letrec;
   }
 
-let spec_filter ghost varm vars c =
+let spec_vsset c =
   let add f s = Mvs.set_union f.t_vars s in
-  let vss = add c.c_pre c.c_post.t_vars in
-  let vss = Mexn.fold (fun _ -> add) c.c_xpost vss in
-  let vss = List.fold_right (fun (t,_) -> add t) c.c_variant vss in
-  let check { vs_name = id } _ = if not (Mid.mem id varm) then
-    Loc.errorm "Local variable %s escapes from its scope" id.id_string in
-  Mvs.iter check vss;
+  let s = add c.c_pre c.c_post.t_vars in
+  let s = Mexn.fold (fun _ f s -> add f s) c.c_xpost s in
+  List.fold_left (fun s (t,_) -> add t s) s c.c_variant
+
+let spec_filter ghost svs vars c =
+  let s = spec_vsset c in
+  if not (Mvs.set_submap s svs) then
+    Loc.errorm "Local variable %s escapes from its scope"
+      (fst (Mvs.choose (Mvs.set_diff s svs))).vs_name.id_string;
   if not ghost && not (Sexn.is_empty c.c_effect.eff_ghostx) then
     Loc.errorm "Only ghost functions may raise ghost exceptions";
   { c with c_effect = eff_ghostify ghost (eff_filter vars c.c_effect) }
@@ -828,6 +820,9 @@ let spec_check ~full_xpost c ty =
     Loc.error ?loc:c.c_pre.t_loc (Term.FmlaExpected c.c_pre);
   check_post ty c.c_post;
   Mexn.iter (fun xs q -> check_post (ty_of_ity xs.xs_ity) q) c.c_xpost;
+  (* we admit non-empty variant list even for null letrec,
+     so that we can store there external variables from
+     user-written effects to save them from spec_filter *)
   let check_variant (t,rel) = match rel with
     | Some ps -> ignore (ps_app ps [t;t])
     | None -> ignore (t_type t) in
@@ -865,14 +860,20 @@ let create_pvsymbol id ghost ity = {
   pv_ghost = ghost;
 }
 
-let create_pvsymbol, restore_pv, restore_pv_by_id =
-  let id_to_pv = Wid.create 17 in
+let create_pvsymbol, restore_pv =
+  let vs_to_pv = Wvs.create 17 in
   (fun id ?(ghost=false) ity ->
     let pv = create_pvsymbol id ghost ity in
-    Wid.set id_to_pv pv.pv_vs.vs_name pv;
+    Wvs.set vs_to_pv pv.pv_vs pv;
     pv),
-  (fun vs -> Wid.find id_to_pv vs.vs_name),
-  (fun id -> Wid.find id_to_pv id)
+  (fun vs -> Wvs.find vs_to_pv vs)
+
+let pvs_of_vss pvs vss =
+  Mvs.fold (fun vs _ s -> Spv.add (restore_pv vs) s) vss pvs
+
+let t_pvset pvs t = pvs_of_vss pvs t.t_vars
+
+let spec_pvset pvs spec = pvs_of_vss pvs (spec_vsset spec)
 
 (** program types *)
 
@@ -920,9 +921,6 @@ let vty_arrow argl ?spec vty =
   let spec = match spec with
     | Some spec -> spec_check spec vty; spec
     | None -> spec_empty (ty_of_vty vty) in
-  (* we admit non-empty variant list even for null letrec,
-     so that we can store there external variables from
-     user-written effects to save them from spec_filter *)
   vty_arrow_unsafe argl spec vty
 
 (* this only compares the types of arguments and results, and ignores
@@ -960,37 +958,42 @@ let aty_full_inst sbs aty =
   in
   aty_inst Mvs.empty aty
 
-(* remove from the given arrow every effect that is covered
-   neither by the arrow's aty_vars nor by the given varmap *)
-let rec aty_filter ghost varm vars aty =
-  let add_m pv m = Mid.add pv.pv_vs.vs_name pv.pv_ity.ity_vars m in
-  let add_s pv s = vars_union pv.pv_ity.ity_vars s in
-  let varm = List.fold_right add_m aty.aty_args varm in
-  let vars = List.fold_right add_s aty.aty_args vars in
-  let vty = match aty.aty_result with
-    | VTarrow a -> VTarrow (aty_filter ghost varm vars a)
-    | VTvalue _ -> aty.aty_result in
-  (* reads and writes must come from the context,
-     resets may affect the regions in the result *)
-  let spec = spec_filter ghost varm vars aty.aty_spec in
-  let rst = aty.aty_spec.c_effect.eff_resets in
-  let spec = if Mreg.is_empty rst then spec else
-    let vars = vars_union vars (vty_vars vty) in
-    let rst = { eff_empty with eff_resets = rst } in
-    let rst = (eff_filter vars rst).eff_resets in
-    let eff = { spec.c_effect with eff_resets = rst } in
-    { spec with c_effect = eff } in
-  (* we must also reset every fresh region in the value *)
+(* remove from the given arrow every inner effect *)
+let rec aty_filter ghost svs vars aty =
+  let add svs { pv_vs = vs } = Svs.add vs svs in
+  let svs = List.fold_left add svs aty.aty_args in
+  (* every region in the type must be unique *)
+  let check_alias vars ity =
+    (* FIXME? This check is not needed for soundness
+       and can be made outside of the core WhyML API *)
+    let check reg = if reg_occurs reg vars then
+      Loc.errorm "The type of this function contains an alias" in
+    reg_iter check ity.ity_vars in
+  let add vars { pv_ity = ity } =
+    check_alias vars ity; vars_union vars ity.ity_vars in
+  let vars = List.fold_left add vars aty.aty_args in
+  (* remove the effects that do not affect the context *)
+  let spec = spec_filter ghost svs vars aty.aty_spec in
+  (* reset every fresh region in the returned value *)
   let spec = match aty.aty_result with
     | VTvalue v ->
         let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
-        let eff = reg_fold on_reg v.ity_vars spec.c_effect in
-        { spec with c_effect = eff }
+        { spec with c_effect = reg_fold on_reg v.ity_vars spec.c_effect }
     | VTarrow _ -> spec in
+  (* filter the result type *)
+  let vty = match aty.aty_result with
+    | VTarrow a -> VTarrow (aty_filter ghost svs vars a)
+    (* FIXME? This check is commented out since we do have examples
+       where a mutable argument is incorporated into the result. *)
+    | VTvalue _ -> (*check_alias vars v;*) aty.aty_result in
   vty_arrow_unsafe aty.aty_args spec vty
 
-let aty_filter ?(ghost=false) varm aty =
-  aty_filter ghost varm (vars_merge varm vars_empty) aty
+let aty_filter ?(ghost=false) pvs aty =
+  let add pv svs = Svs.add pv.pv_vs svs in
+  let svs = Spv.fold add pvs Svs.empty in
+  let add pv vars = vars_union vars pv.pv_ity.ity_vars in
+  let vars = Spv.fold add pvs vars_empty in
+  aty_filter ghost svs vars aty
 
 let aty_app aty pv =
   let arg, rest = match aty.aty_args with

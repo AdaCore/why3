@@ -23,8 +23,6 @@ module rec T : sig
     vars_reg : Sreg.t;
   }
 
-  type varmap = varset Mid.t
-
   type itysymbol = private {
     its_ts   : tysymbol;
     its_regs : region list;
@@ -167,15 +165,13 @@ val ity_full_inst : ity_subst -> ity -> ity
 
 val reg_full_inst : ity_subst -> region -> region
 
+(* varset manipulation *)
+
 val vars_empty : varset
 
 val vars_union : varset -> varset -> varset
 
-val vars_merge : varmap -> varset -> varset
-
 val vars_freeze : varset -> ity_subst
-
-val create_varset : Stv.t -> Sreg.t -> varset
 
 (* exception symbols *)
 type xsymbol = private {
@@ -234,8 +230,6 @@ exception GhostDiverg
 
 val eff_full_inst : ity_subst -> effect -> effect
 
-val eff_filter : varset -> effect -> effect
-
 val eff_is_empty : effect -> bool
 val eff_is_read_only: effect -> bool
 
@@ -280,8 +274,11 @@ val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 val restore_pv : vsymbol -> pvsymbol
   (* raises Not_found if the argument is not a pv_vs *)
 
-val restore_pv_by_id : ident -> pvsymbol
-  (* raises Not_found if the argument is not a pv_vs.vs_name *)
+val t_pvset : Spv.t -> term -> Spv.t
+  (* raises Not_found if the term contains non-pv variables *)
+
+val spec_pvset : Spv.t -> spec -> Spv.t
+  (* raises Not_found if the spec contains non-pv variables *)
 
 (** program types *)
 
@@ -311,8 +308,8 @@ val aty_vars_match : ity_subst -> aty -> ity list -> ity -> ity_subst
 val aty_full_inst : ity_subst -> aty -> aty
 
 (* remove from the given arrow every effect that is covered
-   neither by the arrow's arguments nor by the given varmap *)
-val aty_filter : ?ghost:bool -> varmap -> aty -> aty
+   neither by the arrow's arguments nor by the given pvset *)
+val aty_filter : ?ghost:bool -> Spv.t -> aty -> aty
 
 (* apply a function specification to a variable argument *)
 val aty_app : aty -> pvsymbol -> spec * bool * vty

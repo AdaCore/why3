@@ -215,7 +215,7 @@ let print_list_next sep print fmt = function
       print_list sep (print false) fmt r
 
 let is_letrec = function
-  | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
+  | [fd] -> fd.fun_lambda.l_spec.c_letrec <> 0
   | _ -> true
 
 let rec print_expr fmt e = print_lexpr 0 fmt e

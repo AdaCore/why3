@@ -500,32 +500,15 @@ let clone_export uc m inst =
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec fdl ->
-        let add_id id _ (pvs,pss) =
-          try match Hid.find psh id with
-            | PV pv -> Spv.add pv pvs, pss
-            | PS ps -> pvs, Sps.add ps pss
-            | _ -> assert false
-          with Not_found ->
-            let exn = Invalid_argument "Mlw_module.clone_export" in
-            begin match (Mid.find_exn exn id extras).pd_node with
-              | PDval (LetV pv) | PDlet { let_sym = LetV pv } ->
-                  Spv.add pv pvs, pss
-              | PDval (LetA ps) | PDlet { let_sym = LetA ps } ->
-                  pvs, Sps.add ps pss
-              | PDrec fdl ->
-                  let rec down = function
-                    | { fun_ps = ps }::_ when id_equal ps.ps_name id -> ps
-                    | _::fdl -> down fdl
-                    | [] -> assert false in
-                  pvs, Sps.add (down fdl) pss
-              | PDtype _ | PDdata _ | PDexn _ -> assert false
-            end in
         let conv_fd uc { fun_ps = ps } =
           let id = id_clone ps.ps_name in
           let aty = conv_aty !mvs ps.ps_aty in
-          (* we must retrieve all pvsymbols and psymbols in ps.ps_varm *)
-          let pvs,pss = Mid.fold add_id ps.ps_varm (Spv.empty,Sps.empty) in
-          let nps = create_psymbol_extra id ~ghost:ps.ps_ghost aty pvs pss in
+          let vari = Spv.fold (fun pv l ->
+            (t_var (Mvs.find pv.pv_vs !mvs), None)::l) ps.ps_pvset [] in
+          (* we save all external pvsymbols to preserve the effects *)
+          let spec = { aty.aty_spec with c_variant = vari } in
+          let aty = vty_arrow ~spec aty.aty_args aty.aty_result in
+          let nps = create_psymbol id ~ghost:ps.ps_ghost aty in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
         List.fold_left conv_fd uc fdl
