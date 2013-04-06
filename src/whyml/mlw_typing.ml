@@ -984,14 +984,6 @@ let reset_vars eff pvs =
   if Mreg.is_empty eff.eff_resets then Svs.empty else
   Spv.fold add pvs Svs.empty
 
-(* add dummy postconditions for uncovered exceptions *)
-let complete_xpost eff xq =
-  let dummy { xs_ity = ity } () =
-    let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
-    Mlw_ty.create_post v t_true in
-  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
-  Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xe xq))
-
 let spec_invariant lenv pvs vty spec =
   let ity = ity_of_vty vty in
   let pvs = spec_pvset pvs spec in
@@ -1004,23 +996,17 @@ let spec_invariant lenv pvs vty spec =
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
 let abstr_invariant lenv e spec0 =
-  let pvs = e.e_syms.syms_pv in
+  let pvs = spec_pvset e.e_syms.syms_pv spec0 in
   let spec = { spec0 with c_effect = e.e_effect } in
   let spec = spec_invariant lenv pvs e.e_vty spec in
   (* we do not require invariants on free variables *)
   { spec with c_pre = spec0.c_pre }
 
-let lambda_invariant lenv pvs eff lam =
-  let pvs = List.fold_right Spv.add lam.l_args pvs in
-  let spec = { lam.l_spec with c_effect = eff } in
-  let spec = spec_invariant lenv pvs lam.l_expr.e_vty spec in
-  (* we add dummy xposts for uncovered exceptions to silence
-     Mlw_ty.spec_check, but we do another proper check later
-     in check_user_effect, which will give us a precise
-     location of the exception-raising sub-expression *)
-  let xpost = complete_xpost eff spec.c_xpost in
-  let spec = { spec with c_xpost = xpost } in
-  { lam with l_spec = spec }
+let lambda_invariant lenv lam =
+  let { l_spec = spec; l_expr = e } = lam in
+  let pvs = spec_pvset e.e_syms.syms_pv spec in
+  let spec = spec_invariant lenv pvs e.e_vty spec in
+  { lam with l_spec = { spec with c_letrec = 0 }}
 
 (* specification handling *)
 
@@ -1494,15 +1480,8 @@ and expr_rec lenv dfdl =
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
-  let fdl = List.map step2 fdl in
-  let rd_pvset pvs (_, lam) =
-    let s = spec_pvset lam.l_expr.e_syms.syms_pv lam.l_spec in
-    let s = List.fold_right Spv.remove lam.l_args s in
-    Spv.union pvs s in
-  let pvs = List.fold_left rd_pvset Spv.empty fdl in
-  let rd_effect eff (_, lam) = eff_union eff lam.l_expr.e_effect in
-  let eff = List.fold_left rd_effect eff_empty fdl in
-  let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
+  let fdl = create_rec_defn (List.map step2 fdl) in
+  let step3 fd = fd.fun_ps, lambda_invariant lenv fd.fun_lambda in
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (_,_,_,bl,(de,dsp)) =
     Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp in
@@ -1525,9 +1504,7 @@ and expr_fun lenv x gh bl (de, dsp as tr) =
         let post = Mlw_ty.create_post vs f in
         let spec = { lam.l_spec with c_post = post } in
         { lam with l_spec = spec } in
-  let pvs = spec_pvset lam.l_expr.e_syms.syms_pv lam.l_spec in
-  let pvs = List.fold_right Spv.remove lam.l_args pvs in
-  let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
+  let lam = lambda_invariant lenv lam in
   let fd = create_fun_defn (Denv.create_user_id x) lam in
   Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
   fd
