@@ -658,8 +658,10 @@ lexpr:
    { mk_pp (PPmatch ($2, $5)) }
 | MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
+/*
 | EPSILON lident labels COLON primitive_type DOT lexpr
    { mk_pp (PPeps ((add_lab $2 $3, Some $5), $7)) }
+*/
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
