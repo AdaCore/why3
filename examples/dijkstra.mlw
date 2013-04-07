@@ -48,14 +48,14 @@ module DijkstraShortestPath
 
   val q: ref (S.set vertex)
 
-  val q_is_empty () : bool reads {q}
+  val q_is_empty () : bool
     ensures { result = True <-> S.is_empty !q }
 
   predicate min (m: vertex) (q: S.set vertex) (d: M.map vertex int) =
     S.mem m q /\
     forall x: vertex. S.mem x q -> d[m] <= d[x]
 
-  val q_extract_min () : vertex reads {d} writes {q}
+  val q_extract_min () : vertex writes {q}
     requires { not S.is_empty !q }
     ensures  { min result (old !q) !d }
     ensures  { !q = S.remove result (old !q) }
@@ -173,7 +173,7 @@ module DijkstraShortestPath
 
   (* Iteration on a set *)
 
-  val set_has_next (s: ref (S.set 'a)) : bool reads {s}
+  val set_has_next (s: ref (S.set 'a)) : bool
     ensures { result = True <-> not (S.is_empty !s) }
 
   val set_next (s: ref (S.set 'a)) : 'a writes {s}

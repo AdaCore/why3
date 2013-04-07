@@ -199,10 +199,8 @@ module Sexn: Extset.S with module M = Mexn
 (** effects *)
 
 type effect = private {
-  eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
   eff_raises : Sexn.t;
-  eff_ghostr : Sreg.t; (* ghost reads *)
   eff_ghostw : Sreg.t; (* ghost writes *)
   eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
@@ -216,7 +214,6 @@ val eff_equal : effect -> effect -> bool
 val eff_union : effect -> effect -> effect
 val eff_ghostify : bool -> effect -> effect
 
-val eff_read  : effect -> ?ghost:bool -> region -> effect
 val eff_write : effect -> ?ghost:bool -> region -> effect
 val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
@@ -238,7 +235,6 @@ exception GhostDiverg
 val eff_full_inst : ity_subst -> effect -> effect
 
 val eff_is_empty : effect -> bool
-val eff_is_read_only: effect -> bool
 
 (** specification *)
 

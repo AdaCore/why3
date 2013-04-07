@@ -78,7 +78,7 @@ module M2
 
   function block_size memory pointer : int
 
-  val get_ (p : pointer) (ofs : int) : int reads { mem }
+  val get_ (p : pointer) (ofs : int) : int
     requires { 0 <= ofs < block_size !mem p }
     ensures  { result = get !mem p ofs }
 
@@ -135,7 +135,7 @@ module M3
 
   function block_size memory pointer : int
 
-  val get_ (p:pointer) (ofs:int32) : int32 reads { mem }
+  val get_ (p:pointer) (ofs:int32) : int32
     requires { 0 <= to_int ofs < block_size !mem p }
     ensures  { result = get !mem p (to_int ofs) }
 

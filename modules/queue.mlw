@@ -21,7 +21,7 @@ module Queue
       | Cons x t -> result = x /\ q.elts = t end }
     raises  { Empty -> q.elts = old q.elts = Nil }
 
-  val peek (q: t 'a) : 'a reads {q}
+  val peek (q: t 'a) : 'a
     ensures { match q.elts with Nil -> false
       | Cons x _ -> result = x end }
     raises  { Empty -> q.elts = Nil }
@@ -31,21 +31,21 @@ module Queue
     ensures { match old q.elts with Nil -> false
       | Cons x t -> result = x /\ q.elts = t end }
 
-  val safe_peek (q: t 'a) : 'a reads {q}
+  val safe_peek (q: t 'a) : 'a
     requires { q.elts <> Nil }
     ensures { match q.elts with Nil -> false
       | Cons x _ -> result = x end }
 
   val clear (q: t 'a) : unit writes {q} ensures { q.elts = Nil }
 
-  val copy (q: t 'a) : t 'a reads {q} ensures { result = q }
+  val copy (q: t 'a) : t 'a ensures { result = q }
 
-  val is_empty (q: t 'a) : bool reads {q}
+  val is_empty (q: t 'a) : bool
     ensures { result = True <-> q.elts = Nil }
 
   function length (q: t 'a) : int = L.length q.elts
 
-  val length (q: t 'a) : int reads {q}
+  val length (q: t 'a) : int
     ensures { result = L.length q.elts }
 
 end

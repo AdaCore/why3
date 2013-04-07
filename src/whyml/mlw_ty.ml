@@ -572,10 +572,8 @@ module Mexn = Exn.M
 
 (* effects *)
 type effect = {
-  eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
   eff_raises : Sexn.t;
-  eff_ghostr : Sreg.t; (* ghost reads *)
   eff_ghostw : Sreg.t; (* ghost writes *)
   eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
@@ -585,10 +583,8 @@ type effect = {
 }
 
 let eff_empty = {
-  eff_reads  = Sreg.empty;
   eff_writes = Sreg.empty;
   eff_raises = Sexn.empty;
-  eff_ghostr = Sreg.empty;
   eff_ghostw = Sreg.empty;
   eff_ghostx = Sexn.empty;
   eff_resets = Mreg.empty;
@@ -597,17 +593,6 @@ let eff_empty = {
 }
 
 let eff_is_empty e =
-  Sreg.is_empty e.eff_reads &&
-  Sreg.is_empty e.eff_writes &&
-  Sexn.is_empty e.eff_raises &&
-  Sreg.is_empty e.eff_ghostr &&
-  Sreg.is_empty e.eff_ghostw &&
-  Sexn.is_empty e.eff_ghostx &&
-  Mreg.is_empty e.eff_resets &&
-  (* eff_compar is not a side effect *)
-  not e.eff_diverg
-
-let eff_is_read_only e =
   Sreg.is_empty e.eff_writes &&
   Sexn.is_empty e.eff_raises &&
   Sreg.is_empty e.eff_ghostw &&
@@ -617,10 +602,8 @@ let eff_is_read_only e =
   not e.eff_diverg
 
 let eff_equal e1 e2 =
-  Sreg.equal e1.eff_reads  e2.eff_reads  &&
   Sreg.equal e1.eff_writes e2.eff_writes &&
   Sexn.equal e1.eff_raises e2.eff_raises &&
-  Sreg.equal e1.eff_ghostr e2.eff_ghostr &&
   Sreg.equal e1.eff_ghostw e2.eff_ghostw &&
   Sexn.equal e1.eff_ghostx e2.eff_ghostx &&
   Mreg.equal (Opt.equal reg_equal) e1.eff_resets e2.eff_resets &&
@@ -636,10 +619,8 @@ let join_reset _key v1 v2 = match v1, v2 with
   | _ -> Some None
 
 let eff_union x y = {
-  eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
   eff_writes = Sreg.union x.eff_writes y.eff_writes;
   eff_raises = Sexn.union x.eff_raises y.eff_raises;
-  eff_ghostr = Sreg.union x.eff_ghostr y.eff_ghostr;
   eff_ghostw = Sreg.union x.eff_ghostw y.eff_ghostw;
   eff_ghostx = Sexn.union x.eff_ghostx y.eff_ghostx;
   eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
@@ -650,10 +631,8 @@ let eff_union x y = {
 exception GhostDiverg
 
 let eff_ghostify e = {
-  eff_reads  = Sreg.empty;
   eff_writes = Sreg.empty;
   eff_raises = Sexn.empty;
-  eff_ghostr = Sreg.union e.eff_reads  e.eff_ghostr;
   eff_ghostw = Sreg.union e.eff_writes e.eff_ghostw;
   eff_ghostx = Sexn.union e.eff_raises e.eff_ghostx;
   eff_resets = e.eff_resets;
@@ -668,10 +647,6 @@ let eff_ghostify e = {
 }
 
 let eff_ghostify gh e = if gh then eff_ghostify e else e
-
-let eff_read e ?(ghost=false) r = if ghost
-  then { e with eff_ghostr = Sreg.add r e.eff_ghostr }
-  else { e with eff_reads  = Sreg.add r e.eff_reads  }
 
 let eff_write e ?(ghost=false) r = if ghost
   then { e with eff_ghostw = Sreg.add r e.eff_ghostw }
@@ -748,9 +723,7 @@ let eff_full_inst sbs e =
     ity_s_fold check (fun () _ -> ()) () ity;
     Stv.union acc ity.ity_vars.vars_tv in
   { e with
-    eff_reads  = Sreg.fold add_sreg e.eff_reads  Sreg.empty;
     eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
-    eff_ghostr = Sreg.fold add_sreg e.eff_ghostr Sreg.empty;
     eff_ghostw = Sreg.fold add_sreg e.eff_ghostw Sreg.empty;
     eff_resets = Mreg.fold add_mreg e.eff_resets Mreg.empty;
     eff_compar = Stv.fold  add_stv  e.eff_compar Stv.empty;
@@ -764,9 +737,7 @@ let eff_filter vars e =
     | _ -> Some None
   in
   { e with
-    eff_reads  = Sreg.filter check e.eff_reads;
     eff_writes = Sreg.filter check e.eff_writes;
-    eff_ghostr = Sreg.filter check e.eff_ghostr;
     eff_ghostw = Sreg.filter check e.eff_ghostw;
     eff_resets = Mreg.mapi_filter reset e.eff_resets;
     eff_compar = Stv.inter vars.vars_tv e.eff_compar;

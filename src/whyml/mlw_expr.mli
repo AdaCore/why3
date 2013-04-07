@@ -64,7 +64,6 @@ type ppattern = private {
   ppat_pattern : pattern;
   ppat_ity     : ity;
   ppat_ghost   : bool;
-  ppat_effect  : effect;
 }
 
 type pre_ppattern =

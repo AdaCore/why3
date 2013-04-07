@@ -22,7 +22,7 @@ module Stack
       | Cons x t -> result = x /\ s.elts = t end }
     raises  { Empty -> s.elts = old s.elts = Nil }
 
-  val top (s: t 'a) : 'a reads {s}
+  val top (s: t 'a) : 'a
     ensures { match s.elts with Nil -> false
       | Cons x _ -> result = x end }
     raises  { Empty -> s.elts = Nil }
@@ -32,21 +32,21 @@ module Stack
     ensures { match old s.elts with Nil -> false
       | Cons x t -> result = x /\ s.elts = t end }
 
-  val safe_top (s: t 'a) : 'a reads {s}
+  val safe_top (s: t 'a) : 'a
     requires { s.elts <> Nil }
     ensures { match s.elts with Nil -> false
       | Cons x _ -> result = x end }
 
   val clear (s: t 'a) : unit writes {s} ensures { s.elts = Nil }
 
-  val copy (s: t 'a) : t 'a reads {s} ensures { result = s }
+  val copy (s: t 'a) : t 'a ensures { result = s }
 
-  val is_empty (s: t 'a) : bool reads {s}
+  val is_empty (s: t 'a) : bool
     ensures { result = True <-> s.elts = Nil }
 
   function length (s: t 'a) : int = L.length s.elts
 
-  val length (s: t 'a) : int reads {s}
+  val length (s: t 'a) : int
     ensures { result = L.length s.elts }
 
 end

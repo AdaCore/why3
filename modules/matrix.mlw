@@ -21,7 +21,7 @@ module Matrix
   predicate valid_index (a: matrix 'a) (i: index) =
     let r,c = i in 0 <= r < a.rows /\ 0 <= c < a.columns
 
-  val get (a: matrix 'a) (i: index) : 'a reads {a}
+  val get (a: matrix 'a) (i: index) : 'a
     requires { valid_index a i }
     ensures  { result = get a i }
 
@@ -74,7 +74,7 @@ module Syntax
   function ([]) (a: matrix 'a) (i: index) : 'a = get a i
   function ([<-]) (a: matrix 'a) (i: index) (v: 'a) : matrix 'a = set a i v
 
-  val ([]) (a: matrix 'a) (i: index) : 'a reads {a}
+  val ([]) (a: matrix 'a) (i: index) : 'a
     requires { valid_index a i }
     ensures  { result = get a i }
 

@@ -66,10 +66,10 @@ module String
     ensures  { length result = len }
     ensures  { forall i:int. 0 <= i < len -> result[i] = c }
 
-  val get (s:string) (i:int) : char reads {s}
+  val get (s:string) (i:int) : char
     requires { 0 <= i < length s } ensures { result = s[i] }
 
-  val unsafe_get (s:string) (i:int) : char reads {s}
+  val unsafe_get (s:string) (i:int) : char
     ensures { result = s[i] }
 
   val set (s:string) (i:int) (v:char) : unit writes {s}
@@ -79,7 +79,7 @@ module String
   val unsafe_set (s:string) (i:int) (v:char) : unit writes {s}
     ensures { s.chars = (old s.chars)[i <- v] }
 
-  val length (s:string) : int reads {s} ensures { result = length s }
+  val length (s:string) : int ensures { result = length s }
 
   val copy (s:string) : string
     ensures { length result = length s }
@@ -124,7 +124,7 @@ module Buffer
     requires { size >= 0 } ensures { result.length = 0 }
     (** [size] is only given as a hint for the initial size *)
 
-  val contents (b:t) : string reads {b}
+  val contents (b:t) : string
     ensures { S.length result = length b }
 
   val add_char (b:t) (c:char) : unit writes {b}
@@ -133,7 +133,7 @@ module Buffer
       0 <= i < length b -> b.contents[i] = (old b.contents)[i] }
     ensures { b.contents[length b - 1] = c }
 
-  val add_string (b:t) (s:string) : unit reads {s} writes {b}
+  val add_string (b:t) (s:string) : unit writes {b}
     ensures { length b = old (length b) + S.length s }
     ensures { forall i: int.
       0 <= i < old (length b) -> b.contents[i] = (old b.contents)[i] }

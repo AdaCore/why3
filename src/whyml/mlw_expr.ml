@@ -125,7 +125,6 @@ type ppattern = {
   ppat_pattern : pattern;
   ppat_ity     : ity;
   ppat_ghost   : bool;
-  ppat_effect  : effect;
 }
 
 type pre_ppattern =
@@ -151,24 +150,20 @@ let make_ppattern pp ?(ghost=false) ity =
       Hstr.add hv nm pv; pv
   in
   let make_app ls ppl ghost ity =
-    let add_ppat e pp = eff_union e pp.ppat_effect, pp.ppat_pattern in
-    let effect, patl = Lists.map_fold_left add_ppat eff_empty ppl in
+    let patl = List.map (fun pp -> pp.ppat_pattern) ppl in
     { ppat_pattern = pat_app ls patl (ty_of_ity ity);
       ppat_ity     = ity;
-      ppat_ghost   = ghost;
-      ppat_effect  = effect; }
+      ppat_ghost   = ghost; }
   in
   let rec make ghost ity = function
     | PPwild -> {
         ppat_pattern = pat_wild (ty_of_ity ity);
         ppat_ity     = ity;
-        ppat_ghost   = ghost;
-        ppat_effect  = eff_empty; }
+        ppat_ghost   = ghost; }
     | PPvar id -> {
         ppat_pattern = pat_var (find id ghost ity).pv_vs;
         ppat_ity     = ity;
-        ppat_ghost   = ghost;
-        ppat_effect  = eff_empty; }
+        ppat_ghost   = ghost; }
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls);
         if pls.pl_ls.ls_constr = 0 then
@@ -178,14 +173,7 @@ let make_ppattern pp ?(ghost=false) ity =
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
           let ghost = ghost || arg.fd_ghost in
-          let pp = make ghost (ity_full_inst sbs arg.fd_ity) pp in
-          match pp.ppat_pattern.pat_node, arg.fd_mut with
-            | Pwild, _ -> pp
-            | _, Some r ->
-                let reg = reg_full_inst sbs r in
-                let eff = eff_read ~ghost pp.ppat_effect reg in
-                { pp with ppat_effect = eff }
-            | _, _ -> pp in
+          make ghost (ity_full_inst sbs arg.fd_ity) pp in
         let ppl = try List.map2 mtch pls.pl_args ppl with
           | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
@@ -209,14 +197,12 @@ let make_ppattern pp ?(ghost=false) ity =
         let pp2 = make ghost ity pp2 in
         { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
           ppat_ity     = ity;
-          ppat_ghost   = ghost;
-          ppat_effect  = eff_union pp1.ppat_effect pp2.ppat_effect; }
+          ppat_ghost   = ghost; }
     | PPas (pp,id) ->
         let pp = make ghost ity pp in
         { ppat_pattern = pat_as pp.ppat_pattern (find id ghost ity).pv_vs;
           ppat_ity     = ity;
-          ppat_ghost   = ghost;
-          ppat_effect  = pp.ppat_effect; }
+          ppat_ghost   = ghost; }
   in
   let pp = make ghost ity pp in
   let gh = pp.ppat_ghost || !gghost in
@@ -291,9 +277,7 @@ let rec aty_check vars aty =
   let ch_tv tv = test_or_raise (Stv.mem tv vars.vars_tv) in
   let check reg = test_or_raise (reg_occurs reg vars) in
   let eff = aty.aty_spec.c_effect in
-  Sreg.iter check eff.eff_reads;
   Sreg.iter check eff.eff_writes;
-  Sreg.iter check eff.eff_ghostr;
   Sreg.iter check eff.eff_ghostw;
   Stv.iter  ch_tv eff.eff_compar;
   match aty.aty_result with
@@ -609,9 +593,8 @@ let e_plapp pls el ity =
   if pls.pl_rdonly then raise (RdOnlyPLS pls);
   let rec app tl syms ghost eff sbs fdl argl = match fdl, argl with
     | [],[] ->
-        let mut_fold fn leff fd = Opt.fold fn leff fd.fd_mut in
-        let leff = mut_fold (eff_read ~ghost) eff_empty pls.pl_value in
-        let leff = List.fold_left (mut_fold eff_reset) leff pls.pl_args in
+        let mut_fold leff fd = Opt.fold eff_reset leff fd.fd_mut in
+        let leff = List.fold_left mut_fold eff_empty pls.pl_args in
         let mtv = Mtv.set_diff sbs.ity_subst_tv pls.pl_ls.ls_opaque in
         let leff = Mtv.fold (fun tv _ e -> eff_compare e tv) mtv leff in
         let eff = eff_union eff (eff_full_inst sbs leff) in
@@ -678,9 +661,9 @@ let e_case e0 bl =
           Loc.errorm "Non-ghost pattern in a ghost position";
         ity_equal_check (ity_of_expr e0) pp.ppat_ity;
         ity_equal_check (ity_of_expr e) bity;
+        let eff = eff_union eff e.e_effect in
         let del_vs vs _ syms = del_pv_syms (restore_pv vs) syms in
         let bsyms = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_syms in
-        let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
         (* one-branch match is not ghost even if its pattern is ghost *)
         let ghost = ghost || (multi_br && pp.ppat_ghost) || e.e_ghost in
         branch ghost eff (syms_union syms bsyms) bl

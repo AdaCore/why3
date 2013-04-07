@@ -1684,7 +1684,7 @@ let wp_rec ~wp env kn th fdl =
     if Slab.mem lemma_label name.id_label then
       let loc = name.id_loc in
       let spec = ps.ps_aty.aty_spec in
-      if not (eff_is_read_only spec.c_effect) then
+      if not (eff_is_empty spec.c_effect) then
         Loc.errorm ?loc "lemma functions can not have effects";
       if not (ity_equal (ity_of_expr l.l_expr) ity_unit) then
         Loc.errorm ?loc "lemma functions must return unit";

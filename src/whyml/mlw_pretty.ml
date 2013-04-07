@@ -116,10 +116,8 @@ let print_effect fmt eff =
     | Some u ->
         fprintf fmt "{refresh %a@ under %a}@ " print_regty r print_regty u
   in
-  Sreg.iter (print_reg "read") eff.eff_reads;
   Sreg.iter (print_reg "write") eff.eff_writes;
   Sexn.iter (print_xs  "raise") eff.eff_raises;
-  Sreg.iter (print_reg "ghost read") eff.eff_ghostr;
   Sreg.iter (print_reg "ghost write") eff.eff_ghostw;
   Sexn.iter (print_xs  "ghost raise") eff.eff_ghostx;
   Mreg.iter print_reset eff.eff_resets

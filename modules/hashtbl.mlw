@@ -26,23 +26,23 @@ module Hashtbl
     ensures { h[k] = Cons v (old h)[k] }
     ensures { forall k': key. k' <> k -> h[k'] = (old h)[k'] }
 
-  val mem (h: t 'a) (k: key) : bool reads {h}
+  val mem (h: t 'a) (k: key) : bool
     ensures { result=True <-> h[k] <> Nil }
 
-  val find (h: t 'a) (k: key) : 'a reads {h}
+  val find (h: t 'a) (k: key) : 'a
     requires { h[k] <> Nil }
     ensures  { match h[k] with Nil -> false | Cons v _ -> result = v end }
 
-  val find_all (h: t 'a) (k: key) : list 'a reads {h}
+  val find_all (h: t 'a) (k: key) : list 'a
     ensures { result = h[k] }
 
   exception NotFound
 
-  val defensive_find (h: t 'a) (k: key) : 'a reads {h}
+  val defensive_find (h: t 'a) (k: key) : 'a
     ensures { match h[k] with Nil -> false | Cons v _ -> result = v end }
     raises  { NotFound -> h[k] = Nil }
 
-  val copy (h: t 'a) : t 'a reads {h}
+  val copy (h: t 'a) : t 'a
     ensures { forall k: key. result[k] = h[k] }
 
   val remove (h: t 'a) (k: key) : unit writes {h}

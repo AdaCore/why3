@@ -437,9 +437,6 @@ let clone_export uc m inst =
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
   let conv_eff eff =
     let e = eff_empty in
-    let conv ghost r e = eff_read ~ghost e (conv_reg r) in
-    let e = Sreg.fold (conv false) eff.eff_reads  e in
-    let e = Sreg.fold (conv true)  eff.eff_ghostr e in
     let conv ghost r e = eff_write ~ghost e (conv_reg r) in
     let e = Sreg.fold (conv false) eff.eff_writes e in
     let e = Sreg.fold (conv true)  eff.eff_ghostw e in

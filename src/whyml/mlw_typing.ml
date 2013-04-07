@@ -430,7 +430,6 @@ let dspec uc sp = {
   ds_pre     = sp.sp_pre;
   ds_post    = dpost sp.sp_post;
   ds_xpost   = dxpost uc sp.sp_xpost;
-  ds_reads   = sp.sp_reads;
   ds_writes  = sp.sp_writes;
   ds_variant = dvariant uc sp.sp_variant;
 }
@@ -1154,8 +1153,6 @@ let get_eff_regs lenv fn (eff,svs) le =
 
 let eff_of_deff lenv dsp =
   let acc = eff_empty, Svs.empty in
-  let add_read acc e = get_eff_regs lenv eff_read acc e in
-  let acc = List.fold_left add_read acc dsp.ds_reads in
   let add_write acc e = get_eff_regs lenv eff_write acc e in
   let eff, svs = List.fold_left add_write acc dsp.ds_writes in
   let add_raise xs _ eff = eff_raise eff xs in
@@ -1166,21 +1163,12 @@ let e_find_loc pr e =
   with Not_found -> None
 
 let check_user_effect lenv e eeff full_xpost dsp =
-  let has_read reg eff =
-    Sreg.mem reg eff.eff_reads || Sreg.mem reg eff.eff_ghostr in
   let has_write reg eff =
     Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
   let has_raise xs eff =
     Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
   (* check that every user effect actually happens *)
   let acc = eff_empty, Svs.empty in
-  let read le ueff ?ghost reg =
-    if has_read reg eeff then eff_read ?ghost ueff reg
-    else Loc.errorm ~loc:le.pp_loc
-      "this read effect never happens in the expression" in
-  let add_read acc e = get_eff_regs lenv (read e) acc e in
-  let acc = List.fold_left add_read acc dsp.ds_reads in
-  let ueff_ro = not (eff_is_empty (fst acc)) in
   let write le ueff ?ghost reg =
     if has_write reg eeff then eff_write ?ghost ueff reg
     else Loc.errorm ~loc:le.pp_loc
@@ -1194,11 +1182,6 @@ let check_user_effect lenv e eeff full_xpost dsp =
       "this expression does not raise exception %a" print_xs xs in
   let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
   (* check that every computed effect is listed *)
-  let check_read reg = if not (has_read reg ueff) then
-    Loc.errorm ?loc:(e_find_loc (fun e -> has_read reg e.e_effect) e)
-      "this expression produces an unlisted read effect" in
-  if ueff_ro then Sreg.iter check_read eeff.eff_reads;
-  if ueff_ro then Sreg.iter check_read eeff.eff_ghostr;
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this expression produces an unlisted write effect" in

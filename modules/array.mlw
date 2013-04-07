@@ -24,7 +24,7 @@ module Array
   function ([]) (a: array 'a) (i: int) : 'a = get a i
   function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
-  val ([]) (a: array 'a) (i: int) : 'a reads {a}
+  val ([]) (a: array 'a) (i: int) : 'a
     requires { 0 <= i < length a }
     ensures  { result = a[i] }
 
