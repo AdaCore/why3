@@ -268,27 +268,25 @@ let reg_occurs r vars = reg_any (reg_equal r) vars
 
 (* detect non-ghost type variables and regions *)
 
-let rec ity_nonghost_reg regs ity = match ity.ity_node with
-  | _ when ity_immutable ity -> regs
-  | Ityvar _ -> regs
-  | Itypur (_,tl) -> List.fold_left ity_nonghost_reg regs tl
+let rec fold_nonghost on_reg acc ity =
+  let fn = fold_nonghost on_reg in
+  if ity_immutable ity then acc
+  else match ity.ity_node with
+  | Ityvar _ -> acc
+  | Itypur (_,tl) ->
+      List.fold_left fn acc tl
   | Ityapp ({ its_ghrl = ghrl },tl,rl) ->
-      let regs = List.fold_left ity_nonghost_reg regs tl in
+      let acc = List.fold_left fn acc tl in
       List.fold_left2 (fun s gh ({ reg_ity = ity } as r) ->
-        if gh then s else ity_nonghost_reg (Sreg.add r s) ity) regs ghrl rl
+        if gh then s else fn (on_reg r s) ity) acc ghrl rl
+
+let ity_nonghost_reg regs ity = fold_nonghost Sreg.add regs ity
 
 let lookup_nonghost_reg regs ity =
-  let rec any ity = match ity.ity_node with
-    | _ when ity_immutable ity -> ()
-    | Ityvar _ -> ()
-    | Itypur (_,tl) -> List.iter any tl
-    | Ityapp ({ its_ghrl = ghrl },tl,rl) ->
-        List.iter any tl;
-        List.iter2 (fun gh ({ reg_ity = ity } as r) -> if not gh then
-          (if Sreg.mem r regs then raise Util.FoldSkip else any ity)) ghrl rl
-  in
   if reg_any (fun r -> Sreg.mem r regs) ity.ity_vars
-  then try any ity; false with Util.FoldSkip -> true
+  then try fold_nonghost (fun r acc ->
+    if Sreg.mem r regs then raise Util.FoldSkip else acc) false ity
+  with Util.FoldSkip -> true
   else false
 
 (* smart constructors *)
