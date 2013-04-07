@@ -27,6 +27,7 @@ module rec T : sig
     its_ts   : tysymbol;
     its_regs : region list;
     its_def  : ity option;
+    its_ghrl : bool list;
     its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
@@ -59,6 +60,7 @@ end = struct
     its_ts   : tysymbol;
     its_regs : region list;
     its_def  : ity option;
+    its_ghrl : bool list;
     its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
@@ -157,16 +159,16 @@ module Hsity = Hashcons.Make (struct
   let ity_vars s ity = vars_union s ity.ity_vars
   let reg_vars s r = { s with vars_reg = Sreg.add r s.vars_reg }
 
-  let vars s ity = match ity.ity_node with
+  let vars ity = match ity.ity_node with
     | Ityvar v ->
-        { s with vars_tv = Stv.add v s.vars_tv }
+        { vars_tv = Stv.singleton v; vars_reg = Sreg.empty }
     | Itypur (_,tl) ->
-        List.fold_left ity_vars s tl
+        List.fold_left ity_vars vars_empty tl
     | Ityapp (_,tl,rl) ->
-        List.fold_left reg_vars (List.fold_left ity_vars s tl) rl
+        List.fold_left reg_vars (List.fold_left ity_vars vars_empty tl) rl
 
   let tag n ity = { ity with
-    ity_vars = vars vars_empty ity;
+    ity_vars = vars ity;
     ity_tag  = Weakhtbl.create_tag n }
 
 end)
@@ -263,6 +265,31 @@ let rec reg_iter fn vars =
   Sreg.iter on_reg vars.vars_reg
 
 let reg_occurs r vars = reg_any (reg_equal r) vars
+
+(* detect non-ghost type variables and regions *)
+
+let rec ity_nonghost_reg regs ity = match ity.ity_node with
+  | _ when ity_immutable ity -> regs
+  | Ityvar _ -> regs
+  | Itypur (_,tl) -> List.fold_left ity_nonghost_reg regs tl
+  | Ityapp ({ its_ghrl = ghrl },tl,rl) ->
+      let regs = List.fold_left ity_nonghost_reg regs tl in
+      List.fold_left2 (fun s gh ({ reg_ity = ity } as r) ->
+        if gh then s else ity_nonghost_reg (Sreg.add r s) ity) regs ghrl rl
+
+let lookup_nonghost_reg regs ity =
+  let rec any ity = match ity.ity_node with
+    | _ when ity_immutable ity -> ()
+    | Ityvar _ -> ()
+    | Itypur (_,tl) -> List.iter any tl
+    | Ityapp ({ its_ghrl = ghrl },tl,rl) ->
+        List.iter any tl;
+        List.iter2 (fun gh ({ reg_ity = ity } as r) -> if not gh then
+          (if Sreg.mem r regs then raise Util.FoldSkip else any ity)) ghrl rl
+  in
+  if reg_any (fun r -> Sreg.mem r regs) ity.ity_vars
+  then try any ity; false with Util.FoldSkip -> true
+  else false
 
 (* smart constructors *)
 
@@ -408,11 +435,12 @@ let ity_pur s tl =
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ts ~abst ~priv ~inv regs def ->
+  (fun ts ~abst ~priv ~inv ~ghrl regs def ->
     let its = {
       its_ts    = ts;
       its_regs  = regs;
       its_def   = def;
+      its_ghrl  = ghrl;
       its_inv   = inv;
       its_abst  = abst;
       its_priv  = priv;
@@ -421,12 +449,13 @@ let create_itysymbol_unsafe, restore_its =
     its),
   Wts.find ts_to_its
 
-let create_itysymbol
-      name ?(abst=false) ?(priv=false) ?(inv=false) args regs def =
+let create_itysymbol name
+      ?(abst=false) ?(priv=false) ?(inv=false) ?(ghost_reg=Sreg.empty)
+      args regs def =
   let puredef = Opt.map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
-  let add s v = Sreg.add_new (DuplicateRegion v) v s in
+  let add s r = Sreg.add_new (DuplicateRegion r) r s in
   let sregs = List.fold_left add Sreg.empty regs in
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in
@@ -444,7 +473,16 @@ let create_itysymbol
     if priv then Loc.errorm "Type aliases cannot be private";
     if inv  then Loc.errorm "Type aliases cannot have invariants"
   end;
-  create_itysymbol_unsafe purets ~abst ~priv ~inv regs def
+  (* every ghost region argument must be in [regs] *)
+  if not (Sreg.subset ghost_reg sregs) then
+    invalid_arg "Mlw_ty.create_itysymbol";
+  Opt.iter (fun ity ->
+    let nogh = ity_nonghost_reg Sreg.empty ity in
+    if Sreg.exists (fun r -> Sreg.mem r ghost_reg) nogh then
+      invalid_arg "Mlw_ty.create_itysymbol") def;
+  let ghrl = List.map (fun r -> Sreg.mem r ghost_reg) regs in
+  (* create the type symbol *)
+  create_itysymbol_unsafe purets ~abst ~priv ~inv ~ghrl regs def
 
 let ts_unit = ts_tuple 0
 let ty_unit = ty_tuple []
@@ -467,10 +505,11 @@ let its_clone sm =
     let nits = try restore_its nts with Not_found ->
       let abst = oits.its_abst in
       let priv = oits.its_priv in
+      let ghrl = oits.its_ghrl in
       let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
       let def  = Opt.map conv_ity oits.its_def in
-      create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
+      create_itysymbol_unsafe nts ~abst ~priv ~inv ~ghrl regs def
     in
     Hits.replace itsh oits nits;
     nits

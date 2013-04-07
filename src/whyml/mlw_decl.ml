@@ -68,54 +68,63 @@ let null_invariant { its_ts = ts } =
 
 let create_data_decl tdl =
   let news = ref Sid.empty in
-  let projections = Hstr.create 17 in (* id -> plsymbol *)
-  let build_constructor its res cll (id,al) =
-    (* check well-formedness *)
-    let fds = List.map snd al in
-    let tvs = List.fold_right Stv.add its.its_ts.ts_args Stv.empty in
-    let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
-    let check_vars { vars_tv = atvs; vars_reg = aregs } =
-      if not (Stv.subset atvs tvs) then
-        raise (UnboundTypeVar (Stv.choose (Stv.diff atvs tvs)));
-      if not (Sreg.subset aregs regs) then
-        raise (UnboundRegion (Sreg.choose (Sreg.diff aregs regs))) in
-    let check_arg fd = match fd.fd_mut with
-      | Some r -> if not (Sreg.mem r regs) then raise (UnboundRegion r)
-      | None -> check_vars fd.fd_ity.ity_vars in
-    List.iter check_arg fds;
-    (* build the constructor ps *)
-    let hidden = its.its_abst and rdonly = its.its_priv in
-    let cs = create_plsymbol ~hidden ~rdonly ~constr:cll id fds res in
-    news := news_id !news cs.pl_ls.ls_name;
-    (* build the projections, if any *)
-    let build_proj fd id =
-      try
-        let pj = Hstr.find projections (preid_name id) in
-        ity_equal_check pj.pl_value.fd_ity fd.fd_ity;
-        begin match pj.pl_value.fd_mut, fd.fd_mut with
-          | None, None -> ()
-          | Some r1, Some r2 -> reg_equal_check r1 r2
-          | _,_ -> invalid_arg "Mlw_decl.create_data_decl"
-        end;
-        if pj.pl_value.fd_ghost <> fd.fd_ghost then
-          invalid_arg "Mlw_decl.create_data_decl";
-        pj
-      with Not_found ->
-        let pj = create_plsymbol ~hidden id [res] fd in
-        news := news_id !news pj.pl_ls.ls_name;
-        Hstr.add projections (preid_name id) pj;
-        pj
-    in
-    cs, List.map (fun (id,fd) -> Opt.map (build_proj fd) id) al
-  in
   let build_type (its,cl) =
-    Hstr.clear projections;
     news := news_id !news its.its_ts.ts_name;
-    let cll = List.length cl in
+    let projections = Hstr.create 3 in
+    let hidden = its.its_abst in
+    let rdonly = its.its_priv in
+    let constr = List.length cl in
     let tvl = List.map ity_var its.its_ts.ts_args in
     let ity = ity_app its tvl its.its_regs in
     let res = { fd_ity = ity; fd_ghost = false; fd_mut = None } in
-    its, List.map (build_constructor its res cll) cl, null_invariant its
+    let tvs = List.fold_right Stv.add its.its_ts.ts_args Stv.empty in
+    let regs = List.fold_right Sreg.add its.its_regs Sreg.empty in
+    let nogh = ity_nonghost_reg Sreg.empty ity in
+    let build_constructor (id,al) =
+      (* check well-formedness *)
+      let fds = List.map snd al in
+      let check_vars { vars_tv = atvs; vars_reg = aregs } =
+        if not (Stv.subset atvs tvs) then
+          raise (UnboundTypeVar (Stv.choose (Stv.diff atvs tvs)));
+        if not (Sreg.subset aregs regs) then
+          raise (UnboundRegion (Sreg.choose (Sreg.diff aregs regs))) in
+      let check_vars fd = match fd.fd_mut with
+        | Some r -> if not (Sreg.mem r regs) then raise (UnboundRegion r)
+        | None -> check_vars fd.fd_ity.ity_vars in
+      let check_ghost fd =
+        let regs = ity_nonghost_reg Sreg.empty fd.fd_ity in
+        let regs = Opt.fold_right Sreg.add fd.fd_mut regs in
+        if not (Sreg.subset regs nogh) then
+          invalid_arg "Mlw_decl.create_data_decl" in
+      let check_fd fd =
+        if not fd.fd_ghost then check_ghost fd;
+        check_vars fd in
+      List.iter check_fd fds;
+      (* build the constructor symbol *)
+      let cs = create_plsymbol ~hidden ~rdonly ~constr id fds res in
+      news := news_id !news cs.pl_ls.ls_name;
+      (* build the projections, if any *)
+      let build_proj fd id =
+        try
+          let pj = Hstr.find projections (preid_name id) in
+          ity_equal_check pj.pl_value.fd_ity fd.fd_ity;
+          begin match pj.pl_value.fd_mut, fd.fd_mut with
+            | None, None -> ()
+            | Some r1, Some r2 -> reg_equal_check r1 r2
+            | _,_ -> invalid_arg "Mlw_decl.create_data_decl"
+          end;
+          if pj.pl_value.fd_ghost <> fd.fd_ghost then
+            invalid_arg "Mlw_decl.create_data_decl";
+          pj
+        with Not_found ->
+          let pj = create_plsymbol ~hidden id [res] fd in
+          news := news_id !news pj.pl_ls.ls_name;
+          Hstr.add projections (preid_name id) pj;
+          pj
+      in
+      cs, List.map (fun (id,fd) -> Opt.map (build_proj fd) id) al
+    in
+    its, List.map build_constructor cl, null_invariant its
   in
   let tdl = List.map build_type tdl in
   mk_decl (PDdata tdl) Sid.empty !news

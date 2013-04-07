@@ -24,12 +24,13 @@ module rec T : sig
   }
 
   type itysymbol = private {
-    its_ts   : tysymbol;
-    its_regs : region list;
-    its_def  : ity option;
-    its_inv  : bool;
-    its_abst : bool;
-    its_priv : bool;
+    its_ts   : tysymbol;      (* "pure snapshot" type symbol *)
+    its_regs : region list;   (* region arguments *)
+    its_def  : ity option;    (* type alias definition *)
+    its_ghrl : bool list;     (* ghost region arguments *)
+    its_inv  : bool;          (* carries a type invariant *)
+    its_abst : bool;          (* is an abstract (= "model") type *)
+    its_priv : bool;          (* is a private (à la Ocaml) type *)
   }
 
   (** ity = individual type in programs, first-order, i.e. no functions *)
@@ -86,7 +87,8 @@ val create_region : preid -> ity -> region
 
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
-  preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
+  preid ->
+    ?abst:bool -> ?priv:bool -> ?inv:bool -> ?ghost_reg:Sreg.t ->
     tvsymbol list -> region list -> ity option -> itysymbol
 
 val restore_its : tysymbol -> itysymbol
@@ -133,6 +135,11 @@ val reg_all  : (region -> bool) -> varset -> bool
 val reg_iter : (region -> unit) -> varset -> unit
 
 val reg_occurs : region -> varset -> bool
+
+(* detect non-ghost regions *)
+
+val ity_nonghost_reg : Sreg.t -> ity -> Sreg.t
+val lookup_nonghost_reg : Sreg.t -> ity -> bool
 
 (* built-in types *)
 

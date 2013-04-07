@@ -1706,13 +1706,17 @@ let add_types ~wp uc tdl =
       let ts = match d.td_def with
         | TDalias ty when Hstr.find impures x ->
             let def = parse ty in
+            let nogh = ity_nonghost_reg Sreg.empty def in
+            let ghost_reg = Sreg.diff def.ity_vars.vars_reg nogh in
             let rl = Sreg.elements def.ity_vars.vars_reg in
-            PT (create_itysymbol id ~abst ~priv ~inv:false vl rl (Some def))
+            PT (create_itysymbol id
+              ~abst ~priv ~inv:false ~ghost_reg vl rl (Some def))
         | TDalias ty ->
             let def = ty_of_ity (parse ty) in
             TS (create_tysymbol id vl (Some def))
         | TDalgebraic csl when Hstr.find mutables x ->
             let projs = Hstr.create 5 in
+            let nogh = ref Sreg.empty in
             (* to check projections' types we must fix the tyvars *)
             let add s v = let t = ity_var v in ity_match s t t in
             let sbs = List.fold_left add ity_subst_empty vl in
@@ -1722,6 +1726,7 @@ let add_types ~wp uc tdl =
               let inv = inv || ity_has_inv ity in
               match id with
               | None ->
+                  if not gh then nogh := ity_nonghost_reg !nogh ity;
                   let regs = Sreg.union regs ity.ity_vars.vars_reg in
                   (regs, inv), (None, fd)
               | Some id ->
@@ -1733,6 +1738,7 @@ let add_types ~wp uc tdl =
                     (regs, inv), (Some (Denv.create_user_id id), fd)
                   with Not_found ->
                     Hstr.replace projs id.id fd;
+                    if not gh then nogh := ity_nonghost_reg !nogh ity;
                     let regs = Sreg.union regs ity.ity_vars.vars_reg in
                     (regs, inv), (Some (Denv.create_user_id id), fd)
             in
@@ -1742,10 +1748,12 @@ let add_types ~wp uc tdl =
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),def = Lists.map_fold_left mk_constr init csl in
+            let ghost_reg = Sreg.diff regs !nogh in
             let rl = Sreg.elements regs in
             Hstr.replace predefs x def;
-            PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
+            PT (create_itysymbol id ~abst ~priv ~inv ~ghost_reg vl rl None)
         | TDrecord fl when Hstr.find mutables x ->
+            let nogh = ref Sreg.empty in
             let mk_field (regs,inv) f =
               let ity = parse f.f_pty in
               let inv = inv || ity_has_inv ity in
@@ -1756,14 +1764,17 @@ let add_types ~wp uc tdl =
               else
                 Sreg.union regs ity.ity_vars.vars_reg, None
               in
+              if not f.f_ghost then nogh :=
+                Opt.fold_right Sreg.add mut (ity_nonghost_reg !nogh ity);
               (regs, inv), (Some fid, mk_field ity f.f_ghost mut)
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),pjl = Lists.map_fold_left mk_field init fl in
+            let ghost_reg = Sreg.diff regs !nogh in
             let rl = Sreg.elements regs in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
             Hstr.replace predefs x [Denv.create_user_id cid, pjl];
-            PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
+            PT (create_itysymbol id ~abst ~priv ~inv ~ghost_reg vl rl None)
         | TDalgebraic _ | TDrecord _ when Hstr.find impures x ->
             PT (create_itysymbol id ~abst ~priv ~inv:false vl [] None)
         | TDalgebraic _ | TDrecord _ | TDabstract ->
