@@ -193,9 +193,6 @@ exception ArrowExpected of expr
 val ity_of_expr : expr -> ity
 val aty_of_expr : expr -> aty
 
-exception GhostWrite of expr * region
-(* a ghost expression writes in a non-ghost region *)
-
 val e_app : expr -> expr list -> expr
 (** [e_app e el] builds the application of [e] to arguments [el].
     [e] is typically constructed using [e_arrow] defined above].

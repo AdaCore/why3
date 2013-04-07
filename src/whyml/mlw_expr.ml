@@ -472,7 +472,6 @@ let e_find pr e =
 (* check admissibility of consecutive events *)
 
 exception StaleRegion of expr * ident
-exception GhostWrite of expr * region
 
 let check_reset e { syms_pv = spv; syms_ps = sps } =
   (* If we reset a region, then it may only occur in the later code
@@ -486,16 +485,13 @@ let check_reset e { syms_pv = spv; syms_ps = sps } =
     Spv.iter (fun pv -> check pv.pv_vs.vs_name pv.pv_ity.ity_vars) spv
   end
 
-let check_ghost_write e eff =
-  (* If we make a ghost write, then the modified region cannot
-     be read in a later non-ghost code. We ignore any resets:
-     a once ghostified region must stay so, even if it is reset. *)
-  let badwr = Sreg.inter e.e_effect.eff_ghostw eff.eff_reads in
-  if not (Sreg.is_empty badwr) then
-    Loc.error ?loc:e.e_loc (GhostWrite (e, Sreg.choose badwr))
+let check_ghost_write { eff_ghostw = regs } { syms_pv = pvs } =
+  let check { pv_ghost = gh; pv_ity = ity } =
+    if not gh && lookup_nonghost_reg regs ity then Loc.errorm
+      "This expression makes a ghost write into a non-ghost location" in
+  if not (Sreg.is_empty regs) then Spv.iter check pvs
 
-let check_postexpr e eff syms =
-  check_ghost_write e eff;
+let check_postexpr e _eff syms =
   check_reset e syms
 
 (* smart constructors *)
@@ -503,6 +499,7 @@ let check_postexpr e eff syms =
 let mk_expr node vty ghost eff syms =
   let ghost = ghost || not (Sexn.is_empty eff.eff_ghostx) in
   let eff = eff_ghostify ghost eff in
+  check_ghost_write eff syms;
   { e_node   = node;
     e_vty    = vty;
     e_ghost  = ghost;
@@ -724,22 +721,7 @@ let e_assign_real pls e0 pv =
   check_postexpr e0 eff syms;
   let syms = add_e_syms e0 syms in
   let eff = eff_union eff e0.e_effect in
-  let e = mk_expr (Eassign (pls,e0,r,pv)) (VTvalue ity_unit) ghost eff syms in
-  (* FIXME? Ok, this is awkward. We prohibit assignments
-     where a ghost value is being written in a non-ghost
-     mutable lvalue (which is reasonable), but we build the
-     offending expression nonetheless and include it into
-     the exception! But in fact, there is nothing inherently
-     bad in such expressions, and the check here serves only
-     to catch potential problems early. Indeed, it is quite
-     easy to fool: it suffices to write (ghost r).val <- ghv,
-     to put a ghost value ghv into a non-ghost reference r.
-     The real check is written above in e_let, where we ensure
-     that every ghost write (whether it was made into a ghost
-     lvalue or not) is never followed by a non-ghost read. *)
-  if not lghost && pv.pv_ghost then
-    Loc.error (GhostWrite (e,r));
-  e
+  mk_expr (Eassign (pls,e0,r,pv)) (VTvalue ity_unit) ghost eff syms
 
 let e_assign pls e0 e1 = on_value (e_assign_real pls e0) e1
 

@@ -1,0 +1,15 @@
+module Horror
+
+  use import ref.Ref
+ 
+  let bad (ghost i : int) : ref int
+    ensures { !result = i }
+  = let r = ref 0 in
+    r := i;
+    r
+
+  let good (ghost i : int) : int
+    ensures { result = i }
+  = !(bad i)
+
+end

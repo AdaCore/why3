@@ -301,41 +301,8 @@ let inst_constructors lkn kn ity = match ity.ity_node with
   | Ityvar _ ->
       invalid_arg "Mlw_decl.inst_constructors"
 
-let check_ghost lkn kn d =
-  let rec access regs ity =
-    let check fd = match fd.fd_mut with
-      | _ when fd.fd_ghost -> ()
-      | Some r when Sreg.mem r regs -> raise (GhostWrite (e_void, r))
-      | _ -> access regs fd.fd_ity in
-    let check (_cs,fdl) = List.iter check fdl in
-    let occurs r = reg_occurs r ity.ity_vars in
-    if not (Sreg.exists occurs regs) then () else
-    List.iter check (inst_constructors lkn kn ity)
-  in
-  let rec check pvs aty =
-    let eff = aty.aty_spec.c_effect in
-    let pvs = List.fold_right Spv.add aty.aty_args pvs in
-    let test pv =
-      if pv.pv_ghost then () else
-      access eff.eff_ghostw pv.pv_ity
-    in
-    Spv.iter test pvs;
-    match aty.aty_result with
-    | VTarrow aty -> check pvs aty
-    | VTvalue _ -> ()
-  in
-  let check ps =
-    if ps.ps_ghost then () else
-    check ps.ps_pvset ps.ps_aty
-  in
-  match d.pd_node with
-  | PDrec fdl -> List.iter (fun fd -> check fd.fun_ps) fdl
-  | PDval (LetA ps) | PDlet { let_sym = LetA ps } -> check ps
-  | PDval _ | PDlet _ | PDtype _ | PDdata _ | PDexn _ -> ()
-
 let known_add_decl lkn kn d =
   let kn = known_add_decl lkn kn d in
-  check_ghost lkn kn d;
   check_match lkn kn d;
   kn
 

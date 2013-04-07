@@ -467,9 +467,6 @@ let () = Exn_printer.register
   | Mlw_expr.HiddenPLS pl ->
       fprintf fmt "'%a' is a constructor/field of an abstract type \
         and cannot be used in a program" print_ls pl.pl_ls;
-  | Mlw_expr.GhostWrite (_e, _reg) ->
-      fprintf fmt
-        "This expression performs a ghost write in a non-ghost location"
   | Mlw_expr.StaleRegion (_e, id) ->
       fprintf fmt "This expression prohibits further \
         usage of variable %s" id.id_string
