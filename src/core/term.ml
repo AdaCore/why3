@@ -1435,9 +1435,9 @@ let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
   | Ttrue, _, _  when can_simp f1 && can_simp f3 -> f2
   | Tfalse, _, _ when can_simp f1 && can_simp f2 -> f3
   | _, Ttrue, _  when can_simp f2 -> t_implies_simp (t_not_simp f1) f3
-  | _, Tfalse, _ when can_simp f2 -> t_and_simp (t_not_simp f1) f3
+  | _, Tfalse, _ when can_simp f2 -> t_and_asym_simp (t_not_simp f1) f3
   | _, _, Ttrue  when can_simp f3 -> t_implies_simp f1 f2
-  | _, _, Tfalse when can_simp f3 -> t_and_simp f1 f2
+  | _, _, Tfalse when can_simp f3 -> t_and_asym_simp f1 f2
   | _, _, _ when t_equal f2 f3 && can_simp f1 -> f2
   | _, _, _ -> t_if f1 f2 f3
 
