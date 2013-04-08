@@ -42,7 +42,8 @@ let ns_replace eq chk x vo vn =
 let rec merge_ns chk ns1 ns2 =
   if ns1 == ns2 then ns1 else
   let join eq x n o = Some (ns_replace eq chk x o n) in
-  let ns_union eq m1 m2 = Mstr.union (join eq) m1 m2 in
+  let ns_union eq m1 m2 =
+    if m1 == m2 then m1 else Mstr.union (join eq) m1 m2 in
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_ts = ns_union ts_equal ns1.ns_ts ns2.ns_ts;
     ns_ls = ns_union ls_equal ns1.ns_ls ns2.ns_ls;
