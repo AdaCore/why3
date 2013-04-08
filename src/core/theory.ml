@@ -40,6 +40,7 @@ let ns_replace eq chk x vo vn =
   raise (ClashSymbol x)
 
 let rec merge_ns chk ns1 ns2 =
+  if ns1 == ns2 then ns1 else
   let join eq x n o = Some (ns_replace eq chk x o n) in
   let ns_union eq m1 m2 = Mstr.union (join eq) m1 m2 in
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
