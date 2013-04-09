@@ -39,41 +39,46 @@ module RingBuffer
 
   (* code *)
 
-  let create (n: int) (dummy: 'a)
+  let create (n: int) (dummy: 'a) : buffer 'a
     requires { n > 0 }
-    ensures { size result = n /\ result.sequence = Nil }
+    ensures  { size result = n }
+    ensures  { result.sequence = Nil }
   = { first = 0; len = 0; data = make n dummy; sequence = Nil }
 
-  let length (b: buffer 'a)
+  let length (b: buffer 'a) : int
     ensures { result = length b }
   = b.len
 
-  let clear (b: buffer 'a)
-    ensures { length b = 0 /\ b.sequence = Nil }
+  let clear (b: buffer 'a) : unit
+    writes  { b.len, b.sequence }
+    ensures { length b = 0 }
+    ensures { b.sequence = Nil }
   = ghost b.sequence <- Nil;
     b.len <- 0
 
-  let push (b: buffer 'a) (x: 'a)
+  let push (b: buffer 'a) (x: 'a) : unit
     requires { length b < size b }
-    ensures { length b = (old (length b)) + 1 /\
-      b.sequence = (old b.sequence) ++ Cons x Nil }
+    writes   { b.data.elts, b.len, b.sequence }
+    ensures  { length b = (old (length b)) + 1 }
+    ensures  { b.sequence = (old b.sequence) ++ Cons x Nil }
   = ghost b.sequence <- b.sequence ++ Cons x Nil;
     let i = b.first + b.len in
     let n = Array.length b.data in
     b.data[if i >= n then i - n else i] <- x;
     b.len <- b.len + 1
 
-  let head (b: buffer 'a)
+  let head (b: buffer 'a) : 'a
     requires { length b > 0 }
-    ensures { match b.sequence with Nil -> false | Cons x _ -> result = x end }
+    ensures  { match b.sequence with Nil -> false | Cons x _ -> result = x end }
   = b.data[b.first]
 
-  let pop (b: buffer 'a)
+  let pop (b: buffer 'a) : 'a
     requires { length b > 0 }
-    ensures { length b = (old (length b)) - 1 /\
-      match old b.sequence with
-      | Nil -> false
-      | Cons x l -> result = x /\ b.sequence = l end }
+    writes   { b.first, b.len, b.sequence }
+    ensures  { length b = (old (length b)) - 1 }
+    ensures  { match old b.sequence with
+               | Nil -> false
+               | Cons x l -> result = x /\ b.sequence = l end }
   = ghost match b.sequence with Nil -> absurd | Cons _ s -> b.sequence <- s end;
     let r = b.data[b.first] in
     b.len <- b.len - 1;
