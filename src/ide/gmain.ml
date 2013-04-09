@@ -866,7 +866,7 @@ let sched =
 (* add new file from command line *)
 (**********************************)
 
-let open_file f =
+let open_file ?(start=false) f =
   let f = Sysutil.relativize_filename project_dir f in
   Debug.dprintf debug "Adding file '%s'@." f;
   if S.PHstr.mem (env_session()).S.session.S.session_files f then
@@ -876,12 +876,19 @@ let open_file f =
       Debug.dprintf debug "[Info] adding file %s in database@." f;
       ignore (M.add_file (env_session()) ?format:!opt_parser f);
     with e ->
-      let msg =
-        Pp.sprintf_wnl "@[Error while reading file@ '%s':@ %a@]" f
-          Exn_printer.exn_printer e in
-      info_window `ERROR msg
+      if start
+      then begin
+        eprintf "@[Error while reading file@ '%s':@ %a@]@." f
+          Exn_printer.exn_printer e;
+        exit 1
+      end
+      else
+        let msg =
+          Pp.sprintf_wnl "@[Error while reading file@ '%s':@ %a@]" f
+            Exn_printer.exn_printer e in
+        info_window `ERROR msg
 
-let () = Queue.iter open_file files
+let () = Queue.iter (open_file ~start:true) files
 
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
