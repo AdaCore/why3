@@ -544,6 +544,8 @@ and tr_global_ts dep env r =
               let tvm = match kind_of_term c with
                 | App (_, v) ->
                     let v = Array.to_list v in
+                    let no_whytype c = not (has_WhyType env c) in
+                    let v = List.filter no_whytype v in
                     let add v1 v2 tvm = match kind_of_term v1 with
                       | Var x1 ->
                           if Idmap.mem x1 tvm then raise NotFO;
@@ -583,7 +585,7 @@ and tr_global_ts dep env r =
                   let d = Decl.create_param_decl ls in
                   sl := d :: !sl
                 with NotFO ->
-                  assert false
+                  ()
               done;
               Decl.create_ty_decl ts :: tl, dl, !sl
             end else
