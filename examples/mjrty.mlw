@@ -61,7 +61,6 @@ module Mjrty
         invariant { !k = numof a !cand 0 i /\ 2 * !k <= n }
         if a[i] = !cand then begin
           incr k;
-          assert { !k = numof a !cand 0 (i+1) };
           if 2 * !k > n then raise Found
         end
       done;
