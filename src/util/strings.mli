@@ -22,3 +22,7 @@ val pad_right : char -> string -> int -> string
 val starts_with : string -> string -> bool
 (** test if a string starts with another *)
 
+val slice : string -> int -> int -> string
+(* [slice s start end] returns the substring of s that starts at [start] and
+   ends at [end-1]. Uses [String.sub] under the hood, so Invalid_argument will
+   be raised if start/end do not correspond to a valid substring. *)

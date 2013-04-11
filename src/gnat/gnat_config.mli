@@ -22,7 +22,7 @@ val verbose : verbosity
 
 type report_mode = Fail | Fail_And_Proved | Detailed
 (* In mode fail, only print failed proof objectives.
-   In mode verbose, print all proof objectives.
+   In mode fail_and_proved, print all proof objectives.
    In mode detailed, additionally print if VC was timeout or if prover stopped.
    *)
 

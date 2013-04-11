@@ -50,3 +50,5 @@ let starts_with s pref =
       true
    with Exit -> false
 
+let slice s start end_ =
+  String.sub s start (end_ - start)
