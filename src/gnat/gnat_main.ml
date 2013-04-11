@@ -143,7 +143,7 @@ let rec handle_vc_result goal result prover_result =
          begin match Gnat_config.report, prover_result with
          | Gnat_config.Fail_And_Proved, _ ->
              print true (Session.goal_task goal) obj
-         | Gnat_config.Detailed, Some result ->
+         | Gnat_config.Statistics, Some result ->
              print ~endline:false true (Session.goal_task goal) obj;
              Format.printf " (%a)@." print_statistics result
          | _ -> ()
@@ -153,7 +153,7 @@ let rec handle_vc_result goal result prover_result =
             Gnat_objectives.Save_VCs.save_trace goal
          end;
          begin match Gnat_config.report, prover_result with
-         | Gnat_config.Detailed, Some result ->
+         | Gnat_config.Statistics, Some result ->
             print ~endline:false false (Session.goal_task goal)
                (Gnat_objectives.get_objective goal);
             Format.printf " (%a)@." print_statistics result

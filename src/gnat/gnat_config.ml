@@ -1,6 +1,6 @@
 open Why3
 
-type report_mode = Fail | Fail_And_Proved | Detailed
+type report_mode = Fail | Fail_And_Proved | Statistics
 
 type proof_mode =
     Then_Split
@@ -41,13 +41,13 @@ let set_filename s =
       Gnat_util.abort_with_message "Only one file name should be given."
 
 let set_report s =
-   if s = "detailed" then
-      opt_report := Detailed
+   if s = "statistics" then
+      opt_report := Statistics
    else if s = "all" then
       opt_report := Fail_And_Proved
    else if s <> "fail" then
       Gnat_util.abort_with_message
-        "argument for option --report should be one of (fail|all|detailed)."
+        "argument for option --report should be one of (fail|all|statistics)."
 
 let set_proof_mode s =
    if s = "no_wp" then
@@ -117,7 +117,7 @@ let options = Arg.align [
    "--force", Arg.Set opt_force,
           " Rerun VC generation and proofs, even when the result is up to date";
    "--report", Arg.String set_report,
-          " Set report mode, one of (fail | all | detailed), default is fail";
+          " Set report mode, one of (fail | all | statistics), default is fail";
    "--proof", Arg.String set_proof_mode,
           " Set proof mode, one of (then_split|no_wp|all_split|path_wp|no_split), default is then_split";
    "--limit-line", Arg.String set_limit_line,
