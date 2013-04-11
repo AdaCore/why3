@@ -176,6 +176,32 @@ theory NthLengthAppend
 
 end
 
+(** {2 Reversing a list} *)
+
+theory Reverse
+
+  use export List
+  use import Append
+
+  function reverse (l: list 'a) : list 'a = match l with
+    | Nil      -> Nil
+    | Cons x r -> reverse r ++ Cons x Nil
+  end
+
+  lemma reverse_append:
+    forall l1 l2: list 'a, x: 'a.
+    (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
+
+  lemma reverse_reverse:
+    forall l: list 'a. reverse (reverse l) = l
+
+  use import Length
+
+  lemma Reverse_length:
+    forall l: list 'a. length (reverse l) = length l
+
+end
+
 (** {2 Reverse append} *)
 
 theory RevAppend
@@ -204,42 +230,6 @@ theory RevAppend
   lemma rev_append_length:
     forall s t: list 'a.
       length (rev_append s t) = length s + length t
-
-end
-
-(** {2 Reversing a list} *)
-
-theory Reverse
-
-  use export List
-  use import Append
-  use import RevAppend
-
-  function reverse (l: list 'a) : list 'a = rev_append l Nil
-
-  lemma rev_append_def:
-    forall l1 l2: list 'a.
-    rev_append l1 l2 = reverse l1 ++ l2
-
-  lemma reverse_cons:
-    forall x: 'a, r: list 'a.
-    reverse (Cons x r) = reverse r ++ Cons x Nil
-
-  lemma reverse_append:
-    forall l1 l2: list 'a.
-    reverse (l1 ++ l2) = (reverse l2) ++ (reverse l1)
-
-  lemma reverse_cons_append:
-    forall l1 l2: list 'a, x: 'a.
-    (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
-
-  lemma reverse_reverse:
-    forall l: list 'a. reverse (reverse l) = l
-
-  use import Length
-
-  lemma Reverse_length:
-    forall l: list 'a. length (reverse l) = length l
 
 end
 
