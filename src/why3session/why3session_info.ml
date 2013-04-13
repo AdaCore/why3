@@ -210,27 +210,30 @@ and stats2_of_transf ~nb_proofs tr : (notask goal * notask goal_stat) list =
         | r -> (g,r)::acc)
     [] tr.transf_goals
 
-let print_res fmt (p,t) = fprintf fmt "%a (%.2f)" print_prover p t
+let print_res ~time fmt (p,t) = 
+  fprintf fmt "%a" print_prover p;
+  if time then fprintf fmt " (%.2f)" t
 
-let rec print_goal_stats depth (g,l) =
+let rec print_goal_stats ~time depth (g,l) =
   for _i=1 to depth do printf "  " done;
   printf "+-- goal %s" g.goal_name.Ident.id_string;
   match l with
     | No l ->
       printf "@\n";
-      List.iter (print_transf_stats (depth+1)) l
+      List.iter (print_transf_stats ~time (depth+1)) l
     | Yes(pl,l) ->
       begin
         match pl with
           | [] -> printf "@\n"
-          | _ -> printf ": %a@\n" (Pp.print_list pp_print_space print_res) pl
+          | _ -> printf ": %a@\n" 
+            (Pp.print_list pp_print_space (print_res ~time)) pl
       end;
-      List.iter (print_transf_stats (depth+1)) l
+      List.iter (print_transf_stats ~time (depth+1)) l
 
-and print_transf_stats depth (tr,l) =
+and print_transf_stats ~time depth (tr,l) =
   for _i=1 to depth do printf "  " done;
   printf "+-- transformation %s@\n" tr.transf_name;
-  List.iter (print_goal_stats (depth+1)) l
+  List.iter (print_goal_stats ~time (depth+1)) l
 
 let stats2_of_theory ~nb_proofs th =
   List.fold_left
@@ -240,9 +243,9 @@ let stats2_of_theory ~nb_proofs th =
         | r -> (g,r)::acc)
     [] th.theory_goals
 
-let print_theory_stats (th,r) =
+let print_theory_stats ~time (th,r) =
   printf "  +-- theory %s@\n" th.theory_name.Ident.id_string;
-  List.iter (print_goal_stats 2) r
+  List.iter (print_goal_stats ~time 2) r
 
 let stats2_of_file ~nb_proofs file =
   List.fold_left
@@ -260,11 +263,11 @@ let stats2_of_session ~nb_proofs s acc =
         | r -> (f,List.rev r)::acc)
     s.session_files acc
 
-let print_file_stats (f,r) =
+let print_file_stats ~time (f,r) =
   printf "+-- file %s@\n" f.file_name;
-  List.iter print_theory_stats r
+  List.iter (print_theory_stats ~time) r
 
-let print_session_stats = List.iter print_file_stats
+let print_session_stats ~time = List.iter (print_file_stats ~time)
 
 
 (*
@@ -289,12 +292,12 @@ let print_stats r0 r1 stats =
     stats.nb_goals stats.nb_proved_goals;
 
   printf "== Goals not proved ==@\n  @[";
-  print_session_stats r0;
+  print_session_stats ~time:false r0;
   (* Sstr.iter (fun s -> printf "%s@\n" s) stats.no_proof; *)
   printf "@]@\n";
 
   printf "== Goals proved by only one prover ==@\n  @[";
-  print_session_stats r1;
+  print_session_stats ~time:false r1;
   (* Sstr.iter (fun s -> printf "%s@\n" s) stats.only_one_proof; *)
   printf "@]@\n";
 
