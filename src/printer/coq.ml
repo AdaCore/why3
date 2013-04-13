@@ -47,9 +47,9 @@ let tv_set = ref Sid.empty
 
 (* type variables *)
 
-let print_tv fmt tv =
+let print_tv ?(whytypes=false) fmt tv =
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "%s" n
+  fprintf fmt "%s%s" n (if whytypes then "_WT" else "")
 
 let print_tv_binder fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
@@ -132,7 +132,35 @@ let print_ts_tv fmt ts =
   | _ -> fprintf fmt "(%a %a)" print_ts ts
     (print_list space print_tv) ts.ts_args
 
-let rec print_ty info fmt ty = match ty.ty_node with
+let rec print_whytype info fmt ty =
+  begin match ty.ty_node with
+  | Tyvar v -> print_tv ~whytypes:true fmt v
+  | Tyapp (ts, _tl) when is_ts_tuple ts -> assert false
+(*
+      begin
+        match tl with
+          | []  -> fprintf fmt "unit"
+          | [ty] -> print_ty info fmt ty
+          | _   -> fprintf fmt "(%a)%%type" (print_list star (print_ty info)) tl
+      end
+*)
+  | Tyapp (ts, tl) ->
+    begin match query_syntax info.info_syn ts.ts_name with
+      | Some _s -> fprintf fmt "_"
+        (* syntax_arguments s (print_ty info) fmt tl *)
+      | None ->
+        begin
+          match tl with
+            | []  -> (print_ts_real info) fmt ts
+            | l   -> fprintf fmt "(@@%a_WhyType@ %a)" 
+              (print_ts_real info) ts
+              (print_list space (print_ty ~whytypes:true info)) l
+        end
+    end
+  end
+
+and print_ty ?(whytypes=false) info fmt ty = 
+  begin match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin
@@ -142,16 +170,18 @@ let rec print_ty info fmt ty = match ty.ty_node with
           | _   -> fprintf fmt "(%a)%%type" (print_list star (print_ty info)) tl
       end
   | Tyapp (ts, tl) ->
-      begin match query_syntax info.info_syn ts.ts_name with
-        | Some s -> syntax_arguments s (print_ty info) fmt tl
-        | None ->
-            begin
-              match tl with
-                | []  -> (print_ts_real info) fmt ts
-                | l   -> fprintf fmt "(%a@ %a)" (print_ts_real info) ts
-                    (print_list space (print_ty info)) l
-            end
-      end
+    begin match query_syntax info.info_syn ts.ts_name with
+      | Some s -> syntax_arguments s (print_ty info) fmt tl
+      | None ->
+        begin
+          match tl with
+            | []  -> (print_ts_real info) fmt ts
+            | l   -> fprintf fmt "(@@%a@ %a)" (print_ts_real info) ts
+              (print_list space (print_ty ~whytypes:true info)) l
+        end
+    end
+  end;
+  if whytypes then fprintf fmt " %a" (print_whytype info) ty
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -694,7 +724,9 @@ let print_data_whytype_and_implicits fmt (name,ts,csl) =
     (fun (cs,_) ->
       let _, _, all_ty_params = ls_ty_vars cs in
       if not (Stv.is_empty all_ty_params) then
-        let print fmt tv = fprintf fmt "[%a]@ [%a_WT]" print_tv tv print_tv tv in
+        let print fmt tv = fprintf fmt "[%a]@ [%a_WT]" 
+          (print_tv ~whytypes:false) tv (print_tv ~whytypes:false) tv 
+        in
         fprintf fmt "@[<hov 2>Implicit Arguments %a@ [%a].@]@\n"
           print_ls cs
           (print_list space print) ts.ts_args)
