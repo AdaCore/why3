@@ -220,6 +220,6 @@ exception ClashSymbol of string
 
 exception KnownMeta of meta
 exception UnknownMeta of string
-exception BadMetaArity of meta * int * int
+exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 

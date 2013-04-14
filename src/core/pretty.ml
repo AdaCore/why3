@@ -500,20 +500,20 @@ let () = Exn_printer.register
   | Ty.TypeMismatch (t1,t2) ->
       fprintf fmt "Type mismatch between %a and %a"
         print_ty t1 print_ty t2
-  | Ty.BadTypeArity (ts, ts_arg, app_arg) ->
+  | Ty.BadTypeArity (ts, app_arg) ->
       fprintf fmt "Bad type arity: type symbol %a must be applied \
                    to %i arguments, but is applied to %i"
-        print_ts ts ts_arg app_arg
+        print_ts ts (List.length ts.ts_args) app_arg
   | Ty.DuplicateTypeVar tv ->
       fprintf fmt "Type variable %a is used twice" print_tv tv
   | Ty.UnboundTypeVar tv ->
       fprintf fmt "Unbound type variable: %a" print_tv tv
   | Ty.UnexpectedProp ->
       fprintf fmt "Unexpected propositional type"
-  | Term.BadArity (ls, ls_arg, app_arg) ->
+  | Term.BadArity (ls, app_arg) ->
       fprintf fmt "Bad arity: symbol %a must be applied \
                    to %i arguments, but is applied to %i"
-        print_ls ls ls_arg app_arg
+        print_ls ls (List.length ls.ls_args) app_arg
   | Term.EmptyCase ->
       fprintf fmt "Empty match expression"
   | Term.DuplicateVar vs ->

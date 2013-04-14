@@ -69,28 +69,24 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
       let reg = create_dreg ity in
       Mreg.add r reg mr, reg
 
-let its_app s tl =
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
-    with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
+let its_app s dl =
+  let mv = try List.fold_right2 Mtv.add s.its_ts.ts_args dl Mtv.empty with
+    | Invalid_argument _ -> raise (BadItyArity (s, List.length dl)) in
   match s.its_def with
   | Some ity ->
       snd (ity_inst_fresh mv Mreg.empty ity)
   | None ->
       let _,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
-      its_app_real s tl rl
+      its_app_real s dl rl
 
-let ts_app ts dl =
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty ts.ts_args dl
-    with Invalid_argument _ ->
-      raise (BadTypeArity (ts, List.length ts.ts_args, List.length dl)) in
-  match ts.ts_def with
+let ts_app s dl =
+  let mv = try List.fold_right2 Mtv.add s.ts_args dl Mtv.empty with
+    | Invalid_argument _ -> raise (BadTypeArity (s, List.length dl)) in
+  match s.ts_def with
   | Some ty ->
       snd (ity_inst_fresh mv Mreg.empty (ity_of_ty ty))
   | None ->
-      ts_app_real ts dl
+      ts_app_real s dl
 
 let rec dity_refresh = function
   | Dvar { contents = Dtvs _ } as dity -> dity

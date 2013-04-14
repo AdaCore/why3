@@ -368,8 +368,8 @@ and dpat_app denv gloc ({ de_loc = loc } as de) ppl dity =
     | DEglobal_ps ps -> errorm ~loc "%a is not a constructor" print_ps ps
     | _ -> assert false in
   let argl, res = de.de_type in
-  if List.length argl <> List.length ppl then error ~loc:gloc
-    (Term.BadArity (ls, List.length argl, List.length ppl));
+  if List.length argl <> List.length ppl then
+    error ~loc:gloc (Term.BadArity (ls, List.length ppl));
   unify_loc unify gloc res dity;
   let add_pp lp ty (ppl, denv) =
     let pp, denv = dpattern denv lp ty in pp::ppl, denv in

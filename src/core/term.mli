@@ -66,7 +66,7 @@ val ls_ty_freevars : lsymbol -> Stv.t
 exception EmptyCase
 exception DuplicateVar of vsymbol
 exception UncoveredVar of vsymbol
-exception BadArity of lsymbol * int * int
+exception BadArity of lsymbol * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 exception ConstructorExpected of lsymbol

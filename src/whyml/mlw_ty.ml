@@ -291,8 +291,8 @@ let lookup_nonghost_reg regs ity =
 
 (* smart constructors *)
 
-exception BadItyArity of itysymbol * int * int
-exception BadRegArity of itysymbol * int * int
+exception BadItyArity of itysymbol * int
+exception BadRegArity of itysymbol * int
 
 exception DuplicateRegion of region
 exception UnboundRegion of region
@@ -389,10 +389,8 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
 
 let ity_app_fresh s tl =
   (* type variable map *)
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
-    with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
+  let mv = try List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty with
+    | Invalid_argument _ -> raise (BadItyArity (s, List.length tl)) in
   (* refresh regions *)
   let mr,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
   let sub = { ity_subst_tv = mv; ity_subst_reg = mr } in
@@ -403,15 +401,12 @@ let ity_app_fresh s tl =
 
 let ity_app s tl rl =
   (* type variable map *)
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
-    with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
+  let mv = try List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty with
+    | Invalid_argument _ -> raise (BadItyArity (s, List.length tl)) in
   (* region map *)
   let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
-  let sub = try List.fold_left2 reg_match sub s.its_regs rl
-    with Invalid_argument _ ->
-      raise (BadRegArity (s, List.length s.its_regs, List.length rl)) in
+  let sub = try List.fold_left2 reg_match sub s.its_regs rl with
+    | Invalid_argument _ -> raise (BadRegArity (s, List.length rl)) in
   (* every type var and top region in def are in its_ts.ts_args and its_regs *)
   match s.its_def with
   | Some ity -> ity_full_inst sub ity
@@ -419,10 +414,8 @@ let ity_app s tl rl =
 
 let ity_pur s tl =
   (* type variable map *)
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.ts_args tl
-    with Invalid_argument _ ->
-      raise (Ty.BadTypeArity (s, List.length s.ts_args, List.length tl)) in
+  let mv = try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty with
+    | Invalid_argument _ -> raise (Ty.BadTypeArity (s, List.length tl)) in
   let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
   (* every top region in def is guaranteed to be in mr *)
   match s.ts_def with

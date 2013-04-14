@@ -202,7 +202,7 @@ let pat_any pr pat =
 
 (* smart constructors for patterns *)
 
-exception BadArity of lsymbol * int * int
+exception BadArity of lsymbol * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 exception ConstructorExpected of lsymbol
@@ -213,9 +213,8 @@ let pat_app fs pl ty =
     | None -> raise (FunctionSymbolExpected fs)
   in
   let mtch s ty p = ty_match s ty p.pat_ty in
-  ignore (try List.fold_left2 mtch s fs.ls_args pl
-    with Invalid_argument _ -> raise (BadArity
-      (fs, List.length fs.ls_args, List.length pl)));
+  ignore (try List.fold_left2 mtch s fs.ls_args pl with
+    | Invalid_argument _ -> raise (BadArity (fs, List.length pl)));
   if fs.ls_constr = 0 then raise (ConstructorExpected fs);
   pat_app fs pl ty
 
@@ -707,9 +706,8 @@ let t_open_quant_cb fq =
 
 let ls_arg_inst ls tl =
   let mtch s ty t = ty_match s ty (t_type t) in
-  try List.fold_left2 mtch Mtv.empty ls.ls_args tl
-  with Invalid_argument _ -> raise (BadArity
-    (ls, List.length ls.ls_args, List.length tl))
+  try List.fold_left2 mtch Mtv.empty ls.ls_args tl with
+    | Invalid_argument _ -> raise (BadArity (ls, List.length tl))
 
 let ls_app_inst ls tl ty =
   let s = ls_arg_inst ls tl in
