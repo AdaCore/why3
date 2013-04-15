@@ -1701,8 +1701,8 @@ let wp_rec ~wp env kn th fdl =
       let f = t_forall_close (Mvs.keys f.t_vars) [] f in
       let lkn = Theory.get_known th in
       let f = if Debug.test_flag no_track then f else track_values lkn kn f in
-      let f = if Debug.test_flag no_eval then f else
-        Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkn f in
+      (*let f = if Debug.test_flag no_eval then f else
+        Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkn f in*)
       let pr = create_prsymbol (id_clone name) in
       let d = create_prop_decl Paxiom pr f in
       Theory.add_decl th d
