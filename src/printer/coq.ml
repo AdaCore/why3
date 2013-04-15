@@ -135,7 +135,7 @@ let print_ts_tv fmt ts =
 let rec print_whytype info fmt ty =
   begin match ty.ty_node with
   | Tyvar v -> print_tv ~whytypes:true fmt v
-  | Tyapp (ts, _tl) when is_ts_tuple ts -> assert false
+  | Tyapp (ts, _tl) when is_ts_tuple ts -> fprintf fmt "_"
 (*
       begin
         match tl with
@@ -151,7 +151,7 @@ let rec print_whytype info fmt ty =
       | None ->
         begin
           match tl with
-            | []  -> (print_ts_real info) fmt ts
+            | []  -> fprintf fmt "%a_WhyType" (print_ts_real info) ts
             | l   -> fprintf fmt "(@@%a_WhyType@ %a)" 
               (print_ts_real info) ts
               (print_list space (print_ty ~whytypes:true info)) l
