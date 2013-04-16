@@ -1177,12 +1177,19 @@ let tr_top_decls () =
 let pr_fp fp =
   pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)
 
+let plugins_loaded = ref false
+
 let why3tac ?(timelimit=timelimit) s gl =
   (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
   try
+    (* OCaml doesn't let us do it at the initialisation time *)
+    if not !plugins_loaded then begin
+      Whyconf.load_plugins main;
+      plugins_loaded := true
+    end;
     (* add global declarations from modules Top and Why3.X.Y *)
     tr_top_decls ();
     (* then translate the goal *)
