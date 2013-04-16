@@ -20,11 +20,10 @@ type verbosity =
 val verbose : verbosity
 (* true if option -v/--verbose was present *)
 
-type report_mode = Fail | Fail_And_Proved | Detailed
+type report_mode = Fail | Fail_And_Proved | Statistics
 (* In mode fail, only print failed proof objectives.
-   In mode verbose, print all proof objectives.
-   In mode detailed, additionally print if VC was timeout or if prover stopped.
-   *)
+   In mode fail_and_proved, print all proof objectives.
+   In mode statistics, additionally print steps and time taken by the VC *)
 
 type proof_mode =
     Then_Split

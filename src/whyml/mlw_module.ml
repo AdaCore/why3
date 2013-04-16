@@ -76,8 +76,10 @@ let psym_sub p1 p2 = match p1,p2 with
   | _, _ -> false
 
 let rec merge_ns chk ns1 ns2 =
+  if ns1 == ns2 then ns1 else
   let join sub x n o = Some (ns_replace sub chk x o n) in
-  let ns_union sub m1 m2 = Mstr.union (join sub) m1 m2 in
+  let ns_union sub m1 m2 =
+    if m1 == m2 then m1 else Mstr.union (join sub) m1 m2 in
   let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
   { ns_ts = ns_union tsym_sub ns1.ns_ts ns2.ns_ts;
     ns_ps = ns_union psym_sub ns1.ns_ps ns2.ns_ps;

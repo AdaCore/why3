@@ -67,7 +67,7 @@ type status =
 (* These are the possible statuses of an objective.
    [Proved] means that all goals of that objectives are proved.
    [Not_Proved] means that a proof attempt for a goal of the objective that
-               cannot be further simplified has failed.
+               cannot (or should not) be further simplified has failed.
 
    In both cases, there is no more work to do, and we can issue a message to
    the user.
