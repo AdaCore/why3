@@ -1458,7 +1458,9 @@ and expr_desc lenv loc de = match de.de_desc with
 and expr_rec lenv dfdl =
   let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
     let pvl = binders bl in
-    let aty = vty_arrow pvl (vty_of_dvty de.de_type) in
+    if fst de.de_type <> [] then errorm ~loc:de.de_loc
+      "The body of a recursive function must be a first-order value";
+    let aty = vty_arrow pvl (VTvalue (ity_of_dity (snd de.de_type))) in
     let ps = create_psymbol (Denv.create_user_id id) ~ghost:gh aty in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in

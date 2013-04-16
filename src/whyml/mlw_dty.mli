@@ -46,8 +46,7 @@ val unify: dity -> dity -> unit
 val unify_weak: dity -> dity -> unit (* don't unify regions *)
 
 val ity_of_dity: dity -> ity
-val vty_of_dvty: dvty -> vty
-  (** use with care, only once unification is done *)
+  (** only use once unification is done *)
 
 val specialize_scheme: tvars -> dvty -> dvty
 

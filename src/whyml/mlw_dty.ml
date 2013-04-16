@@ -34,24 +34,8 @@ and dreg =
   | Rvar  of rvar ref
 
 and rvar =
-  | Rtvs  of tvsymbol * dity * region Lazy.t
+  | Rtvs  of tvsymbol * dity
   | Rval  of dreg
-
-let ity_of_dity dity =
-  let rec get_ity = function
-    | Dvar { contents = Dtvs _ } ->
-        Loc.errorm "undefined type variable"
-    | Dvar { contents = Dval dty } -> get_ity dty
-    | Duvar (tv,_) -> ity_var tv
-    | Dits (its,dl,rl) ->
-        ity_app its (List.map get_ity dl) (List.map get_reg rl)
-    | Dts (ts,dl) -> ity_pur ts (List.map get_ity dl)
-  and get_reg = function
-    | Rreg (r,_) -> r
-    | Rvar { contents = Rtvs (_,_,r) } -> Lazy.force r
-    | Rvar { contents = Rval dreg } -> get_reg dreg
-  in
-  get_ity dity
 
 let create_user_type_variable x op =
   Duvar (Typing.create_user_tv x.id, op)
@@ -60,10 +44,7 @@ let create_type_variable () =
   Dvar (ref (Dtvs (create_tvsymbol (id_fresh "a"))))
 
 let create_dreg dity =
-  let id = id_fresh "rho" in
-  let tv = create_tvsymbol id in
-  let reg = lazy (create_region id (ity_of_dity dity)) in
-  Rvar (ref (Rtvs (tv,dity,reg)))
+  Rvar (ref (Rtvs (create_tvsymbol (id_fresh "rho"), dity)))
 
 let ts_app_real ts dl = Dts (ts, dl)
 
@@ -125,6 +106,32 @@ let rec opaque_tvs acc = function
   | Duvar (_,false) -> acc
   | Dits (_,dl,_) | Dts (_,dl) -> List.fold_left opaque_tvs acc dl
 
+(* create ity *)
+
+let ity_of_dity dity =
+  let rec get_ity = function
+    | Dvar { contents = Dtvs _ } ->
+        Loc.errorm "undefined type variable"
+    | Dvar { contents = Dval dty } ->
+        get_ity dty
+    | Duvar (tv,_) ->
+        ity_var tv
+    | Dits (its,dl,rl) ->
+        ity_app its (List.map get_ity dl) (List.map get_reg rl)
+    | Dts (ts,dl) ->
+        ity_pur ts (List.map get_ity dl)
+  and get_reg = function
+    | Rreg (r,_) ->
+        r
+    | Rvar ({ contents = Rtvs (tv,dty) } as r) ->
+        let reg = create_region (id_clone tv.tv_name) (get_ity dty) in
+        r := Rval (Rreg (reg,dty));
+        reg
+    | Rvar { contents = Rval dreg } ->
+        get_reg dreg
+  in
+  get_ity dity
+
 (* unification *)
 
 let rec occur_check tv = function
@@ -139,7 +146,7 @@ let rec occur_check_reg tv = function
   | Dits (_,dl,rl) ->
       let rec check = function
         | Rvar { contents = Rval dreg } -> check dreg
-        | Rvar { contents = Rtvs (tv',dity,_) } ->
+        | Rvar { contents = Rtvs (tv',dity) } ->
             if tv_equal tv tv' then raise Exit;
             occur_check_reg tv dity
         | Rreg _ -> ()
@@ -173,18 +180,18 @@ let rec unify ~weak d1 d2 = match d1,d2 with
 and unify_reg r1 r2 =
   let rec dity_of_reg = function
     | Rvar { contents = Rval r } -> dity_of_reg r
-    | Rvar { contents = Rtvs (_,dity,_) }
+    | Rvar { contents = Rtvs (_,dity) }
     | Rreg (_,dity) -> dity
   in
   match r1,r2 with
     | Rvar { contents = Rval r1 }, r2
     | r1, Rvar { contents = Rval r2 } ->
         unify_reg r1 r2
-    | Rvar { contents = Rtvs (tv1,_,_) },
-      Rvar { contents = Rtvs (tv2,_,_) } when tv_equal tv1 tv2 ->
+    | Rvar { contents = Rtvs (tv1,_) },
+      Rvar { contents = Rtvs (tv2,_) } when tv_equal tv1 tv2 ->
         ()
-    | Rvar ({ contents = Rtvs (tv,rd,_) } as r), d
-    | d, Rvar ({ contents = Rtvs (tv,rd,_) } as r) ->
+    | Rvar ({ contents = Rtvs (tv,rd) } as r), d
+    | d, Rvar ({ contents = Rtvs (tv,rd) } as r) ->
         let dity = dity_of_reg d in
         occur_check_reg tv dity;
         unify ~weak:false rd dity;
@@ -210,11 +217,6 @@ let is_chainable dvty =
   match dvty with
     | [t1;t2],t -> is_bool t && not (is_bool t1) && not (is_bool t2)
     | _ -> false
-
-let vty_of_dvty (argl,res) =
-  let vty = VTvalue (ity_of_dity res) in
-  let conv a = create_pvsymbol (id_fresh "x") (ity_of_dity a) in
-  if argl = [] then vty else VTarrow (vty_arrow (List.map conv argl) vty)
 
 type tvars = dity list
 
@@ -256,7 +258,7 @@ let specialize_scheme tvs (argl,res) =
         ts_app_real ts (List.map specialize dl)
   and spec_reg r = match r with
     | Rvar { contents = Rval r } -> spec_reg r
-    | Rvar { contents = Rtvs (tv,dity,_) } ->
+    | Rvar { contents = Rtvs (tv,dity) } ->
         if reg_in_tvars tv tvs then r else
         begin try Htv.find hreg tv with Not_found ->
           let v = create_dreg (specialize dity) in
@@ -373,12 +375,12 @@ let print_dity fmt dity =
           Mlw_pretty.print_ity r.reg_ity
     | Rreg (r,_) ->
         Mlw_pretty.print_reg fmt r
-    | Rvar { contents = Rtvs (tv,dity,_) }
+    | Rvar { contents = Rtvs (tv,dity) }
       when Debug.test_flag debug_print_reg_types ->
         let r = create_region (id_clone tv.tv_name) Mlw_ty.ity_unit in
         Format.fprintf fmt "@[%a:@,%a@]" Mlw_pretty.print_reg r
           (print_dity false) dity
-    | Rvar { contents = Rtvs (tv,_,_) } ->
+    | Rvar { contents = Rtvs (tv,_) } ->
         let r = create_region (id_clone tv.tv_name) Mlw_ty.ity_unit in
         Mlw_pretty.print_reg fmt r
     | Rvar { contents = Rval dreg } ->
