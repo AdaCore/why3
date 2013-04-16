@@ -26,7 +26,7 @@ module M
 
   exception Not_found
 
-  val find (x:int) : int reads { table }
+  val find (x:int) : int
     ensures { !table[x] = Some result }
     raises { Not_found -> !table[x] = None }
 

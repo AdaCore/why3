@@ -25,15 +25,14 @@ module rec T : sig
   (* the set of variables, e.g. of an individual type. An individual program
      type can contain type and region variables *)
 
-  type varmap = varset Mid.t
-
   type itysymbol = private {
-    its_ts   : tysymbol;
-    its_regs : region list;
-    its_def  : ity option;
-    its_inv  : bool;
-    its_abst : bool;
-    its_priv : bool;
+    its_ts   : tysymbol;      (* "pure snapshot" type symbol *)
+    its_regs : region list;   (* region arguments *)
+    its_def  : ity option;    (* type alias definition *)
+    its_ghrl : bool list;     (* ghost region arguments *)
+    its_inv  : bool;          (* carries a type invariant *)
+    its_abst : bool;          (* is an abstract (= "model") type *)
+    its_priv : bool;          (* is a private (à la Ocaml) type *)
   }
 
   (** ity = individual type in programs, first-order, i.e. no functions *)
@@ -92,7 +91,8 @@ val create_region : preid -> ity -> region
 
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
-  preid -> ?abst:bool -> ?priv:bool -> ?inv:bool ->
+  preid ->
+    ?abst:bool -> ?priv:bool -> ?inv:bool -> ?ghost_reg:Sreg.t ->
     tvsymbol list -> region list -> ity option -> itysymbol
 
 val restore_its : tysymbol -> itysymbol
@@ -140,6 +140,11 @@ val reg_iter : (region -> unit) -> varset -> unit
 
 val reg_occurs : region -> varset -> bool
 
+(* detect non-ghost regions *)
+
+val ity_nonghost_reg : Sreg.t -> ity -> Sreg.t
+val lookup_nonghost_reg : Sreg.t -> ity -> bool
+
 (* built-in types *)
 
 val ts_unit : tysymbol (* the same as [Ty.ts_tuple 0] *)
@@ -171,15 +176,13 @@ val ity_full_inst : ity_subst -> ity -> ity
 
 val reg_full_inst : ity_subst -> region -> region
 
+(* varset manipulation *)
+
 val vars_empty : varset
 
 val vars_union : varset -> varset -> varset
 
-val vars_merge : varmap -> varset -> varset
-
 val vars_freeze : varset -> ity_subst
-
-val create_varset : Stv.t -> Sreg.t -> varset
 
 (* exception symbols *)
 type xsymbol = private {
@@ -200,10 +203,8 @@ module Sexn: Extset.S with module M = Mexn
 (** effects *)
 
 type effect = private {
-  eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
   eff_raises : Sexn.t;
-  eff_ghostr : Sreg.t; (* ghost reads *)
   eff_ghostw : Sreg.t; (* ghost writes *)
   eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
@@ -217,7 +218,6 @@ val eff_equal : effect -> effect -> bool
 val eff_union : effect -> effect -> effect
 val eff_ghostify : bool -> effect -> effect
 
-val eff_read  : effect -> ?ghost:bool -> region -> effect
 val eff_write : effect -> ?ghost:bool -> region -> effect
 val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
@@ -238,10 +238,7 @@ exception GhostDiverg
 
 val eff_full_inst : ity_subst -> effect -> effect
 
-val eff_filter : varset -> effect -> effect
-
 val eff_is_empty : effect -> bool
-val eff_is_read_only: effect -> bool
 
 (** specification *)
 
@@ -285,8 +282,11 @@ val restore_pv : vsymbol -> pvsymbol
   (* return the program variable [pvs] such that pvs.pv_vs is equal to the
      argument. raises Not_found if the argument is not a pv_vs *)
 
-val restore_pv_by_id : ident -> pvsymbol
-  (* raises Not_found if the argument is not a pv_vs.vs_name *)
+val t_pvset : Spv.t -> term -> Spv.t
+  (* raises Not_found if the term contains non-pv variables *)
+
+val spec_pvset : Spv.t -> spec -> Spv.t
+  (* raises Not_found if the spec contains non-pv variables *)
 
 (** program types *)
 
@@ -316,8 +316,8 @@ val aty_vars_match : ity_subst -> aty -> ity list -> ity -> ity_subst
 val aty_full_inst : ity_subst -> aty -> aty
 
 (* remove from the given arrow every effect that is covered
-   neither by the arrow's arguments nor by the given varmap *)
-val aty_filter : ?ghost:bool -> varmap -> aty -> aty
+   neither by the arrow's arguments nor by the given pvset *)
+val aty_filter : ?ghost:bool -> Spv.t -> aty -> aty
 
 (* apply a function specification to a variable argument *)
 val aty_app : aty -> pvsymbol -> spec * bool * vty

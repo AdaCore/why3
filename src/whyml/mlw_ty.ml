@@ -23,12 +23,11 @@ module rec T : sig
     vars_reg : Reg.S.t;
   }
 
-  type varmap = varset Mid.t
-
   type itysymbol = {
     its_ts   : tysymbol;
     its_regs : region list;
     its_def  : ity option;
+    its_ghrl : bool list;
     its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
@@ -57,12 +56,11 @@ end = struct
     vars_reg : Reg.S.t;
   }
 
-  type varmap = varset Mid.t
-
   type itysymbol = {
     its_ts   : tysymbol;
     its_regs : region list;
     its_def  : ity option;
+    its_ghrl : bool list;
     its_inv  : bool;
     its_abst : bool;
     its_priv : bool;
@@ -119,13 +117,6 @@ let vars_union s1 s2 = {
   vars_reg = Sreg.union s1.vars_reg s2.vars_reg;
 }
 
-let vars_merge = Mid.fold (fun _ -> vars_union)
-
-let create_varset tvs regs = {
-  vars_tv = Sreg.fold (fun r -> Stv.union r.reg_ity.ity_vars.vars_tv) regs tvs;
-  vars_reg = regs;
-}
-
 (* value type symbols *)
 
 module Itsym = MakeMSHW (struct
@@ -168,16 +159,16 @@ module Hsity = Hashcons.Make (struct
   let ity_vars s ity = vars_union s ity.ity_vars
   let reg_vars s r = { s with vars_reg = Sreg.add r s.vars_reg }
 
-  let vars s ity = match ity.ity_node with
+  let vars ity = match ity.ity_node with
     | Ityvar v ->
-        { s with vars_tv = Stv.add v s.vars_tv }
+        { vars_tv = Stv.singleton v; vars_reg = Sreg.empty }
     | Itypur (_,tl) ->
-        List.fold_left ity_vars s tl
+        List.fold_left ity_vars vars_empty tl
     | Ityapp (_,tl,rl) ->
-        List.fold_left reg_vars (List.fold_left ity_vars s tl) rl
+        List.fold_left reg_vars (List.fold_left ity_vars vars_empty tl) rl
 
   let tag n ity = { ity with
-    ity_vars = vars vars_empty ity;
+    ity_vars = vars ity;
     ity_tag  = Weakhtbl.create_tag n }
 
 end)
@@ -274,6 +265,29 @@ let rec reg_iter fn vars =
   Sreg.iter on_reg vars.vars_reg
 
 let reg_occurs r vars = reg_any (reg_equal r) vars
+
+(* detect non-ghost type variables and regions *)
+
+let rec fold_nonghost on_reg acc ity =
+  let fn = fold_nonghost on_reg in
+  if ity_immutable ity then acc
+  else match ity.ity_node with
+  | Ityvar _ -> acc
+  | Itypur (_,tl) ->
+      List.fold_left fn acc tl
+  | Ityapp ({ its_ghrl = ghrl },tl,rl) ->
+      let acc = List.fold_left fn acc tl in
+      List.fold_left2 (fun s gh ({ reg_ity = ity } as r) ->
+        if gh then s else fn (on_reg r s) ity) acc ghrl rl
+
+let ity_nonghost_reg regs ity = fold_nonghost Sreg.add regs ity
+
+let lookup_nonghost_reg regs ity =
+  if reg_any (fun r -> Sreg.mem r regs) ity.ity_vars
+  then try fold_nonghost (fun r acc ->
+    if Sreg.mem r regs then raise Util.FoldSkip else acc) false ity
+  with Util.FoldSkip -> true
+  else false
 
 (* smart constructors *)
 
@@ -419,11 +433,12 @@ let ity_pur s tl =
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ts ~abst ~priv ~inv regs def ->
+  (fun ts ~abst ~priv ~inv ~ghrl regs def ->
     let its = {
       its_ts    = ts;
       its_regs  = regs;
       its_def   = def;
+      its_ghrl  = ghrl;
       its_inv   = inv;
       its_abst  = abst;
       its_priv  = priv;
@@ -432,12 +447,13 @@ let create_itysymbol_unsafe, restore_its =
     its),
   Wts.find ts_to_its
 
-let create_itysymbol
-      name ?(abst=false) ?(priv=false) ?(inv=false) args regs def =
+let create_itysymbol name
+      ?(abst=false) ?(priv=false) ?(inv=false) ?(ghost_reg=Sreg.empty)
+      args regs def =
   let puredef = Opt.map ty_of_ity def in
   let purets = create_tysymbol name args puredef in
   (* all regions *)
-  let add s v = Sreg.add_new (DuplicateRegion v) v s in
+  let add s r = Sreg.add_new (DuplicateRegion r) r s in
   let sregs = List.fold_left add Sreg.empty regs in
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in
@@ -455,7 +471,16 @@ let create_itysymbol
     if priv then Loc.errorm "Type aliases cannot be private";
     if inv  then Loc.errorm "Type aliases cannot have invariants"
   end;
-  create_itysymbol_unsafe purets ~abst ~priv ~inv regs def
+  (* every ghost region argument must be in [regs] *)
+  if not (Sreg.subset ghost_reg sregs) then
+    invalid_arg "Mlw_ty.create_itysymbol";
+  Opt.iter (fun ity ->
+    let nogh = ity_nonghost_reg Sreg.empty ity in
+    if Sreg.exists (fun r -> Sreg.mem r ghost_reg) nogh then
+      invalid_arg "Mlw_ty.create_itysymbol") def;
+  let ghrl = List.map (fun r -> Sreg.mem r ghost_reg) regs in
+  (* create the type symbol *)
+  create_itysymbol_unsafe purets ~abst ~priv ~inv ~ghrl regs def
 
 let ts_unit = ts_tuple 0
 let ty_unit = ty_tuple []
@@ -478,10 +503,11 @@ let its_clone sm =
     let nits = try restore_its nts with Not_found ->
       let abst = oits.its_abst in
       let priv = oits.its_priv in
+      let ghrl = oits.its_ghrl in
       let inv  = oits.its_inv in
       let regs = List.map conv_reg oits.its_regs in
       let def  = Opt.map conv_ity oits.its_def in
-      create_itysymbol_unsafe nts ~abst ~priv ~inv regs def
+      create_itysymbol_unsafe nts ~abst ~priv ~inv ~ghrl regs def
     in
     Hits.replace itsh oits nits;
     nits
@@ -544,10 +570,8 @@ module Mexn = Exn.M
 
 (* effects *)
 type effect = {
-  eff_reads  : Sreg.t;
   eff_writes : Sreg.t;
   eff_raises : Sexn.t;
-  eff_ghostr : Sreg.t; (* ghost reads *)
   eff_ghostw : Sreg.t; (* ghost writes *)
   eff_ghostx : Sexn.t; (* ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
@@ -557,10 +581,8 @@ type effect = {
 }
 
 let eff_empty = {
-  eff_reads  = Sreg.empty;
   eff_writes = Sreg.empty;
   eff_raises = Sexn.empty;
-  eff_ghostr = Sreg.empty;
   eff_ghostw = Sreg.empty;
   eff_ghostx = Sexn.empty;
   eff_resets = Mreg.empty;
@@ -569,17 +591,6 @@ let eff_empty = {
 }
 
 let eff_is_empty e =
-  Sreg.is_empty e.eff_reads &&
-  Sreg.is_empty e.eff_writes &&
-  Sexn.is_empty e.eff_raises &&
-  Sreg.is_empty e.eff_ghostr &&
-  Sreg.is_empty e.eff_ghostw &&
-  Sexn.is_empty e.eff_ghostx &&
-  Mreg.is_empty e.eff_resets &&
-  (* eff_compar is not a side effect *)
-  not e.eff_diverg
-
-let eff_is_read_only e =
   Sreg.is_empty e.eff_writes &&
   Sexn.is_empty e.eff_raises &&
   Sreg.is_empty e.eff_ghostw &&
@@ -589,10 +600,8 @@ let eff_is_read_only e =
   not e.eff_diverg
 
 let eff_equal e1 e2 =
-  Sreg.equal e1.eff_reads  e2.eff_reads  &&
   Sreg.equal e1.eff_writes e2.eff_writes &&
   Sexn.equal e1.eff_raises e2.eff_raises &&
-  Sreg.equal e1.eff_ghostr e2.eff_ghostr &&
   Sreg.equal e1.eff_ghostw e2.eff_ghostw &&
   Sexn.equal e1.eff_ghostx e2.eff_ghostx &&
   Mreg.equal (Opt.equal reg_equal) e1.eff_resets e2.eff_resets &&
@@ -608,10 +617,8 @@ let join_reset _key v1 v2 = match v1, v2 with
   | _ -> Some None
 
 let eff_union x y = {
-  eff_reads  = Sreg.union x.eff_reads  y.eff_reads;
   eff_writes = Sreg.union x.eff_writes y.eff_writes;
   eff_raises = Sexn.union x.eff_raises y.eff_raises;
-  eff_ghostr = Sreg.union x.eff_ghostr y.eff_ghostr;
   eff_ghostw = Sreg.union x.eff_ghostw y.eff_ghostw;
   eff_ghostx = Sexn.union x.eff_ghostx y.eff_ghostx;
   eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
@@ -622,10 +629,8 @@ let eff_union x y = {
 exception GhostDiverg
 
 let eff_ghostify e = {
-  eff_reads  = Sreg.empty;
   eff_writes = Sreg.empty;
   eff_raises = Sexn.empty;
-  eff_ghostr = Sreg.union e.eff_reads  e.eff_ghostr;
   eff_ghostw = Sreg.union e.eff_writes e.eff_ghostw;
   eff_ghostx = Sexn.union e.eff_raises e.eff_ghostx;
   eff_resets = e.eff_resets;
@@ -640,10 +645,6 @@ let eff_ghostify e = {
 }
 
 let eff_ghostify gh e = if gh then eff_ghostify e else e
-
-let eff_read e ?(ghost=false) r = if ghost
-  then { e with eff_ghostr = Sreg.add r e.eff_ghostr }
-  else { e with eff_reads  = Sreg.add r e.eff_reads  }
 
 let eff_write e ?(ghost=false) r = if ghost
   then { e with eff_ghostw = Sreg.add r e.eff_ghostw }
@@ -720,9 +721,7 @@ let eff_full_inst sbs e =
     ity_s_fold check (fun () _ -> ()) () ity;
     Stv.union acc ity.ity_vars.vars_tv in
   { e with
-    eff_reads  = Sreg.fold add_sreg e.eff_reads  Sreg.empty;
     eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
-    eff_ghostr = Sreg.fold add_sreg e.eff_ghostr Sreg.empty;
     eff_ghostw = Sreg.fold add_sreg e.eff_ghostw Sreg.empty;
     eff_resets = Mreg.fold add_mreg e.eff_resets Mreg.empty;
     eff_compar = Stv.fold  add_stv  e.eff_compar Stv.empty;
@@ -736,9 +735,7 @@ let eff_filter vars e =
     | _ -> Some None
   in
   { e with
-    eff_reads  = Sreg.filter check e.eff_reads;
     eff_writes = Sreg.filter check e.eff_writes;
-    eff_ghostr = Sreg.filter check e.eff_ghostr;
     eff_ghostw = Sreg.filter check e.eff_ghostw;
     eff_resets = Mreg.mapi_filter reset e.eff_resets;
     eff_compar = Stv.inter vars.vars_tv e.eff_compar;
@@ -809,14 +806,17 @@ let spec_subst sbs c =
     c_letrec  = c.c_letrec;
   }
 
-let spec_filter ghost varm vars c =
+let spec_vsset c =
   let add f s = Mvs.set_union f.t_vars s in
-  let vss = add c.c_pre c.c_post.t_vars in
-  let vss = Mexn.fold (fun _ -> add) c.c_xpost vss in
-  let vss = List.fold_right (fun (t,_) -> add t) c.c_variant vss in
-  let check { vs_name = id } _ = if not (Mid.mem id varm) then
-    Loc.errorm "Local variable %s escapes from its scope" id.id_string in
-  Mvs.iter check vss;
+  let s = add c.c_pre c.c_post.t_vars in
+  let s = Mexn.fold (fun _ f s -> add f s) c.c_xpost s in
+  List.fold_left (fun s (t,_) -> add t s) s c.c_variant
+
+let spec_filter ghost svs vars c =
+  let s = spec_vsset c in
+  if not (Mvs.set_submap s svs) then
+    Loc.errorm "Local variable %s escapes from its scope"
+      (fst (Mvs.choose (Mvs.set_diff s svs))).vs_name.id_string;
   if not ghost && not (Sexn.is_empty c.c_effect.eff_ghostx) then
     Loc.errorm "Only ghost functions may raise ghost exceptions";
   { c with c_effect = eff_ghostify ghost (eff_filter vars c.c_effect) }
@@ -828,6 +828,9 @@ let spec_check ~full_xpost c ty =
     Loc.error ?loc:c.c_pre.t_loc (Term.FmlaExpected c.c_pre);
   check_post ty c.c_post;
   Mexn.iter (fun xs q -> check_post (ty_of_ity xs.xs_ity) q) c.c_xpost;
+  (* we admit non-empty variant list even for null letrec,
+     so that we can store there external variables from
+     user-written effects to save them from spec_filter *)
   let check_variant (t,rel) = match rel with
     | Some ps -> ignore (ps_app ps [t;t])
     | None -> ignore (t_type t) in
@@ -865,14 +868,20 @@ let create_pvsymbol id ghost ity = {
   pv_ghost = ghost;
 }
 
-let create_pvsymbol, restore_pv, restore_pv_by_id =
-  let id_to_pv = Wid.create 17 in
+let create_pvsymbol, restore_pv =
+  let vs_to_pv = Wvs.create 17 in
   (fun id ?(ghost=false) ity ->
     let pv = create_pvsymbol id ghost ity in
-    Wid.set id_to_pv pv.pv_vs.vs_name pv;
+    Wvs.set vs_to_pv pv.pv_vs pv;
     pv),
-  (fun vs -> Wid.find id_to_pv vs.vs_name),
-  (fun id -> Wid.find id_to_pv id)
+  (fun vs -> Wvs.find vs_to_pv vs)
+
+let pvs_of_vss pvs vss =
+  Mvs.fold (fun vs _ s -> Spv.add (restore_pv vs) s) vss pvs
+
+let t_pvset pvs t = pvs_of_vss pvs t.t_vars
+
+let spec_pvset pvs spec = pvs_of_vss pvs (spec_vsset spec)
 
 (** program types *)
 
@@ -920,9 +929,6 @@ let vty_arrow argl ?spec vty =
   let spec = match spec with
     | Some spec -> spec_check spec vty; spec
     | None -> spec_empty (ty_of_vty vty) in
-  (* we admit non-empty variant list even for null letrec,
-     so that we can store there external variables from
-     user-written effects to save them from spec_filter *)
   vty_arrow_unsafe argl spec vty
 
 (* this only compares the types of arguments and results, and ignores
@@ -960,37 +966,42 @@ let aty_full_inst sbs aty =
   in
   aty_inst Mvs.empty aty
 
-(* remove from the given arrow every effect that is covered
-   neither by the arrow's aty_vars nor by the given varmap *)
-let rec aty_filter ghost varm vars aty =
-  let add_m pv m = Mid.add pv.pv_vs.vs_name pv.pv_ity.ity_vars m in
-  let add_s pv s = vars_union pv.pv_ity.ity_vars s in
-  let varm = List.fold_right add_m aty.aty_args varm in
-  let vars = List.fold_right add_s aty.aty_args vars in
-  let vty = match aty.aty_result with
-    | VTarrow a -> VTarrow (aty_filter ghost varm vars a)
-    | VTvalue _ -> aty.aty_result in
-  (* reads and writes must come from the context,
-     resets may affect the regions in the result *)
-  let spec = spec_filter ghost varm vars aty.aty_spec in
-  let rst = aty.aty_spec.c_effect.eff_resets in
-  let spec = if Mreg.is_empty rst then spec else
-    let vars = vars_union vars (vty_vars vty) in
-    let rst = { eff_empty with eff_resets = rst } in
-    let rst = (eff_filter vars rst).eff_resets in
-    let eff = { spec.c_effect with eff_resets = rst } in
-    { spec with c_effect = eff } in
-  (* we must also reset every fresh region in the value *)
+(* remove from the given arrow every inner effect *)
+let rec aty_filter ghost svs vars aty =
+  let add svs { pv_vs = vs } = Svs.add vs svs in
+  let svs = List.fold_left add svs aty.aty_args in
+  (* every region in the type must be unique *)
+  let check_alias vars ity =
+    (* FIXME? This check is not needed for soundness
+       and can be made outside of the core WhyML API *)
+    let check reg = if reg_occurs reg vars then
+      Loc.errorm "The type of this function contains an alias" in
+    reg_iter check ity.ity_vars in
+  let add vars { pv_ity = ity } =
+    check_alias vars ity; vars_union vars ity.ity_vars in
+  let vars = List.fold_left add vars aty.aty_args in
+  (* remove the effects that do not affect the context *)
+  let spec = spec_filter ghost svs vars aty.aty_spec in
+  (* reset every fresh region in the returned value *)
   let spec = match aty.aty_result with
     | VTvalue v ->
         let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
-        let eff = reg_fold on_reg v.ity_vars spec.c_effect in
-        { spec with c_effect = eff }
+        { spec with c_effect = reg_fold on_reg v.ity_vars spec.c_effect }
     | VTarrow _ -> spec in
+  (* filter the result type *)
+  let vty = match aty.aty_result with
+    | VTarrow a -> VTarrow (aty_filter ghost svs vars a)
+    (* FIXME? This check is commented out since we do have examples
+       where a mutable argument is incorporated into the result. *)
+    | VTvalue _ -> (*check_alias vars v;*) aty.aty_result in
   vty_arrow_unsafe aty.aty_args spec vty
 
-let aty_filter ?(ghost=false) varm aty =
-  aty_filter ghost varm (vars_merge varm vars_empty) aty
+let aty_filter ?(ghost=false) pvs aty =
+  let add pv svs = Svs.add pv.pv_vs svs in
+  let svs = Spv.fold add pvs Svs.empty in
+  let add pv vars = vars_union vars pv.pv_ity.ity_vars in
+  let vars = Spv.fold add pvs vars_empty in
+  aty_filter ghost svs vars aty
 
 let aty_app aty pv =
   let arg, rest = match aty.aty_args with

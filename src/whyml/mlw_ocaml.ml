@@ -679,7 +679,7 @@ and print_vty info fmt = function
   | VTarrow aty -> print_aty info fmt aty
 
 let is_letrec = function
-  | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
+  | [fd] -> fd.fun_lambda.l_spec.c_letrec <> 0
   | _ -> true
 
 let ity_mark = ity_pur Mlw_wp.ts_mark []

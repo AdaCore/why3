@@ -430,7 +430,6 @@ let dspec uc sp = {
   ds_pre     = sp.sp_pre;
   ds_post    = dpost sp.sp_post;
   ds_xpost   = dxpost uc sp.sp_xpost;
-  ds_reads   = sp.sp_reads;
   ds_writes  = sp.sp_writes;
   ds_variant = dvariant uc sp.sp_variant;
 }
@@ -984,14 +983,6 @@ let reset_vars eff pvs =
   if Mreg.is_empty eff.eff_resets then Svs.empty else
   Spv.fold add pvs Svs.empty
 
-(* add dummy postconditions for uncovered exceptions *)
-let complete_xpost eff xq =
-  let dummy { xs_ity = ity } () =
-    let v = create_vsymbol (id_fresh "dummy") (ty_of_ity ity) in
-    Mlw_ty.create_post v t_true in
-  let xe = Sexn.union eff.eff_raises eff.eff_ghostx in
-  Mexn.set_union xq (Mexn.mapi dummy (Mexn.set_diff xe xq))
-
 let spec_invariant lenv pvs vty spec =
   let ity = ity_of_vty vty in
   let pvs = spec_pvset pvs spec in
@@ -1004,23 +995,17 @@ let spec_invariant lenv pvs vty spec =
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
 let abstr_invariant lenv e spec0 =
-  let pvs = e_pvset Spv.empty e in
+  let pvs = spec_pvset e.e_syms.syms_pv spec0 in
   let spec = { spec0 with c_effect = e.e_effect } in
   let spec = spec_invariant lenv pvs e.e_vty spec in
   (* we do not require invariants on free variables *)
   { spec with c_pre = spec0.c_pre }
 
-let lambda_invariant lenv pvs eff lam =
-  let pvs = List.fold_right Spv.add lam.l_args pvs in
-  let spec = { lam.l_spec with c_effect = eff } in
-  let spec = spec_invariant lenv pvs lam.l_expr.e_vty spec in
-  (* we add dummy xposts for uncovered exceptions to silence
-     Mlw_ty.spec_check, but we do another proper check later
-     in check_user_effect, which will give us a precise
-     location of the exception-raising sub-expression *)
-  let xpost = complete_xpost eff spec.c_xpost in
-  let spec = { spec with c_xpost = xpost } in
-  { lam with l_spec = spec }
+let lambda_invariant lenv lam =
+  let { l_spec = spec; l_expr = e } = lam in
+  let pvs = spec_pvset e.e_syms.syms_pv spec in
+  let spec = spec_invariant lenv pvs e.e_vty spec in
+  { lam with l_spec = { spec with c_letrec = 0 }}
 
 (* specification handling *)
 
@@ -1168,8 +1153,6 @@ let get_eff_regs lenv fn (eff,svs) le =
 
 let eff_of_deff lenv dsp =
   let acc = eff_empty, Svs.empty in
-  let add_read acc e = get_eff_regs lenv eff_read acc e in
-  let acc = List.fold_left add_read acc dsp.ds_reads in
   let add_write acc e = get_eff_regs lenv eff_write acc e in
   let eff, svs = List.fold_left add_write acc dsp.ds_writes in
   let add_raise xs _ eff = eff_raise eff xs in
@@ -1180,21 +1163,12 @@ let e_find_loc pr e =
   with Not_found -> None
 
 let check_user_effect lenv e eeff full_xpost dsp =
-  let has_read reg eff =
-    Sreg.mem reg eff.eff_reads || Sreg.mem reg eff.eff_ghostr in
   let has_write reg eff =
     Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
   let has_raise xs eff =
     Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
   (* check that every user effect actually happens *)
   let acc = eff_empty, Svs.empty in
-  let read le ueff ?ghost reg =
-    if has_read reg eeff then eff_read ?ghost ueff reg
-    else Loc.errorm ~loc:le.pp_loc
-      "this read effect never happens in the expression" in
-  let add_read acc e = get_eff_regs lenv (read e) acc e in
-  let acc = List.fold_left add_read acc dsp.ds_reads in
-  let ueff_ro = not (eff_is_empty (fst acc)) in
   let write le ueff ?ghost reg =
     if has_write reg eeff then eff_write ?ghost ueff reg
     else Loc.errorm ~loc:le.pp_loc
@@ -1208,11 +1182,6 @@ let check_user_effect lenv e eeff full_xpost dsp =
       "this expression does not raise exception %a" print_xs xs in
   let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
   (* check that every computed effect is listed *)
-  let check_read reg = if not (has_read reg ueff) then
-    Loc.errorm ?loc:(e_find_loc (fun e -> has_read reg e.e_effect) e)
-      "this expression produces an unlisted read effect" in
-  if ueff_ro then Sreg.iter check_read eeff.eff_reads;
-  if ueff_ro then Sreg.iter check_read eeff.eff_ghostr;
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this expression produces an unlisted write effect" in
@@ -1246,17 +1215,10 @@ let spec_of_dspec lenv eff vty dsp = {
 let rec type_c lenv pvs vars otv (dtyv, dsp) =
   let vty = type_v lenv pvs vars otv dtyv in
   let eff, esvs = eff_of_deff lenv dsp in
-  (* reset every new region in the result *)
-  let eff = match vty with
-    | VTvalue v ->
-        let on_reg r e = if reg_occurs r vars then e else eff_reset e r in
-        reg_fold on_reg v.ity_vars eff
-    | VTarrow _ -> eff in
-  (* refresh every unmodified subregion of a modified region *)
+  (* refresh every subregion of a modified region *)
   let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
   let check u eff =
-    let on_reg r e = if Sreg.mem r writes then e else eff_refresh e r u in
-    reg_fold on_reg u.reg_ity.ity_vars eff in
+    reg_fold (fun r e -> eff_refresh e r u) u.reg_ity.ity_vars eff in
   let eff = Sreg.fold check writes eff in
   (* eff_compare every type variable not marked as opaque *)
   let otv = match dtyv with DSpecV v -> opaque_tvs otv v | _ -> otv in
@@ -1350,22 +1312,24 @@ and expr_desc lenv loc de = match de.de_desc with
       let e1 = e_ghostify gh (expr lenv de1) in
       let mk_expr e1 =
         let def1 = create_let_defn (Denv.create_user_id x) e1 in
-        let name = match def1.let_sym with
-          | LetA ps -> ps.ps_name | LetV pv -> pv.pv_vs.vs_name in
         let lenv = add_local x.id def1.let_sym lenv in
         let e2 = expr lenv de2 in
         let e2_unit = match e2.e_vty with
           | VTvalue ity -> ity_equal ity ity_unit
           | _ -> false in
+        let x_in_e2 = match def1.let_sym with
+          | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
+          | LetA ps -> Sps.mem ps e2.e_syms.syms_ps in
         let e2 =
-          if e2_unit (* e2 is ghost unit *)
+          if e2_unit (* e2 is unit *)
              && e2.e_ghost (* and e2 is ghost *)
              && not e1.e_ghost (* and e1 is non-ghost *)
-             && not (Mid.mem name e2.e_varm) (* and x doesn't occur in e2 *)
-          then e_let (create_let_defn (id_fresh "gh") e2) e_void else e2 in
+             && not x_in_e2 (* and x doesn't occur in e2 *)
+          then e_let (create_let_defn (id_fresh "gh") e2) e_void
+          else e2 in
         e_let def1 e2 in
       let rec flatten e1 = match e1.e_node with
-        | Elet (ld,_) (* can't let a non-ghost expr from a ghost one *)
+        | Elet (ld,_) (* can't let a non-ghost expr escape from a ghost one *)
           when gh && not ld.let_expr.e_ghost -> mk_expr e1
         | Elet (ld,e1) -> e_let ld (flatten e1)
         | _ -> mk_expr e1 in
@@ -1495,17 +1459,12 @@ and expr_rec lenv dfdl =
   let step1 lenv (id, gh, _, bl, ((de, _) as tr)) =
     let pvl = binders bl in
     let aty = vty_arrow pvl (vty_of_dvty de.de_type) in
-    let aty = aty_filter Mid.empty aty (* add reset effects *) in
     let ps = create_psymbol (Denv.create_user_id id) ~ghost:gh aty in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
-  let fdl = List.map step2 fdl in
-  let rd_pvset pvs (_, lam) = l_pvset pvs lam in
-  let pvs = List.fold_left rd_pvset Spv.empty fdl in
-  let rd_effect eff (_, lam) = eff_union eff lam.l_expr.e_effect in
-  let eff = List.fold_left rd_effect eff_empty fdl in
-  let step3 (ps, lam) = ps, lambda_invariant lenv pvs eff lam in
+  let fdl = create_rec_defn (List.map step2 fdl) in
+  let step3 fd = fd.fun_ps, lambda_invariant lenv fd.fun_lambda in
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (_,_,_,bl,(de,dsp)) =
     Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp in
@@ -1528,8 +1487,7 @@ and expr_fun lenv x gh bl (de, dsp as tr) =
         let post = Mlw_ty.create_post vs f in
         let spec = { lam.l_spec with c_post = post } in
         { lam with l_spec = spec } in
-  let pvs = l_pvset Spv.empty lam in
-  let lam = lambda_invariant lenv pvs lam.l_expr.e_effect lam in
+  let lam = lambda_invariant lenv lam in
   let fd = create_fun_defn (Denv.create_user_id x) lam in
   Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
   fd
@@ -1731,13 +1689,17 @@ let add_types ~wp uc tdl =
       let ts = match d.td_def with
         | TDalias ty when Hstr.find impures x ->
             let def = parse ty in
+            let nogh = ity_nonghost_reg Sreg.empty def in
+            let ghost_reg = Sreg.diff def.ity_vars.vars_reg nogh in
             let rl = Sreg.elements def.ity_vars.vars_reg in
-            PT (create_itysymbol id ~abst ~priv ~inv:false vl rl (Some def))
+            PT (create_itysymbol id
+              ~abst ~priv ~inv:false ~ghost_reg vl rl (Some def))
         | TDalias ty ->
             let def = ty_of_ity (parse ty) in
             TS (create_tysymbol id vl (Some def))
         | TDalgebraic csl when Hstr.find mutables x ->
             let projs = Hstr.create 5 in
+            let nogh = ref Sreg.empty in
             (* to check projections' types we must fix the tyvars *)
             let add s v = let t = ity_var v in ity_match s t t in
             let sbs = List.fold_left add ity_subst_empty vl in
@@ -1747,6 +1709,7 @@ let add_types ~wp uc tdl =
               let inv = inv || ity_has_inv ity in
               match id with
               | None ->
+                  if not gh then nogh := ity_nonghost_reg !nogh ity;
                   let regs = Sreg.union regs ity.ity_vars.vars_reg in
                   (regs, inv), (None, fd)
               | Some id ->
@@ -1758,6 +1721,7 @@ let add_types ~wp uc tdl =
                     (regs, inv), (Some (Denv.create_user_id id), fd)
                   with Not_found ->
                     Hstr.replace projs id.id fd;
+                    if not gh then nogh := ity_nonghost_reg !nogh ity;
                     let regs = Sreg.union regs ity.ity_vars.vars_reg in
                     (regs, inv), (Some (Denv.create_user_id id), fd)
             in
@@ -1767,10 +1731,12 @@ let add_types ~wp uc tdl =
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),def = Lists.map_fold_left mk_constr init csl in
+            let ghost_reg = Sreg.diff regs !nogh in
             let rl = Sreg.elements regs in
             Hstr.replace predefs x def;
-            PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
+            PT (create_itysymbol id ~abst ~priv ~inv ~ghost_reg vl rl None)
         | TDrecord fl when Hstr.find mutables x ->
+            let nogh = ref Sreg.empty in
             let mk_field (regs,inv) f =
               let ity = parse f.f_pty in
               let inv = inv || ity_has_inv ity in
@@ -1781,14 +1747,17 @@ let add_types ~wp uc tdl =
               else
                 Sreg.union regs ity.ity_vars.vars_reg, None
               in
+              if not f.f_ghost then nogh :=
+                Opt.fold_right Sreg.add mut (ity_nonghost_reg !nogh ity);
               (regs, inv), (Some fid, mk_field ity f.f_ghost mut)
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),pjl = Lists.map_fold_left mk_field init fl in
+            let ghost_reg = Sreg.diff regs !nogh in
             let rl = Sreg.elements regs in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
             Hstr.replace predefs x [Denv.create_user_id cid, pjl];
-            PT (create_itysymbol id ~abst ~priv ~inv vl rl None)
+            PT (create_itysymbol id ~abst ~priv ~inv ~ghost_reg vl rl None)
         | TDalgebraic _ | TDrecord _ when Hstr.find impures x ->
             PT (create_itysymbol id ~abst ~priv ~inv:false vl [] None)
         | TDalgebraic _ | TDrecord _ | TDabstract ->

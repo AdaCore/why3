@@ -78,7 +78,7 @@ module M
 
   (***
 
-  val ghost_find (u:ref uf) (x:int) : int reads {u}
+  val ghost_find (u:ref uf) (x:int) : int
     requires { inv !u /\ 0 <= x < size !u }
     ensures { repr !u x result }
 

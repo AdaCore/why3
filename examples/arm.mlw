@@ -46,14 +46,14 @@ module ARM
 
   (* memory *)
   val mem : ref (map int int)
-  val mem_ldr (a:int) : int reads { mem } ensures { result = !mem[a] }
+  val mem_ldr (a:int) : int ensures { result = !mem[a] }
   val mem_str (a:int) (v:int) : int writes { mem }
     ensures { !mem = (old !mem)[a <- v] }
 
   (* data segment *)
   (*
   val data : ref (t int int)
-  val data_ldr (a:int) : int reads { data } ensures { result = data[a] }
+  val data_ldr (a:int) : int ensures { result = data[a] }
   val data_str (a:int) (v:int) : int writes { data }
     ensures { data = (old data)[a <- v] }
   *)
@@ -67,16 +67,16 @@ module ARM
   val fp : ref int
   val pc : ref int (* pc *)
 
-  val ldr (r : ref int) (a : int) : unit reads {mem} writes {r}
+  val ldr (r : ref int) (a : int) : unit writes {r}
     ensures { !r = !mem[a] }
 
-  val str (r : ref int) (a : int) : unit reads {r} writes {mem}
+  val str (r : ref int) (a : int) : unit writes {mem}
     ensures { !mem = (old !mem)[a <- !r] }
 
   (* condition flags *)
   val le : ref bool
 
-  val cmp (r : ref int) (v : int) : unit reads {r} writes {le}
+  val cmp (r : ref int) (v : int) : unit writes {le}
     ensures { !le=True <-> !r <= v }
 
 end

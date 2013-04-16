@@ -83,7 +83,7 @@ module HashTable
 
   exception Not_found
 
-  val find (h: t 'a 'b) (k: 'a) : 'b reads {h}
+  val find (h: t 'a 'b) (k: 'a) : 'b
     ensures { h[k] = Some result } raises { Not_found -> h[k] = None }
 
 end

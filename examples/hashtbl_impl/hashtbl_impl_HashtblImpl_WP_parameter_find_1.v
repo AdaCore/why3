@@ -131,13 +131,16 @@ Theorem WP_parameter_find : forall {a:Type} {a_WT:WhyType a}, forall (k:key),
   (list (key* a)%type))), ((((0%Z < rho1)%Z /\ forall (i:Z), ((0%Z <= i)%Z /\
   (i < rho1)%Z) -> (good_hash (mk_array rho1 rho2) i)) /\ forall (k1:key)
   (v:a), (good_data k1 v rho (mk_array rho1 rho2))) /\ (0%Z <= rho1)%Z) ->
-  (((0%Z <= (bucket k rho1))%Z /\ ((bucket k rho1) < rho1)%Z) -> let o :=
-  (map.Map.get rho2 (bucket k rho1)) in forall (result:(option a)),
+  let i := (bucket k rho1) in (((0%Z <= i)%Z /\ (i < rho1)%Z) -> let o :=
+  (map.Map.get rho2 i) in forall (result:(option a)),
   match result with
   | None => forall (v:a), ~ (mem (k, v) o)
   | (Some v) => (mem (k, v) o)
   end -> (result = (map.Map.get rho k))).
-intros a a_WT k rho rho1 rho2 (((h1,h2),h3),h4) (h5,h6) o result h7.
+(* Why3 intros a a_WT k rho rho1 rho2 (((h1,h2),h3),h4) i (h5,h6) o result
+        h7. *)
+intros a a_WT k rho rho1 rho2 (((h1,h2),h3),h4) i (h5,h6) o result h7.
+subst i.
 destruct result.
 unfold good_data in h3.
 generalize (h3 k); clear h3.

@@ -125,7 +125,6 @@ type ppattern = {
   ppat_pattern : pattern;
   ppat_ity     : ity;
   ppat_ghost   : bool;
-  ppat_effect  : effect;
 }
 
 type pre_ppattern =
@@ -151,24 +150,20 @@ let make_ppattern pp ?(ghost=false) ity =
       Hstr.add hv nm pv; pv
   in
   let make_app ls ppl ghost ity =
-    let add_ppat e pp = eff_union e pp.ppat_effect, pp.ppat_pattern in
-    let effect, patl = Lists.map_fold_left add_ppat eff_empty ppl in
+    let patl = List.map (fun pp -> pp.ppat_pattern) ppl in
     { ppat_pattern = pat_app ls patl (ty_of_ity ity);
       ppat_ity     = ity;
-      ppat_ghost   = ghost;
-      ppat_effect  = effect; }
+      ppat_ghost   = ghost; }
   in
   let rec make ghost ity = function
     | PPwild -> {
         ppat_pattern = pat_wild (ty_of_ity ity);
         ppat_ity     = ity;
-        ppat_ghost   = ghost;
-        ppat_effect  = eff_empty; }
+        ppat_ghost   = ghost; }
     | PPvar id -> {
         ppat_pattern = pat_var (find id ghost ity).pv_vs;
         ppat_ity     = ity;
-        ppat_ghost   = ghost;
-        ppat_effect  = eff_empty; }
+        ppat_ghost   = ghost; }
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls);
         if pls.pl_ls.ls_constr = 0 then
@@ -178,14 +173,7 @@ let make_ppattern pp ?(ghost=false) ity =
         let sbs = ity_match ity_subst_empty ityv ity in
         let mtch arg pp =
           let ghost = ghost || arg.fd_ghost in
-          let pp = make ghost (ity_full_inst sbs arg.fd_ity) pp in
-          match pp.ppat_pattern.pat_node, arg.fd_mut with
-            | Pwild, _ -> pp
-            | _, Some r ->
-                let reg = reg_full_inst sbs r in
-                let eff = eff_read ~ghost pp.ppat_effect reg in
-                { pp with ppat_effect = eff }
-            | _, _ -> pp in
+          make ghost (ity_full_inst sbs arg.fd_ity) pp in
         let ppl = try List.map2 mtch pls.pl_args ppl with
           | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
@@ -209,14 +197,12 @@ let make_ppattern pp ?(ghost=false) ity =
         let pp2 = make ghost ity pp2 in
         { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
           ppat_ity     = ity;
-          ppat_ghost   = ghost;
-          ppat_effect  = eff_union pp1.ppat_effect pp2.ppat_effect; }
+          ppat_ghost   = ghost; }
     | PPas (pp,id) ->
         let pp = make ghost ity pp in
         { ppat_pattern = pat_as pp.ppat_pattern (find id ghost ity).pv_vs;
           ppat_ity     = ity;
-          ppat_ghost   = ghost;
-          ppat_effect  = pp.ppat_effect; }
+          ppat_ghost   = ghost; }
   in
   let pp = make ghost ity pp in
   let gh = pp.ppat_ghost || !gghost in
@@ -229,7 +215,7 @@ type psymbol = {
   ps_name  : ident;
   ps_aty   : aty;
   ps_ghost : bool;
-  ps_varm  : varmap;
+  ps_pvset : Spv.t;
   ps_vars  : varset;
   ps_subst : ity_subst;
 }
@@ -244,15 +230,30 @@ module Mps = Psym.M
 module Hps = Psym.H
 module Wps = Psym.W
 
+type symset = {
+  syms_pv : Spv.t;
+  syms_ps : Sps.t;
+}
+
 let ps_equal : psymbol -> psymbol -> bool = (==)
 
-let create_psymbol_real ~poly id ghost aty varm =
-  let vars = if poly then vars_empty else aty_vars aty in
-  let vars = vars_merge varm vars in
+let add_pv_vars vars pv = vars_union vars pv.pv_ity.ity_vars
+let add_ps_vars vars ps = vars_union vars ps.ps_vars
+
+let create_psymbol_real ~poly id ghost syms aty =
+  let { syms_pv = pvset; syms_ps = psset } = syms in
+  let tyvars = if poly then vars_empty else aty_vars aty in
+  let pvvars = Spv.fold_left add_pv_vars vars_empty pvset in
+  let psvars = Sps.fold_left add_ps_vars vars_empty psset in
+  let vars = vars_union psvars (vars_union pvvars tyvars) in
+  (* we must be polymorphic in every region not fixed by the context *)
+  reg_iter (fun reg -> if not (reg_occurs reg pvvars) then Loc.errorm
+    "This partial application produces non-generalizable effects") tyvars;
+  assert (reg_all (fun reg -> reg_occurs reg pvvars) psvars);
   { ps_name  = id_register id;
-    ps_aty   = aty_filter ~ghost varm aty;
+    ps_aty   = aty_filter ~ghost pvset aty;
     ps_ghost = ghost;
-    ps_varm  = varm;
+    ps_pvset = pvset;
     ps_vars  = vars;
     ps_subst = vars_freeze vars; }
 
@@ -261,85 +262,33 @@ let create_psymbol_mono = create_psymbol_real ~poly:false
 
 (** specification *)
 
-let varmap_union = Mid.set_union
-
-let add_pv_vars pv m = Mid.add pv.pv_vs.vs_name pv.pv_ity.ity_vars m
-let add_vs_vars vs _ m = add_pv_vars (restore_pv vs) m
-let add_t_vars vss m = Mvs.fold add_vs_vars vss m
-
-let add_ps_vars ps m =
-  Mid.add ps.ps_name ps.ps_vars (varmap_union ps.ps_varm m)
-
-let pre_vars f vsset = Mvs.set_union vsset f.t_vars
-let post_vars f vsset = Mvs.set_union vsset f.t_vars
-let xpost_vars = Mexn.fold (fun _ -> post_vars)
-
-let variant_vars varl vsset =
-  let add_variant s (t,_) = Mvs.set_union s t.t_vars in
-  List.fold_left add_variant vsset varl
-
-let spec_vsset spec =
-  let vsset = pre_vars spec.c_pre Mvs.empty in
-  let vsset = post_vars spec.c_post vsset in
-  let vsset = xpost_vars spec.c_xpost vsset in
-  let vsset = variant_vars spec.c_variant vsset in
-  vsset
-
-let spec_varmap varm spec = add_t_vars (spec_vsset spec) varm
-
-let spec_pvset pvs spec =
-  let add_vs vs _ s = Spv.add (restore_pv vs) s in
-  Mvs.fold add_vs (spec_vsset spec) pvs
-
-let rec aty_varmap aty =
-  let varm = match aty.aty_result with
-    | VTarrow a -> aty_varmap a
-    | VTvalue _ -> Mid.empty in
-  let varm = spec_varmap varm aty.aty_spec in
-  let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
-  List.fold_left del_pv varm aty.aty_args
-
-let eff_check vars result e =
-  let check vars r = if not (reg_occurs r vars) then
-    Loc.errorm "every external effect must be mentioned in specification" in
-  let reset vars r u = check vars r; Opt.iter (check vars) u in
-  let check = check vars in
-  Sreg.iter check e.eff_reads;
-  Sreg.iter check e.eff_writes;
-  Sreg.iter check e.eff_ghostr;
-  Sreg.iter check e.eff_ghostw;
-  if not (Mreg.is_empty e.eff_resets) then
-    let reset = reset (vars_union vars (vty_vars result)) in
-    Mreg.iter reset e.eff_resets
-
-let ity_check vars eff ity =
-  let on_reg r =
-    if not (reg_occurs r vars) &&
-      (try Mreg.find r eff.eff_resets <> None with Not_found -> true)
-    then Loc.errorm "every fresh region in the result must be reset" in
-  reg_iter on_reg ity.ity_vars
+let rec aty_pvset aty =
+  let spv = match aty.aty_result with
+    | VTarrow a -> aty_pvset a
+    | VTvalue _ -> Spv.empty in
+  let spv = spec_pvset spv aty.aty_spec in
+  List.fold_right Spv.remove aty.aty_args spv
 
 let rec aty_check vars aty =
-  let add_arg vars pv = vars_union vars pv.pv_ity.ity_vars in
-  let vars = List.fold_left add_arg vars aty.aty_args in
-  eff_check vars aty.aty_result aty.aty_spec.c_effect;
   if aty.aty_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.aty_check";
+  let test_or_raise c = if not c then Loc.errorm
+    "every external effect must be mentioned in specification" in
+  let vars = List.fold_left add_pv_vars vars aty.aty_args in
+  let ch_tv tv = test_or_raise (Stv.mem tv vars.vars_tv) in
+  let check reg = test_or_raise (reg_occurs reg vars) in
+  let eff = aty.aty_spec.c_effect in
+  Sreg.iter check eff.eff_writes;
+  Sreg.iter check eff.eff_ghostw;
+  Stv.iter  ch_tv eff.eff_compar;
   match aty.aty_result with
   | VTarrow a -> aty_check vars a
-  | VTvalue v -> ity_check vars aty.aty_spec.c_effect v
+  | VTvalue _ -> ()
 
 let create_psymbol id ?(ghost=false) aty =
-  let ps = create_psymbol_poly id ghost aty (aty_varmap aty) in
-  aty_check ps.ps_vars aty;
-  ps
-
-let create_psymbol_extra id ?(ghost=false) aty pvs pss =
-  let varm = aty_varmap aty in
-  let varm = Spv.fold add_pv_vars pvs varm in
-  let varm = Sps.fold add_ps_vars pss varm in
-  let ps = create_psymbol_poly id ghost aty varm in
-  aty_check ps.ps_vars aty;
-  ps
+  let syms = { syms_pv = aty_pvset aty; syms_ps = Sps.empty } in
+  let vars = Spv.fold_left add_pv_vars vars_empty syms.syms_pv in
+  aty_check vars aty;
+  create_psymbol_poly id ghost syms aty
 
 (** program expressions *)
 
@@ -360,7 +309,7 @@ type expr = {
   e_vty    : vty;
   e_ghost  : bool;
   e_effect : effect;
-  e_varm   : varmap;
+  e_syms   : symset;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
@@ -393,13 +342,65 @@ and let_defn = {
 and fun_defn = {
   fun_ps     : psymbol;
   fun_lambda : lambda;
-  fun_varm   : varmap;
+  fun_syms   : symset;
 }
 
 and lambda = {
   l_args : pvsymbol list;
   l_expr : expr;
   l_spec : spec;
+}
+
+(* symset manipulation *)
+
+let syms_empty = {
+  syms_pv = Spv.empty;
+  syms_ps = Sps.empty;
+}
+
+let del_pv_syms pv syms = {
+(* TODO/FIXME: removing a pvsymbol directly from syms_pv may break
+   the symset invariant requiring that all pvs in syms_ps*ps_pvset
+   were in syms_pv. This is only possible if one reuses a let_defn
+   in an expr, and reusing let_defn breaks WP anyway, so we ignore
+   this for now, until a proper variable binding is implemented. *)
+  syms_pv = Spv.remove pv syms.syms_pv;
+  syms_ps = syms.syms_ps;
+}
+
+let del_ps_syms ps syms = {
+  syms_pv = syms.syms_pv;
+  syms_ps = Sps.remove ps syms.syms_ps;
+}
+
+let add_pv_syms pv syms = {
+  syms_pv = Spv.add pv syms.syms_pv;
+  syms_ps = syms.syms_ps;
+}
+
+let add_ps_syms ps syms = {
+  syms_pv = Spv.union ps.ps_pvset syms.syms_pv;
+  syms_ps = Sps.add ps syms.syms_ps;
+}
+
+let add_e_syms e syms = {
+  syms_pv = Spv.union e.e_syms.syms_pv syms.syms_pv;
+  syms_ps = Sps.union e.e_syms.syms_ps syms.syms_ps;
+}
+
+let add_t_syms t syms = {
+  syms_pv = t_pvset syms.syms_pv t;
+  syms_ps = syms.syms_ps;
+}
+
+let add_spec_syms c syms = {
+  syms_pv = spec_pvset syms.syms_pv c;
+  syms_ps = syms.syms_ps;
+}
+
+let syms_union syms1 syms2 = {
+  syms_pv = Spv.union syms1.syms_pv syms2.syms_pv;
+  syms_ps = Sps.union syms1.syms_ps syms2.syms_ps;
 }
 
 (* base tools *)
@@ -423,23 +424,6 @@ let ity_of_expr e = match e.e_vty with
 let aty_of_expr e = match e.e_vty with
   | VTvalue _ -> Loc.error ?loc:e.e_loc (ArrowExpected e)
   | VTarrow aty -> aty
-
-let add_e_vars e m = varmap_union e.e_varm m
-
-let varmap_pvset pvs varm =
-  let add_id id _ s =
-    try Spv.add (restore_pv_by_id id) s
-    with Not_found -> s in
-  Mid.fold add_id varm pvs
-
-let ps_pvset pvs ps = varmap_pvset pvs ps.ps_varm
-
-let e_pvset pvs e = varmap_pvset pvs e.e_varm
-
-let l_pvset pvs lam =
-  let pvs = e_pvset pvs lam.l_expr in
-  let pvs = spec_pvset pvs lam.l_spec in
-  List.fold_right Spv.remove lam.l_args pvs
 
 (* fold *)
 
@@ -472,54 +456,53 @@ let e_find pr e =
 (* check admissibility of consecutive events *)
 
 exception StaleRegion of expr * ident
-exception GhostWrite of expr * region
 
-let check_reset e varm =
+let check_reset e { syms_pv = spv; syms_ps = sps } =
   (* If we reset a region, then it may only occur in the later code
      as the result of the resetting expression. Otherwise, this is
      a freshness violation: some symbol defined earlier carries that
      region into the later code. *)
-  let check_id id vars = if eff_stale_region e.e_effect vars then
+  let check id vars = if eff_stale_region e.e_effect vars then
     Loc.error ?loc:e.e_loc (StaleRegion (e,id)) in
-  if not (Mreg.is_empty e.e_effect.eff_resets) then
-    Mid.iter check_id varm
+  if not (Mreg.is_empty e.e_effect.eff_resets) then begin
+    Sps.iter (fun ps -> check ps.ps_name ps.ps_vars) sps;
+    Spv.iter (fun pv -> check pv.pv_vs.vs_name pv.pv_ity.ity_vars) spv
+  end
 
-let check_ghost_write e eff =
-  (* If we make a ghost write, then the modified region cannot
-     be read in a later non-ghost code. We ignore any resets:
-     a once ghostified region must stay so, even if it is reset. *)
-  let badwr = Sreg.inter e.e_effect.eff_ghostw eff.eff_reads in
-  if not (Sreg.is_empty badwr) then
-    Loc.error ?loc:e.e_loc (GhostWrite (e, Sreg.choose badwr))
+let check_ghost_write { eff_ghostw = regs } { syms_pv = pvs } =
+  let check { pv_ghost = gh; pv_ity = ity } =
+    if not gh && lookup_nonghost_reg regs ity then Loc.errorm
+      "This expression makes a ghost write into a non-ghost location" in
+  if not (Sreg.is_empty regs) then Spv.iter check pvs
 
-let check_postexpr e eff varm =
-  check_ghost_write e eff;
-  check_reset e varm
+let check_postexpr e _eff syms =
+  check_reset e syms
 
 (* smart constructors *)
 
-let mk_expr node vty ghost eff varm =
+let mk_expr node vty ghost eff syms =
   let ghost = ghost || not (Sexn.is_empty eff.eff_ghostx) in
   let eff = eff_ghostify ghost eff in
+  check_ghost_write eff syms;
   { e_node   = node;
     e_vty    = vty;
     e_ghost  = ghost;
     e_effect = eff;
-    e_varm   = varm;
+    e_syms   = syms;
     e_label  = Slab.empty;
     e_loc    = None; }
 
 (* program variables and program symbols *)
 
 let e_value pv =
-  let varm = add_pv_vars pv Mid.empty in
-  mk_expr (Evalue pv) (VTvalue pv.pv_ity) pv.pv_ghost eff_empty varm
+  let syms = add_pv_syms pv syms_empty in
+  mk_expr (Evalue pv) (VTvalue pv.pv_ity) pv.pv_ghost eff_empty syms
 
 let e_arrow ps argl res =
-  let varm = add_ps_vars ps Mid.empty in
+  let syms = add_ps_syms ps syms_empty in
   let sbs = aty_vars_match ps.ps_subst ps.ps_aty argl res in
   let aty = aty_full_inst sbs ps.ps_aty in
-  mk_expr (Earrow ps) (VTarrow aty) ps.ps_ghost eff_empty varm
+  mk_expr (Earrow ps) (VTarrow aty) ps.ps_ghost eff_empty syms
 
 let e_arrow_aty ps aty =
   let rec get_types argl a =
@@ -535,7 +518,7 @@ let e_arrow_aty ps aty =
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTarrow aty -> LetA (create_psymbol_mono id e.e_ghost aty e.e_varm)
+    | VTarrow aty -> LetA (create_psymbol_mono id e.e_ghost e.e_syms aty)
     | VTvalue ity -> LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
   { let_sym = lv ; let_expr = e }
 
@@ -552,13 +535,12 @@ let create_let_ps_defn id e =
     | LetA ps -> ld, ps
 
 let e_let ({ let_sym = lv ; let_expr = d } as ld) e =
-  let id = match lv with
-    | LetV pv -> pv.pv_vs.vs_name
-    | LetA ps -> ps.ps_name in
-  let varm = Mid.remove id e.e_varm in
-  check_postexpr d e.e_effect varm;
+  let syms = match lv with
+    | LetV pv -> del_pv_syms pv e.e_syms
+    | LetA ps -> del_ps_syms ps e.e_syms in
+  check_postexpr d e.e_effect syms;
   let eff = eff_union d.e_effect e.e_effect in
-  mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff (add_e_vars d varm)
+  mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff (add_e_syms d syms)
 
 let on_value fn e = match e.e_node with
   | Evalue pv -> fn pv
@@ -572,9 +554,9 @@ let e_app_real e pv =
   let spec,ghost,vty = aty_app (aty_of_expr e) pv in
   let ghost = e.e_ghost || ghost in
   let eff = eff_ghostify ghost spec.c_effect in
-  check_postexpr e eff (add_pv_vars pv Mid.empty);
+  check_postexpr e eff (add_pv_syms pv syms_empty);
   let eff = eff_union e.e_effect eff in
-  mk_expr (Eapp (e,pv,spec)) vty ghost eff (add_pv_vars pv e.e_varm)
+  mk_expr (Eapp (e,pv,spec)) vty ghost eff (add_pv_syms pv e.e_syms)
 
 let rec e_app_flatten e pv = match e.e_node with
   (* TODO/FIXME? here, we avoid capture in the first case,
@@ -609,18 +591,17 @@ let e_app = List.fold_left (fun e -> on_value (e_app_flatten e))
 let e_plapp pls el ity =
   if pls.pl_hidden then raise (HiddenPLS pls);
   if pls.pl_rdonly then raise (RdOnlyPLS pls);
-  let rec app tl varm ghost eff sbs fdl argl = match fdl, argl with
+  let rec app tl syms ghost eff sbs fdl argl = match fdl, argl with
     | [],[] ->
-        let mut_fold fn leff fd = Opt.fold fn leff fd.fd_mut in
-        let leff = mut_fold (eff_read ~ghost) eff_empty pls.pl_value in
-        let leff = List.fold_left (mut_fold eff_reset) leff pls.pl_args in
+        let mut_fold leff fd = Opt.fold eff_reset leff fd.fd_mut in
+        let leff = List.fold_left mut_fold eff_empty pls.pl_args in
         let mtv = Mtv.set_diff sbs.ity_subst_tv pls.pl_ls.ls_opaque in
         let leff = Mtv.fold (fun tv _ e -> eff_compare e tv) mtv leff in
         let eff = eff_union eff (eff_full_inst sbs leff) in
         let t = match pls.pl_ls.ls_value with
           | Some _ -> fs_app pls.pl_ls tl (ty_of_ity ity)
           | None   -> ps_app pls.pl_ls tl in
-        mk_expr (Elogic t) (VTvalue ity) ghost eff varm
+        mk_expr (Elogic t) (VTvalue ity) ghost eff syms
     | [],_ | _,[] ->
         raise (Term.BadArity
           (pls.pl_ls, List.length pls.pl_args, List.length el))
@@ -633,13 +614,13 @@ let e_plapp pls el ity =
           Loc.errorm "non-ghost value passed as a ghost argument";
         let eff = eff_union eff e.e_effect in
         let sbs = ity_match sbs fd.fd_ity (ity_of_expr e) in
-        app (t::tl) (add_e_vars e varm) ghost eff sbs fdl argl
+        app (t::tl) (add_e_syms e syms) ghost eff sbs fdl argl
     | fd::fdl, e::argl ->
         let apply_to_pv pv =
           let t = t_var pv.pv_vs in
           let ghost = ghost || (pv.pv_ghost && not fd.fd_ghost) in
           let sbs = ity_match sbs fd.fd_ity pv.pv_ity in
-          app (t::tl) (add_pv_vars pv varm) ghost eff sbs fdl argl
+          app (t::tl) (add_pv_syms pv syms) ghost eff sbs fdl argl
         in
         if fd.fd_ghost && not e.e_ghost then
           Loc.errorm "non-ghost value passed as a ghost argument";
@@ -647,7 +628,7 @@ let e_plapp pls el ity =
   in
   let argl = List.rev el and fdl = List.rev pls.pl_args in
   let sbs = ity_match ity_subst_empty pls.pl_value.fd_ity ity in
-  app [] Mid.empty pls.pl_value.fd_ghost eff_empty sbs fdl argl
+  app [] syms_empty pls.pl_value.fd_ghost eff_empty sbs fdl argl
 
 let e_lapp ls el ity = e_plapp (fake_pls ls) el ity
 
@@ -661,45 +642,45 @@ let e_if e0 e1 e2 =
   ity_equal_check (ity_of_expr e0) ity_bool;
   ity_equal_check (ity_of_expr e1) (ity_of_expr e2);
   let eff = eff_union e1.e_effect e2.e_effect in
-  let varm = add_e_vars e2 (add_e_vars e1 Mid.empty) in
+  let syms = add_e_syms e2 (add_e_syms e1 syms_empty) in
   let ghost = e0.e_ghost || e1.e_ghost || e2.e_ghost in
   let eff = eff_ghostify ghost eff in
-  check_postexpr e0 eff varm;
-  let varm = add_e_vars e0 varm in
+  check_postexpr e0 eff syms;
+  let syms = add_e_syms e0 syms in
   let eff = eff_union e0.e_effect eff in
-  mk_expr (Eif (e0,e1,e2)) e1.e_vty ghost eff varm
+  mk_expr (Eif (e0,e1,e2)) e1.e_vty ghost eff syms
 
 let e_case e0 bl =
   let bity = match bl with
     | (_,e)::_ -> ity_of_expr e
     | [] -> raise Term.EmptyCase in
   let multi_br = List.length bl > 1 in
-  let rec branch ghost eff varm = function
+  let rec branch ghost eff syms = function
     | (pp,e)::bl ->
         if e0.e_ghost && not pp.ppat_ghost then
           Loc.errorm "Non-ghost pattern in a ghost position";
         ity_equal_check (ity_of_expr e0) pp.ppat_ity;
         ity_equal_check (ity_of_expr e) bity;
-        let del_vs vs _ m = Mid.remove vs.vs_name m in
-        let bvarm = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_varm in
-        let eff = eff_union (eff_union eff pp.ppat_effect) e.e_effect in
+        let eff = eff_union eff e.e_effect in
+        let del_vs vs _ syms = del_pv_syms (restore_pv vs) syms in
+        let bsyms = Mvs.fold del_vs pp.ppat_pattern.pat_vars e.e_syms in
         (* one-branch match is not ghost even if its pattern is ghost *)
         let ghost = ghost || (multi_br && pp.ppat_ghost) || e.e_ghost in
-        branch ghost eff (varmap_union varm bvarm) bl
+        branch ghost eff (syms_union syms bsyms) bl
     | [] ->
         (* the cumulated effect of all branches, w/out e0 *)
         let eff = eff_ghostify ghost eff in
-        check_postexpr e0 eff varm; (* cumulated varmap *)
+        check_postexpr e0 eff syms; (* cumulated symset *)
         let eff = eff_union e0.e_effect eff in
-        let varm = add_e_vars e0 varm in
-        mk_expr (Ecase (e0,bl)) (VTvalue bity) ghost eff varm
+        let syms = add_e_syms e0 syms in
+        mk_expr (Ecase (e0,bl)) (VTvalue bity) ghost eff syms
   in
-  branch false eff_empty Mid.empty bl
+  branch false eff_empty syms_empty bl
 
 (* ghost *)
 
 let e_ghost e =
-  mk_expr (Eghost e) e.e_vty true e.e_effect e.e_varm
+  mk_expr (Eghost e) e.e_vty true e.e_effect e.e_syms
 
 (* assignment *)
 
@@ -719,33 +700,18 @@ let e_assign_real pls e0 pv =
   let lghost = e0.e_ghost || pls.pl_value.fd_ghost in
   let ghost = lghost || pv.pv_ghost in
   let eff = eff_assign eff_empty ~ghost r pv.pv_ity in
-  let varm = add_pv_vars pv Mid.empty in
-  check_postexpr e0 eff varm;
-  let varm = add_e_vars e0 varm in
+  let syms = add_pv_syms pv syms_empty in
+  check_postexpr e0 eff syms;
+  let syms = add_e_syms e0 syms in
   let eff = eff_union eff e0.e_effect in
-  let e = mk_expr (Eassign (pls,e0,r,pv)) (VTvalue ity_unit) ghost eff varm in
-  (* FIXME? Ok, this is awkward. We prohibit assignments
-     where a ghost value is being written in a non-ghost
-     mutable lvalue (which is reasonable), but we build the
-     offending expression nonetheless and include it into
-     the exception! But in fact, there is nothing inherently
-     bad in such expressions, and the check here serves only
-     to catch potential problems early. Indeed, it is quite
-     easy to fool: it suffices to write (ghost r).val <- ghv,
-     to put a ghost value ghv into a non-ghost reference r.
-     The real check is written above in e_let, where we ensure
-     that every ghost write (whether it was made into a ghost
-     lvalue or not) is never followed by a non-ghost read. *)
-  if not lghost && pv.pv_ghost then
-    Loc.error (GhostWrite (e,r));
-  e
+  mk_expr (Eassign (pls,e0,r,pv)) (VTvalue ity_unit) ghost eff syms
 
 let e_assign pls e0 e1 = on_value (e_assign_real pls e0) e1
 
 (* numeric constants *)
 
 let e_const t =
-  mk_expr (Elogic t) (VTvalue (ity_of_ty_opt t.t_ty)) false eff_empty Mid.empty
+  mk_expr (Elogic t) (VTvalue (ity_of_ty_opt t.t_ty)) false eff_empty syms_empty
 
 let e_const c = e_const (t_const c)
 
@@ -753,10 +719,10 @@ let e_const c = e_const (t_const c)
 
 (* FIXME? Should we rather use boolean constants here? *)
 let e_true =
-  mk_expr (Elogic t_true) (VTvalue ity_bool) false eff_empty Mid.empty
+  mk_expr (Elogic t_true) (VTvalue ity_bool) false eff_empty syms_empty
 
 let e_false =
-  mk_expr (Elogic t_false) (VTvalue ity_bool) false eff_empty Mid.empty
+  mk_expr (Elogic t_false) (VTvalue ity_bool) false eff_empty syms_empty
 
 let on_fmla fn e = match e.e_node with
   | Elogic ({ t_ty = None } as f) -> fn e f
@@ -769,16 +735,16 @@ let on_fmla fn e = match e.e_node with
 let e_not e =
   on_fmla (fun e f ->
     ity_equal_check (ity_of_expr e) ity_bool;
-    mk_expr (Elogic (t_not f)) e.e_vty e.e_ghost e.e_effect e.e_varm) e
+    mk_expr (Elogic (t_not f)) e.e_vty e.e_ghost e.e_effect e.e_syms) e
 
 let e_binop op e1 e2 =
   on_fmla (fun e1 f1 -> on_fmla (fun e2 f2 ->
     ity_equal_check (ity_of_expr e1) ity_bool;
     ity_equal_check (ity_of_expr e2) ity_bool;
-    let varm = add_e_vars e1 e2.e_varm in
+    let syms = add_e_syms e1 e2.e_syms in
     let eff = eff_union e1.e_effect e2.e_effect in
     let ghost = e1.e_ghost || e2.e_ghost in
-    mk_expr (Elogic (t_binary op f1 f2)) e1.e_vty ghost eff varm) e2) e1
+    mk_expr (Elogic (t_binary op f1 f2)) e1.e_vty ghost eff syms) e2) e1
 
 let rec e_nospec e = match e.e_node with
   | Elogic _ | Evalue _ -> true
@@ -800,12 +766,12 @@ let e_lazy_or e1 e2 =
 
 let e_loop inv variant ({e_effect = eff} as e) =
   ity_equal_check (ity_of_expr e) ity_unit;
-  let vsset = pre_vars inv Mvs.empty in
-  let vsset = variant_vars variant vsset in
-  let varm = add_t_vars vsset e.e_varm in
-  check_postexpr e eff varm;
+  let syms = List.fold_left (fun s (t,_) ->
+    add_t_syms t s) e.e_syms variant in
+  let syms = add_t_syms inv syms in
+  check_postexpr e eff syms;
   let eff = if variant = [] then eff_diverge eff else eff in
-  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_ghost eff varm
+  mk_expr (Eloop (inv,variant,e)) e.e_vty e.e_ghost eff syms
 
 let e_for_real pv bounds inv e =
   let pvfrom,_,pvto = bounds in
@@ -815,14 +781,14 @@ let e_for_real pv bounds inv e =
   ity_equal_check pvto.pv_ity ity_int;
   let ghost = pv.pv_ghost || pvfrom.pv_ghost || pvto.pv_ghost || e.e_ghost in
   let eff = eff_ghostify ghost e.e_effect in
-  let varm = add_t_vars inv.t_vars e.e_varm in
+  let syms = add_t_syms inv e.e_syms in
   (* FIXME? We check that no variable in the loop body, _including_
      the index variable, is not invalidated because of a region reset.
      We ignore the loop bounds, since they are computed just once. *)
-  check_postexpr e eff varm;
-  let varm = Mid.remove pv.pv_vs.vs_name varm in
-  let varm = add_pv_vars pvfrom (add_pv_vars pvto varm) in
-  mk_expr (Efor (pv,bounds,inv,e)) e.e_vty ghost eff varm
+  check_postexpr e eff syms;
+  let syms = del_pv_syms pv syms in
+  let syms = add_pv_syms pvfrom (add_pv_syms pvto syms) in
+  mk_expr (Efor (pv,bounds,inv,e)) e.e_vty ghost eff syms
 
 let e_for pv efrom dir eto inv e =
   let apply pvto pvfrom = e_for_real pv (pvfrom,dir,pvto) inv e in
@@ -834,91 +800,89 @@ let e_for pv efrom dir eto inv e =
 let e_raise xs e ity =
   ity_equal_check (ity_of_expr e) xs.xs_ity;
   let eff = eff_raise eff_empty ~ghost:e.e_ghost xs in
-  check_postexpr e eff Mid.empty;
+  check_postexpr e eff syms_empty;
   let eff = eff_union eff e.e_effect in
-  mk_expr (Eraise (xs,e)) (VTvalue ity) e.e_ghost eff e.e_varm
+  mk_expr (Eraise (xs,e)) (VTvalue ity) e.e_ghost eff e.e_syms
 
 let e_try e0 bl =
-  let rec branch ghost eff varm = function
+  let rec branch ghost eff syms = function
     | (xs,pv,e)::bl ->
         ity_equal_check (ity_of_expr e) (ity_of_expr e0);
         ity_equal_check pv.pv_ity xs.xs_ity;
         (* we don't care about pv being ghost *)
         let ghost = ghost || e.e_ghost in
         let eff = eff_union eff e.e_effect in
-        let bvarm = Mid.remove pv.pv_vs.vs_name e.e_varm in
-        branch ghost eff (varmap_union varm bvarm) bl
+        let bsyms = del_pv_syms pv e.e_syms in
+        branch ghost eff (syms_union syms bsyms) bl
     | [] ->
         (* the cumulated effect of all branches, w/out e0 *)
         let eff = eff_ghostify ghost eff in
-        check_postexpr e0 eff varm; (* cumulated varmap *)
+        check_postexpr e0 eff syms; (* cumulated symset *)
         (* remove from e0.e_effect the catched exceptions *)
         let remove eff0 (xs,_,_) = eff_remove_raise eff0 xs in
         let eff0 = List.fold_left remove e0.e_effect bl in
-        (* total effect and varmap *)
+        (* total effect and symset *)
         let eff = eff_union eff0 eff in
-        let varm = add_e_vars e0 varm in
-        mk_expr (Etry (e0,bl)) e0.e_vty ghost eff varm
+        let syms = add_e_syms e0 syms in
+        mk_expr (Etry (e0,bl)) e0.e_vty ghost eff syms
   in
-  branch e0.e_ghost eff_empty Mid.empty bl
+  branch e0.e_ghost eff_empty syms_empty bl
 
 (* specification-related expressions *)
 
 let pv_dummy = create_pvsymbol (id_fresh "dummy") ity_unit
 
 let e_any spec vty =
-  if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_any";
   let aty = vty_arrow [pv_dummy] ~spec vty in
-  let varm = aty_varmap aty in
-  aty_check (vars_merge varm vars_empty) aty;
-  mk_expr (Eany spec) vty false spec.c_effect varm
+  let ps = create_psymbol (id_fresh "dummy") aty in
+  let syms = del_ps_syms ps (add_ps_syms ps syms_empty) in
+  let vty = ps.ps_aty.aty_result in
+  let spec = ps.ps_aty.aty_spec in
+  mk_expr (Eany spec) vty false spec.c_effect syms
 
 let e_abstract ({ e_effect = eff } as e) spec =
   if spec.c_letrec <> 0 then invalid_arg "Mlw_expr.e_abstract";
   let spec = { spec with c_effect = eff } in
   spec_check ~full_xpost:false spec e.e_vty;
-  let varm = spec_varmap e.e_varm spec in
-  mk_expr (Eabstr (e,spec)) e.e_vty e.e_ghost e.e_effect varm
+  let syms = add_spec_syms spec e.e_syms in
+  mk_expr (Eabstr (e,spec)) e.e_vty e.e_ghost e.e_effect syms
 
 let e_assert ak f =
-  let varm = add_t_vars f.t_vars Mid.empty in
-  mk_expr (Eassert (ak, f)) (VTvalue ity_unit) false eff_empty varm
+  let syms = add_t_syms f syms_empty in
+  mk_expr (Eassert (ak, f)) (VTvalue ity_unit) false eff_empty syms
 
 let e_absurd ity =
-  mk_expr Eabsurd (VTvalue ity) false eff_empty Mid.empty
+  mk_expr Eabsurd (VTvalue ity) false eff_empty syms_empty
 
 (* simple functional definitions *)
 
-let create_fun_defn id ({l_expr = e; l_spec = c} as lam) recsyms =
+let create_fun_defn id ({l_expr = e; l_spec = c} as lam) =
   let eff = if c.c_letrec <> 0 && c.c_variant = []
     then eff_diverge e.e_effect else e.e_effect in
   let spec = { c with c_effect = eff } in
   let lam = { lam with l_spec = spec } in
-  let varm = spec_varmap e.e_varm spec in
-  let del_pv m pv = Mid.remove pv.pv_vs.vs_name m in
-  let varm = List.fold_left del_pv varm lam.l_args in
-  let varm_ps = Mid.set_diff varm recsyms in
+  let syms = add_spec_syms lam.l_spec lam.l_expr.e_syms in
+  let syms = List.fold_right del_pv_syms lam.l_args syms in
   let aty = vty_arrow lam.l_args ~spec e.e_vty in
-  { fun_ps     = create_psymbol_poly id e.e_ghost aty varm_ps;
+  { fun_ps     = create_psymbol_poly id e.e_ghost syms aty;
     fun_lambda = lam;
-    fun_varm   = varm; }
+    fun_syms   = syms; }
 
-let rec_varmap varm fdl =
+let e_rec fdl e =
+  (* check letrec *)
   let fd, rest = match fdl with
-    | [] -> invalid_arg "Mlw_expr.rec_varm"
+    | [] -> invalid_arg "Mlw_expr.e_rec"
     | fd :: fdl -> fd, fdl in
   let lr = fd.fun_ps.ps_aty.aty_spec.c_letrec in
   let bad fd = fd.fun_ps.ps_aty.aty_spec.c_letrec <> lr in
-  if List.exists bad rest then invalid_arg "Mlw_expr.rec_varm";
-  let add_fd m fd = varmap_union fd.fun_varm m in
-  let del_fd m fd = Mid.remove fd.fun_ps.ps_name m in
-  let varm = List.fold_left add_fd varm fdl in
-  let varm = List.fold_left del_fd varm fdl in
-  varm
-
-let e_rec fdl e =
-  let varm = rec_varmap e.e_varm fdl in
-  mk_expr (Erec (fdl,e)) e.e_vty e.e_ghost e.e_effect varm
+  if List.exists bad rest then invalid_arg "Mlw_expr.e_rec";
+  if lr = 0 && rest <> [] then invalid_arg "Mlw_expr.e_rec";
+  (* compute syms *)
+  let add_fd syms fd = syms_union fd.fun_syms syms in
+  let del_fd syms fd = del_ps_syms fd.fun_ps syms in
+  let syms = List.fold_left add_fd e.e_syms fdl in
+  let syms = List.fold_left del_fd syms fdl in
+  mk_expr (Erec (fdl,e)) e.e_vty e.e_ghost e.e_effect syms
 
 (* compute the fixpoint on recursive definitions *)
 
@@ -934,11 +898,13 @@ let rec aty_compat a1 a2 =
 let ps_compat ps1 ps2 =
   aty_compat ps1.ps_aty ps2.ps_aty &&
   ps1.ps_ghost = ps2.ps_ghost &&
-  Mid.equal (fun _ _ -> true) ps1.ps_varm ps2.ps_varm
+  Spv.equal ps1.ps_pvset ps2.ps_pvset &&
+  Stv.equal ps1.ps_vars.vars_tv ps2.ps_vars.vars_tv &&
+  Sreg.equal ps1.ps_vars.vars_reg ps2.ps_vars.vars_reg
 
 let rec expr_subst psm e = e_label_copy e (match e.e_node with
-  | Earrow ps when Mid.mem ps.ps_name psm ->
-      e_arrow_aty (Mid.find ps.ps_name psm) (aty_of_expr e)
+  | Earrow ps when Mps.mem ps psm ->
+      e_arrow_aty (Mps.find ps psm) (aty_of_expr e)
   | Eapp (e,pv,_) ->
       e_app_real (expr_subst psm e) pv
   | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->
@@ -948,12 +914,12 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
   | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
       let ld,ns = create_let_ps_defn (id_clone ps.ps_name) (expr_subst psm d) in
-      e_let ld (expr_subst (Mid.add ps.ps_name ns psm) e)
+      e_let ld (expr_subst (Mps.add ps ns psm) e)
   | Erec (fdl, e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
       let defl = List.map (fun fd -> fd.fun_ps, conv fd.fun_lambda) fdl in
       let fdl = create_rec_defn defl in
-      let add psm (ps,_) fd = Mid.add ps.ps_name fd.fun_ps psm in
+      let add psm (ps,_) fd = Mps.add ps fd.fun_ps psm in
       e_rec fdl (expr_subst (List.fold_left2 add psm defl fdl) e)
   | Eif (e,e1,e2) ->
       e_if (expr_subst psm e) (expr_subst psm e1) (expr_subst psm e2)
@@ -978,18 +944,16 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
   | Elogic _ | Evalue _ | Earrow _ | Eany _ | Eabsurd | Eassert _ -> e)
 
 and create_rec_defn defl =
-  let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
-  let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) =
-    let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
+    let fd = create_fun_defn (id_clone ps.ps_name) lam in
     if ps_compat ps fd.fun_ps then m, { fd with fun_ps = ps }
-    else Mid.add ps.ps_name fd.fun_ps m, fd in
-  let m, fdl = Lists.map_fold_left conv Mid.empty defl in
-  if Mid.is_empty m then fdl else subst_fd m fdl
+    else Mps.add ps fd.fun_ps m, fd in
+  let m, fdl = Lists.map_fold_left conv Mps.empty defl in
+  if Mps.is_empty m then fdl else subst_fd m fdl
 
 and subst_fd psm fdl =
   let subst { fun_ps = ps; fun_lambda = lam } =
-    Mid.find_def ps ps.ps_name psm,
+    Mps.find_def ps ps psm,
     { lam with l_expr = expr_subst psm lam.l_expr } in
   create_rec_defn (List.map subst fdl)
 
@@ -1017,8 +981,6 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   in
   List.iter check_variant (List.tl defl);
   (* create the first list of fun_defns *)
-  let add_sym acc (ps,_) = Sid.add ps.ps_name acc in
-  let recsyms = List.fold_left add_sym Sid.empty defl in
   let conv m (ps,lam) = match lam.l_expr.e_vty with
     | VTarrow _ -> Loc.errorm ?loc:lam.l_expr.e_loc
         "The body of a recursive function must be a first-order value"
@@ -1026,15 +988,15 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
         if lam.l_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.create_rec_defn";
         let spec = { lam.l_spec with c_letrec = !letrec } in
         let lam = { lam with l_spec = spec } in
-        let fd = create_fun_defn (id_clone ps.ps_name) lam recsyms in
-        Mid.add ps.ps_name fd.fun_ps m, fd in
-  let m, fdl = Lists.map_fold_left conv Mid.empty defl in
+        let fd = create_fun_defn (id_clone ps.ps_name) lam in
+        Mps.add ps fd.fun_ps m, fd in
+  let m, fdl = Lists.map_fold_left conv Mps.empty defl in
   incr letrec;
   subst_fd m fdl
 
 let create_fun_defn id lam =
   if lam.l_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.create_fun_defn";
-  create_fun_defn id lam Sid.empty
+  create_fun_defn id lam
 
 (* expr to term *)
 

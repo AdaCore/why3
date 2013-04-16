@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-Copyright (C) 2010-
-  Francois Bobot
-  Jean-Christophe Filliatre
-  Johannes Kanig
-  Andrei Paskevich
+The Why3 Verification Platform   /   The Why3 Development Team
+Copyright 2010-2013   -    INRIA - CNRS - Paris-Sud University
 
-This software is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License version 2.1, with the special exception on linking
-described in file LICENSE.
+This software is distributed under the terms of the GNU Lesser
+General Public License version 2.1, with the special exception
+on linking described in file LICENSE.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 -->
 <!--
  This file was based on ocaml.lang by
  Copyright (C) 2007 Eric Cooper <ecc@cmu.edu>
  Copyright (C) 2007 Eric Norige <thelema314@gmail.com>
 -->
-<language id="why" _name="Why3" version="2.0" _section="Sources">
+<language id="why3" _name="Why3" version="2.0" _section="Sources">
   <metadata>
-    <property name="mimetypes">text/x-why</property>
+    <property name="mimetypes">text/x-why3</property>
     <property name="globs">*.mlw;*.why</property>
     <property name="block-comment-start">(*</property>
     <property name="block-comment-end">*)</property>
@@ -61,7 +54,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
       <match>\%{char-esc}</match>
     </context>
     <!-- here's the main context -->
-    <context id="why">
+    <context id="why3">
       <include>
 	<context id="symbol-star">
 	  <match>\(\*\)</match>
@@ -134,7 +127,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 	  <start>\{</start>
 	  <end>\}</end>
 	  <include>
-	    <context ref="why"/>
+	    <context ref="why3"/>
 	  </include>
 	</context>
 	<context id="badrecord" style-ref="error" extend-parent="false">
@@ -145,7 +138,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 	  <start>\[\|</start>
 	  <end>\|\]</end>
 	  <include>
-	    <context ref="why"/>
+	    <context ref="why3"/>
 	  </include>
 	</context>
 	<context id="badarray" style-ref="error" extend-parent="false">
@@ -155,7 +148,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 	  <start>\[</start>
 	  <end>(?&lt;!\|)\]</end>
 	  <include>
-	    <context ref="why"/>
+	    <context ref="why3"/>
 	  </include>
 	</context>
 	<context id="badlist" style-ref="error" extend-parent="false">

@@ -60,7 +60,7 @@ module UnionFind_sig
         same (old u.state) x a /\ same (old u.state) b y \/
         same (old u.state) x b /\ same (old u.state) a y }
 
-  val get_num_classes (u:uf) : int reads {u} ensures { result = num u.state }
+  val get_num_classes (u:uf) : int ensures { result = num u.state }
 
 end
 

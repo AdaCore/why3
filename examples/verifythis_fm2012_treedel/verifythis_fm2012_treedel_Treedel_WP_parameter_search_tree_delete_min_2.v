@@ -39,14 +39,12 @@ Definition data (v:node): Z := match v with
   end.
 
 (* Why3 assumption *)
-Definition right1 (v:node): loc :=
-  match v with
+Definition right1 (v:node): loc := match v with
   | (mk_node x x1 x2) => x1
   end.
 
 (* Why3 assumption *)
-Definition left1 (v:node): loc :=
-  match v with
+Definition left1 (v:node): loc := match v with
   | (mk_node x x1 x2) => x
   end.
 
@@ -140,14 +138,12 @@ Axiom distinct_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
   x l1) -> ~ (mem x l2)) -> (distinct (infix_plpl l1 l2)))).
 
 (* Why3 assumption *)
-Inductive tree1 : (map.Map.map loc node) -> loc -> (tree
-  loc) -> Prop :=
-  | leaf : forall (m:(map.Map.map loc node)), (tree1 m null (Empty :(tree
+Inductive istree : (map.Map.map loc node) -> loc -> (tree loc) -> Prop :=
+  | leaf : forall (m:(map.Map.map loc node)), (istree m null (Empty :(tree
       loc)))
-  | node1 : forall (m:(map.Map.map loc node)) (p:loc) (l:(tree
-      loc)) (r:(tree loc)), (~ (p = null)) -> ((tree1 m
-      (left1 (map.Map.get m p)) l) -> ((tree1 m (right1 (map.Map.get m p))
-      r) -> (tree1 m p (Node l p r)))).
+  | node1 : forall (m:(map.Map.map loc node)) (p:loc) (l:(tree loc)) (r:(tree
+      loc)), (~ (p = null)) -> ((istree m (left1 (map.Map.get m p)) l) ->
+      ((istree m (right1 (map.Map.get m p)) r) -> (istree m p (Node l p r)))).
 
 (* Why3 assumption *)
 Inductive zipper
@@ -171,41 +167,38 @@ Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(zipper a))
   (x:a) (l:(tree a)) (r:(tree a)), ((inorder (zip (Node l x r)
   z)) = (infix_plpl (inorder l) (Cons x (inorder (zip r z))))).
 
-Axiom main_lemma : forall (m:(map.Map.map loc node)) (t:loc)
-  (pp:loc) (p:loc) (ppr:(tree loc)) (pr:(tree loc))
-  (z:(zipper loc)), let it := (zip (Node (Node (Empty :(tree loc)) p
-  pr) pp ppr) z) in ((tree1 m t it) -> ((distinct (inorder it)) -> (tree1
-  (map.Map.set m pp (mk_node (right1 (map.Map.get m p))
-  (right1 (map.Map.get m pp)) (data (map.Map.get m pp)))) t (zip (Node pr pp
-  ppr) z)))).
+Axiom main_lemma : forall (m:(map.Map.map loc node)) (t:loc) (pp:loc) (p:loc)
+  (ppr:(tree loc)) (pr:(tree loc)) (z:(zipper loc)), let it :=
+  (zip (Node (Node (Empty :(tree loc)) p pr) pp ppr) z) in ((istree m t
+  it) -> ((distinct (inorder it)) -> (istree (map.Map.set m pp
+  (mk_node (right1 (map.Map.get m p)) (right1 (map.Map.get m pp))
+  (data (map.Map.get m pp)))) t (zip (Node pr pp ppr) z)))).
 
 Require Import Why3. Ltac ae := why3 "alt-ergo" timelimit 3.
 
 (* Why3 goal *)
-Theorem WP_parameter_search_tree_delete_min : forall (t:loc) (it:(tree
-  loc)), forall (mem1:(map.Map.map loc node)), (((~ (t = null)) /\
-  (tree1 mem1 t it)) /\ (distinct (inorder it))) -> ((~ (t = null)) ->
+Theorem WP_parameter_search_tree_delete_min : forall (t:loc) (it:(tree loc)),
+  forall (mem1:(map.Map.map loc node)), (((~ (t = null)) /\ (istree mem1 t
+  it)) /\ (distinct (inorder it))) -> ((~ (t = null)) ->
   ((~ ((left1 (map.Map.get mem1 t)) = null)) -> ((~ ((left1 (map.Map.get mem1
-  t)) = null)) -> ((~ (it = (Empty :(tree loc)))) -> forall (o:(tree
-  loc)), match it with
+  t)) = null)) -> ((~ (it = (Empty :(tree loc)))) -> forall (o:(tree loc)),
+  match it with
   | Empty => False
   | (Node _ _ r) => (o = r)
   end -> ((~ (it = (Empty :(tree loc)))) -> forall (o1:(tree loc)),
   match it with
   | Empty => False
   | (Node l _ _) => (o1 = l)
-  end -> forall (subtree:(tree loc)) (ppr:(tree loc))
-  (zipper1:(zipper loc)) (tt:loc) (pp:loc) (p:loc),
-  ((((~ (pp = null)) /\ ((left1 (map.Map.get mem1 pp)) = p)) /\
-  ((~ (p = null)) /\ ((left1 (map.Map.get mem1 p)) = tt))) /\ let pt :=
-  (Node subtree pp ppr) in ((tree1 mem1 pp pt) /\ ((zip pt
-  zipper1) = it))) -> ((tt = null) -> ((tree1 mem1 p subtree) ->
-  ((~ (pp = p)) -> ((~ (p = null)) -> ((~ (p = null)) ->
-  forall (tt1:loc), (tt1 = (right1 (map.Map.get mem1 p))) ->
+  end -> forall (subtree:(tree loc)) (ppr:(tree loc)) (zipper1:(zipper loc))
+  (tt:loc) (pp:loc) (p:loc), ((((~ (pp = null)) /\ ((left1 (map.Map.get mem1
+  pp)) = p)) /\ ((~ (p = null)) /\ ((left1 (map.Map.get mem1 p)) = tt))) /\
+  let pt := (Node subtree pp ppr) in ((istree mem1 pp pt) /\ ((zip pt
+  zipper1) = it))) -> ((tt = null) -> ((istree mem1 p subtree) ->
+  ((~ (pp = p)) -> ((~ (p = null)) -> ((~ (p = null)) -> forall (tt1:loc),
+  (tt1 = (right1 (map.Map.get mem1 p))) -> let q_ := (map.Map.get mem1 pp) in
   forall (mem2:(map.Map.map loc node)), (mem2 = (map.Map.set mem1 pp
-  (mk_node tt1 (right1 (map.Map.get mem1 pp)) (data (map.Map.get mem1
-  pp))))) -> ((~ (subtree = (Empty :(tree loc)))) -> forall (pl:(tree
-  loc)),
+  (mk_node tt1 (right1 q_) (data q_)))) -> ((~ (subtree = (Empty :(tree
+  loc)))) -> forall (pl:(tree loc)),
   match subtree with
   | Empty => False
   | (Node l _ _) => (pl = l)
@@ -220,8 +213,8 @@ Theorem WP_parameter_search_tree_delete_min : forall (t:loc) (it:(tree
   | (Cons p1 l) => ((inorder ot) = l)
   end))))))))))))).
 intros t it mem1 ((h1,h2),h3) h4 h5 h6 h7 o h8 h9 o1 h10 subtree ppr
-   zipper1 tt pp p (((h11,h12),(h13,h14)),h15) h16 h17 h18 h19 h20 tt1 h21
-   mem2 h22.
+        zipper1 tt pp p (((h11,h12),(h13,h14)),h15) h16 h17 h18 h19 h20 tt1
+        h21 q_ mem2 h22.
 destruct subtree; auto.
 intuition.
 intros.

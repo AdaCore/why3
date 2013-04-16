@@ -622,7 +622,10 @@ and wp_desc env e q xq = match e.e_node with
       (* NOTE: if you replace this t_subst by t_let or anything else,
          you must handle separately the case "let mark = 'now in ...",
          which requires 'now to be substituted for mark in q *)
-      t_subst_single v (to_term t) q
+      if ty_equal v.vs_ty ty_mark then
+        t_subst_single v (to_term t) q
+      else
+        t_let_close_simp v (to_term t) q
   | Evalue pv ->
       let v, q = open_post q in
       let t = wp_label e (t_var pv.pv_vs) in
@@ -1688,7 +1691,7 @@ let wp_rec ~wp env kn th fdl =
     if Slab.mem lemma_label name.id_label then
       let loc = name.id_loc in
       let spec = ps.ps_aty.aty_spec in
-      if not (eff_is_read_only spec.c_effect) then
+      if not (eff_is_empty spec.c_effect) then
         Loc.errorm ?loc "lemma functions can not have effects";
       if not (ity_equal (ity_of_expr l.l_expr) ity_unit) then
         Loc.errorm ?loc "lemma functions must return unit";

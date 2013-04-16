@@ -17,7 +17,7 @@ module M
       forall k':key, v':value.
       mem !m k' v' <-> if k' = k then v' = v else mem (old !m) k' v' }
 
-  val lookup (m:ref rbt) (k:key) : value reads {m}
+  val lookup (m:ref rbt) (k:key) : value
     ensures { mem !m k result }
 
   val remove (m:ref rbt) (k:key) : unit writes {m}

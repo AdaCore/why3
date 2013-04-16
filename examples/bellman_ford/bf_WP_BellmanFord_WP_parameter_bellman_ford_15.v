@@ -6,10 +6,11 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 (* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
+Inductive list
+  (a:Type) {a_WT:WhyType a} :=
   | Nil : list a
   | Cons : a -> (list a) -> list a.
 Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
@@ -18,7 +19,7 @@ Implicit Arguments Nil [[a] [a_WT]].
 Implicit Arguments Cons [[a] [a_WT]].
 
 (* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
+Fixpoint length {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Z :=
   match l with
   | Nil => 0%Z
   | (Cons _ r) => (1%Z + (length r))%Z
@@ -37,15 +38,15 @@ Existing Instance set_WhyType.
 Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
   a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
 
 Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
 
 (* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a}(s1:(set a)) (s2:(set a)): Prop :=
-  forall (x:a), (mem x s1) -> (mem x s2).
+Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
+  a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
 
 Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (subset s s).
@@ -57,7 +58,7 @@ Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
 Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a}(s:(set a)): Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
   forall (x:a), ~ (mem x s).
 
 Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set
@@ -136,7 +137,7 @@ Parameter vertices: (set vertex).
 Parameter edges: (set (vertex* vertex)%type).
 
 (* Why3 assumption *)
-Definition edge(x:vertex) (y:vertex): Prop := (mem (x, y) edges).
+Definition edge (x:vertex) (y:vertex): Prop := (mem (x, y) edges).
 
 Axiom edges_def : forall (x:vertex) (y:vertex), (mem (x, y) edges) -> ((mem x
   vertices) /\ (mem y vertices)).
@@ -148,7 +149,7 @@ Axiom s_in_graph : (mem s vertices).
 Axiom vertices_cardinal_pos : (0%Z < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
+Fixpoint infix_plpl {a:Type} {a_WT:WhyType a} (l1:(list a)) (l2:(list
   a)) {struct l1}: (list a) :=
   match l1 with
   | Nil => l2
@@ -167,7 +168,8 @@ Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
   l2)) = ((length l1) + (length l2))%Z).
 
 (* Why3 assumption *)
-Fixpoint mem1 {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
+Fixpoint mem1 {a:Type} {a_WT:WhyType a} (x:a) (l:(list
+  a)) {struct l}: Prop :=
   match l with
   | Nil => False
   | (Cons y r) => (x = y) \/ (mem1 x r)
@@ -210,7 +212,7 @@ Axiom path_decomposition : forall (x:vertex) (y:vertex) (z:vertex) (l1:(list
 Parameter weight: vertex -> vertex -> Z.
 
 (* Why3 assumption *)
-Fixpoint path_weight(l:(list vertex)) (dst:vertex) {struct l}: Z :=
+Fixpoint path_weight (l:(list vertex)) (dst:vertex) {struct l}: Z :=
   match l with
   | Nil => 0%Z
   | (Cons x Nil) => (weight x dst)
@@ -229,16 +231,16 @@ Axiom path_in_vertices : forall (v1:vertex) (v2:vertex) (l:(list vertex)),
   (mem v1 vertices) -> ((path v1 l v2) -> (mem v2 vertices)).
 
 (* Why3 assumption *)
-Definition pigeon_set(s1:(set vertex)): Prop := forall (l:(list vertex)),
+Definition pigeon_set (s1:(set vertex)): Prop := forall (l:(list vertex)),
   (forall (e:vertex), (mem1 e l) -> (mem e s1)) ->
   (((cardinal s1) < (length l))%Z -> exists e:vertex, exists l1:(list
   vertex), exists l2:(list vertex), exists l3:(list vertex),
   (l = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
 
-Axiom Induction : (forall (s1:(set vertex)), (is_empty s1) ->
-  (pigeon_set s1)) -> ((forall (s1:(set vertex)), (pigeon_set s1) ->
-  forall (t:vertex), (~ (mem t s1)) -> (pigeon_set (add t s1))) ->
-  forall (s1:(set vertex)), (pigeon_set s1)).
+Axiom Induction : (forall (s1:(set vertex)), (is_empty s1) -> (pigeon_set
+  s1)) -> ((forall (s1:(set vertex)), (pigeon_set s1) -> forall (t:vertex),
+  (~ (mem t s1)) -> (pigeon_set (add t s1))) -> forall (s1:(set vertex)),
+  (pigeon_set s1)).
 
 Axiom corner : forall (s1:(set vertex)) (l:(list vertex)),
   ((length l) = (cardinal s1)) -> ((forall (e:vertex), (mem1 e l) -> (mem e
@@ -291,24 +293,24 @@ Axiom simple_path : forall (v:vertex) (l:(list vertex)), (path s l v) ->
   ((length l') < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
-Definition negative_cycle(v:vertex): Prop := (mem v vertices) /\
-  ((exists l1:(list vertex), (path s l1 v)) /\ exists l2:(list vertex),
-  (path v l2 v) /\ ((path_weight l2 v) < 0%Z)%Z).
+Definition negative_cycle (v:vertex): Prop := (mem v vertices) /\
+  ((exists l1:(list vertex), (path s l1 v)) /\ exists l2:(list vertex), (path
+  v l2 v) /\ ((path_weight l2 v) < 0%Z)%Z).
 
-Axiom key_lemma_1 : forall (v:vertex) (n:Z), (forall (l:(list vertex)),
-  (path s l v) -> (((length l) < (cardinal vertices))%Z ->
-  (n <= (path_weight l v))%Z)) -> ((exists l:(list vertex), (path s l v) /\
-  ((path_weight l v) < n)%Z) -> exists u:vertex, (negative_cycle u)).
+Axiom key_lemma_1 : forall (v:vertex) (n:Z), (forall (l:(list vertex)), (path
+  s l v) -> (((length l) < (cardinal vertices))%Z -> (n <= (path_weight l
+  v))%Z)) -> ((exists l:(list vertex), (path s l v) /\ ((path_weight l
+  v) < n)%Z) -> exists u:vertex, (negative_cycle u)).
 
 (* Why3 assumption *)
-Inductive t  :=
-  | Finite : Z -> t 
-  | Infinite : t .
+Inductive t :=
+  | Finite : Z -> t
+  | Infinite : t.
 Axiom t_WhyType : WhyType t.
 Existing Instance t_WhyType.
 
 (* Why3 assumption *)
-Definition add1(x:t) (y:t): t :=
+Definition add1 (x:t) (y:t): t :=
   match x with
   | Infinite => Infinite
   | (Finite x1) =>
@@ -319,7 +321,7 @@ Definition add1(x:t) (y:t): t :=
   end.
 
 (* Why3 assumption *)
-Definition lt(x:t) (y:t): Prop :=
+Definition lt (x:t) (y:t): Prop :=
   match x with
   | Infinite => False
   | (Finite x1) =>
@@ -330,7 +332,7 @@ Definition lt(x:t) (y:t): Prop :=
   end.
 
 (* Why3 assumption *)
-Definition le(x:t) (y:t): Prop := (lt x y) \/ (x = y).
+Definition le (x:t) (y:t): Prop := (lt x y) \/ (x = y).
 
 Axiom Refl : forall (x:t), (le x x).
 
@@ -348,7 +350,7 @@ Existing Instance ref_WhyType.
 Implicit Arguments mk_ref [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
@@ -357,10 +359,10 @@ Definition contents {a:Type} {a_WT:WhyType a}(v:(ref a)): a :=
 Definition t1 (a:Type) {a_WT:WhyType a} := (ref (set a)).
 
 (* Why3 assumption *)
-Definition distmap  := (map.Map.map vertex t).
+Definition distmap := (map.Map.map vertex t).
 
 (* Why3 assumption *)
-Definition inv1(m:(map.Map.map vertex t)) (pass:Z) (via:(set (vertex*
+Definition inv1 (m:(map.Map.map vertex t)) (pass:Z) (via:(set (vertex*
   vertex)%type)): Prop := forall (v:vertex), (mem v vertices) ->
   match (map.Map.get m
   v) with
@@ -376,7 +378,7 @@ Definition inv1(m:(map.Map.map vertex t)) (pass:Z) (via:(set (vertex*
   end.
 
 (* Why3 assumption *)
-Definition inv2(m:(map.Map.map vertex t)) (via:(set (vertex*
+Definition inv2 (m:(map.Map.map vertex t)) (via:(set (vertex*
   vertex)%type)): Prop := forall (u:vertex) (v:vertex), (mem (u, v) via) ->
   (le (map.Map.get m v) (add1 (map.Map.get m u) (Finite (weight u v)))).
 
@@ -388,17 +390,16 @@ Require Import Why3.
 Ltac ae := why3 "alt-ergo".
 
 (* Why3 goal *)
-Theorem WP_parameter_bellman_ford : (1%Z <= ((cardinal vertices) - 1%Z)%Z)%Z ->
-  forall (m:(map.Map.map vertex t)), (inv1 m
-  (((cardinal vertices) - 1%Z)%Z + 1%Z)%Z (empty :(set (vertex*
-  vertex)%type))) -> ((inv1 m (cardinal vertices) (empty :(set (vertex*
-  vertex)%type))) -> forall (es:(set (vertex* vertex)%type)), (es = edges) ->
-  forall (es1:(set (vertex* vertex)%type)), ((subset es1 edges) /\ (inv2 m
-  (diff edges es1))) -> forall (o:bool), ((o = true) <-> (is_empty es1)) ->
-  ((~ (o = true)) -> ((~ (is_empty es1)) -> forall (es2:(set (vertex*
-  vertex)%type)), forall (result:vertex) (result1:vertex), let result2 := (
-  result, result1) in (((mem result2 es1) /\ (es2 = (remove result2 es1))) ->
-  (match (map.Map.get m
+Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
+  ((1%Z <= o)%Z -> forall (m:(map.Map.map vertex t)), (inv1 m (o + 1%Z)%Z
+  (empty :(set (vertex* vertex)%type))) -> ((inv1 m (cardinal vertices)
+  (empty :(set (vertex* vertex)%type))) -> forall (es:(set (vertex*
+  vertex)%type)), (es = edges) -> forall (es1:(set (vertex* vertex)%type)),
+  ((subset es1 edges) /\ (inv2 m (diff edges es1))) -> forall (o1:bool),
+  ((o1 = true) <-> (is_empty es1)) -> ((~ (o1 = true)) -> ((~ (is_empty
+  es1)) -> forall (es2:(set (vertex* vertex)%type)), forall (result:vertex)
+  (result1:vertex), let result2 := (result, result1) in (((mem result2
+  es1) /\ (es2 = (remove result2 es1))) -> (match (map.Map.get m
   result) with
   | Infinite => False
   | (Finite x) => match (map.Map.get m
@@ -406,8 +407,10 @@ Theorem WP_parameter_bellman_ford : (1%Z <= ((cardinal vertices) - 1%Z)%Z)%Z ->
       | Infinite => True
       | (Finite y) => ((x + (weight result result1))%Z < y)%Z
       end
-  end -> exists v:vertex, (negative_cycle v)))))).
-intros _ m _ hinv1.
+  end -> exists v:vertex, (negative_cycle v))))))).
+(* Why3 intros o h1 m h2 h3 es h4 es1 (h5,h6) o1 h7 h8 h9 es2 result result1
+        result2 (h10,h11) h12. *)
+intros o _ m _ hinv1. subst o.
 intros result hresult; subst result.
 intros es (h1, h2) _ _ _ h3.
 intros es1 u v uv. unfold uv; clear uv.

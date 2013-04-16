@@ -143,7 +143,6 @@ end
     sp_pre     = [];
     sp_post    = [];
     sp_xpost   = [];
-    sp_reads   = [];
     sp_writes  = [];
     sp_variant = [];
   }
@@ -152,7 +151,6 @@ end
     sp_pre     = s1.sp_pre @ s2.sp_pre;
     sp_post    = s1.sp_post @ s2.sp_post;
     sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
-    sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
   }
@@ -658,8 +656,10 @@ lexpr:
    { mk_pp (PPmatch ($2, $5)) }
 | MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
+/*
 | EPSILON lident labels COLON primitive_type DOT lexpr
    { mk_pp (PPeps ((add_lab $2 $3, Some $5), $7)) }
+*/
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
@@ -1383,7 +1383,8 @@ single_spec:
 | RAISES LEFTBRC BAR raises RIGHTBRC
     { { empty_spec with sp_xpost = [floc_i 4, $4] } }
 | READS  LEFTBRC effect RIGHTBRC
-    { { empty_spec with sp_reads = $3 } }
+    { Warning.emit ~loc:(floc ()) "read effect annotations are deprecated";
+      empty_spec }
 | WRITES LEFTBRC effect RIGHTBRC
     { { empty_spec with sp_writes = $3 } }
 | RAISES LEFTBRC xsymbols RIGHTBRC

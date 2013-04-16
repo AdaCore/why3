@@ -64,7 +64,6 @@ type ppattern = private {
   ppat_pattern : pattern;
   ppat_ity     : ity;
   ppat_ghost   : bool;
-  ppat_effect  : effect;
 }
 
 type pre_ppattern =
@@ -88,7 +87,7 @@ type psymbol = private {
   ps_name  : ident;
   ps_aty   : aty;
   ps_ghost : bool;
-  ps_varm  : varmap;
+  ps_pvset : Spv.t;
   ps_vars  : varset;
   (* this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
@@ -107,12 +106,6 @@ val ps_equal : psymbol -> psymbol -> bool
 
 val create_psymbol : preid -> ?ghost:bool -> aty -> psymbol
 
-val create_psymbol_extra :
-  preid -> ?ghost:bool -> aty -> Spv.t -> Sps.t -> psymbol
-
-val spec_pvset : Spv.t -> spec -> Spv.t
-val ps_pvset : Spv.t -> psymbol -> Spv.t
-
 (** program expressions *)
 
 type assertion_kind = Aassert | Aassume | Acheck
@@ -127,12 +120,17 @@ type let_sym =
   | LetV of pvsymbol
   | LetA of psymbol
 
+type symset = private {
+  syms_pv : Spv.t;
+  syms_ps : Sps.t;
+}
+
 type expr = private {
   e_node   : expr_node;
   e_vty    : vty;
   e_ghost  : bool;
   e_effect : effect;
-  e_varm   : varmap;
+  e_syms   : symset;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
@@ -172,7 +170,7 @@ and let_defn = private {
 and fun_defn = private {
   fun_ps     : psymbol;
   fun_lambda : lambda;
-  fun_varm   : varmap;
+  fun_syms   : symset;
 }
 
 and lambda = {
@@ -180,9 +178,6 @@ and lambda = {
   l_expr : expr;
   l_spec : spec;
 }
-
-val e_pvset : Spv.t -> expr -> Spv.t
-val l_pvset : Spv.t -> lambda -> Spv.t
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
 val e_label_add : label -> expr -> expr
@@ -204,9 +199,6 @@ exception ArrowExpected of expr
 val ity_of_expr : expr -> ity
 val aty_of_expr : expr -> aty
 
-exception GhostWrite of expr * region
-(* a ghost expression writes in a non-ghost region *)
-
 val e_app : expr -> expr list -> expr
 (** [e_app e el] builds the application of [e] to arguments [el].
     [e] is typically constructed using [e_arrow] defined above].
@@ -223,8 +215,6 @@ val create_let_ps_defn : preid -> expr -> let_defn * psymbol
 
 val create_fun_defn : preid -> lambda -> fun_defn
 val create_rec_defn : (psymbol * lambda) list -> fun_defn list
-
-val rec_varmap : varmap -> fun_defn list -> varmap
 
 exception StaleRegion of expr * ident
 (* freshness violation: a previously reset region is associated to an ident *)
@@ -257,8 +247,9 @@ val e_loop : invariant -> variant list -> expr -> expr
 val e_for :
   pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
-val e_any : spec -> vty -> expr
 val e_abstract : expr -> spec -> expr
+val e_any : spec -> vty -> expr
+
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
 

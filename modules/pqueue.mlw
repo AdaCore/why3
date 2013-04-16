@@ -43,7 +43,7 @@ module Pqueue
     raises  { Empty -> q.elts = (old q.elts) = Nil }
 
   (** returns the minimal element, without modifying the queue *)
-  val peek (q: t) : elt reads {q}
+  val peek (q: t) : elt
     ensures { minimal_elt result q.elts }
     raises  { Empty -> q.elts = Nil }
 
@@ -51,14 +51,14 @@ module Pqueue
   val clear (q: t) : unit writes {q} ensures { q.elts = Nil }
 
   (** returns a fresh copy of the queue *)
-  val copy (q: t) : t reads {q} ensures { result = q }
+  val copy (q: t) : t ensures { result = q }
 
   (** checks whether the queue is empty *)
-  val is_empty (q: t) : bool reads {q}
+  val is_empty (q: t) : bool
     ensures { result = True <-> q.elts = Nil }
 
   (** returns the number of elements in the queue *)
-  val length (q: t) : int reads {q}
+  val length (q: t) : int
     ensures { result = length q.elts }
 
 end
@@ -107,7 +107,7 @@ module PqueueNoDup
     raises  { Empty -> q.elts = (old q.elts) = empty }
 
   (** returns the minimal element, without modifying the queue *)
-  val peek (q: t) : elt reads {q}
+  val peek (q: t) : elt
     ensures { minimal_elt result q.elts }
     raises  { Empty -> q.elts = empty }
 
@@ -115,14 +115,14 @@ module PqueueNoDup
   val clear (q: t) : unit writes {q} ensures {q.elts = empty }
 
   (** returns a fresh copy of the queue *)
-  val copy (q: t) : t reads {q} ensures { result = q }
+  val copy (q: t) : t ensures { result = q }
 
   (** checks whether the queue is empty *)
-  val is_empty (q: t) : bool reads {q}
+  val is_empty (q: t) : bool
     ensures { result=True <-> q.elts = empty }
 
   (** returns the number of elements in the queue *)
-  val length (q: t) : int reads {q}
+  val length (q: t) : int
     ensures { result = cardinal q.elts }
 
 end

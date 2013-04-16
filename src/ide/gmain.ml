@@ -121,9 +121,9 @@ let (why_lang, any_lang) =
   languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
   let why_lang =
-    match languages_manager#language "why" with
+    match languages_manager#language "why3" with
     | None ->
-        eprintf "language file for 'why' not found in directory %s@."
+        eprintf "language file for 'why3' not found in directory %s@."
           load_path;
         exit 1
     | Some _ as l -> l in

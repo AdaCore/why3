@@ -116,10 +116,8 @@ let print_effect fmt eff =
     | Some u ->
         fprintf fmt "{refresh %a@ under %a}@ " print_regty r print_regty u
   in
-  Sreg.iter (print_reg "read") eff.eff_reads;
   Sreg.iter (print_reg "write") eff.eff_writes;
   Sexn.iter (print_xs  "raise") eff.eff_raises;
-  Sreg.iter (print_reg "ghost read") eff.eff_ghostr;
   Sreg.iter (print_reg "ghost write") eff.eff_ghostw;
   Sexn.iter (print_xs  "ghost raise") eff.eff_ghostx;
   Mreg.iter print_reset eff.eff_resets
@@ -215,7 +213,7 @@ let print_list_next sep print fmt = function
       print_list sep (print false) fmt r
 
 let is_letrec = function
-  | [fd] -> Mid.mem fd.fun_ps.ps_name fd.fun_varm
+  | [fd] -> fd.fun_lambda.l_spec.c_letrec <> 0
   | _ -> true
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
@@ -467,9 +465,6 @@ let () = Exn_printer.register
   | Mlw_expr.HiddenPLS pl ->
       fprintf fmt "'%a' is a constructor/field of an abstract type \
         and cannot be used in a program" print_ls pl.pl_ls;
-  | Mlw_expr.GhostWrite (_e, _reg) ->
-      fprintf fmt
-        "This expression performs a ghost write in a non-ghost location"
   | Mlw_expr.StaleRegion (_e, id) ->
       fprintf fmt "This expression prohibits further \
         usage of variable %s" id.id_string

@@ -29,7 +29,6 @@ type dspec = {
   ds_pre     : dpre;
   ds_post    : dpost;
   ds_xpost   : dxpost;
-  ds_reads   : deffect;
   ds_writes  : deffect;
   ds_variant : dvariant list;
 }
