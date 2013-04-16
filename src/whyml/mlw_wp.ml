@@ -1021,41 +1021,113 @@ module Subst : sig
    type t
    (* the type of substitutions *)
 
-   val init : effect -> t
-   (* the initial substitution for a program with given effects *)
+   val init : Spv.t -> effect -> t
+   (* the initial substitution for a program with given effects and the given
+      program variables *)
 
-   val init_reg : Sreg.t -> t
-   (* the initial substitution given a set of regions *)
+   val havoc : wp_env -> Sreg.t -> t -> t * term
+   (* [havoc env regions s] generates a new state in which all regions in
+      [regions] and all other regions unchanged. The result pair (s',f) is the
+      new state [s'] and a formula [f] which defines the new values in [s'] with
+      respect to the input state [s]. *)
 
-   val empty : t
-   (* the empty substitution *)
+   val merge : t -> t -> t * term * term
+   (* Given two states, return a new "join" state and two formulas.
+      The first formula links the first branch state with the join state, the
+      second formula links the second branch state with the join state. *)
 
-   val refresh : Sreg.t -> t -> t
-   (* refresh the state, ie, generate new names for all variables in the region
-      set *)
+   val save_label : lsymbol -> t -> t
+   (* [save_label l s] registers the state s as being the one that corresponds
+      to label [l]. This mapping is preserved even after calls to [havoc] and
+      [merge], so that any labeled previous state can be obtained *)
 
-   val term : wp_env -> t -> term -> term
-   (* In the given term, substitute the variables that refer to the current
-      state by the symbols that stand for the value of these variables at this
-      point in execution, as recorded in subtitution [t]. *)
+   val term : t -> term -> term
+   (* [term s f] apply the state [s] to the term [f]. If [f] contains
+      labeled subterms, these will be appropriately dealt with. *)
 
-   val merge_states : t -> Sreg.t * t -> Sreg.t * t -> t * term * term
-   (* Given a base state and two branches (represented by written regions in
-      each branch, and a state), return the state of the join point of the
-      branches, and two formulas. The first formula links the first branch
-      state with the join state, the second formula links the second branch
-      state with the join state. *)
 
 end = struct
 
-  type t = vsymbol option ref Mreg.t
+  type subst =
+    { subst_regions : vsymbol Mreg.t;
+      subst_vars   : vsymbol Mvs.t
+    }
+
+  type t =
+    { now : subst;
+      other : subst Mls.t
+    }
+
+  let fresh_var_from_region reg =
+    mk_var reg.reg_name Slab.empty (ty_of_ity reg.reg_ity)
+
+  let init pvs effect =
+    let regs = effect.eff_writes in
+    { other = Mls.empty;
+      now   =
+        { subst_regions =
+            Mreg.mapi (fun k () -> fresh_var_from_region k) regs;
+          subst_vars    =
+            Spv.fold (fun k acc -> Mvs.add k.pv_vs k.pv_vs acc) pvs Mvs.empty
+        }
+    }
   (* Each region is mapped to a reference, which represents the name of the
      region. At beginning, this reference points to [None], meaning that the
      name of the region is not yet decided. When needed, the value under the
      reference is changed to [Some v], with [v] a fresh variable symbol, to fix
      the name of the region. This delayed choice of name allows getting better
      names for regions, so a region for variable [x] ends up called something
-     like [x1] instead of the generic [rho1]. *)
+     like [x1] instead of the generic [rho1].
+
+     Program variables are initially mapped to themselves, and each havoc
+     replaces the concerned program variables by a fresh name.
+
+     The label map is initially empty.
+     *)
+
+  let save_label ls sub =
+    (* simply store the "now" substitution in the map with the given label *)
+    { sub with other = Mls.add ls sub.now sub.other }
+
+  let pv_is_touched_by_regions vs regset =
+    reg_any (fun reg -> Sreg.mem reg regset) (restore_pv vs).pv_ity.ity_vars
+
+(*
+ * ??? code maybe to be used in havoc
+ *
+    let mreg = Mreg.mapi_filter (fun reg vr ->
+      match !vr with
+      | Some _ -> !vr
+      | None ->
+            match var_of_region ~allow_non_prog_vars:true reg t with
+            | Some v ->
+                let v' = name_from_region ~id:v.vs_name reg in
+                vr := Some v';
+                !vr
+            | None ->
+                (* it is correct to return [None] here, because if
+                   [var_of_region] does not return anything, the
+                   corresponding region is not in the term! *)
+                None
+
+    ) sub in
+    let r = update_term ~allow_non_prog_vars:true env mreg t in
+    r
+*)
+
+  let havoc env regset s =
+    let regs =
+      Sreg.fold (fun reg acc -> Mreg.add reg (fresh_var_from_region reg) acc)
+      regset s.now.subst_regions in
+    let touched_regs = Mreg.set_inter regs regset in
+    let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
+      if pv_is_touched_by_regions vs regset then
+        let var = mk_var vs.vs_name Slab.empty (ty_of_ity (ity_of_vs vs)) in
+        let new_term = update_var env touched_regs vs in
+        Mvs.add vs var acc_vars,
+        t_and_simp (t_equ_simp (t_var var) new_term) acc_f
+      else acc) s.now.subst_vars (s.now.subst_vars, t_true) in
+    { s with now = { subst_regions = regs; subst_vars = vars } }, f
 
   let name_from_region ?hint ?id reg =
     let id = match id with
@@ -1085,37 +1157,29 @@ end = struct
     in
     mk_var id Slab.empty (ty_of_ity reg.reg_ity)
 
-  let init_reg reg =
-    Mreg.map (fun () -> ref None) reg
+  let rec term s t =
+    match t.t_node with
+    | Tvar vs ->
+        begin
+          try t_var (Mvs.find vs s.now.subst_vars) with Not_found -> t
+        end
+    | Tapp (ls, _) when ls_equal ls fs_old -> assert false
+    | Tapp (ls, [_; mark]) when ls_equal ls fs_at ->
+        let label =
+          match mark.t_node with
+          | Tvar vs when vs_equal vs vs_old -> assert false
+          | Tapp (ls,[]) -> ls
+          | _ -> assert false
+        in
+        t_map (term { s with now = (Mls.find label s.other)}) t
+    | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+        (* do not open unless necessary *)
+        let mvs = Mvs.set_inter s.now.subst_vars t.t_vars in
+        if Mvs.is_empty mvs then t else
+        t_map (term s) t
+    | _ ->
+        t_map (term s) t
 
-  let init effect =
-    init_reg effect.eff_writes
-
-  let empty = Mreg.empty
-
-  let refresh regset s =
-    Sreg.fold (fun reg acc -> Mreg.add reg (ref None) acc) regset s
-
-  let term env sub t =
-
-    let mreg = Mreg.mapi_filter (fun reg vr ->
-      match !vr with
-      | Some _ -> !vr
-      | None ->
-            match var_of_region ~allow_non_prog_vars:true reg t with
-            | Some v ->
-                let v' = name_from_region ~id:v.vs_name reg in
-                vr := Some v';
-                !vr
-            | None ->
-                (* it is correct to return [None] here, because if
-                   [var_of_region] does not return anything, the
-                   corresponding region is not in the term! *)
-                None
-
-    ) sub in
-    let r = update_term ~allow_non_prog_vars:true env mreg t in
-    r
 
   (* Update the name of region [reg] in substitution [s], possibly based on
      the provided [hint], and return a variable of that name. *)
@@ -1128,6 +1192,9 @@ end = struct
           rv := Some new_name;
           t_var (new_name)
 
+  let merge _ _ =
+    assert false
+(*
   let merge_states base (reg1,s1) (reg2,s2) =
     let all_regs = Sreg.union reg1 reg2 in
     Sreg.fold
@@ -1151,6 +1218,7 @@ end = struct
           t_and_simp f2 (t_equ (region_name reg s1)
                           (region_name ~hint:s1 reg base))
         end) all_regs (base, t_true, t_true)
+*)
 end
 
 let fastwp_or_label = Ident.create_label "fastwp:or"
@@ -1300,7 +1368,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: true *)
       (* NE: result = t *)
       let t = wp_label e t in
-      let t = Subst.term env s (to_term t) in
+      let t = Subst.term s (to_term t) in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { ok = t_true;
         post = { ne = ne; s = s };
@@ -1309,7 +1377,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: true *)
       (* NE: result = v *)
       let va = wp_label e (t_var v.pv_vs) in
-      let ne = Subst.term env s (t_equ (t_var result) va) in
+      let ne = Subst.term s (t_equ (t_var result) va) in
       { ok = t_true;
         post = { ne = ne; s = s };
         exn = Mexn.empty }
@@ -1329,7 +1397,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
-      let f = wp_label e (Subst.term env s f) in
+      let f = wp_label e (Subst.term s f) in
       let ok = if kind = Aassume then t_true else f in
       let ne = if kind = Acheck then t_true else f in
       { ok = ok;
