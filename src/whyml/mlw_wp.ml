@@ -1567,9 +1567,13 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                 Mexn.find_opt ex wp2.exn,
                 Mexn.find_opt ex wp3.exn with
           | None, None, None -> assert false
-          | None, None, Some x
-          | None, Some x, None
-          | Some x, None, None -> x
+          | None, None, Some post3 ->
+              { s = post3.s ;
+                ne = t_and_simp_l [wp1.post.ne; t_not test; post3.ne] }
+          | None, Some post2, None ->
+              { s = post2.s ; ne = t_and_simp_l [wp1.post.ne; test; post2.ne] }
+          | Some post1, None, None ->
+              post1
           | None, Some post2, Some post3 ->
               let s, f2, f3 = Subst.merge post2.s post3.s in
               { s = s;
@@ -1615,8 +1619,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       { ok = ok;
         post = { ne = ne; s = state };
         exn = xne }
-(*
- * ???
   | Eraise (ex, e1) ->
       (* OK: ok(e1) *)
       (* NE: false *)
@@ -1624,24 +1626,27 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* EX(x): ex(e1)(x) *)
       let ex_res = create_vsymbol (id_fresh "x") (ty_of_vty e1.e_vty) in
       let wp1 = fast_wp_expr env s (ex_res, xresult) e1 in
-      let e1_regs = regs_of_writes e1.e_effect in
-      let p = get_exn e1_regs ex wp1.exn in
-      let s, r1, r2 =
-        Subst.merge_states s (e1_regs, p.s)
-          (e1_regs, wp1.post.s) in
-      let r3 =
+      let rpost =
         (* avoid to introduce useless equation between void terms *)
         if ty_equal (ty_of_vty e1.e_vty) (ty_tuple []) then t_true
         else t_equ (t_var ex_res) (t_var (Mexn.find ex xresult)) in
-      let ne =
-        wp_or (t_and_simp p.ne r1)
-              (t_and_simp_l [wp1.post.ne; r2; r3]) in
-      let ne = wp_label e ne in
-      let xpost = { s = s; ne = ne } in
-      let xne = Mexn.add ex xpost wp1.exn in
+      let s, ne =
+        try
+          let p = Mexn.find ex wp1.exn in
+          let s, r1, r2 = Subst.merge p.s wp1.post.s in
+          let ne =
+            wp_or (t_and_simp p.ne r1)
+                  (t_and_simp_l [wp1.post.ne; r2; rpost]) in
+          s, ne
+        with Not_found ->
+          wp1.post.s, t_and_simp wp1.post.ne rpost in
+      let expost = { s = s; ne = wp_label e ne } in
+      let xne = Mexn.add ex expost wp1.exn in
       { ok = wp1.ok;
-        post = { ne = t_false; s = wp1.post.s }; (* Should s be Subst.empty??? *)
+        post = { ne = t_false; s = wp1.post.s };
         exn = xne }
+(*
+ * ???
   | Etry (e1, handlers) ->
       (* OK: ok(e1) /\ (forall x. ex(e1)(x) => ok(handlers(x))) *)
       (* NE: ne(e1) \/ (bigor x. ex(e1)(x) /\ ne(handlers(x))) *)
@@ -1758,7 +1763,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         exn = exn
       }
 *)
-  | Eloop _ | Eany _ | Eabstr _ | Eraise _ | Etry _ -> assert false
+  | Eloop _ | Eany _ | Eabstr _ | Etry _ -> assert false
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)

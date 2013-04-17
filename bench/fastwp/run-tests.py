@@ -6,19 +6,19 @@ import tools
 
 # list_of_files = glob.glob ("*.mlw")
 list_of_files = [
-   "try.mlw",
-   "assign.mlw",
    "app.mlw",
-   "call.mlw",
    "result.mlw",
-   "call_exc.mlw",
-   "if.mlw",
+   "call.mlw",
    "assert.mlw",
+   "if.mlw",
    "raise.mlw",
-   "abstract.mlw",
-   "loop.mlw",
-   "bug1.mlw",
-   "bug2.mlw"
+   #"try.mlw",
+   #"assign.mlw",
+   #"call_exc.mlw",
+   #"abstract.mlw",
+   #"loop.mlw",
+   #"bug1.mlw",
+   #"bug2.mlw"
    ]
 
 def compute_expected_output(fn, outputfile):
