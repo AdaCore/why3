@@ -1346,7 +1346,8 @@ type res_type = vsymbol * vsymbol Mexn.t
 
 (* Take a [post], and place the postcondition [post.ne] in the
    poststate [post.s]. Also, open the postcondition and replace the result
-   variable by [result_var]. In [post.s], [lab] is used to define the prestate. *)
+   variable by [result_var]. In [post.s], [lab] is used to define the prestate.
+*)
 let apply_state_to_single_post glue lab result_var post =
   (* get the result var of the post *)
   let res, ne = open_post post.ne in
