@@ -1645,8 +1645,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       { ok = wp1.ok;
         post = { ne = t_false; s = wp1.post.s };
         exn = xne }
-(*
- * ???
   | Etry (e1, handlers) ->
       (* OK: ok(e1) /\ (forall x. ex(e1)(x) => ok(handlers(x))) *)
       (* NE: ne(e1) \/ (bigor x. ex(e1)(x) /\ ne(handlers(x))) *)
@@ -1662,15 +1660,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
          Mexn.fold (fun ex (pv,_) acc ->
             Mexn.add ex pv.pv_vs acc) handlers xresult in
       let wp1 = fast_wp_expr env s (result,xresult') e1 in
-      let e1_regs = regs_of_writes e1.e_effect in
       Mexn.fold (fun ex post acc ->
         try
           let _, e2 = Mexn.find ex handlers in
           let wp2 = fast_wp_expr env post.s r e2 in
-          let e2_regs = regs_of_writes e2.e_effect in
-          let s,f1,f2 =
-            Subst.merge_states s (e1_regs, wp1.post.s)
-                                 (Sreg.union e1_regs e2_regs, wp2.post.s) in
+          let s,f1,f2 = Subst.merge wp1.post.s wp2.post.s in
           let ne =
              wp_or
                 (t_and_simp acc.post.ne f1)
@@ -1692,7 +1686,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
              /\ (forall x. ex(e1)(x) => spec.xpost(x) *)
       (* NE: spec.post *)
       (* EX: spec.xpost *)
-      let wp1 = fast_wp_expr env s r e1 in
+      let pre_abstr_label = fresh_mark () in
+      let pre_abstr_state = Subst.save_label pre_abstr_label s in
+      let wp1 = fast_wp_expr env pre_abstr_state r e1 in
       let xpost = Mexn.map (fun p ->
         { s = wp1.post.s;
           ne = p }) spec.c_xpost in
@@ -1708,12 +1704,15 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             Mexn.add ex post acc)
         wp1.exn xpost in
       let abstr_post = { s = wp1.post.s; ne = spec.c_post } in
+      (* ??? the glue is missing in this call to apply_state_to_post. This
+         means that "abstract" also forgets which immutable *components* are
+         not modified. To be fixed. *)
       let post, xpost =
-        adapt_post_to_state_pair env s r abstr_post xpost in
+        apply_state_to_post t_true pre_abstr_label r abstr_post xpost in
       let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
       let ok =
         t_and_simp_l
-          [wp1.ok; (Subst.term env s spec.c_pre);
+          [wp1.ok; (Subst.term s spec.c_pre);
            wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
       let ok = wp_label e ok in
       { ok = ok ;
@@ -1724,17 +1723,22 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: spec.pre *)
       (* NE: spec.post *)
       (* EX: spec.xpost *)
-      let poststate = Subst.refresh (regs_of_writes spec.c_effect) s in
+      let pre_any_label = fresh_mark () in
+      let prestate = Subst.save_label pre_any_label s in
+      let poststate, glue =
+        Subst.havoc env (regs_of_writes spec.c_effect) prestate in
       let post = { s = poststate; ne = spec.c_post } in
       let xpost =
         Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in
       let post, xpost =
-        adapt_post_to_state_pair env s r post xpost in
-      let pre = Subst.term env s spec.c_pre in
+        apply_state_to_post glue pre_any_label r post xpost in
+      let pre = Subst.term s spec.c_pre in
       { ok = wp_label e pre;
         post = post;
         exn = xpost;
       }
+(*
+ * ???
   | Eloop (inv, _varl, e1) -> (* TODO variant proof *)
       (* OK: inv /\ (forall r in writes(e1), replace r by fresh r' in
                        inv => (ok(e1) /\ (ne(e1) => inv'))) *)
@@ -1763,7 +1767,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         exn = exn
       }
 *)
-  | Eloop _ | Eany _ | Eabstr _ | Etry _ -> assert false
+  | Eloop _ -> assert false
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)

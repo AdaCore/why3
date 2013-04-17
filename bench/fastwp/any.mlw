@@ -2,14 +2,20 @@ module An
    use import int.Int
    use import ref.Ref
 
-   let f (x : int) =
-      { }
-         any { true } int { result = x }
-      { x = result }
+(* Valid *)
+   let f (x : int)
+      requires { true }
+      ensures { x = result }
+      =
+         any int
+         requires { true }
+         ensures { result = x }
 
-   let g (x : int) =
-      { }
-         any {true } int {result > 0 }
-      { result = 0 }
+(* Unknown *)
+   let g (x : int)
+      requires { true }
+      ensures { result = 0 }
+      =
+      any int requires { true } ensures {result > 0 }
 
 end
