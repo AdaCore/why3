@@ -17,7 +17,7 @@ list_of_files = [
    "call_exc.mlw",
    "abstract.mlw",
    "any.mlw",
-   #"loop.mlw",
+   "loop.mlw",
    #"bug1.mlw",
    #"bug2.mlw"
    ]

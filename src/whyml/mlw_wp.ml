@@ -1527,7 +1527,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
         match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
         | None, None -> assert false
-        | None, Some x | Some x, None -> x
+        | Some post1, None -> post1
+        | None, Some post2 ->
+            { s = post2.s ; ne = wp_label e (t_and_simp wp1.post.ne post2.ne) }
         | Some p1, Some p2 ->
             let s, r1, r2 = Subst.merge p1.s p2.s in
             { s = s;
@@ -1737,19 +1739,18 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = post;
         exn = xpost;
       }
-(*
- * ???
   | Eloop (inv, _varl, e1) -> (* TODO variant proof *)
       (* OK: inv /\ (forall r in writes(e1), replace r by fresh r' in
                        inv => (ok(e1) /\ (ne(e1) => inv'))) *)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
-      let havoc_state = Subst.refresh (regs_of_writes e1.e_effect) s in
-      let init_inv = t_label_add expl_loop_init (Subst.term env s inv) in
-      let inv_hypo = Subst.term env havoc_state inv in
+      let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
+      let init_inv = t_label_add expl_loop_init (Subst.term s inv) in
+      let inv_hypo =
+        t_and_simp glue (Subst.term havoc_state inv) in
       let wp1 = fast_wp_expr env havoc_state r e1 in
       let post_inv =
-        t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
+        t_label_add expl_loop_keep (Subst.term wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
            I => (OK /\ (NE => I'))
@@ -1766,8 +1767,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { s = wp1.post.s; ne = t_false }; (* this is an infinite loop *)
         exn = exn
       }
-*)
-  | Eloop _ -> assert false
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
