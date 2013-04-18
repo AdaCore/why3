@@ -163,13 +163,9 @@ let unify_loc unify_fn loc x1 x2 = try unify_fn x1 x2 with
       Mlw_dty.print_dity dity2 Mlw_dty.print_dity dity1
   | exn when Debug.test_noflag Debug.stack_trace -> error ~loc exn
 
-let expected_type { de_loc = loc ; de_type = (argl,res) } dity =
+let expected_type ?(weak=false) { de_loc = loc ; de_type = (argl,res) } dity =
   if argl <> [] then errorm ~loc "This expression is not a first-order value";
-  unify_loc unify loc dity res
-
-let expected_type_weak { de_loc = loc ; de_type = (argl,res) } dity =
-  if argl <> [] then errorm ~loc "This expression is not a first-order value";
-  unify_loc unify_weak loc dity res
+  unify_loc (unify ~weak) loc dity res
 
 let rec extract_labels labs loc e = match e.Ptree.expr_desc with
   | Ptree.Enamed (Ptree.Lstr s, e) -> extract_labels (Slab.add s labs) loc e
@@ -545,7 +541,7 @@ and de_desc denv loc = function
       DEfun (bl, tr), (tyl @ argl, res)
   | Ptree.Ecast (e1, pty) ->
       let e1 = dexpr denv e1 in
-      expected_type_weak e1 (dity_of_pty denv pty);
+      expected_type ~weak:true e1 (dity_of_pty denv pty);
       e1.de_desc, e1.de_type
   | Ptree.Enamed _ ->
       assert false
@@ -621,7 +617,7 @@ and de_desc denv loc = function
       let e0 = mk_dexpr d ty loc Slab.empty in
       let res = create_type_variable () in
       expected_type e0 res;
-      expected_type_weak e2 res;
+      expected_type ~weak:true e2 res;
       DEassign (pl, e1, e2), ([], dity_unit)
   | Ptree.Econstant (Number.ConstInt _ as c) ->
       DEconstant c, ([], dity_int)
@@ -780,7 +776,7 @@ and rtype_v denv = function
 let rec rexpr denv ({ de_type = (argl,res) } as de) =
   let desc, dvty = re_desc denv de in
   let de = { de with de_desc = desc; de_type = dvty } in
-  if argl = [] then expected_type_weak de (dity_refresh res);
+  if argl = [] then expected_type ~weak:true de (dity_refresh res);
   de
 
 and re_desc denv de = match de.de_desc with

@@ -197,11 +197,8 @@ and unify_reg r1 r2 =
 
 exception DTypeMismatch of dity * dity
 
-let unify ~weak d1 d2 =
+let unify ?(weak=false) d1 d2 =
   try unify ~weak d1 d2 with Exit -> raise (DTypeMismatch (d1,d2))
-
-let unify_weak d1 d2 = unify ~weak:true d1 d2
-let unify d1 d2 = unify ~weak:false d1 d2
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 

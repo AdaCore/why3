@@ -42,11 +42,11 @@ val is_chainable: dvty -> bool (* non-bool * non-bool -> bool *)
 
 exception DTypeMismatch of dity * dity
 
-val unify: dity -> dity -> unit
-val unify_weak: dity -> dity -> unit (* don't unify regions *)
+val unify: ?weak:bool -> dity -> dity -> unit
+  (* when [weak] is true, don't unify regions *)
 
 val ity_of_dity: dity -> ity
-  (** only use once unification is done *)
+  (* only use once unification is done *)
 
 val specialize_scheme: tvars -> dvty -> dvty
 
