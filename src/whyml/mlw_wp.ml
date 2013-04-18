@@ -1021,9 +1021,9 @@ module Subst : sig
    type t
    (* the type of substitutions *)
 
-   val init : Spv.t -> effect -> t
-   (* the initial substitution for a program with given effects and the given
-      program variables *)
+   val init : Spv.t -> t
+   (* the initial substitution for a program which mentions the given program
+      variables *)
 
    val havoc : wp_env -> Sreg.t -> t -> t * term
    (* [havoc env regions s] generates a new state in which all regions in
@@ -1048,6 +1048,8 @@ module Subst : sig
    (* [term s f] apply the state [s] to the term [f]. If [f] contains
       labeled subterms, these will be appropriately dealt with. *)
 
+   val add_pvar : pvsymbol -> t -> t
+   (* [add_pvar v s] adds the variable v to s, if it is mutable. *)
 
 end = struct
 
@@ -1067,16 +1069,28 @@ end = struct
   let fresh_var_from_var vs =
     mk_var vs.vs_name Slab.empty (ty_of_ity (ity_of_vs vs))
 
-  let init pvs effect =
-    let regs = effect.eff_writes in
-    { other = Mvs.empty;
-      now   =
-        { subst_regions =
-            Mreg.mapi (fun k () -> fresh_var_from_region k) regs;
-          subst_vars    =
-            Spv.fold (fun k acc -> Mvs.add k.pv_vs k.pv_vs acc) pvs Mvs.empty
-        }
-    }
+  let add_pvar pv s =
+    let ity = pv.pv_ity in
+    if ity_immutable ity then s
+    else
+      let vs = pv.pv_vs in
+      { other = s.other;
+        now =
+          { subst_vars = Mvs.add vs vs s.now.subst_vars;
+            subst_regions =
+              reg_fold (fun r acc ->
+                if Mreg.mem r acc then acc
+                else Mreg.add r (fresh_var_from_region r) acc)
+              ity.ity_vars s.now.subst_regions
+          }
+      }
+
+  let init pvs =
+    Spv.fold add_pvar pvs
+      { other = Mvs.empty;
+                              now   = { subst_regions = Mreg.empty;
+                                        subst_vars    = Mvs.empty }
+      }
   (* Each region is mapped to a reference, which represents the name of the
      region. At beginning, this reference points to [None], meaning that the
      name of the region is not yet decided. When needed, the value under the
@@ -1097,7 +1111,6 @@ end = struct
 
   let pv_is_touched_by_regions vs regset =
     reg_any (fun reg -> Sreg.mem reg regset) (restore_pv vs).pv_ity.ity_vars
-
 (*
  * ??? code maybe to be used in havoc
  *
@@ -1132,18 +1145,25 @@ end = struct
           t_var (new_name)
 *)
 
+  let print_regset fmt x =
+    Format.fprintf fmt "{";
+  Mreg.iter (fun k _ -> Format.fprintf fmt "%a " Mlw_pretty.print_reg k) x;
+    Format.fprintf fmt "}"
+
   let havoc env regset s =
     let regs =
       Sreg.fold (fun reg acc -> Mreg.add reg (fresh_var_from_region reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
     let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
-      if pv_is_touched_by_regions vs regset then
+      if pv_is_touched_by_regions vs regset then begin
         let var = fresh_var_from_var vs in
         let new_term = update_var env touched_regs vs in
         Mvs.add vs var acc_vars,
         t_and_simp (t_equ_simp (t_var var) new_term) acc_f
-      else acc) s.now.subst_vars (s.now.subst_vars, t_true) in
+      end else begin
+        acc
+      end) s.now.subst_vars (s.now.subst_vars, t_true) in
     { s with now = { subst_regions = regs; subst_vars = vars } }, f
 
 (*
@@ -1190,7 +1210,14 @@ end = struct
           | Tvar vs -> vs
           | _ -> assert false
         in
-        t_map (term { s with now = (Mvs.find label s.other)}) subterm
+        let subst =
+          try
+            { s with now = Mvs.find label s.other }
+          with Not_found ->
+            Format.printf "  not found mark %a@." Pretty.print_vs label;
+            exit 1
+        in
+        t_map (term subst) subterm
     | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
         (* do not open unless necessary *)
         let mvs = Mvs.set_inter s.now.subst_vars t.t_vars in
@@ -1487,7 +1514,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
       let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
       let state_after_call, call_glue =
-        Subst.havoc env call_regs state_before_call  in
+        Subst.havoc env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->
         { s = state_after_call;
           ne = p }) spec.c_xpost in
@@ -1510,21 +1537,29 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         { ok = ok;
           post = { ne = ne; s = state_after_call };
           exn = xne }
+
+  | Elet ({ let_sym = LetV v; let_expr = _ }, e2)
+  (* ??? can we really ignore the first expression? *)
+      when ty_equal v.pv_vs.vs_ty ty_mark ->
+        let s = Subst.save_label v.pv_vs s in
+        fast_wp_expr env s r e2
+
   | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
       (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
       (* NE: ne(e1) /\ ne(e2) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
-      let v = v.pv_vs in
+      let vs = v.pv_vs in
       let e2 =
-         if Opt.equal Loc.equal v.vs_name.id_loc e1.e_loc then
+         if Opt.equal Loc.equal vs.vs_name.id_loc e1.e_loc then
             e_label_copy e e2
          else e2 in
-      let wp1 = fast_wp_expr env s (v, xresult) e1 in
-      let wp2 = fast_wp_expr env wp1.post.s r e2 in
+      let wp1 = fast_wp_expr env s (vs, xresult) e1 in
+      let wp1posts = Subst.add_pvar v wp1.post.s in
+      let wp2 = fast_wp_expr env wp1posts r e2 in
       let ok =
-         t_and_simp wp1.ok (t_implies_subst v wp1.post.ne wp2.ok) in
+         t_and_simp wp1.ok (t_implies_subst vs wp1.post.ne wp2.ok) in
       let ok = wp_label e ok in
-      let ne = wp_label e (t_and_subst v wp1.post.ne wp2.post.ne) in
+      let ne = wp_label e (t_and_subst vs wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
         match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
         | None, None -> assert false
@@ -1792,7 +1827,13 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
     let lrv = Mint.add c.c_letrec tl env.letrec_var in
     { env with letrec_var = lrv } in
   (* generate the initial state, using the overall effect of the function *)
-  let prestate = Subst.init l.l_expr.e_syms.syms_pv c.c_effect in
+  let build_set svs =
+    Mvs.fold (fun x _ acc -> Spv.add (restore_pv x) acc) svs Spv.empty in
+  let pre_vars = build_set c.c_pre.t_vars in
+  let post_vars = build_set c.c_post.t_vars in
+  let all_vars = Spv.union l.l_expr.e_syms.syms_pv pre_vars in
+  let all_vars = Spv.union all_vars post_vars in
+  let prestate = Subst.init all_vars in
   let prestate = Subst.save_label lab prestate in
   (* extract the result and xresult variables *)
   let result, _  = open_post c.c_post in
@@ -1822,7 +1863,7 @@ and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 let fast_wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in
   let res =
-    fast_wp_expr env (Subst.init e.e_syms.syms_pv e.e_effect) (result e) e in
+    fast_wp_expr env (Subst.init e.e_syms.syms_pv) (result e) e in
   let f = wp_forall (Mvs.keys res.ok.t_vars) res.ok in
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name

@@ -18,8 +18,10 @@ list_of_files = [
    "abstract.mlw",
    "any.mlw",
    "loop.mlw",
-   #"bug1.mlw",
-   #"bug2.mlw"
+   "bug1.mlw",
+   "bug2.mlw",
+   "bug3.mlw",
+   "bug4.mlw"
    ]
 
 def compute_expected_output(fn, outputfile):

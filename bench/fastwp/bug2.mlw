@@ -11,6 +11,8 @@ val x : ref int
   let test1 ()
    requires { true }
    ensures { true }
+   raises { R -> true }
+   raises { L -> true }
     =
        if True then
           x := !x
@@ -21,6 +23,7 @@ val x : ref int
   let test2 ()
    requires { true }
    ensures { true }
+   raises { R -> true }
     =
       try
        while True do
