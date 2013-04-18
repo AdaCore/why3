@@ -1618,7 +1618,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                 ne =
                   wp_label e
                     (wp_or
-                      (t_and_simp_l [test; post2.ne; f2])
+                      (t_and_simp_l [wp1.post.ne; test; post2.ne; f2])
                       (t_and_simp_l [wp1.post.ne; t_not test; post3.ne; f3]))
               }
           | Some post1, Some post2, None ->
