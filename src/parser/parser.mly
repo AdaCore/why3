@@ -1383,8 +1383,7 @@ single_spec:
 | RAISES LEFTBRC BAR raises RIGHTBRC
     { { empty_spec with sp_xpost = [floc_i 4, $4] } }
 | READS  LEFTBRC effect RIGHTBRC
-    { Warning.emit ~loc:(floc ()) "read effect annotations are deprecated";
-      empty_spec }
+    { empty_spec }
 | WRITES LEFTBRC effect RIGHTBRC
     { { empty_spec with sp_writes = $3 } }
 | RAISES LEFTBRC xsymbols RIGHTBRC
