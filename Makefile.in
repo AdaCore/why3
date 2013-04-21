@@ -233,7 +233,6 @@ install_no_local::
 	cp -f share/emacs/why3.el $(DATADIR)/why3/emacs/why3.el
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
-	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
 
 install_no_local_lib::
 	rm -rf $(OCAMLLIB)/why3
@@ -1326,6 +1325,14 @@ doc/apidoc.tex: $(FILESTODOC)
 
 clean::
 	rm -f doc/apidoc/*
+
+##########
+# Install rules that require root, and thus appear last in the file!
+##########
+
+install_no_local::
+	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
+
 
 ##########
 # Stdlib formatted with why3doc
