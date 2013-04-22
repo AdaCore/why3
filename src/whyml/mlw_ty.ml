@@ -961,17 +961,9 @@ let aty_full_inst sbs aty =
 
 (* remove from the given arrow every inner effect *)
 let rec aty_filter ghost svs vars aty =
-  let add svs { pv_vs = vs } = Svs.add vs svs in
+  let add svs pv = Svs.add pv.pv_vs svs in
   let svs = List.fold_left add svs aty.aty_args in
-  (* every region in the type must be unique *)
-  let check_alias vars ity =
-    (* FIXME? This check is not needed for soundness
-       and can be made outside of the core WhyML API *)
-    let check reg = if reg_occurs reg vars then
-      Loc.errorm "The type of this function contains an alias" in
-    reg_iter check ity.ity_vars in
-  let add vars { pv_ity = ity } =
-    check_alias vars ity; vars_union vars ity.ity_vars in
+  let add vars pv = vars_union vars pv.pv_ity.ity_vars in
   let vars = List.fold_left add vars aty.aty_args in
   (* remove the effects that do not affect the context *)
   let spec = spec_filter ghost svs vars aty.aty_spec in
@@ -984,9 +976,7 @@ let rec aty_filter ghost svs vars aty =
   (* filter the result type *)
   let vty = match aty.aty_result with
     | VTarrow a -> VTarrow (aty_filter ghost svs vars a)
-    (* FIXME? This check is commented out since we do have examples
-       where a mutable argument is incorporated into the result. *)
-    | VTvalue _ -> (*check_alias vars v;*) aty.aty_result in
+    | VTvalue _ -> aty.aty_result in
   vty_arrow_unsafe aty.aty_args spec vty
 
 let aty_filter ?(ghost=false) pvs aty =

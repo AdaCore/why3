@@ -1018,6 +1018,41 @@ let check_lambda_effect lenv ({fun_lambda = lam} as fd) bl dsp =
     "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
   ignore (Mtv.inter bad_comp (opaque_binders Stv.empty bl) eeff.eff_compar)
 
+let check_user_ps recu ps =
+  let ps_regs = ps.ps_subst.ity_subst_reg in
+  let report r =
+    if Mreg.mem r ps_regs then let spv = Spv.filter
+        (fun pv -> reg_occurs r pv.pv_ity.ity_vars) ps.ps_pvset in
+      Loc.errorm "The type of this function contains an alias with \
+        external variable %a" Mlw_pretty.print_pv (Spv.choose spv)
+    else
+      Loc.errorm "The type of this function contains an alias"
+  in
+  let rec check regs ity = match ity.ity_node with
+    | Ityapp (_,_,rl) ->
+        let add regs r =
+          if Mreg.mem r regs then report r else
+          check (Mreg.add r r regs) r.reg_ity in
+        let regs = List.fold_left add regs rl in
+        ity_fold check regs ity
+    | _ ->
+        ity_fold check regs ity
+  in
+  let rec down regs a =
+    let add regs pv = check regs pv.pv_ity in
+    let regs = List.fold_left add regs a.aty_args in
+    match a.aty_result with
+    | VTarrow a -> down regs a
+    | VTvalue v -> check (if recu then regs else ps_regs) v
+    (* we allow the value in a non-recursive function to contain
+       regions coming the function's arguments, but not from the
+       context. It is sometimes useful to write a function around
+       a constructor or a projection. For recursive functions, we
+       impose the full non-alias discipline, to ensure the safety
+       of region polymorphism (see add_rec_mono). *)
+  in
+  ignore (down ps_regs ps.ps_aty)
+
 let spec_of_dspec lenv eff vty dsp = {
   c_pre     = create_pre lenv dsp.ds_pre;
   c_post    = create_post lenv vty dsp.ds_post;
@@ -1283,8 +1318,9 @@ and expr_rec lenv dfdl =
   let fdl = create_rec_defn (List.map step2 fdl) in
   let step3 fd = fd.fun_ps, lambda_invariant lenv fd.fun_lambda in
   let fdl = create_rec_defn (List.map step3 fdl) in
-  let step4 fd (_,_,_,bl,(de,dsp)) =
-    Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp in
+  let step4 fd (id,_,_,bl,(de,dsp)) =
+    Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
+    Loc.try2 id.id_loc check_user_ps true fd.fun_ps in
   List.iter2 step4 fdl dfdl;
   fdl
 
@@ -1307,6 +1343,7 @@ and expr_fun lenv x gh bl (de, dsp as tr) =
   let lam = lambda_invariant lenv lam in
   let fd = create_fun_defn (Denv.create_user_id x) lam in
   Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
+  Loc.try2 x.id_loc check_user_ps false fd.fun_ps;
   fd
 
 and expr_lam lenv gh pvl (de, dsp) =
