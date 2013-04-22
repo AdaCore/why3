@@ -175,15 +175,15 @@ let rec extract_labels labs loc e = match e.Ptree.expr_desc with
       labs, loc, Ptree.Ecast ({ e with Ptree.expr_desc = d }, ty)
   | e -> labs, loc, e
 
+let rec find_top_pty e = match e.Ptree.expr_desc with
+  | Ptree.Enamed (_, e) -> find_top_pty e
+  | Ptree.Ecast (_, pty) -> Some pty
+  | _ -> None
+
 (* Hack alert. Since the result type in "let [rec] fn x y : ty = ..."
    is moved to Ecast and then usually lost in destructive unification,
    we try to preserve opacity annotations by moving them to binders. *)
-let pass_opacity (e,_) bl =
-  let rec find e = match e.Ptree.expr_desc with
-    | Ptree.Ecast (_, pty) -> Some pty
-    | Ptree.Enamed (_, e) -> find e
-    | _ -> None in
-  match find e with
+let pass_opacity (e,_) bl = match find_top_pty e with
   | Some pty ->
       let ht = Hstr.create 3 in
       let rec fill = function
@@ -276,6 +276,12 @@ let add_poly id dvty denv =
 let add_mono id dvty denv =
   let locals = Mstr.add id.id (None, dvty) denv.locals in
   { denv with locals = locals; tvars = add_dvty denv.tvars dvty }
+
+let add_rec_mono id dvty denv =
+  (* fix type variables but not regions *)
+  let tvars = add_dvty denv.tvars dvty in
+  let locals = Mstr.add id.id (Some tvars, dvty) denv.locals in
+  { denv with locals = locals; tvars = tvars }
 
 let add_var id dity denv = add_mono id ([],dity) denv
 
@@ -698,223 +704,36 @@ and de_desc denv loc = function
 
 and dletrec ~top denv fdl =
   (* add all functions into the environment *)
-  let add_one denv (_,id,_,bl,_) =
-    let argl = List.map (fun _ -> create_type_variable ()) bl in
-    let dvty = argl, create_type_variable () in
-    add_mono id dvty denv, dvty in
+  let add_one denv (_,id,_,bl,tr) =
+    let _,argl,tyl = dbinders denv (pass_opacity tr bl) in
+    let rpty = find_top_pty (fst tr) in
+    let dvty = tyl, match rpty with
+      | Some pty -> dity_of_pty denv pty
+      | None -> create_type_variable () in
+    let check (_,_,_,apty) = apty = None in
+    let denv = if rpty = None || List.exists check bl
+      then add_rec_mono id dvty denv
+      else add_poly id dvty denv in
+    denv, (argl, dvty) in
   let denv, dvtyl = Lists.map_fold_left add_one denv fdl in
-  (* then unify the binders *)
-  let bind_one (_,_,_,bl,tr) (argl,res) =
-    let denv,bl,tyl = dbinders denv (pass_opacity tr bl) in
-    List.iter2 unify argl tyl;
-    denv,bl,tyl,res in
-  let denvl = List.map2 bind_one fdl dvtyl in
   (* then type-check the bodies *)
-  let type_one (loc,id,gh,_,tr) (denv,bl,tyl,tyv) =
+  let type_one (loc,id,gh,bl,tr) (argl,((tyl,tyv) as dvty)) =
+    let add denv (_,id,_,_) dity = match id with
+      | Some id -> add_var id dity denv
+      | None -> denv in
+    let denv = List.fold_left2 add denv bl tyl in
     let id, gh = add_lemma_label ~top id gh in
-    let tr, (argl, res) = dtriple denv tr in
-    if argl <> [] then errorm ~loc
+    let tr, (badl, res) = dtriple denv tr in
+    if badl <> [] then errorm ~loc
       "The body of a recursive function must be a first-order value";
     unify_loc unify loc tyv res;
-    id, gh, (tyl, tyv), bl, tr in
-  List.map2 type_one fdl denvl
+    id, gh, dvty, argl, tr in
+  List.map2 type_one fdl dvtyl
 
 and dtriple denv (e, sp) =
   let e = dexpr denv e in
   let sp = dspec denv.uc sp in
   (e, sp), e.de_type
-
-(** stage 1.5 *)
-
-(* After the stage 1, we know precisely the types of all binders
-   and program expressions. However, the regions in recursive functions
-   might be over-unified, since we do not support recursive polymorphism.
-   For example, the letrec below will require that a and b share the region.
-
-     let rec main a b : int = if !a = 0 then main b a else 5
-
-   To avoid this, we retype the whole dexpr generated at the stage 1.
-   Every binder keeps its previous type with all regions refreshed.
-   Every non-arrow expression keeps its previous type modulo regions.
-   When we type-check recursive functions, we add them to the denv
-   as polymorphic, but freeze every type variable. In other words,
-   only regions are specialized during recursive calls. *)
-
-let add_preid id dity denv =
-  add_var (mk_id (Ident.preid_name id) Loc.dummy_position) dity denv
-
-let rec rpattern denv pp dity = match pp with
-  | PPwild -> denv
-  | PPvar id -> add_preid id dity denv
-  | PPlapp (ls, ppl) -> rpat_app denv (specialize_lsymbol ls) ppl dity
-  | PPpapp (pl, ppl) -> rpat_app denv (specialize_plsymbol pl) ppl dity
-  | PPor (pp1, pp2) -> rpattern (rpattern denv pp1 dity) pp2 dity
-  | PPas (pp1, id) -> add_preid id dity (rpattern denv pp1 dity)
-
-and rpat_app denv (argl,res) ppl dity =
-  unify res dity;
-  List.fold_left2 rpattern denv ppl argl
-
-let rbinders denv bl =
-  let rbinder (id,gh,dity) (denv,bl,tyl) =
-    let dity = dity_refresh dity in
-    add_var id dity denv, (id,gh,dity)::bl, dity::tyl in
-  List.fold_right rbinder bl (denv,[],[])
-
-let rec rtype_c denv (tyv, sp) =
-  let tyv, dvty = rtype_v denv tyv in (tyv, sp), dvty
-
-and rtype_v denv = function
-  | DSpecV dity ->
-      let dity = dity_refresh dity in
-      DSpecV dity, ([],dity)
-  | DSpecA (bl,tyc) ->
-      let denv,bl,tyl = rbinders denv bl in
-      let tyc,(argl,res) = rtype_c denv tyc in
-      DSpecA (bl,tyc), (tyl @ argl,res)
-
-let rec rexpr denv ({ de_type = (argl,res) } as de) =
-  let desc, dvty = re_desc denv de in
-  let de = { de with de_desc = desc; de_type = dvty } in
-  if argl = [] then expected_type ~weak:true de (dity_refresh res);
-  de
-
-and re_desc denv de = match de.de_desc with
-  | DElocal x as d ->
-      let dvty = match Mstr.find x denv.locals with
-        | Some tvs, dvty -> specialize_scheme tvs dvty
-        | None,     dvty -> dvty in
-      d, dvty
-  | DEglobal_pv pv as d -> d, ([],specialize_pvsymbol pv)
-  | DEglobal_ps ps as d -> d, specialize_psymbol ps
-  | DEglobal_pl pl as d -> d, specialize_plsymbol pl
-  | DEglobal_ls ls as d -> d, specialize_lsymbol ls
-  | DEconstant _   as d -> d, de.de_type
-  | DEapply (e1, el) ->
-      let e1 = rexpr denv e1 in
-      let el = List.map (rexpr denv) el in
-      de_app de.de_loc e1 el
-  | DEfun (bl, (e1, sp)) ->
-      let denv, bl, tyl = rbinders denv bl in
-      let e1 = rexpr denv e1 in
-      let argl, res = e1.de_type in
-      DEfun (bl, (e1, sp)), (tyl @ argl, res)
-  | DElet (id, gh, e1, e2) ->
-      let e1 = rexpr denv e1 in
-      let denv = match e1.de_desc with
-        | DEfun _ -> add_poly id e1.de_type denv
-        | _       -> add_mono id e1.de_type denv in
-      let e2 = rexpr denv e2 in
-      DElet (id, gh, e1, e2), e2.de_type
-  | DEletrec (fdl, e1) ->
-      let fdl = rletrec denv fdl in
-      let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
-      let denv = List.fold_left add_one denv fdl in
-      let e1 = rexpr denv e1 in
-      DEletrec (fdl, e1), e1.de_type
-  | DEassign (pl, e1, e2) ->
-      let e1 = rexpr denv e1 in
-      let e2 = rexpr denv e2 in
-      (* no need to weakly reunify e1.pl with e2,
-         since both dexprs retain their "pure" types *)
-      DEassign (pl, e1, e2), ([], dity_unit)
-  | DEif (e1, e2, e3) ->
-      let e1 = rexpr denv e1 in
-      expected_type e1 dity_bool;
-      let e2 = rexpr denv e2 in
-      let e3 = rexpr denv e3 in
-      let res = create_type_variable () in
-      expected_type e2 res;
-      expected_type e3 res;
-      DEif (e1, e2, e3), e2.de_type
-  | DElazy (op, e1, e2) ->
-      let e1 = rexpr denv e1 in
-      let e2 = rexpr denv e2 in
-      expected_type e1 dity_bool;
-      expected_type e2 dity_bool;
-      DElazy (op, e1, e2), ([], dity_bool)
-  | DEnot e1 ->
-      let e1 = rexpr denv e1 in
-      expected_type e1 dity_bool;
-      DEnot e1, ([], dity_bool)
-  | DEmatch (e1, bl) ->
-      let e1 = rexpr denv e1 in
-      let res = create_type_variable () in
-      let ety = create_type_variable () in
-      expected_type e1 ety;
-      let branch (pp,e) =
-        let denv = rpattern denv pp ety in
-        let e = rexpr denv e in
-        expected_type e res;
-        pp, e in
-      DEmatch (e1, List.map branch bl), ([], res)
-  | DEraise (xs, e1) ->
-      let e1 = rexpr denv e1 in
-      expected_type e1 (specialize_xsymbol xs);
-      DEraise (xs, e1), ([], create_type_variable ())
-  | DEtry (e1, cl) ->
-      let res = create_type_variable () in
-      let e1 = rexpr denv e1 in
-      expected_type e1 res;
-      let branch (xs, pp, e) =
-        let ety = specialize_xsymbol xs in
-        let denv = rpattern denv pp ety in
-        let e = rexpr denv e in
-        expected_type e res;
-        xs, pp, e in
-      DEtry (e1, List.map branch cl), e1.de_type
-  | DEabsurd as d ->
-      d, ([], create_type_variable ())
-  | DEassert _ as d ->
-      d, ([], dity_unit)
-  | DEabstract (e1, sp) ->
-      let e1 = rexpr denv e1 in
-      DEabstract (e1, sp), e1.de_type
-  | DEmark (id, e1) ->
-      let e1 = rexpr denv e1 in
-      DEmark (id, e1), e1.de_type
-  | DEghost e1 ->
-      let e1 = rexpr denv e1 in
-      DEghost e1, e1.de_type
-  | DEany tyc ->
-      let tyc, dvty = rtype_c denv tyc in
-      DEany tyc, dvty
-  | DEloop (var, inv, e1) ->
-      let e1 = rexpr denv e1 in
-      expected_type e1 dity_unit;
-      DEloop (var, inv, e1), e1.de_type
-  | DEfor (id, efrom, dir, eto, inv, e1) ->
-      let efrom = rexpr denv efrom in
-      let eto = rexpr denv eto in
-      let denv = add_var id dity_int denv in
-      let e1 = rexpr denv e1 in
-      expected_type efrom dity_int;
-      expected_type eto dity_int;
-      expected_type e1 dity_unit;
-      DEfor (id, efrom, dir, eto, inv, e1), e1.de_type
-
-and rletrec denv fdl =
-  (* add all functions into the environment *)
-  let add_one denv (id,_,(argl,res),_,_) =
-    let dvty = List.map dity_refresh argl, dity_refresh res in
-    let tvars = add_dvty_vars denv.tvars dvty in
-    let locals = Mstr.add id.id (Some tvars, dvty) denv.locals in
-    { denv with locals = locals; tvars = tvars } in
-  let denv = List.fold_left add_one denv fdl in
-  (* then type-check the bodies *)
-  let type_one (id,gh,_,bl,(e,sp)) =
-    let denv,bl,tyl = rbinders denv bl in
-    let e = rexpr denv e in
-    let argl, tyv = e.de_type in
-    assert (argl = []);
-    id, gh, (tyl, tyv), bl, (e, sp) in
-  List.map type_one fdl
-
-let dexpr denv e =
-  rexpr denv (dexpr denv e)
-
-let dletrec ~top denv fdl =
-  rletrec denv (dletrec ~top denv fdl)
 
 (** stage 2 *)
 

@@ -27,14 +27,11 @@ type tvars (* a set of type variables *)
 val empty_tvars: tvars
 val add_dity: tvars -> dity -> tvars
 val add_dvty: tvars -> dvty -> tvars
-val add_dvty_vars: tvars -> dvty -> tvars (* add only variables *)
 
 val create_type_variable: unit -> dity
 val create_user_type_variable: Ptree.ident -> (* opaque *) bool -> dity
 val its_app: itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
-
-val dity_refresh: dity -> dity (* refresh regions *)
 
 val opaque_tvs: Stv.t -> dity -> Stv.t
 
@@ -46,7 +43,7 @@ val unify: ?weak:bool -> dity -> dity -> unit
   (* when [weak] is true, don't unify regions *)
 
 val ity_of_dity: dity -> ity
-  (* only use once unification is done *)
+  (* only use once all unification is done *)
 
 val specialize_scheme: tvars -> dvty -> dvty
 
