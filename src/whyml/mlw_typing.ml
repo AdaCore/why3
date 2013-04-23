@@ -1315,7 +1315,21 @@ and expr_rec lenv dfdl =
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
-  let fdl = create_rec_defn (List.map step2 fdl) in
+  let fdl = try List.map step2 fdl with
+    | Loc.Located (_, Mlw_ty.TypeMismatch _)
+    | Mlw_ty.TypeMismatch _ as exn ->
+        List.iter (fun (ps,_,_,_) ->
+          let loc = Opt.get ps.ps_name.Ident.id_loc in
+          Loc.try2 loc check_user_ps true ps) fdl;
+        raise exn in
+  let fdl = try create_rec_defn fdl with
+    | Loc.Located (_, Mlw_ty.TypeMismatch _)
+    | Mlw_ty.TypeMismatch _ as exn ->
+        List.iter (fun (ps,lam) ->
+          let loc = Opt.get ps.ps_name.Ident.id_loc in
+          let fd = create_fun_defn (id_clone ps.ps_name) lam in
+          Loc.try2 loc check_user_ps true fd.fun_ps) fdl;
+        raise exn in
   let step3 fd = fd.fun_ps, lambda_invariant lenv fd.fun_lambda in
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (id,_,_,bl,(de,dsp)) =
