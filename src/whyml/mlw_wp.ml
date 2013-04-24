@@ -1688,13 +1688,10 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* TODO exceptional case *)
   | Elet (_, _) -> assert false (*TODO*)
 
-and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
+and fast_wp_fun_defn env { fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
      NE: true *)
   let lab = fresh_mark () and c = l.l_spec in
-  let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
-  let subst = List.fold_left add_arg ps.ps_subst l.l_args in
-  let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env =
     if c.c_letrec = 0 || c.c_variant = [] then env else
@@ -1733,7 +1730,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
      t_and_simp res.ok
      (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
   let f = wp_implies pre f in
-  wp_forall args (quantify env regs f)
+  wp_forall args (t_forall_close_merge (Mvs.keys f.t_vars) f)
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
