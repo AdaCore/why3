@@ -245,6 +245,14 @@ let add_dvty tvs (argl,res) = res :: List.rev_append argl tvs
 let tv_in_tvars tv tvs =
   try List.iter (occur_check tv) tvs; false with Exit -> true
 
+let free_user_vars tvs (argl,res) =
+  let rec add s = function
+    | Dvar { contents = Dval d } -> add s d
+    | Dvar { contents = Dtvs _ } -> s
+    | Duvar (tv,_) -> if tv_in_tvars tv tvs then s else Stv.add tv s
+    | Dits (_,dl,_) | Dts (_,dl) -> List.fold_left add s dl in
+  List.fold_left add (add Stv.empty res) argl
+
 let specialize_scheme tvs (argl,res) =
   let htvs = Htv.create 17 in
   let hreg = Htv.create 17 in

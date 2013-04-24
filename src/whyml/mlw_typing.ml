@@ -277,6 +277,10 @@ let add_mono id dvty denv =
   let locals = Mstr.add id.id (None, dvty) denv.locals in
   { denv with locals = locals; tvars = add_dvty denv.tvars dvty }
 
+let add_rec_poly id dvty tvs denv =
+  let locals = Mstr.add id.id (Some tvs, dvty) denv.locals in
+  { denv with locals = locals }
+
 let add_rec_mono id dvty denv =
   (* fix type variables but not regions *)
   let tvars = add_dvty denv.tvars dvty in
@@ -703,6 +707,7 @@ and de_desc denv loc = function
       DEfor (id, efrom, dir, eto, inv, e1), e1.de_type
 
 and dletrec ~top denv fdl =
+  let tvars = denv.tvars in
   (* add all functions into the environment *)
   let add_one denv (_,id,_,bl,tr) =
     let _,argl,tyl = dbinders denv (pass_opacity tr bl) in
@@ -710,23 +715,27 @@ and dletrec ~top denv fdl =
     let dvty = tyl, match rpty with
       | Some pty -> dity_of_pty denv pty
       | None -> create_type_variable () in
-    let check (_,_,_,apty) = apty = None in
-    let denv = if rpty = None || List.exists check bl
-      then add_rec_mono id dvty denv
-      else add_poly id dvty denv in
-    denv, (argl, dvty) in
+    let check (_,_,_,apty) = apty <> None in
+    let denv, freetvs = if rpty <> None && List.for_all check bl
+      then add_rec_poly id dvty tvars denv, free_user_vars tvars dvty
+      else add_rec_mono id dvty denv, Stv.empty in
+    denv, (argl, dvty, freetvs) in
   let denv, dvtyl = Lists.map_fold_left add_one denv fdl in
   (* then type-check the bodies *)
-  let type_one (loc,id,gh,bl,tr) (argl,((tyl,tyv) as dvty)) =
+  let type_one (loc,id,gh,bl,tr) (argl,((tyl,tyv) as dvty),freetvs) =
     let add denv (_,id,_,_) dity = match id with
       | Some id -> add_var id dity denv
       | None -> denv in
     let denv = List.fold_left2 add denv bl tyl in
     let id, gh = add_lemma_label ~top id gh in
     let tr, (badl, res) = dtriple denv tr in
-    if badl <> [] then errorm ~loc
+    if badl <> [] then Loc.errorm ~loc
       "The body of a recursive function must be a first-order value";
     unify_loc unify loc tyv res;
+    let freenow = free_user_vars tvars dvty in
+    if not (Stv.subset freetvs freenow) then Loc.errorm ~loc
+      "This function is expected to be polymorphic in type variable %a"
+      Pretty.print_tv (Stv.choose (Stv.diff freetvs freenow));
     id, gh, dvty, argl, tr in
   List.map2 type_one fdl dvtyl
 

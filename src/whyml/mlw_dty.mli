@@ -35,7 +35,11 @@ val ts_app: tysymbol -> dity list -> dity
 
 val opaque_tvs: Stv.t -> dity -> Stv.t
 
-val is_chainable: dvty -> bool (* non-bool * non-bool -> bool *)
+val is_chainable: dvty -> bool
+  (* non-bool * non-bool -> bool *)
+
+val free_user_vars: tvars -> dvty -> Stv.t
+  (* user type variables not bound in the context *)
 
 exception DTypeMismatch of dity * dity
 
