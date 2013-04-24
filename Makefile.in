@@ -958,11 +958,9 @@ PVSLIBS_LIST = $(addprefix lib/pvs/int/, $(PVSLIBS_LIST_FILES))
 PVSLIBS_NUMBER_FILES = # Divisibility Gcd Parity Prime
 PVSLIBS_NUMBER = $(addprefix lib/pvs/number/, $(PVSLIBS_NUMBER_FILES))
 
-ifeq (@enable_pvs_nasa_libs@,yes)
 PVSLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 PVSLIBS_FP_ALL_FILES = GenFloat $(PVSLIBS_FP_FILES)
 PVSLIBS_FP = $(addprefix lib/pvs/floating_point/, $(PVSLIBS_FP_ALL_FILES))
-endif
 
 PVSLIBS_FILES = $(PVSLIBS_INT) $(PVSLIBS_REAL) $(PVSLIBS_LIST) \
                 $(PVSLIBS_NUMBER) $(PVSLIBS_FP)
@@ -989,10 +987,8 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3/pvs/real
 	cp $(addsuffix .pvs, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
 	cp $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
-ifeq (@enable_pvs_nasa_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/pvs/floating_point/
 	cp $(PVSLIBS_FP) $(LIBDIR)/why3/pvs/
-endif
 	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 install_local: drivers/pvs-realizations.aux
@@ -1481,6 +1477,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       theories/*.why \
       modules/*.mlw \
       lib/coq/*.v lib/coq/*/*.v lib/coq-tactic/*.v \
+      lib/pvs/*/*.pvs lib/pvs/*/*.prf \
       share/provers-detection-data.conf.in \
       share/why3session.dtd \
       share/javascript/*.js share/javascript/*.css \

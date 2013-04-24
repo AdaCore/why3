@@ -513,16 +513,16 @@ if test "$enable_pvs_support" = no; then
 fi
 
 if test "$enable_pvs_libs" = yes; then
-   AC_MSG_CHECKING([for NASA libraries])
-   enable_pvs_nasa_libs=no
-   reason_pvs_nasa_libs=" (not in PVS_LIBRARY_PATH)"
+   AC_MSG_CHECKING([for NASA PVS library])
+   enable_pvs_libs=no
+   reason_pvs_libs=" (no NASA PVS library in PVS_LIBRARY_PATH)"
    for dir in ${PVS_LIBRARY_PATH//:/ }; do
        if test -f $dir/nasalib-version; then
-          enable_pvs_nasa_libs=yes
-          reason_pvs_nasa_libs=""
+          enable_pvs_libs=yes
+          reason_pvs_libs=""
        fi
    done
-   AC_MSG_RESULT($enable_pvs_nasa_libs)
+   AC_MSG_RESULT($enable_pvs_libs)
 fi
 
 # hypothesis_selection
@@ -633,7 +633,6 @@ AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
 
 AC_SUBST(enable_pvs_libs)
-AC_SUBST(enable_pvs_nasa_libs)
 AC_SUBST(PVS)
 AC_SUBST(PVSVERSION)
 
@@ -708,9 +707,6 @@ if test "$enable_pvs_support" = yes ; then
    echo "    Version             : $PVSVERSION"
    echo "    Library path        : $PVSLIB"
    echo "    Realization support : $enable_pvs_libs$reason_pvs_libs"
-   if test "$enable_pvs_libs" = yes ; then
-      echo "        NASA libraries  : $enable_pvs_nasa_libs$reason_pvs_nasa_libs"
-   fi
 fi
 echo "Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then
