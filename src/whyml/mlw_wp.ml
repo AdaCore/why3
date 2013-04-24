@@ -98,8 +98,8 @@ let old_mark lab t = t_subst_single vs_old (t_var lab) t
 (* replace [at(t,lab)] with [at(t,'now)] everywhere in formula [f] *)
 let erase_mark lab t = t_subst_single lab t_now t
 
-(* replace ['old] by a fresh label in q and xq, and call the argument *)
-let backstep fn (q : term) xq =
+(* retreat to the point of the current postcondition's ['old] *)
+let backstep fn q xq =
   let lab = fresh_mark () in
   let f = fn (old_mark lab q) (Mexn.map (old_mark lab) xq) in
   erase_mark lab f
@@ -317,8 +317,6 @@ let update_var env (mreg : vsymbol Mreg.t) vs =
     (* are we a mutable variable? *)
     let get_vs r = Mreg.find_def vs r mreg in
     let vs = Opt.fold (fun _ -> get_vs) vs mut in
-    (* at this point, vs is either itself (vtv_mut is None, or the contained
-     * region is not in the map), or the vsymbol in the map mreg *)
     (* should we update our value further? *)
     let check_reg r _ = reg_occurs r ity.ity_vars in
     if ity_immutable ity || not (Mreg.exists check_reg mreg) then t_var vs
@@ -326,15 +324,11 @@ let update_var env (mreg : vsymbol Mreg.t) vs =
   update vs { fd_ity = ity_of_vs vs; fd_ghost = false; fd_mut = None }
 
 (* given a map of modified regions, update every affected variable in [f] *)
-let update_term ?(allow_non_prog_vars=false) env (mreg : vsymbol Mreg.t) f =
+let update_term env (mreg : vsymbol Mreg.t) f =
   (* [vars] : modified variable -> updated value *)
-  let update vs _ =
-    try match update_var env mreg vs with
+  let update vs _ = match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
-    | t -> Some t
-    with Not_found ->
-      if allow_non_prog_vars then None else raise Not_found
-  in
+    | t -> Some t in
   let vars = Mvs.mapi_filter update f.t_vars in
   (* [vv'] : modified variable -> fresh variable *)
   let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
@@ -344,27 +338,23 @@ let update_term ?(allow_non_prog_vars=false) env (mreg : vsymbol Mreg.t) f =
   Mvs.fold update vars (subst_at_now true vv' f)
 
 (* look for a variable with a single region equal to [reg] *)
-let var_of_region ?(allow_non_prog_vars=false) reg f =
-  let test vs _ acc =
-    try match (ity_of_vs vs).ity_node with
+let var_of_region reg f =
+  let test vs _ acc = match (ity_of_vs vs).ity_node with
     | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
-    | _ -> acc
-    with Not_found ->
-      if allow_non_prog_vars then acc else raise Not_found
-  in
+    | _ -> acc in
   Mvs.fold test f.t_vars None
 
-let quantify ?allow_non_prog_vars env regs f =
+let quantify env regs f =
   (* mreg : modified region -> vs *)
   let get_var reg () =
     let ty = ty_of_ity reg.reg_ity in
-    let id = match var_of_region ?allow_non_prog_vars reg f with
+    let id = match var_of_region reg f with
       | Some vs -> vs.vs_name
       | None -> reg.reg_name in
     mk_var id model1_lab ty in
   let mreg = Mreg.mapi get_var regs in
   (* quantify over the modified resions *)
-  let f = update_term ?allow_non_prog_vars env mreg f in
+  let f = update_term env mreg f in
   wp_forall (List.rev (Mreg.values mreg)) f
 
 (** Invariants *)
@@ -1027,9 +1017,9 @@ module Subst : sig
 
    val havoc : wp_env -> Sreg.t -> t -> t * term
    (* [havoc env regions s] generates a new state in which all regions in
-      [regions] and all other regions unchanged. The result pair (s',f) is the
-      new state [s'] and a formula [f] which defines the new values in [s'] with
-      respect to the input state [s]. *)
+      [regions] are touched and all other regions unchanged. The result pair
+      (s',f) is the new state [s'] and a formula [f] which defines the new
+      values in [s'] with respect to the input state [s]. *)
 
    val merge : t -> t -> t * term * term
    (* Given two states, return a new "join" state and two formulas.
@@ -1057,11 +1047,15 @@ end = struct
     { subst_regions : vsymbol Mreg.t;
       subst_vars   : vsymbol Mvs.t
     }
+  (* a substitution or state knows the current variables to use for each region
+     and each mutable program variable. *)
 
   type t =
     { now : subst;
       other : subst Mvs.t
     }
+  (* the actual state knows not only the current state, but also all labeled
+     past states. *)
 
   let fresh_var_from_region reg =
     mk_var reg.reg_name Slab.empty (ty_of_ity reg.reg_ity)
@@ -1070,6 +1064,11 @@ end = struct
     mk_var vs.vs_name Slab.empty (ty_of_ity (ity_of_vs vs))
 
   let add_pvar pv s =
+    (* register a single program variable in the state. Use the variable itself
+       as its first name; for subsequent havocs this will change. All regions
+       belonging to this program variable are also added to the state, if not
+       already there. Note that [add_pvar] doesn't really change the state,
+       only adds new knowledge. *)
     let ity = pv.pv_ity in
     if ity_immutable ity then s
     else
@@ -1085,72 +1084,28 @@ end = struct
           }
       }
 
+  let empty =
+    { other = Mvs.empty;
+      now   = { subst_regions = Mreg.empty;
+              subst_vars    = Mvs.empty }
+    }
+
   let init pvs =
-    Spv.fold add_pvar pvs
-      { other = Mvs.empty;
-                              now   = { subst_regions = Mreg.empty;
-                                        subst_vars    = Mvs.empty }
-      }
-  (* Each region is mapped to a reference, which represents the name of the
-     region. At beginning, this reference points to [None], meaning that the
-     name of the region is not yet decided. When needed, the value under the
-     reference is changed to [Some v], with [v] a fresh variable symbol, to fix
-     the name of the region. This delayed choice of name allows getting better
-     names for regions, so a region for variable [x] ends up called something
-     like [x1] instead of the generic [rho1].
-
-     Program variables are initially mapped to themselves, and each havoc
-     replaces the concerned program variables by a fresh name.
-
-     The label map is initially empty.
-     *)
+    (* init the state with the given program variables. *)
+    Spv.fold add_pvar pvs empty
 
   let save_label vs sub =
     (* simply store the "now" substitution in the map with the given label *)
     { sub with other = Mvs.add vs sub.now sub.other }
 
   let pv_is_touched_by_regions vs regset =
+    (* decide whether a (logic) variable [vs] changes value when [regset] has
+       been touched. *)
     reg_any (fun reg -> Sreg.mem reg regset) (restore_pv vs).pv_ity.ity_vars
-(*
- * ??? code maybe to be used in havoc
- *
-    let mreg = Mreg.mapi_filter (fun reg vr ->
-      match !vr with
-      | Some _ -> !vr
-      | None ->
-            match var_of_region ~allow_non_prog_vars:true reg t with
-            | Some v ->
-                let v' = name_from_region ~id:v.vs_name reg in
-                vr := Some v';
-                !vr
-            | None ->
-                (* it is correct to return [None] here, because if
-                   [var_of_region] does not return anything, the
-                   corresponding region is not in the term! *)
-                None
-
-    ) sub in
-    let r = update_term ~allow_non_prog_vars:true env mreg t in
-    r
-
-  (* Update the name of region [reg] in substitution [s], possibly based on
-     the provided [hint], and return a variable of that name. *)
-  let region_name ?hint reg s =
-    let rv = Mreg.find reg s in
-    match !rv with
-      | Some x -> t_var x
-      | None ->
-          let new_name = name_from_region ?hint reg in
-          rv := Some new_name;
-          t_var (new_name)
-*)
-
-  let print_regset fmt x =
-    Format.fprintf fmt "{";
-  Mreg.iter (fun k _ -> Format.fprintf fmt "%a " Mlw_pretty.print_reg k) x;
-    Format.fprintf fmt "}"
 
   let havoc env regset s =
+    (* introduce new variables for all regions, and all program variables for a
+       region. *)
     let regs =
       Sreg.fold (fun reg acc -> Mreg.add reg (fresh_var_from_region reg) acc)
       regset s.now.subst_regions in
@@ -1166,37 +1121,10 @@ end = struct
       end) s.now.subst_vars (s.now.subst_vars, t_true) in
     { s with now = { subst_regions = regs; subst_vars = vars } }, f
 
-(*
-  let name_from_region ?hint ?id reg =
-    let id = match id with
-      | Some x ->
-          (* an id was provided, take it *)
-          x
-      | None ->
-          (* none was provided, maybe there was a hint state *)
-          begin match hint with
-            | None ->
-                (* no hint, return default *)
-                reg.reg_name
-            | Some s ->
-                begin try match !(Mreg.find reg s) with
-                  | None ->
-                      (* the hint state also contains no id, return default *)
-                      reg.reg_name
-                  | Some x ->
-                      (* the hint state contains something, take it *)
-                      x.vs_name
-                  with Not_found ->
-                    (* the hint state has no entry for that region,
-                       return default *)
-                    reg.reg_name
-                end
-          end
-    in
-    mk_var id Slab.empty (ty_of_ity reg.reg_ity)
-*)
-
   let rec term s t =
+    (* apply a substitution to a formula. This is straightforward, we only need
+       to take care of labels that may point to previous states. We update the
+       "current" substitution accordingly. *)
     match t.t_node with
     | Tvar vs ->
         begin
@@ -1227,6 +1155,7 @@ end = struct
         t_map (term s) t
 
   let subst_inter a b =
+    (* compute the intersection of two substitutions. *)
     { subst_vars = Mvs.set_inter a.subst_vars b.subst_vars;
       subst_regions = Mreg.set_inter a.subst_regions b.subst_regions
     }
@@ -1273,8 +1202,6 @@ end = struct
            program variables/regions should be present in all of them. *)
         let domain =
           List.fold_left (fun acc s -> subst_inter acc s.now) x.now rest in
-        (* we can pick any "other" state, because all relevant labels should be
-           in any state. *)
         let vars, fl1 =
           merge_vars domain.subst_vars (List.map (fun x -> x.now.subst_vars) sl)
         in
@@ -1282,6 +1209,8 @@ end = struct
           merge_regs domain.subst_regions
                      (List.map (fun x -> x.now.subst_regions) sl)
         in
+        (* we can pick any "other" state, because all relevant labels should be
+           in any state. *)
         { other = x.other;
           now = { subst_vars = vars; subst_regions = regs }
         },
@@ -1293,31 +1222,6 @@ end = struct
     | [f1; f2] -> s, f1, f2
     | _ -> assert false
 
-(*
-  let merge_states base (reg1,s1) (reg2,s2) =
-    let all_regs = Sreg.union reg1 reg2 in
-    Sreg.fold
-      (fun reg (s, f1, f2) ->
-        (* If both branches modify region [reg], pick the name from [s2], and
-           add the necessary equations to [f1]. Otherwise, pick the name from
-           the branch that modifies [reg], and add the necessary equations to
-           the formula for the other branch.*)
-        if Sreg.mem reg reg1 && Sreg.mem reg reg2 then begin
-          Mreg.add reg (Mreg.find reg s2) s,
-          t_and_simp f1 (t_equ (region_name reg s2) (region_name reg s1)),
-          f2
-        end else if Sreg.mem reg reg2 then begin
-          Mreg.add reg (Mreg.find reg s2) s,
-          t_and_simp f1 (t_equ (region_name reg s2)
-                          (region_name ~hint:s2 reg base)),
-          f2
-        end else begin
-          Mreg.add reg (Mreg.find reg s1) s,
-          f1,
-          t_and_simp f2 (t_equ (region_name reg s1)
-                          (region_name ~hint:s1 reg base))
-        end) all_regs (base, t_true, t_true)
-*)
 end
 
 let fastwp_or_label = Ident.create_label "fastwp:or"
@@ -1384,32 +1288,13 @@ let apply_state_to_single_post glue lab result_var post =
   { post with ne = t_and_simp glue (Subst.term post.s ne) }
 
 (* Given normal and exceptional [post,xpost], each with its
-   own poststate, place all [(x)post.ne] in the prestate/poststate pair defined
-   by [prestate] and [(x)post.s].*)
+   own poststate, place all [(x)post.ne] in the state defined by [(x)post.s].*)
 let apply_state_to_post glue lab result_vars post xpost =
   let result, xresult = result_vars in
   let f = apply_state_to_single_post glue lab in
   let a = f result post in
   let b = Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost in
   a, b
-
-(*
- ???
-let either_state base (reg1, s1, f1) (reg2, s2, f2) =
-  (* Starting from a base state, and two branches identified by their
-     effects, state and postcondition, return a merged state and two formulas;
-     the first formula improves the first postcondition, the second one the
-     second postcondition. *)
-  let s, eq1, eq2 = Subst.merge_states base (reg1, s1) (reg2, s2) in
-  s, t_and_simp f1 eq1, t_and_simp f2 eq2
-*)
-
-(*
- * ???
-let get_exn ex xmap =
-  try Mexn.find ex xmap
-  with Not_found -> { s = Subst.init_reg reg; ne = t_false }
-*)
 
 let all_exns xmap_list =
   let add_elt k _ acc = Sexn.add k acc in
@@ -1444,14 +1329,6 @@ let rec fast_wp_expr (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
     Format.eprintf "@[<hov 2>OK = %a@]@\n" Pretty.print_term res.ok;
   end;
   res
-
-(* In every case of this function, we have to (potentially) deal with:
-   "old"
-   exceptions
-   effects
-   result variable
-   tracability
-*)
 
 (* TODO: Should we make sure the label of [e] is always propagated to the
    result of fast wp? In that case, should it be put on [ok], on [ne], on
@@ -1856,7 +1733,7 @@ and fast_wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
      t_and_simp res.ok
      (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
   let f = wp_implies pre f in
-  wp_forall args (quantify ~allow_non_prog_vars:true env regs f)
+  wp_forall args (quantify env regs f)
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
