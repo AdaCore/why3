@@ -516,7 +516,7 @@ if test "$enable_pvs_libs" = yes; then
    AC_MSG_CHECKING([for NASA PVS library])
    enable_pvs_libs=no
    reason_pvs_libs=" (no NASA PVS library in PVS_LIBRARY_PATH)"
-   for dir in ${PVS_LIBRARY_PATH//:/ }; do
+   for dir in  `echo $PVS_LIBRARY_PATH | tr ':' ' '`; do
        if test -f $dir/nasalib-version; then
           enable_pvs_libs=yes
           reason_pvs_libs=""

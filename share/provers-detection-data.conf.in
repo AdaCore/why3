@@ -378,14 +378,14 @@ version_switch = "-version"
 version_regexp = "PVS Version \\([^ \n]+\\)"
 version_ok = "6.0"
 version_bad = "^[0-5]\..+$"
-command = "'@LOCALBIN@why3-cpulimit' 0 %m -s @LOCALBIN@why3-check-pvs %l %f"
+command = "'@LOCALBIN@why3-cpulimit' 0 %m -s @LOCALBIN@why3-call-pvs %l proveit -f %f"
 driver = "drivers/pvs.drv"
 in_place = true
 editor = "pvs"
 
 [editor pvs]
 name = "PVS"
-command = "@LOCALBIN@why3-call-pvs %l %f"
+command = "@LOCALBIN@why3-call-pvs %l pvs %f"
 
 [editor coqide]
 name = "CoqIDE"

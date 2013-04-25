@@ -1052,6 +1052,7 @@ clean::
 
 install_no_local::
 	cp -f bin/why3-cpulimit$(EXE) $(BINDIR)/why3-cpulimit$(EXE)
+	cp -f bin/why3-call-pvs $(BINDIR)/why3-call-pvs
 
 #########
 # why3doc
@@ -1462,6 +1463,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
       plugins/printer/.keepme plugins/*/*.ml* plugins/*/*.dep \
       lib/why3/META.in lib/why3/why3.ml \
+      bin/why3-call-pvs \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.mlw examples/logic/*.why \
