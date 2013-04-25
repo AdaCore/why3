@@ -108,8 +108,6 @@ let opt_list_formats = ref false
 let opt_list_metas = ref false
 
 let opt_token_count = ref false
-let opt_parse_only = ref false
-let opt_type_only = ref false
 let opt_version = ref false
 
 let option_list = Arg.align [
@@ -608,7 +606,8 @@ let total_annot_tokens = ref 0
 let total_program_tokens = ref 0
 
 let do_input env drv edrv = function
-  | None, _ when !opt_parse_only || !opt_type_only ->
+  | None, _ when Debug.test_flag Typing.debug_type_only ||
+                 Debug.test_flag Typing.debug_parse_only ->
       ()
   | None, tlist when edrv <> None ->
       Queue.iter (do_global_extract (Opt.get edrv)) tlist
@@ -639,7 +638,7 @@ let do_input env drv edrv = function
       end else begin
         let m = Env.read_channel ?format:!opt_parser env fname cin in
         close_in cin;
-        if !opt_type_only then
+        if Debug.test_flag Typing.debug_type_only then
           ()
         else
           if Queue.is_empty tlist then
