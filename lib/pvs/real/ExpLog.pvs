@@ -17,6 +17,8 @@ ExpLog: THEORY
   % Why3 e
   e: real = exp(1)
   
+  log_total(x: real): real
+
   % Why3 log
   log(x:real): MACRO real = IF x > 0 THEN ln(x) ELSE log_total(x) ENDIF
   

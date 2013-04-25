@@ -3,45 +3,39 @@ MinMax: THEORY
   IMPORTING Int
   % do not edit above this line
   
-  % Why3 min1
-  min1(x:int, x1:int): int
-  
-  % Why3 max1
-  max1(x:int, x1:int): int
-  
   % Why3 max_is_ge
-  max_is_ge: LEMMA FORALL (x:int, y:int): (max1(x, y) >= x) AND (max1(x,
-    y) >= y)
+  max_is_ge: LEMMA FORALL (x:int, y:int): (max(x, y) >= x) AND
+    (max(x, y) >= y)
   
   % Why3 max_is_some
-  max_is_some: LEMMA FORALL (x:int, y:int): (max1(x, y) = x) OR (max1(x,
-    y) = y)
+  max_is_some: LEMMA FORALL (x:int, y:int): (max(x, y) = x) OR
+    (max(x, y) = y)
   
   % Why3 min_is_le
-  min_is_le: LEMMA FORALL (x:int, y:int): (x >= min1(x, y)) AND (y >= min1(x,
-    y))
+  min_is_le: LEMMA FORALL (x:int, y:int): (x >= min(x, y)) AND
+    (y >= min(x, y))
   
   % Why3 min_is_some
-  min_is_some: LEMMA FORALL (x:int, y:int): (min1(x, y) = x) OR (min1(x,
-    y) = y)
+  min_is_some: LEMMA FORALL (x:int, y:int): (min(x, y) = x) OR
+    (min(x, y) = y)
   
   % Why3 max_x
-  max_x: LEMMA FORALL (x:int, y:int): (x >= y) => (max1(x, y) = x)
+  max_x: LEMMA FORALL (x:int, y:int): (x >= y) => (max(x, y) = x)
   
   % Why3 max_y
-  max_y: LEMMA FORALL (x:int, y:int): (y >= x) => (max1(x, y) = y)
+  max_y: LEMMA FORALL (x:int, y:int): (y >= x) => (max(x, y) = y)
   
   % Why3 min_x
-  min_x: LEMMA FORALL (x:int, y:int): (y >= x) => (min1(x, y) = x)
+  min_x: LEMMA FORALL (x:int, y:int): (y >= x) => (min(x, y) = x)
   
   % Why3 min_y
-  min_y: LEMMA FORALL (x:int, y:int): (x >= y) => (min1(x, y) = y)
+  min_y: LEMMA FORALL (x:int, y:int): (x >= y) => (min(x, y) = y)
   
   % Why3 max_sym
-  max_sym: LEMMA FORALL (x:int, y:int): (x >= y) => (max1(x, y) = max1(y, x))
+  max_sym: LEMMA FORALL (x:int, y:int): (x >= y) => (max(x, y) = max(y, x))
   
   % Why3 min_sym
-  min_sym: LEMMA FORALL (x:int, y:int): (x >= y) => (min1(x, y) = min1(y, x))
+  min_sym: LEMMA FORALL (x:int, y:int): (x >= y) => (min(x, y) = min(y, x))
   
   
  END MinMax

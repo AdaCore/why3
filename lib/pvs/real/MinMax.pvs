@@ -3,28 +3,21 @@ MinMax: THEORY
   IMPORTING Real
   % do not edit above this line
   
-  % Why3 min1
-  min1(x:real, x1:real): real
+  % Obsolete chunk max_is_ge
+  % max_is_ge: LEMMA FORALL (x:real, y:real): (max1(x, y) >= x) AND (max1(x,
+  %   y) >= y)
   
-  % Why3 max1
-  max1(x:real, x1:real): real
+  % Obsolete chunk max_is_some
+  % max_is_some: LEMMA FORALL (x:real, y:real): (max1(x, y) = x) OR (max1(x,
+  %   y) = y)
   
-  % Why3 max_is_ge
-  max_is_ge: LEMMA FORALL (x:real, y:real): (max1(x, y) >= x) AND (max1(x,
-    y) >= y)
+  % Obsolete chunk min_is_le
+  % min_is_le: LEMMA FORALL (x:real, y:real): (min1(x, y) <= x) AND (min1(x,
+  %   y) <= y)
   
-  % Why3 max_is_some
-  max_is_some: LEMMA FORALL (x:real, y:real): (max1(x, y) = x) OR (max1(x,
-    y) = y)
-  
-  % Why3 min_is_le
-  min_is_le: LEMMA FORALL (x:real, y:real): (min1(x, y) <= x) AND (min1(x,
-    y) <= y)
-  
-  % Why3 min_is_some
-  min_is_some: LEMMA FORALL (x:real, y:real): (min1(x, y) = x) OR (min1(x,
-    y) = y)
-  
+  % Obsolete chunk min_is_some
+  % min_is_some: LEMMA FORALL (x:real, y:real): (min1(x, y) = x) OR (min1(x,
+  %   y) = y)
   
  END MinMax
  

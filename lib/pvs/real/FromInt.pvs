@@ -4,30 +4,26 @@ FromInt: THEORY
   IMPORTING Real
   % do not edit above this line
   
-  % Why3 from_int
-  from_int(x:int): MACRO real = x
+  % Obsolete chunk zero
+  % zero: LEMMA (from_int(0) = 0)
   
-  % Why3 zero
-  zero: LEMMA (from_int(0) = 0)
+  % Obsolete chunk one
+  % one: LEMMA (from_int(1) = 1)
   
-  % Why3 one
-  one: LEMMA (from_int(1) = 1)
+  % Obsolete chunk add1
+  % add1: LEMMA FORALL (x:int, y:int):
+  %   (from_int((x + y)) = (from_int(x) + from_int(y)))
   
-  % Why3 add1
-  add1: LEMMA FORALL (x:int, y:int):
-    (from_int((x + y)) = (from_int(x) + from_int(y)))
+  % Obsolete chunk sub
+  % sub: LEMMA FORALL (x:int, y:int):
+  %   (from_int((x - y)) = (from_int(x) - from_int(y)))
   
-  % Why3 sub
-  sub: LEMMA FORALL (x:int, y:int):
-    (from_int((x - y)) = (from_int(x) - from_int(y)))
+  % Obsolete chunk mul
+  % mul: LEMMA FORALL (x:int, y:int):
+  %   (from_int((x * y)) = (from_int(x) * from_int(y)))
   
-  % Why3 mul
-  mul: LEMMA FORALL (x:int, y:int):
-    (from_int((x * y)) = (from_int(x) * from_int(y)))
-  
-  % Why3 neg
-  neg: LEMMA FORALL (x:int): (from_int((-x)) = (-from_int(x)))
-  
+  % Obsolete chunk neg
+  % neg: LEMMA FORALL (x:int): (from_int((-x)) = (-from_int(x)))
   
  END FromInt
  

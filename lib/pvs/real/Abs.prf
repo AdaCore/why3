@@ -1,41 +1,11 @@
 (Abs
- (abs_le 0
-  (abs_le-1 nil 3551212620 ("" (default-strategy))
-   ((abs1 const-decl "real" Abs nil)
-    (real_le_is_total_order name-judgement "(total_order?[real])"
-     real_props nil)
-    (minus_real_is_real application-judgement "real" reals nil)
-    (real_ge_is_total_order name-judgement "(total_order?[real])"
-     real_props nil)
-    (real nonempty-type-from-decl nil reals nil)
-    (real_pred const-decl "[number_field -> boolean]" reals nil)
-    (number_field nonempty-type-from-decl nil number_fields nil)
-    (number_field_pred const-decl "[number -> boolean]" number_fields
-     nil)
-    (number nonempty-type-decl nil numbers nil)
-    (NOT const-decl "[bool -> bool]" booleans nil)
-    (boolean nonempty-type-decl nil booleans nil))
-   shostak))
- (abs_pos 0
-  (abs_pos-1 nil 3551212620 ("" (default-strategy))
-   ((abs1 const-decl "real" Abs nil)
-    (real_ge_is_total_order name-judgement "(total_order?[real])"
-     real_props nil)
-    (real nonempty-type-from-decl nil reals nil)
-    (real_pred const-decl "[number_field -> boolean]" reals nil)
-    (number_field nonempty-type-from-decl nil number_fields nil)
-    (number_field_pred const-decl "[number -> boolean]" number_fields
-     nil)
-    (number nonempty-type-decl nil numbers nil)
-    (NOT const-decl "[bool -> bool]" booleans nil)
-    (boolean nonempty-type-decl nil booleans nil))
-   shostak))
  (abs_sum 0
   (abs_sum-1 nil 3551212620 ("" (default-strategy))
-   ((abs1 const-decl "real" Abs nil)
+   ((abs const-decl "{n: nonneg_real | n >= m AND n >= -m}" real_defs
+         nil)
     (minus_real_is_real application-judgement "real" reals nil)
-    (real_ge_is_total_order name-judgement "(total_order?[real])"
-     real_props nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
     (real_plus_real_is_real application-judgement "real" reals nil)
     (real nonempty-type-from-decl nil reals nil)
     (real_pred const-decl "[number_field -> boolean]" reals nil)
@@ -44,6 +14,7 @@
      nil)
     (number nonempty-type-decl nil numbers nil)
     (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
     (boolean nonempty-type-decl nil booleans nil))
    shostak))
  (abs_prod 0
@@ -59,11 +30,11 @@
    nil shostak))
  (triangular_inequality 0
   (triangular_inequality-1 nil 3551212620 ("" (default-strategy))
-   ((minus_odd_is_odd application-judgement "odd_int" integers nil)
-    (abs1 const-decl "real" Abs nil)
+   ((abs const-decl "{n: nonneg_real | n >= m AND n >= -m}" real_defs
+         nil)
     (minus_real_is_real application-judgement "real" reals nil)
-    (real_ge_is_total_order name-judgement "(total_order?[real])"
-     real_props nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
     (real_minus_real_is_real application-judgement "real" reals nil)
     (real nonempty-type-from-decl nil reals nil)
     (real_pred const-decl "[number_field -> boolean]" reals nil)
@@ -72,6 +43,7 @@
      nil)
     (number nonempty-type-decl nil numbers nil)
     (NOT const-decl "[bool -> bool]" booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
     (boolean nonempty-type-decl nil booleans nil))
    shostak)))
 

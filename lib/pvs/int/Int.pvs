@@ -2,91 +2,60 @@ Int: THEORY
  BEGIN
   % do not edit above this line
   
-  % Why3 zero
-  zero: int = 0
+  % Obsolete chunk unit_def
+  % unit_def: LEMMA FORALL (x:int): (infix_pl(x, zero) = x)
   
-  % Why3 one
-  one: int = 1
+  % Obsolete chunk assoc
+  % assoc: LEMMA FORALL (x:int, y:int, z:int): (infix_pl(infix_pl(x, y),
+  %   z) = infix_pl(x, infix_pl(y, z)))
   
-  % Why3 infix_ls
-  infix_ls(x:int, x1:int): MACRO bool = x<x1
+  % Obsolete chunk inv_def
+  % inv_def: LEMMA FORALL (x:int): (infix_pl(x, prefix_mn(x)) = zero)
   
-  % Why3 infix_gt
-  infix_gt(x:int, y:int): bool = infix_ls(y, x)
+  % Obsolete chunk comm
+  % comm: LEMMA FORALL (x:int, y:int): (infix_pl(x, y) = infix_pl(y, x))
   
-  % Why3 infix_lseq
-  infix_lseq(x:int, y:int): bool = infix_ls(x, y) OR (x = y)
+  % Obsolete chunk assoc1
+  % assoc1: LEMMA FORALL (x:int, y:int, z:int): (infix_as(infix_as(x, y),
+  %   z) = infix_as(x, infix_as(y, z)))
   
-  % Why3 infix_pl
-  infix_pl(x:int, x1:int): MACRO int = x+x1
+  % Obsolete chunk mul_distr
+  % mul_distr: LEMMA FORALL (x:int, y:int, z:int): (infix_as(x, infix_pl(y,
+  %   z)) = infix_pl(infix_as(x, y), infix_as(x, z)))
   
-  % Why3 prefix_mn
-  prefix_mn(x:int): MACRO int = -x
+  % Obsolete chunk comm1
+  % comm1: LEMMA FORALL (x:int, y:int): (infix_as(x, y) = infix_as(y, x))
   
-  % Why3 infix_as
-  infix_as(x:int, x1:int): MACRO int = x*x1
+  % Obsolete chunk unitary
+  % unitary: LEMMA FORALL (x:int): (infix_as(one, x) = x)
   
-  % Why3 unit_def
-  unit_def: LEMMA FORALL (x:int): (infix_pl(x, zero) = x)
+  % Obsolete chunk nontrivialring
+  % nontrivialring: LEMMA NOT (zero = one)
   
-  % Why3 assoc
-  assoc: LEMMA FORALL (x:int, y:int, z:int): (infix_pl(infix_pl(x, y),
-    z) = infix_pl(x, infix_pl(y, z)))
+  % Obsolete chunk refl
+  % refl: LEMMA FORALL (x:int): infix_lseq(x, x)
   
-  % Why3 inv_def
-  inv_def: LEMMA FORALL (x:int): (infix_pl(x, prefix_mn(x)) = zero)
+  % Obsolete chunk trans
+  % trans: LEMMA FORALL (x:int, y:int, z:int): infix_lseq(x, y) =>
+  %   (infix_lseq(y, z) => infix_lseq(x, z))
   
-  % Why3 comm
-  comm: LEMMA FORALL (x:int, y:int): (infix_pl(x, y) = infix_pl(y, x))
+  % Obsolete chunk antisymm
+  % antisymm: LEMMA FORALL (x:int, y:int): infix_lseq(x, y) => (infix_lseq(y,
+  %   x) => (x = y))
   
-  % Why3 assoc1
-  assoc1: LEMMA FORALL (x:int, y:int, z:int): (infix_as(infix_as(x, y),
-    z) = infix_as(x, infix_as(y, z)))
+  % Obsolete chunk total
+  % total: LEMMA FORALL (x:int, y:int): infix_lseq(x, y) OR infix_lseq(y, x)
   
-  % Why3 mul_distr
-  mul_distr: LEMMA FORALL (x:int, y:int, z:int): (infix_as(x, infix_pl(y,
-    z)) = infix_pl(infix_as(x, y), infix_as(x, z)))
+  % Obsolete chunk zerolessone
+  % zerolessone: LEMMA infix_lseq(zero, one)
   
-  % Why3 infix_mn
-  infix_mn(x:int, y:int): int = infix_pl(x, prefix_mn(y))
+  % Obsolete chunk compatorderadd
+  % compatorderadd: LEMMA FORALL (x:int, y:int, z:int): infix_lseq(x, y) =>
+  %   infix_lseq(infix_pl(x, z), infix_pl(y, z))
   
-  % Why3 comm1
-  comm1: LEMMA FORALL (x:int, y:int): (infix_as(x, y) = infix_as(y, x))
-  
-  % Why3 unitary
-  unitary: LEMMA FORALL (x:int): (infix_as(one, x) = x)
-  
-  % Why3 nontrivialring
-  nontrivialring: LEMMA NOT (zero = one)
-  
-  % Why3 infix_gteq
-  infix_gteq(x:int, y:int): bool = infix_lseq(y, x)
-  
-  % Why3 refl
-  refl: LEMMA FORALL (x:int): infix_lseq(x, x)
-  
-  % Why3 trans
-  trans: LEMMA FORALL (x:int, y:int, z:int): infix_lseq(x, y) =>
-    (infix_lseq(y, z) => infix_lseq(x, z))
-  
-  % Why3 antisymm
-  antisymm: LEMMA FORALL (x:int, y:int): infix_lseq(x, y) => (infix_lseq(y,
-    x) => (x = y))
-  
-  % Why3 total
-  total: LEMMA FORALL (x:int, y:int): infix_lseq(x, y) OR infix_lseq(y, x)
-  
-  % Why3 zerolessone
-  zerolessone: LEMMA infix_lseq(zero, one)
-  
-  % Why3 compatorderadd
-  compatorderadd: LEMMA FORALL (x:int, y:int, z:int): infix_lseq(x, y) =>
-    infix_lseq(infix_pl(x, z), infix_pl(y, z))
-  
-  % Why3 compatordermult
-  compatordermult: LEMMA FORALL (x:int, y:int, z:int): infix_lseq(x, y) =>
-    (infix_lseq(zero, z) => infix_lseq(infix_as(x, z), infix_as(y, z)))
-  
+  % Obsolete chunk compatordermult
+  % compatordermult: LEMMA FORALL (x:int, y:int, z:int): infix_lseq(x, y) =>
+  %   (infix_lseq(zero, z) => infix_lseq(infix_as(x, z), infix_as(y, z)))
   
  END Int
  

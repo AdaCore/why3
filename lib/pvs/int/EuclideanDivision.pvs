@@ -59,6 +59,14 @@ EuclideanDivision: THEORY
   mod_minus1_left: LEMMA FORALL (y:int): (y >  1) => (mod1((-1),
     y) = (y - 1))
   
+  % Why3 div_mult
+  div_mult: LEMMA FORALL (x:int, y:int, z:int): (x >  0) =>
+    (div(((x * y) + z), x) = (y + div(z, x)))
+  
+  % Why3 mod_mult
+  mod_mult: LEMMA FORALL (x:int, y:int, z:int): (x >  0) =>
+    (mod1(((x * y) + z), x) = mod1(z, x))
+  
   
  END EuclideanDivision
  
