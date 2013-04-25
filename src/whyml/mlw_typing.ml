@@ -436,6 +436,7 @@ let dspec uc sp = {
   ds_pre     = sp.sp_pre;
   ds_post    = dpost sp.sp_post;
   ds_xpost   = dxpost uc sp.sp_xpost;
+  ds_reads   = sp.sp_reads;
   ds_writes  = sp.sp_writes;
   ds_variant = dvariant uc sp.sp_variant;
 }
@@ -902,18 +903,23 @@ let add_binders lenv pvl =
 let mk_field ity gh mut = { fd_ity = ity; fd_ghost = gh; fd_mut = mut }
 let fd_of_pv pv = mk_field pv.pv_ity pv.pv_ghost None
 
-(* TODO: devise a good grammar for effect expressions *)
-let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
-  | Ptree.PPvar (Ptree.Qident {id=x}) when Mstr.mem x lenv.let_vars ->
+let get_eff_pv lenv p = match p with
+  | Ptree.Qident {id = x} when Mstr.mem x lenv.let_vars ->
       begin match Mstr.find x lenv.let_vars with
-        | LetV pv -> pv.pv_vs, fd_of_pv pv
-        | LetA _ -> errorm ~loc "'%s' must be a first-order value" x
+        | LetV pv -> pv
+        | LetA _ -> errorm ~loc:(qloc p) "'%s' must be a first-order value" x
       end
-  | Ptree.PPvar p ->
+  | _ ->
       begin match uc_find_ps lenv.mod_uc p with
-        | PV pv -> pv.pv_vs, fd_of_pv pv
+        | PV pv -> pv
         | _ -> errorm ~loc:(qloc p) "'%a' must be a variable" print_qualid p
       end
+
+(* TODO: devise a good grammar for effect expressions *)
+let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
+  | Ptree.PPvar p ->
+      let pv = get_eff_pv lenv p in
+      pv.pv_vs, fd_of_pv pv
   | Ptree.PPapp (p, [le]) ->
       let vs, fda = get_eff_expr lenv le in
       let quit () = errorm ~loc:le.pp_loc "This expression is not a record" in
@@ -979,19 +985,30 @@ let eff_of_deff lenv dsp =
   let acc = eff_empty, Svs.empty in
   let add_write acc e = get_eff_regs lenv eff_write acc e in
   let eff, svs = List.fold_left add_write acc dsp.ds_writes in
+  let add_read svs q = Svs.add (get_eff_pv lenv q).pv_vs svs in
+  let svs = List.fold_left add_read svs dsp.ds_reads in
   let add_raise xs _ eff = eff_raise eff xs in
-  Mexn.fold add_raise dsp.ds_xpost eff, svs
+  let eff = Mexn.fold add_raise dsp.ds_xpost eff in
+  eff, svs
 
 let e_find_loc pr e =
   try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
   with Not_found -> None
 
-let check_user_effect lenv e eeff full_xpost dsp =
+let check_user_effect lenv e spec full_xpost dsp =
   let has_write reg eff =
     Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
   let has_raise xs eff =
     Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
   (* check that every user effect actually happens *)
+  let eeff = spec.c_effect in
+  let add_read spv q =
+    let pv = get_eff_pv lenv q in
+    if Spv.mem pv e.e_syms.syms_pv then Spv.add pv spv
+    else Loc.errorm ?loc:e.e_loc
+      "variable %a does not occur in this expression" print_pv pv in
+  let spv = List.fold_left add_read Spv.empty dsp.ds_reads in
+  let ueff_r = not (Spv.is_empty spv) in
   let acc = eff_empty, Svs.empty in
   let write le ueff ?ghost reg =
     if has_write reg eeff then eff_write ?ghost ueff reg
@@ -999,18 +1016,24 @@ let check_user_effect lenv e eeff full_xpost dsp =
       "this write effect never happens in the expression" in
   let add_write acc e = get_eff_regs lenv (write e) acc e in
   let ueff, _ = List.fold_left add_write acc dsp.ds_writes in
-  let ueff_rw = not (eff_is_empty ueff) in
+  let ueff_w = not (eff_is_empty ueff) in
   let add_raise xs _ ueff =
     if has_raise xs eeff then eff_raise ueff xs
     else Loc.errorm ?loc:e.e_loc
       "this expression does not raise exception %a" print_xs xs in
   let ueff = Mexn.fold add_raise dsp.ds_xpost ueff in
   (* check that every computed effect is listed *)
+  let check_read pv = Loc.errorm
+    ?loc:(e_find_loc (fun e -> Spv.mem pv e.e_syms.syms_pv) e)
+    "this expression depends on variable %a left out in specification"
+    Mlw_pretty.print_pv pv in
+  if ueff_r then Spv.iter check_read
+    (Spv.diff e.e_syms.syms_pv (Mlw_ty.spec_pvset spv spec));
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this expression produces an unlisted write effect" in
-  if ueff_rw then Sreg.iter check_write eeff.eff_writes;
-  if ueff_rw then Sreg.iter check_write eeff.eff_ghostw;
+  if ueff_w then Sreg.iter check_write eeff.eff_writes;
+  if ueff_w then Sreg.iter check_write eeff.eff_ghostw;
   let check_raise xs = if not (has_raise xs ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
       "this expression raises unlisted exception %a" print_xs xs in
@@ -1019,13 +1042,14 @@ let check_user_effect lenv e eeff full_xpost dsp =
 
 let check_lambda_effect lenv ({fun_lambda = lam} as fd) bl dsp =
   let lenv = add_binders lenv lam.l_args in
-  let eeff = fd.fun_ps.ps_aty.aty_spec.c_effect in
-  check_user_effect lenv lam.l_expr eeff true dsp;
+  let spec = fd.fun_ps.ps_aty.aty_spec in
+  check_user_effect lenv lam.l_expr spec true dsp;
   (* check that we don't look inside opaque type variables *)
+  let optv = opaque_binders Stv.empty bl in
   let bad_comp tv _ _ = Loc.errorm
     ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
     "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
-  ignore (Mtv.inter bad_comp (opaque_binders Stv.empty bl) eeff.eff_compar)
+  ignore (Mtv.inter bad_comp optv spec.c_effect.eff_compar)
 
 let check_user_ps recu ps =
   let ps_regs = ps.ps_subst.ity_subst_reg in
@@ -1243,7 +1267,7 @@ and expr_desc lenv loc de = match de.de_desc with
       let spec = spec_of_dspec lenv e1.e_effect e1.e_vty dsp in
       if spec.c_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      check_user_effect lenv e1 e1.e_effect false dsp;
+      check_user_effect lenv e1 spec false dsp;
       let spec = abstr_invariant lenv e1 spec in
       e_abstract e1 spec
   | DEassert (ak, f) ->
