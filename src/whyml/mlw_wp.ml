@@ -1035,7 +1035,7 @@ module Subst : sig
       to label [vs]. This mapping is preserved even after calls to [havoc] and
       [merge], so that any labeled previous state can be obtained *)
 
-   val term : wp_env -> t -> term -> term
+   val term : t -> term -> term
    (* [term s f] apply the state [s] to the term [f]. If [f] contains
       labeled subterms, these will be appropriately dealt with. *)
 
@@ -1170,7 +1170,7 @@ end = struct
         subst_vars    = vars;
       } }, f
 
-  let rec term env s t =
+  let rec term s t =
     (* apply a substitution to a formula. This is straightforward, we only need
        to take care of labels that may point to previous states. We update the
        "current" substitution accordingly. *)
@@ -1197,14 +1197,14 @@ end = struct
             Format.printf "  not found mark %a@." Pretty.print_vs label;
             exit 1
         in
-        t_map (term env subst) subterm
+        t_map (term subst) subterm
     | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
         (* do not open unless necessary *)
         let mvs = Mvs.set_inter s.now.subst_vars t.t_vars in
         if Mvs.is_empty mvs then t else
-        t_map (term env s) t
+        t_map (term s) t
     | _ ->
-        t_map (term env s) t
+        t_map (term s) t
 
   let subst_inter a b =
     (* compute the intersection of two substitutions. *)
@@ -1330,19 +1330,19 @@ type res_type = vsymbol * vsymbol Mexn.t
    poststate [post.s]. Also, open the postcondition and replace the result
    variable by [result_var]. In [post.s], [lab] is used to define the prestate.
 *)
-let apply_state_to_single_post env glue lab result_var post =
+let apply_state_to_single_post glue lab result_var post =
   (* get the result var of the post *)
   let res, ne = open_post post.ne in
   (* substitute result_var and replace "old" label with new label *)
   let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
   (* apply the prestate = replace previously "old" variables *)
-  { post with ne = t_and_simp glue (Subst.term env post.s ne) }
+  { post with ne = t_and_simp glue (Subst.term post.s ne) }
 
 (* Given normal and exceptional [post,xpost], each with its
    own poststate, place all [(x)post.ne] in the state defined by [(x)post.s].*)
-let apply_state_to_post env glue lab result_vars post xpost =
+let apply_state_to_post glue lab result_vars post xpost =
   let result, xresult = result_vars in
-  let f = apply_state_to_single_post env glue lab in
+  let f = apply_state_to_single_post glue lab in
   let a = f result post in
   let b = Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost in
   a, b
@@ -1393,7 +1393,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: true *)
       (* NE: result = t *)
       let t = wp_label e t in
-      let t = Subst.term env s (to_term t) in
+      let t = Subst.term s (to_term t) in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { ok = t_true;
         post = { ne = ne; s = s };
@@ -1402,7 +1402,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: true *)
       (* NE: result = v *)
       let va = wp_label e (t_var v.pv_vs) in
-      let ne = Subst.term env s (t_equ (t_var result) va) in
+      let ne = Subst.term s (t_equ (t_var result) va) in
       { ok = t_true;
         post = { ne = ne; s = s };
         exn = Mexn.empty }
@@ -1422,7 +1422,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
-      let f = wp_label e (Subst.term env s f) in
+      let f = wp_label e (Subst.term s f) in
       let ok = if kind = Aassume then t_true else f in
       let ne = if kind = Acheck then t_true else f in
       { ok = ok;
@@ -1440,7 +1440,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let call_regs = regs_of_writes spec.c_effect in
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
-      let pre = wp_label e (Subst.term env state_before_call spec.c_pre) in
+      let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
       let state_after_call, call_glue =
         Subst.havoc env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->
@@ -1448,7 +1448,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           ne = p }) spec.c_xpost in
       let call_post = { s = state_after_call; ne = spec.c_post } in
       let post, xpost =
-        apply_state_to_post env call_glue pre_call_label r call_post xpost in
+        apply_state_to_post call_glue pre_call_label r call_post xpost in
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
       let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
       let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
@@ -1680,11 +1680,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
          means that "abstract" also forgets which immutable *components* are
          not modified. To be fixed. *)
       let post, xpost =
-        apply_state_to_post env t_true pre_abstr_label r abstr_post xpost in
+        apply_state_to_post t_true pre_abstr_label r abstr_post xpost in
       let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
       let ok =
         t_and_simp_l
-          [wp1.ok; (Subst.term env s spec.c_pre);
+          [wp1.ok; (Subst.term s spec.c_pre);
            wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
       let ok = wp_label e ok in
       { ok = ok ;
@@ -1703,8 +1703,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let xpost =
         Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in
       let post, xpost =
-        apply_state_to_post env glue pre_any_label r post xpost in
-      let pre = Subst.term env s spec.c_pre in
+        apply_state_to_post glue pre_any_label r post xpost in
+      let pre = Subst.term s spec.c_pre in
       { ok = wp_label e pre;
         post = post;
         exn = xpost;
@@ -1715,12 +1715,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
       let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
-      let init_inv = t_label_add expl_loop_init (Subst.term env s inv) in
+      let init_inv = t_label_add expl_loop_init (Subst.term s inv) in
       let inv_hypo =
-        t_and_simp glue (Subst.term env havoc_state inv) in
+        t_and_simp glue (Subst.term havoc_state inv) in
       let wp1 = fast_wp_expr env havoc_state r e1 in
       let post_inv =
-        t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
+        t_label_add expl_loop_keep (Subst.term wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
            I => (OK /\ (NE => I'))
@@ -1777,9 +1777,9 @@ and fast_wp_fun_defn env { fun_lambda = l } =
   let xq =
     Mexn.mapi (fun ex q -> {ne = q; s = (Mexn.find ex res.exn).s }) c.c_xpost in
   let fun_post = { s = res.post.s ; ne = c.c_post } in
-  let q, xq = apply_state_to_post env t_true lab (result, xresult) fun_post xq in
+  let q, xq = apply_state_to_post t_true lab (result, xresult) fun_post xq in
   (* apply the prestate to the precondition *)
-  let pre = Subst.term env prestate c.c_pre in
+  let pre = Subst.term prestate c.c_pre in
   let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xq in
   (* build the formula "forall variables, pre implies OK,
      and NE implies post" *)
