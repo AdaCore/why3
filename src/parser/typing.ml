@@ -326,7 +326,7 @@ and dpat_node loc uc env = function
 
 and dpat_args ls loc uc env el pl =
   let n = List.length el and m = List.length pl in
-  if n <> m then error ~loc (BadArity (ls,n,m));
+  if n <> m then error ~loc (BadArity (ls,m));
   let rec check_arg env = function
     | [], [] ->
         env, []
@@ -402,8 +402,7 @@ and dterm_node ~localize loc uc env = function
   | PPvar x ->
       (* 0-arity symbol (constant) *)
       let s, tyl, ty = specialize_fsymbol x uc in
-      let n = List.length tyl in
-      if n > 0 then error ~loc (BadArity (s,n,0));
+      if tyl <> [] then error ~loc (BadArity (s,0));
       Tapp (s, []), ty
   | PPapp (x, tl) when check_highord uc env x tl ->
       let tl = apply_highord loc x tl in
@@ -666,7 +665,7 @@ and dpat_list uc env ty p =
 
 and dtype_args ~localize ls loc uc env el tl =
   let n = List.length el and m = List.length tl in
-  if n <> m then error ~loc (BadArity (ls,n,m));
+  if n <> m then error ~loc (BadArity (ls,m));
   let rec check_arg = function
     | [], [] ->
         []

@@ -291,8 +291,8 @@ let lookup_nonghost_reg regs ity =
 
 (* smart constructors *)
 
-exception BadItyArity of itysymbol * int * int
-exception BadRegArity of itysymbol * int * int
+exception BadItyArity of itysymbol * int
+exception BadRegArity of itysymbol * int
 
 exception DuplicateRegion of region
 exception UnboundRegion of region
@@ -389,10 +389,8 @@ and reg_refresh mv mr r = match Mreg.find_opt r mr with
 
 let ity_app_fresh s tl =
   (* type variable map *)
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
-    with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
+  let mv = try List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty with
+    | Invalid_argument _ -> raise (BadItyArity (s, List.length tl)) in
   (* refresh regions *)
   let mr,rl = Lists.map_fold_left (reg_refresh mv) Mreg.empty s.its_regs in
   let sub = { ity_subst_tv = mv; ity_subst_reg = mr } in
@@ -403,15 +401,12 @@ let ity_app_fresh s tl =
 
 let ity_app s tl rl =
   (* type variable map *)
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.its_ts.ts_args tl
-    with Invalid_argument _ ->
-      raise (BadItyArity (s, List.length s.its_ts.ts_args, List.length tl)) in
+  let mv = try List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty with
+    | Invalid_argument _ -> raise (BadItyArity (s, List.length tl)) in
   (* region map *)
   let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
-  let sub = try List.fold_left2 reg_match sub s.its_regs rl
-    with Invalid_argument _ ->
-      raise (BadRegArity (s, List.length s.its_regs, List.length rl)) in
+  let sub = try List.fold_left2 reg_match sub s.its_regs rl with
+    | Invalid_argument _ -> raise (BadRegArity (s, List.length rl)) in
   (* every type var and top region in def are in its_ts.ts_args and its_regs *)
   match s.its_def with
   | Some ity -> ity_full_inst sub ity
@@ -419,10 +414,8 @@ let ity_app s tl rl =
 
 let ity_pur s tl =
   (* type variable map *)
-  let add m v t = Mtv.add v t m in
-  let mv = try List.fold_left2 add Mtv.empty s.ts_args tl
-    with Invalid_argument _ ->
-      raise (Ty.BadTypeArity (s, List.length s.ts_args, List.length tl)) in
+  let mv = try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty with
+    | Invalid_argument _ -> raise (Ty.BadTypeArity (s, List.length tl)) in
   let sub = { ity_subst_tv = mv; ity_subst_reg = Mreg.empty } in
   (* every top region in def is guaranteed to be in mr *)
   match s.ts_def with
@@ -968,17 +961,9 @@ let aty_full_inst sbs aty =
 
 (* remove from the given arrow every inner effect *)
 let rec aty_filter ghost svs vars aty =
-  let add svs { pv_vs = vs } = Svs.add vs svs in
+  let add svs pv = Svs.add pv.pv_vs svs in
   let svs = List.fold_left add svs aty.aty_args in
-  (* every region in the type must be unique *)
-  let check_alias vars ity =
-    (* FIXME? This check is not needed for soundness
-       and can be made outside of the core WhyML API *)
-    let check reg = if reg_occurs reg vars then
-      Loc.errorm "The type of this function contains an alias" in
-    reg_iter check ity.ity_vars in
-  let add vars { pv_ity = ity } =
-    check_alias vars ity; vars_union vars ity.ity_vars in
+  let add vars pv = vars_union vars pv.pv_ity.ity_vars in
   let vars = List.fold_left add vars aty.aty_args in
   (* remove the effects that do not affect the context *)
   let spec = spec_filter ghost svs vars aty.aty_spec in
@@ -991,9 +976,7 @@ let rec aty_filter ghost svs vars aty =
   (* filter the result type *)
   let vty = match aty.aty_result with
     | VTarrow a -> VTarrow (aty_filter ghost svs vars a)
-    (* FIXME? This check is commented out since we do have examples
-       where a mutable argument is incorporated into the result. *)
-    | VTvalue _ -> (*check_alias vars v;*) aty.aty_result in
+    | VTvalue _ -> aty.aty_result in
   vty_arrow_unsafe aty.aty_args spec vty
 
 let aty_filter ?(ghost=false) pvs aty =

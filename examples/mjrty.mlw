@@ -33,7 +33,7 @@ module Mjrty
 
   clone import array.NumOfEq with type elt = candidate
 
-  let mjrty (a: array candidate)
+  let mjrty (a: array candidate) : candidate
     requires { 1 <= length a }
     ensures  { 2 * numof a result 0 (length a) > length a }
     raises   { Not_found ->
@@ -42,11 +42,9 @@ module Mjrty
     let cand = ref a[0] in
     let k = ref 0 in
     for i = 0 to n-1 do (* could start at 1 with k initialized to 1 *)
-      invariant {
-        0 <= !k <= numof a !cand 0 i /\
-        2 * (numof a !cand 0 i - !k) <= i - !k /\
-        forall c: candidate. c <> !cand -> 2 * numof a c 0 i <= i - !k
-      }
+      invariant { 0 <= !k <= numof a !cand 0 i }
+      invariant {2 * (numof a !cand 0 i - !k) <= i - !k }
+      invariant {forall c:candidate. c <> !cand -> 2 * numof a c 0 i <= i - !k }
       if !k = 0 then begin
         cand := a[i];
         k := 1
@@ -63,7 +61,6 @@ module Mjrty
         invariant { !k = numof a !cand 0 i /\ 2 * !k <= n }
         if a[i] = !cand then begin
           incr k;
-          assert { !k = numof a !cand 0 (i+1) };
           if 2 * !k > n then raise Found
         end
       done;

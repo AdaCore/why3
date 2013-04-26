@@ -1,0 +1,23 @@
+module Bad
+
+  use import ref.Ref
+
+  function comp ~'a 'a : int
+
+  let test () =
+    let r = ref 0 in
+    let rec f x =
+      (* the argument of [g] shares the region with [r], but we don't
+         know it yet, and specialize [g] as fully region polymorpic.
+         Since we do not compute the fixed point during type inference,
+         the type of [f] will be erroneously over-generalized, the types
+         of [x] and [r] won't be unified, and we will have a region
+         mismatch on [g x] when building the expression. This is why
+         recursive functions must be completely alias-free. *)
+      g x
+    with g u =
+      u := comp u r
+    in
+    ()
+
+end

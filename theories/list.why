@@ -202,6 +202,37 @@ theory Reverse
 
 end
 
+(** {2 Reverse append} *)
+
+theory RevAppend
+
+  use import List
+
+  function rev_append (s t: list 'a) : list 'a =
+    match s with
+    | Cons x r -> rev_append r (Cons x t)
+    | Nil -> t
+    end
+
+  use import Append
+
+  lemma rev_append_append_l:
+    forall r s t: list 'a.
+      rev_append (r ++ s) t = rev_append s (rev_append r t)
+
+  lemma rev_append_append_r:
+    forall r s t: list 'a.
+      rev_append r (s ++ t) = rev_append (rev_append s r) t
+
+  use import int.Int
+  use import Length
+
+  lemma rev_append_length:
+    forall s t: list 'a.
+      length (rev_append s t) = length s + length t
+
+end
+
 (** {2 Sorted lists for some order as parameter} *)
 
 theory Sorted
@@ -235,6 +266,46 @@ theory SortedInt
   use import int.Int
   clone export Sorted with type t = int, predicate le = (<=)
 
+end
+
+theory RevSorted
+
+  type t
+  predicate le t t
+  predicate ge (x y: t) = le y x
+
+  use import List
+
+  clone Sorted as Incr with type t = t, predicate le = le
+  clone Sorted as Decr with type t = t, predicate le = ge
+
+  predicate compat (s t: list t) =
+    match s, t with
+    | Cons x _, Cons y _ -> le x y
+    | _, _ -> true
+    end
+
+  use import RevAppend
+
+  lemma rev_append_sorted_incr:
+    forall s t: list t.
+      Incr.sorted (rev_append s t) <->
+        Decr.sorted s /\ Incr.sorted t /\ compat s t
+
+  lemma rev_append_sorted_decr:
+    forall s t: list t.
+      Decr.sorted (rev_append s t) <->
+        Incr.sorted s /\ Decr.sorted t /\ compat t s
+
+  (*
+  use import Reverse
+
+  lemma rev_sorted_incr:
+    forall s: list t. Incr.sorted (reverse s) <-> Decr.sorted s
+
+  lemma rev_sorted_decr:
+    forall s: list t. Decr.sorted (reverse s) <-> Incr.sorted s
+  *)
 end
 
 (** {2 Number of occurrences in a list} *)

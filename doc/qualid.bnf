@@ -11,7 +11,9 @@
   \
   ident ::= lident | uident
   \
-  lqualid ::= lident | uqualid "." lident ;
+  lqualid ::= lident | uqualid "." lident
   \
-  uqualid ::= uident | uqualid "." uident ;%
+  uqualid ::= uident | uqualid "." uident
+  \
+  qualid ::= ident | uqualid "." ident ;%
 \end{syntax}

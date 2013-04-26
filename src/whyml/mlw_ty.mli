@@ -82,8 +82,8 @@ val ity_hash : ity -> int
 val reg_equal : region -> region -> bool
 val reg_hash : region -> int
 
-exception BadItyArity of itysymbol * int * int
-exception BadRegArity of itysymbol * int * int
+exception BadItyArity of itysymbol * int
+exception BadRegArity of itysymbol * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
 

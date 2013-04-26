@@ -144,7 +144,7 @@ let ty_closed ty = ty_v_all Util.ffalse ty
 
 (* smart constructors *)
 
-exception BadTypeArity of tysymbol * int * int
+exception BadTypeArity of tysymbol * int
 exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVar of tvsymbol
 
@@ -155,17 +155,15 @@ let create_tysymbol name args def =
   ignore (Opt.map (ty_v_all check) def);
   mk_ts name args def
 
-let ty_app s tl =
-  let tll = List.length tl in
-  let stl = List.length s.ts_args in
-  if tll <> stl then raise (BadTypeArity (s,stl,tll));
-  match s.ts_def with
-    | Some ty ->
-        let add m v t = Mtv.add v t m in
-        let m = List.fold_left2 add Mtv.empty s.ts_args tl in
-        ty_full_inst m ty
-    | _ ->
-        ty_app s tl
+let ty_app s tl = match s.ts_def with
+  | Some ty ->
+      let mv = try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty with
+        | Invalid_argument _ -> raise (BadTypeArity (s, List.length tl)) in
+      ty_full_inst mv ty
+  | None ->
+      if List.length s.ts_args <> List.length tl then
+        raise (BadTypeArity (s, List.length tl));
+      ty_app s tl
 
 (* symbol-wise map/fold *)
 

@@ -540,14 +540,25 @@ and tr_global_ts dep env r =
               let r = ConstructRef (j, k+1) in
               let ty = Global.type_of_global r in
               let (_,vars), env, t = decomp_type_quantifiers env ty in
-              let tvm =
-                let add v1 v2 tvm =
-                  let v2 = Some (Ty.ty_var v2) in
-                  Idmap.add (id_of_string v1.tv_name.Ident.id_string) v2 tvm
-                in
-                List.fold_right2 add vars ts.Ty.ts_args Idmap.empty
+              let l, c = decompose_arrows t in
+              let tvm = match kind_of_term c with
+                | App (_, v) ->
+                    let v = Array.to_list v in
+                    let no_whytype c = not (has_WhyType env c) in
+                    let v = List.filter no_whytype v in
+                    let add v1 v2 tvm = match kind_of_term v1 with
+                      | Var x1 ->
+                          if Idmap.mem x1 tvm then raise NotFO;
+                          let v2 = Some (Ty.ty_var v2) in
+                          Idmap.add x1 v2 tvm
+                      | _ -> raise NotFO (* GADT *)
+                    in
+                    List.fold_right2 add v ts.Ty.ts_args Idmap.empty
+                | Ind _ ->
+                    Idmap.empty
+                | _ ->
+                    assert false (* ensured by Coq typing *)
               in
-              let l, _ = decompose_arrows t in
               let l = List.map (tr_type dep' tvm env) l in
               let id = preid_of_id (Nametab.basename_of_global r) in
               let ls = Term.create_fsymbol ~opaque ~constr id l tyj in
@@ -559,14 +570,28 @@ and tr_global_ts dep env r =
               try Array.to_list (Array.mapi mk_constructor oib.mind_nf_lc)
               with NotFO -> []
             in
-            ts, cl
+            (j, oib), (ts, cl)
           in
           let dl = Array.mapi make_one mib.mind_packets in
           let dl = Array.to_list dl in
-          let add (ts, cl as d) (tl, dl) =
-            if cl = [] then Decl.create_ty_decl ts :: tl, dl else tl, d :: dl
+          let add ((j, oib), (ts, cl as d)) (tl, dl, sl) =
+            if cl = [] then begin
+              let sl = ref sl in
+              for k = 0 to Array.length oib.mind_nf_lc - 1 do
+                let r = ConstructRef (j, k+1) in
+                try
+                  make_one_ls dep' env r;
+                  let ls = lookup_table global_ls r in
+                  let d = Decl.create_param_decl ls in
+                  sl := d :: !sl
+                with NotFO ->
+                  ()
+              done;
+              Decl.create_ty_decl ts :: tl, dl, !sl
+            end else
+              tl, d :: dl, sl
           in
-          let tl, dl = List.fold_right add dl ([], []) in
+          let tl, dl, sl = List.fold_right add dl ([], [], []) in
           let decl =
             if dl = [] then None else Some (Decl.create_data_decl dl)
           in
@@ -574,6 +599,8 @@ and tr_global_ts dep env r =
           List.iter (add_new_decl dep !dep') tl;
           List.iter (add_dep dep') tl;
           Opt.iter (add_new_decl dep !dep') decl;
+          Opt.iter (add_dep dep') decl;
+          List.iter (add_new_decl dep !dep') sl;
           lookup_table global_ts r
 
 (* the function/predicate symbol for r *)
@@ -1150,12 +1177,19 @@ let tr_top_decls () =
 let pr_fp fp =
   pr_str (Pp.string_of_wnl Whyconf.print_filter_prover fp)
 
+let plugins_loaded = ref false
+
 let why3tac ?(timelimit=timelimit) s gl =
   (* print_dep Format.err_formatter; *)
   let concl_type = pf_type_of gl (pf_concl gl) in
   if not (is_Prop concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
   try
+    (* OCaml doesn't let us do it at the initialisation time *)
+    if not !plugins_loaded then begin
+      Whyconf.load_plugins main;
+      plugins_loaded := true
+    end;
     (* add global declarations from modules Top and Why3.X.Y *)
     tr_top_decls ();
     (* then translate the goal *)

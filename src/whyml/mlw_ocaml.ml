@@ -386,8 +386,16 @@ let rec print_pat_node pri info fmt p = match p.pat_node with
     begin match query_syntax info.info_syn cs.ls_name with
       | Some s -> syntax_arguments s (print_pat_node 0 info) fmt pl
       | None when pl = [] -> print_cs info fmt cs
-      | _ -> fprintf fmt (protect_on (pri > 1) "%a@ (%a)")
-        (print_cs info) cs (print_list comma (print_pat_node 2 info)) pl
+      | _ ->
+          let pjl = get_record info cs in
+          if pjl = [] then
+            fprintf fmt (protect_on (pri > 1) "%a@ (%a)")
+              (print_cs info) cs (print_list comma (print_pat_node 2 info)) pl
+          else
+            let print_field fmt (ls, p) = fprintf fmt "%a = %a"
+              (print_ls info) ls (print_pat_node 0 info) p in
+            fprintf fmt "{ %a }" (print_list semi print_field)
+              (List.combine pjl pl)
     end
 
 let print_pat = print_pat_node 0
@@ -425,11 +433,6 @@ and print_app pri ls info fmt tl =
   match tl with
   | [] ->
       print info fmt ls
-  | [t1] when isfield ->
-      fprintf fmt "(%a).%a" (print_term info) t1 (print info) ls
-  | [t1] ->
-      fprintf fmt (protect_on (pri > 4) "%a %a")
-        (print info) ls (print_lterm 5 info) t1
   | tl when isconstr ->
       let pjl = get_record info ls in
       if pjl = [] then
@@ -440,6 +443,11 @@ and print_app pri ls info fmt tl =
           fprintf fmt "%a = %a" (print_ls info) ls (print_term info) t in
         fprintf fmt "@[<hov 1>{ %a }@]" (print_list semi print_field)
           (List.combine pjl tl)
+  | [t1] when isfield ->
+      fprintf fmt "(%a).%a" (print_term info) t1 (print info) ls
+  | [t1] ->
+      fprintf fmt (protect_on (pri > 4) "%a %a")
+        (print info) ls (print_lterm 5 info) t1
   | tl ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
         (print_ls info) ls (print_list space (print_lterm 6 info)) tl

@@ -1,0 +1,25 @@
+module Bad
+
+  use import ref.Ref
+
+  function comp ~'a 'a : ()
+
+  let test z =
+    let rec f x =
+      (* the argument of [g] shares the type vairable with [z], but we
+         don't know it yet, and specialize [g] as fully type polymorpic,
+         because of its explicit type signature. Since we do not compute
+         the fixed point during type inference, the type of [f] will be
+         erroneously over-generalized, the types of [x] and [z] won't be
+         unified, and we will have a type mismatch on [g x] when building
+         the expression. This is why recursive functions with explicit
+         signatures must either be polymorphic in a given type variable
+         or that type variable must appear explicitly in the context of
+         the recursive definition (here, in the type of [z]). *)
+      g x
+    with g (u : 'a) : unit =
+      comp u z
+    in
+    ()
+
+end

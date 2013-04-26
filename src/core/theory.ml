@@ -115,7 +115,7 @@ let meta_hash m = m.meta_tag
 
 exception KnownMeta of meta
 exception UnknownMeta of string
-exception BadMetaArity of meta * int * int
+exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
 let meta_table = Hstr.create 17
@@ -767,9 +767,8 @@ let create_meta m al =
     let mt = get_meta_arg_type a in
     if at = mt then a else raise (MetaTypeMismatch (m,at,mt))
   in
-  let al = try List.map2 get_meta_arg m.meta_type al
-    with Invalid_argument _ ->
-      raise (BadMetaArity (m, List.length m.meta_type, List.length al))
+  let al = try List.map2 get_meta_arg m.meta_type al with
+    | Invalid_argument _ -> raise (BadMetaArity (m, List.length al))
   in
   mk_tdecl (Meta (m,al))
 
@@ -907,9 +906,9 @@ let () = Exn_printer.register
   | KnownMeta m ->
       Format.fprintf fmt "Metaproperty %s is already registered with \
         a conflicting signature" m.meta_name
-  | BadMetaArity (m,i1,i2) ->
+  | BadMetaArity (m,n) ->
       Format.fprintf fmt "Metaproperty %s requires %d arguments but \
-        is applied to %d" m.meta_name i1 i2
+        is applied to %d" m.meta_name (List.length m.meta_type) n
   | MetaTypeMismatch (m,t1,t2) ->
       Format.fprintf fmt "Metaproperty %s expects %a argument but \
         is applied to %a"

@@ -234,7 +234,6 @@ install_no_local::
 	cp -f share/emacs/why3.el $(DATADIR)/why3/emacs/why3.el
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
-	# if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
 
 install_no_local_lib::
 	rm -rf $(OCAMLLIB)/why3
@@ -828,12 +827,6 @@ src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 	    WHY3CONFIG="" $(COQC) -opt -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
-test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
-	$(COQC) -byte -I lib/coq-tactic/ src/coq-tactic/test.v
-
-test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
-	$(COQC) -opt -I lib/coq-tactic/ src/coq-tactic/test.v
-
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS)" "clean"
@@ -1013,11 +1006,9 @@ PVSLIBS_LIST = $(addprefix lib/pvs/int/, $(PVSLIBS_LIST_FILES))
 PVSLIBS_NUMBER_FILES = # Divisibility Gcd Parity Prime
 PVSLIBS_NUMBER = $(addprefix lib/pvs/number/, $(PVSLIBS_NUMBER_FILES))
 
-ifeq (@enable_pvs_nasa_libs@,yes)
 PVSLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 PVSLIBS_FP_ALL_FILES = GenFloat $(PVSLIBS_FP_FILES)
 PVSLIBS_FP = $(addprefix lib/pvs/floating_point/, $(PVSLIBS_FP_ALL_FILES))
-endif
 
 PVSLIBS_FILES = $(PVSLIBS_INT) $(PVSLIBS_REAL) $(PVSLIBS_LIST) \
                 $(PVSLIBS_NUMBER) $(PVSLIBS_FP)
@@ -1044,10 +1035,8 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3/pvs/real
 	cp $(addsuffix .pvs, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
 	cp $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
-ifeq (@enable_pvs_nasa_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/pvs/floating_point/
 	cp $(PVSLIBS_FP) $(LIBDIR)/why3/pvs/
-endif
 	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 install_local: drivers/pvs-realizations.aux
@@ -1111,6 +1100,7 @@ clean::
 
 install_no_local::
 	cp -f bin/why3-cpulimit$(EXE) $(BINDIR)/why3-cpulimit$(EXE)
+	cp -f bin/why3-call-pvs $(BINDIR)/why3-call-pvs
 
 #########
 # why3doc
@@ -1255,7 +1245,11 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml
 
+test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
+	$(COQC) -byte -I lib/coq-tactic/ bench/coq-tactic/test.v
 
+test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
+	$(COQC) -opt -I lib/coq-tactic/ bench/coq-tactic/test.v
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
@@ -1378,6 +1372,14 @@ doc/apidoc.tex: $(FILESTODOC)
 
 clean::
 	rm -f doc/apidoc/*
+
+##########
+# Install rules that require root, and thus appear last in the file!
+##########
+
+install_no_local::
+	# if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
+
 
 ##########
 # Stdlib formatted with why3doc
@@ -1516,6 +1518,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
       plugins/printer/.keepme plugins/*/*.ml* plugins/*/*.dep \
       lib/why3/META.in lib/why3/why3.ml \
+      bin/why3-call-pvs \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.mlw examples/logic/*.why \
@@ -1531,6 +1534,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       theories/*.why \
       modules/*.mlw \
       lib/coq/*.v lib/coq/*/*.v lib/coq-tactic/*.v \
+      lib/pvs/*/*.pvs lib/pvs/*/*.prf \
       share/provers-detection-data.conf.in \
       share/why3session.dtd \
       share/javascript/*.js share/javascript/*.css \

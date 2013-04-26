@@ -193,6 +193,7 @@ type spec = {
   sp_pre     : pre list;
   sp_post    : post list;
   sp_xpost   : xpost list;
+  sp_reads   : qualid list;
   sp_writes  : lexpr list;
   sp_variant : variant list;
 }

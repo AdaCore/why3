@@ -61,7 +61,7 @@ val ty_equal : ty -> ty -> bool
 val ts_hash : tysymbol -> int
 val ty_hash : ty -> int
 
-exception BadTypeArity of tysymbol * int * int
+exception BadTypeArity of tysymbol * int
 exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVar of tvsymbol
 

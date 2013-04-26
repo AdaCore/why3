@@ -177,7 +177,7 @@ let make_ppattern pp ?(ghost=false) ity =
         let ppl = try List.map2 mtch pls.pl_args ppl with
           | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
-              (pls.pl_ls, List.length pls.pl_args, List.length ppl)) in
+              (pls.pl_ls, List.length ppl)) in
         make_app pls.pl_ls ppl ghost ity
     | PPlapp (ls,ppl) ->
         if ls.ls_constr = 0 then
@@ -190,7 +190,7 @@ let make_ppattern pp ?(ghost=false) ity =
         let ppl = try List.map2 mtch ls.ls_args ppl with
           | Not_found -> raise (Term.ConstructorExpected ls)
           | Invalid_argument _ -> raise (Term.BadArity
-              (ls,List.length ls.ls_args,List.length ppl)) in
+              (ls, List.length ppl)) in
         make_app ls ppl ghost ity
     | PPor (pp1,pp2) ->
         let pp1 = make ghost ity pp1 in
@@ -603,8 +603,7 @@ let e_plapp pls el ity =
           | None   -> ps_app pls.pl_ls tl in
         mk_expr (Elogic t) (VTvalue ity) ghost eff syms
     | [],_ | _,[] ->
-        raise (Term.BadArity
-          (pls.pl_ls, List.length pls.pl_args, List.length el))
+        raise (Term.BadArity (pls.pl_ls, List.length el))
     | fd::fdl, ({ e_node = Elogic t } as e)::argl ->
         let t = match t.t_ty with
           | Some _ -> t

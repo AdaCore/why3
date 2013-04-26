@@ -27,27 +27,27 @@ type tvars (* a set of type variables *)
 val empty_tvars: tvars
 val add_dity: tvars -> dity -> tvars
 val add_dvty: tvars -> dvty -> tvars
-val add_dvty_vars: tvars -> dvty -> tvars (* add only variables *)
 
 val create_type_variable: unit -> dity
 val create_user_type_variable: Ptree.ident -> (* opaque *) bool -> dity
 val its_app: itysymbol -> dity list -> dity
 val ts_app: tysymbol -> dity list -> dity
 
-val dity_refresh: dity -> dity (* refresh regions *)
-
 val opaque_tvs: Stv.t -> dity -> Stv.t
 
-val is_chainable: dvty -> bool (* non-bool * non-bool -> bool *)
+val is_chainable: dvty -> bool
+  (* non-bool * non-bool -> bool *)
+
+val free_user_vars: tvars -> dvty -> Stv.t
+  (* user type variables not bound in the context *)
 
 exception DTypeMismatch of dity * dity
 
-val unify: dity -> dity -> unit
-val unify_weak: dity -> dity -> unit (* don't unify regions *)
+val unify: ?weak:bool -> dity -> dity -> unit
+  (* when [weak] is true, don't unify regions *)
 
 val ity_of_dity: dity -> ity
-val vty_of_dvty: dvty -> vty
-  (** use with care, only once unification is done *)
+  (* only use once all unification is done *)
 
 val specialize_scheme: tvars -> dvty -> dvty
 

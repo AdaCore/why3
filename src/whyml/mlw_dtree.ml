@@ -21,7 +21,8 @@ type ghost = bool
 type dpre = Ptree.lexpr list
 type dpost = (Ptree.pattern * Ptree.lexpr) list
 type dxpost = dpost Mexn.t
-type deffect = Ptree.lexpr list
+type dreads = Ptree.qualid list
+type dwrites = Ptree.lexpr list
 type dvariant = Ptree.lexpr * Term.lsymbol option
 type dinvariant = Ptree.lexpr list
 
@@ -29,7 +30,8 @@ type dspec = {
   ds_pre     : dpre;
   ds_post    : dpost;
   ds_xpost   : dxpost;
-  ds_writes  : deffect;
+  ds_reads   : dreads;
+  ds_writes  : dwrites;
   ds_variant : dvariant list;
 }
 

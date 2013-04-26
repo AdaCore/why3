@@ -426,14 +426,14 @@ let print_pdecl fmt d = match d.pd_node with
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
-  | Mlw_ty.BadItyArity (ts, ts_arg, app_arg) ->
+  | Mlw_ty.BadItyArity (ts, app_arg) ->
       fprintf fmt "Bad type arity: type symbol %a must be applied \
                    to %i arguments, but is applied to %i"
-        print_its ts ts_arg app_arg
-  | Mlw_ty.BadRegArity (ts, ts_arg, app_arg) ->
+        print_its ts (List.length ts.its_ts.ts_args) app_arg
+  | Mlw_ty.BadRegArity (ts, app_arg) ->
       fprintf fmt "Bad region arity: type symbol %a must be applied \
                    to %i regions, but is applied to %i"
-        print_its ts ts_arg app_arg
+        print_its ts (List.length ts.its_regs) app_arg
   | Mlw_ty.DuplicateRegion r ->
       fprintf fmt "Region %a is used twice" print_reg r
   | Mlw_ty.UnboundRegion r ->
