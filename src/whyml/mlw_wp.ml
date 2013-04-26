@@ -1046,7 +1046,6 @@ end = struct
   type subst =
     { subst_regions : vsymbol Mreg.t;
       subst_vars    : vsymbol Mvs.t;
-      reg_names     : vsymbol Mreg.t;
     }
   (* a substitution or state knows the current variables to use for each region
      and each mutable program variable. *)
@@ -1055,8 +1054,9 @@ end = struct
      This mapping is not required to be complete for regions. *)
 
   type t =
-    { now : subst;
-      other : subst Mvs.t
+    { now       : subst;
+      other     : subst Mvs.t;
+      reg_names : vsymbol Mreg.t;
     }
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
@@ -1080,6 +1080,12 @@ end = struct
 
   let is_simple_var vs = is_simple_pvar (restore_pv vs)
 
+  let dummy_var =
+    create_vsymbol (id_fresh "dummy") ty_mark
+  (* the dummy variable used for simple variables *)
+
+  let is_dummy_var = vs_equal dummy_var
+
   let add_pvar pv s =
     (* register a single program variable in the state. Use the variable itself
        as its first name; for subsequent havocs this will change. All regions
@@ -1087,27 +1093,28 @@ end = struct
        already there. Note that [add_pvar] doesn't really change the state,
        only adds new knowledge. *)
     (* for simple variables (1 variable = 1 mutable region), we register the
-       variable name as a name hint for the region. Also, we don't enter the
-       program variable in the substitution map, because havoc/merge is not
-       required on such variables. See also [havoc], [merge] and [term]. *)
+       variable name as a name hint for the region. Also, we enter a
+       dummy program variable in the substitution map, so that we know that we
+       have to do something with this variable, but still know it is a program
+       variable. Previously, we did not enter it at all in the map, which made
+       us forget to substitute it.
+       See also [havoc], [merge] and [term]. *)
     let ity = pv.pv_ity in
     if ity_immutable ity then s
     else
       let vs = pv.pv_vs in
       let is_simple = is_simple_pvar pv in
-      let vars =
-          if is_simple <> None then s.now.subst_vars
-          else Mvs.add vs vs s.now.subst_vars
-      in
+      let var = if is_simple <> None then dummy_var else vs in
+      let vars = Mvs.add vs var s.now.subst_vars in
       let reg_names =
         match is_simple with
-        | None -> s.now.reg_names
-        | Some r -> Mreg.add r vs s.now.reg_names
+        | None -> s.reg_names
+        | Some r -> Mreg.add r vs s.reg_names
       in
-      { other = s.other;
-        now =
+      { other      = s.other;
+        reg_names  = reg_names;
+        now        =
           { subst_vars = vars;
-            reg_names  = reg_names;
             subst_regions =
               reg_fold (fun r acc ->
                 if Mreg.mem r acc then acc
@@ -1117,10 +1124,10 @@ end = struct
       }
 
   let empty =
-    { other = Mvs.empty;
-      now   = { subst_regions = Mreg.empty;
-                subst_vars    = Mvs.empty;
-                reg_names     = Mreg.empty; }
+    { other         = Mvs.empty;
+      reg_names     = Mreg.empty;
+      now           = { subst_regions = Mreg.empty;
+                        subst_vars    = Mvs.empty; }
     }
 
   let init pvs =
@@ -1141,13 +1148,13 @@ end = struct
        region. *)
     let regs =
       Sreg.fold (fun reg acc ->
-        Mreg.add reg (fresh_var_from_region s.now.reg_names reg) acc)
+        Mreg.add reg (fresh_var_from_region s.reg_names reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
-    (* note that the [subst_vars] map does not contain a mapping for simple
-       variables. So no new names/equations are introduced for those. *)
-    let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
-      if pv_is_touched_by_regions vs regset then begin
+    (* We special case simple variables, when the mapping is the dummy
+     * variable. So no new names/equations are introduced for those. *)
+    let vars, f = Mvs.fold (fun vs old ((acc_vars, acc_f) as acc) ->
+      if not (is_dummy_var old) && pv_is_touched_by_regions vs regset then begin
         let var = fresh_var_from_var vs in
         let new_term = update_var env touched_regs vs in
         Mvs.add vs var acc_vars,
@@ -1158,7 +1165,7 @@ end = struct
     { s with now =
       { subst_regions = regs;
         subst_vars    = vars;
-        reg_names     = s.now.reg_names } }, f
+      } }, f
 
   let rec term env s t =
     (* apply a substitution to a formula. This is straightforward, we only need
@@ -1170,11 +1177,10 @@ end = struct
            "now" value. The special case is where it is a simple variable; we
            directly insert the "update" term here. *)
         begin try
-            if is_simple_var vs <> None then
-              update_var env s.now.subst_regions vs
-            else
-              t_var (Mvs.find vs s.now.subst_vars)
-         with Not_found -> t
+          let sub = Mvs.find vs s.now.subst_vars in
+          if is_dummy_var sub then update_var env s.now.subst_regions vs
+          else t_var sub
+        with Not_found -> t
         end
     | Tapp (ls, _) when ls_equal ls fs_old -> assert false
     | Tapp (ls, [subterm; mark]) when ls_equal ls fs_at ->
@@ -1204,7 +1210,6 @@ end = struct
     (* compute the intersection of two substitutions. *)
     { subst_vars = Mvs.set_inter a.subst_vars b.subst_vars;
       subst_regions = Mreg.set_inter a.subst_regions b.subst_regions;
-      reg_names = a.reg_names;
     }
 
   let all_equal eq l =
@@ -1217,15 +1222,20 @@ end = struct
   let all_equal_regs = all_equal reg_equal
 
   let merge_vars domain mapl =
-    Mvs.fold (fun k _ ( map , fl) ->
-      let all_vars = List.map (fun m -> Mvs.find k m) mapl in
-      if all_equal_vars all_vars then
-        Mvs.add k (List.hd all_vars) map, fl
+    Mvs.fold (fun k old ( map , fl) ->
+      (* we check whether the variable of interest is a simple variable, and do
+         nothing in that case. *)
+      if is_dummy_var old then
+        Mvs.add k old map, fl
       else
-          let new_ = fresh_var_from_var k in
-          Mvs.add k new_ map,
-          List.map2 (fun old f ->
-            t_and_simp (t_equ (t_var new_) (t_var old)) f) all_vars fl)
+        let all_vars = List.map (fun m -> Mvs.find k m) mapl in
+        if all_equal_vars all_vars then
+          Mvs.add k (List.hd all_vars) map, fl
+        else
+            let new_ = fresh_var_from_var k in
+            Mvs.add k new_ map,
+            List.map2 (fun old f ->
+              t_and_simp (t_equ (t_var new_) (t_var old)) f) all_vars fl)
     domain (Mvs.empty, List.map (fun _ -> t_true) mapl)
 
   let merge_regs hints domain mapl =
@@ -1241,8 +1251,6 @@ end = struct
     domain (Mreg.empty, List.map (fun _ -> t_true) mapl)
 
   let merge_l sl =
-    (* again, no merging is needed for "simple variables". As they are not even
-       entered in the [subst_vars] map, no merging is done. *)
     match sl with
     | [] -> assert false
     | [s] -> s, [t_true]
@@ -1255,16 +1263,14 @@ end = struct
           merge_vars domain.subst_vars (List.map (fun x -> x.now.subst_vars) sl)
         in
         let regs, fl2 =
-          merge_regs x.now.reg_names domain.subst_regions
+          merge_regs x.reg_names domain.subst_regions
                      (List.map (fun x -> x.now.subst_regions) sl)
         in
         (* we can pick any "other" state, because all relevant labels should be
            in any state. *)
-        { other = x.other;
-          now = { subst_vars = vars;
-                  subst_regions = regs ;
-                  reg_names  = x.now.reg_names }
-        },
+        { x with now =
+          { subst_vars = vars;
+            subst_regions = regs ; } } ,
         List.map2 t_and_simp fl1 fl2
 
   let merge s1 s2 =
