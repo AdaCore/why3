@@ -1034,7 +1034,7 @@ module Subst : sig
       to label [vs]. This mapping is preserved even after calls to [havoc] and
       [merge], so that any labeled previous state can be obtained *)
 
-   val term : t -> term -> term
+   val term : wp_env -> t -> term -> term
    (* [term s f] apply the state [s] to the term [f]. If [f] contains
       labeled subterms, these will be appropriately dealt with. *)
 
@@ -1045,10 +1045,14 @@ end = struct
 
   type subst =
     { subst_regions : vsymbol Mreg.t;
-      subst_vars   : vsymbol Mvs.t
+      subst_vars    : vsymbol Mvs.t;
+      reg_names     : vsymbol Mreg.t;
     }
   (* a substitution or state knows the current variables to use for each region
      and each mutable program variable. *)
+  (* the reg_names field is a simple name hint; a mapping reg |-> name means
+     that [name] should be used as a base for new variables in region [reg].
+     This mapping is not required to be complete for regions. *)
 
   type t =
     { now : subst;
@@ -1057,11 +1061,24 @@ end = struct
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
 
-  let fresh_var_from_region reg =
-    mk_var reg.reg_name Slab.empty (ty_of_ity reg.reg_ity)
+  let mk_var name ity = mk_var name Slab.empty (ty_of_ity ity)
+
+  let fresh_var_from_region hints reg =
+    let name =
+      try (Mreg.find reg hints).vs_name
+      with Not_found -> reg.reg_name
+    in
+    mk_var name reg.reg_ity
 
   let fresh_var_from_var vs =
-    mk_var vs.vs_name Slab.empty (ty_of_ity (ity_of_vs vs))
+    mk_var vs.vs_name (ity_of_vs vs)
+
+  let is_simple_pvar pv =
+    match pv.pv_ity.ity_node with
+    | Ityapp ({ its_def = None },[ _],[r]) -> Some r
+    | _ -> None
+
+  let is_simple_var vs = is_simple_pvar (restore_pv vs)
 
   let add_pvar pv s =
     (* register a single program variable in the state. Use the variable itself
@@ -1069,25 +1086,41 @@ end = struct
        belonging to this program variable are also added to the state, if not
        already there. Note that [add_pvar] doesn't really change the state,
        only adds new knowledge. *)
+    (* for simple variables (1 variable = 1 mutable region), we register the
+       variable name as a name hint for the region. Also, we don't enter the
+       program variable in the substitution map, because havoc/merge is not
+       required on such variables. See also [havoc], [merge] and [term]. *)
     let ity = pv.pv_ity in
     if ity_immutable ity then s
     else
       let vs = pv.pv_vs in
+      let is_simple = is_simple_pvar pv in
+      let vars =
+          if is_simple <> None then s.now.subst_vars
+          else Mvs.add vs vs s.now.subst_vars
+      in
+      let reg_names =
+        match is_simple with
+        | None -> s.now.reg_names
+        | Some r -> Mreg.add r vs s.now.reg_names
+      in
       { other = s.other;
         now =
-          { subst_vars = Mvs.add vs vs s.now.subst_vars;
+          { subst_vars = vars;
+            reg_names  = reg_names;
             subst_regions =
               reg_fold (fun r acc ->
                 if Mreg.mem r acc then acc
-                else Mreg.add r (fresh_var_from_region r) acc)
-              ity.ity_vars s.now.subst_regions
+                else Mreg.add r (fresh_var_from_region reg_names r) acc)
+              ity.ity_vars s.now.subst_regions;
           }
       }
 
   let empty =
     { other = Mvs.empty;
       now   = { subst_regions = Mreg.empty;
-              subst_vars    = Mvs.empty }
+                subst_vars    = Mvs.empty;
+                reg_names     = Mreg.empty; }
     }
 
   let init pvs =
@@ -1107,9 +1140,12 @@ end = struct
     (* introduce new variables for all regions, and all program variables for a
        region. *)
     let regs =
-      Sreg.fold (fun reg acc -> Mreg.add reg (fresh_var_from_region reg) acc)
+      Sreg.fold (fun reg acc ->
+        Mreg.add reg (fresh_var_from_region s.now.reg_names reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
+    (* note that the [subst_vars] map does not contain a mapping for simple
+       variables. So no new names/equations are introduced for those. *)
     let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
       if pv_is_touched_by_regions vs regset then begin
         let var = fresh_var_from_var vs in
@@ -1119,16 +1155,26 @@ end = struct
       end else begin
         acc
       end) s.now.subst_vars (s.now.subst_vars, t_true) in
-    { s with now = { subst_regions = regs; subst_vars = vars } }, f
+    { s with now =
+      { subst_regions = regs;
+        subst_vars    = vars;
+        reg_names     = s.now.reg_names } }, f
 
-  let rec term s t =
+  let rec term env s t =
     (* apply a substitution to a formula. This is straightforward, we only need
        to take care of labels that may point to previous states. We update the
        "current" substitution accordingly. *)
     match t.t_node with
     | Tvar vs ->
-        begin
-          try t_var (Mvs.find vs s.now.subst_vars) with Not_found -> t
+        (* the normal case here is to replace the program variable [vs] by its
+           "now" value. The special case is where it is a simple variable; we
+           directly insert the "update" term here. *)
+        begin try
+            if is_simple_var vs <> None then
+              update_var env s.now.subst_regions vs
+            else
+              t_var (Mvs.find vs s.now.subst_vars)
+         with Not_found -> t
         end
     | Tapp (ls, _) when ls_equal ls fs_old -> assert false
     | Tapp (ls, [subterm; mark]) when ls_equal ls fs_at ->
@@ -1145,19 +1191,20 @@ end = struct
             Format.printf "  not found mark %a@." Pretty.print_vs label;
             exit 1
         in
-        t_map (term subst) subterm
+        t_map (term env subst) subterm
     | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
         (* do not open unless necessary *)
         let mvs = Mvs.set_inter s.now.subst_vars t.t_vars in
         if Mvs.is_empty mvs then t else
-        t_map (term s) t
+        t_map (term env s) t
     | _ ->
-        t_map (term s) t
+        t_map (term env s) t
 
   let subst_inter a b =
     (* compute the intersection of two substitutions. *)
     { subst_vars = Mvs.set_inter a.subst_vars b.subst_vars;
-      subst_regions = Mreg.set_inter a.subst_regions b.subst_regions
+      subst_regions = Mreg.set_inter a.subst_regions b.subst_regions;
+      reg_names = a.reg_names;
     }
 
   let all_equal eq l =
@@ -1181,19 +1228,21 @@ end = struct
             t_and_simp (t_equ (t_var new_) (t_var old)) f) all_vars fl)
     domain (Mvs.empty, List.map (fun _ -> t_true) mapl)
 
-  let merge_regs domain mapl =
+  let merge_regs hints domain mapl =
     Mreg.fold (fun k _ (map, fl) ->
       let all_vars = List.map (fun m -> Mreg.find k m) mapl in
       if all_equal_vars all_vars then
         Mreg.add k (List.hd all_vars) map, fl
       else
-          let new_ = fresh_var_from_region k in
+          let new_ = fresh_var_from_region hints k in
           Mreg.add k new_ map,
           List.map2 (fun old f ->
             t_and_simp (t_equ (t_var new_) (t_var old)) f) all_vars fl)
     domain (Mreg.empty, List.map (fun _ -> t_true) mapl)
 
   let merge_l sl =
+    (* again, no merging is needed for "simple variables". As they are not even
+       entered in the [subst_vars] map, no merging is done. *)
     match sl with
     | [] -> assert false
     | [s] -> s, [t_true]
@@ -1206,13 +1255,15 @@ end = struct
           merge_vars domain.subst_vars (List.map (fun x -> x.now.subst_vars) sl)
         in
         let regs, fl2 =
-          merge_regs domain.subst_regions
+          merge_regs x.now.reg_names domain.subst_regions
                      (List.map (fun x -> x.now.subst_regions) sl)
         in
         (* we can pick any "other" state, because all relevant labels should be
            in any state. *)
         { other = x.other;
-          now = { subst_vars = vars; subst_regions = regs }
+          now = { subst_vars = vars;
+                  subst_regions = regs ;
+                  reg_names  = x.now.reg_names }
         },
         List.map2 t_and_simp fl1 fl2
 
@@ -1279,19 +1330,19 @@ type res_type = vsymbol * vsymbol Mexn.t
    poststate [post.s]. Also, open the postcondition and replace the result
    variable by [result_var]. In [post.s], [lab] is used to define the prestate.
 *)
-let apply_state_to_single_post glue lab result_var post =
+let apply_state_to_single_post env glue lab result_var post =
   (* get the result var of the post *)
   let res, ne = open_post post.ne in
   (* substitute result_var and replace "old" label with new label *)
   let ne = t_subst_single res (t_var result_var) (old_mark lab ne) in
   (* apply the prestate = replace previously "old" variables *)
-  { post with ne = t_and_simp glue (Subst.term post.s ne) }
+  { post with ne = t_and_simp glue (Subst.term env post.s ne) }
 
 (* Given normal and exceptional [post,xpost], each with its
    own poststate, place all [(x)post.ne] in the state defined by [(x)post.s].*)
-let apply_state_to_post glue lab result_vars post xpost =
+let apply_state_to_post env glue lab result_vars post xpost =
   let result, xresult = result_vars in
-  let f = apply_state_to_single_post glue lab in
+  let f = apply_state_to_single_post env glue lab in
   let a = f result post in
   let b = Mexn.mapi (fun ex post -> f (Mexn.find ex xresult) post) xpost in
   a, b
@@ -1342,7 +1393,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: true *)
       (* NE: result = t *)
       let t = wp_label e t in
-      let t = Subst.term s (to_term t) in
+      let t = Subst.term env s (to_term t) in
       let ne = if is_vty_unit e.e_vty then t_true else t_equ (t_var result) t in
       { ok = t_true;
         post = { ne = ne; s = s };
@@ -1351,7 +1402,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* OK: true *)
       (* NE: result = v *)
       let va = wp_label e (t_var v.pv_vs) in
-      let ne = Subst.term s (t_equ (t_var result) va) in
+      let ne = Subst.term env s (t_equ (t_var result) va) in
       { ok = t_true;
         post = { ne = ne; s = s };
         exn = Mexn.empty }
@@ -1371,7 +1422,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* assert: OK = f    / NE = f    *)
       (* check : OK = f    / NE = true *)
       (* assume: OK = true / NE = f    *)
-      let f = wp_label e (Subst.term s f) in
+      let f = wp_label e (Subst.term env s f) in
       let ok = if kind = Aassume then t_true else f in
       let ne = if kind = Acheck then t_true else f in
       { ok = ok;
@@ -1389,7 +1440,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let call_regs = regs_of_writes spec.c_effect in
       let pre_call_label = fresh_mark () in
       let state_before_call = Subst.save_label pre_call_label wp1.post.s in
-      let pre = wp_label e (Subst.term state_before_call spec.c_pre) in
+      let pre = wp_label e (Subst.term env state_before_call spec.c_pre) in
       let state_after_call, call_glue =
         Subst.havoc env call_regs state_before_call in
       let xpost = Mexn.map (fun p ->
@@ -1397,7 +1448,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           ne = p }) spec.c_xpost in
       let call_post = { s = state_after_call; ne = spec.c_post } in
       let post, xpost =
-        apply_state_to_post call_glue pre_call_label r call_post xpost in
+        apply_state_to_post env call_glue pre_call_label r call_post xpost in
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
       let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
       let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
@@ -1623,11 +1674,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
          means that "abstract" also forgets which immutable *components* are
          not modified. To be fixed. *)
       let post, xpost =
-        apply_state_to_post t_true pre_abstr_label r abstr_post xpost in
+        apply_state_to_post env t_true pre_abstr_label r abstr_post xpost in
       let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
       let ok =
         t_and_simp_l
-          [wp1.ok; (Subst.term s spec.c_pre);
+          [wp1.ok; (Subst.term env s spec.c_pre);
            wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
       let ok = wp_label e ok in
       { ok = ok ;
@@ -1646,8 +1697,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let xpost =
         Mexn.map (fun p -> { s = poststate; ne = p }) spec.c_xpost in
       let post, xpost =
-        apply_state_to_post glue pre_any_label r post xpost in
-      let pre = Subst.term s spec.c_pre in
+        apply_state_to_post env glue pre_any_label r post xpost in
+      let pre = Subst.term env s spec.c_pre in
       { ok = wp_label e pre;
         post = post;
         exn = xpost;
@@ -1658,12 +1709,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
       let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
-      let init_inv = t_label_add expl_loop_init (Subst.term s inv) in
+      let init_inv = t_label_add expl_loop_init (Subst.term env s inv) in
       let inv_hypo =
-        t_and_simp glue (Subst.term havoc_state inv) in
+        t_and_simp glue (Subst.term env havoc_state inv) in
       let wp1 = fast_wp_expr env havoc_state r e1 in
       let post_inv =
-        t_label_add expl_loop_keep (Subst.term wp1.post.s inv) in
+        t_label_add expl_loop_keep (Subst.term env wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
            I => (OK /\ (NE => I'))
@@ -1720,9 +1771,9 @@ and fast_wp_fun_defn env { fun_lambda = l } =
   let xq =
     Mexn.mapi (fun ex q -> {ne = q; s = (Mexn.find ex res.exn).s }) c.c_xpost in
   let fun_post = { s = res.post.s ; ne = c.c_post } in
-  let q, xq = apply_state_to_post t_true lab (result, xresult) fun_post xq in
+  let q, xq = apply_state_to_post env t_true lab (result, xresult) fun_post xq in
   (* apply the prestate to the precondition *)
-  let pre = Subst.term prestate c.c_pre in
+  let pre = Subst.term env prestate c.c_pre in
   let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xq in
   (* build the formula "forall variables, pre implies OK,
      and NE implies post" *)
