@@ -337,10 +337,16 @@ let update_term env (mreg : vsymbol Mreg.t) f =
   let update v t f = wp_let (Mvs.find v vv') t f in
   Mvs.fold update vars (subst_at_now true vv' f)
 
+let get_single_region_of_var vs =
+  match (ity_of_vs vs).ity_node with
+    | Ityapp (_,_,[r]) -> Some r
+    | _ -> None
+
 (* look for a variable with a single region equal to [reg] *)
 let var_of_region reg f =
-  let test vs _ acc = match (ity_of_vs vs).ity_node with
-    | Ityapp (_,_,[r]) when reg_equal r reg -> Some vs
+  let test vs _ acc =
+    match get_single_region_of_var vs with
+    | Some r when reg_equal r reg -> Some vs
     | _ -> acc in
   Mvs.fold test f.t_vars None
 
@@ -1074,18 +1080,8 @@ end = struct
   let fresh_var_from_var vs =
     mk_var vs.vs_name (ity_of_vs vs)
 
-  let is_simple_pvar pv =
-    match pv.pv_ity.ity_node with
-    | Ityapp ({ its_def = None },[ _],[r]) -> Some r
-    | _ -> None
-
-  let is_simple_var vs = is_simple_pvar (restore_pv vs)
-
-  let dummy_var =
-    create_vsymbol (id_fresh "dummy") ty_mark
-  (* the dummy variable used for simple variables *)
-
-  let is_dummy_var = vs_equal dummy_var
+  let is_simple_var = get_single_region_of_var
+  let is_simple_pvar pv = is_simple_var pv.pv_vs
 
   let add_pvar pv s =
     (* register a single program variable in the state. Use the variable itself
@@ -1194,8 +1190,8 @@ end = struct
           try
             { s with now = Mvs.find label s.other }
           with Not_found ->
-            Format.printf "  not found mark %a@." Pretty.print_vs label;
-            exit 1
+            (* all labels should have been registered in the "others" map *)
+            assert false
         in
         t_map (term subst) subterm
     | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
