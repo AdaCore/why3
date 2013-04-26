@@ -1787,7 +1787,8 @@ and fast_wp_fun_defn env { fun_lambda = l } =
      t_and_simp res.ok
      (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
   let f = wp_implies pre f in
-  wp_forall args (t_forall_close_merge (Mvs.keys f.t_vars) f)
+  let f = wp_forall args (t_forall_close (Mvs.keys f.t_vars) [] f) in
+  f
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
 
