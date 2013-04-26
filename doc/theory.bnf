@@ -39,8 +39,8 @@
     | "function" lqualid "=" lqualid          ;
     | "predicate" lqualid "=" lqualid         ;
     | "namespace" (uqualid | ".") "=" (uqualid | ".")  ;
-    | "lemma" uqualid 	  		   ;
-    | "goal"  uqualid			   ;
+    | "lemma" qualid 	  		   ;
+    | "goal"  qualid			   ;
   \
   tqualid ::= uident | ident ("." ident)* "." uident ;
   \ 
