@@ -1540,19 +1540,22 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           | None, None, None -> assert false
           | None, None, Some post3 ->
               { s = post3.s ;
-                ne = t_and_simp_l [wp1.post.ne; t_not test; post3.ne] }
+                ne = wp_label e (t_and_subst cond_res wp1.post.ne
+                        (t_and_simp (t_not test) post3.ne))
+              }
           | None, Some post2, None ->
-              { s = post2.s ; ne = t_and_simp_l [wp1.post.ne; test; post2.ne] }
+              { s = post2.s ;
+                ne = wp_label e (t_and_subst cond_res wp1.post.ne
+                (t_and_simp test post2.ne)) }
           | Some post1, None, None ->
               post1
           | None, Some post2, Some post3 ->
               let s, f2, f3 = Subst.merge wp1.post.s post2.s post3.s in
               { s = s;
                 ne =
-                  wp_label e
-                    (wp_or
-                      (t_and_simp_l [wp1.post.ne; test; post2.ne; f2])
-                      (t_and_simp_l [wp1.post.ne; t_not test; post3.ne; f3]))
+                  wp_label e (t_and_subst cond_res wp1.post.ne
+                  (t_if test (t_and_simp post2.ne f2)
+                             (t_and_simp post3.ne f3)))
               }
           | Some post1, Some post2, None ->
               let s, f1, f2 = Subst.merge s post1.s post2.s in
@@ -1561,7 +1564,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                   wp_label e
                     (wp_or
                       (t_and_simp_l [post1.ne; f1])
-                      (t_and_simp_l [wp1.post.ne; test; post2.ne; f2]))
+                      (t_and_subst cond_res wp1.post.ne
+                         (t_and_simp_l [test; post2.ne; f2])))
               }
           | Some post1, None, Some post3 ->
               let s, f1, f3 = Subst.merge s post1.s post3.s in
@@ -1570,7 +1574,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                   wp_label e
                     (wp_or
                       (t_and_simp_l [post1.ne; f1])
-                      (t_and_simp_l [wp1.post.ne; t_not test; post3.ne; f3]))
+                      (t_and_subst cond_res wp1.post.ne
+                        (t_and_simp_l [t_not test; post3.ne; f3])))
               }
           | Some post1, Some post2, Some post3 ->
               let s, fl = Subst.merge_l s [post1.s; post2.s; post3.s] in
@@ -1581,8 +1586,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
                     wp_label e
                       (wp_ors
                         [t_and_simp_l [post1.ne; f1];
-                         t_and_simp_l [wp1.post.ne; test; post2.ne; f2];
-                         t_and_simp_l [wp1.post.ne; t_not test; post3.ne; f3]])
+                         t_and_subst cond_res wp1.post.ne
+                           (t_if test (t_and_simp post2.ne f2)
+                                      (t_and_simp post3.ne f3))])
                 }
               | _ -> assert false
               end)
