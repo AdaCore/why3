@@ -45,13 +45,18 @@ The GUI is launched on the file above as follows.
 why3ide hello_proof.why
 \end{verbatim}
 When the GUI is started for the first time, you should get a window
-which looks like the screenshot of Figure~\ref{fig:gui1}.
+that looks like the screenshot of Figure~\ref{fig:gui1}.
 
 The left column is a tool bar which provides different actions to
 apply on goals. The section ``Provers'' displays the provers that were
-detected as installed on your computer\footnote{If not done yet, you
+detected as installed on your computer.%
+%BEGIN LATEX
+\footnote{If not done yet, you
   must perform prover autodetection using \texttt{why3config
-    --detect-provers}}. Three provers were detected, in this case
+    --detect-provers}}
+%END LATEX
+%HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3config --detect-provers}.)
+Three provers were detected, in this case,
 these are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
 Simplify~\cite{simplify05}.
 

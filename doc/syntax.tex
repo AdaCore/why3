@@ -13,19 +13,16 @@ logic with polymorphic types.
 
 \section{Example 1: lists}
 
-The Figure~\ref{fig:tutorial1} contains an example of \why input
-text, containing three theories. The first theory, \texttt{List},
-declares a new algebraic type for polymorphic lists, \texttt{list 'a}.
-As in ML, \texttt{'a} stands for a type variable.
-The type \texttt{list 'a} has two constructors, \texttt{Nil} and
-\texttt{Cons}. Both constructors can be used as usual function
-symbols, respectively of type \texttt{list 'a} and \texttt{'a
-  $\times$ list 'a $\rightarrow$ list 'a}.
-We deliberately make this theory that short, for reasons which will be
-discussed later.
+%BEGIN LATEX
+Figure~\ref{fig:tutorial1} contains an example of \why input
+text, containing three theories.
+%END LATEX
+%HEVEA The code below is an example of \why input text, containing three theories.
 
+%BEGIN LATEX
 \begin{figure}
 \centering
+%END LATEX
 \begin{whycode}
 theory List
   type list 'a = Nil | Cons 'a (list 'a)
@@ -58,9 +55,21 @@ theory Sorted
         x <= y -> sorted (Cons y l) -> sorted (Cons x (Cons y l))
 end
 \end{whycode}
+%BEGIN LATEX
 \caption{Example of Why3 text.}
 \label{fig:tutorial1}
 \end{figure}
+%END LATEX
+
+The first theory, \texttt{List},
+declares a new algebraic type for polymorphic lists, \texttt{list 'a}.
+As in ML, \texttt{'a} stands for a type variable.
+The type \texttt{list 'a} has two constructors, \texttt{Nil} and
+\texttt{Cons}. Both constructors can be used as usual function
+symbols, respectively of type \texttt{list 'a} and \texttt{'a
+  $\times$ list 'a $\rightarrow$ list 'a}.
+We deliberately make this theory that short, for reasons which will be
+discussed later.
 
 The next theory, \texttt{Length}, introduces the notion of list
 length. The \texttt{use import List} command indicates that this new
@@ -118,8 +127,20 @@ by ``cloning''. A \texttt{clone} declaration constructs a local
 copy of the cloned theory, possibly instantiating some of its
 abstract (\emph{i.e.}~declared but not defined) symbols.
 
+%BEGIN LATEX
+Consider the continued example in Figure~\ref{fig:tutorial2}.
+%END LATEX
+%HEVEA Consider the continued example below.
+We write an abstract theory of partial orders, declaring an
+abstract type \texttt{t} and an abstract binary predicate
+\texttt{<=}. Notice that an infix operation must be enclosed
+in parentheses when used outside a term. We also specify
+three axioms of a partial order.
+
+%BEGIN LATEX
 \begin{figure}
 \centering
+%END LATEX
 \begin{whycode}
 theory Order
   type t
@@ -149,16 +170,11 @@ theory SortedIntList
   clone SortedGen with type O.t = int, predicate O.(<=) = (<=)
 end
 \end{whycode}
+%BEGIN LATEX
 \caption{Example of Why3 text (continued).}
 \label{fig:tutorial2}
 \end{figure}
-
-Consider the continued example in Figure~\ref{fig:tutorial2}.
-We write an abstract theory of partial orders, declaring an
-abstract type \texttt{t} and an abstract binary predicate
-\texttt{<=}. Notice that an infix operation must be enclosed
-in parentheses when used outside a term. We also specify
-three axioms of a partial order.
+%END LATEX
 
 There is little value in \texttt{use}'ing such a theory: this
 would constrain us to stay with the type \texttt{t}. However,
@@ -299,7 +315,11 @@ this feature is rarely used.
 
 We now consider another, slightly more complex example: how to use \why
 to solve a little puzzle known as ``Einstein's logic
-problem''\footnote{This \why example was contributed by St\'ephane Lescuyer.}.
+problem''.%
+%BEGIN LATEX
+\footnote{This \why example was contributed by St\'ephane Lescuyer.}
+%END LATEX
+%HEVEA {} (This \why example was contributed by St\'ephane Lescuyer.)
 The problem is stated as follows. Five persons, of five
 different nationalities, live in five houses in a row, all
 painted with different colors.
