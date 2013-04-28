@@ -6,8 +6,8 @@ module Bad
 
   let test z =
     let rec f x =
-      (* the argument of [g] shares the type vairable with [z], but we
-         don't know it yet, and specialize [g] as fully type polymorpic,
+      (* the argument of [g] shares the type variable with [z], but we
+         don't know it yet, and specialize [g] as fully type polymorphic,
          because of its explicit type signature. Since we do not compute
          the fixed point during type inference, the type of [f] will be
          erroneously over-generalized, the types of [x] and [z] won't be
