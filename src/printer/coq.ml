@@ -231,7 +231,7 @@ let print_paren_r fmt x =
   print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
 
 let arrow fmt () = fprintf fmt "@ -> "
-let print_arrow_list fmt x = print_list arrow fmt x
+let print_arrow_list fmt x = print_list_suf arrow fmt x
 
 let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> fprintf fmt "_"
@@ -412,14 +412,9 @@ let print_expr info fmt =
 (** Declarations *)
 
 let print_constr info ts fmt (cs,_) =
-  match cs.ls_args with
-    | [] ->
-        fprintf fmt "@[<hov 4>| %a : %a%a@]" print_ls cs
-          print_ts ts (print_list_pre space print_tv) ts.ts_args
-    | l ->
-        fprintf fmt "@[<hov 4>| %a : %a -> %a%a@]" print_ls cs
-          (print_arrow_list (print_ty info)) l
-          print_ts ts (print_list_pre space print_tv) ts.ts_args
+  fprintf fmt "@[<hov 4>| %a : %a%a%a@]" print_ls cs
+    (print_arrow_list (print_ty info)) cs.ls_args
+    print_ts ts (print_list_pre space print_tv) ts.ts_args
 
 (*
 
@@ -766,9 +761,7 @@ let print_data_decls info fmt tl =
       List.iter (print_data_whytype_and_implicits fmt) d
     end
 
-let print_ls_type ?(arrow=false) info fmt ls =
-  if arrow then fprintf fmt " ->@ ";
-  match ls with
+let print_ls_type info fmt = function
   | None -> fprintf fmt "Prop"
   | Some ty -> print_ty info fmt ty
 
@@ -782,7 +775,7 @@ let print_param_decl ~prev info fmt ls =
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Variable %a: %a%a%a.@]@\n@\n"
         print_ls ls print_params all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
-        (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+        (print_ls_type info) ls.ls_value
     | (* Some Info *) _ when Mid.mem ls.ls_name info.info_syn ->
       let vl =
         List.map (fun ty -> create_vsymbol (id_fresh "x") ty) ls.ls_args in
@@ -800,13 +793,13 @@ let print_param_decl ~prev info fmt ls =
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Definition %a: %a%a%a.@]@\n%a@\n"
         print_ls ls print_params all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
-        (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+        (print_ls_type info) ls.ls_value
         (print_previous_proof None info) prev
   else
     fprintf fmt "@[<hov 2>Parameter %a: %a%a%a.@]@\n@\n"
       print_ls ls print_params all_ty_params
       (print_arrow_list (print_ty info)) ls.ls_args
-      (print_ls_type ~arrow:(ls.ls_args <> []) info) ls.ls_value
+      (print_ls_type info) ls.ls_value
 
 let print_param_decl ~prev info fmt ls =
   if info.realization || not (Mid.mem ls.ls_name info.info_syn) then
@@ -888,7 +881,7 @@ let print_ind info fmt (pr,f) =
 let print_ind_decl info s fmt (ps,bl) =
   let _, _, all_ty_params = ls_ty_vars ps in
   lsymbols_under_definition := Sls.add ps Sls.empty;
-  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>%s %a %a: %a -> Prop :=@ @[<hov>%a@].@]@\n"
+  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>%s %a %a: %aProp :=@ @[<hov>%a@].@]@\n"
     (match s with Ind -> "Inductive" | Coind -> "CoInductive")
      print_ls ps print_implicit_params all_ty_params
     (print_arrow_list (print_ty info)) ps.ls_args
