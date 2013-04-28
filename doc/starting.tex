@@ -135,15 +135,14 @@ now is editing the proof: select that row and then click on the
 launch the Coq proof editor, which is \texttt{coqide} by default (see
 Section~\ref{sec:ideref} for details on how to configure this). You get
 now a regular Coq file to fill in, as shown on Figure~\ref{fig:coqide}.
-Please take care of the comments of this file. Only the part between
-the two last comments can be modified. Moreover, these comments
-themselves should not be modified at all, they are used to mark the
-part you modify, in order to regenerate the file if the goal is
-changed.
+Please be mindful of the comments of this file. They indicate where \why
+expects you to fill the blanks. Note that the comments themselves should
+not be removed, as they are needed to properly regenerate the file when the
+goal is changed. See Section~\ref{sec:edited-files} for more details.
 
 \begin{figure}[tbp]
 %HEVEA\centering
-  \includegraphics[width=\textwidth]{coqide-0-70.png}
+  \includegraphics[width=\textwidth]{coqide-0-81.png}
   \caption{CoqIDE on subgoal 1 of $G_2$}
   \label{fig:coqide}
 \end{figure}
