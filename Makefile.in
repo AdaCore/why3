@@ -1007,7 +1007,7 @@ PVSLIBS_NUMBER_FILES = # Divisibility Gcd Parity Prime
 PVSLIBS_NUMBER = $(addprefix lib/pvs/number/, $(PVSLIBS_NUMBER_FILES))
 
 PVSLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
-PVSLIBS_FP_ALL_FILES = GenFloat $(PVSLIBS_FP_FILES)
+PVSLIBS_FP_ALL_FILES = $(PVSLIBS_FP_FILES)
 PVSLIBS_FP = $(addprefix lib/pvs/floating_point/, $(PVSLIBS_FP_ALL_FILES))
 
 PVSLIBS_FILES = $(PVSLIBS_INT) $(PVSLIBS_REAL) $(PVSLIBS_LIST) \
@@ -1036,7 +1036,7 @@ install_no_local::
 	cp $(addsuffix .pvs, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
 	cp $(addsuffix .prf, $(PVSLIBS_REAL)) $(LIBDIR)/why3/pvs/real/
 	mkdir -p $(LIBDIR)/why3/pvs/floating_point/
-	cp $(PVSLIBS_FP) $(LIBDIR)/why3/pvs/
+	cp $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
 	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 install_local: drivers/pvs-realizations.aux

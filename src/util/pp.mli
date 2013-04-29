@@ -19,6 +19,9 @@ val print_option_or_default :
 val print_list_pre :
   (formatter -> unit -> unit) ->
   (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
+val print_list_suf :
+  (formatter -> unit -> unit) ->
+  (formatter -> 'a -> unit) -> formatter -> 'a list -> unit
 val print_list :
   (formatter -> unit -> unit) ->
   (formatter -> 'a -> unit) -> formatter -> 'a list -> unit

@@ -45,13 +45,18 @@ The GUI is launched on the file above as follows.
 why3ide hello_proof.why
 \end{verbatim}
 When the GUI is started for the first time, you should get a window
-which looks like the screenshot of Figure~\ref{fig:gui1}.
+that looks like the screenshot of Figure~\ref{fig:gui1}.
 
 The left column is a tool bar which provides different actions to
 apply on goals. The section ``Provers'' displays the provers that were
-detected as installed on your computer\footnote{If not done yet, you
+detected as installed on your computer.%
+%BEGIN LATEX
+\footnote{If not done yet, you
   must perform prover autodetection using \texttt{why3config
-    --detect-provers}}. Three provers were detected, in this case
+    --detect-provers}}
+%END LATEX
+%HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3config --detect-provers}.)
+Three provers were detected, in this case,
 these are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
 Simplify~\cite{simplify05}.
 
@@ -130,15 +135,14 @@ now is editing the proof: select that row and then click on the
 launch the Coq proof editor, which is \texttt{coqide} by default (see
 Section~\ref{sec:ideref} for details on how to configure this). You get
 now a regular Coq file to fill in, as shown on Figure~\ref{fig:coqide}.
-Please take care of the comments of this file. Only the part between
-the two last comments can be modified. Moreover, these comments
-themselves should not be modified at all, they are used to mark the
-part you modify, in order to regenerate the file if the goal is
-changed.
+Please be mindful of the comments of this file. They indicate where \why
+expects you to fill the blanks. Note that the comments themselves should
+not be removed, as they are needed to properly regenerate the file when the
+goal is changed. See Section~\ref{sec:edited-files} for more details.
 
 \begin{figure}[tbp]
 %HEVEA\centering
-  \includegraphics[width=\textwidth]{coqide-0-70.png}
+  \includegraphics[width=\textwidth]{coqide-0-81.png}
   \caption{CoqIDE on subgoal 1 of $G_2$}
   \label{fig:coqide}
 \end{figure}

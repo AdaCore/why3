@@ -27,6 +27,10 @@ let rec print_list_pre sep print fmt = function
   | [] -> ()
   | x :: r -> sep fmt (); print fmt x; print_list_pre sep print fmt r
 
+let rec print_list_suf sep print fmt = function
+  | [] -> ()
+  | x :: r -> print fmt x; sep fmt (); print_list_suf sep print fmt r
+
 let print_list sep print fmt = function
   | [] -> ()
   | [x] -> print fmt x

@@ -161,9 +161,12 @@ keyword \texttt{invariant}, immediately after the keyword \texttt{do}.
 There is no need to introduce a variant, as the termination of a
 \texttt{for} loop is automatically guaranteed.
 This completes module \texttt{MaxAndSum}.
+%BEGIN LATEX
 Figure~\ref{fig:MaxAndSum} shows the whole code.
 \begin{figure}
   \centering
+%END LATEX
+%HEVEA The whole code is shown below.
 \begin{whycode}
 module MaxAndSum
 
@@ -186,10 +189,12 @@ module MaxAndSum
 
 end
 \end{whycode}
+%BEGIN LATEX
 \vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 1.}
   \label{fig:MaxAndSum}
 \end{figure}
+%END LATEX
 We can now proceed to its verification.
 Running \texttt{why3}, or better \texttt{why3ide}, on file
 \verb|max_sum.mlw| will show a single verification condition with name
@@ -267,11 +272,16 @@ which simply expresses the values assigned to array \texttt{b} so far:
 \end{whycode}
 Here we chose to have array \texttt{b} as argument; returning a
 freshly allocated array would be equally simple.
+%BEGIN LATEX
 The whole module is given in Figure~\ref{fig:Inverting}.
+%END LATEX
+%HEVEA The whole module is given below.
 The verification conditions for function \texttt{inverting} are easily
 discharged automatically, thanks to the lemma.
+%BEGIN LATEX
 \begin{figure}
   \centering
+%END LATEX
 \begin{whycode}
 module InvertingAnInjection
 
@@ -302,10 +312,12 @@ module InvertingAnInjection
 
 end
 \end{whycode}
+%BEGIN LATEX
 \vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 2.}
   \label{fig:Inverting}
 \end{figure}
+%END LATEX
 
 \section{Problem 3: Searching a Linked List}
 
@@ -388,10 +400,15 @@ or no zero value was found, and thus the returned value is exactly
 \end{whycode}
 Solving the problem is simply a matter of calling \texttt{search} with
 0 as first argument.
-The code is given Figure~\ref{fig:LinkedList}. The verification
-conditions are all discharged automatically.
+%BEGIN LATEX
+The code is given Figure~\ref{fig:LinkedList}.
+%END LATEX
+%HEVEA The code is given below.
+The verification conditions are all discharged automatically.
+%BEGIN LATEX
 \begin{figure}
   \centering
+%END LATEX
 \begin{whycode}
 module SearchingALinkedList
 
@@ -421,10 +438,12 @@ module SearchingALinkedList
 
 end
 \end{whycode}
+%BEGIN LATEX
 \vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 3.}
   \label{fig:LinkedList}
 \end{figure}
+%END LATEX
 
 Alternatively, we can implement the search with a \texttt{while} loop.
 To do this, we need to import references from the standard library,
@@ -548,9 +567,14 @@ the loop is reached, \texttt{True} is returned.
     end
 \end{whycode}
 The assertion in the exception handler is a cut for SMT solvers.
+%BEGIN LATEX
 This first part of the solution is given in Figure~\ref{fig:NQueens1}.
+%END LATEX
+%HEVEA This first part of the solution is given below.
+%BEGIN LATEX
 \begin{figure}
   \centering
+%END LATEX
 \begin{whycode}
 module NQueens
   use import int.Int
@@ -586,10 +610,12 @@ module NQueens
       False
     end
 \end{whycode}
+%BEGIN LATEX
 \vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 4 (1/2).}
   \label{fig:NQueens1}
 \end{figure}
+%END LATEX
 
 We now proceed with the verification of the backtracking algorithm.
 The specification requires us to define the notion of solution, which
@@ -686,12 +712,17 @@ search on row 0. The postcondition is also twofold, as for
     raises   { Solution -> solution board n }
   = bt_queens board n 0
 \end{whycode}
+%BEGIN LATEX
 This second part of the solution is given Figure~\ref{fig:NQueens2}.
+%END LATEX
+%HEVEA This second part of the solution is given below.
 With the help of a few auxiliary lemmas --- not given here but available
 from \why's sources --- the verification conditions are all discharged
 automatically, including the verification of the lemmas themselves.
+%BEGIN LATEX
 \begin{figure}
   \centering
+%END LATEX
 \begin{whycode}
   predicate is_board (board: array int) (pos: int) =
     forall q:int. 0 <= q < pos -> 0 <= board[q] < length board
@@ -732,11 +763,12 @@ automatically, including the verification of the lemmas themselves.
 
 end
 \end{whycode}
+%BEGIN LATEX
 \vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 4 (2/2).}
   \label{fig:NQueens2}
 \end{figure}
-
+%END LATEX
 
 \section{Problem 5: Amortized Queue}
 
@@ -858,10 +890,15 @@ a one line code.
     ensures { sequence result = sequence q ++ Cons x Nil }
   = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 \end{whycode}
-The code is given Figure~\ref{fig:AQueue}. The verification conditions
-are all discharged automatically.
+%BEGIN LATEX
+The code is given Figure~\ref{fig:AQueue}.
+%END LATEX
+%HEVEA The code is given below.
+The verification conditions are all discharged automatically.
+%BEGIN LATEX
 \begin{figure}[p]
   \centering
+%END LATEX
 \begin{whycode}
 module AmortizedQueue
   use import int.Int
@@ -907,10 +944,12 @@ module AmortizedQueue
   = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 end
 \end{whycode}
+%BEGIN LATEX
 \vspace*{-1em}%\hrulefill
   \caption{Solution for VSTTE'10 competition problem 5.}
   \label{fig:AQueue}
 \end{figure}
+%END LATEX
 
 % other examples: same fringe ?
 
