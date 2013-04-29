@@ -562,10 +562,10 @@ if test "$enable_frama_c" = yes ; then
       FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|Version: *\(.*\)$|\1|p'`
       AC_MSG_RESULT($FRAMAC_VERSION)
       case $FRAMAC_VERSION in
-         Oxygen-20120901) ;;
-         *) AC_MSG_WARN(Version Oxygen-20120901 required.)
+         Fluorine-20130401) ;;
+         *) AC_MSG_WARN(Version Fluorine-20130401 required.)
             enable_frama_c=no
-            reason_frama_c=" (version Oxygen required)"
+            reason_frama_c=" (version Fluorine required)"
             ;;
       esac
       FRAMAC_SHARE=`$FRAMAC -print-path`
