@@ -1328,7 +1328,7 @@ clean::
 ##########
 
 install_no_local::
-	if test -d /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
+	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
 
 
 ##########
