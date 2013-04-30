@@ -285,6 +285,14 @@ if test "$USEOCAMLFIND" = yes; then
    fi
 fi
 
+#if ocamlfind is used it gives the install path for ocaml library
+if test "$USEOCAMLFIND" = yes; then
+   OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
+else
+   OCAMLINSTALLLIB=$OCAMLLIB
+fi
+
+
 # checking for rubber
 if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(RUBBER,rubber,rubber,no)
@@ -607,6 +615,7 @@ AC_SUBST(OCAMLDOC)
 AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
+AC_SUBST(OCAMLINSTALLLIB)
 dnl AC_SUBST(OCAMLV)
 dnl AC_SUBST(FORPACK)
 AC_SUBST(OCAMLGRAPHLIB)
@@ -720,6 +729,8 @@ if test "$enable_local" = yes ; then
 else
    echo "Installable             : yes"
    echo "    Binary path         : $bindir"
+   echo "    Lib path            : $libdir/why3"
    echo "    Data path           : $datarootdir/why3"
+   echo "    Ocaml Library       : $OCAMLINSTALLLIB/why3"
    echo "    Relocatable         : $enable_relocation"
 fi

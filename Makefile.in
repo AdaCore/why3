@@ -43,6 +43,7 @@ OCAMLLEX  = @OCAMLLEX@
 OCAMLYACC = @OCAMLYACC@
 OCAMLDOC  = @OCAMLDOC@
 OCAMLLIB  = @OCAMLLIB@
+OCAMLINSTALLLIB  = @OCAMLINSTALLLIB@
 OCAMLBEST = @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 COQC      = @COQC@
@@ -207,8 +208,10 @@ clean::
 clean_old_install:
 	rm -f $(BINDIR)/why3*
 	rm -rf $(DATADIR)/why3
+	rm -rf $(OCAMLINSTALLLIB)/why3
 
-install_no_local::
+
+install_no_local:: clean_old_install
 	mkdir -p $(BINDIR)
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
@@ -235,10 +238,9 @@ install_no_local::
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
 install_no_local_lib::
-	rm -rf $(OCAMLLIB)/why3
-	mkdir -p $(OCAMLLIB)/why3
+	mkdir -p $(OCAMLINSTALLLIB)/why3
 	cp -f lib/why3/why3.cm* lib/why3/why3.[ao] \
-		lib/why3/META $(OCAMLLIB)/why3
+		lib/why3/META $(OCAMLINSTALLLIB)/why3
 
 ifeq (@enable_local@,yes)
 install install-lib:
