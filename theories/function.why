@@ -19,14 +19,14 @@ theory Surjective
   function to_ a : v
   function from v : a
 
-  clone import Injective with type v = a, type a = v,
+  clone export Injective with type v = a, type a = v,
     function to_ = from, function from = to_
 
 end
 
 theory Bijective
 
-  use import Injective
-  clone Surjective with namespace . = .
+  clone export Injective
+  clone Surjective as S with namespace . = .
 
 end
