@@ -25,6 +25,8 @@ type namespace = {
   ns_ns : namespace Mstr.t;  (* inner namespaces *)
 }
 
+val empty_ns : namespace
+
 val ns_find_ts : namespace -> string list -> tysymbol
 val ns_find_ls : namespace -> string list -> lsymbol
 val ns_find_pr : namespace -> string list -> prsymbol
