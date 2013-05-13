@@ -774,8 +774,10 @@ and wp_desc env e q xq = match e.e_node with
       (* TODO: what do we do about well-foundness? *)
       let i = wp_expl expl_loop_keep inv in
       let olds = List.map (fun (t,_) -> t_at_old t) varl in
-      let d = decrease e.e_loc expl_loopvar env olds varl in
-      let q = create_unit_post (wp_and ~sym:true i d) in
+      let i = if varl = [] then i else
+        let d = decrease e.e_loc expl_loopvar env olds varl in
+        wp_and ~sym:true i d in
+      let q = create_unit_post i in
       let w = backstep (wp_expr env e1) q xq in
       let regs = regs_of_writes e1.e_effect in
       let w = quantify env regs (wp_implies inv w) in
