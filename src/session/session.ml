@@ -668,45 +668,6 @@ let save_session config session =
   session_dir_for_save := session.session_dir;
   save f config session
 
-(*******************************)
-(*          explanations       *)
-(*******************************)
-
-let expl_regexp = Str.regexp "expl:\\(.*\\)"
-
-let check_expl lab acc =
-  let lab = lab.Ident.lab_string in
-  if Str.string_match expl_regexp lab 0
-  then Some (Str.matched_group 1 lab)
-  else acc
-
-let check_expl lab =
-  if Ident.Slab.mem Split_goal.stop_split lab then None
-  else Ident.Slab.fold check_expl lab None
-
-let rec get_expl_fmla acc f =
-  if f.t_ty <> None then acc else
-  let res = check_expl f.Term.t_label in
-  if res = None then match f.t_node with
-    | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
-    | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla acc f
-    | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
-        Term.t_fold get_expl_fmla acc f
-    | _ -> raise Exit
-  else if acc = None then res else raise Exit
-
-let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
-
-let goal_expl_task ~root task =
-  let gid = (Task.task_goal task).Decl.pr_name in
-  let info =
-    let fmla = Task.task_goal_fmla task in
-    let res = get_expl_fmla fmla in
-    if res <> None || not root then res else check_expl gid.Ident.id_label
-  in
-  gid, info, task
-
-
 (*****************************)
 (*   update verified field   *)
 (*****************************)
@@ -884,8 +845,8 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
   in
   let key = keygen ~parent:parent_key () in
   let sum = Termcode.task_checksum ~version t in
-  let shape = Termcode.t_shape_buf ~version
-    (Task.task_goal_fmla t) in
+  (* let shape = Termcode.t_shape_buf ~version (Task.task_goal_fmla t) in *)
+  let shape = Termcode.t_shape_task ~version t in
   let goal = { goal_name = name;
                goal_expl = expl;
                goal_parent = parent;
@@ -1464,7 +1425,7 @@ let read_file env ?format fn =
 
 let add_file_return_theories ~keygen env ?format filename =
   let x_keygen = keygen in
-  let x_goal = goal_expl_task ~root:true in
+  let x_goal = Termcode.goal_expl_task ~root:true in
   let x_fold_theory f acc th =
     let tasks = List.rev (Task.split_theory th None None) in
     List.fold_left f acc tasks in
@@ -1498,7 +1459,7 @@ let add_transformation ~keygen env_session transfn g goals =
   let parent_goal_name = g.goal_name.Ident.id_string in
   let next_subgoal task =
     incr i;
-    let gid,expl,_ = goal_expl_task ~root:false task in
+    let gid,expl,_ = Termcode.goal_expl_task ~root:false task in
     let expl = match expl with
       | None -> string_of_int !i ^ "."
       | Some e -> string_of_int !i ^ ". " ^ e
@@ -2096,7 +2057,8 @@ let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
 
 let rec recompute_all_shapes_goal g =
   let t = goal_task g in
-  g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t);
+  (* g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t); *)
+  g.goal_shape <- Termcode.t_shape_task t;
   g.goal_checksum <- Termcode.task_checksum t;
   PHstr.iter recompute_all_shapes_transf g.goal_transformations
 
