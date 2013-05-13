@@ -185,7 +185,7 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
               fn (push tag_let (t_shape ~version ~push c m acc t2)) t1
             | _ -> assert false
         end
-    | Tnot f -> push tag_not (fn acc f)
+    | Tnot f -> fn (push tag_not acc) f
     | Ttrue -> push tag_true acc
     | Tfalse -> push tag_false acc
 
