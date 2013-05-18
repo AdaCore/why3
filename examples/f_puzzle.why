@@ -1,7 +1,14 @@
 
 (* Let f be a function over natural numbers such that, for all n
-     f(f(n)) < f(n)+1
-   Show that f(n)=n for all n. *)
+     f(f(n)) < f(n+1)
+   Show that f(n)=n for all n.
+
+   Inspired by a Dafny example (see http://searchco.de/codesearch/view/28108482)
+   Original reference is
+
+    Edsger W. Dijkstra: Heuristics for a Calculational Proof.
+    Inf. Process. Lett. (IPL) 53(3):141-143 (1995)
+*)
 
 theory Puzzle
 
