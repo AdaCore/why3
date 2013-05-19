@@ -92,6 +92,15 @@ module Array
     ensures  { forall i:int.
       ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2] }
 
+  val self_blit (a: array 'a) (ofs1: int) (ofs2: int) (len: int) : unit
+    writes {a}
+    requires { 0 <= ofs1 /\ 0 <= len /\ ofs1 + len <= length a }
+    requires { 0 <= ofs2 /\             ofs2 + len <= length a }
+    ensures  { forall i:int.
+      (0 <= i < ofs2 \/ ofs2 + len <= i < length a) -> a[i] = (old a)[i] }
+    ensures  { forall i:int.
+      ofs2 <= i < ofs2 + len -> a[i] = (old a)[ofs1 + i - ofs2] }
+
   (*** TODO?
      - concat : 'a array list -> 'a array
      - to_list

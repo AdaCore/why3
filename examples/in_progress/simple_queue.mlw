@@ -1,0 +1,107 @@
+
+(* Simple queue implemented by an array
+
+   From
+     Developing Verified Programs with Dafny.
+     K. Rustan M. Leino. Tutorial notes, ICSE 2013.
+
+   For a similar data structure, see vstte12_ring_buffer.mlw
+*)
+
+module ToList
+
+  use import int.Int
+  use export array.Array
+  use export list.List
+
+  (** the list of elements a[l..u[ *)
+  function to_list (a: array 'a) (l u: int) : list 'a
+
+  axiom to_list_nil:
+    forall a: array 'a, l u: int. u <= l -> to_list a l u = Nil
+  axiom to_list_cons:
+    forall a: array 'a, l u: int. l < u ->
+    to_list a l u = Cons a[l] (to_list a (l+1) u)
+
+  lemma to_list_one:
+    forall a: array 'a, l: int. to_list a l (l+1) = Cons a[l] Nil
+
+  use import list.Append
+
+  lemma to_list_append:
+    forall a: array 'a, l m u: int. l <= m <= u ->
+    to_list a l u = to_list a l m ++ to_list a m u
+
+  lemma to_list_eq:
+    forall a1 a2: array 'a, l1 l2 u1 u2 len: int.
+    (forall i: int. 0 <= i < len -> a1[l1 + i] = a2[l2 + i]) ->
+    u1 - l1 = len -> u2 - l2 = len ->
+    to_list a1 l1 u1 = to_list a2 l2 u2
+
+  lemma to_list_frame:
+    forall a: array 'a, l u i: int, x: 'a.
+    (i < l \/ i >= u) -> to_list a[i <- x] l u = to_list a l u
+
+end
+
+module SimpleQueue
+
+  use import int.Int
+  use import array.Array
+  use import ToList
+  use import list.Append
+
+  type t 'a = {
+    mutable data: array 'a;
+    mutable m: int;
+    mutable n: int;
+    ghost mutable contents: list 'a; (* data[m..n[ *)
+  }
+  invariant { 0 < length self.data }
+  invariant { 0 <= self.m <= self.n <= length self.data }
+  invariant { self.contents = to_list self.data self.m self.n }
+
+  let create (x: 'a) : t 'a
+    ensures { result.contents = Nil }
+  =
+    { data = Array.make 10 x;
+      m = 0; n = 0;
+      contents = Nil; }
+
+  let dequeue (q: t 'a) : 'a
+    requires { q.contents <> Nil }
+    writes   { q.m, q.contents }
+    ensures  { match old q.contents with
+               | Nil -> false
+               | Cons x tl -> result = x && q.contents = tl end }
+  =
+    let r = q.data[q.m] in
+    q.m <- q.m + 1;
+    ghost
+      match q.contents with Nil -> absurd | Cons _ tl -> q.contents <- tl end;
+    r
+
+  let enqueue (q: t 'a) (x: 'a) : unit
+    requires { q.n < length q.data }
+    (* writes  { q.data, q.data.elts, q.m, q.n, q.contents } *)
+    writes  { q.data.elts, q.n, q.contents }
+    ensures { q.contents = (old q.contents) ++ Cons x Nil }
+  =
+(*
+    let len = q.n - q.m in
+    if q.n = length q.data then begin
+      if q.m = 0 then begin
+        let new = Array.make (2 * length q.data) q.data[0] in
+        Array.blit q.data q.m new 0 len;
+        q.data <- new
+      end else
+        Array.self_blit q.data q.m 0 len;
+      q.n <- len;
+      q.m <- 0
+    end;
+*)
+    q.data[q.n] <- x;
+    q.n <- q.n + 1;
+    ghost q.contents <- q.contents ++ Cons x Nil
+
+end
