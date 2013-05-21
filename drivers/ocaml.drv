@@ -2,13 +2,20 @@
 printer "ocaml"
 
 theory BuiltIn
-  syntax predicate  (=)   "(%1 = %2)"
+  syntax predicate  (=)   "((%1) = (%2))"
+end
+
+theory HighOrd
+  syntax type func "((%1) -> (%2))"
+  syntax type pred "((%1) -> bool)"
+  syntax function (@!) "((%1) (%2))"
+  syntax predicate (@?) "((%1) (%2))"
 end
 
 theory option.Option
-  syntax type     option "(%1 option)"
+  syntax type     option "((%1) option)"
   syntax function None   "None"
-  syntax function Some   "(Some %1)"
+  syntax function Some   "(Some (%1))"
 end
 
 theory Bool
@@ -20,22 +27,22 @@ end
 theory bool.Bool
   syntax function andb  "((%1) && (%2))"
   syntax function orb   "((%1) || (%2))"
-  (* syntax function xorb  "(xorb %1 %2)" *)
+  (* syntax function xorb  "(xorb (%1) (%2))" *)
   syntax function notb  "(not (%1))"
-  (* syntax function implb "(implb %1)" *)
+  (* syntax function implb "(implb (%1))" *)
 end
 
 theory list.List
-  syntax type     list "%1 list"
+  syntax type     list "(%1) list"
   syntax function Nil  "[]"
-  syntax function Cons "(%1 :: %2)"
+  syntax function Cons "((%1) :: (%2))"
 end
 
 
 (* WhyML *)
 
 module ref.Ref
-  syntax type     ref      "(%1 Pervasives.ref)"
+  syntax type     ref      "((%1) Pervasives.ref)"
   syntax function contents "(%1).Pervasives.contents"
   syntax val      ref      "Pervasives.ref"
   syntax val      (!_)     "Pervasives.(!)"
