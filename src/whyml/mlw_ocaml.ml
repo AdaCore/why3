@@ -368,6 +368,11 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
+let filter_ghost ls def al =
+  let flt fd arg = if fd.Mlw_expr.fd_ghost then def else arg in
+  try List.map2 flt (Mlw_expr.restore_pl ls).Mlw_expr.pl_args al
+  with Not_found -> al
+
 let rec print_pat_node pri info fmt p = match p.pat_node with
   | Term.Pwild ->
       fprintf fmt "_"
@@ -387,6 +392,8 @@ let rec print_pat_node pri info fmt p = match p.pat_node with
       | Some s -> syntax_arguments s (print_pat_node 0 info) fmt pl
       | None when pl = [] -> print_cs info fmt cs
       | _ ->
+          let pat_void = Term.pat_app Mlw_expr.fs_void [] Mlw_ty.ty_unit in
+          let pl = filter_ghost cs pat_void pl in
           let pjl = get_record info cs in
           if pjl = [] then
             fprintf fmt (protect_on (pri > 1) "%a@ (%a)")
@@ -434,6 +441,7 @@ and print_app pri ls info fmt tl =
   | [] ->
       print info fmt ls
   | tl when isconstr ->
+      let tl = filter_ghost ls Mlw_expr.t_void tl in
       let pjl = get_record info ls in
       if pjl = [] then
         fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ (%a)@]")

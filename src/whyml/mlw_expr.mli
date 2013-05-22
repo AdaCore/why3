@@ -45,6 +45,9 @@ val create_plsymbol :
   ?hidden:bool -> ?rdonly:bool -> ?constr:int ->
     preid -> field list -> field -> plsymbol
 
+val restore_pl : lsymbol -> plsymbol
+  (* raises Not_found if the argument is not a pl_ls *)
+
 exception HiddenPLS of plsymbol
 exception RdOnlyPLS of plsymbol
 
