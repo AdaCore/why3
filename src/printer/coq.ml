@@ -874,24 +874,32 @@ let print_recursive_decl ~old info fmt dl =
   end;
   List.iter (print_equivalence_lemma ~old info fmt) dl_syn
 
-
 let print_ind info fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
 
-let print_ind_decl info s fmt (ps,bl) =
+let print_ind_decl info fmt ps bl =
   let _, _, all_ty_params = ls_ty_vars ps in
   lsymbols_under_definition := Sls.add ps Sls.empty;
-  fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>%s %a %a: %aProp :=@ @[<hov>%a@].@]@\n"
-    (match s with Ind -> "Inductive" | Coind -> "CoInductive")
-     print_ls ps print_implicit_params all_ty_params
+  fprintf fmt " %a %a: %aProp :=@ @[<hov>%a@]"
+    print_ls ps print_implicit_params all_ty_params
     (print_arrow_list (print_ty info)) ps.ls_args
-     (print_list newline (print_ind info)) bl;
-  fprintf fmt "@\n";
+    (print_list newline (print_ind info)) bl;
   lsymbols_under_definition := Sls.empty
 
-let print_ind_decl info s fmt d =
-  if not (Mid.mem (fst d).ls_name info.info_syn) then
-    (print_ind_decl info s fmt d; forget_tvs ())
+let print_ind_decls info s fmt tl =
+  let none =
+    List.fold_left (fun first (ps,bl) ->
+      if Mid.mem ps.ls_name info.info_syn then first
+      else begin
+        if first then
+          fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>%s"
+            (match s with Ind -> "Inductive" | Coind -> "CoInductive")
+          else fprintf fmt "@\nwith";
+        print_ind_decl info fmt ps bl;
+        forget_tvs ();
+        false
+      end) true tl in
+  if not none then fprintf fmt ".@]@\n@\n"
 
 let print_prop_decl ~prev info fmt (k,pr,f) =
   ignore prev;
@@ -944,7 +952,7 @@ let print_decl ~old info fmt d =
   | Dlogic ll ->
       print_recursive_decl ~old info fmt ll
   | Dind (s, il) ->
-      print_list nothing (print_ind_decl info s) fmt il
+      print_ind_decls info s fmt il
   | Dprop (_,pr,_) when not info.realization && Mid.mem pr.pr_name info.info_syn ->
       ()
   | Dprop pr ->
