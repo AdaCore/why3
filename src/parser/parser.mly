@@ -282,6 +282,7 @@ theory:
 list0_decl:
 | /* epsilon */        { () }
 | new_decl list0_decl  { () }
+| new_ns_th list0_decl { () }
 ;
 
 new_decl:
@@ -289,6 +290,9 @@ new_decl:
    { Incremental.new_decl (floc ()) $1 }
 | use_clone
    { Incremental.use_clone (floc ()) $1 }
+;
+
+new_ns_th:
 | namespace_head list0_decl END
    { Incremental.close_namespace (floc_i 1) $1 }
 ;
@@ -1076,10 +1080,16 @@ list0_pdecl:
 | /* epsilon */         { () }
 | new_decl  list0_pdecl { () }
 | new_pdecl list0_pdecl { () }
+| new_ns_mo list0_pdecl { () }
 ;
 
 new_pdecl:
 | pdecl { Incremental.new_pdecl (floc ()) $1 }
+;
+
+new_ns_mo:
+| namespace_head list0_pdecl END
+   { Incremental.close_namespace (floc_i 1) $1 }
 ;
 
 pdecl:
