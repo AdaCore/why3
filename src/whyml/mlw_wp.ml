@@ -1430,7 +1430,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ spec.ex(x)) *)
       (* The first thing that happens, before the call, is the evaluation of
          [e1]. This translates as a recursive call to the fast_wp. *)
-      let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
+      let arg_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
       (* Next we have to deal with the call itself. *)
       let call_regs = regs_of_writes spec.c_effect in
@@ -1501,13 +1501,40 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       { ok = ok;
         post = { ne = ne; s = wp2.post.s };
         exn = xne }
+  | Elet ({ let_sym = LetA _; let_expr = e1 }, e2) ->
+      (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
+      (* NE: ne(e1) /\ ne(e2) *)
+      (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
+      let unit_v = vs_result e1 in
+      let wp1 = fast_wp_expr env s (unit_v, xresult) e1 in
+      let wp2 = fast_wp_expr env wp1.post.s r e2 in
+      let ok = t_and_simp wp1.ok (t_implies_simp wp1.post.ne wp2.ok) in
+      let ok = wp_label e ok in
+      let ne = wp_label e (t_and_simp wp1.post.ne wp2.post.ne) in
+      let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
+        match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
+        | None, None -> assert false
+        | Some post1, None -> post1
+        | None, Some post2 ->
+            { s = post2.s ; ne = wp_label e (t_and_simp wp1.post.ne post2.ne) }
+        | Some p1, Some p2 ->
+            let s, r1, r2 = Subst.merge s p1.s p2.s in
+            { s = s;
+              ne =
+                wp_label e
+                  (wp_or (t_and_simp p1.ne r1)
+                        (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
+            }) in
+      { ok = ok;
+        post = { ne = ne; s = wp2.post.s };
+        exn = xne }
   | Eif (e1, e2, e3) ->
       (* OK: ok(e1) /\ ne(e1) => (if e1=True then ok(e2) else ok(e3)) *)
       (* NE: ne(e1) /\ (if e1=True then ne(e2) else ne(e3)) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ e1=True /\ ex(e2)(x))
                           \/ (ne(e1) /\ e1=False /\ ex(e3)(x)) *)
       (* First thing is the evaluation of e1 *)
-      let cond_res = create_vsymbol (id_fresh "c") (ty_of_vty e1.e_vty) in
+      let cond_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let wp3 = fast_wp_expr env wp1.post.s r e3 in
@@ -1592,7 +1619,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* NE: false *)
       (* EX(ex): (ne(e1) /\ xresult=e1) \/ ex(e1)(ex) *)
       (* EX(x): ex(e1)(x) *)
-      let ex_res = create_vsymbol (id_fresh "x") (ty_of_vty e1.e_vty) in
+      let ex_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (ex_res, xresult) e1 in
       let rpost =
         (* avoid to introduce useless equation between void terms *)
@@ -1738,8 +1765,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
   | Eghost _ -> assert false (*TODO*)
   | Ecase (_, _) -> assert false (*TODO*)
   | Erec (_, _) -> assert false (*TODO*)
-      (* TODO exceptional case *)
-  | Elet (_, _) -> assert false (*TODO*)
 
 and fast_wp_fun_defn env { fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
