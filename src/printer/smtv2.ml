@@ -47,6 +47,8 @@ let ident_printer =
       "distinct";
       (** CVC4 built-in symbols *)
       "concat";
+      (* Reals_Ints symbols in SMTlib *)
+      "to_int"; "to_real"; "is_real";
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
