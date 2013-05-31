@@ -174,7 +174,7 @@ and interpret_result pa pas =
          let goal = pa.Session.proof_parent in
          let answer = r.Call_provers.pr_answer in
          if answer = Call_provers.HighFailure then begin
-            Format.eprintf "An error occured when calling alt-ergo@.";
+            Format.eprintf "An error occured when calling the prover.@.";
             if Gnat_config.verbose = Gnat_config.Verbose then begin
                Format.eprintf "%s@." r.Call_provers.pr_output
             end;
