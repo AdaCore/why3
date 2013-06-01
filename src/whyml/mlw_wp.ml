@@ -1460,11 +1460,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { ne = ne; s = s };
         exn = Mexn.empty }
   | Eapp (e1, _, spec) ->
-      (* OK: ok(e1) /\ (ne(e1) => spec.pre) *)
+      (* OK: ok(e1) /\ (ne(e1) => spec.pre /\ variant) *)
       (* NE: ne(e1) /\ spec.post *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ spec.ex(x)) *)
-      (* The first thing that happens, before the call, is the evaluation of
-         [e1]. This translates as a recursive call to the fast_wp. *)
       let arg_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
       (* Next we have to deal with the call itself. *)
@@ -1480,7 +1478,16 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let call_post = { s = state_after_call; ne = spec.c_post } in
       let post, xpost =
         apply_state_to_post call_glue pre_call_label r call_post xpost in
-      let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
+      let variant =
+        if spec.c_letrec = 0 || spec.c_variant = [] then t_true else
+        let olds = Mint.find_def [] spec.c_letrec env.letrec_var in
+        if olds = [] then t_true (* we are out of letrec *) else
+        let news =
+          List.map (fun (t,rel) ->
+            Subst.term state_before_call t, rel) spec.c_variant in
+        decrease e.e_loc expl_variant env olds news in
+      let ok =
+        t_and_simp wp1.ok (wp_implies wp1.post.ne (t_and_simp variant pre)) in
       let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
       let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
         let s, post1, post2 =
@@ -1730,14 +1737,6 @@ and fast_wp_fun_defn env { fun_lambda = l } =
      NE: true *)
   let lab = fresh_mark () and c = l.l_spec in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env =
-    if c.c_letrec = 0 || c.c_variant = [] then env else
-    let lab = t_var lab in
-    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
-    let tl = List.map t_at_lab c.c_variant in
-    let lrv = Mint.add c.c_letrec tl env.letrec_var in
-    { env with letrec_var = lrv } in
-  (* generate the initial state, using the overall effect of the function *)
   let build_set svs =
     Mvs.fold (fun x _ acc -> Spv.add (restore_pv x) acc) svs Spv.empty in
   let pre_vars = build_set c.c_pre.t_vars in
@@ -1746,6 +1745,12 @@ and fast_wp_fun_defn env { fun_lambda = l } =
   let all_vars = Spv.union all_vars post_vars in
   let prestate = Subst.init all_vars in
   let prestate = Subst.save_label lab prestate in
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
+    let tl = List.map (fun (t,_) -> Subst.term prestate t) c.c_variant in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
+  (* generate the initial state, using the overall effect of the function *)
   (* extract the result and xresult variables *)
   let result, _  = open_post c.c_post in
   let xresult = Mexn.map (fun x -> fst (open_post x)) c.c_xpost in
