@@ -1685,9 +1685,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = post;
         exn = xpost;
       }
-  | Eloop (inv, _varl, e1) -> (* TODO variant proof *)
+  | Eloop (inv, varl, e1) ->
       (* OK: inv /\ (forall r in writes(e1), replace r by fresh r' in
-                       inv => (ok(e1) /\ (ne(e1) => inv'))) *)
+                       inv => (ok(e1) /\ (ne(e1) => inv' /\ var))) *)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
       let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
@@ -1699,12 +1699,18 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         t_label_add expl_loop_keep (Subst.term wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
-           I => (OK /\ (NE => I'))
+           I => (OK /\ (NE => I' /\ V))
         *)
+      let variant =
+        let old_vars = List.map (fun (t,_) -> Subst.term havoc_state t) varl in
+        let new_vars =
+          List.map (fun (t,rel) -> Subst.term wp1.post.s t,rel) varl in
+        decrease e.e_loc expl_loopvar env old_vars new_vars
+      in
       let preserv_inv =
         t_implies_simp inv_hypo
           (t_and_simp wp1.ok
-             (t_implies_simp wp1.post.ne post_inv)) in
+             (t_implies_simp wp1.post.ne (t_and_simp post_inv variant))) in
       let exn =
         Mexn.map (fun post ->
           { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
