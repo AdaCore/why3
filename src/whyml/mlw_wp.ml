@@ -1350,43 +1350,49 @@ let iter_exns exns f =
 let iter_all_exns xmap_list f =
   iter_exns (all_exns xmap_list) f
 
-let merge_opt_post s opt_p1 opt_p2 =
-  (* given two optional fwp_post states, merge them and return a triple
-       s, post1, post2
-     such that s is the merged state, post1 is the formula that expresses p1 in
-     the new state s, and post2 is the formula that expresses p2 in the new
-     state s *)
-  match opt_p1, opt_p2 with
-  | None, None -> assert false
-  | None, Some x -> x.s, t_false, x.ne
-  | Some x, None -> x.s, x.ne, t_false
-  | Some p1, Some p2 ->
-      let s, r1, r2 = Subst.merge s p1.s p2.s in
-      s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne
+let merge_opt s opt_sl =
+  (* merge a list of optional states: all present states are merged together,
+     and the merged state is returned, together with the glue formula for all
+     states. For absent states, the glue formula "false" is returned *)
+  let l = List.filter (fun x -> x <> None) opt_sl in
+  let l =
+    List.map (fun x -> match x with Some x -> x | None -> assert false) l in
+  let s, fl = Subst.merge_l s l in
+  let rec merge_lists acc opt_sl fl =
+    match opt_sl, fl with
+    | None :: rest, _ -> merge_lists (t_false :: acc) rest fl
+    | Some _ :: rest, f :: fl -> merge_lists (f :: acc) rest fl
+    | [], [] -> List.rev acc
+    | _, _ -> assert false
+  in
+  s, merge_lists [] opt_sl fl
+
+let merge_opt_post_l s opt_l =
+  (* given a list of optional fwp_post states, merge them and return a tuple
+       s, postl
+     such that s is the merged state, and postl is the list of formulas that
+     express each input fwp in the new state s.*)
+  let opt_sl = List.map (fun x -> Opt.map (fun x -> x.s) x) opt_l in
+  let s, fl = merge_opt s opt_sl in
+  s,
+  List.map2 (fun opt f ->
+    match opt with
+    | None -> t_false
+    | Some x -> t_and_simp f x.ne) opt_l fl
+
+let merge_opt_post s opt1 opt2 =
+  (* wrapper for merge_opt_post_l for two input states *)
+  let s, fl = merge_opt_post_l s [opt1;opt2] in
+  match fl with
+  | [f1;f2] -> s, f1, f2
+  | _ -> assert false
 
 let merge_opt_post_3 s opt_p1 opt_p2 opt_p3 =
-  (* same as merge_opt_post, but merge three fwp_post states and return a
-     4-tuple *)
-  match opt_p1, opt_p2, opt_p3 with
-  | None, None, None -> assert false
-  | None, None, Some x -> x.s, t_false, t_false, x.ne
-  | None, Some x, None -> x.s, t_false, x.ne, t_false
-  | Some x, None, None -> x.s, x.ne, t_false, t_false
-  | None, Some p2, Some p3 ->
-      let s, r2, r3 = Subst.merge s p2.s p3.s in
-      s, t_false, t_and_simp r2 p2.ne, t_and_simp r3 p3.ne
-  | Some p1, Some p2, None ->
-      let s, r1, r2 = Subst.merge s p1.s p2.s in
-      s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne, t_false
-  | Some p1, None, Some p3 ->
-      let s, r1, r3 = Subst.merge s p1.s p3.s in
-      s, t_and_simp r1 p1.ne, t_false, t_and_simp r3 p3.ne
-  | Some p1, Some p2, Some p3 ->
-      let s, rl = Subst.merge_l s [p1.s; p2.s; p3.s] in
-      match rl with
-      | [r1;r2;r3] ->
-          s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne, t_and_simp r3 p3.ne
-      | _ -> assert false
+  (* wrapper for merge_opt_post for three input states *)
+  let s, fl = merge_opt_post_l s [opt_p1;opt_p2;opt_p3] in
+  match fl with
+  | [f1;f2;f3] -> s, f1, f2, f3
+  | _ -> assert false
 
 (* Input
    - a state s: Subst.t
