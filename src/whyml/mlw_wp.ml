@@ -1273,7 +1273,6 @@ end
 
 let fastwp_or_label = Ident.create_label "fastwp:or"
 let wp_or f1 f2 = t_label_add fastwp_or_label (t_or_simp f1 f2)
-let wp_ors l = List.fold_left wp_or t_false l
 
 let xs_result xs = create_vsymbol (id_fresh "result") (ty_of_ity xs.xs_ity)
 let result e =
@@ -1350,6 +1349,44 @@ let iter_exns exns f =
 
 let iter_all_exns xmap_list f =
   iter_exns (all_exns xmap_list) f
+
+let merge_opt_post s opt_p1 opt_p2 =
+  (* given two optional fwp_post states, merge them and return a triple
+       s, post1, post2
+     such that s is the merged state, post1 is the formula that expresses p1 in
+     the new state s, and post2 is the formula that expresses p2 in the new
+     state s *)
+  match opt_p1, opt_p2 with
+  | None, None -> assert false
+  | None, Some x -> x.s, t_false, x.ne
+  | Some x, None -> x.s, x.ne, t_false
+  | Some p1, Some p2 ->
+      let s, r1, r2 = Subst.merge s p1.s p2.s in
+      s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne
+
+let merge_opt_post_3 s opt_p1 opt_p2 opt_p3 =
+  (* same as merge_opt_post, but merge three fwp_post states and return a
+     4-tuple *)
+  match opt_p1, opt_p2, opt_p3 with
+  | None, None, None -> assert false
+  | None, None, Some x -> x.s, t_false, t_false, x.ne
+  | None, Some x, None -> x.s, t_false, x.ne, t_false
+  | Some x, None, None -> x.s, x.ne, t_false, t_false
+  | None, Some p2, Some p3 ->
+      let s, r2, r3 = Subst.merge s p2.s p3.s in
+      s, t_false, t_and_simp r2 p2.ne, t_and_simp r3 p3.ne
+  | Some p1, Some p2, None ->
+      let s, r1, r2 = Subst.merge s p1.s p2.s in
+      s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne, t_false
+  | Some p1, None, Some p3 ->
+      let s, r1, r3 = Subst.merge s p1.s p3.s in
+      s, t_and_simp r1 p1.ne, t_false, t_and_simp r3 p3.ne
+  | Some p1, Some p2, Some p3 ->
+      let s, rl = Subst.merge_l s [p1.s; p2.s; p3.s] in
+      match rl with
+      | [r1;r2;r3] ->
+          s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne, t_and_simp r3 p3.ne
+      | _ -> assert false
 
 (* Input
    - a state s: Subst.t
@@ -1446,14 +1483,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
       let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
       let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
-        let s, post1, post2 = 
-          match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex xpost with
-          | None, None -> assert false
-          | None, Some x -> x.s, t_false, x.ne
-          | Some x, None -> x.s, x.ne, t_false
-          | Some p1, Some p2 ->
-              let s, r1, r2 = Subst.merge s p1.s p2.s in
-              s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne
+        let s, post1, post2 =
+          merge_opt_post s (Mexn.find_opt ex wp1.exn) (Mexn.find_opt ex xpost)
         in
         { s = s;
           ne = wp_or post1 (t_and_simp wp1.post.ne post2) }) in
@@ -1487,19 +1518,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let ok = wp_label e ok in
       let ne = wp_label e (t_and_subst vs wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
-        match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
-        | None, None -> assert false
-        | Some post1, None -> post1
-        | None, Some post2 ->
-            { s = post2.s ; ne = wp_label e (t_and_simp wp1.post.ne post2.ne) }
-        | Some p1, Some p2 ->
-            let s, r1, r2 = Subst.merge s p1.s p2.s in
-            { s = s;
-              ne =
-                wp_label e
-                  (wp_or (t_and_simp p1.ne r1)
-                        (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
-            }) in
+        let s, post1, post2 =
+          merge_opt_post s (Mexn.find_opt ex wp1.exn) (Mexn.find_opt ex wp2.exn)
+        in
+        { s = s;
+          ne = wp_label e (wp_or post1 (t_and_simp wp1.post.ne post2)) })
+      in
       { ok = ok;
         post = { ne = ne; s = wp2.post.s };
         exn = xne }
@@ -1527,64 +1551,17 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let ne = wp_label e ne in
       let xne = iter_all_exns [wp1.exn; wp2.exn; wp3.exn]
         (fun ex ->
-          match Mexn.find_opt ex wp1.exn,
-                Mexn.find_opt ex wp2.exn,
-                Mexn.find_opt ex wp3.exn with
-          | None, None, None -> assert false
-          | None, None, Some post3 ->
-              { s = post3.s ;
-                ne = wp_label e (t_and_subst cond_res wp1.post.ne
-                        (t_and_simp (t_not test) post3.ne))
-              }
-          | None, Some post2, None ->
-              { s = post2.s ;
-                ne = wp_label e (t_and_subst cond_res wp1.post.ne
-                (t_and_simp test post2.ne)) }
-          | Some post1, None, None ->
-              post1
-          | None, Some post2, Some post3 ->
-              let s, f2, f3 = Subst.merge wp1.post.s post2.s post3.s in
-              { s = s;
-                ne =
-                  wp_label e (t_and_subst cond_res wp1.post.ne
-                  (t_if test (t_and_simp post2.ne f2)
-                             (t_and_simp post3.ne f3)))
-              }
-          | Some post1, Some post2, None ->
-              let s, f1, f2 = Subst.merge s post1.s post2.s in
-              { s = s;
-                ne =
-                  wp_label e
-                    (wp_or
-                      (t_and_simp_l [post1.ne; f1])
-                      (t_and_subst cond_res wp1.post.ne
-                         (t_and_simp_l [test; post2.ne; f2])))
-              }
-          | Some post1, None, Some post3 ->
-              let s, f1, f3 = Subst.merge s post1.s post3.s in
-              { s = s;
-                ne =
-                  wp_label e
-                    (wp_or
-                      (t_and_simp_l [post1.ne; f1])
-                      (t_and_subst cond_res wp1.post.ne
-                        (t_and_simp_l [t_not test; post3.ne; f3])))
-              }
-          | Some post1, Some post2, Some post3 ->
-              let s, fl = Subst.merge_l s [post1.s; post2.s; post3.s] in
-              begin match fl with
-              | [ f1; f2; f3 ] ->
-                { s = s;
-                  ne =
-                    wp_label e
-                      (wp_ors
-                        [t_and_simp_l [post1.ne; f1];
-                         t_and_subst cond_res wp1.post.ne
-                           (t_if test (t_and_simp post2.ne f2)
-                                      (t_and_simp post3.ne f3))])
-                }
-              | _ -> assert false
-              end)
+          let s, post1, post2, post3 =
+            merge_opt_post_3 s
+                (Mexn.find_opt ex wp1.exn)
+                (Mexn.find_opt ex wp2.exn)
+                (Mexn.find_opt ex wp3.exn) in
+          { s = s;
+            ne =
+              wp_label e (wp_or post1
+                                (t_and_subst cond_res wp1.post.ne
+                                             (t_if test post2 post3)))
+          })
       in
       { ok = ok;
         post = { ne = ne; s = state };
