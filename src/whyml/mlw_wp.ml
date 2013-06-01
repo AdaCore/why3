@@ -1516,7 +1516,14 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       when ty_equal v.pv_vs.vs_ty ty_mark ->
         let s = Subst.save_label v.pv_vs s in
         fast_wp_expr env s r e2
-
+  | Erec (fdl, e1) ->
+      let fr = fast_wp_rec_defn env fdl in
+      let wp1 = fast_wp_expr env s r e1 in
+      let ok = wp_label e (wp_and ~sym:true (wp_ands ~sym:true fr) wp1.ok) in
+      { ok   = ok;
+        post = wp1.post;
+        exn = wp1.exn;
+      }
   | Elet ({ let_sym = sym; let_expr = e1 }, e2) ->
       (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
       (* NE: ne(e1) /\ ne(e2) *)
@@ -1782,10 +1789,11 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { ne = ne; s = state };
         exn = xne
       }
+  | Eghost e1 ->
+      fast_wp_expr env s r e1
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
-  | Eghost _ -> assert false (*TODO*)
-  | Erec (_, _) -> assert false (*TODO*)
+    
 
 and fast_wp_fun_defn env { fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
