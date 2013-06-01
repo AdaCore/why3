@@ -1283,8 +1283,6 @@ let is_vty_unit = function
   | VTvalue ity -> ity_equal ity ity_unit
   | VTarrow _   -> false
 
-let map_exns e f = Mexn.mapi (fun xs _ -> f xs) e.e_effect.eff_raises
-
 (* The type for postconditions of expressions is the pair of the actual
    formula [ne], and a substitution [s] to be applied to [ne] to get the final
    postcondition. This allows delayed choice of names. *)
@@ -1448,19 +1446,20 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
       let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
       let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
-        match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex xpost with
-        | None, None -> assert false
-        | None, Some x | Some x, None -> x
-        | Some p1, Some p2 ->
-            let s, r1, r2 = Subst.merge s p1.s p2.s in
-            { s = s;
-              ne =
-                wp_or (t_and_simp p1.ne r1)
-                      (t_and_simp_l [p2.ne; r2; wp1.post.ne])
-            }) in
-        { ok = ok;
-          post = { ne = ne; s = state_after_call };
-          exn = xne }
+        let s, post1, post2 = 
+          match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex xpost with
+          | None, None -> assert false
+          | None, Some x -> x.s, t_false, x.ne
+          | Some x, None -> x.s, x.ne, t_false
+          | Some p1, Some p2 ->
+              let s, r1, r2 = Subst.merge s p1.s p2.s in
+              s, t_and_simp r1 p1.ne, t_and_simp r2 p2.ne
+        in
+        { s = s;
+          ne = wp_or post1 (t_and_simp wp1.post.ne post2) }) in
+      { ok = ok;
+        post = { ne = ne; s = state_after_call };
+        exn = xne }
 
   | Elet ({ let_sym = LetV v; let_expr = _ }, e2)
   (* ??? can we really ignore the first expression? *)
@@ -1468,49 +1467,25 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         let s = Subst.save_label v.pv_vs s in
         fast_wp_expr env s r e2
 
-  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
+  | Elet ({ let_sym = sym; let_expr = e1 }, e2) ->
       (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
       (* NE: ne(e1) /\ ne(e2) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
-      let vs = v.pv_vs in
+      let vs = match sym with | LetV v -> v.pv_vs | LetA _ -> vs_result e1 in
       let e2 =
          if Opt.equal Loc.equal vs.vs_name.id_loc e1.e_loc then
             e_label_copy e e2
          else e2 in
       let wp1 = fast_wp_expr env s (vs, xresult) e1 in
-      let wp1posts = Subst.add_pvar v wp1.post.s in
+      let wp1posts =
+        match sym with
+        | LetV v -> Subst.add_pvar v wp1.post.s
+        | _ -> wp1.post.s in
       let wp2 = fast_wp_expr env wp1posts r e2 in
       let ok =
          t_and_simp wp1.ok (t_implies_subst vs wp1.post.ne wp2.ok) in
       let ok = wp_label e ok in
       let ne = wp_label e (t_and_subst vs wp1.post.ne wp2.post.ne) in
-      let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
-        match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
-        | None, None -> assert false
-        | Some post1, None -> post1
-        | None, Some post2 ->
-            { s = post2.s ; ne = wp_label e (t_and_simp wp1.post.ne post2.ne) }
-        | Some p1, Some p2 ->
-            let s, r1, r2 = Subst.merge s p1.s p2.s in
-            { s = s;
-              ne =
-                wp_label e
-                  (wp_or (t_and_simp p1.ne r1)
-                        (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
-            }) in
-      { ok = ok;
-        post = { ne = ne; s = wp2.post.s };
-        exn = xne }
-  | Elet ({ let_sym = LetA _; let_expr = e1 }, e2) ->
-      (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
-      (* NE: ne(e1) /\ ne(e2) *)
-      (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
-      let unit_v = vs_result e1 in
-      let wp1 = fast_wp_expr env s (unit_v, xresult) e1 in
-      let wp2 = fast_wp_expr env wp1.post.s r e2 in
-      let ok = t_and_simp wp1.ok (t_implies_simp wp1.post.ne wp2.ok) in
-      let ok = wp_label e ok in
-      let ne = wp_label e (t_and_simp wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
         match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
         | None, None -> assert false
