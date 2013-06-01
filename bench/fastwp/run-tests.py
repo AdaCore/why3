@@ -24,7 +24,8 @@ list_of_files = [
    "bug4.mlw",
    "bug5.mlw",
    "bug6.mlw",
-   "variant.mlw"
+   "variant.mlw",
+   "rec_variant.mlw"
    ]
 
 def compute_expected_output(fn, outputfile):
