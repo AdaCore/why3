@@ -1401,8 +1401,11 @@ clean::
 %.ml %.mli: %.mly
 	$(if $(QUIET),@echo 'Ocamlyacc $<' &&) $(OCAMLYACC) -v $<
 
-%.dep: %.ml
+%.dep: %.ml %.mli
 	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< $<i > $@
+
+%.dep: %.ml
+	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< > $@
 
 # .ml4.ml:
 # 	$(CAMLP4) pr_o.cmo -impl $< > $@
