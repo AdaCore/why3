@@ -1394,6 +1394,12 @@ let merge_opt_post_3 s opt_p1 opt_p2 opt_p3 =
   | [f1;f2;f3] -> s, f1, f2, f3
   | _ -> assert false
 
+let t_case_simp t l =
+  let all_branches_true = List.for_all (fun (_,t) -> t = t_true) l in
+  if all_branches_true then t_true else
+  let branches = List.map (fun (p,x) -> t_close_branch p x) l in
+  t_case t branches
+
 (* Input
    - a state s: Subst.t
    - names r = (result: vsymbol, xresult: vsymbol Mexn.t)
@@ -1732,10 +1738,53 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { s = wp1.post.s; ne = t_false }; (* this is an infinite loop *)
         exn = exn
       }
+  | Ecase (e1, bl) ->
+      let cond_res = vs_result e1 in
+      let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
+      let wps = List.map (fun (_,e) -> fast_wp_expr env wp1.post.s r e) bl in
+      let cond_t = t_var cond_res in
+      let pats = List.map (fun ({ppat_pattern = pat}, _) -> pat) bl in
+      let build_case f l =
+        t_case_simp cond_t
+          (List.map2 (fun pat x -> pat, (f x)) pats l) in
+      let ok =
+        t_and_simp
+          wp1.ok
+          (t_implies_subst cond_res wp1.post.ne
+                           (build_case (fun wp -> wp.ok) wps))
+      in
+      let state, fl =
+        Subst.merge_l wp1.post.s (List.map (fun wp -> wp.post.s) wps) in
+      let posts = List.map2 (fun f wp -> t_and_simp f wp.post.ne) fl wps in
+      let ne =
+        t_and_subst cond_res wp1.post.ne
+                    (build_case (fun x -> x) posts) in
+      let ok = wp_label e ok in
+      let ne = wp_label e ne in
+      let all_wps = wp1 :: wps in
+      let exns = List.map (fun x -> x.exn) all_wps in
+      let xne = iter_all_exns exns
+        (fun ex ->
+          let opt_postl = List.map (fun wp -> Mexn.find_opt ex wp) exns in
+          let s, post_l = merge_opt_post_l s opt_postl in
+          match post_l with
+          | cond_f :: branches ->
+            { s = s;
+              ne =
+                wp_label e
+                  (wp_or cond_f
+                      (t_and_subst cond_res wp1.post.ne
+                          (build_case (fun b -> b) branches)))
+            }
+          | _ -> assert false)
+      in
+      { ok = ok;
+        post = { ne = ne; s = state };
+        exn = xne
+      }
   | Eassign _ -> assert false
   | Efor (_, _, _, _) -> assert false (*TODO*)
   | Eghost _ -> assert false (*TODO*)
-  | Ecase (_, _) -> assert false (*TODO*)
   | Erec (_, _) -> assert false (*TODO*)
 
 and fast_wp_fun_defn env { fun_lambda = l } =
