@@ -1791,8 +1791,51 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       }
   | Eghost e1 ->
       fast_wp_expr env s r e1
+  | Efor ({pv_vs = x}, ({pv_vs = v1}, d, {pv_vs = v2}), inv, e1) ->
+      let gt, le, incr = match d with
+        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
+        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn
+      in
+      let one = t_nat_const 1 in
+      let v1_gt_v2 = ps_app gt [t_var v1; t_var v2] in
+      let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
+      let init_inv =
+        wp_expl expl_loop_init
+          (Subst.term s (t_subst_single x (t_var v1) inv)) in
+      let init_inv = t_implies_simp v1_le_v2 init_inv in
+      let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
+      let inv_hypo =
+        t_and_simp_l
+          [ps_app le [t_var v1; t_var x];
+          ps_app le [t_var x;  t_var v2];
+          t_and_simp glue (Subst.term havoc_state inv)]
+      in
+      let wp1 = fast_wp_expr env havoc_state r e1 in
+      let post_inv =
+        let next = fs_app incr [t_var x; one] ty_int in
+        wp_expl expl_loop_keep
+          (Subst.term wp1.post.s (t_subst_single x next inv)) in
+      let preserv_inv =
+        t_implies_simp inv_hypo
+          (t_and_simp wp1.ok
+            (t_implies_simp wp1.post.ne post_inv)) in
+      let ok = wp_label e (t_and_simp init_inv preserv_inv) in
+      let post_state, f1, f2 = Subst.merge s s wp1.post.s in
+      let v2pl1 = fs_app incr [t_var v2; one] ty_int in
+      let ne = 
+        wp_label e
+          (t_if_simp v1_le_v2
+            (t_and_simp f2
+              (Subst.term post_state (t_subst_single x v2pl1 inv)))
+            (t_and_simp f1 v1_gt_v2)) in
+      let exn =
+        Mexn.map (fun post ->
+          { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
+      { ok = ok;
+        post = { s = post_state; ne = ne };
+        exn = exn
+      }
   | Eassign _ -> assert false
-  | Efor (_, _, _, _) -> assert false (*TODO*)
     
 
 and fast_wp_fun_defn env { fun_lambda = l } =
