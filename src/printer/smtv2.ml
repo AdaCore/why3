@@ -38,15 +38,20 @@ let ident_printer =
       "get-option"; "get-proof"; "get-unsat-core"; "get-value"; "pop"; "push";
       "set-logic"; "set-info"; "set-option";
        (** for security *)
-      "Bool";"unsat";"sat";"true";"false";"select";"store";
+      "unsat";"sat";
+      (** SMT-LIB Theories http://www.smt-lib.org/ *)
+      (** SmtV2 core *)
+      "Bool"; "true";"false"; "not"; "and"; "or"; "xor"; "distinct"; "ite";
        (** arrays -- this really belongs to the driver! (esp. const) *)
       "Array";"select";"store";"const";
-       (** div and mod are builtin *)
-      "div";"mod";
-      (** distinct is builtin in some provers *)
-      "distinct";
-      (** CVC4 built-in symbols *)
-      "concat";
+       (** Ints theory *)
+      "div"; "mod"; "abs";
+      (** Fixed_Size_BitVectors theory *)
+      "BitVec"; "concat"; "extract"; "bv2nat"; "nat2bv"; "bvnot"; "bvneg";
+      "bvand"; "bvor";  "bvand"; "bvmul"; "bvudiv"; "bvurem"; "bvshl";
+      "bvlshr"; "bvult";
+      (** SMTv2's Reals_Ints theory *)
+      "to_int"; "to_real"; "is_int"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
