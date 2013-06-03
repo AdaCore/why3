@@ -399,8 +399,9 @@ let print_task _env pr thpr _blacklist ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
   print_prelude fmt pr;
+  fprintf fmt "theory Task@\n";
   print_th_prelude task fmt thpr;
-  fprintf fmt "theory Task@\n%a@\nend@."
+  fprintf fmt "%a@\nend@."
     (print_list nothing string)
       (List.rev (Trans.apply print_tdecls task))
 

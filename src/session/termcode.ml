@@ -11,6 +11,44 @@
 
 open Term
 
+(*******************************)
+(*          explanations       *)
+(*******************************)
+
+let expl_regexp = Str.regexp "expl:\\(.*\\)"
+
+let check_expl lab acc =
+  let lab = lab.Ident.lab_string in
+  if Str.string_match expl_regexp lab 0
+  then Some (Str.matched_group 1 lab)
+  else acc
+
+let check_expl lab =
+  if Ident.Slab.mem Split_goal.stop_split lab then None
+  else Ident.Slab.fold check_expl lab None
+
+let rec get_expl_fmla acc f =
+  if f.t_ty <> None then acc else
+  let res = check_expl f.Term.t_label in
+  if res = None then match f.t_node with
+    | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
+    | Term.Tbinop(Term.Timplies,_,f) -> get_expl_fmla acc f
+    | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
+        Term.t_fold get_expl_fmla acc f
+    | _ -> raise Exit
+  else if acc = None then res else raise Exit
+
+let get_expl_fmla f = try get_expl_fmla None f with Exit -> None
+
+let goal_expl_task ~root task =
+  let gid = (Task.task_goal task).Decl.pr_name in
+  let info =
+    let fmla = Task.task_goal_fmla task in
+    let res = get_expl_fmla fmla in
+    if res <> None || not root then res else check_expl gid.Ident.id_label
+  in
+  gid, info, task
+
 (* Shapes *)
 
 type shape = string
@@ -97,15 +135,17 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         List.fold_left fn
           (ident_shape ~push s.ls_name (push tag_app acc))
           l
-    | Tif (f,t1,t2) -> fn (fn (fn (push tag_if acc) f) t1) t2
+    | Tif (f,t1,t2) -> fn (fn (fn (push tag_if acc) t2) t1) f
     | Tcase (t1,bl) ->
         let br_shape acc b =
           let p,t2 = t_open_branch b in
-          let acc = pat_shape ~push c m acc p in
-          let m = pat_rename_alpha c m p in
-          t_shape ~version ~push c m acc t2
+          let m1 = pat_rename_alpha c m p in
+          let acc = t_shape ~version ~push c m1 acc t2 in
+          pat_shape ~push c m acc p
         in
-        List.fold_left br_shape (fn (push tag_case acc) t1) bl
+        let acc = push tag_case acc in
+        let acc = List.fold_left br_shape acc bl in
+        fn acc t1
     | Teps b ->
         let u,f = t_open_bound b in
         let m = vs_rename_alpha c m u in
@@ -145,7 +185,7 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
               fn (push tag_let (t_shape ~version ~push c m acc t2)) t1
             | _ -> assert false
         end
-    | Tnot f -> push tag_not (fn acc f)
+    | Tnot f -> fn (push tag_not acc) f
     | Ttrue -> push tag_true acc
     | Tfalse -> push tag_false acc
 
@@ -155,6 +195,14 @@ let t_shape_buf ?(version=current_shape_version) t =
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () t in
   Buffer.contents b
 
+let t_shape_task ?(version=current_shape_version) t =
+  let b = Buffer.create 17 in
+  let push t () = Buffer.add_string b t in
+  let _, expl, _ = goal_expl_task ~root:false t in
+  Opt.iter (Buffer.add_string b) expl;
+  let f = Task.task_goal_fmla t in
+  let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
+  Buffer.contents b
 
 (* Checksums *)
 

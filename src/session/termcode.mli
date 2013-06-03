@@ -9,6 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Explanations *)
+
+val goal_expl_task:
+  root:bool -> Task.task -> Ident.ident * string option * Task.task
+
 (** Shapes *)
 
 val current_shape_version : int
@@ -18,8 +23,10 @@ val print_shape: Format.formatter -> shape -> unit
 val string_of_shape: shape -> string
 val shape_of_string: string -> shape
 
-val t_shape_buf : ?version:int -> Term.term -> shape
-  (** returns a shape of the given term *)
+(* val t_shape_buf : ?version:int -> Term.term -> shape *)
+  (** returns the shape of a given term *)
+val t_shape_task: ?version:int -> Task.task -> shape
+  (** returns the shape of a given task *)
 
 (** Checksums *)
 

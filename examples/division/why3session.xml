@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <file
+  name="../division.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="Division"
+   locfile="../division.mlw"
+   loclnum="4" loccnumb="7" loccnume="15"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter division"
+    locfile="../division.mlw"
+    loclnum="9" loccnumb="6" loccnume="14"
+    expl="VC for division"
+    sum="a0bab90b7a0d847ab4e8eb89f6f3f1b3"
+    proved="true"
+    expanded="true"
+    shape="iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix =ainfix +ainfix *V3V1V4V0Eainfix &lt;V6V2Aainfix &lt;=c0V2Aainfix &lt;=c0V6Aainfix =ainfix +ainfix *V5V1V6V0Iainfix =V6ainfix -V2V1FIainfix =V5ainfix +V3c1Fainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FAainfix &lt;=c0V0Aainfix =ainfix +ainfix *c0V1V0V0Iainfix &lt;c0V1Aainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for division"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter division.1"
+      locfile="../division.mlw"
+      loclnum="9" loccnumb="6" loccnume="14"
+      expl="1. loop invariant init"
+      sum="5da94f982609895ce5a16b0bae3b45c0"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=c0V0Aainfix =ainfix +ainfix *c0V1V0V0Iainfix &lt;c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for division"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter division.2"
+      locfile="../division.mlw"
+      loclnum="9" loccnumb="6" loccnume="14"
+      expl="2. loop invariant preservation"
+      sum="6728e3597616985df5a6f2c41146c9e7"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=c0V5Aainfix =ainfix +ainfix *V4V1V5V0Iainfix =V5ainfix -V2V1FIainfix =V4ainfix +V3c1FIainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FIainfix &lt;c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for division"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter division.3"
+      locfile="../division.mlw"
+      loclnum="9" loccnumb="6" loccnume="14"
+      expl="3. loop variant decrease"
+      sum="b9642f0e65625992fc491a8bd7e0ef8d"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;V5V2Aainfix &lt;=c0V2Iainfix =V5ainfix -V2V1FIainfix =V4ainfix +V3c1FIainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FIainfix &lt;c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for division"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter division.4"
+      locfile="../division.mlw"
+      loclnum="9" loccnumb="6" loccnume="14"
+      expl="4. postcondition"
+      sum="520a7751ab7f5630f333ba1f0c0e3d22"
+      proved="true"
+      expanded="true"
+      shape="postconditionainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix =ainfix +ainfix *V3V1V4V0EINainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FIainfix &lt;c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for division"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

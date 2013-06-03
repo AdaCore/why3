@@ -222,7 +222,7 @@ let logic_constant c =
       let c = Literals.integer s in Number.ConstInt c
     | Integer(_value,None) ->
       Self.not_yet_implemented "logic_constant Integer None"
-    | LReal(_value,s) ->
+    | LReal { r_literal = s } ->
       let c = Literals.floating_point s in Number.ConstReal c
     | (LStr _|LWStr _|LChr _|LEnum _) ->
       Self.not_yet_implemented "logic_constant"
@@ -247,7 +247,7 @@ let bin (ty1,t1) op (ty2,t2) =
     | Mult,Lreal,Lreal -> t_app mul_real [t1;t2]
 
     | PlusA,ty1,ty2 -> Self.not_yet_implemented "bin PlusA(%a,%a)"
-      Cil.d_logic_type ty1 Cil.d_logic_type ty2
+      Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
     | MinusA,_,_ -> Self.not_yet_implemented "bin MinusA"
     | Mult,_,_ -> Self.not_yet_implemented "bin Mult"
     | (PlusPI|IndexPI|MinusPI|MinusPP),_,_
@@ -406,6 +406,7 @@ let rec term_node ~label t =
     | Tnull
     | TCoerce (_, _)
     | TCoerceE (_, _)
+    | TLogic_coerce (_, _)
     | TUpdate (_, _, _)
     | Ttypeof _
     | Ttype _
@@ -626,7 +627,7 @@ let seq e1 e2 =
   Mlw_expr.e_let l e2
 
 let annot a e =
-  match (Annotations.code_annotation_of_rooted a).annot_content with
+  match a.annot_content with
   | AAssert ([],pred) ->
     let p = predicate_named ~label:Here pred in
     let a = Mlw_expr.e_assert Mlw_expr.Aassert p in
@@ -648,7 +649,7 @@ let annot a e =
 
 let loop_annot a =
   List.fold_left (fun (inv,var) a ->
-    match (Annotations.code_annotation_of_rooted a).annot_content with
+    match a.annot_content with
       | AAssert ([],_pred) ->
         Self.not_yet_implemented "loop_annot AAssert"
       | AAssert(_labels,_pred) ->
@@ -697,7 +698,7 @@ let constant c =
   | CInt64(_t,_ikind, Some s) ->
       Number.ConstInt (Literals.integer s)
   | CInt64(t,_ikind, None) ->
-      Number.ConstInt (Literals.integer (My_bigint.to_string t))
+      Number.ConstInt (Literals.integer (Integer.to_string t))
   | CStr _
   | CWStr _
   | CChr _

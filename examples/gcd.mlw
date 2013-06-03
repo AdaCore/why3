@@ -7,10 +7,12 @@ module EuclideanAlgorithm
   use import number.Gcd
   use import int.ComputerDivision
 
-  let rec gcd u v variant { v }
+  let rec gcd (u v: int) : int
+    variant  { v }
     requires { u >= 0 /\ v >= 0 }
-    ensures { result = gcd u v }
-  = if v = 0 then
+    ensures  { result = gcd u v }
+  =
+    if v = 0 then
       u
     else
       gcd v (mod u v)

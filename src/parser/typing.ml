@@ -978,26 +978,57 @@ let find_theory env lenv q id = match q with
       (* theory in file f *)
       read_lib_theory env q id
 
-let rec clone_ns loc sl ns2 ns1 s =
-  let clash id = error ~loc (ClashSymbol id.id_string) in
+let rec clone_ns kn sl path ns2 ns1 s =
+  let qualid fmt path = Pp.print_list
+    (fun fmt () -> pp_print_char fmt '.')
+    pp_print_string fmt (List.rev path) in
   let s = Mstr.fold (fun nm ns1 acc ->
-    if not (Mstr.mem nm ns2.ns_ns) then acc else
-    let ns2 = Mstr.find nm ns2.ns_ns in
-    clone_ns loc sl ns2 ns1 acc) ns1.ns_ns s
+    let ns2 = Mstr.find_def empty_ns nm ns2.ns_ns in
+    clone_ns kn sl (nm::path) ns2 ns1 acc) ns1.ns_ns s
   in
   let inst_ts = Mstr.fold (fun nm ts1 acc ->
-    if not (Mstr.mem nm ns2.ns_ts) then acc else
-    if not (Sid.mem ts1.ts_name sl) then acc else
-    if Mts.mem ts1 acc then clash ts1.ts_name else
-    let ts2 = Mstr.find nm ns2.ns_ts in
-    Mts.add ts1 ts2 acc) ns1.ns_ts s.inst_ts
+    match Mstr.find_opt nm ns2.ns_ts with
+    | Some ts2 when ts_equal ts1 ts2 -> acc
+    | Some _ when not (Sid.mem ts1.ts_name sl) ->
+        raise (NonLocal ts1.ts_name)
+    | Some _ when ts1.ts_def <> None ->
+        raise (CannotInstantiate ts1.ts_name)
+    | Some ts2 ->
+        begin match (Mid.find ts1.ts_name kn).d_node with
+          | Decl.Dtype _ -> Mts.add_new (ClashSymbol nm) ts1 ts2 acc
+          | _ -> raise (CannotInstantiate ts1.ts_name)
+        end
+    | None when not (Sid.mem ts1.ts_name sl) -> acc
+    | None when ts1.ts_def <> None -> acc
+    | None ->
+        begin match (Mid.find ts1.ts_name kn).d_node with
+          | Decl.Dtype _ -> Loc.errorm
+              "type symbol %a not found in the target theory"
+              qualid (nm::path)
+          | _ -> acc
+        end)
+    ns1.ns_ts s.inst_ts
   in
   let inst_ls = Mstr.fold (fun nm ls1 acc ->
-    if not (Mstr.mem nm ns2.ns_ls) then acc else
-    if not (Sid.mem ls1.ls_name sl) then acc else
-    if Mls.mem ls1 acc then clash ls1.ls_name else
-    let ls2 = Mstr.find nm ns2.ns_ls in
-    Mls.add ls1 ls2 acc) ns1.ns_ls s.inst_ls
+    match Mstr.find_opt nm ns2.ns_ls with
+    | Some ls2 when ls_equal ls1 ls2 -> acc
+    | Some _ when not (Sid.mem ls1.ls_name sl) ->
+       raise (NonLocal ls1.ls_name)
+    | Some ls2 ->
+        begin match (Mid.find ls1.ls_name kn).d_node with
+          | Decl.Dparam _ -> Mls.add_new (ClashSymbol nm) ls1 ls2 acc
+          | _ -> raise (CannotInstantiate ls1.ls_name)
+        end
+    | None when not (Sid.mem ls1.ls_name sl) -> acc
+    | None ->
+        begin match (Mid.find ls1.ls_name kn).d_node with
+          | Decl.Dparam _ -> Loc.errorm
+              "%s symbol %a not found in the target theory"
+              (if ls1.ls_value <> None then "function" else "predicate")
+              qualid (nm::path)
+          | _ -> acc
+        end)
+    ns1.ns_ls s.inst_ls
   in
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
 
@@ -1032,7 +1063,7 @@ let type_inst th t s =
       let find ns x = find_namespace_ns x ns in
       let ns1 = Opt.fold find t.th_export p in
       let ns2 = Opt.fold find (get_namespace th) q in
-      clone_ns loc t.th_local ns2 ns1 s
+      Loc.try6 loc clone_ns t.th_known t.th_local [] ns2 ns1 s
     | CStsym (loc,p,[],PPTtyapp (q,[])) ->
       let ts1 = find_tysymbol_ns p t.th_export in
       let ts2 = find_tysymbol q th in

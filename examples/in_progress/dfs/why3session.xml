@@ -1,0 +1,835 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="4"
+  name="Eprover"
+  version="1.4"/>
+ <prover
+  id="5"
+  name="Eprover"
+  version="1.6"/>
+ <prover
+  id="6"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="7"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="8"
+  name="Yices"
+  version="1.0.38"/>
+ <prover
+  id="9"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="10"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="11"
+  name="Z3"
+  version="4.2"/>
+ <prover
+  id="12"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../dfs.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="DFS"
+   locfile="../dfs.mlw"
+   loclnum="28" loccnumb="7" loccnume="10"
+   verified="false"
+   expanded="true">
+   <goal
+    name="WP_parameter dfs"
+    locfile="../dfs.mlw"
+    loclnum="58" loccnumb="10" loccnume="13"
+    expl="VC for dfs"
+    sum="ca900b1fce2221e98340751d7b2a6d7a"
+    proved="true"
+    expanded="false"
+    shape="iaonly_descendants_are_markedV2Aainfix =agetV1V3aTrueIainfix =agetV1V3aTrueFAainfix =agetV2V0aTrueINainfix =V0anullAainfix =agetV2V4aTrueIainfix =agetV2V4aTrueFAawell_coloredV2V1iaonly_descendants_are_markedV2Aainfix =agetV1V5aTrueIainfix =agetV1V5aTrueFAainfix =agetV2V0aTrueINainfix =V0anullAainfix =agetV2V6aTrueIainfix =agetV2V6aTrueFAawell_coloredV2V1aonly_descendants_are_markedV14Aainfix =agetV1V16aTrueIainfix =agetV15V16aTrueFAainfix =agetV14V0aTrueINainfix =V0anullAainfix =agetV14V17aTrueIainfix =agetV2V17aTrueFAawell_coloredV14V15Iainfix =V15asetV13V0aFalseFIaonly_descendants_are_markedV14Aainfix =agetV10V18aTrueIainfix =agetV13V18aTrueFAainfix =agetV14V12aTrueINainfix =V12anullAainfix =agetV14V19aTrueIainfix =agetV11V19aTrueFAawell_coloredV14V13FAapatharootV12Aaonly_descendants_are_markedV11Aawell_coloredV11V10LarightV0Iaonly_descendants_are_markedV11Aainfix =agetV7V20aTrueIainfix =agetV10V20aTrueFAainfix =agetV11V9aTrueINainfix =V9anullAainfix =agetV11V21aTrueIainfix =agetV8V21aTrueFAawell_coloredV11V10FAapatharootV9Aaonly_descendants_are_markedV8Aawell_coloredV8V7LaleftV0Iainfix =V8asetV2V0aTrueFIainfix =V7asetV1V0aTrueFNainfix =agetV2V0aTrueNainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+    <label
+     name="expl:VC for dfs"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter dfs.1"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="1. precondition"
+      sum="227214c826e048e016bdbce3185b70ea"
+      proved="true"
+      expanded="false"
+      shape="preconditionawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.2"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="2. precondition"
+      sum="e8a57ee98b54d75e65dc9101cfe3198f"
+      proved="true"
+      expanded="false"
+      shape="preconditionaonly_descendants_are_markedV4LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.3"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="3. precondition"
+      sum="527661000974c6127924a28463e68371"
+      proved="true"
+      expanded="false"
+      shape="preconditionapatharootV5LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.4"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="4. precondition"
+      sum="4a4c4402dd6f952f8133bd578347321c"
+      proved="true"
+      expanded="false"
+      shape="preconditionawell_coloredV7V6LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V9aTrueIainfix =agetV6V9aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V10aTrueIainfix =agetV4V10aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.5"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="5. precondition"
+      sum="018b904a4c37d5031a6b60d9a0367cb2"
+      proved="true"
+      expanded="false"
+      shape="preconditionaonly_descendants_are_markedV7LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V9aTrueIainfix =agetV6V9aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V10aTrueIainfix =agetV4V10aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.6"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="6. precondition"
+      sum="4b536a797fd29a80e3a9ad8a6620e31a"
+      proved="true"
+      expanded="false"
+      shape="preconditionapatharootV8LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V9aTrueIainfix =agetV6V9aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V10aTrueIainfix =agetV4V10aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.7"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="7. postcondition"
+      sum="d337ea87989594cd0ae3825affaa3a8e"
+      proved="true"
+      expanded="false"
+      shape="postconditionawell_coloredV10V11Iainfix =V11asetV9V0aFalseFIaonly_descendants_are_markedV10Aainfix =agetV6V12aTrueIainfix =agetV9V12aTrueFAainfix =agetV10V8aTrueINainfix =V8anullAainfix =agetV10V13aTrueIainfix =agetV7V13aTrueFAawell_coloredV10V9FIapatharootV8Aaonly_descendants_are_markedV7Aawell_coloredV7V6LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V14aTrueIainfix =agetV6V14aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V15aTrueIainfix =agetV4V15aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.8"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="8. postcondition"
+      sum="d946c035afacde2b172033d1974bf3a0"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV10V12aTrueIainfix =agetV2V12aTrueFIainfix =V11asetV9V0aFalseFIaonly_descendants_are_markedV10Aainfix =agetV6V13aTrueIainfix =agetV9V13aTrueFAainfix =agetV10V8aTrueINainfix =V8anullAainfix =agetV10V14aTrueIainfix =agetV7V14aTrueFAawell_coloredV10V9FIapatharootV8Aaonly_descendants_are_markedV7Aawell_coloredV7V6LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V15aTrueIainfix =agetV6V15aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V16aTrueIainfix =agetV4V16aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.9"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="9. postcondition"
+      sum="5a5343bb3ceea8ef740f112aa00e0fe5"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV10V0aTrueINainfix =V0anullIainfix =V11asetV9V0aFalseFIaonly_descendants_are_markedV10Aainfix =agetV6V12aTrueIainfix =agetV9V12aTrueFAainfix =agetV10V8aTrueINainfix =V8anullAainfix =agetV10V13aTrueIainfix =agetV7V13aTrueFAawell_coloredV10V9FIapatharootV8Aaonly_descendants_are_markedV7Aawell_coloredV7V6LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V14aTrueIainfix =agetV6V14aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V15aTrueIainfix =agetV4V15aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.10"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="10. postcondition"
+      sum="a6147d836622fb8e2ae7c20b45703733"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV1V12aTrueIainfix =agetV11V12aTrueFIainfix =V11asetV9V0aFalseFIaonly_descendants_are_markedV10Aainfix =agetV6V13aTrueIainfix =agetV9V13aTrueFAainfix =agetV10V8aTrueINainfix =V8anullAainfix =agetV10V14aTrueIainfix =agetV7V14aTrueFAawell_coloredV10V9FIapatharootV8Aaonly_descendants_are_markedV7Aawell_coloredV7V6LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V15aTrueIainfix =agetV6V15aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V16aTrueIainfix =agetV4V16aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.11"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="11. postcondition"
+      sum="a0c60b7d43266c9924097cae830f4c8f"
+      proved="true"
+      expanded="false"
+      shape="postconditionaonly_descendants_are_markedV10Iainfix =V11asetV9V0aFalseFIaonly_descendants_are_markedV10Aainfix =agetV6V12aTrueIainfix =agetV9V12aTrueFAainfix =agetV10V8aTrueINainfix =V8anullAainfix =agetV10V13aTrueIainfix =agetV7V13aTrueFAawell_coloredV10V9FIapatharootV8Aaonly_descendants_are_markedV7Aawell_coloredV7V6LarightV0Iaonly_descendants_are_markedV7Aainfix =agetV3V14aTrueIainfix =agetV6V14aTrueFAainfix =agetV7V5aTrueINainfix =V5anullAainfix =agetV7V15aTrueIainfix =agetV4V15aTrueFAawell_coloredV7V6FIapatharootV5Aaonly_descendants_are_markedV4Aawell_coloredV4V3LaleftV0Iainfix =V4asetV2V0aTrueFIainfix =V3asetV1V0aTrueFINainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.12"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="12. postcondition"
+      sum="1a288efc64276063bd915c6246b46a15"
+      proved="true"
+      expanded="false"
+      shape="postconditionawell_coloredV2V1INNainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.13"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="13. postcondition"
+      sum="ec85a97e440061e2f59324cb70632908"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV2V3aTrueIainfix =agetV2V3aTrueFINNainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.14"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="14. postcondition"
+      sum="9f7f628ce28e0f95b2cd14c032900567"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV2V0aTrueINainfix =V0anullINNainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.15"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="15. postcondition"
+      sum="2702e807ff27c23b986977ce2f5f673b"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV1V3aTrueIainfix =agetV1V3aTrueFINNainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.16"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="16. postcondition"
+      sum="41865f25db10864a850fcf27d35e5139"
+      proved="true"
+      expanded="false"
+      shape="postconditionaonly_descendants_are_markedV2INNainfix =agetV2V0aTrueINainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.17"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="17. postcondition"
+      sum="bb6e1304e9d634e08e2814604a2d9d0b"
+      proved="true"
+      expanded="false"
+      shape="postconditionawell_coloredV2V1INNainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.18"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="18. postcondition"
+      sum="8cbd3210e11c82c62a3d9bbde5980590"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV2V3aTrueIainfix =agetV2V3aTrueFINNainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.19"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="19. postcondition"
+      sum="4697ee4a5c50cb8d50006ae5b807a49b"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV2V0aTrueINainfix =V0anullINNainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.20"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="20. postcondition"
+      sum="27bb202d41e75af78e21c235f58a2a98"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV1V3aTrueIainfix =agetV1V3aTrueFINNainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter dfs.21"
+      locfile="../dfs.mlw"
+      loclnum="58" loccnumb="10" loccnume="13"
+      expl="21. postcondition"
+      sum="6aba5e8f65f37e0d995b0a3e56c35f24"
+      proved="true"
+      expanded="false"
+      shape="postconditionaonly_descendants_are_markedV2INNainfix =V0anullIapatharootV0Aaonly_descendants_are_markedV2Aawell_coloredV2V1FF">
+      <label
+       name="expl:VC for dfs"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="reformulation"
+    locfile="../dfs.mlw"
+    loclnum="81" loccnumb="8" loccnume="21"
+    sum="74e0e89dd88af041418bd613fdcaf461"
+    proved="false"
+    expanded="true"
+    shape="ainfix =amixfix []V0V1aTrueIapatharootV1INainfix =V1anullFIaall_descendants_are_markedV0F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.26"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.46"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.97"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.97"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.88"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="5.02"/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="5.23"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.35"/>
+    </proof>
+    <proof
+     prover="10"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.43"/>
+    </proof>
+    <proof
+     prover="11"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.33"/>
+    </proof>
+    <proof
+     prover="12"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.44"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter traverse"
+    locfile="../dfs.mlw"
+    loclnum="86" loccnumb="6" loccnume="14"
+    expl="VC for traverse"
+    sum="dd4be444794ebbf2ae72d4279f74b5a7"
+    proved="false"
+    expanded="true"
+    shape="ainfix =agetV3V5aFalseINainfix =V5anullFAaall_descendants_are_markedV4Aaonly_descendants_are_markedV4Iaonly_descendants_are_markedV4Aainfix =agetV0V6aTrueIainfix =agetV3V6aTrueFAainfix =agetV4V2aTrueINainfix =V2anullAainfix =agetV4V7aTrueIainfix =agetV1V7aTrueFAawell_coloredV4V3FAapatharootV2Aaonly_descendants_are_markedV1Aawell_coloredV1V0LarootIainfix =agetV0V8aFalseAainfix =agetV1V8aFalseINainfix =V8anullFF">
+    <label
+     name="expl:VC for traverse"/>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter traverse.1"
+      locfile="../dfs.mlw"
+      loclnum="86" loccnumb="6" loccnume="14"
+      expl="1. precondition"
+      sum="f3a20f4050a1229e0f0aae31a92b606e"
+      proved="true"
+      expanded="false"
+      shape="preconditionawell_coloredV1V0LarootIainfix =agetV0V3aFalseAainfix =agetV1V3aFalseINainfix =V3anullFF">
+      <label
+       name="expl:VC for traverse"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter traverse.2"
+      locfile="../dfs.mlw"
+      loclnum="86" loccnumb="6" loccnume="14"
+      expl="2. precondition"
+      sum="e7fd89db1ebbf2572bf45a8327f8305b"
+      proved="true"
+      expanded="false"
+      shape="preconditionaonly_descendants_are_markedV1LarootIainfix =agetV0V3aFalseAainfix =agetV1V3aFalseINainfix =V3anullFF">
+      <label
+       name="expl:VC for traverse"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter traverse.3"
+      locfile="../dfs.mlw"
+      loclnum="86" loccnumb="6" loccnume="14"
+      expl="3. precondition"
+      sum="d67d8e444fd40aeadda63bef2cedc857"
+      proved="true"
+      expanded="false"
+      shape="preconditionapatharootV2LarootIainfix =agetV0V3aFalseAainfix =agetV1V3aFalseINainfix =V3anullFF">
+      <label
+       name="expl:VC for traverse"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter traverse.4"
+      locfile="../dfs.mlw"
+      loclnum="86" loccnumb="6" loccnume="14"
+      expl="4. postcondition"
+      sum="6f77c1cff4e151ffec61748a346beba0"
+      proved="true"
+      expanded="false"
+      shape="postconditionaonly_descendants_are_markedV4Iaonly_descendants_are_markedV4Aainfix =agetV0V5aTrueIainfix =agetV3V5aTrueFAainfix =agetV4V2aTrueINainfix =V2anullAainfix =agetV4V6aTrueIainfix =agetV1V6aTrueFAawell_coloredV4V3FIapatharootV2Aaonly_descendants_are_markedV1Aawell_coloredV1V0LarootIainfix =agetV0V7aFalseAainfix =agetV1V7aFalseINainfix =V7anullFF">
+      <label
+       name="expl:VC for traverse"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter traverse.5"
+      locfile="../dfs.mlw"
+      loclnum="86" loccnumb="6" loccnume="14"
+      expl="5. postcondition"
+      sum="406bd219f17bdfd37b3f49de4db5cbdd"
+      proved="false"
+      expanded="true"
+      shape="postconditionaall_descendants_are_markedV4Iaonly_descendants_are_markedV4Aainfix =agetV0V5aTrueIainfix =agetV3V5aTrueFAainfix =agetV4V2aTrueINainfix =V2anullAainfix =agetV4V6aTrueIainfix =agetV1V6aTrueFAawell_coloredV4V3FIapatharootV2Aaonly_descendants_are_markedV1Aawell_coloredV1V0LarootIainfix =agetV0V7aFalseAainfix =agetV1V7aFalseINainfix =V7anullFF">
+      <label
+       name="expl:VC for traverse"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="5.26"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="2.30"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="1.48"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.24"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.98"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.14"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="4.99"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="5.16"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.25"/>
+      </proof>
+      <proof
+       prover="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.27"/>
+      </proof>
+      <proof
+       prover="11"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.19"/>
+      </proof>
+      <proof
+       prover="12"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.11"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter traverse.6"
+      locfile="../dfs.mlw"
+      loclnum="86" loccnumb="6" loccnume="14"
+      expl="6. postcondition"
+      sum="655d1d49caf69b5d6695753766dd0413"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV3V5aFalseINainfix =V5anullFIaonly_descendants_are_markedV4Aainfix =agetV0V6aTrueIainfix =agetV3V6aTrueFAainfix =agetV4V2aTrueINainfix =V2anullAainfix =agetV4V7aTrueIainfix =agetV1V7aTrueFAawell_coloredV4V3FIapatharootV2Aaonly_descendants_are_markedV1Aawell_coloredV1V0LarootIainfix =agetV0V8aFalseAainfix =agetV1V8aFalseINainfix =V8anullFF">
+      <label
+       name="expl:VC for traverse"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
