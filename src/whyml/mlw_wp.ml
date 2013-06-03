@@ -1487,7 +1487,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           merge_opt_post s (Mexn.find_opt ex wp1.exn) (Mexn.find_opt ex xpost)
         in
         { s = s;
-          ne = wp_or post1 (t_and_simp wp1.post.ne post2) }) in
+          ne = wp_label e (wp_or post1 (t_and_simp wp1.post.ne post2)) }) in
       { ok = ok;
         post = { ne = ne; s = state_after_call };
         exn = xne }
@@ -1639,30 +1639,31 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let xpost = Mexn.map (fun p ->
         { s = wp1.post.s;
           ne = p }) spec.c_xpost in
-      (* We allow the xpost of the "abstract" to be incomplete; we fill in the
-         holes here *)
-      let xpost =
-        Mexn.fold (fun ex { ne = post; s = s } acc ->
-          if Mexn.mem ex acc then acc
-          else
-            let post =
-              { ne = create_post (Mexn.find ex xresult) post;
-                s = s } in
-            Mexn.add ex post acc)
-        wp1.exn xpost in
       let abstr_post = { s = wp1.post.s; ne = spec.c_post } in
-      (* ??? the glue is missing in this call to apply_state_to_post. This
-         means that "abstract" also forgets which immutable *components* are
-         not modified. To be fixed. *)
       let post, xpost =
         apply_state_to_post t_true pre_abstr_label r abstr_post xpost in
-      let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
-      let ok =
-        t_and_simp_l
-          [wp1.ok; (Subst.term s spec.c_pre);
-           wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
-      let ok = wp_label e ok in
-      { ok = ok ;
+      let ok_post =
+        (* This is the formula which expresses that "abstract" indeed implies
+           its normal and exceptional postcondition. Note that we only do this
+           for the exceptions that are actually listed. *)
+        let wp1_exn_filtered =
+          Mexn.filter (fun ex _ -> Mexn.mem ex xpost) wp1.exn in
+        (* ??? the glue is missing in this call to apply_state_to_post. This
+           means that "abstract" also forgets which immutable *components* are
+           not modified. To be fixed. *)
+        let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
+        wp_nimplies wp1.post.ne wp1_exn_filtered ((result, post.ne), xq)
+      in
+      (* We now enrich the xpost used by the context to "leak" information
+         about the exceptional exits that are *not* covered by the xpost of the
+         abstract expression *)
+      let xpost =
+        Mexn.fold (fun ex post acc ->
+          if Mexn.mem ex acc then acc
+          else Mexn.add ex post acc)
+        wp1.exn xpost in
+      let ok = t_and_simp_l [wp1.ok; (Subst.term s spec.c_pre); ok_post] in
+      { ok = wp_label e ok;
         post = post;
         exn = xpost
       }
