@@ -1824,7 +1824,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let ok = wp_label e (t_and_simp init_inv preserv_inv) in
       let post_state, f1, f2 = Subst.merge s s wp1.post.s in
       let v2pl1 = fs_app incr [t_var v2; one] ty_int in
-      let ne = 
+      let ne =
         wp_label e
           (t_if_simp v1_le_v2
             (t_and_simp f2
@@ -1838,7 +1838,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         exn = exn
       }
   | Eassign _ -> assert false
-    
+
 
 and fast_wp_fun_defn env { fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
