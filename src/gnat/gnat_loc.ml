@@ -1,3 +1,4 @@
+open Why3
 type simple_loc  = { file : string; line : int ; col : int }
 type loc = simple_loc list
 
@@ -42,3 +43,5 @@ let parse_loc =
 let get_file l = l.file
 let get_line l = l.line
 let get_col l = l.col
+
+module S = Extset.Make (struct type t = loc let compare = compare end)

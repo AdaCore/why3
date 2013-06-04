@@ -34,3 +34,5 @@ val equal_line : loc -> loc -> bool
 (* compare two locations by file and line only, ignoring the column *)
 
 val compare : loc -> loc -> int
+
+module S : Extset.S with type M.key = loc

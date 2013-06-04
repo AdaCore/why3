@@ -587,21 +587,21 @@ module Save_VCs = struct
        match Gnat_expl.extract_explanation f.Term.t_label with
        (* it should be enough to look at the "sloc"s here, and not take into
           account the explanations. *)
-       | Gnat_expl.Sloc loc -> loc :: acc
+       | Gnat_expl.Sloc loc -> Gnat_loc.S.add loc acc
        | _ -> acc
      in
      fun goal ->
        let f = Task.task_goal_fmla (Session.goal_task goal) in
-       compute_trace [] f
+       compute_trace Gnat_loc.S.empty f
 
    let save_trace goal =
       let expl = get_objective goal in
       let base = Gnat_expl.to_filename ~goal expl in
       let trace = compute_trace goal in
-      if trace <> [] then begin
+      if not (Gnat_loc.S.is_empty trace) then begin
         let trace_fn = base ^ ".trace" in
         with_fmt_channel trace_fn (fun fmt ->
-           List.iter (fun l ->
+           Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
              (Gnat_loc.orig_loc l)) trace)
       end
