@@ -1275,7 +1275,6 @@ end
 
 let fastwp_or_label = Ident.create_label "fastwp:or"
 let wp_or f1 f2 = t_label_add fastwp_or_label (t_or_simp f1 f2)
-let wp_ors l = List.fold_left wp_or t_false l
 
 let xs_result xs = create_vsymbol (id_fresh "result") (ty_of_ity xs.xs_ity)
 let result e =
@@ -1284,8 +1283,6 @@ let result e =
 let is_vty_unit = function
   | VTvalue ity -> ity_equal ity ity_unit
   | VTarrow _   -> false
-
-let map_exns e f = Mexn.mapi (fun xs _ -> f xs) e.e_effect.eff_raises
 
 (* The type for postconditions of expressions is the pair of the actual
    formula [ne], and a substitution [s] to be applied to [ne] to get the final
@@ -1354,6 +1351,55 @@ let iter_exns exns f =
 
 let iter_all_exns xmap_list f =
   iter_exns (all_exns xmap_list) f
+
+let merge_opt s opt_sl =
+  (* merge a list of optional states: all present states are merged together,
+     and the merged state is returned, together with the glue formula for all
+     states. For absent states, the glue formula "false" is returned *)
+  let l = List.filter (fun x -> x <> None) opt_sl in
+  let l = List.map Opt.get l in
+  let s, fl = Subst.merge_l s l in
+  let rec merge_lists acc opt_sl fl =
+    match opt_sl, fl with
+    | None :: rest, _ -> merge_lists (t_false :: acc) rest fl
+    | Some _ :: rest, f :: fl -> merge_lists (f :: acc) rest fl
+    | [], [] -> List.rev acc
+    | _, _ -> assert false
+  in
+  s, merge_lists [] opt_sl fl
+
+let merge_opt_post_l s opt_l =
+  (* given a list of optional fwp_post states, merge them and return a tuple
+       s, postl
+     such that s is the merged state, and postl is the list of formulas that
+     express each input fwp in the new state s.*)
+  let opt_sl = List.map (fun x -> Opt.map (fun x -> x.s) x) opt_l in
+  let s, fl = merge_opt s opt_sl in
+  s,
+  List.map2 (fun opt f ->
+    match opt with
+    | None -> t_false
+    | Some x -> t_and_simp f x.ne) opt_l fl
+
+let merge_opt_post s opt1 opt2 =
+  (* wrapper for merge_opt_post_l for two input states *)
+  let s, fl = merge_opt_post_l s [opt1;opt2] in
+  match fl with
+  | [f1;f2] -> s, f1, f2
+  | _ -> assert false
+
+let merge_opt_post_3 s opt_p1 opt_p2 opt_p3 =
+  (* wrapper for merge_opt_post for three input states *)
+  let s, fl = merge_opt_post_l s [opt_p1;opt_p2;opt_p3] in
+  match fl with
+  | [f1;f2;f3] -> s, f1, f2, f3
+  | _ -> assert false
+
+let t_case_simp t l =
+  let all_branches_true = List.for_all (fun (_,t) -> t = t_true) l in
+  if all_branches_true then t_true else
+  let branches = List.map (fun (p,x) -> t_close_branch p x) l in
+  t_case t branches
 
 (* Input
    - a state s: Subst.t
@@ -1427,12 +1473,10 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { ne = ne; s = s };
         exn = Mexn.empty }
   | Eapp (e1, _, spec) ->
-      (* OK: ok(e1) /\ (ne(e1) => spec.pre) *)
+      (* OK: ok(e1) /\ (ne(e1) => spec.pre /\ variant) *)
       (* NE: ne(e1) /\ spec.post *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ spec.ex(x)) *)
-      (* The first thing that happens, before the call, is the evaluation of
-         [e1]. This translates as a recursive call to the fast_wp. *)
-      let arg_res = create_vsymbol (id_fresh "tmp") (ty_of_vty e1.e_vty) in
+      let arg_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (arg_res, xresult) e1 in
       (* Next we have to deal with the call itself. *)
       let call_regs = regs_of_writes spec.c_effect in
@@ -1447,59 +1491,66 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let call_post = { s = state_after_call; ne = spec.c_post } in
       let post, xpost =
         apply_state_to_post call_glue pre_call_label r call_post xpost in
-      let ok = t_and_simp wp1.ok (wp_implies wp1.post.ne pre) in
+      let variant =
+        if spec.c_letrec = 0 || spec.c_variant = [] then t_true else
+        let olds = Mint.find_def [] spec.c_letrec env.letrec_var in
+        if olds = [] then t_true (* we are out of letrec *) else
+        let news =
+          List.map (fun (t,rel) ->
+            Subst.term state_before_call t, rel) spec.c_variant in
+        decrease e.e_loc expl_variant env olds news in
+      let ok =
+        t_and_simp wp1.ok (wp_implies wp1.post.ne (t_and_simp variant pre)) in
       let ne = wp_label e (t_and_simp wp1.post.ne post.ne) in
       let xne = iter_all_exns [xpost; wp1.exn] (fun ex ->
-        match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex xpost with
-        | None, None -> assert false
-        | None, Some x | Some x, None -> x
-        | Some p1, Some p2 ->
-            let s, r1, r2 = Subst.merge s p1.s p2.s in
-            { s = s;
-              ne =
-                wp_or (t_and_simp p1.ne r1)
-                      (t_and_simp_l [p2.ne; r2; wp1.post.ne])
-            }) in
-        { ok = ok;
-          post = { ne = ne; s = state_after_call };
-          exn = xne }
+        let s, post1, post2 =
+          merge_opt_post s (Mexn.find_opt ex wp1.exn) (Mexn.find_opt ex xpost)
+        in
+        { s = s;
+          ne = wp_label e (wp_or post1 (t_and_simp wp1.post.ne post2)) }) in
+      { ok = ok;
+        post = { ne = ne; s = state_after_call };
+        exn = xne }
 
   | Elet ({ let_sym = LetV v; let_expr = _ }, e2)
   (* ??? can we really ignore the first expression? *)
       when ty_equal v.pv_vs.vs_ty ty_mark ->
         let s = Subst.save_label v.pv_vs s in
         fast_wp_expr env s r e2
-
-  | Elet ({ let_sym = LetV v; let_expr = e1 }, e2) ->
+  | Erec (fdl, e1) ->
+      let fr = fast_wp_rec_defn env fdl in
+      let wp1 = fast_wp_expr env s r e1 in
+      let ok = wp_label e (wp_and ~sym:true (wp_ands ~sym:true fr) wp1.ok) in
+      { ok   = ok;
+        post = wp1.post;
+        exn = wp1.exn;
+      }
+  | Elet ({ let_sym = sym; let_expr = e1 }, e2) ->
       (* OK: ok(e1) /\ (ne(e1) => ok(e2)) *)
       (* NE: ne(e1) /\ ne(e2) *)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ ex(e2)(x)) *)
-      let vs = v.pv_vs in
+      let vs = match sym with | LetV v -> v.pv_vs | LetA _ -> vs_result e1 in
       let e2 =
          if Opt.equal Loc.equal vs.vs_name.id_loc e1.e_loc then
             e_label_copy e e2
          else e2 in
       let wp1 = fast_wp_expr env s (vs, xresult) e1 in
-      let wp1posts = Subst.add_pvar v wp1.post.s in
+      let wp1posts =
+        match sym with
+        | LetV v -> Subst.add_pvar v wp1.post.s
+        | _ -> wp1.post.s in
       let wp2 = fast_wp_expr env wp1posts r e2 in
       let ok =
          t_and_simp wp1.ok (t_implies_subst vs wp1.post.ne wp2.ok) in
       let ok = wp_label e ok in
       let ne = wp_label e (t_and_subst vs wp1.post.ne wp2.post.ne) in
       let xne = iter_all_exns [wp1.exn; wp2.exn] (fun ex ->
-        match Mexn.find_opt ex wp1.exn, Mexn.find_opt ex wp2.exn with
-        | None, None -> assert false
-        | Some post1, None -> post1
-        | None, Some post2 ->
-            { s = post2.s ; ne = wp_label e (t_and_simp wp1.post.ne post2.ne) }
-        | Some p1, Some p2 ->
-            let s, r1, r2 = Subst.merge s p1.s p2.s in
-            { s = s;
-              ne =
-                wp_label e
-                  (wp_or (t_and_simp p1.ne r1)
-                        (t_and_simp_l [p2.ne; r2; wp1.post.ne]))
-            }) in
+        let s, post1, post2 =
+          merge_opt_post s (Mexn.find_opt ex wp1.exn) (Mexn.find_opt ex wp2.exn)
+        in
+        { s = s;
+          ne = wp_label e (wp_or post1 (t_and_simp wp1.post.ne post2)) })
+      in
       { ok = ok;
         post = { ne = ne; s = wp2.post.s };
         exn = xne }
@@ -1509,7 +1560,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* EX(x): ex(e1)(x) \/ (ne(e1) /\ e1=True /\ ex(e2)(x))
                           \/ (ne(e1) /\ e1=False /\ ex(e3)(x)) *)
       (* First thing is the evaluation of e1 *)
-      let cond_res = create_vsymbol (id_fresh "c") (ty_of_vty e1.e_vty) in
+      let cond_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
       let wp2 = fast_wp_expr env wp1.post.s r e2 in
       let wp3 = fast_wp_expr env wp1.post.s r e3 in
@@ -1527,64 +1578,17 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let ne = wp_label e ne in
       let xne = iter_all_exns [wp1.exn; wp2.exn; wp3.exn]
         (fun ex ->
-          match Mexn.find_opt ex wp1.exn,
-                Mexn.find_opt ex wp2.exn,
-                Mexn.find_opt ex wp3.exn with
-          | None, None, None -> assert false
-          | None, None, Some post3 ->
-              { s = post3.s ;
-                ne = wp_label e (t_and_subst cond_res wp1.post.ne
-                        (t_and_simp (t_not test) post3.ne))
-              }
-          | None, Some post2, None ->
-              { s = post2.s ;
-                ne = wp_label e (t_and_subst cond_res wp1.post.ne
-                (t_and_simp test post2.ne)) }
-          | Some post1, None, None ->
-              post1
-          | None, Some post2, Some post3 ->
-              let s, f2, f3 = Subst.merge wp1.post.s post2.s post3.s in
-              { s = s;
-                ne =
-                  wp_label e (t_and_subst cond_res wp1.post.ne
-                  (t_if test (t_and_simp post2.ne f2)
-                             (t_and_simp post3.ne f3)))
-              }
-          | Some post1, Some post2, None ->
-              let s, f1, f2 = Subst.merge s post1.s post2.s in
-              { s = s;
-                ne =
-                  wp_label e
-                    (wp_or
-                      (t_and_simp_l [post1.ne; f1])
-                      (t_and_subst cond_res wp1.post.ne
-                         (t_and_simp_l [test; post2.ne; f2])))
-              }
-          | Some post1, None, Some post3 ->
-              let s, f1, f3 = Subst.merge s post1.s post3.s in
-              { s = s;
-                ne =
-                  wp_label e
-                    (wp_or
-                      (t_and_simp_l [post1.ne; f1])
-                      (t_and_subst cond_res wp1.post.ne
-                        (t_and_simp_l [t_not test; post3.ne; f3])))
-              }
-          | Some post1, Some post2, Some post3 ->
-              let s, fl = Subst.merge_l s [post1.s; post2.s; post3.s] in
-              begin match fl with
-              | [ f1; f2; f3 ] ->
-                { s = s;
-                  ne =
-                    wp_label e
-                      (wp_ors
-                        [t_and_simp_l [post1.ne; f1];
-                         t_and_subst cond_res wp1.post.ne
-                           (t_if test (t_and_simp post2.ne f2)
-                                      (t_and_simp post3.ne f3))])
-                }
-              | _ -> assert false
-              end)
+          let s, post1, post2, post3 =
+            merge_opt_post_3 s
+                (Mexn.find_opt ex wp1.exn)
+                (Mexn.find_opt ex wp2.exn)
+                (Mexn.find_opt ex wp3.exn) in
+          { s = s;
+            ne =
+              wp_label e (wp_or post1
+                                (t_and_subst cond_res wp1.post.ne
+                                             (t_if test post2 post3)))
+          })
       in
       { ok = ok;
         post = { ne = ne; s = state };
@@ -1594,7 +1598,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* NE: false *)
       (* EX(ex): (ne(e1) /\ xresult=e1) \/ ex(e1)(ex) *)
       (* EX(x): ex(e1)(x) *)
-      let ex_res = create_vsymbol (id_fresh "x") (ty_of_vty e1.e_vty) in
+      let ex_res = vs_result e1 in
       let wp1 = fast_wp_expr env s (ex_res, xresult) e1 in
       let rpost =
         (* avoid to introduce useless equation between void terms *)
@@ -1662,30 +1666,31 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let xpost = Mexn.map (fun p ->
         { s = wp1.post.s;
           ne = p }) spec.c_xpost in
-      (* We allow the xpost of the "abstract" to be incomplete; we fill in the
-         holes here *)
-      let xpost =
-        Mexn.fold (fun ex { ne = post; s = s } acc ->
-          if Mexn.mem ex acc then acc
-          else
-            let post =
-              { ne = create_post (Mexn.find ex xresult) post;
-                s = s } in
-            Mexn.add ex post acc)
-        wp1.exn xpost in
       let abstr_post = { s = wp1.post.s; ne = spec.c_post } in
-      (* ??? the glue is missing in this call to apply_state_to_post. This
-         means that "abstract" also forgets which immutable *components* are
-         not modified. To be fixed. *)
       let post, xpost =
         apply_state_to_post t_true pre_abstr_label r abstr_post xpost in
-      let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
-      let ok =
-        t_and_simp_l
-          [wp1.ok; (Subst.term s spec.c_pre);
-           wp_nimplies wp1.post.ne wp1.exn ((result, post.ne), xq)] in
-      let ok = wp_label e ok in
-      { ok = ok ;
+      let ok_post =
+        (* This is the formula which expresses that "abstract" indeed implies
+           its normal and exceptional postcondition. Note that we only do this
+           for the exceptions that are actually listed. *)
+        let wp1_exn_filtered =
+          Mexn.filter (fun ex _ -> Mexn.mem ex xpost) wp1.exn in
+        (* ??? the glue is missing in this call to apply_state_to_post. This
+           means that "abstract" also forgets which immutable *components* are
+           not modified. To be fixed. *)
+        let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
+        wp_nimplies wp1.post.ne wp1_exn_filtered ((result, post.ne), xq)
+      in
+      (* We now enrich the xpost used by the context to "leak" information
+         about the exceptional exits that are *not* covered by the xpost of the
+         abstract expression *)
+      let xpost =
+        Mexn.fold (fun ex post acc ->
+          if Mexn.mem ex acc then acc
+          else Mexn.add ex post acc)
+        wp1.exn xpost in
+      let ok = t_and_simp_l [wp1.ok; (Subst.term s spec.c_pre); ok_post] in
+      { ok = wp_label e ok;
         post = post;
         exn = xpost
       }
@@ -1707,9 +1712,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = post;
         exn = xpost;
       }
-  | Eloop (inv, _varl, e1) -> (* TODO variant proof *)
+  | Eloop (inv, varl, e1) ->
       (* OK: inv /\ (forall r in writes(e1), replace r by fresh r' in
-                       inv => (ok(e1) /\ (ne(e1) => inv'))) *)
+                       inv => (ok(e1) /\ (ne(e1) => inv' /\ var))) *)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
       let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
@@ -1721,12 +1726,18 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         t_label_add expl_loop_keep (Subst.term wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
-           I => (OK /\ (NE => I'))
+           I => (OK /\ (NE => I' /\ V))
         *)
+      let variant =
+        let old_vars = List.map (fun (t,_) -> Subst.term havoc_state t) varl in
+        let new_vars =
+          List.map (fun (t,rel) -> Subst.term wp1.post.s t,rel) varl in
+        decrease e.e_loc expl_loopvar env old_vars new_vars
+      in
       let preserv_inv =
         t_implies_simp inv_hypo
           (t_and_simp wp1.ok
-             (t_implies_simp wp1.post.ne post_inv)) in
+             (t_implies_simp wp1.post.ne (t_and_simp post_inv variant))) in
       let exn =
         Mexn.map (fun post ->
           { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
@@ -1735,27 +1746,104 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { s = wp1.post.s; ne = t_false }; (* this is an infinite loop *)
         exn = exn
       }
+  | Ecase (e1, bl) ->
+      let cond_res = vs_result e1 in
+      let wp1 = fast_wp_expr env s (cond_res, xresult) e1 in
+      let wps = List.map (fun (_,e) -> fast_wp_expr env wp1.post.s r e) bl in
+      let cond_t = t_var cond_res in
+      let pats = List.map (fun ({ppat_pattern = pat}, _) -> pat) bl in
+      let build_case f l =
+        t_case_simp cond_t
+          (List.map2 (fun pat x -> pat, (f x)) pats l) in
+      let ok =
+        t_and_simp
+          wp1.ok
+          (t_implies_subst cond_res wp1.post.ne
+                           (build_case (fun wp -> wp.ok) wps))
+      in
+      let state, fl =
+        Subst.merge_l wp1.post.s (List.map (fun wp -> wp.post.s) wps) in
+      let posts = List.map2 (fun f wp -> t_and_simp f wp.post.ne) fl wps in
+      let ne =
+        t_and_subst cond_res wp1.post.ne
+                    (build_case (fun x -> x) posts) in
+      let ok = wp_label e ok in
+      let ne = wp_label e ne in
+      let all_wps = wp1 :: wps in
+      let exns = List.map (fun x -> x.exn) all_wps in
+      let xne = iter_all_exns exns
+        (fun ex ->
+          let opt_postl = List.map (fun wp -> Mexn.find_opt ex wp) exns in
+          let s, post_l = merge_opt_post_l s opt_postl in
+          match post_l with
+          | cond_f :: branches ->
+            { s = s;
+              ne =
+                wp_label e
+                  (wp_or cond_f
+                      (t_and_subst cond_res wp1.post.ne
+                          (build_case (fun b -> b) branches)))
+            }
+          | _ -> assert false)
+      in
+      { ok = ok;
+        post = { ne = ne; s = state };
+        exn = xne
+      }
+  | Eghost e1 ->
+      fast_wp_expr env s r e1
+  | Efor ({pv_vs = x}, ({pv_vs = v1}, d, {pv_vs = v2}), inv, e1) ->
+      let gt, le, incr = match d with
+        | Mlw_expr.To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
+        | Mlw_expr.DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn
+      in
+      let one = t_nat_const 1 in
+      let v1_gt_v2 = ps_app gt [t_var v1; t_var v2] in
+      let v1_le_v2 = ps_app le [t_var v1; t_var v2] in
+      let init_inv =
+        wp_expl expl_loop_init
+          (Subst.term s (t_subst_single x (t_var v1) inv)) in
+      let init_inv = t_implies_simp v1_le_v2 init_inv in
+      let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
+      let inv_hypo =
+        t_and_simp_l
+          [ps_app le [t_var v1; t_var x];
+          ps_app le [t_var x;  t_var v2];
+          t_and_simp glue (Subst.term havoc_state inv)]
+      in
+      let wp1 = fast_wp_expr env havoc_state r e1 in
+      let post_inv =
+        let next = fs_app incr [t_var x; one] ty_int in
+        wp_expl expl_loop_keep
+          (Subst.term wp1.post.s (t_subst_single x next inv)) in
+      let preserv_inv =
+        t_implies_simp inv_hypo
+          (t_and_simp wp1.ok
+            (t_implies_simp wp1.post.ne post_inv)) in
+      let ok = wp_label e (t_and_simp init_inv preserv_inv) in
+      let post_state, f1, f2 = Subst.merge s s wp1.post.s in
+      let v2pl1 = fs_app incr [t_var v2; one] ty_int in
+      let ne =
+        wp_label e
+          (t_if_simp v1_le_v2
+            (t_and_simp f2
+              (Subst.term post_state (t_subst_single x v2pl1 inv)))
+            (t_and_simp f1 v1_gt_v2)) in
+      let exn =
+        Mexn.map (fun post ->
+          { post with ne = t_and_simp inv_hypo post.ne }) wp1.exn in
+      { ok = ok;
+        post = { s = post_state; ne = ne };
+        exn = exn
+      }
   | Eassign _ -> assert false
-  | Efor (_, _, _, _) -> assert false (*TODO*)
-  | Eghost _ -> assert false (*TODO*)
-  | Ecase (_, _) -> assert false (*TODO*)
-  | Erec (_, _) -> assert false (*TODO*)
-      (* TODO exceptional case *)
-  | Elet (_, _) -> assert false (*TODO*)
+
 
 and fast_wp_fun_defn env { fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
      NE: true *)
   let lab = fresh_mark () and c = l.l_spec in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
-  let env =
-    if c.c_letrec = 0 || c.c_variant = [] then env else
-    let lab = t_var lab in
-    let t_at_lab (t,_) = t_app fs_at [t; lab] t.t_ty in
-    let tl = List.map t_at_lab c.c_variant in
-    let lrv = Mint.add c.c_letrec tl env.letrec_var in
-    { env with letrec_var = lrv } in
-  (* generate the initial state, using the overall effect of the function *)
   let build_set svs =
     Mvs.fold (fun x _ acc -> Spv.add (restore_pv x) acc) svs Spv.empty in
   let pre_vars = build_set c.c_pre.t_vars in
@@ -1764,6 +1852,12 @@ and fast_wp_fun_defn env { fun_lambda = l } =
   let all_vars = Spv.union all_vars post_vars in
   let prestate = Subst.init all_vars in
   let prestate = Subst.save_label lab prestate in
+  let env =
+    if c.c_letrec = 0 || c.c_variant = [] then env else
+    let tl = List.map (fun (t,_) -> Subst.term prestate t) c.c_variant in
+    let lrv = Mint.add c.c_letrec tl env.letrec_var in
+    { env with letrec_var = lrv } in
+  (* generate the initial state, using the overall effect of the function *)
   (* extract the result and xresult variables *)
   let result, _  = open_post c.c_post in
   let xresult = Mexn.map (fun x -> fst (open_post x)) c.c_xpost in
