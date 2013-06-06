@@ -562,8 +562,9 @@ if test "$enable_frama_c" = yes ; then
       FRAMAC_VERSION=`$FRAMAC -version | sed -n -e 's|Version: *\(.*\)$|\1|p'`
       AC_MSG_RESULT($FRAMAC_VERSION)
       case $FRAMAC_VERSION in
+         Fluorine-20130501) ;;
          Fluorine-20130401) ;;
-         *) AC_MSG_WARN(Version Fluorine-20130401 required.)
+         *) AC_MSG_WARN(Version Fluorine-20130(4|5)01 required.)
             enable_frama_c=no
             reason_frama_c=" (version Fluorine required)"
             ;;

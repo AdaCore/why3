@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* example of an option 
+(* example of an option
 module OutputFile =
   Self.EmptyString
     (struct
@@ -25,7 +25,7 @@ open Why3
 let run_on_task fmt prover prover_driver t =
   let result =
     Call_provers.wait_on_call
-      (Why3.Driver.prove_task 
+      (Why3.Driver.prove_task
          ~command:prover.Whyconf.command
          ~timelimit:3
          prover_driver t ()) ()
@@ -33,7 +33,7 @@ let run_on_task fmt prover prover_driver t =
   Format.fprintf fmt "%a" Call_provers.print_prover_answer result.Call_provers.pr_answer
 
 let get_prover config env acc (short, name) =
-  let prover = 
+  let prover =
     try
       let fp = Whyconf.parse_filter_prover name in
       let provers = Whyconf.filter_one_prover config fp in
@@ -55,17 +55,17 @@ let get_prover config env acc (short, name) =
 let process () =
   let prog = Ast.get () in
   (* File.pretty_ast (); *)
-  let provers = 
-    List.fold_left 
-      (get_prover ACSLtoWhy3.config ACSLtoWhy3.env) 
+  let provers =
+    List.fold_left
+      (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
       []
-      [ "Z42", "Z3,4.2";
-        "Z32", "Z3,3.2"; 
+      [ "Z42", "Z3,4.3.1";
+        "Z32", "Z3,3.2";
         "C24", "CVC3,2.4.1";
-        "C22", "CVC3,2.2"; 
-        "A95", "Alt-Ergo,0.95,";
-        "A94", "Alt-Ergo,0.94";
-        ] 
+        "C22", "CVC3,2.2";
+        "A95", "Alt-Ergo,0.95.1,";
+        (* "A94", "Alt-Ergo,0.94"; *)
+        ]
   in
   let theories = ACSLtoWhy3.prog prog in
   try
@@ -73,16 +73,16 @@ let process () =
       ACSLtoWhy3.Self.result "running theory 1:";
       ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
       let tasks = Task.split_theory th None None in
-      ACSLtoWhy3.Self.result "@[<h 0>%a@]" 
-        (Pp.print_list Pp.comma 
-           (fun fmt (_n,p,_d) -> 
+      ACSLtoWhy3.Self.result "@[<h 0>%a@]"
+        (Pp.print_list Pp.comma
+           (fun fmt (_n,p,_d) ->
              let p = p.Whyconf.prover in
-             Format.fprintf fmt "%s %s" p.Whyconf.prover_name p.Whyconf.prover_version)) 
+             Format.fprintf fmt "%s %s" p.Whyconf.prover_name p.Whyconf.prover_version))
         provers;
       let _ =
         List.fold_left (fun n t ->
-          ACSLtoWhy3.Self.result "@[<h 0>Task %d: %a@]" n 
-            (Pp.print_list Pp.comma (fun fmt (_n,p,d) -> run_on_task fmt p d t)) 
+          ACSLtoWhy3.Self.result "@[<h 0>Task %d: %a@]" n
+            (Pp.print_list Pp.comma (fun fmt (_n,p,d) -> run_on_task fmt p d t))
             provers;
           n+1) 1 tasks
       in ())
