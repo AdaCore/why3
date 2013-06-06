@@ -11,13 +11,13 @@
 
 (*******************
 
-This file builds some MLW modules using the API 
+This file builds some MLW modules, using parse trees instead of direct
+API calls
 
 ******************)
 
 (* opening the Why3 library *)
 open Why3
-
 
 (* reads the config file *)
 let config : Whyconf.config = Whyconf.read_config None
@@ -38,9 +38,70 @@ let mul_int : Term.lsymbol =
 
 let unit_type = Ty.ty_tuple []
 
-(* start a module named "Program" *)
-let m = Mlw_module.create_module env (Ident.id_fresh "Program")
+(* start a parsing *)
 
+let lib = Mlw_main.library_of_env env
+
+let pathname = [] (* dummy pathname *)
+
+let t : Ptree.incremental = Mlw_typing.open_file lib pathname
+
+open Ptree
+
+(*
+type incremental = {
+  open_theory     : ident -> unit;
+  close_theory    : unit -> unit;
+  open_module     : ident -> unit;
+  close_module    : unit -> unit;
+  open_namespace  : string -> unit;
+  close_namespace : loc -> bool (*import:*) -> unit;
+  new_decl        : loc -> decl -> unit;
+  new_pdecl       : loc -> pdecl -> unit;
+  use_clone       : loc -> use_clone -> unit;
+}
+*)
+
+
+
+(* start a module *)
+
+let mk_ident ?(label=[]) ?(loc=Loc.dummy_position) s = {
+  id = s; id_lab=label; id_loc = loc
+}
+
+let m = t.open_module (mk_ident "Program")
+
+
+(* use int.Int *)
+
+let mk_qid l =
+  let rec aux l =
+    match l with
+      | [] -> assert false
+      | [x] -> Qident(mk_ident x)
+      | x::r -> Qdot(aux r,mk_ident x)
+  in
+  aux (List.rev l)
+
+let use_int_Int =
+  let qualid = mk_qid ["int" ; "Int"] in
+  {
+  use_theory = qualid;
+  use_import = Some(true,"Int");
+}
+
+let () = t.use_clone Loc.dummy_position (use_int_Int,None)
+
+let mul_int = mk_qid ["Int";"infix *"]
+
+let mk_lexpr p = { pp_loc = Loc.dummy_position;
+                   pp_desc = p }
+
+let mk_const s =
+  mk_lexpr (PPconst(Number.ConstInt(Number.int_const_dec s)))
+
+let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
 
 (* declaration of
      let f (_dummy:unit) : unit
@@ -49,37 +110,37 @@ let m = Mlw_module.create_module env (Ident.id_fresh "Program")
       =
         assert { 6*7 = 42 }
  *)
-let d =
+let d : pdecl =
   let args =
-    [Mlw_ty.create_pvsymbol (Ident.id_fresh "_dummy") Mlw_ty.ity_unit]
+    [Loc.dummy_position,Some(mk_ident "_dummy"),false,Some(PPTtuple [])]
   in
-  let result = Term.create_vsymbol (Ident.id_fresh "result") unit_type in
   let spec = {
-    Mlw_ty.c_pre = Term.t_true;
-    c_post = Mlw_ty.create_post result Term.t_true;
-    c_xpost = Mlw_ty.Mexn.empty;
-    c_effect = Mlw_ty.eff_empty;
-    c_variant = [];
-    c_letrec  = 0;
+    sp_pre = [];
+    sp_post = [];
+    sp_xpost = [];
+    sp_reads = [];
+    sp_writes = [];
+    sp_variant = [];
   }
   in
   let body =
-    let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
-    let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
-    let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
-    let p =
-      Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
-    in
-    Mlw_expr.e_assert Mlw_expr.Aassert p
+    let c6 = mk_const "6" in
+    let c7 = mk_const "7" in
+    let c42 = mk_const "42" in
+    let c6p7 = mk_lexpr (PPapp(mul_int,[c6;c7])) in
+    let p = mk_lexpr (PPinfix(c6p7,mk_ident "infix =",c42)) in
+    mk_expr(Eassert(Aassert,p))
   in
-  let lambda = {
-    Mlw_expr.l_args = args;
-    l_expr = body;
-    l_spec = spec;
-  }
-  in
-  let def = Mlw_expr.create_fun_defn (Ident.id_fresh "f") lambda in
-  Mlw_decl.create_rec_decl [def]
+  let triple = body, spec in
+  let lambda = mk_expr(Efun(args,triple)) in
+  Dlet(mk_ident "f",Gnone,lambda)
+
+let () =
+  try t.new_pdecl Loc.dummy_position d
+  with e ->
+    Format.printf "Exception raised during typing of d:@ %a@."
+      Exn_printer.exn_printer e
+
 
 (*
 
@@ -94,6 +155,9 @@ declaration of
 *)
 
 
+(* TODO *)
+
+(*
 (* import the ref.Ref module *)
 
 let ref_modules, ref_theories =
@@ -160,6 +224,7 @@ let d2 =
   Mlw_decl.create_rec_decl [def]
 
 
+*)
 
 
 
@@ -182,6 +247,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma mlw.ml"
+compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma mlw_tree.ml"
 End:
 *)
