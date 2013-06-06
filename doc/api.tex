@@ -484,6 +484,24 @@ One can run provers on those tasks exactly as we did above.
 See the example \verb|examples/use_api/create_session.ml| of the distribution for
 an illustration on how to manipulate proof sessions from an OCaml program.
 
+\section{ML programs}
+
+There are two ways for building WhyML programs from OCaml. The first
+is to build untyped syntax trees for such WhyML programs, and then
+call the Why3 typing procedure to build typed declarations. The second
+way is to directly build typed programs using smart constructors that
+check well-typedness at each step.
+
+The first approach, building untyped trees and then typed them, is
+examplified in file \verb|examples/use_api/mlw_tree.ml| of the
+distribution. The second approach is
+examplified in file \verb|examples/use_api/mlw.ml|. The first approach
+is significantly simpler to do since the internal typing mechanism
+using regions remains implicit, whereas when one uses the second
+approach one should care about such typing. On the other hand, the
+second approach is more `''efficient'' in the sense that no
+intermediate form needs to be built in memory.
+
 
 
 
