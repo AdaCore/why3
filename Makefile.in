@@ -1117,7 +1117,8 @@ install_local: bin/why3doc
 .PHONY: bench test
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
-	$(MAKE) test-api.@OCAMLBEST@
+	$(MAKE) test-api-logic.@OCAMLBEST@
+	$(MAKE) test-api-mlw.@OCAMLBEST@
 	$(MAKE) test-session.@OCAMLBEST@
 	# desactivé car requiert findlib
 	# if test -d examples/runstrat ; then \
@@ -1166,18 +1167,31 @@ testl-ide: bin/why3ide.opt
 testl-type: bin/why3.byte
 	ocamlrun -bt bin/why3.byte --type-only tests/test-pgm-jcf.mlw
 
-test-api.byte: examples/use_api/use_api.ml lib/why3/why3.cma
+test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
-	|| (rm -f test-api.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api.byte;
+	|| (rm -f test-api-logic.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-logic.byte;
 
-test-api.opt: examples/use_api/use_api.ml lib/why3/why3.cmxa
+test-api-logic.opt: examples/use_api/logic.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
-	&& ./test-api.opt) \
-	|| (rm -f test-api.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api.opt
+	&& ./test-api-logic.opt) \
+	|| (rm -f test-api-logic.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-logic.opt
+
+test-api-mlw.byte: examples/use_api/mlw.ml lib/why3/why3.cma
+	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
+	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	|| (rm -f test-api-mlw.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-mlw.byte;
+
+test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
+	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	&& ./test-api-mlw.opt) \
+	|| (rm -f test-api-mlw.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-mlw.opt
 
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
