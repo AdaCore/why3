@@ -38,7 +38,7 @@ module SameFringe
 
   (* the enum of a tree [t], prepended to a given enum [e] *)
 
-  let rec enum t e variant { length (elements t) }
+  let rec enum t e variant { t }
     ensures { enum_elements result = elements t ++ enum_elements e }
   = match t with
     | Empty -> e
