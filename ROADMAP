@@ -8,7 +8,7 @@
     particulier la solution avec les types classes qui reste a
     implanter
 
-  * paper on the proof management system
+  * DONE paper on the proof management system
 
   * DONE Encodings and transformations (Andrei+Francois FroCos 11)
   * DONE Why presentation at the IVL workshop of CADE:
@@ -72,9 +72,144 @@
 ** support de Yices 2 ? interesserait Cesar
 
 
+==================== Roadmap for release 0.82 ========================
+
+== New Features to announce ==
+
+== Final preparation ==
+
+* faire une passe sur le BTS
+* do "make update-coq" and "make", fix Coq realizations if needed
+* check that nightly bench is OK
+* check that "make xml-validate" is OK
+  (see below : copy the dtd on the web)
+* put 0.82 in file Version
+* check headers
+* check the file CHANGES, add the release date
+* manual in PDF: check that macro \todo is commented out
+    in ./macros.tex, and then "make doc"
+* manual in HTML: "make doc/html/index.html"
+* do "make distrib"
+* test distrib/why3-0.82.tar.gz
+* install web page for why2 which includes an updated page for the
+  quick migration guide. (sources are in CVS repository
+  ~filliatr/ARCHIVE/www/why)
+* put on the web page
+ - why3-0.82.tar.gz
+   cp distrib/why3-0.82.tar.gz /users/www-perso/projets/why3/download
+
+ - the manual in PDF
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.82.pdf
+
+ - the HTML version of the manual (content of doc/html)
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.82
+
+ - why3session.dtd
+   cp share/why3session.dtd /users/www-perso/projets/why3/
+
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.82
+   rm /users/www-perso/projets/why3/stdlib
+   ln -s /users/www-perso/projets/why3/stdlib-0.82 \
+            /users/www-perso/projets/why3/stdlib
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.82
+    rm /users/www-perso/projets/why3/api
+    ln -s /users/www-perso/projets/why3/api-0.82 \
+      /users/www-perso/projets/why3/api
+   PROBLEME avec style.css
+ - update the main HTML page (sources are in repository why3-www)
+   edit index.html
+   make export
+
+ - add links to extra resources like
+   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
+   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
+ - make everything writeable for the group
+   chmod -R g+w /users/www-perso/projets/why3
+
+* make a last commit:
+ - git commit -m "release 0.82"
+ - add tag 0.82 to the git repository, using
+   git tag 0.82
+ - do not forget to push it using
+   git push
+   git push --tags
+
+* add a new version to the bugtracker:
+  https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
+
+* produce the Why3 part of Toccata gallery
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
+  "make gallery-files" in the sources of the Toccata web pages)
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+== TODOs ==
+
+* replayer
+** deplacer option -bench dans une commande de why3session
+
+
+* extraction vers Caml
+ - PRIORITAIRE, JCF, ANDREI
+
+* terminaison
+** generer une obligation de preuve de well-foundedness quand on utilise
+   un variant avec "with R" (une seule fois pour chaque R !)
+** quand une definition logique recursive ne peut pas etre verifiee
+   bien-fondee statiquement, generer une obligation de preuve
+   (feature wish de F Besson)
+
+* Coq detection
+** refuser de detecter Coq si on n'a pas compilé avec le support de Coq
+   (i.e. si Coq a ete installé apres)
+
+* Coq tactic
+** ajout de bases de hint
+
+* efficiency issues
+ - understand problems when large number of goals (cf D Mentré examples)
+ - also: BTS 13736
+https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
+
+* Smoke detector and absurd: on pourrait mettre un label particulier
+  sur le "false" genéré par absurd, pour indiquer que c'est
+  intentionel que l'on veuille prouver false. Un tel cas pourrait etre
+  traité de facon speciale par le smoke detector avec option "deep",
+  pour eviter une fausse alarme.
+
+* IDE
+** todo: run detection immediately at start up if conf file absent or
+    outdated. should become doable with the new Session module
+** "detect provers" menu
+** syntax highlighting bugs ?
+   some keywords are not colored in the bottom-right window
+   (but they are in the top-right window)
+   it is caused by the language file for alt-ergo superseding the one for why3
+
+* faire le menage dans les transformations d'induction : _int _ty
+  _ty_lex, et DOCUMENTER
+
+* Contre-exemples de Alt-Ergo
+
+* detect editors
+*** check if coqide and also emacs/proof-general is installed
+
+* Documentation
+ - (ANDREI) make the glossary available
+ - (CLAUDE) complete api.tex: explain how to build apply
+   transformations, write new functions on terms (A)
+
+
+
 ==================== Roadmap for release 0.81 ========================
 
-scheduled on March 2013
+released on March 25th, 2013
 
 == New Features to announce ==
 
@@ -180,59 +315,11 @@ scheduled on March 2013
 
 == TODOs ==
 
-* replayer
-** deplacer option -bench dans une commande de why3session
-
-
 * extraction vers Caml
  - PRIORITAIRE, JCF, ANDREI
 
-* terminaison
-** generer une obligation de preuve de well-foundedness quand on utilise
-   un variant avec "with R" (une seule fois pour chaque R !)
-** quand une definition logique recursive ne peut pas etre verifiee
-   bien-fondee statiquement, generer une obligation de preuve
-   (feature wish de F Besson)
-
-* Coq detection
-** refuser de detecter Coq si on n'a pas compilé avec le support de Coq
-   (i.e. si Coq a ete installé apres)
-
-* Coq tactic
-** ajout de bases de hint
-
-* efficiency issues
- - understand problems when large number of goals (cf D Mentré examples)
- - also: BTS 13736
-https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
-
-* Smoke detector and absurd: on pourrait mettre un label particulier
-  sur le "false" genéré par absurd, pour indiquer que c'est
-  intentionel que l'on veuille prouver false. Un tel cas pourrait etre
-  traité de facon speciale par le smoke detector avec option "deep",
-  pour eviter une fausse alarme.
-
-* IDE
-** todo: run detection immediately at start up if conf file absent or
-    outdated. should become doable with the new Session module
-** "detect provers" menu
-** syntax highlighting bugs ?
-   some keywords are not colored in the bottom-right window
-   (but they are in the top-right window)
-   it is caused by the language file for alt-ergo superseding the one for why3
-
-* faire le menage dans les transformations d'induction : _int _ty
-  _ty_lex, et DOCUMENTER
-
-* Contre-exemples de Alt-Ergo
-
-* detect editors
-*** check if coqide and also emacs/proof-general is installed
-
 * Documentation
- - (ANDREI) make the glossary available
- - (CLAUDE) complete api.tex: explain how to build theories, apply
-   transformations, write new functions on terms (A)
+ - (CLAUDE) complete api.tex: explain how to build theories
 
 
 ==================== Roadmap for release 0.80 ========================

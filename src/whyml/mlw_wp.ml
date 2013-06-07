@@ -1357,8 +1357,7 @@ let merge_opt s opt_sl =
      and the merged state is returned, together with the glue formula for all
      states. For absent states, the glue formula "false" is returned *)
   let l = List.filter (fun x -> x <> None) opt_sl in
-  let l =
-    List.map (fun x -> match x with Some x -> x | None -> assert false) l in
+  let l = List.map Opt.get l in
   let s, fl = Subst.merge_l s l in
   let rec merge_lists acc opt_sl fl =
     match opt_sl, fl with

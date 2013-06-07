@@ -61,6 +61,7 @@ let env,config =
     Self.fatal "Exception raised in Why3 env:@ %a" Exn_printer.exn_printer e
 
 let find th s = Theory.ns_find_ls th.Theory.th_export [s]
+let find_type th s = Theory.ns_find_ts th.Theory.th_export [s]
 
 (* int.Int theory *)
 let int_type : Ty.ty = Ty.ty_int
@@ -74,7 +75,7 @@ let le_int : Term.lsymbol = find int_theory "infix <="
 let gt_int : Term.lsymbol = find int_theory "infix >"
 let lt_int : Term.lsymbol = find int_theory "infix <"
 
-let computer_div_theory : Theory.theory = 
+let computer_div_theory : Theory.theory =
   Env.find_theory env ["int"] "ComputerDivision"
 let div_int : Term.lsymbol = find computer_div_theory "div"
 
@@ -86,6 +87,12 @@ let sub_real : Term.lsymbol = find real_theory "infix -"
 let minus_real : Term.lsymbol = find real_theory "prefix -"
 let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
+
+(* map.Map theory *)
+let map_theory : Theory.theory = Env.find_theory env ["map"] "Map"
+let map_ts : Ty.tysymbol = find_type map_theory "map"
+(* let map_type (t:Ty.ty) : Ty.ty = Ty.ty_app map_ts [t] *)
+let map_get : Term.lsymbol = find map_theory "get"
 
 
 (* ref.Ref module *)
@@ -112,10 +119,12 @@ let set_fun : Mlw_expr.psymbol =
 
 (* array.Array module *)
 
+(*
 let array_modules, array_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["array"]
 
 let array_module : Mlw_module.modul = Stdlib.Mstr.find "Array" array_modules
+*)
 
 (*
 let array_type : Mlw_ty.T.itysymbol =
@@ -132,27 +141,29 @@ let array_type : Mlw_ty.T.itysymbol =
 (*********)
 
 let unit_type = Ty.ty_tuple []
+let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
 
 let ctype ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit
-    | TInt (_, _) -> Mlw_ty.ity_pur Ty.ts_int []
-    | TFloat (_, _) -> 
+    | TInt (_, _) -> mlw_int_type
+    | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
-    | TPtr(_ty, _attr) -> 
-      (* array_type *)
+    | TPtr(TInt(_,_), _attr) ->
+      Mlw_ty.ity_pur map_ts [mlw_int_type ; mlw_int_type]
+    | TPtr(_ty, _attr) ->
       Self.not_yet_implemented "ctype TPtr"
-    | TArray (_, _, _, _) -> 
+    | TArray (_, _, _, _) ->
       Self.not_yet_implemented "ctype TArray"
-    | TFun (_, _, _, _) -> 
+    | TFun (_, _, _, _) ->
       Self.not_yet_implemented "ctype TFun"
-    | TNamed (_, _) -> 
+    | TNamed (_, _) ->
       Self.not_yet_implemented "ctype TNamed"
-    | TComp (_, _, _) -> 
+    | TComp (_, _, _) ->
       Self.not_yet_implemented "ctype TComp"
-    | TEnum (_, _) -> 
+    | TEnum (_, _) ->
       Self.not_yet_implemented "ctype TEnum"
-    | TBuiltin_va_list _ -> 
+    | TBuiltin_va_list _ ->
       Self.not_yet_implemented "ctype TBuiltin_va_list"
 
 let logic_types = Hashtbl.create 257
@@ -333,34 +344,18 @@ let result_vsymbol =
 
 type label = Here | Old | At of string
 
-let tlval ~label (host,offset) =
-  match host,offset with
-    | TResult _, TNoOffset -> Term.t_var !result_vsymbol
-    | TVar lv, TNoOffset -> 
-      begin
-        let t =
-          match lv.lv_origin with
-            | None -> Term.t_var (get_lvar lv)
-            | Some v -> 
-              let (v,is_mutable,_ty) = get_var v in
-              if is_mutable then
-                t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
-              else
-                Term.t_var v.Mlw_ty.pv_vs
-        in
-        match label with
-          | Here -> t
-          | Old -> Mlw_wp.t_at_old t
-          | At _lab -> 
-            (* t_app Mlw_wp.fs_at [t; ??? lab] *)
-      Self.not_yet_implemented "tlval TVar/At"
-      end
-    | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
-      Self.not_yet_implemented "tlval TVar"
-    | TResult _, _ ->
-      Self.not_yet_implemented "tlval Result"
-    | TMem _, _ ->
-      Self.not_yet_implemented "tlval Mem"
+let is_int_type t =
+  match t with
+    | Linteger -> true
+    | Ctype(TInt (_, _)) -> true
+    | _ -> false
+
+let is_real_type t =
+  match t with
+    | Lreal -> true
+    | Ctype(TFloat (_, _)) -> true
+    | _ -> false
+
 
 let rec term_node ~label t =
   match t with
@@ -385,11 +380,19 @@ let rec term_node ~label t =
           | LogicLabel(None, "Here") -> snd (term ~label:Here t)
           | LogicLabel(None, "Old") -> snd (term ~label:Old t)
           | LogicLabel(None, lab) -> snd (term ~label:(At lab) t)
-          | LogicLabel(Some _, _lab) -> 
+          | LogicLabel(Some _, _lab) ->
             Self.not_yet_implemented "term_node Tat/LogicLabel/Some"
           | StmtLabel _ ->
             Self.not_yet_implemented "term_node Tat/StmtLabel"
       end
+    | TCoerce (_, _)->
+      Self.not_yet_implemented "TCoerce"
+    | TCoerceE (_, _)->
+      Self.not_yet_implemented "TCoerceE"
+    | TLogic_coerce (ty, t) when is_int_type ty->
+      snd (term ~label t)
+    | TLogic_coerce (_, _) ->
+      Self.not_yet_implemented "TLogic_coerce"
     | TSizeOf _
     | TSizeOfE _
     | TSizeOfStr _
@@ -403,10 +406,8 @@ let rec term_node ~label t =
     | Tbase_addr (_, _)
     | Toffset (_, _)
     | Tblock_length (_, _)
-    | Tnull
-    | TCoerce (_, _)
-    | TCoerceE (_, _)
-    | TLogic_coerce (_, _)
+    | Tnull ->
+      Self.not_yet_implemented "term_node (1)"
     | TUpdate (_, _, _)
     | Ttypeof _
     | Ttype _
@@ -416,9 +417,52 @@ let rec term_node ~label t =
     | Tcomprehension (_, _, _)
     | Trange (_, _)
     | Tlet (_, _) ->
-      Self.not_yet_implemented "term_node"
+      Self.not_yet_implemented "term_node (2)"
 
 and term ~label t = (t.term_type, term_node ~label t.term_node)
+
+and tlval ~label (host,offset) =
+  match host,offset with
+    | TResult _, TNoOffset -> Term.t_var !result_vsymbol
+    | TVar lv, TNoOffset ->
+      begin
+        let t =
+          match lv.lv_origin with
+            | None -> Term.t_var (get_lvar lv)
+            | Some v ->
+              let (v,is_mutable,_ty) = get_var v in
+              if is_mutable then
+                t_app get_logic_fun [Term.t_var v.Mlw_ty.pv_vs]
+              else
+                Term.t_var v.Mlw_ty.pv_vs
+        in
+        match label with
+          | Here -> t
+          | Old -> Mlw_wp.t_at_old t
+          | At _lab ->
+            (* t_app Mlw_wp.fs_at [t; ??? lab] *)
+      Self.not_yet_implemented "tlval TVar/At"
+      end
+    | TVar _, (TField (_, _)|TModel (_, _)|TIndex (_, _)) ->
+      Self.not_yet_implemented "tlval TVar"
+    | TResult _, _ ->
+      Self.not_yet_implemented "tlval Result"
+    | TMem({term_node = TBinOp((PlusPI|IndexPI),t,i)}), TNoOffset ->
+      (* t[i] *)
+      t_app map_get [snd(term ~label t);snd(term ~label i)]
+    | TMem({term_node = TBinOp(_,t,i)}), TNoOffset ->
+      Self.not_yet_implemented "tlval Mem(TBinOp(_,%a,%a), TNoOffset)"
+        Cil_printer.pp_term t Cil_printer.pp_term i
+    | TMem t, TNoOffset ->
+      Self.not_yet_implemented "tlval Mem(%a, TNoOffset)"
+        Cil_printer.pp_term t
+    | TMem _t, TField _ ->
+      Self.not_yet_implemented "tlval Mem TField"
+    | TMem _t, TModel _ ->
+      Self.not_yet_implemented "tlval Mem TModel"
+    | TMem _t, TIndex _ ->
+      Self.not_yet_implemented "tlval Mem TNoOffset"
+
 
 
 
@@ -427,18 +471,23 @@ and term ~label t = (t.term_type, term_node ~label t.term_node)
 (****************)
 
 let rel (ty1,t1) op (ty2,t2) =
-  match op,ty1,ty2 with
-    | Req,_,_ -> Term.t_equ t1 t2
-    | Rneq,_,_ -> Term.t_neq t1 t2
-    | Rge,Linteger,Linteger -> t_app ge_int [t1;t2]
-    | Rle,Linteger,Linteger -> t_app le_int [t1;t2]
-    | Rgt,Linteger,Linteger -> t_app gt_int [t1;t2]
-    | Rlt,Linteger,Linteger -> t_app lt_int [t1;t2]
-    | Rge,Lreal,Lreal -> t_app ge_real [t1;t2]
-    | Rge,_,_ ->
+  match op with
+    | Req -> Term.t_equ t1 t2
+    | Rneq -> Term.t_neq t1 t2
+    | Rge when is_int_type ty1 && is_int_type ty2 -> t_app ge_int [t1;t2]
+    | Rle when is_int_type ty1 && is_int_type ty2 -> t_app le_int [t1;t2]
+    | Rgt when is_int_type ty1 && is_int_type ty2 -> t_app gt_int [t1;t2]
+    | Rlt when is_int_type ty1 && is_int_type ty2 -> t_app lt_int [t1;t2]
+    | Rge when is_real_type ty1 && is_real_type ty2 -> t_app ge_real [t1;t2]
+    | Rge ->
       Self.not_yet_implemented "rel Rge"
-    | (Rlt|Rgt|Rle),_,_ ->
-      Self.not_yet_implemented "rel"
+    | Rle ->
+      Self.not_yet_implemented "rel Rle"
+    | Rgt ->
+      Self.not_yet_implemented "rel Rgt"
+    | Rlt ->
+      Self.not_yet_implemented "rel Rlt %a %a"
+        Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
 let rec predicate ~label p =
   match p with
@@ -601,26 +650,6 @@ let identified_proposition p =
 
 
 
-let lval (host,offset) =
-  match host,offset with
-    | Var v, NoOffset ->
-      let v,is_mutable,ty = get_var v in
-      if is_mutable then
-        begin try
-                Mlw_expr.e_app
-                  (mk_get v.Mlw_ty.pv_ity ty)
-                  [Mlw_expr.e_value v]
-          with e ->
-            Self.fatal "Exception raised during application of !@ %a@."
-              Exn_printer.exn_printer e
-        end
-      else
-        Mlw_expr.e_value v
-    | Var _, (Field (_, _)|Index (_, _)) ->
-      Self.not_yet_implemented "lval Var"
-    | Mem _, _ ->
-      Self.not_yet_implemented "lval Mem"
-
 
 let seq e1 e2 =
   let l = Mlw_expr.create_let_defn (Ident.id_fresh "_tmp") e1 in
@@ -723,6 +752,45 @@ let rec expr e =
     | StartOf _
     | Info (_, _)
       -> Self.not_yet_implemented "expr"
+
+and lval (host,offset) =
+  match host,offset with
+    | Var v, NoOffset ->
+      let v,is_mutable,ty = get_var v in
+      if is_mutable then
+        begin try
+                Mlw_expr.e_app
+                  (mk_get v.Mlw_ty.pv_ity ty)
+                  [Mlw_expr.e_value v]
+          with e ->
+            Self.fatal "Exception raised during application of !@ %a@."
+              Exn_printer.exn_printer e
+        end
+      else
+        Mlw_expr.e_value v
+    | Var _, (Field (_, _)|Index (_, _)) ->
+      Self.not_yet_implemented "lval Var"
+    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
+      (* e[i] -> Map.get !e i *)
+      let e = expr e in
+      let ity = match e.Mlw_expr.e_vty with
+        | Mlw_ty.VTvalue ity -> ity
+        | Mlw_ty.VTarrow _ -> assert false
+      in
+      begin try
+              Mlw_expr.e_lapp map_get [e;expr i] ity
+(*
+      let ty = ctype ty in
+        let t = Mlw_expr.e_app (mk_get ity ty) [e] in
+        t (* Mlw_expr.e_lapp map_get [t;expr i] ity *)
+      *)
+        with Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) -> 
+          Self.fatal "e[i]: TypeMismatch(%a,%a,_)"
+            Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2
+      end
+  | Mem _, _ ->
+      Self.not_yet_implemented "lval Mem"
+
 
 let assignment (lhost,offset) e _loc =
   match lhost,offset with
@@ -898,8 +966,8 @@ let fundecl fdec =
   in
   let spec = {
     Mlw_ty.c_pre = predicate_named ~label:Here pre;
-    c_post = 
-      Term.t_eps 
+    c_post =
+      Term.t_eps
         (Term.t_close_bound result (predicate_named ~label:Here post));
     c_xpost = Mlw_ty.Mexn.empty;
     c_effect = Mlw_ty.eff_empty;
