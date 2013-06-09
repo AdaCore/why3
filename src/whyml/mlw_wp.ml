@@ -1836,8 +1836,34 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
         post = { s = post_state; ne = ne };
         exn = exn
       }
-  | Eassign _ -> assert false
-
+  | Eassign (pl, e1, reg, pv) ->
+      let rec get_term d = match d.e_node with
+        | Eghost e | Elet (_,e) | Erec (_,e) -> get_term e
+        | Evalue v -> vs_result e1, t_var v.pv_vs
+        | Elogic t -> vs_result e1, t
+        | _ ->
+            let ity = ity_of_expr e1 in
+            let id = id_fresh ?loc:e1.e_loc "o" in
+            (* must be a pvsymbol or restore_pv will fail *)
+            let npv = create_pvsymbol id ~ghost:e1.e_ghost ity in
+            npv.pv_vs, t_var npv.pv_vs
+      in
+      let res, t = get_term e1 in
+      let t = fs_app pl.pl_ls [t] pv.pv_vs.vs_ty in
+      let wp1 = fast_wp_expr env s (res, xresult) e1 in
+      let s2, glue = Subst.havoc env (Sreg.singleton reg) wp1.post.s in
+      let t = Subst.term s2 t in
+      let ne =
+        t_and_simp_l
+          [wp1.post.ne;
+           glue;
+           t_equ t (t_var pv.pv_vs)]
+      in
+      {
+        ok = wp_label e wp1.ok;
+        exn = wp1.exn;
+        post = { s = s2; ne = wp_label e ne }
+      }
 
 and fast_wp_fun_defn env { fun_lambda = l } =
   (* OK: forall bl. pl => ok(e)
