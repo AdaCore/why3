@@ -123,26 +123,13 @@ theory real.Real
 
 end
 
- (* Not supported currently *)
-(*
 theory Bool
    syntax type     bool  "Bool"
    syntax function True  "true"
    syntax function False "false"
    meta "encoding : kept" type bool
 end
-*)
-(** so use datatype *)
-(*
-theory Bool
-   prelude "(declare-datatypes () ((why3_bool  (why3_true) (why3_false) )))"
-   syntax type     bool  "why3_bool"
-   syntax function True  "why3_true"
-   syntax function False "why3_false"
-   meta "encoding : kept" type bool
-end
-*)
-(*
+
 theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
@@ -150,7 +137,11 @@ theory bool.Bool
    syntax function notb  "(not %1)"
    syntax function implb "(=> %1 %2)"
 end
-*)
+
+theory bool.Ite
+  syntax function ite "(ite %1 %2 %3)"
+  meta "encoding : lskept" function ite
+end
 
 (* CVC4 division seems to be neither the Euclidean one,
 nor the Computer one *)

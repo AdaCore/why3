@@ -124,12 +124,18 @@ theory Bool
    syntax function False "false"
    meta "encoding : kept" type bool
 end
+
 theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
    syntax function implb "(=> %1 %2)"
+end
+
+theory bool.Ite
+  syntax function ite "(ite %1 %2 %3)"
+  meta "encoding : lskept" function ite
 end
 
 (* needs to be checked
