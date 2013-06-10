@@ -117,6 +117,20 @@ let get_fun : Mlw_expr.psymbol =
 let set_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
 
+(* mach_int.Int32 module *)
+
+let mach_int_modules, mach_int_theories =
+  Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
+
+let int32_module : Mlw_module.modul = Stdlib.Mstr.find "Int32" mach_int_modules
+
+let int32_type : Mlw_ty.T.itysymbol =
+  Mlw_module.ns_find_its int32_module.Mlw_module.mod_export ["int32"]
+
+let add32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["add"]
+
+
 (* array.Array module *)
 
 (*
@@ -142,11 +156,12 @@ let array_type : Mlw_ty.T.itysymbol =
 
 let unit_type = Ty.ty_tuple []
 let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
+let mlw_int32_type = Mlw_ty.ity_app int32_type [] []
 
 let ctype ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit
-    | TInt (_, _) -> mlw_int_type
+    | TInt (_, _) -> mlw_int32_type
     | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
     | TPtr(TInt(_,_), _attr) ->
@@ -704,11 +719,13 @@ let loop_annot a =
 let binop op e1 e2 =
   let ls,ty =
     match op with
-      | PlusA -> add_int, Mlw_ty.ity_int
+      | PlusA -> add32_fun, mlw_int32_type
+(*
       | MinusA -> sub_int, Mlw_ty.ity_int
       | Mult -> mul_int, Mlw_ty.ity_int
       | Lt -> lt_int, Mlw_ty.ity_bool
       | Le -> le_int, Mlw_ty.ity_bool
+*)
       | Gt | Ge | Eq | Ne ->
         Self.not_yet_implemented "binop comp"
       | PlusPI|IndexPI|MinusPI|MinusPP ->
@@ -719,8 +736,10 @@ let binop op e1 e2 =
         Self.not_yet_implemented "binop shift"
       | BAnd|BXor|BOr|LAnd|LOr ->
         Self.not_yet_implemented "binop bool"
+      | _ ->
+        Self.not_yet_implemented "binop"
   in
-  Mlw_expr.e_lapp ls [e1;e2] ty
+  Mlw_expr.e_app (Mlw_expr.e_arrow ls [] ty) [e1;e2]
 
 let constant c =
   match c with
@@ -770,7 +789,7 @@ and lval (host,offset) =
         Mlw_expr.e_value v
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
-    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
+    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,_ty)}), NoOffset ->
       (* e[i] -> Map.get !e i *)
       let e = expr e in
       let ity = match e.Mlw_expr.e_vty with
