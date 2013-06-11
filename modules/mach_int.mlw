@@ -32,6 +32,14 @@ val mul (a:t) (b:t) : t
   requires { "expl:integer overflow" in_bounds (to_int a * to_int b) }
   ensures { to_int result = to_int a * to_int b }
 
+val le (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a <= to_int b else to_int a > to_int b }
+
+val lt (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a < to_int b else to_int a >= to_int b }
+
 use import int.ComputerDivision
 
 val div (a:t) (b:t) : t

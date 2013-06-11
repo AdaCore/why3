@@ -6,11 +6,11 @@
 //@ logic integer sqr(integer x) = x * x;
 
 /*@ requires x >= 0;
-  @ ensures \result >= 0 && sqr(\result) <= x && x < sqr(\result + 1);
+  @ ensures \result >= 0 ; // && sqr(\result) <= x && x < sqr(\result + 1);
   @*/
 int isqrt(int x) {
   int count = 0, sum = 1;
-  /*@ loop invariant count >= 0 && x >= sqr(count) && sum == sqr(count+1);
+  /*@ loop invariant count >= 0 && x >= sqr(count) ; // && sum == sqr(count+1);
     @ loop variant  x - count; 
     @*/
   while (sum <= x) { ++count; sum += 2 * count + 1; }
