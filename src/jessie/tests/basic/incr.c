@@ -3,12 +3,13 @@
 */
 
 
-/*@ ensures \result == x+1;
+/* ensures \result == x+1;
   @*/
 int f(int x) {
-  return x+1;
+  return /* x+ */ 1;
 }
 
+#if 0
 
 int g;
 
@@ -18,6 +19,7 @@ void h(int x) {
   g += x;
 }
 
+#endif
 
 /*
 Local Variables:

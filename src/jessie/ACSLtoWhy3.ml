@@ -124,12 +124,14 @@ let mach_int_modules, mach_int_theories =
 
 let int32_module : Mlw_module.modul = Stdlib.Mstr.find "Int32" mach_int_modules
 
-let int32_type : Mlw_ty.T.itysymbol =
-  Mlw_module.ns_find_its int32_module.Mlw_module.mod_export ["int32"]
+let int32_type : Why3.Ty.tysymbol =
+  Mlw_module.ns_find_ts int32_module.Mlw_module.mod_export ["int32"]
 
 let add32_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["add"]
 
+let int32ofint_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["of_int"]
 
 (* array.Array module *)
 
@@ -156,12 +158,14 @@ let array_type : Mlw_ty.T.itysymbol =
 
 let unit_type = Ty.ty_tuple []
 let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
-let mlw_int32_type = Mlw_ty.ity_app int32_type [] []
+let mlw_int32_type = Mlw_ty.ity_pur int32_type []
 
 let ctype ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit
-    | TInt (_, _) -> mlw_int32_type
+    | TInt (IInt, _) -> mlw_int32_type
+    | TInt (_, _) -> 
+      Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
     | TPtr(TInt(_,_), _attr) ->
@@ -743,10 +747,20 @@ let binop op e1 e2 =
 
 let constant c =
   match c with
-  | CInt64(_t,_ikind, Some s) ->
-      Number.ConstInt (Literals.integer s)
-  | CInt64(t,_ikind, None) ->
-      Number.ConstInt (Literals.integer (Integer.to_string t))
+  | CInt64(t,IInt, sopt) ->
+    let s =
+      match sopt with 
+        | Some s -> s
+        | None -> Integer.to_string t
+    in
+    let n = Mlw_expr.e_const (Number.ConstInt (Literals.integer s)) in
+    begin try
+      Mlw_expr.e_app 
+        (Mlw_expr.e_arrow int32ofint_fun [mlw_int_type] mlw_int32_type) [n]
+      with _ -> Self.fatal "bla"
+    end
+  | CInt64(_t,_ikind, _) ->
+      Self.not_yet_implemented "CInt64"
   | CStr _
   | CWStr _
   | CChr _
@@ -756,7 +770,7 @@ let constant c =
 
 let rec expr e =
   match e.enode with
-    | Const c -> Mlw_expr.e_const (constant c)
+    | Const c -> constant c
     | Lval lv -> lval lv
     | BinOp (op, e1, e2, _loc) ->
       binop op (expr e1) (expr e2)
@@ -796,17 +810,12 @@ and lval (host,offset) =
         | Mlw_ty.VTvalue ity -> ity
         | Mlw_ty.VTarrow _ -> assert false
       in
-      begin try
-              Mlw_expr.e_lapp map_get [e;expr i] ity
+      Mlw_expr.e_lapp map_get [e;expr i] ity
 (*
       let ty = ctype ty in
         let t = Mlw_expr.e_app (mk_get ity ty) [e] in
         t (* Mlw_expr.e_lapp map_get [t;expr i] ity *)
       *)
-        with Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) -> 
-          Self.fatal "e[i]: TypeMismatch(%a,%a,_)"
-            Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2
-      end
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
@@ -1120,6 +1129,9 @@ let prog p =
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
-  with Exit as e  ->
+  with (Exit|Not_found|Mlw_ty.TypeMismatch _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."
       Exn_printer.exn_printer e
+    (* | Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) ->  *)
+    (*   Self.fatal "TypeMismatch(%a,%a,_)" *)
+    (*         Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2 *)
