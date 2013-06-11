@@ -240,7 +240,6 @@ theory real.Square
 
 end
 
-
 theory real.ExpLog
 
   prelude "Require Import Rtrigo_def."
@@ -258,7 +257,6 @@ theory real.ExpLog
 
 end
 
-
 theory real.PowerInt
 
   prelude "Require Import Rfunctions."
@@ -270,6 +268,22 @@ theory real.PowerInt
   remove prop Power_1 (* already as powerRZ_1 *)
   (* remove prop Power_sum *) (* not the same as powerRZ_add *)
   (* remove prop Power_mult *)
+
+end
+
+theory list.List
+
+  syntax type list "list %1"
+  syntax function Nil "nil"
+  syntax function Cons "(cons %1 %2)"
+
+end
+
+theory option.Option
+
+  syntax type option "option %1"
+  syntax function None "None"
+  syntax function Some "(Some %1)"
 
 end
 
