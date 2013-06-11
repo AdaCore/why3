@@ -160,16 +160,21 @@ let unit_type = Ty.ty_tuple []
 let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
 let mlw_int32_type = Mlw_ty.ity_pur int32_type []
 
-let ctype ty =
+let ctype_and_default ty =
   match ty with
-    | TVoid _attr -> Mlw_ty.ity_unit
-    | TInt (IInt, _) -> mlw_int32_type
-    | TInt (_, _) -> 
+    | TVoid _attr -> Mlw_ty.ity_unit, Mlw_expr.e_void
+    | TInt (IInt, _attr) ->
+      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      mlw_int32_type,
+      Mlw_expr.e_app
+        (Mlw_expr.e_arrow int32ofint_fun [mlw_int_type] mlw_int32_type) [n]
+    | TInt (_, _) ->
       Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
     | TPtr(TInt(_,_), _attr) ->
-      Mlw_ty.ity_pur map_ts [mlw_int_type ; mlw_int_type]
+      Self.not_yet_implemented "ctype TPtr(TInt,_)"
+      (* Mlw_ty.ity_pur map_ts [mlw_int_type ; mlw_int_type], *)
     | TPtr(_ty, _attr) ->
       Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) ->
@@ -184,6 +189,8 @@ let ctype ty =
       Self.not_yet_implemented "ctype TEnum"
     | TBuiltin_va_list _ ->
       Self.not_yet_implemented "ctype TBuiltin_va_list"
+
+let ctype ty = fst(ctype_and_default ty)
 
 let logic_types = Hashtbl.create 257
 
@@ -223,9 +230,6 @@ let rec logic_type ty =
         Self.not_yet_implemented "logic_type"
 
 
-
-let any _ty =
-  Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
 
 let mk_ref ty =
     let ref_ty = Mlw_ty.ity_app_fresh ref_type [ty] in
@@ -322,8 +326,8 @@ let program_vars = Hashtbl.create 257
 
 let create_var_full v =
   let id = Ident.id_fresh v.vname in
-  let ty = ctype v.vtype in
-  let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
+  let ty,def = ctype_and_default v.vtype in
+  let def = Mlw_expr.e_app (mk_ref ty) [def] in
   let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
 (*
   Self.result "create program variable %s (%d)" v.vname v.vid;
@@ -749,13 +753,13 @@ let constant c =
   match c with
   | CInt64(t,IInt, sopt) ->
     let s =
-      match sopt with 
+      match sopt with
         | Some s -> s
         | None -> Integer.to_string t
     in
     let n = Mlw_expr.e_const (Number.ConstInt (Literals.integer s)) in
     begin try
-      Mlw_expr.e_app 
+      Mlw_expr.e_app
         (Mlw_expr.e_arrow int32ofint_fun [mlw_int_type] mlw_int32_type) [n]
       with _ -> Self.fatal "bla"
     end
@@ -1012,7 +1016,9 @@ let fundecl fdec =
   }
   in
   let def =
-    Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda
+    try
+      Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda
+    with _ -> Self.fatal "def"
   in
   Mlw_decl.create_rec_decl [def]
 
@@ -1125,11 +1131,12 @@ let prog p =
     let m = use m real_theory in
     let m = List.fold_left use m theories in
     let m = use_module m ref_module in
+    let m = use_module m int32_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
-  with (Exit|Not_found|Mlw_ty.TypeMismatch _) as e  ->
+  with (Exit|Not_found|Mlw_ty.TypeMismatch _|Decl.UnknownIdent _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."
       Exn_printer.exn_printer e
     (* | Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) ->  *)

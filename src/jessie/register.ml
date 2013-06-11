@@ -59,11 +59,11 @@ let process () =
     List.fold_left
       (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
       []
-      [ (* "Z42", "Z3,4.3.1"; *)
-        "Z32", "Z3,3.2";
-        "C24", "CVC3,2.4.1";
-        "C22", "CVC3,2.2";
-        "A95", "Alt-Ergo,0.95.1,";
+      [ "Z431", "Z3,4.3.1";
+        "Z32 ", "Z3,3.2";
+        "C241", "CVC3,2.4.1";
+        "C22 ", "CVC3,2.2";
+        "A951", "Alt-Ergo,0.95.1,";
         (* "A94", "Alt-Ergo,0.94"; *)
         ]
   in
