@@ -20,6 +20,7 @@ open Decl
 open Theory
 open Printer
 
+(** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
 let ident_printer =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -29,29 +30,39 @@ let ident_printer =
      "notes";"preds";"sorts";"status";"theory";"Int";"Real";"Bool";
      "Array";"U";"select";"store"]*)
     (** smtlib2 V2 p71 *)
-    [(** General: *)
-      "!";"_"; "as"; "DECIMAL"; "exists"; "forall"; "let"; "NUMERAL";
-      "par"; "STRING";
-       (**Command names:*)
-      "assert";"check-sat"; "declare-sort";"declare-fun";"define-sort";
-      "define-fun";"exit";"get-assertions";"get-assignment"; "get-info";
-      "get-option"; "get-proof"; "get-unsat-core"; "get-value"; "pop"; "push";
-      "set-logic"; "set-info"; "set-option";
-       (** for security *)
+    [(** Base SMT-LIB tokens *)
+      "assert"; "check-sat"; "declare-fun"; "declare-sort"; "define-fun";
+      "define-sort"; "get-value"; "get-assignment"; "get-assertions";
+      "get-proof"; "get-unsat-core"; "exit"; "ite"; "let"; "!"; "_";
+      "set-logic"; "set-info"; "get-info"; "set-option"; "get-option";
+      "push"; "pop"; "as";
+
+      (** extended commands *)
+      "declare-datatypes"; "get-model"; "echo"; "assert-rewrite";
+      "assert-reduction"; "assert-propagation"; "declare-sorts";
+      "declare-funs"; "declare-preds"; "define"; "declare-const";
+      "simplify";
+
+      (** attributes *)
+
+      (** operators, including theory symbols *)
+      "and"; "distinct"; "exists"; "forall"; "is_int"; "not"; "or"; "select";
+      "store"; "to_int"; "to_real"; "xor";
+
+      "div"; "mod";
+
+      "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
+      "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
+      "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge";
+
+      (** Other stuff that Why3 seems to need *)
+      "DECIMAL"; "NUMERAL"; "par"; "STRING";
       "unsat";"sat";
-      (** SMT-LIB Theories http://www.smt-lib.org/ *)
-      (** SmtV2 core *)
-      "Bool"; "true";"false"; "not"; "and"; "or"; "xor"; "distinct"; "ite";
-       (** arrays -- this really belongs to the driver! (esp. const) *)
-      "Array";"select";"store";"const";
-       (** Ints theory *)
-      "div"; "mod"; "abs";
-      (** Fixed_Size_BitVectors theory *)
-      "BitVec"; "concat"; "extract"; "bv2nat"; "nat2bv"; "bvnot"; "bvneg";
-      "bvand"; "bvor";  "bvand"; "bvmul"; "bvudiv"; "bvurem"; "bvshl";
-      "bvlshr"; "bvult";
-      (** SMTv2's Reals_Ints theory *)
-      "to_int"; "to_real"; "is_int"
+      "Bool"; "true"; "false";
+      "Array";"const";
+      "abs";
+      "BitVec"; "extract"; "bv2nat"; "nat2bv"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
