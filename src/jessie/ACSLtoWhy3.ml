@@ -534,14 +534,29 @@ let eq op ty1 t1 ty2 t2 =
     | _,_ ->
       Self.not_yet_implemented "eq"
 
+let compare op ty1 t1 ty2 t2 =
+  match ty1,ty2 with
+    | Linteger, Linteger -> t_app op [t1;t2]
+    | Lreal, Lreal -> assert false
+    | Ctype _,_ ->
+      Self.not_yet_implemented "compare Ctype"
+    | Ltype _, Ltype _ -> assert false
+    | Lvar _,_ ->
+      Self.not_yet_implemented "compare Lvar"
+    | Larrow _,_ ->
+      Self.not_yet_implemented "compare Larrow"
+    | _,_ ->
+      Self.not_yet_implemented "compare"
+
+
 let rel (ty1,t1) op (ty2,t2) =
   match op with
     | Req -> eq Term.t_equ ty1 t1 ty2 t2
     | Rneq -> eq Term.t_neq ty1 t1 ty2 t2
-    | Rge when is_int_type ty1 && is_int_type ty2 -> t_app ge_int [t1;t2]
-    | Rle when is_int_type ty1 && is_int_type ty2 -> t_app le_int [t1;t2]
-    | Rgt when is_int_type ty1 && is_int_type ty2 -> t_app gt_int [t1;t2]
-    | Rlt when is_int_type ty1 && is_int_type ty2 -> t_app lt_int [t1;t2]
+    | Rge when is_int_type ty1 && is_int_type ty2 -> compare ge_int ty1 t1 ty2 t2
+    | Rle when is_int_type ty1 && is_int_type ty2 -> compare le_int ty1 t1 ty2 t2
+    | Rgt when is_int_type ty1 && is_int_type ty2 -> compare gt_int ty1 t1 ty2 t2
+    | Rlt when is_int_type ty1 && is_int_type ty2 -> compare lt_int ty1 t1 ty2 t2
     | Rge when is_real_type ty1 && is_real_type ty2 -> t_app ge_real [t1;t2]
     | Rge ->
       Self.not_yet_implemented "rel Rge"
