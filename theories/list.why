@@ -118,7 +118,7 @@ theory NthHdTl
 
   lemma Nth_tl:
     forall l1 l2: list 'a. tl l1 = Some l2 ->
-    forall i: int. nth i l2 = nth (i+1) l1
+    forall i: int. i <> -1 -> nth i l2 = nth (i+1) l1
 
   lemma Nth0_head:
     forall l: list 'a. nth 0 l = hd l

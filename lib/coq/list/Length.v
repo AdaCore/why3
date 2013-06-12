@@ -6,26 +6,34 @@ Require int.Int.
 Require list.List.
 
 (* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a} (l:list a) {struct l}: Z :=
+Fixpoint length {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Z :=
   match l with
   | nil => 0%Z
   | (cons _ r) => (1%Z + (length r))%Z
   end.
 
-(* Why3 goal *)
-Lemma Length_nonnegative : forall {a:Type} {a_WT:WhyType a},
-  forall (l:list a), (0%Z <= (length l))%Z.
+Lemma length_std :
+  forall {a:Type} {a_WT:WhyType a} (l:list a),
+  length l = Z_of_nat (List.length l).
 Proof.
 intros a a_WT l.
-induction l as [|h t].
-apply Zle_refl.
-unfold length.
-fold length.
-omega.
+induction l.
+easy.
+change (1 + length l = Z.of_nat (S (List.length l)))%Z.
+now rewrite inj_S, Zplus_comm, IHl.
 Qed.
 
 (* Why3 goal *)
-Lemma Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:list a),
+Lemma Length_nonnegative : forall {a:Type} {a_WT:WhyType a},
+  forall (l:(list a)), (0%Z <= (length l))%Z.
+Proof.
+intros a a_WT l.
+rewrite length_std.
+apply Zle_0_nat.
+Qed.
+
+(* Why3 goal *)
+Lemma Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
   ((length l) = 0%Z) <-> (l = nil).
 Proof.
 intros a a_WT [|h t] ; split ; try easy.
