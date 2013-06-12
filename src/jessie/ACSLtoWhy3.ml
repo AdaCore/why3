@@ -407,7 +407,12 @@ let rec term_node ~label t =
         match labels with
           | [] ->
             let ls = get_lsymbol li in
-            let args = List.map (fun x -> snd(term ~label x)) args in
+            let args = List.map (fun x -> 
+              let ty,t = term ~label x in
+              Self.result "arg = %a, type  = %a"
+              Cil_printer.pp_term x
+              Cil_printer.pp_logic_type ty;
+              t) args in
             t_app ls args
           | _ ->
             Self.not_yet_implemented "term_node Tapp with labels"

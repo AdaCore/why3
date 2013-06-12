@@ -6,6 +6,7 @@
 //@ logic integer sqr(integer x) = x * x;
 
 /*@ requires x >= 0;
+  @ requires x <= 1000000000; // not avoid integer overflow
   @ ensures \result >= 0 && sqr(\result+0) <= x && x < sqr(\result + 1);
   @*/
 int isqrt(int x) {
