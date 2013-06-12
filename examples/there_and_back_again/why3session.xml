@@ -17,10 +17,6 @@
   id="3"
   name="Coq"
   version="8.4pl1"/>
- <prover
-  id="4"
-  name="Vampire"
-  version="0.6"/>
  <file
   name="../there_and_back_again.mlw"
   verified="true"
@@ -58,12 +54,12 @@
       <label
        name="expl:VC for convolution_rec"/>
       <proof
-       prover="4"
-       timelimit="5"
+       prover="1"
+       timelimit="120"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.18"/>
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
@@ -215,7 +211,7 @@
    <goal
     name="WP_parameter palindrome_rec"
     locfile="../there_and_back_again.mlw"
-    loclnum="67" loccnumb="10" loccnume="24"
+    loclnum="66" loccnumb="10" loccnume="24"
     expl="VC for palindrome_rec"
     sum="7e634064ccacfc5ad6c2df6d1567ecab"
     proved="true"
@@ -230,11 +226,11 @@
      <goal
       name="WP_parameter palindrome_rec.1"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="1. variant decrease"
       sum="c9269f03d55b1561de628bce196af07f"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="variant decreaseCCCCfaNilainfix =V8V7aConswVV0aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -250,11 +246,11 @@
      <goal
       name="WP_parameter palindrome_rec.2"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="2. precondition"
       sum="30ddb600975ca0e6c224271002e8b14b"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="preconditionCCCainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -270,11 +266,11 @@
      <goal
       name="WP_parameter palindrome_rec.3"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="3. assertion"
       sum="ca2db8562f1dac57158fcf74e6b6e0ae"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="assertionCCCCainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V11V8Aainfix =alengthV11alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -290,11 +286,11 @@
      <goal
       name="WP_parameter palindrome_rec.4"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="4. postcondition"
       sum="c4581f97e64a7167770d9066542145e0"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCCCCainfix =V0ainfix ++V11V10Aainfix =alengthV11alengthV1EIainfix =V6V9Iainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V12V8Aainfix =alengthV12alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -310,11 +306,11 @@
      <goal
       name="WP_parameter palindrome_rec.5"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="5. postcondition"
       sum="b015636f147ec98faca507d20ce415ff"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCCCCapalV0alengthV1Iainfix =V6V9Iainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V11V8Aainfix =alengthV11alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -330,7 +326,7 @@
      <goal
       name="WP_parameter palindrome_rec.6"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="6. exceptional postcondition"
       sum="eb0b6d73d2d2aa88c31e757249f0ef9f"
       proved="true"
@@ -350,11 +346,11 @@
      <goal
       name="WP_parameter palindrome_rec.7"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="7. unreachable point"
       sum="1f435cf7318c513634ebeebd1a302cb0"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="unreachable pointCCCCtaConsVVfaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V11V8Aainfix =alengthV11alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -374,19 +370,11 @@
        archived="false">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.33"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter palindrome_rec.8"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="8. exceptional postcondition"
       sum="1a70a13714064380c7b904a3753a20cc"
       proved="true"
@@ -407,11 +395,11 @@
      <goal
       name="WP_parameter palindrome_rec.9"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="9. unreachable point"
       sum="7eafa2f72de3712a8810c827ea1ffbdd"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="unreachable pointCCCtaConsVVfwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -427,11 +415,11 @@
      <goal
       name="WP_parameter palindrome_rec.10"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="10. postcondition"
       sum="6f9bb37f1314d0f542cbc47d89ef8ce8"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCCtaConsVVCainfix =V0ainfix ++V8V7Aainfix =alengthV8alengthV1EaConsVVtwV0aNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -455,11 +443,11 @@
      <goal
       name="WP_parameter palindrome_rec.11"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="11. postcondition"
       sum="bf73b97baf28d8a0eeb4e6aaa8ba1037"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCCtaConsVVCapalV0alengthV1aConsVVtwV0aNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -483,11 +471,11 @@
      <goal
       name="WP_parameter palindrome_rec.12"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="12. unreachable point"
       sum="22df6cf609c885c360d1c9faa0cc6f04"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="unreachable pointCCtaConsVVCtaConsVVfwV0aNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -503,11 +491,11 @@
      <goal
       name="WP_parameter palindrome_rec.13"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="13. postcondition"
       sum="606aa752df9cf08ad05e796484aa2146"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaConsVVainfix =V0ainfix ++V4V0Aainfix =alengthV4alengthV1EaNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -523,11 +511,11 @@
      <goal
       name="WP_parameter palindrome_rec.14"
       locfile="../there_and_back_again.mlw"
-      loclnum="67" loccnumb="10" loccnume="24"
+      loclnum="66" loccnumb="10" loccnume="24"
       expl="14. postcondition"
       sum="85b8b3d107da1717b61d1265dc096412"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaConsVVapalV0alengthV1aNilV1Iainfix &gt;=alengthV0alengthV1F">
       <label
        name="expl:VC for palindrome_rec"/>
@@ -553,26 +541,26 @@
    <goal
     name="WP_parameter palindrome"
     locfile="../there_and_back_again.mlw"
-    loclnum="94" loccnumb="6" loccnume="16"
+    loclnum="88" loccnumb="6" loccnume="16"
     expl="VC for palindrome"
     sum="94c053a03ecd5719b8dae13d7e65b044"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="NapalV0alengthV0INainfix =anthV1V0anthainfix -ainfix -alengthV0c1V1V0Aainfix &lt;V1alengthV0Aainfix &lt;=c0V1EAapalV0alengthV0IapalV0alengthV0Aainfix =V0ainfix ++V3V2Aainfix =alengthV3alengthV0EFAainfix &gt;=alengthV0alengthV0F">
     <label
      name="expl:VC for palindrome"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter palindrome.1"
       locfile="../there_and_back_again.mlw"
-      loclnum="94" loccnumb="6" loccnume="16"
+      loclnum="88" loccnumb="6" loccnume="16"
       expl="1. precondition"
       sum="e29ac2a1b5ae0281c5e8aeb050364e97"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="preconditionainfix &gt;=alengthV0alengthV0F">
       <label
        name="expl:VC for palindrome"/>
@@ -588,11 +576,11 @@
      <goal
       name="WP_parameter palindrome.2"
       locfile="../there_and_back_again.mlw"
-      loclnum="94" loccnumb="6" loccnume="16"
+      loclnum="88" loccnumb="6" loccnume="16"
       expl="2. postcondition"
       sum="635665a140e472f46df3a28d46bed6e1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionapalV0alengthV0IapalV0alengthV0Aainfix =V0ainfix ++V2V1Aainfix =alengthV2alengthV0EFIainfix &gt;=alengthV0alengthV0F">
       <label
        name="expl:VC for palindrome"/>
@@ -608,11 +596,11 @@
      <goal
       name="WP_parameter palindrome.3"
       locfile="../there_and_back_again.mlw"
-      loclnum="94" loccnumb="6" loccnume="16"
+      loclnum="88" loccnumb="6" loccnume="16"
       expl="3. postcondition"
       sum="50e4a7e5f1635c2376bf40088a61cd89"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionNapalV0alengthV0INainfix =anthV1V0anthainfix -ainfix -alengthV0c1V1V0Aainfix &lt;V1alengthV0Aainfix &lt;=c0V1EIainfix &gt;=alengthV0alengthV0F">
       <label
        name="expl:VC for palindrome"/>
