@@ -1,0 +1,39 @@
+
+(* Puzzle from Olivier Danvy's ``There and back again''
+   http://www.brics.dk/RS/02/12/BRICS-RS-02-12.pdf‎
+
+   Given two lists of the same length, [x1;x2;...;xn] and [y1;y2;...;yn],
+   build the list of pairs [(x1,yn); (x2,yn-1); ...; (xn,y1)] in linear
+   time using only n recursive calls.
+*)
+
+module ThereAndBackAgain
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import list.Reverse
+  use import list.Combine
+
+  let rec product (x y: list 'a) : (list ('a, 'a), list 'a)
+    variant  { x }
+    requires { length x <= length y }
+    ensures  { let (r, ys) = result in exists y0: list 'a.
+               y = y0 ++ ys && length y0 = length x &&
+               r = combine x (reverse y0) }
+  = match x with
+    | Nil ->
+        (Nil, y)
+    | Cons x0 xs ->
+        match product xs y with
+        | r, Cons y0 ys -> (Cons (x0, y0) r, ys)
+        | _ -> absurd end
+    end
+
+  let puzzle (x y: list 'a) : list ('a, 'a)
+    requires { length x = length y }
+    ensures  { result = combine x (reverse y) }
+  = let r, _ = product x y in r
+
+end

@@ -233,6 +233,20 @@ theory RevAppend
 
 end
 
+(** {2 Zip} *)
+
+theory Combine
+
+  use export List
+
+  function combine (x: list 'a) (y: list 'b) : list ('a, 'b) =
+    match x, y with
+    | Cons x0 x, Cons y0 y -> Cons (x0, y0) (combine x y)
+    | _ -> Nil
+    end
+
+end
+
 (** {2 Sorted lists for some order as parameter} *)
 
 theory Sorted

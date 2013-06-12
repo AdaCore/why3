@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.1"/>
+ <prover
+  id="1"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="2"
+  name="Vampire"
+  version="0.6"/>
+ <file
+  name="../there_and_back_again.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="ThereAndBackAgain"
+   locfile="../there_and_back_again.mlw"
+   loclnum="10" loccnumb="7" loccnume="24"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter product"
+    locfile="../there_and_back_again.mlw"
+    loclnum="19" loccnumb="10" loccnume="17"
+    expl="VC for product"
+    sum="6f30a7efd50e3f2ad7a9c6d697d895c8"
+    proved="true"
+    expanded="true"
+    shape="Cainfix =aNilacombineV0areverseV2Aainfix =alengthV2alengthV0Aainfix =V1ainfix ++V2V1EaNilCainfix =aConsaTuple2V3V7V5acombineV0areverseV9Aainfix =alengthV9alengthV0Aainfix =V1ainfix ++V9V8EaConsVVfwV6Iainfix =V5acombineV4areverseV10Aainfix =alengthV10alengthV4Aainfix =V1ainfix ++V10V6EFAainfix &lt;=alengthV4alengthV1ACfaNilainfix =V11V4aConswVV0aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
+    <label
+     name="expl:VC for product"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter product.1"
+      locfile="../there_and_back_again.mlw"
+      loclnum="19" loccnumb="10" loccnume="17"
+      expl="1. postcondition"
+      sum="22323d25c9228a98c48b2d4068a93d70"
+      proved="true"
+      expanded="false"
+      shape="postconditionCainfix =aNilacombineV0areverseV2Aainfix =alengthV2alengthV0Aainfix =V1ainfix ++V2V1EaNiltaConsVVV0Iainfix &lt;=alengthV0alengthV1F">
+      <label
+       name="expl:VC for product"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter product.2"
+      locfile="../there_and_back_again.mlw"
+      loclnum="19" loccnumb="10" loccnume="17"
+      expl="2. variant decrease"
+      sum="af7cd6694489661f532eb2655f4675eb"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV0aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
+      <label
+       name="expl:VC for product"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter product.3"
+      locfile="../there_and_back_again.mlw"
+      loclnum="19" loccnumb="10" loccnume="17"
+      expl="3. precondition"
+      sum="c2966dd9b745070fb99fd7ccd7e899cb"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaNilainfix &lt;=alengthV3alengthV1aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
+      <label
+       name="expl:VC for product"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter product.4"
+      locfile="../there_and_back_again.mlw"
+      loclnum="19" loccnumb="10" loccnume="17"
+      expl="4. postcondition"
+      sum="1043027ce4b62fc6c89b9349fdb262f2"
+      proved="true"
+      expanded="true"
+      shape="postconditionCtaNilCainfix =aConsaTuple2V2V6V4acombineV0areverseV8Aainfix =alengthV8alengthV0Aainfix =V1ainfix ++V8V7EaConsVVtwV5Iainfix =V4acombineV3areverseV9Aainfix =alengthV9alengthV3Aainfix =V1ainfix ++V9V5EFIainfix &lt;=alengthV3alengthV1aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
+      <label
+       name="expl:VC for product"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter product.5"
+      locfile="../there_and_back_again.mlw"
+      loclnum="19" loccnumb="10" loccnume="17"
+      expl="5. unreachable point"
+      sum="6a3cb5cd8701aaa9c2c6dc245ad33d97"
+      proved="true"
+      expanded="true"
+      shape="unreachable pointCtaNilCtaConsVVfwV5Iainfix =V4acombineV3areverseV8Aainfix =alengthV8alengthV3Aainfix =V1ainfix ++V8V5EFIainfix &lt;=alengthV3alengthV1aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
+      <label
+       name="expl:VC for product"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter puzzle"
+    locfile="../there_and_back_again.mlw"
+    loclnum="34" loccnumb="6" loccnume="12"
+    expl="VC for puzzle"
+    sum="f223ffa3689b0af9965ecdb23a057442"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V2acombineV0areverseV1Iainfix =V2acombineV0areverseV4Aainfix =alengthV4alengthV0Aainfix =V1ainfix ++V4V3EFAainfix &lt;=alengthV0alengthV1Iainfix =alengthV0alengthV1F">
+    <label
+     name="expl:VC for puzzle"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter puzzle.1"
+      locfile="../there_and_back_again.mlw"
+      loclnum="34" loccnumb="6" loccnume="12"
+      expl="1. precondition"
+      sum="2a2bb6b3599f9fc69ed8efd523693ce5"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=alengthV0alengthV1Iainfix =alengthV0alengthV1F">
+      <label
+       name="expl:VC for puzzle"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter puzzle.2"
+      locfile="../there_and_back_again.mlw"
+      loclnum="34" loccnumb="6" loccnume="12"
+      expl="2. postcondition"
+      sum="c7238414782f18b0852e59cd85f29247"
+      proved="true"
+      expanded="true"
+      shape="postconditionainfix =V2acombineV0areverseV1Iainfix =V2acombineV0areverseV4Aainfix =alengthV4alengthV0Aainfix =V1ainfix ++V4V3EFIainfix &lt;=alengthV0alengthV1Iainfix =alengthV0alengthV1F">
+      <label
+       name="expl:VC for puzzle"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
