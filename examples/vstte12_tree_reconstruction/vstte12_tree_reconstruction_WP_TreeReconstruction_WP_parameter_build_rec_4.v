@@ -3,112 +3,61 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require list.List.
+Require list.Length.
+Require list.Mem.
+Require list.Append.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 (* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
-
-(* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Inductive tree  :=
-  | Leaf : tree 
-  | Node : tree -> tree -> tree .
+Inductive tree :=
+  | Leaf : tree
+  | Node : tree -> tree -> tree.
 Axiom tree_WhyType : WhyType tree.
 Existing Instance tree_WhyType.
 
 (* Why3 assumption *)
-Fixpoint depths(d:Z) (t:tree) {struct t}: (list Z) :=
+Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
-  | Leaf => (Cons d (Nil :(list Z)))
-  | (Node l r) => (infix_plpl (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
+  | Leaf => (cons d nil)
+  | (Node l r) => (List.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
   end.
 
 Axiom depths_head : forall (t:tree) (d:Z), match (depths d
   t) with
-  | (Cons x _) => (d <= x)%Z
-  | Nil => False
+  | (cons x _) => (d <= x)%Z
+  | nil => False
   end.
 
 Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
-  (s2:(list Z)), ((infix_plpl (depths d t1) s1) = (infix_plpl (depths d t2)
-  s2)) -> ((t1 = t2) /\ (s1 = s2)).
+  (s2:(list Z)), ((List.app (depths d t1) s1) = (List.app (depths d
+  t2) s2)) -> ((t1 = t2) /\ (s1 = s2)).
 
-Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list
-  Z)), ((infix_plpl (depths d1 t) s1) = (infix_plpl (depths d2 t) s2)) ->
-  (d1 = d2).
+Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z))
+  (s2:(list Z)), ((List.app (depths d1 t) s1) = (List.app (depths d2
+  t) s2)) -> (d1 = d2).
 
 Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
   t) = (depths d2 t)) -> (d1 = d2).
 
-Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list
-  Z)), ((infix_plpl (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
+Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z)
+  (s1:(list Z)), ((List.app (depths d1 t1) s1) = (depths d2 t2)) ->
+  (d2 <= d1)%Z.
 
 Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
   t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
 
 (* Why3 assumption *)
-Definition lex(x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
+Definition lex (x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
   match x1 with
   | (s1, d1) =>
       match x2 with
-      | (s2, d2) => ((length s1) < (length s2))%Z \/
-          (((length s1) = (length s2)) /\ match (s1,
+      | (s2, d2) => ((list.Length.length s1) < (list.Length.length s2))%Z \/
+          (((list.Length.length s1) = (list.Length.length s2)) /\ match (s1,
           s2) with
-          | ((Cons h1 _), (Cons h2 _)) => ((d2 < d1)%Z /\ (d1 <= h1)%Z) /\
+          | ((cons h1 _), (cons h2 _)) => ((d2 < d1)%Z /\ (d1 <= h1)%Z) /\
               (h1 = h2)
           | _ => False
           end)
@@ -118,12 +67,12 @@ Definition lex(x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
 (* Why3 goal *)
 Theorem WP_parameter_build_rec : forall (d:Z) (s:(list Z)),
   match s with
-  | Nil => True
-  | (Cons h t) => (~ (h < d)%Z) -> ((~ (h = d)) -> ((forall (t1:tree)
-      (s':(list Z)), ~ ((infix_plpl (depths (d + 1%Z)%Z t1) s') = s)) ->
-      forall (t1:tree) (s':(list Z)), ~ ((infix_plpl (depths d t1) s') = s)))
+  | nil => True
+  | (cons h t) => (~ (h < d)%Z) -> ((~ (h = d)) -> ((forall (t1:tree)
+      (s':(list Z)), ~ ((List.app (depths (d + 1%Z)%Z t1) s') = s)) ->
+      forall (t1:tree) (s':(list Z)), ~ ((List.app (depths d t1) s') = s)))
   end.
-(* YOU MAY EDIT THE PROOF BELOW *)
+(* Why3 intros d s. *)
 intuition.
 destruct s; intuition.
 rename z into h. rename s into t.
@@ -134,7 +83,7 @@ injection H2.
 omega.
 (* t1 = Node t1 t2 *)
 simpl in H2.
-rewrite <- Append_assoc in H2.
+rewrite <- Append.Append_assoc in H2.
 apply (H1 _ _ H2).
 Qed.
 
