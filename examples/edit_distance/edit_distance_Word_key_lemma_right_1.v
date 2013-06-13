@@ -4,120 +4,65 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require int.MinMax.
+Require list.List.
+Require list.Length.
+Require list.Mem.
+Require list.Append.
 
-(* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list
-  a)) {struct l}: BuiltIn.int :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Parameter char : Type.
-Axiom char_WhyType : WhyType char.
+Axiom char : Type.
+Parameter char_WhyType : WhyType char.
 Existing Instance char_WhyType.
 
 (* Why3 assumption *)
-Definition word  := (list char).
+Definition word := (list char).
 
 (* Why3 assumption *)
-Inductive dist : (list char) -> (list char) -> BuiltIn.int -> Prop :=
-  | dist_eps : (dist (Nil :(list char)) (Nil :(list char)) 0%Z)
-  | dist_add_left : forall (w1:(list char)) (w2:(list char)) (n:BuiltIn.int),
-      (dist w1 w2 n) -> forall (a:char), (dist (Cons a w1) w2 (n + 1%Z)%Z)
-  | dist_add_right : forall (w1:(list char)) (w2:(list char))
-      (n:BuiltIn.int), (dist w1 w2 n) -> forall (a:char), (dist w1 (Cons a
-      w2) (n + 1%Z)%Z)
-  | dist_context : forall (w1:(list char)) (w2:(list char)) (n:BuiltIn.int),
-      (dist w1 w2 n) -> forall (a:char), (dist (Cons a w1) (Cons a w2) n).
+Inductive dist : (list char) -> (list char) -> Z -> Prop :=
+  | dist_eps : (dist nil nil 0%Z)
+  | dist_add_left : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
+      w2 n) -> forall (a:char), (dist (cons a w1) w2 (n + 1%Z)%Z)
+  | dist_add_right : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
+      w2 n) -> forall (a:char), (dist w1 (cons a w2) (n + 1%Z)%Z)
+  | dist_context : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
+      w2 n) -> forall (a:char), (dist (cons a w1) (cons a w2) n).
 
 (* Why3 assumption *)
-Definition min_dist(w1:(list char)) (w2:(list char)) (n:BuiltIn.int): Prop :=
-  (dist w1 w2 n) /\ forall (m:BuiltIn.int), (dist w1 w2 m) -> (n <= m)%Z.
+Definition min_dist (w1:(list char)) (w2:(list char)) (n:Z): Prop := (dist w1
+  w2 n) /\ forall (m:Z), (dist w1 w2 m) -> (n <= m)%Z.
 
 (* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Fixpoint last_char(a:char) (u:(list char)) {struct u}: char :=
+Fixpoint last_char (a:char) (u:(list char)) {struct u}: char :=
   match u with
-  | Nil => a
-  | (Cons c u') => (last_char c u')
+  | nil => a
+  | (cons c u') => (last_char c u')
   end.
 
 (* Why3 assumption *)
-Fixpoint but_last(a:char) (u:(list char)) {struct u}: (list char) :=
+Fixpoint but_last (a:char) (u:(list char)) {struct u}: (list char) :=
   match u with
-  | Nil => (Nil :(list char))
-  | (Cons c u') => (Cons a (but_last c u'))
+  | nil => nil
+  | (cons c u') => (cons a (but_last c u'))
   end.
 
 Axiom first_last_explicit : forall (u:(list char)) (a:char),
-  ((infix_plpl (but_last a u) (Cons (last_char a u) (Nil :(list
-  char)))) = (Cons a u)).
+  ((List.app (but_last a u) (cons (last_char a u) nil)) = (cons a u)).
 
 Axiom first_last : forall (a:char) (u:(list char)), exists v:(list char),
-  exists b:char, ((infix_plpl v (Cons b (Nil :(list char)))) = (Cons a u)) /\
-  ((length v) = (length u)).
+  exists b:char, ((List.app v (cons b nil)) = (cons a u)) /\
+  ((list.Length.length v) = (list.Length.length u)).
 
-Lemma app_comm_cons: forall (A:Type) {A_WT:WhyType A} (x y : list A) (a: A),
-   Cons a (infix_plpl x y) = infix_plpl (Cons a x) y.
+Lemma app_comm_cons: forall {A:Type} {A_WT:WhyType A} (x y : list A) (a: A),
+   cons a (app x y) = app (cons a x) y.
 simpl; auto.
 Qed.
 
 (* Why3 goal *)
-Theorem key_lemma_right : forall (w1:(list char)) (w'2:(list char))
-  (m:BuiltIn.int) (a:char), (dist w1 w'2 m) -> forall (w2:(list char)),
-  (w'2 = (Cons a w2)) -> exists u1:(list char), exists v1:(list char),
-  exists k:BuiltIn.int, (w1 = (infix_plpl u1 v1)) /\ ((dist v1 w2 k) /\
-  ((k + (length u1))%Z <= (m + 1%Z)%Z)%Z).
-(* YOU MAY EDIT THE PROOF BELOW *)
+Theorem key_lemma_right : forall (w1:(list char)) (w'2:(list char)) (m:Z)
+  (a:char), (dist w1 w'2 m) -> forall (w2:(list char)),
+  (w'2 = (cons a w2)) -> exists u1:(list char), exists v1:(list char),
+  exists k:Z, (w1 = (List.app u1 v1)) /\ ((dist v1 w2 k) /\
+  ((k + (list.Length.length u1))%Z <= (m + 1%Z)%Z)%Z).
+(* Why3 intros w1 w'2 m a h1 w2 h2. *)
 intros w1 w'2 m a H; elim H.
 (* 1. [dist_eps]: absurd *)
 intros; discriminate H0.
@@ -129,17 +74,17 @@ elim Hex; clear Hex; intros k Hex.
 decompose [and] Hex; clear Hex.
 elim (first_last b u'1); intros u1 Hex.
 elim Hex; intros c [Hc Hlength].
-exists u1; exists (Cons c v'1); exists (k + 1)%Z.
+exists u1; exists (cons c v'1); exists (k + 1)%Z.
 repeat split.
 rewrite H0.
 rewrite app_comm_cons.
 rewrite <- Hc.
-rewrite <- Append_assoc; reflexivity.
+rewrite <- Append.Append_assoc; reflexivity.
 apply dist_add_left; assumption.
 omega.
 (* 3. [dist_add_right]: direct *)
 intros.
-exists Nil; exists w0; exists n.
+exists nil; exists w0; exists n.
 repeat split.
 inversion H2.
 rewrite <- H5; assumption.
@@ -147,7 +92,7 @@ simpl; omega.
 (* 4. [dist_context]: direct *)
 intros.
 inversion H2.
-exists (Cons a Nil); exists w0; exists n.
+exists (cons a nil); exists w0; exists n.
 repeat split.
 rewrite <- H5; assumption.
 simpl; omega.
