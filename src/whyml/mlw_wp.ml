@@ -1029,6 +1029,11 @@ module Subst : sig
       (s',f) is the new state [s'] and a formula [f] which defines the new
       values in [s'] with respect to the input state [s]. *)
 
+   val extract_glue : wp_env -> Sreg.t -> t -> t -> term
+   (* The formula [extract_glue env regs s1 s2] expresses what has not changed
+      between [s1] and [s2], concerning program variables. The set of 
+    *)
+
    val merge : t -> t -> t -> t * term * term
    (* Given a start state and two states that parted from there, return a new
       "join" state and two formulas.  The first formula links the first branch
@@ -1199,6 +1204,22 @@ end = struct
         t_map (term s) t
     | _ ->
         t_map (term s) t
+
+  let extract_glue env regions s1 s2 =
+    (* we are only interested in "now" program vars *)
+    let touched_regions =
+      Mreg.filter (fun r _ -> Sreg.mem r regions) s2.now.subst_regions in
+    let s1 = s1.now.subst_vars and s2 = s2.now.subst_vars in
+    (* We iterate over the first state, because the second one potentially
+     * contains more variables *)
+    Mvs.fold
+      (fun var old_f acc ->
+          let f = Mvs.find var s2 in
+          if t_equal f old_f || is_simple_var var <> None then acc
+          else
+            let new_value = update_var env touched_regions var in
+            t_and_simp acc (t_equ_simp f new_value)
+      ) s1 t_true
 
   let subst_inter a b =
     (* compute the intersection of two substitutions. *)
@@ -1671,9 +1692,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
            for the exceptions that are actually listed. *)
         let wp1_exn_filtered =
           Mexn.filter (fun ex _ -> Mexn.mem ex xpost) wp1.exn in
-        (* ??? the glue is missing in this call to apply_state_to_post. This
-           means that "abstract" also forgets which immutable *components* are
-           not modified. To be fixed. *)
         let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
         wp_nimplies wp1.post.ne wp1_exn_filtered ((result, post.ne), xq)
       in
@@ -1685,6 +1703,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           if Mexn.mem ex acc then acc
           else Mexn.add ex post acc)
         wp1.exn xpost in
+      let regs = regs_of_writes e1.e_effect in
+      let glue = Subst.extract_glue env regs pre_abstr_state wp1.post.s in
+      let post = { post with ne = t_and_simp glue post.ne } in
       let ok = t_and_simp_l [wp1.ok; (Subst.term s spec.c_pre); ok_post] in
       { ok = wp_label e ok;
         post = post;
