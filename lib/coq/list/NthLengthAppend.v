@@ -49,6 +49,7 @@ simpl.
 generalize (Zeq_bool_if i 0).
 case Zeq_bool.
 intros Hi'.
+exfalso.
 generalize (Length.Length_nonnegative l1).
 omega.
 intros _.

@@ -19,6 +19,8 @@ easy.
 simpl.
 generalize (Zeq_bool_if (i + 1) 0).
 case Zeq_bool.
+intro H.
+exfalso.
 omega.
 intros _.
 simpl in h1.

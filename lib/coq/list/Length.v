@@ -19,7 +19,7 @@ Proof.
 intros a a_WT l.
 induction l.
 easy.
-change (1 + length l = Z.of_nat (S (List.length l)))%Z.
+change (1 + length l = Z_of_nat (S (List.length l)))%Z.
 now rewrite inj_S, Zplus_comm, IHl.
 Qed.
 
@@ -39,6 +39,7 @@ Proof.
 intros a a_WT [|h t] ; split ; try easy.
 unfold length. fold length.
 intros H.
+exfalso.
 generalize (Length_nonnegative t).
 omega.
 Qed.

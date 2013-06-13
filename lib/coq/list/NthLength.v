@@ -41,6 +41,7 @@ generalize (Zeq_bool_if i 0).
 case Zeq_bool.
 intros H'.
 rewrite H' in H.
+exfalso.
 generalize (Length.Length_nonnegative q).
 omega.
 intros _.
