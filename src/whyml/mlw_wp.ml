@@ -1058,15 +1058,15 @@ end = struct
     }
   (* a substitution or state knows the current variables to use for each region
      and each mutable program variable. *)
-  (* the reg_names field is a simple name hint; a mapping reg |-> name means
-     that [name] should be used as a base for new variables in region [reg].
-     This mapping is not required to be complete for regions. *)
 
   type t =
     { now       : subst;
       other     : subst Mvs.t;
       reg_names : vsymbol Mreg.t;
     }
+  (* the reg_names field is a simple name hint; a mapping reg |-> name means
+     that [name] should be used as a base for new variables in region [reg].
+     This mapping is not required to be complete for regions. *)
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
 
@@ -1091,13 +1091,11 @@ end = struct
        belonging to this program variable are also added to the state, if not
        already there. Note that [add_pvar] doesn't really change the state,
        only adds new knowledge. *)
-    (* for simple variables (1 variable = 1 mutable region), we register the
-       variable name as a name hint for the region. Also, we enter a
-       dummy program variable in the substitution map, so that we know that we
-       have to do something with this variable, but still know it is a program
-       variable. Previously, we did not enter it at all in the map, which made
-       us forget to substitute it.
-       See also [havoc], [merge] and [term]. *)
+    (* for simple variables (1 variable = 1 mutable region), we do not
+       introduce a new program variable each time, instead we use directly the
+       [update_var] term. See also [havoc]. This is a heuristics which assumes
+       that in this case, the program variable would be an overhead. In
+       particular for simple references it is an important optimization. *)
     let ity = pv.pv_ity in
     if ity_immutable ity then s
     else
@@ -1149,8 +1147,8 @@ end = struct
         Mreg.add reg (fresh_var_from_region s.reg_names reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
-    (* We special case simple variables, when the mapping is the dummy
-     * variable. So no new names/equations are introduced for those. *)
+    (* We special case simple variables: no new variable is introduced for the
+     * program variable, we directly use the "update_var" term. *)
     let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
       if pv_is_touched_by_regions vs regset then begin
         let new_term = update_var env touched_regs vs in
@@ -1174,9 +1172,7 @@ end = struct
        "current" substitution accordingly. *)
     match t.t_node with
     | Tvar vs ->
-        (* the normal case here is to replace the program variable [vs] by its
-           "now" value. The special case is where it is a simple variable; we
-           directly insert the "update" term here. *)
+        (* We simply replace the program variable [vs] by its "now" value. *)
         begin try Mvs.find vs s.now.subst_vars
         with Not_found -> t
         end
