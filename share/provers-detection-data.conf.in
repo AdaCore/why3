@@ -228,6 +228,15 @@ command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -t %t"
 driver = "drivers/vampire.drv"
 version_ok = "0.6"
 
+[ATP princess]
+name = "Princess"
+exec = "princess"
+# version_switch = "-h"
+version_regexp = "(release \\([0-9-]+\\))"
+command = "'@LOCALBIN@why3-cpulimit' %t 0 -s %e %f"
+driver = "drivers/princess.drv"
+version_ok = "2013-04-21"
+
 [ATP verit]
 name = "veriT"
 exec = "veriT"
