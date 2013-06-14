@@ -1,0 +1,295 @@
+(* Why3 driver for beagle
+   see http://users.cecs.anu.edu.au/~baumgart/systems/beagle/ *)
+
+printer "tptp-tff"
+filename "%f-%t-%g.p"
+
+valid   "Proof found"
+invalid "Completion found"
+valid   "^% SZS status Theorem"
+valid   "^SZS status Theorem"
+valid   "^% SZS status Unsatisfiable"
+unknown "^% SZS status CounterSatisfiable" ""
+unknown "^% SZS status Satisfiable" ""
+unknown "^Cannot normalize into a linear term:" ""
+timeout "^% SZS status Timeout"
+unknown "^% SZS status GaveUp" ""
+fail    "^% SZS status Error" ""
+timeout "Ran out of time"
+timeout "CPU time limit exceeded"
+outofmemory "Out of Memory"
+unknown "No Proof Found"            ""
+fail    "Failure.*"                   "\"\\0\""
+time "why3cpulimit time : %s s"
+
+(* transformations *)
+
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+
+(* currently, princess does not support $let and $ite *)
+transformation "eliminate_let"
+transformation "eliminate_if"
+
+transformation "encoding_smt"
+transformation "encoding_sort"
+
+theory BuiltIn
+  syntax predicate (=)  "(%1 = %2)"
+  syntax type int  "$int"
+  syntax type real "$real"
+
+  meta "encoding : kept" type int
+  meta "encoding : kept" type real
+  meta "eliminate_algebraic" "no_index"
+
+  meta "select_inst" "all"
+  meta "select_lskept" "all"
+  meta "select_lsinst" "all"
+  meta "select_kept" "all"
+end
+
+theory int.Int
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "$sum(%1,%2)"
+  syntax function (-)  "$difference(%1,%2)"
+  syntax function (*)  "$product(%1,%2)"
+  syntax function (-_) "$uminus(%1)"
+
+  syntax predicate (<=) "$lesseq(%1,%2)"
+  syntax predicate (<)  "$less(%1,%2)"
+  syntax predicate (>=) "$greatereq(%1,%2)"
+  syntax predicate (>)  "$greater(%1,%2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+  (* Beagle fails on non-linear axioms *)
+  remove prop CompatOrderMult
+end
+
+theory real.Real
+  syntax function zero "0.0"
+  syntax function one  "1.0"
+
+  syntax function (+)  "$sum(%1,%2)"
+  syntax function (-)  "$difference(%1,%2)"
+  syntax function (*)  "$product(%1,%2)"
+  syntax function (-_) "$uminus(%1)"
+
+  syntax function (/)  "$quotient(%1,%2)"
+  syntax function inv  "$quotient(1.0,%1)"
+
+  syntax predicate (<=) "$lesseq(%1,%2)"
+  syntax predicate (<)  "$less(%1,%2)"
+  syntax predicate (>=) "$greatereq(%1,%2)"
+  syntax predicate (>)  "$greater(%1,%2)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+end
+
+theory int.EuclideanDivision
+  syntax function div "$quotient_e(%1,%2)"
+  syntax function mod "$remainder_e(%1,%2)"
+
+  remove prop Div_mod
+  remove prop Div_bound
+  remove prop Mod_bound
+  remove prop Mod_1
+  remove prop Div_1
+  remove prop Div_inf
+  remove prop Div_inf_neg
+  remove prop Mod_0
+  remove prop Div_1_left
+  remove prop Div_minus1_left
+  remove prop Mod_1_left
+  remove prop Mod_minus1_left
+end
+
+theory tptp.Univ
+  syntax type iType "$i"
+
+  meta "encoding : kept" type iType
+end
+
+theory tptp.IntTrunc
+  syntax function floor    "$floor(%1)"
+  syntax function ceil     "$ceil(%1)"
+  syntax function truncate "$truncate(%1)"
+  syntax function round    "$round(%1)"
+
+  syntax function to_int   "$to_int(%1)"
+
+  syntax predicate is_int  "$is_int(%1)"
+  syntax predicate is_rat  "$is_rat(%1)"
+end
+
+theory tptp.IntDivT
+  syntax function div_t "$quotient_t(%1,%2)"
+  syntax function mod_t "$remainder_t(%1,%2)"
+end
+
+theory tptp.IntDivF
+  syntax function div_f "$quotient_f(%1,%2)"
+  syntax function mod_f "$remainder_f(%1,%2)"
+end
+
+theory tptp.Rat
+  syntax type rat "$rat"
+
+  syntax function zero "0/1"
+  syntax function one  "1/1"
+
+  syntax function (+)  "$sum(%1,%2)"
+  syntax function (-)  "$difference(%1,%2)"
+  syntax function (*)  "$product(%1,%2)"
+  syntax function (-_) "$uminus(%1)"
+
+  syntax function (/)  "$quotient(%1,%2)"
+  syntax function inv  "$quotient(1.0,%1)"
+
+  syntax predicate (<=) "$lesseq(%1,%2)"
+  syntax predicate (<)  "$less(%1,%2)"
+  syntax predicate (>=) "$greatereq(%1,%2)"
+  syntax predicate (>)  "$greater(%1,%2)"
+
+  syntax function to_rat   "$to_rat(%1)"
+
+  syntax predicate is_int  "$is_int(%1)"
+  syntax predicate is_rat  "$is_rat(%1)"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+  meta "encoding : kept" type rat
+end
+
+theory tptp.RatTrunc
+  syntax function floor    "$floor(%1)"
+  syntax function ceil     "$ceil(%1)"
+  syntax function truncate "$truncate(%1)"
+  syntax function round    "$round(%1)"
+
+  syntax function to_int   "$to_int(%1)"
+end
+
+theory tptp.RatDivE
+  syntax function div "$quotient_e(%1,%2)"
+  syntax function mod "$remainder_e(%1,%2)"
+end
+
+theory tptp.RatDivT
+  syntax function div_t "$quotient_t(%1,%2)"
+  syntax function mod_t "$remainder_t(%1,%2)"
+end
+
+theory tptp.RatDivF
+  syntax function div_f "$quotient_f(%1,%2)"
+  syntax function mod_f "$remainder_f(%1,%2)"
+end
+
+theory tptp.Real
+  syntax function to_real "$to_real(%1)"
+end
+
+theory real.Truncate
+  syntax function floor    "$floor(%1)"
+  syntax function ceil     "$ceil(%1)"
+  syntax function truncate "$truncate(%1)"
+end
+
+theory tptp.RealTrunc
+  syntax function round    "$round(%1)"
+
+  syntax function to_int   "$to_int(%1)"
+
+  syntax predicate is_int  "$is_int(%1)"
+  syntax predicate is_rat  "$is_rat(%1)"
+end
+
+theory tptp.RealDivE
+  syntax function div "$quotient_e(%1,%2)"
+  syntax function mod "$remainder_e(%1,%2)"
+end
+
+theory tptp.RealDivT
+  syntax function div_t "$quotient_t(%1,%2)"
+  syntax function mod_t "$remainder_t(%1,%2)"
+end
+
+theory tptp.RealDivF
+  syntax function div_f "$quotient_f(%1,%2)"
+  syntax function mod_f "$remainder_f(%1,%2)"
+end
+
+theory tptp.IntToRat
+  syntax function to_rat   "$to_rat(%1)"
+end
+
+theory tptp.IntToReal
+  syntax function to_real "$to_real(%1)"
+end
+
+theory tptp.RealToRat
+  syntax function to_rat   "$to_rat(%1)"
+end
+
+theory tptp.RatToReal
+  syntax function to_real "$to_real(%1)"
+end
+
