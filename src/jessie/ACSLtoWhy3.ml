@@ -119,7 +119,7 @@ let set_fun : Mlw_expr.psymbol =
 
 (* mach_int.Int32 module *)
 
-let mach_int_modules, mach_int_theories =
+let mach_int_modules, _mach_int_theories =
   Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
 
 let int32_module : Mlw_module.modul = Stdlib.Mstr.find "Int32" mach_int_modules
@@ -148,6 +148,37 @@ let lt32_fun : Mlw_expr.psymbol =
 let int32ofint_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["of_int"]
 
+(* mach_int.Int64 module *)
+
+let mach_int_modules, mach_int_theories =
+  Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
+
+let int64_module : Mlw_module.modul = Stdlib.Mstr.find "Int64" mach_int_modules
+
+let int64_type : Why3.Ty.tysymbol =
+  Mlw_module.ns_find_ts int64_module.Mlw_module.mod_export ["int64"]
+
+let int64_to_int : Term.lsymbol =
+  find int64_module.Mlw_module.mod_theory "to_int"
+
+let add64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["add"]
+
+let sub64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["sub"]
+
+let mul64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["mul"]
+
+let le64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["le"]
+
+let lt64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["lt"]
+
+let int64ofint_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["of_int"]
+
 (* array.Array module *)
 
 (*
@@ -174,6 +205,7 @@ let array_type : Mlw_ty.T.itysymbol =
 let unit_type = Ty.ty_tuple []
 let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
 let mlw_int32_type = Mlw_ty.ity_pur int32_type []
+let mlw_int64_type = Mlw_ty.ity_pur int64_type []
 
 let ctype_and_default ty =
   match ty with
@@ -183,6 +215,11 @@ let ctype_and_default ty =
       mlw_int32_type,
       Mlw_expr.e_app
         (Mlw_expr.e_arrow int32ofint_fun [mlw_int_type] mlw_int32_type) [n]
+    | TInt (ILong, _attr) ->
+      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      mlw_int64_type,
+      Mlw_expr.e_app
+        (Mlw_expr.e_arrow int64ofint_fun [mlw_int_type] mlw_int64_type) [n]
     | TInt (_, _) ->
       Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->

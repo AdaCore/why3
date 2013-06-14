@@ -12,7 +12,7 @@
 int isqrt(int x) {
   int count = 0, sum = 1;
   /*@ loop invariant count >= 0 && x >= sqr(count+0) && sum == sqr(count+1);
-    @ loop variant  x - count; 
+    @ loop variant  x - count;
     @*/
   while (sum <= x) { ++count; sum += 2 * count + 1; }
   return count;

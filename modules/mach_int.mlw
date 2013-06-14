@@ -44,9 +44,9 @@ use import int.ComputerDivision
 
 val div (a:t) (b:t) : t
   requires { "expl:division by zero" to_int b <> 0 }
-  requires { "expl:integer overflow" 
+  requires { "expl:integer overflow"
     in_bounds (ComputerDivision.div (to_int a) (to_int b)) }
-  ensures { 
+  ensures {
     to_int result = ComputerDivision.div (to_int a) (to_int b) }
 
 end
@@ -62,8 +62,8 @@ constant min_int32 : int = - 0x80000000
 
 constant max_int32 : int =   0x7fffffff
 
-clone export Bounded_int with 
-  type t = int32, 
+clone export Bounded_int with
+  type t = int32,
   constant min = min_int32,
   constant max = max_int32
 
@@ -77,10 +77,30 @@ constant min_uint32 : int = 0x00000000
 
 constant max_uint32 : int = 0xffffffff
 
-clone export Bounded_int with 
-  type t = uint32, 
+clone export Bounded_int with
+  type t = uint32,
   constant min = min_uint32,
   constant max = max_uint32
+
+end
+
+
+
+
+module Int64
+
+use import int.Int
+
+type int64
+
+constant min_int64 : int = - 0x8000000000000000
+
+constant max_int64 : int =   0x7fffffffffffffff
+
+clone export Bounded_int with
+  type t = int64,
+  constant min = min_int64,
+  constant max = max_int64
 
 end
 
