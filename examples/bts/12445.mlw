@@ -1,0 +1,9 @@
+module M
+   use import int.Int
+
+   let f ()
+     ensures { let (a,b,c) = result in a > 0 }
+   =
+     (1,2,3)
+end
+
