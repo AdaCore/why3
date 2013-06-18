@@ -14,10 +14,22 @@
   @ ensures \result == sum_upto(x+0);
   @*/
 long sum(int x) {
+  long tmp;
+  if (x == 0) return 0;
+  tmp = sum (x-1);
+  return /* x+ */ tmp;
+}
+
+#if 0
+/*@ requires 0 <= x <= 60000;
+  @ decreases x;
+  @ ensures \result == sum_upto(x+0);
+  @*/
+long sum(int x) {
   if (x == 0) return 0;
   else return x + sum (x-1);
 }
-
+#endif
 
 /*@ ensures \result == 36;
   @*/

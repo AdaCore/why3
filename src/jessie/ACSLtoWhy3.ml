@@ -475,6 +475,8 @@ let rec term_node ~label t =
         match ty, t.term_type with
           | Linteger, Ctype(TInt(IInt,_attr)) ->
              t_app int32_to_int [t']
+          | Linteger, Ctype(TInt(ILong,_attr)) ->
+             t_app int64_to_int [t']
           | _ ->
             Self.not_yet_implemented "TLogic_coerce(int_type,_)"
       end
@@ -869,13 +871,25 @@ let rec expr e =
     | Lval lv -> lval lv
     | BinOp (op, e1, e2, _loc) ->
       binop op (expr e1) (expr e2)
+    | UnOp (_, _, _)
+      -> Self.not_yet_implemented "expr UnOp"
+    | CastE (ty, e) ->
+      let e' = expr e in
+      begin
+        match ty, Cil.typeOf e with
+          | TInt(ILong,_attr1), TInt(IInt,_attr2) ->
+            Mlw_expr.e_app
+              (Mlw_expr.e_arrow int64ofint_fun 
+                 [mlw_int_type] mlw_int64_type) 
+              [Mlw_expr.e_lapp int32_to_int [e'] mlw_int_type]
+          | _ ->
+            Self.not_yet_implemented "expr CastE"
+      end
     | SizeOf _
     | SizeOfE _
     | SizeOfStr _
     | AlignOf _
     | AlignOfE _
-    | UnOp (_, _, _)
-    | CastE (_, _)
     | AddrOf _
     | StartOf _
     | Info (_, _)
