@@ -3,4 +3,18 @@
 Require Import BuiltIn.
 Require BuiltIn.
 
-
+Global Instance list_WhyType : forall T {T_WT : WhyType T}, WhyType (list T).
+split.
+apply nil.
+induction x as [|xh x] ; intros [|yh y] ; try (now right).
+now left.
+destruct (IHx y) as [->|E].
+destruct (why_decidable_eq xh yh) as [->|Eh].
+now left.
+right.
+contradict Eh.
+now injection Eh.
+right.
+contradict E.
+now injection E.
+Qed.
