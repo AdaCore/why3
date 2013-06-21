@@ -395,6 +395,22 @@ let get_var v =
   with Not_found ->
     Self.fatal "program variable %s (%d) not found" v.vname v.vid
 
+let program_funs = Hashtbl.create 257
+
+let create_fun v =
+  let id = Ident.id_fresh v.vname in
+  let ty = ctype v.vtype in
+  Self.result "create program function %s (%d)" v.vname v.vid;
+  Hashtbl.add program_funs v.vid (id,ty);
+  (id,ty)
+
+let get_fun v =
+  try
+    Hashtbl.find program_funs v.vid
+  with Not_found ->
+    Self.fatal "program function %s (%d) not found" v.vname v.vid
+
+
 let logic_symbols = Hashtbl.create 257
 
 let create_lsymbol li =
@@ -445,10 +461,12 @@ let rec term_node ~label t =
           | [] ->
             let ls = get_lsymbol li in
             let args = List.map (fun x -> 
-              let ty,t = term ~label x in
+              let _ty,t = term ~label x in
+(*
               Self.result "arg = %a, type  = %a"
               Cil_printer.pp_term x
               Cil_printer.pp_logic_type ty;
+*)
               t) args in
             t_app ls args
           | _ ->
@@ -928,6 +946,25 @@ and lval (host,offset) =
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
+let functional_expr e =
+  match e.enode with
+    | Lval (Var v, NoOffset) ->
+      let _id,_ty = get_fun v in
+      assert false (* TODO Mlw_expr.e_arrow id *)
+    | Lval _
+    | Const _ 
+    | BinOp _ 
+    | SizeOf _
+    | SizeOfE _
+    | SizeOfStr _
+    | AlignOf _
+    | AlignOfE _
+    | UnOp (_, _, _)
+    | CastE (_, _)
+    | AddrOf _
+    | StartOf _
+    | Info (_, _)
+      -> Self.not_yet_implemented "functional_expr"
 
 let assignment (lhost,offset) e _loc =
   match lhost,offset with
@@ -949,8 +986,11 @@ let assignment (lhost,offset) e _loc =
 let instr i =
   match i with
   | Set(lv,e,loc) -> assignment lv e loc
-  | Call (_, _, _, _) ->
-    Self.not_yet_implemented "instr Call"
+  | Call (None, _loc, _e, _el) ->
+    Self.not_yet_implemented "instr Call None"
+  | Call (Some _lv, e, el, _loc) ->   
+    let e = functional_expr e in
+    Mlw_expr.e_app e (List.map expr el)
   | Asm (_, _, _, _, _, _) ->
     Self.not_yet_implemented "instr Asm"
   | Skip _loc ->
@@ -1120,8 +1160,9 @@ let fundecl fdec =
     l_spec = spec;
   }
   in
+  let x,_ty = create_fun fun_id in
   let def =
-    Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda
+    Mlw_expr.create_fun_defn x lambda
   in
   Mlw_decl.create_rec_decl [def]
 
