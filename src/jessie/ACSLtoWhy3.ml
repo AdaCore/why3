@@ -397,14 +397,16 @@ let get_var v =
 
 let program_funs = Hashtbl.create 257
 
-let create_fun v =
+let create_function v args ret_type lambda =
   let id = Ident.id_fresh v.vname in
-  let ty = ctype v.vtype in
-  Self.result "create program function %s (%d)" v.vname v.vid;
-  Hashtbl.add program_funs v.vid (id,ty);
-  (id,ty)
+  let def = Mlw_expr.create_fun_defn id lambda in
+  let ps = def.Mlw_expr.fun_ps in
+  Self.result "created program function %s (%d)" v.vname v.vid;
+  let arg_ty = List.map (fun v -> v.Mlw_ty.pv_ity) args in
+  Hashtbl.add program_funs v.vid (ps,arg_ty,ret_type);
+  def
 
-let get_fun v =
+let get_function v =
   try
     Hashtbl.find program_funs v.vid
   with Not_found ->
@@ -460,7 +462,7 @@ let rec term_node ~label t =
         match labels with
           | [] ->
             let ls = get_lsymbol li in
-            let args = List.map (fun x -> 
+            let args = List.map (fun x ->
               let _ty,t = term ~label x in
 (*
               Self.result "arg = %a, type  = %a"
@@ -526,9 +528,9 @@ let rec term_node ~label t =
     | Tlet (_, _) ->
       Self.not_yet_implemented "term_node (2)"
 
-and term ~label t = 
+and term ~label t =
 (*
-  Self.result "term %a: type = %a" 
+  Self.result "term %a: type = %a"
     Cil_printer.pp_term t Cil_printer.pp_logic_type t.term_type;
 *)
   (t.term_type, term_node ~label t.term_node)
@@ -897,8 +899,8 @@ let rec expr e =
         match ty, Cil.typeOf e with
           | TInt(ILong,_attr1), TInt(IInt,_attr2) ->
             Mlw_expr.e_app
-              (Mlw_expr.e_arrow int64ofint_fun 
-                 [mlw_int_type] mlw_int64_type) 
+              (Mlw_expr.e_arrow int64ofint_fun
+                 [mlw_int_type] mlw_int64_type)
               [Mlw_expr.e_lapp int32_to_int [e'] mlw_int_type]
           | _ ->
             Self.not_yet_implemented "expr CastE"
@@ -949,11 +951,11 @@ and lval (host,offset) =
 let functional_expr e =
   match e.enode with
     | Lval (Var v, NoOffset) ->
-      let _id,_ty = get_fun v in
-      assert false (* TODO Mlw_expr.e_arrow id *)
+      let id,tyl,ty = get_function v in
+      Mlw_expr.e_arrow id tyl ty
     | Lval _
-    | Const _ 
-    | BinOp _ 
+    | Const _
+    | BinOp _
     | SizeOf _
     | SizeOfE _
     | SizeOfStr _
@@ -973,7 +975,7 @@ let assignment (lhost,offset) e _loc =
       if is_mutable then
         Mlw_expr.e_app
           (mk_set v.Mlw_ty.pv_ity ty)
-          [Mlw_expr.e_value v; expr e]
+          [Mlw_expr.e_value v; e]
       else
         Self.not_yet_implemented "mutation of formal parameters"
     | Var _ , Field _ ->
@@ -985,12 +987,14 @@ let assignment (lhost,offset) e _loc =
 
 let instr i =
   match i with
-  | Set(lv,e,loc) -> assignment lv e loc
-  | Call (None, _loc, _e, _el) ->
-    Self.not_yet_implemented "instr Call None"
-  | Call (Some _lv, e, el, _loc) ->   
+  | Set(lv,e,loc) -> assignment lv (expr e) loc
+  | Call (None, e, el, _loc) ->
     let e = functional_expr e in
     Mlw_expr.e_app e (List.map expr el)
+  | Call (Some lv, e, el, loc) ->
+    let e = functional_expr e in
+    let e = Mlw_expr.e_app e (List.map expr el) in
+    assignment lv e loc
   | Asm (_, _, _, _, _, _) ->
     Self.not_yet_implemented "instr Asm"
   | Skip _loc ->
@@ -1160,10 +1164,7 @@ let fundecl fdec =
     l_spec = spec;
   }
   in
-  let x,_ty = create_fun fun_id in
-  let def =
-    Mlw_expr.create_fun_defn x lambda
-  in
+  let def = create_function fun_id args ret_type lambda in
   Mlw_decl.create_rec_decl [def]
 
 
@@ -1276,7 +1277,12 @@ let prog p =
     let m = List.fold_left use m theories in
     let m = use_module m ref_module in
     let m = use_module m int32_module in
-    let m = List.fold_left add_pdecl m (List.rev functions) in
+    let m = List.fold_left
+      (fun m f ->
+        Self.result "making function";
+        add_pdecl m f)
+      m (List.rev functions) 
+    in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
