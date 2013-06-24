@@ -63,6 +63,8 @@ let env,config =
 let find th s = Theory.ns_find_ls th.Theory.th_export [s]
 let find_type th s = Theory.ns_find_ts th.Theory.th_export [s]
 
+(* let () = Self.result "Loading Why3 theories" *)
+
 (* int.Int theory *)
 let int_type : Ty.ty = Ty.ty_int
 let int_theory : Theory.theory = Env.find_theory env ["int"] "Int"
@@ -138,6 +140,9 @@ let sub32_fun : Mlw_expr.psymbol =
 
 let mul32_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["mul"]
+
+let neg32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["neg"]
 
 let le32_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["le"]
@@ -450,6 +455,14 @@ let is_real_type t =
     | _ -> false
 
 
+let coerce_to_int ty t =
+  match ty with
+    | Linteger -> t
+    | Ctype(TInt(IInt,_attr)) -> t_app int32_to_int [t]
+    | Ctype(TInt(ILong,_attr)) -> t_app int64_to_int [t]
+    | _ -> Self.not_yet_implemented "coerce_to_int"
+      
+
 let rec term_node ~label t =
   match t with
     | TConst cst -> Term.t_const (logic_constant cst)
@@ -586,7 +599,8 @@ and tlval ~label (host,offset) =
 
 let eq op ty1 t1 ty2 t2 =
   match ty1,ty2 with
-    | Linteger, Linteger -> op t1 t2
+    | ty1, ty2 when is_int_type ty1 && is_int_type ty2 -> 
+      op (coerce_to_int ty1 t1) (coerce_to_int ty2 t2)
     | Lreal, Lreal -> op t1 t2
     | Ctype _,_ ->
       Self.not_yet_implemented "eq Ctype"
@@ -600,7 +614,8 @@ let eq op ty1 t1 ty2 t2 =
 
 let compare op ty1 t1 ty2 t2 =
   match ty1,ty2 with
-    | Linteger, Linteger -> t_app op [t1;t2]
+    | ty1,ty2 when is_int_type ty1 && is_int_type ty2 -> 
+      t_app op [coerce_to_int ty1 t1;coerce_to_int ty2 t2]
     | Lreal, Lreal -> assert false
     | Ctype _,_ ->
       Self.not_yet_implemented "compare Ctype"
@@ -644,16 +659,19 @@ let rec predicate ~label p =
       Term.t_implies (predicate_named ~label p1) (predicate_named ~label p2)
     | Pand (p1, p2) ->
       Term.t_and (predicate_named ~label p1) (predicate_named ~label p2)
-    | Papp (_, _, _)
-    | Pseparated _
-    | Por (_, _)
+    | Papp (_, _, _) ->
+      Self.not_yet_implemented "predicate Papp"
+    | Pnot _ ->
+      Self.not_yet_implemented "predicate Pnot"
+    | Pat (_, _) ->
+      Self.not_yet_implemented "predicate Pat"
+    | Pseparated _ 
+    | Por (_, _) 
     | Pxor (_, _)
-    | Piff (_, _)
-    | Pnot _
+    | Piff (_, _) 
     | Pif (_, _, _)
     | Plet (_, _)
     | Pexists (_, _)
-    | Pat (_, _)
     | Pvalid_read (_, _)
     | Pvalid (_, _)
     | Pinitialized (_, _)
@@ -866,6 +884,18 @@ let binop op e1 e2 =
   in
   Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty;ty] ty') [e1;e2]
 
+let unop op e =
+  let ls,ty,ty' =
+    match op with
+      | Neg -> (** Unary minus *)
+        neg32_fun, mlw_int32_type, mlw_int32_type
+      | BNot -> (** Bitwise complement (~) *)
+        Self.not_yet_implemented "unop BNot"
+      | LNot -> (** Logical Not (!) *)
+        Self.not_yet_implemented "unop LNot"
+  in
+  Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty] ty') [e]
+
 let constant c =
   match c with
   | CInt64(t,IInt, sopt) ->
@@ -892,8 +922,8 @@ let rec expr e =
     | Lval lv -> lval lv
     | BinOp (op, e1, e2, _loc) ->
       binop op (expr e1) (expr e2)
-    | UnOp (_, _, _)
-      -> Self.not_yet_implemented "expr UnOp"
+    | UnOp (op, e, _loc) ->
+      unop op (expr e)
     | CastE (ty, e) ->
       let e' = expr e in
       begin
@@ -1259,6 +1289,7 @@ let use_module m modul =
 
 let prog p =
    try
+    (* Self.result "Starting translation"; *)
     let theories,decls,functions =
       List.fold_left global ([],[],[]) p.globals
     in
