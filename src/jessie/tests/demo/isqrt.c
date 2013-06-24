@@ -18,8 +18,6 @@ int isqrt(int x) {
   return count;
 }
 
-#if 0
-
 //@ ensures \result == 4;
 int main () {
   int r;
@@ -29,7 +27,6 @@ int main () {
   return r;
 }
 
-#endif
 
 /*
 Local Variables:

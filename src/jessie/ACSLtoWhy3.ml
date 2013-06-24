@@ -207,7 +207,7 @@ let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
 let mlw_int32_type = Mlw_ty.ity_pur int32_type []
 let mlw_int64_type = Mlw_ty.ity_pur int64_type []
 
-let ctype_and_default ty =
+let rec ctype_and_default ty =
   match ty with
     | TVoid _attr -> Mlw_ty.ity_unit, Mlw_expr.e_void
     | TInt (IInt, _attr) ->
@@ -224,9 +224,9 @@ let ctype_and_default ty =
       Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
-    | TPtr(TInt(_,_), _attr) ->
-      Self.not_yet_implemented "ctype TPtr(TInt,_)"
-      (* Mlw_ty.ity_pur map_ts [mlw_int_type ; mlw_int_type], *)
+    | TPtr(TInt _ as t, _attr) ->
+      let t,_ = ctype_and_default t in
+      Mlw_ty.ity_pur map_ts [mlw_int_type ; t], Mlw_expr.e_void
     | TPtr(_ty, _attr) ->
       Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) ->
@@ -693,6 +693,7 @@ let add_decls_as_theory theories id decls =
       let th = Theory.create_theory id in
       let th = use th int_theory in
       let th = use th real_theory in
+      let th = use th map_theory in
       let th = List.fold_left use th theories in
       let th = List.fold_left add_decl th (List.rev decls) in
       let th = Theory.close_theory th in
@@ -932,19 +933,17 @@ and lval (host,offset) =
         Mlw_expr.e_value v
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
-    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,_ty)}), NoOffset ->
-      (* e[i] -> Map.get !e i *)
+    | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
+      (* e[i] -> Map.get e i *)
       let e = expr e in
-      let ity = match e.Mlw_expr.e_vty with
-        | Mlw_ty.VTvalue ity -> ity
-        | Mlw_ty.VTarrow _ -> assert false
+      let ity = 
+        match ty with
+          | TPtr(t,_) -> ctype t 
+          | _ -> assert false
       in
-      Mlw_expr.e_lapp map_get [e;expr i] ity
-(*
-      let ty = ctype ty in
-        let t = Mlw_expr.e_app (mk_get ity ty) [e] in
-        t (* Mlw_expr.e_lapp map_get [t;expr i] ity *)
-      *)
+      let i = expr i in
+      let i = Mlw_expr.e_lapp int32_to_int [i] mlw_int_type in
+      Mlw_expr.e_lapp map_get [e;i] ity
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
@@ -1274,15 +1273,11 @@ let prog p =
     in
     let m = use m int_theory in
     let m = use m real_theory in
+    let m = use m map_theory in
     let m = List.fold_left use m theories in
     let m = use_module m ref_module in
     let m = use_module m int32_module in
-    let m = List.fold_left
-      (fun m f ->
-        Self.result "making function";
-        add_pdecl m f)
-      m (List.rev functions) 
-    in
+    let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;

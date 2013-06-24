@@ -1,12 +1,12 @@
-[kernel] preprocessing with "gcc -C -E -I.  tests/basic/generic.c"
-[jessie3] creating logic symbol 740 (occ)
-[jessie3] creating logic symbol 742 (singleton)
-[jessie3] creating logic symbol 745 (bag_union)
-[jessie3] found 0 logic decl(s)
+[kernel] preprocessing with "gcc -C -E -I.  tests/basic/app.c"
+[jessie3] creating logic symbol 739 (f)
+[jessie3] processing function g
+[jessie3] created program function g (740)
+[jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
-[jessie3] made 0 function(s)
+[jessie3] made 1 function(s)
 [jessie3] running theory 1:
-[jessie3] theory Bag
+[jessie3] theory Global_logic_declarations
             (* use why3.BuiltIn *)
             
             (* use int.Int *)
@@ -15,13 +15,7 @@
             
             (* use map.Map *)
             
-            type bag 'x
-            
-            function occ 'x (bag 'x) : int
-            
-            function singleton 'x : bag 'x
-            
-            function bag_union (bag 'x) (bag 'x) : bag 'x
+            function f (x:int) : int = x + 1
             end
 [jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
 [jessie3] running theory 1:
@@ -40,10 +34,13 @@
             
             (* use map.Map *)
             
-            (* use Bag *)
+            (* use Global_logic_declarations *)
             
             (* use ref.Ref *)
             
             (* use mach_int.Int32 *)
+            
+            goal WP_parameter_g : true
             end
 [jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter g): Valid, Valid, Valid, Valid

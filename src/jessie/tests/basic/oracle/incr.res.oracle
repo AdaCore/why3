@@ -1,6 +1,8 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/incr.c"
 [jessie3] processing function f
+[jessie3] created program function f (738)
 [jessie3] processing function h
+[jessie3] created program function h (744)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
 [jessie3] made 3 function(s)
@@ -17,6 +19,8 @@
             (* use int.Int *)
             
             (* use real.Real *)
+            
+            (* use map.Map *)
             
             (* use ref.Ref *)
             
@@ -47,6 +51,6 @@
                     to_int o = (to_int g + to_int x) ->
                      (forall g1:int32. g1 = o -> to_int g1 = (to_int g + to_int x)))
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2: Valid, Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid
+[jessie3] Task 2 (WP_parameter h): Valid, Valid, Valid, Valid

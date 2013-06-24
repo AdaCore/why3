@@ -1,9 +1,12 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/demo/isqrt.c"
 [jessie3] creating logic symbol 739 (sqr)
 [jessie3] processing function isqrt
+[jessie3] created program function isqrt (740)
+[jessie3] processing function main
+[jessie3] created program function main (747)
 [jessie3] found 1 logic decl(s)
 [jessie3] made 1 theory(ies)
-[jessie3] made 1 function(s)
+[jessie3] made 2 function(s)
 [jessie3] running theory 1:
 [jessie3] theory Global_logic_declarations
             (* use why3.BuiltIn *)
@@ -12,9 +15,11 @@
             
             (* use real.Real *)
             
+            (* use map.Map *)
+            
             function sqr (x:int) : int = x * x
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
             (* use why3.BuiltIn *)
@@ -29,6 +34,8 @@
             
             (* use real.Real *)
             
+            (* use map.Map *)
+            
             (* use Global_logic_declarations *)
             
             (* use ref.Ref *)
@@ -37,7 +44,7 @@
             
             goal WP_parameter_isqrt :
               forall x:int32.
-               to_int x >= 0 ->
+               to_int x <= 1000000000 /\ to_int x >= 0 ->
                 in_bounds 0 &&
                  (forall o:int32.
                    to_int o = 0 ->
@@ -157,6 +164,22 @@
                                              else (to_int count1 >= 0 /\
                                                     sqr (to_int count1 + 0) <= to_int x) /\
                                                    to_int x < sqr (to_int count1 + 1))))))))))
+            
+            goal WP_parameter_main :
+              in_bounds 0 &&
+               (forall o:int32.
+                 to_int o = 0 ->
+                  in_bounds 17 &&
+                   (forall o1:int32.
+                     to_int o1 = 17 ->
+                      (to_int o1 <= 1000000000 /\ to_int o1 >= 0) &&
+                       (forall o2:int32.
+                         (to_int o2 >= 0 /\ sqr (to_int o2 + 0) <= to_int o1) /\
+                          to_int o1 < sqr (to_int o2 + 1) ->
+                          (forall r:int32.
+                            r = o2 ->
+                             not to_int r < 4 && not to_int r > 4 && to_int r = 4))))
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1: Unknown, Unknown, Timeout, Timeout, Timeout
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter isqrt): Timeout, Timeout, Timeout, Timeout
+[jessie3] Task 2 (WP_parameter main): Unknown, Unknown, Valid, Valid
