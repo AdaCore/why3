@@ -144,11 +144,23 @@ let mul32_fun : Mlw_expr.psymbol =
 let neg32_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["neg"]
 
+let eq32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["eq"]
+
+let ne32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["ne"]
+
 let le32_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["le"]
 
 let lt32_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["lt"]
+
+let ge32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["ge"]
+
+let gt32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["gt"]
 
 let int32ofint_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["of_int"]
@@ -402,14 +414,18 @@ let get_var v =
 
 let program_funs = Hashtbl.create 257
 
-let create_function v args ret_type lambda =
+let create_function v args spec ret_type =
   let id = Ident.id_fresh v.vname in
+  let aty = Mlw_ty.vty_arrow args ~spec (Mlw_ty.VTvalue ret_type) in
+  let ps = Mlw_expr.create_psymbol id aty in
+(*
   let def = Mlw_expr.create_fun_defn id lambda in
   let ps = def.Mlw_expr.fun_ps in
+*)
   Self.result "created program function %s (%d)" v.vname v.vid;
   let arg_ty = List.map (fun v -> v.Mlw_ty.pv_ity) args in
   Hashtbl.add program_funs v.vid (ps,arg_ty,ret_type);
-  def
+  ps
 
 let get_function v =
   try
@@ -871,8 +887,10 @@ let binop op e1 e2 =
       | Mult -> mul32_fun, mlw_int32_type, mlw_int32_type
       | Lt -> lt32_fun, mlw_int32_type, Mlw_ty.ity_bool
       | Le -> le32_fun, mlw_int32_type, Mlw_ty.ity_bool
-      | Gt | Ge | Eq | Ne ->
-        Self.not_yet_implemented "binop comp"
+      | Gt -> gt32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Ge -> ge32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Eq -> eq32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Ne -> ne32_fun, mlw_int32_type, Mlw_ty.ity_bool
       | PlusPI|IndexPI|MinusPI|MinusPP ->
         Self.not_yet_implemented "binop plus/minus"
       | Div|Mod ->
@@ -1185,6 +1203,7 @@ let fundecl fdec =
     c_letrec  = 0;
   }
   in
+  let ps = create_function fun_id args spec ret_type in
   let body = block body in
   let full_body = List.fold_right Mlw_expr.e_let locals body in
   let lambda = {
@@ -1193,8 +1212,8 @@ let fundecl fdec =
     l_spec = spec;
   }
   in
-  let def = create_function fun_id args ret_type lambda in
-  Mlw_decl.create_rec_decl [def]
+  let def = Mlw_expr.create_rec_defn [ps,lambda] in
+  Mlw_decl.create_rec_decl def
 
 
 

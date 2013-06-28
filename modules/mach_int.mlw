@@ -36,6 +36,14 @@ val neg (a:t) : t
   requires { "expl:integer overflow" in_bounds (- (to_int a)) }
   ensures { to_int result = - (to_int a) }
 
+val eq (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a = to_int b else to_int a <> to_int b }
+
+val ne (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a <> to_int b else to_int a = to_int b }
+
 val le (a:t) (b:t) : bool
   requires { true }
   ensures  { if result = True then to_int a <= to_int b else to_int a > to_int b }
@@ -43,6 +51,14 @@ val le (a:t) (b:t) : bool
 val lt (a:t) (b:t) : bool
   requires { true }
   ensures  { if result = True then to_int a < to_int b else to_int a >= to_int b }
+
+val ge (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a >= to_int b else to_int a < to_int b }
+
+val gt (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a > to_int b else to_int a <= to_int b }
 
 use import int.ComputerDivision
 

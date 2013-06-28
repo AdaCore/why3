@@ -16,17 +16,18 @@ an element maximal in the array.
 
 */
 
-/*@ requires len > 0 && \valid(a+(0..(len-1)));
-  @ ensures 0 <= \result < len &&
-  @   \forall integer i; 0 <= i < len ==> a[i] <= a[\result];
+/*@ requires len > 0;
+  @ // requires \valid(a+(0..(len-1)));
+  @ ensures 0 <= \result < len;
+  @ // ensures \forall integer i; 0 <= i < len ==> a[i] <= a[\result];
   @*/
 int max(int *a, int len) {
   int x = 0;
   int y = len-1;
-  /*@ loop invariant 0 <= x <= y < len &&
-    @      \forall integer i;
-    @         0 <= i < x || y < i < len ==>
-    @         a[i] <= \max(a[x],a[y]);
+  /*@ loop invariant 0 <= x <= y < len;
+    @ // loop invariant \forall integer i;
+    @ //        0 <= i < x || y < i < len ==>
+    @ //        a[i] <= \max(a[x],a[y]);
     @ loop variant y - x;
     @*/
   while (x != y) {
