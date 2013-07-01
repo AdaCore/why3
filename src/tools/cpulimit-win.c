@@ -193,6 +193,7 @@ int main(int argc, char *argv[]) {
     wall_time = (ull_stop.QuadPart - ull_start.QuadPart + 0.0) / 10000000.;
     fprintf(stdout, 
 	    "why3cpulimit cpu time: %fs wall time: %fs\n", cpu_time, wall_time);
+    fflush(stdout);
   }
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
