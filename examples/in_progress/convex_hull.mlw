@@ -1,0 +1,62 @@
+
+
+theory ConvexSet
+
+use import real.Real
+
+type pt = { x : real ; y : real }
+
+function crossproduct (p1 p2 p3:pt) : real =
+  (p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y) 
+
+predicate colinear (p1 p2 p3:pt) = crossproduct p1 p2 p3 = 0.0
+
+predicate turns_left (p1 p2 p3:pt) = crossproduct p1 p2 p3 > 0.0
+
+(* test: p1 = (0,0), p2 = (1,0) p3 = (1,1) *)
+
+goal test1 :
+   turns_left {x=0.0;y=0.0} {x=1.0;y=0.0} {x=1.0;y=1.0}
+
+use import list.List
+
+type path = list pt
+
+predicate is_ccw_convex (p:path) =
+  let l = List.length p in
+  forall i:int. 0 <= i < l ->
+    let i' = if i = l-1 then 0 else i+1 in
+    let p0 = List.nth p i in
+    let p1 = List.nth p i' in
+    forall j:int. 0 <= j < l /\ j <> i /\ j <> i' ->
+       turns_left p0 p1 (List.nth p j)
+
+end
+
+
+
+
+module Graham
+
+
+use import ConvexSet
+
+(*
+let convex_hull (l:path) : path =
+  ensures { forall p:pt. List.mem p result -> List.mem p l }
+  ensures { is_ccw_convex result }
+  let min,rem = find_minimum_pt l in
+  let sorted = sorted_increasing_angle min rem in
+  match sorted with
+    | Nil -> l
+    | Cons p r -> 
+       let done = ref (Cons p min) in
+       let todo = ref r in
+       try while true do
+         match !todo with
+         | Nil -> 
+       with Exit -> !done
+ 
+*)
+
+end
