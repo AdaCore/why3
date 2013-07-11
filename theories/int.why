@@ -106,7 +106,7 @@ theory EuclideanDivision
 
   lemma Mod_1_left: forall y:int. y > 1 -> mod 1 y = 1
 
-  lemma Mod_minus1_left: forall y:int. y > 1 -> mod (-1) y = y - 1
+  lemma Mod_minus1_left: forall y:int [mod (-1) y]. y > 1 -> mod (-1) y = y - 1
 
   lemma Div_mult: forall x y z:int [div (x * y + z) x].
           x > 0 ->
