@@ -18,3 +18,28 @@ module EuclideanAlgorithm
       gcd v (mod u v)
 
 end
+
+module EuclideanAlgorithmIterative
+
+  use import int.Int
+  use import ref.Ref
+  use import number.Gcd
+  use import int.ComputerDivision
+
+  let gcd (u0 v0: int) : int
+    requires { u0 >= 0 /\ v0 >= 0 }
+    ensures  { result = gcd u0 v0 }
+  =
+    let u = ref u0 in
+    let v = ref v0 in
+    while !v <> 0 do
+      invariant { !u >= 0 /\ !v >= 0 }
+      invariant { gcd !u !v = gcd u0 v0 }
+      variant   { !v }
+      let tmp = !v in
+      v := mod !u !v;
+      u := tmp
+    done;
+    !u
+
+end
