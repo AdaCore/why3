@@ -21,6 +21,10 @@
   id="4"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../gcd.mlw"
   verified="true"
@@ -214,7 +218,7 @@
       expl="1. loop invariant init"
       sum="5a2214a241ef5919406e1dce9fab47c1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
@@ -234,7 +238,7 @@
       expl="2. loop invariant init"
       sum="8d426254805264123885c5a7e67d38d2"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initainfix =agcdV0V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
@@ -254,7 +258,7 @@
       expl="3. loop invariant preservation"
       sum="fc2460530d56c590dbcaa039058e38eb"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
@@ -274,7 +278,7 @@
       expl="4. loop invariant preservation"
       sum="cf776c8d21eccdc90f18c62bc0dcdf9c"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationainfix =agcdV5V4agcdV0V1Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
@@ -294,18 +298,10 @@
       expl="5. loop variant decrease"
       sum="caab89302ad24174467c877c6498e3be"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop variant decreaseainfix &lt;V4V2Aainfix &lt;=c0V2Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <undone/>
-      </proof>
       <proof
        prover="2"
        timelimit="10"
@@ -313,6 +309,14 @@
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -322,7 +326,7 @@
       expl="6. postcondition"
       sum="1644ab1125c43173f855bc860eb6e22e"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionainfix =V3agcdV0V1INNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
