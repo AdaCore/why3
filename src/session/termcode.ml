@@ -60,7 +60,7 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 2
+let current_shape_version = 3
 
 (* similarity code of terms, or of "shapes"
 
@@ -135,17 +135,35 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         List.fold_left fn
           (ident_shape ~push s.ls_name (push tag_app acc))
           l
-    | Tif (f,t1,t2) -> fn (fn (fn (push tag_if acc) t2) t1) f
+    | Tif (f,t1,t2) ->
+      begin match version with
+      | 1 | 2 -> fn (fn (fn (push tag_if acc) f) t1) t2
+      | 3 -> fn (fn (fn (push tag_if acc) t2) t1) f
+      | _ -> assert false
+      end
     | Tcase (t1,bl) ->
         let br_shape acc b =
           let p,t2 = t_open_branch b in
-          let m1 = pat_rename_alpha c m p in
-          let acc = t_shape ~version ~push c m1 acc t2 in
-          pat_shape ~push c m acc p
+          match version with
+          | 1 | 2 ->
+            let acc = pat_shape ~push c m acc p in
+            let m = pat_rename_alpha c m p in
+            t_shape ~version ~push c m acc t2
+          | 3 ->
+            let m1 = pat_rename_alpha c m p in
+            let acc = t_shape ~version ~push c m1 acc t2 in
+            pat_shape ~push c m acc p
+          | _ -> assert false
         in
-        let acc = push tag_case acc in
-        let acc = List.fold_left br_shape acc bl in
-        fn acc t1
+        begin match version with
+        | 1 | 2 ->
+          List.fold_left br_shape (fn (push tag_case acc) t1) bl
+        | 3 ->
+          let acc = push tag_case acc in
+          let acc = List.fold_left br_shape acc bl in
+          fn acc t1
+        | _ -> assert false
+        end
     | Teps b ->
         let u,f = t_open_bound b in
         let m = vs_rename_alpha c m u in
@@ -180,12 +198,17 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
           match version with
             | 1 ->
               t_shape ~version ~push c m (fn (push tag_let acc) t1) t2
-            | 2 ->
+            | 2 | 3 ->
               (* t2 first, intentionally *)
               fn (push tag_let (t_shape ~version ~push c m acc t2)) t1
             | _ -> assert false
         end
-    | Tnot f -> fn (push tag_not acc) f
+    | Tnot f ->
+      begin match version with
+      | 1 | 2 -> push tag_not (fn acc f)
+      | 3 -> fn (push tag_not acc) f
+      | _ -> assert false
+      end
     | Ttrue -> push tag_true acc
     | Tfalse -> push tag_false acc
 
@@ -198,8 +221,13 @@ let t_shape_buf ?(version=current_shape_version) t =
 let t_shape_task ?(version=current_shape_version) t =
   let b = Buffer.create 17 in
   let push t () = Buffer.add_string b t in
-  let _, expl, _ = goal_expl_task ~root:false t in
-  Opt.iter (Buffer.add_string b) expl;
+  begin match version with
+  | 1 | 2 -> ()
+  | 3 -> 
+    let _, expl, _ = goal_expl_task ~root:false t in
+    Opt.iter (Buffer.add_string b) expl
+  | _ -> assert false
+  end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
   Buffer.contents b
