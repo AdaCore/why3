@@ -247,7 +247,8 @@ let decrease_alg ?loc env old_t t =
 
 let decrease_rel ?loc env old_t t = function
   | Some ls -> ps_app ls [t; old_t]
-  | None when ty_equal (t_type t) ty_int ->
+  | None when ty_equal (t_type old_t) ty_int
+           && ty_equal (t_type t) ty_int ->
       t_and
         (ps_app env.ps_int_le [t_nat_const 0; old_t])
         (ps_app env.ps_int_lt [t; old_t])

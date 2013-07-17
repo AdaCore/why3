@@ -970,6 +970,9 @@ let create_rec_defn = let letrec = ref 1 in fun defl ->
   (* check that the all variants use the same order *)
   let variant1 = (snd (List.hd defl)).l_spec.c_variant in
   let check_variant (_, { l_spec = { c_variant = vl }}) =
+    let vl, variant1 = match List.rev vl, List.rev variant1 with
+      | (_, None)::vl, (_, None)::variant1 -> vl, variant1
+      | _, _ -> vl, variant1 in
     let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
         Opt.equal ty_equal t1.t_ty t2.t_ty &&
         Opt.equal ls_equal r1 r2) vl variant1
