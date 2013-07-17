@@ -1466,26 +1466,21 @@ let () =
              ~label:"Inline in selection"
              ~callback:inline_selected_goals
              () : GMenu.image_menu_item) in
-  let add_submenu_transform nonsplitting () =
-    let non_splitting = tools_factory#add_submenu
-      (if nonsplitting
-       then "non-splitting transformations"
-       else "splitting transformations") in
-    let non_splitting = new GMenu.factory non_splitting ~accel_group in
+  let add_submenu_transform name get_trans () =
+    let submenu = tools_factory#add_submenu name in
+    let submenu = new GMenu.factory submenu ~accel_group in
     let iter ((name,_) as desc) =
       let callback () = apply_trans_on_selection name in
-      let ii = non_splitting#add_image_item
+      let ii = submenu#add_image_item
         ~label:(sanitize_markup name) ~callback () in
       let print_trans_desc fmt (x,r) =
         fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r in
       ii#misc#set_tooltip_text
         (Pp.string_of print_trans_desc desc) in
-    let trans =
-      if nonsplitting
-      then Trans.list_transforms ()
-      else Trans.list_transforms_l () in
+    let trans = get_trans () in
     let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
-    List.iter iter trans in
+    List.iter iter trans
+  in
 
   let add_item_bisect () =
     ignore(tools_factory#add_image_item
@@ -1502,14 +1497,35 @@ let () =
              ~callback:paste_on_selection
              () : GMenu.image_menu_item) in
 
+  let add_splitting =
+    add_submenu_transform
+      "splitting transformations" Trans.list_transforms_l
+  in
+  let add_non_splitting_1 =
+    add_submenu_transform
+      "non-splitting transformations (a-e)"
+      (fun () ->
+        let l = Trans.list_transforms () in
+        List.filter (fun (x,_) -> x < "f") l)
+  in
+  let add_non_splitting_2 =
+    add_submenu_transform
+      "non-splitting transformations (f-z)"
+      (fun () ->
+        let l = Trans.list_transforms () in
+        List.filter (fun (x,_) -> x >= "f") l)
+  in
+
   add_refresh_provers add_separator "add separator in tools menu";
   add_refresh_provers add_copy_past_item "add copy paste item";
   add_refresh_provers add_separator "add separator in tools menu";
   add_refresh_provers add_item_split "add split in tools menu";
   add_refresh_provers add_item_inline  "add inline in tools menu";
-  add_refresh_provers (add_submenu_transform true)
-    "add non splitting transformations in tools menu";
-  add_refresh_provers (add_submenu_transform false)
+  add_refresh_provers add_non_splitting_1
+    "add non splitting transformations (a-e) in tools menu";
+  add_refresh_provers add_non_splitting_2
+    "add non splitting transformations (f-z) in tools menu";
+  add_refresh_provers add_splitting
     "add splitting transformations in tools menu";
   add_refresh_provers add_separator "add separator for metas in tools menu";
   add_refresh_provers add_item_bisect "add bisect in tools menu";
@@ -1519,8 +1535,9 @@ let () =
   add_separator ();
   add_item_split ();
   add_item_inline ();
-  add_submenu_transform true ();
-  add_submenu_transform false ();
+  add_non_splitting_1 ();
+  add_non_splitting_2 ();
+  add_splitting ();
   add_separator ();
   add_item_bisect ()
 
