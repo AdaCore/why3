@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -27,7 +27,7 @@
   version="3.2"/>
  <file
   name="../queens.mlw"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="S"
@@ -49,10 +49,10 @@
     locfile="../queens.mlw"
     loclnum="29" loccnumb="10" loccnume="11"
     expl="VC for t"
-    sum="4dc222f47c4b8cd9dc565f8f8cc18981"
+    sum="3db8c5cbafe54317f89390f148eaeb41"
     proved="true"
     expanded="false"
-    shape="ainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4AasubsetV8adiffadiffV0V1V2Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFAainfix &lt;acardinalaremoveV5V0acardinalV0Aainfix &lt;=c0acardinalV0Lamin_eltV4Iais_emptyV4NIasubsetV4adiffadiffV0V1V2FAasubsetadiffadiffV0V1V2adiffadiffV0V1V2Iais_emptyV0NF">
+    shape="ainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4AasubsetV8adiffadiffV0V1V2Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFAainfix &lt;acardinalaremoveV5V0acardinalV0Aainfix &lt;=c0acardinalV0Lamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FAasubsetadiffadiffV0V1V2adiffadiffV0V1V2INais_emptyV0F">
     <label
      name="expl:VC for t"/>
     <transf
@@ -64,10 +64,10 @@
       locfile="../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="1. loop invariant init"
-      sum="9597224abbbcad369886bc671fd3396a"
+      sum="3d919c0c44aefd6715728c03ae9524d7"
       proved="true"
       expanded="false"
-      shape="asubsetadiffadiffV0V1V2adiffadiffV0V1V2Iais_emptyV0NF">
+      shape="loop invariant initasubsetadiffadiffV0V1V2adiffadiffV0V1V2INais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
@@ -84,10 +84,10 @@
       locfile="../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="2. variant decrease"
-      sum="e26375882a30bd6c40c5da613bef949a"
+      sum="49b2440e08827dcd28d5fdc42263dae0"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalaremoveV5V0acardinalV0Aainfix &lt;=c0acardinalV0Lamin_eltV4Iais_emptyV4NIasubsetV4adiffadiffV0V1V2FIais_emptyV0NF">
+      shape="variant decreaseainfix &lt;acardinalaremoveV5V0acardinalV0Aainfix &lt;=c0acardinalV0Lamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FINais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
@@ -104,10 +104,10 @@
       locfile="../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="3. loop invariant preservation"
-      sum="0eb3076c3feb8d2dc18a455e589bf89a"
+      sum="170bef908be82d10fd66cd14469a2756"
       proved="true"
       expanded="false"
-      shape="asubsetV8adiffadiffV0V1V2Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFLamin_eltV4Iais_emptyV4NIasubsetV4adiffadiffV0V1V2FIais_emptyV0NF">
+      shape="loop invariant preservationasubsetV8adiffadiffV0V1V2Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFLamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FINais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
@@ -124,10 +124,10 @@
       locfile="../queens.mlw"
       loclnum="29" loccnumb="10" loccnume="11"
       expl="4. loop variant decrease"
-      sum="19a36c2250d4da205d33336bafb1a5cc"
+      sum="83d2fc68a7c74f1568977107bdfb8b48"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFLamin_eltV4Iais_emptyV4NIasubsetV4adiffadiffV0V1V2FIais_emptyV0NF">
+      shape="loop variant decreaseainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFLamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FINais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
@@ -172,7 +172,7 @@
     sum="ac1040b6a58aa7259631cd516189ba0d"
     proved="true"
     expanded="false"
-    shape="aeq_solamixfix []V0V3amixfix []V0V4NIainfix &lt;V4V2Aainfix &lt;V3V4Aainfix &lt;=V1V3FIasortedV0V1V2F">
+    shape="Naeq_solamixfix []V0V3amixfix []V0V4Iainfix &lt;V4V2Aainfix &lt;V3V4Aainfix &lt;=V1V3FIasortedV0V1V2F">
     <proof
      prover="1"
      timelimit="10"
@@ -187,32 +187,32 @@
    name="NQueensSets"
    locfile="../queens.mlw"
    loclnum="94" loccnumb="7" loccnume="18"
-   verified="true"
+   verified="false"
    expanded="true">
    <goal
     name="WP_parameter t3"
     locfile="../queens.mlw"
     loclnum="107" loccnumb="10" loccnume="12"
     expl="VC for t3"
-    sum="47d4d2dd31c4ca89188bbf954a8b13fa"
-    proved="true"
+    sum="450fd955b96b2fd943d913a80a3dea4f"
+    proved="false"
     expanded="true"
-    shape="iais_emptyV0Niais_emptyV8Nainfix &lt;acardinalV23acardinalV8Aainfix &lt;=c0acardinalV8Aaeq_prefixV4V18V3Aaeq_prefixV6V20V22Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25Eqamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FAainfix &lt;V26V27IamemV27V23IamemV26adiffadiffadiffV0V1V2V23FAasortedV18V3V17Aapartial_solutionV22V20AasubsetV23adiffadiffV0V1V2Aainfix =V22V5Aainfix &gt;=ainfix -V17V3c0Aainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV28amixfix []V18V29Aainfix &lt;V29V17Aainfix &lt;=V9V29Eqaeq_prefixV20V28V19AasolutionV28FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FAapartial_solutionV15V14Aainfix =amixfix []V14V31ainfix -ainfix +V30V15V31NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30apredaaddV13V2NIainfix &gt;=V30c0FAainfix =amixfix []V14V33ainfix -ainfix +V32V33V15NIainfix &lt;V33V15Aainfix &lt;=c0V33FqamemV32asuccaaddV13V1NIainfix &gt;=V32c0FAainfix =amixfix []V14V35V34NIainfix &lt;V35V15Aainfix &lt;=c0V35FAainfix &lt;V34anAainfix &lt;=c0V34qamemV34V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15Aainfix &lt;acardinalV16acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8aeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV36amixfix []V10V37Aainfix &lt;V37V9Aainfix &lt;=V3V37Eqaeq_prefixV12V36V11AasolutionV36FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV38amixfix []V10V39Aainfix &lt;V39V9Aainfix &lt;=V3V39Eqamemamixfix []V38V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V38V11AasolutionV38FAainfix &lt;V40V41IamemV41V8IamemV40adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FAaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV42amixfix []V4V43Aainfix &lt;V43V3Aainfix &lt;=V3V43Eqamemamixfix []V42V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V42V5AasolutionV42FAainfix &lt;V44V45IamemV45adiffadiffV0V1V2IamemV44adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3aeq_prefixV4V46V3Aaeq_prefixV6V6V5Aaeq_solV48amixfix []V46V49Aainfix &lt;V49V47Aainfix &lt;=V3V49Eqaeq_prefixV6V48V5AasolutionV48FAasortedV46V3V47Aainfix =V5V5Aainfix &gt;=ainfix -V47V3c0Aainfix =c1ainfix -V47V3Iainfix =V47ainfix +V3c1FIainfix =V46amixfix [&lt;-]V4V3V6FIapartial_solutionV5V6Aainfix =amixfix []V6V51ainfix -ainfix +V50V5V51NIainfix &lt;V51V5Aainfix &lt;=c0V51FqamemV50V2NIainfix &gt;=V50c0FAainfix =amixfix []V6V53ainfix -ainfix +V52V53V5NIainfix &lt;V53V5Aainfix &lt;=c0V53FqamemV52V1NIainfix &gt;=V52c0FAainfix =amixfix []V6V55V54NIainfix &lt;V55V5Aainfix &lt;=c0V55FAainfix &lt;V54anAainfix &lt;=c0V54qamemV54V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+    shape="iaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix =V5V5Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6Fiaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV17amixfix []V14V18Aainfix &lt;V18V13Aainfix &lt;=V3V18Eqaeq_prefixV16V17V15AasolutionV17FAasortedV14V3V13Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3ainfix &lt;acardinalV29acardinalV12Aainfix &lt;=c0acardinalV12Aaeq_prefixV4V24V3Aaeq_prefixV6V26V28Aaeq_solV30amixfix []V24V31Aainfix &lt;V31V23Aainfix &lt;=V3V31Eqamemamixfix []V30V28adiffadiffadiffV0V1V2V29Aaeq_prefixV26V30V28AasolutionV30FAainfix &lt;V32V33IamemV33V29IamemV32adiffadiffadiffV0V1V2V29FAasortedV24V3V23Aapartial_solutionV28V26AasubsetV29adiffadiffV0V1V2Aainfix =V28V5Aainfix &gt;=ainfix -V23V3c0Aainfix =V27ainfix -V23V3Iainfix =V29aremoveV19V12FIainfix =V28ainfix -V25c1FIainfix =V27ainfix +V11ainfix -V23V13FIaeq_prefixV14V24V13Aaeq_prefixV20V26V25Aaeq_solV34amixfix []V24V35Aainfix &lt;V35V23Aainfix &lt;=V13V35Eqaeq_prefixV26V34V25AasolutionV34FAasortedV24V13V23Aainfix =V25V21Aainfix &gt;=ainfix -V23V13c0FAapartial_solutionV21V20ANainfix =amixfix []V20V37ainfix -ainfix +V36V21V37Iainfix &lt;V37V21Aainfix &lt;=c0V37FqNamemV36apredaaddV19V2Iainfix &gt;=V36c0FANainfix =amixfix []V20V39ainfix -ainfix +V38V39V21Iainfix &lt;V39V21Aainfix &lt;=c0V39FqNamemV38asuccaaddV19V1Iainfix &gt;=V38c0FANainfix =amixfix []V20V41V40Iainfix &lt;V41V21Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V22FAainfix &gt;=V13c0Aainfix =ainfix +V21acardinalV22anAainfix &lt;=c0V21Aainfix &lt;acardinalV22acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV19V0Iainfix =V21ainfix +V15c1FIainfix =V20amixfix [&lt;-]V16V15V19FLamin_eltV12Nais_emptyV12Iaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV42amixfix []V14V43Aainfix &lt;V43V13Aainfix &lt;=V3V43Eqamemamixfix []V42V15adiffadiffadiffV0V1V2V12Aaeq_prefixV16V42V15AasolutionV42FAainfix &lt;V44V45IamemV45V12IamemV44adiffadiffadiffV0V1V2V12FAasortedV14V3V13Aapartial_solutionV15V16AasubsetV12adiffadiffV0V1V2Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3FAaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV46amixfix []V4V47Aainfix &lt;V47V3Aainfix &lt;=V3V47Eqamemamixfix []V46V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V46V5AasolutionV46FAainfix &lt;V48V49IamemV49adiffadiffV0V1V2IamemV48adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3Nais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V51ainfix -ainfix +V50V5V51Iainfix &lt;V51V5Aainfix &lt;=c0V51FqNamemV50V2Iainfix &gt;=V50c0FANainfix =amixfix []V6V53ainfix -ainfix +V52V53V5Iainfix &lt;V53V5Aainfix &lt;=c0V53FqNamemV52V1Iainfix &gt;=V52c0FANainfix =amixfix []V6V55V54Iainfix &lt;V55V5Aainfix &lt;=c0V55FAainfix &lt;V54anAainfix &lt;=c0V54qamemV54V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
     <label
      name="expl:VC for t3"/>
     <transf
      name="split_goal"
-     proved="true"
+     proved="false"
      expanded="true">
      <goal
       name="WP_parameter t3.1"
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="1. loop invariant init"
-      sum="9e0c147ac26d924e6add2842438a7588"
+      sum="6554c5830deeb82db925c44522b766c6"
       proved="true"
       expanded="false"
-      shape="aeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV7amixfix []V4V8Aainfix &lt;V8V3Aainfix &lt;=V3V8Eqamemamixfix []V7V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V7V5AasolutionV7FAainfix &lt;V9V10IamemV10adiffadiffV0V1V2IamemV9adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3Iais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="loop invariant initaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV7amixfix []V4V8Aainfix &lt;V8V3Aainfix &lt;=V3V8Eqamemamixfix []V7V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V7V5AasolutionV7FAainfix &lt;V9V10IamemV10adiffadiffV0V1V2IamemV9adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3INais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <proof
@@ -237,10 +237,10 @@
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="2. variant decrease"
-      sum="355b7d0f64d474bdde1b1eb49de97ba4"
+      sum="ee681890146317e7d1d96f99e46f0089"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalV16acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="variant decreaseainfix &lt;acardinalV16acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <proof
@@ -249,7 +249,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.12"/>
+       <result status="valid" time="0.79"/>
       </proof>
      </goal>
      <goal
@@ -257,25 +257,25 @@
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="3. precondition"
-      sum="e7720be01a38149ec39c1b29aa759cea"
-      proved="true"
+      sum="889f1cfa3ed29ecb298066063cc6f693"
+      proved="false"
       expanded="true"
-      shape="apartial_solutionV15V14Aainfix =amixfix []V14V18ainfix -ainfix +V17V15V18NIainfix &lt;V18V15Aainfix &lt;=c0V18FqamemV17apredaaddV13V2NIainfix &gt;=V17c0FAainfix =amixfix []V14V20ainfix -ainfix +V19V20V15NIainfix &lt;V20V15Aainfix &lt;=c0V20FqamemV19asuccaaddV13V1NIainfix &gt;=V19c0FAainfix =amixfix []V14V22V21NIainfix &lt;V22V15Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV23amixfix []V10V24Aainfix &lt;V24V9Aainfix &lt;=V3V24Eqamemamixfix []V23V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V23V11AasolutionV23FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V28ainfix -ainfix +V27V5V28NIainfix &lt;V28V5Aainfix &lt;=c0V28FqamemV27V2NIainfix &gt;=V27c0FAainfix =amixfix []V6V30ainfix -ainfix +V29V30V5NIainfix &lt;V30V5Aainfix &lt;=c0V30FqamemV29V1NIainfix &gt;=V29c0FAainfix =amixfix []V6V32V31NIainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix &lt;V31anAainfix &lt;=c0V31qamemV31V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="preconditionapartial_solutionV15V14ANainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FqNamemV17apredaaddV13V2Iainfix &gt;=V17c0FANainfix =amixfix []V14V20ainfix -ainfix +V19V20V15Iainfix &lt;V20V15Aainfix &lt;=c0V20FqNamemV19asuccaaddV13V1Iainfix &gt;=V19c0FANainfix =amixfix []V14V22V21Iainfix &lt;V22V15Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV23amixfix []V10V24Aainfix &lt;V24V9Aainfix &lt;=V3V24Eqamemamixfix []V23V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V23V11AasolutionV23FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V28ainfix -ainfix +V27V5V28Iainfix &lt;V28V5Aainfix &lt;=c0V28FqNamemV27V2Iainfix &gt;=V27c0FANainfix =amixfix []V6V30ainfix -ainfix +V29V30V5Iainfix &lt;V30V5Aainfix &lt;=c0V30FqNamemV29V1Iainfix &gt;=V29c0FANainfix =amixfix []V6V32V31Iainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix &lt;V31anAainfix &lt;=c0V31qamemV31V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
-       proved="true"
+       proved="false"
        expanded="true">
        <goal
         name="WP_parameter t3.3.1"
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="1."
-        sum="97dfa3cad3b71c081de9ebdd7035eb74"
+        sum="6a6c8b4a90ff3413f4436f4fc72afc44"
         proved="true"
         expanded="false"
-        shape="ainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -292,10 +292,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="2."
-        sum="4432ef2b9d1d103f1fc1a19584a1edd2"
+        sum="1513695a3e4d3bd33d7895ac0d90f9db"
         proved="true"
         expanded="false"
-        shape="ainfix =ainfix +V15acardinalV16anLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =ainfix +V15acardinalV16anLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -304,7 +304,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.16"/>
+         <result status="valid" time="1.01"/>
         </proof>
        </goal>
        <goal
@@ -312,10 +312,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="3."
-        sum="3d1f930a3245a96c313db42e0a803143"
+        sum="99b0aff6df25c5d76c8977efafb784eb"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=V9c0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &gt;=V9c0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -332,10 +332,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="4."
-        sum="047b0bc5457ef939e5f9e5094e7419ff"
+        sum="9cd7d054177f79a689cf1183a2b41000"
         proved="true"
         expanded="false"
-        shape="ainfix &lt;=c0V17IamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV18amixfix []V10V19Aainfix &lt;V19V9Aainfix &lt;=V3V19Eqamemamixfix []V18V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V18V11AasolutionV18FAainfix &lt;V20V21IamemV21V8IamemV20adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V23ainfix -ainfix +V22V5V23NIainfix &lt;V23V5Aainfix &lt;=c0V23FqamemV22V2NIainfix &gt;=V22c0FAainfix =amixfix []V6V25ainfix -ainfix +V24V25V5NIainfix &lt;V25V5Aainfix &lt;=c0V25FqamemV24V1NIainfix &gt;=V24c0FAainfix =amixfix []V6V27V26NIainfix &lt;V27V5Aainfix &lt;=c0V27FAainfix &lt;V26anAainfix &lt;=c0V26qamemV26V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &lt;=c0V17IamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV18amixfix []V10V19Aainfix &lt;V19V9Aainfix &lt;=V3V19Eqamemamixfix []V18V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V18V11AasolutionV18FAainfix &lt;V20V21IamemV21V8IamemV20adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V23ainfix -ainfix +V22V5V23Iainfix &lt;V23V5Aainfix &lt;=c0V23FqNamemV22V2Iainfix &gt;=V22c0FANainfix =amixfix []V6V25ainfix -ainfix +V24V25V5Iainfix &lt;V25V5Aainfix &lt;=c0V25FqNamemV24V1Iainfix &gt;=V24c0FANainfix =amixfix []V6V27V26Iainfix &lt;V27V5Aainfix &lt;=c0V27FAainfix &lt;V26anAainfix &lt;=c0V26qamemV26V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -352,10 +352,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="5."
-        sum="826a154c7f329d883bc74789d4435f4e"
+        sum="c465cafc314f8f06b3602e96c91c617d"
         proved="true"
         expanded="false"
-        shape="ainfix &lt;V17anIamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV18amixfix []V10V19Aainfix &lt;V19V9Aainfix &lt;=V3V19Eqamemamixfix []V18V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V18V11AasolutionV18FAainfix &lt;V20V21IamemV21V8IamemV20adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V23ainfix -ainfix +V22V5V23NIainfix &lt;V23V5Aainfix &lt;=c0V23FqamemV22V2NIainfix &gt;=V22c0FAainfix =amixfix []V6V25ainfix -ainfix +V24V25V5NIainfix &lt;V25V5Aainfix &lt;=c0V25FqamemV24V1NIainfix &gt;=V24c0FAainfix =amixfix []V6V27V26NIainfix &lt;V27V5Aainfix &lt;=c0V27FAainfix &lt;V26anAainfix &lt;=c0V26qamemV26V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &lt;V17anIamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV18amixfix []V10V19Aainfix &lt;V19V9Aainfix &lt;=V3V19Eqamemamixfix []V18V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V18V11AasolutionV18FAainfix &lt;V20V21IamemV21V8IamemV20adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V23ainfix -ainfix +V22V5V23Iainfix &lt;V23V5Aainfix &lt;=c0V23FqNamemV22V2Iainfix &gt;=V22c0FANainfix =amixfix []V6V25ainfix -ainfix +V24V25V5Iainfix &lt;V25V5Aainfix &lt;=c0V25FqNamemV24V1Iainfix &gt;=V24c0FANainfix =amixfix []V6V27V26Iainfix &lt;V27V5Aainfix &lt;=c0V27FAainfix &lt;V26anAainfix &lt;=c0V26qamemV26V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -372,10 +372,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="6."
-        sum="cfe9659ae5b51482f82070ba484531a8"
+        sum="0d4371500f9818c6644ecbf16d8fbe09"
         proved="true"
         expanded="false"
-        shape="ainfix =amixfix []V14V18V17NIainfix &lt;V18V15Aainfix &lt;=c0V18FIamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V24ainfix -ainfix +V23V5V24NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V2NIainfix &gt;=V23c0FAainfix =amixfix []V6V26ainfix -ainfix +V25V26V5NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V1NIainfix &gt;=V25c0FAainfix =amixfix []V6V28V27NIainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="Nainfix =amixfix []V14V18V17Iainfix &lt;V18V15Aainfix &lt;=c0V18FIamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -384,7 +384,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.22"/>
+         <result status="valid" time="1.86"/>
         </proof>
        </goal>
        <goal
@@ -392,10 +392,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="7."
-        sum="54b4a7519ea84666cde6ff831210e216"
+        sum="4a80c5937e2519229499be6f776322ac"
         proved="true"
         expanded="false"
-        shape="amemV17V16Iainfix =amixfix []V14V18V17NIainfix &lt;V18V15Aainfix &lt;=c0V18FAainfix &lt;V17anAainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V24ainfix -ainfix +V23V5V24NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V2NIainfix &gt;=V23c0FAainfix =amixfix []V6V26ainfix -ainfix +V25V26V5NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V1NIainfix &gt;=V25c0FAainfix =amixfix []V6V28V27NIainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="amemV17V16INainfix =amixfix []V14V18V17Iainfix &lt;V18V15Aainfix &lt;=c0V18FAainfix &lt;V17anAainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -413,10 +413,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="8."
-        sum="56d622a39c2c977a7c23ede520504964"
-        proved="true"
+        sum="7ed5c99d7b3cfa8db5b6f5e1397ccd0b"
+        proved="false"
         expanded="false"
-        shape="ainfix =amixfix []V14V18ainfix -ainfix +V17V18V15NIainfix &lt;V18V15Aainfix &lt;=c0V18FIamemV17asuccaaddV13V1NIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V24ainfix -ainfix +V23V5V24NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V2NIainfix &gt;=V23c0FAainfix =amixfix []V6V26ainfix -ainfix +V25V26V5NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V1NIainfix &gt;=V25c0FAainfix =amixfix []V6V28V27NIainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="Nainfix =amixfix []V14V18ainfix -ainfix +V17V18V15Iainfix &lt;V18V15Aainfix &lt;=c0V18FINamemV17asuccaaddV13V1Iainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -425,7 +425,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.88"/>
+         <result status="timeout" time="19.88"/>
         </proof>
        </goal>
        <goal
@@ -433,10 +433,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="9."
-        sum="d5966955b4ee00f02175f7c3d22f68da"
+        sum="ebd4463368c6e16fd8781461774fb8bf"
         proved="true"
         expanded="false"
-        shape="amemV17asuccaaddV13V1NIainfix =amixfix []V14V18ainfix -ainfix +V17V18V15NIainfix &lt;V18V15Aainfix &lt;=c0V18FIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V24ainfix -ainfix +V23V5V24NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V2NIainfix &gt;=V23c0FAainfix =amixfix []V6V26ainfix -ainfix +V25V26V5NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V1NIainfix &gt;=V25c0FAainfix =amixfix []V6V28V27NIainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="NamemV17asuccaaddV13V1INainfix =amixfix []V14V18ainfix -ainfix +V17V18V15Iainfix &lt;V18V15Aainfix &lt;=c0V18FIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -454,10 +454,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="10."
-        sum="259e8ada8495b8089110ba7aca60d8af"
+        sum="9aca022619371b6b8a69816f7f675d6d"
         proved="true"
         expanded="false"
-        shape="ainfix =amixfix []V14V18ainfix -ainfix +V17V15V18NIainfix &lt;V18V15Aainfix &lt;=c0V18FIamemV17apredaaddV13V2NIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V24ainfix -ainfix +V23V5V24NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V2NIainfix &gt;=V23c0FAainfix =amixfix []V6V26ainfix -ainfix +V25V26V5NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V1NIainfix &gt;=V25c0FAainfix =amixfix []V6V28V27NIainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="Nainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FINamemV17apredaaddV13V2Iainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -474,10 +474,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="11."
-        sum="0e3a4a6a60feb61ed8de2e283261bd32"
+        sum="a37555e2558bf2abd74511b6195c50a2"
         proved="true"
         expanded="false"
-        shape="amemV17apredaaddV13V2NIainfix =amixfix []V14V18ainfix -ainfix +V17V15V18NIainfix &lt;V18V15Aainfix &lt;=c0V18FIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V24ainfix -ainfix +V23V5V24NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V2NIainfix &gt;=V23c0FAainfix =amixfix []V6V26ainfix -ainfix +V25V26V5NIainfix &lt;V26V5Aainfix &lt;=c0V26FqamemV25V1NIainfix &gt;=V25c0FAainfix =amixfix []V6V28V27NIainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="NamemV17apredaaddV13V2INainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -495,40 +495,40 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="12."
-        sum="ff1369deecfda8648985bea8438e6036"
-        proved="true"
+        sum="53cabbd0090d9d58648293d3c3b99578"
+        proved="false"
         expanded="true"
-        shape="apartial_solutionV15V14LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V22ainfix -ainfix +V21V5V22NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V2NIainfix &gt;=V21c0FAainfix =amixfix []V6V24ainfix -ainfix +V23V24V5NIainfix &lt;V24V5Aainfix &lt;=c0V24FqamemV23V1NIainfix &gt;=V23c0FAainfix =amixfix []V6V26V25NIainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="apartial_solutionV15V14LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <transf
          name="inline_goal"
-         proved="true"
+         proved="false"
          expanded="true">
          <goal
           name="WP_parameter t3.3.12.1"
           locfile="../queens.mlw"
           loclnum="107" loccnumb="10" loccnume="12"
           expl="1."
-          sum="f1ce8d6866a30a743473735a41d176c3"
-          proved="true"
+          sum="c95ca79344fabcd04c3ce92c6abb27b0"
+          proved="false"
           expanded="true"
-          shape="ainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17NAainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18NAainfix =amixfix []V14V17amixfix []V14V18NIainfix &lt;V18V17Aainfix &lt;=c0V18FAainfix &lt;amixfix []V14V17anAainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8IamemV19V8NFNIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29NAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30NAainfix =amixfix []V12V29amixfix []V12V30NIainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV32V0NFNIainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33NAainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34NAainfix =amixfix []V6V33amixfix []V6V34NIainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V2NIainfix &lt;=c0V35FAainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqamemV37V1NIainfix &lt;=c0V37FAainfix =agetV6V40V39NIainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
+          shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17ANainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18ANainfix =amixfix []V14V17amixfix []V14V18Iainfix &lt;V18V17Aainfix &lt;=c0V18FAainfix &lt;amixfix []V14V17anAainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
           <label
            name="expl:VC for t3"/>
           <transf
            name="split_goal"
-           proved="true"
+           proved="false"
            expanded="true">
            <goal
             name="WP_parameter t3.3.12.1.1"
             locfile="../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="1."
-            sum="0705ead87ef3493f9a23f4c9ca33f104"
+            sum="e2f74e035293b7a1732cf8dc29d8e89c"
             proved="true"
             expanded="false"
-            shape="ainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8IamemV18V8NFNIainfix =amixfix []V4V19amixfix []V10V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =amixfix []V6V20amixfix []V12V20Iainfix &lt;V20V11Aainfix &lt;=c0V20FAaeq_prefixV21amixfix []V10V22anAainfix &lt;V22V9Aainfix =V3V22Oainfix &lt;V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V23amixfix []V21V23Iainfix &lt;V23V11Aainfix &lt;=c0V23FAapartial_solutionanV21FAainfix &lt;V24V25IamemV25V8IamemV24adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V26amixfix []V10V27Iainfix &lt;V27V9Aainfix &lt;V26V27Aainfix &lt;=V3V26FAainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V29V28NAainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V28V29NAainfix =amixfix []V12V28amixfix []V12V29NIainfix &lt;V29V28Aainfix &lt;=c0V29FAainfix &lt;amixfix []V12V28anAainfix &lt;=c0amixfix []V12V28Iainfix &lt;V28V11Aainfix &lt;=c0V28FAamemV30adiffadiffV0V1V2IamemV30V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV31V0NFNIainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V33V32NAainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V32V33NAainfix =amixfix []V6V32amixfix []V6V33NIainfix &lt;V33V32Aainfix &lt;=c0V33FAainfix &lt;amixfix []V6V32anAainfix &lt;=c0amixfix []V6V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix =agetV6V35ainfix +ainfix +V34V5aprefix -V35NIainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqamemV34V2NIainfix &lt;=c0V34FAainfix =agetV6V37ainfix +ainfix +V36V37aprefix -V5NIainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FqamemV36V1NIainfix &lt;=c0V36FAainfix =agetV6V39V38NIainfix &lt;V39V5Aainfix =c0V39Oainfix &lt;c0V39FAainfix &lt;V38anAainfix =c0V38Oainfix &lt;c0V38qamemV38V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
+            shape="ainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV18V8FIainfix =amixfix []V4V19amixfix []V10V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =amixfix []V6V20amixfix []V12V20Iainfix &lt;V20V11Aainfix &lt;=c0V20FAaeq_prefixV21amixfix []V10V22anAainfix &lt;V22V9Aainfix =V3V22Oainfix &lt;V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V23amixfix []V21V23Iainfix &lt;V23V11Aainfix &lt;=c0V23FAapartial_solutionanV21FAainfix &lt;V24V25IamemV25V8IamemV24adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V26amixfix []V10V27Iainfix &lt;V27V9Aainfix &lt;V26V27Aainfix &lt;=V3V26FANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V29V28ANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V28V29ANainfix =amixfix []V12V28amixfix []V12V29Iainfix &lt;V29V28Aainfix &lt;=c0V29FAainfix &lt;amixfix []V12V28anAainfix &lt;=c0amixfix []V12V28Iainfix &lt;V28V11Aainfix &lt;=c0V28FAamemV30adiffadiffV0V1V2IamemV30V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV31V0FINainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V33V32ANainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V32V33ANainfix =amixfix []V6V32amixfix []V6V33Iainfix &lt;V33V32Aainfix &lt;=c0V33FAainfix &lt;amixfix []V6V32anAainfix &lt;=c0amixfix []V6V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FANainfix =agetV6V35ainfix +ainfix +V34V5aprefix -V35Iainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqNamemV34V2Iainfix &lt;=c0V34FANainfix =agetV6V37ainfix +ainfix +V36V37aprefix -V5Iainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FqNamemV36V1Iainfix &lt;=c0V36FANainfix =agetV6V39V38Iainfix &lt;V39V5Aainfix =c0V39Oainfix &lt;c0V39FAainfix &lt;V38anAainfix =c0V38Oainfix &lt;c0V38qamemV38V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
@@ -545,7 +545,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.20"/>
+             <result status="timeout" time="4.97"/>
             </proof>
             <proof
              prover="5"
@@ -553,7 +553,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.64"/>
+             <result status="timeout" time="4.97"/>
             </proof>
            </goal>
            <goal
@@ -561,10 +561,10 @@
             locfile="../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="2."
-            sum="407ba9aed0a21a13a07708bd59c17ff1"
+            sum="17b2086b3ebe3c95997a7b33753a15c8"
             proved="true"
             expanded="false"
-            shape="ainfix &lt;amixfix []V14V17anIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8IamemV18V8NFNIainfix =amixfix []V4V19amixfix []V10V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =amixfix []V6V20amixfix []V12V20Iainfix &lt;V20V11Aainfix &lt;=c0V20FAaeq_prefixV21amixfix []V10V22anAainfix &lt;V22V9Aainfix =V3V22Oainfix &lt;V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V23amixfix []V21V23Iainfix &lt;V23V11Aainfix &lt;=c0V23FAapartial_solutionanV21FAainfix &lt;V24V25IamemV25V8IamemV24adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V26amixfix []V10V27Iainfix &lt;V27V9Aainfix &lt;V26V27Aainfix &lt;=V3V26FAainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V29V28NAainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V28V29NAainfix =amixfix []V12V28amixfix []V12V29NIainfix &lt;V29V28Aainfix &lt;=c0V29FAainfix &lt;amixfix []V12V28anAainfix &lt;=c0amixfix []V12V28Iainfix &lt;V28V11Aainfix &lt;=c0V28FAamemV30adiffadiffV0V1V2IamemV30V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV31V0NFNIainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V33V32NAainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V32V33NAainfix =amixfix []V6V32amixfix []V6V33NIainfix &lt;V33V32Aainfix &lt;=c0V33FAainfix &lt;amixfix []V6V32anAainfix &lt;=c0amixfix []V6V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix =agetV6V35ainfix +ainfix +V34V5aprefix -V35NIainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqamemV34V2NIainfix &lt;=c0V34FAainfix =agetV6V37ainfix +ainfix +V36V37aprefix -V5NIainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FqamemV36V1NIainfix &lt;=c0V36FAainfix =agetV6V39V38NIainfix &lt;V39V5Aainfix =c0V39Oainfix &lt;c0V39FAainfix &lt;V38anAainfix =c0V38Oainfix &lt;c0V38qamemV38V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
+            shape="ainfix &lt;amixfix []V14V17anIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV18V8FIainfix =amixfix []V4V19amixfix []V10V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =amixfix []V6V20amixfix []V12V20Iainfix &lt;V20V11Aainfix &lt;=c0V20FAaeq_prefixV21amixfix []V10V22anAainfix &lt;V22V9Aainfix =V3V22Oainfix &lt;V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V23amixfix []V21V23Iainfix &lt;V23V11Aainfix &lt;=c0V23FAapartial_solutionanV21FAainfix &lt;V24V25IamemV25V8IamemV24adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V26amixfix []V10V27Iainfix &lt;V27V9Aainfix &lt;V26V27Aainfix &lt;=V3V26FANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V29V28ANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V28V29ANainfix =amixfix []V12V28amixfix []V12V29Iainfix &lt;V29V28Aainfix &lt;=c0V29FAainfix &lt;amixfix []V12V28anAainfix &lt;=c0amixfix []V12V28Iainfix &lt;V28V11Aainfix &lt;=c0V28FAamemV30adiffadiffV0V1V2IamemV30V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV31V0FINainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V33V32ANainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V32V33ANainfix =amixfix []V6V32amixfix []V6V33Iainfix &lt;V33V32Aainfix &lt;=c0V33FAainfix &lt;amixfix []V6V32anAainfix &lt;=c0amixfix []V6V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FANainfix =agetV6V35ainfix +ainfix +V34V5aprefix -V35Iainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqNamemV34V2Iainfix &lt;=c0V34FANainfix =agetV6V37ainfix +ainfix +V36V37aprefix -V5Iainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FqNamemV36V1Iainfix &lt;=c0V36FANainfix =agetV6V39V38Iainfix &lt;V39V5Aainfix =c0V39Oainfix &lt;c0V39FAainfix &lt;V38anAainfix =c0V38Oainfix &lt;c0V38qamemV38V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
@@ -581,7 +581,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.86"/>
+             <result status="timeout" time="4.98"/>
             </proof>
             <proof
              prover="2"
@@ -597,7 +597,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.11"/>
+             <result status="timeout" time="4.97"/>
             </proof>
             <proof
              prover="5"
@@ -605,7 +605,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.59"/>
+             <result status="timeout" time="4.97"/>
             </proof>
            </goal>
            <goal
@@ -613,10 +613,10 @@
             locfile="../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="3."
-            sum="738ed6d320ad92af28b1dddcf9006176"
+            sum="13d65ef74838cf70dc1c3f46fc795660"
             proved="true"
             expanded="true"
-            shape="ainfix =amixfix []V14V17amixfix []V14V18NIainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8IamemV19V8NFNIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29NAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30NAainfix =amixfix []V12V29amixfix []V12V30NIainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV32V0NFNIainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33NAainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34NAainfix =amixfix []V6V33amixfix []V6V34NIainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V2NIainfix &lt;=c0V35FAainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqamemV37V1NIainfix &lt;=c0V37FAainfix =agetV6V40V39NIainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
+            shape="Nainfix =amixfix []V14V17amixfix []V14V18Iainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
@@ -625,7 +625,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="4.19"/>
+             <result status="valid" time="4.72"/>
             </proof>
             <proof
              prover="2"
@@ -641,10 +641,10 @@
             locfile="../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="4."
-            sum="acabda464116cb7ec8e5b5521ffa729a"
+            sum="41f44a4f6cacf66d681fc11aab0551b2"
             proved="true"
             expanded="true"
-            shape="ainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18NIainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8IamemV19V8NFNIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29NAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30NAainfix =amixfix []V12V29amixfix []V12V30NIainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV32V0NFNIainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33NAainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34NAainfix =amixfix []V6V33amixfix []V6V34NIainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V2NIainfix &lt;=c0V35FAainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqamemV37V1NIainfix &lt;=c0V37FAainfix =agetV6V40V39NIainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
+            shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18Iainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
@@ -669,10 +669,10 @@
             locfile="../queens.mlw"
             loclnum="107" loccnumb="10" loccnume="12"
             expl="5."
-            sum="1dcc141750bac350de168c81921495f4"
-            proved="true"
+            sum="e8ddf780388f96ee89fb77d1a975c01e"
+            proved="false"
             expanded="false"
-            shape="ainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17NIainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8IamemV19V8NFNIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29NAainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30NAainfix =amixfix []V12V29amixfix []V12V30NIainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FIamemV32V0NFNIainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33NAainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34NAainfix =amixfix []V6V33amixfix []V6V34NIainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FAainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36NIainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqamemV35V2NIainfix &lt;=c0V35FAainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5NIainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqamemV37V1NIainfix &lt;=c0V37FAainfix =agetV6V40V39NIainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
+            shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17Iainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
@@ -681,7 +681,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.72"/>
+             <result status="timeout" time="4.97"/>
             </proof>
             <proof
              prover="5"
@@ -689,7 +689,7 @@
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="2.16"/>
+             <result status="timeout" time="4.97"/>
             </proof>
            </goal>
           </transf>
@@ -703,10 +703,10 @@
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="4. loop invariant preservation"
-      sum="e4f3b31b5d4bd3c734a96df3413a4ba9"
+      sum="9f28bcf2797fe7e9702171b2a9a252d6"
       proved="true"
       expanded="true"
-      shape="aeq_prefixV4V18V3Aaeq_prefixV6V20V22Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25Eqamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FAainfix &lt;V26V27IamemV27V23IamemV26adiffadiffadiffV0V1V2V23FAasortedV18V3V17Aapartial_solutionV22V20AasubsetV23adiffadiffV0V1V2Aainfix =V22V5Aainfix &gt;=ainfix -V17V3c0Aainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV28amixfix []V18V29Aainfix &lt;V29V17Aainfix &lt;=V9V29Eqaeq_prefixV20V28V19AasolutionV28FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V31ainfix -ainfix +V30V15V31NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30apredaaddV13V2NIainfix &gt;=V30c0FAainfix =amixfix []V14V33ainfix -ainfix +V32V33V15NIainfix &lt;V33V15Aainfix &lt;=c0V33FqamemV32asuccaaddV13V1NIainfix &gt;=V32c0FAainfix =amixfix []V14V35V34NIainfix &lt;V35V15Aainfix &lt;=c0V35FAainfix &lt;V34anAainfix &lt;=c0V34qamemV34V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV36amixfix []V10V37Aainfix &lt;V37V9Aainfix &lt;=V3V37Eqamemamixfix []V36V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V36V11AasolutionV36FAainfix &lt;V38V39IamemV39V8IamemV38adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V41ainfix -ainfix +V40V5V41NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V2NIainfix &gt;=V40c0FAainfix =amixfix []V6V43ainfix -ainfix +V42V43V5NIainfix &lt;V43V5Aainfix &lt;=c0V43FqamemV42V1NIainfix &gt;=V42c0FAainfix =amixfix []V6V45V44NIainfix &lt;V45V5Aainfix &lt;=c0V45FAainfix &lt;V44anAainfix &lt;=c0V44qamemV44V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="loop invariant preservationaeq_prefixV4V18V3Aaeq_prefixV6V20V22Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25Eqamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FAainfix &lt;V26V27IamemV27V23IamemV26adiffadiffadiffV0V1V2V23FAasortedV18V3V17Aapartial_solutionV22V20AasubsetV23adiffadiffV0V1V2Aainfix =V22V5Aainfix &gt;=ainfix -V17V3c0Aainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV28amixfix []V18V29Aainfix &lt;V29V17Aainfix &lt;=V9V29Eqaeq_prefixV20V28V19AasolutionV28FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V31ainfix -ainfix +V30V15V31Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30apredaaddV13V2Iainfix &gt;=V30c0FANainfix =amixfix []V14V33ainfix -ainfix +V32V33V15Iainfix &lt;V33V15Aainfix &lt;=c0V33FqNamemV32asuccaaddV13V1Iainfix &gt;=V32c0FANainfix =amixfix []V14V35V34Iainfix &lt;V35V15Aainfix &lt;=c0V35FAainfix &lt;V34anAainfix &lt;=c0V34qamemV34V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV36amixfix []V10V37Aainfix &lt;V37V9Aainfix &lt;=V3V37Eqamemamixfix []V36V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V36V11AasolutionV36FAainfix &lt;V38V39IamemV39V8IamemV38adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V41ainfix -ainfix +V40V5V41Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V2Iainfix &gt;=V40c0FANainfix =amixfix []V6V43ainfix -ainfix +V42V43V5Iainfix &lt;V43V5Aainfix &lt;=c0V43FqNamemV42V1Iainfix &gt;=V42c0FANainfix =amixfix []V6V45V44Iainfix &lt;V45V5Aainfix &lt;=c0V45FAainfix &lt;V44anAainfix &lt;=c0V44qamemV44V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
@@ -718,10 +718,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="1."
-        sum="6dace28f8038f61811182f5e63556b5f"
+        sum="65ab4382ee40676a30d4f4a972b3e031"
         proved="true"
         expanded="false"
-        shape="ainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -738,10 +738,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="2."
-        sum="5b1a65ec3fcebfb53b5c64d33f32ef57"
+        sum="9a241bee04e3b96a80f099f3f733eb9c"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=ainfix -V17V3c0Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &gt;=ainfix -V17V3c0Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -758,10 +758,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="3."
-        sum="bd1ab06f57e30a86b8e036c6066e9a69"
+        sum="6d9243d09c054161b5f1bae159feda06"
         proved="true"
         expanded="false"
-        shape="ainfix =V22V5Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =V22V5Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -778,10 +778,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="4."
-        sum="4c4824d3c6a61eae3357512a63a56b51"
+        sum="7d0e12dacfe588ac02eea7f99f6ce345"
         proved="true"
         expanded="false"
-        shape="asubsetV23adiffadiffV0V1V2Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asubsetV23adiffadiffV0V1V2Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -798,10 +798,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="5."
-        sum="29e66bacaec78e70d5fba379108fcbee"
+        sum="97e20244d37862fd8e22808525dd835c"
         proved="true"
         expanded="false"
-        shape="apartial_solutionV22V20Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="apartial_solutionV22V20Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -818,10 +818,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="6."
-        sum="c0c996c1de92fd55b684b5b390d07010"
+        sum="42e1ad215184fc3f979c7e40eb87e97e"
         proved="true"
         expanded="true"
-        shape="asortedV18V3V17Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asortedV18V3V17Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -839,10 +839,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="7."
-        sum="c2aaf5216306085de75f818b639a375e"
+        sum="74e2459f1b26b9ab166539dcb019903e"
         proved="true"
         expanded="true"
-        shape="ainfix &lt;V24V25IamemV25V23IamemV24adiffadiffadiffV0V1V2V23FIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V29ainfix -ainfix +V28V15V29NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28apredaaddV13V2NIainfix &gt;=V28c0FAainfix =amixfix []V14V31ainfix -ainfix +V30V31V15NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30asuccaaddV13V1NIainfix &gt;=V30c0FAainfix =amixfix []V14V33V32NIainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V39ainfix -ainfix +V38V5V39NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V2NIainfix &gt;=V38c0FAainfix =amixfix []V6V41ainfix -ainfix +V40V41V5NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V1NIainfix &gt;=V40c0FAainfix =amixfix []V6V43V42NIainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &lt;V24V25IamemV25V23IamemV24adiffadiffadiffV0V1V2V23FIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -860,10 +860,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="8."
-        sum="574ad967fba2e6c9529b9840e1f14a44"
+        sum="f000252ec4536b6f09840786c8aeda91"
         proved="true"
         expanded="false"
-        shape="aeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EIamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V29ainfix -ainfix +V28V15V29NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28apredaaddV13V2NIainfix &gt;=V28c0FAainfix =amixfix []V14V31ainfix -ainfix +V30V31V15NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30asuccaaddV13V1NIainfix &gt;=V30c0FAainfix =amixfix []V14V33V32NIainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V39ainfix -ainfix +V38V5V39NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V2NIainfix &gt;=V38c0FAainfix =amixfix []V6V41ainfix -ainfix +V40V41V5NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V1NIainfix &gt;=V40c0FAainfix =amixfix []V6V43V42NIainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EIamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -872,7 +872,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.61"/>
+         <result status="valid" time="3.03"/>
         </proof>
        </goal>
        <goal
@@ -880,10 +880,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="9."
-        sum="1a383ffa48a001e448e63152572b5be7"
+        sum="f431bdd4957f06e06f4ec86ae9eb3dbc"
         proved="true"
         expanded="false"
-        shape="asolutionV24Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V29ainfix -ainfix +V28V15V29NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28apredaaddV13V2NIainfix &gt;=V28c0FAainfix =amixfix []V14V31ainfix -ainfix +V30V31V15NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30asuccaaddV13V1NIainfix &gt;=V30c0FAainfix =amixfix []V14V33V32NIainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V39ainfix -ainfix +V38V5V39NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V2NIainfix &gt;=V38c0FAainfix =amixfix []V6V41ainfix -ainfix +V40V41V5NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V1NIainfix &gt;=V40c0FAainfix =amixfix []V6V43V42NIainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asolutionV24Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -900,10 +900,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="10."
-        sum="c055f78abf4ff46fad0433aac47ee704"
+        sum="145d54abc3713f1f21aa4513dbb1d687"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV20V24V22Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V29ainfix -ainfix +V28V15V29NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28apredaaddV13V2NIainfix &gt;=V28c0FAainfix =amixfix []V14V31ainfix -ainfix +V30V31V15NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30asuccaaddV13V1NIainfix &gt;=V30c0FAainfix =amixfix []V14V33V32NIainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V39ainfix -ainfix +V38V5V39NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V2NIainfix &gt;=V38c0FAainfix =amixfix []V6V41ainfix -ainfix +V40V41V5NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V1NIainfix &gt;=V40c0FAainfix =amixfix []V6V43V42NIainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV20V24V22Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -912,7 +912,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.96"/>
+         <result status="valid" time="1.16"/>
         </proof>
        </goal>
        <goal
@@ -920,10 +920,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="11."
-        sum="81751a6d9a34e630f4b6e6456e4401fe"
+        sum="1052f31ca47036fe60652b8b3e6184d7"
         proved="true"
         expanded="false"
-        shape="amemamixfix []V24V22adiffadiffadiffV0V1V2V23Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V29ainfix -ainfix +V28V15V29NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28apredaaddV13V2NIainfix &gt;=V28c0FAainfix =amixfix []V14V31ainfix -ainfix +V30V31V15NIainfix &lt;V31V15Aainfix &lt;=c0V31FqamemV30asuccaaddV13V1NIainfix &gt;=V30c0FAainfix =amixfix []V14V33V32NIainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V39ainfix -ainfix +V38V5V39NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V2NIainfix &gt;=V38c0FAainfix =amixfix []V6V41ainfix -ainfix +V40V41V5NIainfix &lt;V41V5Aainfix &lt;=c0V41FqamemV40V1NIainfix &gt;=V40c0FAainfix =amixfix []V6V43V42NIainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="amemamixfix []V24V22adiffadiffadiffV0V1V2V23Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -932,7 +932,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.06"/>
+         <result status="valid" time="2.84"/>
         </proof>
        </goal>
        <goal
@@ -940,10 +940,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="12."
-        sum="ce8e990fdda9a711185fcdb32edafa94"
+        sum="93930bad2444a85059d0cd5c90ae2fd7"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV6V20V22Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV6V20V22Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -960,10 +960,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="13."
-        sum="ccca50e138592be8bc1c35234b2baf60"
+        sum="f66c740160f68dac41c85c5b9bd90eb2"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV4V18V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV4V18V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -982,10 +982,10 @@
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="5. loop variant decrease"
-      sum="ab88a54dc91ee15f9cff7ddf108bb48e"
+      sum="530126f29855cc381a1194b794207058"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalV23acardinalV8Aainfix &lt;=c0acardinalV8Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14Aainfix =amixfix []V14V27ainfix -ainfix +V26V15V27NIainfix &lt;V27V15Aainfix &lt;=c0V27FqamemV26apredaaddV13V2NIainfix &gt;=V26c0FAainfix =amixfix []V14V29ainfix -ainfix +V28V29V15NIainfix &lt;V29V15Aainfix &lt;=c0V29FqamemV28asuccaaddV13V1NIainfix &gt;=V28c0FAainfix =amixfix []V14V31V30NIainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8Iais_emptyV8NIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V37ainfix -ainfix +V36V5V37NIainfix &lt;V37V5Aainfix &lt;=c0V37FqamemV36V2NIainfix &gt;=V36c0FAainfix =amixfix []V6V39ainfix -ainfix +V38V39V5NIainfix &lt;V39V5Aainfix &lt;=c0V39FqamemV38V1NIainfix &gt;=V38c0FAainfix =amixfix []V6V41V40NIainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="loop variant decreaseainfix &lt;acardinalV23acardinalV8Aainfix &lt;=c0acardinalV8Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <proof
@@ -1002,10 +1002,10 @@
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="6. postcondition"
-      sum="41be9fbb7a9fda0bffca69702889d0b9"
+      sum="3fca44d3335e43bb09b6b2b4922b6370"
       proved="true"
       expanded="false"
-      shape="aeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqaeq_prefixV12V13V11AasolutionV13FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="postconditionaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqaeq_prefixV12V13V11AasolutionV13FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
@@ -1017,10 +1017,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="1."
-        sum="e40928a7f567e67c89c3a7c0014b5631"
+        sum="8f5e4cde23fca7ab7b21b4520c03c194"
         proved="true"
         expanded="false"
-        shape="ainfix =V7ainfix -V9V3Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =V7ainfix -V9V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1037,10 +1037,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="2."
-        sum="822c3a50c90db4bf20e9e59670ff2b23"
+        sum="54f5b20944b18bb458489854e1caa8e9"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=ainfix -V9V3c0Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &gt;=ainfix -V9V3c0INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1057,10 +1057,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="3."
-        sum="9635ea716e0f66ca1f1c6fc5893cfbb5"
+        sum="caceac854e19a7278f9886a73b67b4e4"
         proved="true"
         expanded="false"
-        shape="ainfix =V11V5Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =V11V5INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1077,10 +1077,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="4."
-        sum="058e5d973d0429be83b6f7f999d963fb"
+        sum="d3ffdde92b776a0bbe60fe70673b9307"
         proved="true"
         expanded="false"
-        shape="asortedV10V3V9Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asortedV10V3V9INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1097,10 +1097,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="5."
-        sum="995bbfdb7e271d3e85de38401bf12aeb"
+        sum="bdccc2e2db33abbc99fa24ddf0cf6c04"
         proved="true"
         expanded="false"
-        shape="aeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EIaeq_prefixV12V13V11AasolutionV13FIais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EIaeq_prefixV12V13V11AasolutionV13FINNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1118,10 +1118,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="6."
-        sum="4c75a324e25a0dc42feebb3f439f301f"
+        sum="aafca9643f3f96cf70f57113cf39153b"
         proved="true"
         expanded="false"
-        shape="asolutionV13Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFIais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asolutionV13Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFINNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1138,10 +1138,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="7."
-        sum="d758470a18d44e9aafc6243cf28ffea5"
+        sum="5abaa3e6f53e7095b54a9c18d981fed1"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV12V13V11Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFIais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V20ainfix -ainfix +V19V5V20NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V2NIainfix &gt;=V19c0FAainfix =amixfix []V6V22ainfix -ainfix +V21V22V5NIainfix &lt;V22V5Aainfix &lt;=c0V22FqamemV21V1NIainfix &gt;=V21c0FAainfix =amixfix []V6V24V23NIainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV12V13V11Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFINNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1158,10 +1158,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="8."
-        sum="e1fc12f7b11ca3006f5a8024ed05fe69"
+        sum="77111e7607ea9e57074bbf1c079ccea5"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV6V12V11Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV6V12V11INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1186,10 +1186,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="9."
-        sum="d9177cf99b0300b26b7a21aaa88e0f67"
+        sum="c1778d3b181e435c51482fb8ff7de21e"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV4V10V3Iais_emptyV8NNIaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FIais_emptyV0NIapartial_solutionV5V6Aainfix =amixfix []V6V18ainfix -ainfix +V17V5V18NIainfix &lt;V18V5Aainfix &lt;=c0V18FqamemV17V2NIainfix &gt;=V17c0FAainfix =amixfix []V6V20ainfix -ainfix +V19V20V5NIainfix &lt;V20V5Aainfix &lt;=c0V20FqamemV19V1NIainfix &gt;=V19c0FAainfix =amixfix []V6V22V21NIainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV4V10V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1216,10 +1216,10 @@
       locfile="../queens.mlw"
       loclnum="107" loccnumb="10" loccnume="12"
       expl="7. postcondition"
-      sum="06c656ec3fdc7989c343e9ce03beba4e"
+      sum="4b77c81ffa1e7bc816a0bd6777417d1d"
       proved="true"
       expanded="false"
-      shape="aeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix =V5V5Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+      shape="postconditionaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix =V5V5Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
@@ -1231,10 +1231,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="1."
-        sum="0576b927737063b96308bb09562dd6cf"
+        sum="25cabb7c49f5ac48466a170eeffa18af"
         proved="true"
         expanded="false"
-        shape="ainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1251,10 +1251,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="2."
-        sum="5a0a8d4486e1178cf31b21f270569bd5"
+        sum="5c5ba4bc0b8fc83819892daad9c2cc70"
         proved="true"
         expanded="false"
-        shape="ainfix &gt;=ainfix -V8V3c0Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix &gt;=ainfix -V8V3c0Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1271,10 +1271,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="3."
-        sum="bdd05dcd3a289580fc763cdb8f91820c"
+        sum="d92015baae813292b51ea33a96794dda"
         proved="true"
         expanded="false"
-        shape="ainfix =V5V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="ainfix =V5V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1291,10 +1291,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="4."
-        sum="e92fe9d705449fcb23ee04533ffaf9ed"
+        sum="739506b67f4f3bf381e45391cbaac27c"
         proved="true"
         expanded="false"
-        shape="asortedV7V3V8Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asortedV7V3V8Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1311,10 +1311,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="5."
-        sum="55e536e9f5c0803b38a11ce7b40bf873"
+        sum="b87a59fc86d995cc344c7d94c8be9fae"
         proved="true"
         expanded="false"
-        shape="aeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EIaeq_prefixV6V9V5AasolutionV9FIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EIaeq_prefixV6V9V5AasolutionV9FIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1331,10 +1331,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="6."
-        sum="d1a5f834678eca4330d9b07a7c65e43d"
+        sum="21beceddadaa8abc429a8af675f8c40b"
         proved="true"
         expanded="false"
-        shape="asolutionV9Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="asolutionV9Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1351,10 +1351,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="7."
-        sum="715e104753b51fbeda8e14d9a46b211b"
+        sum="c1fe11da4ff74fe8795dbdc1a192f624"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV6V9V5Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V12ainfix -ainfix +V11V5V12NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V2NIainfix &gt;=V11c0FAainfix =amixfix []V6V14ainfix -ainfix +V13V14V5NIainfix &lt;V14V5Aainfix &lt;=c0V14FqamemV13V1NIainfix &gt;=V13c0FAainfix =amixfix []V6V16V15NIainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV6V9V5Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1371,10 +1371,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="8."
-        sum="8aa386ae149e0dba295b631cc3d5d74f"
+        sum="3dd733a3ecb17366ffb10cc6fc23d6b0"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV6V6V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV6V6V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1391,10 +1391,10 @@
         locfile="../queens.mlw"
         loclnum="107" loccnumb="10" loccnume="12"
         expl="9."
-        sum="11626d790b193e2fac215223bcf8abf3"
+        sum="9343968ad1396b02dd364e7fe95eaf23"
         proved="true"
         expanded="false"
-        shape="aeq_prefixV4V7V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FIais_emptyV0NNIapartial_solutionV5V6Aainfix =amixfix []V6V10ainfix -ainfix +V9V5V10NIainfix &lt;V10V5Aainfix &lt;=c0V10FqamemV9V2NIainfix &gt;=V9c0FAainfix =amixfix []V6V12ainfix -ainfix +V11V12V5NIainfix &lt;V12V5Aainfix &lt;=c0V12FqamemV11V1NIainfix &gt;=V11c0FAainfix =amixfix []V6V14V13NIainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
+        shape="aeq_prefixV4V7V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
@@ -1415,10 +1415,10 @@
     locfile="../queens.mlw"
     loclnum="156" loccnumb="6" loccnume="13"
     expl="VC for queens3"
-    sum="8f5147b9adf1dad0aca5012dbbd91d42"
+    sum="8b861072bf8546bb8e28e024af599175"
     proved="true"
     expanded="false"
-    shape="aeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FAapartial_solutionV3V4Aainfix =amixfix []V4V16ainfix -ainfix +V15V3V16NIainfix &lt;V16V3Aainfix &lt;=c0V16FqamemV15aemptyNIainfix &gt;=V15c0FAainfix =amixfix []V4V18ainfix -ainfix +V17V18V3NIainfix &lt;V18V3Aainfix &lt;=c0V18FqamemV17aemptyNIainfix &gt;=V17c0FAainfix =amixfix []V4V20V19NIainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
+    shape="aeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FAapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15aemptyIainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17aemptyIainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
     <label
      name="expl:VC for queens3"/>
     <transf
@@ -1430,10 +1430,10 @@
       locfile="../queens.mlw"
       loclnum="156" loccnumb="6" loccnume="13"
       expl="1. precondition"
-      sum="cec52bae6162b4cbd5c2f910549f2549"
+      sum="83f318f3deb5da6201759c05a014480c"
       proved="true"
       expanded="false"
-      shape="apartial_solutionV3V4Aainfix =amixfix []V4V7ainfix -ainfix +V6V3V7NIainfix &lt;V7V3Aainfix &lt;=c0V7FqamemV6aemptyNIainfix &gt;=V6c0FAainfix =amixfix []V4V9ainfix -ainfix +V8V9V3NIainfix &lt;V9V3Aainfix &lt;=c0V9FqamemV8aemptyNIainfix &gt;=V8c0FAainfix =amixfix []V4V11V10NIainfix &lt;V11V3Aainfix &lt;=c0V11FAainfix &lt;V10anAainfix &lt;=c0V10qamemV10V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
+      shape="preconditionapartial_solutionV3V4ANainfix =amixfix []V4V7ainfix -ainfix +V6V3V7Iainfix &lt;V7V3Aainfix &lt;=c0V7FqNamemV6aemptyIainfix &gt;=V6c0FANainfix =amixfix []V4V9ainfix -ainfix +V8V9V3Iainfix &lt;V9V3Aainfix &lt;=c0V9FqNamemV8aemptyIainfix &gt;=V8c0FANainfix =amixfix []V4V11V10Iainfix &lt;V11V3Aainfix &lt;=c0V11FAainfix &lt;V10anAainfix &lt;=c0V10qamemV10V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
       <label
        name="expl:VC for queens3"/>
       <proof
@@ -1450,10 +1450,10 @@
       locfile="../queens.mlw"
       loclnum="156" loccnumb="6" loccnume="13"
       expl="2. postcondition"
-      sum="7089eb580cf0ea9f60231511088fe83a"
+      sum="efe2b3c055d814002c5b8c57a7675afc"
       proved="true"
       expanded="false"
-      shape="aeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FIapartial_solutionV3V4Aainfix =amixfix []V4V16ainfix -ainfix +V15V3V16NIainfix &lt;V16V3Aainfix &lt;=c0V16FqamemV15aemptyNIainfix &gt;=V15c0FAainfix =amixfix []V4V18ainfix -ainfix +V17V18V3NIainfix &lt;V18V3Aainfix &lt;=c0V18FqamemV17aemptyNIainfix &gt;=V17c0FAainfix =amixfix []V4V20V19NIainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
+      shape="postconditionaeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FIapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15aemptyIainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17aemptyIainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
       <label
        name="expl:VC for queens3"/>
       <proof
