@@ -1,7 +1,7 @@
 
 
 
-/*@ ensures \result == t[0];
+/*@ ensures \result == t[0] + 0;
   @*/
 int f(int t[]) {
   return t[0];

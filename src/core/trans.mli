@@ -64,7 +64,7 @@ val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans
 
-(* Dependent Transformatons *)
+(* Dependent Transformations *)
 
 val on_meta : meta -> (meta_arg list list -> 'a trans) -> 'a trans
 val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans

@@ -3,105 +3,37 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require list.List.
+Require list.Length.
+Require list.Mem.
 Require map.Map.
+Require list.Append.
+Require list.Reverse.
 
 (* Why3 assumption *)
-Definition unit  := unit.
-
-(* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
+Definition unit := unit.
 
 Parameter head: forall {a:Type} {a_WT:WhyType a}, (list a) -> a.
 
-Axiom head_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), ((head (Cons x l)) = x).
+Axiom head_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), ((head (cons x l)) = x).
 
 Parameter tail: forall {a:Type} {a_WT:WhyType a}, (list a) -> (list a).
 
-Axiom tail_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), ((tail (Cons x l)) = l).
+Axiom tail_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), ((tail (cons x l)) = l).
 
 (* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
+Definition disjoint {a:Type} {a_WT:WhyType a} (l1:(list a))
+  (l2:(list a)): Prop := forall (x:a), ~ ((list.Mem.mem x l1) /\
+  (list.Mem.mem x l2)).
+
+(* Why3 assumption *)
+Fixpoint no_repet {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Prop :=
   match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
+  | nil => True
+  | (cons x r) => (~ (list.Mem.mem x r)) /\ (no_repet r)
   end.
-
-(* Why3 assumption *)
-Definition disjoint {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)): Prop := forall (x:a), ~ ((mem x l1) /\ (mem x l2)).
-
-(* Why3 assumption *)
-Fixpoint no_repet {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => True
-  | (Cons x r) => (~ (mem x r)) /\ (no_repet r)
-  end.
-
-(* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Fixpoint reverse {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: (list
-  a) :=
-  match l with
-  | Nil => (Nil :(list a))
-  | (Cons x r) => (infix_plpl (reverse r) (Cons x (Nil :(list a))))
-  end.
-
-Axiom reverse_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (x:a), ((infix_plpl (reverse (Cons x l1))
-  l2) = (infix_plpl (reverse l1) (Cons x l2))).
-
-Axiom reverse_reverse : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), ((reverse (reverse l)) = l).
-
-Axiom Reverse_length : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length (reverse l)) = (length l)).
 
 Axiom loc : Type.
 Parameter loc_WhyType : WhyType loc.
@@ -110,30 +42,35 @@ Existing Instance loc_WhyType.
 Parameter null: loc.
 
 (* Why3 assumption *)
-Inductive list_seg : loc -> (map.Map.map loc loc) -> (list loc)
-  -> loc -> Prop :=
-  | list_seg_nil : forall (p:loc) (next:(map.Map.map loc loc)), (list_seg p
-      next (Nil :(list loc)) p)
-  | list_seg_cons : forall (p:loc) (q:loc) (next:(map.Map.map loc loc))
-      (l:(list loc)), ((~ (p = null)) /\ (list_seg (map.Map.get next p) next
-      l q)) -> (list_seg p next (Cons p l) q).
+Inductive list_seg : loc -> (@map.Map.map loc loc_WhyType loc loc_WhyType)
+  -> (list loc) -> loc -> Prop :=
+  | list_seg_nil : forall (p:loc) (next:(@map.Map.map loc loc_WhyType
+      loc loc_WhyType)), (list_seg p next nil p)
+  | list_seg_cons : forall (p:loc) (q:loc) (next:(@map.Map.map
+      loc loc_WhyType loc loc_WhyType)) (l:(list loc)), ((~ (p = null)) /\
+      (list_seg (map.Map.get next p) next l q)) -> (list_seg p next
+      (cons p l) q).
 
-Axiom list_seg_frame : forall (next1:(map.Map.map loc loc))
-  (next2:(map.Map.map loc loc)) (p:loc) (q:loc) (v:loc) (pM:(list loc)),
-  ((list_seg p next1 pM null) /\ ((next2 = (map.Map.set next1 q v)) /\
-  ~ (mem q pM))) -> (list_seg p next2 pM null).
+Axiom list_seg_frame : forall (next1:(@map.Map.map loc loc_WhyType
+  loc loc_WhyType)) (next2:(@map.Map.map loc loc_WhyType loc loc_WhyType))
+  (p:loc) (q:loc) (v:loc) (pM:(list loc)), ((list_seg p next1 pM null) /\
+  ((next2 = (map.Map.set next1 q v)) /\ ~ (list.Mem.mem q pM))) -> (list_seg
+  p next2 pM null).
 
-Axiom list_seg_functional : forall (next:(map.Map.map loc loc)) (l1:(list
-  loc)) (l2:(list loc)) (p:loc), ((list_seg p next l1 null) /\ (list_seg p
-  next l2 null)) -> (l1 = l2).
+Axiom list_seg_functional : forall (next:(@map.Map.map loc loc_WhyType
+  loc loc_WhyType)) (l1:(list loc)) (l2:(list loc)) (p:loc), ((list_seg p
+  next l1 null) /\ (list_seg p next l2 null)) -> (l1 = l2).
 
-Axiom list_seg_sublistl : forall (next:(map.Map.map loc loc)) (l1:(list loc))
-  (l2:(list loc)) (p:loc) (q:loc), (list_seg p next (infix_plpl l1 (Cons q
-  l2)) null) -> (list_seg q next (Cons q l2) null).
+Axiom list_seg_sublistl : forall (next:(@map.Map.map loc loc_WhyType
+  loc loc_WhyType)) (l1:(list loc)) (l2:(list loc)) (p:loc) (q:loc),
+  (list_seg p next (List.app l1 (cons q l2)) null) -> (list_seg q next
+  (cons q l2) null).
 
 (* Why3 goal *)
-Theorem list_seg_no_repet : forall (next:(map.Map.map loc loc)) (pM:(list
-  loc)) (p:loc), (list_seg p next pM null) -> (no_repet pM).
+Theorem list_seg_no_repet : forall (next:(@map.Map.map loc loc_WhyType
+  loc loc_WhyType)) (pM:(list loc)) (p:loc), (list_seg p next pM null) ->
+  (no_repet pM).
+(* Why3 intros next pM p h1. *)
 Proof.
 induction pM.
 now simpl.
@@ -142,16 +79,15 @@ assert (a=p) by (inversion h; auto).
 subst a.
 split.
 intro h1.
-destruct (mem_decomp p pM h1) as (l1 & l2 & h2).
+destruct (Append.mem_decomp p pM h1) as (l1 & l2 & h2).
 subst pM.
-change (Cons p (infix_plpl l1 (Cons p l2))) with
-  (infix_plpl (Cons p l1) (Cons p l2)) in h.
+change (cons p (app l1 (cons p l2))) with (app (cons p l1) (cons p l2)) in h.
 assert (h2 := list_seg_sublistl _ _ _ _ _ h).
 assert (h3 := list_seg_functional _ _ _ _ (conj h h2)).
-assert (h4 := (f_equal length h3)).
-rewrite Append_length in h4.
-generalize (Length_nonnegative l1).
-change (length (Cons p l1)) with (1+length l1)%Z in h4.
+assert (h4 := (f_equal Length.length h3)).
+rewrite Append.Append_length in h4.
+generalize (Length.Length_nonnegative l1).
+change (Length.length (cons p l1)) with (1+Length.length l1)%Z in h4.
 omega.
 inversion h; subst; clear h.
 apply IHpM with (p := Map.get next p).

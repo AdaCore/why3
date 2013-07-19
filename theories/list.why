@@ -72,6 +72,19 @@ theory Nth
 
 end
 
+theory NthNoOpt
+
+  use export List
+  use import int.Int
+
+  function nth (n: int) (l: list 'a) : 'a 
+
+  axiom nth_cons_0: forall x:'a, r:list 'a. nth 0 (Cons x r) = x
+  axiom nth_cons_n: forall x:'a, r:list 'a, n:int.
+    n > 0 -> nth n (Cons x r) = nth (n-1) r
+
+end
+
 theory NthLength
 
   use export Nth
@@ -118,7 +131,7 @@ theory NthHdTl
 
   lemma Nth_tl:
     forall l1 l2: list 'a. tl l1 = Some l2 ->
-    forall i: int. nth i l2 = nth (i+1) l1
+    forall i: int. i <> -1 -> nth i l2 = nth (i+1) l1
 
   lemma Nth0_head:
     forall l: list 'a. nth 0 l = hd l
@@ -230,6 +243,20 @@ theory RevAppend
   lemma rev_append_length:
     forall s t: list 'a.
       length (rev_append s t) = length s + length t
+
+end
+
+(** {2 Zip} *)
+
+theory Combine
+
+  use export List
+
+  function combine (x: list 'a) (y: list 'b) : list ('a, 'b) =
+    match x, y with
+    | Cons x0 x, Cons y0 y -> Cons (x0, y0) (combine x y)
+    | _ -> Nil
+    end
 
 end
 

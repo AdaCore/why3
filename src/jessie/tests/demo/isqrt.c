@@ -6,18 +6,18 @@
 //@ logic integer sqr(integer x) = x * x;
 
 /*@ requires x >= 0;
-  @ ensures \result >= 0 && sqr(\result) <= x && x < sqr(\result + 1);
+  @ requires x <= 1000000000; // to prevent integer overflow
+  @ ensures \result >= 0 && sqr(\result+0) <= x && x < sqr(\result + 1);
   @*/
 int isqrt(int x) {
   int count = 0, sum = 1;
-  /*@ loop invariant count >= 0 && x >= sqr(count) && sum == sqr(count+1);
-    @ loop variant  x - count; 
+  /*@ loop invariant count >= 0 && x >= sqr(count+0) && sum == sqr(count+1);
+    @ loop variant  x - count;
     @*/
   while (sum <= x) { ++count; sum += 2 * count + 1; }
   return count;
 }
 
-#if 0
 //@ ensures \result == 4;
 int main () {
   int r;
@@ -27,7 +27,6 @@ int main () {
   return r;
 }
 
-#endif
 
 /*
 Local Variables:

@@ -876,13 +876,19 @@ COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 COQLIBS_MAP_FILES = Map MapPermut
 COQLIBS_MAP = $(addprefix lib/coq/map/, $(COQLIBS_MAP_FILES))
 
+COQLIBS_LIST_FILES = List Length Mem Nth NthLength HdTl NthHdTl Append NthLengthAppend Reverse
+COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
+
+COQLIBS_OPTION_FILES = Option
+COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_FP)
+COQLIBS_FILES = lib/coq/BuiltIn $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)
 
 COQV  = $(addsuffix .v,  $(COQLIBS_FILES))
 COQVO = $(addsuffix .vo, $(COQLIBS_FILES))
@@ -912,6 +918,10 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory set.'"$$f"' meta "realized_theory" "set.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_MAP_FILES); do \
 	echo 'theory map.'"$$f"' meta "realized_theory" "map.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_LIST_FILES); do \
+	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_OPTION_FILES); do \
+	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -933,6 +943,10 @@ install_no_local::
 	cp $(addsuffix .vo, $(COQLIBS_SET)) $(LIBDIR)/why3/coq/set/
 	mkdir -p $(LIBDIR)/why3/coq/map
 	cp $(addsuffix .vo, $(COQLIBS_MAP)) $(LIBDIR)/why3/coq/map/
+	mkdir -p $(LIBDIR)/why3/coq/list
+	cp $(addsuffix .vo, $(COQLIBS_LIST)) $(LIBDIR)/why3/coq/list/
+	mkdir -p $(LIBDIR)/why3/coq/option
+	cp $(addsuffix .vo, $(COQLIBS_OPTION)) $(LIBDIR)/why3/coq/option/
 ifeq (@enable_coq_fp_libs@,yes)
 	mkdir -p $(LIBDIR)/why3/coq/floating_point
 	cp $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
@@ -942,7 +956,7 @@ endif
 install_local: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS)" "clean"
-ifneq "$(MAKECMDGOALS)" "update-coq"
+ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
 include $(COQVD)
 endif
 endif
@@ -952,7 +966,7 @@ depend: $(COQVD)
 clean::
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
 
-update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-fp
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp
 
 update-coq-int: bin/why3 drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -971,6 +985,12 @@ update-coq-set: bin/why3 drivers/coq-realizations.aux theories/set.why
 
 update-coq-map: bin/why3 drivers/coq-realizations.aux theories/map.why
 	for f in $(COQLIBS_MAP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T map.$$f -o lib/coq/map/; done
+
+update-coq-list: bin/why3 drivers/coq-realizations.aux theories/list.why
+	for f in $(COQLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T list.$$f -o lib/coq/list/; done
+
+update-coq-option: bin/why3 drivers/coq-realizations.aux theories/option.why
+	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T option.$$f -o lib/coq/option/; done
 
 update-coq-fp: bin/why3 drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done

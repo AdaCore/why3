@@ -1,6 +1,8 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/incr.c"
 [jessie3] processing function f
+[jessie3] created program function f (738)
 [jessie3] processing function h
+[jessie3] created program function h (744)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
 [jessie3] made 3 function(s)
@@ -18,15 +20,37 @@
             
             (* use real.Real *)
             
+            (* use map.Map *)
+            
             (* use ref.Ref *)
             
+            (* use mach_int.Int32 *)
+            
             goal WP_parameter_f :
-              forall x:int.
-               forall us_retres:int. us_retres = (x + 1) -> us_retres = (x + 1)
+              forall x:int32.
+               to_int x <= 1000000 ->
+                in_bounds 0 &&
+                 (forall o:int32.
+                   to_int o = 0 ->
+                    in_bounds 1 &&
+                     (forall o1:int32.
+                       to_int o1 = 1 ->
+                        in_bounds (to_int x + to_int o1) &&
+                         (forall o2:int32.
+                           to_int o2 = (to_int x + to_int o1) ->
+                            (forall us_retres:int32.
+                              us_retres = o2 -> to_int us_retres = (to_int x + 1)))))
             
             goal WP_parameter_h :
-              forall x:int. forall g:int. forall g1:int. g1 = (g + x) -> g1 = (g + x)
+              forall x:int32.
+               forall g:int32.
+                (0 <= to_int x /\ to_int x <= 1000000) /\
+                 0 <= to_int g /\ to_int g <= 1000000 ->
+                 in_bounds (to_int g + to_int x) &&
+                  (forall o:int32.
+                    to_int o = (to_int g + to_int x) ->
+                     (forall g1:int32. g1 = o -> to_int g1 = (to_int g + to_int x)))
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2: Valid, Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid
+[jessie3] Task 2 (WP_parameter h): Valid, Valid, Valid, Valid

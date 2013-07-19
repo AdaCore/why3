@@ -1,6 +1,8 @@
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/forty-two.c"
 [jessie3] processing function f
+[jessie3] created program function f (738)
 [jessie3] processing function g
+[jessie3] created program function g (740)
 [jessie3] found 0 logic decl(s)
 [jessie3] made 0 theory(ies)
 [jessie3] made 2 function(s)
@@ -18,13 +20,30 @@
             
             (* use real.Real *)
             
+            (* use map.Map *)
+            
             (* use ref.Ref *)
+            
+            (* use mach_int.Int32 *)
             
             goal WP_parameter_f : (6 * 7) = 42
             
             goal WP_parameter_g :
-              forall us_retres:int. us_retres = (6 * 7) -> us_retres = 42
+              in_bounds 0 &&
+               (forall o:int32.
+                 to_int o = 0 ->
+                  in_bounds 7 &&
+                   (forall o1:int32.
+                     to_int o1 = 7 ->
+                      in_bounds 6 &&
+                       (forall o2:int32.
+                         to_int o2 = 6 ->
+                          in_bounds (to_int o2 * to_int o1) &&
+                           (forall o3:int32.
+                             to_int o3 = (to_int o2 * to_int o1) ->
+                              (forall us_retres:int32.
+                                us_retres = o3 -> to_int us_retres = 42)))))
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2: Valid, Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid
+[jessie3] Task 2 (WP_parameter g): Valid, Valid, Valid, Valid

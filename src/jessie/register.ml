@@ -59,12 +59,10 @@ let process () =
     List.fold_left
       (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
       []
-      [ "Z42", "Z3,4.3.1";
-        "Z32", "Z3,3.2";
-        "C24", "CVC3,2.4.1";
-        "C22", "CVC3,2.2";
-        "A95", "Alt-Ergo,0.95.1,";
-        (* "A94", "Alt-Ergo,0.94"; *)
+      [ "Z431", "Z3,4.3.1";
+        "Z32 ", "Z3,3.2";
+        "C241", "CVC3,2.4.1";
+        "A951", "Alt-Ergo,0.95.1,";
         ]
   in
   let theories = ACSLtoWhy3.prog prog in
@@ -72,8 +70,8 @@ let process () =
     List.iter (fun th ->
       ACSLtoWhy3.Self.result "running theory 1:";
       ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
-      let tasks = Task.split_theory th None None in
-      ACSLtoWhy3.Self.result "@[<h 0>%a@]"
+      let tasks = List.rev (Task.split_theory th None None) in
+      ACSLtoWhy3.Self.result "@[<h 0>Provers: %a@]"
         (Pp.print_list Pp.comma
            (fun fmt (_n,p,_d) ->
              let p = p.Whyconf.prover in
@@ -81,7 +79,8 @@ let process () =
         provers;
       let _ =
         List.fold_left (fun n t ->
-          ACSLtoWhy3.Self.result "@[<h 0>Task %d: %a@]" n
+          let g = Task.task_goal t in
+          ACSLtoWhy3.Self.result "@[<h 0>Task %d (%s): %a@]" n g.Decl.pr_name.Ident.id_string
             (Pp.print_list Pp.comma (fun fmt (_n,p,d) -> run_on_task fmt p d t))
             provers;
           n+1) 1 tasks

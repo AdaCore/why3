@@ -3,138 +3,69 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require list.List.
+Require list.Length.
+Require list.Mem.
+Require map.Map.
+Require list.Append.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
 
 (* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
+Inductive distinct {a:Type} {a_WT:WhyType a} : (list a) -> Prop :=
+  | distinct_zero : ((@distinct _ _) nil)
+  | distinct_one : forall (x:a), ((@distinct _ _) (cons x nil))
+  | distinct_many : forall (x:a) (l:(list a)), (~ (list.Mem.mem x l)) ->
+      (((@distinct _ _) l) -> ((@distinct _ _) (cons x l))).
+
+Axiom distinct_append : forall {a:Type} {a_WT:WhyType a},
+  forall (l1:(list a)) (l2:(list a)), (distinct l1) -> ((distinct l2) ->
+  ((forall (x:a), (list.Mem.mem x l1) -> ~ (list.Mem.mem x l2)) -> (distinct
+  (List.app l1 l2)))).
 
 (* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-(* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Inductive distinct{a:Type} {a_WT:WhyType a}  : (list a) -> Prop :=
-  | distinct_zero : (distinct (Nil :(list a)))
-  | distinct_one : forall (x:a), (distinct (Cons x (Nil :(list a))))
-  | distinct_many : forall (x:a) (l:(list a)), (~ (mem x l)) ->
-      ((distinct l) -> (distinct (Cons x l))).
-
-Axiom distinct_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
-  a)) (l2:(list a)), (distinct l1) -> ((distinct l2) -> ((forall (x:a),
-  (mem x l1) -> ~ (mem x l2)) -> (distinct (infix_plpl l1 l2)))).
-
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
-
-(* Why3 assumption *)
-Inductive array (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map Z a) -> array a.
+Inductive array
+  (a:Type) {a_WT:WhyType a} :=
+  | mk_array : Z -> (@map.Map.map Z _ a a_WT) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a}(v:(array a)): (map Z a) :=
-  match v with
+Definition elts {a:Type} {a_WT:WhyType a} (v:(@array a a_WT)): (@map.Map.map
+  Z _ a a_WT) := match v with
   | (mk_array x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition length1 {a:Type} {a_WT:WhyType a}(v:(array a)): Z :=
+Definition length {a:Type} {a_WT:WhyType a} (v:(@array a a_WT)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z): a :=
-  (get (elts a1) i).
+Definition get {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (i:Z): a :=
+  (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set1 {a:Type} {a_WT:WhyType a}(a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length1 a1) (set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (i:Z)
+  (v:a): (@array a a_WT) := (mk_array (length a1) (map.Map.set (elts a1) i
+  v)).
 
 (* Why3 assumption *)
-Inductive tree  :=
-  | Empty : tree 
-  | Node : tree -> tree -> tree .
+Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (@array a a_WT) :=
+  (mk_array n (map.Map.const v:(@map.Map.map Z _ a a_WT))).
+
+(* Why3 assumption *)
+Inductive tree :=
+  | Empty : tree
+  | Node : tree -> tree -> tree.
 Axiom tree_WhyType : WhyType tree.
 Existing Instance tree_WhyType.
 
 (* Why3 assumption *)
-Fixpoint size(t:tree) {struct t}: Z :=
+Fixpoint size (t:tree) {struct t}: Z :=
   match t with
   | Empty => 0%Z
   | (Node l r) => ((1%Z + (size l))%Z + (size r))%Z
@@ -146,36 +77,35 @@ Axiom size_left : forall (t:tree), (0%Z < (size t))%Z -> exists l:tree,
   exists r:tree, (t = (Node l r)) /\ ((size l) < (size t))%Z.
 
 (* Why3 assumption *)
-Definition all_trees(n:Z) (l:(list tree)): Prop := (distinct l) /\
-  forall (t:tree), ((size t) = n) <-> (mem t l).
+Definition all_trees (n:Z) (l:(list tree)): Prop := (distinct l) /\
+  forall (t:tree), ((size t) = n) <-> (list.Mem.mem t l).
 
-Axiom all_trees_0 : (all_trees 0%Z (Cons Empty (Nil :(list tree)))).
+Axiom all_trees_0 : (all_trees 0%Z (cons Empty nil)).
 
 Axiom tree_diff : forall (l1:tree) (l2:tree), (~ ((size l1) = (size l2))) ->
   forall (r1:tree) (r2:tree), ~ ((Node l1 r1) = (Node l2 r2)).
-
 
 (* Why3 goal *)
 Theorem WP_parameter_combine : forall (i1:Z) (l1:(list tree)) (i2:Z)
   (l2:(list tree)), ((0%Z <= i1)%Z /\ ((all_trees i1 l1) /\ ((0%Z <= i2)%Z /\
   (all_trees i2 l2)))) -> forall (l11:(list tree)), (distinct l11) ->
   match l11 with
-  | Nil => True
-  | (Cons t1 l12) => forall (l21:(list tree)), (distinct l21) ->
+  | nil => True
+  | (cons t1 l12) => forall (l21:(list tree)), (distinct l21) ->
       match l21 with
-      | Nil => True
-      | (Cons t2 l22) => (distinct l22) -> forall (o:(list tree)),
-          ((distinct o) /\ forall (t:tree), (mem t o) <-> exists r:tree,
-          (t = (Node t1 r)) /\ (mem r l22)) -> forall (t:tree), (mem t
-          (Cons (Node t1 t2) o)) -> exists r:tree, (t = (Node t1 r)) /\
-          (mem r l21)
+      | nil => True
+      | (cons t2 l22) => (distinct l22) -> forall (o:(list tree)), ((distinct
+          o) /\ forall (t:tree), (list.Mem.mem t o) <-> exists r:tree,
+          (t = (Node t1 r)) /\ (list.Mem.mem r l22)) -> forall (t:tree),
+          (list.Mem.mem t (cons (Node t1 t2) o)) -> exists r:tree,
+          (t = (Node t1 r)) /\ (list.Mem.mem r l21)
       end
   end.
-(* YOU MAY EDIT THE PROOF BELOW *)
+(* Why3 intros i1 l1 i2 l2 (h1,(h2,(h3,h4))) l11 h5. *)
 intuition.
 destruct l11; intuition.
 destruct l21; intuition.
-unfold mem in H6; fold @mem in H6.
+unfold Mem.mem in H6; fold @Mem.mem in H6.
 destruct H6.
 exists t0; intuition.
 red; intuition.

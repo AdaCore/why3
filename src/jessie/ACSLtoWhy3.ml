@@ -63,6 +63,8 @@ let env,config =
 let find th s = Theory.ns_find_ls th.Theory.th_export [s]
 let find_type th s = Theory.ns_find_ts th.Theory.th_export [s]
 
+(* let () = Self.result "Loading Why3 theories" *)
+
 (* int.Int theory *)
 let int_type : Ty.ty = Ty.ty_int
 let int_theory : Theory.theory = Env.find_theory env ["int"] "Int"
@@ -117,6 +119,83 @@ let get_fun : Mlw_expr.psymbol =
 let set_fun : Mlw_expr.psymbol =
   Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
 
+(* mach_int.Int32 module *)
+
+let mach_int_modules, _mach_int_theories =
+  Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
+
+let int32_module : Mlw_module.modul = Stdlib.Mstr.find "Int32" mach_int_modules
+
+let int32_type : Why3.Ty.tysymbol =
+  Mlw_module.ns_find_ts int32_module.Mlw_module.mod_export ["int32"]
+
+let int32_to_int : Term.lsymbol =
+  find int32_module.Mlw_module.mod_theory "to_int"
+
+let add32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["add"]
+
+let sub32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["sub"]
+
+let mul32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["mul"]
+
+let neg32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["neg"]
+
+let eq32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["eq"]
+
+let ne32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["ne"]
+
+let le32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["le"]
+
+let lt32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["lt"]
+
+let ge32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["ge"]
+
+let gt32_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["gt"]
+
+let int32ofint_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["of_int"]
+
+(* mach_int.Int64 module *)
+
+let mach_int_modules, mach_int_theories =
+  Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
+
+let int64_module : Mlw_module.modul = Stdlib.Mstr.find "Int64" mach_int_modules
+
+let int64_type : Why3.Ty.tysymbol =
+  Mlw_module.ns_find_ts int64_module.Mlw_module.mod_export ["int64"]
+
+let int64_to_int : Term.lsymbol =
+  find int64_module.Mlw_module.mod_theory "to_int"
+
+let add64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["add"]
+
+let sub64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["sub"]
+
+let mul64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["mul"]
+
+let le64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["le"]
+
+let lt64_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["lt"]
+
+let int64ofint_fun : Mlw_expr.psymbol =
+  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["of_int"]
+
 (* array.Array module *)
 
 (*
@@ -142,15 +221,29 @@ let array_type : Mlw_ty.T.itysymbol =
 
 let unit_type = Ty.ty_tuple []
 let mlw_int_type = Mlw_ty.ity_pur Ty.ts_int []
+let mlw_int32_type = Mlw_ty.ity_pur int32_type []
+let mlw_int64_type = Mlw_ty.ity_pur int64_type []
 
-let ctype ty =
+let rec ctype_and_default ty =
   match ty with
-    | TVoid _attr -> Mlw_ty.ity_unit
-    | TInt (_, _) -> mlw_int_type
+    | TVoid _attr -> Mlw_ty.ity_unit, Mlw_expr.e_void
+    | TInt (IInt, _attr) ->
+      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      mlw_int32_type,
+      Mlw_expr.e_app
+        (Mlw_expr.e_arrow int32ofint_fun [mlw_int_type] mlw_int32_type) [n]
+    | TInt (ILong, _attr) ->
+      let n = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      mlw_int64_type,
+      Mlw_expr.e_app
+        (Mlw_expr.e_arrow int64ofint_fun [mlw_int_type] mlw_int64_type) [n]
+    | TInt (_, _) ->
+      Self.not_yet_implemented "ctype TInt"
     | TFloat (_, _) ->
       Self.not_yet_implemented "ctype TFloat"
-    | TPtr(TInt(_,_), _attr) ->
-      Mlw_ty.ity_pur map_ts [mlw_int_type ; mlw_int_type]
+    | TPtr(TInt _ as t, _attr) ->
+      let t,_ = ctype_and_default t in
+      Mlw_ty.ity_pur map_ts [mlw_int_type ; t], Mlw_expr.e_void
     | TPtr(_ty, _attr) ->
       Self.not_yet_implemented "ctype TPtr"
     | TArray (_, _, _, _) ->
@@ -165,6 +258,8 @@ let ctype ty =
       Self.not_yet_implemented "ctype TEnum"
     | TBuiltin_va_list _ ->
       Self.not_yet_implemented "ctype TBuiltin_va_list"
+
+let ctype ty = fst(ctype_and_default ty)
 
 let logic_types = Hashtbl.create 257
 
@@ -204,9 +299,6 @@ let rec logic_type ty =
         Self.not_yet_implemented "logic_type"
 
 
-
-let any _ty =
-  Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0"))
 
 let mk_ref ty =
     let ref_ty = Mlw_ty.ity_app_fresh ref_type [ty] in
@@ -303,8 +395,8 @@ let program_vars = Hashtbl.create 257
 
 let create_var_full v =
   let id = Ident.id_fresh v.vname in
-  let ty = ctype v.vtype in
-  let def = Mlw_expr.e_app (mk_ref ty) [any ty] in
+  let ty,def = ctype_and_default v.vtype in
+  let def = Mlw_expr.e_app (mk_ref ty) [def] in
   let let_defn, vs = Mlw_expr.create_let_pv_defn id def in
 (*
   Self.result "create program variable %s (%d)" v.vname v.vid;
@@ -319,6 +411,28 @@ let get_var v =
     Hashtbl.find program_vars v.vid
   with Not_found ->
     Self.fatal "program variable %s (%d) not found" v.vname v.vid
+
+let program_funs = Hashtbl.create 257
+
+let create_function v args spec ret_type =
+  let id = Ident.id_fresh v.vname in
+  let aty = Mlw_ty.vty_arrow args ~spec (Mlw_ty.VTvalue ret_type) in
+  let ps = Mlw_expr.create_psymbol id aty in
+(*
+  let def = Mlw_expr.create_fun_defn id lambda in
+  let ps = def.Mlw_expr.fun_ps in
+*)
+  Self.result "created program function %s (%d)" v.vname v.vid;
+  let arg_ty = List.map (fun v -> v.Mlw_ty.pv_ity) args in
+  Hashtbl.add program_funs v.vid (ps,arg_ty,ret_type);
+  ps
+
+let get_function v =
+  try
+    Hashtbl.find program_funs v.vid
+  with Not_found ->
+    Self.fatal "program function %s (%d) not found" v.vname v.vid
+
 
 let logic_symbols = Hashtbl.create 257
 
@@ -357,6 +471,14 @@ let is_real_type t =
     | _ -> false
 
 
+let coerce_to_int ty t =
+  match ty with
+    | Linteger -> t
+    | Ctype(TInt(IInt,_attr)) -> t_app int32_to_int [t]
+    | Ctype(TInt(ILong,_attr)) -> t_app int64_to_int [t]
+    | _ -> Self.not_yet_implemented "coerce_to_int"
+      
+
 let rec term_node ~label t =
   match t with
     | TConst cst -> Term.t_const (logic_constant cst)
@@ -369,7 +491,14 @@ let rec term_node ~label t =
         match labels with
           | [] ->
             let ls = get_lsymbol li in
-            let args = List.map (fun x -> snd(term ~label x)) args in
+            let args = List.map (fun x ->
+              let _ty,t = term ~label x in
+(*
+              Self.result "arg = %a, type  = %a"
+              Cil_printer.pp_term x
+              Cil_printer.pp_logic_type ty;
+*)
+              t) args in
             t_app ls args
           | _ ->
             Self.not_yet_implemented "term_node Tapp with labels"
@@ -389,8 +518,17 @@ let rec term_node ~label t =
       Self.not_yet_implemented "TCoerce"
     | TCoerceE (_, _)->
       Self.not_yet_implemented "TCoerceE"
-    | TLogic_coerce (ty, t) when is_int_type ty->
-      snd (term ~label t)
+    | TLogic_coerce (ty, t) when is_int_type ty ->
+      let _,t' = term ~label t in
+      begin
+        match ty, t.term_type with
+          | Linteger, Ctype(TInt(IInt,_attr)) ->
+             t_app int32_to_int [t']
+          | Linteger, Ctype(TInt(ILong,_attr)) ->
+             t_app int64_to_int [t']
+          | _ ->
+            Self.not_yet_implemented "TLogic_coerce(int_type,_)"
+      end
     | TLogic_coerce (_, _) ->
       Self.not_yet_implemented "TLogic_coerce"
     | TSizeOf _
@@ -419,7 +557,12 @@ let rec term_node ~label t =
     | Tlet (_, _) ->
       Self.not_yet_implemented "term_node (2)"
 
-and term ~label t = (t.term_type, term_node ~label t.term_node)
+and term ~label t =
+(*
+  Self.result "term %a: type = %a"
+    Cil_printer.pp_term t Cil_printer.pp_logic_type t.term_type;
+*)
+  (t.term_type, term_node ~label t.term_node)
 
 and tlval ~label (host,offset) =
   match host,offset with
@@ -470,14 +613,45 @@ and tlval ~label (host,offset) =
 (* propositions *)
 (****************)
 
+let eq op ty1 t1 ty2 t2 =
+  match ty1,ty2 with
+    | ty1, ty2 when is_int_type ty1 && is_int_type ty2 -> 
+      op (coerce_to_int ty1 t1) (coerce_to_int ty2 t2)
+    | Lreal, Lreal -> op t1 t2
+    | Ctype _,_ ->
+      Self.not_yet_implemented "eq Ctype"
+    | Ltype _, Ltype _ when ty1 = ty2 -> op t1 t2
+    | Lvar _,_ ->
+      Self.not_yet_implemented "eq Lvar"
+    | Larrow _,_ ->
+      Self.not_yet_implemented "eq Larrow"
+    | _,_ ->
+      Self.not_yet_implemented "eq"
+
+let compare op ty1 t1 ty2 t2 =
+  match ty1,ty2 with
+    | ty1,ty2 when is_int_type ty1 && is_int_type ty2 -> 
+      t_app op [coerce_to_int ty1 t1;coerce_to_int ty2 t2]
+    | Lreal, Lreal -> assert false
+    | Ctype _,_ ->
+      Self.not_yet_implemented "compare Ctype"
+    | Ltype _, Ltype _ -> assert false
+    | Lvar _,_ ->
+      Self.not_yet_implemented "compare Lvar"
+    | Larrow _,_ ->
+      Self.not_yet_implemented "compare Larrow"
+    | _,_ ->
+      Self.not_yet_implemented "compare"
+
+
 let rel (ty1,t1) op (ty2,t2) =
   match op with
-    | Req -> Term.t_equ t1 t2
-    | Rneq -> Term.t_neq t1 t2
-    | Rge when is_int_type ty1 && is_int_type ty2 -> t_app ge_int [t1;t2]
-    | Rle when is_int_type ty1 && is_int_type ty2 -> t_app le_int [t1;t2]
-    | Rgt when is_int_type ty1 && is_int_type ty2 -> t_app gt_int [t1;t2]
-    | Rlt when is_int_type ty1 && is_int_type ty2 -> t_app lt_int [t1;t2]
+    | Req -> eq Term.t_equ ty1 t1 ty2 t2
+    | Rneq -> eq Term.t_neq ty1 t1 ty2 t2
+    | Rge when is_int_type ty1 && is_int_type ty2 -> compare ge_int ty1 t1 ty2 t2
+    | Rle when is_int_type ty1 && is_int_type ty2 -> compare le_int ty1 t1 ty2 t2
+    | Rgt when is_int_type ty1 && is_int_type ty2 -> compare gt_int ty1 t1 ty2 t2
+    | Rlt when is_int_type ty1 && is_int_type ty2 -> compare lt_int ty1 t1 ty2 t2
     | Rge when is_real_type ty1 && is_real_type ty2 -> t_app ge_real [t1;t2]
     | Rge ->
       Self.not_yet_implemented "rel Rge"
@@ -501,16 +675,19 @@ let rec predicate ~label p =
       Term.t_implies (predicate_named ~label p1) (predicate_named ~label p2)
     | Pand (p1, p2) ->
       Term.t_and (predicate_named ~label p1) (predicate_named ~label p2)
-    | Papp (_, _, _)
-    | Pseparated _
-    | Por (_, _)
+    | Papp (_, _, _) ->
+      Self.not_yet_implemented "predicate Papp"
+    | Pnot _ ->
+      Self.not_yet_implemented "predicate Pnot"
+    | Pat (_, _) ->
+      Self.not_yet_implemented "predicate Pat"
+    | Pseparated _ 
+    | Por (_, _) 
     | Pxor (_, _)
-    | Piff (_, _)
-    | Pnot _
+    | Piff (_, _) 
     | Pif (_, _, _)
     | Plet (_, _)
     | Pexists (_, _)
-    | Pat (_, _)
     | Pvalid_read (_, _)
     | Pvalid (_, _)
     | Pinitialized (_, _)
@@ -550,6 +727,7 @@ let add_decls_as_theory theories id decls =
       let th = Theory.create_theory id in
       let th = use th int_theory in
       let th = use th real_theory in
+      let th = use th map_theory in
       let th = List.fold_left use th theories in
       let th = List.fold_left add_decl th (List.rev decls) in
       let th = Theory.close_theory th in
@@ -702,15 +880,17 @@ let loop_annot a =
     (Term.t_true, []) a
 
 let binop op e1 e2 =
-  let ls,ty =
+  let ls,ty,ty' =
     match op with
-      | PlusA -> add_int, Mlw_ty.ity_int
-      | MinusA -> sub_int, Mlw_ty.ity_int
-      | Mult -> mul_int, Mlw_ty.ity_int
-      | Lt -> lt_int, Mlw_ty.ity_bool
-      | Le -> le_int, Mlw_ty.ity_bool
-      | Gt | Ge | Eq | Ne ->
-        Self.not_yet_implemented "binop comp"
+      | PlusA -> add32_fun, mlw_int32_type, mlw_int32_type
+      | MinusA -> sub32_fun, mlw_int32_type, mlw_int32_type
+      | Mult -> mul32_fun, mlw_int32_type, mlw_int32_type
+      | Lt -> lt32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Le -> le32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Gt -> gt32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Ge -> ge32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Eq -> eq32_fun, mlw_int32_type, Mlw_ty.ity_bool
+      | Ne -> ne32_fun, mlw_int32_type, Mlw_ty.ity_bool
       | PlusPI|IndexPI|MinusPI|MinusPP ->
         Self.not_yet_implemented "binop plus/minus"
       | Div|Mod ->
@@ -720,14 +900,33 @@ let binop op e1 e2 =
       | BAnd|BXor|BOr|LAnd|LOr ->
         Self.not_yet_implemented "binop bool"
   in
-  Mlw_expr.e_lapp ls [e1;e2] ty
+  Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty;ty] ty') [e1;e2]
+
+let unop op e =
+  let ls,ty,ty' =
+    match op with
+      | Neg -> (** Unary minus *)
+        neg32_fun, mlw_int32_type, mlw_int32_type
+      | BNot -> (** Bitwise complement (~) *)
+        Self.not_yet_implemented "unop BNot"
+      | LNot -> (** Logical Not (!) *)
+        Self.not_yet_implemented "unop LNot"
+  in
+  Mlw_expr.e_app (Mlw_expr.e_arrow ls [ty] ty') [e]
 
 let constant c =
   match c with
-  | CInt64(_t,_ikind, Some s) ->
-      Number.ConstInt (Literals.integer s)
-  | CInt64(t,_ikind, None) ->
-      Number.ConstInt (Literals.integer (Integer.to_string t))
+  | CInt64(t,IInt, sopt) ->
+    let s =
+      match sopt with
+        | Some s -> s
+        | None -> Integer.to_string t
+    in
+    let n = Mlw_expr.e_const (Number.ConstInt (Literals.integer s)) in
+    Mlw_expr.e_app
+      (Mlw_expr.e_arrow int32ofint_fun [mlw_int_type] mlw_int32_type) [n]
+  | CInt64(_t,_ikind, _) ->
+      Self.not_yet_implemented "CInt64"
   | CStr _
   | CWStr _
   | CChr _
@@ -737,17 +936,29 @@ let constant c =
 
 let rec expr e =
   match e.enode with
-    | Const c -> Mlw_expr.e_const (constant c)
+    | Const c -> constant c
     | Lval lv -> lval lv
     | BinOp (op, e1, e2, _loc) ->
       binop op (expr e1) (expr e2)
+    | UnOp (op, e, _loc) ->
+      unop op (expr e)
+    | CastE (ty, e) ->
+      let e' = expr e in
+      begin
+        match ty, Cil.typeOf e with
+          | TInt(ILong,_attr1), TInt(IInt,_attr2) ->
+            Mlw_expr.e_app
+              (Mlw_expr.e_arrow int64ofint_fun
+                 [mlw_int_type] mlw_int64_type)
+              [Mlw_expr.e_lapp int32_to_int [e'] mlw_int_type]
+          | _ ->
+            Self.not_yet_implemented "expr CastE"
+      end
     | SizeOf _
     | SizeOfE _
     | SizeOfStr _
     | AlignOf _
     | AlignOfE _
-    | UnOp (_, _, _)
-    | CastE (_, _)
     | AddrOf _
     | StartOf _
     | Info (_, _)
@@ -771,26 +982,38 @@ and lval (host,offset) =
     | Var _, (Field (_, _)|Index (_, _)) ->
       Self.not_yet_implemented "lval Var"
     | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
-      (* e[i] -> Map.get !e i *)
+      (* e[i] -> Map.get e i *)
       let e = expr e in
-      let ity = match e.Mlw_expr.e_vty with
-        | Mlw_ty.VTvalue ity -> ity
-        | Mlw_ty.VTarrow _ -> assert false
+      let ity = 
+        match ty with
+          | TPtr(t,_) -> ctype t 
+          | _ -> assert false
       in
-      begin try
-              Mlw_expr.e_lapp map_get [e;expr i] ity
-(*
-      let ty = ctype ty in
-        let t = Mlw_expr.e_app (mk_get ity ty) [e] in
-        t (* Mlw_expr.e_lapp map_get [t;expr i] ity *)
-      *)
-        with Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) -> 
-          Self.fatal "e[i]: TypeMismatch(%a,%a,_)"
-            Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2
-      end
+      let i = expr i in
+      let i = Mlw_expr.e_lapp int32_to_int [i] mlw_int_type in
+      Mlw_expr.e_lapp map_get [e;i] ity
   | Mem _, _ ->
       Self.not_yet_implemented "lval Mem"
 
+let functional_expr e =
+  match e.enode with
+    | Lval (Var v, NoOffset) ->
+      let id,tyl,ty = get_function v in
+      Mlw_expr.e_arrow id tyl ty
+    | Lval _
+    | Const _
+    | BinOp _
+    | SizeOf _
+    | SizeOfE _
+    | SizeOfStr _
+    | AlignOf _
+    | AlignOfE _
+    | UnOp (_, _, _)
+    | CastE (_, _)
+    | AddrOf _
+    | StartOf _
+    | Info (_, _)
+      -> Self.not_yet_implemented "functional_expr"
 
 let assignment (lhost,offset) e _loc =
   match lhost,offset with
@@ -799,7 +1022,7 @@ let assignment (lhost,offset) e _loc =
       if is_mutable then
         Mlw_expr.e_app
           (mk_set v.Mlw_ty.pv_ity ty)
-          [Mlw_expr.e_value v; expr e]
+          [Mlw_expr.e_value v; e]
       else
         Self.not_yet_implemented "mutation of formal parameters"
     | Var _ , Field _ ->
@@ -811,9 +1034,14 @@ let assignment (lhost,offset) e _loc =
 
 let instr i =
   match i with
-  | Set(lv,e,loc) -> assignment lv e loc
-  | Call (_, _, _, _) ->
-    Self.not_yet_implemented "instr Call"
+  | Set(lv,e,loc) -> assignment lv (expr e) loc
+  | Call (None, e, el, _loc) ->
+    let e = functional_expr e in
+    Mlw_expr.e_app e (List.map expr el)
+  | Call (Some lv, e, el, loc) ->
+    let e = functional_expr e in
+    let e = Mlw_expr.e_app e (List.map expr el) in
+    assignment lv e loc
   | Asm (_, _, _, _, _, _) ->
     Self.not_yet_implemented "instr Asm"
   | Skip _loc ->
@@ -975,6 +1203,7 @@ let fundecl fdec =
     c_letrec  = 0;
   }
   in
+  let ps = create_function fun_id args spec ret_type in
   let body = block body in
   let full_body = List.fold_right Mlw_expr.e_let locals body in
   let lambda = {
@@ -983,10 +1212,8 @@ let fundecl fdec =
     l_spec = spec;
   }
   in
-  let def =
-    Mlw_expr.create_fun_defn (Ident.id_fresh fun_id.vname) lambda
-  in
-  Mlw_decl.create_rec_decl [def]
+  let def = Mlw_expr.create_rec_defn [ps,lambda] in
+  Mlw_decl.create_rec_decl def
 
 
 
@@ -1081,6 +1308,7 @@ let use_module m modul =
 
 let prog p =
    try
+    (* Self.result "Starting translation"; *)
     let theories,decls,functions =
       List.fold_left global ([],[],[]) p.globals
     in
@@ -1095,12 +1323,18 @@ let prog p =
     in
     let m = use m int_theory in
     let m = use m real_theory in
+    let m = use m map_theory in
     let m = List.fold_left use m theories in
     let m = use_module m ref_module in
+    let m = use_module m int32_module in
     let m = List.fold_left add_pdecl m (List.rev functions) in
     Self.result "made %d function(s)" (List.length functions);
     let m = Mlw_module.close_module m in
     List.rev (m.Mlw_module.mod_theory :: theories) ;
-  with Exit as e  ->
+  with (Exit | Not_found| Ty.TypeMismatch _
+           | Mlw_ty.TypeMismatch _ | Decl.UnknownIdent _) as e  ->
     Self.fatal "Exception raised during translation to Why3:@ %a@."
       Exn_printer.exn_printer e
+    (* | Mlw_ty.TypeMismatch(ity1,ity2,_ity_subst) ->  *)
+    (*   Self.fatal "TypeMismatch(%a,%a,_)" *)
+    (*         Mlw_pretty.print_ity ity1 Mlw_pretty.print_ity ity2 *)

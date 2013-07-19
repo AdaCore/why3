@@ -77,14 +77,18 @@ version_old = "0.8"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/alt_ergo_0.92.drv"
 
-# CVC4 version 1.0
+# CVC4 version 1.x
 [ATP cvc4]
 name = "CVC4"
 exec = "cvc4"
 exec = "cvc4-1.0"
+exec = "cvc4-1.1"
+exec = "cvc4-1.2"
 version_switch = "--version"
 version_regexp = "This is CVC4 version \\([^ \n\r]+\\)"
 version_ok  = "1.0"
+version_ok  = "1.1"
+version_ok  = "1.2"
 driver = "drivers/cvc4.drv"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
 
@@ -223,6 +227,25 @@ version_regexp = "Vampire \\([0-9.]+\\)"
 command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e -t %t"
 driver = "drivers/vampire.drv"
 version_ok = "0.6"
+
+[ATP princess]
+name = "Princess"
+exec = "princess"
+# version_switch = "-h"
+version_regexp = "(CASC version \\([0-9-]+\\))"
+command = "'@LOCALBIN@why3-cpulimit' %T 0 -s %e -timeout=%t %f"
+driver = "drivers/princess.drv"
+version_ok = "2013-05-13"
+
+[ATP beagle]
+name = "Beagle"
+exec = "beagle"
+exec = "beagle-0.4.1"
+# version_switch = "-h"
+version_regexp = "version \\([0-9.]+\\)"
+command = "'@LOCALBIN@why3-cpulimit' %t 0 -s %e %f"
+driver = "drivers/beagle.drv"
+version_ok = "0.4.1"
 
 [ATP verit]
 name = "veriT"

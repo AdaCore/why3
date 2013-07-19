@@ -1,0 +1,181 @@
+
+
+theory ConvexSet
+
+use export int.Int
+use export real.RealInfix
+
+type pt = { x : real ; y : real }
+
+function crossproduct (p1 p2 p3:pt) : real =
+  (p2.x -. p1.x) *. (p3.y -. p1.y) -. (p3.x -. p1.x) *. (p2.y -. p1.y) 
+
+predicate colinear (p1 p2 p3:pt) = crossproduct p1 p2 p3 = 0.0
+
+predicate turns_left (p1 p2 p3:pt) = crossproduct p1 p2 p3 >. 0.0
+
+lemma knuth1:
+  forall p1 p2 p3:pt. turns_left p1 p2 p3 -> turns_left p2 p3 p1
+
+lemma knuth2:
+  forall p1 p2 p3:pt. turns_left p1 p2 p3 -> not (turns_left p2 p1 p3)
+
+lemma knuth4:
+  forall p1 p2 p3 p4:pt. 
+    turns_left p1 p2 p4 ->
+    turns_left p2 p3 p4 -> 
+    turns_left p3 p1 p4 -> 
+    turns_left p1 p2 p3
+
+lemma knuth5:
+  forall p1 p2 p3 p4 p5:pt. 
+    turns_left p1 p2 p3 ->
+    turns_left p1 p2 p4 ->
+    turns_left p1 p2 p5 ->
+    turns_left p3 p2 p4 ->
+    turns_left p4 p2 p5 ->
+    turns_left p3 p2 p5
+
+lemma knuth3: 
+  forall p1 p2 p3:pt.
+   not (colinear p1 p2 p3) -> turns_left p1 p2 p3 \/ turns_left p1 p3 p2
+
+    
+(* test: p1 = (0,0), p2 = (1,0) p3 = (1,1) *)
+
+goal test1 :
+   turns_left {x=0.0;y=0.0} {x=1.0;y=0.0} {x=1.0;y=1.0}
+
+
+use import list.List
+use import list.Length
+use import list.NthNoOpt
+
+type path = list pt
+
+predicate is_inside_convex_hull (p:pt) (pa:path) =
+  let l = length pa in
+  forall i:int. 0 <= i < l ->
+    let i' = if i = l-1 then 0 else i+1 in
+    let p0 = nth i pa in
+    let p1 = nth i' pa in
+    turns_left p0 p1 p
+
+predicate is_ccw_convex (pa:path) =
+  let l = length pa in
+  forall i:int. 0 <= i < l ->
+    let i' = if i = l-1 then 0 else i+1 in
+    let p0 = nth i pa in
+    let p1 = nth i' pa in
+    forall j:int. 0 <= j < l /\ j <> i /\ j <> i' ->
+       turns_left p0 p1 (nth j pa)
+
+end
+
+
+module Incremental
+
+
+
+end
+
+
+module Jarvis
+
+(*
+
+on calcule le point p d'ordonnee minimale, et d'abscisse minimale
+parmi ceux-ci 
+
+on recherche le point q minimum pour la relation R x y = turns_left p x y
+
+p0 = p
+p1 = q
+si q = p0: fini
+  sinon
+    recommencer avec p := q
+
+*)
+
+use import ConvexSet
+use import set.Fset
+use import ref.Ref
+
+predicate lower (p q:pt) =
+  p.y <. q.y \/ (p.y = q.y /\ p.x <=. q.x)
+
+let lowest_pt (s:set pt) : (pt, set pt)
+  requires { not (is_empty s) }
+  ensures { let (p,r) = result in
+    s = add p r /\ forall q:pt. mem q r -> lower p q }
+=
+  let p = ref (choose s) in
+  let r = ref (remove !p s) in
+  while not (is_empty !r) do
+     invariant { mem !p s }
+     invariant { subset !r s }
+     invariant { forall q:pt. mem q s /\ not (mem q !r) -> lower !p q }
+     let q = choose !r in
+     if lower q !p then p := q;
+     r := remove q !r
+  done;
+  (!p,remove !p s)
+
+(*
+let rightest_pt (p:pt) (s:set pt) : (pt, set pt)
+  requires { not (is_empty s) }
+  ensures { let (p,r) = result in
+    s = add p r /\ forall q:pt. mem q r -> lower p q }
+=
+  let p = ref (choose s) in
+  let r = ref (remove !p s) in
+  while not (is_empty !r) do
+     invariant { mem !p s }
+     invariant { subset !r s }
+     invariant { forall q:pt. mem q s /\ not (mem q !r) -> lower !p q }
+     let q = choose !r in
+     if lower q !p then p := q;
+     r := remove q !r
+  done;
+  (!p,remove !p s)
+
+
+let jarvis (s:set pt) : list pt =
+   let p0 = lowest_pt s in
+*)
+   
+
+end
+
+
+
+module Graham
+
+
+use import ConvexSet
+
+(*
+let convex_hull (l:path) : path =
+    (* all pts of the result are points of the input *)
+  ensures { forall p:pt. List.mem p result -> List.mem p l }
+    (* the output forms a ccw convex circuit *)
+  ensures { is_ccw_convex result }
+    (* all pt of the input are inside the convex hull of the output *)
+  ensures { forall p:pt. List.mem p l /\ not List.mem p result ->
+    is_inside_convex_hull p result  
+  }
+  let min,rem = find_minimum_pt l in
+  let sorted = sorted_increasing_angle min rem in
+  match sorted with
+    | Nil -> l
+    | Cons p r -> 
+       let done = ref (Cons p min) in
+       let todo = ref r in
+       try while true do
+         match !todo with
+         | Nil -> 
+       with Exit -> !done
+ 
+*)
+
+end

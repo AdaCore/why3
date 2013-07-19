@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
           time = (double)((tms.tms_cutime + tms.tms_cstime + 0.0)
                                  / sysconf(_SC_CLK_TCK));
           fprintf(stdout, "why3cpulimit time : %f s\n", time);
+          fflush(stdout);
 
           if (WIFEXITED(status)) return WEXITSTATUS(status);
           kill(getpid(),SIGTERM);

@@ -9,11 +9,12 @@
   @    \forall integer i,j; a <= i <= j <= b ==> t[i] <= t[j];
   @*/
 
-/*@ requires n >= 0 && \valid(t+(0..n-1));
-  @ //requires sorted(t,0,n-1);
+/*@ requires n >= 0 ;
+  @ // requires \valid(t+(0..n-1));
+  @ // requires sorted(t,0,n-1);
   @ requires \forall integer i,j; 0 <= i <= j < n ==> t[i] <= t[j];
-  @ ensures -1 <= \result < n;
-  @ ensures \result >= 0 ==> t[\result] == v;
+  @ ensures -1 <= \result+0 < n;
+  @ ensures \result >= 0 ==> t[\result+0] == v;
   @ ensures \result == -1 ==>
   @     \forall integer k; 0 <= k < n ==> t[k] != v;
   @*/

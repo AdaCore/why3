@@ -1,0 +1,126 @@
+
+
+module Bounded_int
+
+use export int.Int
+
+type t
+
+constant min : int
+
+constant max : int
+
+function to_int (n:t) : int
+
+predicate in_bounds (n:int) = min <= n <= max
+
+axiom to_int_in_bounds: forall n:t. in_bounds (to_int n)
+
+val of_int (n:int) : t
+  requires { "expl:integer overflow" in_bounds n }
+  ensures { to_int result = n }
+
+val add (a:t) (b:t) : t
+  requires { "expl:integer overflow" in_bounds (to_int a + to_int b) }
+  ensures { to_int result = to_int a + to_int b }
+
+val sub (a:t) (b:t) : t
+  requires { "expl:integer overflow" in_bounds (to_int a - to_int b) }
+  ensures { to_int result = to_int a - to_int b }
+
+val mul (a:t) (b:t) : t
+  requires { "expl:integer overflow" in_bounds (to_int a * to_int b) }
+  ensures { to_int result = to_int a * to_int b }
+
+val neg (a:t) : t
+  requires { "expl:integer overflow" in_bounds (- (to_int a)) }
+  ensures { to_int result = - (to_int a) }
+
+val eq (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a = to_int b else to_int a <> to_int b }
+
+val ne (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a <> to_int b else to_int a = to_int b }
+
+val le (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a <= to_int b else to_int a > to_int b }
+
+val lt (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a < to_int b else to_int a >= to_int b }
+
+val ge (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a >= to_int b else to_int a < to_int b }
+
+val gt (a:t) (b:t) : bool
+  requires { true }
+  ensures  { if result = True then to_int a > to_int b else to_int a <= to_int b }
+
+use import int.ComputerDivision
+
+val div (a:t) (b:t) : t
+  requires { "expl:division by zero" to_int b <> 0 }
+  requires { "expl:integer overflow"
+    in_bounds (ComputerDivision.div (to_int a) (to_int b)) }
+  ensures {
+    to_int result = ComputerDivision.div (to_int a) (to_int b) }
+
+end
+
+
+module Int32
+
+use import int.Int
+
+type int32
+
+constant min_int32 : int = - 0x80000000
+
+constant max_int32 : int =   0x7fffffff
+
+clone export Bounded_int with
+  type t = int32,
+  constant min = min_int32,
+  constant max = max_int32
+
+end
+
+module UInt32
+
+type uint32
+
+constant min_uint32 : int = 0x00000000
+
+constant max_uint32 : int = 0xffffffff
+
+clone export Bounded_int with
+  type t = uint32,
+  constant min = min_uint32,
+  constant max = max_uint32
+
+end
+
+
+
+
+module Int64
+
+use import int.Int
+
+type int64
+
+constant min_int64 : int = - 0x8000000000000000
+
+constant max_int64 : int =   0x7fffffffffffffff
+
+clone export Bounded_int with
+  type t = int64,
+  constant min = min_int64,
+  constant max = max_int64
+
+end
+

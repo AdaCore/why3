@@ -1,0 +1,93 @@
+
+(* Two puzzles from Danvy and Goldberg's ``There and back again''
+   http://www.brics.dk/RS/02/12/BRICS-RS-02-12.pdf‎
+*)
+
+(* Computing a symbolic convolution:
+     Given two lists [x1 , x2 , ..., xn−1 , xn ] and
+     [y1 , y2 , ..., yn−1 , yn ], where n is not known in advance,
+     write a function that constructs
+     [(x1 , yn ), (x2 , yn−1 ), ..., (xn−1 , y2 ), (xn , y1 )]
+     in n recursive calls and with no auxiliary list.
+*)
+
+module Convolution
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import list.Reverse
+  use import list.Combine
+
+  let rec convolution_rec (x y: list 'a) : (list ('a, 'a), list 'a)
+    variant  { x }
+    requires { length x <= length y }
+    ensures  { let (r, ys) = result in exists y0: list 'a.
+               y = y0 ++ ys && length y0 = length x &&
+               r = combine x (reverse y0) }
+  = match x with
+    | Nil ->
+        (Nil, y)
+    | Cons x0 xs ->
+        match convolution_rec xs y with
+        | r, Cons y0 ys -> (Cons (x0, y0) r, ys)
+        | _ -> absurd end
+    end
+
+  let convolution (x y: list 'a) : list ('a, 'a)
+    requires { length x = length y }
+    ensures  { result = combine x (reverse y) }
+  = let r, _ = convolution_rec x y in r
+
+end
+
+(* Detecting a palindrome:
+     Given a list of length n, where n is not known in advance,
+     determine whether this list is a palindrome in ceil(n/2) recursive
+     calls and with no auxiliary list.
+*)
+
+module Palindrome
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import list.Nth
+  use import list.NthLength
+  use import list.NthLengthAppend
+
+  predicate pal (x: list 'a) (n: int) =
+    forall i: int. 0 <= i < n -> nth i x = nth (n - 1 - i) x
+
+  exception Exit
+
+  let rec palindrome_rec (x y: list 'a) : list 'a
+    requires { length x >= length y }
+    variant { x }
+    ensures { exists x0: list 'a. length x0 = length y && x = x0 ++ result }
+    ensures { pal x (length y) }
+    raises  { Exit -> exists i: int. 0 <= i < length y &&
+                      nth i x <> nth (length y - 1 - i) x }
+  = match x, y with
+    | _, Nil ->
+        x
+    | Cons _  xs, Cons _ Nil ->
+        xs
+    | Cons x0 xs, Cons _ (Cons _ ys) ->
+        match palindrome_rec xs ys with
+        | Cons x1 xs ->
+            assert { nth (length y - 1) x = Some x1 };
+            if x0 = x1 then xs else raise Exit
+        | Nil -> absurd
+        end
+    | _ -> absurd
+    end
+
+  let palindrome (x: list 'a) : bool
+    ensures { result=True <-> pal x (length x) }
+  = try  let _ = palindrome_rec x x in True
+    with Exit -> False end
+
+end

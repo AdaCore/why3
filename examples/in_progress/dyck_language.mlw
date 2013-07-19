@@ -1,0 +1,67 @@
+
+theory Dyck "Dyck language"
+
+  use export list.List
+  use export list.Append
+
+  type paren = L | R
+
+  type word = list paren
+
+  inductive dyck_word (w: word) =
+  | dyck_nil:
+      dyck_word Nil
+  | dyck_paren:
+      forall w: word. dyck_word w -> dyck_word (Cons L (w ++ Cons R Nil))
+  | dyck_concat:
+      forall w1 w2: word. dyck_word w1 -> dyck_word w2 ->
+      dyck_word (w1 ++ w2)
+
+  lemma dyck_word_LR:
+    dyck_word (Cons L (Cons R Nil))
+
+  (* the first letter, if any, must be L *)
+  lemma dyck_word_first:
+    forall w: word. dyck_word w ->
+    match w with Nil -> true | Cons c _ -> c = L end
+
+  (* a closing parenthesis can always be moved right *)
+  lemma dyck_move_right:
+    forall w1 w2: word.
+    dyck_word (w1 ++ Cons R (Cons L w2)) ->
+    dyck_word (w1 ++ Cons L (Cons R w2))
+
+end
+
+module Check
+
+  use import int.Int
+  use import Dyck
+
+  function open (n: int) (w: word) : word
+  axiom open0: forall w: word. open 0 w = w
+  axiom openS: forall w: word, n: int. 0 < n ->
+               open n w = open (n-1) (Cons L w)
+
+  lemma open_not_dyck: forall n: int. n > 0 -> not (dyck_word (open n Nil))
+
+  lemma dyck_move_right_many:
+    forall w: word, n: int. n > 0 ->
+    dyck_word (Cons L (Cons R (open (n - 1) w))) ->
+    dyck_word (open n (Cons R w))
+
+  let rec is_dyck_rec (n: int) (w: word) : bool
+    variant  { w }
+    requires { n >= 0 }
+    ensures  { result=True <-> dyck_word (open n w) }
+  = match w with
+    | Nil      -> n = 0
+    | Cons L w -> is_dyck_rec (n + 1) w
+    | Cons R w -> n > 0 && is_dyck_rec (n - 1) w
+    end
+
+  let is_dyck_word (w: word) : bool
+    ensures { result=True <-> dyck_word w }
+  = is_dyck_rec 0 w
+
+end

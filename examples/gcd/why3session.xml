@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -11,12 +11,20 @@
   version="2.4.1"/>
  <prover
   id="2"
+  name="CVC4"
+  version="1.0"/>
+ <prover
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../gcd.mlw"
   verified="true"
@@ -35,7 +43,7 @@
     sum="8bf4a45cfd5f2678208d8b0f2c78f532"
     proved="true"
     expanded="true"
-    shape="iainfix =V1c0ainfix =V0agcdV0V1ainfix =agcdV1V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V1c0Aainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    shape="iainfix =agcdV1V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V1c0Aainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1ainfix =V0agcdV0V1ainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
      name="expl:VC for gcd"/>
     <transf
@@ -50,7 +58,7 @@
       sum="c4dfe0b9ff1af5ac4a46a7fd084c9f70"
       proved="true"
       expanded="true"
-      shape="ainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
       <proof
@@ -70,7 +78,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -86,7 +94,7 @@
       sum="428a2a3fab5f1e2b6e7eb3b7cfef68b6"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="variant decreaseainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
       <proof
@@ -114,7 +122,7 @@
       sum="3b74e374f2ac1b0e3c2aa8f5f3fabd0a"
       proved="true"
       expanded="true"
-      shape="ainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
       <proof
@@ -134,7 +142,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -150,17 +158,185 @@
       sum="e06d98df3c6b0085e1314cc48028e1d5"
       proved="true"
       expanded="true"
-      shape="ainfix =agcdV1V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1Iainfix =V1c0NIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =agcdV1V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for gcd"/>
       <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
        prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="3"
        timelimit="10"
        memlimit="0"
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.58"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
+   name="EuclideanAlgorithmIterative"
+   locfile="../gcd.mlw"
+   loclnum="22" loccnumb="7" loccnume="34"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter gcd"
+    locfile="../gcd.mlw"
+    loclnum="29" loccnumb="6" loccnume="9"
+    expl="VC for gcd"
+    sum="2c004ea74d9f154667604e92e9608e1c"
+    proved="true"
+    expanded="true"
+    shape="iainfix =V3agcdV0V1ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =agcdV5V4agcdV0V1Aainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FAainfix =agcdV0V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    <label
+     name="expl:VC for gcd"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter gcd.1"
+      locfile="../gcd.mlw"
+      loclnum="29" loccnumb="6" loccnume="9"
+      expl="1. loop invariant init"
+      sum="5a2214a241ef5919406e1dce9fab47c1"
+      proved="true"
+      expanded="true"
+      shape="loop invariant initainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for gcd"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter gcd.2"
+      locfile="../gcd.mlw"
+      loclnum="29" loccnumb="6" loccnume="9"
+      expl="2. loop invariant init"
+      sum="8d426254805264123885c5a7e67d38d2"
+      proved="true"
+      expanded="true"
+      shape="loop invariant initainfix =agcdV0V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for gcd"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter gcd.3"
+      locfile="../gcd.mlw"
+      loclnum="29" loccnumb="6" loccnume="9"
+      expl="3. loop invariant preservation"
+      sum="fc2460530d56c590dbcaa039058e38eb"
+      proved="true"
+      expanded="true"
+      shape="loop invariant preservationainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for gcd"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter gcd.4"
+      locfile="../gcd.mlw"
+      loclnum="29" loccnumb="6" loccnume="9"
+      expl="4. loop invariant preservation"
+      sum="cf776c8d21eccdc90f18c62bc0dcdf9c"
+      proved="true"
+      expanded="true"
+      shape="loop invariant preservationainfix =agcdV5V4agcdV0V1Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for gcd"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter gcd.5"
+      locfile="../gcd.mlw"
+      loclnum="29" loccnumb="6" loccnume="9"
+      expl="5. loop variant decrease"
+      sum="caab89302ad24174467c877c6498e3be"
+      proved="true"
+      expanded="true"
+      shape="loop variant decreaseainfix &lt;V4V2Aainfix &lt;=c0V2Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for gcd"/>
+      <proof
+       prover="2"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter gcd.6"
+      locfile="../gcd.mlw"
+      loclnum="29" loccnumb="6" loccnume="9"
+      expl="6. postcondition"
+      sum="1644ab1125c43173f855bc860eb6e22e"
+      proved="true"
+      expanded="true"
+      shape="postconditionainfix =V3agcdV0V1INNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for gcd"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>

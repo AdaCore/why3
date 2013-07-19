@@ -4,6 +4,10 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require map.Map.
 Require int.Int.
+Require list.List.
+Require list.Length.
+Require list.Mem.
+Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
@@ -16,7 +20,7 @@ Existing Instance ref_WhyType.
 Implicit Arguments mk_ref [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(@ref a a_WT)): a :=
   match v with
   | (mk_ref x) => x
   end.
@@ -49,132 +53,79 @@ Definition left1 (v:node): loc := match v with
   end.
 
 (* Why3 assumption *)
-Definition memory := (map.Map.map loc node).
+Definition memory := (@map.Map.map loc loc_WhyType node node_WhyType).
 
 (* Why3 assumption *)
 Inductive tree
   (a:Type) {a_WT:WhyType a} :=
   | Empty : tree a
-  | Node : (tree a) -> a -> (tree a) -> tree a.
+  | Node : (@tree a a_WT) -> a -> (@tree a a_WT) -> tree a.
 Axiom tree_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (tree a).
 Existing Instance tree_WhyType.
 Implicit Arguments Empty [[a] [a_WT]].
 Implicit Arguments Node [[a] [a_WT]].
 
 (* Why3 assumption *)
-Inductive list
-  (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
-
-(* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a} (l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Fixpoint inorder {a:Type} {a_WT:WhyType a} (t:(tree a)) {struct t}: (list
-  a) :=
+Fixpoint inorder {a:Type} {a_WT:WhyType a} (t:(@tree
+  a a_WT)) {struct t}: (list a) :=
   match t with
-  | Empty => (Nil :(list a))
-  | (Node l x r) => (infix_plpl (inorder l) (Cons x (inorder r)))
+  | Empty => nil
+  | (Node l x r) => (List.app (inorder l) (cons x (inorder r)))
   end.
 
 (* Why3 assumption *)
-Inductive distinct{a:Type} {a_WT:WhyType a}  : (list a) -> Prop :=
-  | distinct_zero : (distinct (Nil :(list a)))
-  | distinct_one : forall (x:a), (distinct (Cons x (Nil :(list a))))
-  | distinct_many : forall (x:a) (l:(list a)), (~ (mem x l)) -> ((distinct
-      l) -> (distinct (Cons x l))).
+Inductive distinct {a:Type} {a_WT:WhyType a} : (list a) -> Prop :=
+  | distinct_zero : ((@distinct _ _) nil)
+  | distinct_one : forall (x:a), ((@distinct _ _) (cons x nil))
+  | distinct_many : forall (x:a) (l:(list a)), (~ (list.Mem.mem x l)) ->
+      (((@distinct _ _) l) -> ((@distinct _ _) (cons x l))).
 
-Axiom distinct_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list
-  a)) (l2:(list a)), (distinct l1) -> ((distinct l2) -> ((forall (x:a), (mem
-  x l1) -> ~ (mem x l2)) -> (distinct (infix_plpl l1 l2)))).
+Axiom distinct_append : forall {a:Type} {a_WT:WhyType a},
+  forall (l1:(list a)) (l2:(list a)), (distinct l1) -> ((distinct l2) ->
+  ((forall (x:a), (list.Mem.mem x l1) -> ~ (list.Mem.mem x l2)) -> (distinct
+  (List.app l1 l2)))).
 
 (* Why3 assumption *)
-Inductive istree : (map.Map.map loc node) -> loc -> (tree loc) -> Prop :=
-  | leaf : forall (m:(map.Map.map loc node)), (istree m null (Empty :(tree
-      loc)))
-  | node1 : forall (m:(map.Map.map loc node)) (p:loc) (l:(tree loc)) (r:(tree
-      loc)), (~ (p = null)) -> ((istree m (left1 (map.Map.get m p)) l) ->
-      ((istree m (right1 (map.Map.get m p)) r) -> (istree m p (Node l p r)))).
+Inductive istree : (@map.Map.map loc loc_WhyType node node_WhyType) -> loc
+  -> (@tree loc loc_WhyType) -> Prop :=
+  | leaf : forall (m:(@map.Map.map loc loc_WhyType node node_WhyType)),
+      (istree m null (Empty :(@tree loc loc_WhyType)))
+  | node1 : forall (m:(@map.Map.map loc loc_WhyType node node_WhyType))
+      (p:loc) (l:(@tree loc loc_WhyType)) (r:(@tree loc loc_WhyType)),
+      (~ (p = null)) -> ((istree m (left1 (map.Map.get m p)) l) -> ((istree m
+      (right1 (map.Map.get m p)) r) -> (istree m p (Node l p r)))).
 
 (* Why3 assumption *)
 Inductive zipper
   (a:Type) {a_WT:WhyType a} :=
   | Top : zipper a
-  | Left : (zipper a) -> a -> (tree a) -> zipper a.
+  | Left : (@zipper a a_WT) -> a -> (@tree a a_WT) -> zipper a.
 Axiom zipper_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (zipper a).
 Existing Instance zipper_WhyType.
 Implicit Arguments Top [[a] [a_WT]].
 Implicit Arguments Left [[a] [a_WT]].
 
 (* Why3 assumption *)
-Fixpoint zip {a:Type} {a_WT:WhyType a} (t:(tree a)) (z:(zipper
-  a)) {struct z}: (tree a) :=
+Fixpoint zip {a:Type} {a_WT:WhyType a} (t:(@tree a a_WT)) (z:(@zipper
+  a a_WT)) {struct z}: (@tree a a_WT) :=
   match z with
   | Top => t
   | (Left z1 x r) => (zip (Node t x r) z1)
   end.
 
-Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(zipper a))
-  (x:a) (l:(tree a)) (r:(tree a)), ((inorder (zip (Node l x r)
-  z)) = (infix_plpl (inorder l) (Cons x (inorder (zip r z))))).
+Axiom inorder_zip : forall {a:Type} {a_WT:WhyType a}, forall (z:(@zipper
+  a a_WT)) (x:a) (l:(@tree a a_WT)) (r:(@tree a a_WT)),
+  ((inorder (zip (Node l x r)
+  z)) = (List.app (inorder l) (cons x (inorder (zip r z))))).
 
 (** The proof starts here *)
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 20.
+Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 30.
 
 Lemma distinct1:
   forall (p pp: loc) (pr ppr: tree loc),
-    distinct (Cons p (infix_plpl (inorder pr) (Cons pp (inorder ppr)))) ->
+    distinct (cons p (app (inorder pr) (cons pp (inorder ppr)))) ->
     p <> pp.
   Proof.
     induction pr; simpl; ae.
@@ -183,13 +134,13 @@ Lemma distinct1:
 Lemma distinct2:
   forall m p p' n t, 
     let m' := Map.set m p' n in
-    istree m p t -> ~ (mem p' (inorder t)) -> istree m' p t.
+    istree m p t -> ~ (Mem.mem p' (inorder t)) -> istree m' p t.
   Proof.
     induction 1; simpl.
     ae.
     intro.
-    assert (~ (mem p' (inorder l))) by ae.
-    assert (~ (mem p' (inorder r))) by ae.
+    assert (~ (Mem.mem p' (inorder l))) by ae.
+    assert (~ (Mem.mem p' (inorder r))) by ae.
     intuition.
     apply node1; subst m'.
     red; intro; elim H; trivial.
@@ -199,20 +150,20 @@ Lemma distinct2:
 
 Lemma distinct3:
   forall (pp: loc) (l1 l2: list loc),
-  distinct (infix_plpl l1 (Cons pp l2)) -> ~ (mem pp l1).
+  distinct (app l1 (cons pp l2)) -> ~ (Mem.mem pp l1).
 Proof.
 induction l1; simpl; ae.
 Qed.
 
 Lemma distinct4:
   forall (pp: loc) (l1 l2: list loc),
-  distinct (infix_plpl l1 (Cons pp l2)) -> ~ (mem pp l2).
+  distinct (app l1 (cons pp l2)) -> ~ (Mem.mem pp l2).
 Proof.
 induction l1; simpl; ae.
 Qed.
 
 Lemma distinct_append1:
-  forall (l1 l2: list loc), distinct (infix_plpl l1 l2) -> distinct l1.
+  forall (l1 l2: list loc), distinct (app l1 l2) -> distinct l1.
 Proof.
   induction l1; simpl; ae.
 Qed.
@@ -245,7 +196,7 @@ Lemma istree_zip_2:
   forall m n a z t pp l r tr',
   istree m t (zip (Node l pp r) z) ->
   distinct (inorder (zip (Node l pp r) z)) ->
-  mem a (inorder (Node l pp r)) -> let m' := Map.set m a n in
+  Mem.mem a (inorder (Node l pp r)) -> let m' := Map.set m a n in
   istree m' pp tr' ->
   istree m' t (zip tr' z).
 Proof.
@@ -278,25 +229,26 @@ generalize (istree_zip _ _ _ _ _ _ H).
 inversion 1.
 ae.
 clear H4 H2 H H3.
-assert (mem a (inorder (Node l pp r))) by ae.
+assert (Mem.mem a (inorder (Node l pp r))) by ae.
 clear H1.
 generalize (Node l pp r) H0 H. clear H0 H.
 intros.
 generalize (distinct5 _ _ _ _ H0); clear H0.
 simpl.
 intro.
-assert (~ (mem a (Cons a0 (inorder t)))).
+assert (~ (Mem.mem a (cons a0 (inorder t)))).
   generalize (inorder t1) H H0. clear H H0.
-  generalize  (Cons a0 (inorder t)).
+  generalize (cons a0 (inorder t)).
   ae.
 ae.
 Qed.
 
 (* Why3 goal *)
-Theorem main_lemma : forall (m:(map.Map.map loc node)) (t:loc) (pp:loc)
-  (p:loc) (ppr:(tree loc)) (pr:(tree loc)) (z:(zipper loc)), let it :=
-  (zip (Node (Node (Empty :(tree loc)) p pr) pp ppr) z) in ((istree m t
-  it) -> ((distinct (inorder it)) -> (istree (map.Map.set m pp
+Theorem main_lemma : forall (m:(@map.Map.map loc loc_WhyType
+  node node_WhyType)) (t:loc) (pp:loc) (p:loc) (ppr:(@tree loc loc_WhyType))
+  (pr:(@tree loc loc_WhyType)) (z:(@zipper loc loc_WhyType)), let it :=
+  (zip (Node (Node (Empty :(@tree loc loc_WhyType)) p pr) pp ppr) z) in
+  ((istree m t it) -> ((distinct (inorder it)) -> (istree (map.Map.set m pp
   (mk_node (right1 (map.Map.get m p)) (right1 (map.Map.get m pp))
   (data (map.Map.get m pp)))) t (zip (Node pr pp ppr) z)))).
 (* Why3 intros m t pp p ppr pr z it h1 h2. *)
@@ -325,7 +277,6 @@ apply distinct2.
 ae.
 why3 "cvc3" timelimit 3.
 assumption.
-Print istree_zip_2.
 apply istree_zip_2 with (l := (Node (Empty:tree loc) p pr)) (r := ppr)
   (pp := pp); try
 assumption.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -34,12 +34,12 @@
    locfile="../bellman_ford.mlw"
    loclnum="7" loccnumb="7" loccnume="12"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="vertices_cardinal_pos"
     locfile="../bellman_ford.mlw"
     loclnum="30" loccnumb="8" loccnume="29"
-    sum="139dfdbb3be34920fba3ed280b6ac786"
+    sum="fa604ab8ee4dc5f552eb09a3dbe4d808"
     proved="true"
     expanded="false"
     shape="ainfix &gt;acardinalaverticesc0">
@@ -56,7 +56,7 @@
     name="path_in_vertices"
     locfile="../bellman_ford.mlw"
     loclnum="36" loccnumb="8" loccnume="24"
-    sum="46da64715c60bd2b11b02bbb301eefa8"
+    sum="790c2ade5f970502c835ab11264398d6"
     proved="true"
     expanded="false"
     shape="amemV1averticesIapathV0V2V1IamemV0averticesF">
@@ -74,10 +74,10 @@
     name="long_path_decomposition_pigeon1"
     locfile="../bellman_ford.mlw"
     loclnum="60" loccnumb="8" loccnume="39"
-    sum="e4706dec197066cf99d6e5b94fcddef4"
+    sum="5e042aacf3d65cac39988accebd44f12"
     proved="true"
     expanded="false"
-    shape="amemV2averticesIamemV2aConsV1V0FIainfix =V0aNilNIapathasV0V1F">
+    shape="amemV2averticesIamemV2aConsV1V0FINainfix =V0aNilIapathasV0V1F">
     <proof
      prover="3"
      timelimit="8"
@@ -92,7 +92,7 @@
     name="long_path_decomposition_pigeon2"
     locfile="../bellman_ford.mlw"
     loclnum="65" loccnumb="8" loccnume="39"
-    sum="d9b4e483d6812c5ac4309e382cfff9ed"
+    sum="5cb943ad9de3892dc373a620ace78dd7"
     proved="true"
     expanded="false"
     shape="ainfix =aConsV1V0ainfix ++V3aConsV2ainfix ++V4aConsV2V5EIainfix &gt;alengthaConsV1V0acardinalaverticesIamemV6averticesIamemV6aConsV1V0FF">
@@ -109,7 +109,7 @@
     name="long_path_decomposition_pigeon3"
     locfile="../bellman_ford.mlw"
     loclnum="72" loccnumb="8" loccnume="39"
-    sum="437ca4080ba597bb221b40ecdfc664db"
+    sum="94e5b992265d458ddb0e8426d781cd30"
     proved="true"
     expanded="false"
     shape="ainfix =V0ainfix ++V3aConsV2ainfix ++V4aConsV2V5EOainfix =V0ainfix ++V6aConsV1V7EIainfix =aConsV1V0ainfix ++V9aConsV8ainfix ++V10aConsV8V11EF">
@@ -120,14 +120,14 @@
      edited="bellman_ford_Graph_long_path_decomposition_pigeon3_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.39"/>
+     <result status="valid" time="1.29"/>
     </proof>
    </goal>
    <goal
     name="long_path_decomposition"
     locfile="../bellman_ford.mlw"
     loclnum="80" loccnumb="8" loccnume="31"
-    sum="13df091b6159acecc84db53e6654787f"
+    sum="48eba72127e0e4be5bb3d09d5a9d2c1e"
     proved="true"
     expanded="false"
     shape="ainfix =V0ainfix ++V3aConsV2ainfix ++V4aConsV2V5EOainfix =V0ainfix ++V6aConsV1V7EIainfix &gt;=alengthV0acardinalaverticesIapathasV0V1F">
@@ -145,7 +145,7 @@
     name="simple_path"
     locfile="../bellman_ford.mlw"
     loclnum="87" loccnumb="8" loccnume="19"
-    sum="dd95a1c6c96fa1d5f05ae6648be161ad"
+    sum="6364a683329fe8cccc962b7a45e68f1e"
     proved="true"
     expanded="false"
     shape="ainfix &lt;alengthV2acardinalaverticesAapathasV2V0EIapathasV1V0F">
@@ -163,7 +163,7 @@
     name="key_lemma_1"
     locfile="../bellman_ford.mlw"
     loclnum="108" loccnumb="8" loccnume="19"
-    sum="409c66d0acfad3b8866053809766eb01"
+    sum="2b7fdfe5c084be5b095d9ec75770d426"
     proved="true"
     expanded="false"
     shape="anegative_cycleV2EIainfix &lt;apath_weightV3V0V1AapathasV3V0EIainfix &gt;=apath_weightV4V0V1Iainfix &lt;alengthV4acardinalaverticesIapathasV4V0FF">
@@ -188,18 +188,18 @@
     name="key_lemma_2"
     locfile="../bellman_ford.mlw"
     loclnum="172" loccnumb="8" loccnume="19"
-    sum="0b21e9859fa970599d61a2fc00e3e372"
+    sum="cce26e3a3fab77ebb104c5383c66285a"
     proved="true"
     expanded="false"
-    shape="anegative_cycleV1NFIainv2V0aedgesIainv1V0acardinalaverticesaemptyF">
+    shape="Nanegative_cycleV1FIainv2V0aedgesIainv1V0acardinalaverticesaemptyF">
     <proof
      prover="3"
-     timelimit="60"
-     memlimit="1000"
+     timelimit="5"
+     memlimit="4000"
      edited="bf_WP_BellmanFord_key_lemma_2_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="20.19"/>
+     <result status="valid" time="19.48"/>
     </proof>
    </goal>
    <goal
@@ -207,10 +207,10 @@
     locfile="../bellman_ford.mlw"
     loclnum="176" loccnumb="6" loccnume="11"
     expl="VC for relax"
-    sum="a75e1a232d95494efe6a3df7c2503a2e"
+    sum="9ff9f8f791d551642a11221c31d10226"
     proved="true"
     expanded="false"
-    shape="iCagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V5aweightV0V1V6ainv1V7V2aaddaTuple2V0V1V3Iainfix =V7asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V8aweightV0V1Fainv1V4V2aaddaTuple2V0V1V3Iainv1V4V2V3AamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix &lt;=c1V2FF">
+    shape="iainv1V4V2aaddaTuple2V0V1V3ainv1V5V2aaddaTuple2V0V1V3Iainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V6aweightV0V1aFiniteVagetV4V0FCfaInfiniteCtaInfiniteainfix &lt;ainfix +V7aweightV0V1V8aFiniteVagetV4V1aFiniteVagetV4V0Iainv1V4V2V3ANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix &lt;=c1V2FF">
     <label
      name="expl:VC for relax"/>
     <transf
@@ -222,10 +222,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="176" loccnumb="6" loccnume="11"
       expl="1. postcondition"
-      sum="20d95747223b644d6ccb9c71ba981958"
+      sum="9e59d56c394f8e1d8f799ac7d21beb05"
       proved="true"
       expanded="false"
-      shape="ainv1V5V2aaddaTuple2V0V1V3Iainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V6aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V7aweightV0V1V8Iainv1V4V2V3AamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix &lt;=c1V2FF">
+      shape="postconditionainv1V5V2aaddaTuple2V0V1V3Iainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V6aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V7aweightV0V1V8aFiniteVagetV4V1aFiniteVagetV4V0Iainv1V4V2V3ANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix &lt;=c1V2FF">
       <label
        name="expl:VC for relax"/>
       <transf
@@ -237,10 +237,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="176" loccnumb="6" loccnume="11"
         expl="1. postcondition"
-        sum="32e2a193b5cccd0dc1ea4ea8346288d2"
+        sum="bdac3ffa79cc7a863e19e5563708d148"
         proved="true"
         expanded="false"
-        shape="Camixfix []V5V6aFiniteVainfix &gt;=ainfix +apath_weightV9V8aweightV8V6V7IamemaTuple2V8V6aaddaTuple2V0V1V3Iainfix &lt;alengthV9V2IapathasV9V8FAainfix &gt;=apath_weightV10V6V7Iainfix &lt;alengthV10V2IapathasV10V6FAainfix =apath_weightV11V6V7AapathasV11V6EaInfiniteainfix &gt;=alengthV13V2IapathasV13V12FIamemaTuple2V12V6aaddaTuple2V0V1V3FAainfix &gt;=alengthV14V2IapathasV14V6FIamemV6averticesFIainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V15aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V16aweightV0V1V17ICamixfix []V4V18aFiniteVainfix &gt;=ainfix +apath_weightV21V20aweightV20V18V19IamemaTuple2V20V18V3Iainfix &lt;alengthV21V2IapathasV21V20FAainfix &gt;=apath_weightV22V18V19Iainfix &lt;alengthV22V2IapathasV22V18FAainfix =apath_weightV23V18V19AapathasV23V18EaInfiniteainfix &gt;=alengthV25V2IapathasV25V24FIamemaTuple2V24V18V3FAainfix &gt;=alengthV26V2IapathasV26V18FIamemV18averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+        shape="postconditionCainfix &gt;=ainfix +apath_weightV9V8aweightV8V6V7IamemaTuple2V8V6aaddaTuple2V0V1V3Iainfix &lt;alengthV9V2IapathasV9V8FAainfix &gt;=apath_weightV10V6V7Iainfix &lt;alengthV10V2IapathasV10V6FAainfix =apath_weightV11V6V7AapathasV11V6EaFiniteVainfix &gt;=alengthV13V2IapathasV13V12FIamemaTuple2V12V6aaddaTuple2V0V1V3FAainfix &gt;=alengthV14V2IapathasV14V6FaInfiniteamixfix []V5V6IamemV6averticesFIainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V15aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V16aweightV0V1V17aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV21V20aweightV20V18V19IamemaTuple2V20V18V3Iainfix &lt;alengthV21V2IapathasV21V20FAainfix &gt;=apath_weightV22V18V19Iainfix &lt;alengthV22V2IapathasV22V18FAainfix =apath_weightV23V18V19AapathasV23V18EaFiniteVainfix &gt;=alengthV25V2IapathasV25V24FIamemaTuple2V24V18V3FAainfix &gt;=alengthV26V2IapathasV26V18FaInfiniteamixfix []V4V18IamemV18averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
         <label
          name="expl:VC for relax"/>
         <transf
@@ -252,10 +252,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="1. postcondition"
-          sum="c5768b5861031c67c072be2c6131bbb1"
+          sum="501b7fdf43f7e7b8dc350aa8b73a9de0"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V6aFiniteVainfix =apath_weightV8V6V7AapathasV8V6EaInfinitetIamemV6averticesFIainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V9aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V10aweightV0V1V11ICamixfix []V4V12aFiniteVainfix &gt;=ainfix +apath_weightV15V14aweightV14V12V13IamemaTuple2V14V12V3Iainfix &lt;alengthV15V2IapathasV15V14FAainfix &gt;=apath_weightV16V12V13Iainfix &lt;alengthV16V2IapathasV16V12FAainfix =apath_weightV17V12V13AapathasV17V12EaInfiniteainfix &gt;=alengthV19V2IapathasV19V18FIamemaTuple2V18V12V3FAainfix &gt;=alengthV20V2IapathasV20V12FIamemV12averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCainfix =apath_weightV8V6V7AapathasV8V6EaFiniteVtaInfiniteamixfix []V5V6IamemV6averticesFIainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V9aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V10aweightV0V1V11aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV15V14aweightV14V12V13IamemaTuple2V14V12V3Iainfix &lt;alengthV15V2IapathasV15V14FAainfix &gt;=apath_weightV16V12V13Iainfix &lt;alengthV16V2IapathasV16V12FAainfix =apath_weightV17V12V13AapathasV17V12EaFiniteVainfix &gt;=alengthV19V2IapathasV19V18FIamemaTuple2V18V12V3FAainfix &gt;=alengthV20V2IapathasV20V12FaInfiniteamixfix []V4V12IamemV12averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -273,10 +273,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="2. postcondition"
-          sum="e1f8b537442860ca03afba1fb00ee853"
+          sum="9747feb613fcad094ade54d5a1595d31"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V6aFiniteVainfix &gt;=apath_weightV8V6V7Iainfix &lt;alengthV8V2IapathasV8V6FaInfinitetIamemV6averticesFIainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V9aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V10aweightV0V1V11ICamixfix []V4V12aFiniteVainfix &gt;=ainfix +apath_weightV15V14aweightV14V12V13IamemaTuple2V14V12V3Iainfix &lt;alengthV15V2IapathasV15V14FAainfix &gt;=apath_weightV16V12V13Iainfix &lt;alengthV16V2IapathasV16V12FAainfix =apath_weightV17V12V13AapathasV17V12EaInfiniteainfix &gt;=alengthV19V2IapathasV19V18FIamemaTuple2V18V12V3FAainfix &gt;=alengthV20V2IapathasV20V12FIamemV12averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCainfix &gt;=apath_weightV8V6V7Iainfix &lt;alengthV8V2IapathasV8V6FaFiniteVtaInfiniteamixfix []V5V6IamemV6averticesFIainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V9aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V10aweightV0V1V11aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV15V14aweightV14V12V13IamemaTuple2V14V12V3Iainfix &lt;alengthV15V2IapathasV15V14FAainfix &gt;=apath_weightV16V12V13Iainfix &lt;alengthV16V2IapathasV16V12FAainfix =apath_weightV17V12V13AapathasV17V12EaFiniteVainfix &gt;=alengthV19V2IapathasV19V18FIamemaTuple2V18V12V3FAainfix &gt;=alengthV20V2IapathasV20V12FaInfiniteamixfix []V4V12IamemV12averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -287,24 +287,16 @@
            archived="false">
            <result status="valid" time="0.22"/>
           </proof>
-          <proof
-           prover="4"
-           timelimit="28"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="1.50"/>
-          </proof>
          </goal>
          <goal
           name="WP_parameter relax.1.1.3"
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="3. postcondition"
-          sum="f884ed642fcc7e2638be6ee138894977"
+          sum="d207a25424dc27fdffff99de1171cfb5"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V6aFiniteVainfix &gt;=ainfix +apath_weightV9V8aweightV8V6V7IamemaTuple2V8V6aaddaTuple2V0V1V3Iainfix &lt;alengthV9V2IapathasV9V8FaInfinitetIamemV6averticesFIainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V10aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V11aweightV0V1V12ICamixfix []V4V13aFiniteVainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13V3Iainfix &lt;alengthV16V2IapathasV16V15FAainfix &gt;=apath_weightV17V13V14Iainfix &lt;alengthV17V2IapathasV17V13FAainfix =apath_weightV18V13V14AapathasV18V13EaInfiniteainfix &gt;=alengthV20V2IapathasV20V19FIamemaTuple2V19V13V3FAainfix &gt;=alengthV21V2IapathasV21V13FIamemV13averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCainfix &gt;=ainfix +apath_weightV9V8aweightV8V6V7IamemaTuple2V8V6aaddaTuple2V0V1V3Iainfix &lt;alengthV9V2IapathasV9V8FaFiniteVtaInfiniteamixfix []V5V6IamemV6averticesFIainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V10aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V11aweightV0V1V12aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13V3Iainfix &lt;alengthV16V2IapathasV16V15FAainfix &gt;=apath_weightV17V13V14Iainfix &lt;alengthV17V2IapathasV17V13FAainfix =apath_weightV18V13V14AapathasV18V13EaFiniteVainfix &gt;=alengthV20V2IapathasV20V19FIamemaTuple2V19V13V3FAainfix &gt;=alengthV21V2IapathasV21V13FaInfiniteamixfix []V4V13IamemV13averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -321,10 +313,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="4. postcondition"
-          sum="bc2b9e948351cfb270858f2931b631cc"
+          sum="2207b3231ee78c8eed0fcbd1add299fd"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V6aFiniteVtaInfiniteainfix &gt;=alengthV8V2IapathasV8V6FIamemV6averticesFIainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V9aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V10aweightV0V1V11ICamixfix []V4V12aFiniteVainfix &gt;=ainfix +apath_weightV15V14aweightV14V12V13IamemaTuple2V14V12V3Iainfix &lt;alengthV15V2IapathasV15V14FAainfix &gt;=apath_weightV16V12V13Iainfix &lt;alengthV16V2IapathasV16V12FAainfix =apath_weightV17V12V13AapathasV17V12EaInfiniteainfix &gt;=alengthV19V2IapathasV19V18FIamemaTuple2V18V12V3FAainfix &gt;=alengthV20V2IapathasV20V12FIamemV12averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCtaFiniteVainfix &gt;=alengthV8V2IapathasV8V6FaInfiniteamixfix []V5V6IamemV6averticesFIainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V9aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V10aweightV0V1V11aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV15V14aweightV14V12V13IamemaTuple2V14V12V3Iainfix &lt;alengthV15V2IapathasV15V14FAainfix &gt;=apath_weightV16V12V13Iainfix &lt;alengthV16V2IapathasV16V12FAainfix =apath_weightV17V12V13AapathasV17V12EaFiniteVainfix &gt;=alengthV19V2IapathasV19V18FIamemaTuple2V18V12V3FAainfix &gt;=alengthV20V2IapathasV20V12FaInfiniteamixfix []V4V12IamemV12averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -343,24 +335,16 @@
            archived="false">
            <result status="valid" time="0.30"/>
           </proof>
-          <proof
-           prover="4"
-           timelimit="15"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.25"/>
-          </proof>
          </goal>
          <goal
           name="WP_parameter relax.1.1.5"
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="5. postcondition"
-          sum="c97c1af251fdde4850a14108c92a7784"
+          sum="af6b57d268728b38847383441b280e14"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V6aFiniteVtaInfiniteainfix &gt;=alengthV9V2IapathasV9V8FIamemaTuple2V8V6aaddaTuple2V0V1V3FIamemV6averticesFIainfix =V5asetV4V1CagetV4V0aInfiniteaInfiniteaFiniteVaFiniteainfix +V10aweightV0V1FICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V11aweightV0V1V12ICamixfix []V4V13aFiniteVainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13V3Iainfix &lt;alengthV16V2IapathasV16V15FAainfix &gt;=apath_weightV17V13V14Iainfix &lt;alengthV17V2IapathasV17V13FAainfix =apath_weightV18V13V14AapathasV18V13EaInfiniteainfix &gt;=alengthV20V2IapathasV20V19FIamemaTuple2V19V13V3FAainfix &gt;=alengthV21V2IapathasV21V13FIamemV13averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCtaFiniteVainfix &gt;=alengthV9V2IapathasV9V8FIamemaTuple2V8V6aaddaTuple2V0V1V3FaInfiniteamixfix []V5V6IamemV6averticesFIainfix =V5asetV4V1CaInfiniteaInfiniteaFiniteainfix +V10aweightV0V1aFiniteVagetV4V0FICfaInfiniteCtaInfiniteainfix &lt;ainfix +V11aweightV0V1V12aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13V3Iainfix &lt;alengthV16V2IapathasV16V15FAainfix &gt;=apath_weightV17V13V14Iainfix &lt;alengthV17V2IapathasV17V13FAainfix =apath_weightV18V13V14AapathasV18V13EaFiniteVainfix &gt;=alengthV20V2IapathasV20V19FIamemaTuple2V19V13V3FAainfix &gt;=alengthV21V2IapathasV21V13FaInfiniteamixfix []V4V13IamemV13averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -381,10 +365,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="176" loccnumb="6" loccnume="11"
       expl="2. postcondition"
-      sum="abb07d0cb505ad371c3ebef4f9279ce7"
+      sum="53637847673dd225d9eb4789e7004bc7"
       proved="true"
       expanded="false"
-      shape="ainv1V4V2aaddaTuple2V0V1V3ICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V5aweightV0V1V6NIainv1V4V2V3AamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix &lt;=c1V2FF">
+      shape="postconditionainv1V4V2aaddaTuple2V0V1V3INCfaInfiniteCtaInfiniteainfix &lt;ainfix +V5aweightV0V1V6aFiniteVagetV4V1aFiniteVagetV4V0Iainv1V4V2V3ANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix &lt;=c1V2FF">
       <label
        name="expl:VC for relax"/>
       <transf
@@ -396,10 +380,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="176" loccnumb="6" loccnume="11"
         expl="1. postcondition"
-        sum="e02f8fa983ae0d2dcbb6f943d17f1030"
+        sum="1faf5ef5cc0c6f6ec3887ccd3c1b6b68"
         proved="true"
         expanded="false"
-        shape="Camixfix []V4V5aFiniteVainfix &gt;=ainfix +apath_weightV8V7aweightV7V5V6IamemaTuple2V7V5aaddaTuple2V0V1V3Iainfix &lt;alengthV8V2IapathasV8V7FAainfix &gt;=apath_weightV9V5V6Iainfix &lt;alengthV9V2IapathasV9V5FAainfix =apath_weightV10V5V6AapathasV10V5EaInfiniteainfix &gt;=alengthV12V2IapathasV12V11FIamemaTuple2V11V5aaddaTuple2V0V1V3FAainfix &gt;=alengthV13V2IapathasV13V5FIamemV5averticesFICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V14aweightV0V1V15NICamixfix []V4V16aFiniteVainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16V3Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaInfiniteainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16V3FAainfix &gt;=alengthV24V2IapathasV24V16FIamemV16averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+        shape="postconditionCainfix &gt;=ainfix +apath_weightV8V7aweightV7V5V6IamemaTuple2V7V5aaddaTuple2V0V1V3Iainfix &lt;alengthV8V2IapathasV8V7FAainfix &gt;=apath_weightV9V5V6Iainfix &lt;alengthV9V2IapathasV9V5FAainfix =apath_weightV10V5V6AapathasV10V5EaFiniteVainfix &gt;=alengthV12V2IapathasV12V11FIamemaTuple2V11V5aaddaTuple2V0V1V3FAainfix &gt;=alengthV13V2IapathasV13V5FaInfiniteamixfix []V4V5IamemV5averticesFINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V14aweightV0V1V15aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16V3Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaFiniteVainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16V3FAainfix &gt;=alengthV24V2IapathasV24V16FaInfiniteamixfix []V4V16IamemV16averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
         <label
          name="expl:VC for relax"/>
         <transf
@@ -411,10 +395,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="1. postcondition"
-          sum="f07e84e583a1e7b326e25a02fcc82043"
+          sum="c042ebb8861ade12664ca65980505346"
           proved="true"
           expanded="false"
-          shape="Camixfix []V4V5aFiniteVainfix =apath_weightV7V5V6AapathasV7V5EaInfinitetIamemV5averticesFICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V8aweightV0V1V9NICamixfix []V4V10aFiniteVainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10V3Iainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaInfiniteainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10V3FAainfix &gt;=alengthV18V2IapathasV18V10FIamemV10averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCainfix =apath_weightV7V5V6AapathasV7V5EaFiniteVtaInfiniteamixfix []V4V5IamemV5averticesFINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V8aweightV0V1V9aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10V3Iainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaFiniteVainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10V3FAainfix &gt;=alengthV18V2IapathasV18V10FaInfiniteamixfix []V4V10IamemV10averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -433,24 +417,16 @@
            archived="false">
            <result status="valid" time="0.12"/>
           </proof>
-          <proof
-           prover="4"
-           timelimit="15"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.24"/>
-          </proof>
          </goal>
          <goal
           name="WP_parameter relax.2.1.2"
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="2. postcondition"
-          sum="3bfb142386b5b7e1ee78975eeec51db4"
+          sum="cce77886729702fe0e115df2ecc56f02"
           proved="true"
           expanded="false"
-          shape="Camixfix []V4V5aFiniteVainfix &gt;=apath_weightV7V5V6Iainfix &lt;alengthV7V2IapathasV7V5FaInfinitetIamemV5averticesFICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V8aweightV0V1V9NICamixfix []V4V10aFiniteVainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10V3Iainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaInfiniteainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10V3FAainfix &gt;=alengthV18V2IapathasV18V10FIamemV10averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCainfix &gt;=apath_weightV7V5V6Iainfix &lt;alengthV7V2IapathasV7V5FaFiniteVtaInfiniteamixfix []V4V5IamemV5averticesFINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V8aweightV0V1V9aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10V3Iainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaFiniteVainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10V3FAainfix &gt;=alengthV18V2IapathasV18V10FaInfiniteamixfix []V4V10IamemV10averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -469,24 +445,16 @@
            archived="false">
            <result status="valid" time="0.28"/>
           </proof>
-          <proof
-           prover="4"
-           timelimit="15"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="1.03"/>
-          </proof>
          </goal>
          <goal
           name="WP_parameter relax.2.1.3"
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="3. postcondition"
-          sum="60a99c9ac9436277c04772af9b4dc9aa"
+          sum="8530bac15a4136280e413c8604d669be"
           proved="true"
           expanded="false"
-          shape="Camixfix []V4V5aFiniteVainfix &gt;=ainfix +apath_weightV8V7aweightV7V5V6IamemaTuple2V7V5aaddaTuple2V0V1V3Iainfix &lt;alengthV8V2IapathasV8V7FaInfinitetIamemV5averticesFICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV0V1V10NICamixfix []V4V11aFiniteVainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11V3Iainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaInfiniteainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11V3FAainfix &gt;=alengthV19V2IapathasV19V11FIamemV11averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCainfix &gt;=ainfix +apath_weightV8V7aweightV7V5V6IamemaTuple2V7V5aaddaTuple2V0V1V3Iainfix &lt;alengthV8V2IapathasV8V7FaFiniteVtaInfiniteamixfix []V4V5IamemV5averticesFINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV0V1V10aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11V3Iainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaFiniteVainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11V3FAainfix &gt;=alengthV19V2IapathasV19V11FaInfiniteamixfix []V4V11IamemV11averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -497,24 +465,16 @@
            archived="false">
            <result status="valid" time="0.44"/>
           </proof>
-          <proof
-           prover="4"
-           timelimit="40"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="1.73"/>
-          </proof>
          </goal>
          <goal
           name="WP_parameter relax.2.1.4"
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="4. postcondition"
-          sum="a68e672c869bf1f6f9ecc3446e52052f"
+          sum="f62e128e2770e828cfef4919e644c10c"
           proved="true"
           expanded="false"
-          shape="Camixfix []V4V5aFiniteVtaInfiniteainfix &gt;=alengthV7V2IapathasV7V5FIamemV5averticesFICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V8aweightV0V1V9NICamixfix []V4V10aFiniteVainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10V3Iainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaInfiniteainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10V3FAainfix &gt;=alengthV18V2IapathasV18V10FIamemV10averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCtaFiniteVainfix &gt;=alengthV7V2IapathasV7V5FaInfiniteamixfix []V4V5IamemV5averticesFINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V8aweightV0V1V9aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10V3Iainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaFiniteVainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10V3FAainfix &gt;=alengthV18V2IapathasV18V10FaInfiniteamixfix []V4V10IamemV10averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -533,24 +493,16 @@
            archived="false">
            <result status="valid" time="0.08"/>
           </proof>
-          <proof
-           prover="4"
-           timelimit="15"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.66"/>
-          </proof>
          </goal>
          <goal
           name="WP_parameter relax.2.1.5"
           locfile="../bellman_ford.mlw"
           loclnum="176" loccnumb="6" loccnume="11"
           expl="5. postcondition"
-          sum="154f0f2aef08355f27342f430f734601"
+          sum="6ec41992aa28db1b621bbff3b23955b8"
           proved="true"
           expanded="false"
-          shape="Camixfix []V4V5aFiniteVtaInfiniteainfix &gt;=alengthV8V2IapathasV8V7FIamemaTuple2V7V5aaddaTuple2V0V1V3FIamemV5averticesFICagetV4V0aInfinitefaFiniteVCagetV4V1aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV0V1V10NICamixfix []V4V11aFiniteVainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11V3Iainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaInfiniteainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11V3FAainfix &gt;=alengthV19V2IapathasV19V11FIamemV11averticesFAamemaTuple2V0V1V3NAamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
+          shape="postconditionCtaFiniteVainfix &gt;=alengthV8V2IapathasV8V7FIamemaTuple2V7V5aaddaTuple2V0V1V3FaInfiniteamixfix []V4V5IamemV5averticesFINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV0V1V10aFiniteVagetV4V1aFiniteVagetV4V0ICainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11V3Iainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaFiniteVainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11V3FAainfix &gt;=alengthV19V2IapathasV19V11FaInfiniteamixfix []V4V11IamemV11averticesFANamemaTuple2V0V1V3AamemaTuple2V0V1aedgesAainfix =c1V2Oainfix &lt;c1V2FF">
           <label
            name="expl:VC for relax"/>
           <proof
@@ -560,14 +512,6 @@
            obsolete="false"
            archived="false">
            <result status="valid" time="0.13"/>
-          </proof>
-          <proof
-           prover="4"
-           timelimit="15"
-           memlimit="0"
-           obsolete="false"
-           archived="false">
-           <result status="valid" time="0.62"/>
           </proof>
          </goal>
         </transf>
@@ -581,25 +525,25 @@
     locfile="../bellman_ford.mlw"
     loclnum="186" loccnumb="6" loccnume="18"
     expl="VC for bellman_ford"
-    sum="44248d8b08aebb779f24bed2002299f3"
+    sum="b2d6c4d900fbd74db59a1cdd1b935c5e"
     proved="true"
-    expanded="true"
-    shape="iainfix =V4aTrueNiCagetV1V6aInfinitefaFiniteVCagetV1V7aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV6V7V10anegative_cycleV11Eainfix &lt;acardinalV5acardinalV3Aainfix &lt;=c0acardinalV3Aainv2V1adiffaedgesV5AasubsetV5aedgesIainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFAais_emptyV3NCagetV1V12aFiniteVainfix &gt;=apath_weightV14V12V13IapathasV14V12FAainfix =apath_weightV15V12V13AapathasV15V12EaInfiniteapathasV16V12NFIamemV12averticesFAainv2V1aedgesIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFAainv2V1adiffaedgesV2AasubsetV2aedgesIainfix =V2aedgesFAainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyAiainfix =V21aTrueNainfix &lt;acardinalV23acardinalV19Aainfix &lt;=c0acardinalV19Aainv1V27V17adiffaedgesV23AasubsetV23aedgesIainv1V27V17aaddaTuple2V24V25V22FAainv1V20V17V22AamemaTuple2V24V25V22NAamemaTuple2V24V25aedgesAainfix &lt;=c1V17Iainfix =V23aremoveV26V19AamemV26V19LaTuple2V24V25FFAais_emptyV19NLadiffaedgesV19ainv1V20ainfix +V17c1aemptyAainv1V20V17aedgesIais_emptyV19qainfix =V21aTrueFIainv1V20V17adiffaedgesV19AasubsetV19aedgesFAainv1V1V17adiffaedgesV18AasubsetV18aedgesIainfix =V18aedgesFIainv1V1V17aemptyIainfix &lt;=V17V0Aainfix &lt;=c1V17FFAainv1ainitialize_single_sourceasc1aemptyIainfix &lt;=c1V0Aiainfix =V30aTrueNiCagetainitialize_single_sourceasV32aInfinitefaFiniteVCagetainitialize_single_sourceasV33aInfinitetaFiniteVainfix &lt;ainfix +V35aweightV32V33V36anegative_cycleV37Eainfix &lt;acardinalV31acardinalV29Aainfix &lt;=c0acardinalV29Aainv2ainitialize_single_sourceasadiffaedgesV31AasubsetV31aedgesIainfix =V31aremoveV34V29AamemV34V29LaTuple2V32V33FFAais_emptyV29NCagetainitialize_single_sourceasV38aFiniteVainfix &gt;=apath_weightV40V38V39IapathasV40V38FAainfix =apath_weightV41V38V39AapathasV41V38EaInfiniteapathasV42V38NFIamemV38averticesFAainv2ainitialize_single_sourceasaedgesIais_emptyV29qainfix =V30aTrueFIainv2ainitialize_single_sourceasadiffaedgesV29AasubsetV29aedgesFAainv2ainitialize_single_sourceasadiffaedgesV28AasubsetV28aedgesIainfix =V28aedgesFAainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+    expanded="false"
+    shape="iCainfix &gt;=apath_weightV7V5V6IapathasV7V5FAainfix =apath_weightV8V5V6AapathasV8V5EaFiniteVNapathasV9V5FaInfiniteagetV1V5IamemV5averticesFAainv2V1aedgesiainfix &lt;acardinalV10acardinalV3Aainfix &lt;=c0acardinalV3Aainv2V1adiffaedgesV10AasubsetV10aedgesanegative_cycleV14ECfaInfiniteCtaInfiniteainfix &lt;ainfix +V15aweightV11V12V16aFiniteVagetV1V12aFiniteVagetV1V11Iainfix =V10aremoveV13V3AamemV13V3LaTuple2V11V12FFANais_emptyV3Nainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFAainv2V1adiffaedgesV2AasubsetV2aedgesIainfix =V2aedgesFAainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyAiainv1V20ainfix +V17c1aemptyAainv1V20V17aedgesainfix &lt;acardinalV23acardinalV19Aainfix &lt;=c0acardinalV19Aainv1V27V17adiffaedgesV23AasubsetV23aedgesIainv1V27V17aaddaTuple2V24V25V22FAainv1V20V17V22ANamemaTuple2V24V25V22AamemaTuple2V24V25aedgesAainfix &lt;=c1V17Iainfix =V23aremoveV26V19AamemV26V19LaTuple2V24V25FFANais_emptyV19LadiffaedgesV19Nainfix =V21aTrueIais_emptyV19qainfix =V21aTrueFIainv1V20V17adiffaedgesV19AasubsetV19aedgesFAainv1V1V17adiffaedgesV18AasubsetV18aedgesIainfix =V18aedgesFIainv1V1V17aemptyIainfix &lt;=V17V0Aainfix &lt;=c1V17FFAainv1ainitialize_single_sourceasc1aemptyIainfix &lt;=c1V0AiCainfix &gt;=apath_weightV33V31V32IapathasV33V31FAainfix =apath_weightV34V31V32AapathasV34V31EaFiniteVNapathasV35V31FaInfiniteagetainitialize_single_sourceasV31IamemV31averticesFAainv2ainitialize_single_sourceasaedgesiainfix &lt;acardinalV36acardinalV29Aainfix &lt;=c0acardinalV29Aainv2ainitialize_single_sourceasadiffaedgesV36AasubsetV36aedgesanegative_cycleV40ECfaInfiniteCtaInfiniteainfix &lt;ainfix +V41aweightV37V38V42aFiniteVagetainitialize_single_sourceasV38aFiniteVagetainitialize_single_sourceasV37Iainfix =V36aremoveV39V29AamemV39V29LaTuple2V37V38FFANais_emptyV29Nainfix =V30aTrueIais_emptyV29qainfix =V30aTrueFIainv2ainitialize_single_sourceasadiffaedgesV29AasubsetV29aedgesFAainv2ainitialize_single_sourceasadiffaedgesV28AasubsetV28aedgesIainfix =V28aedgesFAainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
     <label
      name="expl:VC for bellman_ford"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter bellman_ford.1"
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="1. assertion"
-      sum="7892f25aecad9aa3771559156dfc593a"
+      sum="513066965974f25f08d77764540b16c8"
       proved="true"
       expanded="false"
-      shape="ainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="assertionainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -616,10 +560,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="2. loop invariant init"
-      sum="a327424bfb27f7936cf7345ac9fab53d"
+      sum="b03b7a9f2054e1a1a92ca6b6da69d514"
       proved="true"
       expanded="false"
-      shape="ainv2ainitialize_single_sourceasadiffaedgesV1AasubsetV1aedgesIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant initainv2ainitialize_single_sourceasadiffaedgesV1AasubsetV1aedgesIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -636,10 +580,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="3. precondition"
-      sum="ce70db30dfe944cf5dc48da72adfb440"
+      sum="a1d8aabe4d864ac754bc6f9e1be21ee3"
       proved="true"
       expanded="false"
-      shape="ais_emptyV2NIainfix =V3aTrueNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="preconditionNais_emptyV2INainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -656,10 +600,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="4. exceptional postcondition"
-      sum="8df7dc9ab82fce2df0c9eb732abf541d"
+      sum="4e158ff1a7f07008cd59e9b3be6d4ac4"
       proved="true"
       expanded="false"
-      shape="anegative_cycleV8EICagetainitialize_single_sourceasV5aInfinitefaFiniteVCagetainitialize_single_sourceasV6aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV5V6V10Iainfix =V4aremoveV7V2AamemV7V2LaTuple2V5V6FFIais_emptyV2NIainfix =V3aTrueNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="exceptional postconditionanegative_cycleV8EICfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV5V6V10aFiniteVagetainitialize_single_sourceasV6aFiniteVagetainitialize_single_sourceasV5Iainfix =V4aremoveV7V2AamemV7V2LaTuple2V5V6FFINais_emptyV2INainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -677,10 +621,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="5. loop invariant preservation"
-      sum="81b72bb4a440461dc3d73165f4ca2dd0"
+      sum="ff459e291fb82d039da6b955ae07ba9e"
       proved="true"
       expanded="false"
-      shape="ainv2ainitialize_single_sourceasadiffaedgesV4AasubsetV4aedgesICagetainitialize_single_sourceasV5aInfinitefaFiniteVCagetainitialize_single_sourceasV6aInfinitetaFiniteVainfix &lt;ainfix +V8aweightV5V6V9NIainfix =V4aremoveV7V2AamemV7V2LaTuple2V5V6FFIais_emptyV2NIainfix =V3aTrueNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant preservationainv2ainitialize_single_sourceasadiffaedgesV4AasubsetV4aedgesINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V8aweightV5V6V9aFiniteVagetainitialize_single_sourceasV6aFiniteVagetainitialize_single_sourceasV5Iainfix =V4aremoveV7V2AamemV7V2LaTuple2V5V6FFINais_emptyV2INainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -689,7 +633,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.74"/>
+       <result status="valid" time="3.19"/>
       </proof>
      </goal>
      <goal
@@ -697,10 +641,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="6. loop variant decrease"
-      sum="eaead26e8402da0d995b8cbb81d1c841"
+      sum="b1c28eccb94b71ecf605de2b70ba02ad"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalV4acardinalV2Aainfix &lt;=c0acardinalV2ICagetainitialize_single_sourceasV5aInfinitefaFiniteVCagetainitialize_single_sourceasV6aInfinitetaFiniteVainfix &lt;ainfix +V8aweightV5V6V9NIainfix =V4aremoveV7V2AamemV7V2LaTuple2V5V6FFIais_emptyV2NIainfix =V3aTrueNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="loop variant decreaseainfix &lt;acardinalV4acardinalV2Aainfix &lt;=c0acardinalV2INCfaInfiniteCtaInfiniteainfix &lt;ainfix +V8aweightV5V6V9aFiniteVagetainitialize_single_sourceasV6aFiniteVagetainitialize_single_sourceasV5Iainfix =V4aremoveV7V2AamemV7V2LaTuple2V5V6FFINais_emptyV2INainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -717,10 +661,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="7. assertion"
-      sum="e5a4ac1eba3c3e7d9a23d3d4169bb4f1"
+      sum="a3ff698aab025b7be11a4f9e86515877"
       proved="true"
       expanded="false"
-      shape="ainv2ainitialize_single_sourceasaedgesIainfix =V3aTrueNNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="assertionainv2ainitialize_single_sourceasaedgesINNainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -737,10 +681,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="8. postcondition"
-      sum="042ac87ea802070f5f007d8d057b9074"
+      sum="ae7bc6b6eac467b4b9f1cda7ddee01ad"
       proved="true"
       expanded="false"
-      shape="Cagetainitialize_single_sourceasV4aFiniteVainfix &gt;=apath_weightV6V4V5IapathasV6V4FAainfix =apath_weightV7V4V5AapathasV7V4EaInfiniteapathasV8V4NFIamemV4averticesFIainv2ainitialize_single_sourceasaedgesIainfix =V3aTrueNNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+      shape="postconditionCainfix &gt;=apath_weightV6V4V5IapathasV6V4FAainfix =apath_weightV7V4V5AapathasV7V4EaFiniteVNapathasV8V4FaInfiniteagetainitialize_single_sourceasV4IamemV4averticesFIainv2ainitialize_single_sourceasaedgesINNainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -752,10 +696,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1. postcondition"
-        sum="08874c5ade2df56834f61cef660d9b63"
+        sum="7f4da5badb5457ead0157839ec6a7876"
         proved="true"
         expanded="false"
-        shape="Cagetainitialize_single_sourceasV4aFiniteVainfix =apath_weightV6V4V5AapathasV6V4EaInfinitetIamemV4averticesFIainv2ainitialize_single_sourceasaedgesIainfix =V3aTrueNNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+        shape="postconditionCainfix =apath_weightV6V4V5AapathasV6V4EaFiniteVtaInfiniteagetainitialize_single_sourceasV4IamemV4averticesFIainv2ainitialize_single_sourceasaedgesINNainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -772,7 +716,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.50"/>
+         <result status="valid" time="0.32"/>
         </proof>
         <proof
          prover="5"
@@ -788,10 +732,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="2. postcondition"
-        sum="21b427d3d6f0cf119eb5e8f6e07fd338"
+        sum="f9f6c236008d2d3e9420f9af8519cb55"
         proved="true"
         expanded="false"
-        shape="Cagetainitialize_single_sourceasV4aFiniteVainfix &gt;=apath_weightV6V4V5IapathasV6V4FaInfinitetIamemV4averticesFIainv2ainitialize_single_sourceasaedgesIainfix =V3aTrueNNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+        shape="postconditionCainfix &gt;=apath_weightV6V4V5IapathasV6V4FaFiniteVtaInfiniteagetainitialize_single_sourceasV4IamemV4averticesFIainv2ainitialize_single_sourceasaedgesINNainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -808,10 +752,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="3. postcondition"
-        sum="25ac67525f40679e4533482098af5e3e"
+        sum="b494dbd322bb2711e5868ef92070fe57"
         proved="true"
         expanded="false"
-        shape="Cagetainitialize_single_sourceasV4aFiniteVtaInfiniteapathasV6V4NFIamemV4averticesFIainv2ainitialize_single_sourceasaedgesIainfix =V3aTrueNNIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
+        shape="postconditionCtaFiniteVNapathasV6V4FaInfiniteagetainitialize_single_sourceasV4IamemV4averticesFIainv2ainitialize_single_sourceasaedgesINNainfix =V3aTrueIais_emptyV2qainfix =V3aTrueFIainv2ainitialize_single_sourceasadiffaedgesV2AasubsetV2aedgesFIainfix =V1aedgesFIainv1ainitialize_single_sourceasacardinalaverticesaemptyIainfix &gt;c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -846,10 +790,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="9. loop invariant init"
-      sum="dae4a5a460db7e71ffcbca339e5e55a6"
+      sum="0b4329ffc4f8186097313d1b215e6829"
       proved="true"
       expanded="false"
-      shape="ainv1ainitialize_single_sourceasc1aemptyIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant initainv1ainitialize_single_sourceasc1aemptyIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -858,7 +802,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.97"/>
+       <result status="valid" time="2.30"/>
       </proof>
      </goal>
      <goal
@@ -866,10 +810,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="10. loop invariant init"
-      sum="0435732f04582cda116bebf04f0b30d0"
+      sum="331f0bc408bf453d58f7420d1e353809"
       proved="true"
       expanded="false"
-      shape="ainv1V1V2adiffaedgesV3AasubsetV3aedgesIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant initainv1V1V2adiffaedgesV3AasubsetV3aedgesIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -881,7 +825,7 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1."
-        sum="e8f96750c1c3e0436c505bc87ba6b7c5"
+        sum="11709080063d1aa6333ef0d68f39aad6"
         proved="true"
         expanded="false"
         shape="asubsetV3aedgesIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
@@ -901,7 +845,7 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="2."
-        sum="418a8474db07c045aac3acd96ef6dbbf"
+        sum="5d3dad56a92cb55a838e5f5ec4f803c9"
         proved="true"
         expanded="false"
         shape="ainv1V1V2adiffaedgesV3Iainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
@@ -923,10 +867,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="11. precondition"
-      sum="2a41b44314d220f71270d39859227cfc"
+      sum="5fa79a08d8648d47969718b95d63176b"
       proved="true"
       expanded="false"
-      shape="ais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="preconditionNais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -943,10 +887,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="12. precondition"
-      sum="c5b9455d7f340dc7f08bc1ae4b52a680"
+      sum="b984d5e2f13038c2d6283ad550191489"
       proved="true"
       expanded="false"
-      shape="amemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="preconditionNamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -963,10 +907,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="13. precondition"
-      sum="029bca72777787ef41deb9c585a0bd6b"
+      sum="b7c3c4ed9b05363e7deb6c944d856772"
       proved="true"
       expanded="false"
-      shape="ainv1V5V2V7Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="preconditionainv1V5V2V7Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -983,10 +927,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="14. loop invariant preservation"
-      sum="42ec0f5cb911d02ac2dca6f73d82c83f"
+      sum="cf756993effcde11d88fa772204eef66"
       proved="true"
       expanded="false"
-      shape="ainv1V12V2adiffaedgesV8AasubsetV8aedgesIainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7AamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant preservationainv1V12V2adiffaedgesV8AasubsetV8aedgesIainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7ANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -998,10 +942,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1."
-        sum="ac0c2d4a6352819fb59a3f572ff95c4f"
+        sum="2b52f7cecc7419e19027360f21383f77"
         proved="true"
         expanded="false"
-        shape="asubsetV8aedgesIainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7AamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="asubsetV8aedgesIainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7ANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -1018,10 +962,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="2."
-        sum="15e095132237e1134388dd63e5bb47a2"
+        sum="e7e4f323b534769774315e88c8aa85d0"
         proved="true"
         expanded="false"
-        shape="ainv1V12V2adiffaedgesV8Iainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7AamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="ainv1V12V2adiffaedgesV8Iainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7ANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <transf
@@ -1033,10 +977,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="1."
-          sum="de80ce08009ed0aed47864e4f0026c0a"
+          sum="f139c63ceb68e24181b15a79e0083ef9"
           proved="true"
           expanded="false"
-          shape="Camixfix []V12V13aFiniteVainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13adiffaedgesV8Iainfix &lt;alengthV16V2IapathasV16V15FAainfix &gt;=apath_weightV17V13V14Iainfix &lt;alengthV17V2IapathasV17V13FAainfix =apath_weightV18V13V14AapathasV18V13EaInfiniteainfix &gt;=alengthV20V2IapathasV20V19FIamemaTuple2V19V13adiffaedgesV8FAainfix &gt;=alengthV21V2IapathasV21V13FIamemV13averticesFICamixfix []V12V22aFiniteVainfix &gt;=ainfix +apath_weightV25V24aweightV24V22V23IamemaTuple2V24V22aaddaTuple2V9V10V7Iainfix &lt;alengthV25V2IapathasV25V24FAainfix &gt;=apath_weightV26V22V23Iainfix &lt;alengthV26V2IapathasV26V22FAainfix =apath_weightV27V22V23AapathasV27V22EaInfiniteainfix &gt;=alengthV29V2IapathasV29V28FIamemaTuple2V28V22aaddaTuple2V9V10V7FAainfix &gt;=alengthV30V2IapathasV30V22FIamemV22averticesFFICamixfix []V5V31aFiniteVainfix &gt;=ainfix +apath_weightV34V33aweightV33V31V32IamemaTuple2V33V31V7Iainfix &lt;alengthV34V2IapathasV34V33FAainfix &gt;=apath_weightV35V31V32Iainfix &lt;alengthV35V2IapathasV35V31FAainfix =apath_weightV36V31V32AapathasV36V31EaInfiniteainfix &gt;=alengthV38V2IapathasV38V37FIamemaTuple2V37V31V7FAainfix &gt;=alengthV39V2IapathasV39V31FIamemV31averticesFAamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIamemV40V4NFNLadiffaedgesV4Iainfix =V6aTrueNIamemV41V4NFqainfix =V6aTrueFICamixfix []V5V42aFiniteVainfix &gt;=ainfix +apath_weightV45V44aweightV44V42V43IamemaTuple2V44V42adiffaedgesV4Iainfix &lt;alengthV45V2IapathasV45V44FAainfix &gt;=apath_weightV46V42V43Iainfix &lt;alengthV46V2IapathasV46V42FAainfix =apath_weightV47V42V43AapathasV47V42EaInfiniteainfix &gt;=alengthV49V2IapathasV49V48FIamemaTuple2V48V42adiffaedgesV4FAainfix &gt;=alengthV50V2IapathasV50V42FIamemV42averticesFAamemV51aedgesIamemV51V4FFIainfix =V3aedgesFICamixfix []V1V52aFiniteVainfix &gt;=ainfix +apath_weightV55V54aweightV54V52V53IamemaTuple2V54V52aemptyIainfix &lt;alengthV55V2IapathasV55V54FAainfix &gt;=apath_weightV56V52V53Iainfix &lt;alengthV56V2IapathasV56V52FAainfix =apath_weightV57V52V53AapathasV57V52EaInfiniteainfix &gt;=alengthV59V2IapathasV59V58FIamemaTuple2V58V52aemptyFAainfix &gt;=alengthV60V2IapathasV60V52FIamemV52averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+          shape="Cainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13adiffaedgesV8Iainfix &lt;alengthV16V2IapathasV16V15FAainfix &gt;=apath_weightV17V13V14Iainfix &lt;alengthV17V2IapathasV17V13FAainfix =apath_weightV18V13V14AapathasV18V13EaFiniteVainfix &gt;=alengthV20V2IapathasV20V19FIamemaTuple2V19V13adiffaedgesV8FAainfix &gt;=alengthV21V2IapathasV21V13FaInfiniteamixfix []V12V13IamemV13averticesFICainfix &gt;=ainfix +apath_weightV25V24aweightV24V22V23IamemaTuple2V24V22aaddaTuple2V9V10V7Iainfix &lt;alengthV25V2IapathasV25V24FAainfix &gt;=apath_weightV26V22V23Iainfix &lt;alengthV26V2IapathasV26V22FAainfix =apath_weightV27V22V23AapathasV27V22EaFiniteVainfix &gt;=alengthV29V2IapathasV29V28FIamemaTuple2V28V22aaddaTuple2V9V10V7FAainfix &gt;=alengthV30V2IapathasV30V22FaInfiniteamixfix []V12V22IamemV22averticesFFICainfix &gt;=ainfix +apath_weightV34V33aweightV33V31V32IamemaTuple2V33V31V7Iainfix &lt;alengthV34V2IapathasV34V33FAainfix &gt;=apath_weightV35V31V32Iainfix &lt;alengthV35V2IapathasV35V31FAainfix =apath_weightV36V31V32AapathasV36V31EaFiniteVainfix &gt;=alengthV38V2IapathasV38V37FIamemaTuple2V37V31V7FAainfix &gt;=alengthV39V2IapathasV39V31FaInfiniteamixfix []V5V31IamemV31averticesFANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINNamemV40V4FLadiffaedgesV4INainfix =V6aTrueINamemV41V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV45V44aweightV44V42V43IamemaTuple2V44V42adiffaedgesV4Iainfix &lt;alengthV45V2IapathasV45V44FAainfix &gt;=apath_weightV46V42V43Iainfix &lt;alengthV46V2IapathasV46V42FAainfix =apath_weightV47V42V43AapathasV47V42EaFiniteVainfix &gt;=alengthV49V2IapathasV49V48FIamemaTuple2V48V42adiffaedgesV4FAainfix &gt;=alengthV50V2IapathasV50V42FaInfiniteamixfix []V5V42IamemV42averticesFAamemV51aedgesIamemV51V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV55V54aweightV54V52V53IamemaTuple2V54V52aemptyIainfix &lt;alengthV55V2IapathasV55V54FAainfix &gt;=apath_weightV56V52V53Iainfix &lt;alengthV56V2IapathasV56V52FAainfix =apath_weightV57V52V53AapathasV57V52EaFiniteVainfix &gt;=alengthV59V2IapathasV59V58FIamemaTuple2V58V52aemptyFAainfix &gt;=alengthV60V2IapathasV60V52FaInfiniteamixfix []V1V52IamemV52averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
           <label
            name="expl:VC for bellman_ford"/>
           <transf
@@ -1048,10 +992,10 @@
             locfile="../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="1."
-            sum="aff1828e8f1aa3a9e4aea1537e6122a2"
+            sum="95476d542c970a7a27faa63dddcd70d8"
             proved="true"
             expanded="false"
-            shape="Camixfix []V12V13aFiniteVainfix =apath_weightV15V13V14AapathasV15V13EaInfinitetIamemV13averticesFICamixfix []V12V16aFiniteVainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aaddaTuple2V9V10V7Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaInfiniteainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aaddaTuple2V9V10V7FAainfix &gt;=alengthV24V2IapathasV24V16FIamemV16averticesFFICamixfix []V5V25aFiniteVainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25V7Iainfix &lt;alengthV28V2IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V2IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaInfiniteainfix &gt;=alengthV32V2IapathasV32V31FIamemaTuple2V31V25V7FAainfix &gt;=alengthV33V2IapathasV33V25FIamemV25averticesFAamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIamemV34V4NFNLadiffaedgesV4Iainfix =V6aTrueNIamemV35V4NFqainfix =V6aTrueFICamixfix []V5V36aFiniteVainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36adiffaedgesV4Iainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaInfiniteainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36adiffaedgesV4FAainfix &gt;=alengthV44V2IapathasV44V36FIamemV36averticesFAamemV45aedgesIamemV45V4FFIainfix =V3aedgesFICamixfix []V1V46aFiniteVainfix &gt;=ainfix +apath_weightV49V48aweightV48V46V47IamemaTuple2V48V46aemptyIainfix &lt;alengthV49V2IapathasV49V48FAainfix &gt;=apath_weightV50V46V47Iainfix &lt;alengthV50V2IapathasV50V46FAainfix =apath_weightV51V46V47AapathasV51V46EaInfiniteainfix &gt;=alengthV53V2IapathasV53V52FIamemaTuple2V52V46aemptyFAainfix &gt;=alengthV54V2IapathasV54V46FIamemV46averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+            shape="Cainfix =apath_weightV15V13V14AapathasV15V13EaFiniteVtaInfiniteamixfix []V12V13IamemV13averticesFICainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aaddaTuple2V9V10V7Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaFiniteVainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aaddaTuple2V9V10V7FAainfix &gt;=alengthV24V2IapathasV24V16FaInfiniteamixfix []V12V16IamemV16averticesFFICainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25V7Iainfix &lt;alengthV28V2IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V2IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaFiniteVainfix &gt;=alengthV32V2IapathasV32V31FIamemaTuple2V31V25V7FAainfix &gt;=alengthV33V2IapathasV33V25FaInfiniteamixfix []V5V25IamemV25averticesFANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINNamemV34V4FLadiffaedgesV4INainfix =V6aTrueINamemV35V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36adiffaedgesV4Iainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaFiniteVainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36adiffaedgesV4FAainfix &gt;=alengthV44V2IapathasV44V36FaInfiniteamixfix []V5V36IamemV36averticesFAamemV45aedgesIamemV45V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV49V48aweightV48V46V47IamemaTuple2V48V46aemptyIainfix &lt;alengthV49V2IapathasV49V48FAainfix &gt;=apath_weightV50V46V47Iainfix &lt;alengthV50V2IapathasV50V46FAainfix =apath_weightV51V46V47AapathasV51V46EaFiniteVainfix &gt;=alengthV53V2IapathasV53V52FIamemaTuple2V52V46aemptyFAainfix &gt;=alengthV54V2IapathasV54V46FaInfiniteamixfix []V1V46IamemV46averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
             <label
              name="expl:VC for bellman_ford"/>
             <proof
@@ -1076,10 +1020,10 @@
             locfile="../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="2."
-            sum="f099f0df5f4004f4d3161a3a5ad32ca2"
+            sum="0db8e15d20606701b09aa177076dd21c"
             proved="true"
             expanded="false"
-            shape="Camixfix []V12V13aFiniteVainfix &gt;=apath_weightV15V13V14Iainfix &lt;alengthV15V2IapathasV15V13FaInfinitetIamemV13averticesFICamixfix []V12V16aFiniteVainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aaddaTuple2V9V10V7Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaInfiniteainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aaddaTuple2V9V10V7FAainfix &gt;=alengthV24V2IapathasV24V16FIamemV16averticesFFICamixfix []V5V25aFiniteVainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25V7Iainfix &lt;alengthV28V2IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V2IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaInfiniteainfix &gt;=alengthV32V2IapathasV32V31FIamemaTuple2V31V25V7FAainfix &gt;=alengthV33V2IapathasV33V25FIamemV25averticesFAamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIamemV34V4NFNLadiffaedgesV4Iainfix =V6aTrueNIamemV35V4NFqainfix =V6aTrueFICamixfix []V5V36aFiniteVainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36adiffaedgesV4Iainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaInfiniteainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36adiffaedgesV4FAainfix &gt;=alengthV44V2IapathasV44V36FIamemV36averticesFAamemV45aedgesIamemV45V4FFIainfix =V3aedgesFICamixfix []V1V46aFiniteVainfix &gt;=ainfix +apath_weightV49V48aweightV48V46V47IamemaTuple2V48V46aemptyIainfix &lt;alengthV49V2IapathasV49V48FAainfix &gt;=apath_weightV50V46V47Iainfix &lt;alengthV50V2IapathasV50V46FAainfix =apath_weightV51V46V47AapathasV51V46EaInfiniteainfix &gt;=alengthV53V2IapathasV53V52FIamemaTuple2V52V46aemptyFAainfix &gt;=alengthV54V2IapathasV54V46FIamemV46averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+            shape="Cainfix &gt;=apath_weightV15V13V14Iainfix &lt;alengthV15V2IapathasV15V13FaFiniteVtaInfiniteamixfix []V12V13IamemV13averticesFICainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aaddaTuple2V9V10V7Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaFiniteVainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aaddaTuple2V9V10V7FAainfix &gt;=alengthV24V2IapathasV24V16FaInfiniteamixfix []V12V16IamemV16averticesFFICainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25V7Iainfix &lt;alengthV28V2IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V2IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaFiniteVainfix &gt;=alengthV32V2IapathasV32V31FIamemaTuple2V31V25V7FAainfix &gt;=alengthV33V2IapathasV33V25FaInfiniteamixfix []V5V25IamemV25averticesFANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINNamemV34V4FLadiffaedgesV4INainfix =V6aTrueINamemV35V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36adiffaedgesV4Iainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaFiniteVainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36adiffaedgesV4FAainfix &gt;=alengthV44V2IapathasV44V36FaInfiniteamixfix []V5V36IamemV36averticesFAamemV45aedgesIamemV45V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV49V48aweightV48V46V47IamemaTuple2V48V46aemptyIainfix &lt;alengthV49V2IapathasV49V48FAainfix &gt;=apath_weightV50V46V47Iainfix &lt;alengthV50V2IapathasV50V46FAainfix =apath_weightV51V46V47AapathasV51V46EaFiniteVainfix &gt;=alengthV53V2IapathasV53V52FIamemaTuple2V52V46aemptyFAainfix &gt;=alengthV54V2IapathasV54V46FaInfiniteamixfix []V1V46IamemV46averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
             <label
              name="expl:VC for bellman_ford"/>
             <proof
@@ -1088,7 +1032,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="1.08"/>
+             <result status="valid" time="1.42"/>
             </proof>
             <proof
              prover="1"
@@ -1104,10 +1048,10 @@
             locfile="../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="3."
-            sum="44c614a50b08074d24aa7bdca4bd7b03"
+            sum="c8aeebf83ab1acc28f63aae6346129de"
             proved="true"
             expanded="false"
-            shape="Camixfix []V12V13aFiniteVainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13adiffaedgesV8Iainfix &lt;alengthV16V2IapathasV16V15FaInfinitetIamemV13averticesFICamixfix []V12V17aFiniteVainfix &gt;=ainfix +apath_weightV20V19aweightV19V17V18IamemaTuple2V19V17aaddaTuple2V9V10V7Iainfix &lt;alengthV20V2IapathasV20V19FAainfix &gt;=apath_weightV21V17V18Iainfix &lt;alengthV21V2IapathasV21V17FAainfix =apath_weightV22V17V18AapathasV22V17EaInfiniteainfix &gt;=alengthV24V2IapathasV24V23FIamemaTuple2V23V17aaddaTuple2V9V10V7FAainfix &gt;=alengthV25V2IapathasV25V17FIamemV17averticesFFICamixfix []V5V26aFiniteVainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26V7Iainfix &lt;alengthV29V2IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V2IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaInfiniteainfix &gt;=alengthV33V2IapathasV33V32FIamemaTuple2V32V26V7FAainfix &gt;=alengthV34V2IapathasV34V26FIamemV26averticesFAamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIamemV35V4NFNLadiffaedgesV4Iainfix =V6aTrueNIamemV36V4NFqainfix =V6aTrueFICamixfix []V5V37aFiniteVainfix &gt;=ainfix +apath_weightV40V39aweightV39V37V38IamemaTuple2V39V37adiffaedgesV4Iainfix &lt;alengthV40V2IapathasV40V39FAainfix &gt;=apath_weightV41V37V38Iainfix &lt;alengthV41V2IapathasV41V37FAainfix =apath_weightV42V37V38AapathasV42V37EaInfiniteainfix &gt;=alengthV44V2IapathasV44V43FIamemaTuple2V43V37adiffaedgesV4FAainfix &gt;=alengthV45V2IapathasV45V37FIamemV37averticesFAamemV46aedgesIamemV46V4FFIainfix =V3aedgesFICamixfix []V1V47aFiniteVainfix &gt;=ainfix +apath_weightV50V49aweightV49V47V48IamemaTuple2V49V47aemptyIainfix &lt;alengthV50V2IapathasV50V49FAainfix &gt;=apath_weightV51V47V48Iainfix &lt;alengthV51V2IapathasV51V47FAainfix =apath_weightV52V47V48AapathasV52V47EaInfiniteainfix &gt;=alengthV54V2IapathasV54V53FIamemaTuple2V53V47aemptyFAainfix &gt;=alengthV55V2IapathasV55V47FIamemV47averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+            shape="Cainfix &gt;=ainfix +apath_weightV16V15aweightV15V13V14IamemaTuple2V15V13adiffaedgesV8Iainfix &lt;alengthV16V2IapathasV16V15FaFiniteVtaInfiniteamixfix []V12V13IamemV13averticesFICainfix &gt;=ainfix +apath_weightV20V19aweightV19V17V18IamemaTuple2V19V17aaddaTuple2V9V10V7Iainfix &lt;alengthV20V2IapathasV20V19FAainfix &gt;=apath_weightV21V17V18Iainfix &lt;alengthV21V2IapathasV21V17FAainfix =apath_weightV22V17V18AapathasV22V17EaFiniteVainfix &gt;=alengthV24V2IapathasV24V23FIamemaTuple2V23V17aaddaTuple2V9V10V7FAainfix &gt;=alengthV25V2IapathasV25V17FaInfiniteamixfix []V12V17IamemV17averticesFFICainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26V7Iainfix &lt;alengthV29V2IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V2IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaFiniteVainfix &gt;=alengthV33V2IapathasV33V32FIamemaTuple2V32V26V7FAainfix &gt;=alengthV34V2IapathasV34V26FaInfiniteamixfix []V5V26IamemV26averticesFANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINNamemV35V4FLadiffaedgesV4INainfix =V6aTrueINamemV36V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV40V39aweightV39V37V38IamemaTuple2V39V37adiffaedgesV4Iainfix &lt;alengthV40V2IapathasV40V39FAainfix &gt;=apath_weightV41V37V38Iainfix &lt;alengthV41V2IapathasV41V37FAainfix =apath_weightV42V37V38AapathasV42V37EaFiniteVainfix &gt;=alengthV44V2IapathasV44V43FIamemaTuple2V43V37adiffaedgesV4FAainfix &gt;=alengthV45V2IapathasV45V37FaInfiniteamixfix []V5V37IamemV37averticesFAamemV46aedgesIamemV46V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV50V49aweightV49V47V48IamemaTuple2V49V47aemptyIainfix &lt;alengthV50V2IapathasV50V49FAainfix &gt;=apath_weightV51V47V48Iainfix &lt;alengthV51V2IapathasV51V47FAainfix =apath_weightV52V47V48AapathasV52V47EaFiniteVainfix &gt;=alengthV54V2IapathasV54V53FIamemaTuple2V53V47aemptyFAainfix &gt;=alengthV55V2IapathasV55V47FaInfiniteamixfix []V1V47IamemV47averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
             <label
              name="expl:VC for bellman_ford"/>
             <proof
@@ -1124,10 +1068,10 @@
             locfile="../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="4."
-            sum="b78962724dc0d22d595e3e07278501e4"
+            sum="ac03cc92f2eeed673da6e0291510283f"
             proved="true"
             expanded="false"
-            shape="Camixfix []V12V13aFiniteVtaInfiniteainfix &gt;=alengthV15V2IapathasV15V13FIamemV13averticesFICamixfix []V12V16aFiniteVainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aaddaTuple2V9V10V7Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaInfiniteainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aaddaTuple2V9V10V7FAainfix &gt;=alengthV24V2IapathasV24V16FIamemV16averticesFFICamixfix []V5V25aFiniteVainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25V7Iainfix &lt;alengthV28V2IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V2IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaInfiniteainfix &gt;=alengthV32V2IapathasV32V31FIamemaTuple2V31V25V7FAainfix &gt;=alengthV33V2IapathasV33V25FIamemV25averticesFAamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIamemV34V4NFNLadiffaedgesV4Iainfix =V6aTrueNIamemV35V4NFqainfix =V6aTrueFICamixfix []V5V36aFiniteVainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36adiffaedgesV4Iainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaInfiniteainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36adiffaedgesV4FAainfix &gt;=alengthV44V2IapathasV44V36FIamemV36averticesFAamemV45aedgesIamemV45V4FFIainfix =V3aedgesFICamixfix []V1V46aFiniteVainfix &gt;=ainfix +apath_weightV49V48aweightV48V46V47IamemaTuple2V48V46aemptyIainfix &lt;alengthV49V2IapathasV49V48FAainfix &gt;=apath_weightV50V46V47Iainfix &lt;alengthV50V2IapathasV50V46FAainfix =apath_weightV51V46V47AapathasV51V46EaInfiniteainfix &gt;=alengthV53V2IapathasV53V52FIamemaTuple2V52V46aemptyFAainfix &gt;=alengthV54V2IapathasV54V46FIamemV46averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+            shape="CtaFiniteVainfix &gt;=alengthV15V2IapathasV15V13FaInfiniteamixfix []V12V13IamemV13averticesFICainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aaddaTuple2V9V10V7Iainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaFiniteVainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aaddaTuple2V9V10V7FAainfix &gt;=alengthV24V2IapathasV24V16FaInfiniteamixfix []V12V16IamemV16averticesFFICainfix &gt;=ainfix +apath_weightV28V27aweightV27V25V26IamemaTuple2V27V25V7Iainfix &lt;alengthV28V2IapathasV28V27FAainfix &gt;=apath_weightV29V25V26Iainfix &lt;alengthV29V2IapathasV29V25FAainfix =apath_weightV30V25V26AapathasV30V25EaFiniteVainfix &gt;=alengthV32V2IapathasV32V31FIamemaTuple2V31V25V7FAainfix &gt;=alengthV33V2IapathasV33V25FaInfiniteamixfix []V5V25IamemV25averticesFANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINNamemV34V4FLadiffaedgesV4INainfix =V6aTrueINamemV35V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36adiffaedgesV4Iainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaFiniteVainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36adiffaedgesV4FAainfix &gt;=alengthV44V2IapathasV44V36FaInfiniteamixfix []V5V36IamemV36averticesFAamemV45aedgesIamemV45V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV49V48aweightV48V46V47IamemaTuple2V48V46aemptyIainfix &lt;alengthV49V2IapathasV49V48FAainfix &gt;=apath_weightV50V46V47Iainfix &lt;alengthV50V2IapathasV50V46FAainfix =apath_weightV51V46V47AapathasV51V46EaFiniteVainfix &gt;=alengthV53V2IapathasV53V52FIamemaTuple2V52V46aemptyFAainfix &gt;=alengthV54V2IapathasV54V46FaInfiniteamixfix []V1V46IamemV46averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
             <label
              name="expl:VC for bellman_ford"/>
             <proof
@@ -1152,10 +1096,10 @@
             locfile="../bellman_ford.mlw"
             loclnum="186" loccnumb="6" loccnume="18"
             expl="5."
-            sum="5ff460ae222039e1c18a52c941329369"
+            sum="6cb40331379f0d546ca33b78429b377a"
             proved="true"
             expanded="false"
-            shape="Camixfix []V12V13aFiniteVtaInfiniteainfix &gt;=alengthV16V2IapathasV16V15FIamemaTuple2V15V13adiffaedgesV8FIamemV13averticesFICamixfix []V12V17aFiniteVainfix &gt;=ainfix +apath_weightV20V19aweightV19V17V18IamemaTuple2V19V17aaddaTuple2V9V10V7Iainfix &lt;alengthV20V2IapathasV20V19FAainfix &gt;=apath_weightV21V17V18Iainfix &lt;alengthV21V2IapathasV21V17FAainfix =apath_weightV22V17V18AapathasV22V17EaInfiniteainfix &gt;=alengthV24V2IapathasV24V23FIamemaTuple2V23V17aaddaTuple2V9V10V7FAainfix &gt;=alengthV25V2IapathasV25V17FIamemV17averticesFFICamixfix []V5V26aFiniteVainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26V7Iainfix &lt;alengthV29V2IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V2IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaInfiniteainfix &gt;=alengthV33V2IapathasV33V32FIamemaTuple2V32V26V7FAainfix &gt;=alengthV34V2IapathasV34V26FIamemV26averticesFAamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIamemV35V4NFNLadiffaedgesV4Iainfix =V6aTrueNIamemV36V4NFqainfix =V6aTrueFICamixfix []V5V37aFiniteVainfix &gt;=ainfix +apath_weightV40V39aweightV39V37V38IamemaTuple2V39V37adiffaedgesV4Iainfix &lt;alengthV40V2IapathasV40V39FAainfix &gt;=apath_weightV41V37V38Iainfix &lt;alengthV41V2IapathasV41V37FAainfix =apath_weightV42V37V38AapathasV42V37EaInfiniteainfix &gt;=alengthV44V2IapathasV44V43FIamemaTuple2V43V37adiffaedgesV4FAainfix &gt;=alengthV45V2IapathasV45V37FIamemV37averticesFAamemV46aedgesIamemV46V4FFIainfix =V3aedgesFICamixfix []V1V47aFiniteVainfix &gt;=ainfix +apath_weightV50V49aweightV49V47V48IamemaTuple2V49V47aemptyIainfix &lt;alengthV50V2IapathasV50V49FAainfix &gt;=apath_weightV51V47V48Iainfix &lt;alengthV51V2IapathasV51V47FAainfix =apath_weightV52V47V48AapathasV52V47EaInfiniteainfix &gt;=alengthV54V2IapathasV54V53FIamemaTuple2V53V47aemptyFAainfix &gt;=alengthV55V2IapathasV55V47FIamemV47averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+            shape="CtaFiniteVainfix &gt;=alengthV16V2IapathasV16V15FIamemaTuple2V15V13adiffaedgesV8FaInfiniteamixfix []V12V13IamemV13averticesFICainfix &gt;=ainfix +apath_weightV20V19aweightV19V17V18IamemaTuple2V19V17aaddaTuple2V9V10V7Iainfix &lt;alengthV20V2IapathasV20V19FAainfix &gt;=apath_weightV21V17V18Iainfix &lt;alengthV21V2IapathasV21V17FAainfix =apath_weightV22V17V18AapathasV22V17EaFiniteVainfix &gt;=alengthV24V2IapathasV24V23FIamemaTuple2V23V17aaddaTuple2V9V10V7FAainfix &gt;=alengthV25V2IapathasV25V17FaInfiniteamixfix []V12V17IamemV17averticesFFICainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26V7Iainfix &lt;alengthV29V2IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V2IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaFiniteVainfix &gt;=alengthV33V2IapathasV33V32FIamemaTuple2V32V26V7FAainfix &gt;=alengthV34V2IapathasV34V26FaInfiniteamixfix []V5V26IamemV26averticesFANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix =c1V2Oainfix &lt;c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINNamemV35V4FLadiffaedgesV4INainfix =V6aTrueINamemV36V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV40V39aweightV39V37V38IamemaTuple2V39V37adiffaedgesV4Iainfix &lt;alengthV40V2IapathasV40V39FAainfix &gt;=apath_weightV41V37V38Iainfix &lt;alengthV41V2IapathasV41V37FAainfix =apath_weightV42V37V38AapathasV42V37EaFiniteVainfix &gt;=alengthV44V2IapathasV44V43FIamemaTuple2V43V37adiffaedgesV4FAainfix &gt;=alengthV45V2IapathasV45V37FaInfiniteamixfix []V5V37IamemV37averticesFAamemV46aedgesIamemV46V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV50V49aweightV49V47V48IamemaTuple2V49V47aemptyIainfix &lt;alengthV50V2IapathasV50V49FAainfix &gt;=apath_weightV51V47V48Iainfix &lt;alengthV51V2IapathasV51V47FAainfix =apath_weightV52V47V48AapathasV52V47EaFiniteVainfix &gt;=alengthV54V2IapathasV54V53FIamemaTuple2V53V47aemptyFAainfix &gt;=alengthV55V2IapathasV55V47FaInfiniteamixfix []V1V47IamemV47averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
             <label
              name="expl:VC for bellman_ford"/>
             <proof
@@ -1164,7 +1108,7 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="10.72"/>
+             <result status="valid" time="16.26"/>
             </proof>
             <proof
              prover="2"
@@ -1186,10 +1130,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="15. loop variant decrease"
-      sum="6c1e0ad7b70ecd8a2da861cd2c2400e9"
+      sum="805d2a672ae39afbd02641b4bdcd43f7"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4Iainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7AamemaTuple2V9V10V7NAamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFIais_emptyV4NLadiffaedgesV4Iainfix =V6aTrueNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop variant decreaseainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4Iainv1V12V2aaddaTuple2V9V10V7FIainv1V5V2V7ANamemaTuple2V9V10V7AamemaTuple2V9V10aedgesAainfix &lt;=c1V2Iainfix =V8aremoveV11V4AamemV11V4LaTuple2V9V10FFINais_emptyV4LadiffaedgesV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1206,10 +1150,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="16. assertion"
-      sum="6fcb72fceaadefd4f4c416fcff1cb6f3"
+      sum="6769288f015e142b1b90248f9acda846"
       proved="true"
       expanded="false"
-      shape="ainv1V5V2aedgesIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="assertionainv1V5V2aedgesINNainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -1221,10 +1165,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1. assertion"
-        sum="6211dadcd03c269871d324b1c7aeece3"
+        sum="0f5a3a261601ee467cb86dd195ed58ef"
         proved="true"
         expanded="false"
-        shape="Camixfix []V5V7aFiniteVainfix &gt;=ainfix +apath_weightV10V9aweightV9V7V8IamemaTuple2V9V7aedgesIainfix &lt;alengthV10V2IapathasV10V9FAainfix &gt;=apath_weightV11V7V8Iainfix &lt;alengthV11V2IapathasV11V7FAainfix =apath_weightV12V7V8AapathasV12V7EaInfiniteainfix &gt;=alengthV14V2IapathasV14V13FIamemaTuple2V13V7aedgesFAainfix &gt;=alengthV15V2IapathasV15V7FIamemV7averticesFIainfix =V6aTrueNNIamemV16V4NFqainfix =V6aTrueFICamixfix []V5V17aFiniteVainfix &gt;=ainfix +apath_weightV20V19aweightV19V17V18IamemaTuple2V19V17adiffaedgesV4Iainfix &lt;alengthV20V2IapathasV20V19FAainfix &gt;=apath_weightV21V17V18Iainfix &lt;alengthV21V2IapathasV21V17FAainfix =apath_weightV22V17V18AapathasV22V17EaInfiniteainfix &gt;=alengthV24V2IapathasV24V23FIamemaTuple2V23V17adiffaedgesV4FAainfix &gt;=alengthV25V2IapathasV25V17FIamemV17averticesFAamemV26aedgesIamemV26V4FFIainfix =V3aedgesFICamixfix []V1V27aFiniteVainfix &gt;=ainfix +apath_weightV30V29aweightV29V27V28IamemaTuple2V29V27aemptyIainfix &lt;alengthV30V2IapathasV30V29FAainfix &gt;=apath_weightV31V27V28Iainfix &lt;alengthV31V2IapathasV31V27FAainfix =apath_weightV32V27V28AapathasV32V27EaInfiniteainfix &gt;=alengthV34V2IapathasV34V33FIamemaTuple2V33V27aemptyFAainfix &gt;=alengthV35V2IapathasV35V27FIamemV27averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+        shape="assertionCainfix &gt;=ainfix +apath_weightV10V9aweightV9V7V8IamemaTuple2V9V7aedgesIainfix &lt;alengthV10V2IapathasV10V9FAainfix &gt;=apath_weightV11V7V8Iainfix &lt;alengthV11V2IapathasV11V7FAainfix =apath_weightV12V7V8AapathasV12V7EaFiniteVainfix &gt;=alengthV14V2IapathasV14V13FIamemaTuple2V13V7aedgesFAainfix &gt;=alengthV15V2IapathasV15V7FaInfiniteamixfix []V5V7IamemV7averticesFINNainfix =V6aTrueINamemV16V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV20V19aweightV19V17V18IamemaTuple2V19V17adiffaedgesV4Iainfix &lt;alengthV20V2IapathasV20V19FAainfix &gt;=apath_weightV21V17V18Iainfix &lt;alengthV21V2IapathasV21V17FAainfix =apath_weightV22V17V18AapathasV22V17EaFiniteVainfix &gt;=alengthV24V2IapathasV24V23FIamemaTuple2V23V17adiffaedgesV4FAainfix &gt;=alengthV25V2IapathasV25V17FaInfiniteamixfix []V5V17IamemV17averticesFAamemV26aedgesIamemV26V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV30V29aweightV29V27V28IamemaTuple2V29V27aemptyIainfix &lt;alengthV30V2IapathasV30V29FAainfix &gt;=apath_weightV31V27V28Iainfix &lt;alengthV31V2IapathasV31V27FAainfix =apath_weightV32V27V28AapathasV32V27EaFiniteVainfix &gt;=alengthV34V2IapathasV34V33FIamemaTuple2V33V27aemptyFAainfix &gt;=alengthV35V2IapathasV35V27FaInfiniteamixfix []V1V27IamemV27averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -1243,10 +1187,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="17. loop invariant preservation"
-      sum="8402e8cb8e2e260361dcd8b319311afa"
+      sum="de29bbfcc0193940aead45bd232c467b"
       proved="true"
       expanded="false"
-      shape="ainv1V5ainfix +V2c1aemptyIainv1V5V2aedgesIainfix =V6aTrueNNIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant preservationainv1V5ainfix +V2c1aemptyIainv1V5V2aedgesINNainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainv1V5V2adiffaedgesV4AasubsetV4aedgesFIainfix =V3aedgesFIainv1V1V2aemptyIainfix &lt;=V2V0Aainfix &lt;=c1V2FFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -1258,10 +1202,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1. loop invariant preservation"
-        sum="3c2088db267e91cc6dfac6a966de6d16"
+        sum="577d3e46eae3d36aa5474e570cd0415c"
         proved="true"
         expanded="false"
-        shape="Camixfix []V5V7aFiniteVainfix &gt;=ainfix +apath_weightV10V9aweightV9V7V8IamemaTuple2V9V7aemptyIainfix &lt;alengthV10ainfix +V2c1IapathasV10V9FAainfix &gt;=apath_weightV11V7V8Iainfix &lt;alengthV11ainfix +V2c1IapathasV11V7FAainfix =apath_weightV12V7V8AapathasV12V7EaInfiniteainfix &gt;=alengthV14ainfix +V2c1IapathasV14V13FIamemaTuple2V13V7aemptyFAainfix &gt;=alengthV15ainfix +V2c1IapathasV15V7FIamemV7averticesFICamixfix []V5V16aFiniteVainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aedgesIainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaInfiniteainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aedgesFAainfix &gt;=alengthV24V2IapathasV24V16FIamemV16averticesFIainfix =V6aTrueNNIamemV25V4NFqainfix =V6aTrueFICamixfix []V5V26aFiniteVainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26adiffaedgesV4Iainfix &lt;alengthV29V2IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V2IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaInfiniteainfix &gt;=alengthV33V2IapathasV33V32FIamemaTuple2V32V26adiffaedgesV4FAainfix &gt;=alengthV34V2IapathasV34V26FIamemV26averticesFAamemV35aedgesIamemV35V4FFIainfix =V3aedgesFICamixfix []V1V36aFiniteVainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36aemptyIainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaInfiniteainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36aemptyFAainfix &gt;=alengthV44V2IapathasV44V36FIamemV36averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+        shape="loop invariant preservationCainfix &gt;=ainfix +apath_weightV10V9aweightV9V7V8IamemaTuple2V9V7aemptyIainfix &lt;alengthV10ainfix +V2c1IapathasV10V9FAainfix &gt;=apath_weightV11V7V8Iainfix &lt;alengthV11ainfix +V2c1IapathasV11V7FAainfix =apath_weightV12V7V8AapathasV12V7EaFiniteVainfix &gt;=alengthV14ainfix +V2c1IapathasV14V13FIamemaTuple2V13V7aemptyFAainfix &gt;=alengthV15ainfix +V2c1IapathasV15V7FaInfiniteamixfix []V5V7IamemV7averticesFICainfix &gt;=ainfix +apath_weightV19V18aweightV18V16V17IamemaTuple2V18V16aedgesIainfix &lt;alengthV19V2IapathasV19V18FAainfix &gt;=apath_weightV20V16V17Iainfix &lt;alengthV20V2IapathasV20V16FAainfix =apath_weightV21V16V17AapathasV21V16EaFiniteVainfix &gt;=alengthV23V2IapathasV23V22FIamemaTuple2V22V16aedgesFAainfix &gt;=alengthV24V2IapathasV24V16FaInfiniteamixfix []V5V16IamemV16averticesFINNainfix =V6aTrueINamemV25V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV29V28aweightV28V26V27IamemaTuple2V28V26adiffaedgesV4Iainfix &lt;alengthV29V2IapathasV29V28FAainfix &gt;=apath_weightV30V26V27Iainfix &lt;alengthV30V2IapathasV30V26FAainfix =apath_weightV31V26V27AapathasV31V26EaFiniteVainfix &gt;=alengthV33V2IapathasV33V32FIamemaTuple2V32V26adiffaedgesV4FAainfix &gt;=alengthV34V2IapathasV34V26FaInfiniteamixfix []V5V26IamemV26averticesFAamemV35aedgesIamemV35V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV39V38aweightV38V36V37IamemaTuple2V38V36aemptyIainfix &lt;alengthV39V2IapathasV39V38FAainfix &gt;=apath_weightV40V36V37Iainfix &lt;alengthV40V2IapathasV40V36FAainfix =apath_weightV41V36V37AapathasV41V36EaFiniteVainfix &gt;=alengthV43V2IapathasV43V42FIamemaTuple2V42V36aemptyFAainfix &gt;=alengthV44V2IapathasV44V36FaInfiniteamixfix []V1V36IamemV36averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <transf
@@ -1273,10 +1217,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="1. loop invariant preservation"
-          sum="fa24335563eb229e84547eea07614774"
+          sum="c781a7f1eeb968a7b6243a834bbfb240"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V7aFiniteVainfix =apath_weightV9V7V8AapathasV9V7EaInfinitetIamemV7averticesFICamixfix []V5V10aFiniteVainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10aedgesIainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaInfiniteainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10aedgesFAainfix &gt;=alengthV18V2IapathasV18V10FIamemV10averticesFIainfix =V6aTrueNNIamemV19V4NFqainfix =V6aTrueFICamixfix []V5V20aFiniteVainfix &gt;=ainfix +apath_weightV23V22aweightV22V20V21IamemaTuple2V22V20adiffaedgesV4Iainfix &lt;alengthV23V2IapathasV23V22FAainfix &gt;=apath_weightV24V20V21Iainfix &lt;alengthV24V2IapathasV24V20FAainfix =apath_weightV25V20V21AapathasV25V20EaInfiniteainfix &gt;=alengthV27V2IapathasV27V26FIamemaTuple2V26V20adiffaedgesV4FAainfix &gt;=alengthV28V2IapathasV28V20FIamemV20averticesFAamemV29aedgesIamemV29V4FFIainfix =V3aedgesFICamixfix []V1V30aFiniteVainfix &gt;=ainfix +apath_weightV33V32aweightV32V30V31IamemaTuple2V32V30aemptyIainfix &lt;alengthV33V2IapathasV33V32FAainfix &gt;=apath_weightV34V30V31Iainfix &lt;alengthV34V2IapathasV34V30FAainfix =apath_weightV35V30V31AapathasV35V30EaInfiniteainfix &gt;=alengthV37V2IapathasV37V36FIamemaTuple2V36V30aemptyFAainfix &gt;=alengthV38V2IapathasV38V30FIamemV30averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+          shape="loop invariant preservationCainfix =apath_weightV9V7V8AapathasV9V7EaFiniteVtaInfiniteamixfix []V5V7IamemV7averticesFICainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10aedgesIainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaFiniteVainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10aedgesFAainfix &gt;=alengthV18V2IapathasV18V10FaInfiniteamixfix []V5V10IamemV10averticesFINNainfix =V6aTrueINamemV19V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV23V22aweightV22V20V21IamemaTuple2V22V20adiffaedgesV4Iainfix &lt;alengthV23V2IapathasV23V22FAainfix &gt;=apath_weightV24V20V21Iainfix &lt;alengthV24V2IapathasV24V20FAainfix =apath_weightV25V20V21AapathasV25V20EaFiniteVainfix &gt;=alengthV27V2IapathasV27V26FIamemaTuple2V26V20adiffaedgesV4FAainfix &gt;=alengthV28V2IapathasV28V20FaInfiniteamixfix []V5V20IamemV20averticesFAamemV29aedgesIamemV29V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV33V32aweightV32V30V31IamemaTuple2V32V30aemptyIainfix &lt;alengthV33V2IapathasV33V32FAainfix &gt;=apath_weightV34V30V31Iainfix &lt;alengthV34V2IapathasV34V30FAainfix =apath_weightV35V30V31AapathasV35V30EaFiniteVainfix &gt;=alengthV37V2IapathasV37V36FIamemaTuple2V36V30aemptyFAainfix &gt;=alengthV38V2IapathasV38V30FaInfiniteamixfix []V1V30IamemV30averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
           <label
            name="expl:VC for bellman_ford"/>
           <proof
@@ -1293,10 +1237,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="2. loop invariant preservation"
-          sum="11f1b628fc40b7d434584d3ba821f4ea"
+          sum="c53fd62b9c1096de99fe1acf9ab86e3d"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V7aFiniteVainfix &gt;=apath_weightV9V7V8Iainfix &lt;alengthV9ainfix +V2c1IapathasV9V7FaInfinitetIamemV7averticesFICamixfix []V5V10aFiniteVainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10aedgesIainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaInfiniteainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10aedgesFAainfix &gt;=alengthV18V2IapathasV18V10FIamemV10averticesFIainfix =V6aTrueNNIamemV19V4NFqainfix =V6aTrueFICamixfix []V5V20aFiniteVainfix &gt;=ainfix +apath_weightV23V22aweightV22V20V21IamemaTuple2V22V20adiffaedgesV4Iainfix &lt;alengthV23V2IapathasV23V22FAainfix &gt;=apath_weightV24V20V21Iainfix &lt;alengthV24V2IapathasV24V20FAainfix =apath_weightV25V20V21AapathasV25V20EaInfiniteainfix &gt;=alengthV27V2IapathasV27V26FIamemaTuple2V26V20adiffaedgesV4FAainfix &gt;=alengthV28V2IapathasV28V20FIamemV20averticesFAamemV29aedgesIamemV29V4FFIainfix =V3aedgesFICamixfix []V1V30aFiniteVainfix &gt;=ainfix +apath_weightV33V32aweightV32V30V31IamemaTuple2V32V30aemptyIainfix &lt;alengthV33V2IapathasV33V32FAainfix &gt;=apath_weightV34V30V31Iainfix &lt;alengthV34V2IapathasV34V30FAainfix =apath_weightV35V30V31AapathasV35V30EaInfiniteainfix &gt;=alengthV37V2IapathasV37V36FIamemaTuple2V36V30aemptyFAainfix &gt;=alengthV38V2IapathasV38V30FIamemV30averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+          shape="loop invariant preservationCainfix &gt;=apath_weightV9V7V8Iainfix &lt;alengthV9ainfix +V2c1IapathasV9V7FaFiniteVtaInfiniteamixfix []V5V7IamemV7averticesFICainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10aedgesIainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaFiniteVainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10aedgesFAainfix &gt;=alengthV18V2IapathasV18V10FaInfiniteamixfix []V5V10IamemV10averticesFINNainfix =V6aTrueINamemV19V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV23V22aweightV22V20V21IamemaTuple2V22V20adiffaedgesV4Iainfix &lt;alengthV23V2IapathasV23V22FAainfix &gt;=apath_weightV24V20V21Iainfix &lt;alengthV24V2IapathasV24V20FAainfix =apath_weightV25V20V21AapathasV25V20EaFiniteVainfix &gt;=alengthV27V2IapathasV27V26FIamemaTuple2V26V20adiffaedgesV4FAainfix &gt;=alengthV28V2IapathasV28V20FaInfiniteamixfix []V5V20IamemV20averticesFAamemV29aedgesIamemV29V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV33V32aweightV32V30V31IamemaTuple2V32V30aemptyIainfix &lt;alengthV33V2IapathasV33V32FAainfix &gt;=apath_weightV34V30V31Iainfix &lt;alengthV34V2IapathasV34V30FAainfix =apath_weightV35V30V31AapathasV35V30EaFiniteVainfix &gt;=alengthV37V2IapathasV37V36FIamemaTuple2V36V30aemptyFAainfix &gt;=alengthV38V2IapathasV38V30FaInfiniteamixfix []V1V30IamemV30averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
           <label
            name="expl:VC for bellman_ford"/>
           <proof
@@ -1314,10 +1258,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="3. loop invariant preservation"
-          sum="63dcd016e3e32b70967cb78f69446a4a"
+          sum="7648f419b3d0dad2add8b1ddc0ed14f7"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V7aFiniteVainfix &gt;=ainfix +apath_weightV10V9aweightV9V7V8IamemaTuple2V9V7aemptyIainfix &lt;alengthV10ainfix +V2c1IapathasV10V9FaInfinitetIamemV7averticesFICamixfix []V5V11aFiniteVainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11aedgesIainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaInfiniteainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11aedgesFAainfix &gt;=alengthV19V2IapathasV19V11FIamemV11averticesFIainfix =V6aTrueNNIamemV20V4NFqainfix =V6aTrueFICamixfix []V5V21aFiniteVainfix &gt;=ainfix +apath_weightV24V23aweightV23V21V22IamemaTuple2V23V21adiffaedgesV4Iainfix &lt;alengthV24V2IapathasV24V23FAainfix &gt;=apath_weightV25V21V22Iainfix &lt;alengthV25V2IapathasV25V21FAainfix =apath_weightV26V21V22AapathasV26V21EaInfiniteainfix &gt;=alengthV28V2IapathasV28V27FIamemaTuple2V27V21adiffaedgesV4FAainfix &gt;=alengthV29V2IapathasV29V21FIamemV21averticesFAamemV30aedgesIamemV30V4FFIainfix =V3aedgesFICamixfix []V1V31aFiniteVainfix &gt;=ainfix +apath_weightV34V33aweightV33V31V32IamemaTuple2V33V31aemptyIainfix &lt;alengthV34V2IapathasV34V33FAainfix &gt;=apath_weightV35V31V32Iainfix &lt;alengthV35V2IapathasV35V31FAainfix =apath_weightV36V31V32AapathasV36V31EaInfiniteainfix &gt;=alengthV38V2IapathasV38V37FIamemaTuple2V37V31aemptyFAainfix &gt;=alengthV39V2IapathasV39V31FIamemV31averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+          shape="loop invariant preservationCainfix &gt;=ainfix +apath_weightV10V9aweightV9V7V8IamemaTuple2V9V7aemptyIainfix &lt;alengthV10ainfix +V2c1IapathasV10V9FaFiniteVtaInfiniteamixfix []V5V7IamemV7averticesFICainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11aedgesIainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaFiniteVainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11aedgesFAainfix &gt;=alengthV19V2IapathasV19V11FaInfiniteamixfix []V5V11IamemV11averticesFINNainfix =V6aTrueINamemV20V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV24V23aweightV23V21V22IamemaTuple2V23V21adiffaedgesV4Iainfix &lt;alengthV24V2IapathasV24V23FAainfix &gt;=apath_weightV25V21V22Iainfix &lt;alengthV25V2IapathasV25V21FAainfix =apath_weightV26V21V22AapathasV26V21EaFiniteVainfix &gt;=alengthV28V2IapathasV28V27FIamemaTuple2V27V21adiffaedgesV4FAainfix &gt;=alengthV29V2IapathasV29V21FaInfiniteamixfix []V5V21IamemV21averticesFAamemV30aedgesIamemV30V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV34V33aweightV33V31V32IamemaTuple2V33V31aemptyIainfix &lt;alengthV34V2IapathasV34V33FAainfix &gt;=apath_weightV35V31V32Iainfix &lt;alengthV35V2IapathasV35V31FAainfix =apath_weightV36V31V32AapathasV36V31EaFiniteVainfix &gt;=alengthV38V2IapathasV38V37FIamemaTuple2V37V31aemptyFAainfix &gt;=alengthV39V2IapathasV39V31FaInfiniteamixfix []V1V31IamemV31averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
           <label
            name="expl:VC for bellman_ford"/>
           <proof
@@ -1350,10 +1294,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="4. loop invariant preservation"
-          sum="c7019e2f7626aed55d12bf3e57ebf305"
+          sum="bdc6c0652b73fea1af1ad9050d8c3c7c"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V7aFiniteVtaInfiniteainfix &gt;=alengthV9ainfix +V2c1IapathasV9V7FIamemV7averticesFICamixfix []V5V10aFiniteVainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10aedgesIainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaInfiniteainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10aedgesFAainfix &gt;=alengthV18V2IapathasV18V10FIamemV10averticesFIainfix =V6aTrueNNIamemV19V4NFqainfix =V6aTrueFICamixfix []V5V20aFiniteVainfix &gt;=ainfix +apath_weightV23V22aweightV22V20V21IamemaTuple2V22V20adiffaedgesV4Iainfix &lt;alengthV23V2IapathasV23V22FAainfix &gt;=apath_weightV24V20V21Iainfix &lt;alengthV24V2IapathasV24V20FAainfix =apath_weightV25V20V21AapathasV25V20EaInfiniteainfix &gt;=alengthV27V2IapathasV27V26FIamemaTuple2V26V20adiffaedgesV4FAainfix &gt;=alengthV28V2IapathasV28V20FIamemV20averticesFAamemV29aedgesIamemV29V4FFIainfix =V3aedgesFICamixfix []V1V30aFiniteVainfix &gt;=ainfix +apath_weightV33V32aweightV32V30V31IamemaTuple2V32V30aemptyIainfix &lt;alengthV33V2IapathasV33V32FAainfix &gt;=apath_weightV34V30V31Iainfix &lt;alengthV34V2IapathasV34V30FAainfix =apath_weightV35V30V31AapathasV35V30EaInfiniteainfix &gt;=alengthV37V2IapathasV37V36FIamemaTuple2V36V30aemptyFAainfix &gt;=alengthV38V2IapathasV38V30FIamemV30averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+          shape="loop invariant preservationCtaFiniteVainfix &gt;=alengthV9ainfix +V2c1IapathasV9V7FaInfiniteamixfix []V5V7IamemV7averticesFICainfix &gt;=ainfix +apath_weightV13V12aweightV12V10V11IamemaTuple2V12V10aedgesIainfix &lt;alengthV13V2IapathasV13V12FAainfix &gt;=apath_weightV14V10V11Iainfix &lt;alengthV14V2IapathasV14V10FAainfix =apath_weightV15V10V11AapathasV15V10EaFiniteVainfix &gt;=alengthV17V2IapathasV17V16FIamemaTuple2V16V10aedgesFAainfix &gt;=alengthV18V2IapathasV18V10FaInfiniteamixfix []V5V10IamemV10averticesFINNainfix =V6aTrueINamemV19V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV23V22aweightV22V20V21IamemaTuple2V22V20adiffaedgesV4Iainfix &lt;alengthV23V2IapathasV23V22FAainfix &gt;=apath_weightV24V20V21Iainfix &lt;alengthV24V2IapathasV24V20FAainfix =apath_weightV25V20V21AapathasV25V20EaFiniteVainfix &gt;=alengthV27V2IapathasV27V26FIamemaTuple2V26V20adiffaedgesV4FAainfix &gt;=alengthV28V2IapathasV28V20FaInfiniteamixfix []V5V20IamemV20averticesFAamemV29aedgesIamemV29V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV33V32aweightV32V30V31IamemaTuple2V32V30aemptyIainfix &lt;alengthV33V2IapathasV33V32FAainfix &gt;=apath_weightV34V30V31Iainfix &lt;alengthV34V2IapathasV34V30FAainfix =apath_weightV35V30V31AapathasV35V30EaFiniteVainfix &gt;=alengthV37V2IapathasV37V36FIamemaTuple2V36V30aemptyFAainfix &gt;=alengthV38V2IapathasV38V30FaInfiniteamixfix []V1V30IamemV30averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
           <label
            name="expl:VC for bellman_ford"/>
           <proof
@@ -1371,10 +1315,10 @@
           locfile="../bellman_ford.mlw"
           loclnum="186" loccnumb="6" loccnume="18"
           expl="5. loop invariant preservation"
-          sum="d42126bb23ced179c2a69f741ec686ab"
+          sum="44f6335d3d5d2acaafc551c9e441712e"
           proved="true"
           expanded="false"
-          shape="Camixfix []V5V7aFiniteVtaInfiniteainfix &gt;=alengthV10ainfix +V2c1IapathasV10V9FIamemaTuple2V9V7aemptyFIamemV7averticesFICamixfix []V5V11aFiniteVainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11aedgesIainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaInfiniteainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11aedgesFAainfix &gt;=alengthV19V2IapathasV19V11FIamemV11averticesFIainfix =V6aTrueNNIamemV20V4NFqainfix =V6aTrueFICamixfix []V5V21aFiniteVainfix &gt;=ainfix +apath_weightV24V23aweightV23V21V22IamemaTuple2V23V21adiffaedgesV4Iainfix &lt;alengthV24V2IapathasV24V23FAainfix &gt;=apath_weightV25V21V22Iainfix &lt;alengthV25V2IapathasV25V21FAainfix =apath_weightV26V21V22AapathasV26V21EaInfiniteainfix &gt;=alengthV28V2IapathasV28V27FIamemaTuple2V27V21adiffaedgesV4FAainfix &gt;=alengthV29V2IapathasV29V21FIamemV21averticesFAamemV30aedgesIamemV30V4FFIainfix =V3aedgesFICamixfix []V1V31aFiniteVainfix &gt;=ainfix +apath_weightV34V33aweightV33V31V32IamemaTuple2V33V31aemptyIainfix &lt;alengthV34V2IapathasV34V33FAainfix &gt;=apath_weightV35V31V32Iainfix &lt;alengthV35V2IapathasV35V31FAainfix =apath_weightV36V31V32AapathasV36V31EaInfiniteainfix &gt;=alengthV38V2IapathasV38V37FIamemaTuple2V37V31aemptyFAainfix &gt;=alengthV39V2IapathasV39V31FIamemV31averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
+          shape="loop invariant preservationCtaFiniteVainfix &gt;=alengthV10ainfix +V2c1IapathasV10V9FIamemaTuple2V9V7aemptyFaInfiniteamixfix []V5V7IamemV7averticesFICainfix &gt;=ainfix +apath_weightV14V13aweightV13V11V12IamemaTuple2V13V11aedgesIainfix &lt;alengthV14V2IapathasV14V13FAainfix &gt;=apath_weightV15V11V12Iainfix &lt;alengthV15V2IapathasV15V11FAainfix =apath_weightV16V11V12AapathasV16V11EaFiniteVainfix &gt;=alengthV18V2IapathasV18V17FIamemaTuple2V17V11aedgesFAainfix &gt;=alengthV19V2IapathasV19V11FaInfiniteamixfix []V5V11IamemV11averticesFINNainfix =V6aTrueINamemV20V4Fqainfix =V6aTrueFICainfix &gt;=ainfix +apath_weightV24V23aweightV23V21V22IamemaTuple2V23V21adiffaedgesV4Iainfix &lt;alengthV24V2IapathasV24V23FAainfix &gt;=apath_weightV25V21V22Iainfix &lt;alengthV25V2IapathasV25V21FAainfix =apath_weightV26V21V22AapathasV26V21EaFiniteVainfix &gt;=alengthV28V2IapathasV28V27FIamemaTuple2V27V21adiffaedgesV4FAainfix &gt;=alengthV29V2IapathasV29V21FaInfiniteamixfix []V5V21IamemV21averticesFAamemV30aedgesIamemV30V4FFIainfix =V3aedgesFICainfix &gt;=ainfix +apath_weightV34V33aweightV33V31V32IamemaTuple2V33V31aemptyIainfix &lt;alengthV34V2IapathasV34V33FAainfix &gt;=apath_weightV35V31V32Iainfix &lt;alengthV35V2IapathasV35V31FAainfix =apath_weightV36V31V32AapathasV36V31EaFiniteVainfix &gt;=alengthV38V2IapathasV38V37FIamemaTuple2V37V31aemptyFAainfix &gt;=alengthV39V2IapathasV39V31FaInfiniteamixfix []V1V31IamemV31averticesFIainfix =V2V0Oainfix &lt;V2V0Aainfix =c1V2Oainfix &lt;c1V2FFIainfix =c1V0Oainfix &lt;c1V0Lainfix -acardinalaverticesc1">
           <label
            name="expl:VC for bellman_ford"/>
           <proof
@@ -1395,10 +1339,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="18. assertion"
-      sum="1f921c33cbc723c14a676763d96246ba"
+      sum="2a6a9c13395d98cf2624775e7f85c280"
       proved="true"
       expanded="false"
-      shape="ainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="assertionainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1415,10 +1359,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="19. loop invariant init"
-      sum="d0f3f5601232cbffa8b2293084bc3d90"
+      sum="7b0124aff02939b226e94197e3293604"
       proved="true"
       expanded="false"
-      shape="ainv2V1adiffaedgesV2AasubsetV2aedgesIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant initainv2V1adiffaedgesV2AasubsetV2aedgesIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1435,10 +1379,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="20. precondition"
-      sum="922ff6c4ba134c34cd526b8af946012e"
+      sum="26c12e6cdaa09256ecc2affc6584a7b6"
       proved="true"
       expanded="false"
-      shape="ais_emptyV3NIainfix =V4aTrueNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="preconditionNais_emptyV3INainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1455,10 +1399,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="21. exceptional postcondition"
-      sum="281d406da4c3a0d079faaeff38ee3b55"
+      sum="f67e802a791fd9375da3ef34d06944ef"
       proved="true"
       expanded="false"
-      shape="anegative_cycleV9EICagetV1V6aInfinitefaFiniteVCagetV1V7aInfinitetaFiniteVainfix &lt;ainfix +V10aweightV6V7V11Iainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFIais_emptyV3NIainfix =V4aTrueNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="exceptional postconditionanegative_cycleV9EICfaInfiniteCtaInfiniteainfix &lt;ainfix +V10aweightV6V7V11aFiniteVagetV1V7aFiniteVagetV1V6Iainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFINais_emptyV3INainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1476,10 +1420,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="22. loop invariant preservation"
-      sum="489487b9a00de00facdd87a5b8a5333c"
+      sum="ce4e72cc8ccaa063c8692748ec7b0136"
       proved="true"
       expanded="false"
-      shape="ainv2V1adiffaedgesV5AasubsetV5aedgesICagetV1V6aInfinitefaFiniteVCagetV1V7aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV6V7V10NIainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFIais_emptyV3NIainfix =V4aTrueNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop invariant preservationainv2V1adiffaedgesV5AasubsetV5aedgesINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV6V7V10aFiniteVagetV1V7aFiniteVagetV1V6Iainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFINais_emptyV3INainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -1491,10 +1435,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1."
-        sum="00156729ab5c2cb84ff9e954e68cab9c"
+        sum="24b12eec20596417a068691f2640d706"
         proved="true"
         expanded="false"
-        shape="asubsetV5aedgesICagetV1V6aInfinitefaFiniteVCagetV1V7aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV6V7V10NIainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFIais_emptyV3NIainfix =V4aTrueNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="asubsetV5aedgesINCfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV6V7V10aFiniteVagetV1V7aFiniteVagetV1V6Iainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFINais_emptyV3INainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -1511,10 +1455,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="2."
-        sum="204ff64a66d243c844011c5f39069a4b"
+        sum="7de6b66265f676e425f3b8e39e393d5b"
         proved="true"
         expanded="false"
-        shape="ainv2V1adiffaedgesV5ICagetV1V6aInfinitefaFiniteVCagetV1V7aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV6V7V10NIainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFIais_emptyV3NIainfix =V4aTrueNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="ainv2V1adiffaedgesV5INCfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV6V7V10aFiniteVagetV1V7aFiniteVagetV1V6Iainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFINais_emptyV3INainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -1533,10 +1477,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="23. loop variant decrease"
-      sum="16098e6262adf18434c710f913a95b95"
+      sum="23c3d8da82904ba2c1252f1c55e66c3d"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;acardinalV5acardinalV3Aainfix &lt;=c0acardinalV3ICagetV1V6aInfinitefaFiniteVCagetV1V7aInfinitetaFiniteVainfix &lt;ainfix +V9aweightV6V7V10NIainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFIais_emptyV3NIainfix =V4aTrueNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="loop variant decreaseainfix &lt;acardinalV5acardinalV3Aainfix &lt;=c0acardinalV3INCfaInfiniteCtaInfiniteainfix &lt;ainfix +V9aweightV6V7V10aFiniteVagetV1V7aFiniteVagetV1V6Iainfix =V5aremoveV8V3AamemV8V3LaTuple2V6V7FFINais_emptyV3INainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1553,10 +1497,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="24. assertion"
-      sum="297189616824b5567261d67ec0b1c9a8"
+      sum="e00a113032e7e09010b2c8bf001ecc99"
       proved="true"
       expanded="false"
-      shape="ainv2V1aedgesIainfix =V4aTrueNNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="assertionainv2V1aedgesINNainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <proof
@@ -1573,10 +1517,10 @@
       locfile="../bellman_ford.mlw"
       loclnum="186" loccnumb="6" loccnume="18"
       expl="25. postcondition"
-      sum="a719addfef76f62e609d62211db99abb"
+      sum="508ddc06755a65d05b95600324a7c8fc"
       proved="true"
       expanded="false"
-      shape="CagetV1V5aFiniteVainfix &gt;=apath_weightV7V5V6IapathasV7V5FAainfix =apath_weightV8V5V6AapathasV8V5EaInfiniteapathasV9V5NFIamemV5averticesFIainv2V1aedgesIainfix =V4aTrueNNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+      shape="postconditionCainfix &gt;=apath_weightV7V5V6IapathasV7V5FAainfix =apath_weightV8V5V6AapathasV8V5EaFiniteVNapathasV9V5FaInfiniteagetV1V5IamemV5averticesFIainv2V1aedgesINNainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
       <label
        name="expl:VC for bellman_ford"/>
       <transf
@@ -1588,10 +1532,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="1. postcondition"
-        sum="d7cbc9316f61767631ad128b472a8639"
+        sum="a65e2dfbe84f7973851e8c2347862d5b"
         proved="true"
         expanded="false"
-        shape="CagetV1V5aFiniteVainfix =apath_weightV7V5V6AapathasV7V5EaInfinitetIamemV5averticesFIainv2V1aedgesIainfix =V4aTrueNNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="postconditionCainfix =apath_weightV7V5V6AapathasV7V5EaFiniteVtaInfiniteagetV1V5IamemV5averticesFIainv2V1aedgesINNainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -1624,10 +1568,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="2. postcondition"
-        sum="db3586deb2edc6796dd23430459b421c"
+        sum="8d9cd8a0c3e91b9530cfe289c96001fb"
         proved="true"
         expanded="false"
-        shape="CagetV1V5aFiniteVainfix &gt;=apath_weightV7V5V6IapathasV7V5FaInfinitetIamemV5averticesFIainv2V1aedgesIainfix =V4aTrueNNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="postconditionCainfix &gt;=apath_weightV7V5V6IapathasV7V5FaFiniteVtaInfiniteagetV1V5IamemV5averticesFIainv2V1aedgesINNainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof
@@ -1645,10 +1589,10 @@
         locfile="../bellman_ford.mlw"
         loclnum="186" loccnumb="6" loccnume="18"
         expl="3. postcondition"
-        sum="b36c4fd2fef37ffe0a0bc15b4d95ec95"
+        sum="f8cfc7574a909227cf447dc424f2f0a8"
         proved="true"
         expanded="false"
-        shape="CagetV1V5aFiniteVtaInfiniteapathasV7V5NFIamemV5averticesFIainv2V1aedgesIainfix =V4aTrueNNIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
+        shape="postconditionCtaFiniteVNapathasV7V5FaInfiniteagetV1V5IamemV5averticesFIainv2V1aedgesINNainfix =V4aTrueIais_emptyV3qainfix =V4aTrueFIainv2V1adiffaedgesV3AasubsetV3aedgesFIainfix =V2aedgesFIainv1V1acardinalaverticesaemptyIainv1V1ainfix +V0c1aemptyFIainfix &lt;=c1V0Lainfix -acardinalaverticesc1">
         <label
          name="expl:VC for bellman_ford"/>
         <proof

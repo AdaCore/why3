@@ -50,6 +50,12 @@ theory SetGen
     forall x y : 'a, s : set 'a.
     mem x (remove y s) <-> x <> y /\ mem x s
 
+  lemma add_remove:
+    forall x: 'a, s : set 'a. mem x s -> add x (remove x s) = s
+
+  lemma remove_add:
+    forall x: 'a, s : set 'a. remove x (add x s) = remove x s
+
   lemma subset_remove:
     forall x: 'a, s: set 'a. subset (remove x s) s
 

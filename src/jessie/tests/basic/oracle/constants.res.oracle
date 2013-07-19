@@ -10,6 +10,8 @@
             
             (* use real.Real *)
             
+            (* use map.Map *)
+            
             lemma test1 : (2 + 0xa) = 0xc
             
             lemma test_ofl : (0xffffffff + 1) = 0x100000000
@@ -20,12 +22,12 @@
             
             lemma test4 : 0x1.1p4 = 17.0
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 2: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 3: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 4: Valid, Valid, Valid, Valid, Valid
-[jessie3] Task 5: Valid, Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (test1): Valid, Valid, Valid, Valid
+[jessie3] Task 2 (test_ofl): Valid, Valid, Valid, Valid
+[jessie3] Task 3 (test2): Valid, Valid, Valid, Valid
+[jessie3] Task 4 (test3): Valid, Valid, Valid, Valid
+[jessie3] Task 5 (test4): Valid, Valid, Valid, Valid
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
             (* use why3.BuiltIn *)
@@ -40,8 +42,12 @@
             
             (* use real.Real *)
             
+            (* use map.Map *)
+            
             (* use Global_logic_declarations *)
             
             (* use ref.Ref *)
+            
+            (* use mach_int.Int32 *)
             end
-[jessie3] Alt-Ergo 0.95.1, CVC3 2.2, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1

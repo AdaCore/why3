@@ -3,16 +3,18 @@
 */
 
 
-/*@ ensures \result == x+1;
+/*@ requires x <= 1000000;
+  @ ensures \result == x+1;
   @*/
 int f(int x) {
   return x+1;
 }
 
-
 int g;
 
-/*@ ensures g == \old(g)+x;
+/*@ requires 0 <= g <= 1000000;
+  @ requires 0 <= x <= 1000000;
+  @ ensures g == \old(g)+x;
   @*/
 void h(int x) {
   g += x;

@@ -1,0 +1,63 @@
+[kernel] preprocessing with "gcc -C -E -I.  tests/basic/call.c"
+[jessie3] processing function f
+[jessie3] created program function f (738)
+[jessie3] processing function g
+[jessie3] created program function g (743)
+[jessie3] found 0 logic decl(s)
+[jessie3] made 0 theory(ies)
+[jessie3] made 2 function(s)
+[jessie3] running theory 1:
+[jessie3] theory C_Functions
+            (* use why3.BuiltIn *)
+            
+            (* use why3.Bool *)
+            
+            (* use why3.Unit *)
+            
+            (* use why3.Prelude *)
+            
+            (* use int.Int *)
+            
+            (* use real.Real *)
+            
+            (* use map.Map *)
+            
+            (* use ref.Ref *)
+            
+            (* use mach_int.Int32 *)
+            
+            goal WP_parameter_f :
+              forall x:int32.
+               0 <= to_int x /\ to_int x <= 1000 ->
+                in_bounds 0 &&
+                 (forall o:int32.
+                   to_int o = 0 ->
+                    in_bounds 1 &&
+                     (forall o1:int32.
+                       to_int o1 = 1 ->
+                        in_bounds (to_int x + to_int o1) &&
+                         (forall o2:int32.
+                           to_int o2 = (to_int x + to_int o1) ->
+                            (forall us_retres:int32.
+                              us_retres = o2 -> (to_int us_retres - to_int x) > 0))))
+            
+            goal WP_parameter_g :
+              forall x:int32.
+               10 <= to_int x /\ to_int x <= 100 ->
+                in_bounds 0 &&
+                 (forall o:int32.
+                   to_int o = 0 ->
+                    in_bounds 1 &&
+                     (forall o1:int32.
+                       to_int o1 = 1 ->
+                        in_bounds (to_int x - to_int o1) &&
+                         (forall o2:int32.
+                           to_int o2 = (to_int x - to_int o1) ->
+                            (0 <= to_int o2 /\ to_int o2 <= 1000) &&
+                             (forall o3:int32.
+                               (to_int o3 - to_int o2) > 0 ->
+                                (forall y:int32. y = o3 -> (to_int y - to_int x) >= 0)))))
+            end
+[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (WP_parameter f): Valid, Valid, Valid, Valid
+[jessie3] Task 2 (WP_parameter g): Valid, Valid, Valid, Valid
