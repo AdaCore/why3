@@ -224,7 +224,9 @@ let rec term env t = match t.dt_node with
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let e2 = term env e2 in
-      check_used_var e2.t_vars v;
+      (* ??? disable warning temporarily, we currently generate some unused
+         variables *)
+(*       check_used_var e2.t_vars v; *)
       t_let_close v e1 e2
   | Tmatch (t1, bl) ->
       let branch (p,e) =
@@ -277,7 +279,9 @@ and fmla env = function
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let f2 = fmla env f2 in
-      check_used_var f2.t_vars v;
+      (* ??? disable warning temporarily, we currently generate some unused
+         variables *)
+(*       check_used_var f2.t_vars v; *)
       t_let_close v e1 f2
   | Fmatch (t, bl) ->
       let branch (p,e) =
