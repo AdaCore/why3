@@ -174,8 +174,8 @@ let prover : Whyconf.config_prover =
                 (Whyconf.mk_filter_prover s)
      | None ->
            let conf =
-              { Whyconf.prover_name = "Alt-Ergo";
-                 prover_version      = "0.94";
+              { Whyconf.prover_name = "Alt-Ergo for GNATprove";
+                 prover_version      = "0.95";
                  prover_altern       = "";
               } in
            Whyconf.Mprover.find conf provers
