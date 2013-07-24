@@ -11,23 +11,31 @@
   version="2.2"/>
  <prover
   id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
   name="CVC4"
   version="1.0"/>
  <prover
-  id="3"
+  id="4"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="5"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="4"
+  id="6"
   name="Z3"
   version="2.19"/>
  <prover
-  id="5"
+  id="7"
   name="Z3"
-  version="3.2"/>
+  version="4.3.1"/>
  <file
   name="../queens.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="S"
@@ -43,7 +51,7 @@
    locfile="../queens.mlw"
    loclnum="24" loccnumb="7" loccnume="29"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="WP_parameter t"
     locfile="../queens.mlw"
@@ -51,14 +59,14 @@
     expl="VC for t"
     sum="3db8c5cbafe54317f89390f148eaeb41"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4AasubsetV8adiffadiffV0V1V2Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFAainfix &lt;acardinalaremoveV5V0acardinalV0Aainfix &lt;=c0acardinalV0Lamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FAasubsetadiffadiffV0V1V2adiffadiffV0V1V2INais_emptyV0F">
     <label
      name="expl:VC for t"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter t.1"
       locfile="../queens.mlw"
@@ -66,17 +74,33 @@
       expl="1. loop invariant init"
       sum="3d919c0c44aefd6715728c03ae9524d7"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initasubsetadiffadiffV0V1V2adiffadiffV0V1V2INais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="25"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -86,17 +110,25 @@
       expl="2. variant decrease"
       sum="49b2440e08827dcd28d5fdc42263dae0"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="variant decreaseainfix &lt;acardinalaremoveV5V0acardinalV0Aainfix &lt;=c0acardinalV0Lamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FINais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="25"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
@@ -106,17 +138,33 @@
       expl="3. loop invariant preservation"
       sum="170bef908be82d10fd66cd14469a2756"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationasubsetV8adiffadiffV0V1V2Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFLamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FINais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="25"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
@@ -126,14 +174,22 @@
       expl="4. loop variant decrease"
       sum="83d2fc68a7c74f1568977107bdfb8b48"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop variant decreaseainfix &lt;acardinalV8acardinalV4Aainfix &lt;=c0acardinalV4Iainfix =V8aremoveV5V4FIainfix =V7ainfix +V3V6FFLamin_eltV4INais_emptyV4IasubsetV4adiffadiffV0V1V2FINais_emptyV0F">
       <label
        name="expl:VC for t"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
@@ -147,22 +203,38 @@
    locfile="../queens.mlw"
    loclnum="46" loccnumb="7" loccnume="15"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="partial_solution_eq_prefix"
     locfile="../queens.mlw"
     loclnum="72" loccnumb="8" loccnume="34"
     sum="e65184b3913216ada726e247a6617556"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="apartial_solutionV2V0Iaeq_prefixV1V0V2Iapartial_solutionV2V1F">
     <proof
      prover="0"
-     timelimit="10"
-     memlimit="0"
+     timelimit="25"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="25"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="25"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
@@ -171,7 +243,7 @@
     loclnum="86" loccnumb="8" loccnume="20"
     sum="ac1040b6a58aa7259631cd516189ba0d"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="Naeq_solamixfix []V0V3amixfix []V0V4Iainfix &lt;V4V2Aainfix &lt;V3V4Aainfix &lt;=V1V3FIasortedV0V1V2F">
     <proof
      prover="1"
@@ -181,13 +253,21 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="25"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
   </theory>
   <theory
    name="NQueensSets"
    locfile="../queens.mlw"
    loclnum="94" loccnumb="7" loccnume="18"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter t3"
@@ -195,14 +275,14 @@
     loclnum="107" loccnumb="10" loccnume="12"
     expl="VC for t3"
     sum="450fd955b96b2fd943d913a80a3dea4f"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="iaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix =V5V5Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6Fiaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV17amixfix []V14V18Aainfix &lt;V18V13Aainfix &lt;=V3V18Eqaeq_prefixV16V17V15AasolutionV17FAasortedV14V3V13Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3ainfix &lt;acardinalV29acardinalV12Aainfix &lt;=c0acardinalV12Aaeq_prefixV4V24V3Aaeq_prefixV6V26V28Aaeq_solV30amixfix []V24V31Aainfix &lt;V31V23Aainfix &lt;=V3V31Eqamemamixfix []V30V28adiffadiffadiffV0V1V2V29Aaeq_prefixV26V30V28AasolutionV30FAainfix &lt;V32V33IamemV33V29IamemV32adiffadiffadiffV0V1V2V29FAasortedV24V3V23Aapartial_solutionV28V26AasubsetV29adiffadiffV0V1V2Aainfix =V28V5Aainfix &gt;=ainfix -V23V3c0Aainfix =V27ainfix -V23V3Iainfix =V29aremoveV19V12FIainfix =V28ainfix -V25c1FIainfix =V27ainfix +V11ainfix -V23V13FIaeq_prefixV14V24V13Aaeq_prefixV20V26V25Aaeq_solV34amixfix []V24V35Aainfix &lt;V35V23Aainfix &lt;=V13V35Eqaeq_prefixV26V34V25AasolutionV34FAasortedV24V13V23Aainfix =V25V21Aainfix &gt;=ainfix -V23V13c0FAapartial_solutionV21V20ANainfix =amixfix []V20V37ainfix -ainfix +V36V21V37Iainfix &lt;V37V21Aainfix &lt;=c0V37FqNamemV36apredaaddV19V2Iainfix &gt;=V36c0FANainfix =amixfix []V20V39ainfix -ainfix +V38V39V21Iainfix &lt;V39V21Aainfix &lt;=c0V39FqNamemV38asuccaaddV19V1Iainfix &gt;=V38c0FANainfix =amixfix []V20V41V40Iainfix &lt;V41V21Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V22FAainfix &gt;=V13c0Aainfix =ainfix +V21acardinalV22anAainfix &lt;=c0V21Aainfix &lt;acardinalV22acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV19V0Iainfix =V21ainfix +V15c1FIainfix =V20amixfix [&lt;-]V16V15V19FLamin_eltV12Nais_emptyV12Iaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV42amixfix []V14V43Aainfix &lt;V43V13Aainfix &lt;=V3V43Eqamemamixfix []V42V15adiffadiffadiffV0V1V2V12Aaeq_prefixV16V42V15AasolutionV42FAainfix &lt;V44V45IamemV45V12IamemV44adiffadiffadiffV0V1V2V12FAasortedV14V3V13Aapartial_solutionV15V16AasubsetV12adiffadiffV0V1V2Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3FAaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV46amixfix []V4V47Aainfix &lt;V47V3Aainfix &lt;=V3V47Eqamemamixfix []V46V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V46V5AasolutionV46FAainfix &lt;V48V49IamemV49adiffadiffV0V1V2IamemV48adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3Nais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V51ainfix -ainfix +V50V5V51Iainfix &lt;V51V5Aainfix &lt;=c0V51FqNamemV50V2Iainfix &gt;=V50c0FANainfix =amixfix []V6V53ainfix -ainfix +V52V53V5Iainfix &lt;V53V5Aainfix &lt;=c0V53FqNamemV52V1Iainfix &gt;=V52c0FANainfix =amixfix []V6V55V54Iainfix &lt;V55V5Aainfix &lt;=c0V55FAainfix &lt;V54anAainfix &lt;=c0V54qamemV54V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
     <label
      name="expl:VC for t3"/>
     <transf
      name="split_goal"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter t3.1"
@@ -211,14 +291,14 @@
       expl="1. loop invariant init"
       sum="6554c5830deeb82db925c44522b766c6"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV7amixfix []V4V8Aainfix &lt;V8V3Aainfix &lt;=V3V8Eqamemamixfix []V7V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V7V5AasolutionV7FAainfix &lt;V9V10IamemV10adiffadiffV0V1V2IamemV9adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix =V5V5Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3INais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="25"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.04"/>
@@ -231,6 +311,22 @@
        archived="false">
        <result status="valid" time="0.03"/>
       </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="10.90"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter t3.2"
@@ -239,17 +335,25 @@
       expl="2. variant decrease"
       sum="ee681890146317e7d1d96f99e46f0089"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="variant decreaseainfix &lt;acardinalV16acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <proof
        prover="0"
-       timelimit="15"
+       timelimit="25"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.79"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
@@ -258,14 +362,14 @@
       loclnum="107" loccnumb="10" loccnume="12"
       expl="3. precondition"
       sum="889f1cfa3ed29ecb298066063cc6f693"
-      proved="false"
+      proved="true"
       expanded="true"
       shape="preconditionapartial_solutionV15V14ANainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FqNamemV17apredaaddV13V2Iainfix &gt;=V17c0FANainfix =amixfix []V14V20ainfix -ainfix +V19V20V15Iainfix &lt;V20V15Aainfix &lt;=c0V20FqNamemV19asuccaaddV13V1Iainfix &gt;=V19c0FANainfix =amixfix []V14V22V21Iainfix &lt;V22V15Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV23amixfix []V10V24Aainfix &lt;V24V9Aainfix &lt;=V3V24Eqamemamixfix []V23V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V23V11AasolutionV23FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V28ainfix -ainfix +V27V5V28Iainfix &lt;V28V5Aainfix &lt;=c0V28FqNamemV27V2Iainfix &gt;=V27c0FANainfix =amixfix []V6V30ainfix -ainfix +V29V30V5Iainfix &lt;V30V5Aainfix &lt;=c0V30FqNamemV29V1Iainfix &gt;=V29c0FANainfix =amixfix []V6V32V31Iainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix &lt;V31anAainfix &lt;=c0V31qamemV31V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
-       proved="false"
+       proved="true"
        expanded="true">
        <goal
         name="WP_parameter t3.3.1"
@@ -274,17 +378,33 @@
         expl="1."
         sum="6a6c8b4a90ff3413f4436f4fc72afc44"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -294,17 +414,25 @@
         expl="2."
         sum="1513695a3e4d3bd33d7895ac0d90f9db"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =ainfix +V15acardinalV16anLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="1.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
@@ -314,17 +442,33 @@
         expl="3."
         sum="99b0aff6df25c5d76c8977efafb784eb"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &gt;=V9c0LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -334,17 +478,25 @@
         expl="4."
         sum="9cd7d054177f79a689cf1183a2b41000"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &lt;=c0V17IamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV18amixfix []V10V19Aainfix &lt;V19V9Aainfix &lt;=V3V19Eqamemamixfix []V18V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V18V11AasolutionV18FAainfix &lt;V20V21IamemV21V8IamemV20adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V23ainfix -ainfix +V22V5V23Iainfix &lt;V23V5Aainfix &lt;=c0V23FqNamemV22V2Iainfix &gt;=V22c0FANainfix =amixfix []V6V25ainfix -ainfix +V24V25V5Iainfix &lt;V25V5Aainfix &lt;=c0V25FqNamemV24V1Iainfix &gt;=V24c0FANainfix =amixfix []V6V27V26Iainfix &lt;V27V5Aainfix &lt;=c0V27FAainfix &lt;V26anAainfix &lt;=c0V26qamemV26V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.11"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -354,17 +506,25 @@
         expl="5."
         sum="c465cafc314f8f06b3602e96c91c617d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &lt;V17anIamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV18amixfix []V10V19Aainfix &lt;V19V9Aainfix &lt;=V3V19Eqamemamixfix []V18V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V18V11AasolutionV18FAainfix &lt;V20V21IamemV21V8IamemV20adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V23ainfix -ainfix +V22V5V23Iainfix &lt;V23V5Aainfix &lt;=c0V23FqNamemV22V2Iainfix &gt;=V22c0FANainfix =amixfix []V6V25ainfix -ainfix +V24V25V5Iainfix &lt;V25V5Aainfix &lt;=c0V25FqNamemV24V1Iainfix &gt;=V24c0FANainfix =amixfix []V6V27V26Iainfix &lt;V27V5Aainfix &lt;=c0V27FAainfix &lt;V26anAainfix &lt;=c0V26qamemV26V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.12"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -374,17 +534,25 @@
         expl="6."
         sum="0d4371500f9818c6644ecbf16d8fbe09"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Nainfix =amixfix []V14V18V17Iainfix &lt;V18V15Aainfix &lt;=c0V18FIamemV17V16FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="1.86"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -394,12 +562,20 @@
         expl="7."
         sum="4a80c5937e2519229499be6f776322ac"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="amemV17V16INainfix =amixfix []V14V18V17Iainfix &lt;V18V15Aainfix &lt;=c0V18FAainfix &lt;V17anAainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="3"
+         prover="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="4.80"/>
+        </proof>
+        <proof
+         prover="5"
          timelimit="5"
          memlimit="1000"
          edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"
@@ -414,18 +590,18 @@
         loclnum="107" loccnumb="10" loccnume="12"
         expl="8."
         sum="7ed5c99d7b3cfa8db5b6f5e1397ccd0b"
-        proved="false"
-        expanded="false"
+        proved="true"
+        expanded="true"
         shape="Nainfix =amixfix []V14V18ainfix -ainfix +V17V18V15Iainfix &lt;V18V15Aainfix &lt;=c0V18FINamemV17asuccaaddV13V1Iainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="1"
-         timelimit="20"
-         memlimit="0"
+         prover="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="19.88"/>
+         <result status="valid" time="4.48"/>
         </proof>
        </goal>
        <goal
@@ -435,12 +611,12 @@
         expl="9."
         sum="ebd4463368c6e16fd8781461774fb8bf"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="NamemV17asuccaaddV13V1INainfix =amixfix []V14V18ainfix -ainfix +V17V18V15Iainfix &lt;V18V15Aainfix &lt;=c0V18FIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="3"
+         prover="5"
          timelimit="5"
          memlimit="1000"
          edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"
@@ -456,17 +632,25 @@
         expl="10."
         sum="9aca022619371b6b8a69816f7f675d6d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="Nainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FINamemV17apredaaddV13V2Iainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="19"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.60"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.37"/>
         </proof>
        </goal>
        <goal
@@ -476,12 +660,20 @@
         expl="11."
         sum="a37555e2558bf2abd74511b6195c50a2"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="NamemV17apredaaddV13V2INainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FIainfix &gt;=V17c0FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV19amixfix []V10V20Aainfix &lt;V20V9Aainfix &lt;=V3V20Eqamemamixfix []V19V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V19V11AasolutionV19FAainfix &lt;V21V22IamemV22V8IamemV21adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V24ainfix -ainfix +V23V5V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V2Iainfix &gt;=V23c0FANainfix =amixfix []V6V26ainfix -ainfix +V25V26V5Iainfix &lt;V26V5Aainfix &lt;=c0V26FqNamemV25V1Iainfix &gt;=V25c0FANainfix =amixfix []V6V28V27Iainfix &lt;V28V5Aainfix &lt;=c0V28FAainfix &lt;V27anAainfix &lt;=c0V27qamemV27V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="3"
+         prover="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="22.29"/>
+        </proof>
+        <proof
+         prover="5"
          timelimit="5"
          memlimit="1000"
          edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"
@@ -496,14 +688,14 @@
         loclnum="107" loccnumb="10" loccnume="12"
         expl="12."
         sum="53cabbd0090d9d58648293d3c3b99578"
-        proved="false"
+        proved="true"
         expanded="true"
         shape="apartial_solutionV15V14LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <transf
          name="inline_goal"
-         proved="false"
+         proved="true"
          expanded="true">
          <goal
           name="WP_parameter t3.3.12.1"
@@ -511,14 +703,14 @@
           loclnum="107" loccnumb="10" loccnume="12"
           expl="1."
           sum="c95ca79344fabcd04c3ce92c6abb27b0"
-          proved="false"
+          proved="true"
           expanded="true"
           shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17ANainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18ANainfix =amixfix []V14V17amixfix []V14V18Iainfix &lt;V18V17Aainfix &lt;=c0V18FAainfix &lt;amixfix []V14V17anAainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
           <label
            name="expl:VC for t3"/>
           <transf
            name="split_goal"
-           proved="false"
+           proved="true"
            expanded="true">
            <goal
             name="WP_parameter t3.3.12.1.1"
@@ -527,33 +719,17 @@
             expl="1."
             sum="e2f74e035293b7a1732cf8dc29d8e89c"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="ainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV18V8FIainfix =amixfix []V4V19amixfix []V10V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =amixfix []V6V20amixfix []V12V20Iainfix &lt;V20V11Aainfix &lt;=c0V20FAaeq_prefixV21amixfix []V10V22anAainfix &lt;V22V9Aainfix =V3V22Oainfix &lt;V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V23amixfix []V21V23Iainfix &lt;V23V11Aainfix &lt;=c0V23FAapartial_solutionanV21FAainfix &lt;V24V25IamemV25V8IamemV24adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V26amixfix []V10V27Iainfix &lt;V27V9Aainfix &lt;V26V27Aainfix &lt;=V3V26FANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V29V28ANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V28V29ANainfix =amixfix []V12V28amixfix []V12V29Iainfix &lt;V29V28Aainfix &lt;=c0V29FAainfix &lt;amixfix []V12V28anAainfix &lt;=c0amixfix []V12V28Iainfix &lt;V28V11Aainfix &lt;=c0V28FAamemV30adiffadiffV0V1V2IamemV30V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV31V0FINainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V33V32ANainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V32V33ANainfix =amixfix []V6V32amixfix []V6V33Iainfix &lt;V33V32Aainfix &lt;=c0V33FAainfix &lt;amixfix []V6V32anAainfix &lt;=c0amixfix []V6V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FANainfix =agetV6V35ainfix +ainfix +V34V5aprefix -V35Iainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqNamemV34V2Iainfix &lt;=c0V34FANainfix =agetV6V37ainfix +ainfix +V36V37aprefix -V5Iainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FqNamemV36V1Iainfix &lt;=c0V36FANainfix =agetV6V39V38Iainfix &lt;V39V5Aainfix =c0V39Oainfix &lt;c0V39FAainfix &lt;V38anAainfix =c0V38Oainfix &lt;c0V38qamemV38V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
              prover="0"
-             timelimit="5"
-             memlimit="4000"
+             timelimit="25"
+             memlimit="1000"
              obsolete="false"
              archived="false">
              <result status="valid" time="0.45"/>
-            </proof>
-            <proof
-             prover="4"
-             timelimit="5"
-             memlimit="4000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="4.97"/>
-            </proof>
-            <proof
-             prover="5"
-             timelimit="5"
-             memlimit="4000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="4.97"/>
             </proof>
            </goal>
            <goal
@@ -563,49 +739,25 @@
             expl="2."
             sum="17b2086b3ebe3c95997a7b33753a15c8"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="ainfix &lt;amixfix []V14V17anIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV18V8FIainfix =amixfix []V4V19amixfix []V10V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =amixfix []V6V20amixfix []V12V20Iainfix &lt;V20V11Aainfix &lt;=c0V20FAaeq_prefixV21amixfix []V10V22anAainfix &lt;V22V9Aainfix =V3V22Oainfix &lt;V3V22Eqamemamixfix []V21V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V23amixfix []V21V23Iainfix &lt;V23V11Aainfix &lt;=c0V23FAapartial_solutionanV21FAainfix &lt;V24V25IamemV25V8IamemV24adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V26amixfix []V10V27Iainfix &lt;V27V9Aainfix &lt;V26V27Aainfix &lt;=V3V26FANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V29V28ANainfix =ainfix -amixfix []V12V28amixfix []V12V29ainfix -V28V29ANainfix =amixfix []V12V28amixfix []V12V29Iainfix &lt;V29V28Aainfix &lt;=c0V29FAainfix &lt;amixfix []V12V28anAainfix &lt;=c0amixfix []V12V28Iainfix &lt;V28V11Aainfix &lt;=c0V28FAamemV30adiffadiffV0V1V2IamemV30V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV31V0FINainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V33V32ANainfix =ainfix -amixfix []V6V32amixfix []V6V33ainfix -V32V33ANainfix =amixfix []V6V32amixfix []V6V33Iainfix &lt;V33V32Aainfix &lt;=c0V33FAainfix &lt;amixfix []V6V32anAainfix &lt;=c0amixfix []V6V32Iainfix &lt;V32V5Aainfix &lt;=c0V32FANainfix =agetV6V35ainfix +ainfix +V34V5aprefix -V35Iainfix &lt;V35V5Aainfix =c0V35Oainfix &lt;c0V35FqNamemV34V2Iainfix &lt;=c0V34FANainfix =agetV6V37ainfix +ainfix +V36V37aprefix -V5Iainfix &lt;V37V5Aainfix =c0V37Oainfix &lt;c0V37FqNamemV36V1Iainfix &lt;=c0V36FANainfix =agetV6V39V38Iainfix &lt;V39V5Aainfix =c0V39Oainfix &lt;c0V39FAainfix &lt;V38anAainfix =c0V38Oainfix &lt;c0V38qamemV38V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
              prover="0"
-             timelimit="5"
-             memlimit="4000"
+             timelimit="25"
+             memlimit="1000"
              obsolete="false"
              archived="false">
              <result status="valid" time="0.29"/>
             </proof>
             <proof
-             prover="1"
-             timelimit="5"
-             memlimit="4000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="4.98"/>
-            </proof>
-            <proof
-             prover="2"
+             prover="3"
              timelimit="5"
              memlimit="4000"
              obsolete="false"
              archived="false">
              <result status="valid" time="0.74"/>
-            </proof>
-            <proof
-             prover="4"
-             timelimit="5"
-             memlimit="4000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="4.97"/>
-            </proof>
-            <proof
-             prover="5"
-             timelimit="5"
-             memlimit="4000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="4.97"/>
             </proof>
            </goal>
            <goal
@@ -621,19 +773,27 @@
              name="expl:VC for t3"/>
             <proof
              prover="0"
-             timelimit="30"
+             timelimit="25"
              memlimit="1000"
              obsolete="false"
              archived="false">
              <result status="valid" time="4.72"/>
             </proof>
             <proof
-             prover="2"
+             prover="3"
              timelimit="5"
              memlimit="4000"
              obsolete="false"
              archived="false">
              <result status="valid" time="0.12"/>
+            </proof>
+            <proof
+             prover="4"
+             timelimit="25"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.34"/>
             </proof>
            </goal>
            <goal
@@ -649,19 +809,27 @@
              name="expl:VC for t3"/>
             <proof
              prover="0"
-             timelimit="30"
+             timelimit="25"
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="5.14"/>
+             <result status="valid" time="6.75"/>
             </proof>
             <proof
-             prover="2"
+             prover="3"
              timelimit="5"
              memlimit="4000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="1.46"/>
+             <result status="valid" time="1.80"/>
+            </proof>
+            <proof
+             prover="4"
+             timelimit="25"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="1.76"/>
             </proof>
            </goal>
            <goal
@@ -670,26 +838,18 @@
             loclnum="107" loccnumb="10" loccnume="12"
             expl="5."
             sum="e8ddf780388f96ee89fb77d1a975c01e"
-            proved="false"
-            expanded="false"
+            proved="true"
+            expanded="true"
             shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17Iainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
             <proof
-             prover="4"
-             timelimit="5"
-             memlimit="4000"
+             prover="0"
+             timelimit="25"
+             memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="timeout" time="4.97"/>
-            </proof>
-            <proof
-             prover="5"
-             timelimit="5"
-             memlimit="4000"
-             obsolete="false"
-             archived="false">
-             <result status="timeout" time="4.97"/>
+             <result status="valid" time="0.72"/>
             </proof>
            </goal>
           </transf>
@@ -720,14 +880,30 @@
         expl="1."
         sum="65ab4382ee40676a30d4f4a972b3e031"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -740,14 +916,30 @@
         expl="2."
         sum="9a241bee04e3b96a80f099f3f733eb9c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &gt;=ainfix -V17V3c0Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -760,17 +952,33 @@
         expl="3."
         sum="6d9243d09c054161b5f1bae159feda06"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V22V5Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -780,14 +988,30 @@
         expl="4."
         sum="7d0e12dacfe588ac02eea7f99f6ce345"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asubsetV23adiffadiffV0V1V2Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -800,10 +1024,18 @@
         expl="5."
         sum="97e20244d37862fd8e22808525dd835c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="apartial_solutionV22V20Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
+        <proof
+         prover="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="22.85"/>
+        </proof>
         <proof
          prover="1"
          timelimit="10"
@@ -811,6 +1043,22 @@
          obsolete="false"
          archived="false">
          <result status="valid" time="0.18"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.08"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
@@ -825,7 +1073,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="3"
+         prover="5"
          timelimit="10"
          memlimit="0"
          edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"
@@ -846,7 +1094,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="3"
+         prover="5"
          timelimit="10"
          memlimit="0"
          edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"
@@ -862,7 +1110,7 @@
         expl="8."
         sum="f000252ec4536b6f09840786c8aeda91"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EIamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
@@ -882,7 +1130,7 @@
         expl="9."
         sum="f431bdd4957f06e06f4ec86ae9eb3dbc"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asolutionV24Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
@@ -894,6 +1142,14 @@
          archived="false">
          <result status="valid" time="0.21"/>
         </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter t3.4.10"
@@ -902,7 +1158,7 @@
         expl="10."
         sum="145d54abc3713f1f21aa4513dbb1d687"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV20V24V22Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
@@ -914,6 +1170,14 @@
          archived="false">
          <result status="valid" time="1.16"/>
         </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="9.10"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter t3.4.11"
@@ -922,7 +1186,7 @@
         expl="11."
         sum="1052f31ca47036fe60652b8b3e6184d7"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="amemamixfix []V24V22adiffadiffadiffV0V1V2V23Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
@@ -934,6 +1198,14 @@
          archived="false">
          <result status="valid" time="2.84"/>
         </proof>
+        <proof
+         prover="2"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="12.04"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter t3.4.12"
@@ -942,14 +1214,30 @@
         expl="12."
         sum="93930bad2444a85059d0cd5c90ae2fd7"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV6V20V22Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -962,14 +1250,30 @@
         expl="13."
         sum="f66c740160f68dac41c85c5b9bd90eb2"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV4V18V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -984,17 +1288,25 @@
       expl="5. loop variant decrease"
       sum="530126f29855cc381a1194b794207058"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop variant decreaseainfix &lt;acardinalV23acardinalV8Aainfix &lt;=c0acardinalV8Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26apredaaddV13V2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28asuccaaddV13V1Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35V8IamemV34adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36V2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <proof
        prover="0"
-       timelimit="10"
-       memlimit="0"
+       timelimit="25"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
@@ -1004,14 +1316,14 @@
       expl="6. postcondition"
       sum="3fca44d3335e43bb09b6b2b4922b6370"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqaeq_prefixV12V13V11AasolutionV13FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter t3.6.1"
         locfile="../queens.mlw"
@@ -1019,17 +1331,33 @@
         expl="1."
         sum="8f5e4cde23fca7ab7b21b4520c03c194"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V7ainfix -V9V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -1039,17 +1367,33 @@
         expl="2."
         sum="54f5b20944b18bb458489854e1caa8e9"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &gt;=ainfix -V9V3c0INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -1059,17 +1403,33 @@
         expl="3."
         sum="caceac854e19a7278f9886a73b67b4e4"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V11V5INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -1079,17 +1439,25 @@
         expl="4."
         sum="d3ffdde92b776a0bbe60fe70673b9307"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asortedV10V3V9INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -1099,12 +1467,12 @@
         expl="5."
         sum="bdccc2e2db33abbc99fa24ddf0cf6c04"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EIaeq_prefixV12V13V11AasolutionV13FINNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="3"
+         prover="5"
          timelimit="10"
          memlimit="0"
          edited="queens_WP_NQueensSets_WP_parameter_t3_2.v"
@@ -1120,7 +1488,7 @@
         expl="6."
         sum="aafca9643f3f96cf70f57113cf39153b"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asolutionV13Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFINNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
@@ -1128,6 +1496,14 @@
          prover="1"
          timelimit="10"
          memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1140,14 +1516,30 @@
         expl="7."
         sum="5abaa3e6f53e7095b54a9c18d981fed1"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV12V13V11Iaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14EFINNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
+         prover="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
          prover="1"
          timelimit="10"
          memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1160,14 +1552,14 @@
         expl="8."
         sum="77111e7607ea9e57074bbf1c079ccea5"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV6V12V11INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1179,6 +1571,22 @@
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -1188,14 +1596,14 @@
         expl="9."
         sum="c1778d3b181e435c51482fb8ff7de21e"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV4V10V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqamemamixfix []V13V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V13V11AasolutionV13FAainfix &lt;V15V16IamemV16V8IamemV15adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V18ainfix -ainfix +V17V5V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FqNamemV17V2Iainfix &gt;=V17c0FANainfix =amixfix []V6V20ainfix -ainfix +V19V20V5Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V1Iainfix &gt;=V19c0FANainfix =amixfix []V6V22V21Iainfix &lt;V22V5Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1204,6 +1612,22 @@
          prover="1"
          timelimit="10"
          memlimit="0"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1218,14 +1642,14 @@
       expl="7. postcondition"
       sum="4b77c81ffa1e7bc816a0bd6777417d1d"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix =V5V5Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter t3.7.1"
         locfile="../queens.mlw"
@@ -1233,17 +1657,33 @@
         expl="1."
         sum="25cabb7c49f5ac48466a170eeffa18af"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal
@@ -1253,14 +1693,30 @@
         expl="2."
         sum="5c5ba4bc0b8fc83819892daad9c2cc70"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &gt;=ainfix -V8V3c0Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1273,13 +1729,29 @@
         expl="3."
         sum="d92015baae813292b51ea33a96794dda"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix =V5V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="5"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
          memlimit="1000"
          obsolete="false"
          archived="false">
@@ -1293,14 +1765,30 @@
         expl="4."
         sum="739506b67f4f3bf381e45391cbaac27c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asortedV7V3V8Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1313,17 +1801,33 @@
         expl="5."
         sum="b87a59fc86d995cc344c7d94c8be9fae"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EIaeq_prefixV6V9V5AasolutionV9FIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="4"
+         prover="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="6"
          timelimit="10"
          memlimit="0"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal
@@ -1333,17 +1837,25 @@
         expl="6."
         sum="21beceddadaa8abc429a8af675f8c40b"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asolutionV9Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.08"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal
@@ -1353,14 +1865,22 @@
         expl="7."
         sum="c1fe11da4ff74fe8795dbdc1a192f624"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV6V9V5Iaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10EFIainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.02"/>
@@ -1373,14 +1893,30 @@
         expl="8."
         sum="3dd733a3ecb17366ffb10cc6fc23d6b0"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV6V6V5Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.00"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.00"/>
@@ -1393,14 +1929,30 @@
         expl="9."
         sum="9343968ad1396b02dd364e7fe95eaf23"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aeq_prefixV4V7V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V10ainfix -ainfix +V9V5V10Iainfix &lt;V10V5Aainfix &lt;=c0V10FqNamemV9V2Iainfix &gt;=V9c0FANainfix =amixfix []V6V12ainfix -ainfix +V11V12V5Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V1Iainfix &gt;=V11c0FANainfix =amixfix []V6V14V13Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix &lt;V13anAainfix &lt;=c0V13qamemV13V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
          prover="0"
-         timelimit="10"
-         memlimit="0"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="25"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="25"
+         memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.01"/>
@@ -1417,14 +1969,14 @@
     expl="VC for queens3"
     sum="8b861072bf8546bb8e28e024af599175"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="aeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FAapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15aemptyIainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17aemptyIainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
     <label
      name="expl:VC for queens3"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter queens3.1"
       locfile="../queens.mlw"
@@ -1432,10 +1984,18 @@
       expl="1. precondition"
       sum="83f318f3deb5da6201759c05a014480c"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="preconditionapartial_solutionV3V4ANainfix =amixfix []V4V7ainfix -ainfix +V6V3V7Iainfix &lt;V7V3Aainfix &lt;=c0V7FqNamemV6aemptyIainfix &gt;=V6c0FANainfix =amixfix []V4V9ainfix -ainfix +V8V9V3Iainfix &lt;V9V3Aainfix &lt;=c0V9FqNamemV8aemptyIainfix &gt;=V8c0FANainfix =amixfix []V4V11V10Iainfix &lt;V11V3Aainfix &lt;=c0V11FAainfix &lt;V10anAainfix &lt;=c0V10qamemV10V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
       <label
        name="expl:VC for queens3"/>
+      <proof
+       prover="0"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
       <proof
        prover="1"
        timelimit="10"
@@ -1443,6 +2003,22 @@
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="9.73"/>
       </proof>
      </goal>
      <goal
@@ -1452,10 +2028,18 @@
       expl="2. postcondition"
       sum="efe2b3c055d814002c5b8c57a7675afc"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionaeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FIapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15aemptyIainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17aemptyIainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
       <label
        name="expl:VC for queens3"/>
+      <proof
+       prover="0"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
       <proof
        prover="1"
        timelimit="10"
@@ -1463,6 +2047,14 @@
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="25"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
     </transf>
