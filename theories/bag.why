@@ -7,6 +7,9 @@ theory Bag
 
   type bag 'a
 
+  (** whatever ['a], the type [bag 'a] is always infinite *)
+  meta "infinite_type" type bag
+
   (** the most basic operation is the number of occurrences *)
 
   function nb_occ (x: 'a) (b: bag 'a): int

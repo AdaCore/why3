@@ -7,6 +7,9 @@ theory SetGen
 
   type set 'a
 
+  (** if ['a] is an infinite type, then [set 'a] is infinite *)
+  meta "material_type_arg" type set, 0
+
   (** membership *)
   predicate mem 'a (set 'a)
 
