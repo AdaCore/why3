@@ -1043,6 +1043,8 @@ let add_decl loc th = function
       add_prop (prop_kind k) loc s f th
   | Meta (id, al) ->
       let convert = function
+        | PMAty (PPTtyapp (q,[]))
+                   -> MAts (find_tysymbol q th)
         | PMAty ty -> MAty (ty_of_pty th ty)
         | PMAfs q  -> MAls (find_fsymbol q th)
         | PMAps q  -> MAls (find_psymbol q th)
