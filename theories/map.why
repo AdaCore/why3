@@ -7,8 +7,7 @@ theory Map
 
   type map 'a 'b
 
-  (** if ['a] or ['b] are infinite types, then [map 'a 'b] is infinite *)
-  meta "material_type_arg" type map, 0
+  (** if ['b] is an infinite type, then [map 'a 'b] is infinite *)
   meta "material_type_arg" type map, 1
 
   function get (map 'a 'b) 'a : 'b
