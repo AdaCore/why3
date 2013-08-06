@@ -42,6 +42,9 @@ val ls_of_ts : tysymbol -> lsymbol
 (* convert a type to a term of type ty_type *)
 val term_of_ty : term Mtv.t -> ty -> term
 
+(* add type args to the signature of a polymorphic lsymbol *)
+val ls_extend : lsymbol -> lsymbol
+
 (* rewrite a closed formula modulo the given free typevars *)
 val type_close : Stv.t -> (term Mtv.t -> 'a -> term) -> 'a -> term
 
@@ -65,6 +68,9 @@ val is_protected_ls : Sty.t -> lsymbol -> bool
 
 (* monomorphise wrt the set of kept types, and a symbol map *)
 val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
+
+(* replace all non-kept types with ty_base *)
+val monomorphise_task : Task.task Trans.trans
 
 (* replace type variables in a goal with fresh type constants *)
 val monomorphise_goal : Task.task Trans.trans

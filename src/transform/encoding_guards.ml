@@ -44,14 +44,6 @@ let ps_sort =
   let tv = ty_var (create_tvsymbol (id_fresh "a")) in
   create_psymbol (id_fresh "sort") [tv]
 
-(* add type args to the signature of polymorphic symbols *)
-let findL = Wls.memoize 63 (fun ls ->
-  if ls_equal ls ps_equ then ls else
-  let tvs = ls_ty_freevars ls in
-  if Stv.is_empty tvs then ls else
-  let args = Stv.fold (fun _ l -> ty_type::l) tvs ls.ls_args in
-  Term.create_lsymbol (id_clone ls.ls_name) args ls.ls_value)
-
 (* add to [svs] each variable that [t] may be equal to *)
 let rec collect svs t = match t.t_node with
   | Tvar v -> Svs.add v svs
@@ -71,7 +63,7 @@ let rec expl_term info svs sign t = match t.t_node with
       let tl = List.map (expl_term info svs sign) tl in
       let add _ ty tl = term_of_ty info.varm ty :: tl in
       let tl = Mtv.fold add tv_to_ty tl in
-      t_label_copy t (t_app (findL ls) tl t.t_ty)
+      t_label_copy t (t_app (ls_extend ls) tl t.t_ty)
   | Tapp (ls,[t1;t2])
     when (not info.polar || sign) && ls_equal ls ps_equ ->
       svs := collect (collect !svs t1) t2;
@@ -144,10 +136,10 @@ let decl info d = match d.d_node with
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic types are not supported, run eliminate_algebraic"
   | Dparam ls ->
-      [create_param_decl (findL ls)] @ ls_desc info ls
+      [create_param_decl (ls_extend ls)] @ ls_desc info ls
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let f = t_type_close (expl_term info true) (ls_defn_axiom ld) in
-      defn_or_axiom (findL ls) f @ ls_desc info ls
+      defn_or_axiom (ls_extend ls) f @ ls_desc info ls
   | Dlogic _ -> Printer.unsupportedDecl d
       "Recursively-defined symbols are not supported, run eliminate_recursion"
   | Dind _ -> Printer.unsupportedDecl d
@@ -162,7 +154,7 @@ let d_infinite =
   let vs_ty = create_vsymbol (id_fresh "t") ty_type in
   let vs_arg = create_vsymbol (id_fresh "x") ty_arg in
   let t_ty = t_var vs_ty and t_arg = t_var vs_arg in
-  let f = ps_app (findL ps_sort) [t_ty; t_arg] in
+  let f = ps_app (ls_extend ps_sort) [t_ty; t_arg] in
   let f = t_forall_close [vs_arg] [] f in
   let f = t_implies (ps_app ps_inf_ty [t_ty]) f in
   let f = t_forall_close [vs_ty] [] f in
@@ -177,36 +169,19 @@ let d_witness =
 let expl_init =
   let init = Task.add_decl None d_ts_type in
   let init = Task.add_param_decl init ps_equ in
-  let init = Task.add_param_decl init (findL ps_sort) in
+  let init = Task.add_param_decl init (ls_extend ps_sort) in
   let init = Task.add_param_decl init ps_inf_ty in
   let init = Task.add_decl init d_infinite in
   let init = List.fold_left Task.add_decl init d_witness in
   init
 
-let explicit info = Trans.decl (decl info) expl_init
-
-(** {2 monomorphise task } *)
-
-let lsmap kept = Wls.memoize 63 (fun ls ->
-  let prot_arg = is_protecting_id ls.ls_name in
-  let prot_val = is_protected_id ls.ls_name in
-  let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
-  let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
-  let ty_arg = List.map neg ls.ls_args in
-  let ty_res = Opt.map pos ls.ls_value in
-  if Opt.equal ty_equal ty_res ls.ls_value &&
-     List.for_all2 ty_equal ty_arg ls.ls_args then ls
-  else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
-
-let monomorph kept =
-  let kept = Sty.add ty_type kept in
-  let decl = d_monomorph kept (lsmap kept) in
-  Trans.decl decl (Task.add_decl None d_ts_base)
-
-let () = Stdlib.Hstr.replace Encoding.ft_enco_poly "guards" (fun _ ->
+let guards =
   Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.on_tagged_ts Eliminate_algebraic.meta_infinite (fun infts ->
   Trans.on_meta Eliminate_algebraic.meta_material (fun matl ->
   let margs = Eliminate_algebraic.get_material_args matl in
   let info = mk_info kept infts margs in
-  Trans.compose (explicit info) (monomorph kept)))))
+  Trans.decl (decl info) expl_init)))
+
+let () = Stdlib.Hstr.replace Encoding.ft_enco_poly "guards" (fun _ ->
+  Trans.compose guards monomorphise_task)

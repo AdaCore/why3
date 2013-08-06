@@ -40,6 +40,14 @@ let ty_type = ty_app ts_type []
 (* ts_type declaration *)
 let d_ts_type = create_ty_decl ts_type
 
+(* add type args to the signature of a polymorphic lsymbol *)
+let ls_extend = Wls.memoize 63 (fun ls ->
+  if ls_equal ls ps_equ then ls else
+  let tvs = ls_ty_freevars ls in
+  if Stv.is_empty tvs then ls else
+  let args = Stv.fold (fun _ l -> ty_type::l) tvs ls.ls_args in
+  Term.create_lsymbol (id_clone ls.ls_name) args ls.ls_value)
+
 (* function symbol mapping ty_type^n to ty_type *)
 let ls_of_ts = Wts.memoize 63 (fun ts ->
   let args = List.map (Util.const ty_type) ts.ts_args in
@@ -181,6 +189,24 @@ let d_monomorph kept lsmap d =
   in
   let add ls acc = create_param_decl ls :: acc in
   Sls.fold add !consts dl
+
+let lsmap kept = Wls.memoize 63 (fun ls ->
+  let prot_arg = is_protecting_id ls.ls_name in
+  let prot_val = is_protected_id ls.ls_name in
+  let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
+  let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
+  let ty_arg = List.map neg ls.ls_args in
+  let ty_res = Opt.map pos ls.ls_value in
+  if Opt.equal ty_equal ty_res ls.ls_value &&
+     List.for_all2 ty_equal ty_arg ls.ls_args then ls
+  else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
+
+(* replace all non-kept types with ty_base *)
+let monomorphise_task =
+  Trans.on_tagged_ty meta_kept (fun kept ->
+    let kept = Sty.add ty_type kept in
+    let decl = d_monomorph kept (lsmap kept) in
+    Trans.decl decl (Task.add_decl None d_ts_base))
 
 (* replace type variables in a goal with fresh type constants *)
 let monomorphise_goal = Trans.goal (fun pr f ->
