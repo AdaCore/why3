@@ -9,9 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** transformation from polymorphic logic to untyped logic. The polymorphic
-logic must not have finite support types. *)
-
+(** transformation from polymorphic logic to many-sorted logic *)
 
 open Stdlib
 open Ident
@@ -40,6 +38,59 @@ end
 
 (** {2 module to separate utilities from important functions} *)
 
+module Lib = struct
+
+(* function symbol selecting ty_type from ty_type^n *)
+let ls_selects_of_ts = Wts.memoize 63 (fun ts ->
+  let create_select _ =
+    let preid = id_fresh ("select_"^ts.ts_name.id_string) in
+    create_fsymbol preid [ty_type] ty_type in
+  List.rev_map create_select ts.ts_args)
+
+let ls_int_of_ty = create_fsymbol (id_fresh "int_of_ty") [ty_type] ty_int
+
+(** definition of the previous selecting functions *)
+let ls_selects_def_of_ts acc ts =
+  let ls = ls_of_ts ts in
+  let vars = List.rev_map
+    (fun _ -> create_vsymbol (id_fresh "x") ty_type) ts.ts_args
+  in
+  let tvars = List.map t_var vars in
+  (** type to int *)
+  let id = id_hash ts.ts_name in
+  let acc =
+    let t = fs_app ls tvars ty_type in
+    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_nat_const id) in
+    let f = t_forall_close vars [[t]] f in
+    let prsymbol = create_prsymbol (id_clone ts.ts_name) in
+    create_prop_decl Paxiom prsymbol f :: acc
+  in
+  (** select *)
+  let ls_selects = ls_selects_of_ts ts in
+  let fmlas = List.rev_map2
+    (fun ls_select value ->
+      let t = fs_app ls tvars ty_type in
+      let t = fs_app ls_select [t] ty_type in
+      let f = t_equ t value in
+      let f = t_forall_close vars [[t]] f in
+      f)
+    ls_selects tvars in
+  let create_props ls_select fmla =
+    let prsymbol = create_prsymbol (id_clone ls_select.ls_name) in
+    create_prop_decl Paxiom prsymbol fmla in
+  let props =
+    List.fold_left2 (fun acc x y -> create_props x y::acc)
+      acc ls_selects fmlas in
+  let add acc fs = create_param_decl fs :: acc in
+  List.fold_left add props ls_selects
+
+(* convert a type declaration to a list of lsymbol declarations *)
+let lsdecl_of_ts_select ts =
+  let defs = ls_selects_def_of_ts [] ts in
+  create_param_decl (ls_of_ts ts) :: defs
+
+end
+
 module Transform = struct
 
   (** type_of *)
@@ -57,7 +108,7 @@ module Transform = struct
     | Tyapp (ts,tyl) ->
       let fold acc ls_select ty =
         extract_tvar acc (fs_app ls_select [t] ty_type) ty in
-      List.fold_left2 fold acc (ls_selects_of_ts ts) tyl
+      List.fold_left2 fold acc (Lib.ls_selects_of_ts ts) tyl
 
   let type_close_select tvs ts fn f =
     let fold acc t = extract_tvar acc (app_type t) (t_type t) in
@@ -142,7 +193,7 @@ module Transform = struct
     let add _ ty acc = term_of_ty varM ty :: acc in
     Mtv.fold add tv_to_ty args
 
-  and f_type_close_select kept f' =
+  let f_type_close_select kept f' =
     let tvs = t_ty_freevars Stv.empty f' in
     let trans fn acc f = match f.t_node with
       | Tquant(Tforall as q,_) -> (* Exists same thing? *)
@@ -216,10 +267,9 @@ end
 
 let decl kept d = match d.d_node with
   | Dtype { ts_def = Some _ } -> []
-  | Dtype ts -> d :: Libencoding.lsdecl_of_ts_select ts
+  | Dtype ts -> d :: Lib.lsdecl_of_ts_select ts
   | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic and recursively-defined types are \
-            not supported, run eliminate_algebraic"
+      "Algebraic types are not supported, run eliminate_algebraic"
   | Dparam ls -> Transform.param_transform kept ls
   | Dlogic ldl -> Transform.logic_transform kept d ldl
   | Dind (s, idl) -> Transform.ind_transform kept s idl
@@ -228,7 +278,7 @@ let decl kept d = match d.d_node with
 let empty_th =
   let task = use_export None Theory.builtin_theory in
   let task = Task.add_decl task d_ts_type in
-  let task = Task.add_param_decl task ls_int_of_ty in
+  let task = Task.add_param_decl task Lib.ls_int_of_ty in
   let task = Task.add_param_decl task Transform.fs_type in
   task
 
@@ -256,5 +306,5 @@ let monomorph = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   let decl = d_monomorph kept (lsmap kept) in
   Trans.decl decl (Task.add_decl None d_ts_base))
 
-let () = Hstr.replace Encoding.ft_enco_poly "guard"
+let () = Hstr.replace Encoding.ft_enco_poly "guards_full"
     (fun _ -> Trans.compose guard monomorph)

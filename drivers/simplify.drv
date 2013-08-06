@@ -27,14 +27,19 @@ transformation "remove_triggers"
 trigger they can't appear since = can't appear *)
 (*transformation "filter_trigger_builtin"*)
 
-transformation "encoding_tptp"
+(* this is sound as long as int is the only kept type *)
+transformation "encoding_smt"
 
 theory BuiltIn
   syntax predicate (=)  "(EQ %1 %2)"
 
-  meta "enco_poly" "decorate"
   meta "encoding : kept" type int
 
+  (* no symbol discrimination, no kept types *)
+  meta "select_inst" "none"
+  meta "select_lskept" "none"
+  meta "select_lsinst" "none"
+  meta "select_kept" "none"
 end
 
 theory int.Int

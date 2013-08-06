@@ -39,12 +39,6 @@ val d_ts_type : decl
 (* function symbol mapping ty_type^n to ty_type *)
 val ls_of_ts : tysymbol -> lsymbol
 
-(* function symbol mapping ty_type^n to int *)
-val ls_int_of_ty : lsymbol
-
-(* function symbol selecting ty_type from ty_type^n *)
-val ls_selects_of_ts : tysymbol -> lsymbol list
-
 (* convert a type to a term of type ty_type *)
 val term_of_ty : term Mtv.t -> ty -> term
 
@@ -56,9 +50,6 @@ val t_type_close : (term Mtv.t -> term -> term) -> term -> term
 
 (* convert a type declaration to a lsymbol declaration *)
 val lsdecl_of_ts : tysymbol -> decl
-
-(* convert a type declaration to a list of lsymbol declarations *)
-val lsdecl_of_ts_select : tysymbol -> decl list
 
 (* a pre-id for vsymbols and lsymbols that produce non-kept values *)
 val id_unprotected : string -> Ident.preid

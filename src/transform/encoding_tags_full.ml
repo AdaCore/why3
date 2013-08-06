@@ -9,6 +9,15 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** transformation from polymorphic logic to many-sorted logic *)
+
+(** an implementation of "decoration" encoding Dec() from Bobot and
+    Paskevich, Expressing Polymorphic Types in a Many-Sorted Language,
+    FroCoS 2011, LNCS 6989, 87-102, and before that, Couchot and Lescuyer,
+    Handling polymorphism in automated deduction, 2007, CADE-21, LNCS 4603.
+    Referred to as "traditional tags" encoding t in Blanchette et al.,
+    Encoding monomorphic and polymorphic types, TACAS 2013, LNCS 7795. *)
+
 open Stdlib
 open Ident
 open Ty
@@ -55,8 +64,7 @@ let deco_decl kept d = match d.d_node with
   | Dtype { ts_def = Some _ } -> []
   | Dtype ts -> [d; lsdecl_of_ts ts]
   | Ddata _ -> Printer.unsupportedDecl d
-      "Algebraic and recursively-defined types are \
-            not supported, run eliminate_algebraic"
+      "Algebraic types are not supported, run eliminate_algebraic"
   | Dparam _ -> [d]
   | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
       let f = t_type_close (deco_term kept) (ls_defn_axiom ld) in
@@ -110,5 +118,4 @@ let mono kept =
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun kept ->
   Trans.compose (deco kept) (mono kept))
 
-let () = Hstr.replace Encoding.ft_enco_poly "decorate" (Util.const t)
-
+let () = Hstr.replace Encoding.ft_enco_poly "tags_full" (Util.const t)

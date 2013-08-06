@@ -120,12 +120,10 @@ LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
-		libencoding discriminate protect_finite \
-		encoding encoding_select \
-		encoding_decorate encoding_decoexp encoding_twin \
-		encoding_explicit encoding_guard encoding_sort \
-		encoding_guards encoding_tags \
-		encoding_instantiate simplify_array filter_trigger \
+		libencoding discriminate encoding encoding_select \
+		encoding_guards_full encoding_tags_full \
+		encoding_guards encoding_tags encoding_twin \
+		encoding_sort simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate smoke_detector
 
