@@ -81,10 +81,10 @@ let rec expl_term info svs sign t = match t.t_node with
   | Tquant (q, b) ->
       let vl,tl,f1,close = t_open_quant_cb b in
       let add_vs v (f,svs) =
-        if is_protected_vs info.kept v || is_infinite_ty info v.vs_ty then
+        if is_protected_vs info.kept v then
           f, svs
         else if info.polar && sign = (q = Tforall) then
-          f, Svs.add v svs
+          f, if is_infinite_ty info v.vs_ty then svs else Svs.add v svs
         else
           let g = t_equ (fs_app fs_sort [t_var v] v.vs_ty) (t_var v) in
           (if q = Tforall then t_implies else t_and) g f, svs
@@ -106,25 +106,8 @@ let expl_term info sign varM t =
 
 (** {2 main part} *)
 
-let ps_inf_ty = create_psymbol (id_fresh "infinite") [ty_type]
-
-let ts_desc info ts =
-  if not (Sts.mem ts info.infts || Mts.mem ts info.margs) then [] else
-  let vs_of_tv v = create_vsymbol (id_clone v.tv_name) ty_type in
-  let vl = List.map vs_of_tv ts.ts_args in
-  let id = id_fresh ("Inf_ts_" ^ ts.ts_name.id_string) in
-  let add_axiom f = let f = t_forall_close vl [] f in
-    create_prop_decl Paxiom (create_prsymbol id) f in
-  let t = fs_app (ls_of_ts ts) (List.map t_var vl) ty_type in
-  let f = ps_app ps_inf_ty [t] in
-  if Sts.mem ts info.infts then [add_axiom f] else
-  let add material v l = if not material then l else
-    add_axiom (t_implies (ps_app ps_inf_ty [t_var v]) f) :: l in
-  List.fold_right2 add (Mts.find ts info.margs) vl []
-
 let ls_desc info ls =
-  if ls.ls_value = None || is_protected_ls info.kept ls ||
-      is_infinite_ty info (Opt.get ls.ls_value) then [] else
+  if ls.ls_value = None || is_protected_ls info.kept ls then [] else
   let vl = List.map (create_vsymbol (id_fresh "x")) ls.ls_args in
   let t = t_app ls (List.map t_var vl) ls.ls_value in
   let f = t_forall_close vl [] (t_equ (t_app fs_sort [t] t.t_ty) t) in
@@ -134,7 +117,7 @@ let ls_desc info ls =
 let decl info d = match d.d_node with
   | Dtype { ts_def = Some _ } -> []
   | Dtype ts ->
-      [d; lsdecl_of_ts ts] @ ts_desc info ts
+      [d; lsdecl_of_ts ts]
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic types are not supported, run eliminate_algebraic"
   | Dparam ls ->
@@ -150,18 +133,6 @@ let decl info d = match d.d_node with
       let sign = (k <> Pgoal) in
       [create_prop_decl k pr (t_type_close (expl_term info sign) f)]
 
-let d_infinite =
-  let pr = create_prsymbol (id_fresh "Infinite_type") in
-  let ty_arg = ty_var (create_tvsymbol (id_fresh "a")) in
-  let vs_ty = create_vsymbol (id_fresh "t") ty_type in
-  let vs_arg = create_vsymbol (id_fresh "x") ty_arg in
-  let t_ty = t_var vs_ty and t_arg = t_var vs_arg in
-  let t = fs_app (ls_extend fs_sort) [t_ty; t_arg] ty_arg in
-  let f = t_forall_close [vs_arg] [] (t_equ t t_arg) in
-  let f = t_implies (ps_app ps_inf_ty [t_ty]) f in
-  let f = t_forall_close [vs_ty] [] f in
-  create_prop_decl Paxiom pr f
-
 let d_witness =
   let tv = ty_var (create_tvsymbol (id_fresh "a")) in
   let fs_wit = create_fsymbol (id_fresh "witness") [] tv in
@@ -172,8 +143,6 @@ let expl_init =
   let init = Task.add_decl None d_ts_type in
   let init = Task.add_param_decl init ps_equ in
   let init = Task.add_param_decl init (ls_extend fs_sort) in
-  let init = Task.add_param_decl init ps_inf_ty in
-  let init = Task.add_decl init d_infinite in
   let init = List.fold_left Task.add_decl init d_witness in
   init
 
