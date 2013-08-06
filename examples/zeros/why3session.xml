@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -28,7 +28,7 @@
     locfile="../zeros.mlw"
     loclnum="7" loccnumb="6" loccnume="15"
     expl="VC for set_zeros"
-    sum="62fdba52e0d5a19eb939d05dfe467e89"
+    sum="af29c4fc7f304a7aa535c8eec7f85b64"
     proved="true"
     expanded="true"
     shape="ainfix =agetV3V4c0Iainfix &lt;V4V0Aainfix &lt;=c0V4FAainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5FAainfix =agetV7V8c0Iainfix &lt;V8ainfix +V6c1Aainfix &lt;=c0V8FIainfix =V7asetV3V6c0Aainfix &lt;=c0V0FAainfix &lt;V6V0Aainfix &lt;=c0V6Aainfix &lt;=c0V0Iainfix =agetV3V9c0Iainfix &lt;V9V6Aainfix &lt;=c0V9FIainfix &lt;=V6V2Aainfix &lt;=c0V6FFAainfix =agetV1V10c0Iainfix &lt;V10c0Aainfix &lt;=c0V10FIainfix &lt;=c0V2Aainfix =agetV1V11c0Iainfix &lt;V11V0Aainfix &lt;=c0V11FIainfix &gt;c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
@@ -43,10 +43,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="1. postcondition"
-      sum="08bdf75fdb7ee1edb198887c5bfbc2a9"
+      sum="a87261936435957bde3bd5ac3e5f6848"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV1V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix &gt;c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="postconditionainfix =agetV1V3c0Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix &gt;c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -63,10 +63,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="2. loop invariant init"
-      sum="2adb58832662bb117c3f5181fe588953"
+      sum="7cbb175119f77056defdebd0c7d896d1"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV1V3c0Iainfix &lt;V3c0Aainfix &lt;=c0V3FIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="loop invariant initainfix =agetV1V3c0Iainfix &lt;V3c0Aainfix &lt;=c0V3FIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -83,10 +83,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="3. type invariant"
-      sum="91e50c689fb908c9f23d694d646a8abd"
+      sum="28857779119a3ce112b5289952487f33"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4V2Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4V2Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -103,10 +103,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="4. precondition"
-      sum="44d107f78ebab56ecce241fb2d297a0f"
+      sum="0be8f547ce8e86855461558a3e932444"
       proved="true"
       expanded="true"
-      shape="ainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4V2Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="preconditionainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4V2Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -123,10 +123,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="5. loop invariant preservation"
-      sum="840ee45390e4ae01616d0b19e561099a"
+      sum="25ec5263a5108a45a20330bff0de3eb5"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV5V6c0Iainfix &lt;V6ainfix +V4c1Aainfix &lt;=c0V6FIainfix =V5asetV3V4c0Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix =agetV3V7c0Iainfix &lt;V7V4Aainfix &lt;=c0V7FIainfix &lt;=V4V2Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="loop invariant preservationainfix =agetV5V6c0Iainfix &lt;V6ainfix +V4c1Aainfix &lt;=c0V6FIainfix =V5asetV3V4c0Aainfix &lt;=c0V0FIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix =agetV3V7c0Iainfix &lt;V7V4Aainfix &lt;=c0V7FIainfix &lt;=V4V2Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -151,10 +151,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="6. type invariant"
-      sum="fd9022fcdc1286cbd6836c258933d939"
+      sum="b2290cda142e387f5652d79b9816df7b"
       proved="true"
       expanded="false"
-      shape="ainfix &lt;=c0V0Iainfix =agetV3V4c0Iainfix &lt;V4ainfix +V2c1Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV3V4c0Iainfix &lt;V4ainfix +V2c1Aainfix &lt;=c0V4FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -171,10 +171,10 @@
       locfile="../zeros.mlw"
       loclnum="7" loccnumb="6" loccnume="15"
       expl="7. postcondition"
-      sum="65dcd4e2e6ee3d3b5cc7678273a7f84b"
+      sum="77bd1327ad85e24598654f2f309e90f8"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV3V4c0Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
+      shape="postconditionainfix =agetV3V4c0Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix &lt;=c0V0Iainfix =agetV3V5c0Iainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5FFIainfix &lt;=c0V2Lainfix -V0c1Iainfix &lt;=c0V0FF">
       <label
        name="expl:VC for set_zeros"/>
       <proof
@@ -193,7 +193,7 @@
     locfile="../zeros.mlw"
     loclnum="14" loccnumb="6" loccnume="13"
     expl="VC for harness"
-    sum="3fd2dd49999680957d4c7f177ce08eb4"
+    sum="88abcf7acdf7e5e75a6a4d1fe787ee6c"
     proved="true"
     expanded="true"
     shape="ainfix =agetV0c12c0Aainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Aainfix &gt;=c42c0">
@@ -208,10 +208,10 @@
       locfile="../zeros.mlw"
       loclnum="14" loccnumb="6" loccnume="13"
       expl="1. precondition"
-      sum="0790f788014985bc64083afc417bec72"
+      sum="74348b92413861c61b37d12db4212ce3"
       proved="true"
       expanded="true"
-      shape="ainfix &gt;=c42c0">
+      shape="preconditionainfix &gt;=c42c0">
       <label
        name="expl:VC for harness"/>
       <proof
@@ -228,10 +228,10 @@
       locfile="../zeros.mlw"
       loclnum="14" loccnumb="6" loccnume="13"
       expl="2. assertion"
-      sum="aa32521d8b7f8c8b96dc29bbd65f7ec4"
+      sum="ce3eb7c56504ce76056ad735b8b8a2da"
       proved="true"
       expanded="true"
-      shape="ainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
+      shape="assertionainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
       <label
        name="expl:VC for harness"/>
       <proof
@@ -248,10 +248,10 @@
       locfile="../zeros.mlw"
       loclnum="14" loccnumb="6" loccnume="13"
       expl="3. assertion"
-      sum="93b04770a3687a89736d06dc002ccc1b"
+      sum="e3d034d921b1926e6a1461293f44a8a2"
       proved="true"
       expanded="true"
-      shape="ainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
+      shape="assertionainfix =agetV0c12c0Iainfix =c42c42Iainfix =agetV0V1c0Iainfix &lt;V1c42Aainfix &lt;=c0V1FAainfix &lt;=c0c42FIainfix &lt;=c0c42Iainfix &gt;=c42c0">
       <label
        name="expl:VC for harness"/>
       <proof

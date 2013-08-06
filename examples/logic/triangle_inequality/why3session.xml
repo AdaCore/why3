@@ -4,33 +4,29 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
   version="0.95.1"/>
  <prover
-  id="2"
+  id="1"
   name="CVC3"
   version="2.2"/>
  <prover
-  id="3"
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="4"
+  id="3"
   name="CVC4"
-  version="1.0"/>
+  version="1.2"/>
  <prover
-  id="5"
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="6"
+  id="5"
   name="Z3"
   version="3.2"/>
  <prover
-  id="7"
+  id="6"
   name="Z3"
   version="4.3.1"/>
  <file
@@ -52,7 +48,7 @@
     expanded="true"
     shape="ainfix &gt;=anorm2V0V1c0.0F">
     <proof
-     prover="6"
+     prover="5"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -60,7 +56,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -77,7 +73,7 @@
     expanded="true"
     shape="ainfix =apV0V1V2V3V4anorm2ainfix +V0ainfix *V4V2ainfix +V1ainfix *V4V3F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -85,7 +81,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="6"
+     prover="5"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -93,7 +89,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -110,7 +106,7 @@
     expanded="true"
     shape="ainfix &gt;=apV0V1V2V3V4c0.0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -118,7 +114,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -126,7 +122,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -134,7 +130,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -151,7 +147,7 @@
     expanded="true"
     shape="ainfix =ainfix *ainfix /V0V1V1V0INainfix =V1c0.0F">
     <proof
-     prover="6"
+     prover="5"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -159,7 +155,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -181,7 +177,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.88"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <metas
      proved="true"
@@ -207,7 +203,7 @@
      </ls_pos>
      <ls_pos
       name="one"
-      id="131"
+      id="138"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -216,7 +212,7 @@
      </ls_pos>
      <ls_pos
       name="infix &lt;"
-      id="132"
+      id="139"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -225,7 +221,7 @@
      </ls_pos>
      <ls_pos
       name="infix &lt;="
-      id="144"
+      id="151"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -234,7 +230,7 @@
      </ls_pos>
      <ls_pos
       name="infix +"
-      id="1232"
+      id="1239"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -243,7 +239,7 @@
      </ls_pos>
      <ls_pos
       name="prefix -"
-      id="1233"
+      id="1240"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -252,7 +248,7 @@
      </ls_pos>
      <ls_pos
       name="infix *"
-      id="1234"
+      id="1241"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -261,7 +257,7 @@
      </ls_pos>
      <ls_pos
       name="inv"
-      id="1300"
+      id="1307"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -270,7 +266,7 @@
      </ls_pos>
      <ls_pos
       name="infix &gt;="
-      id="1357"
+      id="1364"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -279,7 +275,7 @@
      </ls_pos>
      <ls_pos
       name="sqrt"
-      id="2564"
+      id="2571"
       ip_theory="Square">
       <ip_library
        name="real"/>
@@ -288,7 +284,7 @@
      </ls_pos>
      <pr_pos
       name="Assoc"
-      id="1235"
+      id="1242"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -299,7 +295,7 @@
      </pr_pos>
      <pr_pos
       name="Unit_def_l"
-      id="1242"
+      id="1249"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -310,7 +306,7 @@
      </pr_pos>
      <pr_pos
       name="Unit_def_r"
-      id="1245"
+      id="1252"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -321,7 +317,7 @@
      </pr_pos>
      <pr_pos
       name="Inv_def_l"
-      id="1248"
+      id="1255"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -332,7 +328,7 @@
      </pr_pos>
      <pr_pos
       name="Inv_def_r"
-      id="1251"
+      id="1258"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -343,7 +339,7 @@
      </pr_pos>
      <pr_pos
       name="Comm"
-      id="1254"
+      id="1261"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -356,7 +352,7 @@
      </pr_pos>
      <pr_pos
       name="Assoc"
-      id="1259"
+      id="1266"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -367,7 +363,7 @@
      </pr_pos>
      <pr_pos
       name="Mul_distr_l"
-      id="1266"
+      id="1273"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -376,7 +372,7 @@
      </pr_pos>
      <pr_pos
       name="Mul_distr_r"
-      id="1273"
+      id="1280"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -385,7 +381,7 @@
      </pr_pos>
      <pr_pos
       name="Comm"
-      id="1291"
+      id="1298"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -396,7 +392,7 @@
      </pr_pos>
      <pr_pos
       name="Unitary"
-      id="1296"
+      id="1303"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -405,7 +401,7 @@
      </pr_pos>
      <pr_pos
       name="NonTrivialRing"
-      id="1299"
+      id="1306"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -414,7 +410,7 @@
      </pr_pos>
      <pr_pos
       name="Inverse"
-      id="1301"
+      id="1308"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -423,7 +419,7 @@
      </pr_pos>
      <pr_pos
       name="add_div"
-      id="1315"
+      id="1322"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -432,7 +428,7 @@
      </pr_pos>
      <pr_pos
       name="sub_div"
-      id="1322"
+      id="1329"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -441,7 +437,7 @@
      </pr_pos>
      <pr_pos
       name="neg_div"
-      id="1329"
+      id="1336"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -450,7 +446,7 @@
      </pr_pos>
      <pr_pos
       name="assoc_div_mul"
-      id="1341"
+      id="1348"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -459,7 +455,7 @@
      </pr_pos>
      <pr_pos
       name="assoc_div_div"
-      id="1348"
+      id="1355"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -468,7 +464,7 @@
      </pr_pos>
      <pr_pos
       name="Refl"
-      id="1366"
+      id="1373"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -477,7 +473,7 @@
      </pr_pos>
      <pr_pos
       name="Trans"
-      id="1369"
+      id="1376"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -486,7 +482,7 @@
      </pr_pos>
      <pr_pos
       name="Antisymm"
-      id="1376"
+      id="1383"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -495,7 +491,7 @@
      </pr_pos>
      <pr_pos
       name="Total"
-      id="1381"
+      id="1388"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -504,7 +500,7 @@
      </pr_pos>
      <pr_pos
       name="ZeroLessOne"
-      id="1386"
+      id="1393"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -513,7 +509,7 @@
      </pr_pos>
      <pr_pos
       name="CompatOrderAdd"
-      id="1387"
+      id="1394"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -522,7 +518,7 @@
      </pr_pos>
      <pr_pos
       name="CompatOrderMult"
-      id="1394"
+      id="1401"
       ip_theory="Real">
       <ip_library
        name="real"/>
@@ -531,7 +527,7 @@
      </pr_pos>
      <pr_pos
       name="Sqrt_positive"
-      id="2566"
+      id="2573"
       ip_theory="Square">
       <ip_library
        name="real"/>
@@ -540,7 +536,7 @@
      </pr_pos>
      <pr_pos
       name="Sqrt_square"
-      id="2569"
+      id="2576"
       ip_theory="Square">
       <ip_library
        name="real"/>
@@ -549,7 +545,7 @@
      </pr_pos>
      <pr_pos
       name="Square_sqrt"
-      id="2572"
+      id="2579"
       ip_theory="Square">
       <ip_library
        name="real"/>
@@ -558,7 +554,7 @@
      </pr_pos>
      <pr_pos
       name="Sqrt_mul"
-      id="2575"
+      id="2582"
       ip_theory="Square">
       <ip_library
        name="real"/>
@@ -567,7 +563,7 @@
      </pr_pos>
      <pr_pos
       name="Sqrt_le"
-      id="2580"
+      id="2587"
       ip_theory="Square">
       <ip_library
        name="real"/>
@@ -576,21 +572,21 @@
      </pr_pos>
      <pr_pos
       name="norm2_pos"
-      id="2841"
+      id="2848"
       ip_theory="CauchySchwarzInequality">
       <ip_qualid
        name="norm2_pos"/>
      </pr_pos>
      <pr_pos
       name="p_expr"
-      id="2867"
+      id="2874"
       ip_theory="CauchySchwarzInequality">
       <ip_qualid
        name="p_expr"/>
      </pr_pos>
      <pr_pos
       name="p_pos"
-      id="2878"
+      id="2885"
       ip_theory="CauchySchwarzInequality">
       <ip_qualid
        name="p_pos"/>
@@ -603,52 +599,47 @@
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="131"/>
+       id="138"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="132"/>
+       id="139"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="144"/>
+       id="151"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="1232"/>
+       id="1239"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="1233"/>
+       id="1240"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="1234"/>
+       id="1241"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="1300"/>
+       id="1307"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="1357"/>
+       id="1364"/>
      </meta>
      <meta
       name="remove_logic">
       <meta_arg_ls
-       id="2564"/>
-     </meta>
-     <meta
-      name="remove_prop">
-      <meta_arg_pr
-       id="1235"/>
+       id="2571"/>
      </meta>
      <meta
       name="remove_prop">
@@ -658,27 +649,27 @@
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1245"/>
+       id="1249"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1248"/>
+       id="1252"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1251"/>
+       id="1255"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1254"/>
+       id="1258"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1259"/>
+       id="1261"/>
      </meta>
      <meta
       name="remove_prop">
@@ -693,27 +684,27 @@
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1291"/>
+       id="1280"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1296"/>
+       id="1298"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1299"/>
+       id="1303"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1301"/>
+       id="1306"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1315"/>
+       id="1308"/>
      </meta>
      <meta
       name="remove_prop">
@@ -728,7 +719,7 @@
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1341"/>
+       id="1336"/>
      </meta>
      <meta
       name="remove_prop">
@@ -738,12 +729,12 @@
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1366"/>
+       id="1355"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1369"/>
+       id="1373"/>
      </meta>
      <meta
       name="remove_prop">
@@ -753,17 +744,17 @@
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1381"/>
+       id="1383"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1386"/>
+       id="1388"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="1387"/>
+       id="1393"/>
      </meta>
      <meta
       name="remove_prop">
@@ -773,42 +764,47 @@
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2566"/>
+       id="1401"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2569"/>
+       id="2573"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2572"/>
+       id="2576"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2575"/>
+       id="2579"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2580"/>
+       id="2582"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2841"/>
+       id="2587"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2867"/>
+       id="2848"/>
      </meta>
      <meta
       name="remove_prop">
       <meta_arg_pr
-       id="2878"/>
+       id="2874"/>
+     </meta>
+     <meta
+      name="remove_prop">
+      <meta_arg_pr
+       id="2885"/>
      </meta>
      <meta
       name="remove_type">
@@ -838,14 +834,6 @@
         shape="ainfix =apV0V1V2V3aprefix -ainfix /adotV0V1V2V3anorm2V2V3ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
         <proof
          prover="0"
-         timelimit="5"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.10"/>
-        </proof>
-        <proof
-         prover="1"
          timelimit="45"
          memlimit="1000"
          obsolete="false"
@@ -853,7 +841,7 @@
          <result status="valid" time="32.03"/>
         </proof>
         <proof
-         prover="7"
+         prover="6"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -874,7 +862,7 @@
     expanded="true"
     shape="ainfix &gt;=ainfix -anorm2V0V1ainfix /asqradotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -882,7 +870,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -899,7 +887,7 @@
     expanded="true"
     shape="ainfix &gt;=ainfix *anorm2V2V3apV0V1V2V3ainfix /aprefix -adotV0V1V2V3anorm2V2V3c0.0Iainfix &gt;anorm2V2V3c0.0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -916,7 +904,7 @@
     expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3Iainfix &gt;anorm2V2V3c0.0F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_aux_non_null_1.v"
@@ -934,7 +922,7 @@
     expanded="true"
     shape="ainfix =V1c0.0Oainfix =V0c0.0Iainfix =anorm2V0V1c0.0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -951,7 +939,7 @@
     expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3Iainfix =anorm2V2V3c0.0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -959,7 +947,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -967,7 +955,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -975,7 +963,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="6"
+     prover="5"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -983,7 +971,7 @@
      <result status="valid" time="0.28"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1000,7 +988,7 @@
     expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1008,7 +996,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1016,7 +1004,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1024,7 +1012,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1041,7 +1029,7 @@
     expanded="true"
     shape="ainfix &gt;=anormV0V1c0.0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1049,12 +1037,20 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -1065,15 +1061,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="5"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1081,7 +1069,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1098,7 +1086,7 @@
     expanded="true"
     shape="ainfix &lt;=V0asqrtV1Iainfix &lt;=asqrV0V1Aainfix &lt;=c0.0asqrV0Aainfix &lt;=c0.0V0F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1115,7 +1103,7 @@
     expanded="true"
     shape="ainfix &lt;=adotV0V1V2V3ainfix *anormV0V1anormV2V3F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"
@@ -1140,15 +1128,7 @@
     expanded="true"
     shape="ainfix &lt;=anorm2ainfix +V0V2ainfix +V1V3asqrainfix +anormV0V1anormV2V3F">
     <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="4.62"/>
-    </proof>
-    <proof
-     prover="7"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1165,7 +1145,7 @@
     expanded="true"
     shape="ainfix &lt;=asqrtV0V1Iainfix &lt;=V0asqrV1Aainfix &lt;=c0.0V0Aainfix &lt;=c0.0V1F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1173,7 +1153,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="3"
      memlimit="1000"
      obsolete="false"
@@ -1181,7 +1161,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="3"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -1198,7 +1178,7 @@
     expanded="true"
     shape="ainfix &lt;=anormainfix +V0V2ainfix +V1V3ainfix +anormV0V1anormV2V3F">
     <proof
-     prover="5"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="triangle_inequality_TriangleInequality_triangle_1.v"

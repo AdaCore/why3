@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -16,7 +16,7 @@
  <prover
   id="3"
   name="CVC4"
-  version="1.0"/>
+  version="1.2"/>
  <prover
   id="4"
   name="Coq"
@@ -48,10 +48,10 @@
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="56" loccnumb="6" loccnume="14"
     expl="VC for get_left"
-    sum="9d99824bf0a1968da6f14889fb612363"
+    sum="9504d9b9b516bcd653549d977b1799dc"
     proved="true"
     expanded="false"
-    shape="ainfix =aleftagetV1V0aleftagetV1V0Iainfix =V0anullNFF">
+    shape="ainfix =aleftagetV1V0aleftagetV1V0INainfix =V0anullFF">
     <label
      name="expl:VC for get_left"/>
     <proof
@@ -116,10 +116,10 @@
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="60" loccnumb="6" loccnume="15"
     expl="VC for get_right"
-    sum="6f22814458c545e01ba99821ec973397"
+    sum="9abb8323dc5f8cd6ca013a883b4d10be"
     proved="true"
     expanded="false"
-    shape="ainfix =arightagetV1V0arightagetV1V0Iainfix =V0anullNFF">
+    shape="ainfix =arightagetV1V0arightagetV1V0INainfix =V0anullFF">
     <label
      name="expl:VC for get_right"/>
     <proof
@@ -184,10 +184,10 @@
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="64" loccnumb="6" loccnume="14"
     expl="VC for get_data"
-    sum="57473e9c05d1b0677c23beed8c85f89f"
+    sum="bed435e94f215867b7491be0e6be353d"
     proved="true"
     expanded="false"
-    shape="ainfix =adataagetV1V0adataagetV1V0Iainfix =V0anullNFF">
+    shape="ainfix =adataagetV1V0adataagetV1V0INainfix =V0anullFF">
     <label
      name="expl:VC for get_data"/>
     <proof
@@ -258,7 +258,7 @@
     name="inorder_zip"
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="98" loccnumb="8" loccnume="19"
-    sum="f483b9f6a286367cc15475e806d6fb31"
+    sum="d4c4f5df892ba5988aefeaa9ac7df037"
     proved="true"
     expanded="false"
     shape="ainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0F">
@@ -271,10 +271,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="98" loccnumb="8" loccnume="19"
       expl="1."
-      sum="2d7c6553584f6d42bfca9a6b64f17c5b"
+      sum="081753f152024429b10394ea0def55db"
       proved="true"
       expanded="false"
-      shape="CV0aTopainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0FaLeftVVVainfix =ainorderazipaNodeV8V7V9V0ainfix ++ainorderV8aConsV7ainorderazipV9V0FIainfix =ainorderazipaNodeV11V10V12V4ainfix ++ainorderV11aConsV10ainorderazipV12V4FF">
+      shape="Cainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0FaTopainfix =ainorderazipaNodeV8V7V9V0ainfix ++ainorderV8aConsV7ainorderazipV9V0FIainfix =ainorderazipaNodeV11V10V12V4ainfix ++ainorderV11aConsV10ainorderazipV12V4FaLeftVVVV0F">
       <transf
        name="split_goal_wp"
        proved="true"
@@ -284,10 +284,10 @@
         locfile="../verifythis_fm2012_treedel.mlw"
         loclnum="98" loccnumb="8" loccnume="19"
         expl="1."
-        sum="a2b404357de1838f31e1ee95a2e878c4"
+        sum="1803c0522daed2a760ae3d5cda1eafb3"
         proved="true"
         expanded="false"
-        shape="CV0aTopainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0FaLeftVVVtF">
+        shape="Cainfix =ainorderazipaNodeV2V1V3V0ainfix ++ainorderV2aConsV1ainorderazipV3V0FaToptaLeftVVVV0F">
         <proof
          prover="0"
          timelimit="5"
@@ -350,10 +350,10 @@
         locfile="../verifythis_fm2012_treedel.mlw"
         loclnum="98" loccnumb="8" loccnume="19"
         expl="2."
-        sum="3db9e0e1f65bfb3e418a467273ba2cb1"
+        sum="bcb9a001423e9560364e9167b0968b05"
         proved="true"
         expanded="false"
-        shape="CV0aToptaLeftVVVainfix =ainorderazipaNodeV5V4V6V0ainfix ++ainorderV5aConsV4ainorderazipV6V0FIainfix =ainorderazipaNodeV8V7V9V1ainfix ++ainorderV8aConsV7ainorderazipV9V1FF">
+        shape="CtaTopainfix =ainorderazipaNodeV5V4V6V0ainfix ++ainorderV5aConsV4ainorderazipV6V0FIainfix =ainorderazipaNodeV8V7V9V1ainfix ++ainorderV8aConsV7ainorderazipV9V1FaLeftVVVV0F">
         <proof
          prover="0"
          timelimit="5"
@@ -368,7 +368,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.20"/>
+         <result status="valid" time="0.48"/>
         </proof>
         <proof
          prover="2"
@@ -376,7 +376,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.08"/>
+         <result status="valid" time="0.57"/>
         </proof>
         <proof
          prover="3"
@@ -420,10 +420,10 @@
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="102" loccnumb="12" loccnume="16"
     expl="unreachable point"
-    sum="8e6da1c6df52e17cb4a0d9aa3b0eb2ec"
+    sum="e9a3c4cb6ae61a3e5f7ee1359d041de0"
     proved="true"
     expanded="false"
-    shape="CV0aEmptyfaNodeVwwCV0aEmptyfaNodeVwwainfix =V1V2Iainfix =V0aEmptyNF">
+    shape="unreachable pointCfaEmptyCfaEmptyainfix =V1V2aNodeVwwV0aNodeVwwV0INainfix =V0aEmptyF">
     <label
      name="expl:VC for left"/>
     <proof
@@ -456,7 +456,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.15"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="5"
@@ -488,10 +488,10 @@
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="108" loccnumb="12" loccnume="17"
     expl="unreachable point"
-    sum="467ca3bfeebd548b5c6d6054b120a23b"
+    sum="9b2c44e18da4c37b8bec6b5ba8452100"
     proved="true"
     expanded="false"
-    shape="CV0aEmptyfaNodewwVCV0aEmptyfaNodewwVainfix =V1V2Iainfix =V0aEmptyNF">
+    shape="unreachable pointCfaEmptyCfaEmptyainfix =V1V2aNodewwVV0aNodewwVV0INainfix =V0aEmptyF">
     <label
      name="expl:VC for right"/>
     <proof
@@ -524,7 +524,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="5.13"/>
+     <result status="valid" time="0.02"/>
     </proof>
     <proof
      prover="5"
@@ -555,7 +555,7 @@
     name="main_lemma"
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="114" loccnumb="8" loccnume="18"
-    sum="cd815f9d38b7ad039e9edfc67d6c1b48"
+    sum="c4956d408734a6ebf6d77c8502cbf20f"
     proved="true"
     expanded="false"
     shape="aistreeV8V1azipaNodeV5V2V4V6Lamixfix [&lt;-]V0V2amk nodearightamixfix []V0V3arightamixfix []V0V2adataamixfix []V0V2IadistinctainorderV7IaistreeV0V1V7LazipaNodeaNodeaEmptyV3V5V2V4V6F">
@@ -598,7 +598,7 @@
      edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="26.29"/>
+     <result status="valid" time="35.22"/>
     </proof>
     <proof
      prover="5"
@@ -630,10 +630,10 @@
     locfile="../verifythis_fm2012_treedel.mlw"
     loclnum="123" loccnumb="6" loccnume="28"
     expl="VC for search_tree_delete_min"
-    sum="cce99cebffdf743823f15c68b9e0b447"
+    sum="47ad31340d0a82434024a4c86dabd379"
     proved="true"
     expanded="true"
-    shape="iainfix =aleftagetV2V0anullCV1aEmptyfaNodeVwVCainorderV1aNilfaConsVVainfix =ainorderV5V7Aainfix =adataagetV2V0adataagetV2V6AaistreeV2arightagetV2V0V5Iainfix =V5V4FAainfix =V3aEmptyAainfix =V0anullNAainfix =V0anullNiainfix =V14anullNainfix =azipV25V17V1AaistreeV2V22V25LaNodeV21V22V19Aainfix =aleftagetV2V23V24Aainfix =V23anullNAainfix =aleftagetV2V22V23Aainfix =V22anullNIainfix =V24aleftagetV2V23FAainfix =V23anullNIainfix =V23V14FIainfix =V22V16FIainfix =V21V20FICV11aEmptyfaNodeVwwainfix =V20V26FAainfix =V11aEmptyNIainfix =V19V18FICV11aEmptyfaNodewwVainfix =V18V27FAainfix =V11aEmptyNIainfix =V17aLeftV13V15V12FAaistreeV2V16V11CainorderV1aNilfaConsVVainfix =ainorderV33V35Aainfix =adataagetV2V16adataagetV30V34AaistreeV30V0V33Iainfix =V33azipV32aLeftV13V15V12FICV11aEmptyfaNodewwVainfix =V32V36FAainfix =V11aEmptyNAainfix =V31aEmptyICV11aEmptyfaNodeVwwainfix =V31V37FAainfix =V11aEmptyNIainfix =V30asetV2V15amk nodeV28arightV29adataV29FLagetV2V15Iainfix =V28arightagetV2V16FAainfix =V16anullNAainfix =V16anullNAainfix =V15V16NAaistreeV2V16V11Iainfix =azipV38V13V1AaistreeV2V15V38LaNodeV11V15V12Aainfix =aleftagetV2V16V14Aainfix =V16anullNAainfix =aleftagetV2V15V16Aainfix =V15anullNFAainfix =azipV39aTopV1AaistreeV2V0V39LaNodeV10V0V9Aainfix =aleftagetV2aleftagetV2V0aleftagetV2V8Aainfix =aleftagetV2V0anullNAainfix =aleftagetV2V0aleftagetV2V0Aainfix =V0anullNICV1aEmptyfaNodeVwwainfix =V10V40FAainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V9V41FAainfix =V1aEmptyNAainfix =V8anullNLaleftagetV2V0Aainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+    shape="iiCfaNilainfix =ainorderV17V19Aainfix =adataagetV2V11adataagetV14V18aConsVVainorderV1AaistreeV14V0V17Iainfix =V17azipV16aLeftV8V10V7FICfaEmptyainfix =V16V20aNodewwVV6FANainfix =V6aEmptyAainfix =V15aEmptyICfaEmptyainfix =V15V21aNodeVwwV6FANainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FANainfix =V11anullANainfix =V11anullANainfix =V10V11AaistreeV2V11V6ainfix =azipV30V22V1AaistreeV2V27V30LaNodeV26V27V24Aainfix =aleftagetV2V28V29ANainfix =V28anullAainfix =aleftagetV2V27V28ANainfix =V27anullIainfix =V29aleftagetV2V28FANainfix =V28anullIainfix =V28V9FIainfix =V27V11FIainfix =V26V25FICfaEmptyainfix =V25V31aNodeVwwV6FANainfix =V6aEmptyIainfix =V24V23FICfaEmptyainfix =V23V32aNodewwVV6FANainfix =V6aEmptyIainfix =V22aLeftV8V10V7FAaistreeV2V11V6Nainfix =V9anullIainfix =azipV33V8V1AaistreeV2V10V33LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFAainfix =azipV34aTopV1AaistreeV2V0V34LaNodeV5V0V4Aainfix =aleftagetV2aleftagetV2V0aleftagetV2V3ANainfix =aleftagetV2V0anullAainfix =aleftagetV2V0aleftagetV2V0ANainfix =V0anullICfaEmptyainfix =V5V35aNodeVwwV1FANainfix =V1aEmptyICfaEmptyainfix =V4V36aNodewwVV1FANainfix =V1aEmptyANainfix =V3anullLaleftagetV2V0CfaEmptyCfaNilainfix =ainorderV39V41Aainfix =adataagetV2V0adataagetV2V40aConsVVainorderV1AaistreeV2arightagetV2V0V39Iainfix =V39V38FAainfix =V37aEmptyaNodeVwVV1ANainfix =V0anullANainfix =V0anullainfix =aleftagetV2V0anullANainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
     <label
      name="expl:VC for search_tree_delete_min"/>
     <transf
@@ -645,10 +645,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="1. precondition"
-      sum="aeb762536b656647832b204504c64d96"
+      sum="1a1d882b64ae3b4027cac4a1b48b285e"
       proved="true"
       expanded="false"
-      shape="ainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -713,10 +713,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="2. precondition"
-      sum="2cdc84f3fa59e369ad6a9a4c31c25071"
+      sum="7307776c0fcc6afe336543f028a3abad"
       proved="true"
       expanded="false"
-      shape="ainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V0anullIainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -781,10 +781,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="3. precondition"
-      sum="64e7eb33649e4ef03e71329b96aa995b"
+      sum="0e78a30619f51d376da32f58a3d6d356"
       proved="true"
       expanded="false"
-      shape="ainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V0anullINainfix =V0anullIainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -849,10 +849,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="4. unreachable point"
-      sum="b5da9d1525f664ab4cf19b8bf5ae4beb"
+      sum="e8949851ea306f159d2ff69768f82334"
       proved="true"
       expanded="false"
-      shape="CV1aEmptyfaNodeVwVtIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="unreachable pointCfaEmptytaNodeVwVV1INainfix =V0anullINainfix =V0anullIainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -869,7 +869,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.09"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="2"
@@ -877,7 +877,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.31"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="3"
@@ -917,10 +917,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="5. assertion"
-      sum="3c40348cc030ad7863c6f4d663f67afd"
+      sum="2b0694f3c2b9480d4510cb41cfc441f4"
       proved="true"
       expanded="false"
-      shape="CV1aEmptytaNodeVwVainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="assertionCtaEmptyainfix =V3aEmptyaNodeVwVV1INainfix =V0anullINainfix =V0anullIainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -953,7 +953,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.09"/>
+       <result status="valid" time="0.11"/>
       </proof>
       <proof
        prover="5"
@@ -985,10 +985,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="6. postcondition"
-      sum="2e9c1434f24fde05c186fe1360362b88"
+      sum="f5d2a3cec6d5d13518bb62bdd7602b66"
       proved="true"
       expanded="false"
-      shape="CV1aEmptytaNodeVwVCainorderV1aNilfaConsVVainfix =ainorderV5V7Aainfix =adataagetV2V0adataagetV2V6AaistreeV2arightagetV2V0V5Iainfix =V5V4FIainfix =V3aEmptyIainfix =V0anullNIainfix =V0anullNIainfix =aleftagetV2V0anullIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="postconditionCtaEmptyCfaNilainfix =ainorderV5V7Aainfix =adataagetV2V0adataagetV2V6aConsVVainorderV1AaistreeV2arightagetV2V0V5Iainfix =V5V4FIainfix =V3aEmptyaNodeVwVV1INainfix =V0anullINainfix =V0anullIainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1005,7 +1005,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.31"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="2"
@@ -1013,7 +1013,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.30"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="3"
@@ -1021,7 +1021,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.11"/>
+       <result status="valid" time="0.16"/>
       </proof>
       <proof
        prover="5"
@@ -1029,7 +1029,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="4.83"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="6"
@@ -1037,7 +1037,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="3.86"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="7"
@@ -1045,7 +1045,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.16"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
@@ -1053,10 +1053,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="7. precondition"
-      sum="d308bcbae2429e8f3200a9e84c8be5d7"
+      sum="609d3ead783eadc6fc11a1b2d7431097"
       proved="true"
       expanded="false"
-      shape="ainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1121,10 +1121,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="8. precondition"
-      sum="d9982c68600978cbe69b37dd11e825a7"
+      sum="607558999c8604f6c1f95ac450c52a8b"
       proved="true"
       expanded="false"
-      shape="ainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1141,7 +1141,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.11"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="2"
@@ -1149,7 +1149,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.10"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="3"
@@ -1189,10 +1189,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="9. precondition"
-      sum="435f6555d28a75abdc963cbb8653f55a"
+      sum="a07f8c3e23f5243591bdb69e4ae9878f"
       proved="true"
       expanded="false"
-      shape="ainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V5FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V1aEmptyICfaEmptyainfix =V4V5aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1257,10 +1257,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="10. loop invariant init"
-      sum="427621525792a206facda7cd734b4582"
+      sum="170321cb7fad662130572d0bdd08b2da"
       proved="true"
       expanded="false"
-      shape="ainfix =aleftagetV2V0aleftagetV2V0Aainfix =V0anullNICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="loop invariant initainfix =aleftagetV2V0aleftagetV2V0ANainfix =V0anullICfaEmptyainfix =V5V6aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V7aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1325,10 +1325,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="11. loop invariant init"
-      sum="3d9d47ff7f6c48e280af0fab86c2303c"
+      sum="b201d6feb20233e29379bc82cad1538c"
       proved="true"
       expanded="false"
-      shape="ainfix =aleftagetV2aleftagetV2V0aleftagetV2V3Aainfix =aleftagetV2V0anullNICV1aEmptyfaNodeVwwainfix =V5V6FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V7FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="loop invariant initainfix =aleftagetV2aleftagetV2V0aleftagetV2V3ANainfix =aleftagetV2V0anullICfaEmptyainfix =V5V6aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V7aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1393,10 +1393,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="12. loop invariant init"
-      sum="a482f4798be27b3ae52e6eafa222e614"
+      sum="1f13ff530ede2a7f09055bd0d3bc914b"
       proved="true"
       expanded="false"
-      shape="ainfix =azipV6aTopV1AaistreeV2V0V6LaNodeV5V0V4ICV1aEmptyfaNodeVwwainfix =V5V7FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V8FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="loop invariant initainfix =azipV6aTopV1AaistreeV2V0V6LaNodeV5V0V4ICfaEmptyainfix =V5V7aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V8aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1429,7 +1429,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.09"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="5"
@@ -1461,10 +1461,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="13. assertion"
-      sum="e204ed3e1fac2be4e19bac5565b53607"
+      sum="effd514705e80f47a1ecb6c330cc907e"
       proved="true"
       expanded="false"
-      shape="aistreeV2V11V6Iainfix =V9anullNIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="assertionaistreeV2V11V6INainfix =V9anullIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V13aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V14aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1497,7 +1497,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.10"/>
+       <result status="valid" time="0.08"/>
       </proof>
       <proof
        prover="5"
@@ -1529,10 +1529,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="14. precondition"
-      sum="18f8a42889c88a37119710d067e7a6bf"
+      sum="4cf61453ae6f6d878c1a770783baf616"
       proved="true"
       expanded="false"
-      shape="ainfix =V6aEmptyNIainfix =V12aLeftV8V10V7FIaistreeV2V11V6Iainfix =V9anullNIainfix =azipV13V8V1AaistreeV2V10V13LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V14FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V15FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V6aEmptyIainfix =V12aLeftV8V10V7FIaistreeV2V11V6INainfix =V9anullIainfix =azipV13V8V1AaistreeV2V10V13LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V14aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V15aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1597,10 +1597,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="15. precondition"
-      sum="64ce3a1c01d815f6743bfcc70517ff65"
+      sum="9673e2fc4cadfe5db560e5c89553fe30"
       proved="true"
       expanded="false"
-      shape="ainfix =V6aEmptyNIainfix =V14V13FICV6aEmptyfaNodewwVainfix =V13V15FIainfix =V6aEmptyNIainfix =V12aLeftV8V10V7FIaistreeV2V11V6Iainfix =V9anullNIainfix =azipV16V8V1AaistreeV2V10V16LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V17FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V18FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V6aEmptyIainfix =V14V13FICfaEmptyainfix =V13V15aNodewwVV6FINainfix =V6aEmptyIainfix =V12aLeftV8V10V7FIaistreeV2V11V6INainfix =V9anullIainfix =azipV16V8V1AaistreeV2V10V16LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V17aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V18aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1665,10 +1665,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="16. precondition"
-      sum="fba32c463e9e7f7c576c79c6b0e2e1ba"
+      sum="cd2cbb61ca09184d647923718da2c93c"
       proved="true"
       expanded="false"
-      shape="ainfix =V18anullNIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICV6aEmptyfaNodeVwwainfix =V15V19FIainfix =V6aEmptyNIainfix =V14V13FICV6aEmptyfaNodewwVainfix =V13V20FIainfix =V6aEmptyNIainfix =V12aLeftV8V10V7FIaistreeV2V11V6Iainfix =V9anullNIainfix =azipV21V8V1AaistreeV2V10V21LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V22FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V23FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V18anullIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICfaEmptyainfix =V15V19aNodeVwwV6FINainfix =V6aEmptyIainfix =V14V13FICfaEmptyainfix =V13V20aNodewwVV6FINainfix =V6aEmptyIainfix =V12aLeftV8V10V7FIaistreeV2V11V6INainfix =V9anullIainfix =azipV21V8V1AaistreeV2V10V21LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V22aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V23aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1733,10 +1733,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="17. loop invariant preservation"
-      sum="0874e5882d1367a3a34ce76d03b385cb"
+      sum="1e3328063b82fd70e3902081176fbfda"
       proved="true"
       expanded="false"
-      shape="ainfix =aleftagetV2V17V18Aainfix =V17anullNIainfix =V19aleftagetV2V18FIainfix =V18anullNIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICV6aEmptyfaNodeVwwainfix =V15V20FIainfix =V6aEmptyNIainfix =V14V13FICV6aEmptyfaNodewwVainfix =V13V21FIainfix =V6aEmptyNIainfix =V12aLeftV8V10V7FIaistreeV2V11V6Iainfix =V9anullNIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V23FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V24FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="loop invariant preservationainfix =aleftagetV2V17V18ANainfix =V17anullIainfix =V19aleftagetV2V18FINainfix =V18anullIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICfaEmptyainfix =V15V20aNodeVwwV6FINainfix =V6aEmptyIainfix =V14V13FICfaEmptyainfix =V13V21aNodewwVV6FINainfix =V6aEmptyIainfix =V12aLeftV8V10V7FIaistreeV2V11V6INainfix =V9anullIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V23aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V24aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1801,10 +1801,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="18. loop invariant preservation"
-      sum="e99c21eb160cb4b7cdb117bd91fb5761"
+      sum="e122c568e6b9635154cb3362769de781"
       proved="true"
       expanded="false"
-      shape="ainfix =aleftagetV2V18V19Aainfix =V18anullNIainfix =V19aleftagetV2V18FIainfix =V18anullNIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICV6aEmptyfaNodeVwwainfix =V15V20FIainfix =V6aEmptyNIainfix =V14V13FICV6aEmptyfaNodewwVainfix =V13V21FIainfix =V6aEmptyNIainfix =V12aLeftV8V10V7FIaistreeV2V11V6Iainfix =V9anullNIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V23FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V24FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="loop invariant preservationainfix =aleftagetV2V18V19ANainfix =V18anullIainfix =V19aleftagetV2V18FINainfix =V18anullIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICfaEmptyainfix =V15V20aNodeVwwV6FINainfix =V6aEmptyIainfix =V14V13FICfaEmptyainfix =V13V21aNodewwVV6FINainfix =V6aEmptyIainfix =V12aLeftV8V10V7FIaistreeV2V11V6INainfix =V9anullIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V23aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V24aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1869,10 +1869,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="19. loop invariant preservation"
-      sum="32c479769964f5b6299bdce7ff0ef638"
+      sum="890710a63030e91dce9752f8878be472"
       proved="true"
       expanded="false"
-      shape="ainfix =azipV20V12V1AaistreeV2V17V20LaNodeV16V17V14Iainfix =V19aleftagetV2V18FIainfix =V18anullNIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICV6aEmptyfaNodeVwwainfix =V15V21FIainfix =V6aEmptyNIainfix =V14V13FICV6aEmptyfaNodewwVainfix =V13V22FIainfix =V6aEmptyNIainfix =V12aLeftV8V10V7FIaistreeV2V11V6Iainfix =V9anullNIainfix =azipV23V8V1AaistreeV2V10V23LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V24FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V25FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="loop invariant preservationainfix =azipV20V12V1AaistreeV2V17V20LaNodeV16V17V14Iainfix =V19aleftagetV2V18FINainfix =V18anullIainfix =V18V9FIainfix =V17V11FIainfix =V16V15FICfaEmptyainfix =V15V21aNodeVwwV6FINainfix =V6aEmptyIainfix =V14V13FICfaEmptyainfix =V13V22aNodewwVV6FINainfix =V6aEmptyIainfix =V12aLeftV8V10V7FIaistreeV2V11V6INainfix =V9anullIainfix =azipV23V8V1AaistreeV2V10V23LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V24aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V25aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1897,7 +1897,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.17"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="3"
@@ -1905,7 +1905,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.08"/>
+       <result status="valid" time="0.69"/>
       </proof>
       <proof
        prover="5"
@@ -1937,10 +1937,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="20. assertion"
-      sum="f6b852099c5a87328db20c9a482c093e"
+      sum="c10aadad1d0920f1d2866831f2a027d9"
       proved="true"
       expanded="false"
-      shape="aistreeV2V11V6Iainfix =V9anullNNIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="assertionaistreeV2V11V6INNainfix =V9anullIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V13aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V14aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -1973,7 +1973,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.17"/>
+       <result status="valid" time="0.08"/>
       </proof>
       <proof
        prover="5"
@@ -2005,10 +2005,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="21. assertion"
-      sum="540465aeb95db0f5e9c84d1a6dae0677"
+      sum="5e599a38f4e8289ccc98af4bb7b17a38"
       proved="true"
       expanded="false"
-      shape="ainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="assertionNainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V13aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V14aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -2073,10 +2073,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="22. precondition"
-      sum="f33fb62f5fa4128055167719befbea17"
+      sum="92a528618e53709dbeaa467b7c600b0d"
       proved="true"
       expanded="false"
-      shape="ainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V13aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V14aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -2141,10 +2141,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="23. precondition"
-      sum="e47e5e12aa5192db67998b430b8c0e78"
+      sum="e19e184867027655be8583fd9e811fde"
       proved="true"
       expanded="false"
-      shape="ainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V13FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V14FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV12V8V1AaistreeV2V10V12LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V13aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V14aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -2209,10 +2209,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="24. precondition"
-      sum="0bd329a6a8b165d50c1b3cec5387712a"
+      sum="17a00865929427a3158f9c01ccc726a5"
       proved="true"
       expanded="false"
-      shape="ainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV15V8V1AaistreeV2V10V15LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V16FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V17FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV15V8V1AaistreeV2V10V15LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V16aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V17aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -2277,10 +2277,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="25. assertion"
-      sum="635e8cfe85a70b18fee1099d2241e3f3"
+      sum="e02058a8af1bbafcc06c1a4074c04c95"
       proved="true"
       expanded="false"
-      shape="ainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V16FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV17V8V1AaistreeV2V10V17LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="assertionainfix =V15aEmptyICfaEmptyainfix =V15V16aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV17V8V1AaistreeV2V10V17LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V18aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V19aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -2313,7 +2313,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.12"/>
+       <result status="valid" time="0.11"/>
       </proof>
       <proof
        prover="5"
@@ -2345,10 +2345,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="26. precondition"
-      sum="e817ead4395819e2d2717047af77c946"
+      sum="33a9fbd2cbb953da0acfd81e05e59207"
       proved="true"
       expanded="false"
-      shape="ainfix =V6aEmptyNIainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V16FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV17V8V1AaistreeV2V10V17LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V18FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V19FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="preconditionNainfix =V6aEmptyIainfix =V15aEmptyICfaEmptyainfix =V15V16aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV17V8V1AaistreeV2V10V17LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V18aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V19aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <proof
@@ -2413,10 +2413,10 @@
       locfile="../verifythis_fm2012_treedel.mlw"
       loclnum="123" loccnumb="6" loccnume="28"
       expl="27. postcondition"
-      sum="0b7d38e47fa2cef6bb03a5fb73f5db49"
+      sum="2dea96705f13d9a4469e3ff7e3657dfe"
       proved="true"
       expanded="true"
-      shape="CainorderV1aNilfaConsVVainfix =ainorderV17V19Aainfix =adataagetV2V11adataagetV14V18AaistreeV14V0V17Iainfix =V17azipV16aLeftV8V10V7FICV6aEmptyfaNodewwVainfix =V16V20FIainfix =V6aEmptyNIainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V21FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V23FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V24FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+      shape="postconditionCfaNilainfix =ainorderV17V19Aainfix =adataagetV2V11adataagetV14V18aConsVVainorderV1AaistreeV14V0V17Iainfix =V17azipV16aLeftV8V10V7FICfaEmptyainfix =V16V20aNodewwVV6FINainfix =V6aEmptyIainfix =V15aEmptyICfaEmptyainfix =V15V21aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V23aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V24aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
       <label
        name="expl:VC for search_tree_delete_min"/>
       <transf
@@ -2428,10 +2428,10 @@
         locfile="../verifythis_fm2012_treedel.mlw"
         loclnum="123" loccnumb="6" loccnume="28"
         expl="1."
-        sum="0eecb4e9e1ef38206057e086770c47d5"
+        sum="30cfca2a48b407149a0635c34619c211"
         proved="true"
         expanded="false"
-        shape="aistreeV14V0V17Iainfix =V17azipV16aLeftV8V10V7FICV6aEmptyfaNodewwVainfix =V16V18FIainfix =V6aEmptyNIainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V19FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV20V8V1AaistreeV2V10V20LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V21FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V22FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+        shape="aistreeV14V0V17Iainfix =V17azipV16aLeftV8V10V7FICfaEmptyainfix =V16V18aNodewwVV6FINainfix =V6aEmptyIainfix =V15aEmptyICfaEmptyainfix =V15V19aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV20V8V1AaistreeV2V10V20LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V21aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V22aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
         <label
          name="expl:VC for search_tree_delete_min"/>
         <proof
@@ -2464,7 +2464,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.18"/>
+         <result status="valid" time="0.54"/>
         </proof>
         <proof
          prover="5"
@@ -2496,10 +2496,10 @@
         locfile="../verifythis_fm2012_treedel.mlw"
         loclnum="123" loccnumb="6" loccnume="28"
         expl="2."
-        sum="4431967f38d1be727a942c1d9f2b3c9e"
+        sum="c8f033598213f621359d2689c5f69e25"
         proved="true"
         expanded="false"
-        shape="CainorderV1aNilfaConsVVtIainfix =V17azipV16aLeftV8V10V7FICV6aEmptyfaNodewwVainfix =V16V20FIainfix =V6aEmptyNIainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V21FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V23FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V24FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+        shape="CfaNiltaConsVVainorderV1Iainfix =V17azipV16aLeftV8V10V7FICfaEmptyainfix =V16V20aNodewwVV6FINainfix =V6aEmptyIainfix =V15aEmptyICfaEmptyainfix =V15V21aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V23aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V24aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
         <label
          name="expl:VC for search_tree_delete_min"/>
         <proof
@@ -2516,7 +2516,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.11"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof
          prover="2"
@@ -2524,7 +2524,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.11"/>
+         <result status="valid" time="0.10"/>
         </proof>
         <proof
          prover="3"
@@ -2532,7 +2532,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.25"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof
          prover="5"
@@ -2556,7 +2556,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.12"/>
+         <result status="timeout" time="4.97"/>
         </proof>
        </goal>
        <goal
@@ -2564,10 +2564,10 @@
         locfile="../verifythis_fm2012_treedel.mlw"
         loclnum="123" loccnumb="6" loccnume="28"
         expl="3."
-        sum="335608d41139f9c928a9365ee1c153ee"
+        sum="17d6aa8a15698b602f5a421bad53e440"
         proved="true"
         expanded="false"
-        shape="CainorderV1aNiltaConsVVainfix =adataagetV2V11adataagetV14V18Iainfix =V17azipV16aLeftV8V10V7FICV6aEmptyfaNodewwVainfix =V16V20FIainfix =V6aEmptyNIainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V21FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V23FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V24FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+        shape="CtaNilainfix =adataagetV2V11adataagetV14V18aConsVVainorderV1Iainfix =V17azipV16aLeftV8V10V7FICfaEmptyainfix =V16V20aNodewwVV6FINainfix =V6aEmptyIainfix =V15aEmptyICfaEmptyainfix =V15V21aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V23aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V24aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
         <label
          name="expl:VC for search_tree_delete_min"/>
         <proof
@@ -2584,7 +2584,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="60.16"/>
+         <result status="valid" time="0.55"/>
         </proof>
         <proof
          prover="2"
@@ -2592,7 +2592,7 @@
          memlimit="4000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="60.22"/>
+         <result status="valid" time="2.17"/>
         </proof>
         <proof
          prover="5"
@@ -2600,7 +2600,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="38.16"/>
+         <result status="valid" time="6.39"/>
         </proof>
         <proof
          prover="6"
@@ -2608,7 +2608,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="40.46"/>
+         <result status="timeout" time="80.70"/>
         </proof>
         <proof
          prover="7"
@@ -2616,7 +2616,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="57.88"/>
+         <result status="valid" time="0.96"/>
         </proof>
        </goal>
        <goal
@@ -2624,10 +2624,10 @@
         locfile="../verifythis_fm2012_treedel.mlw"
         loclnum="123" loccnumb="6" loccnume="28"
         expl="4."
-        sum="afb87dba3b4aaa24fce5ed29cd0883c8"
+        sum="c8cc0f9615bdc8d2f1bccc51c3d08c9c"
         proved="true"
         expanded="true"
-        shape="CainorderV1aNiltaConsVVainfix =ainorderV17V19Iainfix =V17azipV16aLeftV8V10V7FICV6aEmptyfaNodewwVainfix =V16V20FIainfix =V6aEmptyNIainfix =V15aEmptyICV6aEmptyfaNodeVwwainfix =V15V21FIainfix =V6aEmptyNIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FIainfix =V11anullNIainfix =V11anullNIainfix =V10V11NIaistreeV2V11V6Iainfix =V9anullNNIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9Aainfix =V11anullNAainfix =aleftagetV2V10V11Aainfix =V10anullNFICV1aEmptyfaNodeVwwainfix =V5V23FIainfix =V1aEmptyNICV1aEmptyfaNodewwVainfix =V4V24FIainfix =V1aEmptyNIainfix =V3anullNLaleftagetV2V0Iainfix =aleftagetV2V0anullNIainfix =V0anullNIadistinctainorderV1AaistreeV2V0V1Aainfix =V0anullNFF">
+        shape="CtaNilainfix =ainorderV17V19aConsVVainorderV1Iainfix =V17azipV16aLeftV8V10V7FICfaEmptyainfix =V16V20aNodewwVV6FINainfix =V6aEmptyIainfix =V15aEmptyICfaEmptyainfix =V15V21aNodeVwwV6FINainfix =V6aEmptyIainfix =V14asetV2V10amk nodeV12arightV13adataV13FLagetV2V10Iainfix =V12arightagetV2V11FINainfix =V11anullINainfix =V11anullINainfix =V10V11IaistreeV2V11V6INNainfix =V9anullIainfix =azipV22V8V1AaistreeV2V10V22LaNodeV6V10V7Aainfix =aleftagetV2V11V9ANainfix =V11anullAainfix =aleftagetV2V10V11ANainfix =V10anullFICfaEmptyainfix =V5V23aNodeVwwV1FINainfix =V1aEmptyICfaEmptyainfix =V4V24aNodewwVV1FINainfix =V1aEmptyINainfix =V3anullLaleftagetV2V0INainfix =aleftagetV2V0anullINainfix =V0anullIadistinctainorderV1AaistreeV2V0V1ANainfix =V0anullFF">
         <label
          name="expl:VC for search_tree_delete_min"/>
         <proof
@@ -2644,7 +2644,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.11"/>
+         <result status="valid" time="0.74"/>
         </proof>
         <proof
          prover="2"
@@ -2652,7 +2652,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.14"/>
+         <result status="valid" time="1.86"/>
         </proof>
         <proof
          prover="3"
@@ -2660,7 +2660,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="5.13"/>
+         <result status="valid" time="0.23"/>
         </proof>
         <proof
          prover="4"

@@ -25,6 +25,10 @@
   id="5"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../flag2.mlw"
   verified="true"
@@ -39,7 +43,7 @@
     name="nb_occ_split"
     locfile="../flag2.mlw"
     loclnum="32" loccnumb="8" loccnume="20"
-    sum="ad535741a77580cf1a4aa0eb5a40bbb9"
+    sum="cf6bd14d2ab032d457f4f2f5459cb7e6"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occV0V1V3V4ainfix +anb_occV0V1V2V4anb_occV0V2V3V4Iainfix &lt;=V2V3Aainfix &lt;=V1V2F">
@@ -57,7 +61,7 @@
     name="nb_occ_store_outside_up"
     locfile="../flag2.mlw"
     loclnum="37" loccnumb="8" loccnume="31"
-    sum="0b35c9a70d54d772df34f10dadb0962e"
+    sum="42e40f1733000ae964cf056a447f5c2d"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix &lt;=V2V3Aainfix &lt;=V1V2F">
@@ -75,7 +79,7 @@
     name="nb_occ_store_outside_down"
     locfile="../flag2.mlw"
     loclnum="41" loccnumb="8" loccnume="33"
-    sum="c914b544feaaa749280d599028142a28"
+    sum="8a3d686fbe47d283030d4fa0fa2dc760"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix &lt;=V1V2Aainfix &lt;V3V1F">
@@ -93,7 +97,7 @@
     name="nb_occ_store_eq_eq"
     locfile="../flag2.mlw"
     loclnum="45" loccnumb="8" loccnume="26"
-    sum="711661fcb73d3ad8fcfd64deb848b8ac"
+    sum="4c679716f18dd51b2f70fce0cf6e0eea"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
@@ -134,7 +138,7 @@
     name="nb_occ_store_eq_neq"
     locfile="../flag2.mlw"
     loclnum="50" loccnumb="8" loccnume="27"
-    sum="5de3bd2e200ead47ac30359ec9933fbf"
+    sum="15711f410777c62906315b1131ffc4cf"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4ainfix +anb_occV0V1V2V4c1INainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
@@ -152,24 +156,24 @@
     name="nb_occ_store_neq_eq"
     locfile="../flag2.mlw"
     loclnum="55" loccnumb="8" loccnume="27"
-    sum="12320cd839706b112c6bb361ed28fda8"
+    sum="d7afe737706e9c162f6fe27144f433ca"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V5V1V2V4ainfix -anb_occV0V1V2V4c1Iainfix =agetV0V3V4INainfix =V4V5Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
-     prover="5"
-     timelimit="34"
+     prover="6"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.27"/>
+     <result status="valid" time="2.57"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_neq_neq"
     locfile="../flag2.mlw"
     loclnum="60" loccnumb="8" loccnume="28"
-    sum="7243f6dd14542a265d6f19a77b8f7b36"
+    sum="10d63271cb7c58275b2d2a94749d9407"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V5V1V2V4anb_occV0V1V2V4INainfix =agetV0V3V4INainfix =V4V5Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
@@ -187,7 +191,7 @@
     locfile="../flag2.mlw"
     loclnum="66" loccnumb="5" loccnume="9"
     expl="VC for swap"
-    sum="6b8d375a6b8d2d4e2ac2a110a04114b0"
+    sum="af7b92c0ea591889ec8ba64c89657d46"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occV4V5V6V7anb_occV2V5V6V7Iainfix &lt;V1V6Aainfix &lt;=V5V1Aainfix &lt;V0V6Aainfix &lt;=V5V0FAainfix =agetV4V8agetV2V8INainfix =V8V1ANainfix =V8V0FAainfix =agetV4V1agetV2V0Aainfix =agetV4V0agetV2V1Iainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -202,7 +206,7 @@
       locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="1. postcondition"
-      sum="09319b2c5d927672f5bfda3dd9dedcce"
+      sum="125ae93c28648ba64b3705c4bdea1bac"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agetV4V0agetV2V1Iainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -222,7 +226,7 @@
       locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="2. postcondition"
-      sum="42ad93ee243c6eb335fbaddce5a38e63"
+      sum="8da8066fc53b289b372d4cab343ac67b"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agetV4V1agetV2V0Iainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -242,7 +246,7 @@
       locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="3. postcondition"
-      sum="80ca544da52e3ae855718b5e0d9497de"
+      sum="f78ecf9b5b6a424a61658c771d9e8828"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agetV4V5agetV2V5INainfix =V5V1ANainfix =V5V0FIainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -262,7 +266,7 @@
       locfile="../flag2.mlw"
       loclnum="66" loccnumb="5" loccnume="9"
       expl="4. postcondition"
-      sum="62e2a15684ec1e487f72c4d5a6e59a55"
+      sum="7e0d2ecd583acf9428ca96b20c93a435"
       proved="true"
       expanded="true"
       shape="postconditionainfix =anb_occV4V5V6V7anb_occV2V5V6V7Iainfix &lt;V1V6Aainfix &lt;=V5V1Aainfix &lt;V0V6Aainfix &lt;=V5V0FIainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -284,7 +288,7 @@
     locfile="../flag2.mlw"
     loclnum="78" loccnumb="5" loccnume="15"
     expl="VC for dutch_flag"
-    sum="031fedc22d5bd024ea69bddf72e823de"
+    sum="ec8e1f6df02d7692f87c719b8126c2e5"
     proved="true"
     expanded="true"
     shape="iainfix =anb_occV5c0V0V6anb_occV1c0V0V6FAamonochromeV5V8V0aRedAamonochromeV5V7V8aWhiteAamonochromeV5c0V7aBlueEECainfix &lt;ainfix -V2V11ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV9c0V0V12anb_occV1c0V0V12FAamonochromeV9V2V0aRedAamonochromeV9V10V11aWhiteAamonochromeV9c0V10aBlueAainfix &lt;=V2V0Aainfix &lt;=V11V2Aainfix &lt;=V10V11Aainfix &lt;=c0V10Iainfix =V11ainfix +V3c1FIainfix =V10ainfix +V4c1FIainfix =anb_occV9V13V14V15anb_occV5V13V14V15Iainfix &lt;V3V14Aainfix &lt;=V13V3Aainfix &lt;V4V14Aainfix &lt;=V13V4FAainfix =agetV9V16agetV5V16INainfix =V16V3ANainfix =V16V4FAainfix =agetV9V3agetV5V4Aainfix =agetV9V4agetV5V3FaBlueainfix &lt;ainfix -V2V17ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV5c0V0V18anb_occV1c0V0V18FAamonochromeV5V2V0aRedAamonochromeV5V4V17aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V17V2Aainfix &lt;=V4V17Aainfix &lt;=c0V4Iainfix =V17ainfix +V3c1FaWhiteainfix &lt;ainfix -V19V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV20c0V0V21anb_occV1c0V0V21FAamonochromeV20V19V0aRedAamonochromeV20V4V3aWhiteAamonochromeV20c0V4aBlueAainfix &lt;=V19V0Aainfix &lt;=V3V19Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV20V22V23V24anb_occV5V22V23V24Iainfix &lt;V3V23Aainfix &lt;=V22V3Aainfix &lt;V19V23Aainfix &lt;=V22V19FAainfix =agetV20V25agetV5V25INainfix =V25V3ANainfix =V25V19FAainfix =agetV20V3agetV5V19Aainfix =agetV20V19agetV5V3FIainfix =V19ainfix -V2c1FaRedagetV5V3ainfix &lt;V3V2Iainfix =anb_occV5c0V0V26anb_occV1c0V0V26FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FAainfix =anb_occV1c0V0V27anb_occV1c0V0V27FAamonochromeV1V0V0aRedAamonochromeV1c0c0aWhiteAamonochromeV1c0c0aBlueAainfix &lt;=V0V0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V0FF">
@@ -299,7 +303,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="1. loop invariant init"
-      sum="7662c1c350e4ef4598264b060d286aca"
+      sum="012a58aa95c0e11d6ec3de1c91bfd6e6"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix &lt;=V0V0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V0FF">
@@ -335,7 +339,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="2. loop invariant init"
-      sum="4d4518832cc1568639ff74bcef9045c7"
+      sum="cdb8edecaf012759eadecd9816f7f458"
       proved="true"
       expanded="true"
       shape="loop invariant initamonochromeV1c0c0aBlueIainfix &lt;=c0V0FF">
@@ -371,7 +375,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="3. loop invariant init"
-      sum="a500da8ff152624aa4840cd6e9b6376b"
+      sum="9719dece2161c923e724a06f9377d235"
       proved="true"
       expanded="true"
       shape="loop invariant initamonochromeV1c0c0aWhiteIainfix &lt;=c0V0FF">
@@ -407,7 +411,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="4. loop invariant init"
-      sum="754a51137d308b9d250b7e7202d5b610"
+      sum="2710990f552d423d8208bd6e4f1118b0"
       proved="true"
       expanded="true"
       shape="loop invariant initamonochromeV1V0V0aRedIainfix &lt;=c0V0FF">
@@ -443,7 +447,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="5. loop invariant init"
-      sum="0ef5bf178fbb6aad60bf084967f6bcc8"
+      sum="459f7c9e2063347da1181f6f16e201ec"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix =anb_occV1c0V0V2anb_occV1c0V0V2FIainfix &lt;=c0V0FF">
@@ -495,7 +499,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="6. loop invariant preservation"
-      sum="fa6bbcd8537dcf71972870d2944584d3"
+      sum="1b67cc521ada5b89e0add2940fe9220b"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCainfix &lt;=V2V0Aainfix &lt;=V8V2Aainfix &lt;=V7V8Aainfix &lt;=c0V7Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -531,7 +535,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="7. loop invariant preservation"
-      sum="463790169bf599963e4fa056defb9ef7"
+      sum="9bf07e20fc38922eea9444c5ffeede38"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCamonochromeV6c0V7aBlueIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -567,7 +571,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="8. loop invariant preservation"
-      sum="a8760be3466a6e38f073886acdee37c6"
+      sum="f7b1e2dfa49757684a496f1ab6d58f13"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCamonochromeV6V7V8aWhiteIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -603,7 +607,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="9. loop invariant preservation"
-      sum="357c0a8febe4ba19dd0b986e9ae34cac"
+      sum="847d98539468da3bc307379ceae5a7b6"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCamonochromeV6V2V0aRedIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -639,7 +643,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="10. loop invariant preservation"
-      sum="2ad01dc462ce8554b0bc001a34f179f5"
+      sum="9cf7adbf5a68203e2e988c4f379ec0da"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCainfix =anb_occV6c0V0V9anb_occV1c0V0V9FIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V10V11V12anb_occV5V10V11V12Iainfix &lt;V3V11Aainfix &lt;=V10V3Aainfix &lt;V4V11Aainfix &lt;=V10V4FAainfix =agetV6V13agetV5V13INainfix =V13V3ANainfix =V13V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V14anb_occV1c0V0V14FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -691,7 +695,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="11. loop variant decrease"
-      sum="a22f5a83e168763b6c91727c5b2d255b"
+      sum="d8f702cf7be75371af9174bf62afbd41"
       proved="true"
       expanded="true"
       shape="loop variant decreaseCainfix &lt;ainfix -V2V8ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -743,7 +747,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="12. loop invariant preservation"
-      sum="d51043ee56e6fdd794f207b8894a0d3b"
+      sum="90cb94c992fec383c73dfeecc170a517"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueainfix &lt;=V2V0Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -779,7 +783,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="13. loop invariant preservation"
-      sum="2c09d4ed40ba2acf504b1c5b9d29afbc"
+      sum="f9e0e4f8493c2cb7ba61491e21bdda96"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueamonochromeV5c0V4aBlueIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -815,7 +819,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="14. loop invariant preservation"
-      sum="ff460cb1eb00fc4e454f640f8c9179a5"
+      sum="97cb61777afaa84d2a036645b601d9ba"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueamonochromeV5V4V6aWhiteIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -851,7 +855,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="15. loop invariant preservation"
-      sum="5e614e0722a996773b1d5fb12dd0cf15"
+      sum="542e8c5ddb3e34ab1087b37cd4073f72"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueamonochromeV5V2V0aRedIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -887,7 +891,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="16. loop invariant preservation"
-      sum="205788e5210174791b0955ef2fcdf03c"
+      sum="2a9000184d8e0d6bdad592f6b6b36f20"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueainfix =anb_occV5c0V0V7anb_occV1c0V0V7FIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -939,7 +943,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="17. loop variant decrease"
-      sum="2a2a778b9e4230dced80be1b58039053"
+      sum="8d92322b0395f59f24257a7c056c70c0"
       proved="true"
       expanded="true"
       shape="loop variant decreaseCtaBlueainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -991,7 +995,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="18. loop invariant preservation"
-      sum="bc0145c18a356e0ae973e2d586ba0a08"
+      sum="c4293aad28d52a1d852b9980e53a4c00"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteainfix &lt;=V6V0Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1027,7 +1031,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="19. loop invariant preservation"
-      sum="fd04e7882501ab3b67536f7c5e08b42d"
+      sum="14e1023fa6d70c1ae597f63c677ba141"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteamonochromeV7c0V4aBlueIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1063,7 +1067,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="20. loop invariant preservation"
-      sum="784c5e41052e853e2bfbd5da5f40adcd"
+      sum="f7302e126b652f360c3a71d1eb5a1c84"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteamonochromeV7V4V3aWhiteIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1099,7 +1103,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="21. loop invariant preservation"
-      sum="b50b8b1922c02720a71a3fc6966bbf90"
+      sum="b1b1b64b10e67a4f74d6cf91b7082e1d"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteamonochromeV7V6V0aRedIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1135,7 +1139,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="22. loop invariant preservation"
-      sum="219349ba42efd0ad70a42a8f838232bf"
+      sum="dc0a31e9686e9dd93b3357da99f33a8c"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteainfix =anb_occV7c0V0V8anb_occV1c0V0V8FIainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12INainfix =V12V3ANainfix =V12V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1187,7 +1191,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="23. loop variant decrease"
-      sum="a70213682400d58d45ac565540a1a295"
+      sum="e843e804b198a09fd6ba47db23fc6fa8"
       proved="true"
       expanded="true"
       shape="loop variant decreaseCtaBluetaWhiteainfix &lt;ainfix -V6V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1239,7 +1243,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="24. postcondition"
-      sum="6a850d2a0782d65dd58591626bb62fd1"
+      sum="83a537c60767feaaa1e6ac54ab904067"
       proved="true"
       expanded="true"
       shape="postconditionamonochromeV5V7V0aRedAamonochromeV5V6V7aWhiteAamonochromeV5c0V6aBlueEEINainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1267,7 +1271,7 @@
       locfile="../flag2.mlw"
       loclnum="78" loccnumb="5" loccnume="15"
       expl="25. postcondition"
-      sum="053a978563b38ad2037d0da8062cbada"
+      sum="eed62d308fce0045b85dc5a33f87442e"
       proved="true"
       expanded="true"
       shape="postconditionainfix =anb_occV5c0V0V6anb_occV1c0V0V6FINainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">

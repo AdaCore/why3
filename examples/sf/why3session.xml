@@ -11,16 +11,28 @@
   version="2.4.1"/>
  <prover
   id="2"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../sf.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="HoareLogic"
    locfile="../sf.mlw"
@@ -96,7 +108,7 @@
     expanded="true"
     shape="fIaevenainfix +V0c1IaevenV0F">
     <proof
-     prover="2"
+     prover="3"
      timelimit="10"
      memlimit="0"
      edited="sf_WP_HoareLogic_even_not_odd_1.v"
@@ -137,12 +149,36 @@
     <label
      name="expl:VC for sqrt"/>
     <proof
-     prover="3"
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal
@@ -334,12 +370,44 @@
         <label
          name="expl:VC for list_member"/>
         <proof
-         prover="3"
-         timelimit="10"
-         memlimit="0"
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.18"/>
+         <result status="valid" time="0.01"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.21"/>
         </proof>
        </goal>
       </transf>

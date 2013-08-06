@@ -15,20 +15,40 @@
   version="2.4.1"/>
  <prover
   id="3"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="4"
+  id="5"
+  name="Eprover"
+  version="1.6"/>
+ <prover
+  id="6"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="7"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="8"
   name="Z3"
   version="2.19"/>
  <prover
-  id="5"
+  id="9"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="10"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../vacid_0_red_black_trees.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="RedBlackTree"
    locfile="../vacid_0_red_black_trees.mlw"
@@ -129,7 +149,7 @@
     expanded="false"
     shape="ainfix &lt;V1V0Ialt_treeV0aNodeV5V3V1V2V4F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="0"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"
@@ -147,7 +167,7 @@
     expanded="false"
     shape="ainfix &lt;V0V1Iagt_treeV0aNodeV5V3V1V2V4F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="0"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"
@@ -377,20 +397,20 @@
      <result status="valid" time="0.15"/>
     </proof>
     <proof
-     prover="4"
+     prover="8"
      timelimit="100"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="timeout" time="99.60"/>
     </proof>
     <proof
-     prover="5"
+     prover="9"
      timelimit="100"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="timeout" time="99.39"/>
     </proof>
    </goal>
    <goal
@@ -450,15 +470,39 @@
     loclnum="142" loccnumb="8" loccnume="19"
     sum="1de54b1146f532ba5133b0b09e1a4a5d"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="arbtreeV5V2EIarbtreeV6aNodeV4V2V0V1V3EF">
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.07"/>
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.36"/>
     </proof>
    </goal>
    <goal
@@ -467,15 +511,39 @@
     loclnum="146" loccnumb="8" loccnume="20"
     sum="cd46d5d9044796c029bc7af16dfe37ca"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="arbtreeV5V3EIarbtreeV6aNodeV4V2V0V1V3EF">
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.11"/>
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.34"/>
     </proof>
    </goal>
    <goal
@@ -556,7 +624,7 @@
     expl="VC for lbalance"
     sum="cba604bcf0c532e2b7aa685ec81be889"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="CiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V3Iaalmost_rbtreeV14V0FAabstV11LaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V16V17OamemtV0V16V17ainfix =V17V2ainfix =V16V1qamemtV15V16V17FAarbtreeainfix +V18c1V15IarbtreeV18V3Iaalmost_rbtreeV18V0FAabstV15LaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
     <label
      name="expl:VC for lbalance"/>
@@ -571,7 +639,7 @@
       expl="1. postcondition"
       sum="06f127c109354cb6640d07c0135b1290"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V3Iaalmost_rbtreeV14V0FAabstV11LaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
       <label
        name="expl:VC for lbalance"/>
@@ -599,12 +667,12 @@
          <result status="valid" time="2.18"/>
         </proof>
         <proof
-         prover="5"
+         prover="9"
          timelimit="10"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.65"/>
+         <result status="timeout" time="9.96"/>
         </proof>
        </goal>
        <goal
@@ -619,7 +687,7 @@
         <label
          name="expl:VC for lbalance"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="100"
          memlimit="0"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_lbalance_1.v"
@@ -673,7 +741,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.81"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof
          prover="2"
@@ -681,7 +749,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.84"/>
+         <result status="valid" time="0.09"/>
         </proof>
        </goal>
        <goal
@@ -713,7 +781,7 @@
       expl="2. postcondition"
       sum="9502624c1488b3e03f94cf92abc3f621"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V3Iaalmost_rbtreeV14V0FAabstV11LaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
       <label
        name="expl:VC for lbalance"/>
@@ -764,26 +832,921 @@
         expl="2."
         sum="d1e0e1cdddaa7d3035928b0e797c6f8c"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
         <label
          name="expl:VC for lbalance"/>
         <proof
-         prover="1"
-         timelimit="5"
-         memlimit="0"
+         prover="0"
+         timelimit="120"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.68"/>
+         <result status="valid" time="25.19"/>
         </proof>
-        <proof
-         prover="2"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
-         <result status="valid" time="0.78"/>
-        </proof>
+        <metas
+         proved="true"
+         expanded="true">
+         <ts_pos
+          name="real"
+          arity="0"
+          id="2"
+          ip_theory="BuiltIn">
+          <ip_library
+           name="why3"/>
+          <ip_qualid
+           name="real"/>
+         </ts_pos>
+         <ts_pos
+          name="bool"
+          arity="0"
+          id="3"
+          ip_theory="Bool">
+          <ip_library
+           name="why3"/>
+          <ip_qualid
+           name="bool"/>
+         </ts_pos>
+         <ts_pos
+          name="tuple0"
+          arity="0"
+          id="22"
+          ip_theory="Tuple0">
+          <ip_library
+           name="why3"/>
+          <ip_qualid
+           name="tuple0"/>
+         </ts_pos>
+         <ts_pos
+          name="unit"
+          arity="0"
+          id="23"
+          ip_theory="Unit">
+          <ip_library
+           name="why3"/>
+          <ip_qualid
+           name="unit"/>
+         </ts_pos>
+         <ts_pos
+          name="key"
+          arity="0"
+          id="322"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="key"/>
+         </ts_pos>
+         <ts_pos
+          name="value"
+          arity="0"
+          id="323"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="value"/>
+         </ts_pos>
+         <ls_pos
+          name="infix ="
+          id="10"
+          ip_theory="BuiltIn">
+          <ip_library
+           name="why3"/>
+          <ip_qualid
+           name="infix ="/>
+         </ls_pos>
+         <ls_pos
+          name="zero"
+          id="411"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="zero"/>
+         </ls_pos>
+         <ls_pos
+          name="one"
+          id="412"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="one"/>
+         </ls_pos>
+         <ls_pos
+          name="infix &lt;"
+          id="413"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="infix &lt;"/>
+         </ls_pos>
+         <ls_pos
+          name="infix &gt;"
+          id="416"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="infix &gt;"/>
+         </ls_pos>
+         <ls_pos
+          name="infix &lt;="
+          id="425"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="infix &lt;="/>
+         </ls_pos>
+         <ls_pos
+          name="infix +"
+          id="1513"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="infix +"/>
+         </ls_pos>
+         <ls_pos
+          name="prefix -"
+          id="1514"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="prefix -"/>
+         </ls_pos>
+         <ls_pos
+          name="infix *"
+          id="1515"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="infix *"/>
+         </ls_pos>
+         <ls_pos
+          name="infix &gt;="
+          id="1583"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="infix &gt;="/>
+         </ls_pos>
+         <pr_pos
+          name="memt_color"
+          id="385"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="memt_color"/>
+         </pr_pos>
+         <pr_pos
+          name="Assoc"
+          id="1516"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CommutativeGroup"/>
+          <ip_qualid
+           name="Assoc"/>
+         </pr_pos>
+         <pr_pos
+          name="Unit_def_l"
+          id="1523"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CommutativeGroup"/>
+          <ip_qualid
+           name="Unit_def_l"/>
+         </pr_pos>
+         <pr_pos
+          name="Unit_def_r"
+          id="1526"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CommutativeGroup"/>
+          <ip_qualid
+           name="Unit_def_r"/>
+         </pr_pos>
+         <pr_pos
+          name="Inv_def_l"
+          id="1529"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CommutativeGroup"/>
+          <ip_qualid
+           name="Inv_def_l"/>
+         </pr_pos>
+         <pr_pos
+          name="Inv_def_r"
+          id="1532"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CommutativeGroup"/>
+          <ip_qualid
+           name="Inv_def_r"/>
+         </pr_pos>
+         <pr_pos
+          name="Comm"
+          id="1535"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CommutativeGroup"/>
+          <ip_qualid
+           name="Comm"/>
+          <ip_qualid
+           name="Comm"/>
+         </pr_pos>
+         <pr_pos
+          name="Assoc"
+          id="1540"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Assoc"/>
+          <ip_qualid
+           name="Assoc"/>
+         </pr_pos>
+         <pr_pos
+          name="Mul_distr_l"
+          id="1547"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Mul_distr_l"/>
+         </pr_pos>
+         <pr_pos
+          name="Mul_distr_r"
+          id="1554"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Mul_distr_r"/>
+         </pr_pos>
+         <pr_pos
+          name="Comm"
+          id="1572"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Comm"/>
+          <ip_qualid
+           name="Comm"/>
+         </pr_pos>
+         <pr_pos
+          name="Unitary"
+          id="1577"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Unitary"/>
+         </pr_pos>
+         <pr_pos
+          name="NonTrivialRing"
+          id="1580"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="NonTrivialRing"/>
+         </pr_pos>
+         <pr_pos
+          name="Refl"
+          id="1592"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Refl"/>
+         </pr_pos>
+         <pr_pos
+          name="Trans"
+          id="1595"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Trans"/>
+         </pr_pos>
+         <pr_pos
+          name="Antisymm"
+          id="1602"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Antisymm"/>
+         </pr_pos>
+         <pr_pos
+          name="Total"
+          id="1607"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="Total"/>
+         </pr_pos>
+         <pr_pos
+          name="ZeroLessOne"
+          id="1612"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="ZeroLessOne"/>
+         </pr_pos>
+         <pr_pos
+          name="CompatOrderAdd"
+          id="1613"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CompatOrderAdd"/>
+         </pr_pos>
+         <pr_pos
+          name="CompatOrderMult"
+          id="1620"
+          ip_theory="Int">
+          <ip_library
+           name="int"/>
+          <ip_qualid
+           name="CompatOrderMult"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_leaf"
+          id="2464"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_leaf"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_leaf"
+          id="2468"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_leaf"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_tree_node"
+          id="2472"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_tree_node"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_tree_node"
+          id="2491"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_tree_node"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_node_lt"
+          id="2510"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_node_lt"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_node_gt"
+          id="2529"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_node_gt"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_left"
+          id="2548"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_left"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_right"
+          id="2567"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_right"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_left"
+          id="2586"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_left"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_right"
+          id="2605"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_right"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_tree_not_in"
+          id="2624"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_tree_not_in"/>
+         </pr_pos>
+         <pr_pos
+          name="lt_tree_trans"
+          id="2634"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="lt_tree_trans"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_tree_not_in"
+          id="2644"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_tree_not_in"/>
+         </pr_pos>
+         <pr_pos
+          name="gt_tree_trans"
+          id="2654"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="gt_tree_trans"/>
+         </pr_pos>
+         <pr_pos
+          name="bst_Leaf"
+          id="2709"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="bst_Leaf"/>
+         </pr_pos>
+         <pr_pos
+          name="bst_left"
+          id="2710"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="bst_left"/>
+         </pr_pos>
+         <pr_pos
+          name="bst_right"
+          id="2726"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="bst_right"/>
+         </pr_pos>
+         <pr_pos
+          name="bst_color"
+          id="2742"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="bst_color"/>
+         </pr_pos>
+         <pr_pos
+          name="rotate_left"
+          id="2761"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rotate_left"/>
+         </pr_pos>
+         <pr_pos
+          name="rotate_right"
+          id="2795"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rotate_right"/>
+         </pr_pos>
+         <pr_pos
+          name="rbtree_Leaf"
+          id="2906"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rbtree_Leaf"/>
+         </pr_pos>
+         <pr_pos
+          name="rbtree_Node1"
+          id="2907"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rbtree_Node1"/>
+         </pr_pos>
+         <pr_pos
+          name="rbtree_left"
+          id="2914"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rbtree_left"/>
+         </pr_pos>
+         <pr_pos
+          name="rbtree_right"
+          id="2936"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rbtree_right"/>
+         </pr_pos>
+         <pr_pos
+          name="rbtree_almost_rbtree"
+          id="3186"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rbtree_almost_rbtree"/>
+         </pr_pos>
+         <pr_pos
+          name="rbtree_almost_rbtree_ex"
+          id="3193"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="rbtree_almost_rbtree_ex"/>
+         </pr_pos>
+         <pr_pos
+          name="almost_rbtree_rbtree_black"
+          id="3203"
+          ip_theory="RedBlackTree">
+          <ip_qualid
+           name="almost_rbtree_rbtree_black"/>
+         </pr_pos>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="10"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="411"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="412"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="413"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="416"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="425"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="1513"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="1514"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="1515"/>
+         </meta>
+         <meta
+          name="remove_logic">
+          <meta_arg_ls
+           id="1583"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="385"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1516"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1523"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1526"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1529"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1532"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1535"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1540"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1547"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1554"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1572"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1577"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1580"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1592"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1595"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1602"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1607"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1612"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1613"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="1620"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2464"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2468"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2472"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2491"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2510"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2529"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2548"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2567"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2586"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2605"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2624"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2634"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2644"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2654"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2709"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2710"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2726"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2742"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2761"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2795"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2906"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2907"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2914"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="2936"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="3186"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="3193"/>
+         </meta>
+         <meta
+          name="remove_prop">
+          <meta_arg_pr
+           id="3203"/>
+         </meta>
+         <meta
+          name="remove_type">
+          <meta_arg_ts
+           id="2"/>
+         </meta>
+         <meta
+          name="remove_type">
+          <meta_arg_ts
+           id="3"/>
+         </meta>
+         <meta
+          name="remove_type">
+          <meta_arg_ts
+           id="22"/>
+         </meta>
+         <meta
+          name="remove_type">
+          <meta_arg_ts
+           id="23"/>
+         </meta>
+         <meta
+          name="remove_type">
+          <meta_arg_ts
+           id="322"/>
+         </meta>
+         <meta
+          name="remove_type">
+          <meta_arg_ts
+           id="323"/>
+         </meta>
+         <goal
+          name="WP_parameter lbalance.2.2"
+          locfile="../vacid_0_red_black_trees.mlw"
+          loclnum="202" loccnumb="6" loccnume="14"
+          expl="2."
+          sum="af9d0bd2702b22dbf0b57ea6e24386cc"
+          proved="true"
+          expanded="true"
+          shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+          <label
+           name="expl:VC for lbalance"/>
+          <transf
+           name="eliminate_builtin"
+           proved="true"
+           expanded="true">
+           <goal
+            name="WP_parameter lbalance.2.2.1"
+            locfile="../vacid_0_red_black_trees.mlw"
+            loclnum="202" loccnumb="6" loccnume="14"
+            expl="1."
+            sum="f9dd661b7d0f674bc7e0f4ab4d89b300"
+            proved="true"
+            expanded="true"
+            shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+            <label
+             name="expl:VC for lbalance"/>
+            <proof
+             prover="0"
+             timelimit="120"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="1.18"/>
+            </proof>
+            <proof
+             prover="2"
+             timelimit="10"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.20"/>
+            </proof>
+            <proof
+             prover="10"
+             timelimit="10"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="3.10"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </metas>
        </goal>
        <goal
         name="WP_parameter lbalance.2.3"
@@ -810,7 +1773,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.20"/>
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
@@ -838,7 +1801,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.40"/>
+         <result status="valid" time="0.02"/>
         </proof>
         <proof
          prover="2"
@@ -846,7 +1809,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.35"/>
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
        <goal
@@ -896,7 +1859,7 @@
     expl="VC for rbalance"
     sum="9583db4f644f1421ed2a407bf372960c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="CiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V16V17OamemtV0V16V17ainfix =V17V2ainfix =V16V1qamemtV15V16V17FAarbtreeainfix +V18c1V15IarbtreeV18V0Iaalmost_rbtreeV18V3FAabstV15LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
     <label
      name="expl:VC for rbalance"/>
@@ -911,7 +1874,7 @@
       expl="1. postcondition"
       sum="f3fcc661c95ea32b8a9196ec20558abb"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
       <label
        name="expl:VC for rbalance"/>
@@ -939,12 +1902,12 @@
          <result status="valid" time="1.92"/>
         </proof>
         <proof
-         prover="5"
+         prover="9"
          timelimit="30"
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.15"/>
+         <result status="timeout" time="29.91"/>
         </proof>
        </goal>
        <goal
@@ -959,7 +1922,7 @@
         <label
          name="expl:VC for rbalance"/>
         <proof
-         prover="3"
+         prover="4"
          timelimit="100"
          memlimit="0"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_rbalance_1.v"
@@ -985,7 +1948,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.87"/>
+         <result status="valid" time="4.44"/>
         </proof>
        </goal>
        <goal
@@ -1013,7 +1976,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.73"/>
+         <result status="valid" time="0.06"/>
         </proof>
         <proof
          prover="2"
@@ -1021,7 +1984,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.77"/>
+         <result status="valid" time="0.10"/>
         </proof>
        </goal>
        <goal
@@ -1053,26 +2016,913 @@
       expl="2. postcondition"
       sum="c2d73fbc24f353edba2f3645701fbb85"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
       <label
        name="expl:VC for rbalance"/>
       <proof
-       prover="1"
-       timelimit="100"
-       memlimit="0"
+       prover="0"
+       timelimit="120"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="8.64"/>
+       <result status="valid" time="29.93"/>
       </proof>
-      <proof
-       prover="2"
-       timelimit="100"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="10.77"/>
-      </proof>
+      <metas
+       proved="true"
+       expanded="true">
+       <ts_pos
+        name="real"
+        arity="0"
+        id="2"
+        ip_theory="BuiltIn">
+        <ip_library
+         name="why3"/>
+        <ip_qualid
+         name="real"/>
+       </ts_pos>
+       <ts_pos
+        name="bool"
+        arity="0"
+        id="3"
+        ip_theory="Bool">
+        <ip_library
+         name="why3"/>
+        <ip_qualid
+         name="bool"/>
+       </ts_pos>
+       <ts_pos
+        name="tuple0"
+        arity="0"
+        id="22"
+        ip_theory="Tuple0">
+        <ip_library
+         name="why3"/>
+        <ip_qualid
+         name="tuple0"/>
+       </ts_pos>
+       <ts_pos
+        name="unit"
+        arity="0"
+        id="23"
+        ip_theory="Unit">
+        <ip_library
+         name="why3"/>
+        <ip_qualid
+         name="unit"/>
+       </ts_pos>
+       <ts_pos
+        name="key"
+        arity="0"
+        id="322"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="key"/>
+       </ts_pos>
+       <ts_pos
+        name="value"
+        arity="0"
+        id="323"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="value"/>
+       </ts_pos>
+       <ls_pos
+        name="infix ="
+        id="10"
+        ip_theory="BuiltIn">
+        <ip_library
+         name="why3"/>
+        <ip_qualid
+         name="infix ="/>
+       </ls_pos>
+       <ls_pos
+        name="zero"
+        id="411"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="zero"/>
+       </ls_pos>
+       <ls_pos
+        name="one"
+        id="412"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="one"/>
+       </ls_pos>
+       <ls_pos
+        name="infix &lt;"
+        id="413"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="infix &lt;"/>
+       </ls_pos>
+       <ls_pos
+        name="infix &gt;"
+        id="416"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="infix &gt;"/>
+       </ls_pos>
+       <ls_pos
+        name="infix &lt;="
+        id="425"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="infix &lt;="/>
+       </ls_pos>
+       <ls_pos
+        name="infix +"
+        id="1513"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="infix +"/>
+       </ls_pos>
+       <ls_pos
+        name="prefix -"
+        id="1514"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="prefix -"/>
+       </ls_pos>
+       <ls_pos
+        name="infix *"
+        id="1515"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="infix *"/>
+       </ls_pos>
+       <ls_pos
+        name="infix &gt;="
+        id="1583"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="infix &gt;="/>
+       </ls_pos>
+       <pr_pos
+        name="memt_color"
+        id="385"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="memt_color"/>
+       </pr_pos>
+       <pr_pos
+        name="Assoc"
+        id="1516"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CommutativeGroup"/>
+        <ip_qualid
+         name="Assoc"/>
+       </pr_pos>
+       <pr_pos
+        name="Unit_def_l"
+        id="1523"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CommutativeGroup"/>
+        <ip_qualid
+         name="Unit_def_l"/>
+       </pr_pos>
+       <pr_pos
+        name="Unit_def_r"
+        id="1526"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CommutativeGroup"/>
+        <ip_qualid
+         name="Unit_def_r"/>
+       </pr_pos>
+       <pr_pos
+        name="Inv_def_l"
+        id="1529"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CommutativeGroup"/>
+        <ip_qualid
+         name="Inv_def_l"/>
+       </pr_pos>
+       <pr_pos
+        name="Inv_def_r"
+        id="1532"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CommutativeGroup"/>
+        <ip_qualid
+         name="Inv_def_r"/>
+       </pr_pos>
+       <pr_pos
+        name="Comm"
+        id="1535"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CommutativeGroup"/>
+        <ip_qualid
+         name="Comm"/>
+        <ip_qualid
+         name="Comm"/>
+       </pr_pos>
+       <pr_pos
+        name="Assoc"
+        id="1540"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Assoc"/>
+        <ip_qualid
+         name="Assoc"/>
+       </pr_pos>
+       <pr_pos
+        name="Mul_distr_l"
+        id="1547"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Mul_distr_l"/>
+       </pr_pos>
+       <pr_pos
+        name="Mul_distr_r"
+        id="1554"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Mul_distr_r"/>
+       </pr_pos>
+       <pr_pos
+        name="Comm"
+        id="1572"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Comm"/>
+        <ip_qualid
+         name="Comm"/>
+       </pr_pos>
+       <pr_pos
+        name="Unitary"
+        id="1577"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Unitary"/>
+       </pr_pos>
+       <pr_pos
+        name="NonTrivialRing"
+        id="1580"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="NonTrivialRing"/>
+       </pr_pos>
+       <pr_pos
+        name="Refl"
+        id="1592"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Refl"/>
+       </pr_pos>
+       <pr_pos
+        name="Trans"
+        id="1595"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Trans"/>
+       </pr_pos>
+       <pr_pos
+        name="Antisymm"
+        id="1602"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Antisymm"/>
+       </pr_pos>
+       <pr_pos
+        name="Total"
+        id="1607"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="Total"/>
+       </pr_pos>
+       <pr_pos
+        name="ZeroLessOne"
+        id="1612"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="ZeroLessOne"/>
+       </pr_pos>
+       <pr_pos
+        name="CompatOrderAdd"
+        id="1613"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CompatOrderAdd"/>
+       </pr_pos>
+       <pr_pos
+        name="CompatOrderMult"
+        id="1620"
+        ip_theory="Int">
+        <ip_library
+         name="int"/>
+        <ip_qualid
+         name="CompatOrderMult"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_leaf"
+        id="2464"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_leaf"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_leaf"
+        id="2468"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_leaf"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_tree_node"
+        id="2472"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_tree_node"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_tree_node"
+        id="2491"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_tree_node"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_node_lt"
+        id="2510"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_node_lt"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_node_gt"
+        id="2529"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_node_gt"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_left"
+        id="2548"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_left"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_right"
+        id="2567"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_right"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_left"
+        id="2586"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_left"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_right"
+        id="2605"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_right"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_tree_not_in"
+        id="2624"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_tree_not_in"/>
+       </pr_pos>
+       <pr_pos
+        name="lt_tree_trans"
+        id="2634"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="lt_tree_trans"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_tree_not_in"
+        id="2644"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_tree_not_in"/>
+       </pr_pos>
+       <pr_pos
+        name="gt_tree_trans"
+        id="2654"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="gt_tree_trans"/>
+       </pr_pos>
+       <pr_pos
+        name="bst_Leaf"
+        id="2709"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="bst_Leaf"/>
+       </pr_pos>
+       <pr_pos
+        name="bst_left"
+        id="2710"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="bst_left"/>
+       </pr_pos>
+       <pr_pos
+        name="bst_right"
+        id="2726"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="bst_right"/>
+       </pr_pos>
+       <pr_pos
+        name="bst_color"
+        id="2742"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="bst_color"/>
+       </pr_pos>
+       <pr_pos
+        name="rotate_left"
+        id="2761"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rotate_left"/>
+       </pr_pos>
+       <pr_pos
+        name="rotate_right"
+        id="2795"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rotate_right"/>
+       </pr_pos>
+       <pr_pos
+        name="rbtree_Leaf"
+        id="2906"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rbtree_Leaf"/>
+       </pr_pos>
+       <pr_pos
+        name="rbtree_Node1"
+        id="2907"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rbtree_Node1"/>
+       </pr_pos>
+       <pr_pos
+        name="rbtree_left"
+        id="2914"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rbtree_left"/>
+       </pr_pos>
+       <pr_pos
+        name="rbtree_right"
+        id="2936"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rbtree_right"/>
+       </pr_pos>
+       <pr_pos
+        name="rbtree_almost_rbtree"
+        id="3186"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rbtree_almost_rbtree"/>
+       </pr_pos>
+       <pr_pos
+        name="rbtree_almost_rbtree_ex"
+        id="3193"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="rbtree_almost_rbtree_ex"/>
+       </pr_pos>
+       <pr_pos
+        name="almost_rbtree_rbtree_black"
+        id="3203"
+        ip_theory="RedBlackTree">
+        <ip_qualid
+         name="almost_rbtree_rbtree_black"/>
+       </pr_pos>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="10"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="411"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="412"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="413"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="416"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="425"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="1513"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="1514"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="1515"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="1583"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="385"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1516"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1523"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1526"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1529"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1532"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1535"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1540"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1547"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1554"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1572"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1577"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1580"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1592"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1595"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1602"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1607"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1612"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1613"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="1620"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2464"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2468"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2472"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2491"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2510"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2529"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2548"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2567"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2586"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2605"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2624"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2634"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2644"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2654"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2709"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2710"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2726"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2742"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2761"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2795"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2906"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2907"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2914"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="2936"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="3186"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="3193"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="3203"/>
+       </meta>
+       <meta
+        name="remove_type">
+        <meta_arg_ts
+         id="2"/>
+       </meta>
+       <meta
+        name="remove_type">
+        <meta_arg_ts
+         id="3"/>
+       </meta>
+       <meta
+        name="remove_type">
+        <meta_arg_ts
+         id="22"/>
+       </meta>
+       <meta
+        name="remove_type">
+        <meta_arg_ts
+         id="23"/>
+       </meta>
+       <meta
+        name="remove_type">
+        <meta_arg_ts
+         id="322"/>
+       </meta>
+       <meta
+        name="remove_type">
+        <meta_arg_ts
+         id="323"/>
+       </meta>
+       <goal
+        name="WP_parameter rbalance.2"
+        locfile="../vacid_0_red_black_trees.mlw"
+        loclnum="226" loccnumb="6" loccnume="14"
+        expl="2. postcondition"
+        sum="53c208633e3578f022bbfbfd690fed33"
+        proved="true"
+        expanded="true"
+        shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        <label
+         name="expl:VC for rbalance"/>
+        <transf
+         name="eliminate_builtin"
+         proved="true"
+         expanded="true">
+         <goal
+          name="WP_parameter rbalance.2.1"
+          locfile="../vacid_0_red_black_trees.mlw"
+          loclnum="226" loccnumb="6" loccnume="14"
+          expl="1. postcondition"
+          sum="8145fd05cfe115f2b48d69254942fe87"
+          proved="true"
+          expanded="true"
+          shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+          <label
+           name="expl:VC for rbalance"/>
+          <proof
+           prover="0"
+           timelimit="120"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="1.51"/>
+          </proof>
+          <proof
+           prover="2"
+           timelimit="10"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.22"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+      </metas>
      </goal>
     </transf>
    </goal>
@@ -1170,7 +3020,7 @@
       expl="3. postcondition"
       sum="31cf469a3f2997e8719f6769ad171857"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaLeafiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV11V8IarbtreeV11V0FAabstV8LaNodeaRedV7V4V5V6IiamemtV3V12V13ainfix =V13V2ainfix =V12V1qamemtV7V12V13FAamemtV7V1V2AarbtreeV14V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV14V7IarbtreeV14V3FAabstV7FIarbtreeV15V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
       <label
        name="expl:VC for insert"/>
@@ -1215,7 +3065,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.65"/>
+         <result status="valid" time="0.10"/>
         </proof>
         <proof
          prover="2"
@@ -1223,7 +3073,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.96"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
        <goal
@@ -1343,7 +3193,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.72"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -1371,7 +3221,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.70"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
       </transf>
@@ -1419,7 +3269,7 @@
       expl="5. postcondition"
       sum="f74ffd16c224b1b5d2f01b2e1c0caac0"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaLeafiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV11V8IarbtreeV11V0FAabstV8LaNodeaRedV3V4V5V7IiamemtV6V12V13ainfix =V13V2ainfix =V12V1qamemtV7V12V13FAamemtV7V1V2AarbtreeV14V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV14V7IarbtreeV14V6FAabstV7FIarbtreeV15V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
       <label
        name="expl:VC for insert"/>
@@ -1464,7 +3314,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.48"/>
+         <result status="valid" time="0.10"/>
         </proof>
         <proof
          prover="2"
@@ -1472,7 +3322,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.90"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
        <goal
@@ -1572,7 +3422,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.68"/>
+         <result status="valid" time="0.04"/>
         </proof>
         <proof
          prover="2"
@@ -1580,7 +3430,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.40"/>
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
        <goal
@@ -1608,7 +3458,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.76"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -1636,7 +3486,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.02"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
       </transf>
@@ -1785,7 +3635,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="36.69"/>
+         <result status="valid" time="0.12"/>
         </proof>
        </goal>
        <goal
@@ -1795,17 +3645,49 @@
         expl="3."
         sum="82f1944fb5705d4c14a9a9d97c523667"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="CtaLeaftaNodeaRedVVVVarbtreeV13V12ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0IarbtreeV13V0FIiamemtV10V14V15OamemtV11V14V15ainfix =V15V9ainfix =V14V8qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V17V18ainfix =V18V2ainfix =V17V1qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV21V0EAabstV0F">
         <label
          name="expl:VC for insert"/>
         <proof
          prover="1"
-         timelimit="146"
-         memlimit="0"
+         timelimit="10"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="59.84"/>
+         <result status="valid" time="0.14"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.18"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.47"/>
         </proof>
        </goal>
        <goal
@@ -1869,7 +3751,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.99"/>
+         <result status="valid" time="0.04"/>
         </proof>
         <proof
          prover="2"
@@ -1877,7 +3759,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.93"/>
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
@@ -1905,7 +3787,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.15"/>
+         <result status="valid" time="0.04"/>
         </proof>
         <proof
          prover="2"
@@ -1913,7 +3795,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.17"/>
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
@@ -2062,7 +3944,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="30.15"/>
+         <result status="valid" time="0.10"/>
         </proof>
        </goal>
        <goal
@@ -2072,17 +3954,49 @@
         expl="3."
         sum="d29a8e4d33a44df330fa13c48866d6f1"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="CtaLeaftaNodeaRedVVVVarbtreeV13V12ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0IarbtreeV13V0FIiamemtV11V14V15OamemtV7V14V15ainfix =V15V9ainfix =V14V8qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V17V18ainfix =V18V2ainfix =V17V1qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV21V0EAabstV0F">
         <label
          name="expl:VC for insert"/>
         <proof
          prover="1"
-         timelimit="143"
-         memlimit="0"
+         timelimit="10"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="62.43"/>
+         <result status="valid" time="0.14"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.16"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.50"/>
         </proof>
        </goal>
        <goal
@@ -2166,7 +4080,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.17"/>
+         <result status="valid" time="0.04"/>
         </proof>
         <proof
          prover="2"
@@ -2174,7 +4088,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.10"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -2216,7 +4130,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.30"/>
+       <result status="valid" time="0.16"/>
       </proof>
      </goal>
     </transf>
@@ -2228,7 +4142,7 @@
     expl="VC for add"
     sum="ff568354cbb0722b926d7e3b8233b8cd"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="CiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8EAabstV8LaNodeaBlackV4V5V6V7aNodewVVVVfaLeafV3IiamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV3V12V13FAamemtV3V1V2AarbtreeV14V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV14V3IarbtreeV14V0FAabstV3FAarbtreeV15V0EAabstV0IarbtreeV16V0EAabstV0F">
     <label
      name="expl:VC for add"/>
@@ -2279,7 +4193,7 @@
       expl="2. postcondition"
       sum="7acb809e3ef5fd1f51bcf7552767cda4"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8EAabstV8LaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV3V12V13FAamemtV3V1V2AarbtreeV14V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV14V3IarbtreeV14V0FAabstV3FIarbtreeV15V0EAabstV0IarbtreeV16V0EAabstV0F">
       <label
        name="expl:VC for add"/>
@@ -2337,7 +4251,7 @@
         <transf
          name="inline_goal"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
           name="WP_parameter add.2.2.1"
           locfile="../vacid_0_red_black_trees.mlw"
@@ -2350,7 +4264,7 @@
           <label
            name="expl:VC for add"/>
           <proof
-           prover="3"
+           prover="4"
            timelimit="10"
            memlimit="0"
            edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"
