@@ -92,6 +92,15 @@ version_ok  = "1.2"
 driver = "drivers/cvc4.drv"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
 
+[ATP cvc4_gnatprove]
+name = "cvc4_gnatprove"
+exec = "cvc4"
+version_switch = "--version"
+version_regexp = "This is CVC4 version \\([^ \n\r]+\\)"
+version_ok  = "1.3-prerelease"
+driver = "drivers/cvc4_gnatprove.drv"
+command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e --lang=smt2 %f"
+
 # CVC3 versions 2.4.x
 [ATP cvc3]
 name = "CVC3"

@@ -1,4 +1,4 @@
-(* Why driver for SMT syntax *)
+(* Why driver for SMTLIB2 syntax *)
 
 prelude ";;; this is a prelude for CVC4"
 prelude "(set-logic AUFNIRA)"
@@ -12,15 +12,15 @@ printer "smtv2"
 filename "%f-%t-%g.smt2"
 
 valid "^unsat"
-unknown "^\\(unknown\\|sat\\|Fail\\)" ""
+invalid "^sat"
+unknown "^\\(unknown\\|Fail\\)" ""
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 time "why3cpulimit time : %s s"
 
 
-(* À discuter *)
+(* Commented out in all drivers. Why? *)
 (*transformation "simplify_recursive_definition"*)
 transformation "inline_trivial"
-
 
 transformation "eliminate_builtin"
 transformation "eliminate_definition"
@@ -28,7 +28,10 @@ transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 
 transformation "simplify_formula"
-(*transformation "simplify_trivial_quantification"*)
+
+(* For some reason this is commented out in all drivers except gappa
+and mathematica. Why? *)
+(* transformation "simplify_trivial_quantification" *)
 
 transformation "discriminate"
 transformation "encoding_smt"
@@ -39,6 +42,25 @@ theory BuiltIn
   syntax predicate (=)  "(= %1 %2)"
 
   meta "encoding : kept" type int
+end
+
+theory algebra.Field
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+end
+
+theory algebra.OrderedUnitaryCommutativeRing
+  remove prop CompatOrderAdd
+  remove prop CompatOrderMult
+end
+
+theory algebra.OrderedField
+  remove prop CompatOrderAdd
+  remove prop CompatOrderMult
 end
 
 theory int.Int
@@ -123,51 +145,74 @@ theory real.Real
 
 end
 
-theory bool.Ite
-  syntax function ite "(ite %1 %2 %3)"
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+  remove prop Monotonic
 end
 
- (* Not supported currently *)
-(*
-theory Bool
+theory real.Abs
+  syntax function abs "(ite (<= 0.0 %1) (- %1) %1)"
+
+  remove prop Abs_le
+  remove prop Abs_pos
+  (*** remove prop Abs_zero *)
+  remove prop Abs_sum
+  remove prop Abs_prod
+  remove prop triangular_inequality
+end
+
+theory bool.Bool
+   meta "encoding : kept" type bool
+   meta "eliminate_algebraic" "no_inversion"
+   meta "eliminate_algebraic" "no_selector"
+
    syntax type     bool  "Bool"
    syntax function True  "true"
    syntax function False "false"
-   meta "encoding : kept" type bool
-end
-*)
-(** so use datatype *)
-(*
-theory Bool
-   prelude "(declare-datatypes () ((why3_bool  (why3_true) (why3_false) )))"
-   syntax type     bool  "why3_bool"
-   syntax function True  "why3_true"
-   syntax function False "why3_false"
-   meta "encoding : kept" type bool
-end
-*)
-(*
-theory bool.Bool
+
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
    syntax function implb "(=> %1 %2)"
 end
-*)
 
-(* CVC4 division seems to be neither the Euclidean one,
-nor the Computer one *)
-(*
+theory bool.Ite
+  syntax function ite "(ite %1 %2 %3)"
+end
+
 theory int.EuclideanDivision
    syntax function div "(div %1 %2)"
    syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
+
    remove prop Div_mod
+   remove prop Div_bound
+   remove prop Mod_bound
    remove prop Mod_1
    remove prop Div_1
+   remove prop Div_inf
+   remove prop Div_inf_neg
+   remove prop Mod_0
+   remove prop Div_1_left
+   remove prop Div_minus1_left
+   remove prop Mod_1_left
+   remove prop Mod_minus1_left
+   remove prop Div_mult
+   remove prop Mod_mult
 end
 
+theory int.Div2
+   remove prop div2
+end
+
+(*
 theory int.ComputerDivision
    syntax function div "(div %1 %2)"
    syntax function mod "(mod %1 %2)"
@@ -177,7 +222,6 @@ theory int.ComputerDivision
    remove prop Div_1
 end
 *)
-
 
 (*
 theory real.Truncate
@@ -197,7 +241,6 @@ theory map.Map
   syntax function set   "(store %1 %2 %3)"
 (*  syntax function const "(const[%t0] %1)" *)
 end
-
 
 (*
 Local Variables:

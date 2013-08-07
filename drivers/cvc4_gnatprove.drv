@@ -1,0 +1,48 @@
+import "cvc4.drv"
+
+(**********************************************************************
+ ***                       gnat2why theories                        ***
+ **********************************************************************)
+
+theory _gnatprove_standard_th.Integer_Func
+   syntax function bool_eq "(= %1 %2)"
+   syntax function bool_ne "(not (= %1 %2))"
+   syntax function bool_lt "(< %1 %2)"
+   syntax function bool_le "(<= %1 %2)"
+   syntax function bool_gt "(> %1 %2)"
+   syntax function bool_ge "(>= %1 %2)"
+
+   remove prop bool_eq_axiom
+   remove prop bool_ne_axiom
+   remove prop bool_lt_axiom
+   remove prop bool_int__le_axiom
+   remove prop bool_gt_axiom
+   remove prop bool_ge_axiom
+end
+
+theory _gnatprove_standard_th.Floating_Func
+   syntax function bool_eq "(= %1 %2)"
+   syntax function bool_neq "(not (= %1 %2))"
+   syntax function bool_lt "(< %1 %2)"
+   syntax function bool_le "(<= %1 %2)"
+   syntax function bool_gt "(> %1 %2)"
+   syntax function bool_ge "(>= %1 %2)"
+
+   remove prop Bool_real__lt_axiom
+   remove prop Bool_real__le_axiom
+   remove prop Bool_real__gt_axiom
+   remove prop Bool_real__ge_axiom
+   remove prop Bool_real__eq_axiom
+   remove prop Bool_real__neq_axiom
+end
+
+theory ada__model_th.Floating_Point_Theory
+  syntax function bool_eq "(= %1 %2)"
+end
+
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)
