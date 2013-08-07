@@ -16,7 +16,7 @@
  <prover
   id="3"
   name="CVC4"
-  version="1.0"/>
+  version="1.2"/>
  <prover
   id="4"
   name="Coq"
@@ -111,14 +111,14 @@
     expl="VC for f"
     sum="7ccbbc5682e5ac39ea78feec47b5a13f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="iais_fib_sum_evenV0V3ainfix =V8afib_sum_evenV0V10Aainfix =V7afibainfix +V10c3Aainfix =V7afib_evenainfix +V9c1Aainfix =V6afibV10Aainfix =V6afib_evenV9Aainfix &gt;=V10c1Aainfix &gt;=V9c0Iainfix =V10ainfix +V1c3FIainfix =V9ainfix +V2c1FIainfix =V8ainfix +V3V5FIainfix =V7ainfix +ainfix *c4V4V5FIainfix =V6V4Fainfix &lt;=V5V0Iainfix =V3afib_sum_evenV0V1Aainfix =V4afibainfix +V1c3Aainfix =V4afib_evenainfix +V2c1Aainfix =V5afibV1Aainfix =V5afib_evenV2Aainfix &gt;=V1c1Aainfix &gt;=V2c0FAainfix =c0afib_sum_evenV0c1Aainfix =c8afibainfix +c1c3Aainfix =c8afib_evenainfix +c0c1Aainfix =c2afibc1Aainfix =c2afib_evenc0Aainfix &gt;=c1c1Aainfix &gt;=c0c0Aainfix =c1ainfix +c0c1Iainfix &gt;=V0c0F">
     <label
      name="expl:VC for f"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter f.1"
       locfile="../euler002.mlw"
@@ -794,14 +794,6 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
      </goal>
      <goal
       name="WP_parameter f.12"
@@ -832,14 +824,6 @@
       </proof>
       <proof
        prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"

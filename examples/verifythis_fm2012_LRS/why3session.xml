@@ -50,7 +50,7 @@
    locfile="../verifythis_fm2012_LRS.mlw"
    loclnum="89" loccnumb="7" loccnume="10"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="not_common_prefix_if_last_char_are_different"
     locfile="../verifythis_fm2012_LRS.mlw"
@@ -220,14 +220,14 @@
     expl="VC for lcp"
     sum="456be3b6dcfe6e97e0e81402c8dfd22f"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="iais_longest_common_prefixV4V1V2V5iais_longest_common_prefixV4V1V2V5iais_longest_common_prefixV4V1V2V5ais_common_prefixV4V1V2V8Iainfix =V8ainfix +V5c1Fainfix =agetV3V7agetV3V6Aainfix &lt;V7V0Aainfix &lt;=c0V7Lainfix +V1V5Aainfix &lt;V6V0Aainfix &lt;=c0V6Lainfix +V2V5ainfix &lt;ainfix +V2V5V0ainfix &lt;ainfix +V1V5V0Iais_common_prefixV4V1V2V5FAais_common_prefixV4V1V2c0Iainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3FF">
     <label
      name="expl:VC for lcp"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter lcp.1"
       locfile="../verifythis_fm2012_LRS.mlw"
@@ -487,7 +487,7 @@
       expl="4. loop invariant preservation"
       sum="c5f71e12350274842c72fc22209c3861"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationais_common_prefixV4V1V2V8Iainfix =V8ainfix +V5c1FIainfix =agetV3V7agetV3V6Iainfix &lt;V7V0Aainfix &lt;=c0V7Lainfix +V1V5Iainfix &lt;V6V0Aainfix &lt;=c0V6Lainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0Iais_common_prefixV4V1V2V5FIainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3FF">
       <label
        name="expl:VC for lcp"/>
@@ -500,68 +500,12 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="9.65"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="11.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.95"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.99"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="19.88"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.41"/>
-      </proof>
-      <proof
        prover="8"
-       timelimit="10"
+       timelimit="20"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.22"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.15"/>
+       <result status="valid" time="4.65"/>
       </proof>
      </goal>
      <goal
@@ -571,81 +515,41 @@
       expl="5. postcondition"
       sum="57c6c1244a13f7d421c5215fb6ec40f1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionais_longest_common_prefixV4V1V2V5INainfix =agetV3V7agetV3V6Iainfix &lt;V7V0Aainfix &lt;=c0V7Lainfix +V1V5Iainfix &lt;V6V0Aainfix &lt;=c0V6Lainfix +V2V5Iainfix &lt;ainfix +V2V5V0Iainfix &lt;ainfix +V1V5V0Iais_common_prefixV4V1V2V5FIainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3FF">
       <label
        name="expl:VC for lcp"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="20"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="9.93"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.97"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.95"/>
       </proof>
       <proof
        prover="5"
-       timelimit="10"
+       timelimit="20"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="6"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="20.00"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.44"/>
-      </proof>
-      <proof
        prover="8"
-       timelimit="10"
+       timelimit="20"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="9.94"/>
+       <result status="valid" time="4.88"/>
       </proof>
       <proof
        prover="9"
-       timelimit="10"
+       timelimit="20"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.11"/>
+       <result status="valid" time="6.05"/>
       </proof>
      </goal>
      <goal
@@ -4216,14 +4120,14 @@
     expl="VC for compare"
     sum="ae4389f12126ad79e735169c06ee62ff"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="iiiiifaltV4V2V1Iainfix &gt;c1c0AaltV4V1V2Iainfix &lt;c1c0Aainfix =V1V2Iainfix =c1c0ainfix &gt;agetV3V9agetV3V8Aainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix +V1V5Aainfix &lt;V8V0Aainfix &lt;=c0V8Lainfix +V2V5altV4V2V1Iainfix &gt;V10c0AaltV4V1V2Iainfix &lt;V10c0Aainfix =V1V2Iainfix =V10c0Laprefix -c1ainfix &lt;agetV3V7agetV3V6Aainfix &lt;V7V0Aainfix &lt;=c0V7Lainfix +V1V5Aainfix &lt;V6V0Aainfix &lt;=c0V6Lainfix +V2V5altV4V2V1Iainfix &gt;c1c0AaltV4V1V2Iainfix &lt;c1c0Aainfix =V1V2Iainfix =c1c0ainfix =ainfix +V2V5V0altV4V2V1Iainfix &gt;V11c0AaltV4V1V2Iainfix &lt;V11c0Aainfix =V1V2Iainfix =V11c0Laprefix -c1ainfix =ainfix +V1V5V0Iais_longest_common_prefixV4V1V2V5FAainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1altV4V2V1Iainfix &gt;c0c0AaltV4V1V2Iainfix &lt;c0c0Aainfix =V1V2Iainfix =c0c0ainfix =V1V2Iainfix &lt;=V2V0Aainfix &lt;=c0V2Aainfix &lt;=V1V0Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk arrayV0V3FF">
     <label
      name="expl:VC for compare"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter compare.1"
       locfile="../verifythis_fm2012_LRS.mlw"
@@ -5084,22 +4988,6 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.20"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.97"/>
-      </proof>
-      <proof
        prover="3"
        timelimit="10"
        memlimit="1000"
@@ -5108,44 +4996,12 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="5"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.98"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="20.04"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.16"/>
-      </proof>
-      <proof
        prover="8"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.17"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.03"/>
+       <result status="valid" time="2.59"/>
       </proof>
      </goal>
      <goal
@@ -5924,22 +5780,6 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.96"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.24"/>
-      </proof>
-      <proof
        prover="3"
        timelimit="10"
        memlimit="1000"
@@ -5948,44 +5788,12 @@
        <result status="valid" time="0.07"/>
       </proof>
       <proof
-       prover="5"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.98"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="20.06"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.49"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.15"/>
-      </proof>
-      <proof
        prover="9"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="10.17"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal
@@ -6006,70 +5814,6 @@
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.96"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.99"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.17"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="9.98"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="19.99"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.05"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.17"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.15"/>
       </proof>
      </goal>
     </transf>
@@ -7436,7 +7180,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="5"
@@ -7444,7 +7188,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="6.78"/>
+       <result status="valid" time="7.32"/>
       </proof>
       <proof
        prover="6"
@@ -7452,7 +7196,7 @@
        memlimit="4000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.20"/>
+       <result status="valid" time="0.21"/>
       </proof>
       <proof
        prover="7"
@@ -7460,7 +7204,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="8"
@@ -7468,7 +7212,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="9"
@@ -7520,7 +7264,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="5"
@@ -7528,7 +7272,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="7.32"/>
+       <result status="valid" time="6.78"/>
       </proof>
       <proof
        prover="6"
@@ -7536,7 +7280,7 @@
        memlimit="4000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.21"/>
+       <result status="valid" time="0.20"/>
       </proof>
       <proof
        prover="7"
@@ -7544,7 +7288,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="8"
@@ -7552,7 +7296,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof
        prover="9"
@@ -10987,7 +10731,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
       <proof
        prover="1"
@@ -11003,7 +10747,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.05"/>
       </proof>
       <proof
        prover="3"
@@ -11019,7 +10763,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="9.96"/>
+       <result status="timeout" time="9.98"/>
       </proof>
       <proof
        prover="6"
@@ -11071,7 +10815,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
@@ -11087,7 +10831,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.05"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="3"
@@ -11103,7 +10847,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="9.98"/>
+       <result status="timeout" time="9.96"/>
       </proof>
       <proof
        prover="6"

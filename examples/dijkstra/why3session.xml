@@ -8,13 +8,21 @@
  <prover
   id="1"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="3"
+  id="5"
   name="Z3"
   version="3.2"/>
  <file
@@ -133,7 +141,7 @@
     expanded="false"
     shape="ainfix &gt;=V2c0IapathV0V1V2FF">
     <proof
-     prover="2"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="dijkstra_DijkstraShortestPath_Length_nonneg_1.v"
@@ -168,7 +176,7 @@
     expanded="false"
     shape="ainfix &lt;=V3V2Aashortest_pathV0V1V3EIapathV0V1V2FF">
     <proof
-     prover="2"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"
@@ -203,7 +211,7 @@
     expanded="false"
     shape="amemV2V0IapathV1V2V3FFIamemV1V0FIamemV5V0IamemV5ag_succV4FIamemV4V0FF">
     <proof
-     prover="2"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="dijkstra_DijkstraShortestPath_Completeness_lemma_1.v"
@@ -239,7 +247,7 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -247,7 +255,7 @@
        <result status="valid" time="0.08"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -275,7 +283,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -283,7 +291,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -303,7 +311,7 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -343,7 +351,23 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
+       prover="0"
+       timelimit="15"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
        prover="1"
+       timelimit="15"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -352,11 +376,19 @@
       </proof>
       <proof
        prover="3"
-       timelimit="5"
+       timelimit="15"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="15"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="6.43"/>
       </proof>
      </goal>
      <goal
@@ -622,7 +654,7 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -712,7 +744,7 @@
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
-           prover="1"
+           prover="2"
            timelimit="10"
            memlimit="1000"
            obsolete="false"
@@ -752,7 +784,7 @@
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
-           prover="1"
+           prover="2"
            timelimit="10"
            memlimit="1000"
            obsolete="false"
@@ -812,7 +844,7 @@
           <label
            name="expl:VC for shortest_path_code"/>
           <proof
-           prover="2"
+           prover="4"
            timelimit="30"
            memlimit="1000"
            edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"
@@ -882,7 +914,7 @@
             <label
              name="expl:VC for shortest_path_code"/>
             <proof
-             prover="1"
+             prover="2"
              timelimit="5"
              memlimit="1000"
              obsolete="false"
@@ -890,7 +922,7 @@
              <result status="valid" time="0.08"/>
             </proof>
             <proof
-             prover="3"
+             prover="5"
              timelimit="5"
              memlimit="1000"
              obsolete="false"
@@ -910,7 +942,7 @@
             <label
              name="expl:VC for shortest_path_code"/>
             <proof
-             prover="1"
+             prover="2"
              timelimit="5"
              memlimit="1000"
              obsolete="false"
@@ -976,7 +1008,7 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -996,7 +1028,7 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="2"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"
@@ -1057,7 +1089,7 @@
       <label
        name="expl:VC for shortest_path_code"/>
       <proof
-       prover="3"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"

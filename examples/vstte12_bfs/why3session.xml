@@ -4,27 +4,27 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
   version="0.95.1"/>
  <prover
-  id="2"
+  id="1"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="3"
+  id="2"
   name="CVC4"
-  version="1.0"/>
+  version="1.2"/>
  <prover
-  id="4"
+  id="3"
   name="Coq"
   version="8.3pl4"/>
  <prover
+  id="4"
+  name="Spass"
+  version="3.7"/>
+ <prover
   id="5"
   name="Z3"
-  version="2.19"/>
+  version="3.2"/>
  <prover
   id="6"
   name="Z3"
@@ -45,10 +45,10 @@
     loclnum="26" loccnumb="8" loccnume="19"
     sum="f3bf58aa681ea043d4d2aea1ed12f96e"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &gt;=V2c0IapathV0V1V2F">
     <proof
-     prover="4"
+     prover="3"
      timelimit="10"
      memlimit="0"
      edited="vstte12_bfs_Graph_path_nonneg_1.v"
@@ -63,10 +63,10 @@
     loclnum="30" loccnumb="8" loccnume="22"
     sum="2c8c3dd4e2e9e682477f8cf7d4a1e26c"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="amemV1asuccV3AapathV0V3V2EIapathV0V1ainfix +V2c1Iainfix &gt;=V2c0F">
     <proof
-     prover="4"
+     prover="3"
      timelimit="10"
      memlimit="0"
      edited="vstte12_bfs_Graph_path_inversion_1.v"
@@ -81,10 +81,10 @@
     loclnum="36" loccnumb="8" loccnume="20"
     sum="cfb0d77c6f3cb84eb2c4dbfb5a0950b5"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="amemV2V0IamemV1V0IapathV1V2V3FIamemV5V0IamemV5asuccV4FIamemV4V0FF">
     <proof
-     prover="4"
+     prover="3"
      timelimit="10"
      memlimit="0"
      edited="vstte12_bfs_Graph_path_closure_1.v"
@@ -107,14 +107,14 @@
     expl="VC for fill_next"
     sum="e2feb1f97be62393bb6c14c41d2ba0e8"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="iaclosureV9V5V8V11FAasubsetasuccV2V9AainvV0V1V9V5V8V3iaclosureV9V5V8V14INainfix =V14V2FAasubsetadiffasuccV2V12V9AasubsetV12asuccV2AainvV0V1V9V5V8V3aclosureV15V5V16V17INainfix =V17V2FAasubsetadiffasuccV2V12V15AasubsetV12asuccV2AainvV0V1V15V5V16V3Iainfix =V16aaddV13V8FIainfix =V15aaddV13V9FNamemV13V9Iainfix =V12aremoveV13V7AamemV13V7FFANais_emptyV7Nainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V18INainfix =V18V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FAaclosureV6V5V4V19INainfix =V19V2FAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V5V4V3IaclosureV6V5V4V20INainfix =V20V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
     <label
      name="expl:VC for fill_next"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter fill_next.1"
       locfile="../vstte12_bfs.mlw"
@@ -122,12 +122,12 @@
       expl="1. loop invariant init"
       sum="179018a7256d099c6e779b475aef0705"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initaclosureV6V5V4V7INainfix =V7V2FAasubsetadiffasuccV2asuccV2V6AasubsetasuccV2asuccV2AainvV0V1V6V5V4V3IaclosureV6V5V4V8INainfix =V8V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
       <label
        name="expl:VC for fill_next"/>
       <proof
-       prover="2"
+       prover="1"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -142,12 +142,12 @@
       expl="2. precondition"
       sum="8fd355c6e2afbcb21cd6c6f62cb6b755"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="preconditionNais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V11INainfix =V11V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V12INainfix =V12V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
       <label
        name="expl:VC for fill_next"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -162,14 +162,14 @@
       expl="3. loop invariant preservation"
       sum="1c30887f1894d7e6037352d8e5ff6735"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationaclosureV13V5V14V15INainfix =V15V2FAasubsetadiffasuccV2V11V13AasubsetV11asuccV2AainvV0V1V13V5V14V3Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FINamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V16INainfix =V16V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V17INainfix =V17V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
       <label
        name="expl:VC for fill_next"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter fill_next.3.1"
         locfile="../vstte12_bfs.mlw"
@@ -177,12 +177,12 @@
         expl="1."
         sum="3165d1a1642017fe3818c007e32eeb37"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainvV0V1V13V5V14V3Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FINamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V15INainfix =V15V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V16INainfix =V16V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="20"
          memlimit="0"
          obsolete="false"
@@ -197,12 +197,12 @@
         expl="2."
         sum="874755d3e8bce33146d009c387e245df"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asubsetV11asuccV2Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FINamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V15INainfix =V15V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V16INainfix =V16V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -217,12 +217,12 @@
         expl="3."
         sum="39bf16f63b99cd6e420bafd55c46ea52"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asubsetadiffasuccV2V11V13Iainfix =V14aaddV12V8FIainfix =V13aaddV12V9FINamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V15INainfix =V15V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V16INainfix =V16V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -237,17 +237,25 @@
         expl="4."
         sum="c50ce0f67a3671c4d1443e6d61f57310"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureV13V5V14V15INainfix =V15V2FIainfix =V14aaddV12V8FIainfix =V13aaddV12V9FINamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V16INainfix =V16V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V17INainfix =V17V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
          prover="5"
-         timelimit="10"
-         memlimit="0"
+         timelimit="5"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.02"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -259,14 +267,14 @@
       expl="4. loop invariant preservation"
       sum="5d13200dbb4137cb94c736fccc706ed6"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationaclosureV9V5V8V13INainfix =V13V2FAasubsetadiffasuccV2V11V9AasubsetV11asuccV2AainvV0V1V9V5V8V3INNamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V14INainfix =V14V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V15INainfix =V15V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
       <label
        name="expl:VC for fill_next"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter fill_next.4.1"
         locfile="../vstte12_bfs.mlw"
@@ -274,12 +282,12 @@
         expl="1."
         sum="33fdfe29abd9a64ab417c13ed9873cb4"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainvV0V1V9V5V8V3INNamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13INainfix =V13V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14INainfix =V14V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -294,12 +302,12 @@
         expl="2."
         sum="ca0b09b4d39b104d53409295b7a9efb5"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asubsetV11asuccV2INNamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13INainfix =V13V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14INainfix =V14V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -314,12 +322,12 @@
         expl="3."
         sum="dfea2207159b8a66041f1787e64e0b44"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asubsetadiffasuccV2V11V9INNamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V13INainfix =V13V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V14INainfix =V14V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -334,14 +342,14 @@
         expl="4."
         sum="9e986b997eb97fde0e6d875bb444deda"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureV9V5V8V13INainfix =V13V2FINNamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINais_emptyV7INainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V14INainfix =V14V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V15INainfix =V15V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="false">
+         expanded="true">
          <goal
           name="WP_parameter fill_next.4.4.1"
           locfile="../vstte12_bfs.mlw"
@@ -349,12 +357,12 @@
           expl="1."
           sum="4d6bdaaaddd52f7c7c25ff3fc7a59659"
           proved="true"
-          expanded="false"
+          expanded="true"
           shape="amemV14V9IamemV14asuccV13FINamemV13V8INamemV13V5IamemV13V9INainfix =V13V2FINNamemV12V9Iainfix =V11aremoveV12V7AamemV12V7FFINNamemV15V7FINainfix =V10aTrueINamemV16V7Fqainfix =V10aTrueFIamemV18V9IamemV18asuccV17FINamemV17V8INamemV17V5IamemV17V9INainfix =V17V2FAamemV19V9IamemV19adiffasuccV2V7FAamemV20asuccV2IamemV20V7FAamemV1V8OamemV1V5IamemV1V9ANamemV21V9OamemV21V8Iashortest_pathV0V21ainfix +V3c1FAainfix &lt;=V23ainfix +V3c1AapathV0V22V23EIamemV22V9FAamemV24V9Iainfix &lt;=V25V3IapathV0V24V25FAashortest_pathV0V26ainfix +V3c1IamemV26V8FAasubsetV8V9Aashortest_pathV0V27V3IamemV27V5FAasubsetV5V9FIamemV29V6IamemV29asuccV28FINamemV28V4INamemV28V5IamemV28V6INainfix =V28V2FANapathV0V2V30Iainfix &lt;V30V3FAapathV0V2V3AamemV1V4OamemV1V5IamemV1V6ANamemV31V6OamemV31V4Iashortest_pathV0V31ainfix +V3c1FAainfix &lt;=V33ainfix +V3c1AapathV0V32V33EIamemV32V6FAamemV34V6Iainfix &lt;=V35V3IapathV0V34V35FAashortest_pathV0V36ainfix +V3c1IamemV36V4FAasubsetV4V6Aashortest_pathV0V37V3IamemV37V5FAasubsetV5V6FF">
           <label
            name="expl:VC for fill_next"/>
           <proof
-           prover="1"
+           prover="0"
            timelimit="10"
            memlimit="0"
            obsolete="false"
@@ -373,14 +381,14 @@
       expl="5. postcondition"
       sum="729cca81253901340b4e7553f20f13cd"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionaclosureV9V5V8V11FAasubsetasuccV2V9AainvV0V1V9V5V8V3INNainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V12INainfix =V12V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V13INainfix =V13V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
       <label
        name="expl:VC for fill_next"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter fill_next.5.1"
         locfile="../vstte12_bfs.mlw"
@@ -388,12 +396,12 @@
         expl="1."
         sum="9dc324c8256ff928a1d96c1a3be6f709"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainvV0V1V9V5V8V3INNainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V11INainfix =V11V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V12INainfix =V12V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -408,12 +416,12 @@
         expl="2."
         sum="51bd3118ee94b06f07ecdab55c6c6291"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="asubsetasuccV2V9INNainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V11INainfix =V11V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V12INainfix =V12V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -428,12 +436,12 @@
         expl="3."
         sum="474474ce6e89765a39d64b0395d515fa"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureV9V5V8V11FINNainfix =V10aTrueIais_emptyV7qainfix =V10aTrueFIaclosureV9V5V8V12INainfix =V12V2FAasubsetadiffasuccV2V7V9AasubsetV7asuccV2AainvV0V1V9V5V8V3FIaclosureV6V5V4V13INainfix =V13V2FAashortest_pathV0V2V3AainvV0V1V6V5V4V3FF">
         <label
          name="expl:VC for fill_next"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -467,14 +475,14 @@
       expl="1. loop invariant init"
       sum="a945b050acd4e733d7c9ad7a3170066a"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initainfix &lt;=c0c0AaclosureasingletonV0asingletonV0aemptyV2FAais_emptyaemptyIais_emptyasingletonV0AainvV0V1asingletonV0asingletonV0aemptyc0F">
       <label
        name="expl:VC for bfs"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter bfs.1.1"
         locfile="../vstte12_bfs.mlw"
@@ -482,12 +490,12 @@
         expl="1."
         sum="4d8c263aefc27d3d50cf49812f6ba9ad"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainvV0V1asingletonV0asingletonV0aemptyc0F">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="2"
+         prover="1"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -502,12 +510,12 @@
         expl="2."
         sum="0b9d122a32fb885458bb57cee32f960d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_emptyaemptyIais_emptyasingletonV0F">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -522,14 +530,14 @@
         expl="3."
         sum="e31e9ea71c2a3af0063ef8aa27e4a49e"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureasingletonV0asingletonV0aemptyV2FF">
         <label
          name="expl:VC for bfs"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="false">
+         expanded="true">
          <goal
           name="WP_parameter bfs.1.3.1"
           locfile="../vstte12_bfs.mlw"
@@ -537,12 +545,12 @@
           expl="1."
           sum="8d737fe0edc6b4617655d18e376140ec"
           proved="true"
-          expanded="false"
+          expanded="true"
           shape="amemV3asingletonV0IamemV3asuccV2FINamemV2aemptyINamemV2asingletonV0IamemV2asingletonV0FF">
           <label
            name="expl:VC for bfs"/>
           <proof
-           prover="1"
+           prover="0"
            timelimit="10"
            memlimit="0"
            obsolete="false"
@@ -559,12 +567,12 @@
         expl="4."
         sum="4ee86cd8dc7e3a3f33a11f3154ac909e"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &lt;=c0c0F">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -581,12 +589,12 @@
       expl="2. precondition"
       sum="2585fea25875d7b5755aa99ccb6e9da5"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="preconditionNais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
       <label
        name="expl:VC for bfs"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -601,12 +609,12 @@
       expl="3. exceptional postcondition"
       sum="c3606c18d3d5caacc75d334e4af73e88"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="exceptional postconditionashortest_pathV0V1V2Iainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
       <label
        name="expl:VC for bfs"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -621,14 +629,14 @@
       expl="4. precondition"
       sum="22d3697633f417eec93bdf9d768c2ece"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="preconditionaclosureV5V7V3V9INainfix =V9V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V10FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
       <label
        name="expl:VC for bfs"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter bfs.4.1"
         locfile="../vstte12_bfs.mlw"
@@ -636,12 +644,12 @@
         expl="1."
         sum="33871761e43c415bba64f2a96a48f90e"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -656,12 +664,12 @@
         expl="2."
         sum="acb54effe1a139ca5edd4a760da2ca8d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ashortest_pathV0V8V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V9FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -676,14 +684,14 @@
         expl="3."
         sum="014a2144656e10f45a5251da92d7d32d"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureV5V7V3V9INainfix =V9V8FINainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V10FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="false">
+         expanded="true">
          <goal
           name="WP_parameter bfs.4.3.1"
           locfile="../vstte12_bfs.mlw"
@@ -691,12 +699,12 @@
           expl="1."
           sum="7bab5b5f9e688708e3b8f81b89a74d2b"
           proved="true"
-          expanded="false"
+          expanded="true"
           shape="amemV10V5IamemV10asuccV9FINamemV9V3INamemV9V7IamemV9V5INainfix =V9V8FINainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV11V4FINainfix =V6aTrueINamemV12V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV14V5IamemV14asuccV13FINamemV13V3INamemV13V4IamemV13V5FANamemV15V3FINamemV16V4FAamemV1V3OamemV1V4IamemV1V5ANamemV17V5OamemV17V3Iashortest_pathV0V17ainfix +V2c1FAainfix &lt;=V19ainfix +V2c1AapathV0V18V19EIamemV18V5FAamemV20V5Iainfix &lt;=V21V2IapathV0V20V21FAashortest_pathV0V22ainfix +V2c1IamemV22V3FAasubsetV3V5Aashortest_pathV0V23V2IamemV23V4FAasubsetV4V5FF">
           <label
            name="expl:VC for bfs"/>
           <proof
-           prover="1"
+           prover="0"
            timelimit="10"
            memlimit="0"
            obsolete="false"
@@ -760,12 +768,12 @@
             expl="1."
             sum="5791227a81c86af7de59a48214724c0f"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="asubsetV12V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV15V7Fqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FINamemV16V9INamemV16V7IamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV19V10OamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix &lt;=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix &lt;=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FIamemV27V5IamemV27asuccV26FINamemV26V3INamemV26V7IamemV26V5INainfix =V26V8FANapathV0V8V28Iainfix &lt;V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV29V5OamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix &lt;=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix &lt;=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV36V4FINainfix =V6aTrueINamemV37V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV39V5IamemV39asuccV38FINamemV38V3INamemV38V4IamemV38V5FANamemV40V3FINamemV41V4FAamemV1V3OamemV1V4IamemV1V5ANamemV42V5OamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix &lt;=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix &lt;=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="1"
+             prover="0"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -780,12 +788,12 @@
             expl="2."
             sum="e7557ad12717127c1a090d8ad462a1d1"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="ashortest_pathV0V15V14IamemV15V12FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV16V7Fqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FINamemV17V9INamemV17V7IamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV20V10OamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix &lt;=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix &lt;=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FIamemV28V5IamemV28asuccV27FINamemV27V3INamemV27V7IamemV27V5INainfix =V27V8FANapathV0V8V29Iainfix &lt;V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV30V5OamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix &lt;=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix &lt;=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV37V4FINainfix =V6aTrueINamemV38V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV40V5IamemV40asuccV39FINamemV39V3INamemV39V4IamemV39V5FANamemV41V3FINamemV42V4FAamemV1V3OamemV1V4IamemV1V5ANamemV43V5OamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix &lt;=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix &lt;=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="1"
+             prover="0"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -800,12 +808,12 @@
             expl="3."
             sum="b8f991f34fe488a649a2233f9bf08417"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="asubsetV13V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV15V7Fqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FINamemV16V9INamemV16V7IamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV19V10OamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix &lt;=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix &lt;=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FIamemV27V5IamemV27asuccV26FINamemV26V3INamemV26V7IamemV26V5INainfix =V26V8FANapathV0V8V28Iainfix &lt;V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV29V5OamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix &lt;=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix &lt;=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV36V4FINainfix =V6aTrueINamemV37V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV39V5IamemV39asuccV38FINamemV38V3INamemV38V4IamemV38V5FANamemV40V3FINamemV41V4FAamemV1V3OamemV1V4IamemV1V5ANamemV42V5OamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix &lt;=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix &lt;=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="2"
+             prover="1"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -820,12 +828,12 @@
             expl="4."
             sum="326f34165f4a31ea40d21748ab438053"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="ashortest_pathV0V15ainfix +V14c1IamemV15V13FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV16V7Fqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FINamemV17V9INamemV17V7IamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV20V10OamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix &lt;=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix &lt;=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FIamemV28V5IamemV28asuccV27FINamemV27V3INamemV27V7IamemV27V5INainfix =V27V8FANapathV0V8V29Iainfix &lt;V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV30V5OamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix &lt;=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix &lt;=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV37V4FINainfix =V6aTrueINamemV38V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV40V5IamemV40asuccV39FINamemV39V3INamemV39V4IamemV39V5FANamemV41V3FINamemV42V4FAamemV1V3OamemV1V4IamemV1V5ANamemV43V5OamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix &lt;=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix &lt;=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="2"
+             prover="1"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -850,7 +858,15 @@
              memlimit="1000"
              obsolete="false"
              archived="false">
-             <result status="valid" time="0.04"/>
+             <result status="timeout" time="3.91"/>
+            </proof>
+            <proof
+             prover="5"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.43"/>
             </proof>
             <metas
              proved="true"
@@ -1881,7 +1897,7 @@
                 <label
                  name="expl:VC for bfs"/>
                 <proof
-                 prover="2"
+                 prover="1"
                  timelimit="45"
                  memlimit="1000"
                  obsolete="false"
@@ -1908,12 +1924,12 @@
             expl="6."
             sum="8988183004678df09ec7beadc251e65c"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="ainfix &lt;=V16ainfix +V14c1AapathV0V15V16EIamemV15V10FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV17V7Fqainfix =V11aTrueFIamemV19V10IamemV19asuccV18FINamemV18V9INamemV18V7IamemV18V10FAamemV20V10IamemV20asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV21V10OamemV21V9Iashortest_pathV0V21ainfix +V2c1FAainfix &lt;=V23ainfix +V2c1AapathV0V22V23EIamemV22V10FAamemV24V10Iainfix &lt;=V25V2IapathV0V24V25FAashortest_pathV0V26ainfix +V2c1IamemV26V9FAasubsetV9V10Aashortest_pathV0V27V2IamemV27V7FAasubsetV7V10FIamemV29V5IamemV29asuccV28FINamemV28V3INamemV28V7IamemV28V5INainfix =V28V8FANapathV0V8V30Iainfix &lt;V30V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV31V5OamemV31V3Iashortest_pathV0V31ainfix +V2c1FAainfix &lt;=V33ainfix +V2c1AapathV0V32V33EIamemV32V5FAamemV34V5Iainfix &lt;=V35V2IapathV0V34V35FAashortest_pathV0V36ainfix +V2c1IamemV36V3FAasubsetV3V5Aashortest_pathV0V37V2IamemV37V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV38V4FINainfix =V6aTrueINamemV39V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV41V5IamemV41asuccV40FINamemV40V3INamemV40V4IamemV40V5FANamemV42V3FINamemV43V4FAamemV1V3OamemV1V4IamemV1V5ANamemV44V5OamemV44V3Iashortest_pathV0V44ainfix +V2c1FAainfix &lt;=V46ainfix +V2c1AapathV0V45V46EIamemV45V5FAamemV47V5Iainfix &lt;=V48V2IapathV0V47V48FAashortest_pathV0V49ainfix +V2c1IamemV49V3FAasubsetV3V5Aashortest_pathV0V50V2IamemV50V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="1"
+             prover="0"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -1928,12 +1944,12 @@
             expl="7."
             sum="fc2914edd201889134592d07c9db11da"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="NamemV15V10OamemV15V13Iashortest_pathV0V15ainfix +V14c1FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV16V7Fqainfix =V11aTrueFIamemV18V10IamemV18asuccV17FINamemV17V9INamemV17V7IamemV17V10FAamemV19V10IamemV19asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV20V10OamemV20V9Iashortest_pathV0V20ainfix +V2c1FAainfix &lt;=V22ainfix +V2c1AapathV0V21V22EIamemV21V10FAamemV23V10Iainfix &lt;=V24V2IapathV0V23V24FAashortest_pathV0V25ainfix +V2c1IamemV25V9FAasubsetV9V10Aashortest_pathV0V26V2IamemV26V7FAasubsetV7V10FIamemV28V5IamemV28asuccV27FINamemV27V3INamemV27V7IamemV27V5INainfix =V27V8FANapathV0V8V29Iainfix &lt;V29V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV30V5OamemV30V3Iashortest_pathV0V30ainfix +V2c1FAainfix &lt;=V32ainfix +V2c1AapathV0V31V32EIamemV31V5FAamemV33V5Iainfix &lt;=V34V2IapathV0V33V34FAashortest_pathV0V35ainfix +V2c1IamemV35V3FAasubsetV3V5Aashortest_pathV0V36V2IamemV36V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV37V4FINainfix =V6aTrueINamemV38V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV40V5IamemV40asuccV39FINamemV39V3INamemV39V4IamemV39V5FANamemV41V3FINamemV42V4FAamemV1V3OamemV1V4IamemV1V5ANamemV43V5OamemV43V3Iashortest_pathV0V43ainfix +V2c1FAainfix &lt;=V45ainfix +V2c1AapathV0V44V45EIamemV44V5FAamemV46V5Iainfix &lt;=V47V2IapathV0V46V47FAashortest_pathV0V48ainfix +V2c1IamemV48V3FAasubsetV3V5Aashortest_pathV0V49V2IamemV49V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="1"
+             prover="0"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -1948,12 +1964,12 @@
             expl="8."
             sum="14236423a3a5e574f2e0665d9f984c05"
             proved="true"
-            expanded="false"
+            expanded="true"
             shape="amemV1V13OamemV1V12IamemV1V10Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueINamemV15V7Fqainfix =V11aTrueFIamemV17V10IamemV17asuccV16FINamemV16V9INamemV16V7IamemV16V10FAamemV18V10IamemV18asuccV8FAamemV1V9OamemV1V7IamemV1V10ANamemV19V10OamemV19V9Iashortest_pathV0V19ainfix +V2c1FAainfix &lt;=V21ainfix +V2c1AapathV0V20V21EIamemV20V10FAamemV22V10Iainfix &lt;=V23V2IapathV0V22V23FAashortest_pathV0V24ainfix +V2c1IamemV24V9FAasubsetV9V10Aashortest_pathV0V25V2IamemV25V7FAasubsetV7V10FIamemV27V5IamemV27asuccV26FINamemV26V3INamemV26V7IamemV26V5INainfix =V26V8FANapathV0V8V28Iainfix &lt;V28V2FAapathV0V8V2AamemV1V3OamemV1V7IamemV1V5ANamemV29V5OamemV29V3Iashortest_pathV0V29ainfix +V2c1FAainfix &lt;=V31ainfix +V2c1AapathV0V30V31EIamemV30V5FAamemV32V5Iainfix &lt;=V33V2IapathV0V32V33FAashortest_pathV0V34ainfix +V2c1IamemV34V3FAasubsetV3V5Aashortest_pathV0V35V2IamemV35V7FAasubsetV7V5INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINNamemV36V4FINainfix =V6aTrueINamemV37V4Fqainfix =V6aTrueFIainfix =c0V2Oainfix &lt;c0V2AamemV39V5IamemV39asuccV38FINamemV38V3INamemV38V4IamemV38V5FANamemV40V3FINamemV41V4FAamemV1V3OamemV1V4IamemV1V5ANamemV42V5OamemV42V3Iashortest_pathV0V42ainfix +V2c1FAainfix &lt;=V44ainfix +V2c1AapathV0V43V44EIamemV43V5FAamemV45V5Iainfix &lt;=V46V2IapathV0V45V46FAashortest_pathV0V47ainfix +V2c1IamemV47V3FAasubsetV3V5Aashortest_pathV0V48V2IamemV48V4FAasubsetV4V5FF">
             <label
              name="expl:VC for bfs"/>
             <proof
-             prover="1"
+             prover="0"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -1972,12 +1988,12 @@
         expl="2."
         sum="7357e9581ba5229d9766b089cddacd50"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_emptyV13Iais_emptyV12Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V16INainfix =V16V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1992,17 +2008,25 @@
         expl="3."
         sum="718a057d86038041fd958c6e32dc5528"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureV10V12V13V15FIainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V16FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V17INainfix =V17V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V18FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="5"
-         timelimit="10"
-         memlimit="0"
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.03"/>
+         <result status="valid" time="3.34"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.14"/>
         </proof>
        </goal>
        <goal
@@ -2012,12 +2036,12 @@
         expl="4."
         sum="79f91aaaa4bdf5891cc4da4a17b017b0"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &lt;=c0V14Iainfix =V14ainfix +V2c1FIainfix =V13aemptyFIainfix =V12V9FIainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V15FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V16INainfix =V16V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V17FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2034,14 +2058,14 @@
       expl="6. loop invariant preservation"
       sum="6a6dcd3fea8a89b581b7cdbdf218cde9"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationainfix &lt;=c0V2AaclosureV10V7V9V12FAais_emptyV9Iais_emptyV7AainvV0V1V10V7V9V2INainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V13FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V14INainfix =V14V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V15FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
       <label
        name="expl:VC for bfs"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="false">
+       expanded="true">
        <goal
         name="WP_parameter bfs.6.1"
         locfile="../vstte12_bfs.mlw"
@@ -2049,12 +2073,12 @@
         expl="1."
         sum="4ec568a2e622ac864ee3ca5aac20a680"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainvV0V1V10V7V9V2INainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V13INainfix =V13V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2069,12 +2093,12 @@
         expl="2."
         sum="1e163a681d02eaa1808a54c3e7b2cca8"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ais_emptyV9Iais_emptyV7INainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V13INainfix =V13V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2089,12 +2113,12 @@
         expl="3."
         sum="48b02e94380926ed161e7cba764d559a"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="aclosureV10V7V9V12FINainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V13FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V14INainfix =V14V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V15FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2109,12 +2133,12 @@
         expl="4."
         sum="4d0ad7f57321b2a51c671c55d19c9eba"
         proved="true"
-        expanded="false"
+        expanded="true"
         shape="ainfix &lt;=c0V2INainfix =V11aTrueIais_emptyV7qainfix =V11aTrueFIaclosureV10V7V9V12FAasubsetasuccV8V10AainvV0V1V10V7V9V2FIaclosureV5V7V3V13INainfix =V13V8FAashortest_pathV0V8V2AainvV0V1V5V7V3V2INainfix =V8V1Iainfix =V7aremoveV8V4AamemV8V4FFINais_emptyV4INainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V14FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
         <label
          name="expl:VC for bfs"/>
         <proof
-         prover="1"
+         prover="0"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2131,12 +2155,12 @@
       expl="7. assertion"
       sum="5420584884534a9fa0a7f06e05ece58a"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="assertionNamemV1V5INNainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V7FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
       <label
        name="expl:VC for bfs"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -2144,7 +2168,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="2"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -2159,12 +2183,12 @@
       expl="8. postcondition"
       sum="0df7a6f94edc24e26f63cf3cbbb91427"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionNapathV0V1V7FINamemV1V5INNainfix =V6aTrueIais_emptyV4qainfix =V6aTrueFIainfix &lt;=c0V2AaclosureV5V4V3V8FAais_emptyV3Iais_emptyV4AainvV0V1V5V4V3V2FF">
       <label
        name="expl:VC for bfs"/>
       <proof
-       prover="4"
+       prover="3"
        timelimit="10"
        memlimit="0"
        edited="vstte12_bfs_WP_BFS_WP_parameter_bfs_1.v"

@@ -522,7 +522,19 @@ Theorem wp_preserved_by_reduction : forall (sigma:(@map.Map.map
   (eval_fmla sigma' pi' (wp s' q)).
 (* Why3 intros sigma sigma' pi pi' s s' h1 q h2. *)
 intros sigma sigma' pi pi' s s' h1.
-induction h1; try (simpl; intro; ae).
+induction h1. 
+(simpl; intro; ae).
+(simpl; intro; ae).
+(simpl; intro; ae).
+(simpl; intro; ae).
+(simpl; intro; ae).
+(simpl; intro; ae).
+(* case while true do ... *)
+simpl; intros q (_ & h).
+(* need to keep a copy of h *)
+generalize h; intro h'.
+apply abstract_effects_specialize in h'; simpl in h'; ae.
+(simpl; intro; ae).
 Qed.
 
 

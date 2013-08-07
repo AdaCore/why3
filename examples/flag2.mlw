@@ -34,6 +34,11 @@ module Flag
        i <= j <= k ->
          nb_occ a i k c = nb_occ a i j c + nb_occ a j k c
 
+  lemma nb_occ_ext:
+    forall a1 a2:map int color, i j:int, c:color.
+       (forall k:int. i <= k < j -> get a1 k = get a2 k) ->
+         nb_occ a1 i j c = nb_occ a2 i j c
+
   lemma nb_occ_store_outside_up:
     forall a:map int color, i j k:int, c:color.
       i <= j <= k -> nb_occ (set a k c) i j c = nb_occ a i j c

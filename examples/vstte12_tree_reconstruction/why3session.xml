@@ -110,14 +110,6 @@
     expanded="true"
     shape="ainfix =V1V2Iainfix =adepthsV1V0adepthsV2V0F">
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.35"/>
-    </proof>
-    <proof
      prover="4"
      timelimit="5"
      memlimit="1000"
@@ -249,11 +241,19 @@
        name="expl:VC for build_rec"/>
       <proof
        prover="2"
+       timelimit="15"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="14.94"/>
+      </proof>
+      <proof
+       prover="8"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.36"/>
+       <result status="valid" time="0.64"/>
       </proof>
      </goal>
      <goal
