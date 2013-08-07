@@ -196,7 +196,7 @@ let prover_driver : Driver.driver =
     Driver.load_driver env prover.Whyconf.driver
       prover.Whyconf.extra_drivers
   with e ->
-    Format.eprintf "Failed to load driver for alt-ergo: %a"
+    Format.eprintf "Failed to load driver for prover: %a"
        Exn_printer.exn_printer e;
     Gnat_util.abort_with_message ""
 
