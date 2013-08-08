@@ -8,19 +8,31 @@
  <prover
   id="1"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="3"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="4"
+  id="5"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../list_rev.mlw"
   verified="false"
@@ -35,7 +47,7 @@
     name="acyclic_list"
     locfile="../list_rev.mlw"
     loclnum="109" loccnumb="8" loccnume="20"
-    sum="d7f60d607e7e84db8a4989dfcf0835de"
+    sum="caf3b4a8b24126c2b5b2347f7c7df18b"
     proved="false"
     expanded="true"
     shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1INainfix =V1anullF">
@@ -48,7 +60,7 @@
      <result status="timeout" time="9.97"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -56,19 +68,19 @@
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="4"
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.05"/>
+     <result status="unknown" time="0.03"/>
     </proof>
    </goal>
    <goal
     name="consistent"
     locfile="../list_rev.mlw"
     loclnum="112" loccnumb="7" loccnume="17"
-    sum="7c8c5ecb2e760daf0a9840a9c3b76f24"
+    sum="f75b84d51d62b1960a3738914e27bb3b"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
@@ -81,20 +93,44 @@
      <result status="timeout" time="10.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.96"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.03"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
     </proof>
    </goal>
    <goal
@@ -102,26 +138,42 @@
     locfile="../list_rev.mlw"
     loclnum="115" loccnumb="6" loccnume="14"
     expl="VC for list_rev"
-    sum="5085a83e044ac61d6fb442d99a07c4e6"
+    sum="3d2901f4a15d68d68c14947a8623b555"
     proved="true"
     expanded="true"
     shape="iais_listV4V2asep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [&lt;-]V4V3V2FNainfix =V3anullIasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0F">
     <label
      name="expl:VC for list_rev"/>
     <proof
-     prover="1"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.29"/>
     </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
    </goal>
    <goal
     name="reverse_append"
     locfile="../list_rev.mlw"
     loclnum="145" loccnumb="8" loccnume="22"
-    sum="a78af8ebbf7b3ff8e46c01feca636995"
+    sum="6a4ec04848a2cc53b297794724698ba4"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix ++areverseaConsV2V0V1ainfix ++areverseV0aConsV2V1Fainfix ++areverseV0aConsV2V1ainfix ++areverseaConsV2V0V1">
@@ -139,8 +191,8 @@
     locfile="../list_rev.mlw"
     loclnum="156" loccnumb="6" loccnume="19"
     expl="VC for list_rev_behv"
-    sum="f32551b7ff59c28f5e224f6b1d3e9fd5"
-    proved="false"
+    sum="a93d96f27a3b671955772a7e75549082"
+    proved="true"
     expanded="true"
     shape="iainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2ainfix =areverseamodelV1V0ainfix ++areverseamodelV6V8amodelV6V7Aasep_list_listV6V8V7Aais_listV6V7Aais_listV6V8Iainfix =V8V5FIainfix =V7V3FAainfix =ainfix ++areverseaConsV3amodelV6V5amodelV6V2ainfix ++areverseamodelV6V5aConsV3amodelV6V2Iainfix =V6amixfix [&lt;-]V4V3V2FLamixfix []V4V3Nainfix =V3anullIainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0F">
     <label
@@ -154,20 +206,44 @@
      <result status="timeout" time="10.03"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.11"/>
+     <result status="valid" time="7.59"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.98"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.01"/>
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.29"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="4.99"/>
     </proof>
    </goal>
   </theory>
@@ -181,7 +257,7 @@
     name="is_list_disjoint_case"
     locfile="../list_rev.mlw"
     loclnum="206" loccnumb="7" loccnume="28"
-    sum="5bdcfaf9a70c1ac48208f80fcfe658eb"
+    sum="d838415fcbc5e22d50d4f5b3e7a21416"
     proved="true"
     expanded="true"
     shape="fIais_listV0amixfix []V0V1ANainfix =V1anullAainfix =V1anullF">
@@ -198,12 +274,12 @@
     name="frame_list"
     locfile="../list_rev.mlw"
     loclnum="252" loccnumb="8" loccnume="18"
-    sum="c2f5cbeb0a0d4cd534fded3df2fbf41d"
+    sum="a2ae7dfe2e0a1a4703a5885bd39c70eb"
     proved="true"
     expanded="true"
     shape="ais_listamixfix [&lt;-]V0V2V3V1Iais_listV0V1INain_ftV2alist_ftV0V1Fais_listamixfix [&lt;-]V0V2V3V1">
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      memlimit="0"
      edited="list_rev_M2_frame_list_1.v"
@@ -216,12 +292,12 @@
     name="frame_list_ft"
     locfile="../list_rev.mlw"
     loclnum="263" loccnumb="8" loccnume="21"
-    sum="0ef7e9292a32d0f0c6cb73aae867222f"
+    sum="962981d7ad9b71f4d39ebf419b612dee"
     proved="true"
     expanded="true"
     shape="ainfix =alist_ftV0V1alist_ftamixfix [&lt;-]V0V2V3V1Iais_listV0V1INain_ftV2alist_ftV0V1F">
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      memlimit="0"
      edited="list_rev_M2_frame_list_ft_1.v"
@@ -234,20 +310,44 @@
     name="acyclic_list"
     locfile="../list_rev.mlw"
     loclnum="277" loccnumb="8" loccnume="20"
-    sum="cd65dfbec19dd64ac9e3e09de89ffc12"
+    sum="135d4f59b85cd66e622e741ee73a1d16"
     proved="false"
     expanded="true"
     shape="asep_node_listV0V1amixfix []V0V1Iais_listV0V1INainfix =V1anullF">
     <proof
      prover="0"
-     timelimit="10"
-     memlimit="0"
+     timelimit="60"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.19"/>
     </proof>
     <proof
      prover="1"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.94"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="59.65"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -255,42 +355,74 @@
      <result status="unknown" time="0.02"/>
     </proof>
     <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
+     prover="6"
+     timelimit="60"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.00"/>
     </proof>
    </goal>
    <goal
     name="consistent"
     locfile="../list_rev.mlw"
     loclnum="280" loccnumb="7" loccnume="17"
-    sum="6215ed2462bc24cee250aea146410da0"
+    sum="4267a3214c75395d1b2b2c48f05f97b4"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
      prover="0"
-     timelimit="10"
-     memlimit="0"
+     timelimit="60"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.09"/>
     </proof>
     <proof
+     prover="2"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
      prover="3"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="59.62"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.25"/>
+     <result status="unknown" time="0.01"/>
     </proof>
     <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
+     prover="6"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="60"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.01"/>
@@ -301,31 +433,63 @@
     locfile="../list_rev.mlw"
     loclnum="283" loccnumb="6" loccnume="14"
     expl="VC for list_rev"
-    sum="f5d869dcc8fb27dcda6b9a3163ce1b3a"
+    sum="d27ce997ddad8b633846ad6008ecd70d"
     proved="true"
     expanded="true"
     shape="iais_listV4V2asep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [&lt;-]V4V3V2FNainfix =V3anullIasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0F">
     <label
      name="expl:VC for list_rev"/>
     <proof
-     prover="4"
+     prover="2"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.53"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.38"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="6"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="frame_model"
     locfile="../list_rev.mlw"
     loclnum="317" loccnumb="8" loccnume="19"
-    sum="d774c37071939e0812b062f1055e61c9"
+    sum="767589b0030eb364d4930922fbeb76d7"
     proved="true"
     expanded="true"
     shape="ainfix =amodelV0V1amodelamixfix [&lt;-]V0V2V3V1INain_ftV2alist_ftV0V1Iais_listV0V1Famodelamixfix [&lt;-]V0V2V3V1">
     <proof
-     prover="2"
+     prover="4"
      timelimit="10"
      memlimit="0"
      edited="list_rev_M2_frame_model_1.v"
@@ -338,33 +502,57 @@
     name="consistent_behv"
     locfile="../list_rev.mlw"
     loclnum="324" loccnumb="7" loccnume="22"
-    sum="7716e8c4daacbd753be24a7e319a223d"
+    sum="af3d656067254950bedcaf91997f079d"
     proved="false"
     expanded="true"
     shape="fIais_listV0V2Iais_listV0V1F">
     <proof
      prover="0"
-     timelimit="10"
-     memlimit="0"
+     timelimit="60"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="unknown" time="0.10"/>
     </proof>
     <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
+     prover="2"
+     timelimit="60"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.42"/>
+     <result status="outofmemory" time="10.23"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="59.77"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
      <result status="timeout" time="10.14"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="59.68"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="59.63"/>
     </proof>
    </goal>
    <goal
@@ -372,19 +560,51 @@
     locfile="../list_rev.mlw"
     loclnum="327" loccnumb="6" loccnume="19"
     expl="VC for list_rev_behv"
-    sum="d2d652783a14345ad539462052cb4e52"
+    sum="64069bcc9be554878d37ce35a9449435"
     proved="true"
     expanded="true"
     shape="iainfix =areverseamodelV1V0amodelV4V2Aais_listV4V2ainfix =areverseamodelV1V0ainfix ++areverseamodelV5V7amodelV5V6Aasep_list_listV5V7V6Aais_listV5V6Aais_listV5V7Iainfix =V7amixfix []V4V3FIainfix =V6V3FIainfix =V5amixfix [&lt;-]V4V3V2FNainfix =V3anullIainfix =areverseamodelV1V0ainfix ++areverseamodelV4V3amodelV4V2Aasep_list_listV4V3V2Aais_listV4V2Aais_listV4V3FAainfix =areverseamodelV1V0ainfix ++areverseamodelV1V0amodelV1anullAasep_list_listV1V0anullAais_listV1anullAais_listV1V0Iais_listV1V0F">
     <label
      name="expl:VC for list_rev_behv"/>
     <proof
-     prover="4"
+     prover="2"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="38.47"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.61"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.39"/>
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="6"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="60"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>

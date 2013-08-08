@@ -4,27 +4,35 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.94"/>
+  version="0.95.1"/>
  <prover
   id="1"
   name="CVC3"
   version="2.4.1"/>
  <prover
   id="2"
+  name="Eprover"
+  version="1.6"/>
+ <prover
+  id="3"
   name="Spass"
   version="3.7"/>
  <prover
-  id="3"
+  id="4"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="5"
   name="Z3"
   version="2.19"/>
  <prover
-  id="4"
+  id="6"
   name="Z3"
   version="3.2"/>
  <file
   name="../int.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Test"
    locfile="../int.why"
@@ -57,11 +65,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.06"/>
+     <result status="timeout" time="4.99"/>
     </proof>
     <proof
      prover="3"
@@ -69,10 +77,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="timeout" time="10.06"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="10.05"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -106,11 +130,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.28"/>
+     <result status="timeout" time="4.98"/>
     </proof>
     <proof
      prover="3"
@@ -118,10 +142,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="timeout" time="10.28"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="10.06"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -155,11 +195,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
@@ -167,10 +207,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -204,11 +260,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="1.50"/>
     </proof>
     <proof
      prover="3"
@@ -216,10 +272,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -253,14 +325,30 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.10"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
      prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.86"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -268,7 +356,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -302,14 +390,30 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.37"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.78"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -317,7 +421,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -351,14 +455,30 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.42"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -366,7 +486,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -400,11 +520,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.17"/>
+     <result status="valid" time="0.04"/>
     </proof>
     <proof
      prover="3"
@@ -412,10 +532,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="timeout" time="10.17"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="10.06"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -449,11 +585,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="10.41"/>
+     <result status="valid" time="0.09"/>
     </proof>
     <proof
      prover="3"
@@ -461,10 +597,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="timeout" time="10.41"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="9.98"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -498,8 +650,8 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
@@ -514,6 +666,22 @@
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -554,11 +722,11 @@
     </proof>
     <proof
      prover="2"
-     timelimit="10"
-     memlimit="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="9.96"/>
+     <result status="timeout" time="4.96"/>
     </proof>
     <proof
      prover="3"
@@ -566,10 +734,26 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="timeout" time="9.96"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="10.03"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="10"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"

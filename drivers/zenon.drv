@@ -11,7 +11,6 @@ time "why3cpulimit time : %s s"
 
 (* to be improved *)
 
-(*transformation "simplify_recursive_definition"*)
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
@@ -21,6 +20,7 @@ transformation "eliminate_algebraic"
 transformation "eliminate_if"
 transformation "eliminate_let"
 
+transformation "discriminate"
 transformation "encoding_tptp"
 
 theory BuiltIn
@@ -28,9 +28,4 @@ theory BuiltIn
   meta "eliminate_algebraic" "no_index"
 end
 
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
+import "discrimination.gen"

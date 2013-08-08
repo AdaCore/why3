@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -17,16 +17,24 @@
   id="3"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../imp_n.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Imp"
    locfile="../imp_n.why"
    loclnum="2" loccnumb="7" loccnume="10"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="ident_eq_dec"
     locfile="../imp_n.why"
@@ -34,7 +42,7 @@
     sum="d8b3349496884adeacfffaa63643f166"
     proved="true"
     expanded="false"
-    shape="ainfix =V0V1NOainfix =V0V1F">
+    shape="Nainfix =V0V1Oainfix =V0V1F">
     <proof
      prover="0"
      timelimit="3"
@@ -51,7 +59,7 @@
     sum="c35750e90768e99a7e470a4dbc3b1298"
     proved="true"
     expanded="false"
-    shape="ainfix =V0aSskipNOainfix =V0aSskipF">
+    shape="Nainfix =V0aSskipOainfix =V0aSskipF">
     <proof
      prover="0"
      timelimit="3"
@@ -65,7 +73,7 @@
     name="Test13"
     locfile="../imp_n.why"
     loclnum="59" loccnumb="7" loccnume="13"
-    sum="421b8bb395155d5abba72228d371fbda"
+    sum="1d919416efe66504bb0b18c565c86f88"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_exprV0aEconstc13c13Laconstc0">
@@ -82,7 +90,7 @@
     name="Test42"
     locfile="../imp_n.why"
     loclnum="63" loccnumb="7" loccnume="13"
-    sum="9de6885b50b282d3f84a3b706a489657"
+    sum="a4c9adc9816bfedd66087a41cb422749"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_exprV1aEvarV0c42Lasetaconstc0V0c42Lamk_identc0">
@@ -99,7 +107,7 @@
     name="Test55"
     locfile="../imp_n.why"
     loclnum="68" loccnumb="7" loccnume="13"
-    sum="959eb920b861a2726f816b2d9d00798a"
+    sum="eb6d4b645611d1092a4012f878ad87e0"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_exprV1aEbinaEvarV0aOplusaEconstc13c55Lasetaconstc0V0c42Lamk_identc0">
@@ -116,7 +124,7 @@
     name="Ass42"
     locfile="../imp_n.why"
     loclnum="112" loccnumb="7" loccnume="12"
-    sum="5249f29af4c01f7a0ab574049abcc1f0"
+    sum="0802219b7c5cce543c4454e78cf87982"
     proved="true"
     expanded="false"
     shape="ainfix =agetV2V0c42Iaone_stepV1aSassignV0aEconstc42V2aSskipFLaconstc0Lamk_identc0">
@@ -133,27 +141,43 @@
     name="If42"
     locfile="../imp_n.why"
     loclnum="119" loccnumb="7" loccnume="11"
-    sum="48e5468d3b1d66f26f325c9f6f067538"
+    sum="85ff772508013f63ac10e1381ea94d7c"
     proved="true"
     expanded="false"
     shape="ainfix =agetV3V0c42Iaone_stepV2V4V3aSskipIaone_stepV1aSifaEvarV0aSassignV0aEconstc13aSassignV0aEconstc42V2V4FLaconstc0Lamk_identc0">
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.37"/>
+     <result status="valid" time="0.36"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
     </proof>
    </goal>
    <goal
     name="progress"
     locfile="../imp_n.why"
     loclnum="131" loccnumb="8" loccnume="16"
-    sum="9927c95aec994c6e82c854b4b00824cf"
+    sum="c9f706165a24484783e81cb4a48ca03e"
     proved="true"
     expanded="false"
-    shape="aone_stepV0V1V2V3EIainfix =V1aSskipNF">
+    shape="aone_stepV0V1V2V3EINainfix =V1aSskipF">
     <proof
      prover="2"
      timelimit="3"
@@ -168,7 +192,7 @@
     name="steps_non_neg"
     locfile="../imp_n.why"
     loclnum="148" loccnumb="6" loccnume="19"
-    sum="526026a199126429df505a9b6c794a41"
+    sum="999f2a42df5b8318076920ee39cc4ecb"
     proved="true"
     expanded="false"
     shape="ainfix &gt;=V4c0Iamany_stepsV0V2V1V3V4F">
@@ -186,7 +210,7 @@
     name="many_steps_seq"
     locfile="../imp_n.why"
     loclnum="152" loccnumb="6" loccnume="20"
-    sum="cc632c97d7fe7c816752fdbdd69619ee"
+    sum="fdcac63744030781babb7d0bc94f7097"
     proved="true"
     expanded="false"
     shape="ainfix =V4ainfix +ainfix +c1V6V7Aamany_stepsV5V3V1aSskipV7Aamany_stepsV0V2V5aSskipV6EIamany_stepsV0aSseqV2V3V1aSskipV4F">
@@ -204,7 +228,7 @@
     name="eval_subst_expr"
     locfile="../imp_n.why"
     loclnum="186" loccnumb="6" loccnume="21"
-    sum="5f356fb22e1d7d5faa09aa6c951280c9"
+    sum="f0b5121348f090ee5fac113ea55de289"
     proved="true"
     expanded="false"
     shape="ainfix =aeval_exprV0asubst_exprV1V2V3aeval_exprasetV0V2aeval_exprV0V3V1F">
@@ -222,7 +246,7 @@
     name="eval_subst"
     locfile="../imp_n.why"
     loclnum="199" loccnumb="6" loccnume="16"
-    sum="5d9602ededb83781af3a62fb03b29bf0"
+    sum="a0fa302423655e52a16ffd2d53ed438c"
     proved="true"
     expanded="false"
     shape="aeval_fmlaasetV0V2aeval_exprV0V3V1qaeval_fmlaV0asubstV1V2V3F">
@@ -240,7 +264,7 @@
     name="skip_rule"
     locfile="../imp_n.why"
     loclnum="214" loccnumb="6" loccnume="15"
-    sum="8adde600d429904cc9ce39749b7c6eac"
+    sum="d5f7218f2f315d1572e5324f37d6a487"
     proved="true"
     expanded="false"
     shape="avalid_tripleV0aSskipV0F">
@@ -257,7 +281,7 @@
     name="assign_rule"
     locfile="../imp_n.why"
     loclnum="217" loccnumb="6" loccnume="17"
-    sum="a37e1cece27432356f824792ef22d944"
+    sum="138dacd727834c50f9a43351dff3c3b3"
     proved="true"
     expanded="false"
     shape="avalid_tripleasubstV0V1V2aSassignV1V2V0F">
@@ -275,7 +299,7 @@
     name="seq_rule"
     locfile="../imp_n.why"
     loclnum="221" loccnumb="6" loccnume="14"
-    sum="a9bd3607ee84e8d542fb5ea47bfdaadf"
+    sum="3df29159db0224a5b779ac42a896aebf"
     proved="true"
     expanded="false"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
@@ -293,7 +317,7 @@
     name="if_rule"
     locfile="../imp_n.why"
     loclnum="226" loccnumb="6" loccnume="13"
-    sum="378f994af04625696845a1508e867cbb"
+    sum="ff4cd3e7b47545728da30e8b9d35e391"
     proved="true"
     expanded="false"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
@@ -311,7 +335,7 @@
     name="while_rule"
     locfile="../imp_n.why"
     loclnum="232" loccnumb="6" loccnume="16"
-    sum="96da3b1a7dca4183de560e0a42265f59"
+    sum="95cff5a48e6cf84760f875c18779374d"
     proved="true"
     expanded="false"
     shape="avalid_tripleV1aSwhileV0V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
@@ -329,7 +353,7 @@
     name="consequence_rule"
     locfile="../imp_n.why"
     loclnum="237" loccnumb="6" loccnume="22"
-    sum="0fe6ec908406b36a826b4ae12a4c7aaa"
+    sum="a0a2461afd4e681c3a4020a2a9fc9f9b"
     proved="true"
     expanded="false"
     shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
@@ -347,7 +371,7 @@
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="timeout" time="2.98"/>
     </proof>
    </goal>
   </theory>

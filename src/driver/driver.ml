@@ -160,6 +160,8 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
               Ty.ty_app ts (List.map ty_of_pty tyl)
         in
         let convert = function
+          | PMAty (PTyapp (q,[]))
+                     -> MAts (find_ts th q)
           | PMAty ty -> MAty (ty_of_pty ty)
           | PMAfs q  -> MAls (find_fs th q)
           | PMAps q  -> MAls (find_ps th q)

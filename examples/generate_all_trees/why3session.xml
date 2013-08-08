@@ -16,7 +16,7 @@
  <prover
   id="3"
   name="CVC4"
-  version="1.0"/>
+  version="1.2"/>
  <prover
   id="4"
   name="Coq"
@@ -33,6 +33,10 @@
   id="7"
   name="Z3"
   version="2.19"/>
+ <prover
+  id="8"
+  name="Z3"
+  version="3.2"/>
  <file
   name="../generate_all_trees.mlw"
   verified="true"
@@ -47,7 +51,7 @@
     name="size_nonneg"
     locfile="../generate_all_trees.mlw"
     loclnum="28" loccnumb="8" loccnume="19"
-    sum="eacd3ee890b24a3f5e9f6b3259f7c258"
+    sum="0110f22c5b28c323dd2ae6579dadcc54"
     proved="true"
     expanded="true"
     shape="ainfix &gt;=asizeV0c0F">
@@ -65,24 +69,24 @@
     name="size_left"
     locfile="../generate_all_trees.mlw"
     loclnum="30" loccnumb="8" loccnume="17"
-    sum="1ec6f8cdb46cfff0561d87e38d79082a"
+    sum="d1c984d3c40df5930aeaa8e988b8ef71"
     proved="true"
     expanded="true"
     shape="ainfix &lt;asizeV1asizeV0Aainfix =V0aNodeV1V2EIainfix &gt;asizeV0c0F">
     <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
+     prover="8"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.00"/>
+     <result status="valid" time="0.14"/>
     </proof>
    </goal>
    <goal
     name="all_trees_0"
     locfile="../generate_all_trees.mlw"
     loclnum="38" loccnumb="8" loccnume="19"
-    sum="04c64ba2a5cbb949c45d1e756791cf27"
+    sum="b844775abcc74881e274b42fc5f025b4"
     proved="true"
     expanded="true"
     shape="aall_treesc0aConsaEmptyaNil">
@@ -100,7 +104,7 @@
     name="tree_diff"
     locfile="../generate_all_trees.mlw"
     loclnum="40" loccnumb="8" loccnume="17"
-    sum="9e03ce788b36588c7952384795452de5"
+    sum="a688d0b48acb24e660d23c604b40a329"
     proved="true"
     expanded="true"
     shape="Nainfix =aNodeV0V2aNodeV1V3FINainfix =asizeV0asizeV1F">
@@ -118,7 +122,7 @@
     locfile="../generate_all_trees.mlw"
     loclnum="46" loccnumb="6" loccnume="13"
     expl="VC for combine"
-    sum="2e7aaa88ed9522282b8ce6c9ed279388"
+    sum="922c00defd3f64c60b29aa1afcbafbf4"
     proved="true"
     expanded="true"
     shape="ainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EqamemV5V4FAadistinctV4IamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FAadistinctV1ACamemV15V3AamemV14V11Aainfix =V13aNodeV14V15EqamemV13V12FAadistinctV12LaNilaNilamemV23V3AamemV22V11Aainfix =V21aNodeV22V23EqamemV21V20FAadistinctV20Lainfix ++V19V18IamemV25V3Aainfix =V24aNodeV16V25EqamemV24V19FAadistinctV19FAadistinctV3IamemV28V3AamemV27V17Aainfix =V26aNodeV27V28EqamemV26V18FAadistinctV18FAadistinctV17ACfaNilainfix =V29V17aConswVV11ACamemV33V30Aainfix =V32aNodeV16V33EqamemV32V31FAadistinctV31LaNilaNilamemV39V30Aainfix =V38aNodeV16V39EqamemV38V37FAadistinctV37LaConsaNodeV16V34V36IamemV41V35Aainfix =V40aNodeV16V41EqamemV40V36FAadistinctV36FAadistinctV35ACfaNilainfix =V42V35aConswVV30aConsVVV30IadistinctV30FaConsVVV11IadistinctV11FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -133,9 +137,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="1. postcondition"
-      sum="c13d019f7cec1062360c73edc13939c8"
+      sum="598b71f7e0e6741d9070bb9fcbb19411"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCadistinctV5LaNilaNiltaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for combine"/>
@@ -153,7 +157,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="2. postcondition"
-      sum="e27910608d61af551515e9922b396145"
+      sum="23a1c7dea436432526c8ca4b754d3aae"
       proved="true"
       expanded="true"
       shape="postconditionCamemV8V3AamemV7V4Aainfix =V6aNodeV7V8EqamemV6V5FLaNilaNiltaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -173,9 +177,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="3. postcondition"
-      sum="8d523363c6375c3a5082b6401228c0ba"
+      sum="ad3d09a2f07fca2973cd26568d439506"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaNilCadistinctV8LaNilaNiltaConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for combine"/>
@@ -193,7 +197,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="4. postcondition"
-      sum="78802d34e7b04ce9f4e0a728bd9278fd"
+      sum="6ed943a0e8d3a2a8a973011fad129dd0"
       proved="true"
       expanded="true"
       shape="postconditionCtaNilCamemV10V7Aainfix =V9aNodeV5V10EqamemV9V8FLaNilaNiltaConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -213,7 +217,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="5. variant decrease"
-      sum="ffcfde373ed536ad4b30ad5b6d665341"
+      sum="d60ae2937045dce5994fc98f6342edfa"
       proved="true"
       expanded="true"
       shape="variant decreaseCtaNilCtaNilCfaNilainfix =V10V9aConswVV7aConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -233,7 +237,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="6. precondition"
-      sum="f998c57e2786b4b2f53a899989bb1477"
+      sum="0880b1e97f28b950a883b72c775db3b2"
       proved="true"
       expanded="true"
       shape="preconditionCtaNilCtaNiladistinctV9aConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -253,7 +257,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="7. postcondition"
-      sum="fc7e0f3965d219df92ea88e957650707"
+      sum="1875367eae1704f0f88fca42a0599fbf"
       proved="true"
       expanded="true"
       shape="postconditionCtaNilCtaNiladistinctV11LaConsaNodeV5V8V10IamemV13V9Aainfix =V12aNodeV5V13EqamemV12V10FAadistinctV10FIadistinctV9aConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -265,7 +269,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.27"/>
+       <result status="valid" time="0.08"/>
       </proof>
       <proof
        prover="2"
@@ -273,7 +277,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.94"/>
+       <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal
@@ -281,7 +285,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="8. postcondition"
-      sum="08b8f03a931f99396a6359d59e05722f"
+      sum="46ea0a633abcb85ab23b43ed849093d4"
       proved="true"
       expanded="true"
       shape="postconditionCtaNilCtaNilamemV13V7Aainfix =V12aNodeV5V13EqamemV12V11FLaConsaNodeV5V8V10IamemV15V9Aainfix =V14aNodeV5V15EqamemV14V10FAadistinctV10FIadistinctV9aConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -296,7 +300,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="1. postcondition"
-        sum="04ea39b16c9a96c7184e7221207452d5"
+        sum="4091beef6948e5cbbf271aadebbacc24"
         proved="true"
         expanded="true"
         shape="postconditionCtaNilCtaNilamemV13V7Aainfix =V12aNodeV5V13EIamemV12V11FLaConsaNodeV5V8V10IamemV15V9Aainfix =V14aNodeV5V15EqamemV14V10FAadistinctV10FIadistinctV9aConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -317,7 +321,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.16"/>
+         <result status="valid" time="0.01"/>
         </proof>
         <proof
          prover="6"
@@ -325,7 +329,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.22"/>
+         <result status="valid" time="0.40"/>
         </proof>
        </goal>
        <goal
@@ -333,7 +337,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="2. postcondition"
-        sum="a8b19bfcc62c6be414e14983976428c4"
+        sum="0bccbce8fe54644195b69bcc237e5c8c"
         proved="true"
         expanded="true"
         shape="postconditionCtaNilCtaNilamemV12V11IamemV13V7Aainfix =V12aNodeV5V13EFLaConsaNodeV5V8V10IamemV15V9Aainfix =V14aNodeV5V15EqamemV14V10FAadistinctV10FIadistinctV9aConsVVV7IadistinctV7FaConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -355,7 +359,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="9. variant decrease"
-      sum="8b85cab8aba49f8f00b756df38de6953"
+      sum="c6f425a6453b9b65a013a84af44acc1e"
       proved="true"
       expanded="true"
       shape="variant decreaseCtaNilCfaNilainfix =V7V6aConswVV4aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -375,7 +379,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="10. precondition"
-      sum="595e98e57b182bffd83c3a5e1b269bc5"
+      sum="38fa901930e08252103df46490b15929"
       proved="true"
       expanded="true"
       shape="preconditionCtaNiladistinctV6aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -395,7 +399,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="11. precondition"
-      sum="99d5a9cf301007831648ebb18cf854ef"
+      sum="bbb4e02a6635adfd0ecdc4b56455702a"
       proved="true"
       expanded="true"
       shape="preconditionCtaNiladistinctV3IamemV10V3AamemV9V6Aainfix =V8aNodeV9V10EqamemV8V7FAadistinctV7FIadistinctV6aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -415,9 +419,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="12. postcondition"
-      sum="207720fd6485d0e62339b647b59e5462"
+      sum="230f203124a92467ac8d7ab9e13333d7"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionCtaNiladistinctV9Lainfix ++V8V7IamemV11V3Aainfix =V10aNodeV5V11EqamemV10V8FAadistinctV8FIadistinctV3IamemV14V3AamemV13V6Aainfix =V12aNodeV13V14EqamemV12V7FAadistinctV7FIadistinctV6aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for combine"/>
@@ -435,7 +439,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="13. postcondition"
-      sum="1324c926018cb3ddca2303f682497f57"
+      sum="377a85fea88cb9e20ac5c3f8be950d7e"
       proved="true"
       expanded="true"
       shape="postconditionCtaNilamemV12V3AamemV11V4Aainfix =V10aNodeV11V12EqamemV10V9FLainfix ++V8V7IamemV14V3Aainfix =V13aNodeV5V14EqamemV13V8FAadistinctV8FIadistinctV3IamemV17V3AamemV16V6Aainfix =V15aNodeV16V17EqamemV15V7FAadistinctV7FIadistinctV6aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -450,7 +454,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="1. postcondition"
-        sum="707de325ef21b929eb954584cbe8a77b"
+        sum="aba9829def2f655f0ff9f5ae23766158"
         proved="true"
         expanded="true"
         shape="postconditionCtaNilamemV12V3AamemV11V4Aainfix =V10aNodeV11V12EIamemV10V9FLainfix ++V8V7IamemV14V3Aainfix =V13aNodeV5V14EqamemV13V8FAadistinctV8FIadistinctV3IamemV17V3AamemV16V6Aainfix =V15aNodeV16V17EqamemV15V7FAadistinctV7FIadistinctV6aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -462,7 +466,7 @@
          memlimit="0"
          obsolete="false"
          archived="false">
-         <result status="valid" time="6.60"/>
+         <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal
@@ -470,7 +474,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="2. postcondition"
-        sum="201fbe5a0a5343ebcd408a49970fb58e"
+        sum="8238c1988dc951df8e5da3347d828196"
         proved="true"
         expanded="true"
         shape="postconditionCtaNilamemV10V9IamemV12V3AamemV11V4Aainfix =V10aNodeV11V12EFLainfix ++V8V7IamemV14V3Aainfix =V13aNodeV5V14EqamemV13V8FAadistinctV8FIadistinctV3IamemV17V3AamemV16V6Aainfix =V15aNodeV16V17EqamemV15V7FAadistinctV7FIadistinctV6aConsVVV4IadistinctV4FIaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -492,7 +496,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="14. precondition"
-      sum="23d0a8e491dd4358daaff1cee3e492cd"
+      sum="4d2b0acc7468ddb0c910f810717793da"
       proved="true"
       expanded="true"
       shape="preconditionadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -512,9 +516,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="15. postcondition"
-      sum="425a930971ceec52bfdb4da9500337f2"
+      sum="18e3d8ca0e0616132c4bb9989a2fb19a"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="postconditionadistinctV4IamemV7V3AamemV6V1Aainfix =V5aNodeV6V7EqamemV5V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for combine"/>
@@ -532,7 +536,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="46" loccnumb="6" loccnume="13"
       expl="16. postcondition"
-      sum="ea32f7e110b04f55ef45424746ee78f7"
+      sum="ad6f1d880a7cc041435048b1a0b35010"
       proved="true"
       expanded="true"
       shape="postconditionainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EqamemV5V4FIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -547,7 +551,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="1. postcondition"
-        sum="cb7961c61c0be5f45fa71750c5b534e0"
+        sum="346ac194588836c925932f8307cd293b"
         proved="true"
         expanded="true"
         shape="postconditionainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EIamemV5V4FIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -567,7 +571,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="46" loccnumb="6" loccnume="13"
         expl="2. postcondition"
-        sum="a6da76cc0f218508a3785f89ca65e04e"
+        sum="c35b9ad5d1c9ed0a51db71d493e21cb4"
         proved="true"
         expanded="true"
         shape="postconditionamemV5V4Iainfix =asizeV7V2Aainfix =asizeV6V0Aainfix =V5aNodeV6V7EFIamemV10V3AamemV9V1Aainfix =V8aNodeV9V10EqamemV8V4FAadistinctV4FIadistinctV1Iaall_treesV2V3Aainfix &lt;=c0V2Aaall_treesV0V1Aainfix &lt;=c0V0F">
@@ -591,7 +595,7 @@
     locfile="../generate_all_trees.mlw"
     loclnum="74" loccnumb="6" loccnume="15"
     expl="VC for all_trees"
-    sum="d383ffc5a2eb78b7045e3c91c80954bf"
+    sum="3edb1f59f8961e4b763f3b96a52f5638"
     proved="true"
     expanded="true"
     shape="aall_treesV4agetV3V4Iainfix &lt;=V4V0Aainfix &lt;=c0V4FAainfix &lt;=c0V1Iaall_treesV5agetV3V5Iainfix &lt;V5ainfix +V0c1Aainfix &lt;=c0V5FAaall_treesV10agetV9V10Iainfix &lt;V10ainfix +V6c1Aainfix &lt;=c0V10FIainfix &lt;asizeV12ainfix +V8c1Aainfix =asizeV11V6Aainfix =V11aNodeV12V13EqamemV11agetV9V6FAadistinctagetV9V6Aaall_treesV14agetV9V14Iainfix &lt;V14V6Aainfix &lt;=c0V14FAainfix &lt;asizeV21ainfix +V15c1Aainfix =asizeV20V6Aainfix =V20aNodeV21V22EqamemV20agetV19V6FAadistinctagetV19V6Aaall_treesV23agetV19V23Iainfix &lt;V23V6Aainfix &lt;=c0V23FIainfix =V19asetV9V6ainfix ++V18agetV9V6Aainfix &lt;=c0V1FAainfix &lt;V6V1Aainfix &lt;=c0V6Iainfix =asizeV26V17Aainfix =asizeV25V15Aainfix =V24aNodeV25V26EqamemV24V18FAadistinctV18FAaall_treesV17agetV9V16Aainfix &lt;=c0V17Aaall_treesV15agetV9V15Aainfix &lt;=c0V15Aainfix &lt;V15V1Aainfix &lt;=c0V15Lainfix -ainfix -V6c1V15Aainfix &lt;V16V1Aainfix &lt;=c0V16Lainfix -ainfix -V6c1V15Aainfix &lt;V6V1Aainfix &lt;=c0V6Aainfix &lt;=c0V1Iainfix &lt;asizeV28V15Aainfix =asizeV27V6Aainfix =V27aNodeV28V29EqamemV27agetV9V6FAadistinctagetV9V6Aaall_treesV30agetV9V30Iainfix &lt;V30V6Aainfix &lt;=c0V30FIainfix &lt;=V15V8Aainfix &lt;=c0V15FFAainfix &lt;asizeV32c0Aainfix =asizeV31V6Aainfix =V31aNodeV32V33EqamemV31agetV7V6FAadistinctagetV7V6Aaall_treesV34agetV7V34Iainfix &lt;V34V6Aainfix &lt;=c0V34FIainfix &lt;=c0V8Aaall_treesV35agetV7V35Iainfix &lt;V35ainfix +V6c1Aainfix &lt;=c0V35FIainfix &gt;c0V8Lainfix -V6c1Iainfix =V7asetV3V6aNilAainfix &lt;=c0V1FAainfix &lt;V6V1Aainfix &lt;=c0V6Aainfix &lt;=c0V1Iaall_treesV36agetV3V36Iainfix &lt;V36V6Aainfix &lt;=c0V36FIainfix &lt;=V6V0Aainfix &lt;=c1V6FFAaall_treesV37agetV2V37Iainfix &lt;V37c1Aainfix &lt;=c0V37FIainfix &lt;=c1V0Aaall_treesV38agetV2V38Iainfix &lt;=V38V0Aainfix &lt;=c0V38FIainfix &gt;c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FAainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Aainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -606,7 +610,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="1. precondition"
-      sum="425d50637545ecfe845fc6514ac5226a"
+      sum="8a9d6d4fe713f3a928246b50dae3e59a"
       proved="true"
       expanded="true"
       shape="preconditionainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -626,7 +630,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="2. precondition"
-      sum="131241b0cba9f2d90b41024cc40bcbf6"
+      sum="8be196ec0656b0111aaab11e92ffaf6b"
       proved="true"
       expanded="true"
       shape="preconditionainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -646,7 +650,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="3. postcondition"
-      sum="5f4b981bd45cf9a3471a9193da7b122e"
+      sum="e1a82f5fc5953437a2a6f0fe0d6ebb9a"
       proved="true"
       expanded="true"
       shape="postconditionaall_treesV3agetV2V3Iainfix &lt;=V3V0Aainfix &lt;=c0V3FIainfix &gt;c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -666,7 +670,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="4. loop invariant init"
-      sum="0308c0b2439f2850ea8f9be7dd333114"
+      sum="0ed8e10692313acc20266c2bc16c6480"
       proved="true"
       expanded="true"
       shape="loop invariant initaall_treesV3agetV2V3Iainfix &lt;V3c1Aainfix &lt;=c0V3FIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -686,9 +690,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="5. type invariant"
-      sum="9000aac1f574605bd00c57f7ce507aec"
+      sum="213fe00a9c0ac4f4b382d29b75d3b7ae"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="type invariantainfix &lt;=c0V1Iaall_treesV5agetV3V5Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -706,7 +710,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="6. precondition"
-      sum="d659ead57177b7cc6bca3b5386c44b81"
+      sum="177f0283096b6e579f735dae3fea6a06"
       proved="true"
       expanded="true"
       shape="preconditionainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix &lt;=c0V1Iaall_treesV5agetV3V5Iainfix &lt;V5V4Aainfix &lt;=c0V5FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -726,7 +730,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="7. loop invariant preservation"
-      sum="699d4d948a95075f2dc634da7c74ebfa"
+      sum="ee6dc8f00eb6a73994f36f36c39906b2"
       proved="true"
       expanded="true"
       shape="loop invariant preservationaall_treesV7agetV5V7Iainfix &lt;V7ainfix +V4c1Aainfix &lt;=c0V7FIainfix &gt;c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV8agetV3V8Iainfix &lt;V8V4Aainfix &lt;=c0V8FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -746,9 +750,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="8. loop invariant init"
-      sum="74968c2039a760842da619e64017a5f4"
+      sum="dfe98eef0ce4ccbab4a76eae512aa50c"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initaall_treesV7agetV5V7Iainfix &lt;V7V4Aainfix &lt;=c0V7FIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV8agetV3V8Iainfix &lt;V8V4Aainfix &lt;=c0V8FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -766,9 +770,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="9. loop invariant init"
-      sum="f65a83a5504aca8cc9393e17ef88addd"
+      sum="b0d35d29a1a6cfffe4d7c7278318b413"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant initadistinctagetV5V4Iainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV7agetV3V7Iainfix &lt;V7V4Aainfix &lt;=c0V7FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -786,7 +790,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="10. loop invariant init"
-      sum="a7b701323a901df7d8c139fcf4440a7c"
+      sum="52cc09fa5618c2d882f33b1213ec90d3"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix &lt;asizeV8c0Aainfix =asizeV7V4Aainfix =V7aNodeV8V9EqamemV7agetV5V4FIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV10agetV3V10Iainfix &lt;V10V4Aainfix &lt;=c0V10FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -806,9 +810,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="11. type invariant"
-      sum="f89242d29884f59fd6d7a94db5f66d2e"
+      sum="4bf343ee0d4f03fd05f86bd8d02fb0eb"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="type invariantainfix &lt;=c0V1Iainfix &lt;asizeV10V8Aainfix =asizeV9V4Aainfix =V9aNodeV10V11EqamemV9agetV7V4FAadistinctagetV7V4Aaall_treesV12agetV7V12Iainfix &lt;V12V4Aainfix &lt;=c0V12FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV13agetV3V13Iainfix &lt;V13V4Aainfix &lt;=c0V13FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -826,7 +830,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="12. precondition"
-      sum="7c6578f43f9b0e42cb5934bb83cf0a95"
+      sum="09818b314100b6f50e49fdf9ca4e3252"
       proved="true"
       expanded="true"
       shape="preconditionainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix &lt;=c0V1Iainfix &lt;asizeV10V8Aainfix =asizeV9V4Aainfix =V9aNodeV10V11EqamemV9agetV7V4FAadistinctagetV7V4Aaall_treesV12agetV7V12Iainfix &lt;V12V4Aainfix &lt;=c0V12FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV13agetV3V13Iainfix &lt;V13V4Aainfix &lt;=c0V13FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -846,7 +850,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="13. precondition"
-      sum="63f1ba691a689f3504cf9954a1ac6273"
+      sum="a5e420f8f926e96585a9be5e2942120f"
       proved="true"
       expanded="true"
       shape="preconditionainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV11V8Aainfix =asizeV10V4Aainfix =V10aNodeV11V12EqamemV10agetV7V4FAadistinctagetV7V4Aaall_treesV13agetV7V13Iainfix &lt;V13V4Aainfix &lt;=c0V13FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV14agetV3V14Iainfix &lt;V14V4Aainfix &lt;=c0V14FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -866,7 +870,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="14. precondition"
-      sum="db4d8c5062167447069ec6313fc6f4dd"
+      sum="48fa43aafc5d43bc11a81a083bf537f5"
       proved="true"
       expanded="true"
       shape="preconditionainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV12V8Aainfix =asizeV11V4Aainfix =V11aNodeV12V13EqamemV11agetV7V4FAadistinctagetV7V4Aaall_treesV14agetV7V14Iainfix &lt;V14V4Aainfix &lt;=c0V14FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV15agetV3V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -886,7 +890,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="15. precondition"
-      sum="176b090dd74c6350a0df835ef38aefa8"
+      sum="b3bc2a77f52b9c0bc89f79481b6e9cf1"
       proved="true"
       expanded="true"
       shape="preconditionaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV12V8Aainfix =asizeV11V4Aainfix =V11aNodeV12V13EqamemV11agetV7V4FAadistinctagetV7V4Aaall_treesV14agetV7V14Iainfix &lt;V14V4Aainfix &lt;=c0V14FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV15agetV3V15Iainfix &lt;V15V4Aainfix &lt;=c0V15FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -906,7 +910,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="16. precondition"
-      sum="411b47244350b6d077ebc452233086a8"
+      sum="588c216758a407bbe23da213ec5d78e9"
       proved="true"
       expanded="true"
       shape="preconditionainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix =asizeV14V10Aainfix =asizeV13V8Aainfix =V12aNodeV13V14EqamemV12V11FAadistinctV11FIaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV16V8Aainfix =asizeV15V4Aainfix =V15aNodeV16V17EqamemV15agetV7V4FAadistinctagetV7V4Aaall_treesV18agetV7V18Iainfix &lt;V18V4Aainfix &lt;=c0V18FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV19agetV3V19Iainfix &lt;V19V4Aainfix &lt;=c0V19FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -926,9 +930,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="17. loop invariant preservation"
-      sum="a785645a18d4d48d2227f0f01fde66a4"
+      sum="c42caf2663799d0d985a27f9639c8a2e"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationaall_treesV13agetV12V13Iainfix &lt;V13V4Aainfix &lt;=c0V13FIainfix =V12asetV7V4ainfix ++V11agetV7V4Aainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix =asizeV16V10Aainfix =asizeV15V8Aainfix =V14aNodeV15V16EqamemV14V11FAadistinctV11FIaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV18V8Aainfix =asizeV17V4Aainfix =V17aNodeV18V19EqamemV17agetV7V4FAadistinctagetV7V4Aaall_treesV20agetV7V20Iainfix &lt;V20V4Aainfix &lt;=c0V20FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV21agetV3V21Iainfix &lt;V21V4Aainfix &lt;=c0V21FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -946,9 +950,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="18. loop invariant preservation"
-      sum="075eff95d5733f4b03c6c8221514452c"
+      sum="217ae9c589f5b536553e4d9c30dc77bc"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="loop invariant preservationadistinctagetV12V4Iainfix =V12asetV7V4ainfix ++V11agetV7V4Aainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix =asizeV15V10Aainfix =asizeV14V8Aainfix =V13aNodeV14V15EqamemV13V11FAadistinctV11FIaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV17V8Aainfix =asizeV16V4Aainfix =V16aNodeV17V18EqamemV16agetV7V4FAadistinctagetV7V4Aaall_treesV19agetV7V19Iainfix &lt;V19V4Aainfix &lt;=c0V19FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV20agetV3V20Iainfix &lt;V20V4Aainfix &lt;=c0V20FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -966,7 +970,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="19. loop invariant preservation"
-      sum="1a6e679dad4bfbfb2622405db04526b4"
+      sum="405f0aba3ad62da4d04036927f49e207"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix &lt;asizeV14ainfix +V8c1Aainfix =asizeV13V4Aainfix =V13aNodeV14V15EqamemV13agetV12V4FIainfix =V12asetV7V4ainfix ++V11agetV7V4Aainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix =asizeV18V10Aainfix =asizeV17V8Aainfix =V16aNodeV17V18EqamemV16V11FAadistinctV11FIaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV20V8Aainfix =asizeV19V4Aainfix =V19aNodeV20V21EqamemV19agetV7V4FAadistinctagetV7V4Aaall_treesV22agetV7V22Iainfix &lt;V22V4Aainfix &lt;=c0V22FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV23agetV3V23Iainfix &lt;V23V4Aainfix &lt;=c0V23FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -981,7 +985,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="1. loop invariant preservation"
-        sum="653152da90470af41c345794e71f682e"
+        sum="0d2ecfb4951f111ab3e0409a28f0ff60"
         proved="true"
         expanded="true"
         shape="loop invariant preservationainfix &lt;asizeV14ainfix +V8c1Aainfix =asizeV13V4Aainfix =V13aNodeV14V15EIamemV13agetV12V4FIainfix =V12asetV7V4ainfix ++V11agetV7V4Aainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix =asizeV18V10Aainfix =asizeV17V8Aainfix =V16aNodeV17V18EqamemV16V11FAadistinctV11FIaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV20V8Aainfix =asizeV19V4Aainfix =V19aNodeV20V21EqamemV19agetV7V4FAadistinctagetV7V4Aaall_treesV22agetV7V22Iainfix &lt;V22V4Aainfix &lt;=c0V22FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV23agetV3V23Iainfix &lt;V23V4Aainfix &lt;=c0V23FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -993,7 +997,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.48"/>
+         <result status="valid" time="0.05"/>
         </proof>
         <proof
          prover="2"
@@ -1001,7 +1005,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.29"/>
+         <result status="valid" time="0.12"/>
         </proof>
         <proof
          prover="3"
@@ -1009,7 +1013,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.29"/>
+         <result status="valid" time="3.04"/>
         </proof>
        </goal>
        <goal
@@ -1017,7 +1021,7 @@
         locfile="../generate_all_trees.mlw"
         loclnum="74" loccnumb="6" loccnume="15"
         expl="2. loop invariant preservation"
-        sum="449436a4c5c77caf35a4d97253c579ba"
+        sum="8939c298ab93740e9bc14b285fcfb0fe"
         proved="true"
         expanded="true"
         shape="loop invariant preservationamemV13agetV12V4Iainfix &lt;asizeV14ainfix +V8c1Aainfix =asizeV13V4Aainfix =V13aNodeV14V15EFIainfix =V12asetV7V4ainfix ++V11agetV7V4Aainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Iainfix =asizeV18V10Aainfix =asizeV17V8Aainfix =V16aNodeV17V18EqamemV16V11FAadistinctV11FIaall_treesV10agetV7V9Aainfix &lt;=c0V10Aaall_treesV8agetV7V8Aainfix &lt;=c0V8Iainfix &lt;V8V1Aainfix &lt;=c0V8Lainfix -ainfix -V4c1V8Iainfix &lt;V9V1Aainfix &lt;=c0V9Lainfix -ainfix -V4c1V8Iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iainfix &lt;asizeV20V8Aainfix =asizeV19V4Aainfix =V19aNodeV20V21EqamemV19agetV7V4FAadistinctagetV7V4Aaall_treesV22agetV7V22Iainfix &lt;V22V4Aainfix &lt;=c0V22FIainfix &lt;=V8V6Aainfix &lt;=c0V8FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV23agetV3V23Iainfix &lt;V23V4Aainfix &lt;=c0V23FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -1039,7 +1043,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="20. loop invariant preservation"
-      sum="b6318414907ebdd8e9f271d6788f9a4b"
+      sum="bc56f090969cdbd46e11fd50bd3d56f4"
       proved="true"
       expanded="true"
       shape="loop invariant preservationaall_treesV8agetV7V8Iainfix &lt;V8ainfix +V4c1Aainfix &lt;=c0V8FIainfix &lt;asizeV10ainfix +V6c1Aainfix =asizeV9V4Aainfix =V9aNodeV10V11EqamemV9agetV7V4FAadistinctagetV7V4Aaall_treesV12agetV7V12Iainfix &lt;V12V4Aainfix &lt;=c0V12FFIainfix &lt;=c0V6Lainfix -V4c1Iainfix =V5asetV3V4aNilAainfix &lt;=c0V1FIainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix &lt;=c0V1Iaall_treesV13agetV3V13Iainfix &lt;V13V4Aainfix &lt;=c0V13FIainfix &lt;=V4V0Aainfix &lt;=c1V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
@@ -1059,9 +1063,9 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="21. type invariant"
-      sum="6dbe259076728e88ab4033f021732eee"
+      sum="3c4e9405226f39d704004235ff96caba"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="type invariantainfix &lt;=c0V1Iaall_treesV4agetV3V4Iainfix &lt;V4ainfix +V0c1Aainfix &lt;=c0V4FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">
       <label
        name="expl:VC for all_trees"/>
@@ -1079,7 +1083,7 @@
       locfile="../generate_all_trees.mlw"
       loclnum="74" loccnumb="6" loccnume="15"
       expl="22. postcondition"
-      sum="67731fc91d80be56a85f023f08daf372"
+      sum="c960002f8d605c0c644924ae06d9c34d"
       proved="true"
       expanded="true"
       shape="postconditionaall_treesV4agetV3V4Iainfix &lt;=V4V0Aainfix &lt;=c0V4FIainfix &lt;=c0V1Iaall_treesV5agetV3V5Iainfix &lt;V5ainfix +V0c1Aainfix &lt;=c0V5FFIainfix &lt;=c1V0Iainfix =V2asetaconstaNilc0aConsaEmptyaNilAainfix &lt;=c0V1FIainfix &lt;c0V1Aainfix &lt;=c0c0Iainfix &lt;=c0V1Iainfix &gt;=V1c0Lainfix +V0c1Iainfix &gt;=V0c0F">

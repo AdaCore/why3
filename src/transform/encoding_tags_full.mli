@@ -9,12 +9,3 @@
 (*                                                                  *)
 (********************************************************************)
 
-
-(* Simplify the recursive type and logic definition *)
-
-val t : Task.task Trans.trans
-
-(* ungroup recursive definition *)
-
-val elt : Decl.decl -> Decl.decl list
-

@@ -40,54 +40,18 @@ let ty_type = ty_app ts_type []
 (* ts_type declaration *)
 let d_ts_type = create_ty_decl ts_type
 
+(* add type args to the signature of a polymorphic lsymbol *)
+let ls_extend = Wls.memoize 63 (fun ls ->
+  if ls_equal ls ps_equ then ls else
+  let tvs = ls_ty_freevars ls in
+  if Stv.is_empty tvs then ls else
+  let args = Stv.fold (fun _ l -> ty_type::l) tvs ls.ls_args in
+  Term.create_lsymbol (id_clone ls.ls_name) args ls.ls_value)
+
 (* function symbol mapping ty_type^n to ty_type *)
 let ls_of_ts = Wts.memoize 63 (fun ts ->
   let args = List.map (Util.const ty_type) ts.ts_args in
   create_fsymbol (id_clone ts.ts_name) args ty_type)
-
-(* function symbol selecting ty_type from ty_type^n *)
-let ls_selects_of_ts = Wts.memoize 63 (fun ts ->
-  let create_select _ =
-    let preid = id_fresh ("select_"^ts.ts_name.id_string) in
-    create_fsymbol preid [ty_type] ty_type in
-  List.rev_map create_select ts.ts_args)
-
-let ls_int_of_ty = create_fsymbol (id_fresh "int_of_ty") [ty_type] ty_int
-
-(** definition of the previous selecting functions *)
-let ls_selects_def_of_ts acc ts =
-  let ls = ls_of_ts ts in
-  let vars = List.rev_map
-    (fun _ -> create_vsymbol (id_fresh "x") ty_type) ts.ts_args
-  in
-  let tvars = List.map t_var vars in
-  (** type to int *)
-  let id = id_hash ts.ts_name in
-  let acc =
-    let t = fs_app ls tvars ty_type in
-    let f = t_equ (fs_app ls_int_of_ty [t] ty_int) (t_nat_const id) in
-    let f = t_forall_close vars [[t]] f in
-    let prsymbol = create_prsymbol (id_clone ts.ts_name) in
-    create_prop_decl Paxiom prsymbol f :: acc
-  in
-  (** select *)
-  let ls_selects = ls_selects_of_ts ts in
-  let fmlas = List.rev_map2
-    (fun ls_select value ->
-      let t = fs_app ls tvars ty_type in
-      let t = fs_app ls_select [t] ty_type in
-      let f = t_equ t value in
-      let f = t_forall_close vars [[t]] f in
-      f)
-    ls_selects tvars in
-  let create_props ls_select fmla =
-    let prsymbol = create_prsymbol (id_clone ls_select.ls_name) in
-    create_prop_decl Paxiom prsymbol fmla in
-  let props =
-    List.fold_left2 (fun acc x y -> create_props x y::acc)
-      acc ls_selects fmlas in
-  let add acc fs = create_param_decl fs :: acc in
-  List.fold_left add props ls_selects
 
 (* convert a type to a term of type ty_type *)
 let rec term_of_ty tvmap ty = match ty.ty_node with
@@ -110,11 +74,6 @@ let t_type_close fn f =
 
 (* convert a type declaration to a list of lsymbol declarations *)
 let lsdecl_of_ts ts = create_param_decl (ls_of_ts ts)
-
-(* convert a type declaration to a list of lsymbol declarations *)
-let lsdecl_of_ts_select ts =
-  let defs = ls_selects_def_of_ts [] ts in
-  create_param_decl (ls_of_ts ts) :: defs
 
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =
@@ -230,6 +189,24 @@ let d_monomorph kept lsmap d =
   in
   let add ls acc = create_param_decl ls :: acc in
   Sls.fold add !consts dl
+
+let lsmap kept = Wls.memoize 63 (fun ls ->
+  let prot_arg = is_protecting_id ls.ls_name in
+  let prot_val = is_protected_id ls.ls_name in
+  let neg ty = if prot_arg && Sty.mem ty kept then ty else ty_base in
+  let pos ty = if prot_val && Sty.mem ty kept then ty else ty_base in
+  let ty_arg = List.map neg ls.ls_args in
+  let ty_res = Opt.map pos ls.ls_value in
+  if Opt.equal ty_equal ty_res ls.ls_value &&
+     List.for_all2 ty_equal ty_arg ls.ls_args then ls
+  else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
+
+(* replace all non-kept types with ty_base *)
+let monomorphise_task =
+  Trans.on_tagged_ty meta_kept (fun kept ->
+    let kept = Sty.add ty_type kept in
+    let decl = d_monomorph kept (lsmap kept) in
+    Trans.decl decl (Task.add_decl None d_ts_base))
 
 (* replace type variables in a goal with fresh type constants *)
 let monomorphise_goal = Trans.goal (fun pr f ->

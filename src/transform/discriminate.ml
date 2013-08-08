@@ -212,7 +212,6 @@ let map env d = match d.d_node with
       let task = Ssubst.fold conv_f substs [] in
       task
 
-
 let ft_select_inst =
   ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
 
@@ -221,6 +220,7 @@ let ft_select_lskept =
 
 let ft_select_lsinst =
   ((Hstr.create 17) : (Env.env,Lsmap.t) Trans.flag_trans)
+
 let metas_from_env env =
   let fold_inst tyl _ s = List.fold_left (fun s ty -> Sty.add ty s) s tyl in
   let fold_ls _ insts s = Mtyl.fold fold_inst insts s in

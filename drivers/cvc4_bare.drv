@@ -18,8 +18,6 @@ outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 time "why3cpulimit time : %s s"
 
 
-(* Commented out in all drivers. Why? *)
-(*transformation "simplify_recursive_definition"*)
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
@@ -145,6 +143,7 @@ theory real.Real
 
 end
 
+<<<<<<< HEAD
 theory real.FromInt
   syntax function from_int "(to_real %1)"
 
@@ -183,6 +182,12 @@ theory bool.Bool
    syntax function notb  "(not %1)"
    syntax function implb "(=> %1 %2)"
 end
+
+theory bool.Ite
+  syntax function ite "(ite %1 %2 %3)"
+  meta "encoding : lskept" function ite
+end
+>>>>>>> lri-master
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"

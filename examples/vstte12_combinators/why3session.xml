@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
+<why3session shape_version="3">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -19,6 +19,14 @@
   version="1.6"/>
  <prover
   id="4"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="5"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="6"
   name="Z3"
   version="3.2"/>
  <file
@@ -40,12 +48,12 @@
     expanded="false"
     shape="ainfix --&gt;aAppV0V2aAppV1V2Iainfix --&gt;V0V1F">
     <proof
-     prover="4"
+     prover="6"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.57"/>
+     <result status="valid" time="3.35"/>
     </proof>
    </goal>
    <goal
@@ -57,12 +65,12 @@
     expanded="false"
     shape="ainfix --&gt;aAppV0V1aAppV0V2Iainfix --&gt;V1V2Iais_valueV0F">
     <proof
-     prover="4"
+     prover="6"
      timelimit="10"
      memlimit="0"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.32"/>
+     <result status="valid" time="5.15"/>
     </proof>
    </goal>
    <goal
@@ -109,7 +117,7 @@
     sum="f5aa22f72c7259698628245a02fdfec7"
     proved="true"
     expanded="false"
-    shape="CV0aSais_valueV1AarelTRV0V1LaSaKais_valueV2AarelTRV0V2LaKaAppVVCV5aKais_valueV7AarelTRV0V7LaAppaKV6Iais_valueV6AarelTRV4V6FaSais_valueV9AarelTRV0V9LaAppaSV8Iais_valueV8AarelTRV4V8FaAppaKVais_valueV10AarelTRV0V10Iais_valueV11AarelTRV4V11FaAppaSVais_valueV14AarelTRV0V14LaAppaAppaSV12V13Iais_valueV13AarelTRV4V13FaAppaAppaSVVais_valueV18AarelTRV0V18Iais_valueV18AarelTRaAppaAppV15V17aAppV16V17V18FIais_valueV17AarelTRV4V17FwfIais_valueV5AarelTRV3V5FF">
+    shape="Cais_valueV1AarelTRV0V1LaSaSais_valueV2AarelTRV0V2LaKaKCais_valueV7AarelTRV0V7LaAppaKV6Iais_valueV6AarelTRV4V6FaKais_valueV9AarelTRV0V9LaAppaSV8Iais_valueV8AarelTRV4V8FaSais_valueV10AarelTRV0V10Iais_valueV11AarelTRV4V11FaAppaKVais_valueV14AarelTRV0V14LaAppaAppaSV12V13Iais_valueV13AarelTRV4V13FaAppaSVais_valueV18AarelTRV0V18Iais_valueV18AarelTRaAppaAppV15V17aAppV16V17V18FIais_valueV17AarelTRV4V17FaAppaAppaSVVfwV5Iais_valueV5AarelTRV3V5FaAppVVV0F">
     <label
      name="expl:VC for reduction"/>
     <transf
@@ -124,7 +132,7 @@
       sum="a32a02c4035b830e9c5f750d9f4f8241"
       proved="true"
       expanded="false"
-      shape="CV0aSais_valueV1AarelTRV0V1LaSaKtaAppVVtF">
+      shape="postconditionCais_valueV1AarelTRV0V1LaSaStaKtaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <proof
@@ -144,7 +152,7 @@
       sum="f86432d4edc300998bb28e51a0d3eb65"
       proved="true"
       expanded="false"
-      shape="CV0aStaKais_valueV1AarelTRV0V1LaKaAppVVtF">
+      shape="postconditionCtaSais_valueV1AarelTRV0V1LaKaKtaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <proof
@@ -164,7 +172,7 @@
       sum="44fd3e292e2978c568132c3ff2cfe36e"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKais_valueV5AarelTRV0V5LaAppaKV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+      shape="postconditionCtaStaKCais_valueV5AarelTRV0V5LaAppaKV4Iais_valueV4AarelTRV2V4FaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <transf
@@ -179,7 +187,7 @@
         sum="97200e43e063a6a168f8b89a662129cb"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKarelTRV0V5LaAppaKV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCarelTRV0V5LaAppaKV4Iais_valueV4AarelTRV2V4FaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -192,12 +200,20 @@
          <result status="valid" time="0.53"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.03"/>
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal
@@ -208,7 +224,7 @@
         sum="58efd1212d804ca51c7c0cf7293865d2"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKais_valueV5LaAppaKV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCais_valueV5LaAppaKV4Iais_valueV4AarelTRV2V4FaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -230,7 +246,7 @@
       sum="273930d2202d940fe0b987df3a1664e1"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSais_valueV5AarelTRV0V5LaAppaSV4Iais_valueV4AarelTRV2V4FaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+      shape="postconditionCtaStaKCtaKais_valueV5AarelTRV0V5LaAppaSV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <transf
@@ -245,7 +261,7 @@
         sum="b4d8fdd11b763d3e0efe28a21ffa45fc"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaSarelTRV0V5LaAppaSV4Iais_valueV4AarelTRV2V4FaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKarelTRV0V5LaAppaSV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -258,12 +274,20 @@
          <result status="valid" time="0.53"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.67"/>
+         <result status="valid" time="0.03"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
        <goal
@@ -274,7 +298,7 @@
         sum="8cdae4e085812c53e402a66f3deac071"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaSais_valueV5LaAppaSV4Iais_valueV4AarelTRV2V4FaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKais_valueV5LaAppaSV4Iais_valueV4AarelTRV2V4FaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -296,7 +320,7 @@
       sum="8b473d6f6ca67083da486799fa521140"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4AarelTRV0V4Iais_valueV5AarelTRV2V5FaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+      shape="postconditionCtaStaKCtaKtaSais_valueV4AarelTRV0V4Iais_valueV5AarelTRV2V5FaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <transf
@@ -311,7 +335,7 @@
         sum="ae6d50ccac3d743de35e2806ea77b49b"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVarelTRV0V4Iais_valueV5AarelTRV2V5FaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKtaSarelTRV0V4Iais_valueV5AarelTRV2V5FaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -324,12 +348,20 @@
          <result status="valid" time="0.58"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.58"/>
+         <result status="valid" time="0.07"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
         </proof>
        </goal>
        <goal
@@ -340,7 +372,7 @@
         sum="f7170e3080e00c6e23cf8d513d1a675d"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4Iais_valueV5AarelTRV2V5FaAppaSVtaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKtaSais_valueV4Iais_valueV5AarelTRV2V5FaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -362,7 +394,7 @@
       sum="76221a0cffed271036f6d40e5361d5bb"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVais_valueV7AarelTRV0V7LaAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+      shape="postconditionCtaStaKCtaKtaStaAppaKVais_valueV7AarelTRV0V7LaAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <transf
@@ -377,7 +409,7 @@
         sum="9c561446ef1fb4d2d2495b2cfad7b4a2"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVarelTRV0V7LaAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKtaStaAppaKVarelTRV0V7LaAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -395,7 +427,23 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.33"/>
+         <result status="valid" time="4.92"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.08"/>
         </proof>
        </goal>
        <goal
@@ -406,7 +454,7 @@
         sum="8a2a0244be661a67cc4483f747445ee4"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVais_valueV7LaAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaAppaSVVtwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKtaStaAppaKVais_valueV7LaAppaAppaSV5V6Iais_valueV6AarelTRV2V6FaAppaSVtaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -428,7 +476,7 @@
       sum="ae774e280723a3563bc2ce541d86d3fd"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVais_valueV9AarelTRV0V9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FwtIais_valueV3AarelTRV1V3FF">
+      shape="postconditionCtaStaKCtaKtaStaAppaKVtaAppaSVais_valueV9AarelTRV0V9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <transf
@@ -443,7 +491,7 @@
         sum="a91aa0b07bedafa651f8578fde7e9ad7"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVarelTRV0V9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKtaStaAppaKVtaAppaSVarelTRV0V9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -455,6 +503,14 @@
          archived="false">
          <result status="valid" time="0.54"/>
         </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.00"/>
+        </proof>
        </goal>
        <goal
         name="WP_parameter reduction.7.2"
@@ -464,7 +520,7 @@
         sum="6696b1212d691bcc1ca27aefd5c75c9b"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVais_valueV9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FwtIais_valueV3AarelTRV1V3FF">
+        shape="CtaStaKCtaKtaStaAppaKVtaAppaSVais_valueV9Iais_valueV9AarelTRaAppaAppV6V8aAppV7V8V9FIais_valueV8AarelTRV2V8FaAppaAppaSVVtwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
         <label
          name="expl:VC for reduction"/>
         <proof
@@ -486,7 +542,7 @@
       sum="55cd44fbb86bf27612d7835e385b56d3"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwfIais_valueV3AarelTRV1V3FF">
+      shape="unreachable pointCtaStaKCtaKtaStaAppaKVtaAppaSVtaAppaAppaSVVfwV3Iais_valueV3AarelTRV1V3FaAppVVV0F">
       <label
        name="expl:VC for reduction"/>
       <proof
@@ -579,14 +635,14 @@
     expl="VC for reduction2"
     sum="69db53f47a03e57e13462c770f1d297d"
     proved="true"
-    expanded="false"
-    shape="CV0aSais_valueV1Aaonly_KV1LaSaKais_valueV2Aaonly_KV2LaKaAppVVCV5aKais_valueV7Aaonly_KV7LaAppaKV6Iais_valueV6Aaonly_KV6FAaonly_KV4ACV0aSfaKfaAppVVainfix =V9V4Oainfix =V8V4aSais_valueV11Aaonly_KV11LaAppaSV10Iais_valueV10Aaonly_KV10FAaonly_KV4ACV0aSfaKfaAppVVainfix =V13V4Oainfix =V12V4aAppaKVais_valueV14Aaonly_KV14Iais_valueV15Aaonly_KV15FAaonly_KV4ACV0aSfaKfaAppVVainfix =V17V4Oainfix =V16V4aAppaSVais_valueV20Aaonly_KV20LaAppaAppaSV18V19Iais_valueV19Aaonly_KV19FAaonly_KV4ACV0aSfaKfaAppVVainfix =V22V4Oainfix =V21V4aAppaAppaSVVais_valueV27Aaonly_KV27Iais_valueV27Aaonly_KV27FAaonly_KV26ACV0aSfaKfaAppVVainfix =V29V26Oainfix =V28V26LaAppaAppV23V25aAppV24V25Iais_valueV25Aaonly_KV25FAaonly_KV4ACV0aSfaKfaAppVVainfix =V31V4Oainfix =V30V4wfIais_valueV5Aaonly_KV5FAaonly_KV3ACV0aSfaKfaAppVVainfix =V33V3Oainfix =V32V3Iaonly_KV0F">
+    expanded="true"
+    shape="Cais_valueV1Aaonly_KV1LaSaSais_valueV2Aaonly_KV2LaKaKCais_valueV7Aaonly_KV7LaAppaKV6Iais_valueV6Aaonly_KV6FAaonly_KV4ACfaSfaKainfix =V9V4Oainfix =V8V4aAppVVV0aKais_valueV11Aaonly_KV11LaAppaSV10Iais_valueV10Aaonly_KV10FAaonly_KV4ACfaSfaKainfix =V13V4Oainfix =V12V4aAppVVV0aSais_valueV14Aaonly_KV14Iais_valueV15Aaonly_KV15FAaonly_KV4ACfaSfaKainfix =V17V4Oainfix =V16V4aAppVVV0aAppaKVais_valueV20Aaonly_KV20LaAppaAppaSV18V19Iais_valueV19Aaonly_KV19FAaonly_KV4ACfaSfaKainfix =V22V4Oainfix =V21V4aAppVVV0aAppaSVais_valueV27Aaonly_KV27Iais_valueV27Aaonly_KV27FAaonly_KV26ACfaSfaKainfix =V29V26Oainfix =V28V26aAppVVV0LaAppaAppV23V25aAppV24V25Iais_valueV25Aaonly_KV25FAaonly_KV4ACfaSfaKainfix =V31V4Oainfix =V30V4aAppVVV0aAppaAppaSVVfwV5Iais_valueV5Aaonly_KV5FAaonly_KV3ACfaSfaKainfix =V33V3Oainfix =V32V3aAppVVV0aAppVVV0Iaonly_KV0F">
     <label
      name="expl:VC for reduction2"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter reduction2.1"
       locfile="../vstte12_combinators.mlw"
@@ -595,7 +651,7 @@
       sum="c229edc63e7eacaf31411b03be3c364e"
       proved="true"
       expanded="false"
-      shape="CV0aSais_valueV1Aaonly_KV1LaSaKtaAppVVtIaonly_KV0F">
+      shape="postconditionCais_valueV1Aaonly_KV1LaSaStaKtaAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -615,7 +671,7 @@
       sum="5b846d3093ec1b6f0b26a2929beda619"
       proved="true"
       expanded="false"
-      shape="CV0aStaKais_valueV1Aaonly_KV1LaKaAppVVtIaonly_KV0F">
+      shape="postconditionCtaSais_valueV1Aaonly_KV1LaKaKtaAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -635,7 +691,7 @@
       sum="e4460ff3e47cf720f8bc58f83506c88f"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV0aSfaKfaAppVVainfix =V4V1Oainfix =V3V1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCfaSfaKainfix =V4V1Oainfix =V3V1aAppVVV0aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -655,7 +711,7 @@
       sum="d4eef5055bd85013fe3cc0a2f52e2a88"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -675,7 +731,7 @@
       sum="64773c3df75c9f5d060fffb097b60b40"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKCV0aSfaKfaAppVVainfix =V5V2Oainfix =V4V2aStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCCfaSfaKainfix =V5V2Oainfix =V4V2aAppVVV0aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -695,7 +751,7 @@
       sum="0219e92b3c6342c9750bd12ab85ce67d"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKaonly_KV2aStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKCaonly_KV2aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -715,7 +771,7 @@
       sum="12941d7037e5e301791a056d4a498b75"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKais_valueV5Aaonly_KV5LaAppaKV4Iais_valueV4Aaonly_KV4FIaonly_KV2aStaAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="postconditionCtaStaKCais_valueV5Aaonly_KV5LaAppaKV4Iais_valueV4Aaonly_KV4FIaonly_KV2aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -735,7 +791,7 @@
       sum="d81482f0f662415918706dc7920c92db"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSCV0aSfaKfaAppVVainfix =V5V2Oainfix =V4V2aAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCtaKCfaSfaKainfix =V5V2Oainfix =V4V2aAppVVV0aStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -755,7 +811,7 @@
       sum="c150f4c205a1d07f478dbc8ab10c942b"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSaonly_KV2aAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKCtaKaonly_KV2aStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -775,7 +831,7 @@
       sum="09f4d398328b2d41677dd4c52f4f78b9"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSais_valueV5Aaonly_KV5LaAppaSV4Iais_valueV4Aaonly_KV4FIaonly_KV2aAppaKVtaAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="postconditionCtaStaKCtaKais_valueV5Aaonly_KV5LaAppaSV4Iais_valueV4Aaonly_KV4FIaonly_KV2aStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -795,7 +851,7 @@
       sum="555bc60413932fda6891ab896110ccac"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVCV0aSfaKfaAppVVainfix =V6V2Oainfix =V5V2aAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCtaKtaSCfaSfaKainfix =V6V2Oainfix =V5V2aAppVVV0aAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -815,7 +871,7 @@
       sum="7082e4f3f1d3840218e17a5fc074b541"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVaonly_KV2aAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKCtaKtaSaonly_KV2aAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -835,7 +891,7 @@
       sum="433c6a86529bf7d107e0e4a549cf4f36"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4Aaonly_KV4Iais_valueV5Aaonly_KV5FIaonly_KV2aAppaSVtaAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="postconditionCtaStaKCtaKtaSais_valueV4Aaonly_KV4Iais_valueV5Aaonly_KV5FIaonly_KV2aAppaKVtaAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -855,7 +911,7 @@
       sum="a40302ac3a2c22f57ad1e9b50669b7a8"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVCV0aSfaKfaAppVVainfix =V7V2Oainfix =V6V2aAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCtaKtaStaAppaKVCfaSfaKainfix =V7V2Oainfix =V6V2aAppVVV0aAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -875,7 +931,7 @@
       sum="d49e227d259e9a62febe730aadfb3d8c"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVaonly_KV2aAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKCtaKtaStaAppaKVaonly_KV2aAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -895,7 +951,7 @@
       sum="53a54271999535d48c0b27135a3ae6c0"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVais_valueV7Aaonly_KV7LaAppaAppaSV5V6Iais_valueV6Aaonly_KV6FIaonly_KV2aAppaAppaSVVtwtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="postconditionCtaStaKCtaKtaStaAppaKVais_valueV7Aaonly_KV7LaAppaAppaSV5V6Iais_valueV6Aaonly_KV6FIaonly_KV2aAppaSVtaAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -915,7 +971,7 @@
       sum="2c25f6ce08a3fa7adfd4e961f50d0217"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVCV0aSfaKfaAppVVainfix =V9V2Oainfix =V8V2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCtaKtaStaAppaKVtaAppaSVCfaSfaKainfix =V9V2Oainfix =V8V2aAppVVV0aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -935,7 +991,7 @@
       sum="4086e5797ce065f3e3d38c184136c36b"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKCtaKtaStaAppaKVtaAppaSVaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -955,7 +1011,7 @@
       sum="d10e4bda0307a1afbfd41b487a32910f"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVCV0aSfaKfaAppVVainfix =V11V9Oainfix =V10V9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="variant decreaseCtaStaKCtaKtaStaAppaKVtaAppaSVCfaSfaKainfix =V11V9Oainfix =V10V9aAppVVV0LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <transf
@@ -970,7 +1026,7 @@
         sum="d3ee1d7b549592e16c35d193f9340a25"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVCV0aSfaKtaAppVVtLaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+        shape="variant decreaseCtaStaKCtaKtaStaAppaKVtaAppaSVCfaStaKtaAppVVV0LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
         <label
          name="expl:VC for reduction2"/>
         <proof
@@ -998,7 +1054,7 @@
         sum="bd2f6f3f3edb776fe5ccc87b14970a51"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVCV0aStaKfaAppVVtLaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+        shape="variant decreaseCtaStaKCtaKtaStaAppaKVtaAppaSVCtaSfaKtaAppVVV0LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
         <label
          name="expl:VC for reduction2"/>
         <proof
@@ -1026,7 +1082,7 @@
         sum="11902bc53bcb2e19b9769ea2f620c0bd"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVCV0aStaKtaAppVVainfix =V11V9Oainfix =V10V9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+        shape="variant decreaseCtaStaKCtaKtaStaAppaKVtaAppaSVCtaStaKainfix =V11V9Oainfix =V10V9aAppVVV0LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
         <label
          name="expl:VC for reduction2"/>
         <proof
@@ -1035,7 +1091,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.80"/>
+         <result status="valid" time="0.16"/>
         </proof>
         <proof
          prover="3"
@@ -1056,7 +1112,7 @@
       sum="02a8a2f0f9262fdaf108a36b70a001af"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVaonly_KV9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="preconditionCtaStaKCtaKtaStaAppaKVtaAppaSVaonly_KV9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <transf
@@ -1071,7 +1127,7 @@
         sum="02a8a2f0f9262fdaf108a36b70a001af"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVaonly_KV9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+        shape="preconditionCtaStaKCtaKtaStaAppaKVtaAppaSVaonly_KV9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
         <label
          name="expl:VC for reduction2"/>
         <proof
@@ -1080,7 +1136,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.37"/>
+         <result status="valid" time="0.08"/>
         </proof>
         <proof
          prover="2"
@@ -1110,7 +1166,7 @@
       sum="9382929073d095f42a6f7e858d072c3a"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVais_valueV10Aaonly_KV10Iais_valueV10Aaonly_KV10FIaonly_KV9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2wtIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="postconditionCtaStaKCtaKtaStaAppaKVtaAppaSVais_valueV10Aaonly_KV10Iais_valueV10Aaonly_KV10FIaonly_KV9LaAppaAppV6V8aAppV7V8Iais_valueV8Aaonly_KV8FIaonly_KV2aAppaAppaSVVtwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -1130,7 +1186,7 @@
       sum="e290361dd5d9a96507fc9bab8dc3b93a"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwfIais_valueV3Aaonly_KV3FIaonly_KV1Iaonly_KV0F">
+      shape="unreachable pointCtaStaKCtaKtaStaAppaKVtaAppaSVtaAppaAppaSVVfwV3Iais_valueV3Aaonly_KV3FIaonly_KV1aAppVVV0Iaonly_KV0F">
       <label
        name="expl:VC for reduction2"/>
       <proof
@@ -1222,7 +1278,7 @@
     sum="58dc24dbbc02b08125c289fba8acbf8c"
     proved="true"
     expanded="true"
-    shape="CV0aSainfix =V0aksainfix +ainfix *c2V1c1NAainfix =V0aksainfix *c2V1NIainfix &gt;=V1c0FAais_valueaSaKainfix =V0aksainfix +ainfix *c2V2c1NIainfix &gt;=V2c0FAais_valueaKaAppVVCV5aKainfix =aKV6Iainfix =V0aksainfix +ainfix *c2V7c1Aainfix =V0aksainfix *c2V7NIainfix &gt;=V7c0FAais_valueaAppaKV6Iainfix =V6aAppaKaKIainfix =V4aksainfix +ainfix *c2V8c1Aainfix =V6aKIainfix =V4aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV6FAainfix =V4aksV9Aainfix &gt;=V9c0EaSainfix =V0aksainfix +ainfix *c2V11c1NAainfix =V0aksainfix *c2V11NIainfix &gt;=V11c0FAais_valueaAppaSV10Iainfix =V10aAppaKaKIainfix =V4aksainfix +ainfix *c2V12c1Aainfix =V10aKIainfix =V4aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV10FAainfix =V4aksV13Aainfix &gt;=V13c0EaAppaKVainfix =V14aAppaKaKIainfix =V0aksainfix +ainfix *c2V16c1Aainfix =V14aKIainfix =V0aksainfix *c2V16Iainfix &gt;=V16c0FAais_valueV14Iainfix =V15aAppaKaKIainfix =V4aksainfix +ainfix *c2V17c1Aainfix =V15aKIainfix =V4aksainfix *c2V17Iainfix &gt;=V17c0FAais_valueV15FAainfix =V4aksV18Aainfix &gt;=V18c0EaAppaSVainfix =V0aksainfix +ainfix *c2V21c1NAainfix =V0aksainfix *c2V21NIainfix &gt;=V21c0FAais_valueaAppaAppaSV19V20Iainfix =V20aAppaKaKIainfix =V4aksainfix +ainfix *c2V22c1Aainfix =V20aKIainfix =V4aksainfix *c2V22Iainfix &gt;=V22c0FAais_valueV20FAainfix =V4aksV23Aainfix &gt;=V23c0EaAppaAppaSVVainfix =V28aAppaKaKIainfix =V0aksainfix +ainfix *c2V29c1Aainfix =V28aKIainfix =V0aksainfix *c2V29Iainfix &gt;=V29c0FAais_valueV28Iainfix =V28aAppaKaKIainfix =V27aksainfix +ainfix *c2V30c1Aainfix =V28aKIainfix =V27aksainfix *c2V30Iainfix &gt;=V30c0FAais_valueV28FAainfix =V27aksV31Aainfix &gt;=V31c0ELaAppaAppV24V26aAppV25V26Iainfix =V26aAppaKaKIainfix =V4aksainfix +ainfix *c2V32c1Aainfix =V26aKIainfix =V4aksainfix *c2V32Iainfix &gt;=V32c0FAais_valueV26FAainfix =V4aksV33Aainfix &gt;=V33c0EwfIainfix =V5aAppaKaKIainfix =V3aksainfix +ainfix *c2V34c1Aainfix =V5aKIainfix =V3aksainfix *c2V34Iainfix &gt;=V34c0FAais_valueV5FAainfix =V3aksV35Aainfix &gt;=V35c0EIainfix =V0aksV36Aainfix &gt;=V36c0EF">
+    shape="CNainfix =V0aksainfix +ainfix *c2V1c1ANainfix =V0aksainfix *c2V1Iainfix &gt;=V1c0FAais_valueaSaSNainfix =V0aksainfix +ainfix *c2V2c1Iainfix &gt;=V2c0FAais_valueaKaKCainfix =aKV6Iainfix =V0aksainfix +ainfix *c2V7c1ANainfix =V0aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueaAppaKV6Iainfix =V6aAppaKaKIainfix =V4aksainfix +ainfix *c2V8c1Aainfix =V6aKIainfix =V4aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV6FAainfix =V4aksV9Aainfix &gt;=V9c0EaKNainfix =V0aksainfix +ainfix *c2V11c1ANainfix =V0aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueaAppaSV10Iainfix =V10aAppaKaKIainfix =V4aksainfix +ainfix *c2V12c1Aainfix =V10aKIainfix =V4aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV10FAainfix =V4aksV13Aainfix &gt;=V13c0EaSainfix =V14aAppaKaKIainfix =V0aksainfix +ainfix *c2V16c1Aainfix =V14aKIainfix =V0aksainfix *c2V16Iainfix &gt;=V16c0FAais_valueV14Iainfix =V15aAppaKaKIainfix =V4aksainfix +ainfix *c2V17c1Aainfix =V15aKIainfix =V4aksainfix *c2V17Iainfix &gt;=V17c0FAais_valueV15FAainfix =V4aksV18Aainfix &gt;=V18c0EaAppaKVNainfix =V0aksainfix +ainfix *c2V21c1ANainfix =V0aksainfix *c2V21Iainfix &gt;=V21c0FAais_valueaAppaAppaSV19V20Iainfix =V20aAppaKaKIainfix =V4aksainfix +ainfix *c2V22c1Aainfix =V20aKIainfix =V4aksainfix *c2V22Iainfix &gt;=V22c0FAais_valueV20FAainfix =V4aksV23Aainfix &gt;=V23c0EaAppaSVainfix =V28aAppaKaKIainfix =V0aksainfix +ainfix *c2V29c1Aainfix =V28aKIainfix =V0aksainfix *c2V29Iainfix &gt;=V29c0FAais_valueV28Iainfix =V28aAppaKaKIainfix =V27aksainfix +ainfix *c2V30c1Aainfix =V28aKIainfix =V27aksainfix *c2V30Iainfix &gt;=V30c0FAais_valueV28FAainfix =V27aksV31Aainfix &gt;=V31c0ELaAppaAppV24V26aAppV25V26Iainfix =V26aAppaKaKIainfix =V4aksainfix +ainfix *c2V32c1Aainfix =V26aKIainfix =V4aksainfix *c2V32Iainfix &gt;=V32c0FAais_valueV26FAainfix =V4aksV33Aainfix &gt;=V33c0EaAppaAppaSVVfwV5Iainfix =V5aAppaKaKIainfix =V3aksainfix +ainfix *c2V34c1Aainfix =V5aKIainfix =V3aksainfix *c2V34Iainfix &gt;=V34c0FAais_valueV5FAainfix =V3aksV35Aainfix &gt;=V35c0EaAppVVV0Iainfix =V0aksV36Aainfix &gt;=V36c0EF">
     <label
      name="expl:VC for reduction3"/>
     <transf
@@ -1237,7 +1293,7 @@
       sum="cb97ead5f5d1e395780100bebb2c9d3c"
       proved="true"
       expanded="false"
-      shape="CV0aSainfix =V0aksainfix +ainfix *c2V1c1NAainfix =V0aksainfix *c2V1NIainfix &gt;=V1c0FAais_valueaSaKtaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+      shape="postconditionCNainfix =V0aksainfix +ainfix *c2V1c1ANainfix =V0aksainfix *c2V1Iainfix &gt;=V1c0FAais_valueaSaStaKtaAppVVV0Iainfix =V0aksV4Aainfix &gt;=V4c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1257,7 +1313,7 @@
       sum="73e34a2610dfbe79707779c29805eb95"
       proved="true"
       expanded="false"
-      shape="CV0aStaKainfix =V0aksainfix +ainfix *c2V1c1NIainfix &gt;=V1c0FAais_valueaKaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+      shape="postconditionCtaSNainfix =V0aksainfix +ainfix *c2V1c1Iainfix &gt;=V1c0FAais_valueaKaKtaAppVVV0Iainfix =V0aksV4Aainfix &gt;=V4c0EF">
       <label
        name="expl:VC for reduction3"/>
       <transf
@@ -1272,7 +1328,7 @@
         sum="c19c39e4617ed8e20231ba8de05af749"
         proved="true"
         expanded="false"
-        shape="CV0aStaKais_valueaKaAppVVtIainfix =V0aksV3Aainfix &gt;=V3c0EF">
+        shape="CtaSais_valueaKaKtaAppVVV0Iainfix =V0aksV3Aainfix &gt;=V3c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1292,7 +1348,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="4"
+         prover="6"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1308,7 +1364,7 @@
         sum="8d09574fde08fefed4ca7b0ef5e8c7a6"
         proved="true"
         expanded="false"
-        shape="CV0aStaKainfix =V0aksainfix +ainfix *c2V1c1NIainfix &gt;=V1c0FaAppVVtIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+        shape="CtaSNainfix =V0aksainfix +ainfix *c2V1c1Iainfix &gt;=V1c0FaKtaAppVVV0Iainfix =V0aksV4Aainfix &gt;=V4c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1330,7 +1386,7 @@
       sum="49c7b118935e956f0110e06920d35f0f"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVainfix =V1aksV3Aainfix &gt;=V3c0EIainfix =V0aksV4Aainfix &gt;=V4c0EF">
+      shape="preconditionCtaStaKainfix =V1aksV3Aainfix &gt;=V3c0EaAppVVV0Iainfix =V0aksV4Aainfix &gt;=V4c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1339,7 +1395,7 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.77"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
@@ -1350,7 +1406,7 @@
       sum="f9db68abb262a229743826cff8fee4d0"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKainfix =V2aksV4Aainfix &gt;=V4c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      shape="preconditionCtaStaKCainfix =V2aksV4Aainfix &gt;=V4c0EaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EaAppVVV0Iainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1370,7 +1426,7 @@
       sum="83200969c467c78b66758e2b546ed807"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKainfix =aKV4Iainfix =V0aksainfix +ainfix *c2V5c1Aainfix =V0aksainfix *c2V5NIainfix &gt;=V5c0FAais_valueaAppaKV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      shape="postconditionCtaStaKCainfix =aKV4Iainfix =V0aksainfix +ainfix *c2V5c1ANainfix =V0aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueaAppaKV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
       <label
        name="expl:VC for reduction3"/>
       <transf
@@ -1385,7 +1441,7 @@
         sum="24d9bd08f876a350701eb6410cd007cb"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKais_valueaAppaKV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V5c1Aainfix =V4aKIainfix =V2aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueV4FIainfix =V2aksV6Aainfix &gt;=V6c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V11c1Aainfix =V3aKIainfix =V1aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EIainfix =V0aksV13Aainfix &gt;=V13c0EF">
+        shape="CtaStaKCais_valueaAppaKV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V5c1Aainfix =V4aKIainfix =V2aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueV4FIainfix =V2aksV6Aainfix &gt;=V6c0EaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V11c1Aainfix =V3aKIainfix =V1aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EaAppVVV0Iainfix =V0aksV13Aainfix &gt;=V13c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1405,7 +1461,7 @@
         sum="4b3b4ee124cb19e4e55ce61b43800f97"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKainfix =V0aksainfix *c2V5NIainfix &gt;=V5c0FIainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        shape="CtaStaKCNainfix =V0aksainfix *c2V5Iainfix &gt;=V5c0FIainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1426,7 +1482,7 @@
         sum="38fd3827bf001bb3a64dadc0be985ec6"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKainfix =aKV4Iainfix =V0aksainfix +ainfix *c2V5c1Iainfix &gt;=V5c0FIainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        shape="CtaStaKCainfix =aKV4Iainfix =V0aksainfix +ainfix *c2V5c1Iainfix &gt;=V5c0FIainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1449,7 +1505,7 @@
       sum="2b0436cbb2540b00337d37e3f74e32dd"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSainfix =V2aksV4Aainfix &gt;=V4c0EaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      shape="preconditionCtaStaKCtaKainfix =V2aksV4Aainfix &gt;=V4c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EaAppVVV0Iainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1469,7 +1525,7 @@
       sum="fd3927ba016816cce444740ae2831ce1"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaSainfix =V0aksainfix +ainfix *c2V5c1NAainfix =V0aksainfix *c2V5NIainfix &gt;=V5c0FAais_valueaAppaSV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaKVtaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      shape="postconditionCtaStaKCtaKNainfix =V0aksainfix +ainfix *c2V5c1ANainfix =V0aksainfix *c2V5Iainfix &gt;=V5c0FAais_valueaAppaSV4Iainfix =V4aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4FIainfix =V2aksV7Aainfix &gt;=V7c0EaStaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1490,7 +1546,7 @@
       sum="abc23dd31e494a2de845ed97a3440f8b"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V2aksV5Aainfix &gt;=V5c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      shape="preconditionCtaStaKCtaKtaSainfix =V2aksV5Aainfix &gt;=V5c0EaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EaAppVVV0Iainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1510,7 +1566,7 @@
       sum="62d481cd0a87e11a04b219cd3290b267"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aAppaKaKIainfix =V0aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V0aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4Iainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      shape="postconditionCtaStaKCtaKtaSainfix =V4aAppaKaKIainfix =V0aksainfix +ainfix *c2V6c1Aainfix =V4aKIainfix =V0aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV4Iainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
       <label
        name="expl:VC for reduction3"/>
       <transf
@@ -1525,7 +1581,7 @@
         sum="d1253237a1f273bb31540d328740a6b4"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVais_valueV4Iainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V5aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV5FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V11c1Aainfix =V3aKIainfix =V1aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EIainfix =V0aksV13Aainfix &gt;=V13c0EF">
+        shape="CtaStaKCtaKtaSais_valueV4Iainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V6c1Aainfix =V5aKIainfix =V2aksainfix *c2V6Iainfix &gt;=V6c0FAais_valueV5FIainfix =V2aksV7Aainfix &gt;=V7c0EaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V11c1Aainfix =V3aKIainfix =V1aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV3FIainfix =V1aksV12Aainfix &gt;=V12c0EaAppVVV0Iainfix =V0aksV13Aainfix &gt;=V13c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1545,7 +1601,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="4"
+         prover="6"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -1561,7 +1617,7 @@
         sum="5bd103ce953748df1c966fcf30bdb102"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aKIainfix =V0aksainfix *c2V6Iainfix &gt;=V6c0FIainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        shape="CtaStaKCtaKtaSainfix =V4aKIainfix =V0aksainfix *c2V6Iainfix &gt;=V6c0FIainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1582,7 +1638,7 @@
         sum="a78f989070a97cc29ccedcdde84100d7"
         proved="true"
         expanded="false"
-        shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVainfix =V4aAppaKaKIainfix =V0aksainfix +ainfix *c2V6c1Iainfix &gt;=V6c0FIainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaSVtaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+        shape="CtaStaKCtaKtaSainfix =V4aAppaKaKIainfix =V0aksainfix +ainfix *c2V6c1Iainfix &gt;=V6c0FIainfix =V5aAppaKaKIainfix =V2aksainfix +ainfix *c2V7c1Aainfix =V5aKIainfix =V2aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueV5FIainfix =V2aksV8Aainfix &gt;=V8c0EaAppaKVtaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
         <label
          name="expl:VC for reduction3"/>
         <proof
@@ -1604,7 +1660,7 @@
       sum="84cfe1cb6acadd494947cedc6f8bb83c"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVainfix =V2aksV6Aainfix &gt;=V6c0EaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      shape="preconditionCtaStaKCtaKtaStaAppaKVainfix =V2aksV6Aainfix &gt;=V6c0EaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EaAppVVV0Iainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1624,7 +1680,7 @@
       sum="289f6b378905903a673ee3f48973d600"
       proved="true"
       expanded="true"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVainfix =V0aksainfix +ainfix *c2V7c1NAainfix =V0aksainfix *c2V7NIainfix &gt;=V7c0FAais_valueaAppaAppaSV5V6Iainfix =V6aAppaKaKIainfix =V2aksainfix +ainfix *c2V8c1Aainfix =V6aKIainfix =V2aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV6FIainfix =V2aksV9Aainfix &gt;=V9c0EaAppaAppaSVVtwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EIainfix =V0aksV14Aainfix &gt;=V14c0EF">
+      shape="postconditionCtaStaKCtaKtaStaAppaKVNainfix =V0aksainfix +ainfix *c2V7c1ANainfix =V0aksainfix *c2V7Iainfix &gt;=V7c0FAais_valueaAppaAppaSV5V6Iainfix =V6aAppaKaKIainfix =V2aksainfix +ainfix *c2V8c1Aainfix =V6aKIainfix =V2aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV6FIainfix =V2aksV9Aainfix &gt;=V9c0EaAppaSVtaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V12c1Aainfix =V3aKIainfix =V1aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV3FIainfix =V1aksV13Aainfix &gt;=V13c0EaAppVVV0Iainfix =V0aksV14Aainfix &gt;=V14c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1645,7 +1701,7 @@
       sum="61da6e731f4f9917a9948306ffbfbc10"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V2aksV8Aainfix &gt;=V8c0EwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EIainfix =V0aksV11Aainfix &gt;=V11c0EF">
+      shape="preconditionCtaStaKCtaKtaStaAppaKVtaAppaSVainfix =V2aksV8Aainfix &gt;=V8c0EaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V9c1Aainfix =V3aKIainfix =V1aksainfix *c2V9Iainfix &gt;=V9c0FAais_valueV3FIainfix =V1aksV10Aainfix &gt;=V10c0EaAppVVV0Iainfix =V0aksV11Aainfix &gt;=V11c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1665,7 +1721,7 @@
       sum="552c9c347486b05e7feab59bbdce83f6"
       proved="true"
       expanded="true"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V9aksV10Aainfix &gt;=V10c0ELaAppaAppV6V8aAppV7V8Iainfix =V8aAppaKaKIainfix =V2aksainfix +ainfix *c2V11c1Aainfix =V8aKIainfix =V2aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV8FIainfix =V2aksV12Aainfix &gt;=V12c0EwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V13c1Aainfix =V3aKIainfix =V1aksainfix *c2V13Iainfix &gt;=V13c0FAais_valueV3FIainfix =V1aksV14Aainfix &gt;=V14c0EIainfix =V0aksV15Aainfix &gt;=V15c0EF">
+      shape="preconditionCtaStaKCtaKtaStaAppaKVtaAppaSVainfix =V9aksV10Aainfix &gt;=V10c0ELaAppaAppV6V8aAppV7V8Iainfix =V8aAppaKaKIainfix =V2aksainfix +ainfix *c2V11c1Aainfix =V8aKIainfix =V2aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV8FIainfix =V2aksV12Aainfix &gt;=V12c0EaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V13c1Aainfix =V3aKIainfix =V1aksainfix *c2V13Iainfix &gt;=V13c0FAais_valueV3FIainfix =V1aksV14Aainfix &gt;=V14c0EaAppVVV0Iainfix =V0aksV15Aainfix &gt;=V15c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1686,7 +1742,7 @@
       sum="93722f03d62ddbe342aec80171fa0b1e"
       proved="true"
       expanded="true"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVainfix =V10aAppaKaKIainfix =V0aksainfix +ainfix *c2V11c1Aainfix =V10aKIainfix =V0aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV10Iainfix =V10aAppaKaKIainfix =V9aksainfix +ainfix *c2V12c1Aainfix =V10aKIainfix =V9aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV10FIainfix =V9aksV13Aainfix &gt;=V13c0ELaAppaAppV6V8aAppV7V8Iainfix =V8aAppaKaKIainfix =V2aksainfix +ainfix *c2V14c1Aainfix =V8aKIainfix =V2aksainfix *c2V14Iainfix &gt;=V14c0FAais_valueV8FIainfix =V2aksV15Aainfix &gt;=V15c0EwtIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V16c1Aainfix =V3aKIainfix =V1aksainfix *c2V16Iainfix &gt;=V16c0FAais_valueV3FIainfix =V1aksV17Aainfix &gt;=V17c0EIainfix =V0aksV18Aainfix &gt;=V18c0EF">
+      shape="postconditionCtaStaKCtaKtaStaAppaKVtaAppaSVainfix =V10aAppaKaKIainfix =V0aksainfix +ainfix *c2V11c1Aainfix =V10aKIainfix =V0aksainfix *c2V11Iainfix &gt;=V11c0FAais_valueV10Iainfix =V10aAppaKaKIainfix =V9aksainfix +ainfix *c2V12c1Aainfix =V10aKIainfix =V9aksainfix *c2V12Iainfix &gt;=V12c0FAais_valueV10FIainfix =V9aksV13Aainfix &gt;=V13c0ELaAppaAppV6V8aAppV7V8Iainfix =V8aAppaKaKIainfix =V2aksainfix +ainfix *c2V14c1Aainfix =V8aKIainfix =V2aksainfix *c2V14Iainfix &gt;=V14c0FAais_valueV8FIainfix =V2aksV15Aainfix &gt;=V15c0EaAppaAppaSVVtwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V16c1Aainfix =V3aKIainfix =V1aksainfix *c2V16Iainfix &gt;=V16c0FAais_valueV3FIainfix =V1aksV17Aainfix &gt;=V17c0EaAppVVV0Iainfix =V0aksV18Aainfix &gt;=V18c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1707,7 +1763,7 @@
       sum="540266bc065b39379daff323f29b18ed"
       proved="true"
       expanded="false"
-      shape="CV0aStaKtaAppVVCV3aKtaStaAppaKVtaAppaSVtaAppaAppaSVVtwfIainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V8c1Aainfix =V3aKIainfix =V1aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV3FIainfix =V1aksV9Aainfix &gt;=V9c0EIainfix =V0aksV10Aainfix &gt;=V10c0EF">
+      shape="unreachable pointCtaStaKCtaKtaStaAppaKVtaAppaSVtaAppaAppaSVVfwV3Iainfix =V3aAppaKaKIainfix =V1aksainfix +ainfix *c2V8c1Aainfix =V3aKIainfix =V1aksainfix *c2V8Iainfix &gt;=V8c0FAais_valueV3FIainfix =V1aksV9Aainfix &gt;=V9c0EaAppVVV0Iainfix =V0aksV10Aainfix &gt;=V10c0EF">
       <label
        name="expl:VC for reduction3"/>
       <proof
@@ -1724,15 +1780,15 @@
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.29"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="4"
+       prover="6"
        timelimit="10"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.39"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
     </transf>

@@ -65,6 +65,8 @@ module Lskept = struct
   let add_lskept sls ls = if good_for_inst ls then Sls.add ls sls else sls
 
   let all_lskept task sls = match task.task_decl.td_node with
+    | Decl { d_node = Dparam ls } ->
+        add_lskept sls ls
     | Decl { d_node = Dlogic l } ->
         List.fold_left (fun sls (ls,_) -> add_lskept sls ls) sls l
     | _ -> sls

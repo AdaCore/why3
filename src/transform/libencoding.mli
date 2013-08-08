@@ -39,14 +39,11 @@ val d_ts_type : decl
 (* function symbol mapping ty_type^n to ty_type *)
 val ls_of_ts : tysymbol -> lsymbol
 
-(* function symbol mapping ty_type^n to int *)
-val ls_int_of_ty : lsymbol
-
-(* function symbol selecting ty_type from ty_type^n *)
-val ls_selects_of_ts : tysymbol -> lsymbol list
-
 (* convert a type to a term of type ty_type *)
 val term_of_ty : term Mtv.t -> ty -> term
+
+(* add type args to the signature of a polymorphic lsymbol *)
+val ls_extend : lsymbol -> lsymbol
 
 (* rewrite a closed formula modulo the given free typevars *)
 val type_close : Stv.t -> (term Mtv.t -> 'a -> term) -> 'a -> term
@@ -56,9 +53,6 @@ val t_type_close : (term Mtv.t -> term -> term) -> term -> term
 
 (* convert a type declaration to a lsymbol declaration *)
 val lsdecl_of_ts : tysymbol -> decl
-
-(* convert a type declaration to a list of lsymbol declarations *)
-val lsdecl_of_ts_select : tysymbol -> decl list
 
 (* a pre-id for vsymbols and lsymbols that produce non-kept values *)
 val id_unprotected : string -> Ident.preid
@@ -74,6 +68,9 @@ val is_protected_ls : Sty.t -> lsymbol -> bool
 
 (* monomorphise wrt the set of kept types, and a symbol map *)
 val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
+
+(* replace all non-kept types with ty_base *)
+val monomorphise_task : Task.task Trans.trans
 
 (* replace type variables in a goal with fresh type constants *)
 val monomorphise_goal : Task.task Trans.trans

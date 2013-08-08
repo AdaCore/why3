@@ -118,17 +118,16 @@ LIB_PARSER = ptree denv glob parser typing lexer
 LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection
 
-LIB_TRANSFORM = simplify_recursive_definition simplify_formula \
-		inlining gnat_float split_goal induction \
+LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
-		libencoding discriminate protect_finite \
-		encoding encoding_select rec_logic \
-		encoding_decorate encoding_decoexp encoding_twin \
-		encoding_explicit encoding_guard encoding_sort \
-		encoding_instantiate simplify_array filter_trigger \
+		libencoding discriminate encoding encoding_select \
+		encoding_guards_full encoding_tags_full \
+		encoding_guards encoding_tags encoding_twin \
+		encoding_sort simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
-		eval_match instantiate_predicate smoke_detector
+		eval_match instantiate_predicate smoke_detector \
+		gnat_float
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs \
 		simplify gappa cvc3 yices mathematica

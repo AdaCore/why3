@@ -27,27 +27,25 @@ let meta_enco_kept = register_meta_excl "enco_kept" [MTstring]
   ~desc:"Specify@ the@ type@ protection@ transformation:@;  \
     @[\
       - @[<hov 2>twin: use@ conversion@ functions@ between@ the@ kept@ types@ \
-            and@ the@ universal@ type@]@\n\
-      - @[<hov 2>instantiate: instantiate the axioms with the kept types@ \
-            and@ throw@ out@ polymorphic@ formulas@ (incomplete).@]@\n\
-      - @[<hov 2>instantiate_complete: same@ as@ 'instantiate'@ but@ keep@ \
-            polymorphic@ formulas.@]\
+            and@ the@ universal@ type@]@\
     @]"
 
-let meta_enco_poly   = register_meta_excl "enco_poly"   [MTstring]
+let meta_enco_poly = register_meta_excl "enco_poly" [MTstring]
   ~desc:"Specify@ the@ type@ encoding@ transformation:@;  \
     @[\
-      - @[<hov 2>decorate: put@ type@ annotations@ on@ top@ of@ terms@]@\n\
-      - @[<hov 2>guard: add@ type@ conditions@ under@ quantifiers.@]\
+      - @[<hov 2>tags: protect@ variables@ in@ equalities@ \
+            with@ type@ annotations@]@\n\
+      - @[<hov 2>guards: protect@ variables@ in@ equalities@ \
+            with@ type@ conditions@]\n\
+      - @[<hov 2>tags_full: put@ type@ annotations@ on@ top@ \
+            of@ every@ term@]@\n\
+      - @[<hov 2>guards_full: add@ type@ conditions@ for@ every@ variable.@]\
     @]"
 
 let def_enco_select_smt  = "none"
 let def_enco_kept_smt    = "twin"
-let def_enco_poly_smt    = "decorate"
-
-let def_enco_select_tptp = "none"
-let def_enco_kept_tptp   = "twin"
-let def_enco_poly_tptp   = "decorate"
+let def_enco_poly_smt    = "guards"
+let def_enco_poly_tptp   = "tags"
 
 let ft_select_kept = ((Hstr.create 17) : (Env.env,Sty.t) Trans.flag_trans)
 let ft_enco_kept   = ((Hstr.create 17) : (Env.env,task)  Trans.flag_trans)
@@ -62,6 +60,11 @@ let select_kept def env =
   in
   Trans.store trans
 
+let forget_kept = Trans.fold (fun hd task ->
+  match hd.task_decl.td_node with
+    | Meta (m,_) when meta_equal m Libencoding.meta_kept -> task
+    | _ -> add_tdecl task hd.task_decl) None
+
 let encoding_smt env = Trans.seq [
   Libencoding.monomorphise_goal;
   select_kept def_enco_select_smt env;
@@ -71,11 +74,8 @@ let encoding_smt env = Trans.seq [
 
 let encoding_tptp env = Trans.seq [
   Libencoding.monomorphise_goal;
-  select_kept def_enco_select_tptp env;
-  Trans.print_meta Libencoding.debug Libencoding.meta_kept;
-  Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_tptp env;
-  Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_tptp env;
-  Protect_finite.protect_finite]
+  forget_kept;
+  Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_tptp env]
 
 let () = register_env_transform "encoding_smt" encoding_smt
   ~desc:"Encode@ polymorphic@ types@ for@ provers@ with@ sorts."

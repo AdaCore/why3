@@ -15,16 +15,24 @@
   version="2.4.1"/>
  <prover
   id="3"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.3pl4"/>
  <prover
-  id="4"
+  id="5"
   name="Z3"
   version="2.19"/>
  <prover
-  id="5"
+  id="6"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../flag2.mlw"
   verified="true"
@@ -39,12 +47,12 @@
     name="nb_occ_split"
     locfile="../flag2.mlw"
     loclnum="32" loccnumb="8" loccnume="20"
-    sum="ad535741a77580cf1a4aa0eb5a40bbb9"
+    sum="cf6bd14d2ab032d457f4f2f5459cb7e6"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occV0V1V3V4ainfix +anb_occV0V1V2V4anb_occV0V2V3V4Iainfix &lt;=V2V3Aainfix &lt;=V1V2F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="flag2_WP_Flag_nb_occ_split_1.v"
@@ -54,15 +62,49 @@
     </proof>
    </goal>
    <goal
+    name="nb_occ_ext"
+    locfile="../flag2.mlw"
+    loclnum="37" loccnumb="8" loccnume="18"
+    sum="50ecdb99f9c45dc61091c290ad605a4d"
+    proved="true"
+    expanded="true"
+    shape="ainfix =anb_occV0V2V3V4anb_occV1V2V3V4Iainfix =agetV0V5agetV1V5Iainfix &lt;V5V3Aainfix &lt;=V2V5FF">
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     edited="flag2_Flag_nb_occ_ext_1.v"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.57"/>
+    </proof>
+   </goal>
+   <goal
     name="nb_occ_store_outside_up"
     locfile="../flag2.mlw"
-    loclnum="37" loccnumb="8" loccnume="31"
-    sum="0b35c9a70d54d772df34f10dadb0962e"
+    loclnum="42" loccnumb="8" loccnume="31"
+    sum="504ad4cff71c2a68ff83c3afd7b4895a"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix &lt;=V2V3Aainfix &lt;=V1V2F">
     <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="flag2_WP_Flag_nb_occ_store_outside_up_1.v"
@@ -74,13 +116,29 @@
    <goal
     name="nb_occ_store_outside_down"
     locfile="../flag2.mlw"
-    loclnum="41" loccnumb="8" loccnume="33"
-    sum="c914b544feaaa749280d599028142a28"
+    loclnum="46" loccnumb="8" loccnume="33"
+    sum="1a5b471be54e771bac4e35c8226c71c2"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix &lt;=V1V2Aainfix &lt;V3V1F">
     <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
      prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="flag2_WP_Flag_nb_occ_store_outside_down_1.v"
@@ -92,13 +150,13 @@
    <goal
     name="nb_occ_store_eq_eq"
     locfile="../flag2.mlw"
-    loclnum="45" loccnumb="8" loccnume="26"
-    sum="711661fcb73d3ad8fcfd64deb848b8ac"
+    loclnum="50" loccnumb="8" loccnume="26"
+    sum="d3bfd5626847a6598bf4ea9b96af169d"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -114,15 +172,15 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -133,61 +191,77 @@
    <goal
     name="nb_occ_store_eq_neq"
     locfile="../flag2.mlw"
-    loclnum="50" loccnumb="8" loccnume="27"
-    sum="5de3bd2e200ead47ac30359ec9933fbf"
+    loclnum="55" loccnumb="8" loccnume="27"
+    sum="d5041b0c9f158f6c9bdd529cfc554a05"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V4V1V2V4ainfix +anb_occV0V1V2V4c1INainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="10"
      memlimit="1000"
      edited="flag2_WP_Flag_nb_occ_store_eq_neq_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.00"/>
+     <result status="valid" time="5.16"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_neq_eq"
     locfile="../flag2.mlw"
-    loclnum="55" loccnumb="8" loccnume="27"
-    sum="12320cd839706b112c6bb361ed28fda8"
+    loclnum="60" loccnumb="8" loccnume="27"
+    sum="b5e738403e3b44086121cefae0f58fc5"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V5V1V2V4ainfix -anb_occV0V1V2V4c1Iainfix =agetV0V3V4INainfix =V4V5Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
-     prover="5"
-     timelimit="34"
+     prover="6"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.27"/>
+     <result status="valid" time="0.14"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.51"/>
     </proof>
    </goal>
    <goal
     name="nb_occ_store_neq_neq"
     locfile="../flag2.mlw"
-    loclnum="60" loccnumb="8" loccnume="28"
-    sum="7243f6dd14542a265d6f19a77b8f7b36"
+    loclnum="65" loccnumb="8" loccnume="28"
+    sum="d4829527ed2b53fbacbf14227901c4bf"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occasetV0V3V5V1V2V4anb_occV0V1V2V4INainfix =agetV0V3V4INainfix =V4V5Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
     <proof
-     prover="5"
-     timelimit="8"
+     prover="6"
+     timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="2.28"/>
+     <result status="valid" time="0.12"/>
+    </proof>
+    <proof
+     prover="7"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.76"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter swap"
     locfile="../flag2.mlw"
-    loclnum="66" loccnumb="5" loccnume="9"
+    loclnum="71" loccnumb="5" loccnume="9"
     expl="VC for swap"
-    sum="6b8d375a6b8d2d4e2ac2a110a04114b0"
+    sum="fdb7851894c5eacf7d1c344fad17c67e"
     proved="true"
     expanded="true"
     shape="ainfix =anb_occV4V5V6V7anb_occV2V5V6V7Iainfix &lt;V1V6Aainfix &lt;=V5V1Aainfix &lt;V0V6Aainfix &lt;=V5V0FAainfix =agetV4V8agetV2V8INainfix =V8V1ANainfix =V8V0FAainfix =agetV4V1agetV2V0Aainfix =agetV4V0agetV2V1Iainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -200,9 +274,9 @@
      <goal
       name="WP_parameter swap.1"
       locfile="../flag2.mlw"
-      loclnum="66" loccnumb="5" loccnume="9"
+      loclnum="71" loccnumb="5" loccnume="9"
       expl="1. postcondition"
-      sum="09319b2c5d927672f5bfda3dd9dedcce"
+      sum="c0e9484eab0425f59ac19453f65d7f2e"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agetV4V0agetV2V1Iainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -220,9 +294,9 @@
      <goal
       name="WP_parameter swap.2"
       locfile="../flag2.mlw"
-      loclnum="66" loccnumb="5" loccnume="9"
+      loclnum="71" loccnumb="5" loccnume="9"
       expl="2. postcondition"
-      sum="42ad93ee243c6eb335fbaddce5a38e63"
+      sum="1e5341027dd0086adaae09666678ce66"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agetV4V1agetV2V0Iainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -240,9 +314,9 @@
      <goal
       name="WP_parameter swap.3"
       locfile="../flag2.mlw"
-      loclnum="66" loccnumb="5" loccnume="9"
+      loclnum="71" loccnumb="5" loccnume="9"
       expl="3. postcondition"
-      sum="80ca544da52e3ae855718b5e0d9497de"
+      sum="0cf2af3473a7d1c4396f231a390b80eb"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agetV4V5agetV2V5INainfix =V5V1ANainfix =V5V0FIainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -260,9 +334,9 @@
      <goal
       name="WP_parameter swap.4"
       locfile="../flag2.mlw"
-      loclnum="66" loccnumb="5" loccnume="9"
+      loclnum="71" loccnumb="5" loccnume="9"
       expl="4. postcondition"
-      sum="62e2a15684ec1e487f72c4d5a6e59a55"
+      sum="648a4c7eb354149d017d2eb7414a7fa7"
       proved="true"
       expanded="true"
       shape="postconditionainfix =anb_occV4V5V6V7anb_occV2V5V6V7Iainfix &lt;V1V6Aainfix &lt;=V5V1Aainfix &lt;V0V6Aainfix &lt;=V5V0FIainfix =V4asetV3V1agetV2V0FIainfix =V3asetV2V0agetV2V1FFF">
@@ -282,9 +356,9 @@
    <goal
     name="WP_parameter dutch_flag"
     locfile="../flag2.mlw"
-    loclnum="78" loccnumb="5" loccnume="15"
+    loclnum="83" loccnumb="5" loccnume="15"
     expl="VC for dutch_flag"
-    sum="031fedc22d5bd024ea69bddf72e823de"
+    sum="d08b9263a32be1adc17a2f9cceb499bb"
     proved="true"
     expanded="true"
     shape="iainfix =anb_occV5c0V0V6anb_occV1c0V0V6FAamonochromeV5V8V0aRedAamonochromeV5V7V8aWhiteAamonochromeV5c0V7aBlueEECainfix &lt;ainfix -V2V11ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV9c0V0V12anb_occV1c0V0V12FAamonochromeV9V2V0aRedAamonochromeV9V10V11aWhiteAamonochromeV9c0V10aBlueAainfix &lt;=V2V0Aainfix &lt;=V11V2Aainfix &lt;=V10V11Aainfix &lt;=c0V10Iainfix =V11ainfix +V3c1FIainfix =V10ainfix +V4c1FIainfix =anb_occV9V13V14V15anb_occV5V13V14V15Iainfix &lt;V3V14Aainfix &lt;=V13V3Aainfix &lt;V4V14Aainfix &lt;=V13V4FAainfix =agetV9V16agetV5V16INainfix =V16V3ANainfix =V16V4FAainfix =agetV9V3agetV5V4Aainfix =agetV9V4agetV5V3FaBlueainfix &lt;ainfix -V2V17ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV5c0V0V18anb_occV1c0V0V18FAamonochromeV5V2V0aRedAamonochromeV5V4V17aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V17V2Aainfix &lt;=V4V17Aainfix &lt;=c0V4Iainfix =V17ainfix +V3c1FaWhiteainfix &lt;ainfix -V19V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV20c0V0V21anb_occV1c0V0V21FAamonochromeV20V19V0aRedAamonochromeV20V4V3aWhiteAamonochromeV20c0V4aBlueAainfix &lt;=V19V0Aainfix &lt;=V3V19Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV20V22V23V24anb_occV5V22V23V24Iainfix &lt;V3V23Aainfix &lt;=V22V3Aainfix &lt;V19V23Aainfix &lt;=V22V19FAainfix =agetV20V25agetV5V25INainfix =V25V3ANainfix =V25V19FAainfix =agetV20V3agetV5V19Aainfix =agetV20V19agetV5V3FIainfix =V19ainfix -V2c1FaRedagetV5V3ainfix &lt;V3V2Iainfix =anb_occV5c0V0V26anb_occV1c0V0V26FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FAainfix =anb_occV1c0V0V27anb_occV1c0V0V27FAamonochromeV1V0V0aRedAamonochromeV1c0c0aWhiteAamonochromeV1c0c0aBlueAainfix &lt;=V0V0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V0FF">
@@ -297,9 +371,9 @@
      <goal
       name="WP_parameter dutch_flag.1"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="1. loop invariant init"
-      sum="7662c1c350e4ef4598264b060d286aca"
+      sum="0150fac86357d6fa82d089211a0ba680"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix &lt;=V0V0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V0FF">
@@ -322,7 +396,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -333,9 +407,9 @@
      <goal
       name="WP_parameter dutch_flag.2"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="2. loop invariant init"
-      sum="4d4518832cc1568639ff74bcef9045c7"
+      sum="73b03af11595dd2429657c983a113831"
       proved="true"
       expanded="true"
       shape="loop invariant initamonochromeV1c0c0aBlueIainfix &lt;=c0V0FF">
@@ -358,7 +432,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -369,9 +443,9 @@
      <goal
       name="WP_parameter dutch_flag.3"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="3. loop invariant init"
-      sum="a500da8ff152624aa4840cd6e9b6376b"
+      sum="b8707ae57f7e1a33af3c7b110134c32e"
       proved="true"
       expanded="true"
       shape="loop invariant initamonochromeV1c0c0aWhiteIainfix &lt;=c0V0FF">
@@ -394,7 +468,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -405,9 +479,9 @@
      <goal
       name="WP_parameter dutch_flag.4"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="4. loop invariant init"
-      sum="754a51137d308b9d250b7e7202d5b610"
+      sum="899f808f38761a3c1c0dfac6bcf2ac24"
       proved="true"
       expanded="true"
       shape="loop invariant initamonochromeV1V0V0aRedIainfix &lt;=c0V0FF">
@@ -430,7 +504,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -441,9 +515,9 @@
      <goal
       name="WP_parameter dutch_flag.5"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="5. loop invariant init"
-      sum="0ef5bf178fbb6aad60bf084967f6bcc8"
+      sum="5d05d1f78c3972f9b3bc1095bb140939"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix =anb_occV1c0V0V2anb_occV1c0V0V2FIainfix &lt;=c0V0FF">
@@ -474,7 +548,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -482,7 +556,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -493,9 +567,9 @@
      <goal
       name="WP_parameter dutch_flag.6"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="6. loop invariant preservation"
-      sum="fa6bbcd8537dcf71972870d2944584d3"
+      sum="0592de41d2e00689a9bf8fc8b791a3aa"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCainfix &lt;=V2V0Aainfix &lt;=V8V2Aainfix &lt;=V7V8Aainfix &lt;=c0V7Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -518,7 +592,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -529,9 +603,9 @@
      <goal
       name="WP_parameter dutch_flag.7"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="7. loop invariant preservation"
-      sum="463790169bf599963e4fa056defb9ef7"
+      sum="8300f7276f3b83e069dcc48f13946647"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCamonochromeV6c0V7aBlueIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -554,7 +628,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -565,9 +639,9 @@
      <goal
       name="WP_parameter dutch_flag.8"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="8. loop invariant preservation"
-      sum="a8760be3466a6e38f073886acdee37c6"
+      sum="94716a30b316eac32d25da7da402c7ac"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCamonochromeV6V7V8aWhiteIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -590,7 +664,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -601,9 +675,9 @@
      <goal
       name="WP_parameter dutch_flag.9"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="9. loop invariant preservation"
-      sum="357c0a8febe4ba19dd0b986e9ae34cac"
+      sum="e086c56e6caad5fcc62329303c17c4d4"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCamonochromeV6V2V0aRedIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -626,7 +700,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -637,9 +711,9 @@
      <goal
       name="WP_parameter dutch_flag.10"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="10. loop invariant preservation"
-      sum="2ad01dc462ce8554b0bc001a34f179f5"
+      sum="f99182fad1f53f5a15aefca3a4cee276"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCainfix =anb_occV6c0V0V9anb_occV1c0V0V9FIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V10V11V12anb_occV5V10V11V12Iainfix &lt;V3V11Aainfix &lt;=V10V3Aainfix &lt;V4V11Aainfix &lt;=V10V4FAainfix =agetV6V13agetV5V13INainfix =V13V3ANainfix =V13V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V14anb_occV1c0V0V14FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -670,7 +744,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -678,7 +752,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -689,9 +763,9 @@
      <goal
       name="WP_parameter dutch_flag.11"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="11. loop variant decrease"
-      sum="a22f5a83e168763b6c91727c5b2d255b"
+      sum="49a4edaf2dcc682fa45096ba371833c5"
       proved="true"
       expanded="true"
       shape="loop variant decreaseCainfix &lt;ainfix -V2V8ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -722,7 +796,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -730,7 +804,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -741,9 +815,9 @@
      <goal
       name="WP_parameter dutch_flag.12"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="12. loop invariant preservation"
-      sum="d51043ee56e6fdd794f207b8894a0d3b"
+      sum="a64139023daf718fcd9bcde1e63f5a3d"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueainfix &lt;=V2V0Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -766,7 +840,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -777,9 +851,9 @@
      <goal
       name="WP_parameter dutch_flag.13"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="13. loop invariant preservation"
-      sum="2c09d4ed40ba2acf504b1c5b9d29afbc"
+      sum="d2f9d786688582ea1358c13dac90ba6e"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueamonochromeV5c0V4aBlueIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -802,7 +876,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -813,9 +887,9 @@
      <goal
       name="WP_parameter dutch_flag.14"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="14. loop invariant preservation"
-      sum="ff460cb1eb00fc4e454f640f8c9179a5"
+      sum="4d2e1a02a43a990922cd347284b13412"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueamonochromeV5V4V6aWhiteIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -838,7 +912,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -849,9 +923,9 @@
      <goal
       name="WP_parameter dutch_flag.15"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="15. loop invariant preservation"
-      sum="5e614e0722a996773b1d5fb12dd0cf15"
+      sum="0b5cac0f032ff1810ade357029741b2d"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueamonochromeV5V2V0aRedIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -874,7 +948,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -885,9 +959,9 @@
      <goal
       name="WP_parameter dutch_flag.16"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="16. loop invariant preservation"
-      sum="205788e5210174791b0955ef2fcdf03c"
+      sum="3bf5221c1990645b90a3f745469fd9d1"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBlueainfix =anb_occV5c0V0V7anb_occV1c0V0V7FIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -918,7 +992,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -926,7 +1000,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -937,9 +1011,9 @@
      <goal
       name="WP_parameter dutch_flag.17"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="17. loop variant decrease"
-      sum="2a2a778b9e4230dced80be1b58039053"
+      sum="11c365d1939e7d6c9a6172541bb54d3d"
       proved="true"
       expanded="true"
       shape="loop variant decreaseCtaBlueainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -970,7 +1044,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -978,7 +1052,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -989,9 +1063,9 @@
      <goal
       name="WP_parameter dutch_flag.18"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="18. loop invariant preservation"
-      sum="bc0145c18a356e0ae973e2d586ba0a08"
+      sum="a67444beb1706f84198eb6e91aa62a56"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteainfix &lt;=V6V0Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1014,7 +1088,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1025,9 +1099,9 @@
      <goal
       name="WP_parameter dutch_flag.19"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="19. loop invariant preservation"
-      sum="fd04e7882501ab3b67536f7c5e08b42d"
+      sum="cccbbbcf27a0b380d117af25d0076ef7"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteamonochromeV7c0V4aBlueIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1050,7 +1124,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1061,9 +1135,9 @@
      <goal
       name="WP_parameter dutch_flag.20"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="20. loop invariant preservation"
-      sum="784c5e41052e853e2bfbd5da5f40adcd"
+      sum="b6b4229bbb1ab7b033a9b0ee79cec500"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteamonochromeV7V4V3aWhiteIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1086,7 +1160,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1097,9 +1171,9 @@
      <goal
       name="WP_parameter dutch_flag.21"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="21. loop invariant preservation"
-      sum="b50b8b1922c02720a71a3fc6966bbf90"
+      sum="9bfe81746af7b2529cc61d9827c05094"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteamonochromeV7V6V0aRedIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1122,7 +1196,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1133,9 +1207,9 @@
      <goal
       name="WP_parameter dutch_flag.22"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="22. loop invariant preservation"
-      sum="219349ba42efd0ad70a42a8f838232bf"
+      sum="d4e62507c4e9a5cb0cd3be55111abe63"
       proved="true"
       expanded="true"
       shape="loop invariant preservationCtaBluetaWhiteainfix =anb_occV7c0V0V8anb_occV1c0V0V8FIainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12INainfix =V12V3ANainfix =V12V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V13anb_occV1c0V0V13FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1166,7 +1240,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1174,7 +1248,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1185,9 +1259,9 @@
      <goal
       name="WP_parameter dutch_flag.23"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="23. loop variant decrease"
-      sum="a70213682400d58d45ac565540a1a295"
+      sum="a5756502216ae427b33326a197c3a014"
       proved="true"
       expanded="true"
       shape="loop variant decreaseCtaBluetaWhiteainfix &lt;ainfix -V6V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V0V12anb_occV1c0V0V12FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1218,7 +1292,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1226,7 +1300,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1237,9 +1311,9 @@
      <goal
       name="WP_parameter dutch_flag.24"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="24. postcondition"
-      sum="6a850d2a0782d65dd58591626bb62fd1"
+      sum="15a98ac2a96b444b1cb4765c99b6c972"
       proved="true"
       expanded="true"
       shape="postconditionamonochromeV5V7V0aRedAamonochromeV5V6V7aWhiteAamonochromeV5c0V6aBlueEEINainfix &lt;V3V2Iainfix =anb_occV5c0V0V8anb_occV1c0V0V8FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1265,9 +1339,9 @@
      <goal
       name="WP_parameter dutch_flag.25"
       locfile="../flag2.mlw"
-      loclnum="78" loccnumb="5" loccnume="15"
+      loclnum="83" loccnumb="5" loccnume="15"
       expl="25. postcondition"
-      sum="053a978563b38ad2037d0da8062cbada"
+      sum="f56e69c98b8c63992fe02b7675921406"
       proved="true"
       expanded="true"
       shape="postconditionainfix =anb_occV5c0V0V6anb_occV1c0V0V6FINainfix &lt;V3V2Iainfix =anb_occV5c0V0V7anb_occV1c0V0V7FAamonochromeV5V2V0aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V0Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V0FF">
@@ -1298,7 +1372,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
