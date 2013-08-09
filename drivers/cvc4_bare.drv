@@ -17,7 +17,6 @@ unknown "^\\(unknown\\|Fail\\)" ""
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 time "why3cpulimit time : %s s"
 
-
 transformation "inline_trivial"
 
 transformation "eliminate_builtin"
@@ -26,6 +25,9 @@ transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 
 transformation "simplify_formula"
+
+(* remove pointless quantifiers from the goal *)
+transformation "introduce_premises"
 
 (* For some reason this is commented out in all drivers except gappa
 and mathematica. Why? *)
