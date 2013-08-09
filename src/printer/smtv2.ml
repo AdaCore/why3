@@ -285,7 +285,7 @@ let print_param_decl info fmt ls =
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else
   let vsl,expr = Decl.open_ls_defn def in
-  fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a %a)@]@\n@\n"
+  fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
     print_ident ls.ls_name
     (print_var_list info) vsl
     (print_type_value info) ls.ls_value
