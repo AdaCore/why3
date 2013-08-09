@@ -132,22 +132,21 @@ let print_msg fmt m =
       if Gnat_config.show_tag then
         Format.fprintf fmt " [%s]" (Gnat_expl.tag_of_reason reason)
 
-let print_statistics msg =
+let print_statistics fmt msg =
   if msg.steps <> 0 && msg.time <> 0.0 then
-    Format.printf "%.2fs - %d steps" msg.time msg.steps
+    Format.fprintf fmt "%.2fs - %d steps" msg.time msg.steps
   else if msg.steps <> 0 then
-    Format.printf "%d steps" msg.steps
+    Format.fprintf fmt "%d steps" msg.steps
   else if msg.time <> 0.0 then
-    Format.printf "%.2fs" msg.time
+    Format.fprintf fmt "%.2fs" msg.time
 
 let print_messages_and_clear () =
   let l = List.sort cmp !msg_set in
   clear ();
   List.iter (fun msg ->
-    if not msg.result ||
-       Gnat_config.report <> Gnat_config.Fail then
-      print_msg Format.std_formatter msg;
+    let do_print = not msg.result || Gnat_config.report <> Gnat_config.Fail in
+    if do_print then print_msg Format.std_formatter msg;
     if Gnat_config.report = Gnat_config.Statistics then
-      print_statistics msg;
-    Format.printf "@."
+      Format.printf "(%a)" print_statistics msg;
+    if do_print then Format.printf "@.";
   ) l
