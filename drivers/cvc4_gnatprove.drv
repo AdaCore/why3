@@ -36,9 +36,19 @@ theory _gnatprove_standard_th.Floating_Func
    remove prop Bool_real__neq_axiom
 end
 
+theory _gnatprove_standard_th.Boolean_Func
+   syntax function bool_eq "(= %1 %2)"
+end
+
+theory ada__model_th.Discrete_Base_Theory
+  syntax function bool_eq "(= %1 %2)"
+end
+
 theory ada__model_th.Floating_Point_Theory
   syntax function bool_eq "(= %1 %2)"
 end
+
+
 
 (*
 Local Variables:
