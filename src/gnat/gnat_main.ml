@@ -31,14 +31,6 @@ let search_labels =
     t_fold search_labels acc f
   in
   search_labels None
-
-let print ?(endline=true) b task expl =
-   (* Print a positive or negative message for objectives *)
-   if endline then
-      Format.printf "%a@." (Gnat_expl.print_expl b task) expl
-   else
-      Format.printf "%a" (Gnat_expl.print_expl b task) expl
-
 let rec is_trivial fml =
    (* Check wether the formula is trivial.  *)
    match fml.t_node with
@@ -71,65 +63,6 @@ let register_goal goal =
    | _, Some e ->
        Gnat_objectives.add_to_objective e goal
 
-let is_digit c =
-  match c with
-  | '0' .. '9' -> true
-  | _ -> false
-
-let extract_steps s =
-  (* extract steps from alt-ergo "valid" output; return None if output is not
-     recognized, or no steps information present *)
-  (* We simply search for (xxx) at the end of the first line of the  output,
-     where all the xxx must be digits. *)
-  let s =
-    try Strings.slice s 0 (String.index s '\n' )
-    with Not_found -> s
-  in
-  try
-    let len = String.length s in
-    if len = 0 then None
-    else
-      let i = ref (len - 1) in
-      (* skip spaces *)
-      while s.[!i] = ' ' do
-        i := !i - 1;
-      done;
-      if s.[!i] = ')' then begin
-        let max = !i in
-        while !i > 0 && is_digit s.[!i-1] do
-          i := !i - 1;
-        done;
-        if !i > 0 && s.[!i-1] = '(' then
-          let s = Strings.slice s !i max in
-          Some (int_of_string s)
-        else None
-      end else None
-  with _ -> None
-
-let extract_steps_fail s =
-  if Strings.starts_with s "steps:" then
-    try Some (int_of_string (Strings.slice s 6 (String.length s)))
-    with _ -> None
-  else None
-
-let print_statistics fmt prover_result =
-  (* print statistics about the proof result. *)
-  let time = prover_result.Call_provers.pr_time in
-  match prover_result.Call_provers.pr_answer with
-  | Call_provers.Valid ->
-      begin match extract_steps prover_result.Call_provers.pr_output with
-      | Some steps -> Format.fprintf fmt "%.2fs - %d steps" time steps
-      | None -> Format.fprintf fmt "%.2fs" time
-      end
-  | Call_provers.Timeout ->
-      Format.fprintf fmt "Timeout: %.2fs" prover_result.Call_provers.pr_time
-  | Call_provers.Failure s ->
-      begin match extract_steps_fail s with
-      | Some steps -> Format.fprintf fmt "%.2fs - %d steps" time steps
-      | None -> Format.fprintf fmt "Failure: %s - %.2fs" s time
-      end
-  | _ -> ()
-
 let rec handle_vc_result goal result prover_result =
    (* This function is called when the prover has returned from a VC.
        goal           is the VC that the prover has dealt with
@@ -138,29 +71,15 @@ let rec handle_vc_result goal result prover_result =
    *)
    let obj, status = Gnat_objectives.register_result goal result in
    Gnat_objectives.display_progress ();
+   let task = Session.goal_task goal in
    match status with
    | Gnat_objectives.Proved ->
-         begin match Gnat_config.report, prover_result with
-         | Gnat_config.Fail_And_Proved, _ ->
-             print true (Session.goal_task goal) obj
-         | Gnat_config.Statistics, Some result ->
-             print ~endline:false true (Session.goal_task goal) obj;
-             Format.printf " (%a)@." print_statistics result
-         | _ -> ()
-         end
+       Gnat_report.register obj (Some task) prover_result true
    | Gnat_objectives.Not_Proved ->
          if Gnat_config.proof_mode = Gnat_config.Then_Split then begin
             Gnat_objectives.Save_VCs.save_trace goal
          end;
-         begin match Gnat_config.report, prover_result with
-         | Gnat_config.Statistics, Some result ->
-            print ~endline:false false (Session.goal_task goal)
-               (Gnat_objectives.get_objective goal);
-            Format.printf " (%a)@." print_statistics result
-         | _ ->
-            print false (Session.goal_task goal)
-              (Gnat_objectives.get_objective goal)
-         end
+         Gnat_report.register obj (Some task) prover_result false
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
@@ -182,7 +101,6 @@ and interpret_result pa pas =
          handle_vc_result goal (answer = Call_provers.Valid) (Some r)
    | _ ->
          ()
-
 
 and schedule_goal (g : Gnat_objectives.goal) =
    (* schedule a goal for proof - the goal may not be scheduled actually,
@@ -225,14 +143,15 @@ let normal_handle_one_subp subp =
       Gnat_objectives.iter (fun obj ->
       if Gnat_objectives.objective_status obj =
          Gnat_objectives.Proved then begin
-         Format.printf "%a@." Gnat_expl.print_simple_proven obj
+           Gnat_report.register obj None None true
       end else begin
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
          | None -> ()
       end);
       Gnat_objectives.do_scheduled_jobs ();
-      Gnat_objectives.clear ()
+      Gnat_objectives.clear ();
+      Gnat_report.print_messages_and_clear ()
    end
 
 let all_split_subp subp =

@@ -43,12 +43,11 @@ type expl
 val expl_compare : expl -> expl -> int
 
 val reason_from_string : string -> reason
+val print_reason : Format.formatter -> reason -> unit
+val tag_of_reason : reason -> string
 
 val simple_print_expl : Format.formatter -> expl -> unit
 (* simple text to represent VC, used for debugging *)
-
-val print_simple_proven : Format.formatter -> expl -> unit
-val print_expl : bool -> Task.task -> Format.formatter -> expl -> unit
 
 val print_skipped : Format.formatter -> expl -> unit
 
@@ -58,6 +57,7 @@ val to_filename : ?goal:'a Session.goal -> expl -> string
 val mk_expl : reason -> loc -> expl
 
 val get_loc : expl -> loc
+val get_reason : expl -> reason
 
 module MExpl : Extmap.S with type key = expl
 module HExpl : Hashtbl.S with type key = expl
@@ -69,3 +69,6 @@ type node_info =
 
 val extract_explanation : Ident.Slab.t -> node_info
 (* from a label set, extract the auxiliary information it contains *)
+
+val improve_sloc :
+  Gnat_loc.simple_loc -> Task.task -> Gnat_loc.simple_loc * string

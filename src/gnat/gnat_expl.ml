@@ -23,7 +23,7 @@ type reason =
 type expl = { loc : loc ; reason : reason }
 
 let expl_compare e1 e2 =
-   let c = Pervasives.compare e1.loc e2.loc in
+   let c = Gnat_loc.compare e1.loc e2.loc in
    if c = 0 then Pervasives.compare e1.reason e2.reason
    else c
 
@@ -135,6 +135,7 @@ let read_label s =
     else None
 
 let get_loc e = e.loc
+let get_reason e = e.reason
 
 let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
@@ -246,33 +247,6 @@ let improve_sloc sloc task =
       | Some s -> s
    in
    sloc, msg
-
-let print_simple_proven fmt p =
-   match p.loc with
-   | [] -> assert false (* the sloc of a VC is never empty *)
-   | primary :: _ ->
-         Format.fprintf fmt "%a: info: %a proved"
-         simple_print_loc primary print_reason p.reason
-
-let print_expl proven task fmt p =
-   match p.loc with
-   | [] -> assert false (* the sloc of a VC is never empty *)
-   | primary :: secondaries ->
-         if proven then begin
-            print_simple_proven fmt p
-         end else begin
-            let sloc, msg = improve_sloc primary task in
-            Format.fprintf fmt "%a: %a not proved"
-            simple_print_loc sloc print_reason p.reason;
-            if msg <> "" then Format.fprintf fmt ", requires %s" msg
-         end;
-         List.iter
-         (fun secondary_sloc ->
-            Format.fprintf fmt ", in instantiation at %a"
-              print_line_loc secondary_sloc) secondaries;
-         if Gnat_config.show_tag then
-           Format.fprintf fmt " [%s]" (tag_of_reason p.reason)
-
 let print_skipped fmt p =
    Format.fprintf fmt "%a: %a skipped"
      simple_print_loc (List.hd p.loc) print_reason p.reason
