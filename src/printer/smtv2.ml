@@ -56,13 +56,33 @@ let ident_printer =
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge";
 
+      (** the new floating point theory *)
+      "FloatingPoint";
+      "RoundingMode";
+      "roundNearestTiesToEven"; "RNE";
+      "roundNearestTiesToAway"; "RNA";
+      "roundTowardPositive";    "RTP";
+      "roundTowardNegative";    "RTN";
+      "roundTowardZero";        "RTZ";
+      "NaN"; "+oo"; "-oo";
+      "fp.eq"; "fp.abs"; "fp.neg"; "fp.add"; "fp.sub"; "fp.mul"; "fp.div";
+      "fp.fma"; "fp.sqrt"; "fp.rem"; "roundToIntegral"; "fp.min"; "fp.max";
+      "fp.leq"; "fp.lt"; "fp.geq"; "fp.gt";
+      "fp.isNormal"; "fp.isSubnormal"; "fp.isSignMinus"; "fp.isZero";
+      "fp.isInfinite"; "fp.isNaN";
+      "to_fp"; "to_fp_unsigned";
+      "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
+
+      (** built-in sorts *)
+      "Bool"; "Int"; "Real"; "BitVec"; "Array";
+
       (** Other stuff that Why3 seems to need *)
       "DECIMAL"; "NUMERAL"; "par"; "STRING";
       "unsat";"sat";
-      "Bool"; "true"; "false";
-      "Array";"const";
+      "true"; "false";
+      "const";
       "abs";
-      "BitVec"; "extract"; "bv2nat"; "nat2bv"
+      "extract"; "bv2nat"; "nat2bv"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
