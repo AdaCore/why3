@@ -1,0 +1,88 @@
+(* IEEE 754 floating point *)
+
+
+theory Rounding
+
+  type mode
+
+  function rne : mode
+  function rna : mode
+  function rtp : mode
+  function rtn : mode
+  function rtz : mode
+
+end
+
+theory IEEE_Float
+   use export Rounding
+
+   type t
+
+   constant bits_in_exponent    : int
+   constant bits_in_significand : int
+   constant rounding_mode       : mode
+
+   function from_real (x:real) : t
+   function to_real (x:t)      : real
+
+   function abs  (x:t) : t
+   (* absolute value, no rounding mode *)
+
+   function neg  (x:t) : t
+   (* absolute value, no rounding mode *)
+
+   function (+)  (x:t) (y:t) : t
+
+   function (-)  (x:t) (y:t) : t
+
+   function (*)  (x:t) (y:t) : t
+
+   function (/)  (x:t) (y:t) : t
+
+   function fma  (x:t) (y:t) (z:t) : t
+   (* fused multiplication and addition: x*y+z *)
+
+   function sqrt (x:t) : t
+
+   function rem  (x:t) (y:t) : t
+   (* x-y*n, where n in Z is nearest to x/y *)
+
+   function rti  (x:t) : t
+   (* round to integral *)
+
+   function min  (x:t) (y:t) : t
+   function max  (x:t) (y:t) : t
+
+   (*** comparison operators ***)
+
+   predicate (<=) t t
+   predicate (<)  t t
+   predicate (>=) t t
+   predicate (>)  t t
+
+   (*** classification of numbers ***)
+
+   predicate isNormal    t
+   predicate isSubnormal t
+   predicate isSignMinus t
+   predicate isZero      t
+   predicate isInfinite  t
+   predicate isNaN       t
+
+end
+
+theory Single_RNE
+   use export Rounding
+
+   type single
+
+   constant be : int = 8
+   constant sb : int = 24
+   constant rm : mode = rne
+
+   clone export IEEE_Float with
+      type t = single,
+      constant bits_in_exponent = be,
+      constant bits_in_significand = sb,
+      constant rounding_mode = rm
+end
