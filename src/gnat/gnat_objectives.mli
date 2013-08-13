@@ -150,8 +150,9 @@ module Save_VCs : sig
    val save_vc : goal -> unit
    (* Save the goal to a file *)
 
-   val save_trace : goal -> unit
-   (* save the trace to a file *)
+   val save_trace : goal -> string
+   (* save the trace to a file; return the trace file name, "" if no trace was
+      saved*)
 
    val vc_file : goal -> string
    (* get the file name for a given goal *)

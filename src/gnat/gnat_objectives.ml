@@ -603,8 +603,10 @@ module Save_VCs = struct
         with_fmt_channel trace_fn (fun fmt ->
            Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
-             (Gnat_loc.orig_loc l)) trace)
+             (Gnat_loc.orig_loc l)) trace);
+        trace_fn
       end
+      else ""
 
 end
 

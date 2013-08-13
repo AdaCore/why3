@@ -6,7 +6,8 @@ type msg =
     improved_sloc : Gnat_loc.simple_loc option;
     time   : float;
     steps  : int;
-    msg    : string;
+    extra_msg : string;
+    tracefile : string;
   }
 
 let cmp msg1 msg2 = Gnat_expl.expl_compare msg1.expl msg2.expl
@@ -54,7 +55,7 @@ let extract_steps_fail s =
     with _ -> None
   else None
 
-let register expl task result valid =
+let register expl task result valid tracefile =
   let time =
     match result with
     | None -> 0.0
@@ -88,49 +89,56 @@ let register expl task result valid =
   { expl          = expl;
     result        = valid;
     improved_sloc = improved_sloc;
-    msg           = msg;
+    extra_msg     = msg;
     time          = time;
-    steps         = steps } in
+    steps         = steps;
+    tracefile     = tracefile } in
   msg_set := msg :: !msg_set
 
 let clear () =
   msg_set := []
 
-let print_simple_proven fmt p =
-   match Gnat_expl.get_loc p with
-   | [] -> assert false (* the sloc of a VC is never empty *)
-   | primary :: _ ->
-         Format.fprintf fmt "%a: info: %a proved"
-         Gnat_loc.simple_print_loc primary Gnat_expl.print_reason
-         (Gnat_expl.get_reason p)
+let print_msg fmt m =
+  if m.result then Format.fprintf fmt "info: ";
+  Format.fprintf fmt "%a" Gnat_expl.print_reason (Gnat_expl.get_reason m.expl);
+  if m.result then Format.fprintf fmt " proved"
+  else Format.fprintf fmt " not proved";
+  if m.extra_msg <> "" then Format.fprintf fmt ", requires %s" m.extra_msg
 
 let improve_sloc msg =
-  let sloc =
-    match msg.improved_sloc with
-    | None -> List.hd (Gnat_expl.get_loc msg.expl)
-    | Some l -> l
-  in
-  sloc, msg.msg
+  match msg.improved_sloc with
+  | None -> List.hd (Gnat_expl.get_loc msg.expl)
+  | Some l -> l
 
-let print_msg fmt m =
+let print_with_sloc_and_tag fmt m =
   let reason = Gnat_expl.get_reason m.expl in
   match Gnat_expl.get_loc m.expl with
   | [] -> assert false (* the sloc of a VC is never empty *)
   | _ :: secondaries ->
-      if m.result then print_simple_proven fmt m.expl
-      else begin
-        let sloc, msg = improve_sloc m in
-        Format.fprintf fmt "%a: %a not proved"
-          Gnat_loc.simple_print_loc sloc Gnat_expl.print_reason
-            reason;
-        if msg <> "" then Format.fprintf fmt ", requires %s" msg
-      end;
+      let sloc = improve_sloc m in
+      Format.fprintf fmt "%a: %a" Gnat_loc.simple_print_loc sloc print_msg m;
       List.iter
          (fun secondary_sloc ->
            Format.fprintf fmt ", in instantiation at %a"
               Gnat_loc.print_line_loc secondary_sloc) secondaries;
       if Gnat_config.show_tag then
         Format.fprintf fmt " [%s]" (Gnat_expl.tag_of_reason reason)
+
+let print_json_msg fmt m =
+  let e = m.expl in
+  (* ??? what about more complex slocs *)
+  let loc = List.hd (Gnat_expl.get_loc e) in
+  let file = Gnat_loc.get_file loc in
+  let line = Gnat_loc.get_line loc in
+  let col = Gnat_loc.get_col loc in
+  let msg = Pp.sprintf "%a" print_msg m in
+  let severity = if m.result then "info" else "error" in
+  let rule = Gnat_expl.tag_of_reason (Gnat_expl.get_reason e) in
+  (* ??? Trace file *)
+  Format.fprintf fmt
+     "{\"file\":\"%s\",\"line\":%d,\"col\":%d,\"message\":\"%s\",\
+       \"rule\":\"%s\",\"severity\":\"%s\",\"tracefile\":\"%s\"}@."
+    file line col msg rule severity m.tracefile
 
 let print_statistics fmt msg =
   if msg.steps <> 0 && msg.time <> 0.0 then
@@ -144,9 +152,16 @@ let print_messages_and_clear () =
   let l = List.sort cmp !msg_set in
   clear ();
   List.iter (fun msg ->
-    let do_print = not msg.result || Gnat_config.report <> Gnat_config.Fail in
-    if do_print then print_msg Format.std_formatter msg;
-    if Gnat_config.report = Gnat_config.Statistics then
-      Format.printf "(%a)" print_statistics msg;
-    if do_print then Format.printf "@.";
+    if not msg.result || Gnat_config.report <> Gnat_config.Fail then begin
+      (* we only print the message if asked for *)
+      if Gnat_config.ide_progress_bar then begin
+        (* special output in IDE mode *)
+        print_json_msg Format.std_formatter msg
+      end else begin
+        print_with_sloc_and_tag Format.std_formatter msg;
+        if Gnat_config.report = Gnat_config.Statistics then
+          Format.printf "(%a)" print_statistics msg;
+        Format.printf "@.";
+      end
+    end
   ) l

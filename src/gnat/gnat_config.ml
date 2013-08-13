@@ -119,7 +119,9 @@ let options = Arg.align [
    "--report", Arg.String set_report,
           " Set report mode, one of (fail | all | statistics), default is fail";
    "--proof", Arg.String set_proof_mode,
-          " Set proof mode, one of (then_split|no_wp|all_split|path_wp|no_split), default is then_split";
+          " Set proof mode, one of \
+            (then_split|no_wp|all_split|path_wp|no_split) \
+          , default is then_split";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given by \"file:line\"";
    "--limit-subp", Arg.String set_limit_subp,

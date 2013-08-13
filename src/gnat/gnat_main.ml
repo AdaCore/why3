@@ -74,12 +74,13 @@ let rec handle_vc_result goal result prover_result =
    let task = Session.goal_task goal in
    match status with
    | Gnat_objectives.Proved ->
-       Gnat_report.register obj (Some task) prover_result true
+       Gnat_report.register obj (Some task) prover_result true ""
    | Gnat_objectives.Not_Proved ->
-         if Gnat_config.proof_mode = Gnat_config.Then_Split then begin
-            Gnat_objectives.Save_VCs.save_trace goal
-         end;
-         Gnat_report.register obj (Some task) prover_result false
+       let tracefile =
+         if Gnat_config.proof_mode = Gnat_config.Then_Split then
+           Gnat_objectives.Save_VCs.save_trace goal
+         else "" in
+       Gnat_report.register obj (Some task) prover_result false tracefile
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
@@ -143,7 +144,7 @@ let normal_handle_one_subp subp =
       Gnat_objectives.iter (fun obj ->
       if Gnat_objectives.objective_status obj =
          Gnat_objectives.Proved then begin
-           Gnat_report.register obj None None true
+           Gnat_report.register obj None None true ""
       end else begin
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
