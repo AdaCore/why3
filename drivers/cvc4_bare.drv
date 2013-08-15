@@ -213,16 +213,25 @@ theory int.Div2
    remove prop div2
 end
 
-(*
 theory int.ComputerDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
+   syntax function div "(ite (< %1 0) (ite (< %2 0) (div (- %1) (- %2)) (- (div (- %1) %2))) (div %1 %2))"
+   syntax function mod "(ite (< %1 0) (- mod (- x) y) (mod x y))"
+
    remove prop Div_mod
+   remove prop Div_bound
+   remove prop Mod_bound
+   remove prop Div_sign_pos
+   remove prop Div_sign_neg
+   remove prop Mod_sign_pos
+   remove prop Mod_sign_neg
+   remove prop Rounds_toward_zero
    remove prop Mod_1
    remove prop Div_1
+   remove prop Div_inf
+   remove prop Mod_inf
+   remove prop Div_mult
+   remove prop Mod_mult
 end
-*)
 
 (*
 theory real.Truncate
