@@ -43,5 +43,6 @@ let parse_loc =
 let get_file l = l.file
 let get_line l = l.line
 let get_col l = l.col
+let explode l = l.file, l.line, l.col
 
 module S = Extset.Make (struct type t = loc let compare = compare end)

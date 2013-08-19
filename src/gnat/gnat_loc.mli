@@ -7,6 +7,7 @@ type loc = simple_loc list
 val get_file : simple_loc -> string
 val get_line : simple_loc -> int
 val get_col : simple_loc -> int
+val explode : simple_loc -> string * int * int
 
 val mk_loc : string -> int -> int -> loc
 (* construct a location that consists of a single simple location with given

@@ -49,7 +49,7 @@ let rec is_trivial fml =
             is_trivial t) tbl
    | _ -> false
 
-let register_goal goal =
+let register_goal subp_entity goal =
    (* Register the goal by extracting the explanation and trace. If the goal is
     * trivial, do not register *)
    let task = Session.goal_task goal in
@@ -60,7 +60,8 @@ let register_goal goal =
    | _, None ->
          Gnat_util.abort_with_message
          "Task has no tracability label."
-   | _, Some e ->
+   | _, Some c ->
+       let e = Gnat_expl.mk_expl_check c subp_entity in
        Gnat_objectives.add_to_objective e goal
 
 let rec handle_vc_result goal result prover_result =
@@ -138,29 +139,29 @@ and actually_schedule_goal g =
 
 let normal_handle_one_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
-      Gnat_objectives.init_subp_vcs subp;
-      Gnat_objectives.iter_leaf_goals ~subp register_goal;
-      Gnat_objectives.stat subp;
-      Gnat_objectives.iter (fun obj ->
-      if Gnat_objectives.objective_status obj =
-         Gnat_objectives.Proved then begin
-           Gnat_report.register obj None None true ""
-      end else begin
-         match Gnat_objectives.next obj with
-         | Some g -> schedule_goal g
-         | None -> ()
-      end);
-      Gnat_objectives.do_scheduled_jobs ();
-      Gnat_objectives.clear ();
-      Gnat_report.print_messages_and_clear ()
+     let subp_entity = Gnat_objectives.init_subp_vcs subp in
+     Gnat_objectives.iter_leaf_goals ~subp (register_goal subp_entity);
+     Gnat_objectives.stat subp_entity;
+     Gnat_objectives.iter (fun obj ->
+     if Gnat_objectives.objective_status obj =
+        Gnat_objectives.Proved then begin
+          Gnat_report.register obj None None true ""
+     end else begin
+        match Gnat_objectives.next obj with
+        | Some g -> schedule_goal g
+        | None -> ()
+     end);
+     Gnat_objectives.do_scheduled_jobs ();
+     Gnat_objectives.clear ();
+     Gnat_report.print_messages_and_clear ()
    end
 
 let all_split_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
-      Gnat_objectives.init_subp_vcs subp;
-      Gnat_objectives.iter_leaf_goals ~subp register_goal;
-      Gnat_objectives.all_split_leaf_goals ();
-      Gnat_objectives.clear ()
+     let entity = Gnat_objectives.init_subp_vcs subp in
+     Gnat_objectives.iter_leaf_goals ~subp (register_goal entity);
+     Gnat_objectives.all_split_leaf_goals ();
+     Gnat_objectives.clear ()
    end
 
 let _ =
