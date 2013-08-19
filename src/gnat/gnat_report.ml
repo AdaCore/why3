@@ -124,21 +124,27 @@ let print_with_sloc_and_tag fmt m =
       if Gnat_config.show_tag then
         Format.fprintf fmt " [%s]" (Gnat_expl.tag_of_reason reason)
 
+let print_json_entity fmt e =
+  let sl = List.hd e.Gnat_expl.subp_loc in
+  let file, line, _ = Gnat_loc.explode sl in
+  Format.fprintf fmt "{\"name\":\"%s\",\"file\":\"%s\",\"line\":%d}"
+  e.Gnat_expl.subp_name file line
+
 let print_json_msg fmt m =
   let e = m.expl in
   (* ??? what about more complex slocs *)
   let loc = List.hd (Gnat_expl.get_loc e) in
-  let file = Gnat_loc.get_file loc in
-  let line = Gnat_loc.get_line loc in
-  let col = Gnat_loc.get_col loc in
+  let file, line, col = Gnat_loc.explode loc in
+  let ent = Gnat_expl.get_subp_entity e in
   let msg = Pp.sprintf "%a" print_msg m in
   let severity = if m.result then "info" else "error" in
   let rule = Gnat_expl.tag_of_reason (Gnat_expl.get_reason e) in
   (* ??? Trace file *)
   Format.fprintf fmt
      "{\"file\":\"%s\",\"line\":%d,\"col\":%d,\"message\":\"%s\",\
-       \"rule\":\"%s\",\"severity\":\"%s\",\"tracefile\":\"%s\"}@."
-    file line col msg rule severity m.tracefile
+       \"rule\":\"%s\",\"severity\":\"%s\",\"tracefile\":\"%s\",\
+       \"entity\":%a}@."
+    file line col msg rule severity m.tracefile print_json_entity ent
 
 let print_statistics fmt msg =
   if msg.steps <> 0 && msg.time <> 0.0 then

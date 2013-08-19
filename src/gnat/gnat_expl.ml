@@ -20,21 +20,47 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
 
-type expl = { loc : loc ; reason : reason }
+type check = { loc : loc ; reason : reason }
 
-let expl_compare e1 e2 =
-   let c = Gnat_loc.compare e1.loc e2.loc in
-   if c = 0 then Pervasives.compare e1.reason e2.reason
+type subp_entity =
+  { subp_name : string;
+    subp_loc  : loc
+  }
+
+type expl =
+  (* an explanation is a check, together with a subprogram information. Note
+     that the subprogram info is redundant; for two [expl] with equal
+     [expl_check] field the [expl_subp] field will also be equal. This property
+     is used in equality and hashing. *)
+  { expl_check : check;
+    expl_subp : subp_entity
+  }
+
+let check_compare c1 c2 =
+   let c = Gnat_loc.compare c1.loc c2.loc in
+   if c = 0 then Pervasives.compare c1.reason c2.reason
    else c
 
-let expl_equal e1 e2 =
+let expl_compare e1 e2 = check_compare e1.expl_check e2.expl_check
+
+let check_equal e1 e2 =
    e1.loc = e2.loc && e1.reason = e2.reason
 
-let expl_hash e =
+let expl_equal e1 e2 = check_equal e1.expl_check e2.expl_check
+
+let check_hash e =
    Hashcons.combine (Hashtbl.hash e.loc) (Hashtbl.hash e.reason)
 
-let mk_expl reason sloc =
+let expl_hash e = check_hash e.expl_check
+
+let mk_check reason sloc =
    { reason = reason; loc = sloc }
+
+let mk_expl_check check subp_entity =
+  { expl_check = check; expl_subp = subp_entity }
+
+let mk_expl reason sloc subp_entity =
+  mk_expl_check (mk_check reason sloc) subp_entity
 
 let reason_from_string s =
    match s with
@@ -134,8 +160,9 @@ let read_label s =
                  "found malformed GNATprove label"
     else None
 
-let get_loc e = e.loc
-let get_reason e = e.reason
+let get_loc e = e.expl_check.loc
+let get_reason e = e.expl_check.reason
+let get_subp_entity e = e.expl_subp
 
 let print_reason fmt r =
    Format.fprintf fmt "%s" (string_of_reason r)
@@ -155,7 +182,7 @@ type my_expl =
    by field *)
 
 type node_info =
-   | Expl of expl
+   | Expl of check
    | Sloc of Gnat_loc.loc
    | No_Info
 (* The information that has been found in a node *)
@@ -208,7 +235,7 @@ let extract_explanation s =
      match read_vc_labels s with
      | { expl_loc = VC_Sloc sloc ;
          expl_reason = Some reason } ->
-           Expl (mk_expl reason sloc)
+           Expl (mk_check reason sloc)
      | { expl_loc = Reg_Sloc sloc ;
          expl_reason = _;
          expl_msg = None } ->
@@ -229,6 +256,7 @@ let rec extract_msg t =
          read_vc_labels t.t_label
 
 let simple_print_expl fmt p =
+  let p = p.expl_check in
   match p.loc with
   | [] -> assert false
   | primary :: _ ->
@@ -247,19 +275,22 @@ let improve_sloc sloc task =
       | Some s -> s
    in
    sloc, msg
+
 let print_skipped fmt p =
+  let p = p.expl_check in
    Format.fprintf fmt "%a: %a skipped"
      simple_print_loc (List.hd p.loc) print_reason p.reason
 
 let to_filename ?goal expl =
-   let tag = tag_of_reason expl.reason in
-   let l = orig_loc expl.loc in
-   let l =
-      match goal with
-      | None -> l
-      | Some g -> let l, _ = improve_sloc l (Session.goal_task g) in l
-   in
-   Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) tag
+  let expl = expl.expl_check in
+  let tag = tag_of_reason expl.reason in
+  let l = orig_loc expl.loc in
+  let l =
+     match goal with
+     | None -> l
+     | Some g -> let l, _ = improve_sloc l (Session.goal_task g) in l
+  in
+  Format.sprintf "%s_%d_%d_%s" (get_file l) (get_line l) (get_col l) tag
 
 module ExplCmp = struct
    type t = expl

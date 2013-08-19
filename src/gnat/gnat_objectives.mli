@@ -96,7 +96,7 @@ val goal_has_been_tried : goal -> bool
 val objective_status : objective -> status
 (* query the status of the objective *)
 
-val stat : subp -> unit
+val stat : Gnat_expl.subp_entity -> unit
 (* print statistics *)
 
 val get_num_goals : unit -> int
@@ -135,7 +135,7 @@ module GoalMap : Hashtbl.S with type key = goal
 val iter_subps : (subp -> unit) -> unit
 (* iterate over all subprograms. *)
 
-val init_subp_vcs : subp -> unit
+val init_subp_vcs : subp -> Gnat_expl.subp_entity
 (* init the vcs for a given subp *)
 
 val clear : unit -> unit

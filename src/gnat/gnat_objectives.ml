@@ -336,10 +336,10 @@ let extract_subp_name subp =
      assert false (* There must always be a label *)
    with Found_Name s -> s
 
-let stat subp =
+let stat entity =
    if Gnat_config.verbose <> Gnat_config.Quiet then begin
-     let subp_name = extract_subp_name subp in
-      Format.printf "analyzing %s, %d checks@." subp_name !nb_objectives
+      Format.printf "analyzing %s, %d checks@."
+        entity.Gnat_expl.subp_name !nb_objectives
    end
 
 module Base_Sched = Session_scheduler.Base_scheduler (struct end)
@@ -472,9 +472,27 @@ let schedule_goal callback g =
 let do_scheduled_jobs () =
    Scheduler.main_loop ()
 
+exception Found of Gnat_loc.loc
+
+let extract_sloc main_goal =
+   let task = Session.goal_task main_goal in
+   let goal_ident = (Task.task_goal task).Decl.pr_name in
+   let label_set = goal_ident.Ident.id_label in
+   try
+      Ident.Slab.iter (fun lab ->
+        match Gnat_expl.read_label lab.Ident.lab_string with
+        | Some Gnat_expl.Gp_Subp loc -> raise (Found (loc))
+        | _ -> ()
+      ) label_set;
+      assert false
+   with Found l -> l
+
 let init_subp_vcs goal =
    apply_split_goal_if_needed goal;
-   Scheduler.main_loop ()
+   Scheduler.main_loop ();
+   let subp_loc = extract_sloc goal in
+   let subp_name =  extract_subp_name goal in
+   { Gnat_expl.subp_name = subp_name; subp_loc = subp_loc }
 
 let init () =
    sched_state := Some (M.init Gnat_config.parallel);
@@ -504,21 +522,6 @@ let display_progress () =
       Format.printf "completed %d out of %d (%d%%)...@."
       !nb_goals_done !total_nb_goals (!nb_goals_done * 100 / !total_nb_goals)
    end
-
-exception Found of Gnat_loc.loc
-
-let extract_sloc main_goal =
-   let task = Session.goal_task main_goal in
-   let goal_ident = (Task.task_goal task).Decl.pr_name in
-   let label_set = goal_ident.Ident.id_label in
-   try
-      Ident.Slab.iter (fun lab ->
-        match Gnat_expl.read_label lab.Ident.lab_string with
-        | Some Gnat_expl.Gp_Subp loc -> raise (Found (loc))
-        | _ -> ()
-      ) label_set;
-      assert false
-   with Found l -> l
 
 let compare_by_sloc g1 g2 =
    Gnat_loc.compare (extract_sloc g1) (extract_sloc g2)

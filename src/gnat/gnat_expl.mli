@@ -19,6 +19,13 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
 
+type check = { loc : loc ; reason : reason }
+
+type subp_entity =
+  { subp_name : string;
+    subp_loc  : loc
+  }
+
 (* the type of labels that are used by gnatprove and recognized by gnatwhy3 *)
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc
@@ -54,16 +61,24 @@ val print_skipped : Format.formatter -> expl -> unit
 val to_filename : ?goal:'a Session.goal -> expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
-val mk_expl : reason -> loc -> expl
+val mk_expl : reason -> loc -> subp_entity -> expl
+(* [mk_expl reason l1 se]
+     reason - the kind of check for this VC
+     l1     - the Ada location of the VC
+     se     - the entity information for the subprogram to which the VC belongs
+*)
+
+val mk_expl_check : check -> subp_entity -> expl
 
 val get_loc : expl -> loc
 val get_reason : expl -> reason
+val get_subp_entity : expl -> subp_entity
 
 module MExpl : Extmap.S with type key = expl
 module HExpl : Hashtbl.S with type key = expl
 
 type node_info =
-   | Expl of expl
+   | Expl of check
    | Sloc of Gnat_loc.loc
    | No_Info
 
