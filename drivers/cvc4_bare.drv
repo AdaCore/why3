@@ -297,6 +297,8 @@ theory ieee754.Single_RNE
    syntax predicate isInfinite  "(fp.isInfinite %1)"
    syntax predicate isNaN       "(fp.isNaN %1)"
 
+   syntax function fp_constant_zero "((_ to_fp 8 24) #x00000000)"
+
 end
 
 (*
