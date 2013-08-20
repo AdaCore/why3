@@ -139,9 +139,9 @@ and actually_schedule_goal g =
 
 let normal_handle_one_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
-     let subp_entity = Gnat_objectives.init_subp_vcs subp in
-     Gnat_objectives.iter_leaf_goals ~subp (register_goal subp_entity);
-     Gnat_objectives.stat subp_entity;
+     Gnat_objectives.init_subp_vcs subp;
+     Gnat_objectives.iter_leaf_goals subp register_goal;
+     Gnat_objectives.stat subp;
      Gnat_objectives.iter (fun obj ->
      if Gnat_objectives.objective_status obj =
         Gnat_objectives.Proved then begin
@@ -158,8 +158,8 @@ let normal_handle_one_subp subp =
 
 let all_split_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
-     let entity = Gnat_objectives.init_subp_vcs subp in
-     Gnat_objectives.iter_leaf_goals ~subp (register_goal entity);
+     Gnat_objectives.init_subp_vcs subp;
+     Gnat_objectives.iter_leaf_goals subp register_goal;
      Gnat_objectives.all_split_leaf_goals ();
      Gnat_objectives.clear ()
    end

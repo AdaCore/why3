@@ -29,7 +29,11 @@ type key = int
 type goal = key Session.goal
 
 type subp
-(*    See function "iter_subp" *)
+(* An object of type "subp" represents all objectives for a given Ada
+   subprogram. *)
+
+val get_subp_entity : subp -> Gnat_expl.subp_entity
+(* query the subprogram entity from a subp *)
 
 (* various possibilities to add objectives and goals to the database, and the
    "interesting" bit *)
@@ -87,8 +91,9 @@ val register_result : goal -> bool -> objective * status
 val iter : (objective -> unit) -> unit
 (* iterate over all objectives *)
 
-val iter_leaf_goals : ?subp:subp -> (goal -> unit) -> unit
-(* iterate over all VCs *)
+val iter_leaf_goals : subp -> (Gnat_expl.subp_entity -> goal -> unit) -> unit
+(* iterate over all VCs of a subprogram. The callback will get an individual VC
+   and the subp entity of the VC *)
 
 val goal_has_been_tried : goal -> bool
 (* check whether an existing valid proof attempt exists for the goal *)
@@ -96,8 +101,8 @@ val goal_has_been_tried : goal -> bool
 val objective_status : objective -> status
 (* query the status of the objective *)
 
-val stat : Gnat_expl.subp_entity -> unit
-(* print statistics *)
+val stat : subp -> unit
+(* print statistics for this subprogram *)
 
 val get_num_goals : unit -> int
 (* return the total number of goals *)
@@ -135,7 +140,7 @@ module GoalMap : Hashtbl.S with type key = goal
 val iter_subps : (subp -> unit) -> unit
 (* iterate over all subprograms. *)
 
-val init_subp_vcs : subp -> Gnat_expl.subp_entity
+val init_subp_vcs : subp -> unit
 (* init the vcs for a given subp *)
 
 val clear : unit -> unit
