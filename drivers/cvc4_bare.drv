@@ -284,10 +284,11 @@ theory ieee754.Single_RNE
    syntax function  min  "(fp.min %1 %2)"
    syntax function  max  "(fp.max %1 %2)"
 
-   syntax predicate (<=) "(fp.leq %1 %2)"
-   syntax predicate (<)  "(fp.lt %1 %2)"
-   syntax predicate (>=) "(fp.geq %1 %2)"
-   syntax predicate (>)  "(fp.gt %1 %2)"
+   syntax predicate fp_eq "(fp.eq %1 %2)"
+   syntax predicate (<=)  "(fp.leq %1 %2)"
+   syntax predicate (<)   "(fp.lt %1 %2)"
+   syntax predicate (>=)  "(fp.geq %1 %2)"
+   syntax predicate (>)   "(fp.gt %1 %2)"
 
    syntax predicate isNormal    "(fp.isNormal %1)"
    syntax predicate isSubnormal "(fp.isSubnormal %1)"
