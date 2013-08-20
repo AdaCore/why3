@@ -310,7 +310,7 @@ let analyze_var fn_down fn_join lkm km vs ity =
     let t = fn_join cs (List.map2 fn_down vl fdl) vs.vs_ty in
     t_close_branch pat t in
   let csl = Mlw_decl.inst_constructors lkm km ity in
-  t_case (t_var vs) (List.map branch csl)
+  t_case_simp (t_var vs) (List.map branch csl)
 
 (* given a map of modified regions, construct the updated value of [vs] *)
 let update_var env (mreg : vsymbol Mreg.t) vs =
@@ -541,12 +541,12 @@ let rec track_values state names lesson cond f = match f.t_node with
       let condl = Mint.find_def [] p1 lesson in
       let contains c1 c2 = Mint.submap (fun _ -> ls_equal) c2 c1 in
       if List.exists (contains cond) condl then
-        lesson, t_true
+        lesson, t_label_copy f t_true
       else
         let good c = not (contains c cond) in
         let condl = List.filter good condl in
         let l = Mint.add p1 (cond::condl) lesson in
-        l, get_invariant state.st_km t1
+        l, t_label_copy f (get_invariant state.st_km t1)
   | Tbinop (Timplies, f1, f2) ->
       let l, f1 = track_values state names lesson cond f1 in
       let _, f2 = track_values state names l cond f2 in
@@ -579,7 +579,7 @@ let rec track_values state names lesson cond f = match f.t_node with
         l, cb pat f1
       in
       let l, bl = Lists.map_fold_left branch lesson bl in
-      l, t_label_copy f (t_case t1 bl)
+      l, t_label_copy f (t_case_simp t1 bl)
   | Tlet (t1, bf) ->
       let p1 = point_of_term state names t1 in
       let v, f1, cb = t_open_bound_cb bf in
@@ -686,7 +686,7 @@ and wp_desc env e q xq = match e.e_node with
       let res = vs_result e1 in
       let branch ({ ppat_pattern = pat }, e) =
         t_close_branch pat (wp_expr env e q xq) in
-      let w = t_case (t_var res) (List.map branch bl) in
+      let w = t_case_simp (t_var res) (List.map branch bl) in
       let q = create_post res w in
       wp_label e (wp_expr env e1 q xq)
   | Eghost e1 ->
@@ -1396,12 +1396,6 @@ let merge_opt_post_3 s opt_p1 opt_p2 opt_p3 =
   | [f1;f2;f3] -> s, f1, f2, f3
   | _ -> assert false
 
-let t_case_simp t l =
-  let all_branches_true = List.for_all (fun (_,t) -> t = t_true) l in
-  if all_branches_true then t_true else
-  let branches = List.map (fun (p,x) -> t_close_branch p x) l in
-  t_case t branches
-
 (* Input
    - a state s: Subst.t
    - names r = (result: vsymbol, xresult: vsymbol Mexn.t)
@@ -1754,7 +1748,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       let cond_t = t_var cond_res in
       let pats = List.map (fun ({ppat_pattern = pat}, _) -> pat) bl in
       let build_case f l =
-        t_case_simp cond_t
+        t_case_close_simp cond_t
           (List.map2 (fun pat x -> pat, (f x)) pats l) in
       let ok =
         t_and_simp
