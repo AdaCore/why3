@@ -197,6 +197,24 @@ version_old = "1.5.4"
 command = "'@LOCALBIN@why3-cpulimit' %t %m -s %e %f"
 driver = "drivers/simplify.drv"
 
+[ATP metis]
+name = "Metis"
+exec = "metis"
+version_switch = "-v"
+version_regexp = "metis \\([^ \n,]+\\)"
+version_ok = "2.3"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --time-limit %t %f"
+driver = "drivers/metis.drv"
+
+[ATP metitarski]
+name = "MetiTarski"
+exec = "metit"
+version_switch = "-v"
+version_regexp = "MetiTarski \\([^ \n,]+\\)"
+version_ok = "2.2"
+command = "'@LOCALBIN@why3-cpulimit' %T %m -s %e --time %t %f"
+driver = "drivers/metitarski.drv"
+
 [ATP spass]
 name = "Spass"
 exec = "SPASS"
