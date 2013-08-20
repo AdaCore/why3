@@ -21,7 +21,15 @@ end
 type goal = key Session.goal
 (* the type of goals; a goal is an elementary VC *)
 
-type subp = goal
+type subp =
+  { subp_goal : goal;
+    subp_entity : Gnat_expl.subp_entity
+  }
+(* This type stores the goal which corresponds to a subprogram (the whole
+   correctness formula for a subp), together with the entity information which
+   describes it *)
+
+let get_subp_entity g = g.subp_entity
 
 type objective = Gnat_expl.expl
 (* an objective is identified by its explanation, which contains the source
@@ -336,10 +344,10 @@ let extract_subp_name subp =
      assert false (* There must always be a label *)
    with Found_Name s -> s
 
-let stat entity =
+let stat subp =
    if Gnat_config.verbose <> Gnat_config.Quiet then begin
       Format.printf "analyzing %s, %d checks@."
-        entity.Gnat_expl.subp_name !nb_objectives
+        subp.subp_entity.Gnat_expl.subp_name !nb_objectives
    end
 
 module Base_Sched = Session_scheduler.Base_scheduler (struct end)
@@ -412,26 +420,19 @@ let iter_main_goals fu =
                | _ -> ()) f
       | _ -> ()) (get_session ()).Session.session
 
-let iter_leafs f g =
+let iter_leafs goal f =
       Session.goal_iter (fun any ->
          match any with
          | Session.Transf t
             when t.Session.transf_name = Gnat_config.split_name ->
                Session.transf_iter (fun any ->
                   match any with
-                  | Session.Goal g -> f g
+                  | Session.Goal g ->
+                      f g
                   | _ -> ()) t
-         | _ -> ()) g
+         | _ -> ()) goal
 
-let iter_leaf_goals ?subp f =
-   (* Leaf goals are at the following point in the theory:
-        session -> file -> theory -> subgoal -> transformation -> subgoal
-                                                                  *here*
-      A leaf goal corresponds to a "goal", ie a VC sent to Alt-Ergo
-   *)
-   match subp with
-   | None -> iter_main_goals (iter_leafs f)
-   | Some g -> iter_leafs f g
+let iter_leaf_goals subp f = iter_leafs subp.subp_goal (f subp.subp_entity)
 
 let goal_has_been_tried g =
    (* Check whether the goal has been tried already *)
@@ -487,12 +488,9 @@ let extract_sloc main_goal =
       assert false
    with Found l -> l
 
-let init_subp_vcs goal =
-   apply_split_goal_if_needed goal;
-   Scheduler.main_loop ();
-   let subp_loc = extract_sloc goal in
-   let subp_name =  extract_subp_name goal in
-   { Gnat_expl.subp_name = subp_name; subp_loc = subp_loc }
+let init_subp_vcs subp =
+   apply_split_goal_if_needed subp.subp_goal;
+   Scheduler.main_loop ()
 
 let init () =
    sched_state := Some (M.init Gnat_config.parallel);
@@ -523,21 +521,31 @@ let display_progress () =
       !nb_goals_done !total_nb_goals (!nb_goals_done * 100 / !total_nb_goals)
    end
 
-let compare_by_sloc g1 g2 =
-   Gnat_loc.compare (extract_sloc g1) (extract_sloc g2)
+let compare_by_sloc subp1 subp2 =
+   Gnat_loc.compare
+     subp1.subp_entity.Gnat_expl.subp_loc
+     subp2.subp_entity.Gnat_expl.subp_loc
+
+let mk_subp_goal goal =
+  { subp_goal = goal;
+    subp_entity =
+      { Gnat_expl.subp_name = extract_subp_name goal;
+        subp_loc = extract_sloc goal
+      }
+  }
 
 let iter_subps f =
    let acc = ref [] in
-   iter_main_goals (fun g -> acc := g :: !acc);
+   iter_main_goals (fun g ->
+     acc := mk_subp_goal g :: !acc);
    let subps = List.sort compare_by_sloc !acc in
    List.iter f subps
-
 
 let matches_subp_filter subp =
    match Gnat_config.limit_subp with
    | None -> true
    | Some lab ->
-         let task = Session.goal_task subp in
+         let task = Session.goal_task subp.subp_goal in
          let goal_ident = (Task.task_goal task).Decl.pr_name in
          let label_set = goal_ident.Ident.id_label in
          Ident.Slab.mem lab label_set
@@ -614,7 +622,9 @@ module Save_VCs = struct
 end
 
 let all_split_leaf_goals () =
-   iter_leaf_goals (fun goal ->
+  iter_main_goals (fun g ->
+    iter_leafs g
+     (fun goal ->
       let is_registered =
          try ignore (get_objective goal); true
          with Not_found -> false in
@@ -629,4 +639,4 @@ let all_split_leaf_goals () =
             end;
          end
       else ()
-   )
+   ))
