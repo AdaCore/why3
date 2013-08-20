@@ -474,13 +474,13 @@ if test "$enable_coq_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
      [ echo "Require Import Flocq_version BinNat." \
-            "Goal (20100 <= Flocq_version)%N. easy. Qed." > conftest.v
+            "Goal (20200 <= Flocq_version)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
        AC_MSG_WARN(Cannot find Flocq.)
-       reason_coq_fp_libs=" (Flocq >= 2.1 not found)" ])
+       reason_coq_fp_libs=" (Flocq >= 2.2 not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
 
