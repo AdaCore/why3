@@ -526,7 +526,7 @@ let do_theory env drv fname tname th glist elist =
         let l,t = Decl.open_ls_defn d in
         match l with
         | [] ->
-          let t = Mlw_interp.eval_term Term.Mvs.empty Term.Mvs.empty t in
+          let t = Mlw_interp.eval_term env th.th_known t in
           printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Pretty.print_term t
         | _ ->
           eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;

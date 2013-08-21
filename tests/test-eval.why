@@ -41,7 +41,17 @@ theory T
 
   use import list.Append
 
-  constant l5 : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
+  constant l5 : list 'a = Nil ++ Nil
+
+  constant l5a : list int = (Nil : list int) ++ Nil
+
+  constant l5b : list int = Nil ++ (Nil : list int)
+
+  constant l5c : list int = (Cons 5 Nil) ++ Nil (* plante ! *)
+
+  constant l6a : int = match (Nil : list int) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
+
+  constant l6b : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end (* plante ! *)
 
 
 end

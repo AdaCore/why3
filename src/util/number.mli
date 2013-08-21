@@ -38,6 +38,8 @@ val int_const_bin : string -> integer_constant
     InvalidConstantLiteral(base,s) is raised if [s] contains invalid
     characters for the given base. *)
 
+val compute_int : integer_constant -> Big_int.big_int
+
 val real_const_dec : string -> string -> string option -> real_constant
 val real_const_hex : string -> string -> string option -> real_constant
 
