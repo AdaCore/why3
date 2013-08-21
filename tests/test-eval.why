@@ -31,8 +31,17 @@ theory T
 
   constant l2 : int = match Cons 5 Nil with Nil -> 1 | Cons _ _ -> 2 end
 
+  constant l3 : int = match Cons 5 Nil with Nil -> 1 | Cons x _ -> x end
+
+  constant l4 : list int = match Cons 5 (Cons 8 Nil) with
+    | Nil -> Nil
+    | Cons x Nil -> Nil
+    | Cons x (Cons y l) -> Cons y (Cons x l)
+    end
+
   use import list.Append
 
-  constant l3 : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
+  constant l5 : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
+
 
 end
