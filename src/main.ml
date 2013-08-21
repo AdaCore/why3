@@ -28,6 +28,7 @@ let opt_queue = Queue.create ()
 
 let opt_input = ref None
 let opt_theory = ref None
+let opt_theory_eval = ref None
 let opt_trans = ref []
 let opt_metas = ref []
 
@@ -50,15 +51,19 @@ let add_opt_theory =
       exit 1
   | Some tlist, [] ->
       let glist = Queue.create () in
-      Queue.push (x, p, t, glist) tlist;
-      opt_theory := Some glist
+      let elist = Queue.create () in
+      Queue.push (x, p, t, glist, elist) tlist;
+      opt_theory := Some glist;
+      opt_theory_eval := Some elist
   | _ ->
       let tlist = Queue.create () in
       Queue.push (None, tlist) opt_queue;
       opt_input := None;
       let glist = Queue.create () in
-      Queue.push (x, p, t, glist) tlist;
-      opt_theory := Some glist
+      let elist = Queue.create () in
+      Queue.push (x, p, t, glist,elist) tlist;
+      opt_theory := Some glist;
+      opt_theory_eval := Some elist
 
 let add_opt_goal x = match !opt_theory with
   | None ->
@@ -67,6 +72,14 @@ let add_opt_goal x = match !opt_theory with
   | Some glist ->
       let l = Str.split (Str.regexp "\\.") x in
       Queue.push (x, l) glist
+
+let add_opt_eval x = match !opt_theory_eval with
+  | None ->
+      eprintf "Option '--eval' requires a theory.@.";
+      exit 1
+  | Some elist ->
+      let l = Str.split (Str.regexp "\\.") x in
+      Queue.push (x, l) elist
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
@@ -121,6 +134,8 @@ let option_list = Arg.align [
       "<goal> Select <goal> in the last selected theory";
   "--goal", Arg.String add_opt_goal,
       " same as -G";
+  "--eval", Arg.String add_opt_eval,
+      "<id> Evaluate <id> in the last selected theory";
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
@@ -469,7 +484,7 @@ let do_tasks env drv fname tname th task =
   let tasks = List.fold_left apply [task] trans in
   List.iter (do_task drv fname tname th) tasks
 
-let do_theory env drv fname tname th glist =
+let do_theory env drv fname tname th glist elist =
   if !opt_print_theory then
     printf "%a@." Pretty.print_theory th
   else if !opt_print_namespace then
@@ -498,23 +513,42 @@ let do_theory env drv fname tname th glist =
     let prs = Queue.fold add Decl.Spr.empty glist in
     let sel = if Decl.Spr.is_empty prs then None else Some prs in
     let tasks = List.rev (split_theory th sel !opt_task) in
-    List.iter (do_tasks env drv fname tname th) tasks
+    List.iter (do_tasks env drv fname tname th) tasks;
+    let eval (x,l) =
+      let ls = try ns_find_ls th.th_export l with Not_found ->
+        eprintf "Declaration '%s' not found in theory '%s'.@." x tname;
+        exit 1
+      in
+      match Decl.find_logic_definition th.th_known ls with
+      | None -> eprintf "Symbol '%s' has no definition in theory '%s'.@." x tname;
+        exit 1
+      | Some d ->
+        let l,t = Decl.open_ls_defn d in
+        match l with
+        | [] ->
+          let t = Mlw_interp.eval_term Term.Mvs.empty Term.Mvs.empty t in
+          printf "Evaluation of %s: %a@." x Pretty.print_term t
+        | _ ->
+          eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;
+          exit 1
+    in
+    Queue.iter eval elist
   end
 
-let do_global_theory env drv (tname,p,t,glist) =
+let do_global_theory env drv (tname,p,t,glist,elist) =
   let format = Opt.get_def "why" !opt_parser in
   let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
     eprintf "Theory '%s' not found.@." tname;
     exit 1
   in
-  do_theory env drv "lib" tname th glist
+  do_theory env drv "lib" tname th glist elist
 
-let do_local_theory env drv fname m (tname,_,t,glist) =
+let do_local_theory env drv fname m (tname,_,t,glist,elist) =
   let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_theory env drv fname tname th glist
+  do_theory env drv fname tname th glist elist
 
 (* program extraction *)
 
@@ -545,7 +579,7 @@ let do_extract_module edrv ?fname tname m =
   in
   extract_to ?fname m.Mlw_module.mod_theory extract
 
-let do_global_extract edrv (tname,p,t,_) =
+let do_global_extract edrv (tname,p,t,_,_) =
   let lib = edrv.Mlw_driver.drv_lib in
   try
     let mm, thm = Env.read_lib_file lib p in
@@ -564,14 +598,14 @@ let do_global_extract edrv (tname,p,t,_) =
     eprintf "Theory/module '%s' not found.@." tname;
     exit 1
 
-let do_extract_theory_from env fname m (tname,_,t,_) =
+let do_extract_theory_from env fname m (tname,_,t,_,_) =
   let th = try Mstr.find t m with Not_found ->
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
   do_extract_theory env ~fname tname th
 
-let do_extract_module_from env fname mm thm (tname,_,t,_) =
+let do_extract_module_from env fname mm thm (tname,_,t,_,_) =
   try
     let m = Mstr.find t mm in do_extract_module env ~fname tname m
   with Not_found -> try
@@ -643,8 +677,9 @@ let do_input env drv edrv = function
         else
           if Queue.is_empty tlist then
             let glist = Queue.create () in
+            let elist = Queue.create () in
             let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-            let do_th _ (t,th) = do_theory env drv fname t th glist in
+            let do_th _ (t,th) = do_theory env drv fname t th glist elist in
             Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
           else
             Queue.iter (do_local_theory env drv fname m) tlist
