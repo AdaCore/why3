@@ -10,4 +10,16 @@ theory T
 
   constant c3 : int = if true /\ false then 1 else 2
 
+  constant c4 : int = if 2 = 2 then 1 else 2
+
+  constant c5 : int = if 2 = 3 then 1 else 2
+
+  constant c6 : int = 2+2
+
+  use import list.List
+
+  constant l1 : list int = Cons 5 Nil
+
+  constant l2 : int = match Cons 5 Nil with Nil -> 1 | Cons _ _ -> 2 end
+
 end

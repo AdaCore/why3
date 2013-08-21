@@ -1,12 +1,12 @@
 
 open Term
 
-let eval_app ls tl =
+let eval_app ls tl ty =
   if ls_equal ls ps_equ then
     match tl with
     | [t1;t2] ->
       if t_equal_alpha t1 t2 then t_true else
-        t_app_infer ls tl
+        t_app ls tl ty
 (* TODO later
         begin match t1.t_node,t2.t_node with
         | Ttrue, Tfalse | Tfalse, Ttrue -> t_false
@@ -15,7 +15,13 @@ let eval_app ls tl =
     | _ -> assert false
   else
     (* TODO : if has_definition ls then ... *)
-    t_app_infer ls tl
+    try
+      t_app ls tl ty
+    with e ->
+      Format.eprintf "Exception during term evaluation (t_app_infer %s): %a@."
+        ls.ls_name.Ident.id_string
+        Exn_printer.exn_printer e;
+      exit 2
 
 let rec eval_term menv env t =
   match t.t_node with
@@ -33,7 +39,7 @@ let rec eval_term menv env t =
     t_iff_simp (eval_term menv env t1) (eval_term menv env t2)
   | Tnot t1 -> t_not_simp (eval_term menv env t1)
   | Tapp(ls,tl) ->
-    eval_app ls (List.map (eval_term menv env) tl)
+    eval_app ls (List.map (eval_term menv env) tl) t.t_ty
   | Tif(t1,t2,t3) ->
     let u = eval_term menv env t1 in
     begin match u.t_node with
