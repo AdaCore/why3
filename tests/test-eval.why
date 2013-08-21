@@ -52,19 +52,11 @@ theory T
 
   constant l5b : list int = Nil ++ (Nil : list int)
 
-(* plante !
-
   constant l5c : list int = (Cons 5 Nil) ++ Nil 
-
-*)
 
   constant l6a : int = match (Nil : list int) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
 
-(* plante !
-
   constant l6b : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end 
-
-*)
 
   function prod (l:list int) : int =
     match l with

@@ -130,44 +130,45 @@ let rec matching env t p =
   | Pas _, _ -> raise Undetermined
 
 
-let rec eval_term km menv env t =
+let rec eval_term km menv env ty t =
+  let eval_rec t = eval_term km menv env t.t_ty t in
   match t.t_node with
   | Tvar x ->
     begin try Mvs.find x env
       with Not_found -> t
     end
   | Tbinop(Tand,t1,t2) ->
-    t_and_simp (eval_term km menv env t1) (eval_term km menv env t2)
+    t_and_simp (eval_rec t1) (eval_rec t2)
   | Tbinop(Tor,t1,t2) ->
-    t_or_simp (eval_term km menv env t1) (eval_term km menv env t2)
+    t_or_simp (eval_rec t1) (eval_rec t2)
   | Tbinop(Timplies,t1,t2) ->
-    t_implies_simp (eval_term km menv env t1) (eval_term km menv env t2)
+    t_implies_simp (eval_rec t1) (eval_rec t2)
   | Tbinop(Tiff,t1,t2) ->
-    t_iff_simp (eval_term km menv env t1) (eval_term km menv env t2)
-  | Tnot t1 -> t_not_simp (eval_term km menv env t1)
+    t_iff_simp (eval_rec t1) (eval_rec t2)
+  | Tnot t1 -> t_not_simp (eval_rec t1)
   | Tapp(ls,tl) ->
-    eval_app km menv env ls (List.map (eval_term km menv env) tl) t.t_ty
+    eval_app km menv env ty ls (List.map eval_rec tl)
   | Tif(t1,t2,t3) ->
-    let u = eval_term km menv env t1 in
+    let u = eval_rec t1 in
     begin match u.t_node with
-    | Ttrue -> eval_term km menv env t2
-    | Tfalse -> eval_term km menv env t3
+    | Ttrue -> eval_term km menv env ty t2
+    | Tfalse -> eval_term km menv env ty t3
     | _ -> t_if u t2 t3
     end
   | Tlet(t1,tb) ->
-    let u = eval_term km menv env t1 in
+    let u = eval_rec t1 in
     let v,t2 = t_open_bound tb in
-    eval_term km menv (Mvs.add v u env) t2
+    eval_term km menv (Mvs.add v u env) ty t2
   | Tcase(t1,tbl) ->
-    let u = eval_term km menv env t1 in
-    eval_match km menv env u tbl
+    let u = eval_rec t1 in
+    eval_match km menv env ty u tbl
   | Tquant _
   | Teps _
   | Tconst _
   | Ttrue
   | Tfalse -> t
 
-and eval_match km menv env u tbl =
+and eval_match km menv env ty u tbl =
   let rec iter tbl =
     match tbl with
     | [] ->
@@ -177,12 +178,12 @@ and eval_match km menv env u tbl =
       let p,t = t_open_branch b in
       try
         let env' = matching env u p in
-        eval_term km menv env' t
+        eval_term km menv env' ty t
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined -> t_case u tbl
 
-and eval_app km menv env ls tl ty =
+and eval_app km menv env ty ls tl =
   try
     let f = Hls.find builtins ls in
     f ls tl
@@ -207,10 +208,10 @@ and eval_app km menv env ls tl ty =
     | Some d ->
       let l,t = Decl.open_ls_defn d in
       let env' = List.fold_right2 Mvs.add l tl env in
-      eval_term km menv env' t
+      eval_term km menv env' ty t
 
 
 
 let eval_term env km t =
   get_builtins env;
-  eval_term km Mvs.empty Mvs.empty t
+  eval_term km Mvs.empty Mvs.empty t.t_ty t
