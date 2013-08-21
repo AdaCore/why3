@@ -7,41 +7,96 @@ exception Undetermined
 
 let builtins = Hls.create 17
 
-let eval_equ _ls l =
-  match l with
-  | [t1;t2] ->
-    if t_equal_alpha t1 t2 then t_true else
-      t_equ t1 t2
-    (* TODO later
-       begin match t1.t_node,t2.t_node with
-       | Ttrue, Tfalse | Tfalse, Ttrue -> t_false
-       | Const c1, Const c2 -> eval_const ...
-    *)
-  | _ -> assert false
+let const_of_big_int i =
+(*
+  if Big_int.sign_big_int i >= 0 then
+*)
+    let s = Big_int.string_of_big_int i in
+    t_const (Number.ConstInt (Number.int_const_dec s))
+(*
+  else
+*)
 
-let add_const c1 c2 =
+let op_const op c1 c2 =
   match c1,c2 with
   | Number.ConstInt i1, Number.ConstInt i2 ->
     let i1 = Number.compute_int i1 in
     let i2 = Number.compute_int i2 in
-    let a = Big_int.add_big_int i1 i2 in
-    let s = Big_int.string_of_big_int a in
-    Number.ConstInt (Number.int_const_dec s)
+    op i1 i2
   | _ -> assert false
 
-let eval_add ls l =
+let uop_const op c =
+  match c with
+  | Number.ConstInt i ->
+    let i = Number.compute_int i in op i
+  | _ -> assert false
+
+let bin_const op c1 c2 =
+  let a = op_const op c1 c2 in
+  const_of_big_int a
+
+let unary_const op c =
+  let a = uop_const op c in
+  const_of_big_int a
+
+let eval_int_op op ls l =
   match l with
   | [t1;t2] ->
     begin
       match t1.t_node, t2.t_node with
-      | Tconst c1, Tconst c2 -> t_const (add_const c1 c2)
+      | Tconst c1, Tconst c2 -> bin_const op c1 c2
       | _ -> t_app_infer ls [t1;t2]
     end
   | _ -> assert false
 
+let eval_int_uop op ls l =
+  match l with
+  | [t1] ->
+    begin
+      match t1.t_node with
+      | Tconst c1 -> unary_const op c1
+      | _ -> t_app_infer ls [t1]
+    end
+  | _ -> assert false
+
+let eval_int_rel op ls l =
+  match l with
+  | [t1;t2] ->
+    begin
+      match t1.t_node, t2.t_node with
+      | Tconst c1, Tconst c2 ->
+        if op_const op c1 c2 then t_true else t_false
+      | _ -> t_app_infer ls [t1;t2]
+    end
+  | _ -> assert false
+
+let eval_equ _ls l =
+  match l with
+  | [t1;t2] ->
+    if t_equal_alpha t1 t2 then t_true else
+      begin match t1.t_node,t2.t_node with
+       | Ttrue, Tfalse | Tfalse, Ttrue -> t_false
+       | Tconst c1, Tconst c2 ->
+         if op_const Big_int.eq_big_int c1 c2 then
+           t_true else t_false
+       | _ -> t_equ t1 t2
+      end
+  | _ -> assert false
+
+
 let built_in_theories =
   [ ["int"],"Int",
-    ["infix +", eval_add]
+    [ "infix +", eval_int_op Big_int.add_big_int;
+      "infix -", eval_int_op Big_int.sub_big_int;
+      "infix *", eval_int_op Big_int.mult_big_int;
+(* plante !
+      "prefix -", eval_int_uop Big_int.minus_big_int;
+*)
+      "infix <", eval_int_rel Big_int.lt_big_int;
+      "infix <=", eval_int_rel Big_int.le_big_int;
+      "infix >", eval_int_rel Big_int.gt_big_int;
+      "infix >=", eval_int_rel Big_int.ge_big_int;
+    ]
   ]
 
 let add_builtin_th env (l,n,d) =

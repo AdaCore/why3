@@ -10,7 +10,7 @@ theory T
 
 (* test of the 'let' *)
 
-  constant let1 : int = let x = 42 in x + 1
+  constant let1 : int = let x = 42 in x * x - 1
 
 (* test of the 'if' *)
 
@@ -22,6 +22,11 @@ theory T
 
   constant c5 : int = if 2 = 3 then 1 else 2
 
+  constant c6 : int = if 2 < 3 /\ 5 >= 6 /\ 7 > 8 \/ 9 <= 10 then 1 else 0
+
+  use import int.Abs
+
+  constant c7 : int = abs 42 + abs (-12)
 
   use import list.List
 
@@ -47,11 +52,41 @@ theory T
 
   constant l5b : list int = Nil ++ (Nil : list int)
 
-  constant l5c : list int = (Cons 5 Nil) ++ Nil (* plante ! *)
+(* plante !
+
+  constant l5c : list int = (Cons 5 Nil) ++ Nil 
+
+*)
 
   constant l6a : int = match (Nil : list int) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
 
-  constant l6b : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end (* plante ! *)
+(* plante !
 
+  constant l6b : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end 
+
+*)
+
+  function prod (l:list int) : int =
+    match l with
+    | Nil -> 1
+    | Cons x r -> x * prod r
+    end
+
+  constant l7 : int = prod (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+
+  function puiss (n:int) (l:list int) : int =
+    match l with
+    | Nil -> 1
+    | Cons _ r -> n * puiss n r
+    end
+
+  constant l8 : int = puiss 2 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  constant l9 : int = puiss l7 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  constant l10 : int = puiss l9 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  constant l11 : int = puiss l10 (Cons 12 (Cons 34 (Cons 56 Nil)))
 
 end
