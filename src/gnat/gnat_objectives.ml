@@ -568,7 +568,7 @@ module Save_VCs = struct
       incr r;
       let n = !r in
       let base = Gnat_expl.to_filename expl in
-      let suffix = ".why" in
+      let suffix = ".smt2" in
       if n = 1 then base ^ suffix
       else base ^ "_" ^ string_of_int n ^ suffix
 
