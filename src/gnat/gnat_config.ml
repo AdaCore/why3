@@ -233,3 +233,11 @@ let () = if proof_mode = No_WP then Debug.set_flag Typing.debug_type_only
 let () =
   if proof_mode <> Path_WP then
     Debug.set_flag (Debug.lookup_flag "fast_wp")
+
+let unit_name =
+  let suffix = "__package.mlw" in
+  if Strings.ends_with filename suffix then
+    String.sub filename 0 (String.length filename - String.length suffix)
+  else Filename.chop_extension filename
+
+

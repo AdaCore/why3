@@ -154,9 +154,14 @@ let print_statistics fmt msg =
   else if msg.time <> 0.0 then
     Format.fprintf fmt "%.2fs" msg.time
 
+let write_proof_result_file l =
+  Pp.print_in_file (fun fmt ->
+    List.iter (print_json_msg fmt) l) (Gnat_config.unit_name ^ ".proof")
+
 let print_messages_and_clear () =
   let l = List.sort cmp !msg_set in
   clear ();
+  write_proof_result_file l;
   List.iter (fun msg ->
     if not msg.result || Gnat_config.report <> Gnat_config.Fail then begin
       (* we only print the message if asked for *)

@@ -56,6 +56,9 @@ val force : bool
 val filename : string
 (* the name of the input file *)
 
+val unit_name : string
+(* the name of the Ada unit to which the input file corresponds *)
+
 val split_name : string
 (* name of the "split_goal" transformation *)
 
