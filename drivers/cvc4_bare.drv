@@ -301,6 +301,45 @@ theory ieee754.Single_RNE
 
 end
 
+theory ieee754.Double_RNE
+   meta "encoding : kept" type double
+
+   syntax type double "(_ FloatingPoint 11 53)"
+
+   syntax function  from_real "((_ to_fp 11 53) RNE %1)"
+
+   syntax function  to_real "((_ fp.to_real 11 53) %1)"
+
+   syntax function  abs  "(fp.abs %1)"
+   syntax function  neg  "(fp.neg %1)"
+   syntax function  (+)  "(fp.add RNE %1 %2)"
+   syntax function  (-)  "(fp.sub RNE %1 %2)"
+   syntax function  (*)  "(fp.mul RNE %1 %2)"
+   syntax function  (/)  "(fp.div RNE %1 %2)"
+   syntax function  fma  "(fp.fma RNE %1 %2 %3)"
+   syntax function  sqrt "(fp.sqrt RNE %1)"
+   syntax function  rem  "(fp.rem %1 %2)"
+   syntax function  rti  "(roundToIntegral RNE %1)"
+   syntax function  min  "(fp.min %1 %2)"
+   syntax function  max  "(fp.max %1 %2)"
+
+   syntax predicate fp_eq "(fp.eq %1 %2)"
+   syntax predicate (<=)  "(fp.leq %1 %2)"
+   syntax predicate (<)   "(fp.lt %1 %2)"
+   syntax predicate (>=)  "(fp.geq %1 %2)"
+   syntax predicate (>)   "(fp.gt %1 %2)"
+
+   syntax predicate isNormal    "(fp.isNormal %1)"
+   syntax predicate isSubnormal "(fp.isSubnormal %1)"
+   syntax predicate isSignMinus "(fp.isSignMinus %1)"
+   syntax predicate isZero      "(fp.isZero %1)"
+   syntax predicate isInfinite  "(fp.isInfinite %1)"
+   syntax predicate isNaN       "(fp.isNaN %1)"
+
+   syntax function fp_constant_zero "((_ to_fp 11 53) #x0000000000000000)"
+
+end
+
 (*
 Local Variables:
 mode: why

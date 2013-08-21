@@ -90,3 +90,19 @@ theory Single_RNE
       constant bits_in_significand = sb,
       constant rounding_mode = rm
 end
+
+theory Double_RNE
+   use export Rounding
+
+   type double
+
+   constant be : int = 11
+   constant sb : int = 53
+   constant rm : mode = rne
+
+   clone export IEEE_Float with
+      type t = double,
+      constant bits_in_exponent = be,
+      constant bits_in_significand = sb,
+      constant rounding_mode = rm
+end
