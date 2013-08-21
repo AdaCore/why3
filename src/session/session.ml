@@ -1344,67 +1344,6 @@ let set_file_expanded f b =
     List.iter (fun th -> set_theory_expanded th b) f.file_theories
 
 
-(** raw add_file *)
-let raw_add_file ~version ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
-  let add_goal parent acc goal =
-    let g =
-      let name,expl,task = x_goal goal in
-      raw_add_task ~version ~keygen:x_keygen ~expanded:true
-        parent name expl task
-    in g::acc
-  in
-  let add_file session f_name fmt file =
-    let rfile =
-      raw_add_file ~keygen:x_keygen ~expanded:true session f_name fmt
-    in
-    let add_theory acc thname theory =
-      let rtheory =
-        raw_add_theory ~keygen:x_keygen ~expanded:true rfile thname
-      in
-      let parent = Parent_theory rtheory in
-      let goals = x_fold_theory (add_goal parent) [] theory in
-      rtheory.theory_goals <- List.rev goals;
-      rtheory.theory_verified <- theory_verified rtheory;
-      rtheory::acc
-    in
-    let theories = x_fold_file add_theory [] file in
-    rfile.file_theories <- List.rev theories;
-    rfile
-  in
-  add_file
-
-(** nice functor *)
-
-(* Claude: "nice" ? but not used anyway
-module AddFile(X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * string option * Task.task
-
-  type theory
-  val fold_theory : ('a -> goal -> 'a) -> 'a -> theory -> 'a
-
-  type file
-  val fold_file :
-    ('a -> Ident.ident (** thname *) -> theory -> 'a) ->
-    'a -> file -> 'a
-
-end) = (struct
-  let add_file session fn ?format f =
-    let file = raw_add_file ~x_keygen:X.keygen ~x_goal:X.goal
-      ~version:Termcode.current_shape_version
-    ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session
-    fn format f in
-    check_file_verified notify file;
-    file
-end : sig
-  val add_file :
-    X.key session -> string -> ?format:string -> X.file -> X.key file
-end)
-*)
-
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
 let read_file env ?format fn =
@@ -1425,17 +1364,35 @@ let read_file env ?format fn =
     ltheories,theories
 
 let add_file_return_theories ~keygen env ?format filename =
-  let x_keygen = keygen in
-  let x_goal = Termcode.goal_expl_task ~root:true in
-  let x_fold_theory f acc th =
-    let tasks = List.rev (Task.split_theory th None None) in
-    List.fold_left f acc tasks in
-  let x_fold_file f acc ordered_theories =
-    List.fold_left (fun acc (_,thname,th) -> f acc thname th) acc
-      ordered_theories in
-  dprintf debug "[Load] file '%s'@\n" filename;
-  let add_file = raw_add_file ~version:env.session.session_shape_version
-    ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
+  let version = env.session.session_shape_version in
+  let add_goal parent acc goal =
+    let g =
+      let name,expl,task = Termcode.goal_expl_task ~root:true goal in
+      raw_add_task
+        ~version
+        ~keygen ~expanded:true
+        parent name expl task
+    in g::acc
+  in
+  let add_theory acc rfile thname theory =
+    let rtheory =
+      raw_add_theory ~keygen ~expanded:true rfile thname
+    in
+    let parent = Parent_theory rtheory in
+    let tasks = List.rev (Task.split_theory theory None None) in
+    let goals = List.fold_left (add_goal parent) [] tasks in
+    rtheory.theory_goals <- List.rev goals;
+    rtheory.theory_verified <- theory_verified rtheory;
+    rtheory::acc
+  in
+  let add_file session f_name fmt ordered_theories =
+    let rfile = raw_add_file ~keygen ~expanded:true session f_name fmt in
+    let theories =
+      List.fold_left (fun acc (_,thname,th) -> add_theory acc rfile thname th)
+        [] ordered_theories in
+    rfile.file_theories <- List.rev theories;
+    rfile
+  in
   let fname = Filename.concat env.session.session_dir filename in
   let ordered_theories,theories = read_file env.env ?format fname in
   let file = add_file env.session filename format ordered_theories in

@@ -490,47 +490,6 @@ val file_iter : ('key any -> unit) -> 'key file -> unit
 val session_iter : ('key any -> unit) -> 'key session -> unit
 val iter : ('key any -> unit) -> 'key any -> unit
 
-(** {2 Some functorized interface (not very useful...)}*)
-
-
-(* Claude: if "not very useful" then -> removed
-module AddTransf (X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * expl * Task.task
-
-  type transf
-  val fold_transf : ('a -> goal -> 'a) -> 'a -> Task.task -> transf -> 'a
-end) : sig
-  val add_transformation : X.key goal -> string -> X.transf -> X.key transf
-end
-*)
-
-(*
-module AddFile(X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * expl * Task.task
-
-  type theory
-  val fold_theory : ('a -> goal -> 'a) -> 'a -> theory -> 'a
-
-  type file
-  val fold_file :
-    ('a -> Ident.ident (** thname *) -> theory -> 'a) ->
-    'a -> file -> 'a
-
-end) : sig
-  val add_file :
-    X.key session -> string -> ?format:string -> X.file -> X.key file
-end
-*)
-
-
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
