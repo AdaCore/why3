@@ -7,66 +7,63 @@ exception Undetermined
 
 let builtins = Hls.create 17
 
-let const_of_big_int i =
-(*
+let ls_minus = ref ps_equ (* temporary *)
+
+let term_of_big_int i =
   if Big_int.sign_big_int i >= 0 then
-*)
     let s = Big_int.string_of_big_int i in
     t_const (Number.ConstInt (Number.int_const_dec s))
-(*
   else
-*)
+    let i = Big_int.minus_big_int i in
+    let s = Big_int.string_of_big_int i in
+    let c = t_const (Number.ConstInt (Number.int_const_dec s)) in
+    t_app_infer !ls_minus [c]
 
-let op_const op c1 c2 =
-  match c1,c2 with
-  | Number.ConstInt i1, Number.ConstInt i2 ->
-    let i1 = Number.compute_int i1 in
-    let i2 = Number.compute_int i2 in
-    op i1 i2
-  | _ -> assert false
+exception NotNum
 
-let uop_const op c =
-  match c with
-  | Number.ConstInt i ->
-    let i = Number.compute_int i in op i
-  | _ -> assert false
-
-let bin_const op c1 c2 =
-  let a = op_const op c1 c2 in
-  const_of_big_int a
-
-let unary_const op c =
-  let a = uop_const op c in
-  const_of_big_int a
+let rec big_int_of_term t =
+  match t.t_node with
+    | Tconst (Number.ConstInt i) -> Number.compute_int i
+    | Tapp(ls,[t1]) when ls_equal ls !ls_minus ->
+      let i = big_int_of_term t1 in
+      Big_int.minus_big_int i
+    | _ -> raise NotNum
 
 let eval_int_op op ls l =
   match l with
   | [t1;t2] ->
-    begin
-      match t1.t_node, t2.t_node with
-      | Tconst c1, Tconst c2 -> bin_const op c1 c2
-      | _ -> t_app_infer ls [t1;t2]
+    begin 
+      try
+        let i1 = big_int_of_term t1 in
+        let i2 = big_int_of_term t2 in
+        term_of_big_int (op i1 i2)
+      with NotNum ->
+        t_app_infer ls [t1;t2]
     end
   | _ -> assert false
 
 let eval_int_uop op ls l =
   match l with
   | [t1] ->
-    begin
-      match t1.t_node with
-      | Tconst c1 -> unary_const op c1
-      | _ -> t_app_infer ls [t1]
+    begin 
+      try
+        let i1 = big_int_of_term t1 in
+        term_of_big_int (op i1)
+      with NotNum ->
+        t_app_infer ls [t1]
     end
   | _ -> assert false
 
 let eval_int_rel op ls l =
   match l with
   | [t1;t2] ->
-    begin
-      match t1.t_node, t2.t_node with
-      | Tconst c1, Tconst c2 ->
-        if op_const op c1 c2 then t_true else t_false
-      | _ -> t_app_infer ls [t1;t2]
+    begin 
+      try
+        let i1 = big_int_of_term t1 in
+        let i2 = big_int_of_term t2 in
+        if op i1 i2 then t_true else t_false
+      with NotNum ->
+        t_app_infer ls [t1;t2]
     end
   | _ -> assert false
 
@@ -74,12 +71,16 @@ let eval_equ _ls l =
   match l with
   | [t1;t2] ->
     if t_equal_alpha t1 t2 then t_true else
-      begin match t1.t_node,t2.t_node with
-       | Ttrue, Tfalse | Tfalse, Ttrue -> t_false
-       | Tconst c1, Tconst c2 ->
-         if op_const Big_int.eq_big_int c1 c2 then
-           t_true else t_false
-       | _ -> t_equ t1 t2
+      begin
+        try
+          let i1 = big_int_of_term t1 in
+          let i2 = big_int_of_term t2 in
+          if Big_int.eq_big_int i1 i2 then
+            t_true else t_false
+        with NotNum ->
+          match t1.t_node,t2.t_node with
+            | Ttrue, Tfalse | Tfalse, Ttrue -> t_false
+            | _ -> t_equ t1 t2
       end
   | _ -> assert false
 
@@ -89,9 +90,7 @@ let built_in_theories =
     [ "infix +", eval_int_op Big_int.add_big_int;
       "infix -", eval_int_op Big_int.sub_big_int;
       "infix *", eval_int_op Big_int.mult_big_int;
-(* plante !
       "prefix -", eval_int_uop Big_int.minus_big_int;
-*)
       "infix <", eval_int_rel Big_int.lt_big_int;
       "infix <=", eval_int_rel Big_int.le_big_int;
       "infix >", eval_int_rel Big_int.gt_big_int;
@@ -105,6 +104,8 @@ let add_builtin_th env (l,n,d) =
     List.iter
       (fun (id,f) ->
         let ls = Theory.ns_find_ls th.Theory.th_export [id] in
+        if id = "prefix -" then
+          ls_minus := ls;
         Hls.add builtins ls f)
       d
   with Not_found -> ()
