@@ -13,3 +13,7 @@ val register :
    *)
 
 val print_messages_and_clear : unit -> unit
+(* print messages that have been registered so far and clear all messages *)
+
+val write_proof_result_file : unit -> unit
+(* write the final proof result file in JSON format to disk *)
