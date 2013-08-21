@@ -23,6 +23,24 @@ let eval_app ls tl ty =
         Exn_printer.exn_printer e;
       exit 2
 
+exception NoMatch
+exception Undetermined
+
+let rec matching env t p =
+  match p.pat_node,t.t_node with
+  | Pwild, _ -> env
+  | Pvar v, _ -> Mvs.add v t env
+  | Papp(ls1,pl), Tapp(ls2,tl) ->
+    if ls_equal ls1 ls2 then
+      List.fold_left2 matching env tl pl
+    else
+      if ls2.ls_constr > 0 then raise NoMatch
+      else raise Undetermined
+  | Papp _, _ -> raise Undetermined
+  | Por _, _ -> raise Undetermined
+  | Pas _, _ -> raise Undetermined
+
+
 let rec eval_term menv env t =
   match t.t_node with
   | Tvar x ->
@@ -47,10 +65,30 @@ let rec eval_term menv env t =
     | Tfalse -> eval_term menv env t3
     | _ -> t_if u t2 t3
     end
-  | Tlet(_t1,_tb) -> t (* TODO *)
-  | Tcase(_t1,_tbl) -> t (* TODO *)
+  | Tlet(t1,tb) ->
+    let u = eval_term menv env t1 in
+    let v,t2 = t_open_bound tb in
+    eval_term menv (Mvs.add v u env) t2
+  | Tcase(t1,tbl) ->
+    let u = eval_term menv env t1 in
+    eval_match menv env u tbl
   | Tquant _
   | Teps _
   | Tconst _
   | Ttrue
   | Tfalse -> t
+
+and eval_match menv env u tbl =
+  let rec iter tbl =
+    match tbl with
+    | [] ->
+      Format.eprintf "Pattern matching not exhaustive in evaluation ???@.";
+      exit 2
+    | b::rem ->
+      let p,t = t_open_branch b in
+      try
+        let env' = matching env u p in
+        eval_term menv env' t
+      with NoMatch -> iter rem
+  in
+  try iter tbl with Undetermined -> t_case u tbl

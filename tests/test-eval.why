@@ -4,7 +4,15 @@ theory T
 
   use import int.Int
 
-  constant c1 : int = 42
+  constant i1 : int = 42
+
+  constant i2 : int = 2+2
+
+(* test of the 'let' *)
+
+  constant let1 : int = let x = 42 in x + 1
+
+(* test of the 'if' *)
 
   constant c2 : int = if true then 1 else 2
 
@@ -14,12 +22,17 @@ theory T
 
   constant c5 : int = if 2 = 3 then 1 else 2
 
-  constant c6 : int = 2+2
 
   use import list.List
+
+(* test of the 'match' *)
 
   constant l1 : list int = Cons 5 Nil
 
   constant l2 : int = match Cons 5 Nil with Nil -> 1 | Cons _ _ -> 2 end
+
+  use import list.Append
+
+  constant l3 : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
 
 end
