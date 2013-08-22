@@ -212,6 +212,49 @@ and eval_app km menv env ty ls tl =
 
 
 
-let eval_term env km t =
+let eval_global_term env km t =
   get_builtins env;
   eval_term km Mvs.empty Mvs.empty t.t_ty t
+
+
+
+(* evaluation of WhyML expressions *)
+
+open Mlw_expr
+
+type result = Normal of term | Excep of Mlw_ty.xsymbol * term | Irred of expr
+
+let print_result fmt r =
+  match r with
+    | Normal t -> Pretty.print_term fmt t
+    | Excep(x,t) -> 
+      Format.fprintf fmt "@[exception %s(%a)@]" 
+        x.Mlw_ty.xs_name.Ident.id_string Pretty.print_term t
+    | Irred e -> 
+      Format.fprintf fmt "@[cannot execute expression %a@]" 
+        Mlw_pretty.print_expr e
+
+let eval_expr _mkm tkm menv env (e : expr) : result =
+  match e.e_node with
+  | Elogic t -> Normal (eval_term tkm menv env t.t_ty t)
+  | Evalue _
+  | Earrow _
+  | Eapp _
+  | Elet _
+  | Erec _
+  | Eif _
+  | Ecase _
+  | Eassign _ 
+  | Eghost _ 
+  | Eany _
+  | Eloop _
+  | Efor _
+  | Eraise _
+  | Etry _
+  | Eabstr _
+  | Eassert _
+  | Eabsurd -> Irred e
+
+let eval_global_expr env mkm tkm e =
+  get_builtins env;
+  eval_expr mkm tkm Mvs.empty Mvs.empty e

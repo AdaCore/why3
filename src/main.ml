@@ -29,6 +29,7 @@ let opt_queue = Queue.create ()
 let opt_input = ref None
 let opt_theory = ref None
 let opt_theory_eval = ref None
+let opt_exec = Queue.create ()
 let opt_trans = ref []
 let opt_metas = ref []
 
@@ -80,6 +81,8 @@ let add_opt_eval x = match !opt_theory_eval with
   | Some elist ->
       let l = Str.split (Str.regexp "\\.") x in
       Queue.push (x, l) elist
+
+let add_opt_exec x = Queue.push x opt_exec
 
 let add_opt_trans x = opt_trans := x::!opt_trans
 
@@ -135,7 +138,9 @@ let option_list = Arg.align [
   "--goal", Arg.String add_opt_goal,
       " same as -G";
   "--eval", Arg.String add_opt_eval,
-      "<id> Evaluate <id> in the last selected theory";
+      "<id> Evaluate constant <id> in the last selected theory";
+  "--exec", Arg.String add_opt_exec,
+      "<M.id> Execution function <id> in module <M>";
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
@@ -526,7 +531,7 @@ let do_theory env drv fname tname th glist elist =
         let l,t = Decl.open_ls_defn d in
         match l with
         | [] ->
-          let t = Mlw_interp.eval_term env th.th_known t in
+          let t = Mlw_interp.eval_global_term env th.th_known t in
           printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Pretty.print_term t
         | _ ->
           eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;
@@ -549,6 +554,61 @@ let do_local_theory env drv fname m (tname,_,t,glist,elist) =
     exit 1
   in
   do_theory env drv fname tname th glist elist
+
+(* program execution *)
+
+let do_exec env fname cin exec =
+  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then     
+    let lib = Mlw_main.library_of_env env in
+    let mm, _thm = Mlw_main.read_channel lib [] fname cin in
+    let do_exec x =
+      let mid,name = 
+        match Str.split (Str.regexp "\\.") x with
+          | [m;i] -> m,i
+          | _ ->
+            Format.eprintf 
+              "'--exec argument must be of the form 'module.ident'@.";
+            exit 2
+      in
+      let m = try Mstr.find mid mm with Not_found ->
+        eprintf "Module '%s' not found.@." mid;
+        exit 1
+      in
+      let ps = try Mlw_module.ns_find_ps m.Mlw_module.mod_export [name] 
+        with Not_found ->
+          eprintf "Function '%s' not found in module '%s'.@." name mid;
+          exit 1
+      in
+      let d = Mlw_decl.find_definition m.Mlw_module.mod_known ps in
+      let lam = d.Mlw_expr.fun_lambda in
+      match lam.Mlw_expr.l_args with
+        | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
+          let res =
+            Mlw_interp.eval_global_expr env
+              m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known 
+              lam.Mlw_expr.l_expr
+          in
+          printf "@[<hov 2>Execution of %s ():@ %a@]@." 
+            x Mlw_interp.print_result res
+        | _ -> 
+          eprintf "Only functions with one unit argument can be executed.@.";
+          exit 1
+    in
+    Queue.iter do_exec exec
+(*
+    if Queue.is_empty tlist then begin
+      let do_m t m thm =
+        do_extract_module edrv ~fname t m; Mstr.remove t thm in
+      let thm = Mstr.fold do_m mm thm in
+      Mstr.iter (fun t th -> do_extract_theory edrv ~fname t th) thm
+    end else
+      Queue.iter (do_extract_module_from edrv fname mm thm) tlist
+*)
+ else 
+  begin
+    Format.eprintf "'--exec is available only for mlw files@.";
+    exit 2
+  end
 
 (* program extraction *)
 
@@ -652,38 +712,52 @@ let do_input env drv edrv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      if !opt_token_count then begin
-        let lb = Lexing.from_channel cin in
-        let a,p = Lexer.token_counter lb in
-        close_in cin;
-        if a = 0 then begin
-          (* hack: we assume it is a why file and not a mlw *)
-          total_annot_tokens := !total_annot_tokens + p;
-          Format.printf "File %s: %d tokens@." f p;
-        end else begin
-          total_program_tokens := !total_program_tokens + p;
-          total_annot_tokens := !total_annot_tokens + a;
-          Format.printf "File %s: %d tokens in annotations@." f a;
-          Format.printf "File %s: %d tokens in programs@." f p
-        end
-      end else if edrv <> None then begin
-        do_local_extract (Opt.get edrv) fname cin tlist;
-        close_in cin
-      end else begin
-        let m = Env.read_channel ?format:!opt_parser env fname cin in
-        close_in cin;
-        if Debug.test_flag Typing.debug_type_only then
-          ()
-        else
-          if Queue.is_empty tlist then
-            let glist = Queue.create () in
-            let elist = Queue.create () in
-            let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-            let do_th _ (t,th) = do_theory env drv fname t th glist elist in
-            Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+      if !opt_token_count then 
+        begin
+          let lb = Lexing.from_channel cin in
+          let a,p = Lexer.token_counter lb in
+          close_in cin;
+          if a = 0 then 
+            begin
+              (* hack: we assume it is a why file and not a mlw *)
+              total_annot_tokens := !total_annot_tokens + p;
+              Format.printf "File %s: %d tokens@." f p;
+            end 
+          else 
+            begin
+              total_program_tokens := !total_program_tokens + p;
+              total_annot_tokens := !total_annot_tokens + a;
+              Format.printf "File %s: %d tokens in annotations@." f a;
+              Format.printf "File %s: %d tokens in programs@." f p
+            end
+        end 
+      else 
+        if edrv <> None then 
+          begin
+            do_local_extract (Opt.get edrv) fname cin tlist;
+            close_in cin
+          end 
+        else 
+          if not (Queue.is_empty opt_exec) then
+            do_exec env fname cin opt_exec
           else
-            Queue.iter (do_local_theory env drv fname m) tlist
-      end
+            begin
+              let m = Env.read_channel ?format:!opt_parser env fname cin in
+              close_in cin;
+              if Debug.test_flag Typing.debug_type_only then
+                ()
+              else
+                if Queue.is_empty tlist then
+                  let glist = Queue.create () in
+                  let elist = Queue.create () in
+                  let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+                  let do_th _ (t,th) = 
+                    do_theory env drv fname t th glist elist 
+                  in
+                  Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+                else
+                  Queue.iter (do_local_theory env drv fname m) tlist
+            end
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then

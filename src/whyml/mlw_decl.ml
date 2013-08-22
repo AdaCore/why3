@@ -251,6 +251,20 @@ let find_invariant kn its =
   | PDdata tdl -> snd (find_td its tdl)
   | PDval _ | PDlet _ | PDrec _ | PDexn _ -> assert false
 
+let rec find_def ps = function
+  | d :: _ when ps_equal ps d.fun_ps -> d
+  | _ :: l -> find_def ps l
+  | [] -> raise Not_found
+
+let find_definition kn ps =
+  match (Mid.find ps.ps_name kn).pd_node with
+  | PDtype _ -> assert false
+  | PDdata _ -> assert false
+  | PDval _ -> assert false
+  | PDlet _ -> assert false
+  | PDrec dl -> find_def ps dl
+  | PDexn _ -> assert false
+
 let check_match lkn _kn d =
   let rec checkE () e = match e.e_node with
     | Ecase (e1,bl) ->
