@@ -44,8 +44,10 @@ type expl
 *)
 
 type task_option
-(** Currently just an option on a task, but later perhaps
-    we should be able to release a task and rebuild it when needed *)
+(** The task can be removed and later reconstructible *)
+
+type 'a hide
+(** For internal use *)
 
 
 type ident_path =
@@ -81,7 +83,7 @@ type 'a goal = private
       mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
       mutable goal_verified : bool;
-      goal_task: task_option;
+      mutable goal_task: task_option;
       mutable goal_expanded : bool;
       goal_external_proofs : 'a proof_attempt PHprover.t;
       goal_transformations : 'a transf PHstr.t;
@@ -135,6 +137,7 @@ and 'a theory = private
       (** Not mutated after the creation *)
       mutable theory_verified : bool;
       mutable theory_expanded : bool;
+      mutable theory_task : Theory.theory hide;
     }
 
 and 'a file = private
@@ -146,6 +149,7 @@ and 'a file = private
       (** Not mutated after the creation *)
       mutable file_verified : bool;
       mutable file_expanded : bool;
+      mutable file_for_recovery : Theory.theory Mstr.t hide;
     }
 
 and 'a session = private
@@ -264,7 +268,7 @@ val add_metas_to_goal :
 exception NoTask
 val goal_task : 'key goal -> Task.task
 (** Return the task of a goal. Raise NoTask if the goal doesn't contain a task
-    (equivalent to 'key = notask) *)
+    (equivalent to 'key = notask if release_task is not used) *)
 
 val goal_task_option : 'key goal -> Task.task option
 (** Return the task of a goal. *)
@@ -440,7 +444,22 @@ val add_file :
 val remove_file : 'key file -> unit
 (** Remove a file *)
 
+(** {2 Free and recover task} *)
+(** Tasks are stored inside the goals. For releasing memory you can remove
+    them. Later you can recompute them *)
 
+val release_task: 'a goal -> unit
+  (** remove the task stored in this goal*)
+
+val release_sub_tasks: 'a goal -> unit
+  (** apply the previous function on this goal and its its sub-goal *)
+
+val recover_theory_tasks: 'a env_session -> 'a theory -> unit
+  (** Recover all the sub-goal (not only strict) of this theory *)
+
+val goal_task_or_recover: 'a env_session -> 'a goal -> Task.task
+  (** same as goal_task but recover the task goal and all the one of this
+      theory if this goal task have been released *)
 
 (** {2 Iterators} *)
 

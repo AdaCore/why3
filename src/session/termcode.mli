@@ -22,6 +22,7 @@ type shape
 val print_shape: Format.formatter -> shape -> unit
 val string_of_shape: shape -> string
 val shape_of_string: string -> shape
+val equal_shape: shape -> shape -> bool
 
 (* val t_shape_buf : ?version:int -> Term.term -> shape *)
   (** returns the shape of a given term *)

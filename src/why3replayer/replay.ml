@@ -364,7 +364,7 @@ let add_to_check_no_smoke config found_obs env_session sched =
         exit 1
       end
   in
-  M.check_all ~callback env_session sched
+  M.check_all ~release:true ~callback env_session sched
 
 let add_to_check_smoke env_session sched =
   let callback report =

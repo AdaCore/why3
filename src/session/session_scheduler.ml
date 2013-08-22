@@ -713,12 +713,19 @@ let check_goal_and_children eS eT todo g =
   goal_iter_proof_attempt (check_external_proof eS eT todo) g
 *)
 
-let check_all eS eT ~callback =
+let check_all ?(release=false) eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
  let todo = Todo.create [] push_report callback in
   Todo.start todo;
-  session_iter_proof_attempt (check_external_proof eS eT todo)
-    eS.session;
+  let check_top_goal g =
+    goal_iter_proof_attempt (check_external_proof eS eT todo) g;
+    if release then release_sub_tasks g
+  in
+  PHstr.iter (fun _ file ->
+      List.iter  (fun t ->
+          List.iter  check_top_goal t.theory_goals)
+        file.file_theories)
+    eS.session.session_files;
   Todo.stop todo
 
 
