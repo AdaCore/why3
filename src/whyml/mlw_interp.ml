@@ -45,6 +45,22 @@ let rec matching env t p =
 
 (* builtin symbols *)
 
+let computer_div_mod_big_int x y =
+  let q,r = Big_int.quomod_big_int x y in
+  (* we have x = q*y + r with 0 <= r < |y| *)
+  if Big_int.sign_big_int x < 0 then
+    if Big_int.sign_big_int y < 0 then
+      (Big_int.pred_big_int q, Big_int.add_big_int r y)
+    else
+      (Big_int.succ_big_int q, Big_int.sub_big_int r y)
+  else (q,r)
+
+let computer_div_big_int x y =
+  fst (computer_div_mod_big_int x y)
+
+let computer_mod_big_int x y =
+  snd (computer_div_mod_big_int x y)
+
 let builtins = Hls.create 17
 
 let ls_minus = ref ps_equ (* temporary *)
@@ -77,7 +93,7 @@ let eval_int_op op ls l =
         let i1 = big_int_of_term t1 in
         let i2 = big_int_of_term t2 in
         term_of_big_int (op i1 i2)
-      with NotNum ->
+      with NotNum | Division_by_zero ->
         t_app_infer ls [t1;t2]
     end
   | _ -> assert false
@@ -124,7 +140,6 @@ let eval_equ _ls l =
       end
   | _ -> assert false
 
-
 let built_in_theories =
   [ ["int"],"Int",
     [ "infix +", eval_int_op Big_int.add_big_int;
@@ -135,7 +150,15 @@ let built_in_theories =
       "infix <=", eval_int_rel Big_int.le_big_int;
       "infix >", eval_int_rel Big_int.gt_big_int;
       "infix >=", eval_int_rel Big_int.ge_big_int;
-    ]
+    ] ;
+    ["int"],"ComputerDivision",
+    [ "div", eval_int_op computer_div_big_int;
+      "mod", eval_int_op computer_mod_big_int;
+    ] ;
+    ["int"],"EuclideanDivision",
+    [ "div", eval_int_op Big_int.div_big_int;
+      "mod", eval_int_op Big_int.mod_big_int;
+    ] ;
   ]
 
 let add_builtin_th env (l,n,d) =
@@ -295,7 +318,7 @@ let rec eval_expr env (e : expr) : result =
         end
       | LetA _ -> Irred e
     end
-  | Eapp(e,pvs,spec) ->
+  | Eapp(e,pvs,_spec) ->
     begin match eval_expr env e with
       | Fun ps ->
         begin
