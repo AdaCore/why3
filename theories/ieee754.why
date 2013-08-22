@@ -25,41 +25,42 @@ theory IEEE_Float
    function from_real (x:real) : t
    function to_real (x:t)      : real
 
-   function abs  (x:t) : t
+   function fp_abs (x:t) : t
    (* absolute value, no rounding mode *)
 
-   function neg  (x:t) : t
+   function fp_neg (x:t) : t
    (* absolute value, no rounding mode *)
 
-   function (+)  (x:t) (y:t) : t
+   function fp_add (x:t) (y:t) : t
 
-   function (-)  (x:t) (y:t) : t
+   function fp_sub (x:t) (y:t) : t
 
-   function (*)  (x:t) (y:t) : t
+   function fp_mul (x:t) (y:t) : t
 
-   function (/)  (x:t) (y:t) : t
+   function fp_div (x:t) (y:t) : t
 
-   function fma  (x:t) (y:t) (z:t) : t
+   function fp_fma (x:t) (y:t) (z:t) : t
    (* fused multiplication and addition: x*y+z *)
 
-   function sqrt (x:t) : t
+   function fp_sqrt (x:t) : t
 
-   function rem  (x:t) (y:t) : t
+   function fp_rem (x:t) (y:t) : t
    (* x-y*n, where n in Z is nearest to x/y *)
 
-   function rti  (x:t) : t
+   function roundToIntegral (x:t) : t
    (* round to integral *)
 
-   function min  (x:t) (y:t) : t
-   function max  (x:t) (y:t) : t
+   function fp_min (x:t) (y:t) : t
+   function fp_max (x:t) (y:t) : t
 
    (*** comparison operators ***)
 
-   predicate fp_eq t t
-   predicate (<=) t t
-   predicate (<)  t t
-   predicate (>=) t t
-   predicate (>)  t t
+   predicate fp_eq  t t
+   predicate fp_neq (x:t) (y:t) = not (fp_eq x y)
+   predicate fp_leq t t
+   predicate fp_lt  t t
+   predicate fp_geq t t
+   predicate fp_gt  t t
 
    (*** classification of numbers ***)
 

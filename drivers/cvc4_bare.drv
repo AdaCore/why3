@@ -263,6 +263,8 @@ theory ieee754.Rounding
 end
 
 theory ieee754.Single_RNE
+   prelude ";;; this is a prelude for CVC4 32-bit floating point"
+
    meta "encoding : kept" type single
 
    syntax type single "(_ FloatingPoint 8 24)"
@@ -271,24 +273,25 @@ theory ieee754.Single_RNE
 
    syntax function  to_real "((_ fp.to_real 8 24) %1)"
 
-   syntax function  abs  "(fp.abs %1)"
-   syntax function  neg  "(fp.neg %1)"
-   syntax function  (+)  "(fp.add RNE %1 %2)"
-   syntax function  (-)  "(fp.sub RNE %1 %2)"
-   syntax function  (*)  "(fp.mul RNE %1 %2)"
-   syntax function  (/)  "(fp.div RNE %1 %2)"
-   syntax function  fma  "(fp.fma RNE %1 %2 %3)"
-   syntax function  sqrt "(fp.sqrt RNE %1)"
-   syntax function  rem  "(fp.rem %1 %2)"
-   syntax function  rti  "(roundToIntegral RNE %1)"
-   syntax function  min  "(fp.min %1 %2)"
-   syntax function  max  "(fp.max %1 %2)"
+   syntax function  fp_abs  "(fp.abs %1)"
+   syntax function  fp_neg  "(fp.neg %1)"
+   syntax function  fp_add  "(fp.add RNE %1 %2)"
+   syntax function  fp_sub  "(fp.sub RNE %1 %2)"
+   syntax function  fp_mul  "(fp.mul RNE %1 %2)"
+   syntax function  fp_div  "(fp.div RNE %1 %2)"
+   syntax function  fp_fma  "(fp.fma RNE %1 %2 %3)"
+   syntax function  fp_sqrt "(fp.sqrt RNE %1)"
+   syntax function  fp_rem  "(fp.rem %1 %2)"
+   syntax function  fp_min  "(fp.min %1 %2)"
+   syntax function  fp_max  "(fp.max %1 %2)"
 
-   syntax predicate fp_eq "(fp.eq %1 %2)"
-   syntax predicate (<=)  "(fp.leq %1 %2)"
-   syntax predicate (<)   "(fp.lt %1 %2)"
-   syntax predicate (>=)  "(fp.geq %1 %2)"
-   syntax predicate (>)   "(fp.gt %1 %2)"
+   syntax function  roundToIntegral  "(roundToIntegral RNE %1)"
+
+   syntax predicate fp_eq  "(fp.eq %1 %2)"
+   syntax predicate fp_leq "(fp.leq %1 %2)"
+   syntax predicate fp_lt  "(fp.lt %1 %2)"
+   syntax predicate fp_geq "(fp.geq %1 %2)"
+   syntax predicate fp_gt  "(fp.gt %1 %2)"
 
    syntax predicate isNormal    "(fp.isNormal %1)"
    syntax predicate isSubnormal "(fp.isSubnormal %1)"
@@ -302,6 +305,8 @@ theory ieee754.Single_RNE
 end
 
 theory ieee754.Double_RNE
+   prelude ";;; this is a prelude for CVC4 64-bit floating point"
+
    meta "encoding : kept" type double
 
    syntax type double "(_ FloatingPoint 11 53)"
@@ -310,24 +315,25 @@ theory ieee754.Double_RNE
 
    syntax function  to_real "((_ fp.to_real 11 53) %1)"
 
-   syntax function  abs  "(fp.abs %1)"
-   syntax function  neg  "(fp.neg %1)"
-   syntax function  (+)  "(fp.add RNE %1 %2)"
-   syntax function  (-)  "(fp.sub RNE %1 %2)"
-   syntax function  (*)  "(fp.mul RNE %1 %2)"
-   syntax function  (/)  "(fp.div RNE %1 %2)"
-   syntax function  fma  "(fp.fma RNE %1 %2 %3)"
-   syntax function  sqrt "(fp.sqrt RNE %1)"
-   syntax function  rem  "(fp.rem %1 %2)"
-   syntax function  rti  "(roundToIntegral RNE %1)"
-   syntax function  min  "(fp.min %1 %2)"
-   syntax function  max  "(fp.max %1 %2)"
+   syntax function  fp_abs  "(fp.abs %1)"
+   syntax function  fp_neg  "(fp.neg %1)"
+   syntax function  fp_add  "(fp.add RNE %1 %2)"
+   syntax function  fp_sub  "(fp.sub RNE %1 %2)"
+   syntax function  fp_mul  "(fp.mul RNE %1 %2)"
+   syntax function  fp_div  "(fp.div RNE %1 %2)"
+   syntax function  fp_fma  "(fp.fma RNE %1 %2 %3)"
+   syntax function  fp_sqrt "(fp.sqrt RNE %1)"
+   syntax function  fp_rem  "(fp.rem %1 %2)"
+   syntax function  fp_min  "(fp.min %1 %2)"
+   syntax function  fp_max  "(fp.max %1 %2)"
 
-   syntax predicate fp_eq "(fp.eq %1 %2)"
-   syntax predicate (<=)  "(fp.leq %1 %2)"
-   syntax predicate (<)   "(fp.lt %1 %2)"
-   syntax predicate (>=)  "(fp.geq %1 %2)"
-   syntax predicate (>)   "(fp.gt %1 %2)"
+   syntax function  roundToIntegral  "(roundToIntegral RNE %1)"
+
+   syntax predicate fp_eq  "(fp.eq %1 %2)"
+   syntax predicate fp_leq "(fp.leq %1 %2)"
+   syntax predicate fp_lt  "(fp.lt %1 %2)"
+   syntax predicate fp_geq "(fp.geq %1 %2)"
+   syntax predicate fp_gt  "(fp.gt %1 %2)"
 
    syntax predicate isNormal    "(fp.isNormal %1)"
    syntax predicate isSubnormal "(fp.isSubnormal %1)"
