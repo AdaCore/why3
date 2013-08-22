@@ -1,9 +1,49 @@
 
 open Term
 
+(* environment *)
+
+open Mlw_ty
+
+type env = {
+  mknown : Mlw_decl.known_map;
+  tknown : Decl.known_map;
+(*
+  pvsenv : term Mpv.t;
+*)
+  vsenv : term Mvs.t;
+}
+
+(*
+let bind_pvs v t env = { env with pvsenv = Mpv.add v t env.pvsenv }
+*)
+
+let bind_vs v t env = { env with vsenv = Mvs.add v t env.vsenv }
+
+let multibind_vs l tl env =
+  try
+    List.fold_right2 bind_vs l tl env
+  with Invalid_argument _ -> assert false
+
 exception NoMatch
 exception Undetermined
 
+let rec matching env t p =
+  match p.pat_node,t.t_node with
+  | Pwild, _ -> env
+  | Pvar v, _ -> bind_vs v t env
+  | Papp(ls1,pl), Tapp(ls2,tl) ->
+    if ls_equal ls1 ls2 then
+      List.fold_left2 matching env tl pl
+    else
+      if ls2.ls_constr > 0 then raise NoMatch
+      else raise Undetermined
+  | Papp _, _ -> raise Undetermined
+  | Por _, _ -> raise Undetermined
+  | Pas _, _ -> raise Undetermined
+
+
+(* builtin symbols *)
 
 let builtins = Hls.create 17
 
@@ -32,7 +72,7 @@ let rec big_int_of_term t =
 let eval_int_op op ls l =
   match l with
   | [t1;t2] ->
-    begin 
+    begin
       try
         let i1 = big_int_of_term t1 in
         let i2 = big_int_of_term t2 in
@@ -45,7 +85,7 @@ let eval_int_op op ls l =
 let eval_int_uop op ls l =
   match l with
   | [t1] ->
-    begin 
+    begin
       try
         let i1 = big_int_of_term t1 in
         term_of_big_int (op i1)
@@ -57,7 +97,7 @@ let eval_int_uop op ls l =
 let eval_int_rel op ls l =
   match l with
   | [t1;t2] ->
-    begin 
+    begin
       try
         let i1 = big_int_of_term t1 in
         let i2 = big_int_of_term t2 in
@@ -115,26 +155,12 @@ let get_builtins env =
   Hls.add builtins ps_equ eval_equ;
   List.iter (add_builtin_th env) built_in_theories
 
-let rec matching env t p =
-  match p.pat_node,t.t_node with
-  | Pwild, _ -> env
-  | Pvar v, _ -> Mvs.add v t env
-  | Papp(ls1,pl), Tapp(ls2,tl) ->
-    if ls_equal ls1 ls2 then
-      List.fold_left2 matching env tl pl
-    else
-      if ls2.ls_constr > 0 then raise NoMatch
-      else raise Undetermined
-  | Papp _, _ -> raise Undetermined
-  | Por _, _ -> raise Undetermined
-  | Pas _, _ -> raise Undetermined
 
-
-let rec eval_term km menv env ty t =
-  let eval_rec t = eval_term km menv env t.t_ty t in
+let rec eval_term env ty t =
+  let eval_rec t = eval_term env t.t_ty t in
   match t.t_node with
   | Tvar x ->
-    begin try Mvs.find x env
+    begin try Mvs.find x env.vsenv
       with Not_found -> t
     end
   | Tbinop(Tand,t1,t2) ->
@@ -147,28 +173,28 @@ let rec eval_term km menv env ty t =
     t_iff_simp (eval_rec t1) (eval_rec t2)
   | Tnot t1 -> t_not_simp (eval_rec t1)
   | Tapp(ls,tl) ->
-    eval_app km menv env ty ls (List.map eval_rec tl)
+    eval_app env ty ls (List.map eval_rec tl)
   | Tif(t1,t2,t3) ->
     let u = eval_rec t1 in
     begin match u.t_node with
-    | Ttrue -> eval_term km menv env ty t2
-    | Tfalse -> eval_term km menv env ty t3
+    | Ttrue -> eval_term env ty t2
+    | Tfalse -> eval_term env ty t3
     | _ -> t_if u t2 t3
     end
   | Tlet(t1,tb) ->
     let u = eval_rec t1 in
     let v,t2 = t_open_bound tb in
-    eval_term km menv (Mvs.add v u env) ty t2
+    eval_term (bind_vs v u env) ty t2
   | Tcase(t1,tbl) ->
     let u = eval_rec t1 in
-    eval_match km menv env ty u tbl
+    eval_match env ty u tbl
   | Tquant _
   | Teps _
   | Tconst _
   | Ttrue
   | Tfalse -> t
 
-and eval_match km menv env ty u tbl =
+and eval_match env ty u tbl =
   let rec iter tbl =
     match tbl with
     | [] ->
@@ -178,19 +204,19 @@ and eval_match km menv env ty u tbl =
       let p,t = t_open_branch b in
       try
         let env' = matching env u p in
-        eval_term km menv env' ty t
+        eval_term env' ty t
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined -> t_case u tbl
 
-and eval_app km menv env ty ls tl =
+and eval_app env ty ls tl =
   try
     let f = Hls.find builtins ls in
     f ls tl
   with Not_found ->
     match
       try
-        Decl.find_logic_definition km ls
+        Decl.find_logic_definition env.tknown ls
       with Not_found ->
         Format.eprintf "lsymbol %s not found in term evaluation@."
           ls.ls_name.Ident.id_string;
@@ -210,14 +236,23 @@ and eval_app km menv env ty ls tl =
       end
     | Some d ->
       let l,t = Decl.open_ls_defn d in
-      let env' = List.fold_right2 Mvs.add l tl env in
-      eval_term km menv env' ty t
+      let env' = multibind_vs l tl env in
+      eval_term env' ty t
 
 
 
 let eval_global_term env km t =
   get_builtins env;
-  eval_term km Mvs.empty Mvs.empty t.t_ty t
+  let env =
+    { mknown = Ident.Mid.empty;
+      tknown = km;
+(*
+      pvsenv = Mpv.empty;
+*)
+      vsenv = Mvs.empty;
+    }
+  in
+  eval_term env t.t_ty t
 
 
 
@@ -225,30 +260,93 @@ let eval_global_term env km t =
 
 open Mlw_expr
 
-type result = Normal of term | Excep of Mlw_ty.xsymbol * term | Irred of expr
+type result =
+  | Normal of term
+  | Excep of xsymbol * term
+  | Irred of expr
+  | Fun of psymbol
 
 let print_result fmt r =
   match r with
-    | Normal t -> Pretty.print_term fmt t
-    | Excep(x,t) -> 
-      Format.fprintf fmt "@[exception %s(%a)@]" 
-        x.Mlw_ty.xs_name.Ident.id_string Pretty.print_term t
-    | Irred e -> 
-      Format.fprintf fmt "@[cannot execute expression %a@]" 
+    | Normal t ->
+      Format.fprintf fmt "@[%a@]" Pretty.print_term t
+    | Excep(x,t) ->
+      Format.fprintf fmt "@[exception %s(@[%a@])@]"
+        x.xs_name.Ident.id_string Pretty.print_term t
+    | Irred e ->
+      Format.fprintf fmt "@[Cannot execute expression@ @[%a@]@]"
         Mlw_pretty.print_expr e
+    | Fun _ ->
+      Format.fprintf fmt "@[Result is a function@]"
 
-let eval_expr _mkm tkm menv env (e : expr) : result =
+let rec eval_expr env (e : expr) : result =
   match e.e_node with
-  | Elogic t -> Normal (eval_term tkm menv env t.t_ty t)
+  | Elogic t -> Normal (eval_term env t.t_ty t)
+  | Elet(ld,e1) ->
+    begin match ld.let_sym with
+      | LetV pvs ->
+        begin match eval_expr env ld.let_expr with
+          | Normal t ->
+(*
+            eval_expr (bind_pvs pvs t env) e1
+*)
+            eval_expr (bind_vs pvs.pv_vs t env) e1
+          | r -> r
+        end
+      | LetA _ -> Irred e
+    end
+  | Eapp(e,pvs,spec) ->
+    begin match eval_expr env e with
+      | Fun ps ->
+        begin
+          let d =
+            try
+              Mlw_decl.find_definition env.mknown ps
+            with Not_found ->
+              Format.eprintf "psymbol %s not found in execution@."
+                ps.ps_name.Ident.id_string;
+              exit 2
+          in
+          let lam = d.fun_lambda in
+          match lam.l_args with
+            | [pvs1] ->              
+              let env' = bind_vs pvs1.pv_vs (Mvs.find pvs.pv_vs env.vsenv) env in
+              eval_expr env' lam.l_expr
+            | _ ->
+              Format.eprintf "psymbol %s as more than 1 arg@."
+                ps.ps_name.Ident.id_string;
+              exit 2
+        end
+      | _ -> Irred e
+    end
+  | Earrow ps -> Fun ps
+  | Eif(e1,e2,e3) ->
+    begin
+      let c = eval_expr env e1 in
+      match c with
+        | Normal t ->
+          begin
+            match t.t_node with
+              | Ttrue -> eval_expr env e2
+              | Tfalse -> eval_expr env e3
+              | _ ->
+                Format.eprintf "@[Cannot interp condition of if: @[%a@]@]@."
+                  Pretty.print_term t;
+                Irred e
+          end
+        | _ ->
+(*
+          Format.eprintf
+            "@[Condition of if did not evaluate normally: @[%a@]@]@."
+            print_result c;
+*)
+          c
+    end
   | Evalue _
-  | Earrow _
-  | Eapp _
-  | Elet _
   | Erec _
-  | Eif _
   | Ecase _
-  | Eassign _ 
-  | Eghost _ 
+  | Eassign _
+  | Eghost _
   | Eany _
   | Eloop _
   | Efor _
@@ -256,8 +354,20 @@ let eval_expr _mkm tkm menv env (e : expr) : result =
   | Etry _
   | Eabstr _
   | Eassert _
-  | Eabsurd -> Irred e
+  | Eabsurd ->
+    Format.eprintf "@[Unsupported expression: @[%a@]@]"
+                  Mlw_pretty.print_expr e;
+    Irred e
 
 let eval_global_expr env mkm tkm e =
   get_builtins env;
-  eval_expr mkm tkm Mvs.empty Mvs.empty e
+  let env = {
+    mknown = mkm;
+    tknown = tkm;
+(*
+    pvsenv = Mpv.empty;
+*)
+    vsenv = Mvs.empty;
+  }
+  in
+  eval_expr env e
