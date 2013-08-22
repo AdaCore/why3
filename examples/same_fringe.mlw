@@ -73,3 +73,27 @@ module SameFringe
   let test5 () = same_fringe (Node (leaf a) b Empty) (Node Empty b (leaf a))
 
 end
+
+(* FIXME: the command
+     why3 examples/same_fringe.mlw --exec Test.test1
+   triggers a bug:
+     File "src/whyml/mlw_decl.ml", line 263, characters 15-21: Assertion failed
+*)
+module Test
+
+  use import int.Int
+  clone import SameFringe with type elt = int
+
+  let test1 () = enum Empty Done
+  let test2 () = eq_enum Done Done
+  let test3 () = same_fringe Empty Empty
+
+  constant a : int = 1
+  constant b : int = 2
+
+  let leaf x = Node Empty x Empty
+
+  let test4 () = same_fringe (Node (leaf a) b Empty) (Node Empty a (leaf b))
+  let test5 () = same_fringe (Node (leaf a) b Empty) (Node Empty b (leaf a))
+
+end
