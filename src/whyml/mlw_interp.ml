@@ -133,6 +133,10 @@ let term_equality t1 t2 =
     with NotNum ->
       match t1.t_node,t2.t_node with
         | Ttrue, Tfalse | Tfalse, Ttrue -> Some false
+        | Tapp(ls1,[]),Tapp(ls2,[]) when
+            ls_equal ls1 fs_bool_true && ls_equal ls2 fs_bool_false 
+            || ls_equal ls1 fs_bool_false && ls_equal ls2 fs_bool_true 
+            -> Some false
         | _ -> None
 
 let eval_equ _ty _ls l =
@@ -422,7 +426,11 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           begin
             match t.t_node with
               | Ttrue -> eval_expr env s' e2
+              | Tapp(ls,[]) when ls_equal ls fs_bool_true
+                -> eval_expr env s' e2
               | Tfalse -> eval_expr env s' e3
+              | Tapp(ls,[]) when ls_equal ls fs_bool_false
+                  -> eval_expr env s' e3
               | _ ->
                 Format.eprintf "@[Cannot interp condition of if: @[%a@]@]@."
                   Pretty.print_term t;
