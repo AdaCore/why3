@@ -721,6 +721,10 @@ let t_app_infer ls tl =
   let s = ls_arg_inst ls tl in
   t_app ls tl (oty_inst s ls.ls_value)
 
+let t_app_infer_inst ls tl ty =
+  let s = ls_arg_inst ls tl in
+  t_app ls tl (oty_inst s ty)
+
 let t_app ls tl ty = ignore (ls_app_inst ls tl ty); t_app ls tl ty
 
 let fs_app fs tl ty = t_app fs tl (Some ty)

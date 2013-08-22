@@ -203,6 +203,11 @@ val t_app_infer : lsymbol -> term list -> term
 val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
+val t_app_infer_inst : lsymbol -> term list -> ty option ->term
+(** [t_app_infer_inst ls tl ty] builds the application of
+    symbol [ls] to arguments [tl], enforcing the result type to
+    an instance of type [ty] *)
+
 val t_var : vsymbol -> term
 val t_const : Number.constant -> term
 val t_if : term -> term -> term -> term

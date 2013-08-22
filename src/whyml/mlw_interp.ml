@@ -198,11 +198,14 @@ and eval_app km menv env ty ls tl =
     with
     | None ->
       begin try
-        t_app ls tl ty
+        t_app_infer_inst ls tl ty
         with e ->
-          Format.eprintf "@[<hov 2>Exception during term evaluation (t_app %s):@ %a@]@."
+          Format.eprintf "@[<hov 2>Exception during term evaluation (t_app %s):@ %a@\nty = %a,@ tl = %a@]@."
             ls.ls_name.Ident.id_string
-            Exn_printer.exn_printer e;
+            Exn_printer.exn_printer e
+            (Pp.print_option Pretty.print_ty) ty
+            (Pp.print_list Pp.comma Pretty.print_term) tl
+          ;
           exit 2
       end
     | Some d ->
