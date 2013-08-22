@@ -159,7 +159,12 @@ let all_messages = ref []
 let write_proof_result_file l =
   Pp.print_in_file (fun fmt ->
     Format.fprintf fmt "[@.";
-    List.iter (print_json_msg fmt) l;
+    begin match l with
+    | [] -> ()
+    | x :: xs ->
+        print_json_msg fmt x;
+        List.iter (fun m -> Format.fprintf fmt ",%a" print_json_msg m) xs
+    end;
     Format.fprintf fmt "]@."
     ) (Gnat_config.unit_name ^ ".proof")
 
