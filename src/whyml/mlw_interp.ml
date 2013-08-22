@@ -461,6 +461,27 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         | Normal _, s' -> eval_expr env s' e
         | _ -> r
     end
+  | Efor(pvs,(pvs1,dir,pvs2),_inv,e1) ->
+    begin 
+      try
+        let a = big_int_of_term (Mvs.find pvs1.pv_vs env.vsenv) in
+        let b = big_int_of_term (Mvs.find pvs2.pv_vs env.vsenv) in
+        let le,suc = match dir with
+          | To -> Big_int.le_big_int, Big_int.succ_big_int
+          | DownTo -> Big_int.ge_big_int, Big_int.pred_big_int
+        in
+        let rec iter i s =
+          if le i b then
+            let env' = bind_vs pvs.pv_vs (term_of_big_int i) env in
+            match eval_expr env' s e1 with
+              | Normal _,s' -> iter (suc i) s'
+              | r -> r
+          else Normal t_void, s
+        in
+        iter a s
+      with
+          NotNum -> Irred e,s
+    end
   | Ecase(e1,ebl) ->
     begin
       match eval_expr env s e1 with
@@ -474,7 +495,6 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eassign _
   | Eghost _
   | Eany _
-  | Efor _
   | Eabstr _
   | Eassert _
   | Eabsurd ->

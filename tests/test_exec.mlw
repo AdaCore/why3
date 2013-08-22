@@ -11,6 +11,35 @@ module M
   let y () : list int =
     Cons 12 (Cons 34 (Cons 56 Nil)) ++ Cons 78 (Cons 90 Nil)
 
+end
+
+module Map
+
+  use import int.Int
+  use import map.Map
+
+  exception Found int
+
+  let search (t:map int int) (len:int) (v:int) : int =
+    try
+      for i=0 to len-1 do
+        if t[i] = v then raise (Found i)
+      done;
+      -1
+    with Found i -> i
+    end
+
+  constant t : map int int = (const 0)[0 <- 12][1 <- 42][2 <- 67]
+
+  let test12 () = search t 3 12
+  let test42 () = search t 3 42
+  let test67 () = search t 3 67
+  let test0 () = search t 3 0
+
+end
+
+module Ref
+
   use import ref.Ref
 
   val r: ref int
