@@ -302,25 +302,30 @@ let print_result fmt r =
     | Fun _ ->
       Format.fprintf fmt "@[Result is a function@]"
 
-let rec eval_expr env (e : expr) : result =
+type state = unit
+
+let print_state fmt _s =
+  Format.fprintf fmt "TODO"
+
+let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
-  | Elogic t -> Normal (eval_term env t.t_ty t)
+  | Elogic t -> Normal (eval_term env t.t_ty t), s
   | Elet(ld,e1) ->
     begin match ld.let_sym with
       | LetV pvs ->
-        begin match eval_expr env ld.let_expr with
-          | Normal t ->
+        begin match eval_expr env s ld.let_expr with
+          | Normal t,s' ->
 (*
             eval_expr (bind_pvs pvs t env) e1
 *)
-            eval_expr (bind_vs pvs.pv_vs t env) e1
+            eval_expr (bind_vs pvs.pv_vs t env) s' e1
           | r -> r
         end
-      | LetA _ -> Irred e
+      | LetA _ -> Irred e, s
     end
   | Eapp(e,pvs,_spec) ->
-    begin match eval_expr env e with
-      | Fun ps ->
+    begin match eval_expr env s e with
+      | Fun ps, s' ->
         begin
           let d =
             try
@@ -332,38 +337,62 @@ let rec eval_expr env (e : expr) : result =
           in
           let lam = d.fun_lambda in
           match lam.l_args with
-            | [pvs1] ->              
+            | [pvs1] ->
               let env' = bind_vs pvs1.pv_vs (Mvs.find pvs.pv_vs env.vsenv) env in
-              eval_expr env' lam.l_expr
+              eval_expr env' s' lam.l_expr
             | _ ->
               Format.eprintf "psymbol %s as more than 1 arg@."
                 ps.ps_name.Ident.id_string;
               exit 2
         end
-      | _ -> Irred e
+      | _ -> Irred e, s
     end
-  | Earrow ps -> Fun ps
+  | Earrow ps -> Fun ps, s
   | Eif(e1,e2,e3) ->
     begin
-      let c = eval_expr env e1 in
-      match c with
-        | Normal t ->
+      match eval_expr env s e1 with
+        | Normal t, s' ->
           begin
             match t.t_node with
-              | Ttrue -> eval_expr env e2
-              | Tfalse -> eval_expr env e3
+              | Ttrue -> eval_expr env s' e2
+              | Tfalse -> eval_expr env s' e3
               | _ ->
                 Format.eprintf "@[Cannot interp condition of if: @[%a@]@]@."
                   Pretty.print_term t;
-                Irred e
+                Irred e, s
           end
-        | _ ->
-(*
-          Format.eprintf
-            "@[Condition of if did not evaluate normally: @[%a@]@]@."
-            print_result c;
-*)
-          c
+        | r -> r
+    end
+  | Eraise(xs,e1) ->
+    begin
+      let r,s' = eval_expr env s e1 in 
+      match r with
+        | Normal t -> Excep(xs,t),s'
+        | _ -> r,s'
+    end
+  | Etry(e1,el) ->
+    begin
+      let r = eval_expr env s e1 in
+      match r with
+        | Excep(ex,t), s' ->
+          let rec find_exc l =
+            match l with
+              | [] -> r
+              | (xs,pvs,e2)::rem ->
+                if xs_equal ex xs then
+                  let env' = bind_vs pvs.pv_vs t env in
+                  eval_expr env' s' e2
+                else find_exc rem
+          in
+          find_exc el
+        | _ -> r
+    end
+  | Eloop(_inv,_var,e1) ->
+    begin
+      let r = eval_expr env s e1 in
+      match r with
+        | Normal _, s' -> eval_expr env s' e 
+        | _ -> r
     end
   | Evalue _
   | Erec _
@@ -371,16 +400,13 @@ let rec eval_expr env (e : expr) : result =
   | Eassign _
   | Eghost _
   | Eany _
-  | Eloop _
   | Efor _
-  | Eraise _
-  | Etry _
   | Eabstr _
   | Eassert _
   | Eabsurd ->
     Format.eprintf "@[Unsupported expression: @[%a@]@]@."
                   Mlw_pretty.print_expr e;
-    Irred e
+    Irred e, s
 
 let eval_global_expr env mkm tkm e =
   get_builtins env;
@@ -393,4 +419,4 @@ let eval_global_expr env mkm tkm e =
     vsenv = Mvs.empty;
   }
   in
-  eval_expr env e
+  eval_expr env () e
