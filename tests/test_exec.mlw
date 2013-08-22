@@ -8,8 +8,14 @@ module M
 
   use import list.Append
 
-  let y () : list int = 
+  let y () : list int =
     Cons 12 (Cons 34 (Cons 56 Nil)) ++ Cons 78 (Cons 90 Nil)
 
+  use import ref.Ref
+
+  val r: ref int
+
+  let z () : unit =
+    r := 42
 
 end

@@ -558,15 +558,15 @@ let do_local_theory env drv fname m (tname,_,t,glist,elist) =
 (* program execution *)
 
 let do_exec env fname cin exec =
-  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then     
+  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then
     let lib = Mlw_main.library_of_env env in
     let mm, _thm = Mlw_main.read_channel lib [] fname cin in
     let do_exec x =
-      let mid,name = 
+      let mid,name =
         match Str.split (Str.regexp "\\.") x with
           | [m;i] -> m,i
           | _ ->
-            Format.eprintf 
+            Format.eprintf
               "'--exec argument must be of the form 'module.ident'@.";
             exit 2
       in
@@ -574,7 +574,7 @@ let do_exec env fname cin exec =
         eprintf "Module '%s' not found.@." mid;
         exit 1
       in
-      let ps = try Mlw_module.ns_find_ps m.Mlw_module.mod_export [name] 
+      let ps = try Mlw_module.ns_find_ps m.Mlw_module.mod_export [name]
         with Not_found ->
           eprintf "Function '%s' not found in module '%s'.@." name mid;
           exit 1
@@ -583,16 +583,21 @@ let do_exec env fname cin exec =
       let lam = d.Mlw_expr.fun_lambda in
       match lam.Mlw_expr.l_args with
         | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
-          let res =
-            Mlw_interp.eval_global_expr env
-              m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known 
-              lam.Mlw_expr.l_expr
-          in
-          printf "@[<hov 2>Execution of %s ():@ %a@]@." 
-            x Mlw_interp.print_result res
-        | _ -> 
-          eprintf "Only functions with one unit argument can be executed.@.";
-          exit 1
+            printf "@[<hov 2>Execution of %s ():@\n" x;
+            let body = lam.Mlw_expr.l_expr in
+            printf "type  : %a@\n"
+              Mlw_pretty.print_vty body.Mlw_expr.e_vty;
+            (* printf "effect: %a@\n" *)
+            (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
+            let res =
+              Mlw_interp.eval_global_expr env
+                m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
+                lam.Mlw_expr.l_expr
+            in
+            printf "result: %a@]@." Mlw_interp.print_result res
+        | _ ->
+            eprintf "Only functions with one unit argument can be executed.@.";
+            exit 1
     in
     Queue.iter do_exec exec
 (*
@@ -604,7 +609,7 @@ let do_exec env fname cin exec =
     end else
       Queue.iter (do_extract_module_from edrv fname mm thm) tlist
 *)
- else 
+ else
   begin
     Format.eprintf "'--exec is available only for mlw files@.";
     exit 2
@@ -712,32 +717,32 @@ let do_input env drv edrv = function
         | "-" -> "stdin", stdin
         | f   -> f, open_in f
       in
-      if !opt_token_count then 
+      if !opt_token_count then
         begin
           let lb = Lexing.from_channel cin in
           let a,p = Lexer.token_counter lb in
           close_in cin;
-          if a = 0 then 
+          if a = 0 then
             begin
               (* hack: we assume it is a why file and not a mlw *)
               total_annot_tokens := !total_annot_tokens + p;
               Format.printf "File %s: %d tokens@." f p;
-            end 
-          else 
+            end
+          else
             begin
               total_program_tokens := !total_program_tokens + p;
               total_annot_tokens := !total_annot_tokens + a;
               Format.printf "File %s: %d tokens in annotations@." f a;
               Format.printf "File %s: %d tokens in programs@." f p
             end
-        end 
-      else 
-        if edrv <> None then 
+        end
+      else
+        if edrv <> None then
           begin
             do_local_extract (Opt.get edrv) fname cin tlist;
             close_in cin
-          end 
-        else 
+          end
+        else
           if not (Queue.is_empty opt_exec) then
             do_exec env fname cin opt_exec
           else
@@ -751,8 +756,8 @@ let do_input env drv edrv = function
                   let glist = Queue.create () in
                   let elist = Queue.create () in
                   let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-                  let do_th _ (t,th) = 
-                    do_theory env drv fname t th glist elist 
+                  let do_th _ (t,th) =
+                    do_theory env drv fname t th glist elist
                   in
                   Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
                 else
