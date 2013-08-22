@@ -30,6 +30,12 @@ let () = Warning.set_hook display_warning
 
 module S = Session
 
+let debug = Debug.register_info_flag
+    ~desc:"of@ the@ progression@ of@ a@ replay"
+    "replay"
+
+let () = Debug.set_flag debug
+
 let includes = ref []
 let file = ref None
 let opt_version = ref false
@@ -37,7 +43,6 @@ let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
 let opt_bench = ref false
-let opt_verbose = ref true
 
 
 
@@ -93,10 +98,10 @@ let spec = Arg.align [
    Arg.Clear opt_stats,
    " do not print statistics") ;
   ("-q",
-   Arg.Clear opt_verbose,
+   Arg.Unit (fun () -> Debug.unset_flag debug),
    " run quietly") ;
   ("-v",
-   Arg.Set opt_version,
+   Arg.Unit (fun () -> Debug.set_flag debug),
    " print version information") ;
 (*
   "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
@@ -321,7 +326,7 @@ let same_result r1 r2 =
 let add_to_check_no_smoke config found_obs env_session sched =
   let session = env_session.S.session in
   let callback report =
-    if !opt_verbose then eprintf "@.";
+    Debug.dprintf debug "@.";
     let files,n,m =
       S.PHstr.fold file_statistics
         session.S.session_files ([],0,0)
@@ -335,9 +340,9 @@ let add_to_check_no_smoke config found_obs env_session sched =
         report
     in
     let save () =
-      if !opt_verbose then eprintf "Saving session...@?";
+      Debug.dprintf debug "Saving session...@?";
       S.save_session config session;
-      if !opt_verbose then eprintf " done@." in
+      Debug.dprintf debug " done@." in
     printf " %d/%d " n m;
     if report = [] then
       begin
@@ -345,7 +350,7 @@ let add_to_check_no_smoke config found_obs env_session sched =
           (if found_obs then ", obsolete session" else "")
           (if !found_upgraded_prover then ", upgraded prover" else "");
         if !opt_stats && n<m then print_statistics files;
-        if !opt_verbose then eprintf "Everything replayed OK.@.";
+        Debug.dprintf debug "Everything replayed OK.@.";
         if found_obs || !found_upgraded_prover then save ();
         exit 0
       end
@@ -363,7 +368,7 @@ let add_to_check_no_smoke config found_obs env_session sched =
 
 let add_to_check_smoke env_session sched =
   let callback report =
-    if !opt_verbose then eprintf "@.";
+    Debug.dprintf debug "@.";
     let report =
       List.filter
         (function
@@ -374,7 +379,7 @@ let add_to_check_smoke env_session sched =
           | _ -> false) report
     in
     if report = [] then begin
-      if !opt_verbose then eprintf "No smoke detected.@.";
+      Debug.dprintf debug "No smoke detected.@.";
       exit 0
     end
     else begin
@@ -429,13 +434,13 @@ let run_as_bench env_session =
 
 let () =
   try
-    if !opt_verbose then eprintf "Opening session...@?";
-    O.verbose := !opt_verbose;
+    Debug.dprintf debug "Opening session...@?";
+    O.verbose := Debug.test_flag debug;
     let env_session,found_obs =
       let session = S.read_session project_dir in
       M.update_session ~allow_obsolete:true session env config
     in
-    if !opt_verbose then eprintf " done.@.";
+    Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not found_obs 
       (* useless since too early: && not found_uninstalled_prover *)
     then
