@@ -310,6 +310,12 @@ let print_state fmt _s =
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
   | Elogic t -> Normal (eval_term env t.t_ty t), s
+  | Evalue pvs -> 
+    begin
+      try let t = Mvs.find pvs.pv_vs env.vsenv in
+          Normal t,s
+      with Not_found -> Irred e, s
+    end
   | Elet(ld,e1) ->
     begin match ld.let_sym with
       | LetV pvs ->
@@ -395,9 +401,16 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         | Normal _, s' -> eval_expr env s' e
         | _ -> r
     end
-  | Evalue _
+  | Ecase(e1,ebl) ->
+    begin
+      match eval_expr env s e1 with
+        | Normal t, s' ->
+          begin try exec_match env t s' ebl
+            with Undetermined -> Irred e, s
+          end
+        | r -> r
+    end
   | Erec _
-  | Ecase _
   | Eassign _
   | Eghost _
   | Eany _
@@ -408,6 +421,21 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     Format.eprintf "@[Unsupported expression: @[%a@]@]@."
                   Mlw_pretty.print_expr e;
     Irred e, s
+
+and exec_match env t s ebl =
+  let rec iter ebl =
+    match ebl with
+    | [] ->
+      Format.eprintf "Pattern matching not exhaustive in evaluation ???@.";
+      exit 2
+    | (p,e)::rem ->
+      try
+        let env' = matching env t p.ppat_pattern in
+        eval_expr env' s e
+      with NoMatch -> iter rem
+  in
+  iter ebl
+
 
 let eval_global_expr env mkm tkm e =
   get_builtins env;

@@ -60,6 +60,16 @@ module SameFringe
     ensures { result=True <-> elements t1 = elements t2 }
   = eq_enum (enum t1 Done) (enum t2 Done)
 
-  let test1 () = same_fringe Empty Empty
+  let test1 () = enum Empty Done
+  let test2 () = eq_enum Done Done
+  let test3 () = same_fringe Empty Empty
+
+  constant a : elt
+  constant b : elt
+
+  let leaf x = Node Empty x Empty
+
+  let test4 () = same_fringe (Node (leaf a) b Empty) (Node Empty a (leaf b))
+  let test5 () = same_fringe (Node (leaf a) b Empty) (Node Empty b (leaf a))
 
 end
