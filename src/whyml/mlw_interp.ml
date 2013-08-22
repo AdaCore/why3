@@ -287,7 +287,7 @@ type result =
   | Normal of term
   | Excep of xsymbol * term
   | Irred of expr
-  | Fun of psymbol
+  | Fun of psymbol * lambda * pvsymbol list * int
 
 let print_result fmt r =
   match r with
@@ -325,29 +325,30 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     end
   | Eapp(e,pvs,_spec) ->
     begin match eval_expr env s e with
-      | Fun ps, s' ->
-        begin
-          let d =
-            try
-              Mlw_decl.find_definition env.mknown ps
-            with Not_found ->
-              Format.eprintf "psymbol %s not found in execution@."
-                ps.ps_name.Ident.id_string;
-              exit 2
-          in
-          let lam = d.fun_lambda in
-          match lam.l_args with
-            | [pvs1] ->
-              let env' = bind_vs pvs1.pv_vs (Mvs.find pvs.pv_vs env.vsenv) env in
-              eval_expr env' s' lam.l_expr
-            | _ ->
-              Format.eprintf "psymbol %s as more than 1 arg@."
-                ps.ps_name.Ident.id_string;
-              exit 2
-        end
+      | Fun(ps,lam,args,n), s' ->
+        if n > 1 then
+          Fun(ps,lam,pvs::args,n-1), s'
+        else
+        let args = List.rev (pvs::args) in
+        let params = List.map (fun pvs -> pvs.pv_vs) lam.l_args in
+        let args = List.map (fun pvs -> Mvs.find pvs.pv_vs env.vsenv) args in
+        let env' = multibind_vs params args env in
+        eval_expr env' s' lam.l_expr
       | _ -> Irred e, s
     end
-  | Earrow ps -> Fun ps, s
+  | Earrow ps -> 
+    begin
+      let d =
+        try
+          Mlw_decl.find_definition env.mknown ps
+        with Not_found ->
+          Format.eprintf "psymbol %s not found in execution@."
+            ps.ps_name.Ident.id_string;
+          exit 2
+      in
+      let lam = d.fun_lambda in
+      Fun(ps,lam,[], List.length lam.l_args),s
+    end
   | Eif(e1,e2,e3) ->
     begin
       match eval_expr env s e1 with
@@ -365,7 +366,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     end
   | Eraise(xs,e1) ->
     begin
-      let r,s' = eval_expr env s e1 in 
+      let r,s' = eval_expr env s e1 in
       match r with
         | Normal t -> Excep(xs,t),s'
         | _ -> r,s'
@@ -391,7 +392,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     begin
       let r = eval_expr env s e1 in
       match r with
-        | Normal _, s' -> eval_expr env s' e 
+        | Normal _, s' -> eval_expr env s' e
         | _ -> r
     end
   | Evalue _
