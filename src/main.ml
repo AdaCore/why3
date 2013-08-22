@@ -585,7 +585,7 @@ let do_exec env fname cin exec =
         | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
             printf "@[<hov 2>Execution of %s ():@\n" x;
             let body = lam.Mlw_expr.l_expr in
-            printf "type  : %a@\n"
+            printf "type  : @[%a@]@\n"
               Mlw_pretty.print_vty body.Mlw_expr.e_vty;
             (* printf "effect: %a@\n" *)
             (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)

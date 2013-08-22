@@ -378,7 +378,7 @@ let rec eval_expr env (e : expr) : result =
   | Eabstr _
   | Eassert _
   | Eabsurd ->
-    Format.eprintf "@[Unsupported expression: @[%a@]@]"
+    Format.eprintf "@[Unsupported expression: @[%a@]@]@."
                   Mlw_pretty.print_expr e;
     Irred e
 
