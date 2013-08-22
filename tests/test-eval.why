@@ -84,4 +84,23 @@ theory T
 
   constant l11 : int = puiss l10 (Cons 12 (Cons 34 (Cons 56 Nil)))
 
+  use import map.Map
+
+  constant t : map int int = (const 0)[1<-42]
+
+  constant x0 : int = t[0]
+  constant x1 : int = t[1]
+
+  constant t2 : map int int = t[2<-37]
+
+  constant y0 : int = t2[0]
+  constant y1 : int = t2[1]
+  constant y2 : int = t2[2]
+
+  constant t3 : map int int = t2[1<-12]
+
+  constant z0 : int = t3[0]
+  constant z1 : int = t3[1]
+  constant z2 : int = t3[2]
+
 end

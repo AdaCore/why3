@@ -85,7 +85,7 @@ let rec big_int_of_term t =
       Big_int.minus_big_int i
     | _ -> raise NotNum
 
-let eval_int_op op ls l =
+let eval_int_op op _ty ls l =
   match l with
   | [t1;t2] ->
     begin
@@ -98,7 +98,7 @@ let eval_int_op op ls l =
     end
   | _ -> assert false
 
-let eval_int_uop op ls l =
+let eval_int_uop op _ty ls l =
   match l with
   | [t1] ->
     begin
@@ -110,7 +110,7 @@ let eval_int_uop op ls l =
     end
   | _ -> assert false
 
-let eval_int_rel op ls l =
+let eval_int_rel op _ty ls l =
   match l with
   | [t1;t2] ->
     begin
@@ -123,41 +123,99 @@ let eval_int_rel op ls l =
     end
   | _ -> assert false
 
-let eval_equ _ls l =
+let term_equality t1 t2 =
+  if t_equal_alpha t1 t2 then Some true
+  else
+    try
+      let i1 = big_int_of_term t1 in
+      let i2 = big_int_of_term t2 in
+      Some (Big_int.eq_big_int i1 i2)
+    with NotNum ->
+      match t1.t_node,t2.t_node with
+        | Ttrue, Tfalse | Tfalse, Ttrue -> Some false
+        | _ -> None
+
+let eval_equ _ty _ls l =
   match l with
   | [t1;t2] ->
-    if t_equal_alpha t1 t2 then t_true else
-      begin
-        try
-          let i1 = big_int_of_term t1 in
-          let i2 = big_int_of_term t2 in
-          if Big_int.eq_big_int i1 i2 then
-            t_true else t_false
-        with NotNum ->
-          match t1.t_node,t2.t_node with
-            | Ttrue, Tfalse | Tfalse, Ttrue -> t_false
-            | _ -> t_equ t1 t2
-      end
+    begin match term_equality t1 t2 with
+      | Some true -> t_true 
+      | Some false -> t_false
+      | None -> t_equ t1 t2
+    end
   | _ -> assert false
+
+(* functions on map.Map *)
+
+let ls_map_const = ref ps_equ
+let ls_map_get = ref ps_equ
+let ls_map_set = ref ps_equ
+
+let eval_map_const ty ls l = t_app_infer_inst ls l ty
+
+let eval_map_get ty ls_get l =
+  match l with
+    | [m;x] -> 
+      (* Format.eprintf "Looking for get:"; *)
+      let rec find m =
+        match m.t_node with
+          | Tapp(ls,[m';y;v]) when ls_equal ls !ls_map_set ->
+            begin match term_equality x y with
+              | Some true -> (* Format.eprintf "ok!@."; *) v
+              | Some false -> (* Format.eprintf "recur...@."; *) find m'
+              | None -> (* Format.eprintf "failed.@."; *) 
+                t_app_infer_inst ls_get [m;x] ty
+            end
+          | Tapp(ls,[def]) when ls_equal ls !ls_map_const -> def
+          | _ -> t_app_infer_inst ls_get [m;x] ty
+      in find m
+    | _ -> assert false
+
+let eval_map_set ty ls_set l =
+  match l with
+    | [m;x;v] ->
+      let rec compress m =
+        match m.t_node with
+          | Tapp(ls,[m';y;v']) when ls_equal ls !ls_map_set ->
+            begin match term_equality x y with
+              | Some true -> 
+                t_app_infer_inst ls_set [m';x;v] ty
+              | Some false -> 
+                let c = compress m' in
+                t_app_infer_inst ls_set [c;y;v'] ty
+              | None -> 
+                t_app_infer_inst ls_set [m;x;v] ty
+            end
+          | _ -> 
+            t_app_infer_inst ls_set [m;x;v] ty
+      in compress m
+    | _ -> assert false
+
+(* all builtin functions *)
 
 let built_in_theories =
   [ ["int"],"Int",
-    [ "infix +", eval_int_op Big_int.add_big_int;
-      "infix -", eval_int_op Big_int.sub_big_int;
-      "infix *", eval_int_op Big_int.mult_big_int;
-      "prefix -", eval_int_uop Big_int.minus_big_int;
-      "infix <", eval_int_rel Big_int.lt_big_int;
-      "infix <=", eval_int_rel Big_int.le_big_int;
-      "infix >", eval_int_rel Big_int.gt_big_int;
-      "infix >=", eval_int_rel Big_int.ge_big_int;
+    [ "infix +", None, eval_int_op Big_int.add_big_int;
+      "infix -", None, eval_int_op Big_int.sub_big_int;
+      "infix *", None, eval_int_op Big_int.mult_big_int;
+      "prefix -", Some ls_minus, eval_int_uop Big_int.minus_big_int;
+      "infix <", None, eval_int_rel Big_int.lt_big_int;
+      "infix <=", None, eval_int_rel Big_int.le_big_int;
+      "infix >", None, eval_int_rel Big_int.gt_big_int;
+      "infix >=", None, eval_int_rel Big_int.ge_big_int;
     ] ;
     ["int"],"ComputerDivision",
-    [ "div", eval_int_op computer_div_big_int;
-      "mod", eval_int_op computer_mod_big_int;
+    [ "div", None, eval_int_op computer_div_big_int;
+      "mod", None, eval_int_op computer_mod_big_int;
     ] ;
     ["int"],"EuclideanDivision",
-    [ "div", eval_int_op Big_int.div_big_int;
-      "mod", eval_int_op Big_int.mod_big_int;
+    [ "div", None, eval_int_op Big_int.div_big_int;
+      "mod", None, eval_int_op Big_int.mod_big_int;
+    ] ;
+    ["map"],"Map",
+    [ "const", Some ls_map_const, eval_map_const;
+      "get", Some ls_map_get, eval_map_get;
+      "set", Some ls_map_set, eval_map_set;
     ] ;
   ]
 
@@ -165,13 +223,15 @@ let add_builtin_th env (l,n,d) =
   try
     let th = Env.find_theory env l n in
     List.iter
-      (fun (id,f) ->
+      (fun (id,r,f) ->
         let ls = Theory.ns_find_ls th.Theory.th_export [id] in
-        if id = "prefix -" then
-          ls_minus := ls;
-        Hls.add builtins ls f)
+        Hls.add builtins ls f;
+        match r with
+          | None -> ()
+          | Some r -> r := ls)
       d
-  with Not_found -> ()
+  with Not_found -> 
+    Format.eprintf "[Warning] theory %s not found@." n
 
 
 let get_builtins env =
@@ -235,7 +295,7 @@ and eval_match env ty u tbl =
 and eval_app env ty ls tl =
   try
     let f = Hls.find builtins ls in
-    f ls tl
+    f ty ls tl
   with Not_found ->
     match
       try
