@@ -465,7 +465,7 @@ if test "$enable_coq_libs" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
    if test "$COQDEP" = no ; then
       enable_coq_libs=no
-      AC_MSG_WARN(Cannot find coqc.)
+      AC_MSG_WARN(Cannot find coqdep.)
       reason_coq_libs=" (coqdep not found)"
    fi
 fi
