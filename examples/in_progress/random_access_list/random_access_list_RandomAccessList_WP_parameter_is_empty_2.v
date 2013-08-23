@@ -35,6 +35,9 @@ Fixpoint preorder {a:Type} {a_WT:WhyType a} (t:(@tree
   | (Node l x r) => (cons x (List.app (preorder l) (preorder r)))
   end.
 
+Axiom preorder_non_nil : forall {a:Type} {a_WT:WhyType a}, forall (t:(@tree
+  a a_WT)), ~ ((preorder t) = nil).
+
 (* Why3 assumption *)
 Fixpoint flatten {a:Type} {a_WT:WhyType a} (l:(list (Z* (@tree
   a a_WT))%type)) {struct l}: (list a) :=
@@ -44,89 +47,70 @@ Fixpoint flatten {a:Type} {a_WT:WhyType a} (l:(list (Z* (@tree
   end.
 
 (* Why3 assumption *)
-Fixpoint size {a:Type} {a_WT:WhyType a} (t:(@tree a a_WT)) {struct t}: Z :=
+Fixpoint height {a:Type} {a_WT:WhyType a} (t:(@tree a a_WT)) {struct t}: Z :=
   match t with
   | (Leaf _) => 1%Z
-  | (Node l _ r) => (((size l) + 1%Z)%Z + (size r))%Z
+  | (Node l _ _) => (1%Z + (height l))%Z
   end.
 
 Axiom size_pos : forall {a:Type} {a_WT:WhyType a}, forall (t:(@tree a a_WT)),
-  (1%Z <= (size t))%Z.
+  (1%Z <= (height t))%Z.
 
 (* Why3 assumption *)
-Inductive perfect {a:Type} {a_WT:WhyType a} : Z -> (@tree a a_WT) -> Prop :=
-  | perfect_leaf : forall (x:a), ((@perfect _ _) 1%Z (Leaf x))
-  | perfect_node : forall (x:a) (l:(@tree a a_WT)) (r:(@tree a a_WT)) (s:Z),
-      ((@perfect _ _) s l) -> (((@perfect _ _) s r) -> ((@perfect _ _)
-      (1%Z + (2%Z * s)%Z)%Z (Node l x r))).
-
-Axiom perfect_size : forall {a:Type} {a_WT:WhyType a}, forall (s:Z) (t:(@tree
-  a a_WT)), (perfect s t) -> (s = (size t)).
-
-(* Why3 assumption *)
-Fixpoint well_formed {a:Type} {a_WT:WhyType a} (l:(list (Z* (@tree
-  a a_WT))%type)) {struct l}: Prop :=
-  match l with
-  | nil => True
-  | (cons (s, t) nil) => (perfect s t)
-  | (cons (s1, t1) ((cons (s2, t2) _) as rest)) => (perfect s1 t1) /\
-      ((s1 < s2)%Z /\ (well_formed rest))
+Fixpoint perfect {a:Type} {a_WT:WhyType a} (t:(@tree
+  a a_WT)) {struct t}: Prop :=
+  match t with
+  | (Leaf _) => True
+  | (Node l _ r) => (perfect l) /\ ((perfect r) /\ ((height l) = (height r)))
   end.
 
 (* Why3 assumption *)
-Definition well_formed0 {a:Type} {a_WT:WhyType a} (l:(list (Z* (@tree
+Fixpoint well_formed_aux {a:Type} {a_WT:WhyType a} (h:Z) (l:(list (Z* (@tree
+  a a_WT))%type)) {struct l}: Prop :=
+  match l with
+  | nil => True
+  | (cons (h1, t) rest) => (perfect t) /\ (((height t) = h1) /\
+      (well_formed_aux (h1 + 1%Z)%Z rest))
+  end.
+
+(* Why3 assumption *)
+Definition well_formed {a:Type} {a_WT:WhyType a} (l:(list (Z* (@tree
   a a_WT))%type)): Prop :=
   match l with
   | nil => True
-  | (cons (s, t) nil) => (perfect s t)
-  | (cons (s1, t1) ((cons (s2, t2) _) as rest)) => (perfect s1 t1) /\
-      ((s1 <= s2)%Z /\ (well_formed rest))
+  | (cons (h, _) _) => (well_formed_aux h l)
   end.
 
 (* Why3 assumption *)
 Inductive t
   (a:Type) {a_WT:WhyType a} :=
-  | mk_t : (list (Z* (@tree a a_WT))%type) -> (list a) -> t a.
+  | mk_t : (list (Z* (@tree a a_WT))%type) -> t a.
 Axiom t_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (t a).
 Existing Instance t_WhyType.
 Implicit Arguments mk_t [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): (list a) :=
-  match v with
-  | (mk_t x x1) => x1
+Definition trees {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): (list (Z* (@tree
+  a a_WT))%type) := match v with
+  | (mk_t x) => x
   end.
 
 (* Why3 assumption *)
-Definition trees {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): (list (Z* (@tree
-  a a_WT))%type) := match v with
-  | (mk_t x x1) => x
-  end.
+Definition listof {a:Type} {a_WT:WhyType a} (t1:(@t a a_WT)): (list a) :=
+  (flatten (trees t1)).
 
 (* Why3 goal *)
 Theorem WP_parameter_is_empty : forall {a:Type} {a_WT:WhyType a},
-  forall (t1:(list (Z* (@tree a a_WT))%type)) (t2:(list a)), ((well_formed0
-  t1) /\ (t2 = (flatten t1))) -> ((t1 = nil) <-> (t2 = nil)).
-intros a a_WT t1 t2 (h1,h2).
-destruct t1; simpl in h2.
+  forall (t1:(list (Z* (@tree a a_WT))%type)), (well_formed t1) ->
+  ((t1 = nil) <-> ((flatten t1) = nil)).
+intros a a_WT t1 h1.
+destruct t1; simpl in *.
 intuition.
-simpl in h1.
 destruct p; simpl in *.
-intuition.
-discriminate H.
-destruct t1; simpl in h1.
-inversion h1; intuition.
-subst t0; simpl in h2.
-subst t2.
-discriminate h2.
-subst t0; simpl in h2.
-subst t2.
-discriminate h2.
-destruct t0; simpl in h2.
-subst t2.
-discriminate H.
-subst t2.
-discriminate H.
+generalize (preorder_non_nil t0).
+destruct (preorder t0); intuition.
+discriminate H1.
+discriminate H1.
 Qed.
 
 
