@@ -15,24 +15,28 @@
   version="1.0"/>
  <prover
   id="3"
-  name="Coq"
-  version="8.4pl1"/>
+  name="CVC4"
+  version="1.2"/>
  <prover
   id="4"
-  name="Eprover"
-  version="1.0-004"/>
+  name="Coq"
+  version="8.4pl2"/>
  <prover
   id="5"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="6"
   name="Z3"
   version="2.19"/>
  <prover
-  id="7"
+  id="6"
   name="Z3"
   version="3.2"/>
+ <prover
+  id="7"
+  name="Z3"
+  version="4.2"/>
+ <prover
+  id="8"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../random_access_list.mlw"
   verified="false"
@@ -46,30 +50,38 @@
    <goal
     name="preorder_non_nil"
     locfile="../random_access_list.mlw"
-    loclnum="25" loccnumb="8" loccnume="24"
-    sum="9de0c898f5056ad3ae1ceaed25ddc4f0"
+    loclnum="24" loccnumb="8" loccnume="24"
+    sum="f3afc03e3c92f674b48e5377b89c5eee"
     proved="false"
     expanded="true"
     shape="Nainfix =apreorderV0aNilF">
+    <proof
+     prover="0"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.01"/>
+    </proof>
    </goal>
    <goal
     name="size_pos"
     locfile="../random_access_list.mlw"
-    loclnum="37" loccnumb="8" loccnume="16"
-    sum="83a86434d2e701d93fa4242efd81baad"
+    loclnum="36" loccnumb="8" loccnume="16"
+    sum="5dfc4408a6e40af674ed728c5ccd7748"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix &gt;=aheightV0c1F">
     <transf
      name="induction_ty_lex"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="size_pos.1"
       locfile="../random_access_list.mlw"
-      loclnum="37" loccnumb="8" loccnume="16"
+      loclnum="36" loccnumb="8" loccnume="16"
       expl="1."
-      sum="2e54d592b09de6cfc91f402e1788108d"
+      sum="2d03117885d38146c44f533cfdea412c"
       proved="true"
       expanded="false"
       shape="Cainfix &gt;=aheightV0c1aLeafVainfix &gt;=aheightV0c1Iainfix &gt;=aheightV2c1Iainfix &gt;=aheightV4c1aNodeVVVV0F">
@@ -85,13 +97,63 @@
     </transf>
    </goal>
    <goal
+    name="well_formed_tail"
+    locfile="../random_access_list.mlw"
+    loclnum="59" loccnumb="8" loccnume="24"
+    sum="8f1645c05e525804cb676fafe5575900"
+    proved="false"
+    expanded="false"
+    shape="awell_formedV0Iawell_formedaConsaTuple2V1V2V0F">
+    <proof
+     prover="0"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.14"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="29.84"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="highfailure" time="18.08"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="30"
+     memlimit="1000"
+     edited="random_access_list_RandomAccessList_well_formed_tail_1.v"
+     obsolete="true"
+     archived="false">
+     <undone/>
+    </proof>
+    <proof
+     prover="8"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="outofmemory" time="19.57"/>
+    </proof>
+   </goal>
+   <goal
     name="WP_parameter empty"
     locfile="../random_access_list.mlw"
-    loclnum="63" loccnumb="6" loccnume="11"
+    loclnum="68" loccnumb="6" loccnume="11"
     expl="VC for empty"
-    sum="d068560625a602565f686faf551a6a49"
+    sum="d69a42627596f8cf269469c974cca041"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aflattenaNilaNilAawell_formedaNil">
     <label
      name="expl:VC for empty"/>
@@ -107,78 +169,30 @@
    <goal
     name="WP_parameter is_empty"
     locfile="../random_access_list.mlw"
-    loclnum="67" loccnumb="6" loccnume="14"
+    loclnum="72" loccnumb="6" loccnume="14"
     expl="VC for is_empty"
-    sum="d7c57156540068afa38902195bf14014"
+    sum="d22ceac6586cde5416445abce3d1e6f6"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =aflattenV0aNilqainfix =V0aNilIawell_formedV0F">
     <label
      name="expl:VC for is_empty"/>
     <proof
-     prover="0"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="unknown" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
+     prover="4"
      timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="29.99"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="timeout" time="10.04"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
      memlimit="1000"
      edited="random_access_list_RandomAccessList_WP_parameter_is_empty_2.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="1.55"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <result status="highfailure" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="true"
-     archived="false">
-     <undone/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="29.97"/>
+     <result status="valid" time="0.99"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter cons"
     locfile="../random_access_list.mlw"
-    loclnum="71" loccnumb="6" loccnume="10"
+    loclnum="76" loccnumb="6" loccnume="10"
     expl="VC for cons"
-    sum="22f900f4be9ad18defd28d4e3570a95c"
+    sum="9b5271a9c97e7709d39a567c061867cb"
     proved="false"
     expanded="true"
     shape="Cainfix =aflatteniaConsaTuple2c1aLeafV0V1aConsaTuple2ainfix +c1V2aNodeV3V0V5V6ainfix =V2V4aConsV0aflattenV1Aawell_formediaConsaTuple2c1aLeafV0V1aConsaTuple2ainfix +c1V2aNodeV3V0V5V6ainfix =V2V4aConsaTuple2VVaConsaTuple2VVVainfix =aflattenaConsaTuple2c1aLeafV0V1aConsV0aflattenV1Aawell_formedaConsaTuple2c1aLeafV0V1wV1Iawell_formedV1F">
@@ -191,45 +205,61 @@
      <goal
       name="WP_parameter cons.1"
       locfile="../random_access_list.mlw"
-      loclnum="71" loccnumb="6" loccnume="10"
+      loclnum="76" loccnumb="6" loccnume="10"
       expl="1. type invariant"
-      sum="36e61f8207df119802d87efd5bcc3b8b"
+      sum="21e23f914ea41bd8b81f15734d2b56a4"
       proved="false"
-      expanded="false"
+      expanded="true"
       shape="type invariantCawell_formediaConsaTuple2c1aLeafV0V1aConsaTuple2ainfix +c1V2aNodeV3V0V5V6ainfix =V2V4aConsaTuple2VVaConsaTuple2VVVtwV1Iawell_formedV1F">
       <label
        name="expl:VC for cons"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="9.54"/>
+       <result status="timeout" time="29.89"/>
       </proof>
       <proof
        prover="2"
        timelimit="10"
        memlimit="1000"
-       obsolete="false"
+       obsolete="true"
        archived="false">
        <result status="timeout" time="9.99"/>
       </proof>
       <proof
-       prover="7"
+       prover="3"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="highfailure" time="22.71"/>
+      </proof>
+      <proof
+       prover="6"
        timelimit="10"
        memlimit="1000"
-       obsolete="false"
+       obsolete="true"
        archived="false">
        <result status="timeout" time="9.96"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="29.87"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter cons.2"
       locfile="../random_access_list.mlw"
-      loclnum="71" loccnumb="6" loccnume="10"
+      loclnum="76" loccnumb="6" loccnume="10"
       expl="2. postcondition"
-      sum="d26bcd3a9261253aafd389365b491d2a"
+      sum="f81d3abf452be3acee4bb93a4d4b6b5c"
       proved="true"
       expanded="false"
       shape="postconditionCainfix =aflatteniaConsaTuple2c1aLeafV0V1aConsaTuple2ainfix +c1V2aNodeV3V0V5V6ainfix =V2V4aConsV0aflattenV1Iawell_formediaConsaTuple2c1aLeafV0V1aConsaTuple2ainfix +c1V2aNodeV3V0V5V6ainfix =V2V4aConsaTuple2VVaConsaTuple2VVVtwV1Iawell_formedV1F">
@@ -237,63 +267,79 @@
        name="expl:VC for cons"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.97"/>
+       <result status="valid" time="15.86"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter cons.3"
       locfile="../random_access_list.mlw"
-      loclnum="71" loccnumb="6" loccnume="10"
+      loclnum="76" loccnumb="6" loccnume="10"
       expl="3. type invariant"
-      sum="ce678ef95221aee25f21d5cd9c832874"
+      sum="becd251d0fbb15edf6ea6a46b069d3a8"
       proved="false"
-      expanded="false"
+      expanded="true"
       shape="type invariantCtaConsaTuple2VVaConsaTuple2VVVawell_formedaConsaTuple2c1aLeafV0V1wV1Iawell_formedV1F">
       <label
        name="expl:VC for cons"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="9.94"/>
+       <result status="timeout" time="29.80"/>
       </proof>
       <proof
        prover="2"
        timelimit="10"
        memlimit="1000"
-       obsolete="false"
+       obsolete="true"
        archived="false">
        <result status="timeout" time="9.97"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="highfailure" time="26.80"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="10.01"/>
       </proof>
       <proof
        prover="6"
        timelimit="10"
        memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="10.01"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
+       obsolete="true"
        archived="false">
        <result status="timeout" time="9.98"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="timeout" time="29.86"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter cons.4"
       locfile="../random_access_list.mlw"
-      loclnum="71" loccnumb="6" loccnume="10"
+      loclnum="76" loccnumb="6" loccnume="10"
       expl="4. postcondition"
-      sum="c9ef5ccd676d43d97c41629c85a5951f"
+      sum="5f76033818ca5b2842a09e494df62ff3"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsaTuple2VVaConsaTuple2VVVainfix =aflattenaConsaTuple2c1aLeafV0V1aConsV0aflattenV1Iawell_formedaConsaTuple2c1aLeafV0V1wV1Iawell_formedV1F">
@@ -313,11 +359,11 @@
    <goal
     name="WP_parameter head"
     locfile="../random_access_list.mlw"
-    loclnum="83" loccnumb="6" loccnume="10"
+    loclnum="88" loccnumb="6" loccnume="10"
     expl="VC for head"
-    sum="bbf26a46edee362cbbe80aa1abe607ad"
+    sum="d9fba43bc99da492207913db5121f595"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CCtaNilfaConsVwaflattenV0aNilCfaNilainfix =V2V3aConsVwaflattenV0aConsaTuple2waLeafVwCfaNilainfix =V4V5aConsVwaflattenV0aConsaTuple2waNodewVwwV0Iawell_formedV0F">
     <label
      name="expl:VC for head"/>
@@ -333,11 +379,11 @@
    <goal
     name="WP_parameter safe_hd"
     locfile="../random_access_list.mlw"
-    loclnum="91" loccnumb="6" loccnume="13"
+    loclnum="96" loccnumb="6" loccnume="13"
     expl="unreachable point"
-    sum="dea7576cf7af2dd0e7e524e3cd9b4e89"
+    sum="3b3d3aea4e7384c3eaca0b62991e0c64"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="unreachable pointCfaNilCfaNilainfix =V1V2aConswVV0aConswVV0INainfix =V0aNilF">
     <label
      name="expl:VC for safe_hd"/>
@@ -353,12 +399,12 @@
    <goal
     name="WP_parameter tail"
     locfile="../random_access_list.mlw"
-    loclnum="95" loccnumb="6" loccnume="10"
+    loclnum="100" loccnumb="6" loccnume="10"
     expl="VC for tail"
-    sum="ec30c6b7c1d169b8e1db6a81bb27387d"
+    sum="9805eb8afe2e080ec50b858f3fb0573a"
     proved="false"
     expanded="true"
-    shape="CCtaNilfaConswVaflattenV0aNilCfaNilainfix =aflattenV2V3aConswVaflattenV0Aawell_formedV2aConsaTuple2waLeafwVCfaNilainfix =aflattenaConsaTuple2V9V5aConsaTuple2V9V7V8V10aConswVaflattenV0Aawell_formedaConsaTuple2V9V5aConsaTuple2V9V7V8LadivV4c2aConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
+    shape="CCtaNilfaConswVaflattenV0aNilCfaNilainfix =aflattenV2V3aConswVaflattenV0Aawell_formedV2aConsaTuple2waLeafwVCfaNilainfix =aflattenaConsaTuple2V9V5aConsaTuple2V9V7V8V10aConswVaflattenV0Aawell_formedaConsaTuple2V9V5aConsaTuple2V9V7V8Lainfix -V4c1aConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
     <label
      name="expl:VC for tail"/>
     <transf
@@ -368,9 +414,9 @@
      <goal
       name="WP_parameter tail.1"
       locfile="../random_access_list.mlw"
-      loclnum="95" loccnumb="6" loccnume="10"
+      loclnum="100" loccnumb="6" loccnume="10"
       expl="1. postcondition"
-      sum="97b5d774a818facdc72f9e32d80ba32b"
+      sum="a5f1a7c314d7d889e162c0433111b50e"
       proved="true"
       expanded="false"
       shape="postconditionCCtaNilfaConswVaflattenV0aNiltaConsaTuple2waLeafwVtaConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
@@ -378,7 +424,23 @@
        name="expl:VC for tail"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -388,29 +450,29 @@
      <goal
       name="WP_parameter tail.2"
       locfile="../random_access_list.mlw"
-      loclnum="95" loccnumb="6" loccnume="10"
+      loclnum="100" loccnumb="6" loccnume="10"
       expl="2. type invariant"
-      sum="23975c91f1d327ad9db4bde68a752d44"
-      proved="false"
+      sum="3a9c6eb222936f999b0571a19b3c68a6"
+      proved="true"
       expanded="false"
       shape="type invariantCtaNilawell_formedV1aConsaTuple2waLeafwVtaConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
       <label
        name="expl:VC for tail"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="unknown" time="0.96"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter tail.3"
       locfile="../random_access_list.mlw"
-      loclnum="95" loccnumb="6" loccnume="10"
+      loclnum="100" loccnumb="6" loccnume="10"
       expl="3. postcondition"
-      sum="cf57c0901a61b37722b4c186cf05b0cd"
+      sum="bd9e1dd67b4afb715d7d882fa86cfbad"
       proved="true"
       expanded="false"
       shape="postconditionCtaNilCfaNilainfix =aflattenV1V2aConswVaflattenV0Iawell_formedV1aConsaTuple2waLeafwVtaConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
@@ -418,51 +480,107 @@
        name="expl:VC for tail"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.06"/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.47"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter tail.4"
       locfile="../random_access_list.mlw"
-      loclnum="95" loccnumb="6" loccnume="10"
+      loclnum="100" loccnumb="6" loccnume="10"
       expl="4. type invariant"
-      sum="b7c005edeaff09d80c7d3196d79f1602"
+      sum="3067a446229d08b9c45b4ee96f5143b5"
       proved="false"
-      expanded="false"
-      shape="type invariantCtaNiltaConsaTuple2waLeafwVawell_formedaConsaTuple2V7V3aConsaTuple2V7V5V6LadivV2c2aConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
+      expanded="true"
+      shape="type invariantCtaNiltaConsaTuple2waLeafwVawell_formedaConsaTuple2V7V3aConsaTuple2V7V5V6Lainfix -V2c1aConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
       <label
        name="expl:VC for tail"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <undone/>
       </proof>
+      <proof
+       prover="3"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="highfailure" time="19.89"/>
+      </proof>
+      <proof
+       prover="7"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="outofmemory" time="29.84"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="true"
+       archived="false">
+       <result status="outofmemory" time="30.43"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter tail.5"
       locfile="../random_access_list.mlw"
-      loclnum="95" loccnumb="6" loccnume="10"
+      loclnum="100" loccnumb="6" loccnume="10"
       expl="5. postcondition"
-      sum="32794fcd33c95976405accae7462fc59"
+      sum="0caec5995809109cb439543e366c2d02"
       proved="true"
       expanded="false"
-      shape="postconditionCtaNiltaConsaTuple2waLeafwVCfaNilainfix =aflattenaConsaTuple2V7V3aConsaTuple2V7V5V6V8aConswVaflattenV0Iawell_formedaConsaTuple2V7V3aConsaTuple2V7V5V6LadivV2c2aConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
+      shape="postconditionCtaNiltaConsaTuple2waLeafwVCfaNilainfix =aflattenaConsaTuple2V7V3aConsaTuple2V7V5V6V8aConswVaflattenV0Iawell_formedaConsaTuple2V7V3aConsaTuple2V7V5V6Lainfix -V2c1aConsaTuple2VaNodeVVVVV0Iawell_formedV0F">
       <label
        name="expl:VC for tail"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.39"/>
+       <result status="valid" time="0.38"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="8"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.15"/>
       </proof>
      </goal>
     </transf>

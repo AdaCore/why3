@@ -8,7 +8,6 @@
 module RandomAccessList
 
   use import int.Int
-  use import int.ComputerDivision
   use import list.Append
   use import list.HdTl
   use import list.Nth
@@ -51,9 +50,15 @@ module RandomAccessList
   end
 
   predicate well_formed (l: list (int, tree 'a)) = match l with
-    | Nil -> true
-    | Cons (h, _) _ -> well_formed_aux h l
+    | Nil ->
+        true
+    | Cons (h, t) rest ->
+        perfect t && height t = h && well_formed_aux h l
   end
+
+  lemma well_formed_tail:
+    forall l: list (int, tree 'a), h: int, t: tree 'a.
+    well_formed (Cons (h,t) l) -> well_formed l
 
   type t 'a = { trees: list (int, tree 'a) }
     invariant { well_formed self.trees }
@@ -101,9 +106,9 @@ module RandomAccessList
         None
     | Cons (_, Leaf _) trees' ->
         Some { trees = trees' }
-    | Cons (size, Node l x r) rest ->
-        let size' = div size 2 in
-        Some { trees = Cons (size', l) (Cons (size', r) rest) }
+    | Cons (h, Node l x r) rest ->
+        let h' = h - 1 in
+        Some { trees = Cons (h', l) (Cons (h', r) rest) }
    end
 
 end

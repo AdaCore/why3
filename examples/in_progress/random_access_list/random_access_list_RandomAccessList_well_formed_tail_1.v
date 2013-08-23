@@ -75,45 +75,15 @@ Definition well_formed {a:Type} {a_WT:WhyType a} (l:(list (Z* (@tree
   a a_WT))%type)): Prop :=
   match l with
   | nil => True
-  | (cons (h, t) rest) => (perfect t) /\ (((height t) = h) /\
-      (well_formed_aux h l))
+  | (cons (h, _) _) => (well_formed_aux h l)
   end.
-
-Axiom well_formed_tail : forall {a:Type} {a_WT:WhyType a},
-  forall (l:(list (Z* (@tree a a_WT))%type)) (h:Z) (t:(@tree a a_WT)),
-  (well_formed (cons (h, t) l)) -> (well_formed l).
-
-(* Why3 assumption *)
-Inductive t
-  (a:Type) {a_WT:WhyType a} :=
-  | mk_t : (list (Z* (@tree a a_WT))%type) -> t a.
-Axiom t_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (t a).
-Existing Instance t_WhyType.
-Implicit Arguments mk_t [[a] [a_WT]].
-
-(* Why3 assumption *)
-Definition trees {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): (list (Z* (@tree
-  a a_WT))%type) := match v with
-  | (mk_t x) => x
-  end.
-
-(* Why3 assumption *)
-Definition listof {a:Type} {a_WT:WhyType a} (t1:(@t a a_WT)): (list a) :=
-  (flatten (trees t1)).
 
 (* Why3 goal *)
-Theorem WP_parameter_is_empty : forall {a:Type} {a_WT:WhyType a},
-  forall (t1:(list (Z* (@tree a a_WT))%type)), (well_formed t1) ->
-  ((t1 = nil) <-> ((flatten t1) = nil)).
-(* Why3 intros a a_WT t1 h1. *)
-intros a a_WT t1 h1.
-destruct t1; simpl in *.
-intuition.
-destruct p; simpl in *.
-generalize (preorder_non_nil t0).
-destruct (preorder t0); intuition.
-discriminate H4.
-discriminate H4.
+Theorem well_formed_tail : forall {a:Type} {a_WT:WhyType a},
+  forall (l:(list (Z* (@tree a a_WT))%type)) (h:Z) (t:(@tree a a_WT)),
+  (well_formed (cons (h, t) l)) -> (well_formed l).
+intros a a_WT l h t h1.
+
 Qed.
 
 
