@@ -38,13 +38,25 @@ module Map
 
 end
 
+module Mut
+
+  type t = { mutable a : int; mutable b : int }
+
+  let x () = 
+    let y = { a = 1; b = 2 } in
+    let z = y in
+    z.a <- 3;
+    y.a
+
+end
+
 module Ref
 
   use import ref.Ref
 
-  val r: ref int
-
+  let y () : ref int = { contents = 0 }
+  
   let z () : unit =
-    r := 42
+    let r = ref 0 in r := 42
 
 end

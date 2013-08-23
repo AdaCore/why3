@@ -285,8 +285,8 @@ and eval_match env ty u tbl =
   let rec iter tbl =
     match tbl with
     | [] ->
-      Format.eprintf "Pattern matching not exhaustive in evaluation ???@.";
-      exit 2
+      Format.eprintf "[Exec] fatal error: pattern matching not exhaustive in evaluation.@.";
+      assert false
     | b::rem ->
       let p,t = t_open_branch b in
       try
@@ -305,9 +305,9 @@ and eval_app env ty ls tl =
       try
         Decl.find_logic_definition env.tknown ls
       with Not_found ->
-        Format.eprintf "lsymbol %s not found in term evaluation@."
+        Format.eprintf "[Exec] definition of logic symbol %s not found@."
           ls.ls_name.Ident.id_string;
-        exit 2
+        None
     with
     | None ->
       begin try
@@ -319,7 +319,7 @@ and eval_app env ty ls tl =
             (Pp.print_option Pretty.print_ty) ty
             (Pp.print_list Pp.comma Pretty.print_term) tl
           ;
-          exit 2
+          assert false
       end
     | Some d ->
       let l,t = Decl.open_ls_defn d in
@@ -342,10 +342,61 @@ let eval_global_term env km t =
   eval_term env t.t_ty t
 
 
+(* explicit printing of expr *)
+
+open Format
+open Mlw_expr
+
+
+let p_pvs fmt pvs =
+  fprintf fmt "@[{ pv_vs =@ %a;@ pv_ity =@ %a;@ pv_ghost =@ %B }@]"
+    Pretty.print_vs pvs.pv_vs Mlw_pretty.print_ity pvs.pv_ity
+    pvs.pv_ghost
+
+let p_ps fmt ps =
+  fprintf fmt "@[{ ps_name =@ %s;@ ... }@]"
+    ps.ps_name.Ident.id_string
+
+let p_pls fmt pls =
+  fprintf fmt "@[{ pl_ls =@ %s;@ ... }@]"
+    pls.pl_ls.ls_name.Ident.id_string
+
+let p_letsym fmt lsym =
+  match lsym with
+    | LetV pvs -> fprintf fmt "@[LetV(%a)@]" p_pvs pvs
+    | LetA _ -> fprintf fmt "@[LetA(_)@]"
+
+let rec p_let fmt ld =
+  fprintf fmt "@[{ let_sym =@ %a;@ let_expr =@ %a }@]"
+    p_letsym ld.let_sym p_expr ld.let_expr
+  
+and p_expr fmt e =
+  match e.e_node with
+    | Elogic t -> fprintf fmt "@[Elogic(%a)@]" Pretty.print_term t
+    | Evalue pvs -> fprintf fmt "@[Evalue(%a)@]" p_pvs pvs
+    | Earrow ps -> fprintf fmt "@[Earrow(%a)@]" p_ps ps
+    | Eapp (e1, pvs, _) -> 
+      fprintf fmt "@[Eapp(%a,@ %a,@ _)@]" p_expr e1 p_pvs pvs
+    | Elet(ldefn,e1) -> 
+      fprintf fmt "@[Elet(%a,@ %a)@]" p_let ldefn p_expr e1
+    | Erec (_, _) -> fprintf fmt "@[Erec(_,@ _,@ _)@]"
+    | Eif (_, _, _) -> fprintf fmt "@[Eif(_,@ _,@ _)@]"
+    | Ecase (_, _) -> fprintf fmt "@[Ecase(_,@ _)@]"
+    | Eassign (pls, e1, reg, pvs) -> 
+      fprintf fmt "@[Eassign(%a,@ %a,@ %a,@ %a)@]"
+        p_pls pls p_expr e1 Mlw_pretty.print_reg reg p_pvs pvs
+    | Eghost _ -> fprintf fmt "@[Eghost(_)@]"
+    | Eany _ -> fprintf fmt "@[Eany(_)@]"
+    | Eloop (_, _, _) -> fprintf fmt "@[Eloop(_,@ _,@ _)@]"
+    | Efor (_, _, _, _) -> fprintf fmt "@[Efor(_,@ _,@ _,@ _)@]"
+    | Eraise (_, _) -> fprintf fmt "@[Eraise(_,@ _)@]"
+    | Etry (_, _) -> fprintf fmt "@[Etry(_,@ _)@]"
+    | Eabstr (_, _) -> fprintf fmt "@[Eabstr(_,@ _)@]"
+    | Eassert (_, _) -> fprintf fmt "@[Eassert(_,@ _)@]"
+    | Eabsurd -> fprintf fmt "@[Eabsurd@]"
+
 
 (* evaluation of WhyML expressions *)
-
-open Mlw_expr
 
 type result =
   | Normal of term
@@ -362,7 +413,7 @@ let print_result fmt r =
         x.xs_name.Ident.id_string Pretty.print_term t
     | Irred e ->
       Format.fprintf fmt "@[Cannot execute expression@ @[%a@]@]"
-        Mlw_pretty.print_expr e
+        p_expr e
     | Fun _ ->
       Format.fprintf fmt "@[Result is a function@]"
 
@@ -380,7 +431,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           Normal t,s
       with Not_found -> Irred e, s
     end
-  | Elet(ld,e1) ->
+  | Elet(ld,e1) -> 
     begin match ld.let_sym with
       | LetV pvs ->
         begin match eval_expr env s ld.let_expr with
@@ -408,16 +459,14 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     end
   | Earrow ps -> 
     begin
-      let d =
-        try
-          Mlw_decl.find_definition env.mknown ps
-        with Not_found ->
-          Format.eprintf "psymbol %s not found in execution@."
+      match Mlw_decl.find_definition env.mknown ps with
+        | Some d ->
+          let lam = d.fun_lambda in
+          Fun(ps,lam,[], List.length lam.l_args),s
+        | None ->
+          Format.eprintf "[Exec] definition of psymbol %s not found@."
             ps.ps_name.Ident.id_string;
-          exit 2
-      in
-      let lam = d.fun_lambda in
-      Fun(ps,lam,[], List.length lam.l_args),s
+          Irred e,s
     end
   | Eif(e1,e2,e3) ->
     begin
@@ -514,8 +563,8 @@ and exec_match env t s ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
-      Format.eprintf "Pattern matching not exhaustive in evaluation ???@.";
-      exit 2
+      Format.eprintf "[Exec] Pattern matching not exhaustive in evaluation@.";
+      assert false
     | (p,e)::rem ->
       try
         let env' = matching env t p.ppat_pattern in

@@ -579,27 +579,31 @@ let do_exec env fname cin exec =
           eprintf "Function '%s' not found in module '%s'.@." name mid;
           exit 1
       in
-      let d = Mlw_decl.find_definition m.Mlw_module.mod_known ps in
-      let lam = d.Mlw_expr.fun_lambda in
-      match lam.Mlw_expr.l_args with
-        | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
-            printf "@[<hov 2>Execution of %s ():@\n" x;
-            let body = lam.Mlw_expr.l_expr in
-            printf "type  : @[%a@]@\n"
-              Mlw_pretty.print_vty body.Mlw_expr.e_vty;
+      match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
+        | None ->
+          eprintf "Function %s.%s has no definition.@." mid name;
+          exit 1
+        | Some d ->
+          let lam = d.Mlw_expr.fun_lambda in
+          match lam.Mlw_expr.l_args with
+            | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
+              printf "@[<hov 2>Execution of %s ():@\n" x;
+              let body = lam.Mlw_expr.l_expr in
+              printf "type  : @[%a@]@\n"
+                Mlw_pretty.print_vty body.Mlw_expr.e_vty;
             (* printf "effect: %a@\n" *)
             (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
-            let res, st =
-              Mlw_interp.eval_global_expr env
-                m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
-                lam.Mlw_expr.l_expr
-            in
-            printf "result: %a@\nstate: %a@]@." 
-              Mlw_interp.print_result res
-              Mlw_interp.print_state st
-        | _ ->
-            eprintf "Only functions with one unit argument can be executed.@.";
-            exit 1
+              let res, st =
+                Mlw_interp.eval_global_expr env
+                  m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
+                  lam.Mlw_expr.l_expr
+              in
+              printf "result: %a@\nstate: %a@]@." 
+                Mlw_interp.print_result res
+                Mlw_interp.print_state st
+            | _ ->
+              eprintf "Only functions with one unit argument can be executed.@.";
+              exit 1
     in
     Queue.iter do_exec exec
 (*

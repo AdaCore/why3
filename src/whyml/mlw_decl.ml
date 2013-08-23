@@ -260,9 +260,9 @@ let find_definition kn ps =
   match (Mid.find ps.ps_name kn).pd_node with
   | PDtype _ -> assert false
   | PDdata _ -> assert false
-  | PDval _ -> assert false
+  | PDval _ -> None
   | PDlet _ -> assert false
-  | PDrec dl -> find_def ps dl
+  | PDrec dl -> Some (find_def ps dl)
   | PDexn _ -> assert false
 
 let check_match lkn _kn d =

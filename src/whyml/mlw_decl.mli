@@ -79,7 +79,7 @@ val merge_known : known_map -> known_map -> known_map
 
 val find_constructors : known_map -> itysymbol -> constructor list
 val find_invariant : known_map -> itysymbol -> post
-val find_definition : known_map -> psymbol -> fun_defn
+val find_definition : known_map -> psymbol -> fun_defn option
 
 exception NonupdatableType of ity
 
