@@ -1,29 +1,57 @@
 
+open Format
+
 open Term
 
 (* environment *)
 
 open Mlw_ty
+open Mlw_ty.T
+open Mlw_expr
 
 type env = {
   mknown : Mlw_decl.known_map;
   tknown : Decl.known_map;
-(*
-  pvsenv : term Mpv.t;
-*)
-  vsenv : term Mvs.t;
+  vsenv : (ity option * term) Mvs.t;
 }
 
+let bind_vs v t env =
 (*
-let bind_pvs v t env = { env with pvsenv = Mpv.add v t env.pvsenv }
+  eprintf "adding logic variable %s in env@."
+      v.vs_name.Ident.id_string;
 *)
-
-let bind_vs v t env = { env with vsenv = Mvs.add v t env.vsenv }
+  { env with vsenv = Mvs.add v (None,t) env.vsenv }
 
 let multibind_vs l tl env =
   try
     List.fold_right2 bind_vs l tl env
   with Invalid_argument _ -> assert false
+
+let bind_pvs pv t env =
+(*
+  eprintf "adding program variable %s in env@."
+      pv.pv_vs.vs_name.Ident.id_string;
+*)
+  { env with vsenv = Mvs.add pv.pv_vs (Some pv.pv_ity,t) env.vsenv }
+
+let multibind_pvs l tl env =
+  try
+    List.fold_right2 bind_pvs l tl env
+  with Invalid_argument _ -> assert false
+
+
+
+
+(* store *)
+
+
+type state = term Mreg.t
+
+let print_state fmt _s =
+  Format.fprintf fmt "TODO"
+
+
+(* evaluation of terms *)
 
 exception NoMatch
 exception Undetermined
@@ -167,7 +195,7 @@ let eval_map_const ty ls l = t_app_infer_inst ls l ty
 let eval_map_get ty ls_get l =
   match l with
     | [m;x] ->
-      (* Format.eprintf "Looking for get:"; *)
+      (* eprintf "Looking for get:"; *)
       let rec find m =
         match m.t_node with
           | Tapp(ls,[m';y;v]) when ls_equal ls !ls_map_set ->
@@ -249,13 +277,99 @@ let get_builtins env =
   Hls.add builtins ps_equ eval_equ;
   List.iter (add_builtin_th env) built_in_theories
 
+(* updates term t with current values in the store for
+   mutable fields *)
+let rec update_rec env s ity t =
+    if ity_immutable ity then t
+    else
+      match t.t_node with
+      | Tapp(ls,tl) ->
+        begin
+          try
+            let csl = Mlw_decl.inst_constructors env.tknown env.mknown ity in
+            let rec find_cs csl =
+              match csl with
+              | [] -> assert false
+              | (cs,fdl)::rem ->
+                if ls_equal cs ls then
+                  begin
+                    eprintf "found constructor@.";
+                  let l =
+                    List.map2
+                      (fun fd t ->
+                        let t =
+                          match fd.fd_mut with
+                          | None -> t
+                          | Some r ->
+                            eprintf "found a mutable field, looking in store -> ";
+                            let t =
+                              try
+                                Mreg.find r s
+                              with Not_found ->
+                                eprintf "[region <%a> not bound !] "
+                                  Mlw_pretty.print_reg r;
+                                t
+                            in
+                            eprintf "found term %a@." Pretty.print_term t;
+                            t
+                        in
+                        update_rec env s fd.fd_ity t)
+                      fdl tl
+                  in t_app_infer_inst ls l (Some (ty_of_ity ity))
+                  end
+                else find_cs rem
+            in find_cs csl
+          with Not_found ->
+            (* it must be pure, no ? *)
+            assert false
+            (* t *)
+(*
+            let l =
+              List.map2 (update_rec env s) ityl tl
+            in t_app ls l (Some (ty_of_ity ity))
+*)
+        end
+      | _ -> assert false
 
-let rec eval_term env ty t =
-  let eval_rec t = eval_term env t.t_ty t in
+let update env s ity t =
+  match ity with
+  | None ->
+    (* eprintf "not calling update_rec on %a@." Pretty.print_term t; *)
+    t
+  | Some ity ->
+    eprintf "calling update on %a, type %a: "
+      Pretty.print_term t Mlw_pretty.print_ity ity;
+    let t = update_rec env s ity t in
+    eprintf "returns %a@." Pretty.print_term t;
+    t
+
+
+
+
+let get_vs env s vs =
+  try
+    let vty,t = Mvs.find vs env.vsenv in update env s vty t
+  with Not_found ->
+    eprintf "logic variable %s not found in env@." vs.vs_name.Ident.id_string;
+    exit 1
+
+let get_pvs env s pvs =
+  let vty,t =
+    try
+      Mvs.find pvs.pv_vs env.vsenv
+  with Not_found ->
+    eprintf "program variable %s not found in env@."
+      pvs.pv_vs.vs_name.Ident.id_string;
+    exit 1
+  in
+  update env s vty t
+
+let rec eval_term env s ty t =
+  let eval_rec t = eval_term env s t.t_ty t in
   match t.t_node with
   | Tvar x ->
-    begin try Mvs.find x env.vsenv
-      with Not_found -> t
+    begin
+      try get_vs env s x with Not_found -> t
     end
   | Tbinop(Tand,t1,t2) ->
     t_and_simp (eval_rec t1) (eval_rec t2)
@@ -267,28 +381,29 @@ let rec eval_term env ty t =
     t_iff_simp (eval_rec t1) (eval_rec t2)
   | Tnot t1 -> t_not_simp (eval_rec t1)
   | Tapp(ls,tl) ->
-    eval_app env ty ls (List.map eval_rec tl)
+    eval_app env s ty ls (List.map eval_rec tl)
   | Tif(t1,t2,t3) ->
     let u = eval_rec t1 in
     begin match u.t_node with
-    | Ttrue -> eval_term env ty t2
-    | Tfalse -> eval_term env ty t3
+    | Ttrue -> eval_term env s ty t2
+    | Tfalse -> eval_term env s ty t3
     | _ -> t_if u t2 t3
     end
   | Tlet(t1,tb) ->
     let u = eval_rec t1 in
     let v,t2 = t_open_bound tb in
-    eval_term (bind_vs v u env) ty t2
+    eval_term (bind_vs v u env) s ty t2
   | Tcase(t1,tbl) ->
+    eprintf "found a match ... with ...@.";
     let u = eval_rec t1 in
-    eval_match env ty u tbl
+    eval_match env s ty u tbl
   | Tquant _
   | Teps _
   | Tconst _
   | Ttrue
   | Tfalse -> t
 
-and eval_match env ty u tbl =
+and eval_match env s ty u tbl =
   let rec iter tbl =
     match tbl with
     | [] ->
@@ -298,40 +413,64 @@ and eval_match env ty u tbl =
       let p,t = t_open_branch b in
       try
         let env' = matching env u p in
-        eval_term env' ty t
+        eval_term env' s ty t
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined -> t_case u tbl
 
-and eval_app env ty ls tl =
+and eval_app env s ty ls tl =
   try
     let f = Hls.find builtins ls in
     f ty ls tl
   with Not_found ->
-    match
-      try
-        Decl.find_logic_definition env.tknown ls
-      with Not_found ->
-        Format.eprintf "[Exec] definition of logic symbol %s not found@."
-          ls.ls_name.Ident.id_string;
-        None
-    with
-    | None ->
-      begin try
+    try
+      let d = Ident.Mid.find ls.ls_name env.tknown in
+      match d.Decl.d_node with
+      | Decl.Dtype _ | Decl.Dprop _ -> assert false
+      | Decl.Dlogic dl ->
+        (* regular definition *)
+        let d = List.assq ls dl in
+        let l,t = Decl.open_ls_defn d in
+        let env' = multibind_vs l tl env in
+        eval_term env' s ty t
+      | Decl.Dparam _ | Decl.Dind _ ->
         t_app_infer_inst ls tl ty
-        with e ->
-          Format.eprintf "@[<hov 2>Exception during term evaluation (t_app %s):@ %a@\nty = %a,@ tl = %a@]@."
-            ls.ls_name.Ident.id_string
-            Exn_printer.exn_printer e
-            (Pp.print_option Pretty.print_ty) ty
-            (Pp.print_list Pp.comma Pretty.print_term) tl
-          ;
-          assert false
-      end
-    | Some d ->
-      let l,t = Decl.open_ls_defn d in
-      let env' = multibind_vs l tl env in
-      eval_term env' ty t
+      | Decl.Ddata dl ->
+        (* constructor or projection *)
+        match tl with
+        | [ { t_node = Tapp(ls1,tl1) } ] ->
+          let rec iter dl =
+            match dl with
+            | [] -> assert false
+              (* ?? why does it happen ?? *)
+              (* t_app_infer_inst ls tl ty *)
+            | (_,csl) :: rem ->
+              let rec iter2 csl =
+                match csl with
+                | [] -> iter rem
+                | (cs,prs) :: rem2 ->
+                  if ls_equal cs ls1
+                  then
+                    (* we found the right constructor *)
+                    let rec iter3 prs tl1 =
+                      match prs,tl1 with
+                      | (Some pr)::prs, t::tl1 ->
+                        if ls_equal ls pr
+                        then (* projection found! *) t
+                        else
+                          iter3 prs tl1
+                      | None::prs, _::tl1 ->
+                        iter3 prs tl1
+                      | _ -> assert false
+                    in iter3 prs tl1
+                  else iter2 rem2
+              in iter2 csl
+          in iter dl
+        | _ -> t_app_infer_inst ls tl ty
+    with Not_found ->
+      Format.eprintf "[Exec] definition of logic symbol %s not found@."
+        ls.ls_name.Ident.id_string;
+      t_app_infer_inst ls tl ty
 
 
 
@@ -340,19 +479,13 @@ let eval_global_term env km t =
   let env =
     { mknown = Ident.Mid.empty;
       tknown = km;
-(*
-      pvsenv = Mpv.empty;
-*)
       vsenv = Mvs.empty;
     }
   in
-  eval_term env t.t_ty t
+  eval_term env Mreg.empty t.t_ty t
 
 
 (* explicit printing of expr *)
-
-open Format
-open Mlw_expr
 
 
 let p_pvs fmt pvs =
@@ -424,18 +557,13 @@ let print_result fmt r =
     | Fun _ ->
       Format.fprintf fmt "@[Result is a function@]"
 
-type state = unit
-
-let print_state fmt _s =
-  Format.fprintf fmt "TODO"
-
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
-  | Elogic t -> Normal (eval_term env t.t_ty t), s
+  | Elogic t -> Normal (eval_term env s t.t_ty t), s
   | Evalue pvs ->
     begin
-      try let t = Mvs.find pvs.pv_vs env.vsenv in
-          Normal t,s
+      try
+        let t = get_pvs env s pvs in (Normal t),s
       with Not_found -> Irred e, s
     end
   | Elet(ld,e1) ->
@@ -443,10 +571,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
       | LetV pvs ->
         begin match eval_expr env s ld.let_expr with
           | Normal t,s' ->
-(*
-            eval_expr (bind_pvs pvs t env) e1
-*)
-            eval_expr (bind_vs pvs.pv_vs t env) s' e1
+            eval_expr (bind_pvs pvs t env) s' e1
           | r -> r
         end
       | LetA _ -> Irred e, s
@@ -457,10 +582,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         if n > 1 then
           Fun(ps,lam,pvs::args,n-1), s'
         else
-        let args = List.rev (pvs::args) in
-        let params = List.map (fun pvs -> pvs.pv_vs) lam.l_args in
-        let args = List.map (fun pvs -> Mvs.find pvs.pv_vs env.vsenv) args in
-        let env' = multibind_vs params args env in
+        let args = List.rev_map (fun pvs -> get_pvs env s pvs) (pvs::args) in
+        let env' = multibind_pvs lam.l_args args env in
         eval_expr env' s' lam.l_expr
       | _ -> Irred e, s
     end
@@ -488,7 +611,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
               | Tapp(ls,[]) when ls_equal ls fs_bool_false
                   -> eval_expr env s' e3
               | _ ->
-                Format.eprintf 
+                Format.eprintf
                   "@[[Exec] Cannot decide condition of if: @[%a@]@]@."
                   Pretty.print_term t;
                 Irred e, s
@@ -529,8 +652,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Efor(pvs,(pvs1,dir,pvs2),_inv,e1) ->
     begin
       try
-        let a = big_int_of_term (Mvs.find pvs1.pv_vs env.vsenv) in
-        let b = big_int_of_term (Mvs.find pvs2.pv_vs env.vsenv) in
+        let a = big_int_of_term (get_pvs env s pvs1) in
+        let b = big_int_of_term (get_pvs env s pvs2) in
         let le,suc = match dir with
           | To -> Big_int.le_big_int, Big_int.succ_big_int
           | DownTo -> Big_int.ge_big_int, Big_int.pred_big_int
@@ -556,8 +679,12 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           end
         | r -> r
     end
+  | Eassign(_pl,_e1,reg,pvs) ->
+    let t = get_pvs env s pvs in
+    eprintf "updating region <%a> with value %a@."
+      Mlw_pretty.print_reg reg Pretty.print_term t;
+    Normal t_void, Mreg.add reg t s
   | Erec _
-  | Eassign _
   | Eghost _
   | Eany _
   | Eabstr _
@@ -587,10 +714,7 @@ let eval_global_expr env mkm tkm e =
   let env = {
     mknown = mkm;
     tknown = tkm;
-(*
-    pvsenv = Mpv.empty;
-*)
     vsenv = Mvs.empty;
   }
   in
-  eval_expr env () e
+  eval_expr env Mreg.empty e
